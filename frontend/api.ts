@@ -1,0 +1,72 @@
+import type {
+    CellIdentifier,
+    RuleDefinition,
+    RulesResponse,
+    SimulationSnapshot,
+    TopologyPayload,
+} from "./types/domain.js";
+
+interface CellMutation extends CellIdentifier {
+    state: number;
+}
+
+export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const response = await fetch(path, {
+        headers: { "Content-Type": "application/json" },
+        ...options,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+    }
+
+    return response.json();
+}
+
+export function fetchState(): Promise<SimulationSnapshot> {
+    return request<SimulationSnapshot>("/api/state");
+}
+
+export function fetchTopology(): Promise<TopologyPayload> {
+    return request<TopologyPayload>("/api/topology");
+}
+
+export function fetchRules(): Promise<RulesResponse> {
+    return request<RulesResponse>("/api/rules");
+}
+
+function normalizeCellPayload(cell: CellIdentifier): CellIdentifier {
+    if (typeof cell === "object" && cell !== null && typeof cell.id === "string" && cell.id.length > 0) {
+        return { id: cell.id };
+    }
+    throw new Error("Cell mutations require a topology cell id.");
+}
+
+export function toggleCellRequest(cell: CellIdentifier): Promise<SimulationSnapshot> {
+    return request<SimulationSnapshot>("/api/cells/toggle", {
+        method: "POST",
+        body: JSON.stringify(normalizeCellPayload(cell)),
+    });
+}
+
+export function setCellRequest(cell: CellIdentifier, state: number): Promise<SimulationSnapshot> {
+    const payload = normalizeCellPayload(cell);
+    return request<SimulationSnapshot>("/api/cells/set", {
+        method: "POST",
+        body: JSON.stringify({ ...payload, state }),
+    });
+}
+
+export function setCellsRequest(cells: CellMutation[]): Promise<SimulationSnapshot> {
+    return request<SimulationSnapshot>("/api/cells/set-many", {
+        method: "POST",
+        body: JSON.stringify({ cells }),
+    });
+}
+
+export function postControl(path: string, body: unknown = {}): Promise<SimulationSnapshot> {
+    return request<SimulationSnapshot>(path, {
+        method: "POST",
+        body: JSON.stringify(body),
+    });
+}

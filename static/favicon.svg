@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Cellular Automaton Lab icon">
+  <rect width="64" height="64" rx="14" fill="#0f172a"/>
+  <rect x="6" y="6" width="52" height="52" rx="12" fill="#131d2d" stroke="#334155" stroke-width="1.5"/>
+  <g opacity="0.95" stroke="#0f172a" stroke-linejoin="round">
+    <g transform="translate(32 32)">
+      <g fill="#1d4ed8" stroke-width="1.4">
+        <polygon points="0,-19 8,-8 0,3 -8,-8"/>
+        <polygon points="0,-19 8,-8 0,3 -8,-8" transform="rotate(72)"/>
+        <polygon points="0,-19 8,-8 0,3 -8,-8" transform="rotate(144)"/>
+        <polygon points="0,-19 8,-8 0,3 -8,-8" transform="rotate(216)"/>
+        <polygon points="0,-19 8,-8 0,3 -8,-8" transform="rotate(288)"/>
+      </g>
+      <g fill="#f8f3e7" stroke-width="1.5">
+        <polygon points="0,-15 6,-2 0,14 -6,-2"/>
+        <polygon points="0,-15 6,-2 0,14 -6,-2" transform="rotate(72)"/>
+        <polygon points="0,-15 6,-2 0,14 -6,-2" transform="rotate(144)"/>
+        <polygon points="0,-15 6,-2 0,14 -6,-2" transform="rotate(216)"/>
+        <polygon points="0,-15 6,-2 0,14 -6,-2" transform="rotate(288)"/>
+      </g>
+      <polygon fill="#f59e0b" stroke="#0f172a" stroke-width="1.6" points="0,-8 7,-2 4,7 -4,7 -7,-2"/>
+      <circle cx="0" cy="0" r="2.1" fill="#0f172a"/>
+    </g>
+  </g>
+</svg>

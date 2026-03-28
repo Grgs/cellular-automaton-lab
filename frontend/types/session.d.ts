@@ -1,0 +1,38 @@
+export type UiDisclosureId = "rule-notes-toggle";
+
+export interface UiSessionState {
+    cellSize: number;
+    cellSizeByTilingFamily: Record<string, number>;
+    editorTool: string;
+    brushSize: number;
+    drawerOpen: boolean | null;
+    paintStatesByRule: Record<string, number>;
+    patchDepthByTilingFamily: Record<string, number>;
+    disclosures: Partial<Record<UiDisclosureId, boolean>>;
+}
+
+export interface UiSessionStorage {
+    load(): UiSessionState;
+    clear(): UiSessionState;
+    getCellSizes(): Record<string, number>;
+    getCellSize(tilingFamily?: string): number;
+    setCellSize(tilingFamilyOrCellSize: string | number, cellSize?: number): UiSessionState | void;
+    getEditorTool(): string;
+    setEditorTool(editorTool: unknown): void;
+    getBrushSize(): number;
+    setBrushSize(brushSize: unknown): void;
+    getDrawerOpen(): boolean | null;
+    setDrawerOpen(drawerOpen: unknown): void;
+    getPaintState(ruleName: string | null): number | null;
+    setPaintState(ruleName: string | null, paintState: unknown): void;
+    getPatchDepths(): Record<string, number>;
+    getPatchDepth(tilingFamily: string | null | undefined): number | null;
+    setPatchDepth(tilingFamily: string | null | undefined, patchDepth: unknown): void;
+    getDisclosureStates(): Partial<Record<UiDisclosureId, boolean>>;
+    setDisclosureState(id: string, open: unknown): void;
+}
+
+export interface MatchMediaResult {
+    matches: boolean;
+}
+

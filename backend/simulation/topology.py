@@ -1,0 +1,440 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from functools import lru_cache
+from hashlib import sha1
+from typing import Iterable, cast
+
+from backend.simulation.topology_catalog import (
+    ARCHIMEDEAN_488_GEOMETRY,
+    KAGOME_GEOMETRY,
+    PENROSE_GEOMETRY,
+    PENROSE_VERTEX_GEOMETRY,
+    is_penrose_geometry,
+    is_aperiodic_geometry,
+    topology_spec_payload,
+)
+from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
+from backend.simulation.periodic_face_tilings import (
+    build_periodic_face_cells,
+    is_periodic_face_tiling,
+)
+
+REGULAR_CELL_KIND = "cell"
+TOPOLOGY_CACHE_SIZE = 24
+
+SQUARE_NEIGHBOR_OFFSETS = (
+    (-1, -1),
+    (0, -1),
+    (1, -1),
+    (-1, 0),
+    (1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+)
+HEX_NEIGHBOR_OFFSETS_EVEN_ROW = (
+    (-1, -1),  # NW
+    (0, -1),   # NE
+    (1, 0),    # E
+    (0, 1),    # SE
+    (-1, 1),   # SW
+    (-1, 0),   # W
+)
+HEX_NEIGHBOR_OFFSETS_ODD_ROW = (
+    (0, -1),   # NW
+    (1, -1),   # NE
+    (1, 0),    # E
+    (1, 1),    # SE
+    (0, 1),    # SW
+    (-1, 0),   # W
+)
+TRIANGLE_NEIGHBOR_OFFSETS_UP = (
+    (-2, 0),
+    (-1, 0),
+    (1, 0),
+    (2, 0),
+    (-1, -1),
+    (0, -1),
+    (1, -1),
+    (-2, 1),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+    (2, 1),
+)
+TRIANGLE_NEIGHBOR_OFFSETS_DOWN = (
+    (-2, -1),
+    (-1, -1),
+    (0, -1),
+    (1, -1),
+    (2, -1),
+    (-2, 0),
+    (-1, 0),
+    (1, 0),
+    (2, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+)
+
+
+def regular_cell_id(x: int, y: int) -> str:
+    return f"c:{x}:{y}"
+
+
+def parse_regular_cell_id(cell_id: str) -> tuple[int, int] | None:
+    parts = str(cell_id).split(":")
+    if len(parts) != 3 or parts[0] != "c":
+        return None
+    try:
+        return int(parts[1]), int(parts[2])
+    except ValueError:
+        return None
+
+
+def topology_revision(geometry: str, width: int, height: int, patch_depth: int | None = None) -> str:
+    digest = sha1(
+        f"{geometry}:{width}:{height}:{patch_depth if patch_depth is not None else '-'}:graph-v1".encode("utf-8")
+    ).hexdigest()
+    return digest[:12]
+
+
+@dataclass(frozen=True)
+class LatticeCell:
+    id: str
+    kind: str
+    neighbors: tuple[str | None, ...]
+    slot: str | None = None
+    center: tuple[float, float] | None = None
+    vertices: tuple[tuple[float, float], ...] | None = None
+
+    def to_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {
+            "id": self.id,
+            "kind": self.kind,
+            "neighbors": list(self.neighbors),
+        }
+        if self.slot is not None:
+            payload["slot"] = self.slot
+        if self.center is not None:
+            payload["center"] = {"x": self.center[0], "y": self.center[1]}
+        if self.vertices is not None:
+            payload["vertices"] = [
+                {"x": vertex[0], "y": vertex[1]}
+                for vertex in self.vertices
+            ]
+        return payload
+
+
+@dataclass(frozen=True)
+class LatticeTopology:
+    geometry: str
+    width: int
+    height: int
+    cells: tuple[LatticeCell, ...]
+    topology_revision: str
+    patch_depth: int | None = None
+    _index_by_id: dict[str, int] = field(init=False, repr=False, compare=False)
+    _cell_by_id: dict[str, LatticeCell] = field(init=False, repr=False, compare=False)
+    _neighbor_indexes_by_cell: tuple[tuple[int, ...], ...] = field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
+    _payload: dict[str, object] | None = field(
+        default=None,
+        init=False,
+        repr=False,
+        compare=False,
+    )
+
+    def __post_init__(self) -> None:
+        index_by_id = {cell.id: index for index, cell in enumerate(self.cells)}
+        object.__setattr__(self, "_index_by_id", index_by_id)
+        object.__setattr__(self, "_cell_by_id", {cell.id: cell for cell in self.cells})
+        object.__setattr__(
+            self,
+            "_neighbor_indexes_by_cell",
+            tuple(
+                tuple(-1 if neighbor_id is None else index_by_id[neighbor_id] for neighbor_id in cell.neighbors)
+                for cell in self.cells
+            ),
+        )
+
+    @property
+    def cell_count(self) -> int:
+        return len(self.cells)
+
+    def index_for(self, cell_id: str) -> int:
+        return self._index_by_id[cell_id]
+
+    def get_cell(self, cell_id: str) -> LatticeCell:
+        return self._cell_by_id[cell_id]
+
+    def has_cell(self, cell_id: str) -> bool:
+        return cell_id in self._index_by_id
+
+    def neighbor_indexes_for(self, index: int) -> tuple[int, ...]:
+        return self._neighbor_indexes_by_cell[index]
+
+    def to_dict(self) -> dict[str, object]:
+        if self._payload is None:
+            object.__setattr__(
+                self,
+                "_payload",
+                {
+                    "topology_spec": topology_spec_payload(
+                        self.geometry,
+                        width=self.width,
+                        height=self.height,
+                        patch_depth=self.patch_depth,
+                    ),
+                    "topology_revision": self.topology_revision,
+                    "cells": [cell.to_dict() for cell in self.cells],
+                },
+            )
+        return cast(dict[str, object], self._payload)
+
+
+@dataclass
+class SimulationBoard:
+    topology: LatticeTopology
+    cell_states: list[int]
+
+    def clone(self) -> "SimulationBoard":
+        return SimulationBoard(
+            topology=self.topology,
+            cell_states=self.cell_states.copy(),
+        )
+
+    def state_for(self, cell_id: str) -> int:
+        return self.cell_states[self.topology.index_for(cell_id)]
+
+    def set_state_for(self, cell_id: str, state: int) -> None:
+        self.cell_states[self.topology.index_for(cell_id)] = state
+
+    def states_by_id(self, *, omit_zero: bool = False) -> dict[str, int]:
+        states_by_id: dict[str, int] = {}
+        for index, cell in enumerate(self.topology.cells):
+            state = int(self.cell_states[index])
+            if omit_zero and state == 0:
+                continue
+            states_by_id[cell.id] = state
+        return states_by_id
+
+
+def _regular_neighbor_id(
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+) -> str | None:
+    if 0 <= x < width and 0 <= y < height:
+        return regular_cell_id(x, y)
+    return None
+
+
+def _collect_neighbors(*neighbors: str | None) -> tuple[str, ...]:
+    return tuple(neighbor for neighbor in neighbors if neighbor is not None)
+
+
+def _mixed_topology(
+    geometry: str,
+    width: int,
+    height: int,
+    cells: Iterable[LatticeCell],
+    *,
+    patch_depth: int | None = None,
+) -> LatticeTopology:
+    return LatticeTopology(
+        geometry=geometry,
+        width=width,
+        height=height,
+        cells=tuple(cells),
+        topology_revision=topology_revision(geometry, width, height, patch_depth),
+        patch_depth=patch_depth,
+    )
+
+
+def _build_square_topology(width: int, height: int) -> LatticeTopology:
+    cells: list[LatticeCell] = []
+    for y in range(height):
+        for x in range(width):
+            neighbors = tuple(
+                _regular_neighbor_id(x + dx, y + dy, width, height)
+                for dx, dy in SQUARE_NEIGHBOR_OFFSETS
+            )
+            cells.append(
+                LatticeCell(
+                    id=regular_cell_id(x, y),
+                    kind=REGULAR_CELL_KIND,
+                    neighbors=neighbors,
+                )
+            )
+    return _mixed_topology("square", width, height, cells)
+
+
+def _build_hex_topology(width: int, height: int) -> LatticeTopology:
+    cells: list[LatticeCell] = []
+    for y in range(height):
+        offsets = HEX_NEIGHBOR_OFFSETS_ODD_ROW if y % 2 == 1 else HEX_NEIGHBOR_OFFSETS_EVEN_ROW
+        for x in range(width):
+            neighbors = tuple(
+                _regular_neighbor_id(x + dx, y + dy, width, height)
+                for dx, dy in offsets
+            )
+            cells.append(
+                LatticeCell(
+                    id=regular_cell_id(x, y),
+                    kind=REGULAR_CELL_KIND,
+                    neighbors=neighbors,
+                )
+            )
+    return _mixed_topology("hex", width, height, cells)
+
+
+def _build_triangle_topology(width: int, height: int) -> LatticeTopology:
+    cells: list[LatticeCell] = []
+    for y in range(height):
+        even_offsets, odd_offsets = (
+            (TRIANGLE_NEIGHBOR_OFFSETS_UP, TRIANGLE_NEIGHBOR_OFFSETS_DOWN)
+            if y % 2 == 0
+            else (TRIANGLE_NEIGHBOR_OFFSETS_DOWN, TRIANGLE_NEIGHBOR_OFFSETS_UP)
+        )
+        for x in range(width):
+            offsets = even_offsets if x % 2 == 0 else odd_offsets
+            neighbors = tuple(
+                _regular_neighbor_id(x + dx, y + dy, width, height)
+                for dx, dy in offsets
+            )
+            cells.append(
+                LatticeCell(
+                    id=regular_cell_id(x, y),
+                    kind=REGULAR_CELL_KIND,
+                    neighbors=neighbors,
+                )
+            )
+    return _mixed_topology("triangle", width, height, cells)
+
+
+def _build_aperiodic_topology(geometry: str, patch_depth: int) -> LatticeTopology:
+    patch = build_aperiodic_patch(geometry, patch_depth)
+    cells = [
+        LatticeCell(
+            id=cell.id,
+            kind=cell.kind,
+            neighbors=cell.neighbors,
+            center=cell.center,
+            vertices=cell.vertices,
+        )
+        for cell in patch.cells
+    ]
+    return _mixed_topology(
+        geometry,
+        patch.width,
+        patch.height,
+        cells,
+        patch_depth=patch.patch_depth,
+    )
+
+
+def _build_periodic_face_topology(geometry: str, width: int, height: int) -> LatticeTopology:
+    cells = [
+        LatticeCell(
+            id=cell.id,
+            kind=cell.kind,
+            neighbors=cell.neighbors,
+            slot=cell.slot,
+            center=cell.center,
+            vertices=cell.vertices,
+        )
+        for cell in build_periodic_face_cells(geometry, width, height)
+    ]
+    return _mixed_topology(geometry, width, height, cells)
+
+
+def _build_topology_uncached(
+    geometry: str,
+    width: int,
+    height: int,
+    patch_depth: int | None = None,
+) -> LatticeTopology:
+    if geometry == "hex":
+        return _build_hex_topology(width, height)
+    if geometry == "triangle":
+        return _build_triangle_topology(width, height)
+    if is_periodic_face_tiling(geometry):
+        return _build_periodic_face_topology(geometry, width, height)
+    if is_aperiodic_geometry(geometry):
+        return _build_aperiodic_topology(geometry, 0 if patch_depth is None else int(patch_depth))
+    return _build_square_topology(width, height)
+
+
+@lru_cache(maxsize=TOPOLOGY_CACHE_SIZE)
+def _build_topology_cached(
+    geometry: str,
+    width: int,
+    height: int,
+    patch_depth: int | None = None,
+) -> LatticeTopology:
+    return _build_topology_uncached(geometry, width, height, patch_depth)
+
+
+def build_topology(
+    geometry: str,
+    width: int,
+    height: int,
+    patch_depth: int | None = None,
+) -> LatticeTopology:
+    return _build_topology_cached(
+        str(geometry),
+        int(width),
+        int(height),
+        None if patch_depth is None else int(patch_depth),
+    )
+
+
+def empty_board(
+    geometry: str,
+    width: int,
+    height: int,
+    patch_depth: int | None = None,
+) -> SimulationBoard:
+    topology = build_topology(geometry, width, height, patch_depth)
+    return SimulationBoard(
+        topology=topology,
+        cell_states=[0] * topology.cell_count,
+    )
+
+
+def board_from_states(
+    geometry: str,
+    width: int,
+    height: int,
+    cell_states: Iterable[int],
+    patch_depth: int | None = None,
+) -> SimulationBoard:
+    topology = build_topology(geometry, width, height, patch_depth)
+    normalized_states = list(cell_states)
+    if len(normalized_states) < topology.cell_count:
+        normalized_states.extend([0] * (topology.cell_count - len(normalized_states)))
+    elif len(normalized_states) > topology.cell_count:
+        normalized_states = normalized_states[:topology.cell_count]
+    return SimulationBoard(topology=topology, cell_states=normalized_states)
+
+
+def board_from_cells_by_id(
+    geometry: str,
+    width: int,
+    height: int,
+    cells_by_id: dict[str, int],
+    patch_depth: int | None = None,
+) -> SimulationBoard:
+    board = empty_board(geometry, width, height, patch_depth)
+    if not cells_by_id:
+        return board
+    for cell_id, state in cells_by_id.items():
+        if board.topology.has_cell(cell_id):
+            board.set_state_for(cell_id, int(state))
+    return board

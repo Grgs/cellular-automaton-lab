@@ -1,0 +1,151 @@
+import unittest
+
+from backend.simulation.topology_catalog import (
+    ARCHIMEDEAN_31212_GEOMETRY,
+    ARCHIMEDEAN_33336_GEOMETRY,
+    ARCHIMEDEAN_33344_GEOMETRY,
+    ARCHIMEDEAN_33434_GEOMETRY,
+    ARCHIMEDEAN_3464_GEOMETRY,
+    ARCHIMEDEAN_4612_GEOMETRY,
+    AMMANN_BEENKER_GEOMETRY,
+    GEOMETRY_DEFAULT_RULES,
+    describe_topologies,
+    PENROSE_GEOMETRY,
+    PENROSE_P2_GEOMETRY,
+    PENROSE_VERTEX_GEOMETRY,
+    SUPPORTED_GEOMETRIES,
+    TOPOLOGY_VARIANTS,
+    describe_topology_variants,
+    geometry_uses_backend_viewport_sync,
+    geometry_uses_patch_depth,
+    get_topology_variant_for_geometry,
+    is_penrose_geometry,
+    minimum_grid_dimension_for_geometry,
+)
+
+
+class GeometryManifestTests(unittest.TestCase):
+    def test_supported_geometries_are_unique_and_manifest_backed(self) -> None:
+        manifest_ids = [definition.geometry_key for definition in TOPOLOGY_VARIANTS]
+
+        self.assertEqual(SUPPORTED_GEOMETRIES, tuple(manifest_ids))
+        self.assertEqual(len(manifest_ids), len(set(manifest_ids)))
+
+    def test_default_rule_map_derives_from_manifest(self) -> None:
+        self.assertEqual(
+            GEOMETRY_DEFAULT_RULES,
+            {definition.geometry_key: definition.default_rule for definition in TOPOLOGY_VARIANTS},
+        )
+        self.assertEqual(GEOMETRY_DEFAULT_RULES[PENROSE_GEOMETRY], "life-b2-s23")
+        self.assertEqual(GEOMETRY_DEFAULT_RULES[PENROSE_VERTEX_GEOMETRY], "conway")
+
+    def test_penrose_modes_expose_expected_capabilities(self) -> None:
+        edge = get_topology_variant_for_geometry(PENROSE_GEOMETRY)
+        vertex = get_topology_variant_for_geometry(PENROSE_VERTEX_GEOMETRY)
+
+        self.assertEqual(edge.family, "aperiodic")
+        self.assertEqual(edge.tiling_family, PENROSE_GEOMETRY)
+        self.assertEqual(edge.adjacency_mode, "edge")
+        self.assertEqual(vertex.family, "aperiodic")
+        self.assertEqual(vertex.tiling_family, PENROSE_GEOMETRY)
+        self.assertEqual(vertex.adjacency_mode, "vertex")
+        self.assertTrue(geometry_uses_patch_depth(PENROSE_GEOMETRY))
+        self.assertTrue(geometry_uses_patch_depth(PENROSE_VERTEX_GEOMETRY))
+        self.assertFalse(geometry_uses_backend_viewport_sync(PENROSE_GEOMETRY))
+        self.assertFalse(geometry_uses_backend_viewport_sync(PENROSE_VERTEX_GEOMETRY))
+        self.assertTrue(is_penrose_geometry(PENROSE_GEOMETRY))
+        self.assertTrue(is_penrose_geometry(PENROSE_VERTEX_GEOMETRY))
+
+    def test_mixed_capability_helpers_match_manifest(self) -> None:
+        self.assertTrue(geometry_uses_backend_viewport_sync("square"))
+        self.assertTrue(geometry_uses_backend_viewport_sync(ARCHIMEDEAN_31212_GEOMETRY))
+        self.assertTrue(geometry_uses_backend_viewport_sync("trihexagonal-3-6-3-6"))
+        self.assertFalse(geometry_uses_patch_depth("square"))
+
+    def test_topology_catalog_exposes_expected_sizing_policy_by_family(self) -> None:
+        described = {
+            entry["tiling_family"]: entry
+            for entry in describe_topologies()
+        }
+
+        self.assertEqual(
+            described["square"]["sizing_policy"],
+            {"control": "cell_size", "default": 12, "min": 8, "max": 24},
+        )
+        self.assertEqual(
+            described["hex"]["sizing_policy"],
+            {"control": "cell_size", "default": 16, "min": 10, "max": 24},
+        )
+        self.assertEqual(
+            described["triangle"]["sizing_policy"],
+            {"control": "cell_size", "default": 20, "min": 12, "max": 24},
+        )
+        self.assertEqual(
+            described[ARCHIMEDEAN_33336_GEOMETRY]["sizing_policy"],
+            {"control": "cell_size", "default": 16, "min": 14, "max": 20},
+        )
+        self.assertEqual(
+            described[PENROSE_GEOMETRY]["sizing_policy"],
+            {"control": "patch_depth", "default": 4, "min": 0, "max": 6},
+        )
+        self.assertEqual(
+            described[PENROSE_P2_GEOMETRY]["sizing_policy"],
+            {"control": "patch_depth", "default": 4, "min": 0, "max": 6},
+        )
+        self.assertEqual(
+            described[AMMANN_BEENKER_GEOMETRY]["sizing_policy"],
+            {"control": "patch_depth", "default": 4, "min": 0, "max": 4},
+        )
+
+    def test_new_archimedean_geometries_have_expected_manifest_defaults(self) -> None:
+        expected = {
+            ARCHIMEDEAN_31212_GEOMETRY: "archlife-3-12-12",
+            ARCHIMEDEAN_3464_GEOMETRY: "archlife-3-4-6-4",
+            ARCHIMEDEAN_4612_GEOMETRY: "archlife-4-6-12",
+            ARCHIMEDEAN_33434_GEOMETRY: "archlife-3-3-4-3-4",
+            ARCHIMEDEAN_33344_GEOMETRY: "archlife-3-3-3-4-4",
+            ARCHIMEDEAN_33336_GEOMETRY: "archlife-3-3-3-3-6",
+        }
+
+        for geometry, default_rule in expected.items():
+            with self.subTest(geometry=geometry):
+                definition = get_topology_variant_for_geometry(geometry)
+                self.assertEqual(definition.family, "mixed")
+                self.assertEqual(definition.sizing_mode, "grid")
+                self.assertEqual(definition.viewport_sync_mode, "backend-sync")
+                self.assertEqual(definition.default_rule, default_rule)
+                self.assertEqual(GEOMETRY_DEFAULT_RULES[geometry], default_rule)
+                self.assertEqual(minimum_grid_dimension_for_geometry(geometry), 1)
+
+        self.assertEqual(minimum_grid_dimension_for_geometry("square"), 3)
+        self.assertEqual(minimum_grid_dimension_for_geometry("archimedean-4-8-8"), 3)
+
+    def test_describe_geometries_returns_frontend_ready_metadata(self) -> None:
+        described = describe_topology_variants()
+
+        self.assertEqual([entry["id"] for entry in described], list(SUPPORTED_GEOMETRIES))
+        vertex_entry = next(
+            entry
+            for entry in described
+            if entry["id"] == PENROSE_VERTEX_GEOMETRY
+        )
+        self.assertEqual(
+            vertex_entry,
+            {
+                "id": PENROSE_VERTEX_GEOMETRY,
+                "geometry_key": PENROSE_VERTEX_GEOMETRY,
+                "label": "Penrose P3 Rhombs",
+                "picker_group": "Aperiodic",
+                "picker_order": 220,
+                "default_rule": "conway",
+                "sizing_mode": "patch_depth",
+                "family": "aperiodic",
+                "viewport_sync_mode": "presentation-only",
+                "tiling_family": PENROSE_GEOMETRY,
+                "adjacency_mode": "vertex",
+            },
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()

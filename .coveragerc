@@ -1,0 +1,13 @@
+[run]
+branch = True
+source =
+    backend
+    tools
+
+[report]
+omit =
+    */__pycache__/*
+    tools/bench_canvas.py
+    tools/bench_engine.py
+show_missing = True
+skip_covered = False
