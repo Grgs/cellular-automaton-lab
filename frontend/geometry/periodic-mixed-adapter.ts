@@ -1,9 +1,9 @@
 import { tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
-    isPolygonGeometryCache,
     resolveMixedCellFromOffset,
 } from "../canvas/geometry-mixed.js";
+import { asPolygonGeometryCache } from "./cache-guards.js";
 import {
     applyMixedViewportPreview,
     constrainMixedViewportDimensions,
@@ -330,7 +330,7 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
                 geometry,
                 cell as RenderableTopologyCell,
                 metrics as PatternMetrics,
-                isPolygonGeometryCache(cache) ? cache : null,
+                asPolygonGeometryCache(cache),
             );
         },
 
@@ -348,7 +348,7 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
                 geometry,
                 cell as RenderableTopologyCell,
                 resolvedMetrics,
-                isPolygonGeometryCache(cache) ? cache : null,
+                asPolygonGeometryCache(cache),
             );
             return geometryCell
                 ? { x: geometryCell.centerX, y: geometryCell.centerY }
@@ -375,7 +375,7 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
                 geometry,
                 cell as RenderableTopologyCell,
                 metrics as PatternMetrics,
-                isPolygonGeometryCache(cache) ? cache : null,
+                asPolygonGeometryCache(cache),
             );
             const color = resolveRenderedCellColor(
                 stateValue,

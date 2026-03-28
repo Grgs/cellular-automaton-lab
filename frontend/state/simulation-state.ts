@@ -1,8 +1,8 @@
 import {
     DEFAULT_BRUSH_SIZE,
     DEFAULT_EDITOR_TOOL,
-    normalizeBrushSize,
-    normalizeEditorTool,
+    clampBrushSize,
+    resolveEditorTool,
 } from "../editor-tools.js";
 import {
     describeTopologySpec,
@@ -24,6 +24,7 @@ import type {
     TopologyPayload,
     TopologySpec,
 } from "../types/domain.js";
+import type { EditorTool } from "../editor-tools.js";
 import type {
     AppState,
     PreviewCellStatesById,
@@ -160,12 +161,12 @@ export function setSelectedPaintState(state: AppState, paintState: number | null
     state.selectedPaintState = paintState;
 }
 
-export function setEditorTool(state: AppState, tool: string): void {
-    state.selectedEditorTool = normalizeEditorTool(tool);
+export function setEditorTool(state: AppState, tool: EditorTool): void {
+    state.selectedEditorTool = resolveEditorTool(tool);
 }
 
 export function setBrushSize(state: AppState, brushSize: number): void {
-    state.brushSize = normalizeBrushSize(brushSize);
+    state.brushSize = clampBrushSize(brushSize);
 }
 
 export function getSelectedPresetId(state: AppState, ruleName: string | null): string | null {

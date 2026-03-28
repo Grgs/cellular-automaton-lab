@@ -25,6 +25,7 @@ import type {
 import type { DomElements } from "./dom.js";
 import type { UiDisclosureId } from "./session.js";
 import type { AppState } from "./state.js";
+import type { EditorTool } from "../editor-tools.js";
 
 export interface SimulationActionRuntime {
     state: AppState;
@@ -98,7 +99,7 @@ export interface UiActionSet {
     setCellSize(nextCellSize: number): Promise<boolean>;
     commitCellSize(nextCellSize: number): Promise<boolean>;
     setPaintState(nextPaintState: number | null): void;
-    setEditorTool(nextTool: string): void;
+    setEditorTool(nextTool: EditorTool): void;
     setBrushSize(nextBrushSize: number): void;
     toggleDrawer(): Promise<boolean>;
     closeDrawer(): Promise<boolean>;

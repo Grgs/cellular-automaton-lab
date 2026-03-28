@@ -1,4 +1,5 @@
 import { bindControlShortcuts } from "./controls-shortcuts.js";
+import { parseEditorTool } from "./parsers/editor.js";
 import { DISCLOSURE_IDS } from "./ui-session.js";
 import type { AppActionSet } from "./types/actions.js";
 import type { BrowserClearTimeout, BrowserSetTimeout, BrowserTimerId } from "./types/controller.js";
@@ -389,7 +390,7 @@ export function bindControls(
         (button) => {
             const editorTool = button.dataset.editorTool;
             if (editorTool) {
-                actions.setEditorTool(editorTool);
+                actions.setEditorTool(parseEditorTool(editorTool));
             }
         },
     );

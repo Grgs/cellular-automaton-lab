@@ -1,21 +1,19 @@
 import { FRONTEND_DEFAULTS } from "./defaults.js";
-import { isPlainObject } from "./runtime-validation.js";
 import {
     DEFAULT_BRUSH_SIZE,
     DEFAULT_EDITOR_TOOL,
-    normalizeBrushSize,
-    normalizeEditorTool,
 } from "./editor-tools.js";
+import { parseBrushSize, parseEditorTool } from "./parsers/editor.js";
+import { parseUiSession } from "./parsers/session.js";
 import {
     DEFAULT_CELL_SIZE,
     DEFAULT_TOPOLOGY_SPEC,
 } from "./state/constants.js";
 import {
     defaultCellSizeForTilingFamily,
-    normalizeCellSizeForTilingFamily,
-    normalizePatchDepthForTilingFamily,
 } from "./state/sizing-state.js";
 import type { DomElements } from "./types/dom.js";
+import type { EditorTool } from "./editor-tools.js";
 import type {
     MatchMediaResult,
     UiDisclosureId,
@@ -39,95 +37,6 @@ function emptySession(): UiSessionState {
         patchDepthByTilingFamily: {},
         disclosures: {},
     };
-}
-
-function normalizePaintStatesByRule(value: unknown): Record<string, number> {
-    if (!isPlainObject(value)) {
-        return {};
-    }
-
-    return Object.fromEntries(
-        Object.entries(value)
-            .filter(([ruleName]) => typeof ruleName === "string" && ruleName.length > 0)
-            .map(([ruleName, state]) => [ruleName, Number(state)])
-            .filter(([, state]) => Number.isInteger(state)),
-    );
-}
-
-function normalizeCellSizeByTilingFamily(value: unknown): Record<string, number> {
-    if (!isPlainObject(value)) {
-        return {};
-    }
-
-    return Object.fromEntries(
-        Object.entries(value)
-            .filter(([tilingFamily]) => typeof tilingFamily === "string" && tilingFamily.length > 0)
-            .map(([tilingFamily, cellSize]) => [
-                tilingFamily,
-                normalizeCellSizeForTilingFamily(tilingFamily, cellSize),
-            ])
-            .filter(([, cellSize]) => Number.isInteger(cellSize)),
-    );
-}
-
-function normalizeDisclosures(value: unknown): Partial<Record<UiDisclosureId, boolean>> {
-    if (!isPlainObject(value)) {
-        return {};
-    }
-
-    return Object.fromEntries(
-        DISCLOSURE_IDS.map((id) => [id, Boolean(value[id])]),
-    ) as Partial<Record<UiDisclosureId, boolean>>;
-}
-
-function normalizePatchDepthByTilingFamily(value: unknown): Record<string, number> {
-    if (!isPlainObject(value)) {
-        return {};
-    }
-
-    return Object.fromEntries(
-        Object.entries(value)
-            .filter(([tilingFamily]) => typeof tilingFamily === "string" && tilingFamily.length > 0)
-            .map(([tilingFamily, patchDepth]) => [
-                tilingFamily,
-                normalizePatchDepthForTilingFamily(tilingFamily, patchDepth),
-            ])
-            .filter(([, patchDepth]) => Number.isInteger(patchDepth)),
-    );
-}
-
-export function normalizeUiSession(value: unknown): UiSessionState {
-    if (!isPlainObject(value)) {
-        return emptySession();
-    }
-
-    const rawValue = value;
-    const session = emptySession();
-    if (rawValue.cellSizeByTilingFamily && typeof rawValue.cellSizeByTilingFamily === "object") {
-        session.cellSizeByTilingFamily = normalizeCellSizeByTilingFamily(rawValue.cellSizeByTilingFamily);
-    } else if (rawValue.cellSize !== null && rawValue.cellSize !== undefined) {
-        session.cellSizeByTilingFamily = {
-            [DEFAULT_TOPOLOGY_SPEC.tiling_family]: normalizeCellSizeForTilingFamily(
-                DEFAULT_TOPOLOGY_SPEC.tiling_family,
-                rawValue.cellSize,
-            ),
-        };
-    }
-    if (rawValue.editorTool !== null && rawValue.editorTool !== undefined) {
-        session.editorTool = normalizeEditorTool(rawValue.editorTool);
-    }
-    if (rawValue.brushSize !== null && rawValue.brushSize !== undefined) {
-        session.brushSize = normalizeBrushSize(rawValue.brushSize);
-    }
-    if (rawValue.drawerOpen !== null && rawValue.drawerOpen !== undefined) {
-        session.drawerOpen = Boolean(rawValue.drawerOpen);
-    }
-    session.paintStatesByRule = normalizePaintStatesByRule(rawValue.paintStatesByRule);
-    session.patchDepthByTilingFamily = normalizePatchDepthByTilingFamily(rawValue.patchDepthByTilingFamily);
-    session.disclosures = normalizeDisclosures(rawValue.disclosures);
-    session.cellSize = session.cellSizeByTilingFamily[DEFAULT_TOPOLOGY_SPEC.tiling_family]
-        ?? defaultCellSizeForTilingFamily(DEFAULT_TOPOLOGY_SPEC.tiling_family);
-    return session;
 }
 
 function cloneSession(session: UiSessionState): UiSessionState {
@@ -158,7 +67,7 @@ export function createUiSessionStorage({
             if (!raw) {
                 return emptySession();
             }
-            return normalizeUiSession(JSON.parse(raw));
+            return parseUiSession(JSON.parse(raw), { disclosureIds: DISCLOSURE_IDS });
         } catch (error) {
             void error;
             return emptySession();
@@ -174,7 +83,9 @@ export function createUiSessionStorage({
 
     function flush(): void {
         try {
-            storage.setItem(storageKey, JSON.stringify(normalizeUiSession(ensureLoaded())));
+            storage.setItem(storageKey, JSON.stringify(parseUiSession(ensureLoaded(), {
+                disclosureIds: DISCLOSURE_IDS,
+            })));
         } catch (error) {
             void error;
         }
@@ -183,7 +94,7 @@ export function createUiSessionStorage({
     function update(mutator: (session: UiSessionState) => void): UiSessionState {
         const nextSession = cloneSession(ensureLoaded());
         mutator(nextSession);
-        sessionCache = normalizeUiSession(nextSession);
+        sessionCache = parseUiSession(nextSession, { disclosureIds: DISCLOSURE_IDS });
         flush();
         return cloneSession(sessionCache);
     }
@@ -216,20 +127,22 @@ export function createUiSessionStorage({
                 : String(tilingFamilyOrCellSize);
             const nextCellSize = cellSize === undefined ? tilingFamilyOrCellSize : cellSize;
             return update((session) => {
-                session.cellSizeByTilingFamily[String(tilingFamily)] = normalizeCellSizeForTilingFamily(
-                    tilingFamily,
-                    nextCellSize,
-                );
-                session.cellSize = session.cellSizeByTilingFamily[DEFAULT_TOPOLOGY_SPEC.tiling_family]
-                    ?? defaultCellSizeForTilingFamily(DEFAULT_TOPOLOGY_SPEC.tiling_family);
+                const normalizedSession = parseUiSession({
+                    ...session,
+                    cellSizeByTilingFamily: {
+                        ...session.cellSizeByTilingFamily,
+                        [String(tilingFamily)]: nextCellSize,
+                    },
+                }, { disclosureIds: DISCLOSURE_IDS });
+                Object.assign(session, normalizedSession);
             });
         },
         getEditorTool() {
             return ensureLoaded().editorTool;
         },
-        setEditorTool(editorTool) {
+        setEditorTool(editorTool: EditorTool) {
             update((session) => {
-                session.editorTool = normalizeEditorTool(editorTool);
+                session.editorTool = parseEditorTool(editorTool);
             });
         },
         getBrushSize() {
@@ -237,7 +150,7 @@ export function createUiSessionStorage({
         },
         setBrushSize(brushSize) {
             update((session) => {
-                session.brushSize = normalizeBrushSize(brushSize);
+                session.brushSize = parseBrushSize(brushSize);
             });
         },
         getDrawerOpen() {
@@ -276,10 +189,14 @@ export function createUiSessionStorage({
                 return;
             }
             update((session) => {
-                session.patchDepthByTilingFamily[tilingFamily] = normalizePatchDepthForTilingFamily(
-                    tilingFamily,
-                    patchDepth,
-                );
+                const normalizedSession = parseUiSession({
+                    ...session,
+                    patchDepthByTilingFamily: {
+                        ...session.patchDepthByTilingFamily,
+                        [tilingFamily]: patchDepth,
+                    },
+                }, { disclosureIds: DISCLOSURE_IDS });
+                Object.assign(session, normalizedSession);
             });
         },
         getDisclosureStates() {

@@ -1,9 +1,9 @@
 import { tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
-    isPolygonGeometryCache,
     resolveMixedCellFromOffset,
 } from "../canvas/geometry-mixed.js";
+import { asPolygonGeometryCache } from "./cache-guards.js";
 import { penroseCellGeometry } from "../canvas/geometry-penrose.js";
 import { PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY } from "../topology.js";
 import { fitRenderCellSizeWithMetrics } from "./shared.js";
@@ -144,7 +144,7 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 resolvedMetrics,
-                isPolygonGeometryCache(cache) ? cache : null,
+                asPolygonGeometryCache(cache),
             );
             return geometryCell
                 ? { x: geometryCell.centerX, y: geometryCell.centerY }
@@ -163,7 +163,7 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 metrics as PenroseMetrics,
-                isPolygonGeometryCache(cache) ? cache : null,
+                asPolygonGeometryCache(cache),
             );
             const color = resolveRenderedCellColor(
                 stateValue,

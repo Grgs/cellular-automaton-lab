@@ -7,6 +7,7 @@ import {
     triangleGridMetrics,
 } from "./shared.js";
 import { parseRegularCellId, regularCellId } from "../topology.js";
+import { asTriangleGeometryCache } from "./cache-guards.js";
 import type { PaintableCell } from "../types/editor.js";
 import type {
     GeometryAdapter,
@@ -58,16 +59,6 @@ function triangleVertexTriplet(vertices: readonly Point2D[]): [Point2D, Point2D,
         return null;
     }
     return [first, second, third];
-}
-
-function isTriangleGeometryCache(cache: unknown): cache is TriangleGeometryCache {
-    return cache !== null
-        && Boolean(cache)
-        && typeof cache === "object"
-        && "type" in cache
-        && (cache as { type?: unknown }).type === "triangle"
-        && "cells" in cache
-        && Array.isArray((cache as { cells?: unknown }).cells);
 }
 
 function buildTriangleGeometryCache(width: number, height: number, cellSize: number): TriangleGeometryCache {
@@ -204,7 +195,7 @@ export const triangleGeometryAdapter: GeometryAdapter = {
 
     resolveCellFromOffset({ offsetX, offsetY, width, height, cellSize, metrics, cache }: GeometryResolveCellFromOffsetArgs) {
         const resolvedMetrics = (metrics || triangleGridMetrics(width, height, cellSize)) as TriangleMetrics;
-        const triangleCache = isTriangleGeometryCache(cache) ? cache : null;
+        const triangleCache = asTriangleGeometryCache(cache);
         const approximateRow = Math.floor((offsetY - resolvedMetrics.yInset) / resolvedMetrics.triangleHeight);
         const approximateColumn = Math.round((offsetX - resolvedMetrics.xInset) / resolvedMetrics.horizontalPitch);
 
@@ -218,9 +209,9 @@ export const triangleGeometryAdapter: GeometryAdapter = {
                 }
                 const cachedRow = triangleCache?.cells[y] ?? null;
                 const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
-                if ("minX" in resolvedCell) {
                 if (
-                    typeof resolvedCell.minX === "number"
+                    "minX" in resolvedCell
+                    && typeof resolvedCell.minX === "number"
                     && typeof resolvedCell.maxX === "number"
                     && typeof resolvedCell.minY === "number"
                     && typeof resolvedCell.maxY === "number"
@@ -233,7 +224,6 @@ export const triangleGeometryAdapter: GeometryAdapter = {
                 ) {
                     continue;
                 }
-                }
                 if (pointInTriangle(offsetX, offsetY, resolvedCell.vertices)) {
                     return { id: regularCellId(x, y), kind: "cell", x, y };
                 }
@@ -245,7 +235,7 @@ export const triangleGeometryAdapter: GeometryAdapter = {
 
     resolveCellCenter({ cell, cellSize, cache }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveTriangleCoordinates(cell);
-        const triangleCache = isTriangleGeometryCache(cache) ? cache : null;
+        const triangleCache = asTriangleGeometryCache(cache);
         const cachedRow = triangleCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
         if (
@@ -287,7 +277,7 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         if (context.fillStyle !== color) {
             context.fillStyle = color;
         }
-        const triangleCache = isTriangleGeometryCache(cache) ? cache : null;
+        const triangleCache = asTriangleGeometryCache(cache);
         const cachedRow = triangleCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, metrics.cellSize) };
         tracePolygonPath(context, resolvedCell.vertices);

@@ -6,6 +6,8 @@ import type {
     TopologyOption,
 } from "./domain.js";
 import type { AppState } from "./state.js";
+import type { EditorTool } from "../editor-tools.js";
+import type { ThemeName } from "../theme.js";
 
 export interface LabeledOption<TValue extends string | number = string | number> {
     value: TValue;
@@ -157,7 +159,7 @@ export interface DrawerViewModel {
 
 export interface EditorViewModel {
     editorTools: readonly LabeledOption<string>[];
-    selectedEditorTool: string;
+    selectedEditorTool: EditorTool;
     brushSizeOptions: readonly LabeledOption<number>[];
     selectedBrushSize: number;
     undoDisabled: boolean;
@@ -169,13 +171,13 @@ export interface EditorViewModel {
 }
 
 export interface ControlsViewModel extends TopBarViewModel, DrawerViewModel, EditorViewModel {
-    theme: string;
+    theme: ThemeName;
 }
 
 export interface ControlsViewModelInput {
     state: AppState;
     syncState: ConfigSyncViewState;
-    theme: string;
+    theme: ThemeName;
 }
 
 export interface ControlsModelRuleContext {

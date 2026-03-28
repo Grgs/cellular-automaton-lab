@@ -2,6 +2,7 @@ import {
     DEFAULT_BRUSH_SIZE,
     DEFAULT_EDITOR_TOOL,
 } from "./editor-tools.js";
+import { parseEditorTool } from "./parsers/editor.js";
 import {
     clearPendingPatchDepth,
     rememberedCellSizeForTilingFamily,
@@ -25,6 +26,7 @@ import type {
 } from "./types/controller.js";
 import type { AppState } from "./types/state.js";
 import type { UiDisclosureId, UiSessionStorage } from "./types/session.js";
+import type { EditorTool } from "./editor-tools.js";
 
 function readStoredCellSizes(storage: UiSessionStorage, activeTilingFamily: string): Record<string, number> {
     if (typeof storage.getCellSizes === "function") {
@@ -158,8 +160,8 @@ export function createUiSessionController({
         storage.setCellSize(String(tilingFamilyOrCellSize), cellSize);
     }
 
-    function persistEditorTool(editorTool: string): void {
-        storage.setEditorTool(editorTool);
+    function persistEditorTool(editorTool: EditorTool): void {
+        storage.setEditorTool(parseEditorTool(editorTool));
     }
 
     function persistBrushSize(brushSize: number): void {

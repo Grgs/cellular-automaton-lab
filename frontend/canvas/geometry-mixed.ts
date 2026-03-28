@@ -1,12 +1,13 @@
 import { appendPolygonPath } from "./draw.js";
+import { asPolygonGeometryCache } from "../geometry/cache-guards.js";
 import type {
     Point2D,
-    PolygonGeometryCache,
     PolygonGeometryCell,
     RenderableTopologyCell,
 } from "../types/rendering.js";
 import type { PaintableCell } from "../types/editor.js";
 import type { TopologyPayload } from "../types/domain.js";
+import type { PolygonGeometryCache } from "../types/rendering.js";
 
 export function pointInPolygon(offsetX: number, offsetY: number, vertices: readonly Point2D[]): boolean {
     let inside = false;
@@ -53,15 +54,6 @@ export function buildMixedTopologyGeometryCache(
     };
 }
 
-export function isPolygonGeometryCache(cache: unknown): cache is PolygonGeometryCache {
-    return cache !== null
-        && typeof cache === "object"
-        && "cellsById" in cache
-        && "cells" in cache
-        && "strokePath" in cache
-        && "type" in cache;
-}
-
 export function resolveMixedCellFromOffset(
     offsetX: number,
     offsetY: number,
@@ -85,3 +77,5 @@ export function resolveMixedCellFromOffset(
     }
     return null;
 }
+
+export { asPolygonGeometryCache };

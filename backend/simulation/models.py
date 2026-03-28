@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from backend.defaults import (
@@ -59,16 +58,12 @@ def _coerce_optional_int(value: object, fallback: int) -> int:
     raise TypeError(f"Expected an int-compatible value, received {type(value).__name__}.")
 
 
-def _topology_spec_mapping(topology_spec: TopologySpecInput) -> Mapping[str, object]:
-    return topology_spec
-
-
 def _topology_spec_string_value(
     topology_spec: TopologySpecInput,
     key: str,
     fallback: str,
 ) -> str:
-    value = _topology_spec_mapping(topology_spec).get(key)
+    value = topology_spec.get(key)
     return fallback if value is None else str(value)
 
 
@@ -77,7 +72,7 @@ def _topology_spec_int_value(
     key: str,
     fallback: int,
 ) -> int:
-    return _coerce_optional_int(_topology_spec_mapping(topology_spec).get(key), fallback)
+    return _coerce_optional_int(topology_spec.get(key), fallback)
 
 @dataclass(frozen=True)
 class TopologySpec:
@@ -271,20 +266,19 @@ class SimulationConfig:
                     patch_depth=self.patch_depth if patch_depth is None else patch_depth,
                 ).topology_spec
             else:
-                topology_spec_mapping = _topology_spec_mapping(topology_spec)
-                next_width_value = topology_spec_mapping.get("width")
-                next_height_value = topology_spec_mapping.get("height")
-                next_patch_depth_value = topology_spec_mapping.get("patch_depth")
+                next_width_value = topology_spec.get("width")
+                next_height_value = topology_spec.get("height")
+                next_patch_depth_value = topology_spec.get("patch_depth")
                 base_topology_spec = self.topology_spec.updated(
                     tiling_family=(
                         self.tiling_family
-                        if topology_spec_mapping.get("tiling_family") is None
-                        else str(topology_spec_mapping.get("tiling_family"))
+                        if topology_spec.get("tiling_family") is None
+                        else str(topology_spec.get("tiling_family"))
                     ),
                     adjacency_mode=(
                         self.adjacency_mode
-                        if topology_spec_mapping.get("adjacency_mode") is None
-                        else str(topology_spec_mapping.get("adjacency_mode"))
+                        if topology_spec.get("adjacency_mode") is None
+                        else str(topology_spec.get("adjacency_mode"))
                     ),
                     width=(
                         self.width

@@ -5,6 +5,7 @@ import type {
     TopologySpec,
 } from "./domain.js";
 import type { BrowserTimerId } from "./controller.js";
+import type { EditorTool } from "../editor-tools.js";
 import type { EditorHistoryEntry } from "./editor.js";
 
 export type RuleSelectionOrigin = "default" | "user";
@@ -21,7 +22,7 @@ export interface AppState {
     activeRule: RuleDefinition | null;
     editorRuleName: string | null;
     ruleSelectionOrigin: RuleSelectionOrigin;
-    selectedEditorTool: string;
+    selectedEditorTool: EditorTool;
     brushSize: number;
     selectedPaintState: number | null;
     selectedPresetIdsByRule: Record<string, string>;

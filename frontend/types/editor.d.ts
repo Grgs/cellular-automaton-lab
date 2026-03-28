@@ -9,6 +9,7 @@ import type {
 } from "./controller.js";
 import type { CellIdentifier, CellStateUpdate, SimulationSnapshot, TopologyCell } from "./domain.js";
 import type { AppState } from "./state.js";
+import type { EditorTool } from "../editor-tools.js";
 
 export interface CoordinateCell {
     x: number;
@@ -70,7 +71,7 @@ export interface EditorSessionPointerContext {
 
 export interface EditorSessionController {
     supportsEditorTools(): boolean;
-    currentTool(): string;
+    currentTool(): EditorTool;
     beginPointerSession(cell: PaintableCell, pointerId?: number | null): Promise<boolean>;
     handlePointerMove(cell: PaintableCell): void;
     handlePointerUp(): Promise<SimulationSnapshot | null>;
@@ -102,7 +103,7 @@ export interface GridInteractionBindings {
 export interface EditorSessionOptions {
     state: AppState | null;
     getPaintState: () => number;
-    getEditorTool?: () => string;
+    getEditorTool?: () => EditorTool;
     getBrushSize?: () => number;
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
@@ -168,7 +169,7 @@ export interface InteractionControllerOptions {
     armEditMode?: (() => boolean) | null;
     hideEditCue?: (() => boolean) | null;
     setPatternStatus?: ((message: string, tone?: string) => void) | null;
-    getEditorTool?: () => string;
+    getEditorTool?: () => EditorTool;
     getBrushSize?: () => number;
     renderControlPanel?: () => void;
     setTimeoutFn?: (callback: () => void, delay: number) => number;

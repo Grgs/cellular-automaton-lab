@@ -1,33 +1,39 @@
 import { FRONTEND_DEFAULTS } from "./defaults.js";
 
 export const THEME_STORAGE_KEY = FRONTEND_DEFAULTS.theme.storage_key;
-export const DEFAULT_THEME = FRONTEND_DEFAULTS.theme.default;
+export type ThemeName = "dark" | "light";
 
-type ThemeName = "dark" | "light";
+export const DEFAULT_THEME: ThemeName = FRONTEND_DEFAULTS.theme.default === "light"
+    ? "light"
+    : "dark";
 
-export function normalizeTheme(value: unknown): ThemeName {
-    if (value === "dark" || value === "light") {
+export function isThemeName(value: string | null | undefined): value is ThemeName {
+    return value === "dark" || value === "light";
+}
+
+export function resolveTheme(value: string | null | undefined): ThemeName {
+    if (isThemeName(value)) {
         return value;
     }
-    return DEFAULT_THEME === "dark" ? "dark" : "light";
+    return DEFAULT_THEME;
 }
 
 export function currentTheme(root: HTMLElement = document.documentElement): ThemeName {
-    return normalizeTheme(root.dataset.theme);
+    return resolveTheme(root.dataset.theme);
 }
 
-export function nextTheme(theme: unknown): ThemeName {
-    return normalizeTheme(theme) === "dark" ? "light" : "dark";
+export function nextTheme(theme: ThemeName): ThemeName {
+    return theme === "dark" ? "light" : "dark";
 }
 
-export function applyTheme(theme: unknown, {
+export function applyTheme(theme: ThemeName, {
     root = document.documentElement,
     storage = window.localStorage,
 }: {
     root?: HTMLElement;
     storage?: Storage;
 } = {}): ThemeName {
-    const nextTheme = normalizeTheme(theme);
+    const nextTheme = resolveTheme(theme);
     root.dataset.theme = nextTheme;
 
     try {
@@ -56,7 +62,7 @@ export function resetThemeToDefault({
     root?: HTMLElement;
     storage?: Storage;
 } = {}): ThemeName {
-    const nextTheme = normalizeTheme(DEFAULT_THEME);
+    const nextTheme = DEFAULT_THEME;
     root.dataset.theme = nextTheme;
     try {
         storage.removeItem(THEME_STORAGE_KEY);

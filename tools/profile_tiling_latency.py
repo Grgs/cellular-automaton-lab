@@ -5,9 +5,9 @@ import statistics
 import sys
 import time
 import urllib.request
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from pathlib import Path
-from typing import Mapping, TypedDict
+from typing import TypedDict
 
 from playwright.sync_api import sync_playwright
 
@@ -15,9 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.payload_types import TopologySpecPayload
+from backend.payload_types import CellTargetPayload, SimulationStatePayload, TopologySpecPayload
 from backend.simulation.topology import _build_topology_cached, _build_topology_uncached, empty_board
 from tests.e2e.support_server import AppServer
+from tests.typed_payloads import require_simulation_state_payload
 
 
 class ViewportPayload(TypedDict):
@@ -69,12 +70,12 @@ async ({ resetPayload, toggleId }) => {
 """
 
 
-def request_json(
+def _request_json_bytes(
     base_url: str,
     path: str,
     *,
     method: str = "GET",
-    payload: Mapping[str, object] | None = None,
+    payload: ResetRequestPayload | CellTargetPayload | None = None,
 ) -> tuple[object | None, int, float]:
     body = None if payload is None else json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
@@ -88,6 +89,40 @@ def request_json(
         raw = response.read()
     elapsed_ms = (time.perf_counter() - started_at) * 1000
     return json.loads(raw.decode("utf-8")) if raw else None, len(raw), elapsed_ms
+
+
+def post_reset(
+    base_url: str,
+    payload: ResetRequestPayload,
+) -> tuple[SimulationStatePayload, int, float]:
+    raw_payload, payload_bytes, elapsed_ms = _request_json_bytes(
+        base_url,
+        "/api/control/reset",
+        method="POST",
+        payload=payload,
+    )
+    return (
+        require_simulation_state_payload(raw_payload, context="latency profile reset response"),
+        payload_bytes,
+        elapsed_ms,
+    )
+
+
+def post_toggle(
+    base_url: str,
+    cell_id: str,
+) -> tuple[SimulationStatePayload, int, float]:
+    raw_payload, payload_bytes, elapsed_ms = _request_json_bytes(
+        base_url,
+        "/api/cells/toggle",
+        method="POST",
+        payload={"id": cell_id},
+    )
+    return (
+        require_simulation_state_payload(raw_payload, context="latency profile toggle response"),
+        payload_bytes,
+        elapsed_ms,
+    )
 
 
 def median_elapsed_ms(callback: Callable[[], float], *, repeats: int = 5) -> float:
@@ -161,32 +196,15 @@ def main() -> None:
                     int(dimensions["height"]),
                 )
 
-                reset_payload_response, reset_bytes, reset_ms = request_json(
-                    server.base_url,
-                    "/api/control/reset",
-                    method="POST",
-                    payload=reset_payload,
-                )
-                if not isinstance(reset_payload_response, dict):
-                    raise RuntimeError("Reset response must be a JSON object.")
-                topology_payload = reset_payload_response.get("topology")
-                if not isinstance(topology_payload, dict):
-                    raise RuntimeError("Reset response did not include topology payload.")
-                cells_payload = topology_payload.get("cells")
-                if not isinstance(cells_payload, list) or not cells_payload:
+                reset_payload_response, reset_bytes, reset_ms = post_reset(server.base_url, reset_payload)
+                cells_payload = reset_payload_response["topology"]["cells"]
+                if not cells_payload:
                     raise RuntimeError("Reset response did not include topology cells.")
                 first_cell = cells_payload[0]
-                if not isinstance(first_cell, dict):
-                    raise RuntimeError("Topology cell payload is invalid.")
-                toggle_id = first_cell.get("id")
-                if not isinstance(toggle_id, str) or not toggle_id:
+                toggle_id = first_cell["id"]
+                if not toggle_id:
                     raise RuntimeError("Topology cell payload did not include an id.")
-                _, toggle_bytes, toggle_ms = request_json(
-                    server.base_url,
-                    "/api/cells/toggle",
-                    method="POST",
-                    payload={"id": toggle_id},
-                )
+                _, toggle_bytes, toggle_ms = post_toggle(server.base_url, toggle_id)
 
                 browser_transport = page.evaluate(
                     BROWSER_TRANSPORT_SCRIPT,

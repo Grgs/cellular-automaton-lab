@@ -24,6 +24,7 @@ import {
 import { buildDrawerToggleState } from "../controls-model/shared.js";
 import { topologyUsesPatchDepth } from "../topology-catalog.js";
 import { toggleTheme } from "../theme.js";
+import type { EditorTool } from "../editor-tools.js";
 import type { UiActionOptions, UiActionSet } from "../types/actions.js";
 
 type DrawerToggleLabel = "Hide Inspector" | "Show Inspector" | "Show Overlays" | "Show HUD";
@@ -70,7 +71,7 @@ export function createUiActions({
         renderControlPanel();
     }
 
-    function applyEditorTool(nextTool: string): void {
+    function applyEditorTool(nextTool: EditorTool): void {
         setEditorToolFn(state, nextTool);
         uiSessionController.persistEditorTool(state.selectedEditorTool);
         renderControlPanel();

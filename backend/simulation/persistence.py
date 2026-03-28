@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Mapping
 
-from backend.payload_types import PersistedSimulationSnapshotV5, SparseCellsByIdPayload
+from backend.payload_types import PersistedSimulationSnapshotV5, RawJsonObject, SparseCellsByIdPayload
 from backend.simulation.models import SimulationSnapshot, TopologySpec
 
 
@@ -49,18 +48,20 @@ class SimulationStateStore:
 
     @staticmethod
     def _validate_payload(payload: object) -> PersistedSimulationSnapshotV5:
-        if not isinstance(payload, dict):
-            raise ValueError("Persisted simulation state must be a JSON object.")
-        payload_mapping = payload
+        payload_mapping = SimulationStateStore._require_raw_json_object(
+            payload,
+            "Persisted simulation state must be a JSON object.",
+        )
 
         version = payload_mapping.get("version")
         if version != SNAPSHOT_VERSION:
             raise ValueError("Persisted simulation state version is unsupported.")
 
         topology_spec_payload = payload_mapping.get("topology_spec")
-        if not isinstance(topology_spec_payload, dict):
-            raise ValueError("Persisted simulation state topology spec is invalid.")
-        topology_spec_mapping = topology_spec_payload
+        topology_spec_mapping = SimulationStateStore._require_raw_json_object(
+            topology_spec_payload,
+            "Persisted simulation state topology spec is invalid.",
+        )
         topology_spec = TopologySpec.from_values(
             tiling_family=str(topology_spec_mapping.get("tiling_family") or ""),
             adjacency_mode=str(topology_spec_mapping.get("adjacency_mode") or ""),
@@ -107,15 +108,21 @@ class SimulationStateStore:
         return validated_payload
 
     @staticmethod
-    def _coerce_int(mapping: Mapping[str, object], key: str) -> int:
-        value = mapping.get(key)
+    def _coerce_int(payload: RawJsonObject, key: str) -> int:
+        value = payload.get(key)
         if isinstance(value, (str, bytes, bytearray, int, float)):
             return int(value)
         raise ValueError(f"Persisted simulation field '{key}' is invalid.")
 
     @staticmethod
-    def _coerce_float(mapping: Mapping[str, object], key: str) -> float:
-        value = mapping.get(key)
+    def _coerce_float(payload: RawJsonObject, key: str) -> float:
+        value = payload.get(key)
         if isinstance(value, (str, bytes, bytearray, int, float)):
             return float(value)
         raise ValueError(f"Persisted simulation field '{key}' is invalid.")
+
+    @staticmethod
+    def _require_raw_json_object(value: object, message: str) -> RawJsonObject:
+        if not isinstance(value, dict):
+            raise ValueError(message)
+        return value

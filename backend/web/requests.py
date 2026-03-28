@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Mapping, NoReturn
+from typing import NoReturn
 
 from flask import Request
 from pydantic import ValidationError
@@ -46,21 +46,21 @@ def _raise_validation(message: str, exc: Exception | None = None) -> NoReturn:
     raise RequestValidationError(message) from exc
 
 
-def parse_optional_int(payload: Mapping[str, object], key: str) -> int | None:
+def parse_optional_int(payload: RawJsonObject, key: str) -> int | None:
     try:
         return OptionalIntValueModel.model_validate({"value": payload.get(key)}).value
     except ValidationError as exc:
         _raise_validation(f"'{key}' must be an integer.", exc)
 
 
-def parse_optional_float(payload: Mapping[str, object], key: str) -> float | None:
+def parse_optional_float(payload: RawJsonObject, key: str) -> float | None:
     try:
         return OptionalFloatValueModel.model_validate({"value": payload.get(key)}).value
     except ValidationError as exc:
         _raise_validation(f"'{key}' must be a number.", exc)
 
 
-def parse_required_int(payload: Mapping[str, object], key: str) -> int:
+def parse_required_int(payload: RawJsonObject, key: str) -> int:
     if key not in payload:
         _raise_validation(f"Missing required field '{key}'.")
     try:
@@ -69,7 +69,7 @@ def parse_required_int(payload: Mapping[str, object], key: str) -> int:
         _raise_validation(f"'{key}' must be an integer.", exc)
 
 
-def parse_state_value(payload: Mapping[str, object], rule: AutomatonRule, key: str = "state") -> int:
+def parse_state_value(payload: RawJsonObject, rule: AutomatonRule, key: str = "state") -> int:
     if key not in payload:
         _raise_validation(f"Missing required field '{key}'.")
     try:
@@ -82,7 +82,7 @@ def parse_state_value(payload: Mapping[str, object], rule: AutomatonRule, key: s
     return parsed
 
 
-def parse_cell_id(payload: Mapping[str, object], key: str = "id") -> str:
+def parse_cell_id(payload: RawJsonObject, key: str = "id") -> str:
     value = payload.get(key)
     if value in (None, ""):
         _raise_validation(f"Missing required field '{key}'.")
@@ -93,7 +93,7 @@ def parse_cell_id(payload: Mapping[str, object], key: str = "id") -> str:
 
 
 def parse_cell_target(
-    payload: Mapping[str, object],
+    payload: RawJsonObject,
     *,
     id_key: str = "id",
 ) -> CellTargetPayload:
@@ -107,7 +107,7 @@ def parse_cell_target(
 
 
 def parse_cell_updates(
-    payload: Mapping[str, object],
+    payload: RawJsonObject,
     rule: AutomatonRule,
     key: str = "cells",
 ) -> list[CellUpdatePayload]:
@@ -126,7 +126,7 @@ def parse_cell_updates(
     return parsed_cells
 
 
-def parse_rule_name(payload: Mapping[str, object], rule_registry: RuleRegistry) -> str | None:
+def parse_rule_name(payload: RawJsonObject, rule_registry: RuleRegistry) -> str | None:
     try:
         rule_name = RuleNameValueModel.model_validate({"value": payload.get("rule")}).value
     except ValidationError as exc:
@@ -139,7 +139,7 @@ def parse_rule_name(payload: Mapping[str, object], rule_registry: RuleRegistry) 
 
 
 def parse_topology_spec(
-    payload: Mapping[str, object],
+    payload: RawJsonObject,
     key: str = "topology_spec",
 ) -> TopologySpecRequestPayload | None:
     try:

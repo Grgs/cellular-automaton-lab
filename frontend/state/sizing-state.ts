@@ -12,33 +12,15 @@ import { getTopologySizingPolicy } from "../topology-catalog.js";
 import type { SizingPolicy } from "../types/domain.js";
 import type { AppState } from "../types/state.js";
 
-function normalizeCellSizeByTilingFamily(value: unknown): Record<string, number> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-        return {};
-    }
+function normalizeSizingRecord(
+    value: Record<string, number>,
+    normalizeEntry: (tilingFamily: string, rawValue: number) => number,
+): Record<string, number> {
     return Object.fromEntries(
         Object.entries(value)
             .filter(([tilingFamily]) => typeof tilingFamily === "string" && tilingFamily.length > 0)
-            .map(([tilingFamily, cellSize]) => [
-                tilingFamily,
-                normalizeCellSizeForTilingFamily(tilingFamily, cellSize),
-            ])
-            .filter(([, cellSize]) => Number.isInteger(cellSize)),
-    );
-}
-
-function normalizePatchDepthByTilingFamily(value: unknown): Record<string, number> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-        return {};
-    }
-    return Object.fromEntries(
-        Object.entries(value)
-            .filter(([tilingFamily]) => typeof tilingFamily === "string" && tilingFamily.length > 0)
-            .map(([tilingFamily, patchDepth]) => [
-                tilingFamily,
-                normalizePatchDepthForTilingFamily(tilingFamily, patchDepth),
-            ])
-            .filter(([, patchDepth]) => Number.isInteger(patchDepth)),
+            .map(([tilingFamily, rawValue]) => [tilingFamily, normalizeEntry(tilingFamily, rawValue)])
+            .filter(([, normalizedValue]) => Number.isInteger(normalizedValue)),
     );
 }
 
@@ -67,41 +49,29 @@ export function maxCellSizeForTilingFamily(tilingFamily: string | null | undefin
         : MAX_CELL_SIZE;
 }
 
-export function normalizeCellSize(value: unknown): number {
+export function normalizeCellSize(value: number): number {
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) {
-        return DEFAULT_CELL_SIZE;
-    }
     return Math.min(MAX_CELL_SIZE, Math.max(MIN_CELL_SIZE, Math.round(parsed)));
 }
 
 export function normalizeCellSizeForTilingFamily(
     tilingFamily: string | null | undefined,
-    value: unknown,
+    value: number,
 ): number {
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) {
-        return defaultCellSizeForTilingFamily(tilingFamily);
-    }
     return Math.min(
         maxCellSizeForTilingFamily(tilingFamily),
         Math.max(minCellSizeForTilingFamily(tilingFamily), Math.round(parsed)),
     );
 }
 
-export function normalizeRenderCellSize(value: unknown): number {
+export function normalizeRenderCellSize(value: number): number {
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) {
-        return DEFAULT_CELL_SIZE;
-    }
     return Math.min(MAX_RENDER_CELL_SIZE, Math.max(MIN_RENDER_CELL_SIZE, parsed));
 }
 
-export function normalizePatchDepth(value: unknown): number {
+export function normalizePatchDepth(value: number): number {
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) {
-        return DEFAULT_PATCH_DEPTH;
-    }
     return Math.min(MAX_PATCH_DEPTH, Math.max(MIN_PATCH_DEPTH, Math.round(parsed)));
 }
 
@@ -128,12 +98,9 @@ export function defaultPatchDepthForTilingFamily(tilingFamily: string | null | u
 
 export function normalizePatchDepthForTilingFamily(
     tilingFamily: string | null | undefined,
-    value: unknown,
+    value: number,
 ): number {
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) {
-        return defaultPatchDepthForTilingFamily(tilingFamily);
-    }
     return Math.min(
         maxPatchDepthForTilingFamily(tilingFamily),
         Math.max(minPatchDepthForTilingFamily(tilingFamily), Math.round(parsed)),
@@ -165,11 +132,17 @@ export function clearPendingPatchDepth(state: AppState): void {
 }
 
 export function setPatchDepthMemoryMap(state: AppState, patchDepthByTilingFamily: Record<string, number>): void {
-    state.patchDepthByTilingFamily = normalizePatchDepthByTilingFamily(patchDepthByTilingFamily);
+    state.patchDepthByTilingFamily = normalizeSizingRecord(
+        patchDepthByTilingFamily,
+        normalizePatchDepthForTilingFamily,
+    );
 }
 
 export function setCellSizeMemoryMap(state: AppState, cellSizeByTilingFamily: Record<string, number>): void {
-    state.cellSizeByTilingFamily = normalizeCellSizeByTilingFamily(cellSizeByTilingFamily);
+    state.cellSizeByTilingFamily = normalizeSizingRecord(
+        cellSizeByTilingFamily,
+        normalizeCellSizeForTilingFamily,
+    );
 }
 
 export function rememberCellSizeForTilingFamily(
@@ -181,7 +154,7 @@ export function rememberCellSizeForTilingFamily(
         return;
     }
     state.cellSizeByTilingFamily = {
-        ...normalizeCellSizeByTilingFamily(state.cellSizeByTilingFamily),
+        ...normalizeSizingRecord(state.cellSizeByTilingFamily, normalizeCellSizeForTilingFamily),
         [String(tilingFamily)]: normalizeCellSizeForTilingFamily(tilingFamily, cellSize),
     };
 }
@@ -208,7 +181,7 @@ export function rememberPatchDepthForTilingFamily(
         return;
     }
     state.patchDepthByTilingFamily = {
-        ...normalizePatchDepthByTilingFamily(state.patchDepthByTilingFamily),
+        ...normalizeSizingRecord(state.patchDepthByTilingFamily, normalizePatchDepthForTilingFamily),
         [String(tilingFamily)]: normalizePatchDepthForTilingFamily(tilingFamily, patchDepth),
     };
 }

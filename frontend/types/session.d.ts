@@ -1,9 +1,11 @@
+import type { EditorTool } from "../editor-tools.js";
+
 export type UiDisclosureId = "rule-notes-toggle";
 
 export interface UiSessionState {
     cellSize: number;
     cellSizeByTilingFamily: Record<string, number>;
-    editorTool: string;
+    editorTool: EditorTool;
     brushSize: number;
     drawerOpen: boolean | null;
     paintStatesByRule: Record<string, number>;
@@ -17,8 +19,8 @@ export interface UiSessionStorage {
     getCellSizes(): Record<string, number>;
     getCellSize(tilingFamily?: string): number;
     setCellSize(tilingFamilyOrCellSize: string | number, cellSize?: number): UiSessionState | void;
-    getEditorTool(): string;
-    setEditorTool(editorTool: string): void;
+    getEditorTool(): EditorTool;
+    setEditorTool(editorTool: EditorTool): void;
     getBrushSize(): number;
     setBrushSize(brushSize: number): void;
     getDrawerOpen(): boolean | null;

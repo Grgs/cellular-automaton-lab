@@ -5,6 +5,7 @@ import {
     topologyCellCenter as resolveTopologyCellCenter,
 } from "./geometry-adapters.js";
 import { getGeometryAdapter } from "./geometry/registry.js";
+import { asPolygonGeometryCache } from "./geometry/cache-guards.js";
 import {
     topologyCellStatesById,
     topologyHeight,
@@ -159,9 +160,7 @@ export function createCanvasGridView({
     }
 
     function resolvePreviewTopologyCell(cell: PreviewPaintCell): RenderableTopologyCell | null {
-        const polygonCache = geometryCache && "cellsById" in geometryCache
-            ? geometryCache as PolygonGeometryCache
-            : null;
+        const polygonCache = asPolygonGeometryCache(geometryCache);
         return polygonCache?.cellsById.get(cell.id)?.cell
             || (topology?.cells?.find((candidate) => candidate.id === cell.id) as RenderableTopologyCell | undefined)
             || null;

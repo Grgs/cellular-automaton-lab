@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping
 
 from backend.defaults import DEFAULT_PATCH_DEPTH, DEFAULT_TILING_FAMILY
 from backend.payload_types import (
@@ -65,10 +64,6 @@ def _coerce_float(value: object, fallback: float) -> float:
         return float(value)
     except (TypeError, ValueError):
         return fallback
-
-
-def _payload_mapping(payload: PersistedSimulationSnapshotInput) -> Mapping[str, object]:
-    return payload
 
 
 def _resolve_reset_rule(
@@ -174,7 +169,7 @@ def plan_config_transition(
 
 
 def _resolve_restore_topology_spec(payload: PersistedSimulationSnapshotInput) -> TopologySpec:
-    topology_spec = _payload_mapping(payload).get("topology_spec")
+    topology_spec = payload.get("topology_spec")
     if not isinstance(topology_spec, dict):
         return TopologySpec()
     tiling_family = str(topology_spec.get("tiling_family") or DEFAULT_TILING_FAMILY)
@@ -190,14 +185,19 @@ def _resolve_restore_topology_spec(payload: PersistedSimulationSnapshotInput) ->
     )
 
 
-def _resolve_restore_rule(rule_registry: RuleRegistry, rule_name: object, geometry: str) -> AutomatonRule:
-    if isinstance(rule_name, str) and rule_registry.has(rule_name):
+def _resolve_restore_rule(rule_registry: RuleRegistry, rule_name: str | None, geometry: str) -> AutomatonRule:
+    if rule_name is not None and rule_registry.has(rule_name):
         return rule_registry.get(rule_name)
     return rule_registry.default_for_geometry(geometry)
 
 
+def _restore_rule_name(payload: PersistedSimulationSnapshotInput) -> str | None:
+    rule_name = payload.get("rule")
+    return rule_name if isinstance(rule_name, str) else None
+
+
 def _restore_board_payload_kind(payload: PersistedSimulationSnapshotInput) -> str:
-    if isinstance(_payload_mapping(payload).get("cells_by_id"), dict):
+    if isinstance(payload.get("cells_by_id"), dict):
         return "cells_by_id"
     return "empty"
 
@@ -213,7 +213,7 @@ def plan_restore_transition(
         restored_topology_spec.tiling_family,
         restored_topology_spec.adjacency_mode,
     )
-    next_rule = _resolve_restore_rule(rule_registry, payload.get("rule"), next_geometry)
+    next_rule = _resolve_restore_rule(rule_registry, _restore_rule_name(payload), next_geometry)
     next_patch_depth = _coerce_int(
         restored_topology_spec.patch_depth,
         fallback_state.config.patch_depth if geometry_uses_patch_depth(next_geometry) else DEFAULT_PATCH_DEPTH,
@@ -231,11 +231,11 @@ def plan_restore_transition(
         ),
         width=next_width,
         height=next_height,
-        speed=_coerce_float(_payload_mapping(payload).get("speed"), fallback_state.config.speed),
+        speed=_coerce_float(payload.get("speed"), fallback_state.config.speed),
     )
     return RestoreTransitionPlan(
         config=next_config,
         rule=next_rule,
-        generation=max(0, _coerce_int(_payload_mapping(payload).get("generation"), 0)),
+        generation=max(0, _coerce_int(payload.get("generation"), 0)),
         board_payload_kind=_restore_board_payload_kind(payload),
     )

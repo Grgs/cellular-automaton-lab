@@ -1,9 +1,9 @@
 import { tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
-    isPolygonGeometryCache,
     resolveMixedCellFromOffset,
 } from "../canvas/geometry-mixed.js";
+import { asPolygonGeometryCache } from "./cache-guards.js";
 import { fitRenderCellSizeWithMetrics } from "./shared.js";
 import type {
     GeometryAdapter,
@@ -175,7 +175,7 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 resolvedMetrics,
-                isPolygonGeometryCache(cache) ? cache : null,
+                asPolygonGeometryCache(cache),
             );
             return geometryCell
                 ? { x: geometryCell.centerX, y: geometryCell.centerY }
@@ -194,7 +194,7 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 metrics as AperiodicMetrics,
-                isPolygonGeometryCache(cache) ? cache : null,
+                asPolygonGeometryCache(cache),
             );
             const color = resolveRenderedCellColor(
                 stateValue,

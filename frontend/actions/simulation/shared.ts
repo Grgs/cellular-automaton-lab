@@ -21,6 +21,7 @@ import {
     setPatchDepth,
     setPendingPatchDepth,
 } from "../../state/sizing-state.js";
+import { parsePatchDepth } from "../../parsers/sizing.js";
 import {
     currentRuleSelectionOrigin,
     currentTopologyVariantKey,
@@ -164,7 +165,7 @@ export function createSimulationActionRuntime({
     async function commitPendingPatchDepth(): Promise<boolean> {
         const targetDepth = normalizePatchDepthForTilingFamily(
             state.topologySpec?.tiling_family,
-            state.pendingPatchDepth,
+            parsePatchDepth(state.pendingPatchDepth ?? state.patchDepth),
         );
         if (
             !topologyUsesPatchDepth(state.topologySpec)

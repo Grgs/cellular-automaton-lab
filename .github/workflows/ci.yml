@@ -63,12 +63,24 @@ jobs:
             echo "frontend contract surfaces must not use open-ended unknown object bags outside runtime-validation.ts"
             exit 1
           fi
+          if rg --line-number "normalize[A-Z][A-Za-z]+\([^)]*: unknown|value: unknown|tool: unknown|theme: unknown" frontend --glob "!frontend/parsers/**" --glob "!frontend/runtime-validation.ts"; then
+            echo "frontend raw-value normalization must stay inside dedicated parser modules"
+            exit 1
+          fi
           if rg --line-number "Promise<unknown>|setPreviewCells\(cells: unknown\)|previewPaintCells: \(cells: unknown\)|cache: GeometryCache \| null \| unknown" frontend; then
             echo "frontend public contracts must not expose broad async or render helper types"
             exit 1
           fi
+          if rg --line-number "type\\?: unknown|cells\\?: unknown|cache as|isPolygonGeometryCache\(cache: unknown\)|isHexGeometryCache\(cache: unknown\)|isTriangleGeometryCache\(cache: unknown\)" frontend; then
+            echo "frontend geometry adapters must use shared exact cache guards"
+            exit 1
+          fi
           if rg --line-number "\bJsonObject\b|\bJsonArray\b|\bJsonDocument\b" backend tests tools; then
             echo "raw JSON aliases must use the explicit RawJson* names"
+            exit 1
+          fi
+          if rg --line-number "RawJsonObject|RawJsonDocument" backend tests tools --glob "!backend/payload_types.py" --glob "!backend/frontend_assets.py" --glob "!backend/defaults.py" --glob "!backend/web/requests.py" --glob "!backend/web/routes.py" --glob "!backend/simulation/persistence.py" --glob "!backend/simulation/periodic_face_tilings.py" --glob "!tests/typed_payloads.py" --glob "!tests/e2e/support_server.py"; then
+            echo "raw JSON aliases must stay inside dedicated ingress and validation modules"
             exit 1
           fi
           if rg --line-number "NotRequired\[object\]" tests; then

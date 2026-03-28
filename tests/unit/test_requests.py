@@ -3,6 +3,7 @@ from typing import ClassVar
 
 from flask import Flask, request
 
+from backend.payload_types import RawJsonObject
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.web.requests import (
@@ -42,12 +43,12 @@ class RequestParsingTests(unittest.TestCase):
             self.assertEqual(get_payload(request), {})
 
     def test_parse_optional_numbers_accept_blank_values(self) -> None:
-        payload = {"width": "", "speed": None}
+        payload: RawJsonObject = {"width": "", "speed": None}
         self.assertIsNone(parse_optional_int(payload, "width"))
         self.assertIsNone(parse_optional_float(payload, "speed"))
 
     def test_parse_optional_numbers_convert_numeric_strings(self) -> None:
-        payload = {"width": "12", "speed": "7.5"}
+        payload: RawJsonObject = {"width": "12", "speed": "7.5"}
         self.assertEqual(parse_optional_int(payload, "width"), 12)
         self.assertEqual(parse_optional_float(payload, "speed"), 7.5)
 

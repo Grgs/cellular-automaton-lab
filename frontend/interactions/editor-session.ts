@@ -8,6 +8,7 @@ import {
     EDITOR_TOOL_LINE,
     EDITOR_TOOL_RECTANGLE,
 } from "../editor-tools.js";
+import type { EditorTool } from "../editor-tools.js";
 import type {
     EditorSessionController,
     EditorSessionOptions,
@@ -62,7 +63,7 @@ export function createEditorSessionController({
         return Boolean(state?.topology && state?.topologyIndex && Array.isArray(state?.cellStates));
     }
 
-    function currentTool(): string {
+    function currentTool(): EditorTool {
         return supportsEditorTools() ? getEditorTool() : EDITOR_TOOL_BRUSH;
     }
 

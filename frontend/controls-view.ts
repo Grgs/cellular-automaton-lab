@@ -4,6 +4,7 @@ import type {
     TopologyOption,
 } from "./types/domain.js";
 import type { DomElements } from "./types/dom.js";
+import type { ThemeName } from "./theme.js";
 import type {
     ControlsViewModel,
     LabeledOption,
@@ -220,7 +221,7 @@ function renderRangeControl({
     }
 }
 
-export function renderThemeToggle(elements: DomElements, theme: string): void {
+export function renderThemeToggle(elements: DomElements, theme: ThemeName): void {
     if (!elements.themeToggleBtn) {
         return;
     }

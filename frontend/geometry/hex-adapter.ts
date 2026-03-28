@@ -7,6 +7,7 @@ import {
     hexGridMetrics,
 } from "./shared.js";
 import { parseRegularCellId, regularCellId } from "../topology.js";
+import { asHexGeometryCache } from "./cache-guards.js";
 import type { PaintableCell } from "../types/editor.js";
 import type {
     GeometryAdapter,
@@ -57,16 +58,6 @@ function pointyHexCenterOffset(
         horizontalPitch: resolvedMetrics.horizontalPitch,
         verticalPitch: resolvedMetrics.verticalPitch,
     };
-}
-
-function isHexGeometryCache(cache: unknown): cache is HexGeometryCache {
-    return cache !== null
-        && Boolean(cache)
-        && typeof cache === "object"
-        && "type" in cache
-        && (cache as { type?: unknown }).type === "hex"
-        && "cells" in cache
-        && Array.isArray((cache as { cells?: unknown }).cells);
 }
 
 function pointInPointyHex(
@@ -187,7 +178,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
 
     resolveCellFromOffset({ offsetX, offsetY, width, height, cellSize, metrics, cache }: GeometryResolveCellFromOffsetArgs) {
         const resolvedMetrics = (metrics || hexGridMetrics(width, height, cellSize)) as HexMetrics;
-        const hexCache = isHexGeometryCache(cache) ? cache : null;
+        const hexCache = asHexGeometryCache(cache);
         const approximateRow = Math.round((offsetY - resolvedMetrics.yInset) / resolvedMetrics.verticalPitch);
 
         for (let y = approximateRow - 1; y <= approximateRow + 1; y += 1) {
@@ -225,7 +216,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
 
     resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics, cache }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveHexCoordinates(cell);
-        const hexCache = isHexGeometryCache(cache) ? cache : null;
+        const hexCache = asHexGeometryCache(cache);
         const cachedRow = hexCache?.cells[y] ?? null;
         const cachedCell = cachedRow?.[x]
             ? cachedRow[x]
@@ -254,7 +245,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
     drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
         const { x, y } = resolveHexCoordinates(cell);
         const hexMetrics = metrics as HexMetrics;
-        const hexCache = isHexGeometryCache(cache) ? cache : null;
+        const hexCache = asHexGeometryCache(cache);
         const color = resolveRenderedCellColor(
             stateValue,
             colorLookup,

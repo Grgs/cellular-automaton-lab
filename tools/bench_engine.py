@@ -4,6 +4,7 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 from random import Random
+from typing import TypeVar
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +21,8 @@ from backend.rules.whirlpool import WhirlpoolRule
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.rule_context import build_rule_contexts_for_board
 from backend.simulation.topology import ARCHIMEDEAN_488_GEOMETRY, SimulationBoard, empty_board
+
+TRunnerResult = TypeVar("TRunnerResult")
 
 
 def reference_step_board(
@@ -45,7 +48,7 @@ def build_board(geometry: str, width: int, height: int, max_state: int, seed: in
     return board
 
 
-def median_ms(runner: Callable[[], object], repeats: int = 7, warmups: int = 2) -> float:
+def median_ms(runner: Callable[[], TRunnerResult], repeats: int = 7, warmups: int = 2) -> float:
     for _ in range(warmups):
         runner()
     timings = []

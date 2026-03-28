@@ -10,6 +10,7 @@ import type { AppState, TopologyRenderPayload } from "./state.js";
 import type { DomElements } from "./dom.js";
 import type { MatchMediaResult, UiDisclosureId, UiSessionStorage } from "./session.js";
 import type { AppActionSet } from "./actions.js";
+import type { EditorTool } from "../editor-tools.js";
 
 export type BrowserTimerId = number;
 export type BrowserSetTimeout = (callback: () => void, delay: number) => BrowserTimerId;
@@ -33,7 +34,7 @@ export interface UiSessionController {
     restoreDrawerState(): void;
     restorePaintStateForCurrentRule(): void;
     persistCellSize(tilingFamilyOrCellSize: string | number, cellSize?: number): void;
-    persistEditorTool(editorTool: string): void;
+    persistEditorTool(editorTool: EditorTool): void;
     persistBrushSize(brushSize: number): void;
     persistPaintStateForCurrentRule(): void;
     persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: number): void;
