@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from backend.simulation.topology_catalog_types import TopologyDefinition
+
 if TYPE_CHECKING:
-    from backend.simulation.topology_catalog import (
+    from backend.simulation.topology_catalog_types import (
         SizingPolicyDefinition,
-        TopologyDefinition,
         TopologyVariantDefinition,
     )
 
@@ -15,7 +16,6 @@ def build_topology_catalog(
     sizing_policies: dict[str, SizingPolicyDefinition],
     picker_group_order: dict[str, int],
 ) -> tuple[TopologyDefinition, ...]:
-    from backend.simulation.topology_catalog import TopologyDefinition
     grouped: dict[str, list[TopologyVariantDefinition]] = {}
     for variant in variants:
         grouped.setdefault(variant.tiling_family, []).append(variant)

@@ -11,10 +11,13 @@ from backend.payload_types import (
 )
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
+from backend.simulation.coordinator_mutations import SimulationCoordinatorMutationDispatcher
+from backend.simulation.coordinator_persistence import SimulationCoordinatorPersistence
+from backend.simulation.coordinator_restore import SimulationCoordinatorRestore
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.models import SimulationSnapshot
 from backend.simulation.persistence import SimulationStateStore
-from backend.simulation.persistence_coordinator import PersistenceCoordinator, TimerFactory
+from backend.simulation.persistence_coordinator import TimerFactory
 from backend.simulation.topology import LatticeTopology
 from backend.simulation.runtime import SimulationRuntime
 from backend.simulation.service import SimulationService
@@ -41,10 +44,22 @@ class SimulationCoordinator:
         self.runtime = SimulationRuntime(self.service)
         self.state_restorer = SimulationStateRestorer(rule_registry)
         self.state_store = state_store
-        self.persistence = PersistenceCoordinator(
-            self._save_state_to_store,
+        self.persistence_runtime = SimulationCoordinatorPersistence(
+            logger=self.logger,
+            get_state=self.service.get_state,
+            state_store=state_store,
             debounce_ms=persistence_debounce_ms,
             timer_factory=timer_factory,
+        )
+        self.persistence = self.persistence_runtime.coordinator
+        self.restore_runtime = SimulationCoordinatorRestore(
+            logger=self.logger,
+            service=self.service,
+            state_restorer=self.state_restorer,
+        )
+        self.mutation_dispatcher = SimulationCoordinatorMutationDispatcher(
+            flush_immediately=self.persistence_runtime.flush_immediately,
+            schedule_deferred_persist=self.persistence_runtime.schedule_deferred_persist,
         )
         self.restore_state()
 
@@ -56,7 +71,7 @@ class SimulationCoordinator:
 
     def shutdown(self, timeout: float = 1.0) -> None:
         self.runtime.stop_background_loop(timeout)
-        self.persistence.shutdown()
+        self.persistence_runtime.shutdown()
 
     def _run_immediate_mutation(
         self,
@@ -64,8 +79,7 @@ class SimulationCoordinator:
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> None:
-        action(*args, **kwargs)
-        self.persistence.flush_immediately()
+        self.mutation_dispatcher.run_immediate(action, *args, **kwargs)
 
     def _run_deferred_mutation(
         self,
@@ -73,35 +87,19 @@ class SimulationCoordinator:
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> None:
-        action(*args, **kwargs)
-        self.persistence.schedule_deferred_persist()
+        self.mutation_dispatcher.run_deferred(action, *args, **kwargs)
 
     def _save_state_to_store(self) -> None:
-        if self.state_store is None:
-            return
-        try:
-            self.state_store.save(self.service.get_state())
-        except Exception as exc:
-            self.logger.warning("Failed to persist simulation state: %s", exc)
+        self.persistence_runtime.save_to_store()
 
     def persist_state(self) -> None:
-        self._save_state_to_store()
+        self.persistence_runtime.persist_state()
 
     def _load_persisted_payload(self) -> PersistedSimulationSnapshotV5 | None:
-        if self.state_store is None:
-            return None
-        try:
-            return self.state_store.load()
-        except Exception as exc:
-            self.logger.warning("Failed to restore persisted simulation state: %s", exc)
-            return None
+        return self.persistence_runtime.load_persisted_payload()
 
     def _restore_payload(self, payload: PersistedSimulationSnapshotV5) -> None:
-        restored_state = self.state_restorer.restore(
-            payload,
-            fallback_state=self.service.state,
-        )
-        self.service.replace_state(restored_state)
+        self.restore_runtime.restore_payload(payload)
 
     def restore_state(self) -> None:
         payload = self._load_persisted_payload()

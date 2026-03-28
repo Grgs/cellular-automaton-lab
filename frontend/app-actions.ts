@@ -1,10 +1,9 @@
+import { createDefaultResetRuntime } from "./actions/default-reset.js";
 import { createPatternActions } from "./actions/pattern-actions.js";
 import { createPresetActions } from "./actions/preset-actions.js";
 import { createShowcaseActions } from "./actions/showcase-actions.js";
 import { createSimulationActions } from "./actions/simulation/index.js";
 import { createUiActions } from "./actions/ui-actions.js";
-import { BLOCKING_ACTIVITY_RESTORE_DEFAULTS } from "./blocking-activity.js";
-import { FRONTEND_DEFAULTS } from "./defaults.js";
 import {
     buildPatternFilename,
     buildPatternPayload,
@@ -15,22 +14,7 @@ import {
     serializePatternPayload,
     writeClipboardText,
 } from "./pattern-io.js";
-import { RULE_SELECTION_ORIGIN_DEFAULT } from "./state/constants.js";
-import {
-    clearPendingPatchDepth,
-    rememberedCellSizeForTilingFamily,
-    setCellSize,
-    setPatchDepth,
-} from "./state/sizing-state.js";
 import { dismissFirstRunHint } from "./state/overlay-state.js";
-import {
-    findRule,
-    setActiveRule,
-    setEditorRule,
-    setRuleSelectionOrigin,
-    setSpeed,
-    setTopologySpec,
-} from "./state/simulation-state.js";
 import { resetThemeToDefault } from "./theme.js";
 import type {
     ActionMutationAdapter,
@@ -43,14 +27,7 @@ import type {
     UiActionSet,
 } from "./types/actions.js";
 import type { SimulationMutations } from "./types/controller.js";
-import type { SimulationSnapshot, TopologySpec } from "./types/domain.js";
-
-interface DefaultResetPayload {
-    topology_spec: TopologySpec;
-    speed: number;
-    rule: string;
-    randomize: boolean;
-}
+import type { SimulationSnapshot } from "./types/domain.js";
 
 export function createAppActions({
     state,
@@ -169,37 +146,15 @@ export function createAppActions({
         renderControlPanel,
         viewportController,
     });
-
-    function buildDefaultResetPayload(): DefaultResetPayload {
-        return {
-            topology_spec: FRONTEND_DEFAULTS.simulation.topology_spec,
-            speed: FRONTEND_DEFAULTS.simulation.speed,
-            rule: FRONTEND_DEFAULTS.simulation.rule,
-            randomize: false,
-        };
-    }
-
-    function applyDefaultBoardPreview(): void {
-        const defaultTopologySpec = FRONTEND_DEFAULTS.simulation.topology_spec;
-        const defaultRule = findRule(state, FRONTEND_DEFAULTS.simulation.rule) || null;
-
-        setTopologySpec(state, defaultTopologySpec);
-        state.width = Number(defaultTopologySpec.width) || 0;
-        state.height = Number(defaultTopologySpec.height) || 0;
-        setPatchDepth(state, defaultTopologySpec.patch_depth, defaultTopologySpec.tiling_family);
-        clearPendingPatchDepth(state);
-        setCellSize(
-            state,
-            rememberedCellSizeForTilingFamily(state, defaultTopologySpec.tiling_family),
-            defaultTopologySpec.tiling_family,
-        );
-        setSpeed(state, FRONTEND_DEFAULTS.simulation.speed);
-        setRuleSelectionOrigin(state, RULE_SELECTION_ORIGIN_DEFAULT);
-        if (defaultRule) {
-            setActiveRule(state, defaultRule);
-            setEditorRule(state, defaultRule.name, { resetPaintState: true });
-        }
-    }
+    const defaultResetRuntime = createDefaultResetRuntime({
+        state,
+        interactions,
+        uiSessionController,
+        renderCurrentGrid,
+        renderControlPanel,
+        refreshState,
+        resetThemeToDefault: resetThemeToDefaultFn,
+    });
 
     return {
         ...simulationActions,
@@ -207,22 +162,7 @@ export function createAppActions({
         ...showcaseActions,
         ...patternActions,
         ...uiActions,
-        resetAllSettings: (): Promise<SimulationSnapshot | null> => {
-            dismissFirstRunHint(state);
-            uiSessionController.resetSessionPreferences?.();
-            resetThemeToDefaultFn();
-            renderCurrentGrid();
-            applyDefaultBoardPreview();
-            renderControlPanel();
-            return interactions.sendControl("/api/control/reset", buildDefaultResetPayload(), {
-                blockingActivity: BLOCKING_ACTIVITY_RESTORE_DEFAULTS,
-            }).then(async (simulationState) => {
-                if (!simulationState) {
-                    await refreshState();
-                }
-                return simulationState ?? null;
-            });
-        },
+        resetAllSettings: (): Promise<SimulationSnapshot | null> => defaultResetRuntime.resetAllSettings(),
         undoEdit: () => {
             dismissFirstRunHint(state);
             return interactions.undo?.();
