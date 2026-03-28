@@ -63,6 +63,18 @@ jobs:
             echo "frontend contract surfaces must not use open-ended unknown object bags outside runtime-validation.ts"
             exit 1
           fi
+          if rg --line-number "Promise<unknown>|setPreviewCells\(cells: unknown\)|previewPaintCells: \(cells: unknown\)|cache: GeometryCache \| null \| unknown" frontend; then
+            echo "frontend public contracts must not expose broad async or render helper types"
+            exit 1
+          fi
+          if rg --line-number "\bJsonObject\b|\bJsonArray\b|\bJsonDocument\b" backend tests tools; then
+            echo "raw JSON aliases must use the explicit RawJson* names"
+            exit 1
+          fi
+          if rg --line-number "NotRequired\[object\]" tests; then
+            echo "test override builders must use exact field types"
+            exit 1
+          fi
           if rg --line-number "dict\[str, object\]" backend/simulation/topology_catalog.py backend/defaults.py backend/frontend_assets.py; then
             echo "backend bootstrapped export layer must not use dict[str, object]"
             exit 1

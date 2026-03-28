@@ -5,7 +5,7 @@ import statistics
 import sys
 import time
 import urllib.request
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Mapping, TypedDict
 
@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.payload_types import JsonObject, TopologySpecPayload
+from backend.payload_types import TopologySpecPayload
 from backend.simulation.topology import _build_topology_cached, _build_topology_uncached, empty_board
 from tests.e2e.support_server import AppServer
 

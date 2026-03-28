@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Literal, NotRequired, TypeAlias, TypedDict
 
 
-JsonObject: TypeAlias = dict[str, object]
-JsonArray: TypeAlias = list[object]
-JsonDocument: TypeAlias = JsonObject | JsonArray | str | int | float | bool | None
+RawJsonObject: TypeAlias = dict[str, object]
+RawJsonArray: TypeAlias = list[object]
+RawJsonDocument: TypeAlias = RawJsonObject | RawJsonArray | str | int | float | bool | None
 SparseCellsByIdPayload: TypeAlias = dict[str, int]
 
 

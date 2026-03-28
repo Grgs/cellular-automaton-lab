@@ -34,12 +34,12 @@ except ModuleNotFoundError:
 
 
 class ResetSimulationOverrides(TypedDict, total=False):
-    width: NotRequired[object]
-    height: NotRequired[object]
-    patch_depth: NotRequired[object]
-    speed: NotRequired[object]
-    rule: NotRequired[object]
-    randomize: NotRequired[object]
+    width: NotRequired[int]
+    height: NotRequired[int]
+    patch_depth: NotRequired[int]
+    speed: NotRequired[float]
+    rule: NotRequired[str]
+    randomize: NotRequired[bool]
 
 
 class ApiTestCase(unittest.TestCase):
@@ -72,12 +72,6 @@ class ApiTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.reset_simulation()
 
-    @staticmethod
-    def _coerce_override_int(value: object, *, key: str) -> int:
-        if isinstance(value, (str, bytes, bytearray, int, float)) and not isinstance(value, bool):
-            return int(value)
-        raise AssertionError(f"reset override '{key}' must be int-compatible.")
-
     def build_reset_payload(self, **overrides: Unpack[ResetSimulationOverrides]) -> ResetControlRequestPayload:
         topology_spec: TopologySpecPayload = {
             'tiling_family': 'square',
@@ -88,14 +82,11 @@ class ApiTestCase(unittest.TestCase):
             'patch_depth': 0,
         }
         if "width" in overrides:
-            topology_spec["width"] = self._coerce_override_int(overrides.pop("width"), key="width")
+            topology_spec["width"] = int(overrides.pop("width"))
         if "height" in overrides:
-            topology_spec["height"] = self._coerce_override_int(overrides.pop("height"), key="height")
+            topology_spec["height"] = int(overrides.pop("height"))
         if "patch_depth" in overrides:
-            topology_spec["patch_depth"] = self._coerce_override_int(
-                overrides.pop("patch_depth"),
-                key="patch_depth",
-            )
+            topology_spec["patch_depth"] = int(overrides.pop("patch_depth"))
         payload: ResetControlRequestPayload = {
             'topology_spec': topology_spec,
             'speed': 5,
@@ -103,21 +94,11 @@ class ApiTestCase(unittest.TestCase):
             'randomize': False,
         }
         if "speed" in overrides:
-            speed = overrides.pop("speed")
-            if isinstance(speed, (str, bytes, bytearray, int, float)) and not isinstance(speed, bool):
-                payload["speed"] = float(speed)
-            else:
-                raise AssertionError("reset override 'speed' must be numeric.")
+            payload["speed"] = float(overrides.pop("speed"))
         if "rule" in overrides:
-            rule = overrides.pop("rule")
-            if not isinstance(rule, str) or not rule:
-                raise AssertionError("reset override 'rule' must be a non-empty string.")
-            payload["rule"] = rule
+            payload["rule"] = overrides.pop("rule")
         if "randomize" in overrides:
-            randomize = overrides.pop("randomize")
-            if not isinstance(randomize, bool):
-                raise AssertionError("reset override 'randomize' must be a boolean.")
-            payload["randomize"] = randomize
+            payload["randomize"] = overrides.pop("randomize")
         if overrides:
             raise AssertionError(f"unsupported reset overrides: {sorted(overrides)}")
         return payload

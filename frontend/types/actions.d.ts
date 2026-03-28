@@ -1,4 +1,5 @@
 import type {
+    AsyncVoid,
     BlockingActivityConfig,
     ConfigSyncBody,
     ConfigSyncController,
@@ -94,8 +95,8 @@ export interface ShowcaseActionSet {
 }
 
 export interface UiActionSet {
-    setCellSize(nextCellSize: number): Promise<unknown>;
-    commitCellSize(nextCellSize: number): Promise<unknown>;
+    setCellSize(nextCellSize: number): Promise<boolean>;
+    commitCellSize(nextCellSize: number): Promise<boolean>;
     setPaintState(nextPaintState: number | null): void;
     setEditorTool(nextTool: string): void;
     setBrushSize(nextBrushSize: number): void;
@@ -116,9 +117,9 @@ export interface AppActionSet extends
     ShowcaseActionSet,
     UiActionSet {
     resetAllSettings(): Promise<SimulationSnapshot | null>;
-    undoEdit(): Promise<unknown> | undefined;
-    redoEdit(): Promise<unknown> | undefined;
-    cancelEditorPreview(): Promise<unknown> | undefined;
+    undoEdit(): Promise<SimulationSnapshot | null> | undefined;
+    redoEdit(): Promise<SimulationSnapshot | null> | undefined;
+    cancelEditorPreview(): Promise<void> | undefined;
 }
 
 export interface PatternActionOptions {
@@ -212,7 +213,7 @@ export interface PatternImportOptions {
     successMessage: string;
     cancelMessage: string;
     blockingActivity?: BlockingActivityConfig | null;
-    onSuccess?: () => void;
+    onSuccess?: () => AsyncVoid;
 }
 
 export type ResetRequestBody = ResetControlBody;

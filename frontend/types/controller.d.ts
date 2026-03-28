@@ -5,6 +5,7 @@ import type {
     SimulationSnapshot,
     TopologySpec,
 } from "./domain.js";
+import type { PreviewPaintCells } from "./editor.js";
 import type { AppState, TopologyRenderPayload } from "./state.js";
 import type { DomElements } from "./dom.js";
 import type { MatchMediaResult, UiDisclosureId, UiSessionStorage } from "./session.js";
@@ -13,6 +14,7 @@ import type { AppActionSet } from "./actions.js";
 export type BrowserTimerId = number;
 export type BrowserSetTimeout = (callback: () => void, delay: number) => BrowserTimerId;
 export type BrowserClearTimeout = (timerId: BrowserTimerId) => void;
+export type AsyncVoid = void | Promise<void>;
 
 export interface ConfigSyncController {
     reconcile(simulationState: SimulationSnapshot): void;
@@ -64,7 +66,7 @@ export interface SimulationReconcilerDependencies {
 
 export interface MutationRunnerOptions {
     onError?: (error: unknown) => void;
-    onRecover?: (error: unknown) => Promise<void> | void;
+    onRecover?: (error: unknown) => AsyncVoid;
 }
 
 export interface MutationRunner {
@@ -185,7 +187,7 @@ export interface AppView {
 
 export interface InteractionController {
     bindGridInteractions(): void;
-    toggleCell?(cell: CellIdentifier): Promise<unknown>;
+    toggleCell?(cell: CellIdentifier): Promise<void>;
     sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
     sendControl(
         path: "/api/control/reset",
@@ -198,9 +200,9 @@ export interface InteractionController {
         options?: SimulationMutationOptions,
     ): Promise<SimulationSnapshot | null>;
     runSerialized<T>(task: () => Promise<T>, options?: MutationRunnerOptions): Promise<T>;
-    undo?(): Promise<unknown>;
-    redo?(): Promise<unknown>;
-    cancelActivePreview?(): Promise<unknown>;
+    undo?(): Promise<SimulationSnapshot | null>;
+    redo?(): Promise<SimulationSnapshot | null>;
+    cancelActivePreview?(): Promise<void>;
 }
 
 export interface ViewportController {
@@ -220,7 +222,7 @@ export interface GridView {
         geometry: string,
     ): void;
     getCellFromPointerEvent?(event: Event): CellIdentifier | null;
-    setPreviewCells(cells: unknown): void;
+    setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
 }
 

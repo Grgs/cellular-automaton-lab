@@ -2,7 +2,7 @@ import { DEFAULT_GEOMETRY, gridMetrics, normalizeGeometry } from "./geometry-cor
 import { getGeometryAdapter } from "./geometry/registry.js";
 import type { PaintableCell } from "./types/editor.js";
 import type { TopologyPayload } from "./types/domain.js";
-import type { GeometryAdapter, GeometryCache, GridMetrics } from "./types/rendering.js";
+import type { GeometryCache, GridMetrics, MixedGeometryCell } from "./types/rendering.js";
 
 export function isMixedGeometry(geometry: string): boolean {
     return getGeometryAdapter(geometry).family === "mixed";
@@ -12,7 +12,7 @@ export function buildMixedCellGeometry(
     cell: PaintableCell,
     metrics: GridMetrics,
     geometry: string,
-): unknown {
+): MixedGeometryCell {
     const adapter = getGeometryAdapter(geometry);
     if (adapter.family !== "mixed" || typeof adapter.buildCellGeometry !== "function") {
         return null;
@@ -66,7 +66,7 @@ export function topologyCellCenter(
     topology: TopologyPayload | null = null,
 ): { x: number; y: number } {
     const normalizedGeometry = normalizeGeometry(geometry);
-    const adapter = getGeometryAdapter(normalizedGeometry) as GeometryAdapter;
+    const adapter = getGeometryAdapter(normalizedGeometry);
     return adapter.resolveCellCenter({
         cell,
         width,

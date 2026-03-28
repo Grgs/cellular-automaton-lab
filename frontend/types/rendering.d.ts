@@ -1,6 +1,6 @@
 import type { ViewportDimensions } from "./controller.js";
 import type { CellStateDefinition, TopologyCell, TopologyPayload } from "./domain.js";
-import type { PaintableCell, PreviewPaintCell } from "./editor.js";
+import type { PaintableCell, PreviewPaintCell, PreviewPaintCells } from "./editor.js";
 import type { AppState } from "./state.js";
 
 export interface Point2D {
@@ -97,6 +97,8 @@ export interface PolygonGeometryCell {
     maxY: number;
 }
 
+export type MixedGeometryCell = PolygonGeometryCell | null;
+
 export interface PeriodicFaceTilingDescriptor {
     geometry: string;
     label: string;
@@ -138,7 +140,7 @@ export interface RenderedCellArgs {
     cell: TopologyCell | PaintableCell;
     stateValue: number;
     metrics: GridMetrics;
-    cache: GeometryCache | null | unknown;
+    cache: GeometryCache | null;
     colors: CanvasColors;
     colorLookup: Map<number, string>;
     renderStyle?: CanvasRenderStyle;
@@ -260,7 +262,7 @@ export interface GeometryAdapter {
         cell: TopologyCell | PaintableCell;
         metrics: GridMetrics;
         cache?: GeometryCache | null;
-    }): unknown;
+    }): MixedGeometryCell;
     applyViewportPreview(args: GeometryViewportPreviewArgs): {
         applied: boolean;
         renderGrid: boolean;
@@ -280,7 +282,7 @@ export interface CanvasGridView {
         stateDefinitions: CellStateDefinition[],
         geometry: string,
     ): void;
-    setPreviewCells(cells: PreviewPaintCell[]): void;
+    setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
     getCellFromPointerEvent(event: Event): PaintableCell | null;
 }

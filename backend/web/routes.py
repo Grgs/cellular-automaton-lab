@@ -9,7 +9,7 @@ from backend.payload_types import (
     ApiErrorPayload,
     CellTargetPayload,
     CellUpdatePayload,
-    JsonObject,
+    RawJsonObject,
     RulesResponsePayload,
     TopologySpecPatch,
 )
@@ -70,7 +70,7 @@ def topology_response() -> Response:
     return jsonify(topology.to_dict())
 
 
-def validated_state_action(action: Callable[[JsonObject], None]) -> JsonRouteResult:
+def validated_state_action(action: Callable[[RawJsonObject], None]) -> JsonRouteResult:
     payload = get_payload(request)
     try:
         action(payload)
@@ -84,7 +84,7 @@ def control_state_action(action: Callable[[], None]) -> Response:
     return state_response()
 
 
-def apply_reset_payload(payload: JsonObject) -> None:
+def apply_reset_payload(payload: RawJsonObject) -> None:
     if payload.get("geometry") not in (None, ""):
         raise RequestValidationError("'geometry' must be provided through 'topology_spec'.")
     if payload.get("width") not in (None, "") or payload.get("height") not in (None, ""):
@@ -100,7 +100,7 @@ def apply_reset_payload(payload: JsonObject) -> None:
     )
 
 
-def apply_config_payload(payload: JsonObject) -> None:
+def apply_config_payload(payload: RawJsonObject) -> None:
     if payload.get("geometry") not in (None, ""):
         raise RequestValidationError("'geometry' can only be changed through reset.")
     if payload.get("width") not in (None, "") or payload.get("height") not in (None, ""):
@@ -146,14 +146,14 @@ def dispatch_cell_updates(parsed_cells: list[CellUpdatePayload]) -> None:
         simulation_coordinator().set_cells_by_id(id_cells)
 
 
-def apply_toggle_cell_payload(payload: JsonObject) -> None:
+def apply_toggle_cell_payload(payload: RawJsonObject) -> None:
     dispatch_single_cell_target(
         parse_cell_target(payload),
         by_id=simulation_coordinator().toggle_cell_by_id,
     )
 
 
-def apply_set_cell_payload(payload: JsonObject) -> None:
+def apply_set_cell_payload(payload: RawJsonObject) -> None:
     state = parse_state_value(payload, simulation_coordinator().get_rule())
     dispatch_single_cell_target(
         parse_cell_target(payload),
@@ -164,7 +164,7 @@ def apply_set_cell_payload(payload: JsonObject) -> None:
     )
 
 
-def apply_set_cells_payload(payload: JsonObject) -> None:
+def apply_set_cells_payload(payload: RawJsonObject) -> None:
     dispatch_cell_updates(parse_cell_updates(payload, simulation_coordinator().get_rule()))
 
 

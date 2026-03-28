@@ -62,17 +62,6 @@ function canvasBorderRadius(gap: number): string {
     return gap === 0 ? "0px" : "18px";
 }
 
-function extractRenderState(input: unknown): CanvasRenderPayload {
-    const payload = (input && typeof input === "object") ? input as Partial<CanvasRenderPayload> : {};
-    return {
-        topology: payload.topology ?? null,
-        cellStates: Array.isArray(payload.cellStates) ? payload.cellStates : [],
-        previewCellStatesById: payload.previewCellStatesById && typeof payload.previewCellStatesById === "object"
-            ? payload.previewCellStatesById
-            : null,
-    };
-}
-
 export {
     buildStateColorLookup,
     resolveDeadCellColor,
@@ -322,12 +311,11 @@ export function createCanvasGridView({
     }
 
     function render(
-        nextGridOrState: unknown,
+        nextState: CanvasRenderPayload,
         nextCellSize = cellSize,
         nextStateDefinitions = stateDefinitions,
         nextGeometry = geometry,
     ): void {
-        const nextState = extractRenderState(nextGridOrState);
         topology = nextState.topology;
         cellStates = nextState.cellStates;
         previewCellStatesById = nextState.previewCellStatesById;

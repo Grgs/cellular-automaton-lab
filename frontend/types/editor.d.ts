@@ -34,22 +34,24 @@ export interface PreviewPaintCell extends PaintableCell {
     state: number;
 }
 
+export type PreviewPaintCells = PreviewPaintCell[];
+
 export interface DragPaintResult {
     changed: boolean;
-    previewCells: PreviewPaintCell[];
+    previewCells: PreviewPaintCells;
 }
 
 export interface DragPaintCommit {
     moved: boolean;
     pointerId: number | null;
-    paintedCells: PreviewPaintCell[];
+    paintedCells: PreviewPaintCells;
 }
 
 export interface DragPaintSession {
     start(cell: PaintableCell, paintState?: number, pointerId?: number | null): void;
     update(cell: PaintableCell): DragPaintResult;
     end(): DragPaintCommit | null;
-    getPreviewCells(): PreviewPaintCell[];
+    getPreviewCells(): PreviewPaintCells;
 }
 
 export interface EditorHistoryEntry {
@@ -102,7 +104,7 @@ export interface EditorSessionOptions {
     getPaintState: () => number;
     getEditorTool?: () => string;
     getBrushSize?: () => number;
-    previewPaintCells: (cells: PreviewPaintCell[]) => void;
+    previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
     setCellsRequest: SetCellsRequestFunction;
     postControl: PostControlFunction;
@@ -128,7 +130,7 @@ export interface HistoryCommandsOptions {
 
 export interface LegacyDragOptions {
     getPaintState: () => number;
-    previewPaintCells: (cells: PreviewPaintCell[]) => void;
+    previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
     setCellsRequest: SetCellsRequestFunction;
     runStateMutation: (
@@ -144,7 +146,7 @@ export interface InteractionControllerOptions {
     surfaceElement: HTMLElement | null;
     state?: AppState | null;
     resolveCellFromEvent: (event: PointerEvent | MouseEvent) => PaintableCell | null;
-    previewPaintCells: (cells: PreviewPaintCell[]) => void;
+    previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
     mutationRunner: MutationRunner;
     onError: (error: unknown) => void;

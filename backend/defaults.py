@@ -4,30 +4,30 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-from backend.payload_types import AppDefaultsPayload, JsonObject
+from backend.payload_types import AppDefaultsPayload, RawJsonObject
 from backend.simulation.topology_catalog import resolve_geometry_key
 
 DEFAULTS_PATH = Path(__file__).resolve().parents[1] / "config" / "defaults.json"
 
 
-def _require(mapping: JsonObject, key: str) -> object:
+def _require(mapping: RawJsonObject, key: str) -> object:
     if key not in mapping:
         raise KeyError(f"Missing required defaults key: {key}")
     return mapping[key]
 
 
-def _require_str(mapping: JsonObject, key: str) -> str:
+def _require_str(mapping: RawJsonObject, key: str) -> str:
     return str(_require(mapping, key))
 
 
-def _require_int(mapping: JsonObject, key: str) -> int:
+def _require_int(mapping: RawJsonObject, key: str) -> int:
     value = _require(mapping, key)
     if isinstance(value, (str, bytes, bytearray, int, float)):
         return int(value)
     raise ValueError(f"Defaults key '{key}' must be numeric.")
 
 
-def _require_float(mapping: JsonObject, key: str) -> float:
+def _require_float(mapping: RawJsonObject, key: str) -> float:
     value = _require(mapping, key)
     if isinstance(value, (str, bytes, bytearray, int, float)):
         return float(value)

@@ -142,7 +142,7 @@ export function normalizePatchDepthForTilingFamily(
 
 export function setPatchDepth(
     state: AppState,
-    patchDepth: unknown,
+    patchDepth: number,
     tilingFamily: string | null | undefined = state.topologySpec.tiling_family,
 ): void {
     state.patchDepth = normalizePatchDepthForTilingFamily(tilingFamily, patchDepth);
@@ -152,8 +152,8 @@ export function setPatchDepth(
     };
 }
 
-export function setPendingPatchDepth(state: AppState, patchDepth: unknown): void {
-    if (patchDepth === null || patchDepth === undefined || patchDepth === "") {
+export function setPendingPatchDepth(state: AppState, patchDepth: number | null): void {
+    if (patchDepth === null) {
         state.pendingPatchDepth = null;
         return;
     }
@@ -164,18 +164,18 @@ export function clearPendingPatchDepth(state: AppState): void {
     state.pendingPatchDepth = null;
 }
 
-export function setPatchDepthMemoryMap(state: AppState, patchDepthByTilingFamily: unknown): void {
+export function setPatchDepthMemoryMap(state: AppState, patchDepthByTilingFamily: Record<string, number>): void {
     state.patchDepthByTilingFamily = normalizePatchDepthByTilingFamily(patchDepthByTilingFamily);
 }
 
-export function setCellSizeMemoryMap(state: AppState, cellSizeByTilingFamily: unknown): void {
+export function setCellSizeMemoryMap(state: AppState, cellSizeByTilingFamily: Record<string, number>): void {
     state.cellSizeByTilingFamily = normalizeCellSizeByTilingFamily(cellSizeByTilingFamily);
 }
 
 export function rememberCellSizeForTilingFamily(
     state: AppState,
     tilingFamily: string | null | undefined,
-    cellSize: unknown,
+    cellSize: number,
 ): void {
     if (!tilingFamily) {
         return;
@@ -202,7 +202,7 @@ export function rememberedCellSizeForTilingFamily(
 export function rememberPatchDepthForTilingFamily(
     state: AppState,
     tilingFamily: string | null | undefined,
-    patchDepth: unknown,
+    patchDepth: number,
 ): void {
     if (!tilingFamily) {
         return;
@@ -228,12 +228,12 @@ export function rememberedPatchDepthForTilingFamily(
 
 export function setCellSize(
     state: AppState,
-    cellSize: unknown,
+    cellSize: number,
     tilingFamily: string | null | undefined = state.topologySpec.tiling_family,
 ): void {
     state.cellSize = normalizeCellSizeForTilingFamily(tilingFamily, cellSize);
 }
 
-export function setRenderCellSize(state: AppState, cellSize: unknown): void {
+export function setRenderCellSize(state: AppState, cellSize: number): void {
     state.renderCellSize = normalizeRenderCellSize(cellSize);
 }

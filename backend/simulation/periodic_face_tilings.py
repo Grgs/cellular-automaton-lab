@@ -7,7 +7,7 @@ import math
 from pathlib import Path
 from typing import Callable, NotRequired, TypedDict
 
-from backend.payload_types import JsonObject, PeriodicFaceTilingDescriptorPayload
+from backend.payload_types import PeriodicFaceTilingDescriptorPayload, RawJsonObject
 from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_33336_GEOMETRY,
@@ -125,7 +125,7 @@ class _JsonPatternDescriptor(TypedDict):
     id_pattern: NotRequired[str]
 
 
-def _require_object(value: object, *, context: str) -> JsonObject:
+def _require_object(value: object, *, context: str) -> RawJsonObject:
     if not isinstance(value, dict):
         raise ValueError(f"{context} is invalid.")
     return value

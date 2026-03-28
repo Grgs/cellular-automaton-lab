@@ -2,6 +2,7 @@ import { bindControlShortcuts } from "./controls-shortcuts.js";
 import { DISCLOSURE_IDS } from "./ui-session.js";
 import type { AppActionSet } from "./types/actions.js";
 import type { BrowserClearTimeout, BrowserSetTimeout, BrowserTimerId } from "./types/controller.js";
+import type { SimulationSnapshot } from "./types/domain.js";
 import type { DomElements } from "./types/dom.js";
 import type { UiDisclosureId } from "./types/session.js";
 
@@ -31,6 +32,9 @@ function isInteractiveChromeClick(event: Event, container: HTMLElement | null): 
 }
 
 const LIMIT_CUE_DURATION_MS = 1800;
+type MaybePromise<TResult> = TResult | Promise<TResult>;
+type AsyncControlResult = MaybePromise<boolean | void | null | SimulationSnapshot>;
+type AsyncButtonResult = MaybePromise<boolean | void | null | SimulationSnapshot>;
 
 function parseNumericConstraint(value: string): number | null {
     const parsed = Number(value);
@@ -192,8 +196,8 @@ function bindConstrainedNumericControl({
     input: HTMLInputElement | null;
     field: HTMLElement | null;
     label: HTMLElement | null;
-    onInput?: (value: number) => void | Promise<unknown>;
-    onChange?: (value: number) => void | Promise<unknown>;
+    onInput?: (value: number) => AsyncControlResult;
+    onChange?: (value: number) => AsyncControlResult;
     cueTimeouts: WeakMap<HTMLInputElement, BrowserTimerId>;
     setTimeoutFn: BrowserSetTimeout;
     clearTimeoutFn: BrowserClearTimeout;
@@ -255,7 +259,7 @@ function bindInputControl<TValue>(
     element: HTMLElement | null,
     eventName: "input" | "change",
     valueFactory: () => TValue,
-    handler: ((value: TValue) => void | Promise<unknown>) | undefined,
+    handler: ((value: TValue) => AsyncControlResult) | undefined,
 ): void {
     if (!element || !handler) {
         return;
@@ -267,7 +271,7 @@ function bindInputControl<TValue>(
 
 function bindButtonControl(
     element: HTMLButtonElement | null,
-    handler: (() => void | Promise<unknown>) | undefined,
+    handler: (() => AsyncButtonResult) | undefined,
 ): void {
     if (!element || !handler) {
         return;
@@ -280,7 +284,7 @@ function bindButtonControl(
 function bindDelegatedControl(
     container: HTMLElement | null,
     selector: string,
-    handler: ((button: HTMLElement) => void | Promise<unknown>) | undefined,
+    handler: ((button: HTMLElement) => AsyncControlResult) | undefined,
 ): void {
     if (!container || !handler) {
         return;

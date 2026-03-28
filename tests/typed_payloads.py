@@ -3,7 +3,7 @@ from __future__ import annotations
 from backend.payload_types import (
     ApiErrorPayload,
     CellStatePayload,
-    JsonObject,
+    RawJsonObject,
     RuleDefinitionPayload,
     RulesResponsePayload,
     ServerMetaPayload,
@@ -14,7 +14,7 @@ from backend.payload_types import (
 )
 
 
-def _require_json_object(value: object, *, context: str) -> JsonObject:
+def _require_json_object(value: object, *, context: str) -> RawJsonObject:
     if not isinstance(value, dict):
         raise AssertionError(f"{context} must be a JSON object.")
     return value

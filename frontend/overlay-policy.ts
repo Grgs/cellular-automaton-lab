@@ -36,7 +36,7 @@ type OverlayIntent =
     | typeof OVERLAY_INTENT_LAYOUT_OCCLUSION_CHANGED;
 
 interface OverlayIntentContext {
-    inspectorOccludesGrid?: unknown;
+    inspectorOccludesGrid?: boolean;
 }
 
 function setDismissed(state: AppState, dismissed: boolean): boolean {
@@ -147,7 +147,7 @@ export function applyOverlayIntent(
             return dismissalChanged || inspectorChanged;
         }
         case OVERLAY_INTENT_LAYOUT_OCCLUSION_CHANGED: {
-            const nextOccludesGrid = Boolean(context.inspectorOccludesGrid);
+            const nextOccludesGrid = context.inspectorOccludesGrid ?? false;
             if (state.inspectorOccludesGrid === nextOccludesGrid) {
                 return false;
             }

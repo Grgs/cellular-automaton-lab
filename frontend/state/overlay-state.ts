@@ -8,56 +8,56 @@ interface BlockingActivityOptions {
     startedAt?: number;
 }
 
-export function setDrawerOpen(state: AppState, drawerOpen: unknown): void {
-    state.drawerOpen = Boolean(drawerOpen);
+export function setDrawerOpen(state: AppState, drawerOpen: boolean): void {
+    state.drawerOpen = drawerOpen;
 }
 
-export function setOverlaysDismissed(state: AppState, overlaysDismissed: unknown): void {
-    state.overlaysDismissed = Boolean(overlaysDismissed);
+export function setOverlaysDismissed(state: AppState, overlaysDismissed: boolean): void {
+    state.overlaysDismissed = overlaysDismissed;
 }
 
 export function clearOverlaysDismissed(state: AppState): void {
     state.overlaysDismissed = false;
 }
 
-export function setInspectorTemporarilyHidden(state: AppState, inspectorTemporarilyHidden: unknown): void {
-    state.inspectorTemporarilyHidden = Boolean(inspectorTemporarilyHidden);
+export function setInspectorTemporarilyHidden(state: AppState, inspectorTemporarilyHidden: boolean): void {
+    state.inspectorTemporarilyHidden = inspectorTemporarilyHidden;
 }
 
 export function clearInspectorTemporarilyHidden(state: AppState): void {
     state.inspectorTemporarilyHidden = false;
 }
 
-export function setFirstRunHintDismissed(state: AppState, dismissed: unknown): void {
-    state.firstRunHintDismissed = Boolean(dismissed);
+export function setFirstRunHintDismissed(state: AppState, dismissed: boolean): void {
+    state.firstRunHintDismissed = dismissed;
 }
 
 export function dismissFirstRunHint(state: AppState): void {
     setFirstRunHintDismissed(state, true);
 }
 
-export function setOverlayRunPending(state: AppState, overlayRunPending: unknown): void {
-    state.overlayRunPending = Boolean(overlayRunPending);
+export function setOverlayRunPending(state: AppState, overlayRunPending: boolean): void {
+    state.overlayRunPending = overlayRunPending;
 }
 
-export function setRunningOverlayRestoreActive(state: AppState, runningOverlayRestoreActive: unknown): void {
-    state.runningOverlayRestoreActive = Boolean(runningOverlayRestoreActive);
+export function setRunningOverlayRestoreActive(state: AppState, runningOverlayRestoreActive: boolean): void {
+    state.runningOverlayRestoreActive = runningOverlayRestoreActive;
 }
 
 export function clearRunningOverlayRestoreActive(state: AppState): void {
     state.runningOverlayRestoreActive = false;
 }
 
-export function setInspectorOccludesGrid(state: AppState, inspectorOccludesGrid: unknown): void {
-    state.inspectorOccludesGrid = Boolean(inspectorOccludesGrid);
+export function setInspectorOccludesGrid(state: AppState, inspectorOccludesGrid: boolean): void {
+    state.inspectorOccludesGrid = inspectorOccludesGrid;
 }
 
-export function setEditArmed(state: AppState, editArmed: unknown): void {
-    state.editArmed = Boolean(editArmed);
+export function setEditArmed(state: AppState, editArmed: boolean): void {
+    state.editArmed = editArmed;
 }
 
-export function setEditCueVisible(state: AppState, editCueVisible: unknown): void {
-    state.editCueVisible = Boolean(editCueVisible);
+export function setEditCueVisible(state: AppState, editCueVisible: boolean): void {
+    state.editCueVisible = editCueVisible;
 }
 
 export function armEditMode(

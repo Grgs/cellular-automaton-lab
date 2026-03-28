@@ -29,6 +29,7 @@ import type {
     ViewportController,
 } from "./types/controller.js";
 import type { DomElements } from "./types/dom.js";
+import type { PreviewPaintCells } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 export async function initializeAppController({
@@ -101,7 +102,7 @@ export async function initializeAppController({
         surfaceElement: elements.grid,
         state,
         resolveCellFromEvent: createSurfaceCellResolver({ state, gridView }),
-        previewPaintCells: (cells: unknown) => gridView.setPreviewCells(cells),
+        previewPaintCells: (cells: PreviewPaintCells) => gridView.setPreviewCells(cells),
         clearPreview: () => gridView.clearPreview(),
         mutationRunner,
         simulationMutations: getSimulationMutations(),

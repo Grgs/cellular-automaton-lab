@@ -7,10 +7,9 @@ import tempfile
 import time
 import urllib.request
 from pathlib import Path
-from collections.abc import Mapping
 from typing import IO, Protocol
 
-from backend.payload_types import ResetControlRequestPayload, SimulationStatePayload, TopologyPayload
+from backend.payload_types import RawJsonDocument, ResetControlRequestPayload, SimulationStatePayload, TopologyPayload
 from tests.typed_payloads import require_simulation_state_payload, require_topology_payload
 
 
@@ -48,8 +47,8 @@ class JsonApiClient:
         self,
         path: str,
         method: str = 'GET',
-        payload: Mapping[str, object] | None = None,
-    ) -> object:
+        payload: ResetControlRequestPayload | None = None,
+    ) -> RawJsonDocument:
         body = None if payload is None else json.dumps(payload).encode('utf-8')
         request = urllib.request.Request(
             f'{self.base_url}{path}',

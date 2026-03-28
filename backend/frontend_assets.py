@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from backend.payload_types import FrontendManifestPayload, FrontendManifestRecord, JsonObject
+from backend.payload_types import FrontendManifestPayload, FrontendManifestRecord, RawJsonObject
 
 
 @dataclass(frozen=True)
@@ -61,7 +61,7 @@ class FrontendAssetManifest:
         )
 
     @staticmethod
-    def _normalize_record(record: JsonObject) -> FrontendManifestRecord:
+    def _normalize_record(record: RawJsonObject) -> FrontendManifestRecord:
         normalized_record: FrontendManifestRecord = {}
 
         file_value = record.get("file")

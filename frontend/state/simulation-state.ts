@@ -156,15 +156,15 @@ export function currentRuleSelectionOrigin(state: AppState): RuleSelectionOrigin
         : RULE_SELECTION_ORIGIN_DEFAULT;
 }
 
-export function setSelectedPaintState(state: AppState, paintState: unknown): void {
-    state.selectedPaintState = Number(paintState);
+export function setSelectedPaintState(state: AppState, paintState: number | null): void {
+    state.selectedPaintState = paintState;
 }
 
-export function setEditorTool(state: AppState, tool: unknown): void {
+export function setEditorTool(state: AppState, tool: string): void {
     state.selectedEditorTool = normalizeEditorTool(tool);
 }
 
-export function setBrushSize(state: AppState, brushSize: unknown): void {
+export function setBrushSize(state: AppState, brushSize: number): void {
     state.brushSize = normalizeBrushSize(brushSize);
 }
 
@@ -186,8 +186,8 @@ export function setSelectedPresetId(state: AppState, ruleName: string | null, pr
     state.selectedPresetIdsByRule[ruleName] = presetId;
 }
 
-export function setSpeed(state: AppState, speed: unknown): void {
-    state.speed = Number(speed);
+export function setSpeed(state: AppState, speed: number): void {
+    state.speed = speed;
 }
 
 export function setTopologySpec(state: AppState, topologySpec: Partial<TopologySpec>): void {

@@ -85,7 +85,7 @@ export function createUiActions({
     function applyCellSize(
         nextCellSize: number,
         { immediate = false }: { immediate?: boolean } = {},
-    ): Promise<unknown> {
+    ): Promise<boolean> {
         setCellSizeFn(state, nextCellSize);
         rememberCellSizeForTilingFamily(state, state.topologySpec?.tiling_family, state.cellSize);
         uiSessionController.persistCellSize(state.cellSize);
@@ -97,13 +97,13 @@ export function createUiActions({
 
         if (immediate) {
             const flushed = viewportController?.flush?.();
-            if (flushed) {
+            if (flushed !== undefined) {
                 return flushed;
             }
-            return Promise.resolve(viewportController?.schedule?.({ delay: 0 }));
+            return Promise.resolve(Boolean(viewportController?.schedule?.({ delay: 0 })));
         }
 
-        return Promise.resolve(viewportController?.schedule?.());
+        return Promise.resolve(Boolean(viewportController?.schedule?.()));
     }
 
     function applyDrawerState(nextOpen: boolean): Promise<boolean> {

@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from backend.payload_types import (
     CellTargetPayload,
     CellUpdatePayload,
-    JsonObject,
+    RawJsonObject,
     TopologySpecRequestPayload,
 )
 from backend.rules import RuleRegistry
@@ -35,7 +35,7 @@ class RequestValidationError(ValueError):
     """Raised when an API request payload is malformed."""
 
 
-def get_payload(request: Request) -> JsonObject:
+def get_payload(request: Request) -> RawJsonObject:
     payload = request.get_json(silent=True)
     return payload if isinstance(payload, dict) else {}
 
