@@ -1,0 +1,34 @@
+minimum_pre_commit_version: "4.5.1"
+default_install_hook_types:
+  - pre-commit
+  - pre-push
+
+repos:
+  - repo: local
+    hooks:
+      - id: privacy-guard-staged
+        name: privacy guard (changed files)
+        entry: python tools/privacy_guard.py
+        language: python
+        stages: [pre-commit]
+      - id: privacy-guard-push
+        name: privacy guard (full repo)
+        entry: python tools/privacy_guard.py --all-files
+        language: python
+        pass_filenames: false
+        stages: [pre-push, manual]
+      - id: detect-secrets-staged
+        name: detect-secrets (changed files)
+        entry: python tools/run_detect_secrets.py --baseline .secrets.baseline
+        language: python
+        additional_dependencies:
+          - detect-secrets==1.5.0
+        stages: [pre-commit]
+      - id: detect-secrets-push
+        name: detect-secrets (full repo)
+        entry: python tools/run_detect_secrets.py --baseline .secrets.baseline --all-files
+        language: python
+        additional_dependencies:
+          - detect-secrets==1.5.0
+        pass_filenames: false
+        stages: [pre-push, manual]

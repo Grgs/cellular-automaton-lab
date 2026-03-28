@@ -11,6 +11,43 @@ In practice, the test stack is:
 
 The repository does not rely on a single “everything is tested in the browser” approach. Most logic is validated before a real browser is involved.
 
+## Local Git Guards
+
+The repo also includes local git guards built on `pre-commit`. They are meant to catch privacy leaks and obvious secret exposure before code is pushed.
+
+The guard stack uses:
+
+- `pre-commit` as the hook runner
+- `detect-secrets` for secret scanning
+- a repo-local privacy scanner for local filesystem paths, consumer email addresses, and consumer cloud-share links
+
+Install the hooks with:
+
+```powershell
+py -3 -m pre_commit install --hook-type pre-commit --hook-type pre-push
+```
+
+Run them manually with:
+
+```powershell
+py -3 -m pre_commit run --all-files
+py -3 -m pre_commit run --hook-stage pre-push --all-files
+```
+
+The privacy guard blocks patterns such as:
+
+- Windows or POSIX home-directory paths
+- consumer email addresses, including `@gmail.com` and `@outlook.com`
+- consumer cloud-share links such as Google Drive, Dropbox, and OneDrive share URLs
+
+If a line is intentionally safe and public, it can be allowlisted inline with:
+
+```text
+privacy-guard: allow
+```
+
+Use that sparingly. The intended default is to reject personal information, not to normalize it into the repo.
+
 ## Testing Goals
 
 The overall strategy is designed to protect these boundaries:

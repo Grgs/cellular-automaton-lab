@@ -42,6 +42,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
+      - name: Run local git hooks in CI
+        run: |
+          python -m pre_commit run --all-files --show-diff-on-failure
+          python -m pre_commit run --hook-stage pre-push --all-files --show-diff-on-failure
+
       - name: Enforce typed frontend source
         run: |
           if [ -d frontend-ts ]; then
