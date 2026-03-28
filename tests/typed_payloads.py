@@ -161,7 +161,7 @@ def require_topology_payload(value: object, *, context: str) -> TopologyPayload:
 def require_simulation_state_payload(value: object, *, context: str) -> SimulationStatePayload:
     payload = _require_json_object(value, context=context)
     cell_states = _require_json_list(payload.get("cell_states"), context=f"{context}.cell_states")
-    normalized_payload: SimulationStatePayload = {
+    return {
         "topology_spec": require_topology_spec_payload(
             payload.get("topology_spec"),
             context=f"{context}.topology_spec",
@@ -178,14 +178,11 @@ def require_simulation_state_payload(value: object, *, context: str) -> Simulati
             _require_int(cell_state, context=f"{context}.cell_states[{index}]")
             for index, cell_state in enumerate(cell_states)
         ],
-    }
-    topology = payload.get("topology")
-    if topology is not None:
-        normalized_payload["topology"] = require_topology_payload(
-            topology,
+        "topology": require_topology_payload(
+            payload.get("topology"),
             context=f"{context}.topology",
-        )
-    return normalized_payload
+        ),
+    }
 
 
 def require_rules_response_payload(value: object, *, context: str) -> RulesResponsePayload:

@@ -1,6 +1,6 @@
 import { MAX_EDITOR_HISTORY } from "./editor-tools.js";
 import { findTopologyCellById, regularCellId } from "./topology.js";
-import type { CellStateUpdate, SimulationSnapshot, TopologySpec } from "./types/domain.js";
+import type { CellStateUpdate, SimulationSnapshot } from "./types/domain.js";
 import type { EditorHistoryEntry } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
@@ -89,11 +89,11 @@ export function hasRedoHistory(state: AppState): boolean {
 }
 
 export function peekUndoEntry(state: AppState): EditorHistoryEntry | null {
-    return hasUndoHistory(state) ? state.undoStack[state.undoStack.length - 1] : null;
+    return hasUndoHistory(state) ? (state.undoStack[state.undoStack.length - 1] ?? null) : null;
 }
 
 export function peekRedoEntry(state: AppState): EditorHistoryEntry | null {
-    return hasRedoHistory(state) ? state.redoStack[state.redoStack.length - 1] : null;
+    return hasRedoHistory(state) ? (state.redoStack[state.redoStack.length - 1] ?? null) : null;
 }
 
 export function commitUndoSuccess(state: AppState): EditorHistoryEntry | null {
@@ -148,19 +148,19 @@ export function shouldClearHistoryForSimulationUpdate(
         return false;
     }
 
-    const nextRuleName = simulationState?.rule?.name ?? null;
+    const nextRuleName = simulationState.rule.name;
     const currentRuleName = state.activeRule?.name ?? null;
     if (!sameScalar(nextRuleName, currentRuleName)) {
         return true;
     }
 
-    if (!sameScalar(Number(simulationState?.generation), Number(state.generation))) {
+    if (!sameScalar(Number(simulationState.generation), Number(state.generation))) {
         return true;
     }
 
-    const nextTopologySpec = (simulationState?.topology_spec ?? simulationState?.topology?.topology_spec ?? null) as Partial<TopologySpec> | null;
+    const nextTopologySpec = simulationState.topology_spec;
     if (!sameScalar(
-        nextTopologySpec ? `${nextTopologySpec.tiling_family}:${nextTopologySpec.adjacency_mode || "edge"}` : null,
+        `${nextTopologySpec.tiling_family}:${nextTopologySpec.adjacency_mode || "edge"}`,
         state.topologySpec ? `${state.topologySpec.tiling_family}:${state.topologySpec.adjacency_mode || "edge"}` : null,
     )) {
         return true;
@@ -178,11 +178,11 @@ export function shouldClearHistoryForSimulationUpdate(
         return true;
     }
 
-    if (!sameScalar(simulationState?.topology_revision ?? simulationState?.topology?.topology_revision ?? null, state.topologyRevision ?? null)) {
+    if (!sameScalar(simulationState.topology_revision, state.topologyRevision ?? null)) {
         return true;
     }
 
-    if (Array.isArray(simulationState?.cell_states) && state.cellStates.length > 0) {
+    if (state.cellStates.length > 0) {
         return !sameArray(
             simulationState.cell_states.map((value) => Number(value)),
             state.cellStates.map((value) => Number(value)),

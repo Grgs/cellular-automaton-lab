@@ -133,9 +133,7 @@ export function createSimulationActionRuntime({
 
     function persistAppliedPatchDepth(simulationState: SimulationSnapshot | null | void): void {
         const topologySpec = describeTopologySpec(
-            simulationState?.topology_spec
-            || simulationState?.topology?.topology_spec
-            || state.topologySpec,
+            simulationState?.topology_spec || state.topologySpec,
         );
         if (!topologyUsesPatchDepth(topologySpec)) {
             return;

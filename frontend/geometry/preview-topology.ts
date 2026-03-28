@@ -1,4 +1,5 @@
 import { regularCellId } from "../topology.js";
+import { describeTopologySpec } from "../topology-catalog.js";
 import type { TopologyPayload, TopologySpec } from "../types/domain.js";
 
 export function buildRegularPreviewTopology(
@@ -24,11 +25,11 @@ export function buildRegularPreviewTopology(
 
     return {
         topology_revision: `preview:${geometry}:${width}x${height}`,
-        topology_spec: {
+        topology_spec: describeTopologySpec({
             ...topologySpec,
             width,
             height,
-        },
+        }),
         cells,
     };
 }

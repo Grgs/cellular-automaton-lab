@@ -45,11 +45,11 @@ export function createSimulationMutations({
     function resolveRecoverHandler({
         recoverWithRefresh = false,
         onRecover,
-    }: SimulationMutationOptions = {}): (() => Promise<void> | void) | ((error: unknown) => Promise<void> | void) | undefined {
+    }: SimulationMutationOptions = {}): ((error: unknown) => Promise<void> | void) | undefined {
         if (typeof onRecover === "function") {
             return onRecover;
         }
-        return recoverWithRefresh ? refreshState : undefined;
+        return recoverWithRefresh ? async () => refreshState() : undefined;
     }
 
     function applyState(
@@ -73,6 +73,7 @@ export function createSimulationMutations({
             return () => {};
         }
 
+        const message = activity.message;
         const showDelayMs = Number.isFinite(activity.delayMs) ? Number(activity.delayMs) : 200;
         const escalateAfterMs = Number.isFinite(activity.escalateAfterMs)
             ? Number(activity.escalateAfterMs)
@@ -81,23 +82,25 @@ export function createSimulationMutations({
         let visible = false;
         let showTimerId: BrowserTimerId | null = null;
 
-        setBlockingActivity(state, {
-            kind: activity.kind,
-            message: activity.message,
+        const initialActivity = {
+            message,
             detail: "",
             visible: false,
             startedAt,
-        });
+            ...(activity.kind !== undefined ? { kind: activity.kind } : {}),
+        };
+        setBlockingActivity(state, initialActivity);
 
         const showBlockingActivity = (detail = ""): void => {
             visible = true;
-            setBlockingActivity(state, {
-                kind: activity.kind,
-                message: activity.message,
+            const nextActivity = {
+                message,
                 detail,
                 visible: true,
                 startedAt,
-            });
+                ...(activity.kind !== undefined ? { kind: activity.kind } : {}),
+            };
+            setBlockingActivity(state, nextActivity);
             renderControlPanel();
         };
 
@@ -131,6 +134,15 @@ export function createSimulationMutations({
         task: () => Promise<T>,
         options: SimulationMutationOptions = {},
     ): Promise<T> {
+        const recoverHandler = resolveRecoverHandler(options);
+        const runnerOptions = recoverHandler
+            ? {
+                onError: options.onError ?? onError,
+                onRecover: recoverHandler,
+            }
+            : {
+                onError: options.onError ?? onError,
+            };
         return mutationRunner.run(async () => {
             const finishBlockingActivity = startBlockingActivity(options.blockingActivity);
             try {
@@ -138,10 +150,7 @@ export function createSimulationMutations({
             } finally {
                 finishBlockingActivity();
             }
-        }, {
-            onError: options.onError ?? onError,
-            onRecover: resolveRecoverHandler(options),
-        });
+        }, runnerOptions);
     }
 
     function runStateMutation(

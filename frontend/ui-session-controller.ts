@@ -203,7 +203,7 @@ export function createUiSessionController({
         if (currentRule) {
             setSelectedPaintStateFn(
                 state,
-                currentRule.default_paint_state ?? currentRule.states?.find((cellState) => cellState.paintable)?.value ?? 0,
+                currentRule.default_paint_state ?? currentRule.states.find((cellState) => cellState.paintable)?.value ?? 0,
             );
         }
         setDrawerOpenFn(state, Boolean(matchMediaFn("(min-width: 861px)")?.matches));

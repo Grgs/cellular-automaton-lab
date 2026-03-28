@@ -199,7 +199,7 @@ export function setTopology(state: AppState, topology: TopologyPayload | null, c
         ? {
             ...topology,
             topology_spec: describeTopologySpec(
-                topology.topology_spec || state.topologySpec || DEFAULT_TOPOLOGY_SPEC,
+                topology.topology_spec,
             ),
         }
         : null;
@@ -208,7 +208,7 @@ export function setTopology(state: AppState, topology: TopologyPayload | null, c
     state.topologyIndex = normalizedTopology ? indexTopology(normalizedTopology) : null;
     state.cellStates = Array.isArray(cellStates) ? cellStates : [];
     if (normalizedTopology) {
-        const topologySpec = describeTopologySpec(normalizedTopology.topology_spec || {});
+        const topologySpec = describeTopologySpec(normalizedTopology.topology_spec);
         setTopologySpec(state, {
             ...topologySpec,
             width: topologySpec.width,

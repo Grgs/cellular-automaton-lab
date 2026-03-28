@@ -68,7 +68,7 @@ class ApiControlTests(ApiTestCase):
         self.assertEqual(reset['topology_spec']['height'], 7)
         self.assertEqual(reset['rule']['name'], 'conway')
 
-    def test_state_only_control_responses_omit_topology_when_revision_is_unchanged(self) -> None:
+    def test_state_only_control_responses_include_topology_when_revision_is_unchanged(self) -> None:
         self.client.post('/api/cells/toggle', json={'id': 'c:1:1'})
         initial = self.get_state()
         initial_revision = initial['topology_revision']
@@ -81,9 +81,10 @@ class ApiControlTests(ApiTestCase):
         for response in (started, paused, resumed, stepped):
             self.assertEqual(response.status_code, 200)
             payload = response.get_json()
-            self.assertNotIn('topology', payload)
+            self.assertIn('topology', payload)
             self.assertEqual(payload['topology_revision'], initial_revision)
             self.assertIn('cell_states', payload)
+            self.assertEqual(payload['topology_revision'], payload['topology']['topology_revision'])
 
     def test_speed_only_config_update_keeps_running_when_simulation_is_active(self) -> None:
         self.reset_simulation(width=8, height=8, speed=5, rule='conway', randomize=False)
@@ -96,7 +97,7 @@ class ApiControlTests(ApiTestCase):
 
         self.assertTrue(payload['running'])
         self.assertEqual(payload['speed'], 9)
-        self.assertNotIn('topology', payload)
+        self.assertIn('topology', payload)
         active = self.wait_for_state(lambda state: state['running'] and state['speed'] == 9)
         self.assertTrue(active['running'])
         self.assertEqual(active['speed'], 9)
@@ -138,7 +139,7 @@ class ApiControlTests(ApiTestCase):
         paused_generation = self.assert_generation_stable()
         self.assertEqual(paused_generation, stepped_payload['generation'])
 
-    def test_reset_and_config_include_topology_when_revision_changes(self) -> None:
+    def test_reset_and_config_return_exact_state_payloads(self) -> None:
         resized = self.client.post('/api/config', json={'topology_spec': {'width': 12, 'height': 8}})
         self.assertEqual(resized.status_code, 200)
         resized_payload = resized.get_json()

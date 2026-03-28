@@ -121,11 +121,13 @@ export function resolveHexCellFromOffset(
             if (x < 0 || x >= width) {
                 continue;
             }
-                const cell = geometryCache?.type === "hex" && Array.isArray(geometryCache.cells)
-                    ? geometryCache.cells[y][x]
-                    : pointyHexCenterOffset(x, y, cellSize);
-                const centerX = "centerX" in cell ? cell.centerX : cell.x;
-                const centerY = "centerY" in cell ? cell.centerY : cell.y;
+            const cachedRow = geometryCache?.type === "hex" && Array.isArray(geometryCache.cells)
+                ? geometryCache.cells[y]
+                : null;
+            const cachedCell = cachedRow?.[x];
+            const cell = cachedCell ?? pointyHexCenterOffset(x, y, cellSize);
+            const centerX = "centerX" in cell ? cell.centerX : cell.x;
+            const centerY = "centerY" in cell ? cell.centerY : cell.y;
             const radius = cell.radius;
             const hexWidth = cell.hexWidth;
             if (offsetX < centerX - (hexWidth / 2) || offsetX > centerX + (hexWidth / 2)) {

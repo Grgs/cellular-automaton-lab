@@ -3,7 +3,6 @@ import type {
     RuleDefinition,
     RulesResponse,
     SimulationSnapshot,
-    TopologyPayload,
 } from "./types/domain.js";
 
 interface CellMutation extends CellIdentifier {
@@ -25,10 +24,6 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
 
 export function fetchState(): Promise<SimulationSnapshot> {
     return request<SimulationSnapshot>("/api/state");
-}
-
-export function fetchTopology(): Promise<TopologyPayload> {
-    return request<TopologyPayload>("/api/topology");
 }
 
 export function fetchRules(): Promise<RulesResponse> {

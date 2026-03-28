@@ -128,7 +128,7 @@ class SimulationStatePayload(TypedDict):
     rule: RuleDefinitionPayload
     topology_revision: str
     cell_states: list[int]
-    topology: NotRequired[TopologyPayload]
+    topology: TopologyPayload
 
 
 class ApiErrorPayload(TypedDict):

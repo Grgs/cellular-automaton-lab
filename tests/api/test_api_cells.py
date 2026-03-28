@@ -50,10 +50,10 @@ class ApiCellTests(ApiTestCase):
         payload = toggled.get_json()
         self.assertEqual(payload['topology_spec']['height'], 8)
         self.assertEqual(payload['topology_spec']['width'], 12)
-        self.assertNotIn('topology', payload)
+        self.assertIn('topology', payload)
         self.assertEqual(self.regular_cell_state(payload, 11, 7), 1)
 
-    def test_state_only_cell_mutations_omit_topology_when_revision_is_unchanged(self) -> None:
+    def test_state_only_cell_mutations_include_topology_when_revision_is_unchanged(self) -> None:
         initial = self.get_state()
         initial_revision = initial['topology_revision']
 
@@ -70,9 +70,10 @@ class ApiCellTests(ApiTestCase):
 
         for response in (single, batch, toggle):
             payload = response.get_json()
-            self.assertNotIn('topology', payload)
+            self.assertIn('topology', payload)
             self.assertEqual(payload['topology_revision'], initial_revision)
             self.assertIn('cell_states', payload)
+            self.assertEqual(payload['topology_revision'], payload['topology']['topology_revision'])
 
     def test_set_cell_and_set_many(self) -> None:
         single = self.client.post('/api/cells/set', json={'id': 'c:2:3', 'state': 1})

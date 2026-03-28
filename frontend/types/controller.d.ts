@@ -218,10 +218,6 @@ export interface FetchStateFunction {
     (): Promise<SimulationSnapshot>;
 }
 
-export interface FetchTopologyFunction {
-    (): Promise<SimulationSnapshot["topology"]>;
-}
-
 export interface PostControlFunction {
     (path: string, body?: unknown): Promise<SimulationSnapshot>;
 }

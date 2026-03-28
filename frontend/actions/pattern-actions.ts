@@ -176,7 +176,7 @@ export function createPatternActions({
                     return resolvedResetState;
                 }
 
-                const availableCellIds = new Set((resolvedResetState?.topology?.cells || []).map((cell) => cell.id));
+                const availableCellIds = new Set(resolvedResetState.topology.cells.map((cell) => cell.id));
                 const unknownCellId = importedCells.find((cell) => !availableCellIds.has(cell.id))?.id;
                 if (unknownCellId) {
                     throw new Error(`Pattern references an unknown cell id '${unknownCellId}'.`);

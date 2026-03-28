@@ -1,7 +1,6 @@
 import {
     fetchRules,
     fetchState,
-    fetchTopology,
     postControl,
     setCellRequest,
     setCellsRequest,
@@ -69,7 +68,6 @@ export function createAppController({
         onError,
         fetchRulesFn: fetchRules,
         fetchStateFn: fetchState,
-        fetchTopologyFn: fetchTopology,
         getConfigSyncController: () => controllerRefs.configSyncController,
         getUiSessionController: () => controllerRefs.uiSessionController,
         getRefreshState: () => sync.refreshState,

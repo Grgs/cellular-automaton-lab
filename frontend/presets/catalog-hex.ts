@@ -28,13 +28,16 @@ function buildHexBloomCells(centerX: number, centerY: number): CoordinateCell[] 
     const firstRing = oddRNeighbors(centerX, centerY);
     const east = firstRing[2];
     const southEast = firstRing[3];
+    if (!east || !southEast) {
+        return firstRing;
+    }
     const outerEast = oddRNeighbors(east.x, east.y)[2];
     const outerSouthEast = oddRNeighbors(southEast.x, southEast.y)[3];
 
     return [
         ...firstRing,
-        outerEast,
-        outerSouthEast,
+        ...(outerEast ? [outerEast] : []),
+        ...(outerSouthEast ? [outerSouthEast] : []),
     ];
 }
 
@@ -76,8 +79,14 @@ function buildHexLifeTriBloom(width: number, height: number): CartesianSeedCell[
     const center = centerCell(width, height);
     const east = oddRNeighbors(center.x, center.y)[2];
     const west = oddRNeighbors(center.x, center.y)[5];
+    if (!east || !west) {
+        return [];
+    }
     const east2 = oddRNeighbors(east.x, east.y)[2];
     const west2 = oddRNeighbors(west.x, west.y)[5];
+    if (!east2 || !west2) {
+        return [];
+    }
 
     const cells = [
         ...buildHexBloomCells(center.x, center.y),

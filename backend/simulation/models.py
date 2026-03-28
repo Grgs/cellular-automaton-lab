@@ -373,8 +373,8 @@ class SimulationSnapshot:
     def cells_by_id(self) -> dict[str, int]:
         return self.board.states_by_id(omit_zero=True)
 
-    def to_dict(self, *, include_topology: bool = True) -> SimulationStatePayload:
-        payload: SimulationStatePayload = {
+    def to_dict(self) -> SimulationStatePayload:
+        return {
             "topology_spec": self.config.topology_spec.to_dict(),
             "speed": self.config.speed,
             "running": self.running,
@@ -382,10 +382,8 @@ class SimulationSnapshot:
             "rule": self.rule.to_dict(),
             "topology_revision": self.topology.topology_revision,
             "cell_states": self.cell_states,
+            "topology": self.topology.to_dict(),
         }
-        if include_topology:
-            payload["topology"] = self.topology.to_dict()
-        return payload
 
 
 @dataclass

@@ -109,7 +109,7 @@ class SimulationModelTests(unittest.TestCase):
         self.assertNotIn("logical_x", payload["topology"]["cells"][0])
         self.assertNotIn("logical_y", payload["topology"]["cells"][0])
 
-    def test_snapshot_can_omit_topology_for_state_only_payloads(self) -> None:
+    def test_snapshot_state_payload_always_includes_topology(self) -> None:
         rule = ConwayLifeRule()
         snapshot = SimulationSnapshot(
             board=board_from_grid([[0, 1], [1, 0]]),
@@ -122,10 +122,11 @@ class SimulationModelTests(unittest.TestCase):
             rule=RuleSnapshot.from_rule(rule),
         )
 
-        payload = snapshot.to_dict(include_topology=False)
-        self.assertNotIn("topology", payload)
+        payload = snapshot.to_dict()
+        self.assertIn("topology", payload)
         self.assertEqual(payload["topology_revision"], snapshot.topology.topology_revision)
         self.assertEqual(payload["cell_states"], [0, 1, 1, 0])
+        self.assertEqual(payload["topology"]["topology_revision"], payload["topology_revision"])
 
     def test_simulation_state_data_holds_runtime_fields(self) -> None:
         state = SimulationStateData(

@@ -24,8 +24,8 @@ export interface PaintableCell extends CellIdentifier {
 
 export interface IndexedTopologyPaintableCell extends TopologyCell {
     index: number;
-    neighbors?: string[];
-    kind?: string;
+    neighbors: Array<string | null>;
+    kind: string;
     x?: number;
     y?: number;
 }

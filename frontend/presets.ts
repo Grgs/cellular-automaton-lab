@@ -14,7 +14,7 @@ function withMetadata(preset: RulePresetDefinition): PresetMetadata {
     return {
         id: preset.id,
         label: preset.label,
-        description: preset.description,
+        description: preset.description ?? null,
     };
 }
 

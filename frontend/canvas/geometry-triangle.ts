@@ -55,14 +55,21 @@ export function triangleVertices(x: number, y: number, cellSize: number): Point2
 
 export function triangleCenterOffset(x: number, y: number, cellSize: number): Point2D {
     const vertices = triangleVertices(x, y, cellSize);
+    const [first, second, third] = vertices;
+    if (!first || !second || !third) {
+        return { x: 0, y: 0 };
+    }
     return {
-        x: (vertices[0].x + vertices[1].x + vertices[2].x) / 3,
-        y: (vertices[0].y + vertices[1].y + vertices[2].y) / 3,
+        x: (first.x + second.x + third.x) / 3,
+        y: (first.y + second.y + third.y) / 3,
     };
 }
 
 function pointInTriangle(offsetX: number, offsetY: number, vertices: readonly Point2D[]): boolean {
     const [a, b, c] = vertices;
+    if (!a || !b || !c) {
+        return false;
+    }
     const sign = (left: Point2D, right: Point2D, point: Point2D) => (
         ((left.x - point.x) * (right.y - point.y))
         - ((right.x - point.x) * (left.y - point.y))
@@ -97,9 +104,10 @@ export function resolveTriangleCellFromOffset(
             if (x < 0 || x >= width) {
                 continue;
             }
-            const cell = geometryCache?.type === "triangle" && Array.isArray(geometryCache.cells)
-                ? geometryCache.cells[y][x]
-                : { vertices: triangleVertices(x, y, cellSize) };
+            const cachedRow = geometryCache?.type === "triangle" && Array.isArray(geometryCache.cells)
+                ? geometryCache.cells[y]
+                : null;
+            const cell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
             if (
                 "minX" in cell
                 && typeof cell.minX === "number"

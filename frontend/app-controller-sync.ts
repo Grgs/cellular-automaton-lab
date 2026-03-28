@@ -1,6 +1,5 @@
 import {
     applySimulationSnapshot,
-    simulationSnapshotNeedsTopology,
 } from "./state/snapshot-reducer.js";
 import {
     setEditorRule,
@@ -15,7 +14,6 @@ import type {
     ConfigSyncController,
     FetchRulesFunction,
     FetchStateFunction,
-    FetchTopologyFunction,
     UiSessionController,
 } from "./types/controller.js";
 import type { RulesResponse, SimulationSnapshot } from "./types/domain.js";
@@ -27,7 +25,6 @@ export function createAppControllerSync({
     onError,
     fetchRulesFn,
     fetchStateFn,
-    fetchTopologyFn,
     getConfigSyncController,
     getUiSessionController,
     getRefreshState,
@@ -38,7 +35,6 @@ export function createAppControllerSync({
     onError: (error: unknown) => void;
     fetchRulesFn: FetchRulesFunction;
     fetchStateFn: FetchStateFunction;
-    fetchTopologyFn: FetchTopologyFunction;
     getConfigSyncController: () => ConfigSyncController | null;
     getUiSessionController: () => UiSessionController | null;
     getRefreshState: () => (() => Promise<void>);
@@ -65,27 +61,7 @@ export function createAppControllerSync({
     }
 
     async function resolveSimulationState(simulationState: SimulationSnapshot): Promise<SimulationSnapshot> {
-        if (!simulationState.topology && !state.topology) {
-            return fetchStateFn();
-        }
-
-        if (!simulationSnapshotNeedsTopology(state, simulationState)) {
-            return simulationState;
-        }
-
-        try {
-            const topology = await fetchTopologyFn();
-            if (topology?.topology_revision === simulationState.topology_revision) {
-                return {
-                    ...simulationState,
-                    topology: topology ?? undefined,
-                };
-            }
-        } catch (error) {
-            onError(error);
-        }
-
-        return fetchStateFn();
+        return simulationState;
     }
 
     function applySimulationState(

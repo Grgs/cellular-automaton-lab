@@ -155,13 +155,7 @@ class ApiTestCase(unittest.TestCase):
         return f"c:{x}:{y}"
 
     def cells_by_id(self, payload: SimulationStatePayload) -> dict[str, int]:
-        topology = payload.get('topology')
-        if topology is None:
-            topology = self.get_topology()
-            payload_revision = payload['topology_revision']
-            topology_revision = topology['topology_revision']
-            if payload_revision is not None and topology_revision != payload_revision:
-                raise AssertionError('payload topology revision did not match the current topology endpoint')
+        topology = payload['topology']
         cells = topology['cells']
         cell_states = payload['cell_states']
 

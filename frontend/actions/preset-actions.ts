@@ -110,9 +110,7 @@ export function createPresetActions({
                 );
 
                 const seededTopologySpec = describeTopologySpec(
-                    resolvedResetState?.topology_spec
-                    || resolvedResetState?.topology?.topology_spec
-                    || resetTopologySpec,
+                    resolvedResetState.topology_spec || resetTopologySpec,
                 );
                 const seededGeometry = resolveTopologyVariantKey(
                     seededTopologySpec.tiling_family,
@@ -126,14 +124,8 @@ export function createPresetActions({
                     height: Number(seededTopologySpec.height) || selection.height,
                     presetId,
                 });
-                const resetTopologyIndex = resolvedResetState.topology
-                    ? indexTopology(resolvedResetState.topology)
-                    : null;
-                const topologyUpdates = resetTopologyIndex
-                    ? presetCellsToTopologyUpdatesFn(resetTopologyIndex, seedCells)
-                    : state.topologyIndex
-                        ? presetCellsToTopologyUpdatesFn(state.topologyIndex, seedCells)
-                        : [];
+                const resetTopologyIndex = indexTopology(resolvedResetState.topology);
+                const topologyUpdates = presetCellsToTopologyUpdatesFn(resetTopologyIndex, seedCells);
                 const nextCells: CellStateUpdate[] = topologyUpdates.length > 0 ? topologyUpdates : [];
                 if (nextCells.length === 0) {
                     return resolvedResetState;

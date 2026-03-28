@@ -58,19 +58,36 @@ function triangleVertices(x: number, y: number, cellSize: number): Point2D[] {
     ];
 }
 
+function triangleVertexTriplet(vertices: readonly Point2D[]): [Point2D, Point2D, Point2D] | null {
+    const [first, second, third] = vertices;
+    if (!first || !second || !third) {
+        return null;
+    }
+    return [first, second, third];
+}
+
 function buildTriangleGeometryCache(width: number, height: number, cellSize: number): TriangleCache {
     const cells: TriangleGeometryCell[][] = Array.from({ length: height }, () => Array<TriangleGeometryCell>(width));
     const strokePath = typeof Path2D === "undefined" ? null : new Path2D();
 
     for (let y = 0; y < height; y += 1) {
+        const row = cells[y];
+        if (!row) {
+            continue;
+        }
         for (let x = 0; x < width; x += 1) {
             const vertices = triangleVertices(x, y, cellSize);
-            const centerX = (vertices[0].x + vertices[1].x + vertices[2].x) / 3;
-            const centerY = (vertices[0].y + vertices[1].y + vertices[2].y) / 3;
-            const minX = Math.min(vertices[0].x, vertices[1].x, vertices[2].x);
-            const maxX = Math.max(vertices[0].x, vertices[1].x, vertices[2].x);
-            const minY = Math.min(vertices[0].y, vertices[1].y, vertices[2].y);
-            const maxY = Math.max(vertices[0].y, vertices[1].y, vertices[2].y);
+            const triplet = triangleVertexTriplet(vertices);
+            if (!triplet) {
+                continue;
+            }
+            const [first, second, third] = triplet;
+            const centerX = (first.x + second.x + third.x) / 3;
+            const centerY = (first.y + second.y + third.y) / 3;
+            const minX = Math.min(first.x, second.x, third.x);
+            const maxX = Math.max(first.x, second.x, third.x);
+            const minY = Math.min(first.y, second.y, third.y);
+            const maxY = Math.max(first.y, second.y, third.y);
             const cell = {
                 vertices,
                 centerX,
@@ -80,12 +97,11 @@ function buildTriangleGeometryCache(width: number, height: number, cellSize: num
                 minY,
                 maxY,
             };
-            cells[y][x] = cell;
+            row[x] = cell;
             if (strokePath) {
-                strokePath.moveTo(vertices[0].x, vertices[0].y);
-                for (let index = 1; index < vertices.length; index += 1) {
-                    strokePath.lineTo(vertices[index].x, vertices[index].y);
-                }
+                strokePath.moveTo(first.x, first.y);
+                strokePath.lineTo(second.x, second.y);
+                strokePath.lineTo(third.x, third.y);
                 strokePath.closePath();
             }
         }
@@ -95,7 +111,11 @@ function buildTriangleGeometryCache(width: number, height: number, cellSize: num
 }
 
 function pointInTriangle(offsetX: number, offsetY: number, vertices: readonly Point2D[]): boolean {
-    const [a, b, c] = vertices;
+    const triplet = triangleVertexTriplet(vertices);
+    if (!triplet) {
+        return false;
+    }
+    const [a, b, c] = triplet;
     const sign = (left: Point2D, right: Point2D, point: Point2D) => (
         ((left.x - point.x) * (right.y - point.y))
         - ((right.x - point.x) * (left.y - point.y))
@@ -192,9 +212,8 @@ export const triangleGeometryAdapter: GeometryAdapter = {
                 if (x < 0 || x >= width) {
                     continue;
                 }
-                const resolvedCell = triangleCache?.type === "triangle"
-                    ? triangleCache.cells[y][x]
-                    : { vertices: triangleVertices(x, y, cellSize) };
+                const cachedRow = triangleCache?.type === "triangle" ? triangleCache.cells[y] : null;
+                const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
                 if ("minX" in resolvedCell) {
                 if (
                     typeof resolvedCell.minX === "number"
@@ -223,9 +242,8 @@ export const triangleGeometryAdapter: GeometryAdapter = {
     resolveCellCenter({ cell, cellSize, cache }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveTriangleCoordinates(cell);
         const triangleCache = cache as TriangleCache | null;
-        const resolvedCell = triangleCache?.type === "triangle" && triangleCache.cells?.[y]?.[x]
-            ? triangleCache.cells[y][x]
-            : { vertices: triangleVertices(x, y, cellSize) };
+        const cachedRow = triangleCache?.type === "triangle" ? triangleCache.cells[y] : null;
+        const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
         if (
             "centerX" in resolvedCell
             && typeof resolvedCell.centerX === "number"
@@ -234,10 +252,14 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         ) {
             return { x: resolvedCell.centerX, y: resolvedCell.centerY };
         }
-        const vertices = resolvedCell.vertices;
+        const triplet = triangleVertexTriplet(resolvedCell.vertices);
+        if (!triplet) {
+            return { x: 0, y: 0 };
+        }
+        const [first, second, third] = triplet;
         return {
-            x: (vertices[0].x + vertices[1].x + vertices[2].x) / 3,
-            y: (vertices[0].y + vertices[1].y + vertices[2].y) / 3,
+            x: (first.x + second.x + third.x) / 3,
+            y: (first.y + second.y + third.y) / 3,
         };
     },
 
@@ -262,9 +284,8 @@ export const triangleGeometryAdapter: GeometryAdapter = {
             context.fillStyle = color;
         }
         const triangleCache = cache as TriangleCache | null;
-        const resolvedCell = triangleCache?.type === "triangle" && triangleCache.cells?.[y]?.[x]
-            ? triangleCache.cells[y][x]
-            : { vertices: triangleVertices(x, y, metrics.cellSize) };
+        const cachedRow = triangleCache?.type === "triangle" ? triangleCache.cells[y] : null;
+        const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, metrics.cellSize) };
         tracePolygonPath(context, resolvedCell.vertices);
         context.fill();
         if (renderLayer === "preview" && renderStyle?.triangleStrokeEnabled) {

@@ -4,19 +4,27 @@ import type { CanvasRenderStyle, GeometryCache, Point2D } from "../types/renderi
 type PathTarget = CanvasRenderingContext2D | Path2D;
 
 export function tracePolygonPath(context: CanvasRenderingContext2D, vertices: readonly Point2D[]): void {
-    context.beginPath();
-    context.moveTo(vertices[0].x, vertices[0].y);
-    for (let index = 1; index < vertices.length; index += 1) {
-        context.lineTo(vertices[index].x, vertices[index].y);
+    const [first, ...rest] = vertices;
+    if (!first) {
+        return;
     }
+    context.beginPath();
+    context.moveTo(first.x, first.y);
+    rest.forEach((vertex) => {
+        context.lineTo(vertex.x, vertex.y);
+    });
     context.closePath();
 }
 
 export function appendPolygonPath(target: PathTarget, vertices: readonly Point2D[]): void {
-    target.moveTo(vertices[0].x, vertices[0].y);
-    for (let index = 1; index < vertices.length; index += 1) {
-        target.lineTo(vertices[index].x, vertices[index].y);
+    const [first, ...rest] = vertices;
+    if (!first) {
+        return;
     }
+    target.moveTo(first.x, first.y);
+    rest.forEach((vertex) => {
+        target.lineTo(vertex.x, vertex.y);
+    });
     target.closePath();
 }
 

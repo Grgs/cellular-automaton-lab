@@ -88,10 +88,14 @@ function buildHexGeometryCache(width: number, height: number, metrics: HexMetric
 
     for (let y = 0; y < height; y += 1) {
         const rowOffset = y % 2 === 1 ? metrics.hexWidth / 2 : 0;
+        const row = cells[y];
+        if (!row) {
+            continue;
+        }
         for (let x = 0; x < width; x += 1) {
             const centerX = metrics.xInset + (x * metrics.horizontalPitch) + rowOffset;
             const centerY = metrics.yInset + (y * metrics.verticalPitch);
-            cells[y][x] = {
+            row[x] = {
                 centerX,
                 centerY,
                 radius: metrics.radius,
@@ -192,9 +196,9 @@ export const hexGeometryAdapter: GeometryAdapter = {
                 if (x < 0 || x >= width) {
                     continue;
                 }
-                const cell = hexCache?.type === "hex"
-                    ? hexCache.cells[y][x]
-                    : pointyHexCenterOffset(x, y, cellSize, resolvedMetrics);
+                const cachedRow = hexCache?.type === "hex" ? hexCache.cells[y] : null;
+                const cachedCell = cachedRow?.[x];
+                const cell = cachedCell ?? pointyHexCenterOffset(x, y, cellSize, resolvedMetrics);
                 const centerX = "centerX" in cell ? cell.centerX : cell.x;
                 const centerY = "centerY" in cell ? cell.centerY : cell.y;
                 const radius = cell.radius;
@@ -217,8 +221,9 @@ export const hexGeometryAdapter: GeometryAdapter = {
     resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics, cache }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveHexCoordinates(cell);
         const hexCache = cache as HexCache | null;
-        const cachedCell = hexCache?.type === "hex" && hexCache.cells?.[y]?.[x]
-            ? hexCache.cells[y][x]
+        const cachedRow = hexCache?.type === "hex" ? hexCache.cells[y] : null;
+        const cachedCell = cachedRow?.[x]
+            ? cachedRow[x]
             : pointyHexCenterOffset(
                 x,
                 y,
@@ -237,7 +242,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
             width: Math.max(x + 1, 1),
             height: Math.max(y + 1, 1),
             cellSize,
-            metrics,
+            metrics: metrics ?? null,
         });
     },
 
@@ -254,8 +259,9 @@ export const hexGeometryAdapter: GeometryAdapter = {
         if (context.fillStyle !== color) {
             context.fillStyle = color;
         }
-        const resolvedCell = hexCache?.type === "hex" && hexCache.cells?.[y]?.[x]
-            ? hexCache.cells[y][x]
+        const cachedRow = hexCache?.type === "hex" ? hexCache.cells[y] : null;
+        const resolvedCell = cachedRow?.[x]
+            ? cachedRow[x]
             : pointyHexCenterOffset(x, y, hexMetrics.cellSize, hexMetrics);
         const centerX = "centerX" in resolvedCell ? resolvedCell.centerX : resolvedCell.x;
         const centerY = "centerY" in resolvedCell ? resolvedCell.centerY : resolvedCell.y;

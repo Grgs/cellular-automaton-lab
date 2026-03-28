@@ -102,7 +102,7 @@ export const squareGeometryAdapter: GeometryAdapter = {
             width: Math.max(x + 1, 1),
             height: Math.max(y + 1, 1),
             cellSize,
-            metrics,
+            metrics: metrics ?? null,
         });
     },
 

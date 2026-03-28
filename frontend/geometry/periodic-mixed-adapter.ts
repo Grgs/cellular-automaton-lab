@@ -269,7 +269,7 @@ function createMetricsBuilder(descriptor: PeriodicFaceTilingDescriptor) {
         width: number;
         height: number;
         cellSize: number;
-        topology?: TopologyPayload | null;
+        topology: TopologyPayload | null;
     }) => buildPatternMetrics({
         descriptor,
         width,

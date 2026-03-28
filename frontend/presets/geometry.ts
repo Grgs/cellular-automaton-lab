@@ -103,8 +103,9 @@ export function oddRNeighbors(x: number, y: number): CoordinateCell[] {
 }
 
 export function hexCellsAtDistance(centerX: number, centerY: number, distance: number): CoordinateCell[] {
-    let frontier: CoordinateCell[] = [{ x: centerX, y: centerY }];
-    const visited = new Set([keyForCell(frontier[0])]);
+    const origin = { x: centerX, y: centerY };
+    let frontier: CoordinateCell[] = [origin];
+    const visited = new Set([keyForCell(origin)]);
 
     for (let step = 0; step < distance; step += 1) {
         const nextFrontier: CoordinateCell[] = [];

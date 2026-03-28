@@ -140,9 +140,7 @@ export function createShowcaseActions({
         );
 
         const resetTopologySpec = describeTopologySpec(
-            resolvedResetState?.topology_spec
-            || resolvedResetState?.topology?.topology_spec
-            || resetRequest.topology_spec,
+            resolvedResetState.topology_spec || resetRequest.topology_spec,
         );
         const geometry = resolveTopologyVariantKey(
             resetTopologySpec.tiling_family,
@@ -166,12 +164,8 @@ export function createShowcaseActions({
             height: Number(resetTopologySpec.height) || 0,
             presetId,
         });
-        const topologyIndex = resolvedResetState.topology
-            ? indexTopology(resolvedResetState.topology)
-            : null;
-        const nextCells = topologyIndex
-            ? presetCellsToTopologyUpdatesFn(topologyIndex, seedCells)
-            : [];
+        const topologyIndex = indexTopology(resolvedResetState.topology);
+        const nextCells = presetCellsToTopologyUpdatesFn(topologyIndex, seedCells);
         if (nextCells.length === 0) {
             return resolvedResetState;
         }

@@ -61,16 +61,8 @@ def json_error(message: str, status_code: int = 400) -> tuple[Response, int]:
     return jsonify(payload), status_code
 
 
-def state_response(*, include_topology: bool = True) -> Response:
-    return jsonify(simulation_coordinator().get_state().to_dict(include_topology=include_topology))
-
-
-def current_topology_revision() -> str | None:
-    return simulation_coordinator().get_topology_revision()
-
-
-def conditional_state_response(previous_topology_revision: str | None) -> Response:
-    return state_response(include_topology=current_topology_revision() != previous_topology_revision)
+def state_response() -> Response:
+    return jsonify(simulation_coordinator().get_state().to_dict())
 
 
 def topology_response() -> Response:
@@ -80,18 +72,16 @@ def topology_response() -> Response:
 
 def validated_state_action(action: Callable[[JsonObject], None]) -> JsonRouteResult:
     payload = get_payload(request)
-    previous_topology_revision = current_topology_revision()
     try:
         action(payload)
     except (RequestValidationError, SimulationOperationError) as exc:
         return json_error(str(exc))
-    return conditional_state_response(previous_topology_revision)
+    return state_response()
 
 
 def control_state_action(action: Callable[[], None]) -> Response:
-    previous_topology_revision = current_topology_revision()
     action()
-    return conditional_state_response(previous_topology_revision)
+    return state_response()
 
 
 def apply_reset_payload(payload: JsonObject) -> None:

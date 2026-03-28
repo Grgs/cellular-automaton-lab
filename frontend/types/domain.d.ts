@@ -97,8 +97,21 @@ export interface AdjacencyModeOption {
     label: string;
 }
 
-export interface TopologyCell {
+export interface PointPayload {
+    x: number;
+    y: number;
+}
+
+export interface ApiTopologyCellPayload {
     id: string;
+    kind: string;
+    neighbors: Array<string | null>;
+    slot?: string;
+    center?: PointPayload;
+    vertices?: PointPayload[];
+}
+
+export interface TopologyCell extends ApiTopologyCellPayload {
     [key: string]: unknown;
 }
 
@@ -110,30 +123,38 @@ export interface TopologyIndex {
     byId: Map<string, IndexedTopologyCell>;
 }
 
-export interface TopologyPayload {
-    topology_revision?: string | null;
-    topology_spec?: Partial<TopologySpec>;
-    cells?: TopologyCell[];
-    [key: string]: unknown;
+export interface ApiTopologyPayload {
+    topology_revision: string;
+    topology_spec: TopologySpec;
+    cells: TopologyCell[];
+}
+
+export interface TopologyPayload extends ApiTopologyPayload {
+    geometry?: string;
+    width?: number;
+    height?: number;
 }
 
 export interface CellStateDefinition {
     value: number;
-    label?: string;
-    color?: string;
-    paintable?: boolean;
-    [key: string]: unknown;
+    label: string;
+    color: string;
+    paintable: boolean;
 }
 
-export interface RuleDefinition {
+export interface ApiRuleDefinition {
     name: string;
-    display_name?: string;
+    display_name: string;
+    description: string;
+    default_paint_state: number;
+    supports_randomize: boolean;
+    states: CellStateDefinition[];
+    rule_protocol: string;
+    supports_all_topologies: boolean;
+}
+
+export interface RuleDefinition extends ApiRuleDefinition {
     label?: string;
-    description?: string;
-    default_paint_state?: number | null;
-    supports_randomize?: boolean;
-    states?: CellStateDefinition[];
-    [key: string]: unknown;
 }
 
 export interface RulesResponse {
@@ -176,7 +197,7 @@ export interface ParsedPattern {
 export interface PresetMetadata {
     id: string;
     label: string;
-    description?: string;
+    description: string | null;
 }
 
 export interface PresetBuildContext {
@@ -198,14 +219,16 @@ export interface ResolvedPresetSelection {
     presetId: string | null;
 }
 
-export interface SimulationSnapshot {
-    topology_spec?: Partial<TopologySpec>;
-    speed?: number;
-    running?: boolean;
-    generation?: number;
-    rule?: RuleDefinition | null;
-    topology_revision?: string | null;
-    topology?: TopologyPayload | null;
-    cell_states?: number[];
-    [key: string]: unknown;
+export interface ApiSimulationSnapshot {
+    topology_spec: TopologySpec;
+    speed: number;
+    running: boolean;
+    generation: number;
+    rule: RuleDefinition;
+    topology_revision: string;
+    topology: TopologyPayload;
+    cell_states: number[];
+}
+
+export interface SimulationSnapshot extends ApiSimulationSnapshot {
 }

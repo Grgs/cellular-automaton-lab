@@ -8,6 +8,9 @@ export function pointInPolygon(offsetX: number, offsetY: number, vertices: reado
     for (let index = 0, previous = vertices.length - 1; index < vertices.length; previous = index, index += 1) {
         const left = vertices[index];
         const right = vertices[previous];
+        if (!left || !right) {
+            continue;
+        }
         const intersects = (
             ((left.y > offsetY) !== (right.y > offsetY))
             && (
@@ -26,7 +29,7 @@ export function buildMixedTopologyGeometryCache(
     topology: TopologyPayload | null,
     buildCellGeometry: (cell: RenderableTopologyCell) => PolygonGeometryCell | null,
 ): GeometryCache {
-    const cells = (topology?.cells || [])
+    const cells = (topology?.cells ?? [])
         .map((cell) => buildCellGeometry(cell as RenderableTopologyCell))
         .filter((cell): cell is PolygonGeometryCell => Boolean(cell));
     const strokePath = typeof Path2D === "undefined" ? null : new Path2D();
@@ -49,7 +52,7 @@ export function resolveMixedCellFromOffset(
     offsetX: number,
     offsetY: number,
     geometryCache: GeometryCache | null,
-): Pick<PaintableCell, "id" | "kind"> | null {
+): PaintableCell | null {
     if (!geometryCache?.cellsById) {
         return null;
     }
@@ -65,10 +68,9 @@ export function resolveMixedCellFromOffset(
             continue;
         }
         if (pointInPolygon(offsetX, offsetY, cachedCell.vertices)) {
-            return {
-                id: cachedCell.cell.id,
-                kind: cachedCell.cell.kind,
-            };
+            return cachedCell.cell.kind
+                ? { id: cachedCell.cell.id, kind: cachedCell.cell.kind }
+                : { id: cachedCell.cell.id };
         }
     }
     return null;

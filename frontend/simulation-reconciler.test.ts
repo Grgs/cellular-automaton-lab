@@ -61,7 +61,44 @@ describe("simulation-reconciler", () => {
         });
 
         reconciler.apply({
+            topology_spec: {
+                tiling_family: "hex",
+                adjacency_mode: "edge",
+                sizing_mode: "grid",
+                width: 24,
+                height: 18,
+                patch_depth: 0,
+            },
+            speed: 5,
+            running: false,
+            generation: 0,
+            rule: {
+                name: "conway",
+                display_name: "Life: Conway",
+                description: "Classic Life.",
+                states: [
+                    { value: 0, label: "Dead", color: "#000000", paintable: false },
+                    { value: 1, label: "Alive", color: "#ffffff", paintable: true },
+                ],
+                default_paint_state: 1,
+                supports_randomize: true,
+                rule_protocol: "universal-v1",
+                supports_all_topologies: true,
+            },
             topology_revision: "new-revision",
+            topology: {
+                topology_revision: "new-revision",
+                topology_spec: {
+                    tiling_family: "hex",
+                    adjacency_mode: "edge",
+                    sizing_mode: "grid",
+                    width: 24,
+                    height: 18,
+                    patch_depth: 0,
+                },
+                cells: [],
+            },
+            cell_states: [],
         });
 
         expect(applySimulationSnapshot).toHaveBeenCalled();
