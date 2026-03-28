@@ -12,12 +12,13 @@ import type {
     GeometryAdapter,
     GeometryBuildCacheArgs,
     GeometryBuildMetricsArgs,
+    HexGeometryCache,
+    HexGeometryCell,
     GeometryResolveCellCenterArgs,
     GeometryResolveCellFromOffsetArgs,
     GeometryResolveCoordinateCenterArgs,
     GeometryViewportPreviewArgs,
     GridMetrics,
-    HexGeometryCell,
     RenderedCellArgs,
 } from "../types/rendering.js";
 
@@ -41,12 +42,6 @@ interface HexMetrics extends GridMetrics {
     hexHeight: number;
 }
 
-interface HexCache {
-    [key: string]: unknown;
-    type: "hex";
-    cells: HexGeometryCell[][];
-}
-
 function pointyHexCenterOffset(
     x: number,
     y: number,
@@ -62,6 +57,16 @@ function pointyHexCenterOffset(
         horizontalPitch: resolvedMetrics.horizontalPitch,
         verticalPitch: resolvedMetrics.verticalPitch,
     };
+}
+
+function isHexGeometryCache(cache: unknown): cache is HexGeometryCache {
+    return cache !== null
+        && Boolean(cache)
+        && typeof cache === "object"
+        && "type" in cache
+        && (cache as { type?: unknown }).type === "hex"
+        && "cells" in cache
+        && Array.isArray((cache as { cells?: unknown }).cells);
 }
 
 function pointInPointyHex(
@@ -83,7 +88,7 @@ function pointInPointyHex(
     return dx <= (hexWidth * (radius - dy)) / radius;
 }
 
-function buildHexGeometryCache(width: number, height: number, metrics: HexMetrics): HexCache {
+function buildHexGeometryCache(width: number, height: number, metrics: HexMetrics): HexGeometryCache {
     const cells: HexGeometryCell[][] = Array.from({ length: height }, () => Array<HexGeometryCell>(width));
 
     for (let y = 0; y < height; y += 1) {
@@ -182,7 +187,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
 
     resolveCellFromOffset({ offsetX, offsetY, width, height, cellSize, metrics, cache }: GeometryResolveCellFromOffsetArgs) {
         const resolvedMetrics = (metrics || hexGridMetrics(width, height, cellSize)) as HexMetrics;
-        const hexCache = cache as HexCache | null;
+        const hexCache = isHexGeometryCache(cache) ? cache : null;
         const approximateRow = Math.round((offsetY - resolvedMetrics.yInset) / resolvedMetrics.verticalPitch);
 
         for (let y = approximateRow - 1; y <= approximateRow + 1; y += 1) {
@@ -196,7 +201,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
                 if (x < 0 || x >= width) {
                     continue;
                 }
-                const cachedRow = hexCache?.type === "hex" ? hexCache.cells[y] : null;
+                const cachedRow = hexCache?.cells[y] ?? null;
                 const cachedCell = cachedRow?.[x];
                 const cell = cachedCell ?? pointyHexCenterOffset(x, y, cellSize, resolvedMetrics);
                 const centerX = "centerX" in cell ? cell.centerX : cell.x;
@@ -220,8 +225,8 @@ export const hexGeometryAdapter: GeometryAdapter = {
 
     resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics, cache }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveHexCoordinates(cell);
-        const hexCache = cache as HexCache | null;
-        const cachedRow = hexCache?.type === "hex" ? hexCache.cells[y] : null;
+        const hexCache = isHexGeometryCache(cache) ? cache : null;
+        const cachedRow = hexCache?.cells[y] ?? null;
         const cachedCell = cachedRow?.[x]
             ? cachedRow[x]
             : pointyHexCenterOffset(
@@ -249,7 +254,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
     drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
         const { x, y } = resolveHexCoordinates(cell);
         const hexMetrics = metrics as HexMetrics;
-        const hexCache = cache as HexCache | null;
+        const hexCache = isHexGeometryCache(cache) ? cache : null;
         const color = resolveRenderedCellColor(
             stateValue,
             colorLookup,
@@ -259,7 +264,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
         if (context.fillStyle !== color) {
             context.fillStyle = color;
         }
-        const cachedRow = hexCache?.type === "hex" ? hexCache.cells[y] : null;
+        const cachedRow = hexCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x]
             ? cachedRow[x]
             : pointyHexCenterOffset(x, y, hexMetrics.cellSize, hexMetrics);

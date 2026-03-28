@@ -3,12 +3,18 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
-from typing import Callable, ClassVar
+from typing import Callable, ClassVar, NotRequired, TypedDict, Unpack
 
 from flask import Flask
 from flask.testing import FlaskClient
 
-from backend.payload_types import JsonObject, RuleDefinitionPayload, SimulationStatePayload, TopologyPayload, TopologySpecPayload
+from backend.payload_types import (
+    ResetControlRequestPayload,
+    RuleDefinitionPayload,
+    SimulationStatePayload,
+    TopologyPayload,
+    TopologySpecPayload,
+)
 
 try:
     from backend.api import create_app
@@ -25,6 +31,15 @@ except ModuleNotFoundError:
         require_simulation_state_payload,
         require_topology_payload,
     )
+
+
+class ResetSimulationOverrides(TypedDict, total=False):
+    width: NotRequired[object]
+    height: NotRequired[object]
+    patch_depth: NotRequired[object]
+    speed: NotRequired[object]
+    rule: NotRequired[object]
+    randomize: NotRequired[object]
 
 
 class ApiTestCase(unittest.TestCase):
@@ -63,7 +78,7 @@ class ApiTestCase(unittest.TestCase):
             return int(value)
         raise AssertionError(f"reset override '{key}' must be int-compatible.")
 
-    def reset_simulation(self, **overrides: object) -> SimulationStatePayload:
+    def build_reset_payload(self, **overrides: Unpack[ResetSimulationOverrides]) -> ResetControlRequestPayload:
         topology_spec: TopologySpecPayload = {
             'tiling_family': 'square',
             'adjacency_mode': 'edge',
@@ -81,13 +96,34 @@ class ApiTestCase(unittest.TestCase):
                 overrides.pop("patch_depth"),
                 key="patch_depth",
             )
-        payload: JsonObject = {
+        payload: ResetControlRequestPayload = {
             'topology_spec': topology_spec,
             'speed': 5,
             'rule': 'conway',
             'randomize': False,
         }
-        payload.update(overrides)
+        if "speed" in overrides:
+            speed = overrides.pop("speed")
+            if isinstance(speed, (str, bytes, bytearray, int, float)) and not isinstance(speed, bool):
+                payload["speed"] = float(speed)
+            else:
+                raise AssertionError("reset override 'speed' must be numeric.")
+        if "rule" in overrides:
+            rule = overrides.pop("rule")
+            if not isinstance(rule, str) or not rule:
+                raise AssertionError("reset override 'rule' must be a non-empty string.")
+            payload["rule"] = rule
+        if "randomize" in overrides:
+            randomize = overrides.pop("randomize")
+            if not isinstance(randomize, bool):
+                raise AssertionError("reset override 'randomize' must be a boolean.")
+            payload["randomize"] = randomize
+        if overrides:
+            raise AssertionError(f"unsupported reset overrides: {sorted(overrides)}")
+        return payload
+
+    def reset_simulation(self, **overrides: Unpack[ResetSimulationOverrides]) -> SimulationStatePayload:
+        payload = self.build_reset_payload(**overrides)
         response = self.client.post('/api/control/reset', json=payload)
         self.assertEqual(response.status_code, 200)
         return require_simulation_state_payload(

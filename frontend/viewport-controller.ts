@@ -3,23 +3,12 @@ import type {
     BrowserClearTimeout,
     BrowserSetTimeout,
     BrowserTimerId,
+    ConfigSyncBody,
     ViewportControllerDependencies,
     ViewportController,
     ViewportDimensions,
+    ViewportSyncOptions,
 } from "./types/controller.js";
-
-interface ViewportSyncOptions {
-    includeConfig?: boolean;
-    force?: boolean;
-    preview?: boolean;
-    previewApplied?: boolean;
-    clearConfig?: boolean;
-    delay?: number;
-    path?: string;
-    body?: Record<string, unknown>;
-    desiredDimensions?: ViewportDimensions;
-    blockingActivity?: Record<string, unknown> | null;
-}
 
 export function createViewportController({
     getCurrentDimensions,
@@ -60,7 +49,7 @@ export function createViewportController({
     function buildRequestBody(
         options: ViewportSyncOptions = {},
         desiredDimensions = getViewportDimensions(),
-    ): Record<string, unknown> {
+    ): ConfigSyncBody {
         const { includeConfig = false, body = {} } = options;
         const topologySpec = {
             width: desiredDimensions.width,
@@ -72,14 +61,14 @@ export function createViewportController({
                 ...body,
                 topology_spec: {
                     ...topologySpec,
-                    ...((body && typeof body === "object" && body.topology_spec) || {}),
+                    ...(body.topology_spec ?? {}),
                 },
             }
             : {
                 ...body,
                 topology_spec: {
                     ...topologySpec,
-                    ...((body && typeof body === "object" && body.topology_spec) || {}),
+                    ...(body.topology_spec ?? {}),
                 },
             };
     }
@@ -103,10 +92,9 @@ export function createViewportController({
         pendingViewportDimensions = desiredDimensions;
         try {
             await sendControl(
-                options.path ?? "/api/config",
+                "/api/config",
                 buildRequestBody(options, desiredDimensions),
                 {
-                    clearConfig: Boolean(options.clearConfig),
                     blockingActivity: options.blockingActivity ?? BLOCKING_ACTIVITY_RESIZE_BOARD,
                 },
             );
@@ -216,7 +204,6 @@ export function createViewportController({
     }
 
     return {
-        buildRequestBody,
         sync,
         schedule,
         flush,

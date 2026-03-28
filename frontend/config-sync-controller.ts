@@ -3,12 +3,14 @@ import type {
     BrowserClearTimeout,
     BrowserSetTimeout,
     BrowserTimerId,
+    ConfigSyncBody,
     ConfigSyncController,
     ConfigSyncViewState,
-    PostControlFunction,
-    SimulationMutations,
     CreateSimulationMutationsOptions,
     MutationRunner,
+    PostControlFunction,
+    RuleSyncRequestOptions,
+    SimulationMutations,
 } from "./types/controller.js";
 import type { SimulationSnapshot } from "./types/domain.js";
 import type { AppState } from "./types/state.js";
@@ -140,26 +142,13 @@ export function createConfigSyncController({
         }
     }
 
-    function normalizeConfigBody(body: unknown = null): Record<string, unknown> {
-        if (!body || typeof body !== "object") {
+    function normalizeConfigBody(body: ConfigSyncBody | null = null): ConfigSyncBody {
+        if (!body) {
             return {};
         }
-        const nextBody = { ...(body as Record<string, unknown>) };
-        const topologySpec = {
-            ...((nextBody.topology_spec && typeof nextBody.topology_spec === "object")
-                ? nextBody.topology_spec as Record<string, unknown>
-                : {}),
-        };
-        if (nextBody.width !== undefined) {
-            topologySpec.width = nextBody.width;
-            delete nextBody.width;
-        }
-        if (nextBody.height !== undefined) {
-            topologySpec.height = nextBody.height;
-            delete nextBody.height;
-        }
-        if (Object.keys(topologySpec).length > 0) {
-            nextBody.topology_spec = topologySpec;
+        const nextBody: ConfigSyncBody = { ...body };
+        if (body.topology_spec && Object.keys(body.topology_spec).length > 0) {
+            nextBody.topology_spec = { ...body.topology_spec };
         }
         return nextBody;
     }
@@ -219,7 +208,7 @@ export function createConfigSyncController({
 
     async function syncRuleChange(
         nextRuleName: string | null,
-        { running = false, body = null }: { running?: boolean; body?: unknown } = {},
+        { running = false, body = undefined }: RuleSyncRequestOptions = {},
     ): Promise<void> {
         syncState.pendingRuleName = null;
         syncState.syncingRuleName = nextRuleName || null;
@@ -245,7 +234,7 @@ export function createConfigSyncController({
         );
     }
 
-    function requestRuleSync(nextRuleName: string | null, options: { running?: boolean; body?: unknown } = {}): void {
+    function requestRuleSync(nextRuleName: string | null, options: RuleSyncRequestOptions = {}): void {
         syncState.pendingRuleName = nextRuleName || null;
         notify();
         void syncRuleChange(nextRuleName, options);

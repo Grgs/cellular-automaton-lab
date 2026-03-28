@@ -2,6 +2,7 @@ import {
     describeTopologySpec,
     getTopologyDefinition,
 } from "./topology-catalog.js";
+import { isPlainObject } from "./runtime-validation.js";
 import type { PatternPayload, ParsedPattern, TopologySpec } from "./types/domain.js";
 import type { AppState } from "./types/state.js";
 
@@ -10,11 +11,19 @@ const PATTERN_VERSION = 5;
 
 export class PatternValidationError extends Error {}
 
-function ensurePatternObject(value: unknown): Record<string, unknown> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+interface PatternPayloadCandidate {
+    format?: unknown;
+    version?: unknown;
+    topology_spec?: unknown;
+    rule?: unknown;
+    cells_by_id?: unknown;
+}
+
+function ensurePatternObject(value: unknown): PatternPayloadCandidate {
+    if (!isPlainObject(value)) {
         throw new PatternValidationError("Pattern file must contain a JSON object.");
     }
-    return value as Record<string, unknown>;
+    return value;
 }
 
 function parsePositiveInteger(value: unknown, fieldName: string): number {
@@ -41,7 +50,7 @@ function parseRuleName(value: unknown): string {
 }
 
 function parseTopologySpec(value: unknown): TopologySpec {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+    if (!isPlainObject(value)) {
         throw new PatternValidationError("Pattern field 'topology_spec' must be an object.");
     }
     const normalized = describeTopologySpec(value);
@@ -52,7 +61,7 @@ function parseTopologySpec(value: unknown): TopologySpec {
 }
 
 function parseCellsById(cellsById: unknown): Record<string, number> {
-    if (!cellsById || typeof cellsById !== "object" || Array.isArray(cellsById)) {
+    if (!isPlainObject(cellsById)) {
         throw new PatternValidationError("Pattern field 'cells_by_id' must be an object.");
     }
 

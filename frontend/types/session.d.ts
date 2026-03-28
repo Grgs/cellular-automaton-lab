@@ -18,21 +18,20 @@ export interface UiSessionStorage {
     getCellSize(tilingFamily?: string): number;
     setCellSize(tilingFamilyOrCellSize: string | number, cellSize?: number): UiSessionState | void;
     getEditorTool(): string;
-    setEditorTool(editorTool: unknown): void;
+    setEditorTool(editorTool: string): void;
     getBrushSize(): number;
-    setBrushSize(brushSize: unknown): void;
+    setBrushSize(brushSize: number): void;
     getDrawerOpen(): boolean | null;
-    setDrawerOpen(drawerOpen: unknown): void;
+    setDrawerOpen(drawerOpen: boolean): void;
     getPaintState(ruleName: string | null): number | null;
-    setPaintState(ruleName: string | null, paintState: unknown): void;
+    setPaintState(ruleName: string | null, paintState: number): void;
     getPatchDepths(): Record<string, number>;
     getPatchDepth(tilingFamily: string | null | undefined): number | null;
-    setPatchDepth(tilingFamily: string | null | undefined, patchDepth: unknown): void;
+    setPatchDepth(tilingFamily: string | null | undefined, patchDepth: number): void;
     getDisclosureStates(): Partial<Record<UiDisclosureId, boolean>>;
-    setDisclosureState(id: string, open: unknown): void;
+    setDisclosureState(id: UiDisclosureId, open: boolean): void;
 }
 
 export interface MatchMediaResult {
     matches: boolean;
 }
-

@@ -33,6 +33,7 @@ import type {
     GeometryCache,
     GridMetrics,
     PolygonGeometryCell,
+    PolygonGeometryCache,
     RenderableTopologyCell,
 } from "./types/rendering.js";
 
@@ -169,7 +170,10 @@ export function createCanvasGridView({
     }
 
     function resolvePreviewTopologyCell(cell: PreviewPaintCell): RenderableTopologyCell | null {
-        return geometryCache?.cellsById?.get(cell.id)?.cell
+        const polygonCache = geometryCache && "cellsById" in geometryCache
+            ? geometryCache as PolygonGeometryCache
+            : null;
+        return polygonCache?.cellsById.get(cell.id)?.cell
             || (topology?.cells?.find((candidate) => candidate.id === cell.id) as RenderableTopologyCell | undefined)
             || null;
     }

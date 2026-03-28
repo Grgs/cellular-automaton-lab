@@ -1,5 +1,10 @@
 import { appendPolygonPath } from "./draw.js";
-import type { GeometryCache, Point2D, PolygonGeometryCell, RenderableTopologyCell } from "../types/rendering.js";
+import type {
+    Point2D,
+    PolygonGeometryCache,
+    PolygonGeometryCell,
+    RenderableTopologyCell,
+} from "../types/rendering.js";
 import type { PaintableCell } from "../types/editor.js";
 import type { TopologyPayload } from "../types/domain.js";
 
@@ -28,7 +33,7 @@ export function pointInPolygon(offsetX: number, offsetY: number, vertices: reado
 export function buildMixedTopologyGeometryCache(
     topology: TopologyPayload | null,
     buildCellGeometry: (cell: RenderableTopologyCell) => PolygonGeometryCell | null,
-): GeometryCache {
+): PolygonGeometryCache {
     const cells = (topology?.cells ?? [])
         .map((cell) => buildCellGeometry(cell as RenderableTopologyCell))
         .filter((cell): cell is PolygonGeometryCell => Boolean(cell));
@@ -48,16 +53,21 @@ export function buildMixedTopologyGeometryCache(
     };
 }
 
+export function isPolygonGeometryCache(cache: unknown): cache is PolygonGeometryCache {
+    return cache !== null
+        && typeof cache === "object"
+        && "cellsById" in cache
+        && "cells" in cache
+        && "strokePath" in cache
+        && "type" in cache;
+}
+
 export function resolveMixedCellFromOffset(
     offsetX: number,
     offsetY: number,
-    geometryCache: GeometryCache | null,
+    geometryCache: PolygonGeometryCache | null,
 ): PaintableCell | null {
-    if (!geometryCache?.cellsById) {
-        return null;
-    }
-
-    const cachedCells = Array.isArray(geometryCache.cells) ? geometryCache.cells as PolygonGeometryCell[] : [];
+    const cachedCells = geometryCache?.cells ?? [];
     for (const cachedCell of cachedCells) {
         if (
             offsetX < cachedCell.minX

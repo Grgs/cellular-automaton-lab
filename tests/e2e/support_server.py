@@ -10,7 +10,7 @@ from pathlib import Path
 from collections.abc import Mapping
 from typing import IO, Protocol
 
-from backend.payload_types import JsonDocument, ResetControlRequestPayload, SimulationStatePayload, TopologyPayload
+from backend.payload_types import ResetControlRequestPayload, SimulationStatePayload, TopologyPayload
 from tests.typed_payloads import require_simulation_state_payload, require_topology_payload
 
 
@@ -49,7 +49,7 @@ class JsonApiClient:
         path: str,
         method: str = 'GET',
         payload: Mapping[str, object] | None = None,
-    ) -> JsonDocument:
+    ) -> object:
         body = None if payload is None else json.dumps(payload).encode('utf-8')
         request = urllib.request.Request(
             f'{self.base_url}{path}',

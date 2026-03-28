@@ -24,7 +24,7 @@ import type {
     UiSessionController,
 } from "./types/controller.js";
 import type { AppState } from "./types/state.js";
-import type { UiSessionStorage } from "./types/session.js";
+import type { UiDisclosureId, UiSessionStorage } from "./types/session.js";
 
 function readStoredCellSizes(storage: UiSessionStorage, activeTilingFamily: string): Record<string, number> {
     if (typeof storage.getCellSizes === "function") {
@@ -158,31 +158,31 @@ export function createUiSessionController({
         storage.setCellSize(String(tilingFamilyOrCellSize), cellSize);
     }
 
-    function persistEditorTool(editorTool: unknown): void {
+    function persistEditorTool(editorTool: string): void {
         storage.setEditorTool(editorTool);
     }
 
-    function persistBrushSize(brushSize: unknown): void {
+    function persistBrushSize(brushSize: number): void {
         storage.setBrushSize(brushSize);
     }
 
     function persistPaintStateForCurrentRule(): void {
         const rule = currentEditorRuleFn(state);
-        if (!rule) {
+        if (!rule || state.selectedPaintState === null) {
             return;
         }
         storage.setPaintState(rule.name, state.selectedPaintState);
     }
 
-    function persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: unknown): void {
+    function persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: number): void {
         storage.setPatchDepth(tilingFamily, patchDepth);
     }
 
-    function persistDisclosureState(id: string, open: unknown): void {
+    function persistDisclosureState(id: UiDisclosureId, open: boolean): void {
         storage.setDisclosureState(id, open);
     }
 
-    function persistDrawerState(drawerOpen: unknown): void {
+    function persistDrawerState(drawerOpen: boolean): void {
         storage.setDrawerOpen(drawerOpen);
     }
 

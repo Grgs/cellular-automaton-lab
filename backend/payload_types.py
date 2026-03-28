@@ -28,6 +28,42 @@ class TopologySpecPayload(TypedDict):
     patch_depth: int
 
 
+class SizingPolicyPayload(TypedDict):
+    control: str
+    default: int
+    min: int
+    max: int
+
+
+class TopologyVariantPayload(TypedDict):
+    id: str
+    geometry_key: str
+    tiling_family: str
+    adjacency_mode: str
+    label: str
+    picker_group: str
+    picker_order: int
+    default_rule: str
+    sizing_mode: str
+    family: str
+    viewport_sync_mode: str
+
+
+class TopologyCatalogEntryPayload(TypedDict):
+    tiling_family: str
+    label: str
+    picker_group: str
+    picker_order: int
+    sizing_mode: str
+    family: str
+    viewport_sync_mode: str
+    supported_adjacency_modes: list[str]
+    default_adjacency_mode: str
+    default_rules: dict[str, str]
+    geometry_keys: dict[str, str]
+    sizing_policy: SizingPolicyPayload
+
+
 class TopologySpecRequestPayload(TypedDict):
     tiling_family: str
     adjacency_mode: str
@@ -149,6 +185,36 @@ class PeriodicFaceTilingDescriptorPayload(TypedDict):
     max_y: float
     cell_count_per_unit: int
     row_offset_x: float
+
+
+class SimulationDefaultsPayload(TypedDict):
+    topology_spec: TopologySpecPayload
+    speed: float
+    rule: str
+    min_grid_size: int
+    max_grid_size: int
+    min_patch_depth: int
+    max_patch_depth: int
+    min_speed: float
+    max_speed: float
+
+
+class UiDefaultsPayload(TypedDict):
+    cell_size: int
+    min_cell_size: int
+    max_cell_size: int
+    storage_key: str
+
+
+class ThemeDefaultsPayload(TypedDict):
+    default: str
+    storage_key: str
+
+
+class AppDefaultsPayload(TypedDict):
+    simulation: SimulationDefaultsPayload
+    ui: UiDefaultsPayload
+    theme: ThemeDefaultsPayload
 
 
 class ResetControlRequestPayload(TypedDict):

@@ -1,4 +1,5 @@
 import { FRONTEND_DEFAULTS } from "./defaults.js";
+import { isPlainObject } from "./runtime-validation.js";
 import {
     DEFAULT_BRUSH_SIZE,
     DEFAULT_EDITOR_TOOL,
@@ -41,7 +42,7 @@ function emptySession(): UiSessionState {
 }
 
 function normalizePaintStatesByRule(value: unknown): Record<string, number> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+    if (!isPlainObject(value)) {
         return {};
     }
 
@@ -54,7 +55,7 @@ function normalizePaintStatesByRule(value: unknown): Record<string, number> {
 }
 
 function normalizeCellSizeByTilingFamily(value: unknown): Record<string, number> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+    if (!isPlainObject(value)) {
         return {};
     }
 
@@ -70,17 +71,17 @@ function normalizeCellSizeByTilingFamily(value: unknown): Record<string, number>
 }
 
 function normalizeDisclosures(value: unknown): Partial<Record<UiDisclosureId, boolean>> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+    if (!isPlainObject(value)) {
         return {};
     }
 
     return Object.fromEntries(
-        DISCLOSURE_IDS.map((id) => [id, Boolean((value as Record<string, unknown>)[id])]),
+        DISCLOSURE_IDS.map((id) => [id, Boolean(value[id])]),
     ) as Partial<Record<UiDisclosureId, boolean>>;
 }
 
 function normalizePatchDepthByTilingFamily(value: unknown): Record<string, number> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+    if (!isPlainObject(value)) {
         return {};
     }
 
@@ -96,11 +97,11 @@ function normalizePatchDepthByTilingFamily(value: unknown): Record<string, numbe
 }
 
 export function normalizeUiSession(value: unknown): UiSessionState {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+    if (!isPlainObject(value)) {
         return emptySession();
     }
 
-    const rawValue = value as Record<string, unknown>;
+    const rawValue = value;
     const session = emptySession();
     if (rawValue.cellSizeByTilingFamily && typeof rawValue.cellSizeByTilingFamily === "object") {
         session.cellSizeByTilingFamily = normalizeCellSizeByTilingFamily(rawValue.cellSizeByTilingFamily);
@@ -285,11 +286,11 @@ export function createUiSessionStorage({
             return { ...ensureLoaded().disclosures };
         },
         setDisclosureState(id, open) {
-            if (!DISCLOSURE_IDS.includes(id as UiDisclosureId)) {
+            if (!DISCLOSURE_IDS.includes(id)) {
                 return;
             }
             update((session) => {
-                session.disclosures[id as UiDisclosureId] = Boolean(open);
+                session.disclosures[id] = Boolean(open);
             });
         },
     };

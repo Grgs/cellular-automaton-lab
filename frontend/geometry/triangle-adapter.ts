@@ -20,6 +20,7 @@ import type {
     GridMetrics,
     Point2D,
     RenderedCellArgs,
+    TriangleGeometryCache,
     TriangleGeometryCell,
 } from "../types/rendering.js";
 
@@ -27,13 +28,6 @@ interface TriangleMetrics extends GridMetrics {
     triangleSide: number;
     triangleHeight: number;
     horizontalPitch: number;
-}
-
-interface TriangleCache {
-    [key: string]: unknown;
-    type: "triangle";
-    cells: TriangleGeometryCell[][];
-    strokePath: Path2D | null;
 }
 
 function triangleVertices(x: number, y: number, cellSize: number): Point2D[] {
@@ -66,7 +60,17 @@ function triangleVertexTriplet(vertices: readonly Point2D[]): [Point2D, Point2D,
     return [first, second, third];
 }
 
-function buildTriangleGeometryCache(width: number, height: number, cellSize: number): TriangleCache {
+function isTriangleGeometryCache(cache: unknown): cache is TriangleGeometryCache {
+    return cache !== null
+        && Boolean(cache)
+        && typeof cache === "object"
+        && "type" in cache
+        && (cache as { type?: unknown }).type === "triangle"
+        && "cells" in cache
+        && Array.isArray((cache as { cells?: unknown }).cells);
+}
+
+function buildTriangleGeometryCache(width: number, height: number, cellSize: number): TriangleGeometryCache {
     const cells: TriangleGeometryCell[][] = Array.from({ length: height }, () => Array<TriangleGeometryCell>(width));
     const strokePath = typeof Path2D === "undefined" ? null : new Path2D();
 
@@ -200,7 +204,7 @@ export const triangleGeometryAdapter: GeometryAdapter = {
 
     resolveCellFromOffset({ offsetX, offsetY, width, height, cellSize, metrics, cache }: GeometryResolveCellFromOffsetArgs) {
         const resolvedMetrics = (metrics || triangleGridMetrics(width, height, cellSize)) as TriangleMetrics;
-        const triangleCache = cache as TriangleCache | null;
+        const triangleCache = isTriangleGeometryCache(cache) ? cache : null;
         const approximateRow = Math.floor((offsetY - resolvedMetrics.yInset) / resolvedMetrics.triangleHeight);
         const approximateColumn = Math.round((offsetX - resolvedMetrics.xInset) / resolvedMetrics.horizontalPitch);
 
@@ -212,7 +216,7 @@ export const triangleGeometryAdapter: GeometryAdapter = {
                 if (x < 0 || x >= width) {
                     continue;
                 }
-                const cachedRow = triangleCache?.type === "triangle" ? triangleCache.cells[y] : null;
+                const cachedRow = triangleCache?.cells[y] ?? null;
                 const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
                 if ("minX" in resolvedCell) {
                 if (
@@ -241,8 +245,8 @@ export const triangleGeometryAdapter: GeometryAdapter = {
 
     resolveCellCenter({ cell, cellSize, cache }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveTriangleCoordinates(cell);
-        const triangleCache = cache as TriangleCache | null;
-        const cachedRow = triangleCache?.type === "triangle" ? triangleCache.cells[y] : null;
+        const triangleCache = isTriangleGeometryCache(cache) ? cache : null;
+        const cachedRow = triangleCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
         if (
             "centerX" in resolvedCell
@@ -283,8 +287,8 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         if (context.fillStyle !== color) {
             context.fillStyle = color;
         }
-        const triangleCache = cache as TriangleCache | null;
-        const cachedRow = triangleCache?.type === "triangle" ? triangleCache.cells[y] : null;
+        const triangleCache = isTriangleGeometryCache(cache) ? cache : null;
+        const cachedRow = triangleCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, metrics.cellSize) };
         tracePolygonPath(context, resolvedCell.vertices);
         context.fill();

@@ -1,5 +1,9 @@
 import { tracePolygonPath } from "../canvas/draw.js";
-import { buildMixedTopologyGeometryCache, resolveMixedCellFromOffset } from "../canvas/geometry-mixed.js";
+import {
+    buildMixedTopologyGeometryCache,
+    isPolygonGeometryCache,
+    resolveMixedCellFromOffset,
+} from "../canvas/geometry-mixed.js";
 import {
     applyMixedViewportPreview,
     constrainMixedViewportDimensions,
@@ -19,6 +23,7 @@ import type {
     GridMetrics,
     PeriodicFaceTilingDescriptor,
     Point2D,
+    PolygonGeometryCache,
     PolygonGeometryCell,
     RenderedCellArgs,
     RenderableTopologyCell,
@@ -242,7 +247,7 @@ function resolveGeometryCell(
     geometry: string,
     cell: RenderableTopologyCell,
     metrics: PatternMetrics,
-    cache: { cellsById?: Map<string, PolygonGeometryCell> } | null,
+    cache: PolygonGeometryCache | null,
 ): PolygonGeometryCell | null {
     if (cell?.id && cache?.cellsById?.has(cell.id)) {
         return cache.cellsById.get(cell.id) ?? null;
@@ -321,16 +326,30 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
         },
 
         buildCellGeometry({ cell, metrics, cache }) {
-            return resolveGeometryCell(geometry, cell as RenderableTopologyCell, metrics as PatternMetrics, cache ?? null);
+            return resolveGeometryCell(
+                geometry,
+                cell as RenderableTopologyCell,
+                metrics as PatternMetrics,
+                isPolygonGeometryCache(cache) ? cache : null,
+            );
         },
 
         resolveCellFromOffset({ offsetX, offsetY, cache }: GeometryResolveCellFromOffsetArgs) {
-            return resolveMixedCellFromOffset(offsetX, offsetY, cache ?? null);
+            return resolveMixedCellFromOffset(
+                offsetX,
+                offsetY,
+                cache && "cellsById" in cache ? cache : null,
+            );
         },
 
         resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics, cache, topology = null }: GeometryResolveCellCenterArgs) {
             const resolvedMetrics = (metrics || buildMetrics({ width, height, cellSize, topology })) as PatternMetrics;
-            const geometryCell = resolveGeometryCell(geometry, cell as RenderableTopologyCell, resolvedMetrics, cache ?? null);
+            const geometryCell = resolveGeometryCell(
+                geometry,
+                cell as RenderableTopologyCell,
+                resolvedMetrics,
+                isPolygonGeometryCache(cache) ? cache : null,
+            );
             return geometryCell
                 ? { x: geometryCell.centerX, y: geometryCell.centerY }
                 : { x: 0, y: 0 };
@@ -356,7 +375,7 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
                 geometry,
                 cell as RenderableTopologyCell,
                 metrics as PatternMetrics,
-                cache ?? null,
+                isPolygonGeometryCache(cache) ? cache : null,
             );
             const color = resolveRenderedCellColor(
                 stateValue,

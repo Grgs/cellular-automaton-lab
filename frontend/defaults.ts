@@ -34,30 +34,25 @@ const FALLBACK_DEFAULTS: FrontendDefaults = Object.freeze({
     }),
 }) as FrontendDefaults;
 
-function appDefaults(): BootstrappedFrontendDefaults {
-    return window.APP_DEFAULTS ?? {};
+function cloneDefaults(defaults: FrontendDefaults): FrontendDefaults {
+    return Object.freeze({
+        simulation: Object.freeze({
+            ...defaults.simulation,
+            topology_spec: Object.freeze({
+                ...defaults.simulation.topology_spec,
+            }),
+        }),
+        ui: Object.freeze({
+            ...defaults.ui,
+        }),
+        theme: Object.freeze({
+            ...defaults.theme,
+        }),
+    }) as FrontendDefaults;
 }
 
-const bootstrappedDefaults = appDefaults();
-const bootstrappedSimulation = bootstrappedDefaults.simulation ?? {};
-const bootstrappedUi = bootstrappedDefaults.ui ?? {};
-const bootstrappedTheme = bootstrappedDefaults.theme ?? {};
+function appDefaults(): BootstrappedFrontendDefaults {
+    return window.APP_DEFAULTS ?? FALLBACK_DEFAULTS;
+}
 
-export const FRONTEND_DEFAULTS: FrontendDefaults = Object.freeze({
-    simulation: Object.freeze({
-        ...FALLBACK_DEFAULTS.simulation,
-        ...bootstrappedSimulation,
-        topology_spec: Object.freeze({
-            ...FALLBACK_DEFAULTS.simulation.topology_spec,
-            ...(bootstrappedSimulation.topology_spec ?? {}),
-        }),
-    }),
-    ui: Object.freeze({
-        ...FALLBACK_DEFAULTS.ui,
-        ...bootstrappedUi,
-    }),
-    theme: Object.freeze({
-        ...FALLBACK_DEFAULTS.theme,
-        ...bootstrappedTheme,
-    }),
-}) as FrontendDefaults;
+export const FRONTEND_DEFAULTS: FrontendDefaults = cloneDefaults(appDefaults());

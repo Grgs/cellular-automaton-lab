@@ -1,7 +1,13 @@
-import type { CellIdentifier, CellStateDefinition, RulesResponse, SimulationSnapshot } from "./domain.js";
+import type {
+    CellIdentifier,
+    CellStateDefinition,
+    RulesResponse,
+    SimulationSnapshot,
+    TopologySpec,
+} from "./domain.js";
 import type { AppState, TopologyRenderPayload } from "./state.js";
 import type { DomElements } from "./dom.js";
-import type { MatchMediaResult, UiSessionStorage } from "./session.js";
+import type { MatchMediaResult, UiDisclosureId, UiSessionStorage } from "./session.js";
 import type { AppActionSet } from "./actions.js";
 
 export type BrowserTimerId = number;
@@ -12,7 +18,7 @@ export interface ConfigSyncController {
     reconcile(simulationState: SimulationSnapshot): void;
     shouldAdoptBackendRule(): boolean;
     getViewState(): ConfigSyncViewState;
-    requestRuleSync(nextRuleName: string | null, options?: { running?: boolean; body?: unknown }): void;
+    requestRuleSync(nextRuleName: string | null, options?: RuleSyncRequestOptions): void;
     scheduleSpeedSync(nextSpeed: number): void;
     getDisplaySpeed(fallbackSpeed: number): number;
     dispose(): void;
@@ -25,12 +31,12 @@ export interface UiSessionController {
     restoreDrawerState(): void;
     restorePaintStateForCurrentRule(): void;
     persistCellSize(tilingFamilyOrCellSize: string | number, cellSize?: number): void;
-    persistEditorTool(editorTool: unknown): void;
-    persistBrushSize(brushSize: unknown): void;
+    persistEditorTool(editorTool: string): void;
+    persistBrushSize(brushSize: number): void;
     persistPaintStateForCurrentRule(): void;
-    persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: unknown): void;
-    persistDisclosureState(id: string, open: unknown): void;
-    persistDrawerState(drawerOpen: unknown): void;
+    persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: number): void;
+    persistDisclosureState(id: UiDisclosureId, open: boolean): void;
+    persistDrawerState(drawerOpen: boolean): void;
     resetSessionPreferences(): void;
 }
 
@@ -77,6 +83,53 @@ export interface BlockingActivityConfig {
 export interface SimulationMutationOptions extends MutationRunnerOptions {
     source?: string;
     recoverWithRefresh?: boolean;
+    blockingActivity?: BlockingActivityConfig | null;
+}
+
+export interface ConfigTopologySpecPatch {
+    width?: number;
+    height?: number;
+}
+
+export interface ConfigSyncBody {
+    topology_spec?: ConfigTopologySpecPatch;
+    speed?: number;
+    rule?: string | null;
+}
+
+export interface ResetControlBody {
+    topology_spec: TopologySpec;
+    speed: number;
+    rule: string | null;
+    randomize: boolean;
+}
+
+export interface ControlCommandMap {
+    "/api/control/start": undefined;
+    "/api/control/pause": undefined;
+    "/api/control/resume": undefined;
+    "/api/control/step": undefined;
+    "/api/control/reset": ResetControlBody;
+    "/api/config": ConfigSyncBody;
+}
+
+export type EmptyControlCommandPath = {
+    [TPath in keyof ControlCommandMap]: ControlCommandMap[TPath] extends undefined ? TPath : never;
+}[keyof ControlCommandMap];
+
+export interface RuleSyncRequestOptions {
+    running?: boolean;
+    body?: ConfigSyncBody;
+}
+
+export interface ViewportSyncOptions {
+    includeConfig?: boolean;
+    force?: boolean;
+    preview?: boolean;
+    previewApplied?: boolean;
+    delay?: number;
+    body?: ConfigSyncBody;
+    desiredDimensions?: ViewportDimensions;
     blockingActivity?: BlockingActivityConfig | null;
 }
 
@@ -133,10 +186,16 @@ export interface AppView {
 export interface InteractionController {
     bindGridInteractions(): void;
     toggleCell?(cell: CellIdentifier): Promise<unknown>;
+    sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
     sendControl(
-        path: string,
-        body?: unknown,
-        options?: Record<string, unknown>,
+        path: "/api/control/reset",
+        body: ResetControlBody,
+        options?: SimulationMutationOptions,
+    ): Promise<SimulationSnapshot | null>;
+    sendControl(
+        path: "/api/config",
+        body: ConfigSyncBody,
+        options?: SimulationMutationOptions,
     ): Promise<SimulationSnapshot | null>;
     runSerialized<T>(task: () => Promise<T>, options?: MutationRunnerOptions): Promise<T>;
     undo?(): Promise<unknown>;
@@ -145,10 +204,9 @@ export interface InteractionController {
 }
 
 export interface ViewportController {
-    buildRequestBody(options?: Record<string, unknown>, desiredDimensions?: ViewportDimensions): Record<string, unknown>;
-    sync(options?: Record<string, unknown>): Promise<boolean>;
-    schedule(options?: Record<string, unknown>): boolean;
-    flush(options?: Record<string, unknown>): Promise<boolean>;
+    sync(options?: ViewportSyncOptions): Promise<boolean>;
+    schedule(options?: ViewportSyncOptions): boolean;
+    flush(options?: ViewportSyncOptions): Promise<boolean>;
     suppressAutoSync(durationMs?: number): void;
     install(viewportElement: HTMLElement | null): void;
     dispose(): void;
@@ -219,7 +277,9 @@ export interface FetchStateFunction {
 }
 
 export interface PostControlFunction {
-    (path: string, body?: unknown): Promise<SimulationSnapshot>;
+    (path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
+    (path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
+    (path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
 }
 
 export interface CellMutationRequestFunction {
@@ -244,9 +304,9 @@ export interface ViewportControllerDependencies {
     collectConfig(): { speed: number; rule: string };
     applyPreview(dimensions: ViewportDimensions): void;
     sendControl(
-        path: string,
-        body?: unknown,
-        options?: Record<string, unknown>,
+        path: "/api/config",
+        body: ConfigSyncBody,
+        options?: SimulationMutationOptions,
     ): Promise<SimulationSnapshot | null>;
     sameDimensions(left: ViewportDimensions, right: ViewportDimensions | null | undefined): boolean;
 }

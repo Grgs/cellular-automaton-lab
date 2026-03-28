@@ -57,6 +57,17 @@ jobs:
             exit 1
           fi
 
+      - name: Enforce exact contract boundaries
+        run: |
+          if rg --line-number "Record<string, unknown>|\[key: string\]: unknown" frontend --glob "!frontend/runtime-validation.ts"; then
+            echo "frontend contract surfaces must not use open-ended unknown object bags outside runtime-validation.ts"
+            exit 1
+          fi
+          if rg --line-number "dict\[str, object\]" backend/simulation/topology_catalog.py backend/defaults.py backend/frontend_assets.py; then
+            echo "backend bootstrapped export layer must not use dict[str, object]"
+            exit 1
+          fi
+
       - name: Type check frontend
         run: npm run typecheck:frontend
 

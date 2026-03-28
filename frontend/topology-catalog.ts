@@ -8,69 +8,47 @@ import type {
     TopologySpec,
 } from "./types/domain.js";
 
-function normalizeSizingPolicy(definition: Partial<BootstrappedTopologyDefinition> = {}): Readonly<SizingPolicy> {
-    const sizingMode = String(definition.sizing_mode ?? "grid");
+function normalizeSizingPolicy(definition: Pick<TopologyDefinition, "sizing_mode" | "sizing_policy">): Readonly<SizingPolicy> {
+    const sizingMode = definition.sizing_mode;
     const fallbackControl: SizingPolicy["control"] = sizingMode === "patch_depth"
         ? "patch_depth"
         : "cell_size";
-    const policy = definition.sizing_policy || {};
-    const minimum = Number(policy.min);
-    const maximum = Number(policy.max);
-    const defaultValue = Number(policy.default);
-    const control: SizingControl = String(policy.control ?? fallbackControl) === "patch_depth"
+    const policy = definition.sizing_policy;
+    const control: SizingControl = String(policy.control) === "patch_depth"
         ? "patch_depth"
         : "cell_size";
     return Object.freeze({
         control,
-        default: Number.isFinite(defaultValue) ? defaultValue : (fallbackControl === "patch_depth" ? 4 : 12),
-        min: Number.isFinite(minimum) ? minimum : (fallbackControl === "patch_depth" ? 0 : 4),
-        max: Number.isFinite(maximum) ? maximum : (fallbackControl === "patch_depth" ? 6 : 24),
+        default: Number(policy.default),
+        min: Number(policy.min),
+        max: Number(policy.max),
     });
 }
 
 function normalizeTopologyDefinition(definition: BootstrappedTopologyDefinition): Readonly<TopologyDefinition> {
-    const supportedAdjacencyModes = Array.isArray(definition.supported_adjacency_modes)
-        ? definition.supported_adjacency_modes.map((value) => String(value))
-        : [String(definition.default_adjacency_mode || "edge")];
-    const defaultRules = definition.default_rules ?? {};
-    const geometryKeys = definition.geometry_keys ?? {};
+    const supportedAdjacencyModes = definition.supported_adjacency_modes.map((value) => String(value));
     return Object.freeze({
-        tiling_family: String(definition.tiling_family ?? ""),
-        label: String(definition.label ?? definition.tiling_family ?? ""),
-        picker_group: String(definition.picker_group ?? "Classic"),
-        picker_order: Number(definition.picker_order ?? 999),
-        sizing_mode: String(definition.sizing_mode ?? "grid"),
-        family: String(definition.family ?? "regular"),
-        viewport_sync_mode: String(definition.viewport_sync_mode ?? "backend-sync"),
+        tiling_family: definition.tiling_family,
+        label: definition.label,
+        picker_group: definition.picker_group,
+        picker_order: definition.picker_order,
+        sizing_mode: definition.sizing_mode,
+        family: definition.family,
+        viewport_sync_mode: definition.viewport_sync_mode,
         supported_adjacency_modes: Object.freeze(supportedAdjacencyModes),
-        default_adjacency_mode: String(
-            definition.default_adjacency_mode
-            ?? supportedAdjacencyModes[0]
-            ?? "edge"
-        ),
-        default_rules: Object.freeze({ ...defaultRules }),
-        variant_keys: Object.freeze({ ...geometryKeys }),
+        default_adjacency_mode: definition.default_adjacency_mode,
+        default_rules: Object.freeze({ ...definition.default_rules }),
+        geometry_keys: Object.freeze({ ...definition.geometry_keys }),
         sizing_policy: normalizeSizingPolicy(definition),
     });
 }
 
 function bootstrappedTopologyCatalog(): readonly TopologyDefinition[] {
     const bootstrapped = window.APP_TOPOLOGIES;
-    if (!Array.isArray(bootstrapped) || bootstrapped.length === 0) {
+    if (bootstrapped.length === 0) {
         throw new Error("Missing bootstrapped topology catalog.");
     }
-    return Object.freeze(
-        bootstrapped
-            .filter(
-                (definition): definition is BootstrappedTopologyDefinition => (
-                    Boolean(definition)
-                    && typeof definition === "object"
-                    && "tiling_family" in definition
-                    && Boolean(definition.tiling_family)
-                ),
-            )
-            .map(normalizeTopologyDefinition),
-    );
+    return Object.freeze(bootstrapped.map(normalizeTopologyDefinition));
 }
 
 export const FRONTEND_TOPOLOGY_CATALOG = bootstrappedTopologyCatalog();
@@ -97,7 +75,11 @@ export function getTopologyDefinition(tilingFamily: string | null | undefined): 
 }
 
 export function getTopologySizingPolicy(tilingFamily: string | null | undefined): Readonly<SizingPolicy> {
-    return getTopologyDefinition(tilingFamily)?.sizing_policy || normalizeSizingPolicy({});
+    const definition = getTopologyDefinition(tilingFamily) ?? getTopologyDefinition("square");
+    if (!definition) {
+        throw new Error("Missing bootstrapped square topology definition.");
+    }
+    return definition.sizing_policy;
 }
 
 export function isSupportedTopologyFamily(tilingFamily: string | null | undefined): boolean {
@@ -128,8 +110,8 @@ export function resolveTopologyVariantKey(
         return "square";
     }
     const resolvedAdjacencyMode = resolveAdjacencyMode(tilingFamily, adjacencyMode);
-    return definition.variant_keys[resolvedAdjacencyMode]
-        || definition.variant_keys[definition.default_adjacency_mode]
+    return definition.geometry_keys[resolvedAdjacencyMode]
+        || definition.geometry_keys[definition.default_adjacency_mode]
         || "square";
 }
 

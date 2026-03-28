@@ -1,8 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 
-from backend.payload_types import TopologySpecPayload
+from backend.payload_types import (
+    SizingPolicyPayload,
+    TopologyCatalogEntryPayload,
+    TopologySpecPayload,
+    TopologyVariantPayload,
+)
 
 DEFAULT_SQUARE_RULE = "conway"
 DEFAULT_MIN_GRID_SIZE = 3
@@ -53,10 +58,20 @@ class TopologyVariantDefinition:
     def id(self) -> str:
         return self.geometry_key
 
-    def to_dict(self) -> dict[str, object]:
-        payload = asdict(self)
-        payload["id"] = self.geometry_key
-        return payload
+    def to_dict(self) -> TopologyVariantPayload:
+        return {
+            "id": self.geometry_key,
+            "geometry_key": self.geometry_key,
+            "tiling_family": self.tiling_family,
+            "adjacency_mode": self.adjacency_mode,
+            "label": self.label,
+            "picker_group": self.picker_group,
+            "picker_order": self.picker_order,
+            "default_rule": self.default_rule,
+            "sizing_mode": self.sizing_mode,
+            "family": self.family,
+            "viewport_sync_mode": self.viewport_sync_mode,
+        }
 
 
 @dataclass(frozen=True)
@@ -66,7 +81,7 @@ class SizingPolicyDefinition:
     minimum: int
     maximum: int
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> SizingPolicyPayload:
         return {
             "control": self.control,
             "default": self.default,
@@ -90,7 +105,7 @@ class TopologyDefinition:
     geometry_keys: dict[str, str]
     sizing_policy: SizingPolicyDefinition
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> TopologyCatalogEntryPayload:
         return {
             "tiling_family": self.tiling_family,
             "label": self.label,
@@ -391,11 +406,11 @@ TOPOLOGY_DEFAULT_RULES = {
 }
 
 
-def describe_topologies() -> list[dict[str, object]]:
+def describe_topologies() -> list[TopologyCatalogEntryPayload]:
     return [definition.to_dict() for definition in TOPOLOGY_CATALOG]
 
 
-def describe_topology_variants() -> list[dict[str, object]]:
+def describe_topology_variants() -> list[TopologyVariantPayload]:
     return [variant.to_dict() for variant in TOPOLOGY_VARIANTS]
 
 

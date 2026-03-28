@@ -72,8 +72,8 @@ class CellularAutomatonUITests(BrowserAppTestCase):
             raise AssertionError(f"canvas reported an invalid rendered cell size: {render_cell_size_text!r}")
 
         topology_spec = self._topology_spec(self.read_backend_state())
-        width = int(topology_spec.get("width", 0))
-        height = int(topology_spec.get("height", 0))
+        width = int(topology_spec["width"])
+        height = int(topology_spec["height"])
         if width <= 0 or height <= 0:
             raise AssertionError(f"backend topology dimensions were invalid: {topology_spec!r}")
 
@@ -91,7 +91,7 @@ class CellularAutomatonUITests(BrowserAppTestCase):
 
         self.page.select_option("#rule-select", "highlife")
         backend_state = self.wait_for_backend_state(
-            lambda state: state.get("rule", {}).get("name") == "highlife"
+            lambda state: state["rule"]["name"] == "highlife"
         )
 
         expect(self.page.locator("#rule-select")).to_have_value("highlife")
@@ -102,8 +102,8 @@ class CellularAutomatonUITests(BrowserAppTestCase):
     def test_showcase_pattern_loads_demo(self) -> None:
         self.page.click("#showcase-whirlpool-btn")
         backend_state = self.wait_for_backend_state(
-            lambda state: state.get("rule", {}).get("name") == "whirlpool"
-            and any(cell != 0 for cell in state.get("cell_states", []))
+            lambda state: state["rule"]["name"] == "whirlpool"
+            and any(cell != 0 for cell in state["cell_states"])
         )
 
         expect(self.page.locator("#pattern-status")).to_have_text("Loaded Whirlpool demo.")
@@ -112,7 +112,7 @@ class CellularAutomatonUITests(BrowserAppTestCase):
     def test_penrose_topology_switch_updates_patch_depth_controls(self) -> None:
         self.page.select_option("#tiling-family-select", "penrose-p3-rhombs")
         backend_state = self.wait_for_backend_state(
-            lambda state: self._topology_spec(state).get("tiling_family") == "penrose-p3-rhombs"
+            lambda state: self._topology_spec(state)["tiling_family"] == "penrose-p3-rhombs"
         )
 
         expect(self.page.locator("#patch-depth-field")).to_be_visible()
@@ -122,12 +122,12 @@ class CellularAutomatonUITests(BrowserAppTestCase):
 
     def test_server_restart_preserves_saved_state(self) -> None:
         self.page.select_option("#rule-select", "highlife")
-        self.wait_for_backend_state(lambda state: state.get("rule", {}).get("name") == "highlife")
+        self.wait_for_backend_state(lambda state: state["rule"]["name"] == "highlife")
 
         self.server.restart()
         self.goto_page(f"{self.api.base_url}/", wait_until="load")
         backend_state = self.wait_for_backend_state(
-            lambda state: state.get("rule", {}).get("name") == "highlife"
+            lambda state: state["rule"]["name"] == "highlife"
         )
 
         expect(self.page.locator("#rule-select")).to_have_value("highlife")
@@ -174,9 +174,9 @@ class CellularAutomatonUITests(BrowserAppTestCase):
 
         backend_state = self.wait_for_backend_state(
             lambda state: (
-                state.get("rule", {}).get("name") == "highlife"
-                and self._topology_spec(state).get("width") == 8
-                and self._topology_spec(state).get("height") == 5
+                state["rule"]["name"] == "highlife"
+                and self._topology_spec(state)["width"] == 8
+                and self._topology_spec(state)["height"] == 5
             )
         )
 

@@ -1,5 +1,9 @@
 import { tracePolygonPath } from "../canvas/draw.js";
-import { buildMixedTopologyGeometryCache, resolveMixedCellFromOffset } from "../canvas/geometry-mixed.js";
+import {
+    buildMixedTopologyGeometryCache,
+    isPolygonGeometryCache,
+    resolveMixedCellFromOffset,
+} from "../canvas/geometry-mixed.js";
 import { penroseCellGeometry } from "../canvas/geometry-penrose.js";
 import { PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY } from "../topology.js";
 import { fitRenderCellSizeWithMetrics } from "./shared.js";
@@ -10,6 +14,7 @@ import type {
     GeometryResolveCellFromOffsetArgs,
     GeometryResolveCoordinateCenterArgs,
     GridMetrics,
+    PolygonGeometryCache,
     PolygonGeometryCell,
     RenderedCellArgs,
     RenderableTopologyCell,
@@ -83,7 +88,7 @@ function buildPenroseMetrics(
 function resolveGeometryCell(
     cell: RenderableTopologyCell,
     metrics: PenroseMetrics,
-    cache: { cellsById?: Map<string, PolygonGeometryCell> } | null,
+    cache: PolygonGeometryCache | null,
 ): PolygonGeometryCell | null {
     if (cell?.id && cache?.cellsById?.has(cell.id)) {
         return cache.cellsById.get(cell.id) ?? null;
@@ -127,12 +132,20 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
         },
 
         resolveCellFromOffset({ offsetX, offsetY, cache }: GeometryResolveCellFromOffsetArgs) {
-            return resolveMixedCellFromOffset(offsetX, offsetY, cache ?? null);
+            return resolveMixedCellFromOffset(
+                offsetX,
+                offsetY,
+                cache && "cellsById" in cache ? cache : null,
+            );
         },
 
         resolveCellCenter({ cell, width = 0, height = 0, cellSize, topology, metrics, cache }: GeometryResolveCellCenterArgs) {
             const resolvedMetrics = (metrics || buildPenroseMetrics(geometry, topology ?? null, cellSize, width, height)) as PenroseMetrics;
-            const geometryCell = resolveGeometryCell(cell as RenderableTopologyCell, resolvedMetrics, cache ?? null);
+            const geometryCell = resolveGeometryCell(
+                cell as RenderableTopologyCell,
+                resolvedMetrics,
+                isPolygonGeometryCache(cache) ? cache : null,
+            );
             return geometryCell
                 ? { x: geometryCell.centerX, y: geometryCell.centerY }
                 : { x: 0, y: 0 };
@@ -147,7 +160,11 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
         },
 
         drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
-            const geometryCell = resolveGeometryCell(cell as RenderableTopologyCell, metrics as PenroseMetrics, cache ?? null);
+            const geometryCell = resolveGeometryCell(
+                cell as RenderableTopologyCell,
+                metrics as PenroseMetrics,
+                isPolygonGeometryCache(cache) ? cache : null,
+            );
             const color = resolveRenderedCellColor(
                 stateValue,
                 colorLookup,

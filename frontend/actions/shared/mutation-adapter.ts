@@ -1,4 +1,4 @@
-import type { MutationRunnerOptions } from "../../types/controller.js";
+import type { MutationRunnerOptions, SimulationMutationOptions } from "../../types/controller.js";
 import type { SimulationSnapshot } from "../../types/domain.js";
 
 interface ActionMutationAdapterOptions {
@@ -20,7 +20,7 @@ interface ActionMutationAdapter {
         simulationState: SimulationSnapshot,
         options?: { source?: string },
     ): Promise<SimulationSnapshot>;
-    runSerialized<T>(task: () => Promise<T>, options?: MutationRunnerOptions): Promise<T>;
+    runSerialized<T>(task: () => Promise<T>, options?: SimulationMutationOptions): Promise<T>;
 }
 
 export function createActionMutationAdapter({
@@ -36,7 +36,14 @@ export function createActionMutationAdapter({
             return this.applyState(simulationState, options);
         },
         runSerialized(task, options = {}) {
-            return interactions.runSerialized(task, options);
+            const nextOptions: MutationRunnerOptions = {};
+            if (typeof options.onError === "function") {
+                nextOptions.onError = options.onError;
+            }
+            if (typeof options.onRecover === "function") {
+                nextOptions.onRecover = options.onRecover;
+            }
+            return interactions.runSerialized(task, nextOptions);
         },
     };
 }

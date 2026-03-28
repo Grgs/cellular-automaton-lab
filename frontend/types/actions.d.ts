@@ -1,9 +1,13 @@
 import type {
+    BlockingActivityConfig,
+    ConfigSyncBody,
     ConfigSyncController,
     InteractionController,
     PostControlFunction,
+    ResetControlBody,
     SetCellsRequestFunction,
     SimulationMutations,
+    SimulationMutationOptions,
     UiSessionController,
     ViewportController,
     ViewportDimensions,
@@ -18,6 +22,7 @@ import type {
     TopologySpec,
 } from "./domain.js";
 import type { DomElements } from "./dom.js";
+import type { UiDisclosureId } from "./session.js";
 import type { AppState } from "./state.js";
 
 export interface SimulationActionRuntime {
@@ -34,7 +39,7 @@ export interface SimulationActionRuntime {
     ) => ViewportDimensions;
     dismissHintsAndStatus(): void;
     applyOverlayIntentAndRender(intent: string): boolean;
-    buildResetPayload(randomize: boolean): Record<string, unknown>;
+    buildResetPayload(randomize: boolean): ResetControlBody;
     applyRuleSelection(nextRuleName: string | null): void;
     applySpeedSelection(nextSpeed: number): void;
     requestPatchDepth(
@@ -68,7 +73,7 @@ export interface ActionMutationAdapter {
         simulationState: SimulationSnapshot,
         options?: { source?: string },
     ): Promise<SimulationSnapshot>;
-    runSerialized<T>(task: () => Promise<T>, options?: Record<string, unknown>): Promise<T>;
+    runSerialized<T>(task: () => Promise<T>, options?: SimulationMutationOptions): Promise<T>;
 }
 
 export interface PatternActionSet {
@@ -100,7 +105,7 @@ export interface UiActionSet {
     handleTopBarEmptyClick(): Promise<boolean>;
     handleInspectorEmptyClick(): Promise<boolean>;
     handleWorkspaceEmptyClick(): Promise<boolean>;
-    setDisclosureState(id: string, open: boolean): void;
+    setDisclosureState(id: UiDisclosureId, open: boolean): void;
     toggleTheme(): void;
 }
 
@@ -206,16 +211,11 @@ export interface AppActionOptions {
 export interface PatternImportOptions {
     successMessage: string;
     cancelMessage: string;
-    blockingActivity?: Record<string, unknown> | null;
+    blockingActivity?: BlockingActivityConfig | null;
     onSuccess?: () => void;
 }
 
-export interface ResetRequestBody {
-    topology_spec: Partial<TopologySpec>;
-    speed: number;
-    rule?: string | null;
-    randomize: boolean;
-}
+export type ResetRequestBody = ResetControlBody;
 
 export interface PatternBuildResult {
     pattern: PatternPayload;
@@ -246,4 +246,9 @@ export interface PatternCellResolver {
 
 export interface ResolvedPresetMetadata extends ResolvedPresetSelection {
     presetOptions: PresetMetadata[];
+}
+
+export interface SimulationActionRuleSyncOptions {
+    running: boolean;
+    body?: ConfigSyncBody;
 }

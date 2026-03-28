@@ -18,7 +18,14 @@ import {
     hideEditCue as hideEditCueState,
     setPatternStatus as setPatternStatusState,
 } from "./state/overlay-state.js";
-import type { CreateSimulationMutationsFunction, InteractionController } from "./types/controller.js";
+import type {
+    ConfigSyncBody,
+    CreateSimulationMutationsFunction,
+    EmptyControlCommandPath,
+    InteractionController,
+    ResetControlBody,
+    SimulationMutationOptions,
+} from "./types/controller.js";
 import type {
     EditorHistoryCommands,
     EditorSessionController,
@@ -27,6 +34,7 @@ import type {
     LegacyDragController,
     PaintableCell,
 } from "./types/editor.js";
+import type { SimulationSnapshot } from "./types/domain.js";
 import type { AppState } from "./types/state.js";
 
 export { cellKey, interpolateCellPath, createDragPaintSession } from "./drag-session.js";
@@ -389,9 +397,40 @@ export function createInteractionController({
         await mutations.runStateMutation(() => toggleCellRequest(cell), { source: "editor" }).catch(() => null);
     }
 
-    async function sendControl(path: string, body: unknown = {}, options: Record<string, unknown> = {}) {
+    async function sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
+    async function sendControl(
+        path: "/api/control/reset",
+        body: ResetControlBody,
+        options?: SimulationMutationOptions,
+    ): Promise<SimulationSnapshot | null>;
+    async function sendControl(
+        path: "/api/config",
+        body: ConfigSyncBody,
+        options?: SimulationMutationOptions,
+    ): Promise<SimulationSnapshot | null>;
+    async function sendControl(
+        path: EmptyControlCommandPath | "/api/control/reset" | "/api/config",
+        bodyOrOptions?: ResetControlBody | ConfigSyncBody | SimulationMutationOptions,
+        maybeOptions: SimulationMutationOptions = {},
+    ): Promise<SimulationSnapshot | null> {
+        if (path === "/api/control/reset") {
+            const body = bodyOrOptions as ResetControlBody;
+            return await mutations.runStateMutation(
+                () => postControl(path, body),
+                { source: "control", ...maybeOptions },
+            ).catch(() => null);
+        }
+        if (path === "/api/config") {
+            const body = bodyOrOptions as ConfigSyncBody;
+            return await mutations.runStateMutation(
+                () => postControl(path, body),
+                { source: "control", ...maybeOptions },
+            ).catch(() => null);
+        }
+
+        const options = (bodyOrOptions as SimulationMutationOptions | undefined) ?? {};
         return await mutations.runStateMutation(
-            () => postControl(path, body),
+            () => postControl(path),
             { source: "control", ...options },
         ).catch(() => null);
     }

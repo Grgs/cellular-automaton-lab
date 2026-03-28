@@ -1,5 +1,9 @@
 import { tracePolygonPath } from "../canvas/draw.js";
-import { buildMixedTopologyGeometryCache, resolveMixedCellFromOffset } from "../canvas/geometry-mixed.js";
+import {
+    buildMixedTopologyGeometryCache,
+    isPolygonGeometryCache,
+    resolveMixedCellFromOffset,
+} from "../canvas/geometry-mixed.js";
 import { fitRenderCellSizeWithMetrics } from "./shared.js";
 import type {
     GeometryAdapter,
@@ -8,6 +12,7 @@ import type {
     GeometryResolveCellFromOffsetArgs,
     GeometryResolveCoordinateCenterArgs,
     GridMetrics,
+    PolygonGeometryCache,
     PolygonGeometryCell,
     RenderedCellArgs,
     RenderableTopologyCell,
@@ -114,7 +119,7 @@ function topologyCellGeometry(
 function resolveGeometryCell(
     cell: RenderableTopologyCell,
     metrics: AperiodicMetrics,
-    cache: { cellsById?: Map<string, PolygonGeometryCell> } | null,
+    cache: PolygonGeometryCache | null,
 ): PolygonGeometryCell | null {
     if (cell?.id && cache?.cellsById?.has(cell.id)) {
         return cache.cellsById.get(cell.id) ?? null;
@@ -158,12 +163,20 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
         },
 
         resolveCellFromOffset({ offsetX, offsetY, cache }: GeometryResolveCellFromOffsetArgs) {
-            return resolveMixedCellFromOffset(offsetX, offsetY, cache ?? null);
+            return resolveMixedCellFromOffset(
+                offsetX,
+                offsetY,
+                cache && "cellsById" in cache ? cache : null,
+            );
         },
 
         resolveCellCenter({ cell, width = 0, height = 0, cellSize, topology, metrics, cache }: GeometryResolveCellCenterArgs) {
             const resolvedMetrics = (metrics || buildAperiodicMetrics(geometry, topology ?? null, cellSize, width, height)) as AperiodicMetrics;
-            const geometryCell = resolveGeometryCell(cell as RenderableTopologyCell, resolvedMetrics, cache ?? null);
+            const geometryCell = resolveGeometryCell(
+                cell as RenderableTopologyCell,
+                resolvedMetrics,
+                isPolygonGeometryCache(cache) ? cache : null,
+            );
             return geometryCell
                 ? { x: geometryCell.centerX, y: geometryCell.centerY }
                 : { x: 0, y: 0 };
@@ -178,7 +191,11 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
         },
 
         drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle }: RenderedCellArgs) {
-            const geometryCell = resolveGeometryCell(cell as RenderableTopologyCell, metrics as AperiodicMetrics, cache ?? null);
+            const geometryCell = resolveGeometryCell(
+                cell as RenderableTopologyCell,
+                metrics as AperiodicMetrics,
+                isPolygonGeometryCache(cache) ? cache : null,
+            );
             const color = resolveRenderedCellColor(
                 stateValue,
                 colorLookup,

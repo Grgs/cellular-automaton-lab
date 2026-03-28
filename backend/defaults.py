@@ -3,42 +3,11 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import TypedDict
 
-from backend.payload_types import JsonObject, TopologySpecPayload
+from backend.payload_types import AppDefaultsPayload, JsonObject
 from backend.simulation.topology_catalog import resolve_geometry_key
 
 DEFAULTS_PATH = Path(__file__).resolve().parents[1] / "config" / "defaults.json"
-
-
-class SimulationDefaultsPayload(TypedDict):
-    topology_spec: TopologySpecPayload
-    speed: float
-    rule: str
-    min_grid_size: int
-    max_grid_size: int
-    min_patch_depth: int
-    max_patch_depth: int
-    min_speed: float
-    max_speed: float
-
-
-class UiDefaultsPayload(TypedDict):
-    cell_size: int
-    min_cell_size: int
-    max_cell_size: int
-    storage_key: str
-
-
-class ThemeDefaultsPayload(TypedDict):
-    default: str
-    storage_key: str
-
-
-class AppDefaultsPayload(TypedDict):
-    simulation: SimulationDefaultsPayload
-    ui: UiDefaultsPayload
-    theme: ThemeDefaultsPayload
 
 
 def _require(mapping: JsonObject, key: str) -> object:

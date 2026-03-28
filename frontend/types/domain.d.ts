@@ -39,13 +39,7 @@ export interface FrontendDefaults {
     theme: ThemeDefaults;
 }
 
-export interface BootstrappedFrontendDefaults {
-    simulation?: Partial<SimulationDefaults> & {
-        topology_spec?: Partial<TopologySpec>;
-    };
-    ui?: Partial<UiDefaults>;
-    theme?: Partial<ThemeDefaults>;
-}
+export type BootstrappedFrontendDefaults = FrontendDefaults;
 
 export interface SizingPolicy {
     control: SizingControl;
@@ -55,22 +49,6 @@ export interface SizingPolicy {
 }
 
 export interface BootstrappedTopologyDefinition {
-    tiling_family?: unknown;
-    label?: unknown;
-    picker_group?: unknown;
-    picker_order?: unknown;
-    sizing_mode?: unknown;
-    family?: unknown;
-    viewport_sync_mode?: unknown;
-    supported_adjacency_modes?: unknown;
-    default_adjacency_mode?: unknown;
-    default_rules?: Record<string, string>;
-    geometry_keys?: Record<string, string>;
-    sizing_policy?: Partial<SizingPolicy>;
-    [key: string]: unknown;
-}
-
-export interface TopologyDefinition {
     tiling_family: string;
     label: string;
     picker_group: string;
@@ -81,9 +59,11 @@ export interface TopologyDefinition {
     supported_adjacency_modes: readonly string[];
     default_adjacency_mode: string;
     default_rules: Readonly<Record<string, string>>;
-    variant_keys: Readonly<Record<string, string>>;
+    geometry_keys: Readonly<Record<string, string>>;
     sizing_policy: Readonly<SizingPolicy>;
 }
+
+export type TopologyDefinition = BootstrappedTopologyDefinition;
 
 export interface TopologyOption {
     value: string;
@@ -111,9 +91,7 @@ export interface ApiTopologyCellPayload {
     vertices?: PointPayload[];
 }
 
-export interface TopologyCell extends ApiTopologyCellPayload {
-    [key: string]: unknown;
-}
+export type TopologyCell = ApiTopologyCellPayload;
 
 export interface IndexedTopologyCell extends TopologyCell {
     index: number;

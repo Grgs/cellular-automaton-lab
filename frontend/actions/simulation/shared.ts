@@ -40,8 +40,14 @@ import {
     resolveTopologyVariantKey,
     topologyUsesPatchDepth,
 } from "../../topology-catalog.js";
-import type { BrowserClearTimeout, BrowserSetTimeout, BrowserTimerId } from "../../types/controller.js";
-import type { SimulationActionRuntime } from "../../types/actions.js";
+import type {
+    BrowserClearTimeout,
+    BrowserSetTimeout,
+    BrowserTimerId,
+    ConfigSyncBody,
+    ResetControlBody,
+} from "../../types/controller.js";
+import type { SimulationActionRuleSyncOptions, SimulationActionRuntime } from "../../types/actions.js";
 import type { SimulationSnapshot, TopologyDefinition, TopologySpec } from "../../types/domain.js";
 import type { AppState } from "../../types/state.js";
 
@@ -185,7 +191,7 @@ export function createSimulationActionRuntime({
                         patch_depth: targetDepth,
                     },
                     speed: state.speed,
-                    rule: state.activeRule?.name,
+                    rule: state.activeRule?.name ?? null,
                     randomize: false,
                 },
                 {
@@ -250,10 +256,12 @@ export function createSimulationActionRuntime({
         setRuleSelectionOriginFn(state, RULE_SELECTION_ORIGIN_USER);
         uiSessionController.restorePaintStateForCurrentRule();
         renderControlPanel();
-        const options: { running: boolean; body?: Record<string, unknown> } = { running: state.isRunning };
+        const options: SimulationActionRuleSyncOptions = { running: state.isRunning };
         if (ruleRequiresSquareDimensions(nextRuleName)) {
             options.body = {
-                ...getViewportDimensions(currentTopologyVariantKey(state), nextRuleName, state.cellSize),
+                topology_spec: {
+                    ...getViewportDimensions(currentTopologyVariantKey(state), nextRuleName, state.cellSize),
+                },
             };
         }
         configSyncController.requestRuleSync(nextRuleName, options);
@@ -264,7 +272,7 @@ export function createSimulationActionRuntime({
         renderControlPanel();
     }
 
-    function buildResetPayload(randomize: boolean): Record<string, unknown> {
+    function buildResetPayload(randomize: boolean): ResetControlBody {
         clearScheduledPatchDepthCommit({ clearPending: true });
         if (topologyUsesPatchDepth(state.topologySpec)) {
             const targetPatchDepth = normalizePatchDepthForTilingFamily(
@@ -277,16 +285,22 @@ export function createSimulationActionRuntime({
                     patch_depth: targetPatchDepth,
                 },
                 speed: state.speed,
-                rule: state.activeRule?.name,
+                rule: state.activeRule?.name ?? null,
                 randomize,
             };
         }
-        const viewportPayload = viewportController.buildRequestBody({
-            includeConfig: true,
-            body: { randomize },
-        }) as {
-            topology_spec?: Partial<TopologySpec>;
-            [key: string]: unknown;
+        const desiredDimensions = getViewportDimensions(
+            currentTopologyVariantKey(state),
+            state.activeRule?.name ?? null,
+            state.cellSize,
+        );
+        const viewportPayload: ConfigSyncBody = {
+            speed: state.speed,
+            rule: state.activeRule?.name ?? null,
+            topology_spec: {
+                width: desiredDimensions.width,
+                height: desiredDimensions.height,
+            },
         };
         return {
             ...viewportPayload,
@@ -296,6 +310,9 @@ export function createSimulationActionRuntime({
                 height: viewportPayload.topology_spec?.height ?? state.height,
                 patch_depth: DEFAULT_PATCH_DEPTH,
             },
+            speed: viewportPayload.speed ?? state.speed,
+            rule: viewportPayload.rule ?? state.activeRule?.name ?? null,
+            randomize,
         };
     }
 
@@ -360,12 +377,7 @@ export function createSimulationActionRuntime({
             ? (state.activeRule?.name ?? null)
             : null;
 
-        const body: {
-            topology_spec: Partial<TopologySpec>;
-            speed: number;
-            randomize: false;
-            rule?: string | null;
-        } = {
+        const body: ResetControlBody = {
             topology_spec: topologyUsesPatchDepth(resolved)
                 ? {
                     ...resolved,
@@ -380,11 +392,9 @@ export function createSimulationActionRuntime({
                     height: resolved.height,
                 },
             speed: state.speed,
+            rule: requestedRuleName,
             randomize: false,
         };
-        if (requestedRuleName) {
-            body.rule = requestedRuleName;
-        }
 
         return interactions.sendControl("/api/control/reset", body, {
             blockingActivity: BLOCKING_ACTIVITY_BUILD_TILING,

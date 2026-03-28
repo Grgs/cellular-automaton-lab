@@ -29,7 +29,18 @@ export interface GridMetrics {
     pitch?: number;
     horizontalPitch?: number;
     verticalPitch?: number;
-    [key: string]: number | string | undefined;
+    radius?: number;
+    hexWidth?: number;
+    hexHeight?: number;
+    oddRowOffset?: number;
+    triangleSide?: number;
+    triangleHeight?: number;
+    scale?: number;
+    baseMinX?: number;
+    baseMinY?: number;
+    unitWidth?: number;
+    unitHeight?: number;
+    rowOffsetX?: number;
 }
 
 export interface CanvasColors {
@@ -102,13 +113,25 @@ export interface PeriodicFaceTilingDescriptor {
     row_offset_x: number;
 }
 
-export interface GeometryCache {
-    type?: string;
-    cellsById?: Map<string, PolygonGeometryCell>;
-    cells?: unknown;
-    strokePath?: Path2D | null;
-    [key: string]: unknown;
+export interface HexGeometryCache {
+    type: "hex";
+    cells: HexGeometryCell[][];
 }
+
+export interface TriangleGeometryCache {
+    type: "triangle";
+    cells: TriangleGeometryCell[][];
+    strokePath: Path2D | null;
+}
+
+export interface PolygonGeometryCache {
+    type: string;
+    cells: PolygonGeometryCell[];
+    cellsById: Map<string, PolygonGeometryCell>;
+    strokePath: Path2D | null;
+}
+
+export type GeometryCache = HexGeometryCache | TriangleGeometryCache | PolygonGeometryCache;
 
 export interface RenderedCellArgs {
     context: CanvasRenderingContext2D;

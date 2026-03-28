@@ -4,6 +4,11 @@ import type {
     RulesResponse,
     SimulationSnapshot,
 } from "./types/domain.js";
+import type {
+    ConfigSyncBody,
+    EmptyControlCommandPath,
+    ResetControlBody,
+} from "./types/controller.js";
 
 interface CellMutation extends CellIdentifier {
     state: number;
@@ -59,9 +64,15 @@ export function setCellsRequest(cells: CellMutation[]): Promise<SimulationSnapsh
     });
 }
 
-export function postControl(path: string, body: unknown = {}): Promise<SimulationSnapshot> {
+export function postControl(path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
+export function postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
+export function postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
+export function postControl(
+    path: EmptyControlCommandPath | "/api/control/reset" | "/api/config",
+    body?: ConfigSyncBody | ResetControlBody,
+): Promise<SimulationSnapshot> {
     return request<SimulationSnapshot>(path, {
         method: "POST",
-        body: JSON.stringify(body),
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
 }
