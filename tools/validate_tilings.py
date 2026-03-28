@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Iterator
 from pathlib import Path
+from typing import TypedDict
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,10 +15,20 @@ from backend.simulation.topology_catalog import (
     is_aperiodic_geometry,
 )
 from backend.simulation.topology import build_topology
-from backend.simulation.topology_validation import recommended_validation_options, validate_topology
+from backend.simulation.topology_validation import (
+    TopologyValidationResult,
+    recommended_validation_options,
+    validate_topology,
+)
 
 
-def iter_validation_targets():
+class ValidationParameters(TypedDict):
+    width: int
+    height: int
+    patch_depth: int | None
+
+
+def iter_validation_targets() -> Iterator[tuple[str, ValidationParameters]]:
     for definition in TOPOLOGY_VARIANTS:
         if definition.family == "mixed":
             yield definition.geometry_key, {"width": 3, "height": 3, "patch_depth": None}
@@ -24,7 +36,7 @@ def iter_validation_targets():
             yield definition.geometry_key, {"width": 0, "height": 0, "patch_depth": 3}
 
 
-def validate_manifest_tilings():
+def validate_manifest_tilings() -> tuple[tuple[str, TopologyValidationResult], ...]:
     results = []
     for geometry, parameters in iter_validation_targets():
         topology = build_topology(

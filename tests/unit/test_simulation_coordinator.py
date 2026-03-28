@@ -2,7 +2,7 @@ import sys
 import unittest
 from pathlib import Path
 from typing import ClassVar
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 try:
     from backend.defaults import APP_DEFAULTS, DEFAULT_HEIGHT, DEFAULT_WIDTH
@@ -120,10 +120,11 @@ class SimulationCoordinatorTests(unittest.TestCase):
         self.assertIn("Failed to persist simulation state", "\n".join(logs.output))
 
     def test_restore_state_logs_invalid_payloads_without_raising(self) -> None:
-        self.manager._load_persisted_payload = Mock(return_value={"version": 4})  # type: ignore[method-assign]
-        self.manager._restore_payload = Mock(side_effect=RuntimeError("bad restore"))  # type: ignore[method-assign]
-
-        with self.assertLogs("backend.simulation.coordinator", level="WARNING") as logs:
+        with (
+            patch.object(self.manager, "_load_persisted_payload", return_value={"version": 4}),
+            patch.object(self.manager, "_restore_payload", side_effect=RuntimeError("bad restore")),
+            self.assertLogs("backend.simulation.coordinator", level="WARNING") as logs,
+        ):
             self.manager.restore_state()
 
         self.assertIn("Persisted simulation state was invalid", "\n".join(logs.output))

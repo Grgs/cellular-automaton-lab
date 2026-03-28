@@ -1,5 +1,6 @@
 import sys
 import unittest
+from collections.abc import Callable
 from pathlib import Path
 from typing import ClassVar
 
@@ -7,7 +8,7 @@ try:
     from backend.rules import RuleRegistry
     from backend.rules.conway import ConwayLifeRule
     from backend.simulation.models import SimulationConfig, SimulationStateData
-    from backend.simulation.runtime import SimulationRuntime
+    from backend.simulation.runtime import RuntimeLoopService, SimulationRuntime, ThreadLike
     from backend.simulation.service import SimulationService
     from tests.unit.board_test_support import board_from_grid, regular_grid_from_board
 except ModuleNotFoundError:
@@ -15,10 +16,65 @@ except ModuleNotFoundError:
     from backend.rules import RuleRegistry
     from backend.rules.conway import ConwayLifeRule
     from backend.simulation.models import SimulationConfig, SimulationStateData
-    from backend.simulation.runtime import SimulationRuntime
+    from backend.simulation.runtime import RuntimeLoopService, SimulationRuntime, ThreadLike
     from backend.simulation.service import SimulationService
     from tests.unit.board_test_support import board_from_grid, regular_grid_from_board
 from tests.unit.simulation_test_fixtures import BLINKER_PADDED_GRID
+
+
+class FakeClock:
+    def __init__(self) -> None:
+        self.current = 0.0
+
+    def monotonic(self) -> float:
+        return self.current
+
+    def sleep(self, delay: float) -> None:
+        self.current += delay
+
+    def advance(self, delay: float) -> None:
+        self.current += delay
+
+
+class FakeThread(ThreadLike):
+    def __init__(
+        self,
+        *,
+        target: Callable[[], None] | None = None,
+        daemon: bool | None = None,
+    ) -> None:
+        self.target = target
+        self.daemon = daemon
+        self.started = False
+        self.join_calls: list[float | None] = []
+        self.alive = False
+
+    def start(self) -> None:
+        self.started = True
+        self.alive = True
+
+    def join(self, timeout: float | None = None) -> None:
+        self.join_calls.append(timeout)
+        self.alive = False
+
+    def is_alive(self) -> bool:
+        return self.alive
+
+
+class TimedService(RuntimeLoopService):
+    def __init__(self, clock: FakeClock, *, step_delay: float, target_delay: float) -> None:
+        self._clock = clock
+        self._step_delay = step_delay
+        self._target_delay = target_delay
+        self.steps = 0
+
+    def runtime_plan(self) -> tuple[bool, float]:
+        return True, self._target_delay
+
+    def step_if_running(self) -> bool:
+        self.steps += 1
+        self._clock.advance(self._step_delay)
+        return True
 
 
 class SimulationRuntimeTests(unittest.TestCase):
@@ -28,44 +84,16 @@ class SimulationRuntimeTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.rule_registry = RuleRegistry()
 
-    class FakeClock:
-        def __init__(self) -> None:
-            self.current = 0.0
-
-        def monotonic(self) -> float:
-            return self.current
-
-        def sleep(self, delay: float) -> None:
-            self.current += delay
-
-        def advance(self, delay: float) -> None:
-            self.current += delay
-
-    def create_runtime_with_fake_threads(self):
+    def create_runtime_with_fake_threads(self) -> tuple[SimulationRuntime, list[FakeThread]]:
         service = SimulationService(rule_registry=self.rule_registry)
-        threads = []
+        threads: list[FakeThread] = []
 
-        class FakeThread:
-            def __init__(self, *, target=None, daemon=None) -> None:
-                self.target = target
-                self.daemon = daemon
-                self.started = False
-                self.join_calls: list[float | None] = []
-                self.alive = False
-
-            def start(self) -> None:
-                self.started = True
-                self.alive = True
-
-            def join(self, timeout=None) -> None:
-                self.join_calls.append(timeout)
-                self.alive = False
-
-            def is_alive(self) -> bool:
-                return self.alive
-
-        def thread_factory(**kwargs):
-            thread = FakeThread(**kwargs)
+        def thread_factory(
+            *,
+            target: Callable[[], None] | None = None,
+            daemon: bool | None = None,
+        ) -> FakeThread:
+            thread = FakeThread(target=target, daemon=daemon)
             threads.append(thread)
             return thread
 
@@ -76,20 +104,14 @@ class SimulationRuntimeTests(unittest.TestCase):
         )
         return runtime, threads
 
-    def create_timed_service(self, clock, *, step_delay: float, target_delay: float):
-        class TimedService:
-            def __init__(self) -> None:
-                self.steps = 0
-
-            def runtime_plan(self):
-                return True, target_delay
-
-            def step_if_running(self):
-                self.steps += 1
-                clock.advance(step_delay)
-                return True
-
-        return TimedService()
+    def create_timed_service(
+        self,
+        clock: FakeClock,
+        *,
+        step_delay: float,
+        target_delay: float,
+    ) -> TimedService:
+        return TimedService(clock, step_delay=step_delay, target_delay=target_delay)
 
     def test_run_once_steps_only_while_running(self) -> None:
         state = SimulationStateData(
@@ -136,7 +158,7 @@ class SimulationRuntimeTests(unittest.TestCase):
         self.assertEqual(service.get_state().generation, 1)
 
     def test_run_once_compensates_for_step_duration_when_calculating_sleep(self) -> None:
-        clock = self.FakeClock()
+        clock = FakeClock()
         service = self.create_timed_service(clock, step_delay=0.02, target_delay=0.1)
         runtime = SimulationRuntime(service, sleep_fn=clock.sleep, monotonic_fn=clock.monotonic)
 
@@ -146,7 +168,7 @@ class SimulationRuntimeTests(unittest.TestCase):
         self.assertEqual(service.steps, 1)
 
     def test_repeated_run_once_hits_target_cycle_time_including_step_cost(self) -> None:
-        clock = self.FakeClock()
+        clock = FakeClock()
         service = self.create_timed_service(clock, step_delay=0.02, target_delay=0.1)
         runtime = SimulationRuntime(service, sleep_fn=clock.sleep, monotonic_fn=clock.monotonic)
 
@@ -158,7 +180,7 @@ class SimulationRuntimeTests(unittest.TestCase):
         self.assertAlmostEqual(clock.current, 0.5)
 
     def test_run_once_never_returns_negative_sleep_when_step_exceeds_target_delay(self) -> None:
-        clock = self.FakeClock()
+        clock = FakeClock()
         service = self.create_timed_service(clock, step_delay=0.12, target_delay=0.1)
         runtime = SimulationRuntime(service, sleep_fn=clock.sleep, monotonic_fn=clock.monotonic)
 

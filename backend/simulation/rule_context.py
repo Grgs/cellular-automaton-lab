@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict, deque
 from dataclasses import dataclass, field
 from math import atan2, pi, sqrt
-from typing import Iterable
+from collections.abc import Iterable, Iterator
 
 from backend.simulation.topology import LatticeCell, LatticeTopology, SimulationBoard, parse_regular_cell_id
 from backend.simulation.topology_catalog import EDGE_ADJACENCY, get_topology_variant_for_geometry
@@ -587,7 +587,7 @@ class RuleContext:
         radial: str | None = None,
         turn: str | None = None,
         cell_id: str | None = None,
-    ):
+    ) -> Iterator[NeighborSelection]:
         allowed = None if not states else set(states)
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         for neighbor in self._frame.cells[resolved_index].neighbors:

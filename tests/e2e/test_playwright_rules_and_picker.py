@@ -6,7 +6,11 @@ from tests.e2e.playwright_suite_support import (
 )
 
 
-def load_tests(loader, tests, pattern):
+def load_tests(
+    loader: unittest.TestLoader,
+    tests: unittest.TestSuite,
+    pattern: str | None,
+) -> unittest.TestSuite:
     del loader, tests
     if should_skip_playwright_under_discovery(pattern):
         return unittest.TestSuite()

@@ -2,6 +2,7 @@ import json
 import sys
 import tempfile
 import unittest
+from collections.abc import Callable
 from pathlib import Path
 from typing import ClassVar
 
@@ -9,6 +10,7 @@ try:
     from backend.defaults import APP_DEFAULTS
     from backend.rules import RuleRegistry
     from backend.simulation.coordinator import SimulationCoordinator
+    from backend.simulation.models import SimulationSnapshot
     from backend.simulation.persistence import SNAPSHOT_VERSION, SimulationStateStore
     from tests.unit.board_test_support import regular_grid_from_board
 except ModuleNotFoundError:
@@ -16,6 +18,7 @@ except ModuleNotFoundError:
     from backend.defaults import APP_DEFAULTS
     from backend.rules import RuleRegistry
     from backend.simulation.coordinator import SimulationCoordinator
+    from backend.simulation.models import SimulationSnapshot
     from backend.simulation.persistence import SNAPSHOT_VERSION, SimulationStateStore
     from tests.unit.board_test_support import regular_grid_from_board
 
@@ -25,13 +28,13 @@ class RecordingStateStore(SimulationStateStore):
         super().__init__(path)
         self.save_count = 0
 
-    def save(self, snapshot) -> None:
+    def save(self, snapshot: SimulationSnapshot) -> None:
         self.save_count += 1
         super().save(snapshot)
 
 
 class FakeTimer:
-    def __init__(self, delay_seconds: float, callback) -> None:
+    def __init__(self, delay_seconds: float, callback: Callable[[], None]) -> None:
         self.delay_seconds = delay_seconds
         self.callback = callback
         self.started = False
@@ -52,7 +55,7 @@ class FakeTimerFactory:
     def __init__(self) -> None:
         self.timers: list[FakeTimer] = []
 
-    def __call__(self, delay_seconds: float, callback) -> FakeTimer:
+    def __call__(self, delay_seconds: float, callback: Callable[[], None]) -> FakeTimer:
         timer = FakeTimer(delay_seconds, callback)
         self.timers.append(timer)
         return timer

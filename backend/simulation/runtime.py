@@ -3,8 +3,24 @@ from __future__ import annotations
 import threading
 import time
 from collections.abc import Callable
+from typing import Protocol, TypeAlias
 
-from backend.simulation.service import SimulationService
+
+class RuntimeLoopService(Protocol):
+    def runtime_plan(self) -> tuple[bool, float]: ...
+
+    def step_if_running(self) -> bool: ...
+
+
+class ThreadLike(Protocol):
+    def start(self) -> None: ...
+
+    def join(self, timeout: float | None = None) -> None: ...
+
+    def is_alive(self) -> bool: ...
+
+
+ThreadFactory: TypeAlias = Callable[..., ThreadLike]
 
 
 class SimulationRuntime:
@@ -12,18 +28,18 @@ class SimulationRuntime:
 
     def __init__(
         self,
-        service: SimulationService,
+        service: RuntimeLoopService,
         *,
         sleep_fn: Callable[[float], None] = time.sleep,
         monotonic_fn: Callable[[], float] = time.monotonic,
-        thread_factory: Callable[..., threading.Thread] = threading.Thread,
+        thread_factory: ThreadFactory = threading.Thread,
     ) -> None:
         self.service = service
         self.sleep_fn = sleep_fn
         self.monotonic_fn = monotonic_fn
         self.thread_factory = thread_factory
         self._stop_event = threading.Event()
-        self._thread: threading.Thread | None = None
+        self._thread: ThreadLike | None = None
 
     def start_background_loop(self) -> None:
         if self._thread and self._thread.is_alive():

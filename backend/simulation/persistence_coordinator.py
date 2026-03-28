@@ -2,6 +2,16 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Callable
+from typing import Protocol, TypeAlias
+
+
+class TimerLike(Protocol):
+    def start(self) -> None: ...
+
+    def cancel(self) -> None: ...
+
+
+TimerFactory: TypeAlias = Callable[[float, Callable[[], None]], TimerLike]
 
 
 class PersistenceCoordinator:
@@ -10,17 +20,21 @@ class PersistenceCoordinator:
         persist_fn: Callable[[], None],
         *,
         debounce_ms: int = 100,
-        timer_factory=None,
+        timer_factory: TimerFactory | None = None,
     ) -> None:
         self._persist_fn = persist_fn
         self._debounce_seconds = max(0.0, debounce_ms / 1000.0)
         self._timer_factory = timer_factory or self._default_timer_factory
         self._lock = threading.Lock()
-        self._timer = None
+        self._timer: TimerLike | None = None
         self._dirty = False
         self._token = 0
 
-    def _default_timer_factory(self, delay_seconds, callback):
+    def _default_timer_factory(
+        self,
+        delay_seconds: float,
+        callback: Callable[[], None],
+    ) -> threading.Timer:
         timer = threading.Timer(delay_seconds, callback)
         timer.daemon = True
         return timer

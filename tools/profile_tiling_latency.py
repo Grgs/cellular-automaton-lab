@@ -5,6 +5,7 @@ import statistics
 import sys
 import time
 import urllib.request
+from collections.abc import Callable
 from pathlib import Path
 from typing import Mapping, TypedDict
 
@@ -89,7 +90,7 @@ def request_json(
     return json.loads(raw.decode("utf-8")) if raw else None, len(raw), elapsed_ms
 
 
-def median_elapsed_ms(callback, *, repeats: int = 5) -> float:
+def median_elapsed_ms(callback: Callable[[], float], *, repeats: int = 5) -> float:
     values = [callback() for _ in range(repeats)]
     return statistics.median(values)
 

@@ -5,6 +5,7 @@ import sys
 import tempfile
 import time
 import unittest
+from collections.abc import Callable
 from pathlib import Path
 
 from playwright.sync_api import expect
@@ -45,7 +46,7 @@ class CellularAutomatonUITests(BrowserAppTestCase):
 
     def wait_for_backend_state(
         self,
-        predicate,
+        predicate: Callable[[SimulationStatePayload], bool],
         *,
         timeout_seconds: float = 6.0,
     ) -> SimulationStatePayload:

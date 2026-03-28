@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import math
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
@@ -33,6 +34,14 @@ class PenrosePatch:
     width: int
     height: int
     cells: tuple[PenrosePatchCell, ...]
+
+
+@dataclass(frozen=True)
+class _ProvisionalPenroseCell:
+    id: str
+    kind: str
+    center: tuple[float, float]
+    vertices: tuple[tuple[float, float], ...]
 
 
 class _RhombusType(Enum):
@@ -131,7 +140,7 @@ class _PentAngle:
 PENT_ANGLES = tuple(_PentAngle(index) for index in range(5))
 
 
-def _other_pent_angles(index: int):
+def _other_pent_angles(index: int) -> Iterator[_PentAngle]:
     for pent_angle in PENT_ANGLES:
         if pent_angle.index != index:
             yield pent_angle
@@ -186,7 +195,7 @@ class _StripFamily:
     def strip(self, multiple: int) -> "_Strip":
         return _Strip(self, multiple)
 
-    def strips_near_point(self, point: _Vector):
+    def strips_near_point(self, point: _Vector) -> Iterator[_Strip]:
         pentagrid_point = point / 2.5
         multiple = (pentagrid_point - self.strip(0).origin()).dot(self.offset_direction())
         ceiling = math.ceil(multiple)
@@ -255,7 +264,7 @@ class _Strip:
         )
         return candidates[0]
 
-    def rhombi(self, distance: float, forward: bool):
+    def rhombi(self, distance: float, forward: bool) -> Iterator[_Rhombus]:
         intersection_tuples: list[tuple[_PentAngle, int, float]] = []
         lattice_coords = [0] * 5
         lattice_coords[self.family.pent_angle.index] = self.multiple
@@ -396,7 +405,7 @@ class _PenroseTiling:
     def strip_family(self, pent_angle: _PentAngle) -> _StripFamily:
         return self._families[pent_angle.index]
 
-    def rhombi_in_square(self, half_extent: float):
+    def rhombi_in_square(self, half_extent: float) -> Iterator[_Rhombus]:
         grid_cell = _Grid(
             origin=_Vector(-half_extent, -half_extent),
             grid_size=_Vector(half_extent * 2, half_extent * 2),
@@ -515,7 +524,7 @@ def _compatibility_extent(values: list[float]) -> int:
 
 
 def _connect_owner_groups(
-    owners_by_group,
+    owners_by_group: Iterable[Iterable[str]],
     neighbors_by_id: dict[str, set[str]],
     *,
     require_pair: bool,
@@ -543,7 +552,7 @@ def build_penrose_patch(
     tiling = _PenroseTiling()
     rhombi = list(tiling.rhombi_in_square(penrose_half_extent(patch_depth)))
 
-    provisional = []
+    provisional: list[_ProvisionalPenroseCell] = []
     edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = {}
     vertex_map: dict[tuple[float, float], list[str]] = {}
     center_x_values: list[float] = []
@@ -561,12 +570,12 @@ def build_penrose_patch(
             (ordered_strips[0].family.pent_angle.index, ordered_strips[1].family.pent_angle.index),
         )
         provisional.append(
-            {
-                "id": cell_id,
-                "kind": kind,
-                "center": center,
-                "vertices": vertices,
-            }
+            _ProvisionalPenroseCell(
+                id=cell_id,
+                kind=kind,
+                center=center,
+                vertices=vertices,
+            )
         )
         center_x_values.append(center[0])
         center_y_values.append(center[1])
@@ -580,7 +589,7 @@ def build_penrose_patch(
     unique_x = {value: index for index, value in enumerate(sorted(set(center_x_values)))}
     unique_y = {value: index for index, value in enumerate(sorted(set(center_y_values)))}
     neighbors_by_id: dict[str, set[str]] = {
-        record["id"]: set()
+        record.id: set()
         for record in provisional
     }
 
@@ -591,15 +600,15 @@ def build_penrose_patch(
 
     cells = tuple(
         PenrosePatchCell(
-            id=record["id"],
-            kind=record["kind"],
-            logical_x=unique_x[record["center"][0]],
-            logical_y=unique_y[record["center"][1]],
-            center=record["center"],
-            vertices=record["vertices"],
-            neighbors=tuple(sorted(neighbors_by_id[record["id"]])),
+            id=record.id,
+            kind=record.kind,
+            logical_x=unique_x[record.center[0]],
+            logical_y=unique_y[record.center[1]],
+            center=record.center,
+            vertices=record.vertices,
+            neighbors=tuple(sorted(neighbors_by_id[record.id])),
         )
-        for record in sorted(provisional, key=lambda item: item["id"])
+        for record in sorted(provisional, key=lambda item: item.id)
     )
 
     all_x = [vertex[0] for cell in cells for vertex in cell.vertices]

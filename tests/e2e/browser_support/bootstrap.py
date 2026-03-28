@@ -6,6 +6,7 @@ import tempfile
 import threading
 import time
 import unittest
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, ClassVar, Literal
@@ -40,7 +41,11 @@ class BrowserAppTestCase(unittest.TestCase):
 
     @classmethod
     @contextmanager
-    def _startup_watchdog(cls, description: str, timeout_seconds: float | None = None):
+    def _startup_watchdog(
+        cls,
+        description: str,
+        timeout_seconds: float | None = None,
+    ) -> Iterator[None]:
         deadline_seconds = timeout_seconds or cls.startup_timeout_seconds
         timer = threading.Timer(deadline_seconds, _thread.interrupt_main)
         timer.daemon = True

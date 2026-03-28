@@ -57,7 +57,12 @@ class HypothesisTopologyPropertyTests(unittest.TestCase):
         width=st.integers(min_value=1, max_value=3),
         height=st.integers(min_value=1, max_value=3),
     )
-    def test_periodic_face_tilings_preserve_descriptor_cell_count(self, geometry, width, height) -> None:
+    def test_periodic_face_tilings_preserve_descriptor_cell_count(
+        self,
+        geometry: str,
+        width: int,
+        height: int,
+    ) -> None:
         topology = build_topology(geometry, width, height)
 
         self.assertEqual(
@@ -71,7 +76,12 @@ class HypothesisTopologyPropertyTests(unittest.TestCase):
         height=st.integers(min_value=1, max_value=3),
     )
     @settings(deadline=None)
-    def test_periodic_face_tilings_pass_shared_validation_across_dimensions(self, geometry, width, height) -> None:
+    def test_periodic_face_tilings_pass_shared_validation_across_dimensions(
+        self,
+        geometry: str,
+        width: int,
+        height: int,
+    ) -> None:
         topology = build_topology(geometry, width, height)
         validation = validate_topology(topology, **recommended_validation_options(geometry))
 
@@ -81,7 +91,11 @@ class HypothesisTopologyPropertyTests(unittest.TestCase):
         geometry=PENROSE_GEOMETRY_STRATEGY,
         patch_depth=st.integers(min_value=0, max_value=4),
     )
-    def test_penrose_modes_pass_shared_validation_across_depths(self, geometry, patch_depth) -> None:
+    def test_penrose_modes_pass_shared_validation_across_depths(
+        self,
+        geometry: str,
+        patch_depth: int,
+    ) -> None:
         topology = build_topology(geometry, 0, 0, patch_depth=patch_depth)
         validation = validate_topology(topology, **recommended_validation_options(geometry))
 

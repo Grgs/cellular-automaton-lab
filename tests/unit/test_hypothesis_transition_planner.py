@@ -58,7 +58,11 @@ class HypothesisTransitionPlannerTests(unittest.TestCase):
         width=st.integers(min_value=1, max_value=40),
         height=st.integers(min_value=1, max_value=40),
     )
-    def test_whirlpool_reset_plan_preserves_rectangular_dimensions(self, width, height) -> None:
+    def test_whirlpool_reset_plan_preserves_rectangular_dimensions(
+        self,
+        width: int,
+        height: int,
+    ) -> None:
         plan = plan_reset_transition(
             self.create_regular_state(SQUARE_GEOMETRY),
             self.rule_registry,
@@ -76,7 +80,11 @@ class HypothesisTransitionPlannerTests(unittest.TestCase):
         width=st.integers(min_value=1, max_value=40),
         height=st.integers(min_value=1, max_value=40),
     )
-    def test_hexwhirlpool_config_plan_preserves_rectangular_dimensions(self, width, height) -> None:
+    def test_hexwhirlpool_config_plan_preserves_rectangular_dimensions(
+        self,
+        width: int,
+        height: int,
+    ) -> None:
         plan = plan_config_transition(
             self.create_regular_state(HEX_GEOMETRY),
             self.rule_registry,
@@ -95,7 +103,12 @@ class HypothesisTransitionPlannerTests(unittest.TestCase):
         width=st.integers(min_value=1, max_value=200),
         height=st.integers(min_value=1, max_value=200),
     )
-    def test_penrose_config_plan_ignores_width_and_height_updates(self, geometry, width, height) -> None:
+    def test_penrose_config_plan_ignores_width_and_height_updates(
+        self,
+        geometry: str,
+        width: int,
+        height: int,
+    ) -> None:
         state = self.create_penrose_state(geometry)
         plan = plan_config_transition(
             state,

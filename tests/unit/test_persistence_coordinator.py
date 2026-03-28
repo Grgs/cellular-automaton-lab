@@ -1,10 +1,11 @@
 import unittest
+from collections.abc import Callable
 
-from backend.simulation.persistence_coordinator import PersistenceCoordinator
+from backend.simulation.persistence_coordinator import PersistenceCoordinator, TimerLike
 
 
-class FakeTimer:
-    def __init__(self, delay_seconds, callback) -> None:
+class FakeTimer(TimerLike):
+    def __init__(self, delay_seconds: float, callback: Callable[[], None]) -> None:
         self.delay_seconds = delay_seconds
         self.callback = callback
         self.started = False
@@ -25,7 +26,7 @@ class FakeTimerFactory:
     def __init__(self) -> None:
         self.timers: list[FakeTimer] = []
 
-    def __call__(self, delay_seconds, callback) -> FakeTimer:
+    def __call__(self, delay_seconds: float, callback: Callable[[], None]) -> FakeTimer:
         timer = FakeTimer(delay_seconds, callback)
         self.timers.append(timer)
         return timer

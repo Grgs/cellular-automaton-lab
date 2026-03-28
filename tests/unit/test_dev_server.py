@@ -1,6 +1,7 @@
 import sys
 import unittest
 from pathlib import Path
+from types import TracebackType
 from unittest import mock
 
 try:
@@ -32,7 +33,12 @@ class _FakeUrlResponse:
     def __enter__(self) -> "_FakeUrlResponse":
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         return None
 
     def read(self) -> bytes:

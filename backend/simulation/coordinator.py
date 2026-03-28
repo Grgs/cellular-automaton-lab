@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
+from typing import ParamSpec
 
 from backend.payload_types import (
     PersistedSimulationSnapshotV5,
@@ -8,12 +10,17 @@ from backend.payload_types import (
     TopologySpecPatch,
 )
 from backend.rules import RuleRegistry
+from backend.rules.base import AutomatonRule
 from backend.simulation.engine import SimulationEngine
+from backend.simulation.models import SimulationSnapshot
 from backend.simulation.persistence import SimulationStateStore
-from backend.simulation.persistence_coordinator import PersistenceCoordinator
+from backend.simulation.persistence_coordinator import PersistenceCoordinator, TimerFactory
+from backend.simulation.topology import LatticeTopology
 from backend.simulation.runtime import SimulationRuntime
 from backend.simulation.service import SimulationService
 from backend.simulation.state_restore import SimulationStateRestorer
+
+P = ParamSpec("P")
 
 
 class SimulationCoordinator:
@@ -25,7 +32,7 @@ class SimulationCoordinator:
         *,
         state_store: SimulationStateStore | None = None,
         persistence_debounce_ms: int = 100,
-        timer_factory=None,
+        timer_factory: TimerFactory | None = None,
     ) -> None:
         self.logger = logging.getLogger(__name__)
         self.rule_registry = rule_registry
@@ -51,11 +58,21 @@ class SimulationCoordinator:
         self.runtime.stop_background_loop(timeout)
         self.persistence.shutdown()
 
-    def _run_immediate_mutation(self, action, *args, **kwargs) -> None:
+    def _run_immediate_mutation(
+        self,
+        action: Callable[P, None],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> None:
         action(*args, **kwargs)
         self.persistence.flush_immediately()
 
-    def _run_deferred_mutation(self, action, *args, **kwargs) -> None:
+    def _run_deferred_mutation(
+        self,
+        action: Callable[P, None],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> None:
         action(*args, **kwargs)
         self.persistence.schedule_deferred_persist()
 
@@ -96,17 +113,17 @@ class SimulationCoordinator:
         except Exception as exc:
             self.logger.warning("Persisted simulation state was invalid: %s", exc)
 
-    def get_state(self):
+    def get_state(self) -> SimulationSnapshot:
         return self.service.get_state()
 
-    def get_topology(self):
+    def get_topology(self) -> LatticeTopology:
         return self.service.state.topology
 
     def get_topology_revision(self) -> str | None:
         topology = self.get_topology()
         return topology.topology_revision if topology is not None else None
 
-    def get_rule(self):
+    def get_rule(self) -> AutomatonRule:
         return self.service.state.rule
 
     def start(self) -> None:

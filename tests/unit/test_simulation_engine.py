@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 try:
+    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.hexlife import HexLifeRule
@@ -12,6 +13,7 @@ try:
     from backend.simulation.topology import ARCHIMEDEAN_488_GEOMETRY, SimulationBoard, empty_board
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.hexlife import HexLifeRule
@@ -24,7 +26,7 @@ from tests.unit.board_test_support import board_from_grid, regular_grid_from_boa
 from tests.unit.simulation_test_fixtures import BLINKER_GRID, LiveNeighborTrackingRule, NeighborTrackingRule
 
 
-def reference_step_board(board: SimulationBoard, rule) -> SimulationBoard:
+def reference_step_board(board: SimulationBoard, rule: AutomatonRule) -> SimulationBoard:
     next_states = [rule.next_state(ctx) for ctx in build_rule_contexts_for_board(board)]
     return SimulationBoard(topology=board.topology, cell_states=next_states)
 

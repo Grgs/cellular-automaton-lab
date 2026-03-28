@@ -1,6 +1,7 @@
 import statistics
 import sys
 import time
+from collections.abc import Callable
 from pathlib import Path
 from random import Random
 
@@ -11,6 +12,7 @@ if str(ROOT) not in sys.path:
 
 from backend.rules.conway import ConwayLifeRule
 from backend.rules.archlife488 import ArchLife488Rule
+from backend.rules.base import AutomatonRule
 from backend.rules.hexlife import HexLifeRule
 from backend.rules.hexwhirlpool import HexWhirlpoolRule
 from backend.rules.trilife import TriLifeRule
@@ -20,7 +22,11 @@ from backend.simulation.rule_context import build_rule_contexts_for_board
 from backend.simulation.topology import ARCHIMEDEAN_488_GEOMETRY, SimulationBoard, empty_board
 
 
-def reference_step_board(engine: SimulationEngine, board: SimulationBoard, rule) -> SimulationBoard:
+def reference_step_board(
+    engine: SimulationEngine,
+    board: SimulationBoard,
+    rule: AutomatonRule,
+) -> SimulationBoard:
     del engine
     topology = board.topology
     if topology.cell_count == 0:
@@ -39,7 +45,7 @@ def build_board(geometry: str, width: int, height: int, max_state: int, seed: in
     return board
 
 
-def median_ms(runner, repeats: int = 7, warmups: int = 2) -> float:
+def median_ms(runner: Callable[[], object], repeats: int = 7, warmups: int = 2) -> float:
     for _ in range(warmups):
         runner()
     timings = []
@@ -50,9 +56,10 @@ def median_ms(runner, repeats: int = 7, warmups: int = 2) -> float:
     return statistics.median(timings)
 
 
-def benchmark_case(name: str, rule, board: SimulationBoard) -> dict[str, float]:
+def benchmark_case(name: str, rule: AutomatonRule, board: SimulationBoard) -> dict[str, float]:
     optimized_engine = SimulationEngine()
     reference_engine = SimulationEngine()
+    del name
 
     optimized_ms = median_ms(lambda: optimized_engine.step_board(board, rule))
     reference_ms = median_ms(lambda: reference_step_board(reference_engine, board, rule))
@@ -64,9 +71,10 @@ def benchmark_case(name: str, rule, board: SimulationBoard) -> dict[str, float]:
     }
 
 
-def benchmark_board_case(name: str, rule, board: SimulationBoard) -> dict[str, float]:
+def benchmark_board_case(name: str, rule: AutomatonRule, board: SimulationBoard) -> dict[str, float]:
     optimized_engine = SimulationEngine()
     reference_engine = SimulationEngine()
+    del name
 
     optimized_ms = median_ms(lambda: optimized_engine.step_board(board, rule))
     reference_ms = median_ms(lambda: reference_step_board(reference_engine, board, rule))

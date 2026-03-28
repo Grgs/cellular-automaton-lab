@@ -1,11 +1,12 @@
 import sys
 import unittest
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, TypedDict
 
 try:
     from backend.defaults import DEFAULT_RULE_NAME
     from backend.rules import RuleRegistry
+    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.archlife_extended import (
         ArchLife31212Rule,
@@ -28,6 +29,7 @@ except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.defaults import DEFAULT_RULE_NAME
     from backend.rules import RuleRegistry
+    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.archlife_extended import (
         ArchLife31212Rule,
@@ -48,6 +50,19 @@ except ModuleNotFoundError:
     from backend.simulation.rule_context import RuleContext, TopologyCellFrame, TopologyFrame, TopologyNeighborFrame
 
 
+class NeighborSpec(TypedDict):
+    id: str
+    state: int
+    radial: str
+    turn: str
+    radial_delta: float
+    angle_delta: float
+    clockwise_index: int
+    kind: str
+    shell_rank: int
+    radial_ratio: float
+
+
 def make_neighbor_spec(
     state: int,
     *,
@@ -60,7 +75,7 @@ def make_neighbor_spec(
     kind: str = "neighbor",
     shell_rank: int = 1,
     radial_ratio: float = 0.5,
-):
+) -> NeighborSpec:
     return {
         "id": neighbor_id,
         "state": state,
@@ -78,7 +93,7 @@ def make_neighbor_spec(
 def build_context(
     current_state: int,
     *,
-    neighbor_specs: list[dict] | None = None,
+    neighbor_specs: list[NeighborSpec] | None = None,
     kind: str = "cell",
     shell_rank: int = 1,
     radial_ratio: float = 0.5,
@@ -141,7 +156,7 @@ def build_context(
     return RuleContext(frame, states, 0)
 
 
-def build_source_context(rule, *, target_state: int | None = None) -> RuleContext:
+def build_source_context(rule: WhirlpoolRule, *, target_state: int | None = None) -> RuleContext:
     resolved_target_state = rule.RESTING if target_state is None else target_state
     cells = (
         TopologyCellFrame(
@@ -286,7 +301,7 @@ class SimulationRuleTests(unittest.TestCase):
             self.assertTrue(description["supports_all_topologies"])
             self.assertNotIn("supported_topologies", description)
 
-    def assert_rule_snapshot(self, rule) -> None:
+    def assert_rule_snapshot(self, rule: AutomatonRule) -> None:
         payload = RuleSnapshot.from_rule(rule).to_dict()
         self.assertEqual(payload["rule_protocol"], "universal-v1")
         self.assertTrue(payload["supports_all_topologies"])

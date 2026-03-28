@@ -20,7 +20,11 @@ def _resolve_subset_count() -> int:
     )
 
 
-def load_tests(loader, tests, pattern):
+def load_tests(
+    loader: unittest.TestLoader,
+    tests: unittest.TestSuite,
+    pattern: str | None,
+) -> unittest.TestSuite:
     del loader, tests, pattern
     return build_playwright_subset(_resolve_subset_index(), _resolve_subset_count())
 

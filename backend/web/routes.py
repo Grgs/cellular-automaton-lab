@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TypeVar
 
-from flask import Blueprint, current_app, jsonify, render_template, request
+from flask import Blueprint, Response, current_app, jsonify, render_template, request
 
 from backend.payload_types import (
     ApiErrorPayload,
@@ -33,6 +34,7 @@ page_bp = Blueprint("pages", __name__)
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 _ExtensionT = TypeVar("_ExtensionT")
+JsonRouteResult = Response | tuple[Response, int]
 
 
 def _require_extension(name: str, expected_type: type[_ExtensionT]) -> _ExtensionT:
@@ -54,12 +56,12 @@ def frontend_assets() -> FrontendAssetManifest:
     return _require_extension("frontend_assets", FrontendAssetManifest)
 
 
-def json_error(message: str, status_code: int = 400):
+def json_error(message: str, status_code: int = 400) -> tuple[Response, int]:
     payload: ApiErrorPayload = {"error": message}
     return jsonify(payload), status_code
 
 
-def state_response(*, include_topology: bool = True):
+def state_response(*, include_topology: bool = True) -> Response:
     return jsonify(simulation_coordinator().get_state().to_dict(include_topology=include_topology))
 
 
@@ -67,16 +69,16 @@ def current_topology_revision() -> str | None:
     return simulation_coordinator().get_topology_revision()
 
 
-def conditional_state_response(previous_topology_revision: str | None):
+def conditional_state_response(previous_topology_revision: str | None) -> Response:
     return state_response(include_topology=current_topology_revision() != previous_topology_revision)
 
 
-def topology_response():
+def topology_response() -> Response:
     topology = simulation_coordinator().get_topology()
     return jsonify(topology.to_dict())
 
 
-def validated_state_action(action):
+def validated_state_action(action: Callable[[JsonObject], None]) -> JsonRouteResult:
     payload = get_payload(request)
     previous_topology_revision = current_topology_revision()
     try:
@@ -86,7 +88,7 @@ def validated_state_action(action):
     return conditional_state_response(previous_topology_revision)
 
 
-def control_state_action(action):
+def control_state_action(action: Callable[[], None]) -> Response:
     previous_topology_revision = current_topology_revision()
     action()
     return conditional_state_response(previous_topology_revision)
@@ -140,7 +142,7 @@ def apply_config_payload(payload: JsonObject) -> None:
 def dispatch_single_cell_target(
     target: CellTargetPayload,
     *,
-    by_id,
+    by_id: Callable[[str], None],
 ) -> None:
     by_id(str(target["id"]))
 
@@ -177,7 +179,7 @@ def apply_set_cells_payload(payload: JsonObject) -> None:
 
 
 @page_bp.get("/")
-def index():
+def index() -> str:
     entry_assets = frontend_assets().entry_assets("frontend/app.ts")
     return render_template(
         "index.html",
@@ -190,66 +192,66 @@ def index():
 
 
 @api_bp.get("/state")
-def get_state():
+def get_state() -> Response:
     return state_response()
 
 
 @api_bp.get("/rules")
-def get_rules():
+def get_rules() -> Response:
     payload: RulesResponsePayload = {"rules": rule_registry().describe_rules()}
     return jsonify(payload)
 
 
 @api_bp.get("/topology")
-def get_topology():
+def get_topology() -> Response:
     return topology_response()
 
 
 @api_bp.get("/meta")
-def get_meta():
+def get_meta() -> Response:
     return jsonify(current_app.config["SERVER_META"])
 
 
 @api_bp.post("/control/start")
-def start():
+def start() -> Response:
     return control_state_action(simulation_coordinator().start)
 
 
 @api_bp.post("/control/pause")
-def pause():
+def pause() -> Response:
     return control_state_action(simulation_coordinator().pause)
 
 
 @api_bp.post("/control/resume")
-def resume():
+def resume() -> Response:
     return control_state_action(simulation_coordinator().resume)
 
 
 @api_bp.post("/control/step")
-def step():
+def step() -> Response:
     return control_state_action(simulation_coordinator().step)
 
 
 @api_bp.post("/control/reset")
-def reset():
+def reset() -> JsonRouteResult:
     return validated_state_action(apply_reset_payload)
 
 
 @api_bp.post("/config")
-def update_config():
+def update_config() -> JsonRouteResult:
     return validated_state_action(apply_config_payload)
 
 
 @api_bp.post("/cells/toggle")
-def toggle_cell():
+def toggle_cell() -> JsonRouteResult:
     return validated_state_action(apply_toggle_cell_payload)
 
 
 @api_bp.post("/cells/set")
-def set_cell():
+def set_cell() -> JsonRouteResult:
     return validated_state_action(apply_set_cell_payload)
 
 
 @api_bp.post("/cells/set-many")
-def set_cells():
+def set_cells() -> JsonRouteResult:
     return validated_state_action(apply_set_cells_payload)
