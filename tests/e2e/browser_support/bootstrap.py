@@ -8,23 +8,28 @@ import time
 import unittest
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Callable, ClassVar
+from typing import Callable, ClassVar, Literal
 
 from playwright.sync_api import (
     Browser,
     BrowserContext,
+    ConsoleMessage,
     Error as PlaywrightError,
     Page,
     Playwright,
+    Response,
     TimeoutError as PlaywrightTimeoutError,
+    ViewportSize,
     sync_playwright,
 )
 
 from tests.e2e.support_server import AppServer, JsonApiClient
 
+WaitUntilState = Literal["commit", "domcontentloaded", "load", "networkidle"]
+
 
 class BrowserAppTestCase(unittest.TestCase):
-    page_viewport: ClassVar[dict[str, int] | None] = None
+    page_viewport: ClassVar[ViewportSize | None] = None
     startup_timeout_seconds: ClassVar[float] = 45.0
     server: ClassVar[AppServer]
     api: ClassVar[JsonApiClient]
@@ -32,8 +37,6 @@ class BrowserAppTestCase(unittest.TestCase):
     browser: ClassVar[Browser]
     context: BrowserContext
     page: Page
-    _original_page_goto: Callable[..., Any]
-    _original_page_reload: Callable[..., Any]
 
     @classmethod
     @contextmanager
@@ -72,18 +75,17 @@ class BrowserAppTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        context_kwargs: dict[str, Any] = {"accept_downloads": True}
-        if self.page_viewport is not None:
-            context_kwargs["viewport"] = self.page_viewport
         with self._startup_watchdog("Browser test page context"):
-            self.context = self.browser.new_context(**context_kwargs)
+            if self.page_viewport is None:
+                self.context = self.browser.new_context(accept_downloads=True)
+            else:
+                self.context = self.browser.new_context(
+                    accept_downloads=True,
+                    viewport=self.page_viewport,
+                )
             self.page = self.context.new_page()
         self.page.set_default_timeout(20_000)
         self.page.set_default_navigation_timeout(20_000)
-        self._original_page_goto = self.page.goto
-        self._original_page_reload = self.page.reload
-        self.page.goto = self._create_resilient_goto()  # type: ignore[method-assign]
-        self.page.reload = self._create_resilient_reload()  # type: ignore[method-assign]
         self.console_messages: list[str] = []
         self.page.on("console", self._record_console_message)
         self.page.on("pageerror", self._record_page_error)
@@ -97,10 +99,10 @@ class BrowserAppTestCase(unittest.TestCase):
         self.context.close()
         super().tearDown()
 
-    def _record_console_message(self, message) -> None:
+    def _record_console_message(self, message: ConsoleMessage) -> None:
         self.console_messages.append(f"[console:{message.type}] {message.text}")
 
-    def _record_page_error(self, error) -> None:
+    def _record_page_error(self, error: object) -> None:
         self.console_messages.append(f"[pageerror] {error}")
 
     def _current_test_failed(self) -> bool:
@@ -134,7 +136,7 @@ class BrowserAppTestCase(unittest.TestCase):
             )
 
             try:
-                backend_state = self.server.client.request_json("/api/state")
+                backend_state = self.server.client.get_state()
                 (artifact_dir / "backend-state.json").write_text(
                     json.dumps(backend_state, indent=2),
                     encoding="utf-8",
@@ -143,7 +145,7 @@ class BrowserAppTestCase(unittest.TestCase):
                 (artifact_dir / "backend-state-error.txt").write_text(str(exc), encoding="utf-8")
 
             try:
-                backend_topology = self.server.client.request_json("/api/topology")
+                backend_topology = self.server.client.get_topology()
                 (artifact_dir / "backend-topology.json").write_text(
                     json.dumps(backend_topology, indent=2),
                     encoding="utf-8",
@@ -187,8 +189,13 @@ class BrowserAppTestCase(unittest.TestCase):
             timeout=timeout_ms,
         )
 
-    def _run_navigation_with_retry(self, navigate, *, retries: int = 3):
-        last_error = None
+    def _run_navigation_with_retry(
+        self,
+        navigate: Callable[[], Response | None],
+        *,
+        retries: int = 3,
+    ) -> Response | None:
+        last_error: PlaywrightError | PlaywrightTimeoutError | None = None
         for attempt in range(retries):
             try:
                 return navigate()
@@ -201,34 +208,50 @@ class BrowserAppTestCase(unittest.TestCase):
             raise last_error
         raise AssertionError("navigation retry failed without an underlying Playwright error")
 
-    def _create_resilient_goto(self):
-        def resilient_goto(url, *args, **kwargs):
+    def goto_page(
+        self,
+        url: str,
+        *,
+        wait_until: WaitUntilState | None = None,
+        timeout: float | None = None,
+    ) -> Response | None:
+        return self._run_navigation_with_retry(
+            lambda: self._goto_and_wait(url, wait_until=wait_until, timeout=timeout)
+        )
+
+    def reload_page(
+        self,
+        *,
+        wait_until: WaitUntilState | None = None,
+        timeout: float | None = None,
+    ) -> Response | None:
+        try:
             return self._run_navigation_with_retry(
-                lambda: self._goto_and_wait(url, *args, **kwargs)
+                lambda: self._reload_and_wait(wait_until=wait_until, timeout=timeout)
             )
+        except PlaywrightError:
+            target_url = self.page.url or f"{self.server.client.base_url}/"
+            return self.goto_page(target_url, wait_until=wait_until, timeout=timeout)
 
-        return resilient_goto
-
-    def _create_resilient_reload(self):
-        def resilient_reload(*args, **kwargs):
-            try:
-                return self._run_navigation_with_retry(
-                    lambda: self._reload_and_wait(*args, **kwargs)
-                )
-            except PlaywrightError:
-                target_url = self.page.url or f"{self.server.client.base_url}/"
-                return self.page.goto(target_url, *args, **kwargs)
-
-        return resilient_reload
-
-    def _goto_and_wait(self, url, *args, **kwargs):
+    def _goto_and_wait(
+        self,
+        url: str,
+        *,
+        wait_until: WaitUntilState | None = None,
+        timeout: float | None = None,
+    ) -> Response | None:
         with self._startup_watchdog(f"Navigation to {url!r}"):
-            response = self._original_page_goto(url, *args, **kwargs)
+            response = self.page.goto(url, wait_until=wait_until, timeout=timeout)
             self._wait_for_page_bootstrapped()
         return response
 
-    def _reload_and_wait(self, *args, **kwargs):
+    def _reload_and_wait(
+        self,
+        *,
+        wait_until: WaitUntilState | None = None,
+        timeout: float | None = None,
+    ) -> Response | None:
         with self._startup_watchdog("Page reload"):
-            response = self._original_page_reload(*args, **kwargs)
+            response = self.page.reload(wait_until=wait_until, timeout=timeout)
             self._wait_for_page_bootstrapped()
         return response

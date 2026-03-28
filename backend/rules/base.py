@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from backend.payload_types import CellStatePayload
+
 if TYPE_CHECKING:
     from backend.simulation.rule_context import RuleContext
 
@@ -15,7 +17,7 @@ class CellStateDefinition:
     color: str
     paintable: bool = True
 
-    def to_dict(self) -> dict[str, int | str | bool]:
+    def to_dict(self) -> CellStatePayload:
         return {
             "value": self.value,
             "label": self.label,

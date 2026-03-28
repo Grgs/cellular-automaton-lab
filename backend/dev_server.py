@@ -9,7 +9,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, TypedDict, cast
+from typing import Callable, TypedDict
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -23,6 +23,22 @@ class _WindowsProcessPayload(TypedDict, total=False):
     pid: int
     command_line: str
     executable_path: str
+
+
+def _normalize_windows_process_payload(payload: object) -> _WindowsProcessPayload | None:
+    if not isinstance(payload, dict):
+        return None
+    normalized_payload: _WindowsProcessPayload = {}
+    pid = payload.get("pid")
+    if isinstance(pid, int) and not isinstance(pid, bool):
+        normalized_payload["pid"] = pid
+    command_line = payload.get("command_line")
+    if isinstance(command_line, str):
+        normalized_payload["command_line"] = command_line
+    executable_path = payload.get("executable_path")
+    if isinstance(executable_path, str):
+        normalized_payload["executable_path"] = executable_path
+    return normalized_payload
 
 
 @dataclass(frozen=True)
@@ -110,9 +126,9 @@ def _windows_process_details(pid: int) -> ListeningProcess:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
         return ListeningProcess(pid=pid)
-    if not isinstance(payload, dict):
+    process_payload = _normalize_windows_process_payload(payload)
+    if process_payload is None:
         return ListeningProcess(pid=pid)
-    process_payload = cast(_WindowsProcessPayload, payload)
     return ListeningProcess(
         pid=pid,
         command_line=str(process_payload.get("command_line") or ""),

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
+from backend.payload_types import TopologySpecPayload
+
 DEFAULT_SQUARE_RULE = "conway"
 DEFAULT_MIN_GRID_SIZE = 3
 DEFAULT_TOPOLOGY_PATCH_DEPTH = 4
@@ -432,10 +434,10 @@ def topology_spec_payload(
     width: int,
     height: int,
     patch_depth: int | None = None,
-) -> dict[str, object]:
+) -> TopologySpecPayload:
     variant = get_topology_variant_for_geometry(geometry_key)
     definition = get_topology_definition(variant.tiling_family)
-    return {
+    payload: TopologySpecPayload = {
         "tiling_family": variant.tiling_family,
         "adjacency_mode": variant.adjacency_mode,
         "sizing_mode": definition.sizing_mode,
@@ -443,6 +445,7 @@ def topology_spec_payload(
         "height": height,
         "patch_depth": DEFAULT_TOPOLOGY_PATCH_DEPTH if patch_depth is None else patch_depth,
     }
+    return payload
 
 
 def geometry_uses_patch_depth(geometry_key: str) -> bool:

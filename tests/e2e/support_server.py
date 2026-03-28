@@ -7,7 +7,16 @@ import tempfile
 import time
 import urllib.request
 from pathlib import Path
-from typing import Any, IO
+from collections.abc import Mapping
+from typing import IO, Protocol
+
+from backend.payload_types import JsonDocument, ResetControlRequestPayload, SimulationStatePayload, TopologyPayload
+from tests.typed_payloads import require_simulation_state_payload, require_topology_payload
+
+
+class PollingProcess(Protocol):
+    def poll(self) -> int | None:
+        ...
 
 class JsonApiClient:
     def __init__(self, base_url: str) -> None:
@@ -17,7 +26,7 @@ class JsonApiClient:
         self,
         timeout_seconds: float = 20,
         *,
-        process: subprocess.Popen[str] | None = None,
+        process: PollingProcess | None = None,
     ) -> None:
         deadline = time.time() + timeout_seconds
         while True:
@@ -35,7 +44,12 @@ class JsonApiClient:
                     raise RuntimeError('Server did not start in time.')
                 time.sleep(0.25)
 
-    def request_json(self, path: str, method: str = 'GET', payload: dict[str, Any] | None = None) -> Any:
+    def request_json(
+        self,
+        path: str,
+        method: str = 'GET',
+        payload: Mapping[str, object] | None = None,
+    ) -> JsonDocument:
         body = None if payload is None else json.dumps(payload).encode('utf-8')
         request = urllib.request.Request(
             f'{self.base_url}{path}',
@@ -46,6 +60,24 @@ class JsonApiClient:
         with urllib.request.urlopen(request, timeout=5) as response:
             raw = response.read().decode('utf-8')
             return json.loads(raw) if raw else None
+
+    def get_state(self) -> SimulationStatePayload:
+        return require_simulation_state_payload(
+            self.request_json("/api/state"),
+            context="browser support backend state",
+        )
+
+    def get_topology(self) -> TopologyPayload:
+        return require_topology_payload(
+            self.request_json("/api/topology"),
+            context="browser support backend topology",
+        )
+
+    def reset(self, payload: ResetControlRequestPayload) -> SimulationStatePayload:
+        return require_simulation_state_payload(
+            self.request_json("/api/control/reset", method="POST", payload=payload),
+            context="browser support backend reset response",
+        )
 
 
 class AppServer:

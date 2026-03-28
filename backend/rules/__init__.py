@@ -4,6 +4,7 @@ import importlib
 import inspect
 import pkgutil
 
+from backend.payload_types import RuleDefinitionPayload
 from backend.rules.base import AutomatonRule
 from backend.simulation.models import RuleSnapshot
 from backend.simulation.topology_catalog import (
@@ -68,7 +69,7 @@ class RuleRegistry:
 
         raise RuntimeError(f"No rule modules support geometry '{geometry}'.")
 
-    def describe_rules(self) -> list[dict[str, object]]:
+    def describe_rules(self) -> list[RuleDefinitionPayload]:
         return [
             RuleSnapshot.from_rule(rule).to_dict()
             for rule in self._rules.values()

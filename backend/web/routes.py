@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import cast
+from typing import TypeVar
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
-from backend.payload_types import CellTargetPayload, CellUpdatePayload, JsonObject, TopologySpecPatch
+from backend.payload_types import (
+    ApiErrorPayload,
+    CellTargetPayload,
+    CellUpdatePayload,
+    JsonObject,
+    RulesResponsePayload,
+    TopologySpecPatch,
+)
 from backend.rules import RuleRegistry
 from backend.frontend_assets import FrontendAssetManifest
 from backend.simulation.coordinator import SimulationCoordinator
@@ -16,6 +22,7 @@ from backend.web.requests import (
     get_payload,
     parse_cell_updates,
     parse_optional_float,
+    parse_optional_int,
     parse_rule_name,
     parse_state_value,
     parse_topology_spec,
@@ -25,21 +32,31 @@ from backend.web.requests import (
 page_bp = Blueprint("pages", __name__)
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
+_ExtensionT = TypeVar("_ExtensionT")
+
+
+def _require_extension(name: str, expected_type: type[_ExtensionT]) -> _ExtensionT:
+    extension = current_app.extensions.get(name)
+    if not isinstance(extension, expected_type):
+        raise RuntimeError(f"Flask extension '{name}' is not initialized correctly.")
+    return extension
+
 
 def simulation_coordinator() -> SimulationCoordinator:
-    return cast(SimulationCoordinator, current_app.extensions["simulation_coordinator"])
+    return _require_extension("simulation_coordinator", SimulationCoordinator)
 
 
 def rule_registry() -> RuleRegistry:
-    return cast(RuleRegistry, current_app.extensions["rule_registry"])
+    return _require_extension("rule_registry", RuleRegistry)
 
 
 def frontend_assets() -> FrontendAssetManifest:
-    return cast(FrontendAssetManifest, current_app.extensions["frontend_assets"])
+    return _require_extension("frontend_assets", FrontendAssetManifest)
 
 
 def json_error(message: str, status_code: int = 400):
-    return jsonify({"error": message}), status_code
+    payload: ApiErrorPayload = {"error": message}
+    return jsonify(payload), status_code
 
 
 def state_response(*, include_topology: bool = True):
@@ -105,18 +122,16 @@ def apply_config_payload(payload: JsonObject) -> None:
     if disallowed_keys:
         disallowed = ", ".join(sorted(disallowed_keys))
         raise RequestValidationError(f"'{disallowed}' can only be changed through reset.")
+    topology_patch: TopologySpecPatch = {}
+    if topology_spec is not None:
+        width = parse_optional_int(topology_spec, "width")
+        height = parse_optional_int(topology_spec, "height")
+        if width is not None:
+            topology_patch["width"] = width
+        if height is not None:
+            topology_patch["height"] = height
     simulation_coordinator().update_config(
-        topology_spec=cast(
-            TopologySpecPatch,
-            {} if topology_spec is None else {
-                key: value
-                for key, value in {
-                    "width": topology_spec.get("width"),
-                    "height": topology_spec.get("height"),
-                }.items()
-                if value is not None
-            },
-        ),
+        topology_spec=topology_patch,
         speed=parse_optional_float(payload, "speed"),
         rule_name=parse_rule_name(payload, rule_registry()),
     )
@@ -181,7 +196,8 @@ def get_state():
 
 @api_bp.get("/rules")
 def get_rules():
-    return jsonify({"rules": rule_registry().describe_rules()})
+    payload: RulesResponsePayload = {"rules": rule_registry().describe_rules()}
+    return jsonify(payload)
 
 
 @api_bp.get("/topology")

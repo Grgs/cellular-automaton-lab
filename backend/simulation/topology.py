@@ -3,8 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from functools import lru_cache
 from hashlib import sha1
-from typing import Iterable, cast
+from typing import Iterable
 
+from backend.payload_types import PointPayload, TopologyCellPayload, TopologyPayload
 from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_488_GEOMETRY,
     KAGOME_GEOMETRY,
@@ -126,8 +127,8 @@ class LatticeCell:
     center: tuple[float, float] | None = None
     vertices: tuple[tuple[float, float], ...] | None = None
 
-    def to_dict(self) -> dict[str, object]:
-        payload: dict[str, object] = {
+    def to_dict(self) -> TopologyCellPayload:
+        payload: TopologyCellPayload = {
             "id": self.id,
             "kind": self.kind,
             "neighbors": list(self.neighbors),
@@ -135,10 +136,10 @@ class LatticeCell:
         if self.slot is not None:
             payload["slot"] = self.slot
         if self.center is not None:
-            payload["center"] = {"x": self.center[0], "y": self.center[1]}
+            payload["center"] = PointPayload(x=self.center[0], y=self.center[1])
         if self.vertices is not None:
             payload["vertices"] = [
-                {"x": vertex[0], "y": vertex[1]}
+                PointPayload(x=vertex[0], y=vertex[1])
                 for vertex in self.vertices
             ]
         return payload
@@ -159,7 +160,7 @@ class LatticeTopology:
         repr=False,
         compare=False,
     )
-    _payload: dict[str, object] | None = field(
+    _payload: TopologyPayload | None = field(
         default=None,
         init=False,
         repr=False,
@@ -195,23 +196,26 @@ class LatticeTopology:
     def neighbor_indexes_for(self, index: int) -> tuple[int, ...]:
         return self._neighbor_indexes_by_cell[index]
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> TopologyPayload:
         if self._payload is None:
+            payload: TopologyPayload = {
+                "topology_spec": topology_spec_payload(
+                    self.geometry,
+                    width=self.width,
+                    height=self.height,
+                    patch_depth=self.patch_depth,
+                ),
+                "topology_revision": self.topology_revision,
+                "cells": [cell.to_dict() for cell in self.cells],
+            }
             object.__setattr__(
                 self,
                 "_payload",
-                {
-                    "topology_spec": topology_spec_payload(
-                        self.geometry,
-                        width=self.width,
-                        height=self.height,
-                        patch_depth=self.patch_depth,
-                    ),
-                    "topology_revision": self.topology_revision,
-                    "cells": [cell.to_dict() for cell in self.cells],
-                },
+                payload,
             )
-        return cast(dict[str, object], self._payload)
+        if self._payload is None:
+            raise RuntimeError("Topology payload cache was not initialized.")
+        return self._payload
 
 
 @dataclass

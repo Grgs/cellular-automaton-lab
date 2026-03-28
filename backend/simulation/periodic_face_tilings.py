@@ -5,8 +5,9 @@ from functools import lru_cache
 import json
 import math
 from pathlib import Path
-from typing import Callable, NotRequired, TypedDict, cast
+from typing import Callable, NotRequired, TypedDict
 
+from backend.payload_types import JsonObject, PeriodicFaceTilingDescriptorPayload
 from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_33336_GEOMETRY,
@@ -74,7 +75,7 @@ class PeriodicFaceTilingDescriptor:
     row_offset_x: float = 0.0
     id_pattern: str = "{prefix}:{slot}:{x}:{y}"
 
-    def to_frontend_dict(self) -> dict[str, object]:
+    def to_frontend_dict(self) -> PeriodicFaceTilingDescriptorPayload:
         return {
             "geometry": self.geometry,
             "label": self.label,
@@ -122,6 +123,128 @@ class _JsonPatternDescriptor(TypedDict):
     faces: list[_JsonFace]
     row_offset_x: NotRequired[float]
     id_pattern: NotRequired[str]
+
+
+def _require_object(value: object, *, context: str) -> JsonObject:
+    if not isinstance(value, dict):
+        raise ValueError(f"{context} is invalid.")
+    return value
+
+
+def _require_string(value: object, *, context: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{context} is invalid.")
+    return value
+
+
+def _require_int(value: object, *, context: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{context} is invalid.")
+    return value
+
+
+def _require_float(value: object, *, context: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{context} is invalid.")
+    return float(value)
+
+
+def _require_point_payload(value: object, *, context: str) -> _JsonPoint:
+    payload = _require_object(value, context=context)
+    return {
+        "x": _require_float(payload.get("x"), context=f"{context}.x"),
+        "y": _require_float(payload.get("y"), context=f"{context}.y"),
+    }
+
+
+def _require_face_payload(value: object, *, context: str) -> _JsonFace:
+    payload = _require_object(value, context=context)
+    vertices_value = payload.get("vertices")
+    if not isinstance(vertices_value, list):
+        raise ValueError(f"{context}.vertices is invalid.")
+    normalized_face: _JsonFace = {
+        "slot": _require_string(payload.get("slot"), context=f"{context}.slot"),
+        "kind": _require_string(payload.get("kind"), context=f"{context}.kind"),
+        "prefix": _require_string(payload.get("prefix"), context=f"{context}.prefix"),
+        "center": _require_point_payload(payload.get("center"), context=f"{context}.center"),
+        "vertices": [
+            _require_point_payload(vertex, context=f"{context}.vertices[{index}]")
+            for index, vertex in enumerate(vertices_value)
+        ],
+    }
+    repeat_x_extra = payload.get("repeat_x_extra")
+    if repeat_x_extra is not None:
+        normalized_face["repeat_x_extra"] = _require_int(
+            repeat_x_extra,
+            context=f"{context}.repeat_x_extra",
+        )
+    repeat_y_extra = payload.get("repeat_y_extra")
+    if repeat_y_extra is not None:
+        normalized_face["repeat_y_extra"] = _require_int(
+            repeat_y_extra,
+            context=f"{context}.repeat_y_extra",
+        )
+    return normalized_face
+
+
+def _require_pattern_descriptor_payload(
+    value: object,
+    *,
+    geometry_key: str,
+) -> _JsonPatternDescriptor:
+    payload = _require_object(value, context=f"Periodic face tiling descriptor '{geometry_key}'")
+    faces_value = payload.get("faces")
+    if not isinstance(faces_value, list):
+        raise ValueError(f"Periodic face tiling descriptor '{geometry_key}'.faces is invalid.")
+    normalized_payload: _JsonPatternDescriptor = {
+        "geometry": _require_string(payload.get("geometry"), context=f"{geometry_key}.geometry"),
+        "label": _require_string(payload.get("label"), context=f"{geometry_key}.label"),
+        "unit_width": _require_float(payload.get("unit_width"), context=f"{geometry_key}.unit_width"),
+        "unit_height": _require_float(payload.get("unit_height"), context=f"{geometry_key}.unit_height"),
+        "base_edge": _require_float(payload.get("base_edge"), context=f"{geometry_key}.base_edge"),
+        "min_dimension": _require_int(payload.get("min_dimension"), context=f"{geometry_key}.min_dimension"),
+        "min_x": _require_float(payload.get("min_x"), context=f"{geometry_key}.min_x"),
+        "min_y": _require_float(payload.get("min_y"), context=f"{geometry_key}.min_y"),
+        "max_x": _require_float(payload.get("max_x"), context=f"{geometry_key}.max_x"),
+        "max_y": _require_float(payload.get("max_y"), context=f"{geometry_key}.max_y"),
+        "cell_count_per_unit": _require_int(
+            payload.get("cell_count_per_unit"),
+            context=f"{geometry_key}.cell_count_per_unit",
+        ),
+        "faces": [
+            _require_face_payload(face, context=f"{geometry_key}.faces[{index}]")
+            for index, face in enumerate(faces_value)
+        ],
+    }
+    row_offset_x = payload.get("row_offset_x")
+    if row_offset_x is not None:
+        normalized_payload["row_offset_x"] = _require_float(
+            row_offset_x,
+            context=f"{geometry_key}.row_offset_x",
+        )
+    id_pattern = payload.get("id_pattern")
+    if id_pattern is not None:
+        normalized_payload["id_pattern"] = _require_string(
+            id_pattern,
+            context=f"{geometry_key}.id_pattern",
+        )
+    return normalized_payload
+
+
+def _load_pattern_payload() -> dict[str, _JsonPatternDescriptor]:
+    payload = _require_object(
+        json.loads(_DATA_PATH.read_text(encoding="utf-8")),
+        context="Periodic face tiling data payload",
+    )
+    normalized_payload: dict[str, _JsonPatternDescriptor] = {}
+    for geometry_key, descriptor_payload in payload.items():
+        if not isinstance(geometry_key, str) or not geometry_key:
+            raise ValueError("Periodic face tiling data payload is invalid.")
+        normalized_payload[geometry_key] = _require_pattern_descriptor_payload(
+            descriptor_payload,
+            geometry_key=geometry_key,
+        )
+    return normalized_payload
 
 
 def _edge_key(left: tuple[float, float], right: tuple[float, float]) -> tuple[tuple[float, float], tuple[float, float]]:
@@ -284,14 +407,13 @@ def _pattern_descriptor_from_payload(payload: _JsonPatternDescriptor) -> Periodi
 
 @lru_cache(maxsize=1)
 def _loaded_pattern_descriptors() -> dict[str, PeriodicFaceTilingDescriptor]:
-    payload = cast(
-        dict[str, _JsonPatternDescriptor],
-        json.loads(_DATA_PATH.read_text(encoding="utf-8")),
-    )
+    payload = _load_pattern_payload()
     return {
         geometry: _pattern_descriptor_from_payload(descriptor_payload)
         for geometry, descriptor_payload in payload.items()
     }
+
+
 @lru_cache(maxsize=1)
 def _descriptor_registry() -> dict[str, PeriodicFaceTilingDescriptor]:
     return _loaded_pattern_descriptors()
@@ -305,7 +427,7 @@ def get_periodic_face_tiling_descriptor(geometry: str) -> PeriodicFaceTilingDesc
     return _descriptor_registry()[geometry]
 
 
-def describe_periodic_face_tilings() -> list[dict[str, object]]:
+def describe_periodic_face_tilings() -> list[PeriodicFaceTilingDescriptorPayload]:
     return [
         _descriptor_registry()[geometry].to_frontend_dict()
         for geometry in PERIODIC_FACE_TILING_GEOMETRIES

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Mapping, cast
+from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
 from backend.defaults import (
     DEFAULT_HEIGHT,
@@ -17,7 +18,13 @@ from backend.defaults import (
     MIN_PATCH_DEPTH,
     MIN_SPEED,
 )
-from backend.payload_types import TopologySpecInput, TopologySpecPayload
+from backend.payload_types import (
+    CellStatePayload,
+    RuleDefinitionPayload,
+    SimulationStatePayload,
+    TopologySpecInput,
+    TopologySpecPayload,
+)
 from backend.simulation.topology_catalog import (
     minimum_grid_dimension_for_geometry,
     EDGE_ADJACENCY,
@@ -53,7 +60,7 @@ def _coerce_optional_int(value: object, fallback: int) -> int:
 
 
 def _topology_spec_mapping(topology_spec: TopologySpecInput) -> Mapping[str, object]:
-    return cast(Mapping[str, object], topology_spec)
+    return topology_spec
 
 
 def _topology_spec_string_value(
@@ -314,7 +321,7 @@ class RuleSnapshot:
     name: str
     display_name: str
     description: str
-    states: list[dict[str, int | str | bool]]
+    states: list[CellStatePayload]
     default_paint_state: int
     supports_randomize: bool
     rule_protocol: str
@@ -333,7 +340,7 @@ class RuleSnapshot:
             supports_all_topologies=rule.supports_all_topologies,
         )
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> RuleDefinitionPayload:
         return {
             "name": self.name,
             "display_name": self.display_name,
@@ -366,8 +373,8 @@ class SimulationSnapshot:
     def cells_by_id(self) -> dict[str, int]:
         return self.board.states_by_id(omit_zero=True)
 
-    def to_dict(self, *, include_topology: bool = True) -> dict[str, Any]:
-        payload = {
+    def to_dict(self, *, include_topology: bool = True) -> SimulationStatePayload:
+        payload: SimulationStatePayload = {
             "topology_spec": self.config.topology_spec.to_dict(),
             "speed": self.config.speed,
             "running": self.running,

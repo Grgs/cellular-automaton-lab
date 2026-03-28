@@ -3,15 +3,19 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from backend.payload_types import RuleDefinitionPayload
+
 try:
     from tests.api.support import ApiTestCase
+    from tests.typed_payloads import require_server_meta_payload
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tests.api.support import ApiTestCase
+    from tests.typed_payloads import require_server_meta_payload
 
 
 class ApiStateAndRulesTests(ApiTestCase):
-    def assert_universal_rule_contract(self, payload: dict) -> None:
+    def assert_universal_rule_contract(self, payload: RuleDefinitionPayload) -> None:
         self.assertTrue(payload['supports_all_topologies'])
         self.assertEqual(payload['rule_protocol'], 'universal-v1')
         self.assertNotIn('supported_topologies', payload)
@@ -20,18 +24,20 @@ class ApiStateAndRulesTests(ApiTestCase):
         response = self.client.get('/api/meta')
 
         self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-        self.assertIsInstance(payload, dict)
-        assert isinstance(payload, dict)
+        payload = require_server_meta_payload(
+            response.get_json(),
+            context="server meta response",
+        )
         self.assertEqual(payload, {'app_name': 'cellular-automaton-lab'})
 
     def test_meta_endpoint_omits_local_host_details(self) -> None:
         response = self.client.get('/api/meta')
 
         self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-        self.assertIsInstance(payload, dict)
-        assert isinstance(payload, dict)
+        payload = require_server_meta_payload(
+            response.get_json(),
+            context="server meta response",
+        )
         self.assertNotIn('pid', payload)
         self.assertNotIn('instance_path', payload)
         self.assertNotIn('started_at', payload)

@@ -2,7 +2,6 @@ import sys
 import time
 import unittest
 from pathlib import Path
-from typing import Any, cast
 from unittest import mock
 
 
@@ -35,7 +34,7 @@ class StartupGuardTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "exit code 7"):
                 client.wait_until_ready(
                     timeout_seconds=0.05,
-                    process=cast(Any, DummyProcess(7)),
+                    process=DummyProcess(7),
                 )
 
 

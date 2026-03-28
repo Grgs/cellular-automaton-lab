@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from playwright.sync_api import expect
+from backend.payload_types import ResetControlRequestPayload, SimulationStatePayload, TopologySpecPayload
 
 try:
     from tests.e2e.support_browser import BrowserAppTestCase
@@ -16,10 +17,11 @@ except ModuleNotFoundError:
     from tests.e2e.support_browser import BrowserAppTestCase
 
 
-DEFAULT_RESET_PAYLOAD = {
+DEFAULT_RESET_PAYLOAD: ResetControlRequestPayload = {
     "topology_spec": {
         "tiling_family": "square",
         "adjacency_mode": "edge",
+        "sizing_mode": "grid",
         "width": 30,
         "height": 20,
         "patch_depth": 0,
@@ -35,15 +37,20 @@ class CellularAutomatonUITests(BrowserAppTestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.api.request_json("/api/control/reset", method="POST", payload=DEFAULT_RESET_PAYLOAD)
-        self.page.goto(f"{self.api.base_url}/", wait_until="load")
+        self.api.reset(DEFAULT_RESET_PAYLOAD)
+        self.goto_page(f"{self.api.base_url}/", wait_until="load")
 
-    def read_backend_state(self) -> dict:
-        return self.api.request_json("/api/state")
+    def read_backend_state(self) -> SimulationStatePayload:
+        return self.api.get_state()
 
-    def wait_for_backend_state(self, predicate, *, timeout_seconds: float = 6.0) -> dict:
+    def wait_for_backend_state(
+        self,
+        predicate,
+        *,
+        timeout_seconds: float = 6.0,
+    ) -> SimulationStatePayload:
         deadline = time.time() + timeout_seconds
-        last_state = None
+        last_state: SimulationStatePayload | None = None
         while time.time() < deadline:
             last_state = self.read_backend_state()
             if predicate(last_state):
@@ -51,11 +58,8 @@ class CellularAutomatonUITests(BrowserAppTestCase):
             time.sleep(0.1)
         raise AssertionError(f"backend state did not satisfy predicate in time: {json.dumps(last_state, indent=2)}")
 
-    def _topology_spec(self, state: dict) -> dict:
-        topology_spec = state.get("topology_spec")
-        if not isinstance(topology_spec, dict):
-            raise AssertionError(f"backend state did not include topology_spec: {state!r}")
-        return topology_spec
+    def _topology_spec(self, state: SimulationStatePayload) -> TopologySpecPayload:
+        return state["topology_spec"]
 
     def _click_canvas_center(self) -> None:
         canvas = self.page.locator("#grid")
@@ -120,7 +124,7 @@ class CellularAutomatonUITests(BrowserAppTestCase):
         self.wait_for_backend_state(lambda state: state.get("rule", {}).get("name") == "highlife")
 
         self.server.restart()
-        self.page.goto(f"{self.api.base_url}/", wait_until="load")
+        self.goto_page(f"{self.api.base_url}/", wait_until="load")
         backend_state = self.wait_for_backend_state(
             lambda state: state.get("rule", {}).get("name") == "highlife"
         )

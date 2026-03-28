@@ -1,14 +1,48 @@
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 try:
     from backend.payload_types import ServerMetaPayload
-    from backend.dev_server import APP_NAME, ListeningProcess, prepare_dev_server
+    from backend.dev_server import (
+        APP_NAME,
+        ListeningProcess,
+        _windows_process_details,
+        fetch_server_meta,
+        prepare_dev_server,
+    )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.payload_types import ServerMetaPayload
-    from backend.dev_server import APP_NAME, ListeningProcess, prepare_dev_server
+    from backend.dev_server import (
+        APP_NAME,
+        ListeningProcess,
+        _windows_process_details,
+        fetch_server_meta,
+        prepare_dev_server,
+    )
+
+
+class _FakeUrlResponse:
+    def __init__(self, body: bytes, *, status: int = 200) -> None:
+        self.body = body
+        self.status = status
+
+    def __enter__(self) -> "_FakeUrlResponse":
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        return None
+
+    def read(self) -> bytes:
+        return self.body
+
+
+class _FakeCompletedProcess:
+    def __init__(self, *, returncode: int = 0, stdout: str = "") -> None:
+        self.returncode = returncode
+        self.stdout = stdout
 
 
 class DevServerGuardTests(unittest.TestCase):
@@ -79,6 +113,26 @@ class DevServerGuardTests(unittest.TestCase):
                 find_listening_process_fn=lambda _: listener,
                 fetch_server_meta_fn=lambda *_: None,
             )
+
+    def test_fetch_server_meta_rejects_non_object_payloads(self) -> None:
+        with mock.patch(
+            "backend.dev_server.urlopen",
+            return_value=_FakeUrlResponse(b"[]"),
+        ):
+            self.assertIsNone(fetch_server_meta("127.0.0.1", 5000))
+
+        with mock.patch(
+            "backend.dev_server.urlopen",
+            return_value=_FakeUrlResponse(b'{"app_name": ""}'),
+        ):
+            self.assertIsNone(fetch_server_meta("127.0.0.1", 5000))
+
+    def test_windows_process_details_ignores_invalid_payload_objects(self) -> None:
+        with mock.patch(
+            "backend.dev_server.subprocess.run",
+            return_value=_FakeCompletedProcess(stdout="[]"),
+        ):
+            self.assertEqual(_windows_process_details(42), ListeningProcess(pid=42))
 
 
 if __name__ == "__main__":

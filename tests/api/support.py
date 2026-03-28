@@ -3,16 +3,28 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
-from typing import Any, Callable, ClassVar
+from typing import Callable, ClassVar
 
 from flask import Flask
 from flask.testing import FlaskClient
 
+from backend.payload_types import JsonObject, RuleDefinitionPayload, SimulationStatePayload, TopologyPayload, TopologySpecPayload
+
 try:
     from backend.api import create_app
+    from tests.typed_payloads import (
+        require_rules_response_payload,
+        require_simulation_state_payload,
+        require_topology_payload,
+    )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.api import create_app
+    from tests.typed_payloads import (
+        require_rules_response_payload,
+        require_simulation_state_payload,
+        require_topology_payload,
+    )
 
 
 class ApiTestCase(unittest.TestCase):
@@ -45,21 +57,31 @@ class ApiTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.reset_simulation()
 
-    def reset_simulation(self, **overrides: Any) -> dict[str, Any]:
-        topology_spec = {
+    @staticmethod
+    def _coerce_override_int(value: object, *, key: str) -> int:
+        if isinstance(value, (str, bytes, bytearray, int, float)) and not isinstance(value, bool):
+            return int(value)
+        raise AssertionError(f"reset override '{key}' must be int-compatible.")
+
+    def reset_simulation(self, **overrides: object) -> SimulationStatePayload:
+        topology_spec: TopologySpecPayload = {
             'tiling_family': 'square',
             'adjacency_mode': 'edge',
+            'sizing_mode': 'grid',
             'width': 10,
             'height': 6,
             'patch_depth': 0,
         }
         if "width" in overrides:
-            topology_spec["width"] = overrides.pop("width")
+            topology_spec["width"] = self._coerce_override_int(overrides.pop("width"), key="width")
         if "height" in overrides:
-            topology_spec["height"] = overrides.pop("height")
+            topology_spec["height"] = self._coerce_override_int(overrides.pop("height"), key="height")
         if "patch_depth" in overrides:
-            topology_spec["patch_depth"] = overrides.pop("patch_depth")
-        payload: dict[str, Any] = {
+            topology_spec["patch_depth"] = self._coerce_override_int(
+                overrides.pop("patch_depth"),
+                key="patch_depth",
+            )
+        payload: JsonObject = {
             'topology_spec': topology_spec,
             'speed': 5,
             'rule': 'conway',
@@ -68,32 +90,35 @@ class ApiTestCase(unittest.TestCase):
         payload.update(overrides)
         response = self.client.post('/api/control/reset', json=payload)
         self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-        assert isinstance(payload, dict)
-        return payload
+        return require_simulation_state_payload(
+            response.get_json(),
+            context="reset response",
+        )
 
-    def get_state(self) -> dict[str, Any]:
+    def get_state(self) -> SimulationStatePayload:
         response = self.client.get('/api/state')
         self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-        assert isinstance(payload, dict)
-        return payload
+        return require_simulation_state_payload(
+            response.get_json(),
+            context="state response",
+        )
 
-    def get_topology(self) -> dict[str, Any]:
+    def get_topology(self) -> TopologyPayload:
         response = self.client.get('/api/topology')
         self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-        assert isinstance(payload, dict)
-        return payload
+        return require_topology_payload(
+            response.get_json(),
+            context="topology response",
+        )
 
     def wait_for_state(
         self,
-        predicate: Callable[[dict[str, Any]], bool],
+        predicate: Callable[[SimulationStatePayload], bool],
         timeout: float = 2.0,
         interval: float = 0.05,
-    ) -> dict[str, Any]:
+    ) -> SimulationStatePayload:
         deadline = time.monotonic() + timeout
-        last_state: dict[str, Any] | None = None
+        last_state: SimulationStatePayload | None = None
         while time.monotonic() < deadline:
             last_state = self.get_state()
             if predicate(last_state):
@@ -109,19 +134,18 @@ class ApiTestCase(unittest.TestCase):
             self.assertEqual(self.get_state()['generation'], generation)
         return generation
 
-    def get_rules(self) -> list[dict[str, Any]]:
+    def get_rules(self) -> list[RuleDefinitionPayload]:
         response = self.client.get('/api/rules')
         self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-        assert isinstance(payload, dict)
-        rules = payload['rules']
-        assert isinstance(rules, list)
-        return rules
+        return require_rules_response_payload(
+            response.get_json(),
+            context="rules response",
+        )["rules"]
 
-    def get_rule_definition(self, rule_name: str) -> dict[str, Any]:
+    def get_rule_definition(self, rule_name: str) -> RuleDefinitionPayload:
         return next(rule for rule in self.get_rules() if rule['name'] == rule_name)
 
-    def assert_grid_uses_rule_states(self, payload: dict[str, Any]) -> None:
+    def assert_grid_uses_rule_states(self, payload: SimulationStatePayload) -> None:
         allowed_states = {cell_state['value'] for cell_state in payload['rule']['states']}
         for state in self.cells_by_id(payload).values():
             self.assertIn(state, allowed_states)
@@ -130,50 +154,46 @@ class ApiTestCase(unittest.TestCase):
     def regular_cell_id(x: int, y: int) -> str:
         return f"c:{x}:{y}"
 
-    def cells_by_id(self, payload: dict[str, Any]) -> dict[str, int]:
+    def cells_by_id(self, payload: SimulationStatePayload) -> dict[str, int]:
         topology = payload.get('topology')
-        if not isinstance(topology, dict):
+        if topology is None:
             topology = self.get_topology()
-            payload_revision = payload.get('topology_revision')
-            topology_revision = topology.get('topology_revision')
+            payload_revision = payload['topology_revision']
+            topology_revision = topology['topology_revision']
             if payload_revision is not None and topology_revision != payload_revision:
                 raise AssertionError('payload topology revision did not match the current topology endpoint')
-        cells = topology.get('cells') if isinstance(topology, dict) else None
-        cell_states = payload.get('cell_states')
+        cells = topology['cells']
+        cell_states = payload['cell_states']
 
-        if not isinstance(cells, list) or not isinstance(cell_states, list):
-            raise AssertionError('payload did not contain topology cells and cell_states needed to derive cell states')
         if len(cells) != len(cell_states):
             raise AssertionError('payload topology cells and cell_states had different lengths')
 
         cells_by_id: dict[str, int] = {}
         for index, cell in enumerate(cells):
-            if not isinstance(cell, dict):
-                raise AssertionError('payload topology contained a non-object cell entry')
-            cell_id = cell.get('id')
-            if not isinstance(cell_id, str) or not cell_id:
+            cell_id = cell['id']
+            if not cell_id:
                 raise AssertionError('payload topology cell did not contain a valid id')
             cells_by_id[cell_id] = int(cell_states[index])
 
         return cells_by_id
 
-    def regular_cell_state(self, payload: dict[str, Any], x: int, y: int) -> int:
+    def regular_cell_state(self, payload: SimulationStatePayload, x: int, y: int) -> int:
         return self.cells_by_id(payload).get(self.regular_cell_id(x, y), 0)
 
-    def assert_regular_rows(self, payload: dict[str, Any], rows: list[list[int]]) -> None:
+    def assert_regular_rows(self, payload: SimulationStatePayload, rows: list[list[int]]) -> None:
         expected: dict[str, int] = {}
         for y, row in enumerate(rows):
             for x, value in enumerate(row):
                 expected[self.regular_cell_id(x, y)] = int(value)
         self.assertEqual(self.cells_by_id(payload), expected)
 
-    def assert_wireworld_rule(self, payload: dict[str, Any]) -> None:
+    def assert_wireworld_rule(self, payload: SimulationStatePayload) -> None:
         self.assertEqual(payload['rule']['name'], 'wireworld')
         self.assertEqual(payload['rule']['default_paint_state'], 3)
         self.assertFalse(payload['rule']['supports_randomize'])
         self.assertEqual([cell_state['value'] for cell_state in payload['rule']['states']], [0, 1, 2, 3])
 
-    def assert_whirlpool_rule(self, payload: dict[str, Any]) -> None:
+    def assert_whirlpool_rule(self, payload: SimulationStatePayload) -> None:
         self.assertEqual(payload['rule']['name'], 'whirlpool')
         self.assertEqual(payload['rule']['display_name'], 'Excitable: Outward Whirlpool')
         self.assertEqual(payload['rule']['default_paint_state'], 1)
@@ -186,7 +206,7 @@ class ApiTestCase(unittest.TestCase):
             'Source',
         ])
 
-    def assert_hexlife_rule(self, payload: dict[str, Any]) -> None:
+    def assert_hexlife_rule(self, payload: SimulationStatePayload) -> None:
         self.assertEqual(payload['rule']['name'], 'hexlife')
         self.assertEqual(payload['rule']['display_name'], 'Life: Hex (B2/S34)')
         self.assertEqual(payload['rule']['default_paint_state'], 1)
@@ -195,10 +215,10 @@ class ApiTestCase(unittest.TestCase):
         self.assertTrue(payload['rule']['supports_all_topologies'])
         self.assertEqual([cell_state['value'] for cell_state in payload['rule']['states']], [0, 1])
 
-    def assert_hexwhirlpool_rule(self, payload: dict[str, Any]) -> None:
+    def assert_hexwhirlpool_rule(self, payload: SimulationStatePayload) -> None:
         self.assert_whirlpool_rule(payload)
 
-    def assert_trilife_rule(self, payload: dict[str, Any]) -> None:
+    def assert_trilife_rule(self, payload: SimulationStatePayload) -> None:
         self.assertEqual(payload['rule']['name'], 'trilife')
         self.assertEqual(payload['rule']['display_name'], 'Life: Triangle (B4/S345)')
         self.assertEqual(payload['rule']['default_paint_state'], 1)
@@ -207,7 +227,7 @@ class ApiTestCase(unittest.TestCase):
         self.assertTrue(payload['rule']['supports_all_topologies'])
         self.assertEqual([cell_state['value'] for cell_state in payload['rule']['states']], [0, 1])
 
-    def assert_archlife_rule(self, payload: dict[str, Any]) -> None:
+    def assert_archlife_rule(self, payload: SimulationStatePayload) -> None:
         self.assertEqual(payload['rule']['name'], 'archlife488')
         self.assertEqual(payload['rule']['display_name'], 'Mixed Life: Square-Octagon (4.8.8)')
         self.assertEqual(payload['rule']['default_paint_state'], 1)
@@ -216,7 +236,7 @@ class ApiTestCase(unittest.TestCase):
         self.assertTrue(payload['rule']['supports_all_topologies'])
         self.assertEqual([cell_state['value'] for cell_state in payload['rule']['states']], [0, 1])
 
-    def assert_kagome_rule(self, payload: dict[str, Any]) -> None:
+    def assert_kagome_rule(self, payload: SimulationStatePayload) -> None:
         self.assertEqual(payload['rule']['name'], 'kagome-life')
         self.assertEqual(payload['rule']['display_name'], 'Mixed Life: Kagome (3.6.3.6)')
         self.assertEqual(payload['rule']['default_paint_state'], 1)
