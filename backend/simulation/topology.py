@@ -78,6 +78,23 @@ TRIANGLE_NEIGHBOR_OFFSETS_DOWN = (
     (1, 1),
 )
 
+__all__ = [
+    "ARCHIMEDEAN_488_GEOMETRY",
+    "KAGOME_GEOMETRY",
+    "PENROSE_GEOMETRY",
+    "PENROSE_VERTEX_GEOMETRY",
+    "LatticeCell",
+    "LatticeTopology",
+    "SimulationBoard",
+    "board_from_cells_by_id",
+    "board_from_states",
+    "build_topology",
+    "empty_board",
+    "parse_regular_cell_id",
+    "regular_cell_id",
+    "topology_revision",
+]
+
 
 def regular_cell_id(x: int, y: int) -> str:
     return f"c:{x}:{y}"

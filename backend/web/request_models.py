@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from backend.payload_types import CellTargetPayload, CellUpdatePayload, CellUpdatesPayload, TopologySpecRequestPayload
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 
 
-def blank_to_none(value: Any) -> Any:
+def blank_to_none(value: object) -> object | None:
     if value in (None, ""):
         return None
     return value
@@ -18,7 +18,7 @@ class OptionalIntValueModel(BaseModel):
 
     @field_validator("value", mode="before")
     @classmethod
-    def normalize_blank(cls, value: Any) -> Any:
+    def normalize_blank(cls, value: object) -> object | None:
         return blank_to_none(value)
 
 
@@ -29,7 +29,7 @@ class OptionalFloatValueModel(BaseModel):
 
     @field_validator("value", mode="before")
     @classmethod
-    def normalize_blank(cls, value: Any) -> Any:
+    def normalize_blank(cls, value: object) -> object | None:
         return blank_to_none(value)
 
 
@@ -58,7 +58,7 @@ class RuleNameValueModel(BaseModel):
 
     @field_validator("value", mode="before")
     @classmethod
-    def normalize_blank(cls, value: Any) -> Any:
+    def normalize_blank(cls, value: object) -> object | None:
         return blank_to_none(value)
 
 
@@ -67,15 +67,21 @@ class IdCellTargetModel(BaseModel):
 
     id: StrictStr
 
+    def to_payload(self) -> CellTargetPayload:
+        return {"id": self.id}
+
 
 class IdCellUpdateModel(IdCellTargetModel):
     state: int
+
+    def to_payload(self) -> CellUpdatePayload:
+        return {"id": self.id, "state": self.state}
 
 
 class CellUpdatesPayloadModel(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    cells: list[dict[str, Any]] = Field(min_length=1)
+    cells: list[IdCellUpdateModel] = Field(min_length=1)
 
 
 class TopologySpecValueModel(BaseModel):
@@ -90,13 +96,23 @@ class TopologySpecValueModel(BaseModel):
 
     @field_validator("tiling_family", "adjacency_mode", "sizing_mode", mode="before")
     @classmethod
-    def normalize_optional_strings(cls, value: Any) -> Any:
+    def normalize_optional_strings(cls, value: object) -> object | None:
         return blank_to_none(value)
 
     @field_validator("width", "height", "patch_depth", mode="before")
     @classmethod
-    def normalize_optional_ints(cls, value: Any) -> Any:
+    def normalize_optional_ints(cls, value: object) -> object | None:
         return blank_to_none(value)
+
+    def to_payload(self) -> TopologySpecRequestPayload:
+        return {
+            "tiling_family": self.tiling_family or "",
+            "adjacency_mode": self.adjacency_mode or "",
+            "sizing_mode": self.sizing_mode or "",
+            "width": self.width,
+            "height": self.height,
+            "patch_depth": self.patch_depth,
+        }
 
 
 class ConfigUpdateRequestModel(BaseModel):
@@ -108,12 +124,12 @@ class ConfigUpdateRequestModel(BaseModel):
 
     @field_validator("rule", mode="before")
     @classmethod
-    def normalize_optional_strings(cls, value: Any) -> Any:
+    def normalize_optional_strings(cls, value: object) -> object | None:
         return blank_to_none(value)
 
     @field_validator("speed", mode="before")
     @classmethod
-    def normalize_optional_float(cls, value: Any) -> Any:
+    def normalize_optional_float(cls, value: object) -> object | None:
         return blank_to_none(value)
 
 class ResetRequestModel(ConfigUpdateRequestModel):

@@ -3,13 +3,19 @@ import unittest
 from pathlib import Path
 
 try:
+    from backend.payload_types import ServerMetaPayload
     from backend.dev_server import APP_NAME, ListeningProcess, prepare_dev_server
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from backend.payload_types import ServerMetaPayload
     from backend.dev_server import APP_NAME, ListeningProcess, prepare_dev_server
 
 
 class DevServerGuardTests(unittest.TestCase):
+    @staticmethod
+    def app_meta(*_: object) -> ServerMetaPayload:
+        return {"app_name": APP_NAME}
+
     def test_prepare_dev_server_returns_none_when_port_is_available(self) -> None:
         result = prepare_dev_server(
             host="127.0.0.1",
@@ -32,7 +38,7 @@ class DevServerGuardTests(unittest.TestCase):
                 replace_existing=False,
                 port_is_available_fn=lambda *_: False,
                 find_listening_process_fn=lambda _: listener,
-                fetch_server_meta_fn=lambda *_: {"app_name": APP_NAME},
+                fetch_server_meta_fn=self.app_meta,
             )
 
     def test_prepare_dev_server_replaces_recognized_listener_when_requested(self) -> None:
@@ -51,7 +57,7 @@ class DevServerGuardTests(unittest.TestCase):
             replace_existing=True,
             port_is_available_fn=lambda *_: False,
             find_listening_process_fn=lambda _: listener,
-            fetch_server_meta_fn=lambda *_: {"app_name": APP_NAME},
+            fetch_server_meta_fn=self.app_meta,
             terminate_process_fn=terminated.append,
             wait_for_port_fn=record_wait,
         )

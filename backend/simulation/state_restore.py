@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
-
+from backend.payload_types import PersistedSimulationSnapshotInput, SparseCellsByIdPayload
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.simulation.models import (
@@ -19,7 +18,7 @@ class SimulationStateRestorer:
 
     def restore(
         self,
-        payload: dict[str, Any],
+        payload: PersistedSimulationSnapshotInput,
         *,
         fallback_state: SimulationStateData,
     ) -> SimulationStateData:
@@ -52,7 +51,7 @@ class SimulationStateRestorer:
 
     def _normalize_board(
         self,
-        payload: dict[str, Any],
+        payload: PersistedSimulationSnapshotInput,
         *,
         geometry: str,
         width: int,
@@ -73,11 +72,11 @@ class SimulationStateRestorer:
 
     def _normalize_cells_by_id(
         self,
-        cells_by_id_payload: Any,
+        cells_by_id_payload: object,
         rule: AutomatonRule,
-    ) -> dict[str, int]:
+    ) -> SparseCellsByIdPayload:
         allowed_states = rule.state_values()
-        normalized: dict[str, int] = {}
+        normalized: SparseCellsByIdPayload = {}
         if not isinstance(cells_by_id_payload, dict):
             return normalized
         for cell_id, cell_state in cells_by_id_payload.items():

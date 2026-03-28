@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from typing import Any
-
-
-def rule_requires_square_dimensions(rule_or_name: Any) -> bool:
+def rule_requires_square_dimensions(rule_or_name: object) -> bool:
     _ = rule_or_name
     return False
 
 
 def normalize_rule_dimensions(
-    rule_or_name: Any,
+    rule_or_name: object,
     width: int | None,
     height: int | None,
 ) -> tuple[int | None, int | None]:

@@ -3,12 +3,13 @@ from __future__ import annotations
 import random
 import threading
 
+from backend.defaults import DEFAULT_GEOMETRY
+from backend.payload_types import TopologySpecInput, TopologySpecPatch
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.rules.constraints import normalize_rule_dimensions
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.models import (
-    DEFAULT_GEOMETRY,
     RuleSnapshot,
     SimulationConfig,
     SimulationSnapshot,
@@ -209,7 +210,7 @@ class SimulationService:
 
     def reset(
         self,
-        topology_spec: dict | None = None,
+        topology_spec: TopologySpecInput | None = None,
         rule_name: str | None = None,
         speed: float | None = None,
         randomize: bool = False,
@@ -254,7 +255,7 @@ class SimulationService:
 
     def update_config(
         self,
-        topology_spec: dict | None = None,
+        topology_spec: TopologySpecPatch | None = None,
         speed: float | None = None,
         rule_name: str | None = None,
     ) -> None:

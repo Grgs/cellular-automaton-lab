@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Mapping, cast
 
 from backend.defaults import (
     DEFAULT_HEIGHT,
@@ -17,6 +17,7 @@ from backend.defaults import (
     MIN_PATCH_DEPTH,
     MIN_SPEED,
 )
+from backend.payload_types import TopologySpecInput, TopologySpecPayload
 from backend.simulation.topology_catalog import (
     minimum_grid_dimension_for_geometry,
     EDGE_ADJACENCY,
@@ -43,8 +44,33 @@ def clamp_float(value: float, minimum: float, maximum: float) -> float:
     return max(minimum, min(float(value), maximum))
 
 
-def _coerce_optional_int(value: Any, fallback: int) -> int:
-    return fallback if value is None else int(value)
+def _coerce_optional_int(value: object, fallback: int) -> int:
+    if value is None:
+        return fallback
+    if isinstance(value, (str, bytes, bytearray, int, float)):
+        return int(value)
+    raise TypeError(f"Expected an int-compatible value, received {type(value).__name__}.")
+
+
+def _topology_spec_mapping(topology_spec: TopologySpecInput) -> Mapping[str, object]:
+    return cast(Mapping[str, object], topology_spec)
+
+
+def _topology_spec_string_value(
+    topology_spec: TopologySpecInput,
+    key: str,
+    fallback: str,
+) -> str:
+    value = _topology_spec_mapping(topology_spec).get(key)
+    return fallback if value is None else str(value)
+
+
+def _topology_spec_int_value(
+    topology_spec: TopologySpecInput,
+    key: str,
+    fallback: int,
+) -> int:
+    return _coerce_optional_int(_topology_spec_mapping(topology_spec).get(key), fallback)
 
 @dataclass(frozen=True)
 class TopologySpec:
@@ -129,7 +155,7 @@ class TopologySpec:
     def geometry_key(self) -> str:
         return resolve_geometry_key(self.tiling_family, self.adjacency_mode)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> TopologySpecPayload:
         return {
             "tiling_family": self.tiling_family,
             "adjacency_mode": self.adjacency_mode,
@@ -149,7 +175,7 @@ class SimulationConfig:
     def from_values(
         cls,
         *,
-        topology_spec: TopologySpec | dict[str, Any] | None = None,
+        topology_spec: TopologySpec | TopologySpecInput | None = None,
         tiling_family: str = DEFAULT_TILING_FAMILY,
         adjacency_mode: str | None = DEFAULT_ADJACENCY_MODE,
         width: int = DEFAULT_WIDTH,
@@ -166,13 +192,17 @@ class SimulationConfig:
                 height=topology_spec.height,
                 patch_depth=topology_spec.patch_depth,
             )
-        elif isinstance(topology_spec, dict):
+        elif topology_spec is not None:
             resolved_topology_spec = TopologySpec.from_values(
-                tiling_family=str(topology_spec.get("tiling_family") or tiling_family),
-                adjacency_mode=str(topology_spec.get("adjacency_mode") or adjacency_mode or EDGE_ADJACENCY),
-                width=_coerce_optional_int(topology_spec.get("width"), width),
-                height=_coerce_optional_int(topology_spec.get("height"), height),
-                patch_depth=_coerce_optional_int(topology_spec.get("patch_depth"), patch_depth),
+                tiling_family=_topology_spec_string_value(topology_spec, "tiling_family", tiling_family),
+                adjacency_mode=_topology_spec_string_value(
+                    topology_spec,
+                    "adjacency_mode",
+                    adjacency_mode or EDGE_ADJACENCY,
+                ),
+                width=_topology_spec_int_value(topology_spec, "width", width),
+                height=_topology_spec_int_value(topology_spec, "height", height),
+                patch_depth=_topology_spec_int_value(topology_spec, "patch_depth", patch_depth),
             )
         else:
             resolved_topology_spec = TopologySpec.from_values(
@@ -217,7 +247,7 @@ class SimulationConfig:
 
     def updated(
         self,
-        topology_spec: TopologySpec | dict[str, Any] | None = None,
+        topology_spec: TopologySpec | TopologySpecInput | None = None,
         tiling_family: str | None = None,
         adjacency_mode: str | None = None,
         width: int | None = None,
@@ -234,34 +264,35 @@ class SimulationConfig:
                     patch_depth=self.patch_depth if patch_depth is None else patch_depth,
                 ).topology_spec
             else:
-                next_width_value = topology_spec.get("width")
-                next_height_value = topology_spec.get("height")
-                next_patch_depth_value = topology_spec.get("patch_depth")
+                topology_spec_mapping = _topology_spec_mapping(topology_spec)
+                next_width_value = topology_spec_mapping.get("width")
+                next_height_value = topology_spec_mapping.get("height")
+                next_patch_depth_value = topology_spec_mapping.get("patch_depth")
                 base_topology_spec = self.topology_spec.updated(
                     tiling_family=(
                         self.tiling_family
-                        if topology_spec.get("tiling_family") is None
-                        else str(topology_spec.get("tiling_family"))
+                        if topology_spec_mapping.get("tiling_family") is None
+                        else str(topology_spec_mapping.get("tiling_family"))
                     ),
                     adjacency_mode=(
                         self.adjacency_mode
-                        if topology_spec.get("adjacency_mode") is None
-                        else str(topology_spec.get("adjacency_mode"))
+                        if topology_spec_mapping.get("adjacency_mode") is None
+                        else str(topology_spec_mapping.get("adjacency_mode"))
                     ),
                     width=(
                         self.width
                         if next_width_value is None
-                        else int(next_width_value)
+                        else _coerce_optional_int(next_width_value, self.width)
                     ),
                     height=(
                         self.height
                         if next_height_value is None
-                        else int(next_height_value)
+                        else _coerce_optional_int(next_height_value, self.height)
                     ),
                     patch_depth=(
                         self.patch_depth
                         if next_patch_depth_value is None
-                        else int(next_patch_depth_value)
+                        else _coerce_optional_int(next_patch_depth_value, self.patch_depth)
                     ),
                 )
         else:

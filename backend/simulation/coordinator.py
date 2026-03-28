@@ -2,6 +2,11 @@ from __future__ import annotations
 
 import logging
 
+from backend.payload_types import (
+    PersistedSimulationSnapshotV5,
+    TopologySpecInput,
+    TopologySpecPatch,
+)
 from backend.rules import RuleRegistry
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.persistence import SimulationStateStore
@@ -65,7 +70,7 @@ class SimulationCoordinator:
     def persist_state(self) -> None:
         self._save_state_to_store()
 
-    def _load_persisted_payload(self):
+    def _load_persisted_payload(self) -> PersistedSimulationSnapshotV5 | None:
         if self.state_store is None:
             return None
         try:
@@ -74,7 +79,7 @@ class SimulationCoordinator:
             self.logger.warning("Failed to restore persisted simulation state: %s", exc)
             return None
 
-    def _restore_payload(self, payload) -> None:
+    def _restore_payload(self, payload: PersistedSimulationSnapshotV5) -> None:
         restored_state = self.state_restorer.restore(
             payload,
             fallback_state=self.service.state,
@@ -118,7 +123,7 @@ class SimulationCoordinator:
 
     def reset(
         self,
-        topology_spec: dict | None = None,
+        topology_spec: TopologySpecInput | None = None,
         rule_name: str | None = None,
         speed: float | None = None,
         randomize: bool = False,
@@ -133,7 +138,7 @@ class SimulationCoordinator:
 
     def update_config(
         self,
-        topology_spec: dict | None = None,
+        topology_spec: TopologySpecPatch | None = None,
         speed: float | None = None,
         rule_name: str | None = None,
     ) -> None:

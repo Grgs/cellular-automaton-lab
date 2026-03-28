@@ -6,6 +6,7 @@ from flask import Flask
 from backend.defaults import APP_DEFAULTS
 from backend.dev_server import APP_NAME
 from backend.frontend_assets import FrontendAssetManifest
+from backend.payload_types import ServerMetaPayload
 from backend.simulation.periodic_face_tilings import describe_periodic_face_tilings
 from backend.simulation.bootstrap import register_simulation
 from backend.simulation.topology_catalog import describe_topologies
@@ -31,9 +32,10 @@ def create_app(*, instance_path: str | None = None) -> Flask:
     app.config["APP_DEFAULTS"] = APP_DEFAULTS
     app.config["TOPOLOGY_CATALOG"] = describe_topologies()
     app.config["PERIODIC_FACE_TILINGS"] = describe_periodic_face_tilings()
-    app.config["SERVER_META"] = {
+    server_meta: ServerMetaPayload = {
         "app_name": APP_NAME,
     }
+    app.config["SERVER_META"] = server_meta
     app.extensions["frontend_assets"] = FrontendAssetManifest.load(app.static_folder)
 
     register_simulation(app)

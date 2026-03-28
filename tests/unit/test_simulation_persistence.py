@@ -105,6 +105,37 @@ class SimulationPersistenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unsupported"):
             self.state_store.load()
 
+    def test_state_store_load_rejects_invalid_snapshot_fields(self) -> None:
+        self.state_path.write_text(json.dumps({
+            "version": SNAPSHOT_VERSION,
+            "topology_spec": "bad",
+            "speed": 5,
+            "running": False,
+            "generation": 0,
+            "rule": "conway",
+            "cells_by_id": {},
+        }), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "topology spec"):
+            self.state_store.load()
+
+        self.state_path.write_text(json.dumps({
+            "version": SNAPSHOT_VERSION,
+            "topology_spec": {
+                "tiling_family": "square",
+                "adjacency_mode": "edge",
+                "width": 10,
+                "height": 6,
+                "patch_depth": 4,
+            },
+            "speed": 5,
+            "running": False,
+            "generation": 0,
+            "rule": "conway",
+            "cells_by_id": {"c:1:1": "bad"},
+        }), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "cells_by_id"):
+            self.state_store.load()
+
     def test_serialize_snapshot_persists_topology_spec_and_sparse_cells_only(self) -> None:
         manager = self.create_manager()
         manager.toggle_cell_by_id("c:1:1")

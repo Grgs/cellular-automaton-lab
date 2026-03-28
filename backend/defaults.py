@@ -3,56 +3,113 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
 
+from backend.payload_types import JsonObject, TopologySpecPayload
 from backend.simulation.topology_catalog import resolve_geometry_key
 
 DEFAULTS_PATH = Path(__file__).resolve().parents[1] / "config" / "defaults.json"
 
 
-def _require(mapping: dict[str, Any], key: str) -> Any:
+class SimulationDefaultsPayload(TypedDict):
+    topology_spec: TopologySpecPayload
+    speed: float
+    rule: str
+    min_grid_size: int
+    max_grid_size: int
+    min_patch_depth: int
+    max_patch_depth: int
+    min_speed: float
+    max_speed: float
+
+
+class UiDefaultsPayload(TypedDict):
+    cell_size: int
+    min_cell_size: int
+    max_cell_size: int
+    storage_key: str
+
+
+class ThemeDefaultsPayload(TypedDict):
+    default: str
+    storage_key: str
+
+
+class AppDefaultsPayload(TypedDict):
+    simulation: SimulationDefaultsPayload
+    ui: UiDefaultsPayload
+    theme: ThemeDefaultsPayload
+
+
+def _require(mapping: JsonObject, key: str) -> object:
     if key not in mapping:
         raise KeyError(f"Missing required defaults key: {key}")
     return mapping[key]
 
 
+def _require_str(mapping: JsonObject, key: str) -> str:
+    return str(_require(mapping, key))
+
+
+def _require_int(mapping: JsonObject, key: str) -> int:
+    value = _require(mapping, key)
+    if isinstance(value, (str, bytes, bytearray, int, float)):
+        return int(value)
+    raise ValueError(f"Defaults key '{key}' must be numeric.")
+
+
+def _require_float(mapping: JsonObject, key: str) -> float:
+    value = _require(mapping, key)
+    if isinstance(value, (str, bytes, bytearray, int, float)):
+        return float(value)
+    raise ValueError(f"Defaults key '{key}' must be numeric.")
+
+
 @lru_cache(maxsize=1)
-def load_defaults() -> dict[str, Any]:
+def load_defaults() -> AppDefaultsPayload:
     with DEFAULTS_PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Defaults payload at {DEFAULTS_PATH} must be a JSON object.")
 
     simulation = _require(payload, "simulation")
     ui = _require(payload, "ui")
     theme = _require(payload, "theme")
+    if not isinstance(simulation, dict) or not isinstance(ui, dict) or not isinstance(theme, dict):
+        raise ValueError(f"Defaults payload at {DEFAULTS_PATH} is invalid.")
 
-    defaults: dict[str, Any] = {
+    topology_spec = _require(simulation, "topology_spec")
+    if not isinstance(topology_spec, dict):
+        raise ValueError(f"Defaults payload at {DEFAULTS_PATH} is invalid.")
+
+    defaults: AppDefaultsPayload = {
         "simulation": {
             "topology_spec": {
-                "tiling_family": str(_require(_require(simulation, "topology_spec"), "tiling_family")),
-                "adjacency_mode": str(_require(_require(simulation, "topology_spec"), "adjacency_mode")),
-                "sizing_mode": str(_require(_require(simulation, "topology_spec"), "sizing_mode")),
-                "width": int(_require(_require(simulation, "topology_spec"), "width")),
-                "height": int(_require(_require(simulation, "topology_spec"), "height")),
-                "patch_depth": int(_require(_require(simulation, "topology_spec"), "patch_depth")),
+                "tiling_family": _require_str(topology_spec, "tiling_family"),
+                "adjacency_mode": _require_str(topology_spec, "adjacency_mode"),
+                "sizing_mode": _require_str(topology_spec, "sizing_mode"),
+                "width": _require_int(topology_spec, "width"),
+                "height": _require_int(topology_spec, "height"),
+                "patch_depth": _require_int(topology_spec, "patch_depth"),
             },
-            "speed": float(_require(simulation, "speed")),
-            "rule": str(_require(simulation, "rule")),
-            "min_grid_size": int(_require(simulation, "min_grid_size")),
-            "max_grid_size": int(_require(simulation, "max_grid_size")),
-            "min_patch_depth": int(_require(simulation, "min_patch_depth")),
-            "max_patch_depth": int(_require(simulation, "max_patch_depth")),
-            "min_speed": float(_require(simulation, "min_speed")),
-            "max_speed": float(_require(simulation, "max_speed")),
+            "speed": _require_float(simulation, "speed"),
+            "rule": _require_str(simulation, "rule"),
+            "min_grid_size": _require_int(simulation, "min_grid_size"),
+            "max_grid_size": _require_int(simulation, "max_grid_size"),
+            "min_patch_depth": _require_int(simulation, "min_patch_depth"),
+            "max_patch_depth": _require_int(simulation, "max_patch_depth"),
+            "min_speed": _require_float(simulation, "min_speed"),
+            "max_speed": _require_float(simulation, "max_speed"),
         },
         "ui": {
-            "cell_size": int(_require(ui, "cell_size")),
-            "min_cell_size": int(_require(ui, "min_cell_size")),
-            "max_cell_size": int(_require(ui, "max_cell_size")),
-            "storage_key": str(_require(ui, "storage_key")),
+            "cell_size": _require_int(ui, "cell_size"),
+            "min_cell_size": _require_int(ui, "min_cell_size"),
+            "max_cell_size": _require_int(ui, "max_cell_size"),
+            "storage_key": _require_str(ui, "storage_key"),
         },
         "theme": {
-            "default": str(_require(theme, "default")),
-            "storage_key": str(_require(theme, "storage_key")),
+            "default": _require_str(theme, "default"),
+            "storage_key": _require_str(theme, "storage_key"),
         },
     }
     return defaults

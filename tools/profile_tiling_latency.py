@@ -6,20 +6,32 @@ import sys
 import time
 import urllib.request
 from pathlib import Path
-from typing import Any, cast
+from typing import Mapping, TypedDict
 
 from playwright.sync_api import sync_playwright
-
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from backend.payload_types import JsonObject, TopologySpecPayload
 from backend.simulation.topology import _build_topology_cached, _build_topology_uncached, empty_board
 from tests.e2e.support_server import AppServer
 
 
-VIEWPORT = {"width": 1440, "height": 900}
+class ViewportPayload(TypedDict):
+    width: int
+    height: int
+
+
+class ResetRequestPayload(TypedDict):
+    topology_spec: TopologySpecPayload
+    speed: int
+    rule: str
+    randomize: bool
+
+
+VIEWPORT: ViewportPayload = {"width": 1440, "height": 900}
 CASES = (
     ("square", "conway", {"width": 90, "height": 60}),
     ("archimedean-3-3-3-3-6", "archlife-3-3-3-3-6", {"width": 36, "height": 24}),
@@ -61,8 +73,8 @@ def request_json(
     path: str,
     *,
     method: str = "GET",
-    payload: dict[str, Any] | None = None,
-) -> tuple[Any, int, float]:
+    payload: Mapping[str, object] | None = None,
+) -> tuple[object | None, int, float]:
     body = None if payload is None else json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
         f"{base_url}{path}",
@@ -99,11 +111,12 @@ def benchmark_topology_build_ms(
     return statistics.median(times)
 
 
-def default_reset_payload(geometry: str, rule: str, dimensions: dict[str, int]) -> dict[str, Any]:
+def default_reset_payload(geometry: str, rule: str, dimensions: dict[str, int]) -> ResetRequestPayload:
     return {
         "topology_spec": {
             "tiling_family": geometry,
             "adjacency_mode": "edge",
+            "sizing_mode": "grid",
             "width": int(dimensions["width"]),
             "height": int(dimensions["height"]),
             "patch_depth": 0,
@@ -120,7 +133,7 @@ def main() -> None:
     try:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
-            page = browser.new_page(viewport=cast(Any, VIEWPORT))
+            page = browser.new_page(viewport=VIEWPORT)
             page.goto(f"{server.base_url}/", wait_until="load")
 
             print("Mixed-tiling latency profile")
@@ -153,7 +166,20 @@ def main() -> None:
                     method="POST",
                     payload=reset_payload,
                 )
-                toggle_id = reset_payload_response["topology"]["cells"][0]["id"]
+                if not isinstance(reset_payload_response, dict):
+                    raise RuntimeError("Reset response must be a JSON object.")
+                topology_payload = reset_payload_response.get("topology")
+                if not isinstance(topology_payload, dict):
+                    raise RuntimeError("Reset response did not include topology payload.")
+                cells_payload = topology_payload.get("cells")
+                if not isinstance(cells_payload, list) or not cells_payload:
+                    raise RuntimeError("Reset response did not include topology cells.")
+                first_cell = cells_payload[0]
+                if not isinstance(first_cell, dict):
+                    raise RuntimeError("Topology cell payload is invalid.")
+                toggle_id = first_cell.get("id")
+                if not isinstance(toggle_id, str) or not toggle_id:
+                    raise RuntimeError("Topology cell payload did not include an id.")
                 _, toggle_bytes, toggle_ms = request_json(
                     server.base_url,
                     "/api/cells/toggle",

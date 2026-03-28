@@ -5,6 +5,7 @@ from typing import cast
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
+from backend.payload_types import CellTargetPayload, CellUpdatePayload, JsonObject, TopologySpecPatch
 from backend.rules import RuleRegistry
 from backend.frontend_assets import FrontendAssetManifest
 from backend.simulation.coordinator import SimulationCoordinator
@@ -74,7 +75,7 @@ def control_state_action(action):
     return conditional_state_response(previous_topology_revision)
 
 
-def apply_reset_payload(payload: dict) -> None:
+def apply_reset_payload(payload: JsonObject) -> None:
     if payload.get("geometry") not in (None, ""):
         raise RequestValidationError("'geometry' must be provided through 'topology_spec'.")
     if payload.get("width") not in (None, "") or payload.get("height") not in (None, ""):
@@ -90,7 +91,7 @@ def apply_reset_payload(payload: dict) -> None:
     )
 
 
-def apply_config_payload(payload: dict) -> None:
+def apply_config_payload(payload: JsonObject) -> None:
     if payload.get("geometry") not in (None, ""):
         raise RequestValidationError("'geometry' can only be changed through reset.")
     if payload.get("width") not in (None, "") or payload.get("height") not in (None, ""):
@@ -105,40 +106,47 @@ def apply_config_payload(payload: dict) -> None:
         disallowed = ", ".join(sorted(disallowed_keys))
         raise RequestValidationError(f"'{disallowed}' can only be changed through reset.")
     simulation_coordinator().update_config(
-        topology_spec={
-            "width": None if topology_spec is None else topology_spec.get("width"),
-            "height": None if topology_spec is None else topology_spec.get("height"),
-        },
+        topology_spec=cast(
+            TopologySpecPatch,
+            {} if topology_spec is None else {
+                key: value
+                for key, value in {
+                    "width": topology_spec.get("width"),
+                    "height": topology_spec.get("height"),
+                }.items()
+                if value is not None
+            },
+        ),
         speed=parse_optional_float(payload, "speed"),
         rule_name=parse_rule_name(payload, rule_registry()),
     )
 
 
 def dispatch_single_cell_target(
-    target: Mapping[str, str],
+    target: CellTargetPayload,
     *,
     by_id,
 ) -> None:
     by_id(str(target["id"]))
 
 
-def dispatch_cell_updates(parsed_cells: list[dict[str, int | str]]) -> None:
+def dispatch_cell_updates(parsed_cells: list[CellUpdatePayload]) -> None:
     id_cells = [
-        (str(cell["id"]), int(cell["state"]))
+        (cell["id"], cell["state"])
         for cell in parsed_cells
     ]
     if id_cells:
         simulation_coordinator().set_cells_by_id(id_cells)
 
 
-def apply_toggle_cell_payload(payload: dict) -> None:
+def apply_toggle_cell_payload(payload: JsonObject) -> None:
     dispatch_single_cell_target(
         parse_cell_target(payload),
         by_id=simulation_coordinator().toggle_cell_by_id,
     )
 
 
-def apply_set_cell_payload(payload: dict) -> None:
+def apply_set_cell_payload(payload: JsonObject) -> None:
     state = parse_state_value(payload, simulation_coordinator().get_rule())
     dispatch_single_cell_target(
         parse_cell_target(payload),
@@ -149,7 +157,7 @@ def apply_set_cell_payload(payload: dict) -> None:
     )
 
 
-def apply_set_cells_payload(payload: dict) -> None:
+def apply_set_cells_payload(payload: JsonObject) -> None:
     dispatch_cell_updates(parse_cell_updates(payload, simulation_coordinator().get_rule()))
 
 

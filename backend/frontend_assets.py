@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+
+from backend.payload_types import FrontendManifestPayload, FrontendManifestRecord, JsonObject
 
 
 @dataclass(frozen=True)
@@ -13,7 +14,7 @@ class FrontendEntryAssets:
 
 
 class FrontendAssetManifest:
-    def __init__(self, manifest_path: Path, manifest: dict[str, dict[str, Any]]) -> None:
+    def __init__(self, manifest_path: Path, manifest: FrontendManifestPayload) -> None:
         self._manifest_path = manifest_path
         self._manifest = manifest
 
@@ -33,7 +34,13 @@ class FrontendAssetManifest:
         if not isinstance(manifest, dict):
             raise RuntimeError(f"Frontend build manifest at {manifest_path} is invalid.")
 
-        return cls(manifest_path=manifest_path, manifest=manifest)
+        normalized_manifest: FrontendManifestPayload = {}
+        for entry_name, record in manifest.items():
+            if not isinstance(entry_name, str) or not isinstance(record, dict):
+                raise RuntimeError(f"Frontend build manifest at {manifest_path} is invalid.")
+            normalized_manifest[entry_name] = cls._normalize_record(record)
+
+        return cls(manifest_path=manifest_path, manifest=normalized_manifest)
 
     def entry_assets(self, entry_name: str) -> FrontendEntryAssets:
         record = self._resolve_record(entry_name)
@@ -53,13 +60,37 @@ class FrontendAssetManifest:
             stylesheet_filenames=stylesheet_filenames,
         )
 
-    def _resolve_record(self, entry_name: str) -> dict[str, Any]:
+    @staticmethod
+    def _normalize_record(record: JsonObject) -> FrontendManifestRecord:
+        normalized_record: FrontendManifestRecord = {}
+
+        file_value = record.get("file")
+        if isinstance(file_value, str):
+            normalized_record["file"] = file_value
+
+        src_value = record.get("src")
+        if isinstance(src_value, str):
+            normalized_record["src"] = src_value
+
+        is_entry_value = record.get("isEntry")
+        if isinstance(is_entry_value, bool):
+            normalized_record["isEntry"] = is_entry_value
+
+        css_value = record.get("css")
+        if isinstance(css_value, list):
+            normalized_record["css"] = [
+                stylesheet
+                for stylesheet in css_value
+                if isinstance(stylesheet, str) and stylesheet
+            ]
+
+        return normalized_record
+
+    def _resolve_record(self, entry_name: str) -> FrontendManifestRecord:
         if entry_name in self._manifest:
             return self._manifest[entry_name]
 
         for manifest_key, manifest_value in self._manifest.items():
-            if not isinstance(manifest_value, dict):
-                continue
             if manifest_value.get("src") == entry_name:
                 return manifest_value
             if manifest_key.endswith(entry_name):

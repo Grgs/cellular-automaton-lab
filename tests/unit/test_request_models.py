@@ -91,7 +91,10 @@ class RequestModelTests(unittest.TestCase):
         payload = CellUpdatesPayloadModel.model_validate({
             "cells": [{"id": "c:1:1", "state": 1}],
         })
-        self.assertEqual(payload.cells, [{"id": "c:1:1", "state": 1}])
+        self.assertEqual(
+            [cell.to_payload() for cell in payload.cells],
+            [{"id": "c:1:1", "state": 1}],
+        )
 
         with self.assertRaises(ValidationError):
             CellUpdatesPayloadModel.model_validate({"cells": []})

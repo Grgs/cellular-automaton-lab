@@ -1,6 +1,7 @@
 import unittest
 from typing import ClassVar
 
+from backend.payload_types import TopologySpecPatch, TopologySpecPayload
 from backend.rules import RuleRegistry
 from backend.simulation.models import SimulationConfig, SimulationStateData
 from backend.simulation.topology import empty_board
@@ -20,8 +21,16 @@ class TransitionPlannerTests(unittest.TestCase):
         cls.rule_registry = RuleRegistry()
 
     def create_regular_state(self) -> SimulationStateData:
+        topology_spec: TopologySpecPayload = {
+            "tiling_family": "square",
+            "adjacency_mode": "edge",
+            "sizing_mode": "grid",
+            "width": 10,
+            "height": 6,
+            "patch_depth": 0,
+        }
         config = SimulationConfig.from_values(
-            topology_spec={"tiling_family": "square", "adjacency_mode": "edge", "width": 10, "height": 6},
+            topology_spec=topology_spec,
             speed=5,
         )
         return SimulationStateData(
@@ -34,9 +43,10 @@ class TransitionPlannerTests(unittest.TestCase):
 
     def create_penrose_state(self, geometry: str = "penrose-p3-rhombs") -> SimulationStateData:
         board = empty_board(geometry, 10, 6, patch_depth=4)
-        topology_spec = {
+        topology_spec: TopologySpecPayload = {
             "tiling_family": "penrose-p3-rhombs" if geometry == "penrose-p3-rhombs-vertex" else geometry,
             "adjacency_mode": "vertex" if geometry == "penrose-p3-rhombs-vertex" else "edge",
+            "sizing_mode": "patch_depth",
             "patch_depth": 4,
             "width": board.topology.width,
             "height": board.topology.height,
@@ -79,10 +89,11 @@ class TransitionPlannerTests(unittest.TestCase):
 
     def test_config_plan_ignores_resize_for_patch_depth_geometries(self) -> None:
         state = self.create_penrose_state()
+        resize_patch: TopologySpecPatch = {"width": 999, "height": 888}
         plan = plan_config_transition(
             state,
             self.rule_registry,
-            topology_spec={"width": 999, "height": 888},
+            topology_spec=resize_patch,
             speed=7,
             rule_name="penrose-greenberg-hastings",
         )
@@ -97,10 +108,11 @@ class TransitionPlannerTests(unittest.TestCase):
         self.assertTrue(plan.coerce_rule_states)
 
     def test_config_plan_preserves_rectangular_whirlpool_dimensions(self) -> None:
+        resize_patch: TopologySpecPatch = {"width": 12, "height": 8}
         plan = plan_config_transition(
             self.create_regular_state(),
             self.rule_registry,
-            topology_spec={"width": 12, "height": 8},
+            topology_spec=resize_patch,
             rule_name="whirlpool",
         )
 

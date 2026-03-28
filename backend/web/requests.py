@@ -1,10 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, NoReturn
+from typing import Mapping, NoReturn
 
 from flask import Request
 from pydantic import ValidationError
 
+from backend.payload_types import (
+    CellTargetPayload,
+    CellUpdatePayload,
+    JsonObject,
+    TopologySpecRequestPayload,
+)
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.simulation.topology_catalog import (
@@ -16,7 +22,6 @@ from backend.web.request_models import (
     CellIdValueModel,
     CellUpdatesPayloadModel,
     IdCellTargetModel,
-    IdCellUpdateModel,
     OptionalFloatValueModel,
     OptionalIntValueModel,
     RequiredIntValueModel,
@@ -30,7 +35,7 @@ class RequestValidationError(ValueError):
     """Raised when an API request payload is malformed."""
 
 
-def get_payload(request: Request) -> dict[str, Any]:
+def get_payload(request: Request) -> JsonObject:
     payload = request.get_json(silent=True)
     return payload if isinstance(payload, dict) else {}
 
@@ -41,21 +46,21 @@ def _raise_validation(message: str, exc: Exception | None = None) -> NoReturn:
     raise RequestValidationError(message) from exc
 
 
-def parse_optional_int(payload: dict[str, Any], key: str) -> int | None:
+def parse_optional_int(payload: Mapping[str, object], key: str) -> int | None:
     try:
         return OptionalIntValueModel.model_validate({"value": payload.get(key)}).value
     except ValidationError as exc:
         _raise_validation(f"'{key}' must be an integer.", exc)
 
 
-def parse_optional_float(payload: dict[str, Any], key: str) -> float | None:
+def parse_optional_float(payload: Mapping[str, object], key: str) -> float | None:
     try:
         return OptionalFloatValueModel.model_validate({"value": payload.get(key)}).value
     except ValidationError as exc:
         _raise_validation(f"'{key}' must be a number.", exc)
 
 
-def parse_required_int(payload: dict[str, Any], key: str) -> int:
+def parse_required_int(payload: Mapping[str, object], key: str) -> int:
     if key not in payload:
         _raise_validation(f"Missing required field '{key}'.")
     try:
@@ -64,7 +69,7 @@ def parse_required_int(payload: dict[str, Any], key: str) -> int:
         _raise_validation(f"'{key}' must be an integer.", exc)
 
 
-def parse_state_value(payload: dict[str, Any], rule: AutomatonRule, key: str = "state") -> int:
+def parse_state_value(payload: Mapping[str, object], rule: AutomatonRule, key: str = "state") -> int:
     if key not in payload:
         _raise_validation(f"Missing required field '{key}'.")
     try:
@@ -77,7 +82,7 @@ def parse_state_value(payload: dict[str, Any], rule: AutomatonRule, key: str = "
     return parsed
 
 
-def parse_cell_id(payload: dict[str, Any], key: str = "id") -> str:
+def parse_cell_id(payload: Mapping[str, object], key: str = "id") -> str:
     value = payload.get(key)
     if value in (None, ""):
         _raise_validation(f"Missing required field '{key}'.")
@@ -88,52 +93,40 @@ def parse_cell_id(payload: dict[str, Any], key: str = "id") -> str:
 
 
 def parse_cell_target(
-    payload: dict[str, Any],
+    payload: Mapping[str, object],
     *,
     id_key: str = "id",
-) -> dict[str, str]:
+) -> CellTargetPayload:
     if payload.get(id_key) in (None, ""):
         _raise_validation(f"Missing required field '{id_key}'.")
     try:
         id_target = IdCellTargetModel.model_validate({id_key: payload.get(id_key)})
     except ValidationError as exc:
         _raise_validation(f"'{id_key}' must be a string.", exc)
-    return {"id": id_target.id}
+    return id_target.to_payload()
 
 
 def parse_cell_updates(
-    payload: dict[str, Any],
+    payload: Mapping[str, object],
     rule: AutomatonRule,
     key: str = "cells",
-) -> list[dict[str, int | str]]:
+) -> list[CellUpdatePayload]:
     try:
         raw_cells = CellUpdatesPayloadModel.model_validate(payload).cells
     except ValidationError as exc:
         _raise_validation(f"'{key}' must be a non-empty list.", exc)
 
-    parsed_cells: list[dict[str, int | str]] = []
+    parsed_cells: list[CellUpdatePayload] = []
     for index, cell in enumerate(raw_cells):
-        if not isinstance(cell, dict):
-            _raise_validation(f"'{key}[{index}]' must be an object.")
-        parsed_state = parse_state_value(cell, rule, "state")
-        try:
-            parsed_id_cell = IdCellUpdateModel.model_validate({
-                "id": cell.get("id"),
-                "state": cell.get("state"),
-            })
-            parsed_cells.append({"id": parsed_id_cell.id, "state": parsed_state})
-        except ValidationError:
-            parsed_cells.append(
-                {
-                    **parse_cell_target(cell),
-                    "state": parsed_state,
-                }
-            )
+        parsed_state = parse_state_value({"state": cell.state}, rule, "state")
+        if not isinstance(cell.id, str) or cell.id == "":
+            _raise_validation(f"'{key}[{index}].id' must be a string.")
+        parsed_cells.append({"id": cell.id, "state": parsed_state})
 
     return parsed_cells
 
 
-def parse_rule_name(payload: dict[str, Any], rule_registry: RuleRegistry) -> str | None:
+def parse_rule_name(payload: Mapping[str, object], rule_registry: RuleRegistry) -> str | None:
     try:
         rule_name = RuleNameValueModel.model_validate({"value": payload.get("rule")}).value
     except ValidationError as exc:
@@ -145,7 +138,10 @@ def parse_rule_name(payload: dict[str, Any], rule_registry: RuleRegistry) -> str
     return rule_name
 
 
-def parse_topology_spec(payload: dict[str, Any], key: str = "topology_spec") -> dict[str, Any] | None:
+def parse_topology_spec(
+    payload: Mapping[str, object],
+    key: str = "topology_spec",
+) -> TopologySpecRequestPayload | None:
     try:
         topology_spec = TopologySpecValueModel.model_validate(payload.get(key) or {})
     except ValidationError as exc:
@@ -159,11 +155,8 @@ def parse_topology_spec(payload: dict[str, Any], key: str = "topology_spec") -> 
         _raise_validation(f"'{key}.tiling_family' must be one of: {supported}.")
     definition = get_topology_definition(tiling_family)
     adjacency_mode = normalize_adjacency_mode(tiling_family, topology_spec.adjacency_mode)
-    return {
-        "tiling_family": tiling_family,
-        "adjacency_mode": adjacency_mode,
-        "sizing_mode": definition.sizing_mode,
-        "width": topology_spec.width,
-        "height": topology_spec.height,
-        "patch_depth": topology_spec.patch_depth,
-    }
+    topology_spec_payload = topology_spec.to_payload()
+    topology_spec_payload["tiling_family"] = tiling_family
+    topology_spec_payload["adjacency_mode"] = adjacency_mode
+    topology_spec_payload["sizing_mode"] = definition.sizing_mode
+    return topology_spec_payload

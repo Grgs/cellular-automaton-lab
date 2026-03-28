@@ -21,6 +21,18 @@ class FrontendAssetManifestTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, r"is invalid"):
                 FrontendAssetManifest.load(tempdir)
 
+    def test_load_rejects_manifest_entries_that_are_not_objects(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="cellular-automaton-static-") as tempdir:
+            dist_dir = Path(tempdir) / "dist"
+            dist_dir.mkdir(parents=True, exist_ok=True)
+            (dist_dir / "manifest.json").write_text(
+                json.dumps({"frontend/app.ts": "not-an-object"}),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(RuntimeError, r"is invalid"):
+                FrontendAssetManifest.load(tempdir)
+
     def test_entry_assets_resolve_script_and_stylesheets(self) -> None:
         with tempfile.TemporaryDirectory(prefix="cellular-automaton-static-") as tempdir:
             dist_dir = Path(tempdir) / "dist"

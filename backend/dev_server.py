@@ -9,12 +9,20 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, TypedDict, cast
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
+from backend.payload_types import ServerMetaPayload
+
 
 APP_NAME = "cellular-automaton-lab"
+
+
+class _WindowsProcessPayload(TypedDict, total=False):
+    pid: int
+    command_line: str
+    executable_path: str
 
 
 @dataclass(frozen=True)
@@ -102,10 +110,13 @@ def _windows_process_details(pid: int) -> ListeningProcess:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
         return ListeningProcess(pid=pid)
+    if not isinstance(payload, dict):
+        return ListeningProcess(pid=pid)
+    process_payload = cast(_WindowsProcessPayload, payload)
     return ListeningProcess(
         pid=pid,
-        command_line=str(payload.get("command_line") or ""),
-        executable_path=payload.get("executable_path"),
+        command_line=str(process_payload.get("command_line") or ""),
+        executable_path=process_payload.get("executable_path"),
     )
 
 
@@ -168,7 +179,7 @@ def find_listening_process(port: int) -> ListeningProcess:
     return _posix_process_details(pid) if pid is not None else ListeningProcess(pid=None)
 
 
-def fetch_server_meta(host: str, port: int, *, timeout_seconds: float = 1.0) -> dict[str, Any] | None:
+def fetch_server_meta(host: str, port: int, *, timeout_seconds: float = 1.0) -> ServerMetaPayload | None:
     query_host = resolve_query_host(host)
     url = f"http://{query_host}:{port}/api/meta"
     try:
@@ -178,12 +189,17 @@ def fetch_server_meta(host: str, port: int, *, timeout_seconds: float = 1.0) -> 
             payload = json.loads(response.read().decode("utf-8"))
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, OSError):
         return None
-    return payload if isinstance(payload, dict) else None
+    if not isinstance(payload, dict):
+        return None
+    app_name = payload.get("app_name")
+    if not isinstance(app_name, str) or not app_name:
+        return None
+    return {"app_name": app_name}
 
 
 def looks_like_this_app(
     listener: ListeningProcess,
-    meta: dict[str, Any] | None,
+    meta: ServerMetaPayload | None,
     *,
     app_entrypoint: Path,
 ) -> bool:
@@ -200,7 +216,8 @@ def terminate_process(pid: int) -> None:
     os.kill(pid, signal.SIGTERM)
 
 
-def format_listener(listener: ListeningProcess, meta: dict[str, Any] | None) -> str:
+def format_listener(listener: ListeningProcess, meta: ServerMetaPayload | None) -> str:
+    _ = meta
     pieces = []
     if listener.pid is not None:
         pieces.append(f"pid {listener.pid}")
@@ -217,7 +234,7 @@ def prepare_dev_server(
     replace_existing: bool,
     port_is_available_fn: Callable[[str, int], bool] = port_is_available,
     find_listening_process_fn: Callable[[int], ListeningProcess] = find_listening_process,
-    fetch_server_meta_fn: Callable[[str, int], dict[str, Any] | None] = fetch_server_meta,
+    fetch_server_meta_fn: Callable[[str, int], ServerMetaPayload | None] = fetch_server_meta,
     terminate_process_fn: Callable[[int], None] = terminate_process,
     wait_for_port_fn: Callable[[str, int], bool] | None = None,
 ) -> ListeningProcess | None:
