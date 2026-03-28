@@ -29,24 +29,17 @@ import type { UiDisclosureId, UiSessionStorage } from "./types/session.js";
 import type { EditorTool } from "./editor-tools.js";
 
 function readStoredCellSizes(storage: UiSessionStorage, activeTilingFamily: string): Record<string, number> {
-    if (typeof storage.getCellSizes === "function") {
-        return storage.getCellSizes();
+    const rememberedCellSizes = storage.getCellSizes();
+    if (Object.keys(rememberedCellSizes).length > 0) {
+        return rememberedCellSizes;
     }
-
-    if (typeof storage.getCellSize !== "function") {
-        return {};
-    }
-
     return {
         [activeTilingFamily]: storage.getCellSize(activeTilingFamily),
     };
 }
 
 function readStoredPatchDepths(storage: UiSessionStorage): Record<string, number> {
-    if (typeof storage.getPatchDepths === "function") {
-        return storage.getPatchDepths();
-    }
-    return {};
+    return storage.getPatchDepths();
 }
 
 export function createUiSessionController({
@@ -146,18 +139,13 @@ export function createUiSessionController({
 
     function persistCellSize(tilingFamilyOrCellSize: string | number, cellSize: number | undefined = undefined): void {
         if (cellSize === undefined) {
-            if (storage.setCellSize.length < 2) {
-                storage.setCellSize(tilingFamilyOrCellSize);
-                return;
-            }
-            storage.setCellSize(state.topologySpec.tiling_family, Number(tilingFamilyOrCellSize));
+            storage.setCellSizeForTilingFamily(
+                state.topologySpec.tiling_family,
+                Number(tilingFamilyOrCellSize),
+            );
             return;
         }
-        if (storage.setCellSize.length < 2) {
-            storage.setCellSize(cellSize);
-            return;
-        }
-        storage.setCellSize(String(tilingFamilyOrCellSize), cellSize);
+        storage.setCellSizeForTilingFamily(String(tilingFamilyOrCellSize), cellSize);
     }
 
     function persistEditorTool(editorTool: EditorTool): void {
@@ -173,11 +161,14 @@ export function createUiSessionController({
         if (!rule || state.selectedPaintState === null) {
             return;
         }
-        storage.setPaintState(rule.name, state.selectedPaintState);
+        storage.setPaintStateForRule(rule.name, state.selectedPaintState);
     }
 
     function persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: number): void {
-        storage.setPatchDepth(tilingFamily, patchDepth);
+        if (!tilingFamily) {
+            return;
+        }
+        storage.setPatchDepthForTilingFamily(tilingFamily, patchDepth);
     }
 
     function persistDisclosureState(id: UiDisclosureId, open: boolean): void {

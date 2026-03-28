@@ -5,13 +5,13 @@ import {
     topologyCellCenter as resolveTopologyCellCenter,
 } from "./geometry-adapters.js";
 import { getGeometryAdapter } from "./geometry/registry.js";
-import { asPolygonGeometryCache } from "./geometry/cache-guards.js";
 import {
     topologyCellStatesById,
     topologyHeight,
     topologyWidth,
 } from "./topology.js";
 import { resolveGeometryCache } from "./canvas/cache.js";
+import { drawCommittedLayer, drawPreviewLayer } from "./canvas/render-layers.js";
 import {
     buildStateColorLookup,
     DEFAULT_COLORS,
@@ -23,26 +23,16 @@ import {
     resolveRenderStyle,
     resolveStateColor,
 } from "./canvas/render-style.js";
+import { createCanvasSurface, type CanvasSurfaceMetrics } from "./canvas/surface.js";
 import type { CellStateDefinition, TopologyPayload } from "./types/domain.js";
 import type { PaintableCell, PreviewPaintCell } from "./types/editor.js";
 import type {
     CanvasColors,
     CanvasGridView,
     CanvasRenderPayload,
-    CanvasRenderStyle,
-    GeometryAdapter,
     GeometryCache,
     GridMetrics,
-    PolygonGeometryCell,
-    PolygonGeometryCache,
-    RenderableTopologyCell,
 } from "./types/rendering.js";
-
-interface CanvasMetrics extends GridMetrics {
-    pixelWidth: number;
-    pixelHeight: number;
-    dpr: number;
-}
 
 interface CreateCanvasGridViewOptions {
     canvas: HTMLCanvasElement;
@@ -52,7 +42,7 @@ interface CreateCanvasGridViewOptions {
 
 type RuntimeCanvasGridView = CanvasGridView & {
     supportsTopology: true;
-    getMetrics(): CanvasMetrics;
+    getMetrics(): CanvasSurfaceMetrics;
 };
 
 function previewKey(cell: PreviewPaintCell | null | undefined): string | null {
@@ -125,14 +115,7 @@ export function createCanvasGridView({
     getDevicePixelRatio = () => window.devicePixelRatio || 1,
     getComputedStyleFn = (node) => window.getComputedStyle(node),
 }: CreateCanvasGridViewOptions): RuntimeCanvasGridView {
-    const contextCandidate = canvas.getContext("2d");
-    const committedCanvas = document.createElement("canvas");
-    const committedContextCandidate = committedCanvas.getContext("2d");
-    if (!contextCandidate || !committedContextCandidate) {
-        throw new Error("Canvas 2D rendering context is unavailable.");
-    }
-    const context = contextCandidate;
-    const committedContext = committedContextCandidate;
+    const surface = createCanvasSurface(canvas);
     let topology: TopologyPayload | null = null;
     let cellStates: number[] = [];
     let previewCellStatesById: Record<string, number> | null = null;
@@ -145,114 +128,44 @@ export function createCanvasGridView({
     let canvasColors: CanvasColors = { ...DEFAULT_COLORS };
     let colorLookup = buildStateColorLookup([], canvasColors);
     let currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
-    let metrics: CanvasMetrics = {
+    let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
         pixelWidth: canvas.width,
         pixelHeight: canvas.height,
         dpr: 1,
     };
 
-    function restoreCommittedSurface(): void {
-        context.setTransform(1, 0, 0, 1, 0, 0);
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(committedCanvas, 0, 0);
-        context.setTransform(metrics.dpr, 0, 0, metrics.dpr, 0, 0);
-    }
-
-    function resolvePreviewTopologyCell(cell: PreviewPaintCell): RenderableTopologyCell | null {
-        const polygonCache = asPolygonGeometryCache(geometryCache);
-        return polygonCache?.cellsById.get(cell.id)?.cell
-            || (topology?.cells?.find((candidate) => candidate.id === cell.id) as RenderableTopologyCell | undefined)
-            || null;
-    }
-
-    function drawCommittedCells(targetContext: CanvasRenderingContext2D, adapter: GeometryAdapter): void {
-        if (!topology?.cells) {
-            return;
-        }
-        topology.cells.forEach((cell, index) => {
-            adapter.drawCell({
-                context: targetContext,
-                cell: cell as RenderableTopologyCell,
-                stateValue: cellStates[index] ?? 0,
-                metrics,
-                cache: geometryCache,
-                colors: canvasColors,
-                colorLookup,
-                resolveRenderedCellColor,
-                renderStyle: currentRenderStyle,
-                renderLayer: "committed",
-            });
-        });
-    }
-
     function drawCommittedGrid(): void {
-        const adapter = getGeometryAdapter(geometry);
-        committedContext.setTransform(metrics.dpr, 0, 0, metrics.dpr, 0, 0);
-        committedContext.clearRect(0, 0, Math.max(metrics.cssWidth, 1), Math.max(metrics.cssHeight, 1));
-
         canvasColors = readCanvasColors(canvas, getComputedStyleFn);
         colorLookup = buildStateColorLookup(stateDefinitions, canvasColors);
         currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
-        committedContext.fillStyle = currentRenderStyle.lineColor;
-        committedContext.fillRect(0, 0, metrics.cssWidth, metrics.cssHeight);
-
-        drawCommittedCells(committedContext, adapter);
-        if (typeof adapter.drawOverlay === "function") {
-            adapter.drawOverlay({
-                context: committedContext,
-                width: metrics.width,
-                height: metrics.height,
-                metrics,
-                cache: geometryCache,
-                renderStyle: currentRenderStyle,
-                cellSize,
-            });
-        }
+        drawCommittedLayer({
+            targetContext: surface.committedContext,
+            geometry,
+            topology,
+            metrics,
+            geometryCache,
+            canvasColors,
+            renderStyle: currentRenderStyle,
+            colorLookup,
+            resolveRenderedCellColor,
+            cellStates,
+            cellSize,
+        });
     }
 
     function drawPreviewOverlay(): void {
-        if (previewCells.size === 0) {
-            return;
-        }
-
-        const adapter = getGeometryAdapter(geometry);
-        previewCells.forEach((cell) => {
-            if (adapter.family === "mixed") {
-                const topologyCell = resolvePreviewTopologyCell(cell);
-                if (!topologyCell) {
-                    return;
-                }
-                adapter.drawCell({
-                    context,
-                    cell: topologyCell,
-                    stateValue: cell.state,
-                    metrics,
-                    cache: geometryCache,
-                    colors: canvasColors,
-                    colorLookup,
-                    resolveRenderedCellColor,
-                    renderStyle: currentRenderStyle,
-                    renderLayer: "preview",
-                });
-                return;
-            }
-
-            if (typeof cell?.id !== "string" || cell.id.length === 0) {
-                return;
-            }
-            adapter.drawCell({
-                context,
-                cell,
-                stateValue: cell.state,
-                metrics,
-                cache: geometryCache,
-                colors: canvasColors,
-                colorLookup,
-                resolveRenderedCellColor,
-                renderStyle: currentRenderStyle,
-                renderLayer: "preview",
-            });
+        drawPreviewLayer({
+            context: surface.context,
+            geometry,
+            topology,
+            metrics,
+            geometryCache,
+            canvasColors,
+            renderStyle: currentRenderStyle,
+            colorLookup,
+            resolveRenderedCellColor,
+            previewCells,
         });
     }
 
@@ -262,33 +175,12 @@ export function createCanvasGridView({
         const height = topologyHeight(topology);
         const nextMetrics = adapter.buildMetrics({ width, height, cellSize, topology });
         const dpr = Math.max(1, getDevicePixelRatio());
-        const pixelWidth = Math.max(1, Math.round(nextMetrics.cssWidth * dpr));
-        const pixelHeight = Math.max(1, Math.round(nextMetrics.cssHeight * dpr));
-
-        canvas.style.width = `${nextMetrics.cssWidth}px`;
-        canvas.style.height = `${nextMetrics.cssHeight}px`;
-        canvas.style.borderRadius = canvasBorderRadius(nextMetrics.gap);
         canvas.dataset.renderCellSize = String(cellSize);
-        if (canvas.width !== pixelWidth) {
-            canvas.width = pixelWidth;
-        }
-        if (canvas.height !== pixelHeight) {
-            canvas.height = pixelHeight;
-        }
-        if (committedCanvas.width !== pixelWidth) {
-            committedCanvas.width = pixelWidth;
-        }
-        if (committedCanvas.height !== pixelHeight) {
-            committedCanvas.height = pixelHeight;
-        }
-
+        metrics = surface.resize(nextMetrics, dpr, canvasBorderRadius(nextMetrics.gap));
         metrics = {
-            ...nextMetrics,
+            ...metrics,
             width,
             height,
-            pixelWidth: canvas.width,
-            pixelHeight: canvas.height,
-            dpr,
             pitch: Number(nextMetrics.pitch ?? nextMetrics.horizontalPitch ?? 0),
         };
         const nextCache = resolveGeometryCache({
@@ -305,7 +197,7 @@ export function createCanvasGridView({
         geometryCache = nextCache.geometryCache;
 
         drawCommittedGrid();
-        restoreCommittedSurface();
+        surface.restoreCommittedSurface(metrics);
         drawPreviewOverlay();
     }
 
@@ -334,7 +226,7 @@ export function createCanvasGridView({
                 .map((cell) => [previewKey(cell), cell])
                 .filter((entry): entry is [string, PreviewPaintCell] => typeof entry[0] === "string" && entry[0].length > 0),
         );
-        restoreCommittedSurface();
+        surface.restoreCommittedSurface(metrics);
         drawPreviewOverlay();
     }
 
@@ -343,7 +235,7 @@ export function createCanvasGridView({
             return;
         }
         previewCells = new Map();
-        restoreCommittedSurface();
+        surface.restoreCommittedSurface(metrics);
     }
 
     function getCellFromPointerEvent(event: MouseEvent | PointerEvent): PaintableCell | null {
@@ -360,7 +252,7 @@ export function createCanvasGridView({
         );
     }
 
-    function getMetrics(): CanvasMetrics {
+    function getMetrics(): CanvasSurfaceMetrics {
         return { ...metrics };
     }
 

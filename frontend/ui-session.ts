@@ -5,6 +5,7 @@ import {
 } from "./editor-tools.js";
 import { parseBrushSize, parseEditorTool } from "./parsers/editor.js";
 import { parseUiSession } from "./parsers/session.js";
+import { parseStoredUiSession, serializeUiSession } from "./parsers/session-storage.js";
 import {
     DEFAULT_CELL_SIZE,
     DEFAULT_TOPOLOGY_SPEC,
@@ -12,6 +13,7 @@ import {
 import {
     defaultCellSizeForTilingFamily,
 } from "./state/sizing-state.js";
+import { cloneUiSession, createEmptyUiSession } from "./ui-session-state.js";
 import type { DomElements } from "./types/dom.js";
 import type { EditorTool } from "./editor-tools.js";
 import type {
@@ -26,32 +28,6 @@ export const DISCLOSURE_IDS: readonly UiDisclosureId[] = Object.freeze([
     "rule-notes-toggle",
 ]);
 
-function emptySession(): UiSessionState {
-    return {
-        cellSize: DEFAULT_CELL_SIZE,
-        cellSizeByTilingFamily: {},
-        editorTool: DEFAULT_EDITOR_TOOL,
-        brushSize: DEFAULT_BRUSH_SIZE,
-        drawerOpen: null,
-        paintStatesByRule: {},
-        patchDepthByTilingFamily: {},
-        disclosures: {},
-    };
-}
-
-function cloneSession(session: UiSessionState): UiSessionState {
-    return {
-        cellSize: session.cellSize,
-        cellSizeByTilingFamily: { ...session.cellSizeByTilingFamily },
-        editorTool: session.editorTool,
-        brushSize: session.brushSize,
-        drawerOpen: session.drawerOpen,
-        paintStatesByRule: { ...session.paintStatesByRule },
-        patchDepthByTilingFamily: { ...session.patchDepthByTilingFamily },
-        disclosures: { ...session.disclosures },
-    };
-}
-
 export function createUiSessionStorage({
     storage = window.localStorage,
     storageKey = UI_SESSION_STORAGE_KEY,
@@ -60,17 +36,21 @@ export function createUiSessionStorage({
     storageKey?: string;
 } = {}): UiSessionStorage {
     let sessionCache: UiSessionState | null = null;
+    const defaultTilingFamily = DEFAULT_TOPOLOGY_SPEC.tiling_family;
 
     function readStorage(): UiSessionState {
         try {
             const raw = storage.getItem(storageKey);
             if (!raw) {
-                return emptySession();
+                return createEmptyUiSession(defaultTilingFamily);
             }
-            return parseUiSession(JSON.parse(raw), { disclosureIds: DISCLOSURE_IDS });
+            return parseStoredUiSession(JSON.parse(raw), {
+                disclosureIds: DISCLOSURE_IDS,
+                defaultTilingFamily,
+            });
         } catch (error) {
             void error;
-            return emptySession();
+            return createEmptyUiSession(defaultTilingFamily);
         }
     }
 
@@ -83,8 +63,9 @@ export function createUiSessionStorage({
 
     function flush(): void {
         try {
-            storage.setItem(storageKey, JSON.stringify(parseUiSession(ensureLoaded(), {
+            storage.setItem(storageKey, JSON.stringify(serializeUiSession(ensureLoaded(), {
                 disclosureIds: DISCLOSURE_IDS,
+                defaultTilingFamily,
             })));
         } catch (error) {
             void error;
@@ -92,27 +73,27 @@ export function createUiSessionStorage({
     }
 
     function update(mutator: (session: UiSessionState) => void): UiSessionState {
-        const nextSession = cloneSession(ensureLoaded());
+        const nextSession = cloneUiSession(ensureLoaded());
         mutator(nextSession);
         sessionCache = parseUiSession(nextSession, { disclosureIds: DISCLOSURE_IDS });
         flush();
-        return cloneSession(sessionCache);
+        return cloneUiSession(sessionCache);
     }
 
     function load(): UiSessionState {
-        return cloneSession(ensureLoaded());
+        return cloneUiSession(ensureLoaded());
     }
 
     return {
         load,
         clear() {
-            sessionCache = emptySession();
+            sessionCache = createEmptyUiSession(defaultTilingFamily);
             try {
                 storage.removeItem(storageKey);
             } catch (error) {
                 void error;
             }
-            return cloneSession(sessionCache);
+            return cloneUiSession(sessionCache);
         },
         getCellSizes() {
             return { ...ensureLoaded().cellSizeByTilingFamily };
@@ -121,17 +102,25 @@ export function createUiSessionStorage({
             return ensureLoaded().cellSizeByTilingFamily[String(tilingFamily)]
                 ?? defaultCellSizeForTilingFamily(tilingFamily);
         },
-        setCellSize(tilingFamilyOrCellSize, cellSize = undefined) {
-            const tilingFamily = cellSize === undefined
-                ? DEFAULT_TOPOLOGY_SPEC.tiling_family
-                : String(tilingFamilyOrCellSize);
-            const nextCellSize = cellSize === undefined ? tilingFamilyOrCellSize : cellSize;
+        setDefaultCellSize(cellSize) {
             return update((session) => {
                 const normalizedSession = parseUiSession({
                     ...session,
                     cellSizeByTilingFamily: {
                         ...session.cellSizeByTilingFamily,
-                        [String(tilingFamily)]: nextCellSize,
+                        [DEFAULT_TOPOLOGY_SPEC.tiling_family]: cellSize,
+                    },
+                }, { disclosureIds: DISCLOSURE_IDS });
+                Object.assign(session, normalizedSession);
+            });
+        },
+        setCellSizeForTilingFamily(tilingFamily, cellSize) {
+            return update((session) => {
+                const normalizedSession = parseUiSession({
+                    ...session,
+                    cellSizeByTilingFamily: {
+                        ...session.cellSizeByTilingFamily,
+                        [String(tilingFamily)]: cellSize,
                     },
                 }, { disclosureIds: DISCLOSURE_IDS });
                 Object.assign(session, normalizedSession);
@@ -141,7 +130,7 @@ export function createUiSessionStorage({
             return ensureLoaded().editorTool;
         },
         setEditorTool(editorTool: EditorTool) {
-            update((session) => {
+            return update((session) => {
                 session.editorTool = parseEditorTool(editorTool);
             });
         },
@@ -149,7 +138,7 @@ export function createUiSessionStorage({
             return ensureLoaded().brushSize;
         },
         setBrushSize(brushSize) {
-            update((session) => {
+            return update((session) => {
                 session.brushSize = parseBrushSize(brushSize);
             });
         },
@@ -157,7 +146,7 @@ export function createUiSessionStorage({
             return ensureLoaded().drawerOpen;
         },
         setDrawerOpen(drawerOpen) {
-            update((session) => {
+            return update((session) => {
                 session.drawerOpen = Boolean(drawerOpen);
             });
         },
@@ -167,11 +156,8 @@ export function createUiSessionStorage({
             }
             return ensureLoaded().paintStatesByRule[ruleName] ?? null;
         },
-        setPaintState(ruleName, paintState) {
-            if (!ruleName) {
-                return;
-            }
-            update((session) => {
+        setPaintStateForRule(ruleName, paintState) {
+            return update((session) => {
                 session.paintStatesByRule[ruleName] = Number(paintState);
             });
         },
@@ -184,11 +170,8 @@ export function createUiSessionStorage({
             }
             return ensureLoaded().patchDepthByTilingFamily[tilingFamily] ?? null;
         },
-        setPatchDepth(tilingFamily, patchDepth) {
-            if (!tilingFamily) {
-                return;
-            }
-            update((session) => {
+        setPatchDepthForTilingFamily(tilingFamily, patchDepth) {
+            return update((session) => {
                 const normalizedSession = parseUiSession({
                     ...session,
                     patchDepthByTilingFamily: {
@@ -203,10 +186,7 @@ export function createUiSessionStorage({
             return { ...ensureLoaded().disclosures };
         },
         setDisclosureState(id, open) {
-            if (!DISCLOSURE_IDS.includes(id)) {
-                return;
-            }
-            update((session) => {
+            return update((session) => {
                 session.disclosures[id] = Boolean(open);
             });
         },

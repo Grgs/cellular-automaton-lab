@@ -18,20 +18,21 @@ export interface UiSessionStorage {
     clear(): UiSessionState;
     getCellSizes(): Record<string, number>;
     getCellSize(tilingFamily?: string): number;
-    setCellSize(tilingFamilyOrCellSize: string | number, cellSize?: number): UiSessionState | void;
+    setDefaultCellSize(cellSize: number): UiSessionState;
+    setCellSizeForTilingFamily(tilingFamily: string, cellSize: number): UiSessionState;
     getEditorTool(): EditorTool;
-    setEditorTool(editorTool: EditorTool): void;
+    setEditorTool(editorTool: EditorTool): UiSessionState;
     getBrushSize(): number;
-    setBrushSize(brushSize: number): void;
+    setBrushSize(brushSize: number): UiSessionState;
     getDrawerOpen(): boolean | null;
-    setDrawerOpen(drawerOpen: boolean): void;
+    setDrawerOpen(drawerOpen: boolean): UiSessionState;
     getPaintState(ruleName: string | null): number | null;
-    setPaintState(ruleName: string | null, paintState: number): void;
+    setPaintStateForRule(ruleName: string, paintState: number): UiSessionState;
     getPatchDepths(): Record<string, number>;
     getPatchDepth(tilingFamily: string | null | undefined): number | null;
-    setPatchDepth(tilingFamily: string | null | undefined, patchDepth: number): void;
+    setPatchDepthForTilingFamily(tilingFamily: string, patchDepth: number): UiSessionState;
     getDisclosureStates(): Partial<Record<UiDisclosureId, boolean>>;
-    setDisclosureState(id: UiDisclosureId, open: boolean): void;
+    setDisclosureState(id: UiDisclosureId, open: boolean): UiSessionState;
 }
 
 export interface MatchMediaResult {

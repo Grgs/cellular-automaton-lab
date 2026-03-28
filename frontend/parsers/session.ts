@@ -1,26 +1,13 @@
-import { DEFAULT_CELL_SIZE, DEFAULT_TOPOLOGY_SPEC } from "../state/constants.js";
+import { DEFAULT_TOPOLOGY_SPEC } from "../state/constants.js";
 import { isPlainObject } from "../runtime-validation.js";
 import { defaultCellSizeForTilingFamily } from "../state/sizing-state.js";
-import { DEFAULT_BRUSH_SIZE, DEFAULT_EDITOR_TOOL } from "../editor-tools.js";
 import { parseBrushSize, parseEditorTool } from "./editor.js";
 import {
     parseCellSizeByTilingFamily,
     parsePatchDepthByTilingFamily,
 } from "./sizing.js";
+import { createEmptyUiSession } from "../ui-session-state.js";
 import type { UiDisclosureId, UiSessionState } from "../types/session.js";
-
-function emptySession(): UiSessionState {
-    return {
-        cellSize: DEFAULT_CELL_SIZE,
-        cellSizeByTilingFamily: {},
-        editorTool: DEFAULT_EDITOR_TOOL,
-        brushSize: DEFAULT_BRUSH_SIZE,
-        drawerOpen: null,
-        paintStatesByRule: {},
-        patchDepthByTilingFamily: {},
-        disclosures: {},
-    };
-}
 
 function parsePaintStatesByRule(value: unknown): Record<string, number> {
     if (!isPlainObject(value)) {
@@ -59,13 +46,10 @@ export function parseUiSession(
     },
 ): UiSessionState {
     if (!isPlainObject(value)) {
-        return {
-            ...emptySession(),
-            cellSize: defaultCellSizeForTilingFamily(defaultTilingFamily),
-        };
+        return createEmptyUiSession(defaultTilingFamily);
     }
 
-    const session = emptySession();
+    const session = createEmptyUiSession(defaultTilingFamily);
     if (value.cellSizeByTilingFamily !== null && value.cellSizeByTilingFamily !== undefined) {
         session.cellSizeByTilingFamily = parseCellSizeByTilingFamily(value.cellSizeByTilingFamily);
     } else if (value.cellSize !== null && value.cellSize !== undefined) {

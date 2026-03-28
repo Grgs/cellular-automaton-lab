@@ -2,14 +2,19 @@ from __future__ import annotations
 
 from collections import OrderedDict, deque
 from dataclasses import dataclass, field
-from math import atan2, pi, sqrt
-from collections.abc import Iterable, Iterator
+from math import atan2
+from collections.abc import Iterator
 
-from backend.simulation.topology import LatticeCell, LatticeTopology, SimulationBoard, parse_regular_cell_id
-from backend.simulation.topology_catalog import EDGE_ADJACENCY, get_topology_variant_for_geometry
+from backend.simulation.topology import LatticeTopology, SimulationBoard
+from backend.simulation.rule_context_geometry import (
+    board_bounds,
+    cell_geometry,
+    clockwise_sort_key,
+    normalize_angle,
+    topology_adjacency_mode,
+)
 
 _ANGLE_EPSILON = 1e-9
-_CLOCKWISE_START = pi / 2
 
 
 @dataclass(frozen=True)
@@ -62,152 +67,6 @@ _MAX_TOPOLOGY_FRAME_CACHE_SIZE = 32
 _TOPOLOGY_FRAME_CACHE: OrderedDict[str, TopologyFrame] = OrderedDict()
 
 
-def _normalize_angle(angle: float) -> float:
-    while angle <= -pi:
-        angle += 2 * pi
-    while angle > pi:
-        angle -= 2 * pi
-    return angle
-
-
-def _clockwise_sort_key(angle: float) -> float:
-    return (_CLOCKWISE_START - angle) % (2 * pi)
-
-
-def _triangle_vertices(x: int, y: int) -> tuple[tuple[float, float], ...]:
-    side = 1.0
-    height = (sqrt(3) * side) / 2.0
-    horizontal_pitch = side / 2.0
-    left_x = x * horizontal_pitch
-    top_y = y * height
-    if (x + y) % 2 == 0:
-        return (
-            (left_x, top_y + height),
-            (left_x + (side / 2.0), top_y),
-            (left_x + side, top_y + height),
-        )
-    return (
-        (left_x, top_y),
-        (left_x + side, top_y),
-        (left_x + (side / 2.0), top_y + height),
-    )
-
-
-def _hex_center(x: int, y: int) -> tuple[float, float]:
-    radius = 0.5
-    hex_width = sqrt(3) * radius
-    vertical_pitch = 0.75
-    return (
-        (x * hex_width) + ((y % 2) * (hex_width / 2.0)),
-        y * vertical_pitch,
-    )
-
-
-def _hex_vertices(x: int, y: int) -> tuple[tuple[float, float], ...]:
-    center_x, center_y = _hex_center(x, y)
-    radius = 0.5
-    half_width = (sqrt(3) * radius) / 2.0
-    return (
-        (center_x, center_y - radius),
-        (center_x + half_width, center_y - (radius / 2.0)),
-        (center_x + half_width, center_y + (radius / 2.0)),
-        (center_x, center_y + radius),
-        (center_x - half_width, center_y + (radius / 2.0)),
-        (center_x - half_width, center_y - (radius / 2.0)),
-    )
-
-
-def _square_vertices(x: int, y: int) -> tuple[tuple[float, float], ...]:
-    left = float(x)
-    top = float(y)
-    return (
-        (left, top),
-        (left + 1.0, top),
-        (left + 1.0, top + 1.0),
-        (left, top + 1.0),
-    )
-
-
-def _regular_kind(geometry: str, x: int, y: int) -> str:
-    if geometry == "hex":
-        return "hexagon"
-    if geometry == "triangle":
-        return "triangle-up" if (x + y) % 2 == 0 else "triangle-down"
-    return "square"
-
-
-def _regular_geometry(
-    geometry: str,
-    x: int,
-    y: int,
-) -> tuple[str, tuple[float, float], tuple[tuple[float, float], ...] | None]:
-    if geometry == "hex":
-        center = _hex_center(x, y)
-        return _regular_kind(geometry, x, y), center, _hex_vertices(x, y)
-    if geometry == "triangle":
-        vertices = _triangle_vertices(x, y)
-        center = (
-            sum(vertex[0] for vertex in vertices) / 3.0,
-            sum(vertex[1] for vertex in vertices) / 3.0,
-        )
-        return _regular_kind(geometry, x, y), center, vertices
-
-    vertices = _square_vertices(x, y)
-    center = (x + 0.5, y + 0.5)
-    return _regular_kind(geometry, x, y), center, vertices
-
-
-def _cell_regular_coordinates(cell: LatticeCell) -> tuple[int, int] | None:
-    return parse_regular_cell_id(cell.id)
-
-
-def _cell_geometry(topology: LatticeTopology, cell: LatticeCell) -> tuple[str, tuple[float, float], tuple[tuple[float, float], ...] | None]:
-    regular_coordinates = _cell_regular_coordinates(cell)
-    if cell.center is not None:
-        return (
-            (
-                cell.kind
-                if cell.kind != "cell" or regular_coordinates is None
-                else _regular_kind(topology.geometry, regular_coordinates[0], regular_coordinates[1])
-            ),
-            cell.center,
-            cell.vertices,
-        )
-    if regular_coordinates is None:
-        raise ValueError(f"Cell {cell.id!r} is missing geometry metadata and is not a regular cell id.")
-    return _regular_geometry(topology.geometry, regular_coordinates[0], regular_coordinates[1])
-
-
-def _board_bounds(
-    vertex_sets: Iterable[tuple[tuple[float, float], ...] | None],
-    centers: Iterable[tuple[float, float]],
-) -> tuple[float, float, float, float]:
-    xs: list[float] = []
-    ys: list[float] = []
-    for vertices in vertex_sets:
-        if not vertices:
-            continue
-        xs.extend(vertex[0] for vertex in vertices)
-        ys.extend(vertex[1] for vertex in vertices)
-    if not xs or not ys:
-        centers_list = list(centers)
-        xs = [center[0] for center in centers_list]
-        ys = [center[1] for center in centers_list]
-    return (
-        min(xs, default=0.0),
-        min(ys, default=0.0),
-        max(xs, default=0.0),
-        max(ys, default=0.0),
-    )
-
-
-def _topology_adjacency_mode(topology: LatticeTopology) -> str:
-    try:
-        return get_topology_variant_for_geometry(topology.geometry).adjacency_mode
-    except KeyError:
-        return EDGE_ADJACENCY
-
-
 def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
     cached = _TOPOLOGY_FRAME_CACHE.get(topology.topology_revision)
     if cached is not None:
@@ -216,7 +75,7 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
 
     cell_records = []
     for cell in topology.cells:
-        kind, center, vertices = _cell_geometry(topology, cell)
+        kind, center, vertices = cell_geometry(topology, cell)
         cell_records.append((cell, kind, center, vertices))
 
     centers = [record[2] for record in cell_records]
@@ -228,7 +87,7 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
     else:
         board_center = (0.0, 0.0)
 
-    bounds = _board_bounds((record[3] for record in cell_records), centers)
+    bounds = board_bounds((record[3] for record in cell_records), centers)
     radial_distances = [
         ((center[0] - board_center[0]) ** 2 + (center[1] - board_center[1]) ** 2) ** 0.5
         for _, _, center, _ in cell_records
@@ -275,7 +134,7 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
             neighbor_center = cell_records[neighbor_index][2]
             angle = atan2(-(neighbor_center[1] - center[1]), neighbor_center[0] - center[0])
             distance = ((neighbor_center[0] - center[0]) ** 2 + (neighbor_center[1] - center[1]) ** 2) ** 0.5
-            unsorted_neighbors.append((_clockwise_sort_key(angle), distance, neighbor_index))
+            unsorted_neighbors.append((clockwise_sort_key(angle), distance, neighbor_index))
 
         ordered_neighbors: list[TopologyNeighborFrame] = []
         for clockwise_index, (_, _distance, neighbor_index) in enumerate(sorted(unsorted_neighbors)):
@@ -292,7 +151,7 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
             else:
                 radial = "level"
 
-            angle_delta = _normalize_angle(polar_angles[neighbor_index] - polar_angles[index])
+            angle_delta = normalize_angle(polar_angles[neighbor_index] - polar_angles[index])
             if abs(angle_delta) <= _ANGLE_EPSILON:
                 turn = "aligned"
             elif angle_delta < 0:
@@ -328,7 +187,7 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
         )
 
     frame = TopologyFrame(
-        adjacency_mode=_topology_adjacency_mode(topology),
+        adjacency_mode=topology_adjacency_mode(topology),
         topology_revision=topology.topology_revision,
         center=board_center,
         cell_count=len(frame_cells),
