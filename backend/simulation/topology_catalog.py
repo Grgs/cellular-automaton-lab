@@ -8,6 +8,12 @@ from backend.payload_types import (
     TopologySpecPayload,
     TopologyVariantPayload,
 )
+from backend.simulation.topology_catalog_build import build_topology_catalog
+from backend.simulation.topology_catalog_queries import (
+    describe_topologies as describe_topology_entries,
+    describe_topology_variants as describe_variant_entries,
+    topology_spec_payload as build_topology_spec_payload,
+)
 
 DEFAULT_SQUARE_RULE = "conway"
 DEFAULT_MIN_GRID_SIZE = 3
@@ -345,48 +351,11 @@ TOPOLOGY_VARIANT_BY_GEOMETRY = {
 }
 
 
-def _build_topology_catalog() -> tuple[TopologyDefinition, ...]:
-    grouped: dict[str, list[TopologyVariantDefinition]] = {}
-    for variant in TOPOLOGY_VARIANTS:
-        grouped.setdefault(variant.tiling_family, []).append(variant)
-
-    catalog: list[TopologyDefinition] = []
-    for tiling_family, variants in grouped.items():
-        variants.sort(key=lambda entry: (entry.adjacency_mode != EDGE_ADJACENCY, entry.adjacency_mode))
-        first = variants[0]
-        catalog.append(
-            TopologyDefinition(
-                tiling_family=tiling_family,
-                label=first.label,
-                picker_group=first.picker_group,
-                picker_order=first.picker_order,
-                sizing_mode=first.sizing_mode,
-                family=first.family,
-                viewport_sync_mode=first.viewport_sync_mode,
-                supported_adjacency_modes=tuple(variant.adjacency_mode for variant in variants),
-                default_adjacency_mode=variants[0].adjacency_mode,
-                default_rules={
-                    variant.adjacency_mode: variant.default_rule
-                    for variant in variants
-                },
-                geometry_keys={
-                    variant.adjacency_mode: variant.geometry_key
-                    for variant in variants
-                },
-                sizing_policy=TOPOLOGY_SIZING_POLICIES[tiling_family],
-            )
-        )
-    catalog.sort(
-        key=lambda definition: (
-            PICKER_GROUP_ORDER.get(definition.picker_group, 99),
-            definition.picker_order,
-            definition.label.lower(),
-        )
-    )
-    return tuple(catalog)
-
-
-TOPOLOGY_CATALOG = _build_topology_catalog()
+TOPOLOGY_CATALOG = build_topology_catalog(
+    TOPOLOGY_VARIANTS,
+    TOPOLOGY_SIZING_POLICIES,
+    PICKER_GROUP_ORDER,
+)
 TOPOLOGY_BY_FAMILY = {
     definition.tiling_family: definition
     for definition in TOPOLOGY_CATALOG
@@ -407,11 +376,11 @@ TOPOLOGY_DEFAULT_RULES = {
 
 
 def describe_topologies() -> list[TopologyCatalogEntryPayload]:
-    return [definition.to_dict() for definition in TOPOLOGY_CATALOG]
+    return describe_topology_entries(TOPOLOGY_CATALOG)
 
 
 def describe_topology_variants() -> list[TopologyVariantPayload]:
-    return [variant.to_dict() for variant in TOPOLOGY_VARIANTS]
+    return describe_variant_entries(TOPOLOGY_VARIANTS)
 
 
 def is_supported_topology_family(tiling_family: str) -> bool:
@@ -452,15 +421,13 @@ def topology_spec_payload(
 ) -> TopologySpecPayload:
     variant = get_topology_variant_for_geometry(geometry_key)
     definition = get_topology_definition(variant.tiling_family)
-    payload: TopologySpecPayload = {
-        "tiling_family": variant.tiling_family,
-        "adjacency_mode": variant.adjacency_mode,
-        "sizing_mode": definition.sizing_mode,
-        "width": width,
-        "height": height,
-        "patch_depth": DEFAULT_TOPOLOGY_PATCH_DEPTH if patch_depth is None else patch_depth,
-    }
-    return payload
+    return build_topology_spec_payload(
+        variant=variant,
+        definition=definition,
+        width=width,
+        height=height,
+        patch_depth=DEFAULT_TOPOLOGY_PATCH_DEPTH if patch_depth is None else patch_depth,
+    )
 
 
 def geometry_uses_patch_depth(geometry_key: str) -> bool:
