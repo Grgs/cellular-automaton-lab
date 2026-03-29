@@ -2,7 +2,7 @@
 
 Cellular Automaton Lab is a browser-based cellular automata playground built around topology-first boards. It supports classic lattices, periodic mixed tilings, and finite aperiodic patches in one app, with a Flask backend and a Vite-built TypeScript frontend.
 
-![Current canvas-first workspace on a square board](docs/images/readme-workspace-conway.png)
+![Current canvas-first workspace on a Kagome mixed-tiling board](docs/images/readme-workspace-kagome.png)
 
 ## Highlights
 
@@ -15,13 +15,13 @@ Cellular Automaton Lab is a browser-based cellular automata playground built aro
 
 ## Screenshots
 
-### Square board with Conway in the main workspace
-
-![Square board with Conway randomization](docs/images/readme-workspace-conway.png)
-
 ### Snub Trihexagonal mixed-tiling board with the inspector open
 
 ![Snub Trihexagonal mixed Life](docs/images/readme-snub-trihexagonal-overview.png)
+
+### Square board with Conway after several generations
+
+![Square board with evolved Conway patterns](docs/images/readme-workspace-conway.png)
 
 ### Penrose P3 Rhombs with patch-depth controls
 
