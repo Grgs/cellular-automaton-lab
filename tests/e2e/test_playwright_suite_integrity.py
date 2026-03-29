@@ -19,7 +19,7 @@ def _iter_suite_test_names(suite: unittest.TestSuite) -> list[str]:
         if isinstance(item, unittest.TestSuite):
             names.extend(_iter_suite_test_names(item))
             continue
-        names.append(item._testMethodName)
+        names.append(item.id().rsplit(".", 2)[-2] + "." + item._testMethodName)
     return names
 
 

@@ -5,6 +5,8 @@ This repository now supports two runtime hosts for the same UI:
 - `server` mode keeps the existing Flask + HTTP architecture.
 - `standalone` mode runs the Python simulation inside a Web Worker using Pyodide and serves the frontend as static assets from `output/standalone/`.
 
+The current standalone target is normal static hosting with network access. Pyodide is still loaded from a CDN, so this is browser-local execution rather than a fully offline bundle.
+
 ## Architecture Overview
 
 ### Server mode
@@ -13,14 +15,25 @@ This repository now supports two runtime hosts for the same UI:
 - The frontend uses the HTTP-backed `SimulationBackend` from `frontend/api.ts`.
 - Server bootstrap data is available through both template globals and `GET /api/bootstrap`.
 - The backend remains authoritative for state, persistence, and the threaded run loop.
+- HTTP request extraction stays in Flask, but payload normalization and persisted snapshot validation now live in the shared backend contract layer in `backend/contract_validation.py`.
 
 ### Standalone mode
 
 - `standalone.html` bootstraps the same DOM shell the server-rendered app uses.
-- `frontend/standalone.ts` fetches `standalone-bootstrap.json`, installs the bootstrap globals, creates the worker-backed `SimulationBackend`, and then starts the shared frontend controller stack.
+- `frontend/standalone.ts` fetches `standalone-bootstrap.json`, installs the bootstrap globals first, then dynamically imports the shared app entry so standalone startup no longer races bootstrapped window data.
+- `frontend/standalone.ts` creates the worker-backed `SimulationBackend` and then starts the shared frontend controller stack.
 - `frontend/standalone-worker.ts` loads Pyodide, copies the packaged Python sources into Pyodide's virtual filesystem, imports `backend.browser_runtime`, and proxies frontend commands into the Python simulation runtime.
 - The worker owns the standalone run loop with JS timers. The frontend continues to use the existing polling/reconciliation flow while the worker advances the simulation in the background.
 - Browser-local persistence uses IndexedDB first and falls back to `localStorage` if IndexedDB is unavailable.
+- The standalone worker now uses the same shared command parsing and persisted snapshot acceptance helpers as the Flask route layer.
+
+## Lifecycle Cleanup
+
+- `SimulationBackend` now includes `dispose()`.
+- The HTTP backend implements disposal as a no-op.
+- The standalone backend terminates the worker, removes its listeners, and rejects pending requests during disposal.
+- `AppController` now exposes `dispose()`, and `initApp()` returns the created controller.
+- Both server and standalone entrypoints install `pagehide` cleanup so browser teardown and Playwright tests can release the active controller explicitly.
 
 ## Build Commands
 
@@ -88,17 +101,62 @@ The `path` values intentionally match the existing HTTP command surface:
 - `persist`
   - emitted from background ticks so the main thread can keep browser-local persistence fresh even while the UI is only polling state snapshots
 
+The worker command paths intentionally stay aligned with the existing `/api/...` HTTP surface so the frontend controller does not branch on host after environment creation.
+
+## Browser Test Architecture
+
+- The Playwright harness is now host-aware through `tests/e2e/support_runtime_host.py`.
+- `ServerRuntimeHost` wraps the existing Flask-backed `AppServer` and still supports restart semantics for persistence tests.
+- `StandaloneRuntimeHost` builds `output/standalone/` once per test process, serves it from a local static HTTP server, and captures browser-side persistence/debug artifacts on failure.
+- Shared UI-flow tests now run against both hosts through the same base browser case.
+- Server-only coverage keeps backend restart persistence assertions.
+- Standalone-only coverage adds:
+  - static-host startup
+  - browser storage restore on reload
+  - visible startup error messaging when Pyodide initialization fails
+
+The committed standalone suite entrypoint is:
+
+```powershell
+py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
+```
+
+The feature-grouped server and standalone suites still use the shared `tests/e2e/playwright_suite_support.py` chunking logic, so CI can add standalone coverage without introducing a second browser framework.
+
+## Verification Status
+
+The current implementation was verified with:
+
+```powershell
+npm run typecheck:frontend
+npm run test:frontend
+npm run build:frontend
+npm run build:frontend:standalone
+py -3 -m unittest discover -s tests/unit -p "test_*.py"
+py -3 -m unittest discover -s tests/api -p "test_*.py"
+py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity tests.e2e.test_playwright_rules_and_picker tests.e2e.test_playwright_overlays_and_editor tests.e2e.test_playwright_pattern_and_showcase tests.e2e.test_playwright_topology_and_persistence tests.e2e.test_playwright_standalone_runtime
+```
+
+That browser coverage now exercises:
+
+- startup to ready state
+- run, pause, and single-step generation changes
+- rule and topology switching, including Penrose patch depth controls
+- canvas editing flows
+- pattern import, export, copy, and paste
+- server restart persistence
+- standalone reload persistence from browser storage
+- standalone worker-init failure messaging
+
 ## Known Limitations
 
 - Pyodide is loaded from the CDN configured in `frontend/standalone/worker-client.ts`; the standalone build does not yet vend Pyodide assets locally for fully offline use.
 - The standalone shell currently duplicates the server template structure in `standalone.html`, so future shell/layout changes must be mirrored in both places.
-- The standalone Python runtime intentionally bypasses Flask and the Pydantic request layer. It enforces the core command contract and rule/state validation, but it does not yet share every validation helper byte-for-byte with the HTTP layer.
-- Standalone browser smoke coverage was verified manually, but there is not yet a committed Playwright suite that exercises `output/standalone/` end-to-end in CI.
+- The standalone Python runtime still bypasses Flask-specific HTTP concerns such as request objects and response wrappers; only payload validation and simulation contracts are shared.
+- The standalone build is aimed at static hosting with network access. If offline hosting becomes a requirement, Pyodide must be vendored into the output and loaded locally.
 
 ## Remaining Work Checklist
 
-- Add dedicated standalone Playwright coverage that serves `output/standalone/` from a static test server and verifies startup, stepping, run/pause, topology changes, painting, import/export, and persistence restore.
 - Deduplicate `standalone.html` and `templates/index.html` so both hosts render from one shared shell source.
-- Move more of the standalone request validation into shared backend helpers so the server and worker hosts use the same parsing/validation code paths.
 - Decide whether Pyodide must be bundled into the standalone output instead of loaded from a CDN. If full offline hosting is required, replace the CDN loader with vendored Pyodide assets and update the packager accordingly.
-- If the standalone runtime needs stronger lifecycle guarantees, add explicit backend/worker disposal from the frontend controller so the worker can be terminated cleanly on teardown.
+- Add CI wiring for the standalone Playwright entrypoint if it is not already part of the browser test pipeline.

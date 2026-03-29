@@ -82,6 +82,7 @@ export function createHttpSimulationBackend(): SimulationBackend {
     return {
         getState: fetchState,
         getRules: fetchRules,
+        dispose() {},
         postControl,
         toggleCell: toggleCellRequest,
         setCell: setCellRequest,

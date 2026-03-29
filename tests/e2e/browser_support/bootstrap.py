@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import _thread
-import json
 import tempfile
 import threading
 import time
@@ -24,7 +23,8 @@ from playwright.sync_api import (
     sync_playwright,
 )
 
-from tests.e2e.support_server import AppServer, JsonApiClient
+from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
+from tests.e2e.support_server import JsonApiClient
 
 WaitUntilState = Literal["commit", "domcontentloaded", "load", "networkidle"]
 
@@ -32,8 +32,9 @@ WaitUntilState = Literal["commit", "domcontentloaded", "load", "networkidle"]
 class BrowserAppTestCase(unittest.TestCase):
     page_viewport: ClassVar[ViewportSize | None] = None
     startup_timeout_seconds: ClassVar[float] = 45.0
-    server: ClassVar[AppServer]
-    api: ClassVar[JsonApiClient]
+    runtime_host_kind: ClassVar[str] = "server"
+    host: ClassVar[BrowserRuntimeHost]
+    api: ClassVar[JsonApiClient | None]
     playwright: ClassVar[Playwright]
     browser: ClassVar[Browser]
     context: BrowserContext
@@ -62,10 +63,10 @@ class BrowserAppTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
-        cls.server = AppServer()
-        with cls._startup_watchdog("Browser test server"):
-            cls.server.start()
-        cls.api = cls.server.client
+        cls.host = create_runtime_host(cls.runtime_host_kind)
+        with cls._startup_watchdog(f"{cls.runtime_host_kind} browser runtime host"):
+            cls.host.start()
+        cls.api = cls.host.client()
         with cls._startup_watchdog("Playwright runtime"):
             cls.playwright = sync_playwright().start()
         with cls._startup_watchdog("Chromium browser"):
@@ -75,11 +76,14 @@ class BrowserAppTestCase(unittest.TestCase):
     def tearDownClass(cls) -> None:
         cls.browser.close()
         cls.playwright.stop()
-        cls.server.close()
+        cls.host.close()
         super().tearDownClass()
 
     def setUp(self) -> None:
         super().setUp()
+        with self._startup_watchdog(f"{self.runtime_host_kind} host test setup"):
+            self.host.before_test()
+        self.api = self.host.client()
         with self._startup_watchdog("Browser test page context"):
             if self.page_viewport is None:
                 self.context = self.browser.new_context(accept_downloads=True)
@@ -88,6 +92,10 @@ class BrowserAppTestCase(unittest.TestCase):
                     accept_downloads=True,
                     viewport=self.page_viewport,
                 )
+            self.context.grant_permissions(
+                ["clipboard-read", "clipboard-write"],
+                origin=self.host.base_url,
+            )
             self.page = self.context.new_page()
         self.page.set_default_timeout(20_000)
         self.page.set_default_navigation_timeout(20_000)
@@ -140,34 +148,7 @@ class BrowserAppTestCase(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            try:
-                backend_state = self.server.client.get_state()
-                (artifact_dir / "backend-state.json").write_text(
-                    json.dumps(backend_state, indent=2),
-                    encoding="utf-8",
-                )
-            except Exception as exc:
-                (artifact_dir / "backend-state-error.txt").write_text(str(exc), encoding="utf-8")
-
-            try:
-                backend_topology = self.server.client.get_topology()
-                (artifact_dir / "backend-topology.json").write_text(
-                    json.dumps(backend_topology, indent=2),
-                    encoding="utf-8",
-                )
-            except Exception as exc:
-                (artifact_dir / "backend-topology-error.txt").write_text(str(exc), encoding="utf-8")
-
-            stdout_text = self.server.read_stdout()
-            stderr_text = self.server.read_stderr()
-            if stdout_text:
-                (artifact_dir / "server-stdout.log").write_text(stdout_text, encoding="utf-8")
-            if stderr_text:
-                (artifact_dir / "server-stderr.log").write_text(stderr_text, encoding="utf-8")
-            (artifact_dir / "server-log-paths.txt").write_text(
-                f"stdout={self.server.stdout_path}\nstderr={self.server.stderr_path}\n",
-                encoding="utf-8",
-            )
+            self.host.capture_failure_artifacts(artifact_dir, self.page)
         except Exception as exc:
             (artifact_dir / "artifact-capture-error.txt").write_text(str(exc), encoding="utf-8")
         return artifact_dir
@@ -235,7 +216,7 @@ class BrowserAppTestCase(unittest.TestCase):
                 lambda: self._reload_and_wait(wait_until=wait_until, timeout=timeout)
             )
         except PlaywrightError:
-            target_url = self.page.url or f"{self.server.client.base_url}/"
+            target_url = self.page.url or f"{self.host.base_url}/"
             return self.goto_page(target_url, wait_until=wait_until, timeout=timeout)
 
     def _goto_and_wait(

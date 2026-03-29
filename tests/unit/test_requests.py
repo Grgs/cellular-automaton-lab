@@ -3,6 +3,11 @@ from typing import ClassVar
 
 from flask import Flask, request
 
+from backend.contract_validation import (
+    normalize_config_topology_patch,
+    normalize_reset_topology_spec,
+    validate_persisted_snapshot_payload,
+)
 from backend.payload_types import RawJsonObject
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
@@ -176,6 +181,62 @@ class RequestParsingTests(unittest.TestCase):
             parse_topology_spec({"topology_spec": {"tiling_family": "square", "width": "bad"}})
         with self.assertRaises(RequestValidationError):
             parse_topology_spec({"topology_spec": []})
+
+    def test_normalize_reset_and_config_contracts_match_http_rules(self) -> None:
+        self.assertEqual(
+            normalize_reset_topology_spec({
+                "topology_spec": {
+                    "tiling_family": "hex",
+                    "adjacency_mode": "edge",
+                    "width": 12,
+                    "height": 8,
+                    "patch_depth": 0,
+                },
+            }),
+            {
+                "tiling_family": "hex",
+                "adjacency_mode": "edge",
+                "sizing_mode": "grid",
+                "width": 12,
+                "height": 8,
+                "patch_depth": 0,
+            },
+        )
+        self.assertEqual(
+            normalize_config_topology_patch({"topology_spec": {"width": 12, "height": 8}}),
+            {"width": 12, "height": 8},
+        )
+
+        with self.assertRaises(RequestValidationError):
+            normalize_reset_topology_spec({"width": 12})
+        with self.assertRaises(RequestValidationError):
+            normalize_config_topology_patch({"topology_spec": {"patch_depth": 4}})
+
+    def test_validate_persisted_snapshot_payload_accepts_versioned_shape(self) -> None:
+        payload = validate_persisted_snapshot_payload({
+            "version": 5,
+            "topology_spec": {
+                "tiling_family": "square",
+                "adjacency_mode": "edge",
+                "width": 12,
+                "height": 8,
+                "patch_depth": 0,
+            },
+            "speed": 5,
+            "running": False,
+            "generation": 9,
+            "rule": "conway",
+            "cells_by_id": {
+                "c:1:1": 1,
+            },
+        })
+
+        self.assertEqual(payload["version"], 5)
+        self.assertEqual(payload["topology_spec"]["width"], 12)
+        self.assertEqual(payload["cells_by_id"], {"c:1:1": 1})
+
+        with self.assertRaisesRegex(ValueError, "version is unsupported"):
+            validate_persisted_snapshot_payload({"version": 4})
 
 
 if __name__ == "__main__":

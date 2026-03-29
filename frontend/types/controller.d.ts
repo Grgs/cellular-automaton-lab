@@ -247,6 +247,7 @@ export interface AppControllerStartupResult {
 
 export interface AppController {
     init(): Promise<void>;
+    dispose(): void;
     refreshState(): Promise<void>;
     loadRules(): Promise<void>;
     applySimulationState(simulationState: SimulationSnapshot, options?: { source?: string }): void;
@@ -284,6 +285,7 @@ export interface FetchStateFunction {
 export interface SimulationBackend {
     getState(): Promise<SimulationSnapshot>;
     getRules(): Promise<RulesResponse>;
+    dispose(): void | Promise<void>;
     postControl(path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
     postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
     postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;

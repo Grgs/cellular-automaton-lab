@@ -3,24 +3,22 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
+from backend.contract_validation import (
+    normalize_config_topology_patch,
+    normalize_reset_topology_spec,
+    parse_cell_target,
+    parse_cell_updates,
+    parse_optional_float,
+    parse_rule_name,
+    parse_state_value,
+)
 from backend.payload_types import (
     CellTargetPayload,
     CellUpdatePayload,
     RawJsonObject,
-    TopologySpecPatch,
 )
 from backend.rules import RuleRegistry
 from backend.simulation.coordinator import SimulationCoordinator
-from backend.web.requests import (
-    RequestValidationError,
-    parse_cell_target,
-    parse_cell_updates,
-    parse_optional_float,
-    parse_optional_int,
-    parse_rule_name,
-    parse_state_value,
-    parse_topology_spec,
-)
 
 
 @dataclass(frozen=True)
@@ -29,13 +27,7 @@ class StateActionService:
     rules: RuleRegistry
 
     def apply_reset_payload(self, payload: RawJsonObject) -> None:
-        if payload.get("geometry") not in (None, ""):
-            raise RequestValidationError("'geometry' must be provided through 'topology_spec'.")
-        if payload.get("width") not in (None, "") or payload.get("height") not in (None, ""):
-            raise RequestValidationError("'width' and 'height' must be provided through 'topology_spec'.")
-        if payload.get("patch_depth") not in (None, ""):
-            raise RequestValidationError("'patch_depth' must be provided through 'topology_spec'.")
-        topology_spec = parse_topology_spec(payload)
+        topology_spec = normalize_reset_topology_spec(payload)
         self.coordinator.reset(
             topology_spec=topology_spec,
             rule_name=parse_rule_name(payload, self.rules),
@@ -44,29 +36,8 @@ class StateActionService:
         )
 
     def apply_config_payload(self, payload: RawJsonObject) -> None:
-        if payload.get("geometry") not in (None, ""):
-            raise RequestValidationError("'geometry' can only be changed through reset.")
-        if payload.get("width") not in (None, "") or payload.get("height") not in (None, ""):
-            raise RequestValidationError("'width' and 'height' must be provided through 'topology_spec'.")
-        if payload.get("patch_depth") not in (None, ""):
-            raise RequestValidationError("'patch_depth' can only be changed through reset.")
-        topology_spec = payload.get("topology_spec")
-        if topology_spec is not None and not isinstance(topology_spec, dict):
-            raise RequestValidationError("'topology_spec' must be an object.")
-        disallowed_keys = {"tiling_family", "adjacency_mode", "sizing_mode", "patch_depth"} & set((topology_spec or {}).keys())
-        if disallowed_keys:
-            disallowed = ", ".join(sorted(disallowed_keys))
-            raise RequestValidationError(f"'{disallowed}' can only be changed through reset.")
-        topology_patch: TopologySpecPatch = {}
-        if topology_spec is not None:
-            width = parse_optional_int(topology_spec, "width")
-            height = parse_optional_int(topology_spec, "height")
-            if width is not None:
-                topology_patch["width"] = width
-            if height is not None:
-                topology_patch["height"] = height
         self.coordinator.update_config(
-            topology_spec=topology_patch,
+            topology_spec=normalize_config_topology_patch(payload),
             speed=parse_optional_float(payload, "speed"),
             rule_name=parse_rule_name(payload, self.rules),
         )

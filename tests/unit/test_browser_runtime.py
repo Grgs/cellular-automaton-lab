@@ -54,6 +54,16 @@ class BrowserRuntimeTests(unittest.TestCase):
         self.assertFalse(response["ok"])
         self.assertIn("supported by rule", response["error"])
 
+    def test_handle_request_matches_config_validation_contract(self) -> None:
+        initialize_runtime()
+
+        response = json.loads(handle_request("/api/config", json.dumps({
+            "topology_spec": {"patch_depth": 4},
+        })))
+
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["error"], "'patch_depth' can only be changed through reset.")
+
 
 if __name__ == "__main__":
     unittest.main()

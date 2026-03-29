@@ -33,6 +33,16 @@ class ApiControlTests(ApiTestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.get_json(), {'error': expected_error})
 
+    def test_config_rejects_patch_depth_changes(self) -> None:
+        response = self.client.post('/api/config', json={
+            'topology_spec': {'patch_depth': 4},
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.get_json(), {
+            'error': "'patch_depth' can only be changed through reset.",
+        })
+
     def test_pause_resume_and_reset(self) -> None:
         self.reset_simulation(width=8, height=8, speed=10, rule='highlife', randomize=True)
         self.client.post('/api/control/start')

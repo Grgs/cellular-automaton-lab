@@ -4,15 +4,6 @@ import {
 import { createAppControllerBootstrap } from "./app-controller-bootstrap.js";
 import { createAppControllerSync } from "./app-controller-sync.js";
 import { initializeAppController } from "./app-controller-startup.js";
-import { createConfigSyncController } from "./config-sync-controller.js";
-import { createInteractionController } from "./interactions.js";
-import { createSimulationMutations } from "./interactions/simulation-mutations.js";
-import { createMutationRunner } from "./mutation-runner.js";
-import { createAppActions } from "./app-actions.js";
-import { createUiSessionController } from "./ui-session-controller.js";
-import { createUiSessionStorage } from "./ui-session.js";
-import { createViewportController } from "./viewport-controller.js";
-import { createSimulationReconciler } from "./simulation-reconciler.js";
 import type { AppActionSet } from "./types/actions.js";
 import type {
     AppController,
@@ -34,6 +25,7 @@ export function createAppController({
     let configSyncController: ConfigSyncController | null = null;
     let uiSessionController: UiSessionController | null = null;
     let controlActions: AppActionSet | null = null;
+    let disposed = false;
     const controllerRefs = {
         configSyncController: null as ConfigSyncController | null,
         uiSessionController: null as UiSessionController | null,
@@ -99,8 +91,27 @@ export function createAppController({
         }));
     }
 
+    function dispose(): void {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        viewportController?.dispose();
+        configSyncController?.dispose();
+        mutationRunner.dispose();
+        void Promise.resolve(backend.dispose()).catch(onError);
+        interactions = null;
+        viewportController = null;
+        configSyncController = null;
+        uiSessionController = null;
+        controlActions = null;
+        controllerRefs.configSyncController = null;
+        controllerRefs.uiSessionController = null;
+    }
+
     return {
         init,
+        dispose,
         refreshState: sync.refreshState,
         loadRules: sync.loadRules,
         applySimulationState: sync.applySimulationState,

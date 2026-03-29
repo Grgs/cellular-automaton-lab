@@ -6,10 +6,18 @@ from pathlib import Path
 
 
 try:
-    from tests.e2e.playwright_case_suite import CellularAutomatonUITests
+    from tests.e2e.playwright_case_suite import (
+        CellularAutomatonUITests,
+        StandaloneCellularAutomatonUITests,
+        StandaloneRuntimeFailureTests,
+    )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from tests.e2e.playwright_case_suite import CellularAutomatonUITests
+    from tests.e2e.playwright_case_suite import (
+        CellularAutomatonUITests,
+        StandaloneCellularAutomatonUITests,
+        StandaloneRuntimeFailureTests,
+    )
 
 
 DEFAULT_PLAYWRIGHT_SUBSET_COUNT = 6
@@ -19,6 +27,13 @@ PLAYWRIGHT_FEATURE_NAMES = (
     "overlays_and_editor",
     "topology_and_persistence",
     "pattern_and_showcase",
+    "standalone_runtime",
+)
+
+PLAYWRIGHT_CASES = (
+    CellularAutomatonUITests,
+    StandaloneCellularAutomatonUITests,
+    StandaloneRuntimeFailureTests,
 )
 
 
@@ -45,18 +60,11 @@ def _topology_and_persistence_match(name: str) -> bool:
     return any(
         token in name
         for token in (
-            "switching_to_",
-            "server_restart",
-            "patch_depth",
+            "switch_",
+            "restart",
+            "reload_",
             "topology_",
-            "archimedean",
-            "kagome",
             "penrose",
-            "snub",
-            "triangle",
-            "hexlife_click",
-            "trilife",
-            "hexwhirlpool_cell_size",
         )
     )
 
@@ -68,26 +76,33 @@ def _overlays_and_editor_match(name: str) -> bool:
             "drawer",
             "overlay",
             "hud",
-            "grid_click",
             "edit",
             "paint",
-            "brush",
-            "line_",
-            "rectangle_",
-            "fill_",
-            "top_bar",
-            "mobile",
-            "theme",
-            "workspace_empty_click",
-            "running_",
-            "rule_notes",
-            "rule_palette_section",
             "canvas_",
-            "viewport_",
-            "empty_click",
+            "quick_start",
             "inspector",
         )
     )
+
+
+def _test_id(case_cls: type[unittest.TestCase], name: str) -> str:
+    return f"{case_cls.__name__}.{name}"
+
+
+def _available_test_cases() -> dict[str, type[unittest.TestCase]]:
+    return {
+        case_cls.__name__: case_cls
+        for case_cls in PLAYWRIGHT_CASES
+    }
+
+
+def iter_playwright_test_names() -> list[str]:
+    names: list[str] = []
+    for case_cls in PLAYWRIGHT_CASES:
+        for name, member in inspect.getmembers(case_cls, predicate=callable):
+            if name.startswith("test_"):
+                names.append(_test_id(case_cls, name))
+    return sorted(names)
 
 
 def _playwright_feature_map() -> OrderedDict[str, list[str]]:
@@ -96,33 +111,31 @@ def _playwright_feature_map() -> OrderedDict[str, list[str]]:
         for feature_name in PLAYWRIGHT_FEATURE_NAMES
     )
 
-    for name in iter_playwright_test_names():
+    for test_id in iter_playwright_test_names():
+        case_name, name = test_id.split(".", 1)
+        if case_name.startswith("Standalone"):
+            grouped["standalone_runtime"].append(test_id)
+            continue
         if _pattern_and_showcase_match(name):
-            grouped["pattern_and_showcase"].append(name)
+            grouped["pattern_and_showcase"].append(test_id)
             continue
         if _topology_and_persistence_match(name):
-            grouped["topology_and_persistence"].append(name)
+            grouped["topology_and_persistence"].append(test_id)
             continue
         if _overlays_and_editor_match(name):
-            grouped["overlays_and_editor"].append(name)
+            grouped["overlays_and_editor"].append(test_id)
             continue
-        grouped["rules_and_picker"].append(name)
+        grouped["rules_and_picker"].append(test_id)
 
     return grouped
 
 
-def iter_playwright_test_names() -> list[str]:
-    return sorted(
-        name
-        for name, member in inspect.getmembers(CellularAutomatonUITests, predicate=callable)
-        if name.startswith("test_")
-    )
-
-
-def build_named_playwright_suite(test_names: list[str]) -> unittest.TestSuite:
+def build_named_playwright_suite(test_ids: list[str]) -> unittest.TestSuite:
+    cases = _available_test_cases()
     suite = unittest.TestSuite()
-    for name in test_names:
-        suite.addTest(CellularAutomatonUITests(name))
+    for test_id in test_ids:
+        case_name, method_name = test_id.split(".", 1)
+        suite.addTest(cases[case_name](method_name))
     return suite
 
 

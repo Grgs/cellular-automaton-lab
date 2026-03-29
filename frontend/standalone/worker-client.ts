@@ -42,6 +42,7 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
     const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), { type: "classic" });
     const pendingRequests = new Map<string, PendingRequest>();
     let fatalError: Error | null = null;
+    let disposed = false;
 
     function rejectPending(error: Error): void {
         fatalError = error;
@@ -49,11 +50,14 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
         pendingRequests.clear();
     }
 
-    worker.addEventListener("error", (event) => {
+    function handleWorkerError(event: ErrorEvent): void {
         rejectPending(new Error(event.message || "Standalone worker crashed."));
-    });
+    }
 
-    worker.addEventListener("message", (event: MessageEvent<StandaloneWorkerOutgoingMessage>) => {
+    function handleWorkerMessage(event: MessageEvent<StandaloneWorkerOutgoingMessage>): void {
+        if (disposed) {
+            return;
+        }
         const message = event.data;
         if (message.type === "persist") {
             void persistence.save(message.persistedSnapshot);
@@ -65,11 +69,28 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
         }
         pendingRequests.delete(message.requestId);
         pending.resolve(message);
-    });
+    }
+
+    function dispose(): void {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        worker.removeEventListener("error", handleWorkerError);
+        worker.removeEventListener("message", handleWorkerMessage);
+        rejectPending(new Error("Standalone runtime was disposed."));
+        worker.terminate();
+    }
+
+    worker.addEventListener("error", handleWorkerError);
+    worker.addEventListener("message", handleWorkerMessage);
 
     async function sendMessage(
         message: StandaloneWorkerIncomingMessage,
     ): Promise<StandaloneSuccessResponse | StandaloneReadyResponse | StandaloneInitErrorResponse | StandaloneErrorResponse> {
+        if (disposed) {
+            throw new Error("Standalone runtime was disposed.");
+        }
         if (fatalError) {
             throw fatalError;
         }
@@ -81,15 +102,22 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
 
     const persistedSnapshot = await persistence.load();
     const initRequestId = createRequestId();
-    const initResponse = await sendMessage({
-        type: "init",
-        requestId: initRequestId,
-        persistedSnapshot,
-        pythonManifestUrl: new URL(/* @vite-ignore */ "../standalone-python-manifest.json", import.meta.url).toString(),
-        pyodideBaseUrl: DEFAULT_PYODIDE_BASE_URL,
-    });
+    let initResponse: StandaloneSuccessResponse | StandaloneReadyResponse | StandaloneInitErrorResponse | StandaloneErrorResponse;
+    try {
+        initResponse = await sendMessage({
+            type: "init",
+            requestId: initRequestId,
+            persistedSnapshot,
+            pythonManifestUrl: new URL(/* @vite-ignore */ "../standalone-python-manifest.json", import.meta.url).toString(),
+            pyodideBaseUrl: DEFAULT_PYODIDE_BASE_URL,
+        });
+    } catch (error) {
+        dispose();
+        throw error;
+    }
 
     if ("error" in initResponse) {
+        dispose();
         throw new Error(initResponse.error);
     }
     if (initResponse.persistedSnapshot) {
@@ -138,6 +166,7 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
             const response = await request("/api/rules");
             return { rules: response.rules ?? [] };
         },
+        dispose,
         postControl,
         async toggleCell(cell) {
             const response = await request("/api/cells/toggle", { id: cell.id });
