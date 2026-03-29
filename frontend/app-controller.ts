@@ -1,10 +1,5 @@
 import {
-    fetchRules,
-    fetchState,
-    postControl,
-    setCellRequest,
-    setCellsRequest,
-    toggleCellRequest,
+    createHttpSimulationBackend,
 } from "./api.js";
 import { createAppControllerBootstrap } from "./app-controller-bootstrap.js";
 import { createAppControllerSync } from "./app-controller-sync.js";
@@ -31,6 +26,7 @@ import type {
 export function createAppController({
     elements,
     gridView,
+    backend = createHttpSimulationBackend(),
     onError = (error: unknown) => console.error(error),
 }: CreateAppControllerOptions): AppController {
     let interactions: InteractionController | null = null;
@@ -66,8 +62,8 @@ export function createAppController({
         state,
         appView,
         onError,
-        fetchRulesFn: fetchRules,
-        fetchStateFn: fetchState,
+        fetchRulesFn: () => backend.getRules(),
+        fetchStateFn: () => backend.getState(),
         getConfigSyncController: () => controllerRefs.configSyncController,
         getUiSessionController: () => controllerRefs.uiSessionController,
         getRefreshState: () => sync.refreshState,
@@ -87,10 +83,10 @@ export function createAppController({
             mutationRunner,
             appView,
             onError,
-            postControlFn: postControl,
-            toggleCellRequestFn: toggleCellRequest,
-            setCellRequestFn: setCellRequest,
-            setCellsRequestFn: setCellsRequest,
+            postControlFn: backend.postControl.bind(backend),
+            toggleCellRequestFn: backend.toggleCell.bind(backend),
+            setCellRequestFn: backend.setCell.bind(backend),
+            setCellsRequestFn: backend.setCells.bind(backend),
             sync,
             onConfigSyncController: (nextConfigSyncController) => {
                 controllerRefs.configSyncController = nextConfigSyncController;

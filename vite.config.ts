@@ -35,21 +35,28 @@ function resolveFrontendJsImports() {
     };
 }
 
-export default defineConfig({
-    base: "/static/dist/",
-    plugins: [resolveFrontendJsImports()],
-    build: {
-        outDir: "static/dist",
-        emptyOutDir: true,
-        manifest: "manifest.json",
-        rollupOptions: {
-            input: {
-                app: path.resolve(dirname, "frontend/app.ts"),
+export default defineConfig(({ mode }) => {
+    const isStandalone = mode === "standalone";
+    return {
+        base: isStandalone ? "./" : "/static/dist/",
+        plugins: [resolveFrontendJsImports()],
+        build: {
+            outDir: isStandalone ? "output/standalone" : "static/dist",
+            emptyOutDir: true,
+            ...(isStandalone ? {} : { manifest: "manifest.json" }),
+            rollupOptions: {
+                input: isStandalone
+                    ? {
+                        standalone: path.resolve(dirname, "standalone.html"),
+                    }
+                    : {
+                        app: path.resolve(dirname, "frontend/app.ts"),
+                    },
             },
         },
-    },
-    test: {
-        environment: "jsdom",
-        include: ["frontend/**/*.test.ts"],
-    },
+        test: {
+            environment: "jsdom",
+            include: ["frontend/**/*.test.ts"],
+        },
+    };
 });

@@ -217,6 +217,14 @@ class AppDefaultsPayload(TypedDict):
     theme: ThemeDefaultsPayload
 
 
+class AppBootstrapPayload(TypedDict):
+    app_defaults: AppDefaultsPayload
+    topology_catalog: list[TopologyCatalogEntryPayload]
+    periodic_face_tilings: list[PeriodicFaceTilingDescriptorPayload]
+    server_meta: ServerMetaPayload
+    snapshot_version: int
+
+
 class ResetControlRequestPayload(TypedDict):
     topology_spec: TopologySpecPayload
     speed: float

@@ -2,8 +2,10 @@
   "name": "cellular-automaton-lab",
   "private": true,
   "scripts": {
-    "build:frontend": "vite build",
-    "dev:frontend": "vite build --watch",
+    "build:frontend": "vite build --mode server",
+    "build:frontend:server": "vite build --mode server",
+    "build:frontend:standalone": "node ./tools/build-standalone.mjs",
+    "dev:frontend": "vite build --watch --mode server",
     "typecheck:frontend": "tsc -p tsconfig.json --noEmit",
     "test:frontend": "vitest run",
     "check:frontend": "npm run typecheck:frontend && npm run build:frontend && npm run test:frontend"

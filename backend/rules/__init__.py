@@ -1,15 +1,48 @@
 from __future__ import annotations
 
-import importlib
-import inspect
-import pkgutil
-
 from backend.payload_types import RuleDefinitionPayload
+from backend.rules.archlife488 import ArchLife488Rule
+from backend.rules.archlife_extended import (
+    ArchLife31212Rule,
+    ArchLife33336Rule,
+    ArchLife33344Rule,
+    ArchLife33434Rule,
+    ArchLife3464Rule,
+    ArchLife4612Rule,
+)
 from backend.rules.base import AutomatonRule
+from backend.rules.conway import ConwayLifeRule
+from backend.rules.highlife import HighLifeRule
+from backend.rules.hexlife import HexLifeRule
+from backend.rules.kagome_life import KagomeLifeRule
+from backend.rules.life_b2s23 import LifeB2S23Rule
+from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
+from backend.rules.trilife import TriLifeRule
+from backend.rules.whirlpool import WhirlpoolRule
+from backend.rules.wireworld import WireWorldRule
 from backend.simulation.models import RuleSnapshot
 from backend.simulation.topology_catalog import (
     GEOMETRY_DEFAULT_RULES,
     SQUARE_GEOMETRY,
+)
+
+RULE_TYPES: tuple[type[AutomatonRule], ...] = (
+    ArchLife31212Rule,
+    ArchLife33336Rule,
+    ArchLife33344Rule,
+    ArchLife33434Rule,
+    ArchLife3464Rule,
+    ArchLife4612Rule,
+    ArchLife488Rule,
+    ConwayLifeRule,
+    HighLifeRule,
+    HexLifeRule,
+    KagomeLifeRule,
+    LifeB2S23Rule,
+    PenroseGreenbergHastingsRule,
+    TriLifeRule,
+    WhirlpoolRule,
+    WireWorldRule,
 )
 
 
@@ -28,24 +61,11 @@ class RuleRegistry:
             raise RuntimeError("No rule modules were discovered.")
 
     def _discover_rules(self) -> dict[str, AutomatonRule]:
-        rules: dict[str, AutomatonRule] = {}
-
-        for module_info in pkgutil.iter_modules(__path__):
-            if module_info.name == "base":
-                continue
-
-            module = importlib.import_module(f"{__name__}.{module_info.name}")
-            for _, obj in inspect.getmembers(module, inspect.isclass):
-                if obj.__module__ != module.__name__:
-                    continue
-                if not issubclass(obj, AutomatonRule) or obj is AutomatonRule:
-                    continue
-
-                rule = obj()
-                if rule.name == AutomatonRule.name:
-                    continue
-                rules[rule.name] = rule
-
+        rules = {
+            rule.name: rule
+            for rule in (rule_type() for rule_type in RULE_TYPES)
+            if rule.name != AutomatonRule.name
+        }
         return dict(sorted(rules.items(), key=lambda item: item[1].display_name.lower()))
 
     def has(self, name: str) -> bool:

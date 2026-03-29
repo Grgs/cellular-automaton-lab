@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cellular Automaton Lab</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <script>
+        (function () {
+            try {
+                var storedTheme = window.localStorage.getItem("cellular-automaton-theme");
+                if (storedTheme === "light" || storedTheme === "dark") {
+                    document.documentElement.dataset.theme = storedTheme;
+                    return;
+                }
+                document.documentElement.dataset.theme = "light";
+            } catch (error) {
+                void error;
+            }
+        }());
+    </script>
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+        #app-startup-error {
+            display: none;
+            margin: 1rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid rgba(191, 67, 54, 0.25);
+            border-radius: 0.75rem;
+            background: rgba(191, 67, 54, 0.08);
+            color: #7a2018;
+            font: 600 0.95rem/1.4 system-ui, sans-serif;
+        }
+        #app-startup-error.startup-error-visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-startup-error" hidden></div>
+    <main id="app-frame" class="app-frame">
+        <header id="top-bar" class="top-bar">
+            <div class="top-bar-brand">
+                <p class="eyebrow">Python Engine, Browser Canvas</p>
+                <h1>Cellular Automaton Lab</h1>
+            </div>
+
+            <div class="top-bar-strip">
+                <div class="top-bar-summary">
+                    <div class="summary-chip">
+                        <span class="summary-label">Status</span>
+                        <strong id="status-text" class="summary-value">Paused</strong>
+                    </div>
+                    <div class="summary-chip">
+                        <span class="summary-label">Generation</span>
+                        <strong id="generation-text" class="summary-value">0</strong>
+                    </div>
+                    <div id="config-sync-status" class="sync-pill" hidden aria-live="polite"></div>
+                </div>
+
+                <div class="top-bar-controls">
+                    <div class="top-bar-control-group top-bar-topology-group">
+                        <label class="top-control compact-select top-bar-tiling-control">
+                            <span class="top-control-label">Tiling</span>
+                            <select id="tiling-family-select"></select>
+                        </label>
+                    </div>
+
+                    <div class="top-bar-control-group top-bar-actions-group">
+                        <button id="run-toggle-btn" class="primary-action top-bar-action" type="button">Run</button>
+                        <button id="step-btn" class="soft-action top-bar-action" type="button">Step</button>
+                        <button id="reset-btn" class="soft-action top-bar-action" type="button" title="Clear the board and restart the current setup.">Reset Board</button>
+                    </div>
+
+                    <div class="top-bar-control-group top-bar-utility-group">
+                        <button
+                            id="drawer-toggle-btn"
+                            class="soft-action drawer-toggle"
+                            type="button"
+                            aria-controls="control-drawer"
+                            aria-expanded="true"
+                            aria-pressed="true"
+                        >
+                            Hide Inspector
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section id="main-stage" class="main-stage is-drawer-open">
+            <section id="grid-panel" class="canvas-shell grid-panel">
+                <div id="canvas-hud" class="canvas-hud" aria-live="polite">
+                    <div class="canvas-hud-row canvas-hud-topology-row">
+                        <span class="canvas-hud-label">Tiling</span>
+                        <strong id="canvas-hud-tiling-text" class="canvas-hud-value">Loading...</strong>
+                        <span id="canvas-hud-adjacency-text" class="canvas-hud-adjacency" hidden></span>
+                    </div>
+                    <div class="canvas-hud-row canvas-hud-context-row">
+                        <div class="canvas-hud-context-block">
+                            <span class="canvas-hud-label">Rule</span>
+                            <strong id="rule-text" class="canvas-hud-value">Loading...</strong>
+                        </div>
+                        <div class="canvas-hud-context-block">
+                            <span class="canvas-hud-label">Board</span>
+                            <strong id="grid-size-text" class="canvas-hud-value">-- x --</strong>
+                            <span id="grid-size-panel-text" class="sr-only">-- x --</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="canvas-edit-cue" class="canvas-edit-cue" hidden aria-live="polite">
+                    Edit mode active. Click or drag to paint.
+                </div>
+                <div id="grid-viewport" class="grid-viewport">
+                    <div
+                        id="blocking-activity-overlay"
+                        class="blocking-activity-overlay"
+                        hidden
+                        aria-hidden="true"
+                        aria-live="polite"
+                    >
+                        <div class="blocking-activity-card">
+                            <div class="blocking-activity-spinner" aria-hidden="true"></div>
+                            <strong id="blocking-activity-message" class="blocking-activity-message"></strong>
+                            <span id="blocking-activity-detail" class="blocking-activity-detail" hidden></span>
+                        </div>
+                    </div>
+                    <canvas id="grid" class="grid-canvas" aria-label="Cellular automaton grid"></canvas>
+                </div>
+            </section>
+
+            <aside id="control-drawer" class="control-drawer" aria-hidden="false" data-open="true">
+                <div class="control-drawer-inner">
+                    <header class="drawer-header">
+                        <div class="drawer-header-main">
+                            <div class="drawer-header-copy">
+                                <p class="drawer-eyebrow">Inspector</p>
+                                <div class="drawer-header-context">
+                                    <strong id="inspector-tiling-text" class="drawer-header-title">Loading...</strong>
+                                    <span id="inspector-rule-text" class="drawer-header-subtitle">Loading rule...</span>
+                                </div>
+                            </div>
+                            <button
+                                id="theme-toggle-btn"
+                                class="theme-toggle inspector-theme-toggle"
+                                type="button"
+                                aria-label="Switch to dark mode"
+                                aria-pressed="false"
+                                title="Switch to dark mode"
+                            >
+                                <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true">☀</span>
+                                <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
+                            </button>
+                        </div>
+                        <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
+                            <span class="drawer-showcase-title">Try a starting point</span>
+                            <span class="drawer-showcase-actions">
+                                <button id="showcase-whirlpool-btn" class="soft-action showcase-action-button" type="button">
+                                    Whirlpool Demo
+                                </button>
+                                <button id="showcase-wireworld-btn" class="soft-action showcase-action-button" type="button">
+                                    WireWorld Demo
+                                </button>
+                                <button id="showcase-penrose-btn" class="soft-action showcase-action-button showcase-action-button-wide" type="button">
+                                    Penrose Demo
+                                </button>
+                            </span>
+                            <span id="quick-start-hint-text" class="drawer-showcase-hint">Or click the grid to paint.</span>
+                        </div>
+                        <div id="pattern-status" class="pattern-status inspector-status" hidden aria-live="polite"></div>
+                    </header>
+
+                    <section id="rule-palette-section" class="panel-section drawer-section">
+                        <h2>Rule &amp; Palette</h2>
+                        <label class="top-control compact-select drawer-control drawer-rule-control">
+                            <span class="top-control-label">Rule</span>
+                            <select id="rule-select"></select>
+                        </label>
+                        <p id="rule-summary-text" class="rule-summary"></p>
+                        <div id="paint-palette" class="paint-palette"></div>
+                        <details id="rule-notes-toggle" class="rule-help-toggle">
+                            <summary>Rule Notes</summary>
+                            <p id="rule-description" class="rule-description"></p>
+                        </details>
+                    </section>
+
+                    <section id="editor-section" class="panel-section drawer-section">
+                        <h2>Editor</h2>
+                        <div class="drawer-control-grid drawer-tuning-grid">
+                            <label id="cell-size-field" class="top-control top-compact-control drawer-control">
+                                <span class="top-control-label">Cell Size</span>
+                                <input
+                                    id="cell-size-input"
+                                    class="top-manual-input"
+                                    type="number"
+                                    inputmode="numeric"
+                                    min="4"
+                                    max="24"
+                                    step="1"
+                                    value="12"
+                                >
+                                <span id="cell-size-label" class="top-slider-value">12px</span>
+                            </label>
+
+                            <label id="patch-depth-field" class="top-control top-compact-control drawer-control" hidden>
+                                <span class="top-control-label">Patch Depth</span>
+                                <input
+                                    id="patch-depth-input"
+                                    class="top-manual-input"
+                                    type="number"
+                                    inputmode="numeric"
+                                    min="0"
+                                    max="6"
+                                    step="1"
+                                    value="0"
+                                >
+                                <span id="patch-depth-label" class="top-slider-value">Depth 0</span>
+                            </label>
+
+                            <label id="speed-field" class="top-control top-compact-control drawer-control speed-control">
+                                <span class="top-control-label">Speed</span>
+                                <input
+                                    id="speed-input"
+                                    class="top-manual-input"
+                                    type="number"
+                                    inputmode="numeric"
+                                    min="1"
+                                    max="30"
+                                    step="1"
+                                    value="5"
+                                >
+                                <span id="speed-label" class="top-slider-value">5 gen/s</span>
+                            </label>
+                        </div>
+                        <div id="editor-tools" class="editor-tool-grid" aria-label="Editor tools"></div>
+                        <div class="editor-action-row">
+                            <button id="undo-btn" class="soft-action" type="button" disabled>Undo</button>
+                            <button id="redo-btn" class="soft-action" type="button" disabled>Redo</button>
+                        </div>
+                        <div class="editor-brush-block">
+                            <span class="editor-subtitle">Brush Size</span>
+                            <div id="brush-size-controls" class="brush-size-grid" aria-label="Brush size"></div>
+                        </div>
+                        <p id="editor-shortcut-hint" class="hint editor-shortcut-hint">
+                            Shortcuts: B brush, L line, R rectangle, F fill, 1-3 brush size.
+                        </p>
+                        <details id="reset-settings-toggle" class="rule-help-toggle reset-settings-toggle">
+                            <summary>More</summary>
+                            <div class="reset-settings-panel">
+                                <p class="hint">Reset saved UI preferences and return the app to its default board, rule, and theme.</p>
+                                <button id="reset-all-settings-btn" class="soft-action reset-settings-btn" type="button">Reset All Settings</button>
+                            </div>
+                        </details>
+                    </section>
+
+                    <section id="simulation-section" class="panel-section drawer-section">
+                        <h2>Board &amp; Patterns</h2>
+                        <div class="drawer-control-grid drawer-board-grid">
+                            <label id="adjacency-mode-field" class="top-control compact-select drawer-control" hidden>
+                                <span class="top-control-label">Adjacency</span>
+                                <select id="adjacency-mode-select"></select>
+                            </label>
+                        </div>
+                        <div class="drawer-board-actions">
+                            <div id="preset-seed-controls" class="preset-seed-controls">
+                                <select id="preset-seed-select" hidden aria-label="Preset seed pattern"></select>
+                                <button id="preset-seed-btn" class="soft-action" type="button">Preset Seed</button>
+                            </div>
+                            <button id="random-btn" class="secondary drawer-action-button" type="button">Random Reset</button>
+                        </div>
+                        <p id="preset-helper-text" class="hint preset-helper-text">
+                            Loads a curated seed for this rule and board.
+                        </p>
+                        <input
+                            id="pattern-import-input"
+                            type="file"
+                            accept=".json,application/json"
+                            hidden
+                            aria-hidden="true"
+                        >
+                        <div class="drawer-action-grid">
+                            <button id="import-pattern-btn" class="soft-action" type="button">Import Pattern</button>
+                            <button id="copy-pattern-btn" class="soft-action" type="button">Copy Pattern</button>
+                            <button id="export-pattern-btn" class="soft-action" type="button">Export Pattern</button>
+                            <button id="paste-pattern-btn" class="soft-action" type="button">Paste Pattern</button>
+                        </div>
+                    </section>
+                </div>
+            </aside>
+        </section>
+
+        <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+    </main>
+
+    <script type="module" src="/frontend/standalone.ts"></script>
+</body>
+</html>

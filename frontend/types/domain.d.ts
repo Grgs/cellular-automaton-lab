@@ -1,3 +1,5 @@
+import type { PeriodicFaceTilingDescriptor } from "./rendering.js";
+
 export type SizingControl = "cell_size" | "patch_depth";
 
 export interface TopologySpec {
@@ -40,6 +42,18 @@ export interface FrontendDefaults {
 }
 
 export type BootstrappedFrontendDefaults = FrontendDefaults;
+
+export interface ServerMetaPayload {
+    app_name: string;
+}
+
+export interface AppBootstrapData {
+    app_defaults: BootstrappedFrontendDefaults;
+    topology_catalog: ReadonlyArray<BootstrappedTopologyDefinition>;
+    periodic_face_tilings: ReadonlyArray<PeriodicFaceTilingDescriptor>;
+    server_meta: ServerMetaPayload;
+    snapshot_version: number;
+}
 
 export interface SizingPolicy {
     control: SizingControl;
@@ -209,4 +223,14 @@ export interface ApiSimulationSnapshot {
 }
 
 export interface SimulationSnapshot extends ApiSimulationSnapshot {
+}
+
+export interface PersistedSimulationSnapshotV5 {
+    version: 5;
+    topology_spec: TopologySpec;
+    speed: number;
+    running: boolean;
+    generation: number;
+    rule: string;
+    cells_by_id: Record<string, number>;
 }

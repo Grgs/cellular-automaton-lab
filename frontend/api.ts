@@ -8,6 +8,7 @@ import type {
     ConfigSyncBody,
     EmptyControlCommandPath,
     ResetControlBody,
+    SimulationBackend,
 } from "./types/controller.js";
 
 interface CellMutation extends CellIdentifier {
@@ -75,4 +76,15 @@ export function postControl(
         method: "POST",
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
+}
+
+export function createHttpSimulationBackend(): SimulationBackend {
+    return {
+        getState: fetchState,
+        getRules: fetchRules,
+        postControl,
+        toggleCell: toggleCellRequest,
+        setCell: setCellRequest,
+        setCells: setCellsRequest,
+    };
 }

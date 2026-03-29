@@ -1,0 +1,160 @@
+import type { AppBootstrapData, RulesResponse, SimulationSnapshot } from "../types/domain.js";
+import type {
+    ConfigSyncBody,
+    ResetControlBody,
+    SimulationBackend,
+} from "../types/controller.js";
+import { createSimulationStatePersistence } from "./persistence.js";
+import type {
+    StandaloneCommandPath,
+    StandaloneErrorResponse,
+    StandaloneInitErrorResponse,
+    StandaloneReadyResponse,
+    StandaloneRequestMessage,
+    StandaloneSuccessResponse,
+    StandaloneWorkerIncomingMessage,
+    StandaloneWorkerOutgoingMessage,
+} from "./protocol.js";
+
+const DEFAULT_PYODIDE_BASE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/";
+
+interface PendingRequest {
+    resolve: (value: StandaloneSuccessResponse | StandaloneReadyResponse | StandaloneInitErrorResponse | StandaloneErrorResponse) => void;
+    reject: (error: Error) => void;
+}
+
+function createRequestId(): string {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function requireSnapshot(snapshot: SimulationSnapshot | undefined): SimulationSnapshot {
+    if (!snapshot) {
+        throw new Error("Standalone runtime did not return a simulation snapshot.");
+    }
+    return snapshot;
+}
+
+export async function createStandaloneEnvironment(bootstrapData: AppBootstrapData): Promise<{
+    backend: SimulationBackend;
+    bootstrapData: AppBootstrapData;
+}> {
+    const persistence = await createSimulationStatePersistence();
+    const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), { type: "classic" });
+    const pendingRequests = new Map<string, PendingRequest>();
+    let fatalError: Error | null = null;
+
+    function rejectPending(error: Error): void {
+        fatalError = error;
+        pendingRequests.forEach((pending) => pending.reject(error));
+        pendingRequests.clear();
+    }
+
+    worker.addEventListener("error", (event) => {
+        rejectPending(new Error(event.message || "Standalone worker crashed."));
+    });
+
+    worker.addEventListener("message", (event: MessageEvent<StandaloneWorkerOutgoingMessage>) => {
+        const message = event.data;
+        if (message.type === "persist") {
+            void persistence.save(message.persistedSnapshot);
+            return;
+        }
+        const pending = pendingRequests.get(message.requestId);
+        if (!pending) {
+            return;
+        }
+        pendingRequests.delete(message.requestId);
+        pending.resolve(message);
+    });
+
+    async function sendMessage(
+        message: StandaloneWorkerIncomingMessage,
+    ): Promise<StandaloneSuccessResponse | StandaloneReadyResponse | StandaloneInitErrorResponse | StandaloneErrorResponse> {
+        if (fatalError) {
+            throw fatalError;
+        }
+        return new Promise((resolve, reject) => {
+            pendingRequests.set(message.requestId, { resolve, reject });
+            worker.postMessage(message);
+        });
+    }
+
+    const persistedSnapshot = await persistence.load();
+    const initRequestId = createRequestId();
+    const initResponse = await sendMessage({
+        type: "init",
+        requestId: initRequestId,
+        persistedSnapshot,
+        pythonManifestUrl: new URL(/* @vite-ignore */ "../standalone-python-manifest.json", import.meta.url).toString(),
+        pyodideBaseUrl: DEFAULT_PYODIDE_BASE_URL,
+    });
+
+    if ("error" in initResponse) {
+        throw new Error(initResponse.error);
+    }
+    if (initResponse.persistedSnapshot) {
+        await persistence.save(initResponse.persistedSnapshot);
+    }
+
+    async function request(
+        path: StandaloneCommandPath,
+        payload?: ResetControlBody | ConfigSyncBody | { id: string } | { id: string; state: number } | { cells: Array<{ id: string; state: number }> },
+    ): Promise<StandaloneSuccessResponse> {
+        if (fatalError) {
+            throw fatalError;
+        }
+        const response = await sendMessage({
+            type: "request",
+            requestId: createRequestId(),
+            path,
+            ...(payload === undefined ? {} : { payload }),
+        } satisfies StandaloneRequestMessage);
+        if (!("ok" in response)) {
+            throw new Error("Standalone runtime returned an unexpected response.");
+        }
+        if (!response.ok) {
+            throw new Error(response.error);
+        }
+        if (response.persistedSnapshot) {
+            await persistence.save(response.persistedSnapshot);
+        }
+        return response;
+    }
+
+    async function postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
+    async function postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
+    async function postControl(path: "/api/control/start" | "/api/control/pause" | "/api/control/resume" | "/api/control/step"): Promise<SimulationSnapshot>;
+    async function postControl(path: StandaloneCommandPath, body?: ResetControlBody | ConfigSyncBody): Promise<SimulationSnapshot> {
+        const response = await request(path, body);
+        return requireSnapshot(response.snapshot);
+    }
+
+    const backend: SimulationBackend = {
+        async getState() {
+            const response = await request("/api/state");
+            return requireSnapshot(response.snapshot);
+        },
+        async getRules(): Promise<RulesResponse> {
+            const response = await request("/api/rules");
+            return { rules: response.rules ?? [] };
+        },
+        postControl,
+        async toggleCell(cell) {
+            const response = await request("/api/cells/toggle", { id: cell.id });
+            return requireSnapshot(response.snapshot);
+        },
+        async setCell(cell, state) {
+            const response = await request("/api/cells/set", { id: cell.id, state });
+            return requireSnapshot(response.snapshot);
+        },
+        async setCells(cells) {
+            const response = await request("/api/cells/set-many", { cells });
+            return requireSnapshot(response.snapshot);
+        },
+    };
+
+    return {
+        backend,
+        bootstrapData,
+    };
+}

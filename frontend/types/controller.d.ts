@@ -1,6 +1,8 @@
 import type {
+    AppBootstrapData,
     CellIdentifier,
     CellStateDefinition,
+    PersistedSimulationSnapshotV5,
     RulesResponse,
     SimulationSnapshot,
     TopologySpec,
@@ -279,6 +281,22 @@ export interface FetchStateFunction {
     (): Promise<SimulationSnapshot>;
 }
 
+export interface SimulationBackend {
+    getState(): Promise<SimulationSnapshot>;
+    getRules(): Promise<RulesResponse>;
+    postControl(path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
+    postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
+    postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
+    toggleCell(cell: CellIdentifier): Promise<SimulationSnapshot>;
+    setCell(cell: CellIdentifier, state: number): Promise<SimulationSnapshot>;
+    setCells(cells: Array<{ id: string; state: number }>): Promise<SimulationSnapshot>;
+}
+
+export interface SimulationStatePersistence {
+    load(): Promise<PersistedSimulationSnapshotV5 | null>;
+    save(snapshot: PersistedSimulationSnapshotV5): Promise<void>;
+}
+
 export interface PostControlFunction {
     (path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
     (path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
@@ -321,5 +339,11 @@ export interface CreateSimulationMutationsFunction {
 export interface CreateAppControllerOptions {
     elements: DomElements;
     gridView: GridView;
+    backend?: SimulationBackend;
     onError?: (error: unknown) => void;
+}
+
+export interface InitAppOptions {
+    backend?: SimulationBackend;
+    bootstrapData?: AppBootstrapData | null;
 }

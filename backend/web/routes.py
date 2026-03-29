@@ -5,6 +5,7 @@ from typing import TypeVar
 
 from flask import Blueprint, Response, current_app, jsonify, render_template, request
 
+from backend.bootstrap_data import build_bootstrap_payload
 from backend.payload_types import (
     ApiErrorPayload,
     RawJsonObject,
@@ -111,6 +112,11 @@ def get_topology() -> Response:
 @api_bp.get("/meta")
 def get_meta() -> Response:
     return jsonify(current_app.config["SERVER_META"])
+
+
+@api_bp.get("/bootstrap")
+def get_bootstrap() -> Response:
+    return jsonify(build_bootstrap_payload(current_app.config["SERVER_META"]))
 
 
 @api_bp.post("/control/start")
