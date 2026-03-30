@@ -7,6 +7,9 @@ from tests.e2e.playwright_suite_support import (
     PLAYWRIGHT_FEATURE_NAMES,
     build_playwright_suite,
     iter_playwright_feature_test_names,
+    iter_server_playwright_test_names,
+    iter_server_playwright_subset_test_names,
+    iter_standalone_runtime_test_names,
     iter_playwright_subset_test_names,
     iter_playwright_test_names,
 )
@@ -29,11 +32,11 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
         self.assertEqual(iter_playwright_test_names(), expected)
         self.assertEqual(sorted(_iter_suite_test_names(build_playwright_suite())), expected)
 
-    def test_chunked_playwright_subsets_cover_every_master_browser_test_once(self) -> None:
-        expected = iter_playwright_test_names()
+    def test_chunked_playwright_subsets_cover_every_server_browser_test_once(self) -> None:
+        expected = iter_server_playwright_test_names()
         chunked_names: list[str] = []
         for subset_index in range(DEFAULT_PLAYWRIGHT_SUBSET_COUNT):
-            subset_names = iter_playwright_subset_test_names(
+            subset_names = iter_server_playwright_subset_test_names(
                 subset_index,
                 DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
             )
@@ -42,6 +45,18 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
 
         self.assertEqual(sorted(chunked_names), expected)
         self.assertEqual(Counter(chunked_names), Counter(expected))
+
+    def test_server_shards_plus_standalone_suite_cover_every_master_browser_test_once(self) -> None:
+        expected = iter_playwright_test_names()
+        combined = list(iter_standalone_runtime_test_names())
+        for subset_index in range(DEFAULT_PLAYWRIGHT_SUBSET_COUNT):
+            combined.extend(iter_playwright_subset_test_names(
+                subset_index,
+                DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
+            ))
+
+        self.assertEqual(sorted(combined), expected)
+        self.assertEqual(Counter(combined), Counter(expected))
 
     def test_feature_playwright_suites_cover_every_master_browser_test_once(self) -> None:
         expected = iter_playwright_test_names()

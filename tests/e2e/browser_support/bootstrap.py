@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import _thread
+import os
+import re
+import shutil
 import tempfile
 import threading
 import time
@@ -27,6 +30,7 @@ from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_ho
 from tests.e2e.support_server import JsonApiClient
 
 WaitUntilState = Literal["commit", "domcontentloaded", "load", "networkidle"]
+E2E_ARTIFACTS_DIR_ENV = "E2E_ARTIFACTS_DIR"
 
 
 class BrowserAppTestCase(unittest.TestCase):
@@ -136,8 +140,28 @@ class BrowserAppTestCase(unittest.TestCase):
 
         return False
 
+    def _artifact_root(self) -> Path | None:
+        configured_root = os.environ.get(E2E_ARTIFACTS_DIR_ENV)
+        if not configured_root:
+            return None
+        artifact_root = Path(configured_root)
+        artifact_root.mkdir(parents=True, exist_ok=True)
+        return artifact_root
+
+    def _create_artifact_dir(self) -> Path:
+        artifact_root = self._artifact_root()
+        if artifact_root is None:
+            return Path(tempfile.mkdtemp(prefix="cellular-automaton-e2e-artifacts-"))
+
+        sanitized_test_id = re.sub(r"[^A-Za-z0-9_.-]+", "-", self.id()).strip(".-")
+        artifact_dir = artifact_root / (sanitized_test_id or "unknown-test")
+        if artifact_dir.exists():
+            shutil.rmtree(artifact_dir)
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+        return artifact_dir
+
     def _capture_failure_artifacts(self) -> Path | None:
-        artifact_dir = Path(tempfile.mkdtemp(prefix="cellular-automaton-e2e-artifacts-"))
+        artifact_dir = self._create_artifact_dir()
         try:
             if not self.page.is_closed():
                 self.page.screenshot(path=str(artifact_dir / "page.png"), full_page=True)

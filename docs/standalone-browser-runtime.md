@@ -107,13 +107,14 @@ The worker command paths intentionally stay aligned with the existing `/api/...`
 
 - The Playwright harness is now host-aware through `tests/e2e/support_runtime_host.py`.
 - `ServerRuntimeHost` wraps the existing Flask-backed `AppServer` and still supports restart semantics for persistence tests.
-- `StandaloneRuntimeHost` builds `output/standalone/` once per test process, serves it from a local static HTTP server, and captures browser-side persistence/debug artifacts on failure.
+- `StandaloneRuntimeHost` builds `output/standalone/` once per test process, verifies the expected packaged files exist, serves the output from a local static HTTP server, and captures browser-side persistence/debug artifacts on failure.
 - Shared UI-flow tests now run against both hosts through the same base browser case.
 - Server-only coverage keeps backend restart persistence assertions.
 - Standalone-only coverage adds:
   - static-host startup
   - browser storage restore on reload
   - visible startup error messaging when Pyodide initialization fails
+- The shard machinery in `tests/e2e/playwright_suite_support.py` now targets server-host tests only. Standalone tests are intentionally excluded from those shards and run through their dedicated suite entrypoint.
 
 The committed standalone suite entrypoint is:
 
@@ -121,7 +122,35 @@ The committed standalone suite entrypoint is:
 py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
 ```
 
-The feature-grouped server and standalone suites still use the shared `tests/e2e/playwright_suite_support.py` chunking logic, so CI can add standalone coverage without introducing a second browser framework.
+Server shard entrypoints still use `tests/e2e.playwright_chunk_subset`, but now partition only the Flask-backed browser cases.
+
+## CI Topology
+
+GitHub Actions now exposes standalone browser coverage as a separate signal:
+
+- `frontend-backend`
+  - runs `npm run build:frontend`
+  - runs `npm run build:frontend:standalone`
+  - runs frontend, mypy, descriptor, unit, API, and Playwright integrity checks
+- `e2e-playwright`
+  - a 4-way matrix of server-only Playwright shards
+- `e2e-playwright-standalone`
+  - the dedicated standalone browser job that runs `tests.e2e.test_playwright_standalone_runtime`
+
+This keeps standalone failures explicit in the CI UI while avoiding duplicate execution inside the server shard matrix.
+
+## Failure Artifacts
+
+- Browser tests now honor `E2E_ARTIFACTS_DIR` when it is set.
+- Local runs still fall back to temp directories.
+- CI jobs set deterministic workspace-local artifact roots:
+  - `e2e-artifacts/server-subset-<index>/...`
+  - `e2e-artifacts/standalone-browser/...`
+- On failure, uploaded artifacts can include:
+  - page screenshot and HTML
+  - captured browser console/page errors
+  - backend state/topology snapshots for server-host tests
+  - browser localStorage/IndexedDB snapshots plus static-host logs for standalone tests
 
 ## Verification Status
 
@@ -132,9 +161,14 @@ npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
 npm run build:frontend:standalone
-py -3 -m unittest discover -s tests/unit -p "test_*.py"
-py -3 -m unittest discover -s tests/api -p "test_*.py"
-py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity tests.e2e.test_playwright_rules_and_picker tests.e2e.test_playwright_overlays_and_editor tests.e2e.test_playwright_pattern_and_showcase tests.e2e.test_playwright_topology_and_persistence tests.e2e.test_playwright_standalone_runtime
+py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
+$env:PLAYWRIGHT_SUBSET_INDEX='0'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
+$env:PLAYWRIGHT_SUBSET_INDEX='1'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
+$env:PLAYWRIGHT_SUBSET_INDEX='2'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
+$env:PLAYWRIGHT_SUBSET_INDEX='3'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
+Remove-Item Env:PLAYWRIGHT_SUBSET_INDEX -ErrorAction SilentlyContinue
+Remove-Item Env:PLAYWRIGHT_SUBSET_COUNT -ErrorAction SilentlyContinue
+py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
 ```
 
 That browser coverage now exercises:
@@ -159,4 +193,4 @@ That browser coverage now exercises:
 
 - Deduplicate `standalone.html` and `templates/index.html` so both hosts render from one shared shell source.
 - Decide whether Pyodide must be bundled into the standalone output instead of loaded from a CDN. If full offline hosting is required, replace the CDN loader with vendored Pyodide assets and update the packager accordingly.
-- Add CI wiring for the standalone Playwright entrypoint if it is not already part of the browser test pipeline.
+- If CI time becomes a concern, tune the server shard count or dependency reuse strategy without collapsing the dedicated standalone job back into the server matrix.

@@ -20,7 +20,8 @@ except ModuleNotFoundError:
     )
 
 
-DEFAULT_PLAYWRIGHT_SUBSET_COUNT = 6
+DEFAULT_PLAYWRIGHT_SERVER_SUBSET_COUNT = 4
+DEFAULT_PLAYWRIGHT_SUBSET_COUNT = DEFAULT_PLAYWRIGHT_SERVER_SUBSET_COUNT
 
 PLAYWRIGHT_FEATURE_NAMES = (
     "rules_and_picker",
@@ -30,8 +31,17 @@ PLAYWRIGHT_FEATURE_NAMES = (
     "standalone_runtime",
 )
 
-PLAYWRIGHT_CASES = (
+PLAYWRIGHT_LOCAL_CASES = (
     CellularAutomatonUITests,
+    StandaloneCellularAutomatonUITests,
+    StandaloneRuntimeFailureTests,
+)
+
+PLAYWRIGHT_SERVER_CASES = (
+    CellularAutomatonUITests,
+)
+
+PLAYWRIGHT_STANDALONE_CASES = (
     StandaloneCellularAutomatonUITests,
     StandaloneRuntimeFailureTests,
 )
@@ -92,17 +102,33 @@ def _test_id(case_cls: type[unittest.TestCase], name: str) -> str:
 def _available_test_cases() -> dict[str, type[unittest.TestCase]]:
     return {
         case_cls.__name__: case_cls
-        for case_cls in PLAYWRIGHT_CASES
+        for case_cls in PLAYWRIGHT_LOCAL_CASES
     }
 
 
-def iter_playwright_test_names() -> list[str]:
+def _iter_case_test_names(case_classes: tuple[type[unittest.TestCase], ...]) -> list[str]:
     names: list[str] = []
-    for case_cls in PLAYWRIGHT_CASES:
+    for case_cls in case_classes:
         for name, member in inspect.getmembers(case_cls, predicate=callable):
             if name.startswith("test_"):
                 names.append(_test_id(case_cls, name))
     return sorted(names)
+
+
+def iter_local_playwright_test_names() -> list[str]:
+    return _iter_case_test_names(PLAYWRIGHT_LOCAL_CASES)
+
+
+def iter_playwright_test_names() -> list[str]:
+    return iter_local_playwright_test_names()
+
+
+def iter_server_playwright_test_names() -> list[str]:
+    return _iter_case_test_names(PLAYWRIGHT_SERVER_CASES)
+
+
+def iter_standalone_runtime_test_names() -> list[str]:
+    return _iter_case_test_names(PLAYWRIGHT_STANDALONE_CASES)
 
 
 def _playwright_feature_map() -> OrderedDict[str, list[str]]:
@@ -157,7 +183,7 @@ def build_playwright_feature_suite(feature_name: str) -> unittest.TestSuite:
     return build_named_playwright_suite(iter_playwright_feature_test_names(feature_name))
 
 
-def iter_playwright_subset_test_names(
+def iter_server_playwright_subset_test_names(
     subset_index: int,
     subset_count: int = DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
 ) -> list[str]:
@@ -165,14 +191,28 @@ def iter_playwright_subset_test_names(
         raise ValueError("subset_count must be positive")
     if subset_index < 0 or subset_index >= subset_count:
         raise ValueError("subset_index must be within the configured subset count")
-    names = iter_playwright_test_names()
+    names = iter_server_playwright_test_names()
     return names[subset_index::subset_count]
+
+
+def iter_playwright_subset_test_names(
+    subset_index: int,
+    subset_count: int = DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
+) -> list[str]:
+    return iter_server_playwright_subset_test_names(subset_index, subset_count)
+
+
+def build_server_playwright_subset(
+    subset_index: int,
+    subset_count: int = DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
+) -> unittest.TestSuite:
+    return build_named_playwright_suite(
+        iter_server_playwright_subset_test_names(subset_index, subset_count)
+    )
 
 
 def build_playwright_subset(
     subset_index: int,
     subset_count: int = DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
 ) -> unittest.TestSuite:
-    return build_named_playwright_suite(
-        iter_playwright_subset_test_names(subset_index, subset_count)
-    )
+    return build_server_playwright_subset(subset_index, subset_count)

@@ -20,6 +20,11 @@ from tests.e2e.support_server import AppServer, JsonApiClient
 
 _STANDALONE_BUILD_LOCK = threading.Lock()
 _STANDALONE_BUILD_READY = False
+_STANDALONE_REQUIRED_OUTPUTS = (
+    "index.html",
+    "standalone-bootstrap.json",
+    "standalone-python-manifest.json",
+)
 
 
 def _find_available_port() -> int:
@@ -186,8 +191,26 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
             self.stderr_handle.close()
             self.stderr_handle = None
 
+    def _ensure_required_output_files(self) -> None:
+        missing_outputs = [
+            relative_path
+            for relative_path in _STANDALONE_REQUIRED_OUTPUTS
+            if not (self.output_dir / relative_path).exists()
+        ]
+        if missing_outputs:
+            formatted_outputs = "\n".join(
+                f"- output/standalone/{relative_path}"
+                for relative_path in missing_outputs
+            )
+            raise RuntimeError(
+                "Standalone build is missing required packaging outputs before the static host can start.\n"
+                f"{formatted_outputs}\n"
+                "Run `npm run build:frontend:standalone` and verify the standalone packager completed successfully."
+            )
+
     def _start_process(self) -> None:
         ensure_standalone_build(self.root)
+        self._ensure_required_output_files()
         self.port = _find_available_port()
         self._base_url = f"http://127.0.0.1:{self.port}"
         self.stdout_handle = self.stdout_path.open("a", encoding="utf-8")
