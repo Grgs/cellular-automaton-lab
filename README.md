@@ -2,6 +2,8 @@
 
 Cellular Automaton Lab is a browser-based cellular automata playground built around topology-first boards. It supports classic lattices, periodic mixed tilings, and finite aperiodic patches in one app, with a Flask backend and a Vite-built TypeScript frontend.
 
+Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://grgs.github.io/cellular-automaton-lab/)
+
 ![Current canvas-first workspace on a Kagome mixed-tiling board](docs/images/readme-workspace-kagome.png)
 
 ## Highlights

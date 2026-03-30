@@ -7,6 +7,8 @@ This repository now supports two runtime hosts for the same UI:
 
 The current standalone target is normal static hosting with network access. Pyodide is still loaded from a CDN, so this is browser-local execution rather than a fully offline bundle.
 
+The public evaluator demo is published to GitHub Pages at [https://grgs.github.io/cellular-automaton-lab/](https://grgs.github.io/cellular-automaton-lab/).
+
 ## Architecture Overview
 
 ### Server mode
@@ -59,6 +61,7 @@ This performs four steps:
 4. copies the Python source/config tree into `output/standalone/py-src/` and writes `standalone-python-manifest.json`
 
 The standalone output includes both `standalone.html` and `index.html` for easier static hosting.
+The packager also writes `.nojekyll` so the published artifact is safe for GitHub Pages project-site hosting.
 
 ## Worker Message Contract
 
@@ -136,8 +139,26 @@ GitHub Actions now exposes standalone browser coverage as a separate signal:
   - a 4-way matrix of server-only Playwright shards
 - `e2e-playwright-standalone`
   - the dedicated standalone browser job that runs `tests.e2e.test_playwright_standalone_runtime`
+- `pages-build`
+  - runs only on `push` to `master` or `workflow_dispatch`
+  - rebuilds `output/standalone/`, configures Pages, and uploads the Pages artifact
+- `pages-deploy`
+  - runs only on `push` to `master` or `workflow_dispatch`
+  - deploys the uploaded artifact to the `github-pages` environment
 
-This keeps standalone failures explicit in the CI UI while avoiding duplicate execution inside the server shard matrix.
+This keeps standalone failures explicit in the CI UI, avoids duplicate execution inside the server shard matrix, and only publishes the public demo after the existing quality gates pass.
+
+## GitHub Pages Deployment
+
+- Deployment is handled by the existing CI workflow in `.github/workflows/ci.yml`.
+- Publish conditions:
+  - push to `master`
+  - manual `workflow_dispatch`
+- Published artifact:
+  - `output/standalone/`
+- Expected project-site URL:
+  - `https://grgs.github.io/cellular-automaton-lab/`
+- GitHub repository settings still need `Settings -> Pages -> Source = GitHub Actions` enabled for the workflow to publish.
 
 ## Failure Artifacts
 
@@ -161,6 +182,7 @@ npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
 npm run build:frontend:standalone
+Test-Path .\output\standalone\.nojekyll
 py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
 $env:PLAYWRIGHT_SUBSET_INDEX='0'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
 $env:PLAYWRIGHT_SUBSET_INDEX='1'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
@@ -193,4 +215,4 @@ That browser coverage now exercises:
 
 - Deduplicate `standalone.html` and `templates/index.html` so both hosts render from one shared shell source.
 - Decide whether Pyodide must be bundled into the standalone output instead of loaded from a CDN. If full offline hosting is required, replace the CDN loader with vendored Pyodide assets and update the packager accordingly.
-- If CI time becomes a concern, tune the server shard count or dependency reuse strategy without collapsing the dedicated standalone job back into the server matrix.
+- If the public demo needs stronger polish later, add a post-deploy smoke check and optionally a custom domain without changing the standalone runtime contract.

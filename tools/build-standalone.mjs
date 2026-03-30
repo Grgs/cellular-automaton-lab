@@ -106,6 +106,7 @@ function copyStaticAssets() {
     if (fs.existsSync(standaloneHtmlPath)) {
         fs.copyFileSync(standaloneHtmlPath, path.join(outputDir, "index.html"));
     }
+    fs.writeFileSync(path.join(outputDir, ".nojekyll"), "", "utf8");
 }
 
 function buildStandaloneFrontend() {
