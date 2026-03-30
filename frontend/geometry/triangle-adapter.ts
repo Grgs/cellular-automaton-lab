@@ -1,4 +1,4 @@
-import { drawTriangleGrid, tracePolygonPath } from "../canvas/draw.js";
+import { drawTriangleGrid, resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
     clampGridDimension,
@@ -284,7 +284,7 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         context.fill();
         if (renderLayer === "preview" && renderStyle?.triangleStrokeEnabled) {
             context.strokeStyle = renderStyle.lineColor;
-            context.lineWidth = 1;
+            context.lineWidth = resolvePolygonStrokeWidth(renderStyle);
             tracePolygonPath(context, resolvedCell.vertices);
             context.stroke();
         }

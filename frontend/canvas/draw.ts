@@ -1,5 +1,10 @@
 import { triangleVertices } from "./geometry-triangle.js";
-import type { CanvasRenderStyle, GeometryCache, Point2D } from "../types/rendering.js";
+import type {
+    CanvasRenderStyle,
+    GeometryCache,
+    Point2D,
+    PolygonGeometryCache,
+} from "../types/rendering.js";
 
 type PathTarget = CanvasRenderingContext2D | Path2D;
 
@@ -59,7 +64,7 @@ export function drawTriangleGrid(
         return;
     }
     targetContext.strokeStyle = renderStyle.lineColor;
-    targetContext.lineWidth = 1;
+    targetContext.lineWidth = resolvePolygonStrokeWidth(renderStyle);
     if (geometryCache?.type === "triangle" && geometryCache.strokePath) {
         targetContext.stroke(geometryCache.strokePath);
         return;
@@ -71,4 +76,21 @@ export function drawTriangleGrid(
             targetContext.stroke();
         }
     }
+}
+
+export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): number {
+    return renderStyle.mode === "compact" ? 1 : 1.25;
+}
+
+export function drawPolygonGrid(
+    targetContext: CanvasRenderingContext2D,
+    renderStyle: CanvasRenderStyle,
+    geometryCache: PolygonGeometryCache | null,
+): void {
+    if (!geometryCache?.strokePath) {
+        return;
+    }
+    targetContext.strokeStyle = renderStyle.lineColor;
+    targetContext.lineWidth = resolvePolygonStrokeWidth(renderStyle);
+    targetContext.stroke(geometryCache.strokePath);
 }

@@ -1,4 +1,4 @@
-import { tracePolygonPath } from "../canvas/draw.js";
+import { resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -215,7 +215,7 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
                 if (context.strokeStyle !== strokeColor) {
                     context.strokeStyle = strokeColor;
                 }
-                context.lineWidth = renderStyle?.mode === "compact" ? 1 : 1.25;
+                context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
                 context.stroke();
             }
         },

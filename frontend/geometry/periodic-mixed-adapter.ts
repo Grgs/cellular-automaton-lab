@@ -1,4 +1,4 @@
-import { tracePolygonPath } from "../canvas/draw.js";
+import { drawPolygonGrid, resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -16,6 +16,7 @@ import type {
     GeometryAdapter,
     GeometryBuildCacheArgs,
     GeometryBuildMetricsArgs,
+    GeometryDrawOverlayArgs,
     GeometryResolveCellCenterArgs,
     GeometryResolveCellFromOffsetArgs,
     GeometryResolveCoordinateCenterArgs,
@@ -370,7 +371,18 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
             };
         },
 
-        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
+        drawCell({
+            context,
+            cell,
+            stateValue,
+            metrics,
+            cache,
+            colors,
+            colorLookup,
+            resolveRenderedCellColor,
+            renderStyle,
+            renderLayer,
+        }: RenderedCellArgs) {
             const geometryCell = resolveGeometryCell(
                 geometry,
                 cell as RenderableTopologyCell,
@@ -391,6 +403,15 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
             }
             tracePolygonPath(context, geometryCell.vertices);
             context.fill();
+            if (renderLayer === "preview" && renderStyle) {
+                context.strokeStyle = renderStyle.lineColor;
+                context.lineWidth = resolvePolygonStrokeWidth(renderStyle);
+                context.stroke();
+            }
+        },
+
+        drawOverlay({ context, cache, renderStyle }: GeometryDrawOverlayArgs) {
+            drawPolygonGrid(context, renderStyle, asPolygonGeometryCache(cache));
         },
 
         applyViewportPreview(args: GeometryViewportPreviewArgs) {
