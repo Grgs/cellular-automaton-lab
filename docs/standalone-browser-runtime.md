@@ -140,10 +140,10 @@ GitHub Actions now exposes standalone browser coverage as a separate signal:
 - `e2e-playwright-standalone`
   - the dedicated standalone browser job that runs `tests.e2e.test_playwright_standalone_runtime`
 - `pages-build`
-  - runs only on `push` to `master` or `workflow_dispatch`
+  - runs only on `push` to `main` or `workflow_dispatch`
   - rebuilds `output/standalone/`, configures Pages, and uploads the Pages artifact
 - `pages-deploy`
-  - runs only on `push` to `master` or `workflow_dispatch`
+  - runs only on `push` to `main` or `workflow_dispatch`
   - deploys the uploaded artifact to the `github-pages` environment
 
 This keeps standalone failures explicit in the CI UI, avoids duplicate execution inside the server shard matrix, and only publishes the public demo after the existing quality gates pass.
@@ -152,7 +152,7 @@ This keeps standalone failures explicit in the CI UI, avoids duplicate execution
 
 - Deployment is handled by the existing CI workflow in `.github/workflows/ci.yml`.
 - Publish conditions:
-  - push to `master`
+  - push to `main`
   - manual `workflow_dispatch`
 - Published artifact:
   - `output/standalone/`
