@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from backend.contract_validation import SNAPSHOT_VERSION
 from backend.defaults import APP_DEFAULTS
 from backend.payload_types import AppBootstrapPayload, ServerMetaPayload
 from backend.simulation.periodic_face_tilings import describe_periodic_face_tilings
-from backend.simulation.persistence import SNAPSHOT_VERSION
 from backend.simulation.topology_catalog import describe_topologies
 
 

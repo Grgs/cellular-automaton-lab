@@ -12,6 +12,7 @@ import time
 import urllib.request
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import TextIO
 
 from playwright.sync_api import Page
 
@@ -176,8 +177,8 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
         self.log_dir = tempfile.TemporaryDirectory(prefix="cellular-automaton-standalone-logs-")
         self.stdout_path = Path(self.log_dir.name) / "standalone-stdout.log"
         self.stderr_path = Path(self.log_dir.name) / "standalone-stderr.log"
-        self.stdout_handle = None
-        self.stderr_handle = None
+        self.stdout_handle: TextIO | None = None
+        self.stderr_handle: TextIO | None = None
 
     @property
     def base_url(self) -> str:

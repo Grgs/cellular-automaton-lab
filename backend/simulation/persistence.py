@@ -7,6 +7,8 @@ from backend.contract_validation import SNAPSHOT_VERSION, validate_persisted_sna
 from backend.payload_types import PersistedSimulationSnapshotV5
 from backend.simulation.models import SimulationSnapshot
 
+__all__ = ["SNAPSHOT_VERSION", "SimulationStateStore"]
+
 
 class SimulationStateStore:
     """Persists simulation snapshots as versioned JSON on disk."""

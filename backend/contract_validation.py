@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import NoReturn
+from typing import Literal, NoReturn
 
 from backend.payload_types import (
     CellTargetPayload,
@@ -21,7 +21,7 @@ from backend.simulation.topology_catalog import (
 )
 
 
-SNAPSHOT_VERSION = 5
+SNAPSHOT_VERSION: Literal[5] = 5
 
 
 class ContractValidationError(ValueError):

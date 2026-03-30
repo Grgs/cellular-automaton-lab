@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+import threading
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 from backend.contract_validation import (
     ContractValidationError,
@@ -15,6 +16,7 @@ from backend.contract_validation import (
     parse_state_value,
     validate_persisted_snapshot_payload,
 )
+from backend.payload_types import PersistedSimulationSnapshotInput
 from backend.rules import RuleRegistry
 from backend.simulation.persistence import SimulationStateStore
 from backend.simulation.service import SimulationOperationError, SimulationService
@@ -30,7 +32,7 @@ class NoopLock:
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
         traceback: object | None,
-    ) -> bool:
+    ) -> Literal[False]:
         return False
 
 
@@ -60,11 +62,11 @@ class BrowserSimulationRuntime:
         rule_registry = RuleRegistry()
         return cls(
             rule_registry=rule_registry,
-            service=SimulationService(rule_registry=rule_registry, lock=NoopLock()),
+            service=SimulationService(rule_registry=rule_registry, lock=threading.Lock()),
             state_restorer=SimulationStateRestorer(rule_registry),
         )
 
-    def restore_state(self, payload: object) -> None:
+    def restore_state(self, payload: PersistedSimulationSnapshotInput) -> None:
         next_state = self.state_restorer.restore(payload, fallback_state=self.service.state)
         self.service.replace_state(next_state)
 

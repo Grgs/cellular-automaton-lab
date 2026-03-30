@@ -87,7 +87,7 @@ class BrowserAppTestCase(unittest.TestCase):
         super().setUp()
         with self._startup_watchdog(f"{self.runtime_host_kind} host test setup"):
             self.host.before_test()
-        self.api = self.host.client()
+        type(self).api = self.host.client()
         with self._startup_watchdog("Browser test page context"):
             if self.page_viewport is None:
                 self.context = self.browser.new_context(accept_downloads=True)
