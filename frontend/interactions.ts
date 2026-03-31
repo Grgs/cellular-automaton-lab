@@ -7,11 +7,12 @@ import { createDragPaintSession } from "./drag-session.js";
 import { createEditorSessionController } from "./interactions/editor-session.js";
 import { createHistoryCommands } from "./interactions/history-commands.js";
 import { createLegacyDragController } from "./interactions/legacy-drag.js";
-import { createInteractionCommandDispatch } from "./interactions/command-dispatch.js";
-import { createInteractionEditPolicy } from "./interactions/edit-policy.js";
-import { createInteractionSessionRuntime } from "./interactions/session-runtime.js";
-import { createInteractionSurfaceBindings } from "./interactions/surface-bindings.js";
 import { createSimulationMutations } from "./interactions/simulation-mutations.js";
+import {
+    createInteractionCommandSurface,
+    createInteractionEditorRuntime,
+    createInteractionMutationRuntime,
+} from "./interaction-groups.js";
 import type {
     CreateSimulationMutationsFunction,
     InteractionController,
@@ -37,7 +38,7 @@ export function createInteractionController({
     postControl,
     getPaintState,
     simulationMutations = null,
-    createSimulationMutationsFn = createSimulationMutations,
+    createSimulationMutationsFn,
     createHistoryCommandsFn,
     createLegacyDragControllerFn,
     createEditorSessionControllerFn,
@@ -58,15 +59,14 @@ export function createInteractionController({
     bindGridInteractionsFn?: (options: GridInteractionBindings) => void;
     state?: AppState | null;
 }): InteractionController {
-    const mutations = simulationMutations || createSimulationMutationsFn({
+    const { mutations, editPolicy } = createInteractionMutationRuntime({
+        state,
+        createSimulationMutationsFn,
+        simulationMutations,
         mutationRunner,
         onError,
         applySimulationState,
         refreshState,
-    });
-
-    const editPolicy = createInteractionEditPolicy({
-        state,
         dismissOverlays,
         armEditMode,
         hideEditCue,
@@ -77,7 +77,7 @@ export function createInteractionController({
         setTimeoutFn,
     });
 
-    const sessionRuntime = createInteractionSessionRuntime({
+    const sessionRuntime = createInteractionEditorRuntime({
         surfaceElement,
         state,
         getPaintState,
@@ -95,21 +95,17 @@ export function createInteractionController({
         createEditorSessionControllerFn,
     });
 
-    const commandDispatch = createInteractionCommandDispatch({
-        mutations,
-        toggleCellRequest,
-        setCellRequest,
-        postControl,
-        getPaintState,
-    });
-
-    const surfaceBindings = createInteractionSurfaceBindings({
+    const { commandDispatch, surfaceBindings } = createInteractionCommandSurface({
         surfaceElement,
         resolveCellFromEvent,
         editPolicy,
         editorSession: sessionRuntime.editorSession,
         legacyDrag: sessionRuntime.legacyDrag,
-        paintCell: commandDispatch.paintCell,
+        mutations,
+        toggleCellRequest,
+        setCellRequest,
+        postControl,
+        getPaintState,
         bindGridInteractionsFn,
         setTimeoutFn,
     });

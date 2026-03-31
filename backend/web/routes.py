@@ -84,7 +84,7 @@ def control_state_action(action: Callable[[], None]) -> Response:
 
 @page_bp.get("/")
 def index() -> str:
-    entry_assets = frontend_assets().entry_assets("frontend/app.ts")
+    entry_assets = frontend_assets().entry_assets("frontend/server-entry.ts")
     return render_template(
         "index.html",
         app_defaults=current_app.config["APP_DEFAULTS"],

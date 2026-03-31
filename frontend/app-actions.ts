@@ -1,9 +1,3 @@
-import { createDefaultResetRuntime } from "./actions/default-reset.js";
-import { createPatternActions } from "./actions/pattern-actions.js";
-import { createPresetActions } from "./actions/preset-actions.js";
-import { createShowcaseActions } from "./actions/showcase-actions.js";
-import { createSimulationActions } from "./actions/simulation/index.js";
-import { createUiActions } from "./actions/ui-actions.js";
 import {
     buildPatternFilename,
     buildPatternPayload,
@@ -14,20 +8,23 @@ import {
     serializePatternPayload,
     writeClipboardText,
 } from "./pattern-io.js";
-import { dismissFirstRunHint } from "./state/overlay-state.js";
+import { createPatternActions } from "./actions/pattern-actions.js";
+import { createPresetActions } from "./actions/preset-actions.js";
+import { createShowcaseActions } from "./actions/showcase-actions.js";
+import { createSimulationActions } from "./actions/simulation/index.js";
+import { createUiActions } from "./actions/ui-actions.js";
+import {
+    createEditorUiActionSet,
+    createPatternPresetActionSet,
+    createSimulationConfigActionSet,
+} from "./app-action-groups.js";
 import { resetThemeToDefault } from "./theme.js";
 import type {
     ActionMutationAdapter,
     AppActionOptions,
     AppActionSet,
-    PatternActionSet,
-    PresetActionSet,
-    ShowcaseActionSet,
-    SimulationActionSet,
-    UiActionSet,
 } from "./types/actions.js";
 import type { SimulationMutations } from "./types/controller.js";
-import type { SimulationSnapshot } from "./types/domain.js";
 
 export function createAppActions({
     state,
@@ -53,13 +50,13 @@ export function createAppActions({
     parsePatternTextFn = parsePatternText,
     readClipboardTextFn = readClipboardText,
     writeClipboardTextFn = writeClipboardText,
-    createSimulationActionsFn = createSimulationActions,
-    createPresetActionsFn = createPresetActions,
-    createShowcaseActionsFn = createShowcaseActions,
-    createPatternActionsFn = createPatternActions,
-    createUiActionsFn = createUiActions,
+    createSimulationActionsFn,
+    createPresetActionsFn,
+    createShowcaseActionsFn,
+    createPatternActionsFn,
+    createUiActionsFn,
     confirmImportFn = (message) => window.confirm(message),
-    resetThemeToDefaultFn = resetThemeToDefault,
+    resetThemeToDefaultFn,
 }: AppActionOptions & {
     buildPatternPayloadFn?: typeof buildPatternPayload;
     serializePatternPayloadFn?: typeof serializePatternPayload;
@@ -79,41 +76,44 @@ export function createAppActions({
 }): AppActionSet {
     const sharedSimulationMutations: ActionMutationAdapter | SimulationMutations | null = simulationMutations;
 
-    const simulationActions: SimulationActionSet = createSimulationActionsFn({
+    const simulationActions = createSimulationConfigActionSet({
         state,
+        elements,
         interactions,
         viewportController,
         configSyncController,
         uiSessionController,
+        renderCurrentGrid,
         renderControlPanel,
-        getViewportDimensions,
-    });
-
-    const presetActions: PresetActionSet = createPresetActionsFn({
-        state,
-        elements,
-        interactions,
         applySimulationState,
+        getViewportDimensions,
         postControlFn,
         setCellsRequestFn,
         onError,
         refreshState,
-        renderControlPanel,
         simulationMutations: sharedSimulationMutations,
+        createSimulationActionsFn,
     });
 
-    const patternActions: PatternActionSet = createPatternActionsFn({
+    const presetPatternActions = createPatternPresetActionSet({
         state,
         elements,
         interactions,
         viewportController,
+        configSyncController,
+        uiSessionController,
+        renderCurrentGrid,
         renderControlPanel,
         applySimulationState,
+        getViewportDimensions,
         postControlFn,
         setCellsRequestFn,
         onError,
         refreshState,
         simulationMutations: sharedSimulationMutations,
+        createPresetActionsFn,
+        createShowcaseActionsFn,
+        createPatternActionsFn,
         confirmImportFn,
         buildPatternPayloadFn,
         serializePatternPayloadFn,
@@ -125,52 +125,29 @@ export function createAppActions({
         writeClipboardTextFn,
     });
 
-    const showcaseActions: ShowcaseActionSet = createShowcaseActionsFn({
+    const editorUiActions = createEditorUiActionSet({
         state,
         elements,
         interactions,
+        viewportController,
+        configSyncController,
+        uiSessionController,
+        renderCurrentGrid,
+        renderControlPanel,
         applySimulationState,
+        getViewportDimensions,
         postControlFn,
         setCellsRequestFn,
-        renderControlPanel,
-        refreshState,
         onError,
-        getViewportDimensions,
-        simulationMutations: sharedSimulationMutations,
-    });
-
-    const uiActions: UiActionSet = createUiActionsFn({
-        state,
-        uiSessionController,
-        renderCurrentGrid,
-        renderControlPanel,
-        viewportController,
-    });
-    const defaultResetRuntime = createDefaultResetRuntime({
-        state,
-        interactions,
-        uiSessionController,
-        renderCurrentGrid,
-        renderControlPanel,
         refreshState,
-        resetThemeToDefault: resetThemeToDefaultFn,
+        simulationMutations: sharedSimulationMutations,
+        createUiActionsFn,
+        resetThemeToDefaultFn,
     });
 
     return {
         ...simulationActions,
-        ...presetActions,
-        ...showcaseActions,
-        ...patternActions,
-        ...uiActions,
-        resetAllSettings: (): Promise<SimulationSnapshot | null> => defaultResetRuntime.resetAllSettings(),
-        undoEdit: () => {
-            dismissFirstRunHint(state);
-            return interactions.undo?.();
-        },
-        redoEdit: () => {
-            dismissFirstRunHint(state);
-            return interactions.redo?.();
-        },
-        cancelEditorPreview: () => interactions.cancelActivePreview?.(),
+        ...presetPatternActions,
+        ...editorUiActions,
     };
 }

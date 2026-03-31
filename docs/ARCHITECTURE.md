@@ -28,10 +28,10 @@ flowchart LR
 - [backend/frontend_assets.py](../backend/frontend_assets.py) resolves Vite output from `static/dist/manifest.json`.
 - [templates/index.html](../templates/index.html) is the thin server wrapper that injects bootstrapped defaults, topology metadata, periodic-face descriptors, server asset links, and the rendered shell markup.
 - [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html) is the shared shell source consumed by both Flask and the standalone build.
-- [backend/app_shell.py](../backend/app_shell.py) renders the shared shell for the server host and generates the standalone shell document.
+- [backend/app_shell.py](../backend/app_shell.py) renders the shared shell for the server host and generates the standalone shell document that the standalone build stages into its transient input directory.
 - [frontend/server-entry.ts](../frontend/server-entry.ts) is the canonical server host entrypoint.
 - [frontend/app-runtime.ts](../frontend/app-runtime.ts) owns the shared `initApp(...)` / `disposeApp()` lifecycle API.
-- [frontend/app.ts](../frontend/app.ts) and [frontend/main.ts](../frontend/main.ts) remain compatibility wrappers for the existing Vite manifest key and import surface.
+- [frontend/types/controller-*.d.ts](../frontend/types) split the controller/runtime contracts by concern and re-export them through [frontend/types/controller.d.ts](../frontend/types/controller.d.ts).
 
 Important rules:
 
@@ -149,12 +149,13 @@ The frontend is built around a controller and view composition stack:
 - [frontend/app-runtime.ts](../frontend/app-runtime.ts)
 - [frontend/app-controller.ts](../frontend/app-controller.ts)
 - [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
+- [frontend/app-controller-services.ts](../frontend/app-controller-services.ts)
+- [frontend/app-controller-wiring.ts](../frontend/app-controller-wiring.ts)
+- [frontend/app-controller-hydration.ts](../frontend/app-controller-hydration.ts)
 - [frontend/app-controller-sync.ts](../frontend/app-controller-sync.ts)
 - [frontend/app-controller-bootstrap.ts](../frontend/app-controller-bootstrap.ts)
 
-This stack creates application state, canvas/grid rendering, control actions, session persistence, config sync, and interaction handlers.
-
-[frontend/app.ts](../frontend/app.ts) and [frontend/main.ts](../frontend/main.ts) currently forward to the canonical entry/runtime files so existing build and import paths keep working during the transition.
+This stack now makes the startup order explicit: service construction, interaction/view wiring, then async hydration and binding. It creates application state, canvas/grid rendering, control actions, session persistence, config sync, and interaction handlers.
 
 ### State And Reconciliation
 
@@ -181,7 +182,10 @@ This layer owns pending and syncing UI state for rule and speed controls and kee
 
 ### Actions
 
-[frontend/app-actions.ts](../frontend/app-actions.ts) is the top-level action composer. It combines:
+- [frontend/app-actions.ts](../frontend/app-actions.ts) is the top-level action composer.
+- [frontend/app-action-groups.ts](../frontend/app-action-groups.ts) splits that composition into simulation/config, pattern/preset/showcase, and editor/UI groups.
+
+Those layers combine:
 
 - [frontend/actions/simulation](../frontend/actions/simulation)
 - [frontend/actions/preset-actions.ts](../frontend/actions/preset-actions.ts)
@@ -211,6 +215,7 @@ The binding split is:
 Canvas editing and pointer behavior are split across:
 
 - [frontend/interactions.ts](../frontend/interactions.ts)
+- [frontend/interaction-groups.ts](../frontend/interaction-groups.ts)
 - [frontend/interactions](../frontend/interactions)
 - [frontend/editor-operations.ts](../frontend/editor-operations.ts)
 - [frontend/editor-history.ts](../frontend/editor-history.ts)

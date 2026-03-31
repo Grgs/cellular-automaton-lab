@@ -22,7 +22,7 @@ The public evaluator demo is published to GitHub Pages at [https://grgs.github.i
 
 ### Standalone mode
 
-- `standalone.html` is generated from the same shared shell source that the server wrapper uses, so the large DOM shell is defined in one place.
+- The standalone build stages a transient `standalone.html` input from the same shared shell source that the server wrapper uses, so the large DOM shell is defined in one place without a checked-in wrapper file.
 - `frontend/standalone.ts` fetches `standalone-bootstrap.json`, installs the bootstrap globals first, then dynamically imports the shared app runtime so standalone startup no longer races bootstrapped window data.
 - `frontend/standalone.ts` creates the worker-backed `SimulationBackend` and then starts the shared frontend controller stack.
 - `frontend/standalone-worker.ts` loads Pyodide, copies the packaged Python sources into Pyodide's virtual filesystem, imports `backend.browser_runtime`, and proxies frontend commands into the Python simulation runtime.
@@ -54,11 +54,11 @@ This outputs the Vite manifest and hashed assets to `static/dist/`, which the Fl
 npm run build:frontend:standalone
 ```
 
-This performs four steps:
+This performs five steps:
 
-1. regenerates the root `standalone.html` wrapper from the shared shell source
-2. builds the standalone Vite entry into `output/standalone/`
-3. copies the shared authored stylesheet and favicon into the standalone output
+1. stages a transient standalone build-input directory under `output/`
+2. writes a generated `standalone.html` wrapper plus staged `styles.css` and `favicon.svg` into that build-input directory
+3. builds the standalone Vite entry into `output/standalone/`
 4. exports `standalone-bootstrap.json` from the Python topology/defaults metadata
 5. copies the Python source/config tree into `output/standalone/py-src/` and writes `standalone-python-manifest.json`
 
@@ -214,6 +214,5 @@ That browser coverage now exercises:
 
 ## Remaining Work Checklist
 
-- Remove the temporary startup-path compatibility shims in `frontend/app.ts` and `frontend/main.ts` after the manifest entry and docs no longer need them.
 - Decide whether Pyodide must be bundled into the standalone output instead of loaded from a CDN. If full offline hosting is required, replace the CDN loader with vendored Pyodide assets and update the packager accordingly.
 - If the public demo needs stronger polish later, add a post-deploy smoke check and optionally a custom domain without changing the standalone runtime contract.

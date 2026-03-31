@@ -37,6 +37,9 @@ function resolveFrontendJsImports() {
 
 export default defineConfig(({ mode }) => {
     const isStandalone = mode === "standalone";
+    const standaloneHtmlEntry = process.env.STANDALONE_HTML_ENTRY
+        ? path.resolve(process.env.STANDALONE_HTML_ENTRY)
+        : path.resolve(dirname, "output", ".standalone-build-input", "standalone.html");
     return {
         base: isStandalone ? "./" : "/static/dist/",
         plugins: [resolveFrontendJsImports()],
@@ -47,10 +50,10 @@ export default defineConfig(({ mode }) => {
             rollupOptions: {
                 input: isStandalone
                     ? {
-                        standalone: path.resolve(dirname, "standalone.html"),
+                        standalone: standaloneHtmlEntry,
                     }
                     : {
-                        app: path.resolve(dirname, "frontend/app.ts"),
+                        app: path.resolve(dirname, "frontend/server-entry.ts"),
                     },
             },
         },

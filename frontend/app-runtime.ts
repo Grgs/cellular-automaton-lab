@@ -1,7 +1,7 @@
 import { createCanvasGridView } from "./canvas-view.js";
 import { elements } from "./dom.js";
 import { createAppController } from "./app-controller.js";
-import type { AppController, InitAppOptions } from "./types/controller.js";
+import type { AppController, InitAppOptions } from "./types/controller-app.js";
 
 function handleAppError(error: unknown): void {
     console.error(error);

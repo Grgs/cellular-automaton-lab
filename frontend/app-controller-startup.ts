@@ -1,35 +1,12 @@
-import { bindControls } from "./controls-bindings.js";
-import { collectConfig } from "./controls-model.js";
-import { createAppActions } from "./app-actions.js";
-import { createConfigSyncController } from "./config-sync-controller.js";
-import { createInteractionController } from "./interactions.js";
-import { createSimulationMutations } from "./interactions/simulation-mutations.js";
-import { sameDimensions } from "./layout.js";
-import { applyOverlayIntent, OVERLAY_INTENT_WORKSPACE_EMPTY_CLICK } from "./overlay-policy.js";
-import { createUiSessionController } from "./ui-session-controller.js";
-import { createUiSessionStorage } from "./ui-session.js";
-import { createViewportController } from "./viewport-controller.js";
-import { createSurfaceCellResolver } from "./cell-resolution.js";
-import { currentPaintState } from "./state/selectors.js";
-import { createViewportControllerDependencies } from "./app-controller-bootstrap.js";
-import type {
-    AppControllerStartupResult,
-    AppControllerSync,
-    AppView,
-    ConfigSyncController,
-    GridView,
-    InteractionController,
-    MutationRunner,
-    PostControlFunction,
-    SetCellRequestFunction,
-    SetCellsRequestFunction,
-    SimulationMutations,
-    ToggleCellRequestFunction,
-    UiSessionController,
-    ViewportController,
-} from "./types/controller.js";
+import { hydrateAppController } from "./app-controller-hydration.js";
+import { createAppControllerServices } from "./app-controller-services.js";
+import { wireAppController } from "./app-controller-wiring.js";
+import type { AppControllerStartupResult, AppControllerSync } from "./types/controller-app.js";
+import type { PostControlFunction, SetCellRequestFunction, SetCellsRequestFunction, ToggleCellRequestFunction } from "./types/controller-api.js";
+import type { MutationRunner } from "./types/controller-runtime.js";
+import type { ConfigSyncController, UiSessionController } from "./types/controller-sync-session.js";
+import type { AppView, GridView } from "./types/controller-view.js";
 import type { DomElements } from "./types/dom.js";
-import type { PreviewPaintCells } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 export async function initializeAppController({
@@ -61,115 +38,48 @@ export async function initializeAppController({
     onConfigSyncController?: (controller: ConfigSyncController) => void;
     onUiSessionController?: (controller: UiSessionController) => void;
 }): Promise<AppControllerStartupResult> {
-    let simulationMutations: SimulationMutations | null = null;
-    const getSimulationMutations = (): SimulationMutations => {
-        if (!simulationMutations) {
-            simulationMutations = createSimulationMutations({
-                state,
-                mutationRunner,
-                onError,
-                applySimulationState: sync.applySimulationState,
-                resolveSimulationState: sync.resolveSimulationState,
-                refreshState: sync.refreshState,
-                renderControlPanel: appView.renderControlsPanel,
-            });
-        }
-        return simulationMutations;
-    };
-
-    const uiSessionController = createUiSessionController({
+    const services = createAppControllerServices({
         state,
         elements,
-        createUiSessionStorage,
-    });
-    onUiSessionController(uiSessionController);
-    uiSessionController.restoreInitialCellSize();
-    uiSessionController.restoreDrawerState();
-
-    const configSyncController = createConfigSyncController({
-        state,
         mutationRunner,
-        simulationMutations: getSimulationMutations(),
-        postControl: postControlFn,
+        appView,
         onError,
-        onSyncStateChanged: appView.renderControlsPanel,
-        applySimulationState: sync.applySimulationState,
-        refreshState: sync.refreshState,
+        postControlFn,
+        sync,
     });
-    onConfigSyncController(configSyncController);
+    onConfigSyncController(services.configSyncController);
+    onUiSessionController(services.uiSessionController);
 
-    const interactions = createInteractionController({
-        surfaceElement: elements.grid,
-        state,
-        resolveCellFromEvent: createSurfaceCellResolver({ state, gridView }),
-        previewPaintCells: (cells: PreviewPaintCells) => gridView.setPreviewCells(cells),
-        clearPreview: () => gridView.clearPreview(),
-        mutationRunner,
-        simulationMutations: getSimulationMutations(),
-        onError,
-        applySimulationState: sync.applySimulationState,
-        refreshState: sync.refreshState,
-        toggleCellRequest: toggleCellRequestFn,
-        setCellRequest: setCellRequestFn,
-        setCellsRequest: setCellsRequestFn,
-        postControl: postControlFn,
-        getPaintState: () => currentPaintState(state),
-        getEditorTool: () => state.selectedEditorTool,
-        getBrushSize: () => state.brushSize,
-        dismissOverlays: () => {
-            const changed = applyOverlayIntent(state, OVERLAY_INTENT_WORKSPACE_EMPTY_CLICK);
-            if (changed) {
-                appView.renderControlsPanel();
-            }
-            return Promise.resolve(changed);
-        },
-        renderControlPanel: appView.renderControlsPanel,
-    });
-
-    const viewportController = createViewportController(
-        createViewportControllerDependencies({
-            state,
-            elements,
-            interactions,
-            appView,
-            collectConfig,
-            sameDimensions,
-        }),
-    );
-
-    const controlActions = createAppActions({
+    const { interactions, viewportController, controlActions } = wireAppController({
         state,
         elements,
+        gridView,
+        mutationRunner,
+        appView,
+        onError,
+        postControlFn,
+        toggleCellRequestFn,
+        setCellRequestFn,
+        setCellsRequestFn,
+        sync,
+        services,
+    });
+
+    await hydrateAppController({
+        elements,
+        appView,
+        sync,
+        uiSessionController: services.uiSessionController,
         interactions,
         viewportController,
-        configSyncController,
-        uiSessionController,
-        renderCurrentGrid: appView.renderGrid,
-        renderControlPanel: appView.renderControlsPanel,
-        applySimulationState: sync.applySimulationState,
-        getViewportDimensions: (geometry: string, ruleName: string | null, cellSize: number) => (
-            appView.viewportDimensionsFor(geometry, ruleName, cellSize)
-        ),
-        postControlFn,
-        setCellsRequestFn,
-        onError,
-        refreshState: sync.refreshState,
-        simulationMutations: getSimulationMutations(),
+        controlActions,
     });
-
-    await sync.loadRules();
-    uiSessionController.restoreDisclosures();
-    bindControls(elements, controlActions);
-    appView.renderControlsPanel();
-    await sync.refreshState();
-    interactions.bindGridInteractions();
-    viewportController.install(elements.gridViewport);
 
     return {
         interactions,
         viewportController,
-        configSyncController,
-        uiSessionController,
+        configSyncController: services.configSyncController,
+        uiSessionController: services.uiSessionController,
         controlActions,
     };
 }

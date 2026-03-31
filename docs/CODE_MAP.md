@@ -30,12 +30,12 @@ For the higher-level architecture, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ### Standalone browser runtime
 
-1. [standalone.html](../standalone.html)
-   Generated standalone wrapper consumed by the Vite standalone build.
+1. [tools/build-standalone.mjs](../tools/build-standalone.mjs)
+   Stages the transient standalone build input, runs the standalone Vite build, and finalizes the published static output.
 2. [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html)
    Shared shell source used by both Flask and the standalone wrapper.
 3. [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
-   Regenerates `standalone.html` from the shared shell source.
+   Writes the generated standalone wrapper into the build-owned input directory.
 4. [frontend/standalone.ts](../frontend/standalone.ts)
    `startStandaloneApp()` loads bootstrap JSON, creates the standalone worker environment, and then calls `initApp(...)`.
 5. [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts)
@@ -51,17 +51,19 @@ For the higher-level architecture, see [ARCHITECTURE.md](./ARCHITECTURE.md).
    Canonical server host entrypoint.
 2. [frontend/app-runtime.ts](../frontend/app-runtime.ts)
    `initApp(...)` creates the top-level controller and marks the app ready.
-3. [frontend/app.ts](../frontend/app.ts)
-   Compatibility wrapper that preserves the current Vite manifest entry.
-4. [frontend/main.ts](../frontend/main.ts)
-   Compatibility wrapper that preserves the old `initApp(...)` import path.
-5. [frontend/app-controller.ts](../frontend/app-controller.ts)
+3. [frontend/app-controller.ts](../frontend/app-controller.ts)
    `createAppController(...)` composes state, view, actions, sync, and interactions.
-6. [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
-   `initializeAppController(...)` runs the async startup flow.
-7. [frontend/app-actions.ts](../frontend/app-actions.ts)
+4. [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
+   `initializeAppController(...)` orchestrates service construction, interaction wiring, and hydration.
+5. [frontend/app-controller-services.ts](../frontend/app-controller-services.ts)
+   Builds the session/config-sync/simulation-mutation service layer.
+6. [frontend/app-controller-wiring.ts](../frontend/app-controller-wiring.ts)
+   Connects interactions, viewport sync, and the action surface.
+7. [frontend/app-controller-hydration.ts](../frontend/app-controller-hydration.ts)
+   Preserves the async startup order for rules, controls, refresh, and listeners.
+8. [frontend/app-actions.ts](../frontend/app-actions.ts)
    Creates the action surface used by controls and interaction handlers.
-8. [frontend/app-view.ts](../frontend/app-view.ts)
+9. [frontend/app-view.ts](../frontend/app-view.ts)
    Renders the control shell and canvas-facing UI.
 
 ## Request Flow
@@ -103,14 +105,16 @@ Browser UI
   `initApp(...)`, `disposeApp()`
 - [frontend/server-entry.ts](../frontend/server-entry.ts)
   Server-only host bootstrap.
-- [frontend/app.ts](../frontend/app.ts)
-  Compatibility manifest-entry wrapper.
-- [frontend/main.ts](../frontend/main.ts)
-  Compatibility re-export wrapper.
 - [frontend/app-controller.ts](../frontend/app-controller.ts)
   `createAppController(...)`
 - [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
   `initializeAppController(...)`
+- [frontend/app-controller-services.ts](../frontend/app-controller-services.ts)
+  Service-phase startup wiring.
+- [frontend/app-controller-wiring.ts](../frontend/app-controller-wiring.ts)
+  Interaction, viewport, and action wiring.
+- [frontend/app-controller-hydration.ts](../frontend/app-controller-hydration.ts)
+  Async hydration and control-binding order.
 - [frontend/app-controller-sync.ts](../frontend/app-controller-sync.ts)
   `createAppControllerSync(...)`
 - [frontend/app-controller-bootstrap.ts](../frontend/app-controller-bootstrap.ts)
@@ -146,6 +150,8 @@ Browser UI
 
 - [frontend/app-actions.ts](../frontend/app-actions.ts)
   `createAppActions(...)`
+- [frontend/app-action-groups.ts](../frontend/app-action-groups.ts)
+  Groups action composition into simulation/config, pattern/preset/showcase, and editor/UI seams.
 - [frontend/actions/simulation/index.ts](../frontend/actions/simulation/index.ts)
   `createSimulationActions(...)`
 - [frontend/actions/simulation/run-actions.ts](../frontend/actions/simulation/run-actions.ts)
@@ -203,6 +209,8 @@ Browser UI
 
 - [frontend/interactions.ts](../frontend/interactions.ts)
   `createInteractionController(...)`
+- [frontend/interaction-groups.ts](../frontend/interaction-groups.ts)
+  Splits interaction composition into mutation policy, editor runtime, and surface/command wiring.
 - [frontend/interactions/editor-session.ts](../frontend/interactions/editor-session.ts)
   Edit-session lifecycle.
 - [frontend/interactions/simulation-mutations.ts](../frontend/interactions/simulation-mutations.ts)
@@ -343,7 +351,7 @@ Browser UI
 - [tools/build-standalone.mjs](../tools/build-standalone.mjs)
   Builds the static standalone site.
 - [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
-  Regenerates the standalone wrapper from the shared shell source.
+  Writes the standalone wrapper into the transient build-input directory.
 - [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)
   Exports bootstrap metadata for standalone mode.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)

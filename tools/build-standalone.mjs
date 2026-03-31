@@ -6,6 +6,8 @@ import { spawnSync } from "node:child_process";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, "..");
 const outputDir = path.join(rootDir, "output", "standalone");
+const standaloneBuildInputDir = path.join(rootDir, "output", ".standalone-build-input");
+const standaloneHtmlInputPath = path.join(standaloneBuildInputDir, "standalone.html");
 const pythonCandidates = process.platform === "win32"
     ? [
         [process.env.PYTHON, []],
@@ -51,6 +53,13 @@ function copyFileIntoOutput(sourcePath, relativeDestination) {
     fs.copyFileSync(sourcePath, destinationPath);
 }
 
+function copyFileIntoDirectory(sourcePath, targetDir, filename = path.basename(sourcePath)) {
+    const destinationPath = path.join(targetDir, filename);
+    fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+    fs.copyFileSync(sourcePath, destinationPath);
+    return destinationPath;
+}
+
 function exportBootstrapData() {
     const scriptPath = path.join(rootDir, "tools", "export_bootstrap_data.py");
     const destinationPath = path.join(outputDir, "standalone-bootstrap.json");
@@ -75,8 +84,17 @@ function runPythonScript(scriptPath, args = []) {
     throw new Error(`Unable to run ${path.basename(scriptPath)} because no working Python interpreter was found.`);
 }
 
-function renderStandaloneShell() {
-    runPythonScript(path.join(rootDir, "tools", "render_standalone_shell.py"));
+function renderStandaloneShell(outputPath) {
+    runPythonScript(path.join(rootDir, "tools", "render_standalone_shell.py"), [outputPath]);
+}
+
+function prepareStandaloneBuildInput() {
+    fs.rmSync(standaloneBuildInputDir, { recursive: true, force: true });
+    fs.mkdirSync(standaloneBuildInputDir, { recursive: true });
+    renderStandaloneShell(standaloneHtmlInputPath);
+    copyFileIntoDirectory(path.join(rootDir, "static", "css", "styles.css"), standaloneBuildInputDir);
+    copyFileIntoDirectory(path.join(rootDir, "static", "favicon.svg"), standaloneBuildInputDir);
+    return standaloneHtmlInputPath;
 }
 
 function writePythonManifest() {
@@ -107,21 +125,39 @@ function writePythonManifest() {
 }
 
 function copyStaticAssets() {
-    copyFileIntoOutput(path.join(rootDir, "static", "css", "styles.css"), "styles.css");
-    copyFileIntoOutput(path.join(rootDir, "static", "favicon.svg"), "favicon.svg");
+    const nestedStandaloneHtmlPath = path.join(outputDir, "output", ".standalone-build-input", "standalone.html");
     const standaloneHtmlPath = path.join(outputDir, "standalone.html");
+    if (fs.existsSync(nestedStandaloneHtmlPath)) {
+        const normalizedHtml = fs.readFileSync(nestedStandaloneHtmlPath, "utf8")
+            .replaceAll("../../assets/", "./assets/");
+        fs.writeFileSync(standaloneHtmlPath, normalizedHtml, "utf8");
+        fs.rmSync(path.join(outputDir, "output"), { recursive: true, force: true });
+    }
     if (fs.existsSync(standaloneHtmlPath)) {
         fs.copyFileSync(standaloneHtmlPath, path.join(outputDir, "index.html"));
     }
     fs.writeFileSync(path.join(outputDir, ".nojekyll"), "", "utf8");
 }
 
-function buildStandaloneFrontend() {
-    runCommand(process.execPath, [path.join(rootDir, "node_modules", "vite", "bin", "vite.js"), "build", "--mode", "standalone"]);
+function buildStandaloneFrontend(htmlEntryPath) {
+    runCommand(
+        process.execPath,
+        [path.join(rootDir, "node_modules", "vite", "bin", "vite.js"), "build", "--mode", "standalone"],
+        {
+            env: {
+                ...process.env,
+                STANDALONE_HTML_ENTRY: htmlEntryPath,
+            },
+        },
+    );
 }
 
-renderStandaloneShell();
-buildStandaloneFrontend();
-copyStaticAssets();
-exportBootstrapData();
-writePythonManifest();
+const standaloneHtmlEntry = prepareStandaloneBuildInput();
+try {
+    buildStandaloneFrontend(standaloneHtmlEntry);
+    copyStaticAssets();
+    exportBootstrapData();
+    writePythonManifest();
+} finally {
+    fs.rmSync(standaloneBuildInputDir, { recursive: true, force: true });
+}

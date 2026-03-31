@@ -26,7 +26,7 @@ class FrontendAssetManifestTests(unittest.TestCase):
             dist_dir = Path(tempdir) / "dist"
             dist_dir.mkdir(parents=True, exist_ok=True)
             (dist_dir / "manifest.json").write_text(
-                json.dumps({"frontend/app.ts": "not-an-object"}),
+                json.dumps({"frontend/server-entry.ts": "not-an-object"}),
                 encoding="utf-8",
             )
 
@@ -40,9 +40,9 @@ class FrontendAssetManifestTests(unittest.TestCase):
             (dist_dir / "manifest.json").write_text(
                 json.dumps(
                     {
-                        "frontend/app.ts": {
+                        "frontend/server-entry.ts": {
                             "file": "assets/app-123.js",
-                            "src": "frontend/app.ts",
+                            "src": "frontend/server-entry.ts",
                             "isEntry": True,
                             "css": ["assets/app-123.css"],
                         }
@@ -52,7 +52,7 @@ class FrontendAssetManifestTests(unittest.TestCase):
             )
 
             manifest = FrontendAssetManifest.load(tempdir)
-            entry_assets = manifest.entry_assets("frontend/app.ts")
+            entry_assets = manifest.entry_assets("frontend/server-entry.ts")
 
             self.assertEqual(entry_assets.script_filename, "dist/assets/app-123.js")
             self.assertEqual(entry_assets.stylesheet_filenames, ("dist/assets/app-123.css",))

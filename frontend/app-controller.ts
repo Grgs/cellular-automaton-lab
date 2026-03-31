@@ -5,14 +5,9 @@ import { createAppControllerBootstrap } from "./app-controller-bootstrap.js";
 import { createAppControllerSync } from "./app-controller-sync.js";
 import { initializeAppController } from "./app-controller-startup.js";
 import type { AppActionSet } from "./types/actions.js";
-import type {
-    AppController,
-    CreateAppControllerOptions,
-    ConfigSyncController,
-    InteractionController,
-    UiSessionController,
-    ViewportController,
-} from "./types/controller.js";
+import type { AppController, CreateAppControllerOptions } from "./types/controller-app.js";
+import type { ConfigSyncController, UiSessionController } from "./types/controller-sync-session.js";
+import type { InteractionController, ViewportController } from "./types/controller-view.js";
 
 export function createAppController({
     elements,

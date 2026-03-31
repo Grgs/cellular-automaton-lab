@@ -1,6 +1,8 @@
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from subprocess import run
 
 
 try:
@@ -24,13 +26,22 @@ class AppShellTests(unittest.TestCase):
         self.assertIn(">7 gen/s<", rendered)
         self.assertIn('<select id="adjacency-mode-select"><option value="edge" selected="selected">Edge</option></select>', rendered)
 
-    def test_checked_in_standalone_shell_matches_generated_output(self) -> None:
-        standalone_path = Path(__file__).resolve().parents[2] / "standalone.html"
+    def test_render_standalone_shell_script_matches_generated_output(self) -> None:
+        root_dir = Path(__file__).resolve().parents[2]
+        script_path = root_dir / "tools" / "render_standalone_shell.py"
 
-        self.assertEqual(
-            standalone_path.read_text(encoding="utf-8"),
-            render_standalone_document(),
-        )
+        with tempfile.TemporaryDirectory(prefix="cellular-automaton-standalone-shell-") as tempdir:
+            output_path = Path(tempdir) / "standalone.html"
+            run(
+                [sys.executable, str(script_path), str(output_path)],
+                check=True,
+                cwd=root_dir,
+            )
+
+            self.assertEqual(
+                output_path.read_text(encoding="utf-8"),
+                render_standalone_document(),
+            )
 
 
 if __name__ == "__main__":

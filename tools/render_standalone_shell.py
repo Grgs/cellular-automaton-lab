@@ -16,10 +16,10 @@ def main() -> int:
 
     if len(sys.argv) == 2:
         output_path = Path(sys.argv[1])
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(render_standalone_document(), encoding="utf-8")
     else:
-        output_path = ROOT_DIR / "standalone.html"
-
-    output_path.write_text(render_standalone_document(), encoding="utf-8")
+        sys.stdout.write(render_standalone_document())
     return 0
 
 

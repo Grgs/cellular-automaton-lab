@@ -2,14 +2,9 @@ import { createMutationRunner } from "./mutation-runner.js";
 import { createAppView } from "./app-view.js";
 import { createAppState } from "./state/simulation-state.js";
 import { currentDimensions } from "./state/selectors.js";
-import type {
-    AppControllerBootstrapResult,
-    ConfigSyncViewState,
-    InteractionController,
-    AppView,
-    GridView,
-    ViewportControllerDependencies,
-} from "./types/controller.js";
+import type { AppControllerBootstrapResult } from "./types/controller-app.js";
+import type { ConfigSyncViewState } from "./types/controller-sync-session.js";
+import type { AppView, GridView, InteractionController, ViewportControllerDependencies } from "./types/controller-view.js";
 import type { DomElements } from "./types/dom.js";
 import type { AppState } from "./types/state.js";
 
