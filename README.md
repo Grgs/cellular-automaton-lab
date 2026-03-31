@@ -36,7 +36,7 @@ Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://g
 - Regular, mixed periodic, and aperiodic boards share one rule protocol and one editing workflow.
 - Pattern files use sparse `cells_by_id` payloads instead of dense grid-only formats.
 
-Architecture details live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Architecture details live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). A runtime-oriented source guide lives in [docs/CODE_MAP.md](docs/CODE_MAP.md).
 
 ## Included Rules
 
