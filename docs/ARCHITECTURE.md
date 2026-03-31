@@ -26,8 +26,12 @@ flowchart LR
 
 - [app.py](../app.py) starts the Flask app by calling [backend/api.py](../backend/api.py).
 - [backend/frontend_assets.py](../backend/frontend_assets.py) resolves Vite output from `static/dist/manifest.json`.
-- [templates/index.html](../templates/index.html) renders the HTML shell and injects bootstrapped defaults, topology metadata, and periodic-face descriptors.
-- [frontend/app.ts](../frontend/app.ts) is the browser entrypoint.
+- [templates/index.html](../templates/index.html) is the thin server wrapper that injects bootstrapped defaults, topology metadata, periodic-face descriptors, server asset links, and the rendered shell markup.
+- [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html) is the shared shell source consumed by both Flask and the standalone build.
+- [backend/app_shell.py](../backend/app_shell.py) renders the shared shell for the server host and generates the standalone shell document.
+- [frontend/server-entry.ts](../frontend/server-entry.ts) is the canonical server host entrypoint.
+- [frontend/app-runtime.ts](../frontend/app-runtime.ts) owns the shared `initApp(...)` / `disposeApp()` lifecycle API.
+- [frontend/app.ts](../frontend/app.ts) and [frontend/main.ts](../frontend/main.ts) remain compatibility wrappers for the existing Vite manifest key and import surface.
 
 Important rules:
 
@@ -141,14 +145,16 @@ All shipped rules share the same rule protocol and are exposed through [backend/
 
 The frontend is built around a controller and view composition stack:
 
-- [frontend/app.ts](../frontend/app.ts)
-- [frontend/main.ts](../frontend/main.ts)
+- [frontend/server-entry.ts](../frontend/server-entry.ts)
+- [frontend/app-runtime.ts](../frontend/app-runtime.ts)
 - [frontend/app-controller.ts](../frontend/app-controller.ts)
 - [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
 - [frontend/app-controller-sync.ts](../frontend/app-controller-sync.ts)
 - [frontend/app-controller-bootstrap.ts](../frontend/app-controller-bootstrap.ts)
 
 This stack creates application state, canvas/grid rendering, control actions, session persistence, config sync, and interaction handlers.
+
+[frontend/app.ts](../frontend/app.ts) and [frontend/main.ts](../frontend/main.ts) currently forward to the canonical entry/runtime files so existing build and import paths keep working during the transition.
 
 ### State And Reconciliation
 
@@ -258,7 +264,7 @@ Important persistence rule:
 
 The main runtime loop is:
 
-1. Flask renders the shell and injects bootstrapped defaults, topology catalog entries, and periodic-face descriptors.
+1. Flask renders the server wrapper and injects bootstrapped defaults, topology catalog entries, periodic-face descriptors, and the shared shell markup.
 2. The frontend builds controller, view, config-sync, session, and interaction layers.
 3. The frontend fetches the current backend snapshot.
 4. User actions send explicit control or cell-mutation requests.

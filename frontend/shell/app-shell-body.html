@@ -1,28 +1,3 @@
-<!DOCTYPE html>
-<!-- Generated from frontend/shell/app-shell-body.html by tools/render_standalone_shell.py. -->
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cellular Automaton Lab</title>
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-    <script>
-        (function () {
-            try {
-                var storedTheme = window.localStorage.getItem("cellular-automaton-theme");
-                if (storedTheme === "light" || storedTheme === "dark") {
-                    document.documentElement.dataset.theme = storedTheme;
-                    return;
-                }
-                document.documentElement.dataset.theme = "light";
-            } catch (error) {
-                void error;
-            }
-        }());
-    </script>
-    <link rel="stylesheet" href="./styles.css">
-</head>
-<body>
 <div id="app-startup-error" hidden></div>
 <main id="app-frame" class="app-frame">
     <header id="top-bar" class="top-bar">
@@ -48,7 +23,7 @@
                 <div class="top-bar-control-group top-bar-topology-group">
                     <label class="top-control compact-select top-bar-tiling-control">
                         <span class="top-control-label">Tiling</span>
-                        <select id="tiling-family-select"></select>
+                        <select id="tiling-family-select">__TILING_FAMILY_OPTIONS__</select>
                     </label>
                 </div>
 
@@ -191,12 +166,12 @@
                                 class="top-manual-input"
                                 type="number"
                                 inputmode="numeric"
-                                min="4"
-                                max="24"
+                                min="__CELL_SIZE_MIN__"
+                                max="__CELL_SIZE_MAX__"
                                 step="1"
-                                value="12"
+                                value="__CELL_SIZE_VALUE__"
                             >
-                            <span id="cell-size-label" class="top-slider-value">12px</span>
+                            <span id="cell-size-label" class="top-slider-value">__CELL_SIZE_LABEL__</span>
                         </label>
 
                         <label id="patch-depth-field" class="top-control top-compact-control drawer-control" hidden>
@@ -206,12 +181,12 @@
                                 class="top-manual-input"
                                 type="number"
                                 inputmode="numeric"
-                                min="0"
-                                max="6"
+                                min="__PATCH_DEPTH_MIN__"
+                                max="__PATCH_DEPTH_MAX__"
                                 step="1"
-                                value="0"
+                                value="__PATCH_DEPTH_VALUE__"
                             >
-                            <span id="patch-depth-label" class="top-slider-value">Depth 0</span>
+                            <span id="patch-depth-label" class="top-slider-value">__PATCH_DEPTH_LABEL__</span>
                         </label>
 
                         <label id="speed-field" class="top-control top-compact-control drawer-control speed-control">
@@ -221,12 +196,12 @@
                                 class="top-manual-input"
                                 type="number"
                                 inputmode="numeric"
-                                min="1"
-                                max="30"
+                                min="__SPEED_MIN__"
+                                max="__SPEED_MAX__"
                                 step="1"
-                                value="5"
+                                value="__SPEED_VALUE__"
                             >
-                            <span id="speed-label" class="top-slider-value">5 gen/s</span>
+                            <span id="speed-label" class="top-slider-value">__SPEED_LABEL__</span>
                         </label>
                     </div>
                     <div id="editor-tools" class="editor-tool-grid" aria-label="Editor tools"></div>
@@ -255,9 +230,9 @@
                 <section id="simulation-section" class="panel-section drawer-section">
                     <h2>Board &amp; Patterns</h2>
                     <div class="drawer-control-grid drawer-board-grid">
-                        <label id="adjacency-mode-field" class="top-control compact-select drawer-control" hidden>
+                        <label id="adjacency-mode-field" class="top-control compact-select drawer-control" __ADJACENCY_FIELD_HIDDEN__>
                             <span class="top-control-label">Adjacency</span>
-                            <select id="adjacency-mode-select"></select>
+                            <select id="adjacency-mode-select">__ADJACENCY_MODE_OPTIONS__</select>
                         </label>
                     </div>
                     <div class="drawer-board-actions">
@@ -290,8 +265,3 @@
 
     <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
 </main>
-
-
-    <script type="module" src="/frontend/standalone.ts"></script>
-</body>
-</html>

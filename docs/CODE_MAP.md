@@ -31,27 +31,37 @@ For the higher-level architecture, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 ### Standalone browser runtime
 
 1. [standalone.html](../standalone.html)
-   Static HTML shell for the standalone build.
-2. [frontend/standalone.ts](../frontend/standalone.ts)
+   Generated standalone wrapper consumed by the Vite standalone build.
+2. [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html)
+   Shared shell source used by both Flask and the standalone wrapper.
+3. [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
+   Regenerates `standalone.html` from the shared shell source.
+4. [frontend/standalone.ts](../frontend/standalone.ts)
    `startStandaloneApp()` loads bootstrap JSON, creates the standalone worker environment, and then calls `initApp(...)`.
-3. [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts)
+5. [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts)
    `createStandaloneEnvironment(...)` creates the Web Worker, talks to Pyodide, and exposes a `SimulationBackend`.
-4. [frontend/standalone-worker.ts](../frontend/standalone-worker.ts)
+6. [frontend/standalone-worker.ts](../frontend/standalone-worker.ts)
    Worker entrypoint that loads Python and forwards commands into the browser runtime host.
-5. [backend/browser_runtime.py](../backend/browser_runtime.py)
+7. [backend/browser_runtime.py](../backend/browser_runtime.py)
    Python runtime host for standalone mode. Exposes `initialize_runtime(...)`, `handle_request(...)`, and `tick_running()`.
 
 ### Browser UI startup
 
-1. [frontend/main.ts](../frontend/main.ts)
+1. [frontend/server-entry.ts](../frontend/server-entry.ts)
+   Canonical server host entrypoint.
+2. [frontend/app-runtime.ts](../frontend/app-runtime.ts)
    `initApp(...)` creates the top-level controller and marks the app ready.
-2. [frontend/app-controller.ts](../frontend/app-controller.ts)
+3. [frontend/app.ts](../frontend/app.ts)
+   Compatibility wrapper that preserves the current Vite manifest entry.
+4. [frontend/main.ts](../frontend/main.ts)
+   Compatibility wrapper that preserves the old `initApp(...)` import path.
+5. [frontend/app-controller.ts](../frontend/app-controller.ts)
    `createAppController(...)` composes state, view, actions, sync, and interactions.
-3. [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
+6. [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
    `initializeAppController(...)` runs the async startup flow.
-4. [frontend/app-actions.ts](../frontend/app-actions.ts)
+7. [frontend/app-actions.ts](../frontend/app-actions.ts)
    Creates the action surface used by controls and interaction handlers.
-5. [frontend/app-view.ts](../frontend/app-view.ts)
+8. [frontend/app-view.ts](../frontend/app-view.ts)
    Renders the control shell and canvas-facing UI.
 
 ## Request Flow
@@ -89,8 +99,14 @@ Browser UI
 
 ### App composition
 
-- [frontend/main.ts](../frontend/main.ts)
+- [frontend/app-runtime.ts](../frontend/app-runtime.ts)
   `initApp(...)`, `disposeApp()`
+- [frontend/server-entry.ts](../frontend/server-entry.ts)
+  Server-only host bootstrap.
+- [frontend/app.ts](../frontend/app.ts)
+  Compatibility manifest-entry wrapper.
+- [frontend/main.ts](../frontend/main.ts)
+  Compatibility re-export wrapper.
 - [frontend/app-controller.ts](../frontend/app-controller.ts)
   `createAppController(...)`
 - [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)
@@ -99,6 +115,10 @@ Browser UI
   `createAppControllerSync(...)`
 - [frontend/app-controller-bootstrap.ts](../frontend/app-controller-bootstrap.ts)
   `createAppControllerBootstrap(...)`, `createViewportControllerDependencies(...)`
+- [frontend/config-sync-controller.ts](../frontend/config-sync-controller.ts)
+  `createConfigSyncController(...)`
+- [frontend/ui-session-controller.ts](../frontend/ui-session-controller.ts)
+  `createUiSessionController(...)`
 - [frontend/server-environment.ts](../frontend/server-environment.ts)
   `createServerEnvironment()`
 - [frontend/bootstrap-data.ts](../frontend/bootstrap-data.ts)
@@ -111,6 +131,8 @@ Browser UI
   Key functions: `createAppState()`, `setRules(...)`, `setActiveRule(...)`, `setTopology(...)`, `setSpeed(...)`
 - [frontend/state/snapshot-reducer.ts](../frontend/state/snapshot-reducer.ts)
   `applySimulationSnapshot(...)`
+- [frontend/simulation-reconciler.ts](../frontend/simulation-reconciler.ts)
+  `createSimulationReconciler(...)`
 - [frontend/state/selectors.ts](../frontend/state/selectors.ts)
   `currentEditorRule(...)`, `currentDimensions(...)`, `topologyRenderPayload(...)`
 - [frontend/state/sizing-state.ts](../frontend/state/sizing-state.ts)
@@ -211,6 +233,8 @@ Browser UI
 
 - [backend/api.py](../backend/api.py)
   `create_app(...)`
+- [backend/app_shell.py](../backend/app_shell.py)
+  Shared shell rendering for the Flask wrapper and standalone shell generation.
 - [backend/web/routes.py](../backend/web/routes.py)
   Thin Flask routes and JSON response helpers.
   Main endpoints: `get_state()`, `get_rules()`, `get_bootstrap()`, `start()`, `pause()`, `resume()`, `step()`, `reset()`, `update_config()`, `toggle_cell()`, `set_cell()`, `set_cells()`
@@ -227,6 +251,12 @@ Browser UI
   `register_simulation(app)`
 - [backend/simulation/coordinator.py](../backend/simulation/coordinator.py)
   `SimulationCoordinator`
+- [backend/simulation/coordinator_persistence.py](../backend/simulation/coordinator_persistence.py)
+  Persistence scheduling and save/load orchestration.
+- [backend/simulation/coordinator_restore.py](../backend/simulation/coordinator_restore.py)
+  Persisted-state restore flow.
+- [backend/simulation/coordinator_mutations.py](../backend/simulation/coordinator_mutations.py)
+  Immediate vs deferred mutation dispatch.
 - [backend/simulation/service.py](../backend/simulation/service.py)
   `SimulationService`
   Key methods: `get_state()`, `step()`, `reset(...)`, `update_config(...)`, `toggle_cell_by_id(...)`, `set_cell_state_by_id(...)`, `set_cells_by_id(...)`
@@ -264,6 +294,8 @@ Browser UI
   Public topology catalog façade.
 - [backend/simulation/topology_catalog_data.py](../backend/simulation/topology_catalog_data.py)
   Static topology definitions.
+- [backend/simulation/topology_catalog_types.py](../backend/simulation/topology_catalog_types.py)
+  Catalog dataclasses and definition types.
 - [backend/simulation/topology_catalog_build.py](../backend/simulation/topology_catalog_build.py)
   Catalog assembly.
 - [backend/simulation/topology_catalog_queries.py](../backend/simulation/topology_catalog_queries.py)
@@ -310,6 +342,8 @@ Browser UI
 
 - [tools/build-standalone.mjs](../tools/build-standalone.mjs)
   Builds the static standalone site.
+- [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
+  Regenerates the standalone wrapper from the shared shell source.
 - [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)
   Exports bootstrap metadata for standalone mode.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
@@ -335,3 +369,5 @@ Browser UI
   Start with [frontend/interactions/editor-session.ts](../frontend/interactions/editor-session.ts), [frontend/editor-operation-builders.ts](../frontend/editor-operation-builders.ts), and [frontend/editor-history.ts](../frontend/editor-history.ts)
 - Standalone browser runtime:
   Start with [frontend/standalone.ts](../frontend/standalone.ts), [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts), and [backend/browser_runtime.py](../backend/browser_runtime.py)
+- Shared shell or startup wrappers:
+  Start with [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html), [backend/app_shell.py](../backend/app_shell.py), and [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)

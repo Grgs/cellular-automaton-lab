@@ -4,7 +4,9 @@ from collections.abc import Callable
 from typing import TypeVar
 
 from flask import Blueprint, Response, current_app, jsonify, render_template, request
+from markupsafe import Markup
 
+from backend.app_shell import render_server_app_shell
 from backend.bootstrap_data import build_bootstrap_payload
 from backend.payload_types import (
     ApiErrorPayload,
@@ -86,6 +88,12 @@ def index() -> str:
     return render_template(
         "index.html",
         app_defaults=current_app.config["APP_DEFAULTS"],
+        app_shell=Markup(
+            render_server_app_shell(
+                current_app.config["APP_DEFAULTS"],
+                current_app.config["TOPOLOGY_CATALOG"],
+            )
+        ),
         topology_catalog=current_app.config["TOPOLOGY_CATALOG"],
         periodic_face_tilings=current_app.config["PERIODIC_FACE_TILINGS"],
         frontend_script=entry_assets.script_filename,

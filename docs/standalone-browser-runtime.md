@@ -14,6 +14,7 @@ The public evaluator demo is published to GitHub Pages at [https://grgs.github.i
 ### Server mode
 
 - Flask still renders `templates/index.html`.
+- `templates/index.html` now wraps the shared shell source from `frontend/shell/app-shell-body.html` instead of duplicating the full app body.
 - The frontend uses the HTTP-backed `SimulationBackend` from `frontend/api.ts`.
 - Server bootstrap data is available through both template globals and `GET /api/bootstrap`.
 - The backend remains authoritative for state, persistence, and the threaded run loop.
@@ -21,8 +22,8 @@ The public evaluator demo is published to GitHub Pages at [https://grgs.github.i
 
 ### Standalone mode
 
-- `standalone.html` bootstraps the same DOM shell the server-rendered app uses.
-- `frontend/standalone.ts` fetches `standalone-bootstrap.json`, installs the bootstrap globals first, then dynamically imports the shared app entry so standalone startup no longer races bootstrapped window data.
+- `standalone.html` is generated from the same shared shell source that the server wrapper uses, so the large DOM shell is defined in one place.
+- `frontend/standalone.ts` fetches `standalone-bootstrap.json`, installs the bootstrap globals first, then dynamically imports the shared app runtime so standalone startup no longer races bootstrapped window data.
 - `frontend/standalone.ts` creates the worker-backed `SimulationBackend` and then starts the shared frontend controller stack.
 - `frontend/standalone-worker.ts` loads Pyodide, copies the packaged Python sources into Pyodide's virtual filesystem, imports `backend.browser_runtime`, and proxies frontend commands into the Python simulation runtime.
 - The worker owns the standalone run loop with JS timers. The frontend continues to use the existing polling/reconciliation flow while the worker advances the simulation in the background.
@@ -55,10 +56,11 @@ npm run build:frontend:standalone
 
 This performs four steps:
 
-1. builds the standalone Vite entry into `output/standalone/`
-2. copies the shared authored stylesheet and favicon into the standalone output
-3. exports `standalone-bootstrap.json` from the Python topology/defaults metadata
-4. copies the Python source/config tree into `output/standalone/py-src/` and writes `standalone-python-manifest.json`
+1. regenerates the root `standalone.html` wrapper from the shared shell source
+2. builds the standalone Vite entry into `output/standalone/`
+3. copies the shared authored stylesheet and favicon into the standalone output
+4. exports `standalone-bootstrap.json` from the Python topology/defaults metadata
+5. copies the Python source/config tree into `output/standalone/py-src/` and writes `standalone-python-manifest.json`
 
 The standalone output includes both `standalone.html` and `index.html` for easier static hosting.
 The packager also writes `.nojekyll` so the published artifact is safe for GitHub Pages project-site hosting.
@@ -207,12 +209,11 @@ That browser coverage now exercises:
 ## Known Limitations
 
 - Pyodide is loaded from the CDN configured in `frontend/standalone/worker-client.ts`; the standalone build does not yet vend Pyodide assets locally for fully offline use.
-- The standalone shell currently duplicates the server template structure in `standalone.html`, so future shell/layout changes must be mirrored in both places.
 - The standalone Python runtime still bypasses Flask-specific HTTP concerns such as request objects and response wrappers; only payload validation and simulation contracts are shared.
 - The standalone build is aimed at static hosting with network access. If offline hosting becomes a requirement, Pyodide must be vendored into the output and loaded locally.
 
 ## Remaining Work Checklist
 
-- Deduplicate `standalone.html` and `templates/index.html` so both hosts render from one shared shell source.
+- Remove the temporary startup-path compatibility shims in `frontend/app.ts` and `frontend/main.ts` after the manifest entry and docs no longer need them.
 - Decide whether Pyodide must be bundled into the standalone output instead of loaded from a CDN. If full offline hosting is required, replace the CDN loader with vendored Pyodide assets and update the packager accordingly.
 - If the public demo needs stronger polish later, add a post-deploy smoke check and optionally a custom domain without changing the standalone runtime contract.

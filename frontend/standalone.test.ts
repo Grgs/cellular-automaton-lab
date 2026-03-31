@@ -41,7 +41,7 @@ afterEach(() => {
     vi.resetModules();
     vi.doUnmock("./bootstrap-data.js");
     vi.doUnmock("./standalone/worker-client.js");
-    vi.doUnmock("./main.js");
+    vi.doUnmock("./app-runtime.js");
 });
 
 describe("standalone startup", () => {
@@ -58,7 +58,7 @@ describe("standalone startup", () => {
                 throw new Error("worker initialization failed");
             }),
         }));
-        vi.doMock("./main.js", () => ({
+        vi.doMock("./app-runtime.js", () => ({
             disposeApp: vi.fn(),
             initApp: vi.fn(),
         }));

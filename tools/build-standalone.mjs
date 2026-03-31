@@ -6,6 +6,17 @@ import { spawnSync } from "node:child_process";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, "..");
 const outputDir = path.join(rootDir, "output", "standalone");
+const pythonCandidates = process.platform === "win32"
+    ? [
+        [process.env.PYTHON, []],
+        ["py", ["-3"]],
+        ["python", []],
+    ]
+    : [
+        [process.env.PYTHON, []],
+        ["python3", []],
+        ["python", []],
+    ];
 
 function runCommand(command, args, options = {}) {
     const result = spawnSync(command, args, {
@@ -43,23 +54,15 @@ function copyFileIntoOutput(sourcePath, relativeDestination) {
 function exportBootstrapData() {
     const scriptPath = path.join(rootDir, "tools", "export_bootstrap_data.py");
     const destinationPath = path.join(outputDir, "standalone-bootstrap.json");
-    const candidates = process.platform === "win32"
-        ? [
-            [process.env.PYTHON, []],
-            ["py", ["-3"]],
-            ["python", []],
-        ]
-        : [
-            [process.env.PYTHON, []],
-            ["python3", []],
-            ["python", []],
-        ];
+    runPythonScript(scriptPath, [destinationPath]);
+}
 
-    for (const [command, prefixArgs] of candidates) {
+function runPythonScript(scriptPath, args = []) {
+    for (const [command, prefixArgs] of pythonCandidates) {
         if (!command) {
             continue;
         }
-        const result = spawnSync(command, [...prefixArgs, scriptPath, destinationPath], {
+        const result = spawnSync(command, [...prefixArgs, scriptPath, ...args], {
             cwd: rootDir,
             stdio: "inherit",
             shell: false,
@@ -69,7 +72,11 @@ function exportBootstrapData() {
         }
     }
 
-    throw new Error("Unable to export standalone bootstrap data because no working Python interpreter was found.");
+    throw new Error(`Unable to run ${path.basename(scriptPath)} because no working Python interpreter was found.`);
+}
+
+function renderStandaloneShell() {
+    runPythonScript(path.join(rootDir, "tools", "render_standalone_shell.py"));
 }
 
 function writePythonManifest() {
@@ -113,6 +120,7 @@ function buildStandaloneFrontend() {
     runCommand(process.execPath, [path.join(rootDir, "node_modules", "vite", "bin", "vite.js"), "build", "--mode", "standalone"]);
 }
 
+renderStandaloneShell();
 buildStandaloneFrontend();
 copyStaticAssets();
 exportBootstrapData();

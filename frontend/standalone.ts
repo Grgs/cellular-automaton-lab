@@ -22,7 +22,7 @@ export async function startStandaloneApp(): Promise<void> {
         await fetchBootstrapData(new URL(/* @vite-ignore */ "../standalone-bootstrap.json", import.meta.url).toString()),
     );
     const environment = await createStandaloneEnvironment(bootstrapData);
-    const { disposeApp, initApp } = await import("./main.js");
+    const { disposeApp, initApp } = await import("./app-runtime.js");
     disposeStandaloneApp = disposeApp;
     await initApp({
         backend: environment.backend,
