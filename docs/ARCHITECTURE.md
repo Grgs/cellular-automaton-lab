@@ -195,6 +195,17 @@ Those layers combine:
 
 The simulation action runtime is split further into rule and speed sync, topology selection, patch-depth runtime, and follow-up effects. Reset-all-settings policy lives in [frontend/actions/default-reset.ts](../frontend/actions/default-reset.ts).
 
+Topology selection now has an explicit planning/execution split:
+
+- [frontend/actions/simulation/topology-selection-plan.ts](../frontend/actions/simulation/topology-selection-plan.ts) decides selected patch depth and cell size, computes viewport-sized dimensions for non-patch-depth transitions, builds reset payloads, and detects no-op topology requests.
+- [frontend/actions/simulation/topology-selection-runtime.ts](../frontend/actions/simulation/topology-selection-runtime.ts) owns hint/status dismissal, overlay restoration, optimistic local state, reset dispatch, and rollback.
+
+Pattern import follows the same split:
+
+- [frontend/actions/pattern-import-plan.ts](../frontend/actions/pattern-import-plan.ts) decides whether confirmation is required, builds reset requests from parsed patterns, and normalizes imported cell updates.
+- [frontend/actions/pattern-import-runtime.ts](../frontend/actions/pattern-import-runtime.ts) parses imported text, runs the reset-then-set-cells transaction, validates returned topology cell ids, and applies post-import UI cleanup.
+- [frontend/actions/pattern-actions.ts](../frontend/actions/pattern-actions.ts) remains the thin shell for file/clipboard entrypoints plus export and copy helpers.
+
 ### Controls Shell
 
 The control shell is explicitly layered:

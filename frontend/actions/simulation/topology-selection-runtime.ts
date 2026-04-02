@@ -1,23 +1,20 @@
-import { DEFAULT_PATCH_DEPTH } from "../../state/constants.js";
 import { BLOCKING_ACTIVITY_BUILD_TILING } from "../../blocking-activity.js";
 import { OVERLAY_INTENT_BOARD_REBUILT } from "../../overlay-policy.js";
 import {
-    rememberedCellSizeForTilingFamily,
-    rememberedPatchDepthForTilingFamily,
-    normalizePatchDepthForTilingFamily,
     setCellSize,
     setPatchDepth,
 } from "../../state/sizing-state.js";
-import { currentTopologyVariantKey, setTopologySpec } from "../../state/simulation-state.js";
+import { setTopologySpec } from "../../state/simulation-state.js";
 import {
-    describeTopologySpec,
     getTopologyDefinition,
     resolveAdjacencyMode,
-    resolveTopologyVariantKey,
-    topologyUsesPatchDepth,
 } from "../../topology-catalog.js";
+import {
+    buildCurrentTopologyResetPayload,
+    planTopologySelection,
+    resolveSelectedPatchDepthForTopology,
+} from "./topology-selection-plan.js";
 import type {
-    ConfigSyncBody,
     InteractionController,
     ResetControlBody,
     ViewportDimensions,
@@ -68,87 +65,34 @@ export function createTopologySelectionRuntime({
     setPatchDepthFn = setPatchDepth,
     setCellSizeFn = setCellSize,
 }: CreateTopologySelectionRuntimeOptions): TopologySelectionRuntime {
-    function resolveSelectedPatchDepth(nextTopologySpec: Partial<TopologySpec>): number {
-        const resolved = describeTopologySpec(nextTopologySpec);
-        if (!topologyUsesPatchDepth(resolved)) {
-            return DEFAULT_PATCH_DEPTH;
-        }
-        return rememberedPatchDepthForTilingFamily(state, resolved.tiling_family);
-    }
-
-    function resolveSelectedCellSize(nextTopologySpec: Partial<TopologySpec>): number {
-        const resolved = describeTopologySpec(nextTopologySpec);
-        return rememberedCellSizeForTilingFamily(state, resolved.tiling_family);
-    }
-
     function buildResetPayload(randomize: boolean): ResetControlBody {
         clearScheduledPatchDepthCommit({ clearPending: true });
-        if (topologyUsesPatchDepth(state.topologySpec)) {
-            const targetPatchDepth = normalizePatchDepthForTilingFamily(
-                state.topologySpec?.tiling_family,
-                state.patchDepth,
-            );
-            return {
-                topology_spec: {
-                    ...state.topologySpec,
-                    patch_depth: targetPatchDepth,
-                },
-                speed: state.speed,
-                rule: state.activeRule?.name ?? null,
-                randomize,
-            };
-        }
-        const desiredDimensions = getViewportDimensions(
-            currentTopologyVariantKey(state),
-            state.activeRule?.name ?? null,
-            state.cellSize,
-        );
-        const viewportPayload: ConfigSyncBody = {
-            speed: state.speed,
-            rule: state.activeRule?.name ?? null,
-            topology_spec: {
-                width: desiredDimensions.width,
-                height: desiredDimensions.height,
-            },
-        };
-        return {
-            ...viewportPayload,
-            topology_spec: {
-                ...state.topologySpec,
-                width: viewportPayload.topology_spec?.width ?? state.width,
-                height: viewportPayload.topology_spec?.height ?? state.height,
-                patch_depth: DEFAULT_PATCH_DEPTH,
-            },
-            speed: viewportPayload.speed ?? state.speed,
-            rule: viewportPayload.rule ?? state.activeRule?.name ?? null,
+        return buildCurrentTopologyResetPayload({
+            state,
+            getViewportDimensions,
             randomize,
-        };
+        });
     }
 
     function applyTopologySelection(
         nextTopologySpec: Partial<TopologySpec>,
+        {
+            resizeNonPatchDepthToViewport = false,
+            viewportRuleName = null,
+        }: {
+            resizeNonPatchDepthToViewport?: boolean;
+            viewportRuleName?: string | null;
+        } = {},
     ): Promise<SimulationSnapshot | null | void> {
-        const resolved = describeTopologySpec(nextTopologySpec);
-        const nextGeometry = resolveTopologyVariantKey(
-            resolved.tiling_family,
-            resolved.adjacency_mode,
-        );
-        const targetPatchDepth = resolveSelectedPatchDepth(resolved);
-        const targetCellSize = resolveSelectedCellSize(resolved);
-        if (
-            nextGeometry === currentTopologyVariantKey(state)
-            && Number(resolved.width) === Number(state.width)
-            && Number(resolved.height) === Number(state.height)
-            && Number(
-                topologyUsesPatchDepth(resolved)
-                    ? (resolved.patch_depth ?? targetPatchDepth)
-                    : resolved.patch_depth,
-            ) === Number(
-                topologyUsesPatchDepth(state.topologySpec)
-                    ? targetPatchDepth
-                    : state.patchDepth,
-            )
-        ) {
+        const selectionPlan = planTopologySelection({
+            state,
+            nextTopologySpec,
+            preserveRuleOnTopologySelection: preserveRuleOnTopologySelection(),
+            getViewportDimensions,
+            resizeNonPatchDepthToViewport,
+            viewportRuleName,
+        });
+        if (selectionPlan.kind === "noop") {
             return Promise.resolve();
         }
 
@@ -158,44 +102,26 @@ export function createTopologySelectionRuntime({
         const previousTopologySpec = state.topologySpec;
         const previousCellSize = state.cellSize;
         const previousPatchDepth = state.patchDepth;
-        setTopologySpecFn(state, resolved);
-        if (topologyUsesPatchDepth(resolved)) {
+        setTopologySpecFn(state, selectionPlan.resolvedTopologySpec);
+        if (selectionPlan.resolvedTopologySpec.sizing_mode === "patch_depth") {
             setPatchDepthFn(
                 state,
-                resolved.patch_depth ?? targetPatchDepth,
-                resolved.tiling_family,
+                selectionPlan.optimisticPatchDepth,
+                selectionPlan.resolvedTopologySpec.tiling_family,
             );
         } else {
-            setCellSizeFn(state, targetCellSize, resolved.tiling_family);
+            setCellSizeFn(
+                state,
+                selectionPlan.optimisticCellSize,
+                selectionPlan.resolvedTopologySpec.tiling_family,
+            );
         }
         renderControlPanel();
-        const requestedRuleName = preserveRuleOnTopologySelection()
-            ? (state.activeRule?.name ?? null)
-            : null;
 
-        const body: ResetControlBody = {
-            topology_spec: topologyUsesPatchDepth(resolved)
-                ? {
-                    ...resolved,
-                    patch_depth: normalizePatchDepthForTilingFamily(
-                        resolved.tiling_family,
-                        resolved.patch_depth ?? targetPatchDepth,
-                    ),
-                }
-                : {
-                    ...resolved,
-                    width: resolved.width,
-                    height: resolved.height,
-                },
-            speed: state.speed,
-            rule: requestedRuleName,
-            randomize: false,
-        };
-
-        return interactions.sendControl("/api/control/reset", body, {
+        return interactions.sendControl("/api/control/reset", selectionPlan.resetBody, {
             blockingActivity: BLOCKING_ACTIVITY_BUILD_TILING,
         }).then((simulationState) => {
-            reconcileTopologySelectionRuleOrigin(simulationState, requestedRuleName);
+            reconcileTopologySelectionRuleOrigin(simulationState, selectionPlan.requestedRuleName);
             return simulationState;
         }).catch((error) => {
             setTopologySpecFn(state, previousTopologySpec);
@@ -215,28 +141,17 @@ export function createTopologySelectionRuntime({
         if (!definition) {
             return Promise.resolve();
         }
-        const baseTopologySpec = {
+        return applyTopologySelection({
             tiling_family: nextTilingFamily,
             adjacency_mode: adjacencyMode,
-            patch_depth: resolveSelectedPatchDepth({
+            width: state.width,
+            height: state.height,
+            patch_depth: resolveSelectedPatchDepthForTopology(state, {
                 tiling_family: nextTilingFamily,
                 adjacency_mode: adjacencyMode,
             }),
-            width: state.width,
-            height: state.height,
-        };
-        if (definition.sizing_mode === "patch_depth") {
-            return applyTopologySelection(baseTopologySpec);
-        }
-        const desiredDimensions = getViewportDimensions(
-            resolveTopologyVariantKey(nextTilingFamily, adjacencyMode),
-            null,
-            resolveSelectedCellSize(baseTopologySpec),
-        );
-        return applyTopologySelection({
-            ...baseTopologySpec,
-            width: desiredDimensions.width,
-            height: desiredDimensions.height,
+        }, {
+            resizeNonPatchDepthToViewport: definition.sizing_mode !== "patch_depth",
         });
     }
 
@@ -246,7 +161,7 @@ export function createTopologySelectionRuntime({
             adjacency_mode: nextAdjacencyMode,
             width: state.width,
             height: state.height,
-            patch_depth: resolveSelectedPatchDepth({
+            patch_depth: resolveSelectedPatchDepthForTopology(state, {
                 tiling_family: state.topologySpec?.tiling_family || "square",
                 adjacency_mode: nextAdjacencyMode,
             }),

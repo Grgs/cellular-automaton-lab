@@ -154,16 +154,24 @@ Browser UI
   Groups action composition into simulation/config, pattern/preset/showcase, and editor/UI seams.
 - [frontend/actions/simulation/index.ts](../frontend/actions/simulation/index.ts)
   `createSimulationActions(...)`
+- [frontend/actions/simulation/topology-selection-plan.ts](../frontend/actions/simulation/topology-selection-plan.ts)
+  Pure topology reset and selection planning.
+- [frontend/actions/simulation/topology-selection-runtime.ts](../frontend/actions/simulation/topology-selection-runtime.ts)
+  Transaction layer for optimistic topology changes, reset dispatch, and rollback.
 - [frontend/actions/simulation/run-actions.ts](../frontend/actions/simulation/run-actions.ts)
   Start, pause, resume, step actions.
 - [frontend/actions/simulation/rule-actions.ts](../frontend/actions/simulation/rule-actions.ts)
   Rule changes.
 - [frontend/actions/simulation/topology-actions.ts](../frontend/actions/simulation/topology-actions.ts)
   Topology changes.
+- [frontend/actions/pattern-import-plan.ts](../frontend/actions/pattern-import-plan.ts)
+  Pure pattern-import confirmation, reset-request, and cell-update helpers.
+- [frontend/actions/pattern-import-runtime.ts](../frontend/actions/pattern-import-runtime.ts)
+  Pattern import parsing, mutation orchestration, validation, and status handling.
 - [frontend/actions/preset-actions.ts](../frontend/actions/preset-actions.ts)
   Applies built-in seed presets.
 - [frontend/actions/pattern-actions.ts](../frontend/actions/pattern-actions.ts)
-  Import/export/copy/paste pattern actions.
+  Thin import/export/copy/paste entrypoints and export serialization.
 - [frontend/actions/ui-actions.ts](../frontend/actions/ui-actions.ts)
   Theme, drawer, and disclosure UI actions.
 
