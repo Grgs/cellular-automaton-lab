@@ -223,6 +223,17 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertIsNot(topology, different_topology)
         self.assertIs(topology.to_dict(), topology.to_dict())
 
+    def test_topology_public_facade_preserves_builder_and_board_helpers(self) -> None:
+        topology = build_topology("square", 2, 2)
+        empty = empty_board("square", 2, 2)
+
+        self.assertEqual(topology.cell_count, 4)
+        self.assertEqual(empty.cell_states, [0, 0, 0, 0])
+        self.assertEqual(
+            build_topology("square", 2, 2).cells[0].id,
+            "c:0:0",
+        )
+
     def test_snub_square_unit_cell_has_expected_triangle_square_mix(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 1, 1)
 

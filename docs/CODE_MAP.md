@@ -294,7 +294,23 @@ Browser UI
 - [backend/simulation/models.py](../backend/simulation/models.py)
   `TopologySpec`, `SimulationConfig`, `RuleSnapshot`, `SimulationSnapshot`, `SimulationStateData`
 - [backend/simulation/topology.py](../backend/simulation/topology.py)
-  `LatticeCell`, `LatticeTopology`, `SimulationBoard`, `build_topology(...)`
+  Public compatibility façade for topology types and board builders.
+- [backend/simulation/topology_types.py](../backend/simulation/topology_types.py)
+  `LatticeCell`, `LatticeTopology`, `SimulationBoard`, regular cell ids, revision hashing.
+- [backend/simulation/topology_regular.py](../backend/simulation/topology_regular.py)
+  Square, hex, and triangle lattice builders.
+- [backend/simulation/topology_specialized.py](../backend/simulation/topology_specialized.py)
+  Periodic-face and aperiodic patch conversion helpers.
+- [backend/simulation/topology_builders.py](../backend/simulation/topology_builders.py)
+  Shared topology assembly and cached `build_topology(...)`.
+- [backend/simulation/topology_boards.py](../backend/simulation/topology_boards.py)
+  `empty_board(...)`, `board_from_states(...)`, `board_from_cells_by_id(...)`
+- [backend/simulation/rule_context.py](../backend/simulation/rule_context.py)
+  Public compatibility façade for rule-context frames and queries.
+- [backend/simulation/rule_context_frames.py](../backend/simulation/rule_context_frames.py)
+  `TopologyFrame`, frame cache, and `topology_frame_for(...)`.
+- [backend/simulation/rule_context_queries.py](../backend/simulation/rule_context_queries.py)
+  `RuleContext`, `NeighborSelection`, `build_rule_contexts_for_board(...)`.
 - [backend/simulation/persistence.py](../backend/simulation/persistence.py)
   `SimulationStateStore`
 - [backend/simulation/state_restore.py](../backend/simulation/state_restore.py)
@@ -376,7 +392,7 @@ Browser UI
 - Rule logic:
   Start with [backend/rules/base.py](../backend/rules/base.py) and the concrete rule file under [backend/rules](../backend/rules)
 - Topology generation:
-  Start with [backend/simulation/topology.py](../backend/simulation/topology.py), [backend/simulation/topology_catalog.py](../backend/simulation/topology_catalog.py), and [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py)
+  Start with [backend/simulation/topology.py](../backend/simulation/topology.py), [backend/simulation/topology_builders.py](../backend/simulation/topology_builders.py), and [backend/simulation/topology_catalog.py](../backend/simulation/topology_catalog.py)
 - Canvas rendering:
   Start with [frontend/canvas/render-layers.ts](../frontend/canvas/render-layers.ts), [frontend/canvas/render-style.ts](../frontend/canvas/render-style.ts), and the relevant adapter under [frontend/geometry](../frontend/geometry)
 - Control UI:

@@ -98,6 +98,14 @@ Core simulation and topology types live in:
 
 - [backend/simulation/models.py](../backend/simulation/models.py)
 - [backend/simulation/topology.py](../backend/simulation/topology.py)
+- [backend/simulation/topology_types.py](../backend/simulation/topology_types.py)
+- [backend/simulation/topology_regular.py](../backend/simulation/topology_regular.py)
+- [backend/simulation/topology_specialized.py](../backend/simulation/topology_specialized.py)
+- [backend/simulation/topology_builders.py](../backend/simulation/topology_builders.py)
+- [backend/simulation/topology_boards.py](../backend/simulation/topology_boards.py)
+- [backend/simulation/rule_context.py](../backend/simulation/rule_context.py)
+- [backend/simulation/rule_context_frames.py](../backend/simulation/rule_context_frames.py)
+- [backend/simulation/rule_context_queries.py](../backend/simulation/rule_context_queries.py)
 - [backend/simulation/persistence.py](../backend/simulation/persistence.py)
 - [backend/simulation/state_restore.py](../backend/simulation/state_restore.py)
 
@@ -107,6 +115,8 @@ Important model rules:
 - boards store cell state aligned with that topology
 - persisted snapshots use sparse `cells_by_id` maps keyed by stable cell IDs
 - restore always normalizes external payloads back into backend-owned model objects
+
+`backend/simulation/topology.py` and `backend/simulation/rule_context.py` now act as compatibility façades. The authored internals are split so topology types, regular builders, specialized builders, cached topology assembly, board helpers, frame construction, and `RuleContext` query behavior can evolve independently without changing broad import sites.
 
 ### Topology Catalog
 
