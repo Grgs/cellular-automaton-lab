@@ -147,6 +147,12 @@ export function renderSimulationSections(elements: DomElements, viewModel: Contr
 }
 
 export function renderEditorAndPatternSections(elements: DomElements, viewModel: ControlsViewModel): void {
+    if (elements.unsafeSizingField) {
+        elements.unsafeSizingField.hidden = false;
+    }
+    if (elements.unsafeSizingToggle) {
+        elements.unsafeSizingToggle.checked = Boolean(viewModel.unsafeSizingEnabled);
+    }
     renderToggleButtons(
         elements.editorTools,
         viewModel.editorTools || [],

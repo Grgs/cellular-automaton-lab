@@ -65,6 +65,8 @@ export interface DomElements {
     patternStatus: HTMLElement | null;
     editorTools: HTMLElement | null;
     editorShortcutHint: HTMLElement | null;
+    unsafeSizingField: HTMLElement | null;
+    unsafeSizingToggle: HTMLInputElement | null;
     brushSizeControls: HTMLElement | null;
     undoBtn: HTMLButtonElement | null;
     redoBtn: HTMLButtonElement | null;

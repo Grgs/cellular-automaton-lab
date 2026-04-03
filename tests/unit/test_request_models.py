@@ -56,6 +56,7 @@ class RequestModelTests(unittest.TestCase):
                 "width": "12",
                 "height": 9,
                 "patch_depth": "",
+                "unsafe_size_override": "true",
             },
             "speed": "7.5",
             "rule": "hexlife",
@@ -70,6 +71,7 @@ class RequestModelTests(unittest.TestCase):
         self.assertEqual(payload.speed, 7.5)
         self.assertEqual(payload.rule, "hexlife")
         self.assertIsNone(payload.topology_spec.patch_depth)
+        self.assertTrue(payload.topology_spec.unsafe_size_override)
         self.assertTrue(payload.randomize)
 
     def test_cell_target_model_requires_id_shape(self) -> None:

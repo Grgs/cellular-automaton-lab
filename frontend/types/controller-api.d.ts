@@ -10,6 +10,11 @@ import type {
 export interface ConfigTopologySpecPatch {
     width?: number;
     height?: number;
+    unsafe_size_override?: boolean;
+}
+
+export interface ResetTopologySpec extends TopologySpec {
+    unsafe_size_override?: boolean;
 }
 
 export interface ConfigSyncBody {
@@ -19,7 +24,7 @@ export interface ConfigSyncBody {
 }
 
 export interface ResetControlBody {
-    topology_spec: TopologySpec;
+    topology_spec: ResetTopologySpec;
     speed: number;
     rule: string | null;
     randomize: boolean;

@@ -46,16 +46,30 @@ export function parsePatchDepth(value: unknown): number {
         : normalizePatchDepth(defaultPatchDepthForTilingFamily(null));
 }
 
-export function parseCellSizeByTilingFamily(value: unknown): Record<string, number> {
+export function parseCellSizeByTilingFamily(
+    value: unknown,
+    { unsafe = false }: { unsafe?: boolean } = {},
+): Record<string, number> {
     return parseNumberRecord(
         value,
-        (tilingFamily, rawValue) => normalizeCellSizeForTilingFamily(tilingFamily, Number(rawValue)),
+        (tilingFamily, rawValue) => normalizeCellSizeForTilingFamily(
+            tilingFamily,
+            Number(rawValue),
+            { unsafe },
+        ),
     );
 }
 
-export function parsePatchDepthByTilingFamily(value: unknown): Record<string, number> {
+export function parsePatchDepthByTilingFamily(
+    value: unknown,
+    { unsafe = false }: { unsafe?: boolean } = {},
+): Record<string, number> {
     return parseNumberRecord(
         value,
-        (tilingFamily, rawValue) => normalizePatchDepthForTilingFamily(tilingFamily, Number(rawValue)),
+        (tilingFamily, rawValue) => normalizePatchDepthForTilingFamily(
+            tilingFamily,
+            Number(rawValue),
+            { unsafe },
+        ),
     );
 }

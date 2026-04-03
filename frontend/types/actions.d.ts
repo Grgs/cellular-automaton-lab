@@ -98,6 +98,7 @@ export interface ShowcaseActionSet {
 export interface UiActionSet {
     setCellSize(nextCellSize: number): Promise<boolean>;
     commitCellSize(nextCellSize: number): Promise<boolean>;
+    setUnsafeSizingEnabled(enabled: boolean): Promise<boolean>;
     setPaintState(nextPaintState: number | null): void;
     setEditorTool(nextTool: EditorTool): void;
     setBrushSize(nextBrushSize: number): void;

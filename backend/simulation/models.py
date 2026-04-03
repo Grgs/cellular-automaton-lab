@@ -74,6 +74,30 @@ def _topology_spec_int_value(
 ) -> int:
     return _coerce_optional_int(topology_spec.get(key), fallback)
 
+
+def _topology_spec_bool_value(
+    topology_spec: TopologySpecInput,
+    key: str,
+    fallback: bool = False,
+) -> bool:
+    value = topology_spec.get(key)
+    if value is None:
+        return fallback
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "on"}:
+            return True
+        if normalized in {"false", "0", "no", "off"}:
+            return False
+    if isinstance(value, (int, float)):
+        return bool(value)
+    raise TypeError(f"Expected a bool-compatible value, received {type(value).__name__}.")
+
+
+MAX_UNSAFE_PATCH_DEPTH = 12
+
 @dataclass(frozen=True)
 class TopologySpec:
     tiling_family: str = DEFAULT_TILING_FAMILY
@@ -82,6 +106,7 @@ class TopologySpec:
     width: int = DEFAULT_WIDTH
     height: int = DEFAULT_HEIGHT
     patch_depth: int = DEFAULT_PATCH_DEPTH
+    unsafe_size_override: bool = False
 
     @classmethod
     def from_values(
@@ -91,22 +116,24 @@ class TopologySpec:
         width: int = DEFAULT_WIDTH,
         height: int = DEFAULT_HEIGHT,
         patch_depth: int = DEFAULT_PATCH_DEPTH,
+        unsafe_size_override: bool = False,
     ) -> "TopologySpec":
         tiling_family_id = str(tiling_family)
         definition = get_topology_definition(tiling_family_id)
         resolved_adjacency_mode = normalize_adjacency_mode(tiling_family_id, adjacency_mode)
         geometry_id = resolve_geometry_key(tiling_family_id, resolved_adjacency_mode)
         minimum_grid_size = minimum_grid_dimension_for_geometry(geometry_id)
-        normalized_patch_depth = clamp_int(
-            patch_depth,
-            minimum_patch_depth_for_tiling_family(tiling_family_id),
-            maximum_patch_depth_for_tiling_family(tiling_family_id),
-        )
         if definition.sizing_mode != "patch_depth":
             normalized_patch_depth = DEFAULT_PATCH_DEPTH
+        elif unsafe_size_override:
+            normalized_patch_depth = clamp_int(
+                patch_depth,
+                MIN_PATCH_DEPTH,
+                MAX_UNSAFE_PATCH_DEPTH,
+            )
         else:
             normalized_patch_depth = clamp_int(
-                normalized_patch_depth,
+                patch_depth,
                 minimum_patch_depth_for_tiling_family(tiling_family_id),
                 maximum_patch_depth_for_tiling_family(tiling_family_id),
             )
@@ -117,6 +144,7 @@ class TopologySpec:
             width=clamp_int(width, minimum_grid_size, MAX_GRID_SIZE),
             height=clamp_int(height, minimum_grid_size, MAX_GRID_SIZE),
             patch_depth=normalized_patch_depth,
+            unsafe_size_override=bool(unsafe_size_override),
         )
 
     @classmethod
@@ -144,6 +172,7 @@ class TopologySpec:
         width: int | None = None,
         height: int | None = None,
         patch_depth: int | None = None,
+        unsafe_size_override: bool | None = None,
     ) -> "TopologySpec":
         return self.from_values(
             tiling_family=self.tiling_family if tiling_family is None else tiling_family,
@@ -151,6 +180,7 @@ class TopologySpec:
             width=self.width if width is None else width,
             height=self.height if height is None else height,
             patch_depth=self.patch_depth if patch_depth is None else patch_depth,
+            unsafe_size_override=self.unsafe_size_override if unsafe_size_override is None else unsafe_size_override,
         )
 
     @property
@@ -193,6 +223,7 @@ class SimulationConfig:
                 width=topology_spec.width,
                 height=topology_spec.height,
                 patch_depth=topology_spec.patch_depth,
+                unsafe_size_override=topology_spec.unsafe_size_override,
             )
         elif topology_spec is not None:
             resolved_topology_spec = TopologySpec.from_values(
@@ -205,6 +236,7 @@ class SimulationConfig:
                 width=_topology_spec_int_value(topology_spec, "width", width),
                 height=_topology_spec_int_value(topology_spec, "height", height),
                 patch_depth=_topology_spec_int_value(topology_spec, "patch_depth", patch_depth),
+                unsafe_size_override=_topology_spec_bool_value(topology_spec, "unsafe_size_override"),
             )
         else:
             resolved_topology_spec = TopologySpec.from_values(
@@ -295,6 +327,7 @@ class SimulationConfig:
                         if next_patch_depth_value is None
                         else _coerce_optional_int(next_patch_depth_value, self.patch_depth)
                     ),
+                    unsafe_size_override=_topology_spec_bool_value(topology_spec, "unsafe_size_override"),
                 )
         else:
             base_topology_spec = self.topology_spec.updated(

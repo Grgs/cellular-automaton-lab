@@ -74,6 +74,7 @@ export interface ViewportControllerDependencies {
     getCurrentDimensions(): ViewportDimensions;
     getViewportDimensions(geometry?: string, ruleName?: string | null, cellSize?: number): ViewportDimensions;
     collectConfig(): { speed: number; rule: string };
+    unsafeSizeOverrideEnabled?(): boolean;
     applyPreview(dimensions: ViewportDimensions): void;
     sendControl(
         path: "/api/config",

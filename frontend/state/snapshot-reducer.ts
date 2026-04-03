@@ -42,7 +42,12 @@ export function applySimulationSnapshot(state: AppState, simulationState: Simula
     );
     const normalizedTopology = normalizeIncomingTopology(simulationState, topologySpec);
     setTopologySpec(state, topologySpec);
-    setPatchDepth(state, topologySpec.patch_depth, topologySpec.tiling_family);
+    setPatchDepth(
+        state,
+        topologySpec.patch_depth,
+        topologySpec.tiling_family,
+        { preserveOutOfRange: true },
+    );
     if (Number(state.pendingPatchDepth) === Number(topologySpec.patch_depth)) {
         clearPendingPatchDepth(state);
     } else if (!topologyUsesPatchDepth(topologySpec)) {

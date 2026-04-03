@@ -166,4 +166,35 @@ describe("topology-selection-plan", () => {
         });
         expect(getViewportDimensions).toHaveBeenCalledWith("square", "highlife", 14);
     });
+
+    it("includes the unsafe size override flag in reset payloads when enabled", async () => {
+        const { createAppState } = await import("../../state/simulation-state.js");
+        const { buildCurrentTopologyResetPayload } = await import("./topology-selection-plan.js");
+
+        const state = createAppState();
+        state.unsafeSizingEnabled = true;
+        state.speed = 7;
+        state.patchDepth = 9;
+        state.activeRule = makeRule("life-b2-s23");
+        state.topologySpec = {
+            tiling_family: "penrose-p3-rhombs",
+            adjacency_mode: "edge",
+            sizing_mode: "patch_depth",
+            width: 0,
+            height: 0,
+            patch_depth: 9,
+        };
+
+        const payload = buildCurrentTopologyResetPayload({
+            state,
+            getViewportDimensions: vi.fn(() => ({ width: 99, height: 99 })),
+            randomize: false,
+        });
+
+        expect(payload.topology_spec).toEqual({
+            ...state.topologySpec,
+            patch_depth: 9,
+            unsafe_size_override: true,
+        });
+    });
 });

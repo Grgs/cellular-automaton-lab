@@ -5,6 +5,7 @@ export type UiDisclosureId = "rule-notes-toggle";
 export interface UiSessionState {
     cellSize: number;
     cellSizeByTilingFamily: Record<string, number>;
+    unsafeSizingEnabled: boolean;
     editorTool: EditorTool;
     brushSize: number;
     drawerOpen: boolean | null;
@@ -18,8 +19,10 @@ export interface UiSessionStorage {
     clear(): UiSessionState;
     getCellSizes(): Record<string, number>;
     getCellSize(tilingFamily?: string): number;
+    getUnsafeSizingEnabled(): boolean;
     setDefaultCellSize(cellSize: number): UiSessionState;
     setCellSizeForTilingFamily(tilingFamily: string, cellSize: number): UiSessionState;
+    setUnsafeSizingEnabled(enabled: boolean): UiSessionState;
     getEditorTool(): EditorTool;
     setEditorTool(editorTool: EditorTool): UiSessionState;
     getBrushSize(): number;

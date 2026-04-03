@@ -163,6 +163,25 @@ class RequestParsingTests(unittest.TestCase):
             },
         )
         self.assertEqual(
+            parse_topology_spec({
+                "topology_spec": {
+                    "tiling_family": "spectre",
+                    "adjacency_mode": "edge",
+                    "patch_depth": 9,
+                    "unsafe_size_override": True,
+                },
+            }),
+            {
+                "tiling_family": "spectre",
+                "adjacency_mode": "edge",
+                "sizing_mode": "patch_depth",
+                "width": None,
+                "height": None,
+                "patch_depth": 9,
+                "unsafe_size_override": True,
+            },
+        )
+        self.assertEqual(
             parse_topology_spec({"topology_spec": {"tiling_family": "square", "adjacency_mode": "vertex"}}),
             {
                 "tiling_family": "square",
@@ -205,6 +224,10 @@ class RequestParsingTests(unittest.TestCase):
         self.assertEqual(
             normalize_config_topology_patch({"topology_spec": {"width": 12, "height": 8}}),
             {"width": 12, "height": 8},
+        )
+        self.assertEqual(
+            normalize_config_topology_patch({"topology_spec": {"width": 12, "unsafe_size_override": True}}),
+            {"width": 12, "unsafe_size_override": True},
         )
 
         with self.assertRaises(RequestValidationError):

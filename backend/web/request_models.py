@@ -93,6 +93,7 @@ class TopologySpecValueModel(BaseModel):
     width: int | None = None
     height: int | None = None
     patch_depth: int | None = None
+    unsafe_size_override: bool | None = None
 
     @field_validator("tiling_family", "adjacency_mode", "sizing_mode", mode="before")
     @classmethod
@@ -104,8 +105,13 @@ class TopologySpecValueModel(BaseModel):
     def normalize_optional_ints(cls, value: object) -> object | None:
         return blank_to_none(value)
 
+    @field_validator("unsafe_size_override", mode="before")
+    @classmethod
+    def normalize_optional_bool(cls, value: object) -> object | None:
+        return blank_to_none(value)
+
     def to_payload(self) -> TopologySpecRequestPayload:
-        return {
+        payload: TopologySpecRequestPayload = {
             "tiling_family": self.tiling_family or "",
             "adjacency_mode": self.adjacency_mode or "",
             "sizing_mode": self.sizing_mode or "",
@@ -113,6 +119,9 @@ class TopologySpecValueModel(BaseModel):
             "height": self.height,
             "patch_depth": self.patch_depth,
         }
+        if self.unsafe_size_override is not None:
+            payload["unsafe_size_override"] = bool(self.unsafe_size_override)
+        return payload
 
 
 class ConfigUpdateRequestModel(BaseModel):

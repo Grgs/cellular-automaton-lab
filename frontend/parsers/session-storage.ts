@@ -3,7 +3,7 @@ import { isPlainObject } from "../runtime-validation.js";
 import { cloneUiSession, createEmptyUiSession } from "../ui-session-state.js";
 import type { UiDisclosureId, UiSessionState } from "../types/session.js";
 
-export const UI_SESSION_STORAGE_VERSION = 2;
+export const UI_SESSION_STORAGE_VERSION = 3;
 
 interface PersistedUiSessionV2 {
     version: typeof UI_SESSION_STORAGE_VERSION;

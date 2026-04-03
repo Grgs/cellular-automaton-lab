@@ -84,6 +84,7 @@ export function createAppState(): AppState {
         patchDepth: DEFAULT_PATCH_DEPTH,
         pendingPatchDepth: null,
         patchDepthByTilingFamily: {},
+        unsafeSizingEnabled: false,
         width: 0,
         height: 0,
         topologyRevision: null,
@@ -167,6 +168,10 @@ export function setEditorTool(state: AppState, tool: EditorTool): void {
 
 export function setBrushSize(state: AppState, brushSize: number): void {
     state.brushSize = clampBrushSize(brushSize);
+}
+
+export function setUnsafeSizingEnabled(state: AppState, enabled: boolean): void {
+    state.unsafeSizingEnabled = Boolean(enabled);
 }
 
 export function getSelectedPresetId(state: AppState, ruleName: string | null): string | null {

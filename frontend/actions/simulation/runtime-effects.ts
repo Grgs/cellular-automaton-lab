@@ -8,7 +8,6 @@ import {
     topologyUsesPatchDepth,
 } from "../../topology-catalog.js";
 import {
-    normalizePatchDepthForTilingFamily,
     rememberPatchDepthForTilingFamily,
 } from "../../state/sizing-state.js";
 import type { SimulationSnapshot } from "../../types/domain.js";
@@ -92,10 +91,7 @@ export function createSimulationRuntimeEffects({
         if (!topologyUsesPatchDepth(topologySpec)) {
             return;
         }
-        const patchDepth = normalizePatchDepthForTilingFamily(
-            topologySpec.tiling_family,
-            topologySpec.patch_depth,
-        );
+        const patchDepth = Number(topologySpec.patch_depth) || 0;
         rememberPatchDepthForTilingFamily(state, topologySpec.tiling_family, patchDepth);
         uiSessionController.persistPatchDepthForTilingFamily?.(topologySpec.tiling_family, patchDepth);
     }

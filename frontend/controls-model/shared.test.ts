@@ -33,4 +33,25 @@ describe("controls-model/shared", () => {
             backdropVisible: true,
         });
     });
+
+    it("widens viewport sizing ranges when unsafe sizing is enabled", async () => {
+        const { createAppState } = await import("../state/simulation-state.js");
+        const { resolveViewportSizingState } = await import("./shared.js");
+
+        const state = createAppState();
+        state.unsafeSizingEnabled = true;
+        state.topologySpec = {
+            tiling_family: "square",
+            adjacency_mode: "edge",
+            sizing_mode: "grid",
+            width: 30,
+            height: 20,
+            patch_depth: 0,
+        };
+
+        expect(resolveViewportSizingState(state)).toMatchObject({
+            cellSizeMin: 1,
+            cellSizeMax: 240,
+        });
+    });
 });

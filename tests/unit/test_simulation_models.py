@@ -77,6 +77,40 @@ class SimulationModelTests(unittest.TestCase):
         self.assertEqual(config.patch_depth, 5)
         self.assertEqual(config.topology_spec.patch_depth, 5)
 
+    def test_unsafe_size_override_allows_patch_depth_above_family_cap(self) -> None:
+        config = SimulationConfig.from_values(
+            topology_spec={
+                "tiling_family": "spectre",
+                "adjacency_mode": "edge",
+                "width": 0,
+                "height": 0,
+                "patch_depth": 9,
+                "unsafe_size_override": True,
+            },
+            speed=4,
+        )
+
+        self.assertEqual(config.patch_depth, 9)
+        self.assertEqual(config.topology_spec.patch_depth, 9)
+
+    def test_unsafe_size_override_survives_internal_config_updates(self) -> None:
+        config = SimulationConfig.from_values(
+            topology_spec={
+                "tiling_family": "spectre",
+                "adjacency_mode": "edge",
+                "width": 0,
+                "height": 0,
+                "patch_depth": 8,
+                "unsafe_size_override": True,
+            },
+            speed=4,
+        )
+
+        updated = config.updated(width=5, height=5)
+
+        self.assertEqual(updated.patch_depth, 8)
+        self.assertEqual(updated.topology_spec.patch_depth, 8)
+
     def test_rule_and_snapshot_serialize(self) -> None:
         rule = ConwayLifeRule()
         snapshot = SimulationSnapshot(

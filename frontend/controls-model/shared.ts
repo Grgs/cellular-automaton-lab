@@ -204,17 +204,17 @@ export function resolveViewportSizingState(state: AppState): ViewportSizingState
     const usesPatchDepth = topologyUsesPatchDepth(state.topologySpec);
     const tilingFamily = state.topologySpec?.tiling_family;
     const patchDepthMax = usesPatchDepth
-        ? maxPatchDepthForTilingFamily(tilingFamily)
+        ? maxPatchDepthForTilingFamily(tilingFamily, { unsafe: state.unsafeSizingEnabled })
         : MAX_PATCH_DEPTH;
     const patchDepthMin = usesPatchDepth
-        ? minPatchDepthForTilingFamily(tilingFamily)
+        ? minPatchDepthForTilingFamily(tilingFamily, { unsafe: state.unsafeSizingEnabled })
         : MIN_PATCH_DEPTH;
     const cellSizeMin = usesPatchDepth
         ? MIN_CELL_SIZE
-        : minCellSizeForTilingFamily(tilingFamily);
+        : minCellSizeForTilingFamily(tilingFamily, { unsafe: state.unsafeSizingEnabled });
     const cellSizeMax = usesPatchDepth
         ? MAX_CELL_SIZE
-        : maxCellSizeForTilingFamily(tilingFamily);
+        : maxCellSizeForTilingFamily(tilingFamily, { unsafe: state.unsafeSizingEnabled });
     const cellSize = Number.isFinite(state.cellSize)
         ? state.cellSize
         : defaultCellSizeForTilingFamily(tilingFamily);

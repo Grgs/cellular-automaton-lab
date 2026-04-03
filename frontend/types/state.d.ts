@@ -36,6 +36,7 @@ export interface AppState {
     patchDepth: number;
     pendingPatchDepth: number | null;
     patchDepthByTilingFamily: Record<string, number>;
+    unsafeSizingEnabled: boolean;
     width: number;
     height: number;
     topologyRevision: string | null;

@@ -106,6 +106,7 @@ export function buildDrawerViewModel({
         drawerToggleTitle,
         quickStartHintText: quickStartHint.quickStartHintText,
         quickStartHintVisible: quickStartHint.quickStartHintVisible && patternStatus.patternStatusText === "",
+        unsafeSizingEnabled: Boolean(state.unsafeSizingEnabled),
         ...(sizingState.usesPatchDepth
             ? {
                 ...buildHiddenCellSizeViewState(),

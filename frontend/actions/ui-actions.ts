@@ -11,6 +11,7 @@ import {
     setBrushSize,
     setEditorTool,
     setSelectedPaintState,
+    setUnsafeSizingEnabled,
 } from "../state/simulation-state.js";
 import { setDrawerOpen } from "../state/overlay-state.js";
 import {
@@ -46,6 +47,7 @@ export function createUiActions({
     applyOverlayIntentFn = applyOverlayIntent,
     armEditModeFn = armEditMode,
     clearEditModeFn = clearEditMode,
+    setUnsafeSizingEnabledFn = setUnsafeSizingEnabled,
 }: UiActionOptions & {
     setSelectedPaintStateFn?: typeof setSelectedPaintState;
     setCellSizeFn?: typeof setCellSize;
@@ -57,6 +59,7 @@ export function createUiActions({
     applyOverlayIntentFn?: typeof applyOverlayIntent;
     armEditModeFn?: typeof armEditMode;
     clearEditModeFn?: typeof clearEditMode;
+    setUnsafeSizingEnabledFn?: typeof setUnsafeSizingEnabled;
 }): UiActionSet {
     function applyPaintState(nextPaintState: number | null): void {
         setSelectedPaintStateFn(state, nextPaintState);
@@ -81,6 +84,13 @@ export function createUiActions({
         setBrushSizeFn(state, nextBrushSize);
         uiSessionController.persistBrushSize(state.brushSize);
         renderControlPanel();
+    }
+
+    function applyUnsafeSizingEnabled(enabled: boolean): Promise<boolean> {
+        setUnsafeSizingEnabledFn(state, enabled);
+        uiSessionController.persistUnsafeSizingEnabled(Boolean(state.unsafeSizingEnabled));
+        renderControlPanel();
+        return Promise.resolve(Boolean(state.unsafeSizingEnabled));
     }
 
     function applyCellSize(
@@ -148,6 +158,7 @@ export function createUiActions({
     return {
         setCellSize: (nextCellSize) => applyCellSize(nextCellSize),
         commitCellSize: (nextCellSize) => applyCellSize(nextCellSize, { immediate: true }),
+        setUnsafeSizingEnabled: (enabled) => applyUnsafeSizingEnabled(enabled),
         setPaintState: (nextPaintState) => applyPaintState(nextPaintState),
         setEditorTool: (nextTool) => applyEditorTool(nextTool),
         setBrushSize: (nextBrushSize) => applyBrushSize(nextBrushSize),

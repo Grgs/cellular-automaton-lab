@@ -71,6 +71,8 @@ export const elements: DomElements = {
     patternStatus: elementById("pattern-status"),
     editorTools: elementById("editor-tools"),
     editorShortcutHint: elementById("editor-shortcut-hint"),
+    unsafeSizingField: elementById("unsafe-sizing-field"),
+    unsafeSizingToggle: elementById("unsafe-sizing-toggle"),
     brushSizeControls: elementById("brush-size-controls"),
     undoBtn: elementById("undo-btn"),
     redoBtn: elementById("redo-btn"),

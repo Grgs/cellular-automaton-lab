@@ -71,6 +71,7 @@ class TopologySpecRequestPayload(TypedDict):
     width: int | None
     height: int | None
     patch_depth: int | None
+    unsafe_size_override: NotRequired[bool]
 
 
 class TopologySpecPatch(TypedDict, total=False):
@@ -80,6 +81,7 @@ class TopologySpecPatch(TypedDict, total=False):
     width: int
     height: int
     patch_depth: int
+    unsafe_size_override: bool
 
 
 TopologySpecInput: TypeAlias = TopologySpecPayload | TopologySpecRequestPayload | TopologySpecPatch

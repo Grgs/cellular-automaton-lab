@@ -220,6 +220,13 @@
                         <summary>More</summary>
                         <div class="reset-settings-panel">
                             <p class="hint">Reset saved UI preferences and return the app to its default board, rule, and theme.</p>
+                            <label id="unsafe-sizing-field" class="buried-setting-toggle" for="unsafe-sizing-toggle">
+                                <input id="unsafe-sizing-toggle" type="checkbox">
+                                <span class="buried-setting-copy">
+                                    <strong class="buried-setting-title">Allow unsafe size values</strong>
+                                    <span class="hint">Lets Cell Size and Patch Depth go past normal tiling limits. This can get slow or unstable.</span>
+                                </span>
+                            </label>
                             <button id="reset-all-settings-btn" class="soft-action reset-settings-btn" type="button">
                                 Reset All Settings
                             </button>

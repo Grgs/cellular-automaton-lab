@@ -63,6 +63,7 @@ export function createViewportControllerDependencies({
         getCurrentDimensions: () => currentDimensions(state),
         getViewportDimensions: (geometry, ruleName, cellSize) => appView.viewportDimensionsFor(geometry, ruleName, cellSize),
         collectConfig: () => collectConfig(elements),
+        unsafeSizeOverrideEnabled: () => Boolean(state.unsafeSizingEnabled),
         applyPreview: (dimensions) => appView.applyViewportPreview(dimensions),
         sendControl: (path, body, options = {}) => interactions.sendControl(path, body, options),
         sameDimensions,

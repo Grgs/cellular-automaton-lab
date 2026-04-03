@@ -1,7 +1,7 @@
 import { BLOCKING_ACTIVITY_BUILD_TILING } from "../../blocking-activity.js";
 import { OVERLAY_INTENT_BOARD_REBUILT } from "../../overlay-policy.js";
-import { parsePatchDepth } from "../../parsers/sizing.js";
 import {
+    buildTopologySpecRequest,
     clearPendingPatchDepth,
     normalizePatchDepthForTilingFamily,
     setPendingPatchDepth,
@@ -68,9 +68,11 @@ export function createPatchDepthRuntime({
     }
 
     async function commitPendingPatchDepth(): Promise<boolean> {
+        const requestedDepth = Number(state.pendingPatchDepth ?? state.patchDepth);
         const targetDepth = normalizePatchDepthForTilingFamily(
             state.topologySpec?.tiling_family,
-            parsePatchDepth(state.pendingPatchDepth ?? state.patchDepth),
+            Number.isFinite(requestedDepth) ? requestedDepth : Number(state.patchDepth),
+            { unsafe: state.unsafeSizingEnabled },
         );
         if (
             !topologyUsesPatchDepth(state.topologySpec)
@@ -92,10 +94,10 @@ export function createPatchDepthRuntime({
             const simulationState = await interactions.sendControl(
                 "/api/control/reset",
                 {
-                    topology_spec: {
+                    topology_spec: buildTopologySpecRequest({
                         ...state.topologySpec,
                         patch_depth: targetDepth,
-                    },
+                    }, state.unsafeSizingEnabled),
                     speed: state.speed,
                     rule: state.activeRule?.name ?? null,
                     randomize: false,

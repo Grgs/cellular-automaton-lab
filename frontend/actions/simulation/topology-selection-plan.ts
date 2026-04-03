@@ -1,5 +1,6 @@
 import { DEFAULT_PATCH_DEPTH } from "../../state/constants.js";
 import {
+    buildTopologySpecRequest,
     rememberedCellSizeForTilingFamily,
     rememberedPatchDepthForTilingFamily,
     normalizePatchDepthForTilingFamily,
@@ -56,7 +57,11 @@ export function resolveSelectedPatchDepthForTopology(
         return DEFAULT_PATCH_DEPTH;
     }
     if (nextTopologySpec.patch_depth != null) {
-        return normalizePatchDepthForTilingFamily(resolved.tiling_family, nextTopologySpec.patch_depth);
+        return normalizePatchDepthForTilingFamily(
+            resolved.tiling_family,
+            nextTopologySpec.patch_depth,
+            { unsafe: state.unsafeSizingEnabled },
+        );
     }
     return rememberedPatchDepthForTilingFamily(state, resolved.tiling_family);
 }
@@ -80,12 +85,13 @@ export function buildCurrentTopologyResetPayload({
         const targetPatchDepth = normalizePatchDepthForTilingFamily(
             state.topologySpec?.tiling_family,
             state.patchDepth,
+            { unsafe: state.unsafeSizingEnabled },
         );
         return {
-            topology_spec: {
+            topology_spec: buildTopologySpecRequest({
                 ...state.topologySpec,
                 patch_depth: targetPatchDepth,
-            },
+            }, state.unsafeSizingEnabled),
             speed: state.speed,
             rule: state.activeRule?.name ?? null,
             randomize,
@@ -97,12 +103,12 @@ export function buildCurrentTopologyResetPayload({
         state.cellSize,
     );
     return {
-        topology_spec: {
+        topology_spec: buildTopologySpecRequest({
             ...state.topologySpec,
             width: desiredDimensions.width,
             height: desiredDimensions.height,
             patch_depth: DEFAULT_PATCH_DEPTH,
-        },
+        }, state.unsafeSizingEnabled),
         speed: state.speed,
         rule: state.activeRule?.name ?? null,
         randomize,
@@ -116,24 +122,25 @@ function buildTopologySelectionResetBody(
 ): ResetControlBody {
     if (topologyUsesPatchDepth(resolvedTopologySpec)) {
         return {
-            topology_spec: {
+            topology_spec: buildTopologySpecRequest({
                 ...resolvedTopologySpec,
                 patch_depth: normalizePatchDepthForTilingFamily(
                     resolvedTopologySpec.tiling_family,
                     resolvedTopologySpec.patch_depth,
+                    { unsafe: state.unsafeSizingEnabled },
                 ),
-            },
+            }, state.unsafeSizingEnabled),
             speed: state.speed,
             rule: requestedRuleName,
             randomize: false,
         };
     }
     return {
-        topology_spec: {
+        topology_spec: buildTopologySpecRequest({
             ...resolvedTopologySpec,
             width: resolvedTopologySpec.width,
             height: resolvedTopologySpec.height,
-        },
+        }, state.unsafeSizingEnabled),
         speed: state.speed,
         rule: requestedRuleName,
         randomize: false,

@@ -51,6 +51,7 @@ export function createRuleSpeedRuntime({
             const body: ConfigSyncBody = {
                 topology_spec: {
                     ...getViewportDimensions(currentTopologyVariantKey(state), nextRuleName, state.cellSize),
+                    ...(state.unsafeSizingEnabled ? { unsafe_size_override: true } : {}),
                 },
             };
             options.body = body;

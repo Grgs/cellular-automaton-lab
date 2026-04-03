@@ -50,12 +50,17 @@ export function parseUiSession(
     }
 
     const session = createEmptyUiSession(defaultTilingFamily);
+    session.unsafeSizingEnabled = Boolean(value.unsafeSizingEnabled);
     if (value.cellSizeByTilingFamily !== null && value.cellSizeByTilingFamily !== undefined) {
-        session.cellSizeByTilingFamily = parseCellSizeByTilingFamily(value.cellSizeByTilingFamily);
+        session.cellSizeByTilingFamily = parseCellSizeByTilingFamily(value.cellSizeByTilingFamily, {
+            unsafe: session.unsafeSizingEnabled,
+        });
     } else if (value.cellSize !== null && value.cellSize !== undefined) {
         session.cellSizeByTilingFamily = {
             [defaultTilingFamily]: parseCellSizeByTilingFamily({
                 [defaultTilingFamily]: value.cellSize,
+            }, {
+                unsafe: session.unsafeSizingEnabled,
             })[defaultTilingFamily] ?? defaultCellSizeForTilingFamily(defaultTilingFamily),
         };
     }
@@ -69,7 +74,9 @@ export function parseUiSession(
         session.drawerOpen = Boolean(value.drawerOpen);
     }
     session.paintStatesByRule = parsePaintStatesByRule(value.paintStatesByRule);
-    session.patchDepthByTilingFamily = parsePatchDepthByTilingFamily(value.patchDepthByTilingFamily);
+    session.patchDepthByTilingFamily = parsePatchDepthByTilingFamily(value.patchDepthByTilingFamily, {
+        unsafe: session.unsafeSizingEnabled,
+    });
     session.disclosures = parseDisclosureStates(value.disclosures, disclosureIds);
     session.cellSize = session.cellSizeByTilingFamily[defaultTilingFamily]
         ?? defaultCellSizeForTilingFamily(defaultTilingFamily);

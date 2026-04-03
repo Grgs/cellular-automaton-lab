@@ -29,6 +29,7 @@ export function createViewportController({
         window.addEventListener("resize", listener);
         return () => window.removeEventListener("resize", listener);
     },
+    unsafeSizeOverrideEnabled = () => false,
 }: ViewportControllerDependencies & {
     setTimeoutFn?: BrowserSetTimeout;
     clearTimeoutFn?: BrowserClearTimeout;
@@ -61,6 +62,7 @@ export function createViewportController({
                 ...body,
                 topology_spec: {
                     ...topologySpec,
+                    ...(unsafeSizeOverrideEnabled() ? { unsafe_size_override: true } : {}),
                     ...(body.topology_spec ?? {}),
                 },
             }
@@ -68,6 +70,7 @@ export function createViewportController({
                 ...body,
                 topology_spec: {
                     ...topologySpec,
+                    ...(unsafeSizeOverrideEnabled() ? { unsafe_size_override: true } : {}),
                     ...(body.topology_spec ?? {}),
                 },
             };

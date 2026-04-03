@@ -75,7 +75,10 @@ export function createUiSessionStorage({
     function update(mutator: (session: UiSessionState) => void): UiSessionState {
         const nextSession = cloneUiSession(ensureLoaded());
         mutator(nextSession);
-        sessionCache = parseUiSession(nextSession, { disclosureIds: DISCLOSURE_IDS });
+        sessionCache = parseUiSession(nextSession, {
+            disclosureIds: DISCLOSURE_IDS,
+            defaultTilingFamily,
+        });
         flush();
         return cloneUiSession(sessionCache);
     }
@@ -102,6 +105,9 @@ export function createUiSessionStorage({
             return ensureLoaded().cellSizeByTilingFamily[String(tilingFamily)]
                 ?? defaultCellSizeForTilingFamily(tilingFamily);
         },
+        getUnsafeSizingEnabled() {
+            return Boolean(ensureLoaded().unsafeSizingEnabled);
+        },
         setDefaultCellSize(cellSize) {
             return update((session) => {
                 const normalizedSession = parseUiSession({
@@ -110,7 +116,10 @@ export function createUiSessionStorage({
                         ...session.cellSizeByTilingFamily,
                         [DEFAULT_TOPOLOGY_SPEC.tiling_family]: cellSize,
                     },
-                }, { disclosureIds: DISCLOSURE_IDS });
+                }, {
+                    disclosureIds: DISCLOSURE_IDS,
+                    defaultTilingFamily,
+                });
                 Object.assign(session, normalizedSession);
             });
         },
@@ -122,7 +131,22 @@ export function createUiSessionStorage({
                         ...session.cellSizeByTilingFamily,
                         [String(tilingFamily)]: cellSize,
                     },
-                }, { disclosureIds: DISCLOSURE_IDS });
+                }, {
+                    disclosureIds: DISCLOSURE_IDS,
+                    defaultTilingFamily,
+                });
+                Object.assign(session, normalizedSession);
+            });
+        },
+        setUnsafeSizingEnabled(enabled) {
+            return update((session) => {
+                const normalizedSession = parseUiSession({
+                    ...session,
+                    unsafeSizingEnabled: Boolean(enabled),
+                }, {
+                    disclosureIds: DISCLOSURE_IDS,
+                    defaultTilingFamily,
+                });
                 Object.assign(session, normalizedSession);
             });
         },
@@ -178,7 +202,10 @@ export function createUiSessionStorage({
                         ...session.patchDepthByTilingFamily,
                         [tilingFamily]: patchDepth,
                     },
-                }, { disclosureIds: DISCLOSURE_IDS });
+                }, {
+                    disclosureIds: DISCLOSURE_IDS,
+                    defaultTilingFamily,
+                });
                 Object.assign(session, normalizedSession);
             });
         },

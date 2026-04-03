@@ -32,6 +32,7 @@ export interface UiSessionController {
     restoreDrawerState(): void;
     restorePaintStateForCurrentRule(): void;
     persistCellSize(tilingFamilyOrCellSize: string | number, cellSize?: number): void;
+    persistUnsafeSizingEnabled(enabled: boolean): void;
     persistEditorTool(editorTool: EditorTool): void;
     persistBrushSize(brushSize: number): void;
     persistPaintStateForCurrentRule(): void;

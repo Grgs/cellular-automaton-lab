@@ -144,6 +144,7 @@ export interface DrawerViewModel {
     cellSizeLabel: string;
     cellSizeMin: string;
     cellSizeMax: string;
+    unsafeSizingEnabled: boolean;
     patchDepthVisible: boolean;
     patchDepthVisibleTopBar: boolean;
     patchDepthValue: string;

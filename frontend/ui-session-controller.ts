@@ -14,6 +14,7 @@ import {
     setBrushSize,
     setEditorTool,
     setSelectedPaintState,
+    setUnsafeSizingEnabled,
 } from "./state/simulation-state.js";
 import { setDrawerOpen } from "./state/overlay-state.js";
 import { currentEditorRule } from "./state/selectors.js";
@@ -62,6 +63,7 @@ export function createUiSessionController({
     setEditorToolFn = setEditorTool,
     setPatchDepthMemoryMapFn = setPatchDepthMemoryMap,
     setSelectedPaintStateFn = setSelectedPaintState,
+    setUnsafeSizingEnabledFn = setUnsafeSizingEnabled,
 }: {
     state: AppState;
     elements: DomElements;
@@ -77,11 +79,13 @@ export function createUiSessionController({
     setEditorToolFn?: typeof setEditorTool;
     setPatchDepthMemoryMapFn?: typeof setPatchDepthMemoryMap;
     setSelectedPaintStateFn?: typeof setSelectedPaintState;
+    setUnsafeSizingEnabledFn?: typeof setUnsafeSizingEnabled;
 }): UiSessionController {
     const storage = createUiSessionStorageFn();
 
     function restoreInitialCellSize(): void {
         const activeTilingFamily = state.topologySpec.tiling_family;
+        setUnsafeSizingEnabledFn(state, storage.getUnsafeSizingEnabled());
         const rememberedCellSizes = readStoredCellSizes(storage, activeTilingFamily);
         const hasRememberedCellSizes = Object.keys(rememberedCellSizes).length > 0;
         if (hasRememberedCellSizes) {
@@ -152,6 +156,10 @@ export function createUiSessionController({
         storage.setEditorTool(parseEditorTool(editorTool));
     }
 
+    function persistUnsafeSizingEnabled(enabled: boolean): void {
+        storage.setUnsafeSizingEnabled(Boolean(enabled));
+    }
+
     function persistBrushSize(brushSize: number): void {
         storage.setBrushSize(brushSize);
     }
@@ -184,6 +192,7 @@ export function createUiSessionController({
         setCellSizeMemoryMapFn(state, {});
         setPatchDepthMemoryMapFn(state, {});
         clearPendingPatchDepthFn(state);
+        setUnsafeSizingEnabledFn(state, false);
         const activeTilingFamily = state.topologySpec.tiling_family;
         setCellSizeFn(
             state,
@@ -215,6 +224,7 @@ export function createUiSessionController({
         restoreDrawerState,
         restorePaintStateForCurrentRule,
         persistCellSize,
+        persistUnsafeSizingEnabled,
         persistEditorTool,
         persistBrushSize,
         persistPaintStateForCurrentRule,

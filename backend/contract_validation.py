@@ -72,6 +72,21 @@ def parse_optional_float(payload: RawJsonObject, key: str) -> float | None:
     return _coerce_float(value, f"'{key}' must be a number.")
 
 
+def parse_optional_bool(payload: RawJsonObject, key: str) -> bool | None:
+    value = payload.get(key)
+    if value in (None, ""):
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "on"}:
+            return True
+        if normalized in {"false", "0", "no", "off"}:
+            return False
+    _raise_validation(f"'{key}' must be a boolean.")
+
+
 def parse_required_int(payload: RawJsonObject, key: str) -> int:
     if key not in payload:
         _raise_validation(f"Missing required field '{key}'.")
@@ -158,8 +173,9 @@ def parse_topology_spec(
     adjacency_mode_value = raw_topology_spec.get("adjacency_mode")
     adjacency_mode = None if adjacency_mode_value in (None, "") else str(adjacency_mode_value)
     definition = get_topology_definition(tiling_family)
+    unsafe_size_override = parse_optional_bool(raw_topology_spec, "unsafe_size_override")
 
-    return {
+    normalized_topology_spec: TopologySpecRequestPayload = {
         "tiling_family": tiling_family,
         "adjacency_mode": normalize_adjacency_mode(tiling_family, adjacency_mode),
         "sizing_mode": definition.sizing_mode,
@@ -167,6 +183,9 @@ def parse_topology_spec(
         "height": parse_optional_int(raw_topology_spec, "height"),
         "patch_depth": parse_optional_int(raw_topology_spec, "patch_depth"),
     }
+    if unsafe_size_override is not None:
+        normalized_topology_spec["unsafe_size_override"] = unsafe_size_override
+    return normalized_topology_spec
 
 
 def normalize_reset_topology_spec(payload: RawJsonObject) -> TopologySpecRequestPayload | None:
@@ -203,6 +222,9 @@ def normalize_config_topology_patch(payload: RawJsonObject) -> TopologySpecPatch
         topology_patch["width"] = width
     if height is not None:
         topology_patch["height"] = height
+    unsafe_size_override = parse_optional_bool(mapping, "unsafe_size_override")
+    if unsafe_size_override is not None:
+        topology_patch["unsafe_size_override"] = unsafe_size_override
     return topology_patch
 
 

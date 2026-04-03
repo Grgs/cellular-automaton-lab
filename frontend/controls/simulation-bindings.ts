@@ -50,6 +50,13 @@ export function bindSimulationControls(
         clearTimeoutFn,
     });
 
+    bindInputControl(
+        elements.unsafeSizingToggle,
+        "change",
+        () => Boolean(elements.unsafeSizingToggle?.checked),
+        actions.setUnsafeSizingEnabled,
+    );
+
     bindButtonControl(elements.runToggleBtn, actions.toggleRun);
     bindButtonControl(elements.stepBtn, actions.step);
     bindButtonControl(elements.resetBtn, actions.reset);

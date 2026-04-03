@@ -7,6 +7,7 @@ export function createEmptyUiSession(defaultTilingFamily: string): UiSessionStat
     return {
         cellSize: defaultCellSizeForTilingFamily(defaultTilingFamily) || DEFAULT_CELL_SIZE,
         cellSizeByTilingFamily: {},
+        unsafeSizingEnabled: false,
         editorTool: DEFAULT_EDITOR_TOOL,
         brushSize: DEFAULT_BRUSH_SIZE,
         drawerOpen: null,
@@ -20,6 +21,7 @@ export function cloneUiSession(session: UiSessionState): UiSessionState {
     return {
         cellSize: session.cellSize,
         cellSizeByTilingFamily: { ...session.cellSizeByTilingFamily },
+        unsafeSizingEnabled: Boolean(session.unsafeSizingEnabled),
         editorTool: session.editorTool,
         brushSize: session.brushSize,
         drawerOpen: session.drawerOpen,
