@@ -66,6 +66,7 @@ class TopologyDefinition:
     picker_order: int
     sizing_mode: str
     family: str
+    render_kind: str
     viewport_sync_mode: str
     supported_adjacency_modes: tuple[str, ...]
     default_adjacency_mode: str
@@ -81,6 +82,7 @@ class TopologyDefinition:
             "picker_order": self.picker_order,
             "sizing_mode": self.sizing_mode,
             "family": self.family,
+            "render_kind": self.render_kind,
             "viewport_sync_mode": self.viewport_sync_mode,
             "supported_adjacency_modes": list(self.supported_adjacency_modes),
             "default_adjacency_mode": self.default_adjacency_mode,

@@ -50,6 +50,7 @@ describe("bootstrap-data", () => {
                     picker_order: 2,
                     sizing_mode: "grid",
                     family: "regular",
+                    render_kind: "regular_grid",
                     viewport_sync_mode: "backend-sync",
                     supported_adjacency_modes: ["edge"],
                     default_adjacency_mode: "edge",

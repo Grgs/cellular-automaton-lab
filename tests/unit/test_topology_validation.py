@@ -8,6 +8,7 @@ try:
         LatticeCell,
         LatticeTopology,
         PENROSE_GEOMETRY,
+        SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
@@ -21,6 +22,7 @@ except ModuleNotFoundError:
         LatticeCell,
         LatticeTopology,
         PENROSE_GEOMETRY,
+        SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
@@ -97,6 +99,12 @@ class TopologyValidationTests(unittest.TestCase):
     def test_taylor_socolar_patch_passes_geometry_and_graph_validation(self) -> None:
         topology = build_topology(TAYLOR_SOCOLAR_GEOMETRY, 0, 0, patch_depth=3)
         validation = validate_topology(topology, **recommended_validation_options(TAYLOR_SOCOLAR_GEOMETRY))
+
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+
+    def test_sphinx_patch_passes_geometry_and_graph_validation(self) -> None:
+        topology = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
+        validation = validate_topology(topology, **recommended_validation_options(SPHINX_GEOMETRY))
 
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 

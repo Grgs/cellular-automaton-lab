@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 from backend.simulation.topology_catalog_types import TopologyDefinition
 
@@ -15,6 +15,7 @@ def build_topology_catalog(
     variants: tuple[TopologyVariantDefinition, ...],
     sizing_policies: dict[str, SizingPolicyDefinition],
     picker_group_order: dict[str, int],
+    render_kind_for_geometry: Callable[[str], str],
 ) -> tuple[TopologyDefinition, ...]:
     grouped: dict[str, list[TopologyVariantDefinition]] = {}
     for variant in variants:
@@ -32,6 +33,7 @@ def build_topology_catalog(
                 picker_order=first.picker_order,
                 sizing_mode=first.sizing_mode,
                 family=first.family,
+                render_kind=str(render_kind_for_geometry(first.geometry_key)),
                 viewport_sync_mode=first.viewport_sync_mode,
                 supported_adjacency_modes=tuple(variant.adjacency_mode for variant in family_variants),
                 default_adjacency_mode=family_variants[0].adjacency_mode,

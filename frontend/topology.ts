@@ -31,6 +31,7 @@ export const PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart";
 export const AMMANN_BEENKER_GEOMETRY = "ammann-beenker";
 export const SPECTRE_GEOMETRY = "spectre";
 export const TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar";
+export const SPHINX_GEOMETRY = "sphinx";
 export const PENROSE_GEOMETRIES = Object.freeze([PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY]);
 export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     ARCHIMEDEAN_488_GEOMETRY,

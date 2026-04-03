@@ -34,6 +34,7 @@ PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
 AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
+SPHINX_GEOMETRY = "sphinx"
 
 PICKER_GROUP_ORDER = {
     "Classic": 0,
@@ -69,6 +70,7 @@ TOPOLOGY_SIZING_POLICIES = {
     AMMANN_BEENKER_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 4),
     SPECTRE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
     TAYLOR_SOCOLAR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
+    SPHINX_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
 }
 
 TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
@@ -367,6 +369,18 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         label="Taylor-Socolar",
         picker_group="Aperiodic",
         picker_order=270,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=SPHINX_GEOMETRY,
+        tiling_family=SPHINX_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Sphinx",
+        picker_group="Aperiodic",
+        picker_order=280,
         default_rule="life-b2-s23",
         sizing_mode="patch_depth",
         family="aperiodic",

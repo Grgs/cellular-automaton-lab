@@ -56,6 +56,7 @@ class TopologyCatalogEntryPayload(TypedDict):
     picker_order: int
     sizing_mode: str
     family: str
+    render_kind: str
     viewport_sync_mode: str
     supported_adjacency_modes: list[str]
     default_adjacency_mode: str

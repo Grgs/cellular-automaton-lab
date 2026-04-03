@@ -29,6 +29,7 @@ try:
         PRISMATIC_PENTAGONAL_GEOMETRY,
         RHOMBILLE_GEOMETRY,
         SNUB_SQUARE_DUAL_GEOMETRY,
+        SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
@@ -64,6 +65,7 @@ except ModuleNotFoundError:
         PRISMATIC_PENTAGONAL_GEOMETRY,
         RHOMBILLE_GEOMETRY,
         SNUB_SQUARE_DUAL_GEOMETRY,
+        SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
@@ -90,6 +92,7 @@ class SimulationTopologyTests(unittest.TestCase):
             (FLORET_PENTAGONAL_GEOMETRY, 3, 3),
             (SNUB_SQUARE_DUAL_GEOMETRY, 3, 3),
             (SPECTRE_GEOMETRY, 0, 0),
+            (SPHINX_GEOMETRY, 0, 0),
             (TAYLOR_SOCOLAR_GEOMETRY, 0, 0),
             (PENROSE_GEOMETRY, 0, 0),
             (PENROSE_VERTEX_GEOMETRY, 0, 0),
@@ -101,7 +104,7 @@ class SimulationTopologyTests(unittest.TestCase):
                     geometry,
                     width,
                     height,
-                    patch_depth=3 if geometry in {SPECTRE_GEOMETRY, TAYLOR_SOCOLAR_GEOMETRY, PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY} else None,
+                    patch_depth=3 if geometry in {SPECTRE_GEOMETRY, SPHINX_GEOMETRY, TAYLOR_SOCOLAR_GEOMETRY, PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY} else None,
                 )
                 for index, cell in enumerate(topology.cells):
                     expected = tuple(
@@ -377,6 +380,22 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertTrue(all(cell.kind == "taylor-half-hex" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
         self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 4 for cell in deep.cells))
+        for cell in deep.cells:
+            self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
+            for neighbor_id in cell.neighbors:
+                assert neighbor_id is not None
+                self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
+
+    def test_sphinx_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
+        shallow = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=1)
+        deep = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
+        repeated = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
+        self.assertGreater(deep.cell_count, shallow.cell_count)
+        self.assertTrue(all(cell.kind == "sphinx" for cell in deep.cells))
+        self.assertTrue(all(cell.center is not None for cell in deep.cells))
+        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells))
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:

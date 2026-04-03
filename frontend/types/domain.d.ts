@@ -69,6 +69,7 @@ export interface BootstrappedTopologyDefinition {
     picker_order: number;
     sizing_mode: string;
     family: string;
+    render_kind: string;
     viewport_sync_mode: string;
     supported_adjacency_modes: readonly string[];
     default_adjacency_mode: string;

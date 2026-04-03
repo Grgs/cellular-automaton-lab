@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
+import type { BootstrappedTopologyDefinition } from "../types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "../types/rendering.js";
 
 const ARCHIMEDEAN_488_GEOMETRY = "archimedean-4-8-8";
@@ -40,6 +41,22 @@ const PERIODIC_GEOMETRIES = [
 
 function installRenderStyleTestGlobals(): void {
     installFrontendGlobals();
+    const periodicTopologyEntries = PERIODIC_GEOMETRIES.map((geometry, index): BootstrappedTopologyDefinition => ({
+        tiling_family: geometry,
+        label: geometry,
+        picker_group: "Periodic Mixed",
+        picker_order: 100 + index,
+        sizing_mode: "grid",
+        family: "mixed",
+        render_kind: "polygon_periodic",
+        viewport_sync_mode: "backend-sync",
+        supported_adjacency_modes: ["edge"],
+        default_adjacency_mode: "edge",
+        default_rules: { edge: "life-b2-s23" },
+        geometry_keys: { edge: geometry },
+        sizing_policy: { control: "cell_size", default: 12, min: 8, max: 20 },
+    }));
+    window.APP_TOPOLOGIES = [...window.APP_TOPOLOGIES, ...periodicTopologyEntries];
     window.APP_PERIODIC_FACE_TILINGS = PERIODIC_GEOMETRIES.map((geometry): PeriodicFaceTilingDescriptor => ({
         geometry,
         label: geometry,

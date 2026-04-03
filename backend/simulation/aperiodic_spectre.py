@@ -4,20 +4,20 @@ import math
 from dataclasses import dataclass
 from functools import lru_cache
 
+from backend.simulation.aperiodic_substitution import (
+    SubstitutionChild,
+    SubstitutionLeafTemplate,
+    build_substitution_patch,
+)
 from backend.simulation.aperiodic_support import (
     AFFINE_IDENTITY,
     AFFINE_REFLECT_X,
     Affine,
     AperiodicPatch,
-    PatchRecord,
     Vec,
     affine_apply,
     affine_multiply,
-    id_from_transform,
-    patch_from_records,
-    polygon_centroid,
     rotation,
-    rounded_point,
     translation,
     translation_to,
 )
@@ -156,45 +156,29 @@ def _spectre_template_for_depth(label: str, depth: int) -> _SpectreTemplate:
     )
 
 
-def _collect_spectre_leaf_transforms(
-    label: str,
-    depth: int,
-    transform: Affine,
-    leaves: list[Affine],
-) -> None:
-    template = _spectre_template_for_depth(label, depth)
-    if depth <= 0:
-        for _, child_transform in template.children:
-            leaves.append(affine_multiply(transform, child_transform))
-        return
+def _spectre_expand_children(label: str, depth: int) -> tuple[SubstitutionChild, ...]:
+    return tuple(
+        SubstitutionChild(child_label, child_transform)
+        for child_label, child_transform in _spectre_template_for_depth(label, depth).children
+    )
 
-    for child_label, child_transform in template.children:
-        _collect_spectre_leaf_transforms(
-            child_label,
-            depth - 1,
-            affine_multiply(transform, child_transform),
-            leaves,
+
+def _spectre_leaf_templates(label: str) -> tuple[SubstitutionLeafTemplate, ...]:
+    return tuple(
+        SubstitutionLeafTemplate(
+            kind="spectre",
+            id_prefix="spectre",
+            vertices=_SPECTRE_BASE_VERTICES,
+            transform=child_transform,
         )
+        for _, child_transform in _SPECTRE_BASE_TEMPLATES[label].children
+    )
 
 
 def build_spectre_patch(patch_depth: int) -> AperiodicPatch:
-    leaf_transforms: list[Affine] = []
-    _collect_spectre_leaf_transforms(
-        _SPECTRE_ROOT_LABEL,
-        int(patch_depth),
-        AFFINE_IDENTITY,
-        leaf_transforms,
+    return build_substitution_patch(
+        patch_depth,
+        root_items=(SubstitutionChild(_SPECTRE_ROOT_LABEL, AFFINE_IDENTITY),),
+        expand_children=_spectre_expand_children,
+        leaf_templates_for_label=_spectre_leaf_templates,
     )
-
-    records: list[PatchRecord] = []
-    for transform in leaf_transforms:
-        vertices = tuple(affine_apply(transform, vertex) for vertex in _SPECTRE_BASE_VERTICES)
-        records.append(
-            {
-                "id": id_from_transform("spectre", transform),
-                "kind": "spectre",
-                "center": rounded_point(polygon_centroid(vertices)),
-                "vertices": tuple(rounded_point(vertex) for vertex in vertices),
-            }
-        )
-    return patch_from_records(patch_depth, records)

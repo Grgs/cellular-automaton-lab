@@ -21,6 +21,7 @@ class ApiBootstrapTests(ApiTestCase):
         self.assertIn("topology_catalog", payload)
         self.assertIn("periodic_face_tilings", payload)
         self.assertTrue(any(entry["tiling_family"] == "square" for entry in payload["topology_catalog"]))
+        self.assertTrue(all("render_kind" in entry for entry in payload["topology_catalog"]))
 
 
 if __name__ == "__main__":

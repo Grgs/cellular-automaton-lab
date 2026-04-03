@@ -30,6 +30,7 @@ from backend.simulation.topology_catalog_data import (
     PRISMATIC_PENTAGONAL_GEOMETRY,
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
+    SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     SQUARE_GEOMETRY,
@@ -40,6 +41,7 @@ from backend.simulation.topology_catalog_data import (
     TRIANGLE_GEOMETRY,
     VERTEX_ADJACENCY,
 )
+from backend.simulation.topology_implementation_registry import render_kind_for_geometry
 from backend.simulation.topology_catalog_queries import (
     describe_topologies as describe_topology_entries,
     describe_topology_variants as describe_variant_entries,
@@ -79,6 +81,7 @@ __all__ = [
     "PRISMATIC_PENTAGONAL_GEOMETRY",
     "RHOMBILLE_GEOMETRY",
     "SNUB_SQUARE_DUAL_GEOMETRY",
+    "SPHINX_GEOMETRY",
     "SPECTRE_GEOMETRY",
     "TAYLOR_SOCOLAR_GEOMETRY",
     "SUPPORTED_GEOMETRIES",
@@ -126,6 +129,7 @@ TOPOLOGY_CATALOG = build_topology_catalog(
     TOPOLOGY_VARIANTS,
     TOPOLOGY_SIZING_POLICIES,
     PICKER_GROUP_ORDER,
+    render_kind_for_geometry,
 )
 TOPOLOGY_BY_FAMILY = {
     definition.tiling_family: definition

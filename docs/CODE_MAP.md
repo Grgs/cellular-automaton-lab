@@ -205,6 +205,7 @@ Browser UI
   `resolveGeometryCache(...)`
 - [frontend/geometry/registry.ts](../frontend/geometry/registry.ts)
   `getGeometryAdapter(...)`, `listGeometryAdapters()`
+  Bootstraps geometry adapters from topology `render_kind` metadata instead of hand-maintained geometry lists.
 - [frontend/geometry/square-adapter.ts](../frontend/geometry/square-adapter.ts)
 - [frontend/geometry/hex-adapter.ts](../frontend/geometry/hex-adapter.ts)
 - [frontend/geometry/triangle-adapter.ts](../frontend/geometry/triangle-adapter.ts)
@@ -303,6 +304,10 @@ Browser UI
   Periodic-face and aperiodic patch conversion helpers.
 - [backend/simulation/topology_builders.py](../backend/simulation/topology_builders.py)
   Shared topology assembly and cached `build_topology(...)`.
+  Delegates geometry dispatch through the topology implementation registry.
+- [backend/simulation/topology_implementation_registry.py](../backend/simulation/topology_implementation_registry.py)
+  Internal builder and render dispatch registry.
+  Maps each geometry key to a `builder_kind`, `render_kind`, and backend builder entrypoint.
 - [backend/simulation/topology_boards.py](../backend/simulation/topology_boards.py)
   `empty_board(...)`, `board_from_states(...)`, `board_from_cells_by_id(...)`
 - [backend/simulation/rule_context.py](../backend/simulation/rule_context.py)
@@ -340,13 +345,16 @@ Browser UI
   Public aperiodic patch facade and Penrose P3 conversion path.
 - [backend/simulation/aperiodic_support.py](../backend/simulation/aperiodic_support.py)
   Shared aperiodic patch dataclasses, affine math, polygon helpers, and neighbor reconstruction.
+- [backend/simulation/aperiodic_substitution.py](../backend/simulation/aperiodic_substitution.py)
+  Reusable substitution-recipe helper for recursive affine expansion and deterministic leaf flattening.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
-  Registry-backed dispatch for family-specific aperiodic builders.
+  Registry-backed dispatch for family-specific aperiodic builders and recipe styles.
 - [backend/simulation/aperiodic_penrose_p2.py](../backend/simulation/aperiodic_penrose_p2.py)
 - [backend/simulation/aperiodic_ammann_beenker.py](../backend/simulation/aperiodic_ammann_beenker.py)
 - [backend/simulation/aperiodic_spectre.py](../backend/simulation/aperiodic_spectre.py)
 - [backend/simulation/aperiodic_taylor_socolar.py](../backend/simulation/aperiodic_taylor_socolar.py)
-  Family-specific aperiodic patch builders, including the Taylor-Socolar half-hex factor.
+- [backend/simulation/aperiodic_sphinx.py](../backend/simulation/aperiodic_sphinx.py)
+  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, and Sphinx.
 
 ### Rules
 

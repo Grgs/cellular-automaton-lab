@@ -34,6 +34,7 @@ function normalizeTopologyDefinition(definition: BootstrappedTopologyDefinition)
         picker_order: definition.picker_order,
         sizing_mode: definition.sizing_mode,
         family: definition.family,
+        render_kind: definition.render_kind,
         viewport_sync_mode: definition.viewport_sync_mode,
         supported_adjacency_modes: Object.freeze(supportedAdjacencyModes),
         default_adjacency_mode: definition.default_adjacency_mode,

@@ -13,6 +13,7 @@ from backend.simulation.topology_catalog import (
     GEOMETRY_DEFAULT_RULES,
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
+    SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
@@ -27,6 +28,7 @@ from backend.simulation.topology_catalog import (
     describe_topology_variants,
     geometry_uses_backend_viewport_sync,
     geometry_uses_patch_depth,
+    get_topology_definition,
     get_topology_variant_for_geometry,
     is_penrose_geometry,
     minimum_grid_dimension_for_geometry,
@@ -81,6 +83,7 @@ class GeometryManifestTests(unittest.TestCase):
             described["square"]["sizing_policy"],
             {"control": "cell_size", "default": 12, "min": 8, "max": 24},
         )
+        self.assertEqual(described["square"]["render_kind"], "regular_grid")
         self.assertEqual(
             described["hex"]["sizing_policy"],
             {"control": "cell_size", "default": 16, "min": 10, "max": 24},
@@ -113,6 +116,8 @@ class GeometryManifestTests(unittest.TestCase):
             described[TAYLOR_SOCOLAR_GEOMETRY]["sizing_policy"],
             {"control": "patch_depth", "default": 3, "min": 0, "max": 3},
         )
+        self.assertEqual(described[SPECTRE_GEOMETRY]["render_kind"], "polygon_aperiodic")
+        self.assertEqual(described[ARCHIMEDEAN_33336_GEOMETRY]["render_kind"], "polygon_periodic")
 
     def test_new_archimedean_geometries_have_expected_manifest_defaults(self) -> None:
         expected = {
@@ -179,6 +184,19 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertEqual(GEOMETRY_DEFAULT_RULES[TAYLOR_SOCOLAR_GEOMETRY], "life-b2-s23")
         self.assertTrue(geometry_uses_patch_depth(TAYLOR_SOCOLAR_GEOMETRY))
         self.assertFalse(geometry_uses_backend_viewport_sync(TAYLOR_SOCOLAR_GEOMETRY))
+
+    def test_sphinx_geometry_uses_aperiodic_patch_depth_defaults(self) -> None:
+        definition = get_topology_variant_for_geometry(SPHINX_GEOMETRY)
+        family_definition = get_topology_definition(SPHINX_GEOMETRY)
+
+        self.assertEqual(definition.family, "aperiodic")
+        self.assertEqual(definition.sizing_mode, "patch_depth")
+        self.assertEqual(definition.viewport_sync_mode, "presentation-only")
+        self.assertEqual(definition.default_rule, "life-b2-s23")
+        self.assertEqual(family_definition.render_kind, "polygon_aperiodic")
+        self.assertEqual(GEOMETRY_DEFAULT_RULES[SPHINX_GEOMETRY], "life-b2-s23")
+        self.assertTrue(geometry_uses_patch_depth(SPHINX_GEOMETRY))
+        self.assertFalse(geometry_uses_backend_viewport_sync(SPHINX_GEOMETRY))
 
     def test_describe_geometries_returns_frontend_ready_metadata(self) -> None:
         described = describe_topology_variants()

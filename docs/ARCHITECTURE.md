@@ -118,7 +118,7 @@ Important model rules:
 
 `backend/simulation/topology.py` and `backend/simulation/rule_context.py` now act as compatibility façades. The authored internals are split so topology types, regular builders, specialized builders, cached topology assembly, board helpers, frame construction, and `RuleContext` query behavior can evolve independently without changing broad import sites.
 
-The aperiodic patch path is split similarly. `backend/simulation/aperiodic_prototiles.py` remains the public entrypoint, while shared affine/polygon helpers live in `backend/simulation/aperiodic_support.py`, registry dispatch lives in `backend/simulation/aperiodic_registry.py`, and family-specific builders live in focused modules for Penrose P2, Ammann-Beenker, Spectre, and Taylor-Socolar. Taylor-Socolar is implemented as the half-hex factor topology, not as a decorated hex-grid presentation.
+The aperiodic patch path is split similarly. `backend/simulation/aperiodic_prototiles.py` remains the public entrypoint, while shared affine/polygon helpers live in `backend/simulation/aperiodic_support.py`, reusable substitution expansion lives in `backend/simulation/aperiodic_substitution.py`, registry dispatch lives in `backend/simulation/aperiodic_registry.py`, and family-specific builders live in focused modules for Penrose P2, Ammann-Beenker, Spectre, Taylor-Socolar, and Sphinx. Taylor-Socolar is implemented as the half-hex factor topology, not as a decorated hex-grid presentation. Sphinx is the proof tiling for the substitution-first registry architecture.
 
 ### Topology Catalog
 
@@ -137,7 +137,9 @@ The catalog remains the canonical source of:
 - sizing policy and patch-depth behavior
 - picker grouping and ordering
 - default rule selection
-- frontend bootstrapped topology metadata
+- frontend bootstrapped topology metadata, including `render_kind`
+
+The catalog does not decide how a geometry is built. That implementation dispatch now lives in [backend/simulation/topology_implementation_registry.py](../backend/simulation/topology_implementation_registry.py), which maps each geometry key to a backend `builder_kind`, a frontend-facing `render_kind`, and the concrete builder entrypoint consumed by [backend/simulation/topology_builders.py](../backend/simulation/topology_builders.py).
 
 ### Rules
 
@@ -271,6 +273,12 @@ The render pipeline handles:
 - geometry caches and adapter-specific metrics
 
 Regular, mixed periodic, and aperiodic tilings all render through the same topology-aware canvas pipeline.
+
+[frontend/geometry/registry.ts](../frontend/geometry/registry.ts) now builds adapters from bootstrapped topology `render_kind` metadata instead of hand-enumerating every periodic or aperiodic geometry. The current render families are:
+
+- `regular_grid`
+- `polygon_periodic`
+- `polygon_aperiodic`
 
 ### Presets, Patterns, And Session Storage
 

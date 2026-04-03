@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { BootstrappedTopologyDefinition } from "./types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 
-const TAYLOR_SOCOLAR_TOPOLOGY: BootstrappedTopologyDefinition = {
-    tiling_family: "taylor-socolar",
-    label: "Taylor-Socolar",
+const SPHINX_TOPOLOGY: BootstrappedTopologyDefinition = {
+    tiling_family: "sphinx",
+    label: "Sphinx",
     picker_group: "Aperiodic",
-    picker_order: 270,
+    picker_order: 280,
     sizing_mode: "patch_depth",
     family: "aperiodic",
     render_kind: "polygon_aperiodic",
@@ -15,7 +15,7 @@ const TAYLOR_SOCOLAR_TOPOLOGY: BootstrappedTopologyDefinition = {
     supported_adjacency_modes: ["edge"],
     default_adjacency_mode: "edge",
     default_rules: { edge: "life-b2-s23" },
-    geometry_keys: { edge: "taylor-socolar" },
+    geometry_keys: { edge: "sphinx" },
     sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 3 },
 };
 
@@ -38,7 +38,7 @@ const PERIODIC_MIXED_GEOMETRIES = [
     "snub-square-dual",
 ] as const;
 
-function installTaylorSocolarGlobals(): void {
+function installSphinxGlobals(): void {
     window.APP_TOPOLOGIES = [
         {
             tiling_family: "square",
@@ -55,7 +55,7 @@ function installTaylorSocolarGlobals(): void {
             geometry_keys: { edge: "square" },
             sizing_policy: { control: "cell_size", default: 12, min: 8, max: 24 },
         },
-        TAYLOR_SOCOLAR_TOPOLOGY,
+        SPHINX_TOPOLOGY,
     ];
     window.APP_PERIODIC_FACE_TILINGS = PERIODIC_MIXED_GEOMETRIES.map(
         (geometry): PeriodicFaceTilingDescriptor => ({
@@ -76,27 +76,27 @@ function installTaylorSocolarGlobals(): void {
     );
 }
 
-describe("taylor-socolar topology", () => {
+describe("sphinx topology", () => {
     beforeEach(() => {
         document.body.innerHTML = "";
         vi.resetModules();
-        installTaylorSocolarGlobals();
+        installSphinxGlobals();
     });
 
-    it("appears in topology picker metadata with a patch-depth topology variant", async () => {
+    it("appears in topology picker metadata with patch-depth sizing", async () => {
         const { getTopologyDefinition, resolveTopologyVariantKey, tilingFamilyOptions, topologyUsesPatchDepth } = await import("./topology-catalog.js");
 
-        expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("taylor-socolar");
-        expect(resolveTopologyVariantKey("taylor-socolar", "edge")).toBe("taylor-socolar");
-        expect(getTopologyDefinition("taylor-socolar")?.picker_group).toBe("Aperiodic");
-        expect(topologyUsesPatchDepth("taylor-socolar")).toBe(true);
+        expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("sphinx");
+        expect(resolveTopologyVariantKey("sphinx", "edge")).toBe("sphinx");
+        expect(getTopologyDefinition("sphinx")?.render_kind).toBe("polygon_aperiodic");
+        expect(topologyUsesPatchDepth("sphinx")).toBe(true);
     });
 
-    it("resolves through the aperiodic geometry registry", async () => {
+    it("resolves through the render-kind geometry registry", async () => {
         const { getGeometryAdapter, isSupportedGeometry } = await import("./geometry/registry.js");
 
-        expect(isSupportedGeometry("taylor-socolar")).toBe(true);
-        expect(getGeometryAdapter("taylor-socolar").geometry).toBe("taylor-socolar");
-        expect(getGeometryAdapter("taylor-socolar").family).toBe("mixed");
+        expect(isSupportedGeometry("sphinx")).toBe(true);
+        expect(getGeometryAdapter("sphinx").geometry).toBe("sphinx");
+        expect(getGeometryAdapter("sphinx").family).toBe("mixed");
     });
 });

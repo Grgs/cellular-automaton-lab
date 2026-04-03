@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import math
 
+from backend.simulation.aperiodic_substitution import (
+    SubstitutionChild,
+    SubstitutionLeafTemplate,
+    build_substitution_patch,
+)
 from backend.simulation.aperiodic_support import (
     Affine,
     AperiodicPatch,
-    PatchRecord,
     Vec,
-    affine_apply,
     affine_multiply,
-    id_from_transform,
-    patch_from_records,
-    polygon_centroid,
     rotation,
-    rounded_point,
     scale,
     translation,
 )
@@ -34,41 +33,30 @@ _HALF_HEX_CHILD_TRANSFORMS: tuple[Affine, ...] = (
 )
 
 
-def _collect_half_hex_leaf_transforms(
-    depth: int,
-    transform: Affine,
-    leaves: list[Affine],
-) -> None:
-    if depth <= 0:
-        leaves.append(transform)
-        return
-    for child_transform in _HALF_HEX_CHILD_TRANSFORMS:
-        _collect_half_hex_leaf_transforms(
-            depth - 1,
-            affine_multiply(transform, child_transform),
-            leaves,
-        )
+def _half_hex_children(label: str, depth: int) -> tuple[SubstitutionChild, ...]:
+    del label, depth
+    return tuple(SubstitutionChild("half-hex", transform) for transform in _HALF_HEX_CHILD_TRANSFORMS)
+
+
+def _half_hex_leaf_templates(label: str) -> tuple[SubstitutionLeafTemplate, ...]:
+    del label
+    return (
+        SubstitutionLeafTemplate(
+            kind="taylor-half-hex",
+            id_prefix="taylor",
+            vertices=_HALF_HEX_BASE_VERTICES,
+        ),
+    )
 
 
 def build_taylor_socolar_patch(patch_depth: int) -> AperiodicPatch:
     root_scale = 2 ** int(patch_depth)
-    root_transforms = (
-        scale(root_scale),
-        affine_multiply(rotation(math.pi), scale(root_scale)),
+    return build_substitution_patch(
+        patch_depth,
+        root_items=(
+            SubstitutionChild("half-hex", scale(root_scale)),
+            SubstitutionChild("half-hex", affine_multiply(rotation(math.pi), scale(root_scale))),
+        ),
+        expand_children=_half_hex_children,
+        leaf_templates_for_label=_half_hex_leaf_templates,
     )
-    leaf_transforms: list[Affine] = []
-    for root_transform in root_transforms:
-        _collect_half_hex_leaf_transforms(int(patch_depth), root_transform, leaf_transforms)
-
-    records: list[PatchRecord] = []
-    for transform in leaf_transforms:
-        vertices = tuple(affine_apply(transform, vertex) for vertex in _HALF_HEX_BASE_VERTICES)
-        records.append(
-            {
-                "id": id_from_transform("taylor", transform),
-                "kind": "taylor-half-hex",
-                "center": rounded_point(polygon_centroid(vertices)),
-                "vertices": tuple(rounded_point(vertex) for vertex in vertices),
-            }
-        )
-    return patch_from_records(patch_depth, records)
