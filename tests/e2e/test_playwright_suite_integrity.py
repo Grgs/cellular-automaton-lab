@@ -69,19 +69,19 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
         self.assertEqual(sorted(feature_names), expected)
         self.assertEqual(Counter(feature_names), Counter(expected))
 
-    def test_grid_summary_parser_supports_regular_and_penrose_labels(self) -> None:
+    def test_grid_summary_parser_supports_regular_and_aperiodic_labels(self) -> None:
         regular = parse_grid_summary_text("36 x 25")
-        penrose = parse_grid_summary_text("Depth 4 • 271 tiles")
+        aperiodic = parse_grid_summary_text("Depth 4 • 271 tiles")
 
         self.assertEqual(regular.kind, "regular")
         self.assertEqual(regular.width, 36)
         self.assertEqual(regular.height, 25)
         self.assertIsNone(regular.patch_depth)
 
-        self.assertEqual(penrose.kind, "penrose")
-        self.assertIsNone(penrose.width)
-        self.assertIsNone(penrose.height)
-        self.assertEqual(penrose.patch_depth, 4)
+        self.assertEqual(aperiodic.kind, "aperiodic")
+        self.assertIsNone(aperiodic.width)
+        self.assertIsNone(aperiodic.height)
+        self.assertEqual(aperiodic.patch_depth, 4)
 
 
 if __name__ == "__main__":

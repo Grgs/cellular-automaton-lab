@@ -118,6 +118,8 @@ Important model rules:
 
 `backend/simulation/topology.py` and `backend/simulation/rule_context.py` now act as compatibility façades. The authored internals are split so topology types, regular builders, specialized builders, cached topology assembly, board helpers, frame construction, and `RuleContext` query behavior can evolve independently without changing broad import sites.
 
+The aperiodic patch path is split similarly. `backend/simulation/aperiodic_prototiles.py` remains the public entrypoint, while shared affine/polygon helpers live in `backend/simulation/aperiodic_support.py`, registry dispatch lives in `backend/simulation/aperiodic_registry.py`, and family-specific builders live in focused modules for Penrose P2, Ammann-Beenker, Spectre, and Taylor-Socolar. Taylor-Socolar is implemented as the half-hex factor topology, not as a decorated hex-grid presentation.
+
 ### Topology Catalog
 
 [backend/simulation/topology_catalog.py](../backend/simulation/topology_catalog.py) is now a public façade, not the home of all catalog data.

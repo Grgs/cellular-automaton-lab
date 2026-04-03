@@ -337,7 +337,16 @@ Browser UI
 - [backend/simulation/penrose.py](../backend/simulation/penrose.py)
   Penrose patch builder.
 - [backend/simulation/aperiodic_prototiles.py](../backend/simulation/aperiodic_prototiles.py)
-  Ammann-Beenker and Penrose prototile patch builders.
+  Public aperiodic patch facade and Penrose P3 conversion path.
+- [backend/simulation/aperiodic_support.py](../backend/simulation/aperiodic_support.py)
+  Shared aperiodic patch dataclasses, affine math, polygon helpers, and neighbor reconstruction.
+- [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
+  Registry-backed dispatch for family-specific aperiodic builders.
+- [backend/simulation/aperiodic_penrose_p2.py](../backend/simulation/aperiodic_penrose_p2.py)
+- [backend/simulation/aperiodic_ammann_beenker.py](../backend/simulation/aperiodic_ammann_beenker.py)
+- [backend/simulation/aperiodic_spectre.py](../backend/simulation/aperiodic_spectre.py)
+- [backend/simulation/aperiodic_taylor_socolar.py](../backend/simulation/aperiodic_taylor_socolar.py)
+  Family-specific aperiodic patch builders, including the Taylor-Socolar half-hex factor.
 
 ### Rules
 

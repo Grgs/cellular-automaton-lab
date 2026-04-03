@@ -14,6 +14,7 @@ from backend.simulation.topology_catalog import (
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     SPECTRE_GEOMETRY,
+    TAYLOR_SOCOLAR_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
     PRISMATIC_PENTAGONAL_GEOMETRY,
@@ -108,6 +109,10 @@ class GeometryManifestTests(unittest.TestCase):
             described[SPECTRE_GEOMETRY]["sizing_policy"],
             {"control": "patch_depth", "default": 3, "min": 0, "max": 3},
         )
+        self.assertEqual(
+            described[TAYLOR_SOCOLAR_GEOMETRY]["sizing_policy"],
+            {"control": "patch_depth", "default": 3, "min": 0, "max": 3},
+        )
 
     def test_new_archimedean_geometries_have_expected_manifest_defaults(self) -> None:
         expected = {
@@ -163,6 +168,17 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertEqual(GEOMETRY_DEFAULT_RULES[SPECTRE_GEOMETRY], "life-b2-s23")
         self.assertTrue(geometry_uses_patch_depth(SPECTRE_GEOMETRY))
         self.assertFalse(geometry_uses_backend_viewport_sync(SPECTRE_GEOMETRY))
+
+    def test_taylor_socolar_geometry_uses_aperiodic_patch_depth_defaults(self) -> None:
+        definition = get_topology_variant_for_geometry(TAYLOR_SOCOLAR_GEOMETRY)
+
+        self.assertEqual(definition.family, "aperiodic")
+        self.assertEqual(definition.sizing_mode, "patch_depth")
+        self.assertEqual(definition.viewport_sync_mode, "presentation-only")
+        self.assertEqual(definition.default_rule, "life-b2-s23")
+        self.assertEqual(GEOMETRY_DEFAULT_RULES[TAYLOR_SOCOLAR_GEOMETRY], "life-b2-s23")
+        self.assertTrue(geometry_uses_patch_depth(TAYLOR_SOCOLAR_GEOMETRY))
+        self.assertFalse(geometry_uses_backend_viewport_sync(TAYLOR_SOCOLAR_GEOMETRY))
 
     def test_describe_geometries_returns_frontend_ready_metadata(self) -> None:
         described = describe_topology_variants()

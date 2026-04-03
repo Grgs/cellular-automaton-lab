@@ -1,0 +1,192 @@
+from __future__ import annotations
+
+import math
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Iterable, TypedDict
+
+
+COORDINATE_PRECISION = 6
+
+Affine = tuple[float, float, float, float, float, float]
+AFFINE_IDENTITY: Affine = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+AFFINE_REFLECT_X: Affine = (-1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+
+
+@dataclass(frozen=True)
+class AperiodicPatchCell:
+    id: str
+    kind: str
+    center: tuple[float, float]
+    vertices: tuple[tuple[float, float], ...]
+    neighbors: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class AperiodicPatch:
+    patch_depth: int
+    width: int
+    height: int
+    cells: tuple[AperiodicPatchCell, ...]
+
+
+@dataclass(frozen=True)
+class Vec:
+    x: float
+    y: float
+
+    def __add__(self, other: "Vec") -> "Vec":
+        return Vec(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other: "Vec") -> "Vec":
+        return Vec(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, scalar: float) -> "Vec":
+        return Vec(self.x * scalar, self.y * scalar)
+
+
+class PatchRecord(TypedDict):
+    id: str
+    kind: str
+    center: tuple[float, float]
+    vertices: tuple[tuple[float, float], ...]
+
+
+def rounded_point(point: Vec | tuple[float, float]) -> tuple[float, float]:
+    x_value, y_value = point if isinstance(point, tuple) else (point.x, point.y)
+    return (
+        round(float(x_value), COORDINATE_PRECISION),
+        round(float(y_value), COORDINATE_PRECISION),
+    )
+
+
+def canonical_edge(
+    point_a: tuple[float, float],
+    point_b: tuple[float, float],
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    return (point_a, point_b) if point_a <= point_b else (point_b, point_a)
+
+
+def compatibility_extent(values: list[float]) -> int:
+    if not values:
+        return 1
+    return max(1, int(math.ceil(max(values) - min(values))))
+
+
+def polygon_centroid(vertices: Iterable[Vec]) -> Vec:
+    points = list(vertices)
+    if not points:
+        return Vec(0.0, 0.0)
+    area_twice = 0.0
+    centroid_x = 0.0
+    centroid_y = 0.0
+    for index, point in enumerate(points):
+        next_point = points[(index + 1) % len(points)]
+        cross = (point.x * next_point.y) - (next_point.x * point.y)
+        area_twice += cross
+        centroid_x += (point.x + next_point.x) * cross
+        centroid_y += (point.y + next_point.y) * cross
+    if math.isclose(area_twice, 0.0):
+        return Vec(
+            sum(point.x for point in points) / len(points),
+            sum(point.y for point in points) / len(points),
+        )
+    scale = 1 / (3 * area_twice)
+    return Vec(centroid_x * scale, centroid_y * scale)
+
+
+def encode_float(value: float) -> str:
+    scaled = int(round(value * 1_000_000))
+    if scaled < 0:
+        return f"n{abs(scaled)}"
+    if scaled > 0:
+        return f"p{scaled}"
+    return "0"
+
+
+def affine_multiply(left: Affine, right: Affine) -> Affine:
+    return (
+        (left[0] * right[0]) + (left[1] * right[3]),
+        (left[0] * right[1]) + (left[1] * right[4]),
+        (left[0] * right[2]) + (left[1] * right[5]) + left[2],
+        (left[3] * right[0]) + (left[4] * right[3]),
+        (left[3] * right[1]) + (left[4] * right[4]),
+        (left[3] * right[2]) + (left[4] * right[5]) + left[5],
+    )
+
+
+def affine_apply(transform: Affine, point: Vec) -> Vec:
+    return Vec(
+        (transform[0] * point.x) + (transform[1] * point.y) + transform[2],
+        (transform[3] * point.x) + (transform[4] * point.y) + transform[5],
+    )
+
+
+def translation(tx: float, ty: float) -> Affine:
+    return (1.0, 0.0, float(tx), 0.0, 1.0, float(ty))
+
+
+def translation_to(source: Vec, target: Vec) -> Affine:
+    return translation(target.x - source.x, target.y - source.y)
+
+
+def rotation(radians: float) -> Affine:
+    cosine = math.cos(radians)
+    sine = math.sin(radians)
+    return (cosine, -sine, 0.0, sine, cosine, 0.0)
+
+
+def scale(factor: float) -> Affine:
+    return (float(factor), 0.0, 0.0, 0.0, float(factor), 0.0)
+
+
+def id_from_anchor(prefix: str, anchor: Vec, orientation: int) -> str:
+    return f"{prefix}:{orientation % 360}:{encode_float(anchor.x)}:{encode_float(anchor.y)}"
+
+
+def id_from_transform(prefix: str, transform: Affine) -> str:
+    return prefix + ":" + ":".join(encode_float(value) for value in transform)
+
+
+def build_edge_neighbors(records: list[PatchRecord]) -> dict[str, tuple[str, ...]]:
+    edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = defaultdict(list)
+    for record in records:
+        cell_id = record["id"]
+        vertices = record["vertices"]
+        for index, left in enumerate(vertices):
+            right = vertices[(index + 1) % len(vertices)]
+            edge_map[canonical_edge(left, right)].append(cell_id)
+    neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
+    for owners in edge_map.values():
+        unique_owners = tuple(sorted(set(owners)))
+        if len(unique_owners) != 2:
+            continue
+        neighbor_left, neighbor_right = unique_owners
+        neighbor_sets[neighbor_left].add(neighbor_right)
+        neighbor_sets[neighbor_right].add(neighbor_left)
+    return {
+        cell_id: tuple(sorted(neighbors))
+        for cell_id, neighbors in neighbor_sets.items()
+    }
+
+
+def patch_from_records(patch_depth: int, records: list[PatchRecord]) -> AperiodicPatch:
+    neighbors_by_id = build_edge_neighbors(records)
+    cells = tuple(
+        AperiodicPatchCell(
+            id=record["id"],
+            kind=record["kind"],
+            center=record["center"],
+            vertices=record["vertices"],
+            neighbors=neighbors_by_id[record["id"]],
+        )
+        for record in sorted(records, key=lambda item: item["id"])
+    )
+    all_x = [vertex[0] for cell in cells for vertex in cell.vertices]
+    all_y = [vertex[1] for cell in cells for vertex in cell.vertices]
+    return AperiodicPatch(
+        patch_depth=int(patch_depth),
+        width=compatibility_extent(all_x),
+        height=compatibility_extent(all_y),
+        cells=cells,
+    )

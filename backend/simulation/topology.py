@@ -11,6 +11,7 @@ from backend.simulation.topology_catalog import (
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     SPECTRE_GEOMETRY,
+    TAYLOR_SOCOLAR_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
 )
@@ -42,6 +43,7 @@ __all__ = [
     "REGULAR_CELL_KIND",
     "RHOMBILLE_GEOMETRY",
     "SPECTRE_GEOMETRY",
+    "TAYLOR_SOCOLAR_GEOMETRY",
     "LatticeCell",
     "LatticeTopology",
     "SimulationBoard",

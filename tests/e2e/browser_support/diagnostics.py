@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 
 REGULAR_GRID_SUMMARY_RE = re.compile(r"^\s*(?P<width>\d+)\s*x\s*(?P<height>\d+)\s*$")
-PENROSE_GRID_SUMMARY_RE = re.compile(r"^\s*Depth\s+(?P<depth>\d+)\b")
+APERIODIC_PATCH_DEPTH_SUMMARY_RE = re.compile(r"^\s*Depth\s+(?P<depth>\d+)\b")
 
 
 @dataclass(frozen=True)
@@ -28,12 +28,12 @@ def parse_grid_summary_text(text: str | None) -> GridSummary:
             height=int(regular_match.group("height")),
         )
 
-    penrose_match = PENROSE_GRID_SUMMARY_RE.match(raw)
-    if penrose_match:
+    aperiodic_match = APERIODIC_PATCH_DEPTH_SUMMARY_RE.match(raw)
+    if aperiodic_match:
         return GridSummary(
             raw=raw,
-            kind="penrose",
-            patch_depth=int(penrose_match.group("depth")),
+            kind="aperiodic",
+            patch_depth=int(aperiodic_match.group("depth")),
         )
 
     return GridSummary(raw=raw, kind="unknown")

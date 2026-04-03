@@ -18,11 +18,13 @@ class ValidateTilingsToolTests(unittest.TestCase):
         self.assertIn("rhombille", targets)
         self.assertIn("floret-pentagonal", targets)
         self.assertIn("spectre", targets)
+        self.assertIn("taylor-socolar", targets)
         self.assertIn("penrose-p3-rhombs", targets)
         self.assertIn("penrose-p3-rhombs-vertex", targets)
         self.assertEqual(targets["archimedean-4-8-8"]["width"], 3)
         self.assertEqual(targets["penrose-p3-rhombs"]["patch_depth"], 3)
         self.assertEqual(targets["spectre"]["patch_depth"], 3)
+        self.assertEqual(targets["taylor-socolar"]["patch_depth"], 3)
 
     def test_validate_manifest_tilings_returns_valid_results(self) -> None:
         results = validate_manifest_tilings()

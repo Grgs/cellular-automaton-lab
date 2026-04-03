@@ -9,6 +9,7 @@ try:
         LatticeTopology,
         PENROSE_GEOMETRY,
         SPECTRE_GEOMETRY,
+        TAYLOR_SOCOLAR_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -21,6 +22,7 @@ except ModuleNotFoundError:
         LatticeTopology,
         PENROSE_GEOMETRY,
         SPECTRE_GEOMETRY,
+        TAYLOR_SOCOLAR_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -89,6 +91,12 @@ class TopologyValidationTests(unittest.TestCase):
     def test_spectre_patch_passes_geometry_and_graph_validation(self) -> None:
         topology = build_topology(SPECTRE_GEOMETRY, 0, 0, patch_depth=3)
         validation = validate_topology(topology, **recommended_validation_options(SPECTRE_GEOMETRY))
+
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+
+    def test_taylor_socolar_patch_passes_geometry_and_graph_validation(self) -> None:
+        topology = build_topology(TAYLOR_SOCOLAR_GEOMETRY, 0, 0, patch_depth=3)
+        validation = validate_topology(topology, **recommended_validation_options(TAYLOR_SOCOLAR_GEOMETRY))
 
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 
