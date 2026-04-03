@@ -238,6 +238,7 @@ class ApiStateAndRulesTests(ApiTestCase):
     def test_new_periodic_mixed_geometries_reset_with_generic_default_rule_and_slots(self) -> None:
         cases = [
             ('rhombille', {'rhombus'}, 3),
+            ('deltoidal-hexagonal', {'kite'}, 1),
             ('tetrakis-square', {'triangle'}, 3),
             ('triakis-triangular', {'triangle'}, 1),
             ('deltoidal-trihexagonal', {'kite'}, 1),
@@ -496,6 +497,52 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 20)
         self.assertTrue(all(cell['kind'] == 'sphinx' for cell in topology['cells']))
+
+    def test_chair_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
+        reset = self.client.post('/api/control/reset', json={
+            'topology_spec': {
+                'tiling_family': 'chair',
+                'adjacency_mode': 'edge',
+                'patch_depth': 99,
+            },
+            'speed': 6,
+            'randomize': False,
+        })
+        self.assertEqual(reset.status_code, 200)
+
+        state = reset.get_json()
+        topology = self.get_topology()
+
+        self.assertEqual(state['topology_spec']['tiling_family'], 'chair')
+        self.assertEqual(state['topology_spec']['patch_depth'], 5)
+        self.assertEqual(state['rule']['name'], 'life-b2-s23')
+        self.assertEqual(topology['topology_spec'], state['topology_spec'])
+        self.assertEqual(len(topology['cells']), len(state['cell_states']))
+        self.assertGreater(len(topology['cells']), 100)
+        self.assertTrue(all(cell['kind'] == 'chair' for cell in topology['cells']))
+
+    def test_robinson_triangles_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
+        reset = self.client.post('/api/control/reset', json={
+            'topology_spec': {
+                'tiling_family': 'robinson-triangles',
+                'adjacency_mode': 'edge',
+                'patch_depth': 99,
+            },
+            'speed': 6,
+            'randomize': False,
+        })
+        self.assertEqual(reset.status_code, 200)
+
+        state = reset.get_json()
+        topology = self.get_topology()
+
+        self.assertEqual(state['topology_spec']['tiling_family'], 'robinson-triangles')
+        self.assertEqual(state['topology_spec']['patch_depth'], 5)
+        self.assertEqual(state['rule']['name'], 'life-b2-s23')
+        self.assertEqual(topology['topology_spec'], state['topology_spec'])
+        self.assertEqual(len(topology['cells']), len(state['cell_states']))
+        self.assertGreater(len(topology['cells']), 100)
+        self.assertEqual({cell['kind'] for cell in topology['cells']}, {'robinson-thick', 'robinson-thin'})
 
     def test_unsafe_size_override_allows_patch_depth_above_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={

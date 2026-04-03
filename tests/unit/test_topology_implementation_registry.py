@@ -29,6 +29,14 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertEqual(implementation.builder_kind, "substitution_patch")
         self.assertEqual(implementation.render_kind, "polygon_aperiodic")
 
+    def test_registry_covers_new_periodic_and_aperiodic_geometries(self) -> None:
+        self.assertEqual(get_topology_implementation("deltoidal-hexagonal").builder_kind, "periodic_face")
+        self.assertEqual(render_kind_for_geometry("deltoidal-hexagonal"), "polygon_periodic")
+        self.assertEqual(get_topology_implementation("chair").builder_kind, "substitution_patch")
+        self.assertEqual(render_kind_for_geometry("chair"), "polygon_aperiodic")
+        self.assertEqual(get_topology_implementation("robinson-triangles").builder_kind, "substitution_patch")
+        self.assertEqual(render_kind_for_geometry("robinson-triangles"), "polygon_aperiodic")
+
     def test_unknown_geometry_falls_back_to_square_implementation(self) -> None:
         implementation = get_topology_implementation("not-a-geometry")
 
@@ -41,6 +49,9 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertIn("square", geometries)
         self.assertIn("spectre", geometries)
         self.assertIn("sphinx", geometries)
+        self.assertIn("deltoidal-hexagonal", geometries)
+        self.assertIn("chair", geometries)
+        self.assertIn("robinson-triangles", geometries)
 
 
 if __name__ == "__main__":

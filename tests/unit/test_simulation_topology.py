@@ -21,6 +21,8 @@ try:
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
         ARCHIMEDEAN_488_GEOMETRY,
+        CHAIR_GEOMETRY,
+        DELTOIDAL_HEXAGONAL_GEOMETRY,
         DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
         FLORET_PENTAGONAL_GEOMETRY,
         KAGOME_GEOMETRY,
@@ -28,6 +30,7 @@ try:
         PENROSE_VERTEX_GEOMETRY,
         PRISMATIC_PENTAGONAL_GEOMETRY,
         RHOMBILLE_GEOMETRY,
+        ROBINSON_TRIANGLES_GEOMETRY,
         SNUB_SQUARE_DUAL_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
@@ -57,6 +60,8 @@ except ModuleNotFoundError:
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
         ARCHIMEDEAN_488_GEOMETRY,
+        CHAIR_GEOMETRY,
+        DELTOIDAL_HEXAGONAL_GEOMETRY,
         DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
         FLORET_PENTAGONAL_GEOMETRY,
         KAGOME_GEOMETRY,
@@ -64,6 +69,7 @@ except ModuleNotFoundError:
         PENROSE_VERTEX_GEOMETRY,
         PRISMATIC_PENTAGONAL_GEOMETRY,
         RHOMBILLE_GEOMETRY,
+        ROBINSON_TRIANGLES_GEOMETRY,
         SNUB_SQUARE_DUAL_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
@@ -85,12 +91,15 @@ class SimulationTopologyTests(unittest.TestCase):
             (ARCHIMEDEAN_488_GEOMETRY, 3, 3),
             (KAGOME_GEOMETRY, 4, 3),
             (RHOMBILLE_GEOMETRY, 3, 3),
+            (DELTOIDAL_HEXAGONAL_GEOMETRY, 3, 3),
             (TETRAKIS_SQUARE_GEOMETRY, 3, 3),
             (TRIAKIS_TRIANGULAR_GEOMETRY, 3, 3),
             (DELTOIDAL_TRIHEXAGONAL_GEOMETRY, 3, 3),
             (PRISMATIC_PENTAGONAL_GEOMETRY, 3, 3),
             (FLORET_PENTAGONAL_GEOMETRY, 3, 3),
             (SNUB_SQUARE_DUAL_GEOMETRY, 3, 3),
+            (CHAIR_GEOMETRY, 0, 0),
+            (ROBINSON_TRIANGLES_GEOMETRY, 0, 0),
             (SPECTRE_GEOMETRY, 0, 0),
             (SPHINX_GEOMETRY, 0, 0),
             (TAYLOR_SOCOLAR_GEOMETRY, 0, 0),
@@ -104,7 +113,15 @@ class SimulationTopologyTests(unittest.TestCase):
                     geometry,
                     width,
                     height,
-                    patch_depth=3 if geometry in {SPECTRE_GEOMETRY, SPHINX_GEOMETRY, TAYLOR_SOCOLAR_GEOMETRY, PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY} else None,
+                    patch_depth=3 if geometry in {
+                        CHAIR_GEOMETRY,
+                        ROBINSON_TRIANGLES_GEOMETRY,
+                        SPECTRE_GEOMETRY,
+                        SPHINX_GEOMETRY,
+                        TAYLOR_SOCOLAR_GEOMETRY,
+                        PENROSE_GEOMETRY,
+                        PENROSE_VERTEX_GEOMETRY,
+                    } else None,
                 )
                 for index, cell in enumerate(topology.cells):
                     expected = tuple(
@@ -267,6 +284,7 @@ class SimulationTopologyTests(unittest.TestCase):
     def test_new_periodic_mixed_topologies_are_deterministic_and_single_kind_annotated(self) -> None:
         cases = {
             RHOMBILLE_GEOMETRY: {"rhombus"},
+            DELTOIDAL_HEXAGONAL_GEOMETRY: {"kite"},
             TETRAKIS_SQUARE_GEOMETRY: {"triangle"},
             TRIAKIS_TRIANGULAR_GEOMETRY: {"triangle"},
             DELTOIDAL_TRIHEXAGONAL_GEOMETRY: {"kite"},
@@ -396,6 +414,38 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertTrue(all(cell.kind == "sphinx" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
         self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells))
+        for cell in deep.cells:
+            self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
+            for neighbor_id in cell.neighbors:
+                assert neighbor_id is not None
+                self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
+
+    def test_chair_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
+        shallow = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=1)
+        deep = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
+        repeated = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
+        self.assertGreater(deep.cell_count, shallow.cell_count)
+        self.assertTrue(all(cell.kind == "chair" for cell in deep.cells))
+        self.assertTrue(all(cell.center is not None for cell in deep.cells))
+        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells))
+        for cell in deep.cells:
+            self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
+            for neighbor_id in cell.neighbors:
+                assert neighbor_id is not None
+                self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
+
+    def test_robinson_triangles_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
+        shallow = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=1)
+        deep = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=3)
+        repeated = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
+        self.assertGreater(deep.cell_count, shallow.cell_count)
+        self.assertEqual({cell.kind for cell in deep.cells}, {"robinson-thick", "robinson-thin"})
+        self.assertTrue(all(cell.center is not None for cell in deep.cells))
+        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 3 for cell in deep.cells))
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:

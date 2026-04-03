@@ -5,6 +5,7 @@ import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 
 const NEW_PERIODIC_TILINGS = [
     { geometry: "rhombille", label: "Rhombille", defaultCellSize: 12, maxCellSize: 20 },
+    { geometry: "deltoidal-hexagonal", label: "Deltoidal Hexagonal", defaultCellSize: 12, maxCellSize: 20 },
     { geometry: "tetrakis-square", label: "Tetrakis Square", defaultCellSize: 12, maxCellSize: 20 },
     { geometry: "triakis-triangular", label: "Triakis Triangular", defaultCellSize: 12, maxCellSize: 20 },
     { geometry: "deltoidal-trihexagonal", label: "Deltoidal Trihexagonal", defaultCellSize: 12, maxCellSize: 20 },

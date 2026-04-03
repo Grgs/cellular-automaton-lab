@@ -22,6 +22,7 @@ ARCHIMEDEAN_33336_GEOMETRY = "archimedean-3-3-3-3-6"
 KAGOME_GEOMETRY = "trihexagonal-3-6-3-6"
 CAIRO_GEOMETRY = "cairo-pentagonal"
 RHOMBILLE_GEOMETRY = "rhombille"
+DELTOIDAL_HEXAGONAL_GEOMETRY = "deltoidal-hexagonal"
 TETRAKIS_SQUARE_GEOMETRY = "tetrakis-square"
 TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular"
 DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
@@ -35,6 +36,8 @@ AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
 SPHINX_GEOMETRY = "sphinx"
+CHAIR_GEOMETRY = "chair"
+ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
 
 PICKER_GROUP_ORDER = {
     "Classic": 0,
@@ -59,6 +62,7 @@ TOPOLOGY_SIZING_POLICIES = {
     ARCHIMEDEAN_33336_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 16, 14, 20),
     CAIRO_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 20),
     RHOMBILLE_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+    DELTOIDAL_HEXAGONAL_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
     TETRAKIS_SQUARE_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
     TRIAKIS_TRIANGULAR_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
     DELTOIDAL_TRIHEXAGONAL_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
@@ -71,6 +75,8 @@ TOPOLOGY_SIZING_POLICIES = {
     SPECTRE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
     TAYLOR_SOCOLAR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
     SPHINX_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+    CHAIR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+    ROBINSON_TRIANGLES_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
 }
 
 TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
@@ -225,6 +231,18 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         label="Rhombille",
         picker_group="Periodic Mixed",
         picker_order=200,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=DELTOIDAL_HEXAGONAL_GEOMETRY,
+        tiling_family=DELTOIDAL_HEXAGONAL_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Deltoidal Hexagonal",
+        picker_group="Periodic Mixed",
+        picker_order=215,
         default_rule="life-b2-s23",
         sizing_mode="grid",
         family="mixed",
@@ -386,6 +404,30 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         family="aperiodic",
         viewport_sync_mode="presentation-only",
     ),
+    TopologyVariantDefinition(
+        geometry_key=CHAIR_GEOMETRY,
+        tiling_family=CHAIR_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Chair",
+        picker_group="Aperiodic",
+        picker_order=290,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=ROBINSON_TRIANGLES_GEOMETRY,
+        tiling_family=ROBINSON_TRIANGLES_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Robinson Triangles",
+        picker_group="Aperiodic",
+        picker_order=300,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
 )
 
 LOW_MINIMUM_MIXED_GEOMETRIES = frozenset(
@@ -397,6 +439,7 @@ LOW_MINIMUM_MIXED_GEOMETRIES = frozenset(
         ARCHIMEDEAN_33344_GEOMETRY,
         ARCHIMEDEAN_33336_GEOMETRY,
         CAIRO_GEOMETRY,
+        DELTOIDAL_HEXAGONAL_GEOMETRY,
         DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
         PRISMATIC_PENTAGONAL_GEOMETRY,

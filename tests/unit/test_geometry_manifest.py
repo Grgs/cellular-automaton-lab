@@ -8,10 +8,13 @@ from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_3464_GEOMETRY,
     ARCHIMEDEAN_4612_GEOMETRY,
     AMMANN_BEENKER_GEOMETRY,
+    CHAIR_GEOMETRY,
+    DELTOIDAL_HEXAGONAL_GEOMETRY,
     DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
     FLORET_PENTAGONAL_GEOMETRY,
     GEOMETRY_DEFAULT_RULES,
     RHOMBILLE_GEOMETRY,
+    ROBINSON_TRIANGLES_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
@@ -120,6 +123,14 @@ class GeometryManifestTests(unittest.TestCase):
             described[SPHINX_GEOMETRY]["sizing_policy"],
             {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
         )
+        self.assertEqual(
+            described[CHAIR_GEOMETRY]["sizing_policy"],
+            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
+        )
+        self.assertEqual(
+            described[ROBINSON_TRIANGLES_GEOMETRY]["sizing_policy"],
+            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
+        )
         self.assertEqual(described[SPECTRE_GEOMETRY]["render_kind"], "polygon_aperiodic")
         self.assertEqual(described[ARCHIMEDEAN_33336_GEOMETRY]["render_kind"], "polygon_periodic")
 
@@ -149,6 +160,7 @@ class GeometryManifestTests(unittest.TestCase):
     def test_new_periodic_mixed_geometries_use_generic_defaults_and_expected_grid_minimums(self) -> None:
         expected = {
             RHOMBILLE_GEOMETRY: 3,
+            DELTOIDAL_HEXAGONAL_GEOMETRY: 1,
             TETRAKIS_SQUARE_GEOMETRY: 3,
             TRIAKIS_TRIANGULAR_GEOMETRY: 1,
             DELTOIDAL_TRIHEXAGONAL_GEOMETRY: 1,
@@ -201,6 +213,32 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertEqual(GEOMETRY_DEFAULT_RULES[SPHINX_GEOMETRY], "life-b2-s23")
         self.assertTrue(geometry_uses_patch_depth(SPHINX_GEOMETRY))
         self.assertFalse(geometry_uses_backend_viewport_sync(SPHINX_GEOMETRY))
+
+    def test_chair_geometry_uses_aperiodic_patch_depth_defaults(self) -> None:
+        definition = get_topology_variant_for_geometry(CHAIR_GEOMETRY)
+        family_definition = get_topology_definition(CHAIR_GEOMETRY)
+
+        self.assertEqual(definition.family, "aperiodic")
+        self.assertEqual(definition.sizing_mode, "patch_depth")
+        self.assertEqual(definition.viewport_sync_mode, "presentation-only")
+        self.assertEqual(definition.default_rule, "life-b2-s23")
+        self.assertEqual(family_definition.render_kind, "polygon_aperiodic")
+        self.assertEqual(GEOMETRY_DEFAULT_RULES[CHAIR_GEOMETRY], "life-b2-s23")
+        self.assertTrue(geometry_uses_patch_depth(CHAIR_GEOMETRY))
+        self.assertFalse(geometry_uses_backend_viewport_sync(CHAIR_GEOMETRY))
+
+    def test_robinson_triangles_geometry_uses_aperiodic_patch_depth_defaults(self) -> None:
+        definition = get_topology_variant_for_geometry(ROBINSON_TRIANGLES_GEOMETRY)
+        family_definition = get_topology_definition(ROBINSON_TRIANGLES_GEOMETRY)
+
+        self.assertEqual(definition.family, "aperiodic")
+        self.assertEqual(definition.sizing_mode, "patch_depth")
+        self.assertEqual(definition.viewport_sync_mode, "presentation-only")
+        self.assertEqual(definition.default_rule, "life-b2-s23")
+        self.assertEqual(family_definition.render_kind, "polygon_aperiodic")
+        self.assertEqual(GEOMETRY_DEFAULT_RULES[ROBINSON_TRIANGLES_GEOMETRY], "life-b2-s23")
+        self.assertTrue(geometry_uses_patch_depth(ROBINSON_TRIANGLES_GEOMETRY))
+        self.assertFalse(geometry_uses_backend_viewport_sync(ROBINSON_TRIANGLES_GEOMETRY))
 
     def test_describe_geometries_returns_frontend_ready_metadata(self) -> None:
         described = describe_topology_variants()

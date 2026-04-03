@@ -4,14 +4,18 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from backend.simulation.aperiodic_ammann_beenker import build_ammann_beenker_patch
+from backend.simulation.aperiodic_chair import build_chair_patch
 from backend.simulation.aperiodic_penrose_p2 import build_penrose_p2_patch
+from backend.simulation.aperiodic_robinson_triangles import build_robinson_triangles_patch
 from backend.simulation.aperiodic_sphinx import build_sphinx_patch
 from backend.simulation.aperiodic_spectre import build_spectre_patch
 from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.aperiodic_taylor_socolar import build_taylor_socolar_patch
 from backend.simulation.topology_catalog import (
     AMMANN_BEENKER_GEOMETRY,
+    CHAIR_GEOMETRY,
     PENROSE_P2_GEOMETRY,
+    ROBINSON_TRIANGLES_GEOMETRY,
     SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
@@ -53,6 +57,16 @@ _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
         geometry_key=SPHINX_GEOMETRY,
         builder_kind="substitution_recipe",
         build_patch=build_sphinx_patch,
+    ),
+    CHAIR_GEOMETRY: AperiodicFamilyDefinition(
+        geometry_key=CHAIR_GEOMETRY,
+        builder_kind="substitution_recipe",
+        build_patch=build_chair_patch,
+    ),
+    ROBINSON_TRIANGLES_GEOMETRY: AperiodicFamilyDefinition(
+        geometry_key=ROBINSON_TRIANGLES_GEOMETRY,
+        builder_kind="substitution_recipe",
+        build_patch=build_robinson_triangles_patch,
     ),
 }
 

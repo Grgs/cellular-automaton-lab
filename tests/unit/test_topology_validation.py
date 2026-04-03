@@ -11,6 +11,8 @@ try:
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
+        CHAIR_GEOMETRY,
+        ROBINSON_TRIANGLES_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -25,6 +27,8 @@ except ModuleNotFoundError:
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
+        CHAIR_GEOMETRY,
+        ROBINSON_TRIANGLES_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -105,6 +109,18 @@ class TopologyValidationTests(unittest.TestCase):
     def test_sphinx_patch_passes_geometry_and_graph_validation(self) -> None:
         topology = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
         validation = validate_topology(topology, **recommended_validation_options(SPHINX_GEOMETRY))
+
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+
+    def test_chair_patch_passes_geometry_and_graph_validation(self) -> None:
+        topology = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
+        validation = validate_topology(topology, **recommended_validation_options(CHAIR_GEOMETRY))
+
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+
+    def test_robinson_triangles_patch_passes_geometry_and_graph_validation(self) -> None:
+        topology = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=3)
+        validation = validate_topology(topology, **recommended_validation_options(ROBINSON_TRIANGLES_GEOMETRY))
 
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 

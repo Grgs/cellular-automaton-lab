@@ -19,6 +19,7 @@ export const ARCHIMEDEAN_33336_GEOMETRY = "archimedean-3-3-3-3-6";
 export const KAGOME_GEOMETRY = "trihexagonal-3-6-3-6";
 export const CAIRO_GEOMETRY = "cairo-pentagonal";
 export const RHOMBILLE_GEOMETRY = "rhombille";
+export const DELTOIDAL_HEXAGONAL_GEOMETRY = "deltoidal-hexagonal";
 export const TETRAKIS_SQUARE_GEOMETRY = "tetrakis-square";
 export const TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular";
 export const DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal";
@@ -32,6 +33,8 @@ export const AMMANN_BEENKER_GEOMETRY = "ammann-beenker";
 export const SPECTRE_GEOMETRY = "spectre";
 export const TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar";
 export const SPHINX_GEOMETRY = "sphinx";
+export const CHAIR_GEOMETRY = "chair";
+export const ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles";
 export const PENROSE_GEOMETRIES = Object.freeze([PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY]);
 export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     ARCHIMEDEAN_488_GEOMETRY,
@@ -44,6 +47,7 @@ export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     KAGOME_GEOMETRY,
     CAIRO_GEOMETRY,
     RHOMBILLE_GEOMETRY,
+    DELTOIDAL_HEXAGONAL_GEOMETRY,
     DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,

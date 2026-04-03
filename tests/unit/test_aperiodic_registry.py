@@ -21,6 +21,24 @@ class AperiodicRegistryTests(unittest.TestCase):
         self.assertEqual(patch.height, topology.height)
         self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
 
+    def test_chair_patch_builder_matches_topology_builder_output(self) -> None:
+        patch = build_aperiodic_patch("chair", 3)
+        topology = build_topology("chair", 0, 0, patch_depth=3)
+
+        self.assertEqual(patch.patch_depth, topology.patch_depth)
+        self.assertEqual(patch.width, topology.width)
+        self.assertEqual(patch.height, topology.height)
+        self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
+
+    def test_robinson_triangles_patch_builder_matches_topology_builder_output(self) -> None:
+        patch = build_aperiodic_patch("robinson-triangles", 3)
+        topology = build_topology("robinson-triangles", 0, 0, patch_depth=3)
+
+        self.assertEqual(patch.patch_depth, topology.patch_depth)
+        self.assertEqual(patch.width, topology.width)
+        self.assertEqual(patch.height, topology.height)
+        self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
+
 
 if __name__ == "__main__":
     unittest.main()
