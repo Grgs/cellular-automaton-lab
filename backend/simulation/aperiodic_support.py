@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Iterable, TypedDict
+from typing import Iterable, NotRequired, TypedDict
 
 
 COORDINATE_PRECISION = 6
@@ -20,6 +20,10 @@ class AperiodicPatchCell:
     center: tuple[float, float]
     vertices: tuple[tuple[float, float], ...]
     neighbors: tuple[str, ...]
+    tile_family: str | None = None
+    orientation_token: str | None = None
+    chirality_token: str | None = None
+    decoration_tokens: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -50,6 +54,10 @@ class PatchRecord(TypedDict):
     kind: str
     center: tuple[float, float]
     vertices: tuple[tuple[float, float], ...]
+    tile_family: NotRequired[str | None]
+    orientation_token: NotRequired[str | None]
+    chirality_token: NotRequired[str | None]
+    decoration_tokens: NotRequired[tuple[str, ...] | None]
 
 
 def rounded_point(point: Vec | tuple[float, float]) -> tuple[float, float]:
@@ -179,6 +187,10 @@ def patch_from_records(patch_depth: int, records: list[PatchRecord]) -> Aperiodi
             center=record["center"],
             vertices=record["vertices"],
             neighbors=neighbors_by_id[record["id"]],
+            tile_family=record.get("tile_family"),
+            orientation_token=record.get("orientation_token"),
+            chirality_token=record.get("chirality_token"),
+            decoration_tokens=record.get("decoration_tokens"),
         )
         for record in sorted(records, key=lambda item: item["id"])
     )

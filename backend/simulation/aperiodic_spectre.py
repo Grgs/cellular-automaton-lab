@@ -156,14 +156,14 @@ def _spectre_template_for_depth(label: str, depth: int) -> _SpectreTemplate:
     )
 
 
-def _spectre_expand_children(label: str, depth: int) -> tuple[SubstitutionChild, ...]:
+def _spectre_expand_children(node: SubstitutionChild, depth: int) -> tuple[SubstitutionChild, ...]:
     return tuple(
         SubstitutionChild(child_label, child_transform)
-        for child_label, child_transform in _spectre_template_for_depth(label, depth).children
+        for child_label, child_transform in _spectre_template_for_depth(node.label, depth).children
     )
 
 
-def _spectre_leaf_templates(label: str) -> tuple[SubstitutionLeafTemplate, ...]:
+def _spectre_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:
     return tuple(
         SubstitutionLeafTemplate(
             kind="spectre",
@@ -171,7 +171,7 @@ def _spectre_leaf_templates(label: str) -> tuple[SubstitutionLeafTemplate, ...]:
             vertices=_SPECTRE_BASE_VERTICES,
             transform=child_transform,
         )
-        for _, child_transform in _SPECTRE_BASE_TEMPLATES[label].children
+        for _, child_transform in _SPECTRE_BASE_TEMPLATES[node.label].children
     )
 
 

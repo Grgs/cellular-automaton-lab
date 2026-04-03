@@ -7,12 +7,17 @@ try:
     from backend.simulation.topology import (
         LatticeCell,
         LatticeTopology,
+        HAT_MONOTILE_GEOMETRY,
         PENROSE_GEOMETRY,
+        PINWHEEL_GEOMETRY,
+        SHIELD_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
+        SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         CHAIR_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
+        TUEBINGEN_TRIANGLE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -23,12 +28,17 @@ except ModuleNotFoundError:
     from backend.simulation.topology import (
         LatticeCell,
         LatticeTopology,
+        HAT_MONOTILE_GEOMETRY,
         PENROSE_GEOMETRY,
+        PINWHEEL_GEOMETRY,
+        SHIELD_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
+        SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         CHAIR_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
+        TUEBINGEN_TRIANGLE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -123,6 +133,19 @@ class TopologyValidationTests(unittest.TestCase):
         validation = validate_topology(topology, **recommended_validation_options(ROBINSON_TRIANGLES_GEOMETRY))
 
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+
+    def test_new_aperiodic_wave_patches_pass_geometry_and_graph_validation(self) -> None:
+        for geometry in (
+            HAT_MONOTILE_GEOMETRY,
+            TUEBINGEN_TRIANGLE_GEOMETRY,
+            SQUARE_TRIANGLE_GEOMETRY,
+            SHIELD_GEOMETRY,
+            PINWHEEL_GEOMETRY,
+        ):
+            with self.subTest(geometry=geometry):
+                topology = build_topology(geometry, 0, 0, patch_depth=3)
+                validation = validate_topology(topology, **recommended_validation_options(geometry))
+                self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 
     def test_snub_square_regression_is_covered_by_shared_validator(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)

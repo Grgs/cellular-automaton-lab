@@ -151,6 +151,10 @@ class TopologyCellPayload(TypedDict):
     slot: NotRequired[str]
     center: NotRequired[PointPayload]
     vertices: NotRequired[list[PointPayload]]
+    tile_family: NotRequired[str]
+    orientation_token: NotRequired[str]
+    chirality_token: NotRequired[str]
+    decoration_tokens: NotRequired[list[str]]
 
 
 class TopologyPayload(TypedDict):

@@ -13,15 +13,20 @@ from backend.simulation.topology_catalog import (
     DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
     FLORET_PENTAGONAL_GEOMETRY,
     GEOMETRY_DEFAULT_RULES,
+    HAT_MONOTILE_GEOMETRY,
+    PINWHEEL_GEOMETRY,
     RHOMBILLE_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
+    SHIELD_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
+    SQUARE_TRIANGLE_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
     PRISMATIC_PENTAGONAL_GEOMETRY,
+    TUEBINGEN_TRIANGLE_GEOMETRY,
     describe_topologies,
     PENROSE_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -239,6 +244,31 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertEqual(GEOMETRY_DEFAULT_RULES[ROBINSON_TRIANGLES_GEOMETRY], "life-b2-s23")
         self.assertTrue(geometry_uses_patch_depth(ROBINSON_TRIANGLES_GEOMETRY))
         self.assertFalse(geometry_uses_backend_viewport_sync(ROBINSON_TRIANGLES_GEOMETRY))
+
+    def test_new_substitution_tilings_use_aperiodic_patch_depth_defaults(self) -> None:
+        expected = {
+            HAT_MONOTILE_GEOMETRY: {"default": 2, "min": 0, "max": 3},
+            TUEBINGEN_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 5},
+            SQUARE_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 4},
+            SHIELD_GEOMETRY: {"default": 3, "min": 0, "max": 4},
+            PINWHEEL_GEOMETRY: {"default": 3, "min": 0, "max": 4},
+        }
+
+        described = {entry["tiling_family"]: entry for entry in describe_topologies()}
+        for geometry, sizing_policy in expected.items():
+            with self.subTest(geometry=geometry):
+                definition = get_topology_variant_for_geometry(geometry)
+                family_definition = get_topology_definition(geometry)
+                self.assertEqual(definition.family, "aperiodic")
+                self.assertEqual(definition.sizing_mode, "patch_depth")
+                self.assertEqual(definition.viewport_sync_mode, "presentation-only")
+                self.assertEqual(definition.default_rule, "life-b2-s23")
+                self.assertEqual(family_definition.render_kind, "polygon_aperiodic")
+                self.assertEqual(GEOMETRY_DEFAULT_RULES[geometry], "life-b2-s23")
+                self.assertTrue(geometry_uses_patch_depth(geometry))
+                self.assertFalse(geometry_uses_backend_viewport_sync(geometry))
+                self.assertEqual(described[geometry]["sizing_policy"], {"control": "patch_depth", **sizing_policy})
+                self.assertEqual(described[geometry]["render_kind"], "polygon_aperiodic")
 
     def test_describe_geometries_returns_frontend_ready_metadata(self) -> None:
         described = describe_topology_variants()

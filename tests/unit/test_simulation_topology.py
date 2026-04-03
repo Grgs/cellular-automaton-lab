@@ -25,18 +25,23 @@ try:
         DELTOIDAL_HEXAGONAL_GEOMETRY,
         DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
         FLORET_PENTAGONAL_GEOMETRY,
+        HAT_MONOTILE_GEOMETRY,
         KAGOME_GEOMETRY,
         PENROSE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
+        PINWHEEL_GEOMETRY,
         PRISMATIC_PENTAGONAL_GEOMETRY,
         RHOMBILLE_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
+        SHIELD_GEOMETRY,
         SNUB_SQUARE_DUAL_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
+        SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
+        TUEBINGEN_TRIANGLE_GEOMETRY,
         build_topology,
         empty_board,
     )
@@ -64,18 +69,23 @@ except ModuleNotFoundError:
         DELTOIDAL_HEXAGONAL_GEOMETRY,
         DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
         FLORET_PENTAGONAL_GEOMETRY,
+        HAT_MONOTILE_GEOMETRY,
         KAGOME_GEOMETRY,
         PENROSE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
+        PINWHEEL_GEOMETRY,
         PRISMATIC_PENTAGONAL_GEOMETRY,
         RHOMBILLE_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
+        SHIELD_GEOMETRY,
         SNUB_SQUARE_DUAL_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
+        SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
+        TUEBINGEN_TRIANGLE_GEOMETRY,
         build_topology,
         empty_board,
     )
@@ -99,10 +109,15 @@ class SimulationTopologyTests(unittest.TestCase):
             (FLORET_PENTAGONAL_GEOMETRY, 3, 3),
             (SNUB_SQUARE_DUAL_GEOMETRY, 3, 3),
             (CHAIR_GEOMETRY, 0, 0),
+            (HAT_MONOTILE_GEOMETRY, 0, 0),
+            (PINWHEEL_GEOMETRY, 0, 0),
             (ROBINSON_TRIANGLES_GEOMETRY, 0, 0),
+            (SHIELD_GEOMETRY, 0, 0),
             (SPECTRE_GEOMETRY, 0, 0),
             (SPHINX_GEOMETRY, 0, 0),
+            (SQUARE_TRIANGLE_GEOMETRY, 0, 0),
             (TAYLOR_SOCOLAR_GEOMETRY, 0, 0),
+            (TUEBINGEN_TRIANGLE_GEOMETRY, 0, 0),
             (PENROSE_GEOMETRY, 0, 0),
             (PENROSE_VERTEX_GEOMETRY, 0, 0),
         ]
@@ -115,10 +130,15 @@ class SimulationTopologyTests(unittest.TestCase):
                     height,
                     patch_depth=3 if geometry in {
                         CHAIR_GEOMETRY,
+                        HAT_MONOTILE_GEOMETRY,
+                        PINWHEEL_GEOMETRY,
                         ROBINSON_TRIANGLES_GEOMETRY,
+                        SHIELD_GEOMETRY,
                         SPECTRE_GEOMETRY,
                         SPHINX_GEOMETRY,
+                        SQUARE_TRIANGLE_GEOMETRY,
                         TAYLOR_SOCOLAR_GEOMETRY,
+                        TUEBINGEN_TRIANGLE_GEOMETRY,
                         PENROSE_GEOMETRY,
                         PENROSE_VERTEX_GEOMETRY,
                     } else None,
@@ -451,6 +471,43 @@ class SimulationTopologyTests(unittest.TestCase):
             for neighbor_id in cell.neighbors:
                 assert neighbor_id is not None
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
+
+    def test_new_aperiodic_wave_topologies_are_deterministic_and_emit_metadata(self) -> None:
+        cases = (
+            (HAT_MONOTILE_GEOMETRY, {"hat"}, 2),
+            (TUEBINGEN_TRIANGLE_GEOMETRY, {"tuebingen-thick", "tuebingen-thin"}, 3),
+            (SQUARE_TRIANGLE_GEOMETRY, {"square-triangle-square", "square-triangle-triangle"}, 3),
+            (SHIELD_GEOMETRY, {"shield-shield", "shield-square", "shield-triangle"}, 3),
+            (PINWHEEL_GEOMETRY, {"pinwheel-triangle"}, 3),
+        )
+
+        for geometry, expected_kinds, depth in cases:
+            with self.subTest(geometry=geometry):
+                shallow = build_topology(geometry, 0, 0, patch_depth=1)
+                deep = build_topology(geometry, 0, 0, patch_depth=depth)
+                repeated = build_topology(geometry, 0, 0, patch_depth=depth)
+
+                self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
+                self.assertGreater(deep.cell_count, shallow.cell_count)
+                self.assertEqual({cell.kind for cell in deep.cells}, expected_kinds)
+                self.assertTrue(all(cell.center is not None for cell in deep.cells))
+                self.assertTrue(all(cell.vertices for cell in deep.cells))
+                self.assertTrue(all(cell.tile_family is not None for cell in deep.cells))
+                if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY}:
+                    self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
+                if geometry == SQUARE_TRIANGLE_GEOMETRY:
+                    self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
+                if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY, SQUARE_TRIANGLE_GEOMETRY}:
+                    self.assertTrue(all(cell.chirality_token is not None for cell in deep.cells if cell.kind != "square-triangle-square"))
+                if geometry == SHIELD_GEOMETRY:
+                    self.assertTrue(any(cell.orientation_token is not None for cell in deep.cells if cell.kind == "shield-shield"))
+                    self.assertTrue(any(cell.chirality_token is not None for cell in deep.cells if cell.kind == "shield-triangle"))
+                    self.assertTrue(any(cell.decoration_tokens for cell in deep.cells if cell.kind != "shield-square"))
+                for cell in deep.cells:
+                    self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
+                    for neighbor_id in cell.neighbors:
+                        assert neighbor_id is not None
+                        self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
     def test_penrose_vertex_topology_is_symmetric_duplicate_free_and_larger_than_edge_neighbors(self) -> None:
         edge = build_topology(PENROSE_GEOMETRY, 0, 0, patch_depth=3)

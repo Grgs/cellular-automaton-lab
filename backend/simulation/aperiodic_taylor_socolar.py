@@ -33,13 +33,13 @@ _HALF_HEX_CHILD_TRANSFORMS: tuple[Affine, ...] = (
 )
 
 
-def _half_hex_children(label: str, depth: int) -> tuple[SubstitutionChild, ...]:
-    del label, depth
+def _half_hex_children(node: SubstitutionChild, depth: int) -> tuple[SubstitutionChild, ...]:
+    del node, depth
     return tuple(SubstitutionChild("half-hex", transform) for transform in _HALF_HEX_CHILD_TRANSFORMS)
 
 
-def _half_hex_leaf_templates(label: str) -> tuple[SubstitutionLeafTemplate, ...]:
-    del label
+def _half_hex_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:
+    del node
     return (
         SubstitutionLeafTemplate(
             kind="taylor-half-hex",

@@ -136,6 +136,29 @@ def require_topology_cell_payload(value: object, *, context: str) -> TopologyCel
             }
             for index, vertex in enumerate(vertices_payload)
         ]
+    tile_family = payload.get("tile_family")
+    if tile_family is not None:
+        normalized_payload["tile_family"] = _require_str(tile_family, context=f"{context}.tile_family")
+    orientation_token = payload.get("orientation_token")
+    if orientation_token is not None:
+        normalized_payload["orientation_token"] = _require_str(
+            orientation_token,
+            context=f"{context}.orientation_token",
+        )
+    chirality_token = payload.get("chirality_token")
+    if chirality_token is not None:
+        normalized_payload["chirality_token"] = _require_str(
+            chirality_token,
+            context=f"{context}.chirality_token",
+        )
+    decoration_tokens = payload.get("decoration_tokens")
+    if decoration_tokens is not None:
+        normalized_payload["decoration_tokens"] = [
+            _require_str(token, context=f"{context}.decoration_tokens[{index}]")
+            for index, token in enumerate(
+                _require_json_list(decoration_tokens, context=f"{context}.decoration_tokens")
+            )
+        ]
     return normalized_payload
 
 

@@ -36,6 +36,16 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertEqual(render_kind_for_geometry("chair"), "polygon_aperiodic")
         self.assertEqual(get_topology_implementation("robinson-triangles").builder_kind, "substitution_patch")
         self.assertEqual(render_kind_for_geometry("robinson-triangles"), "polygon_aperiodic")
+        for geometry in (
+            "hat-monotile",
+            "tuebingen-triangle",
+            "square-triangle",
+            "shield",
+            "pinwheel",
+        ):
+            with self.subTest(geometry=geometry):
+                self.assertEqual(get_topology_implementation(geometry).builder_kind, "substitution_patch")
+                self.assertEqual(render_kind_for_geometry(geometry), "polygon_aperiodic")
 
     def test_unknown_geometry_falls_back_to_square_implementation(self) -> None:
         implementation = get_topology_implementation("not-a-geometry")
@@ -52,6 +62,11 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertIn("deltoidal-hexagonal", geometries)
         self.assertIn("chair", geometries)
         self.assertIn("robinson-triangles", geometries)
+        self.assertIn("hat-monotile", geometries)
+        self.assertIn("tuebingen-triangle", geometries)
+        self.assertIn("square-triangle", geometries)
+        self.assertIn("shield", geometries)
+        self.assertIn("pinwheel", geometries)
 
 
 if __name__ == "__main__":

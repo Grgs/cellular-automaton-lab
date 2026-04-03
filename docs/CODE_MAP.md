@@ -346,15 +346,22 @@ Browser UI
 - [backend/simulation/aperiodic_support.py](../backend/simulation/aperiodic_support.py)
   Shared aperiodic patch dataclasses, affine math, polygon helpers, and neighbor reconstruction.
 - [backend/simulation/aperiodic_substitution.py](../backend/simulation/aperiodic_substitution.py)
-  Reusable substitution-recipe helper for recursive affine expansion and deterministic leaf flattening.
+  Reusable substitution-recipe helper for recursive affine expansion, structured substitution nodes, metadata propagation, and deterministic leaf flattening.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
   Registry-backed dispatch for family-specific aperiodic builders and recipe styles.
+- [backend/simulation/aperiodic_golden_triangles.py](../backend/simulation/aperiodic_golden_triangles.py)
+  Shared golden-triangle geometry and metadata helpers for Robinson and Tuebingen families.
 - [backend/simulation/aperiodic_penrose_p2.py](../backend/simulation/aperiodic_penrose_p2.py)
 - [backend/simulation/aperiodic_ammann_beenker.py](../backend/simulation/aperiodic_ammann_beenker.py)
 - [backend/simulation/aperiodic_spectre.py](../backend/simulation/aperiodic_spectre.py)
 - [backend/simulation/aperiodic_taylor_socolar.py](../backend/simulation/aperiodic_taylor_socolar.py)
 - [backend/simulation/aperiodic_sphinx.py](../backend/simulation/aperiodic_sphinx.py)
-  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, and Sphinx.
+- [backend/simulation/aperiodic_hat.py](../backend/simulation/aperiodic_hat.py)
+- [backend/simulation/aperiodic_tuebingen_triangle.py](../backend/simulation/aperiodic_tuebingen_triangle.py)
+- [backend/simulation/aperiodic_square_triangle.py](../backend/simulation/aperiodic_square_triangle.py)
+- [backend/simulation/aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
+- [backend/simulation/aperiodic_pinwheel.py](../backend/simulation/aperiodic_pinwheel.py)
+  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Square-Triangle, Shield, and Pinwheel.
 
 ### Rules
 

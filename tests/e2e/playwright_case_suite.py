@@ -218,6 +218,76 @@ class SharedUiFlowMixin:
             }""",
         )
 
+    def test_hat_topology_switch_renders_aperiodic_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "hat-monotile")
+
+        self._expect("#tiling-family-select").to_have_value("hat-monotile")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        case.page.wait_for_function(
+            """() => {
+                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
+                return Number.isFinite(value) && value > 0;
+            }""",
+        )
+
+    def test_tuebingen_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "tuebingen-triangle")
+
+        self._expect("#tiling-family-select").to_have_value("tuebingen-triangle")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        case.page.wait_for_function(
+            """() => {
+                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
+                return Number.isFinite(value) && value > 0;
+            }""",
+        )
+
+    def test_square_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "square-triangle")
+
+        self._expect("#tiling-family-select").to_have_value("square-triangle")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        case.page.wait_for_function(
+            """() => {
+                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
+                return Number.isFinite(value) && value > 0;
+            }""",
+        )
+
+    def test_shield_topology_switch_renders_aperiodic_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "shield")
+
+        self._expect("#tiling-family-select").to_have_value("shield")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        case.page.wait_for_function(
+            """() => {
+                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
+                return Number.isFinite(value) && value > 0;
+            }""",
+        )
+
+    def test_pinwheel_topology_switch_renders_aperiodic_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "pinwheel")
+
+        self._expect("#tiling-family-select").to_have_value("pinwheel")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        case.page.wait_for_function(
+            """() => {
+                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
+                return Number.isFinite(value) && value > 0;
+            }""",
+        )
+
     def test_deltoidal_hexagonal_topology_switch_renders_periodic_patch(self) -> None:
         case = self._case()
         case.page.select_option("#tiling-family-select", "deltoidal-hexagonal")

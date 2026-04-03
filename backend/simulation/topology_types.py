@@ -43,6 +43,10 @@ class LatticeCell:
     slot: str | None = None
     center: tuple[float, float] | None = None
     vertices: tuple[tuple[float, float], ...] | None = None
+    tile_family: str | None = None
+    orientation_token: str | None = None
+    chirality_token: str | None = None
+    decoration_tokens: tuple[str, ...] | None = None
 
     def to_dict(self) -> TopologyCellPayload:
         payload: TopologyCellPayload = {
@@ -59,6 +63,14 @@ class LatticeCell:
                 PointPayload(x=vertex[0], y=vertex[1])
                 for vertex in self.vertices
             ]
+        if self.tile_family is not None:
+            payload["tile_family"] = self.tile_family
+        if self.orientation_token is not None:
+            payload["orientation_token"] = self.orientation_token
+        if self.chirality_token is not None:
+            payload["chirality_token"] = self.chirality_token
+        if self.decoration_tokens is not None:
+            payload["decoration_tokens"] = list(self.decoration_tokens)
         return payload
 
 

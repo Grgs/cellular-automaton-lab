@@ -544,6 +544,48 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertGreater(len(topology['cells']), 100)
         self.assertEqual({cell['kind'] for cell in topology['cells']}, {'robinson-thick', 'robinson-thin'})
 
+    def test_new_aperiodic_wave_tilings_reset_with_metadata_and_expected_caps(self) -> None:
+        cases = (
+            ('hat-monotile', 3, {'hat'}),
+            ('tuebingen-triangle', 5, {'tuebingen-thick', 'tuebingen-thin'}),
+            ('square-triangle', 4, {'square-triangle-square', 'square-triangle-triangle'}),
+            ('shield', 4, {'shield-shield', 'shield-square', 'shield-triangle'}),
+            ('pinwheel', 4, {'pinwheel-triangle'}),
+        )
+
+        for geometry, expected_patch_depth, expected_kinds in cases:
+            with self.subTest(geometry=geometry):
+                reset = self.client.post('/api/control/reset', json={
+                    'topology_spec': {
+                        'tiling_family': geometry,
+                        'adjacency_mode': 'edge',
+                        'patch_depth': 99,
+                    },
+                    'speed': 6,
+                    'randomize': False,
+                })
+                self.assertEqual(reset.status_code, 200)
+
+                state = reset.get_json()
+                topology = self.get_topology()
+
+                self.assertEqual(state['topology_spec']['tiling_family'], geometry)
+                self.assertEqual(state['topology_spec']['patch_depth'], expected_patch_depth)
+                self.assertEqual(state['rule']['name'], 'life-b2-s23')
+                self.assertEqual(topology['topology_spec'], state['topology_spec'])
+                self.assertEqual(len(topology['cells']), len(state['cell_states']))
+                self.assertTrue(all(cell['kind'] in expected_kinds for cell in topology['cells']))
+                self.assertTrue(all(cell.get('tile_family') is not None for cell in topology['cells']))
+                if geometry in {'hat-monotile', 'tuebingen-triangle', 'pinwheel'}:
+                    self.assertTrue(all(cell.get('orientation_token') is not None for cell in topology['cells']))
+                    self.assertTrue(all(cell.get('chirality_token') is not None for cell in topology['cells']))
+                if geometry == 'square-triangle':
+                    self.assertTrue(any(cell['kind'] == 'square-triangle-square' for cell in topology['cells']))
+                    self.assertTrue(all(cell.get('orientation_token') is not None for cell in topology['cells']))
+                if geometry == 'shield':
+                    self.assertTrue(any(cell['kind'] == 'shield-square' for cell in topology['cells']))
+                    self.assertTrue(any(cell.get('decoration_tokens') for cell in topology['cells'] if cell['kind'] != 'shield-square'))
+
     def test_unsafe_size_override_allows_patch_depth_above_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {

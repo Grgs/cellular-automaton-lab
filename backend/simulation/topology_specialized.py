@@ -17,6 +17,10 @@ def build_aperiodic_topology_cells(
             neighbors=cell.neighbors,
             center=cell.center,
             vertices=cell.vertices,
+            tile_family=cell.tile_family,
+            orientation_token=cell.orientation_token,
+            chirality_token=cell.chirality_token,
+            decoration_tokens=cell.decoration_tokens,
         )
         for cell in patch.cells
     )

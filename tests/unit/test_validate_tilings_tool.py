@@ -22,6 +22,11 @@ class ValidateTilingsToolTests(unittest.TestCase):
         self.assertIn("taylor-socolar", targets)
         self.assertIn("chair", targets)
         self.assertIn("robinson-triangles", targets)
+        self.assertIn("hat-monotile", targets)
+        self.assertIn("tuebingen-triangle", targets)
+        self.assertIn("square-triangle", targets)
+        self.assertIn("shield", targets)
+        self.assertIn("pinwheel", targets)
         self.assertIn("penrose-p3-rhombs", targets)
         self.assertIn("penrose-p3-rhombs-vertex", targets)
         self.assertEqual(targets["archimedean-4-8-8"]["width"], 3)
@@ -30,6 +35,11 @@ class ValidateTilingsToolTests(unittest.TestCase):
         self.assertEqual(targets["taylor-socolar"]["patch_depth"], 3)
         self.assertEqual(targets["chair"]["patch_depth"], 3)
         self.assertEqual(targets["robinson-triangles"]["patch_depth"], 3)
+        self.assertEqual(targets["hat-monotile"]["patch_depth"], 3)
+        self.assertEqual(targets["tuebingen-triangle"]["patch_depth"], 3)
+        self.assertEqual(targets["square-triangle"]["patch_depth"], 3)
+        self.assertEqual(targets["shield"]["patch_depth"], 3)
+        self.assertEqual(targets["pinwheel"]["patch_depth"], 3)
 
     def test_validate_manifest_tilings_returns_valid_results(self) -> None:
         results = validate_manifest_tilings()

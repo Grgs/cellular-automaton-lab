@@ -33,8 +33,13 @@ export const AMMANN_BEENKER_GEOMETRY = "ammann-beenker";
 export const SPECTRE_GEOMETRY = "spectre";
 export const TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar";
 export const SPHINX_GEOMETRY = "sphinx";
+export const HAT_MONOTILE_GEOMETRY = "hat-monotile";
 export const CHAIR_GEOMETRY = "chair";
 export const ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles";
+export const TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle";
+export const SQUARE_TRIANGLE_GEOMETRY = "square-triangle";
+export const SHIELD_GEOMETRY = "shield";
+export const PINWHEEL_GEOMETRY = "pinwheel";
 export const PENROSE_GEOMETRIES = Object.freeze([PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY]);
 export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     ARCHIMEDEAN_488_GEOMETRY,

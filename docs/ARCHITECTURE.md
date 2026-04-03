@@ -118,7 +118,7 @@ Important model rules:
 
 `backend/simulation/topology.py` and `backend/simulation/rule_context.py` now act as compatibility façades. The authored internals are split so topology types, regular builders, specialized builders, cached topology assembly, board helpers, frame construction, and `RuleContext` query behavior can evolve independently without changing broad import sites.
 
-The aperiodic patch path is split similarly. `backend/simulation/aperiodic_prototiles.py` remains the public entrypoint, while shared affine/polygon helpers live in `backend/simulation/aperiodic_support.py`, reusable substitution expansion lives in `backend/simulation/aperiodic_substitution.py`, registry dispatch lives in `backend/simulation/aperiodic_registry.py`, and family-specific builders live in focused modules for Penrose P2, Ammann-Beenker, Spectre, Taylor-Socolar, and Sphinx. Taylor-Socolar is implemented as the half-hex factor topology, not as a decorated hex-grid presentation. Sphinx is the proof tiling for the substitution-first registry architecture.
+The aperiodic patch path is split similarly. `backend/simulation/aperiodic_prototiles.py` remains the public entrypoint, while shared affine/polygon helpers live in `backend/simulation/aperiodic_support.py`, reusable substitution expansion lives in `backend/simulation/aperiodic_substitution.py`, registry dispatch lives in `backend/simulation/aperiodic_registry.py`, and family-specific builders live in focused modules for Penrose P2, Ammann-Beenker, Spectre, Taylor-Socolar, Sphinx, Hat, Tuebingen Triangle, Square-Triangle, Shield, and Pinwheel. Taylor-Socolar is implemented as the half-hex factor topology, not as a decorated hex-grid presentation. The substitution helper now carries structured node metadata such as tile family, orientation, chirality, variant, and decoration tokens so new aperiodic families can preserve builder-local state without changing the public API.
 
 ### Topology Catalog
 
@@ -138,6 +138,8 @@ The catalog remains the canonical source of:
 - picker grouping and ordering
 - default rule selection
 - frontend bootstrapped topology metadata, including `render_kind`
+
+Topology cell payloads may also carry optional metadata fields such as `tile_family`, `orientation_token`, `chirality_token`, and `decoration_tokens`. These are currently ignored by the renderer and control shell, but they let the backend expose richer substitution-family state for diagnostics and future decorated or chiral tilings without changing the base canvas model.
 
 The catalog does not decide how a geometry is built. That implementation dispatch now lives in [backend/simulation/topology_implementation_registry.py](../backend/simulation/topology_implementation_registry.py), which maps each geometry key to a backend `builder_kind`, a frontend-facing `render_kind`, and the concrete builder entrypoint consumed by [backend/simulation/topology_builders.py](../backend/simulation/topology_builders.py).
 

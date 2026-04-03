@@ -104,6 +104,10 @@ export interface ApiTopologyCellPayload {
     slot?: string;
     center?: PointPayload;
     vertices?: PointPayload[];
+    tile_family?: string;
+    orientation_token?: string;
+    chirality_token?: string;
+    decoration_tokens?: string[];
 }
 
 export type TopologyCell = ApiTopologyCellPayload;

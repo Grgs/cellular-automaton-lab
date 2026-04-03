@@ -39,6 +39,38 @@ class AperiodicRegistryTests(unittest.TestCase):
         self.assertEqual(patch.height, topology.height)
         self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
 
+    def test_new_tiling_patch_builders_match_topology_builder_output(self) -> None:
+        for geometry, depth in (
+            ("hat-monotile", 3),
+            ("tuebingen-triangle", 3),
+            ("square-triangle", 3),
+            ("shield", 3),
+            ("pinwheel", 3),
+        ):
+            with self.subTest(geometry=geometry):
+                patch = build_aperiodic_patch(geometry, depth)
+                topology = build_topology(geometry, 0, 0, patch_depth=depth)
+
+                self.assertEqual(patch.patch_depth, topology.patch_depth)
+                self.assertEqual(patch.width, topology.width)
+                self.assertEqual(patch.height, topology.height)
+                self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
+
+    def test_new_tiling_metadata_survives_patch_build(self) -> None:
+        hat_patch = build_aperiodic_patch("hat-monotile", 2)
+        shield_patch = build_aperiodic_patch("shield", 2)
+        pinwheel_patch = build_aperiodic_patch("pinwheel", 2)
+
+        self.assertTrue(all(cell.tile_family == "hat" for cell in hat_patch.cells))
+        self.assertTrue(all(cell.orientation_token is not None for cell in hat_patch.cells))
+        self.assertTrue(all(cell.chirality_token is not None for cell in hat_patch.cells))
+
+        self.assertTrue(any(cell.kind == "shield-square" for cell in shield_patch.cells))
+        self.assertTrue(any(cell.decoration_tokens for cell in shield_patch.cells if cell.kind == "shield-shield"))
+
+        self.assertTrue(all(cell.tile_family == "pinwheel" for cell in pinwheel_patch.cells))
+        self.assertTrue(all(cell.orientation_token is not None for cell in pinwheel_patch.cells))
+
 
 if __name__ == "__main__":
     unittest.main()

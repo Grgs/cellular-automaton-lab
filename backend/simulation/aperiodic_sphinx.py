@@ -67,13 +67,13 @@ _SPHINX_CHILD_TRANSFORMS = (
 )
 
 
-def _sphinx_children(label: str, depth: int) -> tuple[SubstitutionChild, ...]:
-    del label, depth
+def _sphinx_children(node: SubstitutionChild, depth: int) -> tuple[SubstitutionChild, ...]:
+    del node, depth
     return tuple(SubstitutionChild("sphinx", transform) for transform in _SPHINX_CHILD_TRANSFORMS)
 
 
-def _sphinx_leaf_templates(label: str) -> tuple[SubstitutionLeafTemplate, ...]:
-    del label
+def _sphinx_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:
+    del node
     return (
         SubstitutionLeafTemplate(
             kind="sphinx",

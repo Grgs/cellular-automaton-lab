@@ -36,8 +36,13 @@ AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
 SPHINX_GEOMETRY = "sphinx"
+HAT_MONOTILE_GEOMETRY = "hat-monotile"
 CHAIR_GEOMETRY = "chair"
 ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
+TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
+SQUARE_TRIANGLE_GEOMETRY = "square-triangle"
+SHIELD_GEOMETRY = "shield"
+PINWHEEL_GEOMETRY = "pinwheel"
 
 PICKER_GROUP_ORDER = {
     "Classic": 0,
@@ -75,8 +80,13 @@ TOPOLOGY_SIZING_POLICIES = {
     SPECTRE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
     TAYLOR_SOCOLAR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
     SPHINX_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+    HAT_MONOTILE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 3),
     CHAIR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
     ROBINSON_TRIANGLES_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+    TUEBINGEN_TRIANGLE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+    SQUARE_TRIANGLE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+    SHIELD_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+    PINWHEEL_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
 }
 
 TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
@@ -381,6 +391,18 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         viewport_sync_mode="presentation-only",
     ),
     TopologyVariantDefinition(
+        geometry_key=HAT_MONOTILE_GEOMETRY,
+        tiling_family=HAT_MONOTILE_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Hat",
+        picker_group="Aperiodic",
+        picker_order=250,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
         geometry_key=TAYLOR_SOCOLAR_GEOMETRY,
         tiling_family=TAYLOR_SOCOLAR_GEOMETRY,
         adjacency_mode=EDGE_ADJACENCY,
@@ -423,6 +445,54 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         label="Robinson Triangles",
         picker_group="Aperiodic",
         picker_order=300,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=TUEBINGEN_TRIANGLE_GEOMETRY,
+        tiling_family=TUEBINGEN_TRIANGLE_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Tuebingen Triangle",
+        picker_group="Aperiodic",
+        picker_order=310,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=SQUARE_TRIANGLE_GEOMETRY,
+        tiling_family=SQUARE_TRIANGLE_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Square-Triangle",
+        picker_group="Aperiodic",
+        picker_order=320,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=SHIELD_GEOMETRY,
+        tiling_family=SHIELD_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Shield",
+        picker_group="Aperiodic",
+        picker_order=330,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=PINWHEEL_GEOMETRY,
+        tiling_family=PINWHEEL_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Pinwheel",
+        picker_group="Aperiodic",
+        picker_order=340,
         default_rule="life-b2-s23",
         sizing_mode="patch_depth",
         family="aperiodic",
