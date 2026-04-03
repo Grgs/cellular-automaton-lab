@@ -29,6 +29,7 @@ export const PENROSE_GEOMETRY = "penrose-p3-rhombs";
 export const PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex";
 export const PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart";
 export const AMMANN_BEENKER_GEOMETRY = "ammann-beenker";
+export const SPECTRE_GEOMETRY = "spectre";
 export const PENROSE_GEOMETRIES = Object.freeze([PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY]);
 export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     ARCHIMEDEAN_488_GEOMETRY,

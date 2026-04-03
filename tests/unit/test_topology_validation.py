@@ -8,6 +8,7 @@ try:
         LatticeCell,
         LatticeTopology,
         PENROSE_GEOMETRY,
+        SPECTRE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -19,6 +20,7 @@ except ModuleNotFoundError:
         LatticeCell,
         LatticeTopology,
         PENROSE_GEOMETRY,
+        SPECTRE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
@@ -83,6 +85,12 @@ class TopologyValidationTests(unittest.TestCase):
                 topology = build_topology(geometry, 0, 0, patch_depth=3)
                 validation = validate_topology(topology, **recommended_validation_options(geometry))
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+
+    def test_spectre_patch_passes_geometry_and_graph_validation(self) -> None:
+        topology = build_topology(SPECTRE_GEOMETRY, 0, 0, patch_depth=3)
+        validation = validate_topology(topology, **recommended_validation_options(SPECTRE_GEOMETRY))
+
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 
     def test_snub_square_regression_is_covered_by_shared_validator(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)

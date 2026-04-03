@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Iterable, TypedDict
 
 from backend.simulation.topology_catalog import (
@@ -10,6 +11,7 @@ from backend.simulation.topology_catalog import (
     PENROSE_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    SPECTRE_GEOMETRY,
 )
 from backend.simulation.penrose import (
     PENROSE_EDGE_ADJACENCY,
@@ -21,6 +23,10 @@ from backend.simulation.penrose import (
 PHI = (1 + math.sqrt(5)) / 2
 SILVER_RATIO = 1 + math.sqrt(2)
 COORDINATE_PRECISION = 6
+
+_Affine = tuple[float, float, float, float, float, float]
+_AFFINE_IDENTITY: _Affine = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+_AFFINE_REFLECT_X: _Affine = (-1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
 
 @dataclass(frozen=True)
@@ -62,6 +68,12 @@ class _LeafTile:
     center: _Vec
     anchor: _Vec
     orientation: int
+
+
+@dataclass(frozen=True)
+class _SpectreTemplate:
+    quad: tuple[_Vec, _Vec, _Vec, _Vec]
+    children: tuple[tuple[str, _Affine], ...]
 
 
 class _PatchRecord(TypedDict):
@@ -123,8 +135,44 @@ def _encode_float(value: float) -> str:
     return "0"
 
 
+def _affine_multiply(left: _Affine, right: _Affine) -> _Affine:
+    return (
+        (left[0] * right[0]) + (left[1] * right[3]),
+        (left[0] * right[1]) + (left[1] * right[4]),
+        (left[0] * right[2]) + (left[1] * right[5]) + left[2],
+        (left[3] * right[0]) + (left[4] * right[3]),
+        (left[3] * right[1]) + (left[4] * right[4]),
+        (left[3] * right[2]) + (left[4] * right[5]) + left[5],
+    )
+
+
+def _affine_apply(transform: _Affine, point: _Vec) -> _Vec:
+    return _Vec(
+        (transform[0] * point.x) + (transform[1] * point.y) + transform[2],
+        (transform[3] * point.x) + (transform[4] * point.y) + transform[5],
+    )
+
+
+def _translation(tx: float, ty: float) -> _Affine:
+    return (1.0, 0.0, float(tx), 0.0, 1.0, float(ty))
+
+
+def _translation_to(source: _Vec, target: _Vec) -> _Affine:
+    return _translation(target.x - source.x, target.y - source.y)
+
+
+def _rotation(radians: float) -> _Affine:
+    cosine = math.cos(radians)
+    sine = math.sin(radians)
+    return (cosine, -sine, 0.0, sine, cosine, 0.0)
+
+
 def _id_from_anchor(prefix: str, anchor: _Vec, orientation: int) -> str:
     return f"{prefix}:{orientation % 360}:{_encode_float(anchor.x)}:{_encode_float(anchor.y)}"
+
+
+def _id_from_transform(prefix: str, transform: _Affine) -> str:
+    return prefix + ":" + ":".join(_encode_float(value) for value in transform)
 
 
 def _logical_indexes(points: list[tuple[float, float]]) -> dict[tuple[float, float], tuple[int, int]]:
@@ -463,6 +511,177 @@ def _build_ammann_beenker_patch(patch_depth: int) -> AperiodicPatch:
     return patch
 
 
+_SPECTRE_LABELS = (
+    "Gamma",
+    "Delta",
+    "Theta",
+    "Lambda",
+    "Xi",
+    "Pi",
+    "Sigma",
+    "Phi",
+    "Psi",
+)
+_SPECTRE_ROOT_LABEL = "Delta"
+_SPECTRE_BASE_VERTICES = (
+    _Vec(0.0, 0.0),
+    _Vec(1.0, 0.0),
+    _Vec(1.5, -0.8660254037844386),
+    _Vec(2.366025403784439, -0.36602540378443865),
+    _Vec(2.366025403784439, 0.6339745962155614),
+    _Vec(3.366025403784439, 0.6339745962155614),
+    _Vec(3.866025403784439, 1.5),
+    _Vec(3.0, 2.0),
+    _Vec(2.133974596215561, 1.5),
+    _Vec(1.6339745962155614, 2.3660254037844393),
+    _Vec(0.6339745962155614, 2.3660254037844393),
+    _Vec(-0.3660254037844386, 2.3660254037844393),
+    _Vec(-0.866025403784439, 1.5),
+    _Vec(0.0, 1.0),
+)
+_SPECTRE_BASE_QUAD = (
+    _SPECTRE_BASE_VERTICES[3],
+    _SPECTRE_BASE_VERTICES[5],
+    _SPECTRE_BASE_VERTICES[7],
+    _SPECTRE_BASE_VERTICES[11],
+)
+_SPECTRE_GAMMA_SECONDARY_TRANSFORM = _affine_multiply(
+    _translation(_SPECTRE_BASE_VERTICES[8].x, _SPECTRE_BASE_VERTICES[8].y),
+    _rotation(math.pi / 6),
+)
+_SPECTRE_SUBSTITUTION_RULES: dict[str, tuple[str | None, ...]] = {
+    "Gamma": ("Pi", "Delta", None, "Theta", "Sigma", "Xi", "Phi", "Gamma"),
+    "Delta": ("Xi", "Delta", "Xi", "Phi", "Sigma", "Pi", "Phi", "Gamma"),
+    "Theta": ("Psi", "Delta", "Pi", "Phi", "Sigma", "Pi", "Phi", "Gamma"),
+    "Lambda": ("Psi", "Delta", "Xi", "Phi", "Sigma", "Pi", "Phi", "Gamma"),
+    "Xi": ("Psi", "Delta", "Pi", "Phi", "Sigma", "Psi", "Phi", "Gamma"),
+    "Pi": ("Psi", "Delta", "Xi", "Phi", "Sigma", "Psi", "Phi", "Gamma"),
+    "Sigma": ("Xi", "Delta", "Xi", "Phi", "Sigma", "Pi", "Lambda", "Gamma"),
+    "Phi": ("Psi", "Delta", "Psi", "Phi", "Sigma", "Pi", "Phi", "Gamma"),
+    "Psi": ("Psi", "Delta", "Psi", "Phi", "Sigma", "Psi", "Phi", "Gamma"),
+}
+
+
+def _build_spectre_supertile_child_transforms(quad: tuple[_Vec, _Vec, _Vec, _Vec]) -> tuple[_Affine, ...]:
+    transition_rules = (
+        (60, 3, 1),
+        (0, 2, 0),
+        (60, 3, 1),
+        (60, 3, 1),
+        (0, 2, 0),
+        (60, 3, 1),
+        (-120, 3, 3),
+    )
+    transforms: list[_Affine] = [_AFFINE_IDENTITY]
+    total_angle = 0.0
+    rotation_transform = _AFFINE_IDENTITY
+    transformed_quad = list(quad)
+    for angle, from_index, to_index in transition_rules:
+        total_angle += angle
+        if angle != 0:
+            rotation_transform = _rotation(math.radians(total_angle))
+            transformed_quad = [
+                _affine_apply(rotation_transform, point)
+                for point in quad
+            ]
+        translation_transform = _translation_to(
+            transformed_quad[to_index],
+            _affine_apply(transforms[-1], quad[from_index]),
+        )
+        transforms.append(_affine_multiply(translation_transform, rotation_transform))
+    return tuple(
+        _affine_multiply(_AFFINE_REFLECT_X, transform)
+        for transform in transforms
+    )
+
+
+_SPECTRE_BASE_TEMPLATES = {
+    label: _SpectreTemplate(
+        quad=_SPECTRE_BASE_QUAD,
+        children=(
+            (label, _AFFINE_IDENTITY),
+            (label, _SPECTRE_GAMMA_SECONDARY_TRANSFORM),
+        )
+        if label == "Gamma"
+        else ((label, _AFFINE_IDENTITY),),
+    )
+    for label in _SPECTRE_LABELS
+}
+
+
+def _spectre_supertile_quad(
+    quad: tuple[_Vec, _Vec, _Vec, _Vec],
+    child_transforms: tuple[_Affine, ...],
+) -> tuple[_Vec, _Vec, _Vec, _Vec]:
+    return (
+        _affine_apply(child_transforms[6], quad[2]),
+        _affine_apply(child_transforms[5], quad[1]),
+        _affine_apply(child_transforms[3], quad[2]),
+        _affine_apply(child_transforms[0], quad[1]),
+    )
+
+
+@lru_cache(maxsize=None)
+def _spectre_template_for_depth(label: str, depth: int) -> _SpectreTemplate:
+    if depth <= 0:
+        return _SPECTRE_BASE_TEMPLATES[label]
+
+    prior_delta = _spectre_template_for_depth(_SPECTRE_ROOT_LABEL, depth - 1)
+    child_transforms = _build_spectre_supertile_child_transforms(prior_delta.quad)
+    return _SpectreTemplate(
+        quad=_spectre_supertile_quad(prior_delta.quad, child_transforms),
+        children=tuple(
+            (child_label, child_transforms[index])
+            for index, child_label in enumerate(_SPECTRE_SUBSTITUTION_RULES[label])
+            if child_label is not None
+        ),
+    )
+
+
+def _collect_spectre_leaf_transforms(
+    label: str,
+    depth: int,
+    transform: _Affine,
+    leaves: list[_Affine],
+) -> None:
+    template = _spectre_template_for_depth(label, depth)
+    if depth <= 0:
+        for _, child_transform in template.children:
+            leaves.append(_affine_multiply(transform, child_transform))
+        return
+
+    for child_label, child_transform in template.children:
+        _collect_spectre_leaf_transforms(
+            child_label,
+            depth - 1,
+            _affine_multiply(transform, child_transform),
+            leaves,
+        )
+
+
+def _build_spectre_patch(patch_depth: int) -> AperiodicPatch:
+    leaf_transforms: list[_Affine] = []
+    _collect_spectre_leaf_transforms(
+        _SPECTRE_ROOT_LABEL,
+        int(patch_depth),
+        _AFFINE_IDENTITY,
+        leaf_transforms,
+    )
+
+    records: list[_PatchRecord] = []
+    for transform in leaf_transforms:
+        vertices = tuple(_affine_apply(transform, vertex) for vertex in _SPECTRE_BASE_VERTICES)
+        records.append(
+            {
+                "id": _id_from_transform("spectre", transform),
+                "kind": "spectre",
+                "center": _rounded_point(_polygon_centroid(vertices)),
+                "vertices": tuple(_rounded_point(vertex) for vertex in vertices),
+            }
+        )
+    return _patch_from_records(patch_depth, records)
+
+
 def build_aperiodic_patch(geometry: str, patch_depth: int) -> AperiodicPatch:
     if geometry in {PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY}:
         penrose_patch = build_penrose_patch(
@@ -490,4 +709,6 @@ def build_aperiodic_patch(geometry: str, patch_depth: int) -> AperiodicPatch:
         return _build_penrose_p2_patch(patch_depth)
     if geometry == AMMANN_BEENKER_GEOMETRY:
         return _build_ammann_beenker_patch(patch_depth)
+    if geometry == SPECTRE_GEOMETRY:
+        return _build_spectre_patch(patch_depth)
     raise ValueError(f"Unsupported aperiodic geometry '{geometry}'.")

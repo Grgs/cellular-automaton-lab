@@ -16,6 +16,7 @@ import {
     PRISMATIC_PENTAGONAL_GEOMETRY,
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
+    SPECTRE_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
     AMMANN_BEENKER_GEOMETRY,
@@ -52,6 +53,7 @@ const aperiodicGeometryAdapters: GeometryAdapter[] = [
     createAperiodicPrototileGeometryAdapter(PENROSE_VERTEX_GEOMETRY),
     createAperiodicPrototileGeometryAdapter(PENROSE_P2_GEOMETRY),
     createAperiodicPrototileGeometryAdapter(AMMANN_BEENKER_GEOMETRY),
+    createAperiodicPrototileGeometryAdapter(SPECTRE_GEOMETRY),
 ];
 
 const GEOMETRY_ADAPTER_ENTRIES: Array<[string, GeometryAdapter]> = [

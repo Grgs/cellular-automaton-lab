@@ -10,6 +10,7 @@ from backend.simulation.topology_catalog import (
     PRISMATIC_PENTAGONAL_GEOMETRY,
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
+    SPECTRE_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
 )
@@ -40,6 +41,7 @@ __all__ = [
     "PRISMATIC_PENTAGONAL_GEOMETRY",
     "REGULAR_CELL_KIND",
     "RHOMBILLE_GEOMETRY",
+    "SPECTRE_GEOMETRY",
     "LatticeCell",
     "LatticeTopology",
     "SimulationBoard",

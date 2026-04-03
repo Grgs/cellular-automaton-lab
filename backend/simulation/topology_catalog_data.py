@@ -32,6 +32,7 @@ PENROSE_GEOMETRY = "penrose-p3-rhombs"
 PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
 PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
 AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
+SPECTRE_GEOMETRY = "spectre"
 
 PICKER_GROUP_ORDER = {
     "Classic": 0,
@@ -65,6 +66,7 @@ TOPOLOGY_SIZING_POLICIES = {
     PENROSE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
     PENROSE_P2_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
     AMMANN_BEENKER_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 4),
+    SPECTRE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
 }
 
 TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
@@ -339,6 +341,18 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         label="Ammann-Beenker",
         picker_group="Aperiodic",
         picker_order=230,
+        default_rule="life-b2-s23",
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=SPECTRE_GEOMETRY,
+        tiling_family=SPECTRE_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Spectre",
+        picker_group="Aperiodic",
+        picker_order=240,
         default_rule="life-b2-s23",
         sizing_mode="patch_depth",
         family="aperiodic",

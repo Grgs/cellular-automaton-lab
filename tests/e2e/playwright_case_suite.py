@@ -148,6 +148,20 @@ class SharedUiFlowMixin:
         self._expect("#grid-size-text").to_contain_text("Depth")
         self._expect("#adjacency-mode-field").to_be_visible()
 
+    def test_spectre_topology_switch_renders_aperiodic_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "spectre")
+
+        self._expect("#tiling-family-select").to_have_value("spectre")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        case.page.wait_for_function(
+            """() => {
+                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
+                return Number.isFinite(value) && value > 0;
+            }""",
+        )
+
     def test_run_toggle_advances_generation_and_pauses(self) -> None:
         case = self._case()
         initial_generation = self._read_generation()

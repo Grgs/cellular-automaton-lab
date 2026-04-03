@@ -428,6 +428,29 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 100)
 
+    def test_spectre_patch_depth_uses_generic_rule_and_caps_at_three(self) -> None:
+        reset = self.client.post('/api/control/reset', json={
+            'topology_spec': {
+                'tiling_family': 'spectre',
+                'adjacency_mode': 'edge',
+                'patch_depth': 99,
+            },
+            'speed': 6,
+            'randomize': False,
+        })
+        self.assertEqual(reset.status_code, 200)
+
+        state = reset.get_json()
+        topology = self.get_topology()
+
+        self.assertEqual(state['topology_spec']['tiling_family'], 'spectre')
+        self.assertEqual(state['topology_spec']['patch_depth'], 3)
+        self.assertEqual(state['rule']['name'], 'life-b2-s23')
+        self.assertEqual(topology['topology_spec'], state['topology_spec'])
+        self.assertEqual(len(topology['cells']), len(state['cell_states']))
+        self.assertGreater(len(topology['cells']), 500)
+        self.assertTrue(all(cell['kind'] == 'spectre' for cell in topology['cells']))
+
     def test_retired_penrose_rule_names_resolve_to_canonical_rules(self) -> None:
         for requested_rule, expected_rule in (
             ('penrose-life', 'life-b2-s23'),
