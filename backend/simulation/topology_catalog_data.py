@@ -21,6 +21,13 @@ ARCHIMEDEAN_33344_GEOMETRY = "archimedean-3-3-3-4-4"
 ARCHIMEDEAN_33336_GEOMETRY = "archimedean-3-3-3-3-6"
 KAGOME_GEOMETRY = "trihexagonal-3-6-3-6"
 CAIRO_GEOMETRY = "cairo-pentagonal"
+RHOMBILLE_GEOMETRY = "rhombille"
+TETRAKIS_SQUARE_GEOMETRY = "tetrakis-square"
+TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular"
+DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
+PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal"
+FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal"
+SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual"
 PENROSE_GEOMETRY = "penrose-p3-rhombs"
 PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
 PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
@@ -48,6 +55,13 @@ TOPOLOGY_SIZING_POLICIES = {
     ARCHIMEDEAN_33344_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 18, 12, 20),
     ARCHIMEDEAN_33336_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 16, 14, 20),
     CAIRO_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 20),
+    RHOMBILLE_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+    TETRAKIS_SQUARE_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+    TRIAKIS_TRIANGULAR_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+    DELTOIDAL_TRIHEXAGONAL_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+    PRISMATIC_PENTAGONAL_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
+    FLORET_PENTAGONAL_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
+    SNUB_SQUARE_DUAL_GEOMETRY: SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
     PENROSE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
     PENROSE_P2_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
     AMMANN_BEENKER_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 4),
@@ -199,6 +213,90 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         viewport_sync_mode="backend-sync",
     ),
     TopologyVariantDefinition(
+        geometry_key=RHOMBILLE_GEOMETRY,
+        tiling_family=RHOMBILLE_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Rhombille",
+        picker_group="Periodic Mixed",
+        picker_order=200,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=TETRAKIS_SQUARE_GEOMETRY,
+        tiling_family=TETRAKIS_SQUARE_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Tetrakis Square",
+        picker_group="Periodic Mixed",
+        picker_order=230,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=TRIAKIS_TRIANGULAR_GEOMETRY,
+        tiling_family=TRIAKIS_TRIANGULAR_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Triakis Triangular",
+        picker_group="Periodic Mixed",
+        picker_order=240,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+        tiling_family=DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Deltoidal Trihexagonal",
+        picker_group="Periodic Mixed",
+        picker_order=210,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=PRISMATIC_PENTAGONAL_GEOMETRY,
+        tiling_family=PRISMATIC_PENTAGONAL_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Prismatic Pentagonal",
+        picker_group="Periodic Mixed",
+        picker_order=250,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=FLORET_PENTAGONAL_GEOMETRY,
+        tiling_family=FLORET_PENTAGONAL_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Floret Pentagonal",
+        picker_group="Periodic Mixed",
+        picker_order=260,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
+        geometry_key=SNUB_SQUARE_DUAL_GEOMETRY,
+        tiling_family=SNUB_SQUARE_DUAL_GEOMETRY,
+        adjacency_mode=EDGE_ADJACENCY,
+        label="Snub Square Dual",
+        picker_group="Periodic Mixed",
+        picker_order=220,
+        default_rule="life-b2-s23",
+        sizing_mode="grid",
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+    ),
+    TopologyVariantDefinition(
         geometry_key=PENROSE_GEOMETRY,
         tiling_family=PENROSE_GEOMETRY,
         adjacency_mode=EDGE_ADJACENCY,
@@ -257,5 +355,10 @@ LOW_MINIMUM_MIXED_GEOMETRIES = frozenset(
         ARCHIMEDEAN_33344_GEOMETRY,
         ARCHIMEDEAN_33336_GEOMETRY,
         CAIRO_GEOMETRY,
+        DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+        TRIAKIS_TRIANGULAR_GEOMETRY,
+        PRISMATIC_PENTAGONAL_GEOMETRY,
+        FLORET_PENTAGONAL_GEOMETRY,
+        SNUB_SQUARE_DUAL_GEOMETRY,
     }
 )

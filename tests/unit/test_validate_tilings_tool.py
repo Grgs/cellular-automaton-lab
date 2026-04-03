@@ -15,6 +15,8 @@ class ValidateTilingsToolTests(unittest.TestCase):
 
         self.assertIn("archimedean-4-8-8", targets)
         self.assertIn("trihexagonal-3-6-3-6", targets)
+        self.assertIn("rhombille", targets)
+        self.assertIn("floret-pentagonal", targets)
         self.assertIn("penrose-p3-rhombs", targets)
         self.assertIn("penrose-p3-rhombs-vertex", targets)
         self.assertEqual(targets["archimedean-4-8-8"]["width"], 3)

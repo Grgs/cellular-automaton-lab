@@ -8,7 +8,14 @@ from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_3464_GEOMETRY,
     ARCHIMEDEAN_4612_GEOMETRY,
     AMMANN_BEENKER_GEOMETRY,
+    DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+    FLORET_PENTAGONAL_GEOMETRY,
     GEOMETRY_DEFAULT_RULES,
+    RHOMBILLE_GEOMETRY,
+    SNUB_SQUARE_DUAL_GEOMETRY,
+    TETRAKIS_SQUARE_GEOMETRY,
+    TRIAKIS_TRIANGULAR_GEOMETRY,
+    PRISMATIC_PENTAGONAL_GEOMETRY,
     describe_topologies,
     PENROSE_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -119,6 +126,27 @@ class GeometryManifestTests(unittest.TestCase):
 
         self.assertEqual(minimum_grid_dimension_for_geometry("square"), 3)
         self.assertEqual(minimum_grid_dimension_for_geometry("archimedean-4-8-8"), 3)
+
+    def test_new_periodic_mixed_geometries_use_generic_defaults_and_expected_grid_minimums(self) -> None:
+        expected = {
+            RHOMBILLE_GEOMETRY: 3,
+            TETRAKIS_SQUARE_GEOMETRY: 3,
+            TRIAKIS_TRIANGULAR_GEOMETRY: 1,
+            DELTOIDAL_TRIHEXAGONAL_GEOMETRY: 1,
+            PRISMATIC_PENTAGONAL_GEOMETRY: 1,
+            FLORET_PENTAGONAL_GEOMETRY: 1,
+            SNUB_SQUARE_DUAL_GEOMETRY: 1,
+        }
+
+        for geometry, minimum_dimension in expected.items():
+            with self.subTest(geometry=geometry):
+                definition = get_topology_variant_for_geometry(geometry)
+                self.assertEqual(definition.family, "mixed")
+                self.assertEqual(definition.sizing_mode, "grid")
+                self.assertEqual(definition.viewport_sync_mode, "backend-sync")
+                self.assertEqual(definition.default_rule, "life-b2-s23")
+                self.assertEqual(GEOMETRY_DEFAULT_RULES[geometry], "life-b2-s23")
+                self.assertEqual(minimum_grid_dimension_for_geometry(geometry), minimum_dimension)
 
     def test_describe_geometries_returns_frontend_ready_metadata(self) -> None:
         described = describe_topology_variants()

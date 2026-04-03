@@ -18,6 +18,13 @@ export const ARCHIMEDEAN_33344_GEOMETRY = "archimedean-3-3-3-4-4";
 export const ARCHIMEDEAN_33336_GEOMETRY = "archimedean-3-3-3-3-6";
 export const KAGOME_GEOMETRY = "trihexagonal-3-6-3-6";
 export const CAIRO_GEOMETRY = "cairo-pentagonal";
+export const RHOMBILLE_GEOMETRY = "rhombille";
+export const TETRAKIS_SQUARE_GEOMETRY = "tetrakis-square";
+export const TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular";
+export const DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal";
+export const PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal";
+export const FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal";
+export const SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual";
 export const PENROSE_GEOMETRY = "penrose-p3-rhombs";
 export const PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex";
 export const PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart";
@@ -33,6 +40,13 @@ export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     ARCHIMEDEAN_33336_GEOMETRY,
     KAGOME_GEOMETRY,
     CAIRO_GEOMETRY,
+    RHOMBILLE_GEOMETRY,
+    DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+    TETRAKIS_SQUARE_GEOMETRY,
+    TRIAKIS_TRIANGULAR_GEOMETRY,
+    PRISMATIC_PENTAGONAL_GEOMETRY,
+    FLORET_PENTAGONAL_GEOMETRY,
+    SNUB_SQUARE_DUAL_GEOMETRY,
 ]);
 
 export function topologyVariantKey(topology: TopologyPayload | null | undefined): string {

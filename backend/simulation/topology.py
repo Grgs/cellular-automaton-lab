@@ -2,9 +2,16 @@ from __future__ import annotations
 
 from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_488_GEOMETRY,
+    DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+    FLORET_PENTAGONAL_GEOMETRY,
     KAGOME_GEOMETRY,
     PENROSE_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    PRISMATIC_PENTAGONAL_GEOMETRY,
+    RHOMBILLE_GEOMETRY,
+    SNUB_SQUARE_DUAL_GEOMETRY,
+    TETRAKIS_SQUARE_GEOMETRY,
+    TRIAKIS_TRIANGULAR_GEOMETRY,
 )
 from backend.simulation.topology_boards import (
     board_from_cells_by_id,
@@ -25,13 +32,20 @@ from backend.simulation.topology_types import (
 
 __all__ = [
     "ARCHIMEDEAN_488_GEOMETRY",
+    "DELTOIDAL_TRIHEXAGONAL_GEOMETRY",
+    "FLORET_PENTAGONAL_GEOMETRY",
     "KAGOME_GEOMETRY",
     "PENROSE_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
+    "PRISMATIC_PENTAGONAL_GEOMETRY",
     "REGULAR_CELL_KIND",
+    "RHOMBILLE_GEOMETRY",
     "LatticeCell",
     "LatticeTopology",
     "SimulationBoard",
+    "SNUB_SQUARE_DUAL_GEOMETRY",
+    "TETRAKIS_SQUARE_GEOMETRY",
+    "TRIAKIS_TRIANGULAR_GEOMETRY",
     "board_from_cells_by_id",
     "board_from_states",
     "build_topology",

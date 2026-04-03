@@ -7,10 +7,17 @@ import {
     ARCHIMEDEAN_4612_GEOMETRY,
     ARCHIMEDEAN_488_GEOMETRY,
     CAIRO_GEOMETRY,
+    DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+    FLORET_PENTAGONAL_GEOMETRY,
     KAGOME_GEOMETRY,
     PENROSE_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    PRISMATIC_PENTAGONAL_GEOMETRY,
+    RHOMBILLE_GEOMETRY,
+    SNUB_SQUARE_DUAL_GEOMETRY,
+    TETRAKIS_SQUARE_GEOMETRY,
+    TRIAKIS_TRIANGULAR_GEOMETRY,
     AMMANN_BEENKER_GEOMETRY,
 } from "../topology.js";
 import { DEFAULT_GEOMETRY } from "./shared.js";
@@ -31,6 +38,13 @@ const periodicMixedGeometryAdapters: GeometryAdapter[] = [
     createPeriodicMixedGeometryAdapter(ARCHIMEDEAN_33336_GEOMETRY),
     createPeriodicMixedGeometryAdapter(KAGOME_GEOMETRY),
     createPeriodicMixedGeometryAdapter(CAIRO_GEOMETRY),
+    createPeriodicMixedGeometryAdapter(RHOMBILLE_GEOMETRY),
+    createPeriodicMixedGeometryAdapter(DELTOIDAL_TRIHEXAGONAL_GEOMETRY),
+    createPeriodicMixedGeometryAdapter(TETRAKIS_SQUARE_GEOMETRY),
+    createPeriodicMixedGeometryAdapter(TRIAKIS_TRIANGULAR_GEOMETRY),
+    createPeriodicMixedGeometryAdapter(PRISMATIC_PENTAGONAL_GEOMETRY),
+    createPeriodicMixedGeometryAdapter(FLORET_PENTAGONAL_GEOMETRY),
+    createPeriodicMixedGeometryAdapter(SNUB_SQUARE_DUAL_GEOMETRY),
 ];
 
 const aperiodicGeometryAdapters: GeometryAdapter[] = [

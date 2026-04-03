@@ -21,9 +21,16 @@ try:
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
         ARCHIMEDEAN_488_GEOMETRY,
+        DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+        FLORET_PENTAGONAL_GEOMETRY,
         KAGOME_GEOMETRY,
         PENROSE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
+        PRISMATIC_PENTAGONAL_GEOMETRY,
+        RHOMBILLE_GEOMETRY,
+        SNUB_SQUARE_DUAL_GEOMETRY,
+        TETRAKIS_SQUARE_GEOMETRY,
+        TRIAKIS_TRIANGULAR_GEOMETRY,
         build_topology,
         empty_board,
     )
@@ -47,9 +54,16 @@ except ModuleNotFoundError:
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
         ARCHIMEDEAN_488_GEOMETRY,
+        DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+        FLORET_PENTAGONAL_GEOMETRY,
         KAGOME_GEOMETRY,
         PENROSE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
+        PRISMATIC_PENTAGONAL_GEOMETRY,
+        RHOMBILLE_GEOMETRY,
+        SNUB_SQUARE_DUAL_GEOMETRY,
+        TETRAKIS_SQUARE_GEOMETRY,
+        TRIAKIS_TRIANGULAR_GEOMETRY,
         build_topology,
         empty_board,
     )
@@ -64,6 +78,13 @@ class SimulationTopologyTests(unittest.TestCase):
             ("triangle", 5, 4),
             (ARCHIMEDEAN_488_GEOMETRY, 3, 3),
             (KAGOME_GEOMETRY, 4, 3),
+            (RHOMBILLE_GEOMETRY, 3, 3),
+            (TETRAKIS_SQUARE_GEOMETRY, 3, 3),
+            (TRIAKIS_TRIANGULAR_GEOMETRY, 3, 3),
+            (DELTOIDAL_TRIHEXAGONAL_GEOMETRY, 3, 3),
+            (PRISMATIC_PENTAGONAL_GEOMETRY, 3, 3),
+            (FLORET_PENTAGONAL_GEOMETRY, 3, 3),
+            (SNUB_SQUARE_DUAL_GEOMETRY, 3, 3),
             (PENROSE_GEOMETRY, 0, 0),
             (PENROSE_VERTEX_GEOMETRY, 0, 0),
         ]
@@ -233,6 +254,34 @@ class SimulationTopologyTests(unittest.TestCase):
             build_topology("square", 2, 2).cells[0].id,
             "c:0:0",
         )
+
+    def test_new_periodic_mixed_topologies_are_deterministic_and_single_kind_annotated(self) -> None:
+        cases = {
+            RHOMBILLE_GEOMETRY: {"rhombus"},
+            TETRAKIS_SQUARE_GEOMETRY: {"triangle"},
+            TRIAKIS_TRIANGULAR_GEOMETRY: {"triangle"},
+            DELTOIDAL_TRIHEXAGONAL_GEOMETRY: {"kite"},
+            PRISMATIC_PENTAGONAL_GEOMETRY: {"pentagon"},
+            FLORET_PENTAGONAL_GEOMETRY: {"pentagon"},
+            SNUB_SQUARE_DUAL_GEOMETRY: {"pentagon"},
+        }
+
+        for geometry, expected_kinds in cases.items():
+            with self.subTest(geometry=geometry):
+                left = build_topology(geometry, 1, 1)
+                right = build_topology(geometry, 1, 1)
+
+                self.assertEqual(left.cell_count, right.cell_count)
+                self.assertEqual([cell.id for cell in left.cells], [cell.id for cell in right.cells])
+                self.assertEqual({cell.kind for cell in left.cells}, expected_kinds)
+                self.assertTrue(all(cell.slot for cell in left.cells))
+                self.assertTrue(all(cell.center is not None for cell in left.cells))
+                self.assertTrue(all(cell.vertices is not None for cell in left.cells))
+                for cell in left.cells:
+                    self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
+                    for neighbor_id in cell.neighbors:
+                        assert neighbor_id is not None
+                        self.assertIn(cell.id, left.get_cell(neighbor_id).neighbors)
 
     def test_snub_square_unit_cell_has_expected_triangle_square_mix(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 1, 1)

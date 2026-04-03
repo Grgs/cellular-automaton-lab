@@ -235,6 +235,43 @@ class ApiStateAndRulesTests(ApiTestCase):
                 self.assertTrue(all('slot' in cell for cell in topology['cells']))
                 self.assertEqual({cell['kind'] for cell in topology['cells']}, expected_kinds)
 
+    def test_new_periodic_mixed_geometries_reset_with_generic_default_rule_and_slots(self) -> None:
+        cases = [
+            ('rhombille', {'rhombus'}, 3),
+            ('tetrakis-square', {'triangle'}, 3),
+            ('triakis-triangular', {'triangle'}, 1),
+            ('deltoidal-trihexagonal', {'kite'}, 1),
+            ('prismatic-pentagonal', {'pentagon'}, 1),
+            ('floret-pentagonal', {'pentagon'}, 1),
+            ('snub-square-dual', {'pentagon'}, 1),
+        ]
+
+        for geometry, expected_kinds, expected_dimension in cases:
+            with self.subTest(geometry=geometry):
+                reset = self.client.post('/api/control/reset', json={
+                    'topology_spec': {
+                        'tiling_family': geometry,
+                        'adjacency_mode': 'edge',
+                        'width': 1,
+                        'height': 1,
+                        'patch_depth': 0,
+                    },
+                    'speed': 6,
+                    'randomize': False,
+                })
+                self.assertEqual(reset.status_code, 200)
+                state = reset.get_json()
+                topology = self.get_topology()
+
+                self.assertEqual(state['topology_spec']['tiling_family'], geometry)
+                self.assertEqual(state['rule']['name'], 'life-b2-s23')
+                self.assertEqual(topology['topology_spec']['tiling_family'], geometry)
+                self.assertEqual(topology['topology_spec']['width'], expected_dimension)
+                self.assertEqual(topology['topology_spec']['height'], expected_dimension)
+                self.assertTrue(all(cell_state == 0 for cell_state in state['cell_states']))
+                self.assertTrue(all('slot' in cell for cell in topology['cells']))
+                self.assertEqual({cell['kind'] for cell in topology['cells']}, expected_kinds)
+
     def test_topology_endpoint_and_kagome_state_contract(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
