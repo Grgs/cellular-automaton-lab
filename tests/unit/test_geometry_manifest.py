@@ -114,7 +114,11 @@ class GeometryManifestTests(unittest.TestCase):
         )
         self.assertEqual(
             described[TAYLOR_SOCOLAR_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 3, "min": 0, "max": 3},
+            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
+        )
+        self.assertEqual(
+            described[SPHINX_GEOMETRY]["sizing_policy"],
+            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
         )
         self.assertEqual(described[SPECTRE_GEOMETRY]["render_kind"], "polygon_aperiodic")
         self.assertEqual(described[ARCHIMEDEAN_33336_GEOMETRY]["render_kind"], "polygon_periodic")

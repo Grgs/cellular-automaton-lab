@@ -16,7 +16,7 @@ const TAYLOR_SOCOLAR_TOPOLOGY: BootstrappedTopologyDefinition = {
     default_adjacency_mode: "edge",
     default_rules: { edge: "life-b2-s23" },
     geometry_keys: { edge: "taylor-socolar" },
-    sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 3 },
+    sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 5 },
 };
 
 const PERIODIC_MIXED_GEOMETRIES = [

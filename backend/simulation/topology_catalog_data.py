@@ -69,8 +69,8 @@ TOPOLOGY_SIZING_POLICIES = {
     PENROSE_P2_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
     AMMANN_BEENKER_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 4),
     SPECTRE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
-    TAYLOR_SOCOLAR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
-    SPHINX_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
+    TAYLOR_SOCOLAR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+    SPHINX_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
 }
 
 TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (

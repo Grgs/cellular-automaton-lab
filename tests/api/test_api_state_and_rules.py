@@ -451,7 +451,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertGreater(len(topology['cells']), 500)
         self.assertTrue(all(cell['kind'] == 'spectre' for cell in topology['cells']))
 
-    def test_taylor_socolar_patch_depth_uses_generic_rule_and_caps_at_three(self) -> None:
+    def test_taylor_socolar_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'taylor-socolar',
@@ -467,14 +467,14 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'taylor-socolar')
-        self.assertEqual(state['topology_spec']['patch_depth'], 3)
+        self.assertEqual(state['topology_spec']['patch_depth'], 5)
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 100)
         self.assertTrue(all(cell['kind'] == 'taylor-half-hex' for cell in topology['cells']))
 
-    def test_sphinx_patch_depth_uses_generic_rule_and_caps_at_three(self) -> None:
+    def test_sphinx_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'sphinx',
@@ -490,7 +490,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'sphinx')
-        self.assertEqual(state['topology_spec']['patch_depth'], 3)
+        self.assertEqual(state['topology_spec']['patch_depth'], 5)
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
