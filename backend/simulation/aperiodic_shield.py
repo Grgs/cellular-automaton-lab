@@ -1,131 +1,209 @@
 from __future__ import annotations
 
-from backend.simulation.aperiodic_support import (
-    AperiodicPatch,
-    PatchRecord,
-    Vec,
-    patch_from_records,
-    polygon_centroid,
-    rounded_point,
-)
+import math
+
+from backend.simulation.aperiodic_support import AperiodicPatch, AperiodicPatchCell, patch_from_cells
 
 
-def _centroid(vertices: tuple[tuple[float, float], ...]) -> tuple[float, float]:
-    return rounded_point(polygon_centroid(tuple(Vec(x, y) for x, y in vertices)))
+_RING_STEP = 3.2
 
 
-def _square_record(x: int, y: int) -> PatchRecord:
-    vertices = (
-        (float(x - 1), float(y) + 0.5),
-        (float(x), float(y) + 0.5),
-        (float(x), float(y) + 1.5),
-        (float(x - 1), float(y) + 1.5),
+def _rotate(point: tuple[float, float], angle: float) -> tuple[float, float]:
+    cosine = math.cos(angle)
+    sine = math.sin(angle)
+    x_value, y_value = point
+    return (
+        (x_value * cosine) - (y_value * sine),
+        (x_value * sine) + (y_value * cosine),
     )
-    return {
-        "id": f"shield:square:{x}:{y}",
-        "kind": "shield-square",
-        "center": _centroid(vertices),
-        "vertices": tuple(rounded_point(vertex) for vertex in vertices),
-        "tile_family": "shield",
-    }
 
 
-def _right_square_record(x: int, y: int) -> PatchRecord:
-    vertices = (
-        (float(x + 1), float(y) + 0.5),
-        (float(x + 2), float(y) + 0.5),
-        (float(x + 2), float(y) + 1.5),
-        (float(x + 1), float(y) + 1.5),
-    )
-    return {
-        "id": f"shield:outer-square:{x}:{y}",
-        "kind": "shield-square",
-        "center": _centroid(vertices),
-        "vertices": tuple(rounded_point(vertex) for vertex in vertices),
-        "tile_family": "shield",
-    }
-
-
-def _triangle_record(
+def _transform(
+    vertices: tuple[tuple[float, float], ...],
     *,
-    block_x: int,
-    block_y: int,
-    index: int,
-    vertices: tuple[tuple[float, float], tuple[float, float], tuple[float, float]],
-) -> PatchRecord:
-    return {
-        "id": f"shield:triangle:{block_x}:{block_y}:{index}",
-        "kind": "shield-triangle",
-        "center": _centroid(vertices),
-        "vertices": tuple(rounded_point(vertex) for vertex in vertices),
-        "tile_family": "shield",
-        "decoration_tokens": ("corner",),
-        "chirality_token": "left" if index % 2 == 0 else "right",
-    }
-
-
-def _shield_record(block_x: int, block_y: int) -> PatchRecord:
-    x = float(block_x)
-    y = float(block_y)
-    vertices = (
-        (x, y + 0.5),
-        (x + 0.5, y),
-        (x + 1.0, y + 0.5),
-        (x + 1.0, y + 1.5),
-        (x + 0.5, y + 2.0),
-        (x, y + 1.5),
+    angle: float,
+    center: tuple[float, float],
+) -> tuple[tuple[float, float], ...]:
+    cx, cy = center
+    return tuple(
+        (
+            round(rotated[0] + cx, 6),
+            round(rotated[1] + cy, 6),
+        )
+        for rotated in (_rotate(vertex, angle) for vertex in vertices)
     )
-    return {
-        "id": f"shield:shield:{block_x}:{block_y}",
-        "kind": "shield-shield",
-        "center": _centroid(vertices),
-        "vertices": tuple(rounded_point(vertex) for vertex in vertices),
-        "tile_family": "shield",
-        "decoration_tokens": ("arrow-ring", "cross"),
-        "orientation_token": "vertical",
-    }
+
+
+def _center(vertices: tuple[tuple[float, float], ...]) -> tuple[float, float]:
+    return (
+        round(sum(vertex[0] for vertex in vertices) / len(vertices), 6),
+        round(sum(vertex[1] for vertex in vertices) / len(vertices), 6),
+    )
+
+
+def _cell(
+    cell_id: str,
+    kind: str,
+    vertices: tuple[tuple[float, float], ...],
+    *,
+    neighbors: tuple[str, ...],
+    orientation_token: str | None = None,
+    chirality_token: str | None = None,
+    decoration_tokens: tuple[str, ...] | None = None,
+) -> AperiodicPatchCell:
+    return AperiodicPatchCell(
+        id=cell_id,
+        kind=kind,
+        center=_center(vertices),
+        vertices=vertices,
+        neighbors=neighbors,
+        tile_family="shield",
+        orientation_token=orientation_token,
+        chirality_token=chirality_token,
+        decoration_tokens=decoration_tokens,
+    )
 
 
 def build_shield_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    rows = max(1, 2 ** resolved_depth)
-    records: list[PatchRecord] = []
-    for block_y in range(rows):
-        x = 0
-        y = block_y * 2
-        records.append(_shield_record(x, y))
-        records.append(_square_record(x, y))
-        records.append(_right_square_record(x, y))
-        records.append(
-            _triangle_record(
-                block_x=x,
-                block_y=y,
-                index=0,
-                vertices=((x, y), (x + 0.5, y), (x, y + 0.5)),
+    rings = 1 + (resolved_depth * 2)
+    sector_count = 12
+    cells_by_id: dict[str, AperiodicPatchCell] = {}
+
+    shield_polygon = (
+        (-0.5, -1.0),
+        (0.0, -1.5),
+        (0.5, -1.0),
+        (0.5, 1.0),
+        (0.0, 1.5),
+        (-0.5, 1.0),
+    )
+    square_left = (
+        (-1.5, -0.5),
+        (-0.5, -0.5),
+        (-0.5, 0.5),
+        (-1.5, 0.5),
+    )
+    square_right = (
+        (0.5, -0.5),
+        (1.5, -0.5),
+        (1.5, 0.5),
+        (0.5, 0.5),
+    )
+    triangle_top_left = (
+        (-0.5, -1.0),
+        (0.0, -1.5),
+        (-1.0, -1.5),
+    )
+    triangle_top_right = (
+        (0.0, -1.5),
+        (0.5, -1.0),
+        (1.0, -1.5),
+    )
+    triangle_bottom_left = (
+        (-1.0, 1.5),
+        (0.0, 1.5),
+        (-0.5, 1.0),
+    )
+    triangle_bottom_right = (
+        (0.0, 1.5),
+        (1.0, 1.5),
+        (0.5, 1.0),
+    )
+
+    for ring in range(rings):
+        radius = ring * _RING_STEP
+        sectors = 1 if ring == 0 else sector_count
+        for sector in range(sectors):
+            angle = 0.0 if ring == 0 else sector * (math.pi / 6)
+            if ring > 0:
+                angle += (ring % 2) * (math.pi / 12)
+            center = (radius * math.cos(angle), radius * math.sin(angle))
+            orientation_token = str(int(round(math.degrees(angle))) % 360)
+
+            shield_id = f"shield:shield:{ring}:{sector}"
+            left_square_id = f"shield:square:{ring}:{sector}:left"
+            right_square_id = f"shield:square:{ring}:{sector}:right"
+            triangle_ids = (
+                f"shield:triangle:{ring}:{sector}:top-left",
+                f"shield:triangle:{ring}:{sector}:top-right",
+                f"shield:triangle:{ring}:{sector}:bottom-left",
+                f"shield:triangle:{ring}:{sector}:bottom-right",
+            )
+
+            cells_by_id[shield_id] = _cell(
+                shield_id,
+                "shield-shield",
+                _transform(shield_polygon, angle=angle, center=center),
+                neighbors=(left_square_id, right_square_id, *triangle_ids),
+                orientation_token=orientation_token,
+                decoration_tokens=("arrow-ring", "cross"),
+            )
+            cells_by_id[left_square_id] = _cell(
+                left_square_id,
+                "shield-square",
+                _transform(square_left, angle=angle, center=center),
+                neighbors=(shield_id,),
+                orientation_token=orientation_token,
+            )
+            cells_by_id[right_square_id] = _cell(
+                right_square_id,
+                "shield-square",
+                _transform(square_right, angle=angle, center=center),
+                neighbors=(shield_id,),
+                orientation_token=orientation_token,
+            )
+
+            triangles = (
+                (triangle_ids[0], triangle_top_left, "left"),
+                (triangle_ids[1], triangle_top_right, "right"),
+                (triangle_ids[2], triangle_bottom_left, "left"),
+                (triangle_ids[3], triangle_bottom_right, "right"),
+            )
+            for triangle_id, polygon, chirality_token in triangles:
+                cells_by_id[triangle_id] = _cell(
+                    triangle_id,
+                    "shield-triangle",
+                    _transform(polygon, angle=angle, center=center),
+                    neighbors=(shield_id,),
+                    orientation_token=orientation_token,
+                    chirality_token=chirality_token,
+                    decoration_tokens=("cross-arm",),
+                )
+
+    resolved_cells: list[AperiodicPatchCell] = []
+    for cell_id, cell in sorted(cells_by_id.items()):
+        neighbors = set(cell.neighbors)
+        parts = cell_id.split(":")
+        ring = int(parts[2])
+        sector = int(parts[3])
+        if parts[1] == "shield":
+            sectors = 1 if ring == 0 else sector_count
+            if ring > 0:
+                neighbors.add(f"shield:shield:{ring}:{(sector - 1) % sectors}")
+                neighbors.add(f"shield:shield:{ring}:{(sector + 1) % sectors}")
+                if ring > 0:
+                    parent_sectors = 1 if ring - 1 == 0 else sector_count
+                    neighbors.add(f"shield:shield:{ring - 1}:{sector % parent_sectors}")
+                if ring + 1 < rings:
+                    child_sectors = 1 if ring + 1 == 0 else sector_count
+                    neighbors.add(f"shield:shield:{ring + 1}:{sector % child_sectors}")
+            elif rings > 1:
+                for sector_index in range(sector_count):
+                    neighbors.add(f"shield:shield:1:{sector_index}")
+
+        resolved_cells.append(
+            AperiodicPatchCell(
+                id=cell.id,
+                kind=cell.kind,
+                center=cell.center,
+                vertices=cell.vertices,
+                neighbors=tuple(sorted(neighbor for neighbor in neighbors if neighbor in cells_by_id)),
+                tile_family=cell.tile_family,
+                orientation_token=cell.orientation_token,
+                chirality_token=cell.chirality_token,
+                decoration_tokens=cell.decoration_tokens,
             )
         )
-        records.append(
-            _triangle_record(
-                block_x=x,
-                block_y=y,
-                index=1,
-                vertices=((x + 0.5, y), (x + 1, y), (x + 1, y + 0.5)),
-            )
-        )
-        records.append(
-            _triangle_record(
-                block_x=x,
-                block_y=y,
-                index=2,
-                vertices=((x, y + 1.5), (x + 0.5, y + 2), (x, y + 2)),
-            )
-        )
-        records.append(
-            _triangle_record(
-                block_x=x,
-                block_y=y,
-                index=3,
-                vertices=((x + 1, y + 1.5), (x + 1, y + 2), (x + 0.5, y + 2)),
-            )
-        )
-    return patch_from_records(resolved_depth, records)
+
+    return patch_from_cells(resolved_depth, resolved_cells)

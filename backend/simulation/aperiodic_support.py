@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Iterable, NotRequired, TypedDict
 
 
@@ -60,6 +61,16 @@ class PatchRecord(TypedDict):
     decoration_tokens: NotRequired[tuple[str, ...] | None]
 
 
+class ExactPatchRecord(TypedDict):
+    id: str
+    kind: str
+    vertices: tuple[tuple[Fraction, Fraction], ...]
+    tile_family: NotRequired[str | None]
+    orientation_token: NotRequired[str | None]
+    chirality_token: NotRequired[str | None]
+    decoration_tokens: NotRequired[tuple[str, ...] | None]
+
+
 def rounded_point(point: Vec | tuple[float, float]) -> tuple[float, float]:
     x_value, y_value = point if isinstance(point, tuple) else (point.x, point.y)
     return (
@@ -71,7 +82,24 @@ def rounded_point(point: Vec | tuple[float, float]) -> tuple[float, float]:
 def canonical_edge(
     point_a: tuple[float, float],
     point_b: tuple[float, float],
+    *,
+    precision: int = COORDINATE_PRECISION,
 ) -> tuple[tuple[float, float], tuple[float, float]]:
+    left = (
+        round(float(point_a[0]), precision),
+        round(float(point_a[1]), precision),
+    )
+    right = (
+        round(float(point_b[0]), precision),
+        round(float(point_b[1]), precision),
+    )
+    return (left, right) if left <= right else (right, left)
+
+
+def exact_canonical_edge(
+    point_a: tuple[Fraction, Fraction],
+    point_b: tuple[Fraction, Fraction],
+) -> tuple[tuple[Fraction, Fraction], tuple[Fraction, Fraction]]:
     return (point_a, point_b) if point_a <= point_b else (point_b, point_a)
 
 
@@ -130,6 +158,20 @@ def affine_apply(transform: Affine, point: Vec) -> Vec:
     )
 
 
+def affine_inverse(transform: Affine) -> Affine:
+    determinant = (transform[0] * transform[4]) - (transform[1] * transform[3])
+    if math.isclose(determinant, 0.0):
+        raise ValueError("Cannot invert singular affine transform.")
+    inverse_determinant = 1.0 / determinant
+    a = transform[4] * inverse_determinant
+    b = -transform[1] * inverse_determinant
+    d = -transform[3] * inverse_determinant
+    e = transform[0] * inverse_determinant
+    c = -((a * transform[2]) + (b * transform[5]))
+    f = -((d * transform[2]) + (e * transform[5]))
+    return (a, b, c, d, e, f)
+
+
 def translation(tx: float, ty: float) -> Affine:
     return (1.0, 0.0, float(tx), 0.0, 1.0, float(ty))
 
@@ -156,14 +198,18 @@ def id_from_transform(prefix: str, transform: Affine) -> str:
     return prefix + ":" + ":".join(encode_float(value) for value in transform)
 
 
-def build_edge_neighbors(records: list[PatchRecord]) -> dict[str, tuple[str, ...]]:
+def build_edge_neighbors(
+    records: list[PatchRecord],
+    *,
+    edge_precision: int = COORDINATE_PRECISION,
+) -> dict[str, tuple[str, ...]]:
     edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = defaultdict(list)
     for record in records:
         cell_id = record["id"]
         vertices = record["vertices"]
         for index, left in enumerate(vertices):
             right = vertices[(index + 1) % len(vertices)]
-            edge_map[canonical_edge(left, right)].append(cell_id)
+            edge_map[canonical_edge(left, right, precision=edge_precision)].append(cell_id)
     neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
     for owners in edge_map.values():
         unique_owners = tuple(sorted(set(owners)))
@@ -178,8 +224,13 @@ def build_edge_neighbors(records: list[PatchRecord]) -> dict[str, tuple[str, ...
     }
 
 
-def patch_from_records(patch_depth: int, records: list[PatchRecord]) -> AperiodicPatch:
-    neighbors_by_id = build_edge_neighbors(records)
+def patch_from_records(
+    patch_depth: int,
+    records: list[PatchRecord],
+    *,
+    edge_precision: int = COORDINATE_PRECISION,
+) -> AperiodicPatch:
+    neighbors_by_id = build_edge_neighbors(records, edge_precision=edge_precision)
     cells = tuple(
         AperiodicPatchCell(
             id=record["id"],
@@ -201,4 +252,89 @@ def patch_from_records(patch_depth: int, records: list[PatchRecord]) -> Aperiodi
         width=compatibility_extent(all_x),
         height=compatibility_extent(all_y),
         cells=cells,
+    )
+
+
+def patch_from_exact_records(
+    patch_depth: int,
+    records: list[ExactPatchRecord],
+) -> AperiodicPatch:
+    edge_map: dict[
+        tuple[tuple[Fraction, Fraction], tuple[Fraction, Fraction]],
+        list[str],
+    ] = defaultdict(list)
+    for record in records:
+        cell_id = record["id"]
+        vertices = record["vertices"]
+        for index, left in enumerate(vertices):
+            right = vertices[(index + 1) % len(vertices)]
+            edge_map[exact_canonical_edge(left, right)].append(cell_id)
+
+    neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
+    for owners in edge_map.values():
+        unique_owners = tuple(sorted(set(owners)))
+        if len(unique_owners) != 2:
+            continue
+        neighbor_left, neighbor_right = unique_owners
+        neighbor_sets[neighbor_left].add(neighbor_right)
+        neighbor_sets[neighbor_right].add(neighbor_left)
+
+    float_records: list[PatchRecord] = []
+    for record in records:
+        float_vertices = tuple(
+            rounded_point((float(vertex[0]), float(vertex[1])))
+            for vertex in record["vertices"]
+        )
+        centroid = polygon_centroid(
+            tuple(Vec(vertex[0], vertex[1]) for vertex in float_vertices)
+        )
+        float_records.append(
+            {
+                "id": record["id"],
+                "kind": record["kind"],
+                "center": rounded_point(centroid),
+                "vertices": float_vertices,
+                "tile_family": record.get("tile_family"),
+                "orientation_token": record.get("orientation_token"),
+                "chirality_token": record.get("chirality_token"),
+                "decoration_tokens": record.get("decoration_tokens"),
+            }
+        )
+
+    cells = tuple(
+        AperiodicPatchCell(
+            id=record["id"],
+            kind=record["kind"],
+            center=record["center"],
+            vertices=record["vertices"],
+            neighbors=tuple(sorted(neighbor_sets[record["id"]])),
+            tile_family=record.get("tile_family"),
+            orientation_token=record.get("orientation_token"),
+            chirality_token=record.get("chirality_token"),
+            decoration_tokens=record.get("decoration_tokens"),
+        )
+        for record in sorted(float_records, key=lambda item: item["id"])
+    )
+    all_x = [vertex[0] for cell in cells for vertex in cell.vertices]
+    all_y = [vertex[1] for cell in cells for vertex in cell.vertices]
+    return AperiodicPatch(
+        patch_depth=int(patch_depth),
+        width=compatibility_extent(all_x),
+        height=compatibility_extent(all_y),
+        cells=cells,
+    )
+
+
+def patch_from_cells(
+    patch_depth: int,
+    cells: Iterable[AperiodicPatchCell],
+) -> AperiodicPatch:
+    resolved_cells = tuple(cells)
+    all_x = [vertex[0] for cell in resolved_cells for vertex in cell.vertices]
+    all_y = [vertex[1] for cell in resolved_cells for vertex in cell.vertices]
+    return AperiodicPatch(
+        patch_depth=int(patch_depth),
+        width=compatibility_extent(all_x),
+        height=compatibility_extent(all_y),
+        cells=resolved_cells,
     )

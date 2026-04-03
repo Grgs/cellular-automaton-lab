@@ -167,6 +167,7 @@ class TopologyValidationTests(unittest.TestCase):
                 "check_surface": True,
                 "check_overlaps": True,
                 "check_edge_multiplicity": True,
+                "check_graph_connectivity": True,
             },
         )
 

@@ -1,82 +1,122 @@
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 
 from backend.simulation.aperiodic_support import (
-    Affine,
     AperiodicPatch,
-    PatchRecord,
-    Vec,
-    affine_apply,
-    affine_multiply,
-    id_from_transform,
-    patch_from_records,
-    polygon_centroid,
-    rounded_point,
+    ExactPatchRecord,
+    patch_from_exact_records,
 )
 
 
-_BASE_TRIANGLE = (
-    Vec(0.0, 0.0),
-    Vec(2.0, 0.0),
-    Vec(2.0, 1.0),
+ExactPoint = tuple[Fraction, Fraction]
+ExactTriangle = tuple[ExactPoint, ExactPoint, ExactPoint]
+
+_ZERO = Fraction(0, 1)
+_ONE = Fraction(1, 1)
+_TWO = Fraction(2, 1)
+_THREE = Fraction(3, 1)
+_FOUR = Fraction(4, 1)
+_FIVE = Fraction(5, 1)
+
+_BASE_TRIANGLE: ExactTriangle = (
+    (_ZERO, _ZERO),
+    (_TWO, _ZERO),
+    (_TWO, _ONE),
+)
+_PINWHEEL_CHILDREN: tuple[ExactTriangle, ...] = (
+    ((_ZERO, _ZERO), (Fraction(4, 5), Fraction(2, 5)), (_ONE, _ZERO)),
+    ((Fraction(4, 5), Fraction(2, 5)), (_ONE, _ZERO), (Fraction(8, 5), Fraction(4, 5))),
+    ((_ONE, _ZERO), (Fraction(8, 5), Fraction(4, 5)), (Fraction(9, 5), Fraction(2, 5))),
+    ((_ONE, _ZERO), (Fraction(9, 5), Fraction(2, 5)), (_TWO, _ZERO)),
+    ((Fraction(8, 5), Fraction(4, 5)), (_TWO, _ZERO), (_TWO, _ONE)),
+)
+_ROOT_TRIANGLES: tuple[ExactTriangle, ...] = (
+    _BASE_TRIANGLE,
+    (
+        (_ZERO, _ZERO),
+        (_ZERO, _ONE),
+        (_TWO, _ONE),
+    ),
 )
 
 
-def _reflection_across_edge(left: Vec, right: Vec) -> Affine:
-    dx = right.x - left.x
-    dy = right.y - left.y
-    length_squared = (dx * dx) + (dy * dy)
-    a = ((dx * dx) - (dy * dy)) / length_squared
-    b = (2.0 * dx * dy) / length_squared
-    d = b
-    e = ((dy * dy) - (dx * dx)) / length_squared
-    c = left.x - (a * left.x) - (b * left.y)
-    f = left.y - (d * left.x) - (e * left.y)
-    return (a, b, c, d, e, f)
-
-
-_EDGE_REFLECTIONS = (
-    _reflection_across_edge(_BASE_TRIANGLE[0], _BASE_TRIANGLE[1]),
-    _reflection_across_edge(_BASE_TRIANGLE[1], _BASE_TRIANGLE[2]),
-    _reflection_across_edge(_BASE_TRIANGLE[2], _BASE_TRIANGLE[0]),
-)
-
-_PINWHEEL_SEQUENCE = (0, 1, 2)
-
-
-def _orientation_token(transform: Affine) -> str:
-    angle = math.degrees(math.atan2(transform[3], transform[0]))
+def _orientation_token(vertices: ExactTriangle) -> str:
+    edges: list[tuple[Fraction, ExactPoint, ExactPoint]] = []
+    for index, start in enumerate(vertices):
+        end = vertices[(index + 1) % len(vertices)]
+        dx = end[0] - start[0]
+        dy = end[1] - start[1]
+        edges.append((dx * dx + dy * dy, start, end))
+    _, start, end = max(edges, key=lambda item: item[0])
+    angle = math.degrees(
+        math.atan2(float(end[1] - start[1]), float(end[0] - start[0]))
+    )
     return str(int(round(angle)) % 360)
 
 
-def _chirality_token(transform: Affine) -> str:
-    determinant = (transform[0] * transform[4]) - (transform[1] * transform[3])
-    return "left" if determinant >= 0 else "right"
+def _chirality_token(vertices: ExactTriangle) -> str:
+    (ax, ay), (bx, by), (cx, cy) = vertices
+    area_twice = ((bx - ax) * (cy - ay)) - ((cx - ax) * (by - ay))
+    return "left" if area_twice >= 0 else "right"
 
 
-def _triangle_record(index: int, transform: Affine) -> PatchRecord:
-    vertices = tuple(affine_apply(transform, vertex) for vertex in _BASE_TRIANGLE)
+def _map_local(parent: ExactTriangle, point: ExactPoint) -> ExactPoint:
+    (ax, ay), (bx, by), (cx, cy) = parent
+    x_value, y_value = point
+    delta_x = bx - ax
+    delta_y = by - ay
+    return (
+        ax + (delta_x * x_value / _TWO) + ((cx - bx) * y_value),
+        ay + (delta_y * x_value / _TWO) + ((cy - by) * y_value),
+    )
+
+
+def _subdivide(parent: ExactTriangle) -> tuple[ExactTriangle, ...]:
+    return tuple(
+        (
+            _map_local(parent, child[0]),
+            _map_local(parent, child[1]),
+            _map_local(parent, child[2]),
+        )
+        for child in _PINWHEEL_CHILDREN
+    )
+
+
+def _pinwheel_record(path: str, vertices: ExactTriangle) -> ExactPatchRecord:
     return {
-        "id": f"{index}:{id_from_transform('pinwheel', transform)}",
+        "id": f"pinwheel:{path}",
         "kind": "pinwheel-triangle",
-        "center": rounded_point(polygon_centroid(vertices)),
-        "vertices": tuple(rounded_point(vertex) for vertex in vertices),
+        "vertices": vertices,
         "tile_family": "pinwheel",
-        "orientation_token": _orientation_token(transform),
-        "chirality_token": _chirality_token(transform),
+        "orientation_token": _orientation_token(vertices),
+        "chirality_token": _chirality_token(vertices),
     }
+
+
+def _collect_records(
+    vertices: ExactTriangle,
+    remaining_depth: int,
+    path: str,
+    records: list[ExactPatchRecord],
+) -> None:
+    if remaining_depth <= 0:
+        records.append(_pinwheel_record(path, vertices))
+        return
+    for index, child in enumerate(_subdivide(vertices)):
+        _collect_records(child, remaining_depth - 1, f"{path}.{index}", records)
 
 
 def build_pinwheel_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    triangle_count = max(1, 2 ** resolved_depth)
-    records: list[PatchRecord] = []
-    current_transform: Affine = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
-    for index in range(triangle_count):
-        records.append(_triangle_record(index, current_transform))
-        current_transform = affine_multiply(
-            current_transform,
-            _EDGE_REFLECTIONS[_PINWHEEL_SEQUENCE[index % len(_PINWHEEL_SEQUENCE)]],
-        )
-    return patch_from_records(resolved_depth, records)
+    records: list[ExactPatchRecord] = []
+    for index, root in enumerate(_ROOT_TRIANGLES):
+        _collect_records(root, resolved_depth, f"root{index}", records)
+    patch = patch_from_exact_records(resolved_depth, records)
+    return AperiodicPatch(
+        patch_depth=patch.patch_depth,
+        width=max(3, patch.width),
+        height=max(3, patch.height),
+        cells=patch.cells,
+    )
