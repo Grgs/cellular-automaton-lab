@@ -120,6 +120,8 @@ Important model rules:
 
 The aperiodic patch path is split similarly. `backend/simulation/aperiodic_prototiles.py` remains the public entrypoint, while shared affine/polygon helpers live in `backend/simulation/aperiodic_support.py`, reusable substitution expansion lives in `backend/simulation/aperiodic_substitution.py`, registry dispatch lives in `backend/simulation/aperiodic_registry.py`, and family-specific builders live in focused modules for Penrose P2, Ammann-Beenker, Spectre, Taylor-Socolar, Sphinx, Hat, Tuebingen Triangle, Square-Triangle, Shield, and Pinwheel. Taylor-Socolar is implemented as the half-hex factor topology, not as a decorated hex-grid presentation. The substitution helper now carries structured node metadata such as tile family, orientation, chirality, variant, and decoration tokens so new aperiodic families can preserve builder-local state without changing the public API, and `aperiodic_support.py` also provides an exact-record path for dense-orientation families such as Pinwheel before final float serialization.
 
+Geometric validation and literature verification are now separate concerns. `backend/simulation/topology_validation.py` still answers “is this topology internally sane?”, while `backend/simulation/literature_reference_specs.py` and `backend/simulation/literature_reference_verification.py` encode source-backed substitution invariants, staged waivers, and exact-affine checks for families such as Pinwheel. This lets CI report mathematically meaningful deviations without pretending every newly added aperiodic family is already literature-faithful.
+
 ### Topology Catalog
 
 [backend/simulation/topology_catalog.py](../backend/simulation/topology_catalog.py) is now a public façade, not the home of all catalog data.

@@ -349,6 +349,10 @@ Browser UI
   Reusable substitution-recipe helper for recursive affine expansion, structured substitution nodes, metadata propagation, and deterministic leaf flattening.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
   Registry-backed dispatch for family-specific aperiodic builders and recipe styles.
+- [backend/simulation/literature_reference_specs.py](../backend/simulation/literature_reference_specs.py)
+  Source-backed reference specs for staged literature-faithfulness verification of selected aperiodic families.
+- [backend/simulation/literature_reference_verification.py](../backend/simulation/literature_reference_verification.py)
+  Verifier that compares generated aperiodic patches against paper-derived invariants, applies waiver-based staged gating, and checks the exact-affine Pinwheel path.
 - [backend/simulation/aperiodic_golden_triangles.py](../backend/simulation/aperiodic_golden_triangles.py)
   Shared golden-triangle geometry and metadata helpers for Robinson and Tuebingen families.
 - [backend/simulation/aperiodic_penrose_p2.py](../backend/simulation/aperiodic_penrose_p2.py)
@@ -398,6 +402,10 @@ Browser UI
 
 - [tools/build-standalone.mjs](../tools/build-standalone.mjs)
   Builds the static standalone site.
+- [tools/validate_tilings.py](../tools/validate_tilings.py)
+  Manifest-wide geometric sanity checker for catalog tilings. Prints a reminder to run the staged literature verifier for aperiodic families.
+- [tools/verify_reference_tilings.py](../tools/verify_reference_tilings.py)
+  Staged literature-faithfulness verifier for selected aperiodic families. Reports `PASS`, `KNOWN_DEVIATION`, or `FAIL` without changing the public app surface.
 - [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
   Writes the standalone wrapper into the transient build-input directory.
 - [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)

@@ -40,6 +40,8 @@ _ROOT_TRIANGLES: tuple[ExactTriangle, ...] = (
         (_TWO, _ONE),
     ),
 )
+REFERENCE_ROOT_SEED_POLICY = "paired-right-triangle-rectangle"
+USES_EXACT_REFERENCE_PATH = True
 
 
 def _orientation_token(vertices: ExactTriangle) -> str:
@@ -108,12 +110,20 @@ def _collect_records(
         _collect_records(child, remaining_depth - 1, f"{path}.{index}", records)
 
 
-def build_pinwheel_patch(patch_depth: int) -> AperiodicPatch:
+def collect_pinwheel_exact_records(patch_depth: int) -> tuple[ExactPatchRecord, ...]:
     resolved_depth = max(0, int(patch_depth))
     records: list[ExactPatchRecord] = []
     for index, root in enumerate(_ROOT_TRIANGLES):
         _collect_records(root, resolved_depth, f"root{index}", records)
-    patch = patch_from_exact_records(resolved_depth, records)
+    return tuple(records)
+
+
+def build_pinwheel_patch(patch_depth: int) -> AperiodicPatch:
+    resolved_depth = max(0, int(patch_depth))
+    patch = patch_from_exact_records(
+        resolved_depth,
+        list(collect_pinwheel_exact_records(resolved_depth)),
+    )
     return AperiodicPatch(
         patch_depth=patch.patch_depth,
         width=max(3, patch.width),
