@@ -83,10 +83,15 @@ def build_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
         (0.5, 0.5),
         (0.0, 0.5 + _SQRT3_OVER_2),
     )
-    triangle_down = (
-        (-0.5, -0.5),
-        (0.0, -0.5 - _SQRT3_OVER_2),
-        (0.5, -0.5),
+    triangle_left = (
+        (-1.0, 0.5 + _SQRT3_OVER_2),
+        (-0.5, 0.5),
+        (0.0, 0.5 + _SQRT3_OVER_2),
+    )
+    triangle_right = (
+        (0.0, 0.5 + _SQRT3_OVER_2),
+        (0.5, 0.5),
+        (1.0, 0.5 + _SQRT3_OVER_2),
     )
 
     for ring in range(rings):
@@ -118,30 +123,19 @@ def build_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
                     str,
                 ]
             ] = [
-                (f"sqtri:t:{ring}:{sector}:out", triangle_up, "out", "left"),
-                (f"sqtri:t:{ring}:{sector}:in", triangle_down, "in", "right"),
+                (f"sqtri:t:{ring}:{sector}:apex", triangle_up, "apex", "left"),
+                (f"sqtri:t:{ring}:{sector}:left", triangle_left, "left", "left"),
+                (f"sqtri:t:{ring}:{sector}:right", triangle_right, "right", "right"),
             ]
-            if (ring + sector) % 2 == 0:
-                triangle_specs.append(
-                    (
-                        f"sqtri:t:{ring}:{sector}:side",
-                        (
-                            (0.5, -0.5),
-                            (0.5 + _SQRT3_OVER_2, 0.0),
-                            (0.5, 0.5),
-                        ),
-                        "side",
-                        "left",
-                    )
-                )
 
             for triangle_id, local_vertices, orientation_token, chirality_token in triangle_specs:
+                triangle_neighbors = (square_id,) if orientation_token == "apex" else ()
                 cells_by_id[triangle_id] = _cell(
                     triangle_id,
                     _TRIANGLE_KIND,
                     _translate(local_vertices, angle=angle, center=center),
                     tile_family="square-triangle",
-                    neighbors=(square_id,),
+                    neighbors=triangle_neighbors,
                     orientation_token=orientation_token,
                     chirality_token=chirality_token,
                 )
@@ -155,23 +149,34 @@ def build_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
             ring = int(parts[2])
             sector = int(parts[3])
             sectors = 1 if ring == 0 else sector_count
-            neighbors.add(f"sqtri:t:{ring}:{sector}:out")
-            neighbors.add(f"sqtri:t:{ring}:{sector}:in")
-            if (ring + sector) % 2 == 0:
-                neighbors.add(f"sqtri:t:{ring}:{sector}:side")
+            neighbors.add(f"sqtri:t:{ring}:{sector}:apex")
             if ring > 0:
                 neighbors.add(f"sqtri:s:{ring}:{(sector - 1) % sectors}")
                 neighbors.add(f"sqtri:s:{ring}:{(sector + 1) % sectors}")
-                if ring > 0:
-                    parent_sectors = 1 if ring - 1 == 0 else sector_count
-                    neighbors.add(f"sqtri:s:{ring - 1}:{sector % parent_sectors}")
+                parent_sectors = 1 if ring - 1 == 0 else sector_count
+                neighbors.add(f"sqtri:s:{ring - 1}:{sector % parent_sectors}")
                 if ring + 1 < rings:
                     child_sectors = 1 if ring + 1 == 0 else sector_count
                     neighbors.add(f"sqtri:s:{ring + 1}:{sector % child_sectors}")
-            else:
-                if rings > 1:
-                    for sector_index in range(sector_count):
-                        neighbors.add(f"sqtri:s:1:{sector_index}")
+            elif rings > 1:
+                for sector_index in range(sector_count):
+                    neighbors.add(f"sqtri:s:1:{sector_index}")
+        elif parts[1] == "t":
+            ring = int(parts[2])
+            sector = int(parts[3])
+            variant = parts[4]
+            if variant == "apex":
+                neighbors.add(f"sqtri:s:{ring}:{sector}")
+                neighbors.add(f"sqtri:t:{ring}:{sector}:left")
+                neighbors.add(f"sqtri:t:{ring}:{sector}:right")
+            elif variant == "left":
+                neighbors.add(f"sqtri:t:{ring}:{sector}:apex")
+                if ring > 0:
+                    neighbors.add(f"sqtri:t:{ring}:{(sector - 1) % sector_count}:right")
+            elif variant == "right":
+                neighbors.add(f"sqtri:t:{ring}:{sector}:apex")
+                if ring > 0:
+                    neighbors.add(f"sqtri:t:{ring}:{(sector + 1) % sector_count}:left")
 
         resolved_cells.append(
             AperiodicPatchCell(

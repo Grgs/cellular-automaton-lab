@@ -4,6 +4,7 @@ import math
 from collections import deque
 
 from backend.simulation.aperiodic_support import (
+    AFFINE_REFLECT_X,
     Affine,
     AperiodicPatch,
     PatchRecord,
@@ -15,6 +16,7 @@ from backend.simulation.aperiodic_support import (
     polygon_centroid,
     rotation,
     rounded_point,
+    translation,
 )
 
 
@@ -53,6 +55,10 @@ _HAT_MOVES: tuple[Affine, ...] = (
     affine_multiply(rotation(-math.pi / 3), _HAT_ATTACHMENTS[1]),
 )
 _IDENTITY: Affine = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+_ROOT_SEEDS: tuple[Affine, ...] = (
+    _IDENTITY,
+    affine_multiply(translation(8.0, 0.0), AFFINE_REFLECT_X),
+)
 
 
 def _orientation_token(transform: Affine) -> str:
@@ -84,8 +90,12 @@ def _placement_key(transform: Affine) -> tuple[float, ...]:
 
 def build_hat_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    frontier: deque[tuple[Affine, int]] = deque([(_IDENTITY, 0)])
-    seen: dict[tuple[float, ...], Affine] = {_placement_key(_IDENTITY): _IDENTITY}
+    frontier: deque[tuple[Affine, int]] = deque(
+        (transform, 0) for transform in _ROOT_SEEDS
+    )
+    seen: dict[tuple[float, ...], Affine] = {
+        _placement_key(transform): transform for transform in _ROOT_SEEDS
+    }
 
     while frontier:
         transform, depth = frontier.popleft()
@@ -103,21 +113,4 @@ def build_hat_patch(patch_depth: int) -> AperiodicPatch:
         _hat_record(f"hat:{index}", transform)
         for index, transform in enumerate(seen.values())
     ]
-    patch = patch_from_records(resolved_depth, provisional_records)
-    if not patch.cells:
-        return patch
-
-    neighbors_by_id = {cell.id: tuple(cell.neighbors) for cell in patch.cells}
-    root_id = patch.cells[0].id
-    connected: set[str] = {root_id}
-    stack = [root_id]
-    while stack:
-        current = stack.pop()
-        for neighbor in neighbors_by_id[current]:
-            if neighbor in connected:
-                continue
-            connected.add(neighbor)
-            stack.append(neighbor)
-
-    records = [record for record in provisional_records if record["id"] in connected]
-    return patch_from_records(resolved_depth, records)
+    return patch_from_records(resolved_depth, provisional_records)

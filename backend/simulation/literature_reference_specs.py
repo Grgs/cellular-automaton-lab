@@ -43,6 +43,226 @@ class ReferenceFamilySpec:
 
 
 REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
+    "penrose-p3-rhombs": ReferenceFamilySpec(
+        geometry="penrose-p3-rhombs",
+        display_name="Penrose Rhombs",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",
+        ),
+        canonical_root_seed_policy="five thick-rhomb star seed",
+        allowed_public_cell_kinds=("thick-rhomb", "thin-rhomb"),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=5,
+                required_kinds=("thick-rhomb",),
+                required_adjacency_pairs=(("thick-rhomb", "thick-rhomb"),),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=10,
+                required_kinds=("thick-rhomb", "thin-rhomb"),
+                required_adjacency_pairs=(
+                    ("thick-rhomb", "thick-rhomb"),
+                    ("thick-rhomb", "thin-rhomb"),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=24),
+            3: ReferenceDepthExpectation(exact_total_cells=66),
+        },
+    ),
+    "penrose-p3-rhombs-vertex": ReferenceFamilySpec(
+        geometry="penrose-p3-rhombs-vertex",
+        display_name="Penrose Rhombs (Vertex Adjacency)",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",
+        ),
+        canonical_root_seed_policy="five thick-rhomb star seed with vertex-neighbor topology",
+        allowed_public_cell_kinds=("thick-rhomb", "thin-rhomb"),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=5,
+                required_kinds=("thick-rhomb",),
+                required_adjacency_pairs=(("thick-rhomb", "thick-rhomb"),),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=10,
+                required_kinds=("thick-rhomb", "thin-rhomb"),
+                required_adjacency_pairs=(
+                    ("thick-rhomb", "thick-rhomb"),
+                    ("thick-rhomb", "thin-rhomb"),
+                    ("thin-rhomb", "thin-rhomb"),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=24),
+            3: ReferenceDepthExpectation(exact_total_cells=66),
+        },
+        notes=(
+            "This is the app's vertex-adjacency topology variant of the Penrose rhomb tiling.",
+        ),
+    ),
+    "penrose-p2-kite-dart": ReferenceFamilySpec(
+        geometry="penrose-p2-kite-dart",
+        display_name="Penrose Kite-Dart",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/",
+        ),
+        canonical_root_seed_policy="five-kite star seed",
+        allowed_public_cell_kinds=("kite", "dart"),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=5,
+                required_kinds=("kite",),
+                required_adjacency_pairs=(("kite", "kite"),),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=20,
+                required_kinds=("kite", "dart"),
+                required_adjacency_pairs=(
+                    ("dart", "dart"),
+                    ("dart", "kite"),
+                    ("kite", "kite"),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=70),
+            3: ReferenceDepthExpectation(exact_total_cells=240),
+        },
+    ),
+    "ammann-beenker": ReferenceFamilySpec(
+        geometry="ammann-beenker",
+        display_name="Ammann-Beenker",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/ammann-beenker/",
+        ),
+        canonical_root_seed_policy="eight-rhomb star seed",
+        allowed_public_cell_kinds=("rhomb", "square"),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=8,
+                required_kinds=("rhomb",),
+                required_adjacency_pairs=(("rhomb", "rhomb"),),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=24,
+                required_kinds=("rhomb", "square"),
+                required_adjacency_pairs=(
+                    ("rhomb", "rhomb"),
+                    ("rhomb", "square"),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=208),
+            3: ReferenceDepthExpectation(exact_total_cells=1304),
+        },
+    ),
+    "spectre": ReferenceFamilySpec(
+        geometry="spectre",
+        display_name="Spectre",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/spectre/",
+            "https://doi.org/10.5070/C64264241",
+        ),
+        canonical_root_seed_policy="delta supertile seed",
+        allowed_public_cell_kinds=("spectre",),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(exact_total_cells=1, required_kinds=("spectre",)),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=9,
+                required_adjacency_pairs=(("spectre", "spectre"),),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=71),
+            3: ReferenceDepthExpectation(exact_total_cells=559),
+        },
+    ),
+    "taylor-socolar": ReferenceFamilySpec(
+        geometry="taylor-socolar",
+        display_name="Taylor-Socolar",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/half-hex/",
+            "https://www.mdpi.com/2073-8994/5/1/1",
+        ),
+        canonical_root_seed_policy="paired half-hex seed",
+        allowed_public_cell_kinds=("taylor-half-hex",),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=2,
+                required_kinds=("taylor-half-hex",),
+                required_adjacency_pairs=(("taylor-half-hex", "taylor-half-hex"),),
+            ),
+            1: ReferenceDepthExpectation(exact_total_cells=8),
+            2: ReferenceDepthExpectation(exact_total_cells=32),
+            3: ReferenceDepthExpectation(exact_total_cells=128),
+        },
+    ),
+    "sphinx": ReferenceFamilySpec(
+        geometry="sphinx",
+        display_name="Sphinx",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/sphinx/",
+        ),
+        canonical_root_seed_policy="single sphinx rep-tile seed",
+        allowed_public_cell_kinds=("sphinx",),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(exact_total_cells=1, required_kinds=("sphinx",)),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=4,
+                required_adjacency_pairs=(("sphinx", "sphinx"),),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=16),
+            3: ReferenceDepthExpectation(exact_total_cells=64),
+        },
+    ),
+    "chair": ReferenceFamilySpec(
+        geometry="chair",
+        display_name="Chair",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/chair/",
+        ),
+        canonical_root_seed_policy="single chair rep-tile seed",
+        allowed_public_cell_kinds=("chair",),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(exact_total_cells=1, required_kinds=("chair",)),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=4,
+                required_adjacency_pairs=(("chair", "chair"),),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=16),
+            3: ReferenceDepthExpectation(exact_total_cells=64),
+        },
+    ),
+    "robinson-triangles": ReferenceFamilySpec(
+        geometry="robinson-triangles",
+        display_name="Robinson Triangles",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/",
+        ),
+        canonical_root_seed_policy="Penrose-derived Robinson triangle refinement",
+        allowed_public_cell_kinds=("robinson-thick", "robinson-thin"),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=10,
+                required_kinds=("robinson-thick",),
+                required_adjacency_pairs=(("robinson-thick", "robinson-thick"),),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=40,
+                required_kinds=("robinson-thick", "robinson-thin"),
+                required_adjacency_pairs=(
+                    ("robinson-thick", "robinson-thick"),
+                    ("robinson-thick", "robinson-thin"),
+                    ("robinson-thin", "robinson-thin"),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=140),
+            3: ReferenceDepthExpectation(exact_total_cells=480),
+        },
+    ),
     "hat-monotile": ReferenceFamilySpec(
         geometry="hat-monotile",
         display_name="Hat",
@@ -233,12 +453,4 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
 }
 
 
-STAGED_REFERENCE_WAIVERS = frozenset(
-    {
-        "hat-monotile",
-        "tuebingen-triangle",
-        "square-triangle",
-        "shield",
-        "pinwheel",
-    }
-)
+STAGED_REFERENCE_WAIVERS: frozenset[str] = frozenset()

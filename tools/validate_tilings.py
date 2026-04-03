@@ -64,7 +64,7 @@ def main() -> int:
         all_valid = False
         for line in result.summary_lines():
             print(line)
-    print("INFO staged literature verification: py -3 tools/verify_reference_tilings.py")
+    print("INFO literature verification: py -3 tools/verify_reference_tilings.py")
     return 0 if all_valid else 1
 
 

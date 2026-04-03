@@ -46,6 +46,8 @@ def triangle_record(
     kind: str,
     vertices: tuple[tuple[float, float], tuple[float, float], tuple[float, float]],
     tile_family: str,
+    orientation_token: str | None = None,
+    chirality_token: str | None = None,
 ) -> PatchRecord:
     rounded_vertices = [rounded_point(vertex) for vertex in vertices]
     triangle_vertices: tuple[
@@ -60,8 +62,16 @@ def triangle_record(
         "center": rounded_point(centroid),
         "vertices": triangle_vertices,
         "tile_family": tile_family,
-        "orientation_token": triangle_orientation_token(triangle_vertices),
-        "chirality_token": triangle_chirality(triangle_vertices),
+        "orientation_token": (
+            orientation_token
+            if orientation_token is not None
+            else triangle_orientation_token(triangle_vertices)
+        ),
+        "chirality_token": (
+            chirality_token
+            if chirality_token is not None
+            else triangle_chirality(triangle_vertices)
+        ),
     }
 
 
