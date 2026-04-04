@@ -18,10 +18,15 @@ def _print_result(result: ReferenceVerificationResult) -> None:
     waiver_suffix = " [waived]" if result.waived and result.status != "PASS" else ""
     print(f"{result.status} {result.geometry}{waiver_suffix}")
     for observation in result.observations:
+        sample_label = (
+            f"grid {observation.depth}x{observation.depth}"
+            if observation.sample_mode == "grid"
+            else f"depth {observation.depth}"
+        )
         print(
             "  "
             + (
-                f"depth {observation.depth}: cells={observation.total_cells} "
+                f"{sample_label}: cells={observation.total_cells} "
                 f"orientations={observation.unique_orientation_tokens} "
                 f"chirality={observation.unique_chirality_tokens} "
                 f"signature={observation.signature}"

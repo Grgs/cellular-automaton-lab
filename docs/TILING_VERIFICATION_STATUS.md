@@ -1,0 +1,24 @@
+# Tiling Verification Status
+
+This file tracks the current verification level for every tiling family in the app.
+
+Legend:
+
+- `Geometric sanity`: passes `py -3 tools/validate_tilings.py`
+- `Literature verification`: passes `py -3 tools/verify_reference_tilings.py`
+- `Strength`: how strong the current literature check is
+
+## Current Status
+
+| Group | Geometries | Geometric sanity | Literature verification | Strength | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Regular grids | `square`, `hex`, `triangle` | PASS | PASS | Sample-level exact | Verified on canonical open-boundary `3x3` samples with exact totals, adjacency pairs, degree histograms, and signatures. |
+| Classic aperiodic | `penrose-p3-rhombs`, `penrose-p3-rhombs-vertex`, `penrose-p2-kite-dart`, `ammann-beenker` | PASS | PASS | Patch-level exact | Verified by patch-depth counts, allowed kinds, adjacency invariants, and deterministic signatures. |
+| Newer substitution aperiodic | `spectre`, `taylor-socolar`, `sphinx`, `chair`, `robinson-triangles`, `tuebingen-triangle`, `hat-monotile`, `square-triangle`, `shield`, `pinwheel` | PASS | PASS | Mixed | Stronger than render checks; Pinwheel also verifies exact-affine records. Some families are still verified mainly by counts, metadata, adjacency, and signatures rather than full substitution-matrix proofs. |
+| Periodic mixed / periodic-face | `archimedean-4-8-8`, `archimedean-3-12-12`, `archimedean-3-4-6-4`, `archimedean-4-6-12`, `archimedean-3-3-4-3-4`, `archimedean-3-3-3-4-4`, `archimedean-3-3-3-3-6`, `trihexagonal-3-6-3-6`, `cairo-pentagonal`, `rhombille`, `deltoidal-hexagonal`, `tetrakis-square`, `triakis-triangular`, `deltoidal-trihexagonal`, `prismatic-pentagonal`, `floret-pentagonal`, `snub-square-dual` | PASS | PASS | Sample-level exact | Verified on canonical `3x3` samples with exact totals, kind counts, adjacency sets, deterministic signatures, and periodic-face descriptor consistency where applicable. |
+
+## Next Up
+
+- Upgrade periodic mixed verification from sample/signature checks to stronger source-backed structural invariants.
+- Replace generic fallback sources with stronger family-specific references where available.
+- Add richer canonical-patch fixtures for substitution families that currently rely mostly on signatures and count invariants.

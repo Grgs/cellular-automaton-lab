@@ -7,6 +7,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
+from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 from backend.simulation.literature_reference_verification import (
     observe_reference_patch,
     verify_all_reference_families,
@@ -16,27 +17,12 @@ from tools.verify_reference_tilings import main as verify_reference_main
 
 
 class LiteratureReferenceVerificationTests(unittest.TestCase):
-    def test_reference_specs_cover_selected_aperiodic_families(self) -> None:
+    def test_reference_specs_cover_full_catalog(self) -> None:
         self.assertEqual(
             set(REFERENCE_FAMILY_SPECS),
-            {
-                "ammann-beenker",
-                "chair",
-                "hat-monotile",
-                "penrose-p2-kite-dart",
-                "penrose-p3-rhombs",
-                "penrose-p3-rhombs-vertex",
-                "pinwheel",
-                "robinson-triangles",
-                "spectre",
-                "sphinx",
-                "square-triangle",
-                "taylor-socolar",
-                "tuebingen-triangle",
-                "shield",
-            },
+            {definition.geometry_key for definition in TOPOLOGY_VARIANTS},
         )
-        self.assertNotIn("square", REFERENCE_FAMILY_SPECS)
+        self.assertNotIn("not-a-geometry", REFERENCE_FAMILY_SPECS)
 
     def test_reference_patch_signatures_are_deterministic(self) -> None:
         first = observe_reference_patch("pinwheel", 3)
@@ -52,6 +38,13 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             for result in verify_all_reference_families()
         }
 
+        self.assertEqual(results["square"].status, "PASS")
+        self.assertEqual(results["hex"].status, "PASS")
+        self.assertEqual(results["triangle"].status, "PASS")
+        self.assertEqual(results["archimedean-4-8-8"].status, "PASS")
+        self.assertEqual(results["cairo-pentagonal"].status, "PASS")
+        self.assertEqual(results["deltoidal-hexagonal"].status, "PASS")
+        self.assertEqual(results["snub-square-dual"].status, "PASS")
         self.assertEqual(results["ammann-beenker"].status, "PASS")
         self.assertEqual(results["chair"].status, "PASS")
         self.assertEqual(results["hat-monotile"].status, "PASS")
@@ -68,6 +61,20 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["pinwheel"].status, "PASS")
         self.assertTrue(all(not result.waived for result in results.values()))
         self.assertTrue(all(not result.blocking for result in results.values()))
+
+    def test_regular_grid_reference_verifier_tracks_open_boundary_histogram(self) -> None:
+        result = verify_reference_family("square")
+
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
+        self.assertEqual(result.observations[0].degree_histogram, ((3, 4), (5, 4), (8, 1)))
+
+    def test_periodic_face_reference_verifier_checks_descriptor_family(self) -> None:
+        result = verify_reference_family("cairo-pentagonal")
+
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
+        self.assertEqual(result.observations[0].signature, "e33351b2ed77")
 
     def test_pinwheel_reference_verifier_uses_exact_path(self) -> None:
         result = verify_reference_family("pinwheel")

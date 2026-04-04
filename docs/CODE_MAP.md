@@ -350,9 +350,9 @@ Browser UI
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
   Registry-backed dispatch for family-specific aperiodic builders and recipe styles.
 - [backend/simulation/literature_reference_specs.py](../backend/simulation/literature_reference_specs.py)
-  Source-backed reference specs for literature-faithfulness verification of the covered aperiodic families.
+  Source-backed reference specs for literature-faithfulness verification of the full topology catalog.
 - [backend/simulation/literature_reference_verification.py](../backend/simulation/literature_reference_verification.py)
-  Verifier that compares generated aperiodic patches against paper-derived invariants, applies waiver-based gating, and checks the exact-affine Pinwheel path.
+  Verifier that compares canonical regular, periodic, and aperiodic topology samples against source-backed invariants, and checks the exact-affine Pinwheel path.
 - [backend/simulation/aperiodic_golden_triangles.py](../backend/simulation/aperiodic_golden_triangles.py)
   Shared golden-triangle geometry and metadata helpers for Robinson and Tuebingen families.
 - [backend/simulation/aperiodic_penrose_p2.py](../backend/simulation/aperiodic_penrose_p2.py)
@@ -403,9 +403,9 @@ Browser UI
 - [tools/build-standalone.mjs](../tools/build-standalone.mjs)
   Builds the static standalone site.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
-  Manifest-wide geometric sanity checker for catalog tilings. Prints a reminder to run the literature verifier for covered aperiodic families.
+  Manifest-wide geometric sanity checker for catalog tilings. Prints a reminder to run the literature verifier for the full catalog companion checks.
 - [tools/verify_reference_tilings.py](../tools/verify_reference_tilings.py)
-  Literature-faithfulness verifier for the covered aperiodic families. Reports `PASS`, `KNOWN_DEVIATION`, or `FAIL` without changing the public app surface.
+  Literature-faithfulness verifier for the full topology catalog. Reports `PASS`, `KNOWN_DEVIATION`, or `FAIL` without changing the public app surface.
 - [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
   Writes the standalone wrapper into the transient build-input directory.
 - [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)

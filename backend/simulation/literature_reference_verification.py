@@ -8,7 +8,7 @@ import json
 from typing import Literal
 
 from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
-from backend.simulation.aperiodic_support import AperiodicPatch, ExactPatchRecord
+from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.literature_reference_specs import (
     REFERENCE_FAMILY_SPECS,
     STAGED_REFERENCE_WAIVERS,
@@ -17,6 +17,12 @@ from backend.simulation.literature_reference_specs import (
     ReferenceDepthExpectation,
     ReferenceFamilySpec,
 )
+from backend.simulation.periodic_face_tilings import (
+    get_periodic_face_tiling_descriptor,
+    is_periodic_face_tiling,
+)
+from backend.simulation.topology import build_topology
+from backend.simulation.topology_types import LatticeCell, LatticeTopology
 
 
 VerificationStatus = Literal["PASS", "KNOWN_DEVIATION", "FAIL"]
@@ -32,9 +38,11 @@ class ReferenceCheckFailure:
 @dataclass(frozen=True)
 class ReferencePatchObservation:
     geometry: str
+    sample_mode: str
     depth: int
     total_cells: int
     kind_counts: tuple[tuple[str, int], ...]
+    degree_histogram: tuple[tuple[int, int], ...]
     unique_orientation_tokens: int
     unique_chirality_tokens: int
     adjacency_pairs: tuple[tuple[str, str], ...]
@@ -58,10 +66,10 @@ class ReferenceVerificationResult:
         return self.status != "FAIL"
 
 
-def _patch_adjacency_pairs(patch: AperiodicPatch) -> tuple[tuple[str, str], ...]:
-    by_id = {cell.id: cell for cell in patch.cells}
+def _topology_adjacency_pairs(topology: LatticeTopology) -> tuple[tuple[str, str], ...]:
+    by_id = {cell.id: cell for cell in topology.cells}
     pairs: set[tuple[str, str]] = set()
-    for cell in patch.cells:
+    for cell in topology.cells:
         for neighbor_id in cell.neighbors:
             if neighbor_id not in by_id:
                 continue
@@ -71,9 +79,9 @@ def _patch_adjacency_pairs(patch: AperiodicPatch) -> tuple[tuple[str, str], ...]
     return tuple(sorted(pairs))
 
 
-def _patch_bounds_aspect_ratio(patch: AperiodicPatch) -> float:
-    all_x = [vertex[0] for cell in patch.cells for vertex in cell.vertices]
-    all_y = [vertex[1] for cell in patch.cells for vertex in cell.vertices]
+def _cells_bounds_aspect_ratio(cells: tuple[LatticeCell, ...]) -> float:
+    all_x = [vertex[0] for cell in cells if cell.vertices is not None for vertex in cell.vertices]
+    all_y = [vertex[1] for cell in cells if cell.vertices is not None for vertex in cell.vertices]
     if not all_x or not all_y:
         return 0.0
     width = max(all_x) - min(all_x)
@@ -84,74 +92,104 @@ def _patch_bounds_aspect_ratio(patch: AperiodicPatch) -> float:
     return max(width, height) / shortest
 
 
-def _patch_signature_payload(geometry: str, patch: AperiodicPatch) -> dict[str, object]:
-    kind_counts = Counter(cell.kind for cell in patch.cells)
+def _topology_signature_payload(
+    geometry: str,
+    sample_mode: str,
+    sample_key: int,
+    topology: LatticeTopology,
+) -> dict[str, object]:
+    kind_counts = Counter(cell.kind for cell in topology.cells)
     orientation_counts = Counter(
         cell.orientation_token
-        for cell in patch.cells
+        for cell in topology.cells
         if cell.orientation_token is not None
     )
     chirality_counts = Counter(
         cell.chirality_token
-        for cell in patch.cells
+        for cell in topology.cells
         if cell.chirality_token is not None
     )
-    degree_histogram = Counter(len(cell.neighbors) for cell in patch.cells)
+    degree_histogram = Counter(
+        sum(1 for neighbor_id in cell.neighbors if neighbor_id is not None)
+        for cell in topology.cells
+    )
     return {
         "geometry": geometry,
-        "patch_depth": patch.patch_depth,
+        "sample_mode": sample_mode,
+        "sample_key": sample_key,
         "kind_counts": sorted(kind_counts.items()),
         "orientation_counts": sorted(orientation_counts.items()),
         "chirality_counts": sorted(chirality_counts.items()),
-        "adjacency_pairs": _patch_adjacency_pairs(patch),
+        "adjacency_pairs": _topology_adjacency_pairs(topology),
         "degree_histogram": sorted(degree_histogram.items()),
-        "bounds_aspect_ratio": round(_patch_bounds_aspect_ratio(patch), 6),
+        "bounds_aspect_ratio": round(_cells_bounds_aspect_ratio(topology.cells), 6),
     }
 
 
-def _patch_signature(geometry: str, patch: AperiodicPatch) -> str:
+def _topology_signature(
+    geometry: str,
+    sample_mode: str,
+    sample_key: int,
+    topology: LatticeTopology,
+) -> str:
     digest = sha1(
-        json.dumps(_patch_signature_payload(geometry, patch), sort_keys=True).encode("utf-8")
+        json.dumps(
+            _topology_signature_payload(geometry, sample_mode, sample_key, topology),
+            sort_keys=True,
+        ).encode("utf-8")
     ).hexdigest()
     return digest[:12]
 
 
+def _build_reference_topology(spec: ReferenceFamilySpec, sample_key: int) -> LatticeTopology:
+    if spec.sample_mode == "grid":
+        return build_topology(spec.geometry, sample_key, sample_key, None)
+    return build_topology(spec.geometry, 0, 0, sample_key)
+
+
 def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservation:
-    patch = build_aperiodic_patch(geometry, depth)
-    kind_counts = Counter(cell.kind for cell in patch.cells)
+    spec = REFERENCE_FAMILY_SPECS[geometry]
+    topology = _build_reference_topology(spec, depth)
+    kind_counts = Counter(cell.kind for cell in topology.cells)
+    degree_histogram = Counter(
+        sum(1 for neighbor_id in cell.neighbors if neighbor_id is not None)
+        for cell in topology.cells
+    )
     unique_orientation_tokens = len(
         {
             cell.orientation_token
-            for cell in patch.cells
+            for cell in topology.cells
             if cell.orientation_token is not None
         }
     )
     unique_chirality_tokens = len(
         {
             cell.chirality_token
-            for cell in patch.cells
+            for cell in topology.cells
             if cell.chirality_token is not None
         }
     )
     return ReferencePatchObservation(
         geometry=geometry,
+        sample_mode=spec.sample_mode,
         depth=int(depth),
-        total_cells=len(patch.cells),
+        total_cells=len(topology.cells),
         kind_counts=tuple(sorted(kind_counts.items())),
+        degree_histogram=tuple(sorted(degree_histogram.items())),
         unique_orientation_tokens=unique_orientation_tokens,
         unique_chirality_tokens=unique_chirality_tokens,
-        adjacency_pairs=_patch_adjacency_pairs(patch),
-        bounds_aspect_ratio=round(_patch_bounds_aspect_ratio(patch), 6),
-        signature=_patch_signature(geometry, patch),
+        adjacency_pairs=_topology_adjacency_pairs(topology),
+        bounds_aspect_ratio=round(_cells_bounds_aspect_ratio(topology.cells), 6),
+        signature=_topology_signature(geometry, spec.sample_mode, depth, topology),
     )
 
 
 def _metadata_failures(
-    patch: AperiodicPatch,
+    topology: LatticeTopology,
     requirement: MetadataRequirement,
 ) -> list[ReferenceCheckFailure]:
     failures: list[ReferenceCheckFailure] = []
-    matching_cells = [cell for cell in patch.cells if cell.kind == requirement.kind]
+    matching_cells = [cell for cell in topology.cells if cell.kind == requirement.kind]
     if not matching_cells:
         failures.append(
             ReferenceCheckFailure(
@@ -177,6 +215,7 @@ def _expectation_failures(
 ) -> list[ReferenceCheckFailure]:
     failures: list[ReferenceCheckFailure] = []
     kind_counts = dict(observation.kind_counts)
+    degree_histogram = dict(observation.degree_histogram)
     adjacency_pairs = set(observation.adjacency_pairs)
     if (
         expectation.exact_total_cells is not None
@@ -206,15 +245,43 @@ def _expectation_failures(
                 depth=observation.depth,
             )
         )
+    if (
+        expectation.expected_kind_counts is not None
+        and observation.kind_counts != expectation.expected_kind_counts
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="unexpected-kind-counts",
+                message=(
+                    f"Depth {observation.depth} expected kind counts "
+                    f"{expectation.expected_kind_counts!r} but saw {observation.kind_counts!r}."
+                ),
+                depth=observation.depth,
+            )
+        )
     for kind in expectation.required_kinds:
         if kind_counts.get(kind, 0) <= 0:
             failures.append(
                 ReferenceCheckFailure(
                     code="missing-required-kind",
                     message=f"Depth {observation.depth} is missing required kind '{kind}'.",
-                    depth=observation.depth,
-                )
+                depth=observation.depth,
             )
+        )
+    if (
+        expectation.expected_adjacency_pairs is not None
+        and adjacency_pairs != set(expectation.expected_adjacency_pairs)
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="unexpected-adjacency-pairs",
+                message=(
+                    f"Depth {observation.depth} expected adjacency pairs "
+                    f"{expectation.expected_adjacency_pairs!r} but saw {observation.adjacency_pairs!r}."
+                ),
+                depth=observation.depth,
+            )
+        )
     for pair in expectation.required_adjacency_pairs:
         normalized = pair if pair[0] <= pair[1] else (pair[1], pair[0])
         if normalized not in adjacency_pairs:
@@ -224,10 +291,24 @@ def _expectation_failures(
                     message=(
                         f"Depth {observation.depth} is missing required adjacency pair "
                         f"{normalized[0]}/{normalized[1]}."
-                    ),
-                    depth=observation.depth,
-                )
+                ),
+                depth=observation.depth,
             )
+        )
+    if (
+        expectation.expected_degree_histogram is not None
+        and degree_histogram != dict(expectation.expected_degree_histogram)
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="unexpected-degree-histogram",
+                message=(
+                    f"Depth {observation.depth} expected degree histogram "
+                    f"{expectation.expected_degree_histogram!r} but saw {observation.degree_histogram!r}."
+                ),
+                depth=observation.depth,
+            )
+        )
     if (
         expectation.min_unique_orientation_tokens is not None
         and observation.unique_orientation_tokens < expectation.min_unique_orientation_tokens
@@ -284,6 +365,44 @@ def _expectation_failures(
                     f"{expectation.expected_signature} but saw {observation.signature}."
                 ),
                 depth=observation.depth,
+            )
+        )
+    return failures
+
+
+def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[ReferenceCheckFailure]:
+    if not is_periodic_face_tiling(spec.geometry):
+        return []
+    descriptor = get_periodic_face_tiling_descriptor(spec.geometry)
+    failures: list[ReferenceCheckFailure] = []
+    if descriptor.metric_model != "pattern":
+        failures.append(
+            ReferenceCheckFailure(
+                code="unexpected-descriptor-metric-model",
+                message=(
+                    f"{spec.geometry} descriptor expected metric_model 'pattern' "
+                    f"but saw {descriptor.metric_model!r}."
+                ),
+            )
+        )
+    if descriptor.cell_count_per_unit != descriptor.face_template_count:
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-cell-count-mismatch",
+                message=(
+                    f"{spec.geometry} descriptor declared cell_count_per_unit "
+                    f"{descriptor.cell_count_per_unit} but loaded {descriptor.face_template_count} face templates."
+                ),
+            )
+        )
+    if set(descriptor.face_kinds) != set(spec.allowed_public_cell_kinds):
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-kind-vocabulary-mismatch",
+                message=(
+                    f"{spec.geometry} descriptor face kinds {descriptor.face_kinds!r} "
+                    f"did not match the reference spec kinds {spec.allowed_public_cell_kinds!r}."
+                ),
             )
         )
     return failures
@@ -346,8 +465,8 @@ def _verify_spec(spec: ReferenceFamilySpec) -> ReferenceVerificationResult:
         for depth in sorted(spec.depth_expectations)
     )
     failures: list[ReferenceCheckFailure] = []
-    deepest_patch = build_aperiodic_patch(spec.geometry, max(spec.depth_expectations, default=0))
-    observed_kinds = {cell.kind for cell in deepest_patch.cells}
+    deepest_topology = _build_reference_topology(spec, max(spec.depth_expectations, default=0))
+    observed_kinds = {cell.kind for cell in deepest_topology.cells}
     unexpected_kinds = observed_kinds.difference(spec.allowed_public_cell_kinds)
     if unexpected_kinds:
         failures.append(
@@ -360,7 +479,8 @@ def _verify_spec(spec: ReferenceFamilySpec) -> ReferenceVerificationResult:
             )
         )
     for requirement in spec.required_metadata:
-        failures.extend(_metadata_failures(deepest_patch, requirement))
+        failures.extend(_metadata_failures(deepest_topology, requirement))
+    failures.extend(_periodic_face_descriptor_failures(spec))
     failures.extend(_builder_signal_failures(spec.builder_signals))
     if spec.exact_reference_mode == "pinwheel_exact":
         failures.extend(_pinwheel_exact_path_failures())

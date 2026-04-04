@@ -1,0 +1,102 @@
+# Tiling Reference Sources
+
+This file lists the current literature or catalog references used when writing and maintaining `backend/simulation/literature_reference_specs.py`.
+
+The order is intentional:
+
+1. family-specific substitution or tiling source
+2. broader reference fallback if the family-specific source is weaker or unavailable
+
+## Regular Grids
+
+- `square`
+  - [Square tiling](https://en.wikipedia.org/wiki/Square_tiling)
+  - [Regular tiling](https://en.wikipedia.org/wiki/Regular_tiling)
+- `hex`
+  - [Hexagonal tiling](https://en.wikipedia.org/wiki/Hexagonal_tiling)
+  - [Regular tiling](https://en.wikipedia.org/wiki/Regular_tiling)
+- `triangle`
+  - [Triangular tiling](https://en.wikipedia.org/wiki/Triangular_tiling)
+  - [Regular tiling](https://en.wikipedia.org/wiki/Regular_tiling)
+
+## Periodic Mixed / Uniform Families
+
+- `archimedean-4-8-8`
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `archimedean-3-12-12`
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `archimedean-3-4-6-4`
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `archimedean-4-6-12`
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `archimedean-3-3-4-3-4`
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `archimedean-3-3-3-4-4`
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `archimedean-3-3-3-3-6`
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `trihexagonal-3-6-3-6`
+  - [Trihexagonal tiling](https://en.wikipedia.org/wiki/Trihexagonal_tiling)
+  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
+- `cairo-pentagonal`
+  - [Cairo pentagonal tiling](https://en.wikipedia.org/wiki/Cairo_pentagonal_tiling)
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `rhombille`
+  - [Rhombille tiling](https://en.wikipedia.org/wiki/Rhombille_tiling)
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `deltoidal-hexagonal`
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `tetrakis-square`
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `triakis-triangular`
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `deltoidal-trihexagonal`
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `prismatic-pentagonal`
+  - [Prismatic pentagonal tiling](https://en.wikipedia.org/wiki/Prismatic_pentagonal_tiling)
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `floret-pentagonal`
+  - [Floret pentagonal tiling](https://en.wikipedia.org/wiki/Floret_pentagonal_tiling)
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+- `snub-square-dual`
+  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
+
+## Aperiodic / Substitution Families
+
+- `penrose-p3-rhombs`
+  - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
+- `penrose-p3-rhombs-vertex`
+  - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
+- `penrose-p2-kite-dart`
+  - [Penrose kite-dart](https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/)
+- `ammann-beenker`
+  - [Ammann-Beenker](https://tilings.math.uni-bielefeld.de/substitution/ammann-beenker/)
+- `spectre`
+  - [Spectre](https://tilings.math.uni-bielefeld.de/substitution/spectre/)
+  - [The Spectre monotile paper DOI page](https://doi.org/10.5070/C64264241)
+- `hat-monotile`
+  - [An aperiodic monotile](https://arxiv.org/abs/2303.10798)
+  - [Hat metatiles](https://tilings.math.uni-bielefeld.de/substitution/hat-metatiles/)
+- `taylor-socolar`
+  - [Half-hex](https://tilings.math.uni-bielefeld.de/substitution/half-hex/)
+  - [Lee and Moody 2013](https://www.mdpi.com/2073-8994/5/1/1)
+- `sphinx`
+  - [Sphinx](https://tilings.math.uni-bielefeld.de/substitution/sphinx/)
+- `chair`
+  - [Chair](https://tilings.math.uni-bielefeld.de/substitution/chair/)
+- `robinson-triangles`
+  - [Robinson triangle](https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/)
+- `tuebingen-triangle`
+  - [Tuebingen Triangle](https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/)
+- `square-triangle`
+  - [Square-triangle](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
+- `shield`
+  - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)
+- `pinwheel`
+  - [The pinwheel tilings of the plane](https://annals.math.princeton.edu/1994/139-3/p05)
+  - [Pinwheel](https://tilings.math.uni-bielefeld.de/substitution/pinwheel/)
+
+## Notes
+
+- Several periodic mixed families still rely on broad uniform-tiling references. Those should be upgraded to stronger family-specific sources when available.
+- The verifier is allowed to be stronger than the source list here, but not weaker. If a new reference drives a spec change, update this file at the same time.

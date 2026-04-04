@@ -88,6 +88,8 @@ class PeriodicFaceTilingDescriptor:
     max_y: float
     cell_count_per_unit: int
     build_faces: Callable[[int, int], tuple[PeriodicFaceCell, ...]]
+    face_template_count: int
+    face_kinds: tuple[str, ...]
     row_offset_x: float = 0.0
     id_pattern: str = "{prefix}:{slot}:{x}:{y}"
 
@@ -393,6 +395,8 @@ def _pattern_descriptor_from_payload(payload: _JsonPatternDescriptor) -> Periodi
     cell_count_per_unit = payload["cell_count_per_unit"]
     row_offset_x = payload.get("row_offset_x", 0.0)
     id_pattern = payload.get("id_pattern", "{prefix}:{slot}:{x}:{y}")
+    face_template_count = len(faces)
+    face_kinds = tuple(sorted({face.kind for face in faces}))
 
     return PeriodicFaceTilingDescriptor(
         geometry=geometry,
@@ -416,6 +420,8 @@ def _pattern_descriptor_from_payload(payload: _JsonPatternDescriptor) -> Periodi
             width,
             height,
         ),
+        face_template_count=face_template_count,
+        face_kinds=face_kinds,
         row_offset_x=row_offset_x,
         id_pattern=id_pattern,
     )
