@@ -41,13 +41,10 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_reference_observation_records_connectivity_stats(self) -> None:
         observation = observe_reference_patch("pinwheel", 3)
 
-        self.assertGreater(observation.connected_component_count, 1)
-        self.assertTrue(observation.disconnected_component_sizes)
-        self.assertEqual(
-            observation.largest_component_size,
-            max(observation.disconnected_component_sizes),
-        )
-        self.assertGreater(observation.isolated_cell_count, 0)
+        self.assertEqual(observation.connected_component_count, 1)
+        self.assertEqual(observation.disconnected_component_sizes, ())
+        self.assertEqual(observation.largest_component_size, observation.total_cells)
+        self.assertEqual(observation.isolated_cell_count, 0)
 
     def test_reference_observation_records_surface_hole_stats(self) -> None:
         square_triangle_observation = observe_reference_patch("square-triangle", 3)
@@ -86,7 +83,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["robinson-triangles"].status, "PASS")
         self.assertEqual(results["square-triangle"].status, "FAIL")
         self.assertEqual(results["shield"].status, "PASS")
-        self.assertEqual(results["pinwheel"].status, "FAIL")
+        self.assertEqual(results["pinwheel"].status, "PASS")
         self.assertFalse(results["chair"].waived)
         self.assertFalse(results["hat-monotile"].waived)
         self.assertFalse(results["shield"].waived)
@@ -95,12 +92,13 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertFalse(results["hat-monotile"].blocking)
         self.assertTrue(results["square-triangle"].blocking)
         self.assertFalse(results["shield"].blocking)
-        self.assertTrue(results["pinwheel"].blocking)
+        self.assertFalse(results["pinwheel"].blocking)
 
     def test_connected_representative_families_remain_connected_under_observation(self) -> None:
         for geometry in (
             "chair",
             "hat-monotile",
+            "pinwheel",
             "square-triangle",
             "shield",
             "tuebingen-triangle",
@@ -149,11 +147,12 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_pinwheel_reference_verifier_uses_exact_path(self) -> None:
         result = verify_reference_family("pinwheel")
 
-        self.assertEqual(result.status, "FAIL")
-        self.assertTrue(any(failure.code == "disconnected-topology-graph" for failure in result.failures))
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
         self.assertEqual(result.observations[0].total_cells, 2)
         self.assertEqual(result.observations[1].total_cells, 10)
         self.assertGreater(result.observations[1].bounds_longest_span, result.observations[0].bounds_longest_span)
+        self.assertEqual(result.observations[-1].connected_component_count, 1)
 
     def test_chair_reference_verifier_accepts_multiscale_chair_tiles(self) -> None:
         result = verify_reference_family("chair")
@@ -199,8 +198,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_pinwheel_reference_verifier_tracks_expanding_support(self) -> None:
         result = verify_reference_family("pinwheel")
 
-        self.assertEqual(result.status, "FAIL")
-        self.assertTrue(any(failure.code == "disconnected-topology-graph" for failure in result.failures))
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
         spans = [observation.bounds_longest_span for observation in result.observations]
         self.assertTrue(
             all(left < right for left, right in zip(spans, spans[1:]))

@@ -87,7 +87,7 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
 
 - Regular and periodic families are verified on canonical `3x3` samples.
 - Aperiodic families are verified on patch-depth samples.
-- Pinwheel has an exact-affine verification path and should not be treated like the other families when debugging verification failures.
+- Pinwheel has an exact-affine verification path and derives contiguity from exact positive-length segment-overlap neighbors, so it should not be treated like the other families when debugging verification failures.
 - The strongest “tiles do not obscure each other” check is now split across backend topology-space overlap detection and frontend adapter-space overlap detection.
 - Canonical-sample contiguity is now part of literature verification, so a family can be geometrically sane but still blocked if its neighbor graph splits into multiple components.
 - Canonical-sample hole freedom is now part of literature verification too, so a family can be connected and overlap-clean but still blocked if it surrounds bounded empty regions.

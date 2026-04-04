@@ -46,6 +46,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 
 - `pinwheel`
   - must use the exact-affine verification path
+  - contiguity is verified from exact positive-length segment overlap, not only exact whole-edge identity
   - orientation diversity must increase with depth
   - exact-record ids must match serialized patch ids
   - representative support should expand with depth on the exact-affine inflation path

@@ -4,7 +4,7 @@ import math
 from collections import defaultdict
 from dataclasses import dataclass
 from fractions import Fraction
-from typing import Iterable, NotRequired, TypedDict
+from typing import Iterable, Literal, NotRequired, TypedDict
 
 
 COORDINATE_PRECISION = 6
@@ -71,6 +71,9 @@ class ExactPatchRecord(TypedDict):
     decoration_tokens: NotRequired[tuple[str, ...] | None]
 
 
+ExactNeighborMode = Literal["full_edge", "segment_overlap"]
+
+
 def rounded_point(point: Vec | tuple[float, float]) -> tuple[float, float]:
     x_value, y_value = point if isinstance(point, tuple) else (point.x, point.y)
     return (
@@ -101,6 +104,93 @@ def exact_canonical_edge(
     point_b: tuple[Fraction, Fraction],
 ) -> tuple[tuple[Fraction, Fraction], tuple[Fraction, Fraction]]:
     return (point_a, point_b) if point_a <= point_b else (point_b, point_a)
+
+
+def _exact_edges_overlap_with_positive_length(
+    first_left: tuple[Fraction, Fraction],
+    first_right: tuple[Fraction, Fraction],
+    second_left: tuple[Fraction, Fraction],
+    second_right: tuple[Fraction, Fraction],
+) -> bool:
+    delta_x = first_right[0] - first_left[0]
+    delta_y = first_right[1] - first_left[1]
+    if delta_x == 0 and delta_y == 0:
+        return False
+
+    def _cross(
+        origin: tuple[Fraction, Fraction],
+        point: tuple[Fraction, Fraction],
+    ) -> Fraction:
+        return (delta_x * (point[1] - origin[1])) - (delta_y * (point[0] - origin[0]))
+
+    if _cross(first_left, second_left) != 0 or _cross(first_left, second_right) != 0:
+        return False
+
+    axis = 0 if delta_x != 0 else 1
+    first_start, first_end = sorted((first_left[axis], first_right[axis]))
+    second_start, second_end = sorted((second_left[axis], second_right[axis]))
+    overlap_start = max(first_start, second_start)
+    overlap_end = min(first_end, second_end)
+    return overlap_end > overlap_start
+
+
+def build_exact_neighbors(
+    records: list[ExactPatchRecord],
+    *,
+    neighbor_mode: ExactNeighborMode = "full_edge",
+) -> dict[str, tuple[str, ...]]:
+    neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
+    if neighbor_mode == "full_edge":
+        edge_map: dict[
+            tuple[tuple[Fraction, Fraction], tuple[Fraction, Fraction]],
+            list[str],
+        ] = defaultdict(list)
+        for record in records:
+            cell_id = record["id"]
+            vertices = record["vertices"]
+            for index, left in enumerate(vertices):
+                right = vertices[(index + 1) % len(vertices)]
+                edge_map[exact_canonical_edge(left, right)].append(cell_id)
+        for owners in edge_map.values():
+            unique_owners = tuple(sorted(set(owners)))
+            if len(unique_owners) != 2:
+                continue
+            neighbor_left, neighbor_right = unique_owners
+            neighbor_sets[neighbor_left].add(neighbor_right)
+            neighbor_sets[neighbor_right].add(neighbor_left)
+        return {
+            cell_id: tuple(sorted(neighbors))
+            for cell_id, neighbors in neighbor_sets.items()
+        }
+
+    exact_edges: list[
+        tuple[str, tuple[Fraction, Fraction], tuple[Fraction, Fraction]]
+    ] = []
+    for record in records:
+        vertices = record["vertices"]
+        for index, left in enumerate(vertices):
+            exact_edges.append(
+                (record["id"], left, vertices[(index + 1) % len(vertices)])
+            )
+
+    for index, (left_id, left_start, left_end) in enumerate(exact_edges):
+        for right_id, right_start, right_end in exact_edges[index + 1 :]:
+            if left_id == right_id:
+                continue
+            if not _exact_edges_overlap_with_positive_length(
+                left_start,
+                left_end,
+                right_start,
+                right_end,
+            ):
+                continue
+            neighbor_sets[left_id].add(right_id)
+            neighbor_sets[right_id].add(left_id)
+
+    return {
+        cell_id: tuple(sorted(neighbors))
+        for cell_id, neighbors in neighbor_sets.items()
+    }
 
 
 def compatibility_extent(values: list[float]) -> int:
@@ -261,26 +351,9 @@ def patch_from_exact_records(
     *,
     float_scale: float = 1.0,
     vertex_precision: int | None = COORDINATE_PRECISION,
+    neighbor_mode: ExactNeighborMode = "full_edge",
 ) -> AperiodicPatch:
-    edge_map: dict[
-        tuple[tuple[Fraction, Fraction], tuple[Fraction, Fraction]],
-        list[str],
-    ] = defaultdict(list)
-    for record in records:
-        cell_id = record["id"]
-        vertices = record["vertices"]
-        for index, left in enumerate(vertices):
-            right = vertices[(index + 1) % len(vertices)]
-            edge_map[exact_canonical_edge(left, right)].append(cell_id)
-
-    neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
-    for owners in edge_map.values():
-        unique_owners = tuple(sorted(set(owners)))
-        if len(unique_owners) != 2:
-            continue
-        neighbor_left, neighbor_right = unique_owners
-        neighbor_sets[neighbor_left].add(neighbor_right)
-        neighbor_sets[neighbor_right].add(neighbor_left)
+    neighbors_by_id = build_exact_neighbors(records, neighbor_mode=neighbor_mode)
 
     float_records: list[PatchRecord] = []
     for record in records:
@@ -323,7 +396,7 @@ def patch_from_exact_records(
             kind=record["kind"],
             center=record["center"],
             vertices=record["vertices"],
-            neighbors=tuple(sorted(neighbor_sets[record["id"]])),
+            neighbors=neighbors_by_id[record["id"]],
             tile_family=record.get("tile_family"),
             orientation_token=record.get("orientation_token"),
             chirality_token=record.get("chirality_token"),

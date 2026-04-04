@@ -71,6 +71,23 @@ class AperiodicRegistryTests(unittest.TestCase):
         self.assertTrue(all(cell.tile_family == "pinwheel" for cell in pinwheel_patch.cells))
         self.assertTrue(all(cell.orientation_token is not None for cell in pinwheel_patch.cells))
 
+    def test_pinwheel_patch_uses_segment_overlap_neighbors_to_stay_connected(self) -> None:
+        patch = build_aperiodic_patch("pinwheel", 3)
+        by_id = {cell.id: cell for cell in patch.cells}
+
+        seen: set[str] = set()
+        stack = [patch.cells[0].id]
+        seen.add(patch.cells[0].id)
+        while stack:
+            current = stack.pop()
+            for neighbor_id in by_id[current].neighbors:
+                if neighbor_id in seen:
+                    continue
+                seen.add(neighbor_id)
+                stack.append(neighbor_id)
+
+        self.assertEqual(len(seen), len(patch.cells))
+
 
 if __name__ == "__main__":
     unittest.main()

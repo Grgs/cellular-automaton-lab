@@ -7,9 +7,6 @@ This file tracks known mismatches between the current app implementation and the
 - `square-triangle`
   Canonical literature verification now blocks because the depth-3 sample is connected but still leaves enclosed empty gaps rather than a hole-free surface.
 
-- `pinwheel`
-  Canonical literature verification now blocks because the depth-3 sample splits into many disconnected topology-graph components in the neighbor graph the app actually uses.
-
 ## Current Known Deviations
 
 None.
@@ -20,6 +17,7 @@ None.
 - Some periodic families still rely on broad fallback sources rather than the strongest family-specific references.
 - Several aperiodic families are verified through deterministic low-depth samples, count invariants, adjacency rules, and metadata presence rather than a full symbolic substitution proof.
 - Shield decorations are verified as metadata only; they are not rendered.
+- Pinwheel contiguity now uses exact positive-length segment-overlap neighbors on the exact-affine path because the substitution is not edge-to-edge at every subdivision step.
 
 ## When To Add An Entry Here
 

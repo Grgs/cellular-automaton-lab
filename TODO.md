@@ -3,7 +3,6 @@
 ## Now
 
 - Repair `square-triangle` so its canonical depth-3 sample is hole-free.
-- Repair `pinwheel` so the canonical depth-3 sample forms one connected topology component.
 - Replace generic fallback periodic sources with stronger family-specific references where possible.
 - Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
 - Add stronger canonical-patch fixtures for substitution families that still rely mainly on low-depth counts, metadata, adjacency vocabularies, and signatures.
@@ -21,7 +20,7 @@
 
 - Add `turtle-monotile` on top of the existing Hat-family support.
 - Add another verified substitution tiling family such as `socolar-12-fold` or `shield` decoration rendering once decoration metadata is ready to affect visuals.
-- Revisit `pinwheel` verification with stronger substitution-matrix and local-patch invariants, not only orientation-diversity and exact-affine adjacency checks.
+- Revisit `pinwheel` verification with stronger substitution-matrix and local-patch invariants, now that its contiguity is derived from exact segment-overlap neighbors on the exact-affine path.
 - Add a richer “reference data” fixture layer so literature-faithfulness checks can compare canonical low-depth patches directly instead of relying mainly on counts/signatures.
 
 ## Maybe
