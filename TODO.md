@@ -2,7 +2,6 @@
 
 ## Now
 
-- Repair `shield` so the canonical depth-3 sample forms one connected topology component.
 - Repair `pinwheel` so the canonical depth-3 sample forms one connected topology component.
 - Replace generic fallback periodic sources with stronger family-specific references where possible.
 - Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
@@ -13,7 +12,7 @@
 - Strengthen periodic-family literature verification beyond `3x3` sample signatures.
   Use more explicit source-backed invariants such as vertex configurations and dual-family relationships so periodic mixed tilings are not only protected by sample drift checks.
 - Add larger periodic sample fixtures where the open-boundary `3x3` board is too small to expose structural regressions.
-- Promote stronger substitution-level reference fixtures for Hat, Shield, Pinwheel, and the multiscale Chair family now that they pass the staged verifier.
+- Promote stronger substitution-level reference fixtures for Hat, Shield, Pinwheel, and the multiscale Chair family now that Hat, Shield, and Chair pass the staged verifier.
 - Strengthen the exact-affine/render-space overlap checks so the frontend helper can use tighter epsilons for exact-path families like `pinwheel`.
 - Decide whether graph contiguity should eventually move into `recommended_validation_options(...)` for the currently relaxed aperiodic families once their generators are repaired.
 

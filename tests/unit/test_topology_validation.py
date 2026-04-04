@@ -174,6 +174,7 @@ class TopologyValidationTests(unittest.TestCase):
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
             (SQUARE_TRIANGLE_GEOMETRY, 3),
+            (SHIELD_GEOMETRY, 3),
         ):
             with self.subTest(geometry=geometry):
                 topology = build_topology(geometry, 0, 0, patch_depth=patch_depth)
@@ -190,7 +191,6 @@ class TopologyValidationTests(unittest.TestCase):
 
     def test_canonical_sample_connectivity_flags_current_disconnected_representative_families(self) -> None:
         for geometry, patch_depth in (
-            (SHIELD_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
         ):
             with self.subTest(geometry=geometry):

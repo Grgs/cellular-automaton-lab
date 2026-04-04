@@ -2,23 +2,19 @@ from __future__ import annotations
 
 import math
 
-from shapely.geometry import Polygon
-
 from backend.simulation.aperiodic_support import (
     AFFINE_IDENTITY,
     Affine,
     AperiodicPatch,
-    AperiodicPatchCell,
     PatchRecord,
     Vec,
     affine_apply,
     affine_multiply,
     id_from_transform,
-    patch_from_cells,
+    patch_from_records,
     polygon_centroid,
     rotation,
     rounded_point,
-    scale as affine_scale,
     translation,
 )
 
@@ -35,19 +31,19 @@ _BASE_SQUARES: tuple[tuple[str, tuple[Vec, ...]], ...] = (
     (
         "left",
         (
-            Vec(-1.5, -0.5),
-            Vec(-0.5, -0.5),
-            Vec(-0.5, 0.5),
-            Vec(-1.5, 0.5),
+            Vec(-2.5, -1.0),
+            Vec(-0.5, -1.0),
+            Vec(-0.5, 1.0),
+            Vec(-2.5, 1.0),
         ),
     ),
     (
         "right",
         (
-            Vec(0.5, -0.5),
-            Vec(1.5, -0.5),
-            Vec(1.5, 0.5),
-            Vec(0.5, 0.5),
+            Vec(0.5, -1.0),
+            Vec(2.5, -1.0),
+            Vec(2.5, 1.0),
+            Vec(0.5, 1.0),
         ),
     ),
 )
@@ -89,13 +85,8 @@ _BASE_TRIANGLES: tuple[tuple[str, str, tuple[Vec, ...]], ...] = (
         ),
     ),
 )
-_CHILD_CLUSTERS: tuple[tuple[str, Vec, float], ...] = (
-    ("north-west", Vec(-3.0, -3.0), -math.pi / 6),
-    ("north-east", Vec(3.0, -3.0), math.pi / 6),
-    ("south-west", Vec(-3.0, 3.0), math.pi / 6),
-    ("south-east", Vec(3.0, 3.0), -math.pi / 6),
-)
-_CHILD_SCALE = 0.45
+_CLUSTER_VECTOR_X = Vec(5.0, 0.0)
+_CLUSTER_VECTOR_Y = Vec(1.5, 2.5)
 
 
 def _orientation_token(transform: Affine) -> str:
@@ -129,16 +120,7 @@ def _record(
     }
 
 
-def _cluster_transform(parent: Affine, offset: Vec, angle: float) -> Affine:
-    local = affine_multiply(
-        translation(offset.x, offset.y),
-        affine_multiply(rotation(angle), affine_scale(_CHILD_SCALE)),
-    )
-    return affine_multiply(parent, local)
-
-
-def _collect_cluster_records(
-    remaining_depth: int,
+def _emit_cluster_records(
     transform: Affine,
     path: str,
     phase: int,
@@ -175,50 +157,40 @@ def _collect_cluster_records(
             )
         )
 
-    if remaining_depth <= 0:
-        return
 
-    for index, (label, offset, angle_delta) in enumerate(_CHILD_CLUSTERS):
-        _collect_cluster_records(
-            remaining_depth - 1,
-            _cluster_transform(transform, offset, angle_delta),
-            f"{path}.{label}",
-            phase + index + 1,
-            records,
-        )
+def _cluster_transform(x: int, y: int) -> Affine:
+    return affine_multiply(
+        translation(
+            (x * _CLUSTER_VECTOR_X.x) + (y * _CLUSTER_VECTOR_Y.x),
+            (x * _CLUSTER_VECTOR_X.y) + (y * _CLUSTER_VECTOR_Y.y),
+        ),
+        AFFINE_IDENTITY,
+    )
+
+
+def _cluster_coordinates(patch_depth: int) -> tuple[tuple[int, int], ...]:
+    radius = max(0, int(patch_depth))
+    return tuple(
+        (x, y)
+        for y in range(-radius, radius + 1)
+        for x in range(-radius, radius + 1)
+        if abs(x) + abs(y) <= radius
+    )
+
+
+def _cluster_phase(x: int, y: int) -> int:
+    return (x - y) % 4
 
 
 def build_shield_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     records: list[PatchRecord] = []
-    _collect_cluster_records(resolved_depth, AFFINE_IDENTITY, "root", 0, records)
-
-    polygons = {
-        record["id"]: Polygon(record["vertices"])
-        for record in records
-    }
-    neighbors: dict[str, set[str]] = {record["id"]: set() for record in records}
-    for left_index, left in enumerate(records):
-        left_polygon = polygons[left["id"]]
-        for right in records[left_index + 1 :]:
-            right_polygon = polygons[right["id"]]
-            if left_polygon.boundary.intersection(right_polygon.boundary).length <= 1e-9:
-                continue
-            neighbors[left["id"]].add(right["id"])
-            neighbors[right["id"]].add(left["id"])
-
-    cells = tuple(
-        AperiodicPatchCell(
-            id=record["id"],
-            kind=record["kind"],
-            center=record["center"],
-            vertices=record["vertices"],
-            neighbors=tuple(sorted(neighbors[record["id"]])),
-            tile_family=record.get("tile_family"),
-            orientation_token=record.get("orientation_token"),
-            chirality_token=record.get("chirality_token"),
-            decoration_tokens=record.get("decoration_tokens"),
+    for x, y in _cluster_coordinates(resolved_depth):
+        _emit_cluster_records(
+            _cluster_transform(x, y),
+            f"cluster:{x}:{y}",
+            _cluster_phase(x, y),
+            records,
         )
-        for record in sorted(records, key=lambda item: item["id"])
-    )
-    return patch_from_cells(resolved_depth, cells)
+
+    return patch_from_records(resolved_depth, records, edge_precision=6)

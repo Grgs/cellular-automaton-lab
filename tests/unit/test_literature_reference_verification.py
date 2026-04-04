@@ -38,7 +38,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(first.disconnected_component_sizes, second.disconnected_component_sizes)
 
     def test_reference_observation_records_connectivity_stats(self) -> None:
-        observation = observe_reference_patch("shield", 3)
+        observation = observe_reference_patch("pinwheel", 3)
 
         self.assertGreater(observation.connected_component_count, 1)
         self.assertTrue(observation.disconnected_component_sizes)
@@ -73,7 +73,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["sphinx"].status, "PASS")
         self.assertEqual(results["robinson-triangles"].status, "PASS")
         self.assertEqual(results["square-triangle"].status, "PASS")
-        self.assertEqual(results["shield"].status, "FAIL")
+        self.assertEqual(results["shield"].status, "PASS")
         self.assertEqual(results["pinwheel"].status, "FAIL")
         self.assertFalse(results["chair"].waived)
         self.assertFalse(results["hat-monotile"].waived)
@@ -81,7 +81,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertFalse(results["pinwheel"].waived)
         self.assertFalse(results["chair"].blocking)
         self.assertFalse(results["hat-monotile"].blocking)
-        self.assertTrue(results["shield"].blocking)
+        self.assertFalse(results["shield"].blocking)
         self.assertTrue(results["pinwheel"].blocking)
 
     def test_connected_representative_families_remain_connected_under_verifier(self) -> None:
@@ -89,6 +89,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             "chair",
             "hat-monotile",
             "square-triangle",
+            "shield",
             "tuebingen-triangle",
         ):
             with self.subTest(geometry=geometry):
@@ -168,8 +169,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_shield_reference_verifier_accepts_decoration_variants(self) -> None:
         result = verify_reference_family("shield")
 
-        self.assertEqual(result.status, "FAIL")
-        self.assertTrue(any(failure.code == "disconnected-topology-graph" for failure in result.failures))
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
         decoration_counts = dict(result.observations[1].unique_decoration_variants_by_kind)
         self.assertGreaterEqual(decoration_counts["shield-shield"], 2)
         self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
