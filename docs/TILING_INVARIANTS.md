@@ -48,14 +48,20 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - must use the exact-affine verification path
   - orientation diversity must increase with depth
   - exact-record ids must match serialized patch ids
+  - representative support should expand with depth rather than remain a fixed rectangle
 - `shield`
   - `decoration_tokens` are part of the verification surface even though they are not rendered
+  - decorated cell kinds should expose multiple decoration-token variants in representative patches
 - `hat-monotile`
   - verification assumes an `H8`-rooted representative patch rather than a one-tile seed
+  - representative patches should include opposite-chirality Hat adjacencies
+  - reflected hats should appear in the characteristic three-neighbor opposite-chirality local pattern described by the Hat metatiles source
 - `tuebingen-triangle`
   - chirality metadata is part of the expected output
 - `square-triangle`
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
+- `chair`
+  - the literature target is the Ammann Chair family, so representative patches should expose more than one chair size class
 
 ## What Is Not Yet Proved
 

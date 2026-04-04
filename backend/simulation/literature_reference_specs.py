@@ -34,9 +34,14 @@ class ReferenceDepthExpectation:
     required_kinds: tuple[str, ...] = ()
     expected_adjacency_pairs: tuple[tuple[str, str], ...] | None = None
     required_adjacency_pairs: tuple[tuple[str, str], ...] = ()
+    required_chirality_adjacency_pairs: tuple[tuple[str, str], ...] = ()
     expected_degree_histogram: tuple[tuple[int, int], ...] | None = None
     min_unique_orientation_tokens: int | None = None
     min_unique_chirality_tokens: int | None = None
+    min_three_opposite_chirality_neighbor_cells: int | None = None
+    min_unique_polygon_areas_by_kind: tuple[tuple[str, int], ...] | None = None
+    min_unique_decoration_variants_by_kind: tuple[tuple[str, int], ...] | None = None
+    min_bounds_longest_span: float | None = None
     max_bounds_aspect_ratio: float | None = None
     expected_signature: str | None = None
 
@@ -808,10 +813,14 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             1: ReferenceDepthExpectation(
                 exact_total_cells=4,
                 required_adjacency_pairs=(("chair", "chair"),),
+                min_unique_polygon_areas_by_kind=(("chair", 2),),
             ),
             2: ReferenceDepthExpectation(exact_total_cells=16),
             3: ReferenceDepthExpectation(exact_total_cells=64),
         },
+        notes=(
+            "The Ammann Chair family uses two similar chair tiles of different sizes.",
+        ),
     ),
     "robinson-triangles": ReferenceFamilySpec(
         geometry="robinson-triangles",
@@ -864,11 +873,16 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             1: ReferenceDepthExpectation(
                 min_unique_chirality_tokens=2,
                 required_adjacency_pairs=(("hat", "hat"),),
+                required_chirality_adjacency_pairs=(("left", "right"),),
+            ),
+            2: ReferenceDepthExpectation(
+                min_three_opposite_chirality_neighbor_cells=1,
             ),
         },
         notes=(
             "The hat literature describes a metatile substitution rather than a single-tile root seed.",
             "Representative patches should include reflected copies of the monotile.",
+            "The reflected copies should participate in the characteristic three-neighbor local pattern described in the hat-metatiles source.",
         ),
     ),
     "tuebingen-triangle": ReferenceFamilySpec(
@@ -976,6 +990,12 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ),
                 max_bounds_aspect_ratio=4.0,
             ),
+            1: ReferenceDepthExpectation(
+                min_unique_decoration_variants_by_kind=(
+                    ("shield-shield", 2),
+                    ("shield-triangle", 2),
+                ),
+            ),
         },
         notes=(
             "Decorations are authoritative for matching rules even though the renderer ignores them.",
@@ -1006,14 +1026,17 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             1: ReferenceDepthExpectation(
                 exact_total_cells=10,
                 min_unique_orientation_tokens=4,
+                min_bounds_longest_span=3.0,
             ),
             2: ReferenceDepthExpectation(
                 exact_total_cells=50,
                 min_unique_orientation_tokens=10,
+                min_bounds_longest_span=6.0,
             ),
             3: ReferenceDepthExpectation(
                 exact_total_cells=250,
                 min_unique_orientation_tokens=30,
+                min_bounds_longest_span=12.0,
             ),
         },
         builder_signals=(
@@ -1031,4 +1054,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
 }
 
 
-STAGED_REFERENCE_WAIVERS: frozenset[str] = frozenset()
+STAGED_REFERENCE_WAIVERS: frozenset[str] = frozenset(
+    {
+        "hat-monotile",
+        "chair",
+        "shield",
+        "pinwheel",
+    }
+)

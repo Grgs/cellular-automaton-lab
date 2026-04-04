@@ -51,7 +51,14 @@ class ReferencePatchObservation:
     degree_histogram: tuple[tuple[int, int], ...]
     unique_orientation_tokens: int
     unique_chirality_tokens: int
+    chirality_adjacency_pairs: tuple[tuple[str, str], ...]
+    three_opposite_chirality_neighbor_cells: int
+    unique_polygon_areas_by_kind: tuple[tuple[str, int], ...]
+    unique_decoration_variants_by_kind: tuple[tuple[str, int], ...]
     adjacency_pairs: tuple[tuple[str, str], ...]
+    bounds_width: float
+    bounds_height: float
+    bounds_longest_span: float
     bounds_aspect_ratio: float
     signature: str
 
@@ -96,6 +103,22 @@ def _cells_bounds_aspect_ratio(cells: tuple[LatticeCell, ...]) -> float:
     if shortest <= 0.0:
         return float("inf")
     return max(width, height) / shortest
+
+
+def _cells_bounds(cells: tuple[LatticeCell, ...]) -> tuple[float, float]:
+    all_x = [vertex[0] for cell in cells if cell.vertices is not None for vertex in cell.vertices]
+    all_y = [vertex[1] for cell in cells if cell.vertices is not None for vertex in cell.vertices]
+    if not all_x or not all_y:
+        return (0.0, 0.0)
+    return (max(all_x) - min(all_x), max(all_y) - min(all_y))
+
+
+def _polygon_area(vertices: tuple[tuple[float, float], ...]) -> float:
+    total = 0.0
+    for index, (x1, y1) in enumerate(vertices):
+        x2, y2 = vertices[(index + 1) % len(vertices)]
+        total += (x1 * y2) - (x2 * y1)
+    return abs(total) / 2.0
 
 
 def _topology_signature_payload(
@@ -157,6 +180,33 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
     spec = REFERENCE_FAMILY_SPECS[geometry]
     topology = _build_reference_topology(spec, depth)
     kind_counts = Counter(cell.kind for cell in topology.cells)
+    area_classes_by_kind: dict[str, set[float]] = {}
+    decoration_variants_by_kind: dict[str, set[tuple[str, ...]]] = {}
+    chirality_adjacency_pairs: set[tuple[str, str]] = set()
+    three_opposite_chirality_neighbor_cells = 0
+    by_id = {cell.id: cell for cell in topology.cells}
+    for cell in topology.cells:
+        if cell.vertices is not None:
+            area_classes_by_kind.setdefault(cell.kind, set()).add(round(_polygon_area(cell.vertices), 6))
+        if cell.decoration_tokens is not None:
+            decoration_variants_by_kind.setdefault(cell.kind, set()).add(tuple(cell.decoration_tokens))
+        neighbor_chiralities = []
+        for neighbor_id in cell.neighbors:
+            if neighbor_id is None or cell.chirality_token is None:
+                continue
+            neighbor = by_id[neighbor_id]
+            if neighbor.chirality_token is None:
+                continue
+            left = cell.chirality_token
+            right = neighbor.chirality_token
+            chirality_adjacency_pairs.add((left, right) if left <= right else (right, left))
+            neighbor_chiralities.append(neighbor.chirality_token)
+        if (
+            cell.chirality_token is not None
+            and len(neighbor_chiralities) == 3
+            and all(chirality != cell.chirality_token for chirality in neighbor_chiralities)
+        ):
+            three_opposite_chirality_neighbor_cells += 1
     degree_histogram = Counter(
         sum(1 for neighbor_id in cell.neighbors if neighbor_id is not None)
         for cell in topology.cells
@@ -175,6 +225,7 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
             if cell.chirality_token is not None
         }
     )
+    bounds_width, bounds_height = _cells_bounds(topology.cells)
     return ReferencePatchObservation(
         geometry=geometry,
         sample_mode=spec.sample_mode,
@@ -184,7 +235,18 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
         degree_histogram=tuple(sorted(degree_histogram.items())),
         unique_orientation_tokens=unique_orientation_tokens,
         unique_chirality_tokens=unique_chirality_tokens,
+        chirality_adjacency_pairs=tuple(sorted(chirality_adjacency_pairs)),
+        three_opposite_chirality_neighbor_cells=three_opposite_chirality_neighbor_cells,
+        unique_polygon_areas_by_kind=tuple(
+            sorted((kind, len(area_classes)) for kind, area_classes in area_classes_by_kind.items())
+        ),
+        unique_decoration_variants_by_kind=tuple(
+            sorted((kind, len(variants)) for kind, variants in decoration_variants_by_kind.items())
+        ),
         adjacency_pairs=_topology_adjacency_pairs(topology),
+        bounds_width=round(bounds_width, 6),
+        bounds_height=round(bounds_height, 6),
+        bounds_longest_span=round(max(bounds_width, bounds_height), 6),
         bounds_aspect_ratio=round(_cells_bounds_aspect_ratio(topology.cells), 6),
         signature=_topology_signature(geometry, spec.sample_mode, depth, topology),
     )
@@ -223,6 +285,7 @@ def _expectation_failures(
     kind_counts = dict(observation.kind_counts)
     degree_histogram = dict(observation.degree_histogram)
     adjacency_pairs = set(observation.adjacency_pairs)
+    chirality_adjacency_pairs = set(observation.chirality_adjacency_pairs)
     if (
         expectation.exact_total_cells is not None
         and observation.total_cells != expectation.exact_total_cells
@@ -301,6 +364,19 @@ def _expectation_failures(
                 depth=observation.depth,
             )
         )
+    for pair in expectation.required_chirality_adjacency_pairs:
+        normalized = pair if pair[0] <= pair[1] else (pair[1], pair[0])
+        if normalized not in chirality_adjacency_pairs:
+            failures.append(
+                ReferenceCheckFailure(
+                    code="missing-chirality-adjacency-pair",
+                    message=(
+                        f"Depth {observation.depth} is missing required chirality adjacency pair "
+                        f"{normalized[0]}/{normalized[1]}."
+                    ),
+                    depth=observation.depth,
+                )
+            )
     if (
         expectation.expected_degree_histogram is not None
         and degree_histogram != dict(expectation.expected_degree_histogram)
@@ -331,6 +407,22 @@ def _expectation_failures(
             )
         )
     if (
+        expectation.min_three_opposite_chirality_neighbor_cells is not None
+        and observation.three_opposite_chirality_neighbor_cells
+        < expectation.min_three_opposite_chirality_neighbor_cells
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="insufficient-opposite-chirality-triplets",
+                message=(
+                    f"Depth {observation.depth} expected at least "
+                    f"{expectation.min_three_opposite_chirality_neighbor_cells} cells whose three neighbors "
+                    f"all have opposite chirality, but saw {observation.three_opposite_chirality_neighbor_cells}."
+                ),
+                depth=observation.depth,
+            )
+        )
+    if (
         expectation.min_unique_chirality_tokens is not None
         and observation.unique_chirality_tokens < expectation.min_unique_chirality_tokens
     ):
@@ -341,6 +433,48 @@ def _expectation_failures(
                     f"Depth {observation.depth} expected at least "
                     f"{expectation.min_unique_chirality_tokens} unique chirality tokens "
                     f"but saw {observation.unique_chirality_tokens}."
+                ),
+                depth=observation.depth,
+            )
+        )
+    if expectation.min_unique_polygon_areas_by_kind is not None:
+        observed_area_counts = dict(observation.unique_polygon_areas_by_kind)
+        for kind, minimum_count in expectation.min_unique_polygon_areas_by_kind:
+            if observed_area_counts.get(kind, 0) < minimum_count:
+                failures.append(
+                    ReferenceCheckFailure(
+                        code="insufficient-area-classes",
+                        message=(
+                            f"Depth {observation.depth} expected at least {minimum_count} distinct polygon-area classes "
+                            f"for kind '{kind}' but saw {observed_area_counts.get(kind, 0)}."
+                        ),
+                        depth=observation.depth,
+                    )
+                )
+    if expectation.min_unique_decoration_variants_by_kind is not None:
+        observed_decoration_counts = dict(observation.unique_decoration_variants_by_kind)
+        for kind, minimum_count in expectation.min_unique_decoration_variants_by_kind:
+            if observed_decoration_counts.get(kind, 0) < minimum_count:
+                failures.append(
+                    ReferenceCheckFailure(
+                        code="insufficient-decoration-variants",
+                        message=(
+                            f"Depth {observation.depth} expected at least {minimum_count} distinct decoration-token variants "
+                            f"for kind '{kind}' but saw {observed_decoration_counts.get(kind, 0)}."
+                        ),
+                        depth=observation.depth,
+                    )
+                )
+    if (
+        expectation.min_bounds_longest_span is not None
+        and observation.bounds_longest_span < expectation.min_bounds_longest_span
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="insufficient-bounds-span",
+                message=(
+                    f"Depth {observation.depth} expected longest bounds span >= "
+                    f"{expectation.min_bounds_longest_span} but saw {observation.bounds_longest_span}."
                 ),
                 depth=observation.depth,
             )

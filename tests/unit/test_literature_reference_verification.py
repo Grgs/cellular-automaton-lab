@@ -49,8 +49,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["deltoidal-hexagonal"].status, "PASS")
         self.assertEqual(results["snub-square-dual"].status, "PASS")
         self.assertEqual(results["ammann-beenker"].status, "PASS")
-        self.assertEqual(results["chair"].status, "PASS")
-        self.assertEqual(results["hat-monotile"].status, "PASS")
+        self.assertEqual(results["chair"].status, "KNOWN_DEVIATION")
+        self.assertEqual(results["hat-monotile"].status, "KNOWN_DEVIATION")
         self.assertEqual(results["penrose-p2-kite-dart"].status, "PASS")
         self.assertEqual(results["penrose-p3-rhombs"].status, "PASS")
         self.assertEqual(results["penrose-p3-rhombs-vertex"].status, "PASS")
@@ -60,9 +60,12 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["sphinx"].status, "PASS")
         self.assertEqual(results["robinson-triangles"].status, "PASS")
         self.assertEqual(results["square-triangle"].status, "PASS")
-        self.assertEqual(results["shield"].status, "PASS")
-        self.assertEqual(results["pinwheel"].status, "PASS")
-        self.assertTrue(all(not result.waived for result in results.values()))
+        self.assertEqual(results["shield"].status, "KNOWN_DEVIATION")
+        self.assertEqual(results["pinwheel"].status, "KNOWN_DEVIATION")
+        self.assertTrue(results["chair"].waived)
+        self.assertTrue(results["hat-monotile"].waived)
+        self.assertTrue(results["shield"].waived)
+        self.assertTrue(results["pinwheel"].waived)
         self.assertTrue(all(not result.blocking for result in results.values()))
 
     def test_regular_grid_reference_verifier_tracks_open_boundary_histogram(self) -> None:
@@ -103,10 +106,40 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_pinwheel_reference_verifier_uses_exact_path(self) -> None:
         result = verify_reference_family("pinwheel")
 
-        self.assertEqual(result.status, "PASS")
-        self.assertFalse(result.failures)
+        self.assertEqual(result.status, "KNOWN_DEVIATION")
+        self.assertTrue(result.failures)
         self.assertEqual(result.observations[0].total_cells, 2)
         self.assertEqual(result.observations[1].total_cells, 10)
+
+    def test_chair_reference_verifier_flags_missing_multiscale_chair_tiles(self) -> None:
+        result = verify_reference_family("chair")
+
+        self.assertEqual(result.status, "KNOWN_DEVIATION")
+        self.assertTrue(
+            any(failure.code == "insufficient-area-classes" for failure in result.failures)
+        )
+
+    def test_hat_reference_verifier_flags_missing_reflected_neighbor_pattern(self) -> None:
+        result = verify_reference_family("hat-monotile")
+
+        self.assertEqual(result.status, "KNOWN_DEVIATION")
+        self.assertTrue(
+            any(
+                failure.code in {
+                    "missing-chirality-adjacency-pair",
+                    "insufficient-opposite-chirality-triplets",
+                }
+                for failure in result.failures
+            )
+        )
+
+    def test_shield_reference_verifier_flags_flat_decoration_variants(self) -> None:
+        result = verify_reference_family("shield")
+
+        self.assertEqual(result.status, "KNOWN_DEVIATION")
+        self.assertTrue(
+            any(failure.code == "insufficient-decoration-variants" for failure in result.failures)
+        )
 
     def test_reference_tool_returns_success_for_current_spec_set(self) -> None:
         self.assertEqual(verify_reference_main(), 0)

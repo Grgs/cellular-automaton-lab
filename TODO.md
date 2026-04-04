@@ -4,6 +4,7 @@
 
 - Replace generic fallback periodic sources with stronger family-specific references where possible.
 - Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
+- Rebuild `hat-monotile`, `chair`, `shield`, and `pinwheel` so they can graduate off the literature-verification waiver list.
 
 ## Next
 
