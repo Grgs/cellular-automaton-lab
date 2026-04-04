@@ -52,6 +52,12 @@ def _wait_until_ready(base_url: str, *, timeout_seconds: float = 20, process: su
             time.sleep(0.25)
 
 
+def _resolve_npm_executable() -> str | None:
+    if os.name == "nt":
+        return shutil.which("npm.cmd") or shutil.which("npm")
+    return shutil.which("npm") or shutil.which("npm.cmd")
+
+
 class BrowserRuntimeHost(ABC):
     def __init__(self) -> None:
         self.root = Path(__file__).resolve().parents[2]
@@ -155,7 +161,7 @@ def ensure_standalone_build(root: Path) -> None:
     with _STANDALONE_BUILD_LOCK:
         if _STANDALONE_BUILD_READY:
             return
-        npm_executable = shutil.which("npm.cmd") or shutil.which("npm")
+        npm_executable = _resolve_npm_executable()
         if npm_executable is None:
             raise RuntimeError("npm is required to build the standalone frontend for browser tests.")
         subprocess.run(

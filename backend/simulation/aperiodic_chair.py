@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from shapely.geometry import Polygon
-
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
-    AperiodicPatchCell,
     PatchRecord,
     Vec,
     encode_float,
-    patch_from_cells,
+    patch_from_records,
     polygon_centroid,
     rounded_point,
 )
@@ -161,29 +158,8 @@ def build_chair_patch(patch_depth: int) -> AperiodicPatch:
             "root",
             records,
         )
-
-    polygons = {
-        record["id"]: Polygon(record["vertices"])
-        for record in records
-    }
-    neighbors: dict[str, set[str]] = {record["id"]: set() for record in records}
-    for left_index, left in enumerate(records):
-        left_polygon = polygons[left["id"]]
-        for right in records[left_index + 1 :]:
-            right_polygon = polygons[right["id"]]
-            if left_polygon.boundary.intersection(right_polygon.boundary).length <= 1e-9:
-                continue
-            neighbors[left["id"]].add(right["id"])
-            neighbors[right["id"]].add(left["id"])
-
-    cells = tuple(
-        AperiodicPatchCell(
-            id=record["id"],
-            kind=record["kind"],
-            center=record["center"],
-            vertices=record["vertices"],
-            neighbors=tuple(sorted(neighbors[record["id"]])),
-        )
-        for record in sorted(records, key=lambda item: item["id"])
+    return patch_from_records(
+        resolved_depth,
+        records,
+        neighbor_mode="segment_overlap",
     )
-    return patch_from_cells(resolved_depth, cells)

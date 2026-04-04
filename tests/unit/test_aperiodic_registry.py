@@ -1,4 +1,5 @@
 import sys
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -125,6 +126,42 @@ class AperiodicRegistryTests(unittest.TestCase):
 
         self.assertGreater(deep_patch.width, shallow_patch.width)
         self.assertGreater(deep_patch.height, shallow_patch.height)
+
+    def test_aperiodic_registry_remains_importable_without_shapely(self) -> None:
+        repo_root = Path(__file__).resolve().parents[2]
+        script = """
+import builtins
+import sys
+
+original_import = builtins.__import__
+
+def fake_import(name, *args, **kwargs):
+    if name.startswith("shapely"):
+        raise ModuleNotFoundError("No module named shapely")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = fake_import
+from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
+
+chair_patch = build_aperiodic_patch("chair", 1)
+spectre_patch = build_aperiodic_patch("spectre", 1)
+assert chair_patch.cells
+assert spectre_patch.cells
+print(len(chair_patch.cells), len(spectre_patch.cells))
+"""
+        result = subprocess.run(
+            [sys.executable, "-c", script],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(
+            result.returncode,
+            0,
+            msg=f"Subprocess failed without shapely.\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}",
+        )
 
 
 if __name__ == "__main__":
