@@ -58,12 +58,17 @@ class AperiodicRegistryTests(unittest.TestCase):
 
     def test_new_tiling_metadata_survives_patch_build(self) -> None:
         hat_patch = build_aperiodic_patch("hat-monotile", 2)
+        tuebingen_patch = build_aperiodic_patch("tuebingen-triangle", 2)
         shield_patch = build_aperiodic_patch("shield", 2)
         pinwheel_patch = build_aperiodic_patch("pinwheel", 2)
 
         self.assertTrue(all(cell.tile_family == "hat" for cell in hat_patch.cells))
         self.assertTrue(all(cell.orientation_token is not None for cell in hat_patch.cells))
         self.assertTrue(all(cell.chirality_token is not None for cell in hat_patch.cells))
+
+        self.assertTrue(all(cell.tile_family == "tuebingen" for cell in tuebingen_patch.cells))
+        self.assertTrue(all(cell.orientation_token is not None for cell in tuebingen_patch.cells))
+        self.assertTrue(all(cell.chirality_token is not None for cell in tuebingen_patch.cells))
 
         self.assertTrue(any(cell.kind == "shield-square" for cell in shield_patch.cells))
         self.assertTrue(any(cell.decoration_tokens for cell in shield_patch.cells if cell.kind == "shield-shield"))
@@ -87,6 +92,22 @@ class AperiodicRegistryTests(unittest.TestCase):
                 stack.append(neighbor_id)
 
         self.assertEqual(len(seen), len(patch.cells))
+
+    def test_tuebingen_patch_is_not_geometry_identical_to_robinson(self) -> None:
+        robinson_patch = build_aperiodic_patch("robinson-triangles", 3)
+        tuebingen_patch = build_aperiodic_patch("tuebingen-triangle", 3)
+
+        self.assertNotEqual(
+            sorted(tuple(cell.vertices) for cell in robinson_patch.cells),
+            sorted(tuple(cell.vertices) for cell in tuebingen_patch.cells),
+        )
+
+    def test_tuebingen_patch_support_expands_with_depth(self) -> None:
+        shallow_patch = build_aperiodic_patch("tuebingen-triangle", 1)
+        deep_patch = build_aperiodic_patch("tuebingen-triangle", 3)
+
+        self.assertGreater(deep_patch.width, shallow_patch.width)
+        self.assertGreater(deep_patch.height, shallow_patch.height)
 
 
 if __name__ == "__main__":
