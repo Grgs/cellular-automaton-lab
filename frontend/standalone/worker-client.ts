@@ -108,7 +108,7 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
             type: "init",
             requestId: initRequestId,
             persistedSnapshot,
-            pythonManifestUrl: new URL(/* @vite-ignore */ "../standalone-python-manifest.json", import.meta.url).toString(),
+            pythonBundleUrl: new URL(/* @vite-ignore */ "../standalone-python-bundle.json", import.meta.url).toString(),
             pyodideBaseUrl: DEFAULT_PYODIDE_BASE_URL,
         });
     } catch (error) {

@@ -24,7 +24,7 @@ _STANDALONE_BUILD_READY = False
 _STANDALONE_REQUIRED_OUTPUTS = (
     "index.html",
     "standalone-bootstrap.json",
-    "standalone-python-manifest.json",
+    "standalone-python-bundle.json",
 )
 
 

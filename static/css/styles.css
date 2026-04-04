@@ -157,6 +157,77 @@ body {
     color: #ffb1a1;
 }
 
+.standalone-startup-status {
+    position: absolute;
+    inset: 0;
+    z-index: 16;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    pointer-events: none;
+    background: rgba(255, 252, 248, 0.46);
+    backdrop-filter: blur(2px);
+}
+
+.standalone-startup-status-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 14px 16px;
+    min-width: min(340px, calc(100% - 32px));
+    max-width: min(420px, calc(100% - 32px));
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    border-radius: 18px;
+    background: rgba(255, 251, 245, 0.94);
+    box-shadow: 0 18px 30px rgba(15, 22, 34, 0.12);
+}
+
+.standalone-startup-copy {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.app-frame.standalone-startup-pending .top-bar-controls,
+.app-frame.standalone-startup-pending .control-drawer {
+    opacity: 0.72;
+}
+
+.standalone-startup-status.is-error {
+    pointer-events: auto;
+}
+
+.standalone-startup-status.is-error .standalone-startup-status-card {
+    border-color: rgba(191, 67, 54, 0.25);
+    background: rgba(255, 246, 244, 0.98);
+    color: #7a2018;
+}
+
+.standalone-startup-status.is-error .blocking-activity-detail {
+    color: inherit;
+}
+
+.standalone-startup-status.is-error .standalone-startup-spinner {
+    display: none;
+}
+
+:root[data-theme="dark"] .standalone-startup-status {
+    background: rgba(15, 20, 30, 0.52);
+}
+
+:root[data-theme="dark"] .standalone-startup-status-card {
+    border-color: rgba(231, 237, 248, 0.18);
+    background: rgba(22, 29, 41, 0.94);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-theme="dark"] .standalone-startup-status.is-error .standalone-startup-status-card {
+    border-color: rgba(255, 156, 137, 0.28);
+    background: rgba(58, 24, 24, 0.94);
+    color: #ffb1a1;
+}
+
 button,
 input,
 select {

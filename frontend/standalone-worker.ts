@@ -10,13 +10,14 @@ import type {
 declare function importScripts(...urls: string[]): void;
 declare let loadPyodide: ((options: { indexURL: string }) => Promise<any>) | undefined;
 
-interface PythonManifestEntry {
-    url: string;
+interface PythonBundleEntry {
     target_path: string;
+    contents: string;
 }
 
-interface PythonManifest {
-    files: PythonManifestEntry[];
+interface PythonBundle {
+    version: number;
+    files: PythonBundleEntry[];
 }
 
 const runtimeScope = self as DedicatedWorkerGlobalScope;
@@ -68,28 +69,26 @@ async function executePython(expression: string, globals: Record<string, unknown
     return String(await pyodideInstance.runPythonAsync(expression));
 }
 
-async function fetchPythonManifest(url: string): Promise<PythonManifest> {
+async function fetchPythonBundle(url: string): Promise<PythonBundle> {
     const response = await fetch(url);
     if (!response.ok) {
-        throw new Error(`Standalone python manifest request failed: ${response.status}`);
+        throw new Error(`Standalone python bundle request failed: ${response.status}`);
     }
-    const payload = await response.json() as PythonManifest;
-    if (!Array.isArray(payload.files)) {
-        throw new Error("Standalone python manifest is invalid.");
+    const payload = await response.json() as PythonBundle;
+    if (!Number.isFinite(Number(payload.version)) || !Array.isArray(payload.files)) {
+        throw new Error("Standalone python bundle is invalid.");
     }
     return payload;
 }
 
-async function installPythonSources(manifestUrl: string): Promise<void> {
-    const manifest = await fetchPythonManifest(manifestUrl);
-    for (const entry of manifest.files) {
-        const sourceUrl = new URL(entry.url, manifestUrl).toString();
-        const response = await fetch(sourceUrl);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch standalone python source: ${sourceUrl}`);
-        }
-        const contents = await response.text();
+async function installPythonBundle(bundleUrl: string): Promise<void> {
+    const bundle = await fetchPythonBundle(bundleUrl);
+    for (const entry of bundle.files) {
         const targetPath = String(entry.target_path || "");
+        const contents = String(entry.contents ?? "");
+        if (!targetPath.startsWith("/app/")) {
+            throw new Error("Standalone python bundle is invalid.");
+        }
         const targetDirectory = targetPath.split("/").slice(0, -1).join("/");
         if (targetDirectory.length > 0) {
             pyodideInstance.FS.mkdirTree(targetDirectory);
@@ -107,7 +106,7 @@ async function ensurePyodide(initMessage: StandaloneInitMessage): Promise<void> 
         throw new Error("Pyodide loader did not become available inside the standalone worker.");
     }
     pyodideInstance = await loadPyodide({ indexURL: initMessage.pyodideBaseUrl });
-    await installPythonSources(initMessage.pythonManifestUrl);
+    await installPythonBundle(initMessage.pythonBundleUrl);
     await pyodideInstance.runPythonAsync(`
 import sys
 if "/app" not in sys.path:

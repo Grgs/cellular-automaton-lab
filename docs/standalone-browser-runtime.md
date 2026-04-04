@@ -25,7 +25,7 @@ The public evaluator demo is published to GitHub Pages at [https://grgs.github.i
 - The standalone build stages a transient `standalone.html` input from the same shared shell source that the server wrapper uses, so the large DOM shell is defined in one place without a checked-in wrapper file.
 - `frontend/standalone.ts` fetches `standalone-bootstrap.json`, installs the bootstrap globals first, then dynamically imports the shared app runtime so standalone startup no longer races bootstrapped window data.
 - `frontend/standalone.ts` creates the worker-backed `SimulationBackend` and then starts the shared frontend controller stack.
-- `frontend/standalone-worker.ts` loads Pyodide, copies the packaged Python sources into Pyodide's virtual filesystem, imports `backend.browser_runtime`, and proxies frontend commands into the Python simulation runtime.
+- `frontend/standalone-worker.ts` loads Pyodide, installs a bundled Python payload into Pyodide's virtual filesystem, imports `backend.browser_runtime`, and proxies frontend commands into the Python simulation runtime.
 - The worker owns the standalone run loop with JS timers. The frontend continues to use the existing polling/reconciliation flow while the worker advances the simulation in the background.
 - Browser-local persistence uses IndexedDB first and falls back to `localStorage` if IndexedDB is unavailable.
 - The standalone worker now uses the same shared command parsing and persisted snapshot acceptance helpers as the Flask route layer.
@@ -60,7 +60,7 @@ This performs five steps:
 2. writes a generated `standalone.html` wrapper plus staged `styles.css` and `favicon.svg` into that build-input directory
 3. builds the standalone Vite entry into `output/standalone/`
 4. exports `standalone-bootstrap.json` from the Python topology/defaults metadata
-5. copies the Python source/config tree into `output/standalone/py-src/` and writes `standalone-python-manifest.json`
+5. writes `standalone-python-bundle.json`, which contains the standalone Python source/config payload as one bundled JSON file
 
 The standalone output includes both `standalone.html` and `index.html` for easier static hosting.
 The packager also writes `.nojekyll` so the published artifact is safe for GitHub Pages project-site hosting.
@@ -74,7 +74,7 @@ The standalone worker uses the protocol defined in `frontend/standalone/protocol
 - `init`
   - `requestId`
   - `persistedSnapshot`
-  - `pythonManifestUrl`
+  - `pythonBundleUrl`
   - `pyodideBaseUrl`
 - `request`
   - `requestId`

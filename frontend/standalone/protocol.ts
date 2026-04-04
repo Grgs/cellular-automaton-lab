@@ -15,7 +15,7 @@ export interface StandaloneInitMessage {
     type: "init";
     requestId: string;
     persistedSnapshot: PersistedSimulationSnapshotV5 | null;
-    pythonManifestUrl: string;
+    pythonBundleUrl: string;
     pyodideBaseUrl: string;
 }
 
