@@ -120,9 +120,11 @@ def collect_pinwheel_exact_records(patch_depth: int) -> tuple[ExactPatchRecord, 
 
 def build_pinwheel_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
+    inflation_scale = math.sqrt(5) ** resolved_depth
     patch = patch_from_exact_records(
         resolved_depth,
         list(collect_pinwheel_exact_records(resolved_depth)),
+        float_scale=inflation_scale,
     )
     return AperiodicPatch(
         patch_depth=patch.patch_depth,

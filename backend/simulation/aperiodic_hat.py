@@ -55,9 +55,15 @@ _HAT_MOVES: tuple[Affine, ...] = (
     affine_multiply(rotation(-math.pi / 3), _HAT_ATTACHMENTS[1]),
 )
 _IDENTITY: Affine = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
-_ROOT_SEEDS: tuple[Affine, ...] = (
-    _IDENTITY,
-    affine_multiply(translation(8.0, 0.0), AFFINE_REFLECT_X),
+_H8_ROOT_SEEDS: tuple[Affine, ...] = (
+    (0.5, 0.8660254037844386, -2.0, -0.8660254037844386, 0.5, 0.8660254037844386),
+    (-1.0, 0.0, 1.0, 0.0, 1.0, 2.598076211353316),
+    (-0.5, -0.8660254037844386, 1.0, -0.8660254037844386, 0.5, -0.8660254037844386),
+    (0.5, -0.8660254037844386, 1.0, -0.8660254037844386, -0.5, -0.8660254037844386),
+    (-0.5, -0.8660254037844386, 2.0, -0.8660254037844386, 0.5, 0.8660254037844386),
+    (1.0, 0.0, -1.0, 0.0, 1.0, 2.598076211353316),
+    (0.5, 0.8660254037844386, -1.0, -0.8660254037844386, 0.5, -0.8660254037844386),
+    (-0.5, 0.8660254037844386, -1.0, -0.8660254037844386, -0.5, -0.8660254037844386),
 )
 
 
@@ -91,10 +97,10 @@ def _placement_key(transform: Affine) -> tuple[float, ...]:
 def build_hat_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     frontier: deque[tuple[Affine, int]] = deque(
-        (transform, 0) for transform in _ROOT_SEEDS
+        (transform, 0) for transform in _H8_ROOT_SEEDS
     )
     seen: dict[tuple[float, ...], Affine] = {
-        _placement_key(transform): transform for transform in _ROOT_SEEDS
+        _placement_key(transform): transform for transform in _H8_ROOT_SEEDS
     }
 
     while frontier:

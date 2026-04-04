@@ -805,21 +805,22 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         source_urls=(
             "https://tilings.math.uni-bielefeld.de/substitution/chair/",
         ),
-        canonical_root_seed_policy="single chair rep-tile seed",
+        canonical_root_seed_policy="nested multiscale chair supertile",
         allowed_public_cell_kinds=("chair",),
         required_metadata=(),
         depth_expectations={
             0: ReferenceDepthExpectation(exact_total_cells=1, required_kinds=("chair",)),
             1: ReferenceDepthExpectation(
-                exact_total_cells=4,
+                exact_total_cells=13,
                 required_adjacency_pairs=(("chair", "chair"),),
                 min_unique_polygon_areas_by_kind=(("chair", 2),),
             ),
-            2: ReferenceDepthExpectation(exact_total_cells=16),
-            3: ReferenceDepthExpectation(exact_total_cells=64),
+            2: ReferenceDepthExpectation(exact_total_cells=25),
+            3: ReferenceDepthExpectation(exact_total_cells=37),
         },
         notes=(
-            "The Ammann Chair family uses two similar chair tiles of different sizes.",
+            "The representative patch is a deterministic multiscale chair hierarchy.",
+            "Low-depth samples must expose at least two chair size classes.",
         ),
     ),
     "robinson-triangles": ReferenceFamilySpec(
@@ -1054,11 +1055,4 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
 }
 
 
-STAGED_REFERENCE_WAIVERS: frozenset[str] = frozenset(
-    {
-        "hat-monotile",
-        "chair",
-        "shield",
-        "pinwheel",
-    }
-)
+STAGED_REFERENCE_WAIVERS: frozenset[str] = frozenset()

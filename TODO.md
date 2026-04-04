@@ -4,14 +4,14 @@
 
 - Replace generic fallback periodic sources with stronger family-specific references where possible.
 - Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
-- Rebuild `hat-monotile`, `chair`, `shield`, and `pinwheel` so they can graduate off the literature-verification waiver list.
+- Add stronger canonical-patch fixtures for substitution families that still rely mainly on low-depth counts, metadata, adjacency vocabularies, and signatures.
 
 ## Next
 
 - Strengthen periodic-family literature verification beyond `3x3` sample signatures.
   Use more explicit source-backed invariants such as vertex configurations and dual-family relationships so periodic mixed tilings are not only protected by sample drift checks.
 - Add larger periodic sample fixtures where the open-boundary `3x3` board is too small to expose structural regressions.
-- Add stronger canonical-patch fixtures for newer substitution families that still rely mainly on counts, metadata, adjacency vocabularies, and signatures.
+- Promote stronger substitution-level reference fixtures for Hat, Shield, Pinwheel, and the multiscale Chair family now that they pass the staged verifier.
 
 ## Later
 

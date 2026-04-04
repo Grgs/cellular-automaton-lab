@@ -518,7 +518,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
-        self.assertGreater(len(topology['cells']), 100)
+        self.assertGreater(len(topology['cells']), 50)
         self.assertTrue(all(cell['kind'] == 'chair' for cell in topology['cells']))
 
     def test_robinson_triangles_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:

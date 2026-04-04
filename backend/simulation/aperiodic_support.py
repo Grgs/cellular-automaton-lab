@@ -258,6 +258,8 @@ def patch_from_records(
 def patch_from_exact_records(
     patch_depth: int,
     records: list[ExactPatchRecord],
+    *,
+    float_scale: float = 1.0,
 ) -> AperiodicPatch:
     edge_map: dict[
         tuple[tuple[Fraction, Fraction], tuple[Fraction, Fraction]],
@@ -282,7 +284,12 @@ def patch_from_exact_records(
     float_records: list[PatchRecord] = []
     for record in records:
         float_vertices = tuple(
-            rounded_point((float(vertex[0]), float(vertex[1])))
+            rounded_point(
+                (
+                    float(vertex[0]) * float_scale,
+                    float(vertex[1]) * float_scale,
+                )
+            )
             for vertex in record["vertices"]
         )
         centroid = polygon_centroid(

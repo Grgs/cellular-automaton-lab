@@ -4,22 +4,11 @@ This file tracks known mismatches between the current app implementation and the
 
 ## Current Blocking Deviations
 
-None. The current deviations below are staged through the literature-verification waiver list so CI stays green while they are still reported loudly.
+None.
 
 ## Current Known Deviations
 
-- `hat-monotile`
-  - The current builder produces both chiralities, but the reflected hats do not participate in the characteristic opposite-chirality local pattern described by the Hat metatiles source.
-  - The literature verifier now expects cross-chirality adjacency and at least one three-neighbor opposite-chirality local pattern in a low-depth representative patch; this currently fails and is waived.
-- `chair`
-  - The current builder produces a simple rep-4 chair hierarchy with one polygon area class.
-  - The literature verifier now expects the Ammann Chair family to expose a multiscale chair hierarchy; this currently fails and is waived.
-- `shield`
-  - The current builder renders plausible shield/square/triangle patches, but the decoration metadata is too flat.
-  - The literature verifier now expects multiple decoration-token variants for the decorated shield family; this currently fails and is waived.
-- `pinwheel`
-  - The current builder uses the exact-affine path and passes orientation/adjacency checks, but it keeps the support rectangle fixed while only subdividing inside it.
-  - The literature verifier now expects the representative patch to expand with depth; this currently fails and is waived.
+None at the moment.
 
 ## Known Limits That Are Not Currently Treated As Failures
 

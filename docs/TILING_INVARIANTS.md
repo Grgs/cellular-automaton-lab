@@ -48,7 +48,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - must use the exact-affine verification path
   - orientation diversity must increase with depth
   - exact-record ids must match serialized patch ids
-  - representative support should expand with depth rather than remain a fixed rectangle
+  - representative support should expand with depth on the exact-affine inflation path
 - `shield`
   - `decoration_tokens` are part of the verification surface even though they are not rendered
   - decorated cell kinds should expose multiple decoration-token variants in representative patches
@@ -61,7 +61,8 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 - `square-triangle`
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
 - `chair`
-  - the literature target is the Ammann Chair family, so representative patches should expose more than one chair size class
+  - representative patches should expose more than one chair size class
+  - low-depth samples should preserve the deterministic multiscale chair hierarchy used by the current reference patch
 
 ## What Is Not Yet Proved
 
