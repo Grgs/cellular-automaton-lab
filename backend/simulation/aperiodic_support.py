@@ -72,6 +72,7 @@ class ExactPatchRecord(TypedDict):
 
 
 ExactNeighborMode = Literal["full_edge", "segment_overlap"]
+NeighborMode = Literal["full_edge", "segment_overlap"]
 
 
 def rounded_point(point: Vec | tuple[float, float]) -> tuple[float, float]:
@@ -104,6 +105,42 @@ def exact_canonical_edge(
     point_b: tuple[Fraction, Fraction],
 ) -> tuple[tuple[Fraction, Fraction], tuple[Fraction, Fraction]]:
     return (point_a, point_b) if point_a <= point_b else (point_b, point_a)
+
+
+def _edges_overlap_with_positive_length(
+    first_left: tuple[float, float],
+    first_right: tuple[float, float],
+    second_left: tuple[float, float],
+    second_right: tuple[float, float],
+    *,
+    tolerance: float = 1e-7,
+) -> bool:
+    delta_x = first_right[0] - first_left[0]
+    delta_y = first_right[1] - first_left[1]
+    if math.isclose(delta_x, 0.0, abs_tol=tolerance) and math.isclose(
+        delta_y,
+        0.0,
+        abs_tol=tolerance,
+    ):
+        return False
+
+    def _cross(
+        origin: tuple[float, float],
+        point: tuple[float, float],
+    ) -> float:
+        return (delta_x * (point[1] - origin[1])) - (delta_y * (point[0] - origin[0]))
+
+    if abs(_cross(first_left, second_left)) > tolerance or abs(
+        _cross(first_left, second_right)
+    ) > tolerance:
+        return False
+
+    axis = 0 if abs(delta_x) >= abs(delta_y) else 1
+    first_start, first_end = sorted((first_left[axis], first_right[axis]))
+    second_start, second_end = sorted((second_left[axis], second_right[axis]))
+    overlap_start = max(first_start, second_start)
+    overlap_end = min(first_end, second_end)
+    return overlap_end - overlap_start > tolerance
 
 
 def _exact_edges_overlap_with_positive_length(
@@ -292,7 +329,33 @@ def build_edge_neighbors(
     records: list[PatchRecord],
     *,
     edge_precision: int = COORDINATE_PRECISION,
+    neighbor_mode: NeighborMode = "full_edge",
 ) -> dict[str, tuple[str, ...]]:
+    neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
+    if neighbor_mode == "segment_overlap":
+        edges: list[tuple[str, tuple[float, float], tuple[float, float]]] = []
+        for record in records:
+            vertices = record["vertices"]
+            for index, left in enumerate(vertices):
+                edges.append((record["id"], left, vertices[(index + 1) % len(vertices)]))
+        for index, (left_id, left_start, left_end) in enumerate(edges):
+            for right_id, right_start, right_end in edges[index + 1 :]:
+                if left_id == right_id:
+                    continue
+                if not _edges_overlap_with_positive_length(
+                    left_start,
+                    left_end,
+                    right_start,
+                    right_end,
+                ):
+                    continue
+                neighbor_sets[left_id].add(right_id)
+                neighbor_sets[right_id].add(left_id)
+        return {
+            cell_id: tuple(sorted(neighbors))
+            for cell_id, neighbors in neighbor_sets.items()
+        }
+
     edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = defaultdict(list)
     for record in records:
         cell_id = record["id"]
@@ -300,7 +363,6 @@ def build_edge_neighbors(
         for index, left in enumerate(vertices):
             right = vertices[(index + 1) % len(vertices)]
             edge_map[canonical_edge(left, right, precision=edge_precision)].append(cell_id)
-    neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
     for owners in edge_map.values():
         unique_owners = tuple(sorted(set(owners)))
         if len(unique_owners) != 2:
@@ -319,8 +381,13 @@ def patch_from_records(
     records: list[PatchRecord],
     *,
     edge_precision: int = COORDINATE_PRECISION,
+    neighbor_mode: NeighborMode = "full_edge",
 ) -> AperiodicPatch:
-    neighbors_by_id = build_edge_neighbors(records, edge_precision=edge_precision)
+    neighbors_by_id = build_edge_neighbors(
+        records,
+        edge_precision=edge_precision,
+        neighbor_mode=neighbor_mode,
+    )
     cells = tuple(
         AperiodicPatchCell(
             id=record["id"],

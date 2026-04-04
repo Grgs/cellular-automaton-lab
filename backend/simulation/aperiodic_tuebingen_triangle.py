@@ -13,6 +13,7 @@ from backend.simulation.aperiodic_golden_triangles import (
 from backend.simulation.aperiodic_support import (
     Affine,
     AperiodicPatch,
+    PatchRecord,
     Vec,
     affine_apply,
     affine_inverse,
@@ -62,6 +63,14 @@ PAPER_THIN = (
 @dataclass(frozen=True)
 class _TuebingenNode:
     label: str
+    chirality: str
+    transform: Affine
+
+
+@dataclass(frozen=True)
+class _TuebingenChild:
+    label: str
+    chirality: str
     transform: Affine
 
 
@@ -96,7 +105,11 @@ def _similarity_affine(
 
 
 def _vecs(points: tuple[complex, complex, complex]) -> tuple[Vec, Vec, Vec]:
-    return tuple(Vec(float(point.real), float(point.imag)) for point in points)
+    return (
+        Vec(float(points[0].real), float(points[0].imag)),
+        Vec(float(points[1].real), float(points[1].imag)),
+        Vec(float(points[2].real), float(points[2].imag)),
+    )
 
 
 STANDARD_VERTICES = {
@@ -112,6 +125,17 @@ PAPER_AFFINES = {
 STANDARD_FROM_PAPER = {
     label: affine_inverse(transform)
     for label, transform in PAPER_AFFINES.items()
+}
+
+STANDARD_REFLECTIONS = {
+    "thick": _similarity_affine(
+        STANDARD_THICK,
+        (STANDARD_THICK[0], STANDARD_THICK[2], STANDARD_THICK[1]),
+    ),
+    "thin": _similarity_affine(
+        STANDARD_THIN,
+        (STANDARD_THIN[1], STANDARD_THIN[0], STANDARD_THIN[2]),
+    ),
 }
 
 PAPER_CHILD_TRANSFORMS = {
@@ -174,6 +198,10 @@ STANDARD_CHILD_TRANSFORMS = {
 }
 
 
+def _opposite_chirality(chirality: str) -> str:
+    return "right" if chirality == "left" else "left"
+
+
 def _canonical_short_edge_handedness(
     vertices: tuple[tuple[float, float], tuple[float, float], tuple[float, float]],
 ) -> str:
@@ -213,12 +241,65 @@ def _canonical_short_edge_handedness(
     return "left" if cross >= 0 else "right"
 
 
-def _record_for_node(node: _TuebingenNode) -> dict[str, object]:
-    vertices = tuple(
-        affine_apply(node.transform, vertex)
-        for vertex in STANDARD_VERTICES[node.label]
+def _transformed_triangle_vertices(
+    label: str,
+    transform: Affine,
+) -> tuple[tuple[float, float], tuple[float, float], tuple[float, float]]:
+    vertex_a, vertex_b, vertex_c = STANDARD_VERTICES[label]
+    vertices = (
+        affine_apply(transform, vertex_a),
+        affine_apply(transform, vertex_b),
+        affine_apply(transform, vertex_c),
     )
-    rounded_vertices = tuple((vertex.x, vertex.y) for vertex in vertices)
+    return (
+        (vertices[0].x, vertices[0].y),
+        (vertices[1].x, vertices[1].y),
+        (vertices[2].x, vertices[2].y),
+    )
+
+
+def _reflect_child_transform(
+    parent_label: str,
+    child_label: str,
+    transform: Affine,
+) -> Affine:
+    return affine_multiply(
+        STANDARD_REFLECTIONS[parent_label],
+        affine_multiply(transform, STANDARD_REFLECTIONS[child_label]),
+    )
+
+
+STANDARD_CHILD_SUBSTITUTIONS = {
+    parent_label: {
+        "left": tuple(
+            _TuebingenChild(
+                label=child_label,
+                chirality=_canonical_short_edge_handedness(
+                    _transformed_triangle_vertices(child_label, child_transform),
+                ),
+                transform=child_transform,
+            )
+            for child_label, child_transform in child_items
+        ),
+        "right": tuple(
+            _TuebingenChild(
+                label=child_label,
+                chirality=_opposite_chirality(
+                    _canonical_short_edge_handedness(
+                        _transformed_triangle_vertices(child_label, child_transform),
+                    ),
+                ),
+                transform=_reflect_child_transform(parent_label, child_label, child_transform),
+            )
+            for child_label, child_transform in child_items
+        ),
+    }
+    for parent_label, child_items in STANDARD_CHILD_TRANSFORMS.items()
+}
+
+
+def _record_for_node(node: _TuebingenNode) -> PatchRecord:
+    rounded_vertices = _transformed_triangle_vertices(node.label, node.transform)
     return triangle_record(
         cell_id=id_from_transform(f"tuebingen:{node.label}", node.transform),
         kind=(
@@ -228,7 +309,7 @@ def _record_for_node(node: _TuebingenNode) -> dict[str, object]:
         ),
         vertices=rounded_vertices,
         tile_family="tuebingen",
-        chirality_token=_canonical_short_edge_handedness(rounded_vertices),
+        chirality_token=node.chirality,
     )
 
 
@@ -236,13 +317,17 @@ def _root_star_nodes(root_scale: float) -> tuple[_TuebingenNode, ...]:
     nodes: list[_TuebingenNode] = []
     base_scale = scale(root_scale)
     for index in range(10):
+        transform = affine_multiply(
+            rotation(math.radians(index * 36)),
+            base_scale,
+        )
         nodes.append(
             _TuebingenNode(
                 label="thick",
-                transform=affine_multiply(
-                    rotation(math.radians(index * 36)),
-                    base_scale,
+                chirality=_canonical_short_edge_handedness(
+                    _transformed_triangle_vertices("thick", transform),
                 ),
+                transform=transform,
             )
         )
     return tuple(nodes)
@@ -250,17 +335,18 @@ def _root_star_nodes(root_scale: float) -> tuple[_TuebingenNode, ...]:
 
 def build_tuebingen_triangle_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    records: list[dict[str, object]] = []
+    records: list[PatchRecord] = []
 
     def collect(node: _TuebingenNode, remaining_depth: int) -> None:
         if remaining_depth <= 0:
             records.append(_record_for_node(node))
             return
-        for child_label, child_transform in STANDARD_CHILD_TRANSFORMS[node.label]:
+        for child in STANDARD_CHILD_SUBSTITUTIONS[node.label][node.chirality]:
             collect(
                 _TuebingenNode(
-                    label=child_label,
-                    transform=affine_multiply(node.transform, child_transform),
+                    label=child.label,
+                    chirality=child.chirality,
+                    transform=affine_multiply(node.transform, child.transform),
                 ),
                 remaining_depth - 1,
             )
@@ -269,4 +355,8 @@ def build_tuebingen_triangle_patch(patch_depth: int) -> AperiodicPatch:
     for node in _root_star_nodes(root_scale):
         collect(node, resolved_depth)
 
-    return patch_from_records(resolved_depth, records)
+    return patch_from_records(
+        resolved_depth,
+        records,
+        neighbor_mode="segment_overlap",
+    )

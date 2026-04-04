@@ -43,11 +43,12 @@ const TUEBINGEN_DEAD_PALETTE = new Map<string, string>([
 function resolveTuebingenDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
-    if (cell?.tile_family !== "tuebingen") {
+    const topologyCell = cell as Partial<TopologyCell> | null | undefined;
+    if (topologyCell?.tile_family !== "tuebingen") {
         return null;
     }
-    const kind = typeof cell.kind === "string" ? cell.kind : "";
-    const chirality = typeof cell.chirality_token === "string" ? cell.chirality_token : "";
+    const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
+    const chirality = typeof topologyCell.chirality_token === "string" ? topologyCell.chirality_token : "";
     return TUEBINGEN_DEAD_PALETTE.get(`${kind}:${chirality}`) || null;
 }
 

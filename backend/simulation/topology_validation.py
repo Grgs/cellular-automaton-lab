@@ -12,7 +12,8 @@ from backend.simulation.topology import LatticeTopology
 
 
 _COORDINATE_PRECISION = 6
-_AREA_TOLERANCE = 1e-9
+_AREA_TOLERANCE = 1e-7
+_SURFACE_HOLE_AREA_TOLERANCE = 2e-7
 
 
 @dataclass(frozen=True)
@@ -154,7 +155,7 @@ def _significant_surface_hole_count(surfaces: tuple[Polygon, ...]) -> int:
     count = 0
     for surface in surfaces:
         for interior in surface.interiors:
-            if Polygon(interior).area > _AREA_TOLERANCE:
+            if Polygon(interior).area > _SURFACE_HOLE_AREA_TOLERANCE:
                 count += 1
     return count
 

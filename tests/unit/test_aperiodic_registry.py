@@ -93,6 +93,23 @@ class AperiodicRegistryTests(unittest.TestCase):
 
         self.assertEqual(len(seen), len(patch.cells))
 
+    def test_tuebingen_patch_uses_segment_overlap_neighbors_to_stay_connected(self) -> None:
+        patch = build_aperiodic_patch("tuebingen-triangle", 3)
+        by_id = {cell.id: cell for cell in patch.cells}
+
+        seen: set[str] = set()
+        stack = [patch.cells[0].id]
+        seen.add(patch.cells[0].id)
+        while stack:
+            current = stack.pop()
+            for neighbor_id in by_id[current].neighbors:
+                if neighbor_id in seen:
+                    continue
+                seen.add(neighbor_id)
+                stack.append(neighbor_id)
+
+        self.assertEqual(len(seen), len(patch.cells))
+
     def test_tuebingen_patch_is_not_geometry_identical_to_robinson(self) -> None:
         robinson_patch = build_aperiodic_patch("robinson-triangles", 3)
         tuebingen_patch = build_aperiodic_patch("tuebingen-triangle", 3)
