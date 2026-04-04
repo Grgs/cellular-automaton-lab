@@ -204,6 +204,7 @@ describe("standalone worker client", () => {
         const environmentPromise = module.createStandaloneEnvironment(bootstrapData);
         await flushAsyncStartup();
         const initMessage = lastInitMessage(worker());
+        expect(initMessage.pythonBundleUrl).toContain("standalone-python-bundle.json");
         worker().dispatchMessage({
             type: "ready",
             requestId: initMessage.requestId,

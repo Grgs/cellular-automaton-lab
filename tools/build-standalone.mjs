@@ -47,12 +47,6 @@ function collectFiles(directory, predicate, bucket = []) {
     return bucket;
 }
 
-function copyFileIntoOutput(sourcePath, relativeDestination) {
-    const destinationPath = path.join(outputDir, relativeDestination);
-    fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
-    fs.copyFileSync(sourcePath, destinationPath);
-}
-
 function copyFileIntoDirectory(sourcePath, targetDir, filename = path.basename(sourcePath)) {
     const destinationPath = path.join(targetDir, filename);
     fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
@@ -97,7 +91,7 @@ function prepareStandaloneBuildInput() {
     return standaloneHtmlInputPath;
 }
 
-function writePythonManifest() {
+function writePythonBundle() {
     const sourceRoots = [
         path.join(rootDir, "backend"),
         path.join(rootDir, "config"),
@@ -105,21 +99,20 @@ function writePythonManifest() {
     const files = sourceRoots.flatMap((sourceRoot) => collectFiles(
         sourceRoot,
         (absolutePath) => absolutePath.endsWith(".py") || absolutePath.endsWith(".json"),
-    ));
+    )).sort();
 
-    const manifestEntries = files.map((absolutePath) => {
+    const bundleEntries = files.map((absolutePath) => {
         const relativePath = path.relative(rootDir, absolutePath).replace(/\\/g, "/");
-        const outputRelativePath = `py-src/${relativePath}`;
-        copyFileIntoOutput(absolutePath, outputRelativePath);
         return {
-            url: `./${outputRelativePath}`,
             target_path: `/app/${relativePath}`,
+            contents: fs.readFileSync(absolutePath, "utf8"),
         };
     });
 
+    fs.rmSync(path.join(outputDir, "py-src"), { recursive: true, force: true });
     fs.writeFileSync(
-        path.join(outputDir, "standalone-python-manifest.json"),
-        JSON.stringify({ files: manifestEntries }, null, 2),
+        path.join(outputDir, "standalone-python-bundle.json"),
+        JSON.stringify({ version: 1, files: bundleEntries }),
         "utf8",
     );
 }
@@ -157,7 +150,7 @@ try {
     buildStandaloneFrontend(standaloneHtmlEntry);
     copyStaticAssets();
     exportBootstrapData();
-    writePythonManifest();
+    writePythonBundle();
 } finally {
     fs.rmSync(standaloneBuildInputDir, { recursive: true, force: true });
 }
