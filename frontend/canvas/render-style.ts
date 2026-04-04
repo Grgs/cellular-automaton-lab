@@ -33,6 +33,24 @@ const MIXED_DEAD_ALT_CELL_KINDS = new Map<string, ReadonlySet<string>>([
     [KAGOME_GEOMETRY, new Set(["triangle-up", "triangle-down"])],
 ]);
 
+const TUEBINGEN_DEAD_PALETTE = new Map<string, string>([
+    ["tuebingen-thick:left", "#d4d0e7"],
+    ["tuebingen-thick:right", "#1f2378"],
+    ["tuebingen-thin:left", "#f47c14"],
+    ["tuebingen-thin:right", "#f0c86b"],
+]);
+
+function resolveTuebingenDeadColor(
+    cell: TopologyCell | PaintableCell | null | undefined,
+): string | null {
+    if (cell?.tile_family !== "tuebingen") {
+        return null;
+    }
+    const kind = typeof cell.kind === "string" ? cell.kind : "";
+    const chirality = typeof cell.chirality_token === "string" ? cell.chirality_token : "";
+    return TUEBINGEN_DEAD_PALETTE.get(`${kind}:${chirality}`) || null;
+}
+
 export function readCanvasColors(
     canvas: HTMLElement,
     getComputedStyleFn: (node: Element) => CSSStyleDeclaration,
@@ -119,6 +137,11 @@ export function resolveDeadCellColor(
 ): string | null {
     if (stateValue !== 0) {
         return null;
+    }
+
+    const tuebingenDeadColor = resolveTuebingenDeadColor(cell);
+    if (tuebingenDeadColor) {
+        return tuebingenDeadColor;
     }
 
     const normalizedGeometry = normalizeGeometry(geometry);

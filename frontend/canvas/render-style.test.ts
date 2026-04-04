@@ -139,6 +139,67 @@ describe("canvas/render-style", () => {
         ).toBe("#f8f1e5");
     });
 
+    it("uses a four-color dead palette for Tuebingen triangles based on kind and chirality", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: {
+                    id: "tt:left",
+                    state: 0,
+                    kind: "tuebingen-thick",
+                    tile_family: "tuebingen",
+                    chirality_token: "left",
+                },
+                expectedColor: "#d4d0e7",
+            },
+            {
+                cell: {
+                    id: "tt:right",
+                    state: 0,
+                    kind: "tuebingen-thick",
+                    tile_family: "tuebingen",
+                    chirality_token: "right",
+                },
+                expectedColor: "#1f2378",
+            },
+            {
+                cell: {
+                    id: "tn:left",
+                    state: 0,
+                    kind: "tuebingen-thin",
+                    tile_family: "tuebingen",
+                    chirality_token: "left",
+                },
+                expectedColor: "#f47c14",
+            },
+            {
+                cell: {
+                    id: "tn:right",
+                    state: 0,
+                    kind: "tuebingen-thin",
+                    tile_family: "tuebingen",
+                    chirality_token: "right",
+                },
+                expectedColor: "#f0c86b",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "tuebingen-triangle", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "tuebingen-triangle",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
     it("reads canvas line tokens and applies them to the resolved render style", async () => {
         const { readCanvasColors, resolveCanvasRenderStyle } = await import("./render-style.js");
         const canvas = document.createElement("canvas");
