@@ -40,11 +40,35 @@ const TUEBINGEN_DEAD_PALETTE = new Map<string, string>([
     ["tuebingen-thin:right", "#e1cdac"],
 ]);
 
+const ROBINSON_DEAD_PALETTE = new Map<string, string>([
+    ["robinson-thick", "#f8f1e5"],
+    ["robinson-thin", "#d5bb8f"],
+]);
+
+const HAT_DEAD_PALETTE = new Map<string, string>([
+    ["left", "#f8f1e5"],
+    ["right", "#c88d4b"],
+]);
+
 const CHAIR_DEAD_PALETTE = new Map<string, string>([
     ["0", "#f8f1e5"],
     ["1", "#e5c089"],
     ["2", "#c88d4b"],
     ["3", "#dbc1b2"],
+]);
+
+const SQUARE_TRIANGLE_DEAD_PALETTE = new Map<string, string>([
+    ["square-triangle-square:blue", "#f8f1e5"],
+    ["square-triangle-square:red", "#ead6b6"],
+    ["square-triangle-square:yellow", "#d5bb8f"],
+    ["square-triangle-triangle:blue", "#efe4d0"],
+    ["square-triangle-triangle:red", "#e1cdac"],
+    ["square-triangle-triangle:yellow", "#c88d4b"],
+]);
+
+const PINWHEEL_DEAD_PALETTE = new Map<string, string>([
+    ["left", "#efe4d0"],
+    ["right", "#d5bb8f"],
 ]);
 
 const SHIELD_SHIELD_DEAD_PALETTE = new Map<string, string>([
@@ -73,6 +97,30 @@ function resolveTuebingenDeadColor(
     return TUEBINGEN_DEAD_PALETTE.get(`${kind}:${chirality}`) || null;
 }
 
+function resolveRobinsonDeadColor(
+    cell: TopologyCell | PaintableCell | null | undefined,
+): string | null {
+    const topologyCell = cell as Partial<TopologyCell> | null | undefined;
+    if (topologyCell?.tile_family !== "robinson") {
+        return null;
+    }
+    const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
+    return ROBINSON_DEAD_PALETTE.get(kind) || null;
+}
+
+function resolveHatDeadColor(
+    cell: TopologyCell | PaintableCell | null | undefined,
+): string | null {
+    const topologyCell = cell as Partial<TopologyCell> | null | undefined;
+    if (topologyCell?.tile_family !== "hat") {
+        return null;
+    }
+    const chirality = typeof topologyCell.chirality_token === "string"
+        ? topologyCell.chirality_token
+        : "";
+    return HAT_DEAD_PALETTE.get(chirality) || null;
+}
+
 function resolveChairDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
@@ -84,6 +132,33 @@ function resolveChairDeadColor(
         ? topologyCell.orientation_token
         : "";
     return CHAIR_DEAD_PALETTE.get(orientation) || null;
+}
+
+function resolveSquareTriangleDeadColor(
+    cell: TopologyCell | PaintableCell | null | undefined,
+): string | null {
+    const topologyCell = cell as Partial<TopologyCell> | null | undefined;
+    if (topologyCell?.tile_family !== "square-triangle") {
+        return null;
+    }
+    const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
+    const chirality = typeof topologyCell.chirality_token === "string"
+        ? topologyCell.chirality_token
+        : "";
+    return SQUARE_TRIANGLE_DEAD_PALETTE.get(`${kind}:${chirality}`) || null;
+}
+
+function resolvePinwheelDeadColor(
+    cell: TopologyCell | PaintableCell | null | undefined,
+): string | null {
+    const topologyCell = cell as Partial<TopologyCell> | null | undefined;
+    if (topologyCell?.tile_family !== "pinwheel") {
+        return null;
+    }
+    const chirality = typeof topologyCell.chirality_token === "string"
+        ? topologyCell.chirality_token
+        : "";
+    return PINWHEEL_DEAD_PALETTE.get(chirality) || null;
 }
 
 function resolveShieldDeadColor(
@@ -203,9 +278,25 @@ export function resolveDeadCellColor(
     if (tuebingenDeadColor) {
         return tuebingenDeadColor;
     }
+    const robinsonDeadColor = resolveRobinsonDeadColor(cell);
+    if (robinsonDeadColor) {
+        return robinsonDeadColor;
+    }
+    const hatDeadColor = resolveHatDeadColor(cell);
+    if (hatDeadColor) {
+        return hatDeadColor;
+    }
     const chairDeadColor = resolveChairDeadColor(cell);
     if (chairDeadColor) {
         return chairDeadColor;
+    }
+    const squareTriangleDeadColor = resolveSquareTriangleDeadColor(cell);
+    if (squareTriangleDeadColor) {
+        return squareTriangleDeadColor;
+    }
+    const pinwheelDeadColor = resolvePinwheelDeadColor(cell);
+    if (pinwheelDeadColor) {
+        return pinwheelDeadColor;
     }
     const shieldDeadColor = resolveShieldDeadColor(cell);
     if (shieldDeadColor) {

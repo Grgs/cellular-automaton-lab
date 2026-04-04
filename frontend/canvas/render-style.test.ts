@@ -237,6 +237,166 @@ describe("canvas/render-style", () => {
         });
     });
 
+    it("uses differentiated dead-state colors for Robinson thick and thin triangles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: { id: "rob:thick", state: 0, kind: "robinson-thick", tile_family: "robinson" },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: { id: "rob:thin", state: 0, kind: "robinson-thin", tile_family: "robinson" },
+                expectedColor: "#d5bb8f",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "robinson-triangles", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "robinson-triangles",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("uses chirality-based dead-state colors for hat monotiles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: { id: "hat:left", state: 0, kind: "hat", tile_family: "hat", chirality_token: "left" },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: { id: "hat:right", state: 0, kind: "hat", tile_family: "hat", chirality_token: "right" },
+                expectedColor: "#c88d4b",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "hat-monotile", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "hat-monotile",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("uses warm metadata-based dead-state colors for square-triangle tiles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: {
+                    id: "st:square-blue",
+                    state: 0,
+                    kind: "square-triangle-square",
+                    tile_family: "square-triangle",
+                    chirality_token: "blue",
+                },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: {
+                    id: "st:square-yellow",
+                    state: 0,
+                    kind: "square-triangle-square",
+                    tile_family: "square-triangle",
+                    chirality_token: "yellow",
+                },
+                expectedColor: "#d5bb8f",
+            },
+            {
+                cell: {
+                    id: "st:triangle-red",
+                    state: 0,
+                    kind: "square-triangle-triangle",
+                    tile_family: "square-triangle",
+                    chirality_token: "red",
+                },
+                expectedColor: "#e1cdac",
+            },
+            {
+                cell: {
+                    id: "st:triangle-yellow",
+                    state: 0,
+                    kind: "square-triangle-triangle",
+                    tile_family: "square-triangle",
+                    chirality_token: "yellow",
+                },
+                expectedColor: "#c88d4b",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "square-triangle", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "square-triangle",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("uses chirality-based dead-state colors for pinwheel triangles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: {
+                    id: "pin:left",
+                    state: 0,
+                    kind: "pinwheel-triangle",
+                    tile_family: "pinwheel",
+                    chirality_token: "left",
+                },
+                expectedColor: "#efe4d0",
+            },
+            {
+                cell: {
+                    id: "pin:right",
+                    state: 0,
+                    kind: "pinwheel-triangle",
+                    tile_family: "pinwheel",
+                    chirality_token: "right",
+                },
+                expectedColor: "#d5bb8f",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "pinwheel", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "pinwheel",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
     it("renders Shield decoration tokens with distinct dead-state accents", async () => {
         const {
             buildStateColorLookup,
