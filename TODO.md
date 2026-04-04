@@ -2,6 +2,7 @@
 
 ## Now
 
+- Fix positive-area overlap in `hat-monotile`, `square-triangle`, `shield`, and `pinwheel` now that the stronger backend/frontend overlap diagnostics catch them.
 - Replace generic fallback periodic sources with stronger family-specific references where possible.
 - Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
 - Add stronger canonical-patch fixtures for substitution families that still rely mainly on low-depth counts, metadata, adjacency vocabularies, and signatures.

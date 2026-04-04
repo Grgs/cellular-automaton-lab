@@ -38,6 +38,15 @@ py -3 -m mypy --config-file mypy.ini
 
 Use this before committing verifier or generator changes.
 
+### 5. Polygon no-overlap checks
+
+```powershell
+py -3 -m unittest -q tests.unit.test_topology_validation
+npm run test:frontend
+```
+
+Use these when a tiling looks visually stacked or suspicious. The backend test catches topology-space polygon overlap with Shapely, and the frontend suite now includes adapter-space overlap checks using the same transformed polygons the canvas renderer fills.
+
 ## How To Read Failures
 
 - `validate_tilings.py` fails
@@ -51,6 +60,10 @@ Use this before committing verifier or generator changes.
   - spec coverage mismatch
   - verifier behavior changed
   - signature or sample-mode expectation changed
+- overlap-focused topology/frontend tests fail
+  - real positive-area overlap between polygons
+  - geometry adapter transform drift
+  - expected-deviation test needs to be updated after a generator fix
 
 ## Recommended Workflow
 
@@ -60,9 +73,11 @@ Use this before committing verifier or generator changes.
 4. If signatures changed intentionally, update the spec and rerun.
 5. Run the focused verifier unit test.
 6. Run the full backend regression sweep.
+7. If a tiling looks stacked or obscured, run the overlap-focused backend/frontend checks too.
 
 ## Notes
 
 - Regular and periodic families are verified on canonical `3x3` samples.
 - Aperiodic families are verified on patch-depth samples.
 - Pinwheel has an exact-affine verification path and should not be treated like the other families when debugging verification failures.
+- The strongest “tiles do not obscure each other” check is now split across backend topology-space overlap detection and frontend adapter-space overlap detection.
