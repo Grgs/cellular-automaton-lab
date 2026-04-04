@@ -64,6 +64,25 @@ __APP_SHELL__
 </html>
 """
 
+_STANDALONE_GRID_VIEWPORT_MARKER = '<div id="grid-viewport" class="grid-viewport">'
+_STANDALONE_STARTUP_MARKUP = """
+                <div
+                    id="standalone-startup-overlay"
+                    class="standalone-startup-status"
+                    aria-hidden="false"
+                    aria-live="polite"
+                >
+                    <div class="standalone-startup-status-card">
+                        <div class="blocking-activity-spinner standalone-startup-spinner" aria-hidden="true"></div>
+                        <div class="standalone-startup-copy">
+                            <strong id="standalone-startup-message" class="blocking-activity-message">Loading app data</strong>
+                            <span id="standalone-startup-detail" class="blocking-activity-detail">
+                                Reading bundled defaults and topology catalog.
+                            </span>
+                        </div>
+                    </div>
+                </div>"""
+
 
 def load_shared_app_shell_body() -> str:
     return SHARED_APP_SHELL_BODY_PATH.read_text(encoding="utf-8")
@@ -252,7 +271,19 @@ def render_standalone_app_shell() -> str:
         "adjacency_field_hidden": "hidden",
         "adjacency_mode_options": "",
     }
-    return _render_shared_app_shell(render_values)
+    rendered = _render_shared_app_shell(render_values)
+    if _STANDALONE_GRID_VIEWPORT_MARKER not in rendered:
+        raise ValueError("Standalone shell template is missing the grid viewport marker.")
+    return rendered.replace(
+        _STANDALONE_GRID_VIEWPORT_MARKER,
+        "\n".join(
+            [
+                _STANDALONE_GRID_VIEWPORT_MARKER,
+                _STANDALONE_STARTUP_MARKUP,
+            ]
+        ),
+        1,
+    )
 
 
 def render_standalone_document() -> str:

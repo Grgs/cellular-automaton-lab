@@ -43,6 +43,16 @@ class AppShellTests(unittest.TestCase):
                 render_standalone_document(),
             )
 
+    def test_render_standalone_document_places_startup_status_inside_grid_viewport(self) -> None:
+        rendered = render_standalone_document()
+
+        grid_viewport_index = rendered.index('<div id="grid-viewport" class="grid-viewport">')
+        startup_index = rendered.index('id="standalone-startup-overlay"')
+        canvas_index = rendered.index('<canvas id="grid" class="grid-canvas" aria-label="Cellular automaton grid"></canvas>')
+
+        self.assertLess(grid_viewport_index, startup_index)
+        self.assertLess(startup_index, canvas_index)
+
 
 if __name__ == "__main__":
     unittest.main()
