@@ -139,7 +139,7 @@ describe("canvas/render-style", () => {
         ).toBe("#f8f1e5");
     });
 
-    it("uses a four-color dead palette for Tuebingen triangles based on kind and chirality", async () => {
+    it("uses a warm four-color dead palette for Tuebingen triangles based on kind and chirality", async () => {
         const {
             buildStateColorLookup,
             resolveDeadCellColor,
@@ -155,7 +155,7 @@ describe("canvas/render-style", () => {
                     tile_family: "tuebingen",
                     chirality_token: "left",
                 },
-                expectedColor: "#d4d0e7",
+                expectedColor: "#f8f1e5",
             },
             {
                 cell: {
@@ -165,7 +165,7 @@ describe("canvas/render-style", () => {
                     tile_family: "tuebingen",
                     chirality_token: "right",
                 },
-                expectedColor: "#1f2378",
+                expectedColor: "#d5bb8f",
             },
             {
                 cell: {
@@ -175,7 +175,7 @@ describe("canvas/render-style", () => {
                     tile_family: "tuebingen",
                     chirality_token: "left",
                 },
-                expectedColor: "#f47c14",
+                expectedColor: "#efe4d0",
             },
             {
                 cell: {
@@ -185,7 +185,7 @@ describe("canvas/render-style", () => {
                     tile_family: "tuebingen",
                     chirality_token: "right",
                 },
-                expectedColor: "#f0c86b",
+                expectedColor: "#e1cdac",
             },
         ];
 

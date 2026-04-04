@@ -34,10 +34,10 @@ const MIXED_DEAD_ALT_CELL_KINDS = new Map<string, ReadonlySet<string>>([
 ]);
 
 const TUEBINGEN_DEAD_PALETTE = new Map<string, string>([
-    ["tuebingen-thick:left", "#d4d0e7"],
-    ["tuebingen-thick:right", "#1f2378"],
-    ["tuebingen-thin:left", "#f47c14"],
-    ["tuebingen-thin:right", "#f0c86b"],
+    ["tuebingen-thick:left", "#f8f1e5"],
+    ["tuebingen-thick:right", "#d5bb8f"],
+    ["tuebingen-thin:left", "#efe4d0"],
+    ["tuebingen-thin:right", "#e1cdac"],
 ]);
 
 function resolveTuebingenDeadColor(
