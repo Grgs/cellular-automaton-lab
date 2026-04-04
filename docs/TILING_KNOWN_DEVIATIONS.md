@@ -4,8 +4,7 @@ This file tracks known mismatches between the current app implementation and the
 
 ## Current Blocking Deviations
 
-- `square-triangle`
-  Canonical literature verification now blocks because the depth-3 sample is connected but still leaves enclosed empty gaps rather than a hole-free surface.
+None.
 
 ## Current Known Deviations
 

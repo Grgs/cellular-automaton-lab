@@ -9,7 +9,7 @@
       "tiling_family": "square-triangle",
       "adjacency_mode": "edge",
       "sizing_mode": "patch_depth",
-      "width": 28,
+      "width": 24,
       "height": 31,
       "patch_depth": 3
     },
@@ -80,7 +80,6 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:00448",
-          "sqtri:ref:01736",
           "sqtri:ref:02223"
         ],
         "center": {
@@ -168,8 +167,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:00006",
-          "sqtri:ref:00614",
-          "sqtri:ref:01815"
+          "sqtri:ref:00614"
         ],
         "center": {
           "x": -10.216361,
@@ -340,124 +338,6 @@
         "chirality_token": "red"
       },
       {
-        "id": "sqtri:ref:00319",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:00324",
-          "sqtri:ref:00610",
-          "sqtri:ref:01637"
-        ],
-        "center": {
-          "x": -16.448497,
-          "y": -11.796022
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -12.374472
-          },
-          {
-            "x": -17.116742,
-            "y": -11.796023
-          },
-          {
-            "x": -16.114374,
-            "y": -11.217572
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150",
-        "chirality_token": "red"
-      },
-      {
-        "id": "sqtri:ref:00320",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:00323",
-          "sqtri:ref:01638"
-        ],
-        "center": {
-          "x": -16.448497,
-          "y": -8.636267
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -9.214717
-          },
-          {
-            "x": -17.116742,
-            "y": -8.636268
-          },
-          {
-            "x": -16.114374,
-            "y": -8.057816
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150",
-        "chirality_token": "red"
-      },
-      {
-        "id": "sqtri:ref:00323",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:00320",
-          "sqtri:ref:01639"
-        ],
-        "center": {
-          "x": -15.780075,
-          "y": -8.636267
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -8.057816
-          },
-          {
-            "x": -15.111476,
-            "y": -8.636268
-          },
-          {
-            "x": -16.114374,
-            "y": -9.214717
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
-        "chirality_token": "red"
-      },
-      {
-        "id": "sqtri:ref:00324",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:00319",
-          "sqtri:ref:00622",
-          "sqtri:ref:01640"
-        ],
-        "center": {
-          "x": -15.780075,
-          "y": -11.796022
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -11.217572
-          },
-          {
-            "x": -15.111476,
-            "y": -11.796023
-          },
-          {
-            "x": -16.114374,
-            "y": -12.374472
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
-        "chirality_token": "red"
-      },
-      {
         "id": "sqtri:ref:00448",
         "kind": "square-triangle-triangle",
         "neighbors": [
@@ -520,8 +400,7 @@
         "id": "sqtri:ref:00450",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:00006",
-          "sqtri:ref:02061"
+          "sqtri:ref:00006"
         ],
         "center": {
           "x": -9.637857,
@@ -749,64 +628,6 @@
         "chirality_token": "red"
       },
       {
-        "id": "sqtri:ref:00606",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01519",
-          "sqtri:ref:02179"
-        ],
-        "center": {
-          "x": -18.273911,
-          "y": -13.621437
-        },
-        "vertices": [
-          {
-            "x": -17.695517,
-            "y": -13.955614
-          },
-          {
-            "x": -18.852251,
-            "y": -13.955614
-          },
-          {
-            "x": -18.273966,
-            "y": -12.953083
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "180",
-        "chirality_token": "red"
-      },
-      {
-        "id": "sqtri:ref:00610",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:00319",
-          "sqtri:ref:01716"
-        ],
-        "center": {
-          "x": -16.782619,
-          "y": -12.374526
-        },
-        "vertices": [
-          {
-            "x": -17.116742,
-            "y": -11.796023
-          },
-          {
-            "x": -16.114374,
-            "y": -12.374472
-          },
-          {
-            "x": -17.116742,
-            "y": -12.953083
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
-        "chirality_token": "red"
-      },
-      {
         "id": "sqtri:ref:00614",
         "kind": "square-triangle-triangle",
         "neighbors": [
@@ -869,8 +690,7 @@
         "id": "sqtri:ref:00616",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:00085",
-          "sqtri:ref:02187"
+          "sqtri:ref:00085"
         ],
         "center": {
           "x": -12.37334,
@@ -923,41 +743,11 @@
         "chirality_token": "red"
       },
       {
-        "id": "sqtri:ref:00622",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:00324",
-          "sqtri:ref:01719"
-        ],
-        "center": {
-          "x": -15.445775,
-          "y": -12.374526
-        },
-        "vertices": [
-          {
-            "x": -15.111476,
-            "y": -12.953083
-          },
-          {
-            "x": -16.114374,
-            "y": -12.374472
-          },
-          {
-            "x": -15.111476,
-            "y": -11.796023
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150",
-        "chirality_token": "red"
-      },
-      {
         "id": "sqtri:ref:00661",
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:01734",
-          "sqtri:ref:01735",
-          "sqtri:ref:01736"
+          "sqtri:ref:01735"
         ],
         "center": {
           "x": -8.056632,
@@ -985,7 +775,6 @@
         "id": "sqtri:ref:00687",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:01815",
           "sqtri:ref:01816",
           "sqtri:ref:01817"
         ],
@@ -1016,8 +805,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:02059",
-          "sqtri:ref:02060",
-          "sqtri:ref:02061"
+          "sqtri:ref:02060"
         ],
         "center": {
           "x": -8.056632,
@@ -1076,8 +864,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:02185",
-          "sqtri:ref:02186",
-          "sqtri:ref:02187"
+          "sqtri:ref:02186"
         ],
         "center": {
           "x": -12.37334,
@@ -1100,122 +887,6 @@
         "tile_family": "square-triangle",
         "orientation_token": "0",
         "chirality_token": "yellow"
-      },
-      {
-        "id": "sqtri:ref:01267",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01268",
-          "sqtri:ref:01637",
-          "sqtri:ref:01638"
-        ],
-        "center": {
-          "x": -17.361231,
-          "y": -10.21741
-        },
-        "vertices": [
-          {
-            "x": -17.695517,
-            "y": -9.638961
-          },
-          {
-            "x": -16.692659,
-            "y": -10.21741
-          },
-          {
-            "x": -17.695517,
-            "y": -10.795859
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:01268",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01267"
-        ],
-        "center": {
-          "x": -18.02885,
-          "y": -10.21741
-        },
-        "vertices": [
-          {
-            "x": -17.695517,
-            "y": -10.795859
-          },
-          {
-            "x": -18.695517,
-            "y": -10.21741
-          },
-          {
-            "x": -17.695517,
-            "y": -9.638961
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:01271",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01272",
-          "sqtri:ref:01639",
-          "sqtri:ref:01640"
-        ],
-        "center": {
-          "x": -14.867217,
-          "y": -10.21741
-        },
-        "vertices": [
-          {
-            "x": -14.533027,
-            "y": -10.795859
-          },
-          {
-            "x": -15.535598,
-            "y": -10.21741
-          },
-          {
-            "x": -14.533027,
-            "y": -9.638961
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:01272",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01271"
-        ],
-        "center": {
-          "x": -14.198741,
-          "y": -10.21741
-        },
-        "vertices": [
-          {
-            "x": -14.533027,
-            "y": -9.638961
-          },
-          {
-            "x": -13.53017,
-            "y": -10.21741
-          },
-          {
-            "x": -14.533027,
-            "y": -10.795859
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
-        "chirality_token": "blue"
       },
       {
         "id": "sqtri:ref:01379",
@@ -1309,7 +980,6 @@
         "id": "sqtri:ref:01382",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:01383",
           "sqtri:ref:01680",
           "sqtri:ref:02060"
         ],
@@ -1333,35 +1003,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "270",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:01383",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01382",
-          "sqtri:ref:02061"
-        ],
-        "center": {
-          "x": -9.303667,
-          "y": -15.536879
-        },
-        "vertices": [
-          {
-            "x": -9.637967,
-            "y": -16.115369
-          },
-          {
-            "x": -9.637967,
-            "y": -14.958349
-          },
-          {
-            "x": -8.635067,
-            "y": -15.53692
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "90",
         "chirality_token": "blue"
       },
       {
@@ -1570,93 +1211,6 @@
         "chirality_token": "blue"
       },
       {
-        "id": "sqtri:ref:01517",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01518"
-        ],
-        "center": {
-          "x": -18.940633,
-          "y": -11.796022
-        },
-        "vertices": [
-          {
-            "x": -19.273966,
-            "y": -12.374472
-          },
-          {
-            "x": -19.273966,
-            "y": -11.217572
-          },
-          {
-            "x": -18.273966,
-            "y": -11.796023
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "90",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:01518",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01517",
-          "sqtri:ref:01716",
-          "sqtri:ref:02179"
-        ],
-        "center": {
-          "x": -18.607299,
-          "y": -12.374526
-        },
-        "vertices": [
-          {
-            "x": -18.273966,
-            "y": -11.796023
-          },
-          {
-            "x": -18.273966,
-            "y": -12.953083
-          },
-          {
-            "x": -19.273966,
-            "y": -12.374472
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "270",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:01519",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:00606",
-          "sqtri:ref:01716"
-        ],
-        "center": {
-          "x": -17.695408,
-          "y": -13.28726
-        },
-        "vertices": [
-          {
-            "x": -18.273966,
-            "y": -12.953083
-          },
-          {
-            "x": -17.116742,
-            "y": -12.953083
-          },
-          {
-            "x": -17.695517,
-            "y": -13.955614
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "0",
-        "chirality_token": "blue"
-      },
-      {
         "id": "sqtri:ref:01525",
         "kind": "square-triangle-triangle",
         "neighbors": [
@@ -1745,70 +1299,10 @@
         "chirality_token": "blue"
       },
       {
-        "id": "sqtri:ref:01528",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01529",
-          "sqtri:ref:01719",
-          "sqtri:ref:02186"
-        ],
-        "center": {
-          "x": -13.620456,
-          "y": -12.374526
-        },
-        "vertices": [
-          {
-            "x": -12.951884,
-            "y": -12.374472
-          },
-          {
-            "x": -13.954742,
-            "y": -12.953083
-          },
-          {
-            "x": -13.954742,
-            "y": -11.796023
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "210",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:01529",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:01528",
-          "sqtri:ref:02187"
-        ],
-        "center": {
-          "x": -13.28617,
-          "y": -11.796022
-        },
-        "vertices": [
-          {
-            "x": -13.954742,
-            "y": -11.796023
-          },
-          {
-            "x": -12.951884,
-            "y": -11.217572
-          },
-          {
-            "x": -12.951884,
-            "y": -12.374472
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "30",
-        "chirality_token": "blue"
-      },
-      {
         "id": "sqtri:ref:01532",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:00615",
-          "sqtri:ref:01719"
+          "sqtri:ref:00615"
         ],
         "center": {
           "x": -14.533082,
@@ -1893,134 +1387,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "0"
-      },
-      {
-        "id": "sqtri:ref:01637",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00319",
-          "sqtri:ref:01267"
-        ],
-        "center": {
-          "x": -16.904823,
-          "y": -11.006716
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -11.217572
-          },
-          {
-            "x": -16.692659,
-            "y": -10.21741
-          },
-          {
-            "x": -17.695517,
-            "y": -10.795859
-          },
-          {
-            "x": -17.116742,
-            "y": -11.796023
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "120"
-      },
-      {
-        "id": "sqtri:ref:01638",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00320",
-          "sqtri:ref:01267"
-        ],
-        "center": {
-          "x": -16.904823,
-          "y": -9.426839
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -9.214717
-          },
-          {
-            "x": -16.692659,
-            "y": -10.21741
-          },
-          {
-            "x": -17.695517,
-            "y": -9.638961
-          },
-          {
-            "x": -17.116742,
-            "y": -8.636268
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "240"
-      },
-      {
-        "id": "sqtri:ref:01639",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00323",
-          "sqtri:ref:01271"
-        ],
-        "center": {
-          "x": -15.323619,
-          "y": -9.426839
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -9.214717
-          },
-          {
-            "x": -15.535598,
-            "y": -10.21741
-          },
-          {
-            "x": -14.533027,
-            "y": -9.638961
-          },
-          {
-            "x": -15.111476,
-            "y": -8.636268
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "300"
-      },
-      {
-        "id": "sqtri:ref:01640",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00324",
-          "sqtri:ref:01271"
-        ],
-        "center": {
-          "x": -15.323619,
-          "y": -11.006716
-        },
-        "vertices": [
-          {
-            "x": -16.114374,
-            "y": -11.217572
-          },
-          {
-            "x": -15.535598,
-            "y": -10.21741
-          },
-          {
-            "x": -14.533027,
-            "y": -10.795859
-          },
-          {
-            "x": -15.111476,
-            "y": -11.796023
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
       },
       {
         "id": "sqtri:ref:01679",
@@ -2155,39 +1521,6 @@
         "orientation_token": "300"
       },
       {
-        "id": "sqtri:ref:01716",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00610",
-          "sqtri:ref:01518",
-          "sqtri:ref:01519"
-        ],
-        "center": {
-          "x": -17.695354,
-          "y": -12.374553
-        },
-        "vertices": [
-          {
-            "x": -18.273966,
-            "y": -11.796023
-          },
-          {
-            "x": -17.116742,
-            "y": -11.796023
-          },
-          {
-            "x": -17.116742,
-            "y": -12.953083
-          },
-          {
-            "x": -18.273966,
-            "y": -12.953083
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "0"
-      },
-      {
         "id": "sqtri:ref:01718",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -2219,39 +1552,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "60"
-      },
-      {
-        "id": "sqtri:ref:01719",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00622",
-          "sqtri:ref:01528",
-          "sqtri:ref:01532"
-        ],
-        "center": {
-          "x": -14.533109,
-          "y": -12.374553
-        },
-        "vertices": [
-          {
-            "x": -15.111476,
-            "y": -11.796023
-          },
-          {
-            "x": -13.954742,
-            "y": -11.796023
-          },
-          {
-            "x": -13.954742,
-            "y": -12.953083
-          },
-          {
-            "x": -15.111476,
-            "y": -12.953083
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "0"
       },
       {
         "id": "sqtri:ref:01734",
@@ -2318,38 +1618,6 @@
         "orientation_token": "0"
       },
       {
-        "id": "sqtri:ref:01736",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00008",
-          "sqtri:ref:00661"
-        ],
-        "center": {
-          "x": -7.266058,
-          "y": -13.165083
-        },
-        "vertices": [
-          {
-            "x": -7.053925,
-            "y": -13.955614
-          },
-          {
-            "x": -8.056783,
-            "y": -13.377165
-          },
-          {
-            "x": -7.478047,
-            "y": -12.374472
-          },
-          {
-            "x": -6.475476,
-            "y": -12.953083
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150"
-      },
-      {
         "id": "sqtri:ref:01738",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -2375,38 +1643,6 @@
           {
             "x": -2.737108,
             "y": -22.591774
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "0"
-      },
-      {
-        "id": "sqtri:ref:01815",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00084",
-          "sqtri:ref:00687"
-        ],
-        "center": {
-          "x": -10.216334,
-          "y": -12.374553
-        },
-        "vertices": [
-          {
-            "x": -10.7947,
-            "y": -11.796023
-          },
-          {
-            "x": -9.637967,
-            "y": -11.796023
-          },
-          {
-            "x": -9.637967,
-            "y": -12.953083
-          },
-          {
-            "x": -10.7947,
-            "y": -12.953083
           }
         ],
         "tile_family": "square-triangle",
@@ -2544,39 +1780,6 @@
         "orientation_token": "0"
       },
       {
-        "id": "sqtri:ref:02061",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00450",
-          "sqtri:ref:00803",
-          "sqtri:ref:01383"
-        ],
-        "center": {
-          "x": -8.847251,
-          "y": -14.746277
-        },
-        "vertices": [
-          {
-            "x": -9.059189,
-            "y": -13.955614
-          },
-          {
-            "x": -8.056783,
-            "y": -14.534227
-          },
-          {
-            "x": -8.635067,
-            "y": -15.53692
-          },
-          {
-            "x": -9.637967,
-            "y": -14.958349
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330"
-      },
-      {
         "id": "sqtri:ref:02066",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -2677,38 +1880,6 @@
         "orientation_token": "210"
       },
       {
-        "id": "sqtri:ref:02179",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00606",
-          "sqtri:ref:01518"
-        ],
-        "center": {
-          "x": -19.06315,
-          "y": -13.165083
-        },
-        "vertices": [
-          {
-            "x": -18.852251,
-            "y": -13.955614
-          },
-          {
-            "x": -19.852415,
-            "y": -13.377165
-          },
-          {
-            "x": -19.273966,
-            "y": -12.374472
-          },
-          {
-            "x": -18.273966,
-            "y": -12.953083
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150"
-      },
-      {
         "id": "sqtri:ref:02185",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -2747,8 +1918,7 @@
         "neighbors": [
           "sqtri:ref:00615",
           "sqtri:ref:00858",
-          "sqtri:ref:01526",
-          "sqtri:ref:01528"
+          "sqtri:ref:01526"
         ],
         "center": {
           "x": -13.164017,
@@ -2774,39 +1944,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "30"
-      },
-      {
-        "id": "sqtri:ref:02187",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:00616",
-          "sqtri:ref:00858",
-          "sqtri:ref:01529"
-        ],
-        "center": {
-          "x": -12.373292,
-          "y": -11.796022
-        },
-        "vertices": [
-          {
-            "x": -12.951884,
-            "y": -11.217572
-          },
-          {
-            "x": -11.7947,
-            "y": -11.217572
-          },
-          {
-            "x": -11.7947,
-            "y": -12.374472
-          },
-          {
-            "x": -12.951884,
-            "y": -12.374472
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "0"
       },
       {
         "id": "sqtri:ref:02221",
@@ -2871,8 +2008,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:00007",
-          "sqtri:ref:02315",
-          "sqtri:ref:04926"
+          "sqtri:ref:02315"
         ],
         "center": {
           "x": -7.478728,
@@ -2989,8 +2125,7 @@
         "id": "sqtri:ref:02228",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02323",
-          "sqtri:ref:04930"
+          "sqtri:ref:02323"
         ],
         "center": {
           "x": 7.479177,
@@ -3077,8 +2212,7 @@
         "id": "sqtri:ref:02275",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02262",
-          "sqtri:ref:04973"
+          "sqtri:ref:02262"
         ],
         "center": {
           "x": -11.460455,
@@ -3194,8 +2328,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:02225",
-          "sqtri:ref:03099",
-          "sqtri:ref:05014"
+          "sqtri:ref:03099"
         ],
         "center": {
           "x": -4.318387,
@@ -3314,8 +2447,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:02227",
-          "sqtri:ref:03115",
-          "sqtri:ref:05018"
+          "sqtri:ref:03115"
         ],
         "center": {
           "x": 4.317082,
@@ -3401,8 +2533,7 @@
         "id": "sqtri:ref:02330",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02846",
-          "sqtri:ref:05027"
+          "sqtri:ref:02846"
         ],
         "center": {
           "x": -7.722388,
@@ -3545,8 +2676,7 @@
         "id": "sqtri:ref:02341",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02855",
-          "sqtri:ref:05038"
+          "sqtri:ref:02855"
         ],
         "center": {
           "x": 7.722265,
@@ -3604,8 +2734,7 @@
         "id": "sqtri:ref:02667",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02670",
-          "sqtri:ref:04747"
+          "sqtri:ref:02670"
         ],
         "center": {
           "x": -5.563245,
@@ -3634,8 +2763,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:02667",
-          "sqtri:ref:02848",
-          "sqtri:ref:04748"
+          "sqtri:ref:02848"
         ],
         "center": {
           "x": -5.229639,
@@ -3723,8 +2851,7 @@
         "id": "sqtri:ref:02675",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02318",
-          "sqtri:ref:04751"
+          "sqtri:ref:02318"
         ],
         "center": {
           "x": -0.577843,
@@ -3783,8 +2910,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:02682",
-          "sqtri:ref:02857",
-          "sqtri:ref:04753"
+          "sqtri:ref:02857"
         ],
         "center": {
           "x": 5.229177,
@@ -3812,8 +2938,7 @@
         "id": "sqtri:ref:02682",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02679",
-          "sqtri:ref:04754"
+          "sqtri:ref:02679"
         ],
         "center": {
           "x": 5.563462,
@@ -3871,8 +2996,7 @@
         "id": "sqtri:ref:02694",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02318",
-          "sqtri:ref:04760"
+          "sqtri:ref:02318"
         ],
         "center": {
           "x": 0.578293,
@@ -4281,8 +3405,7 @@
         "id": "sqtri:ref:02909",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02223",
-          "sqtri:ref:05431"
+          "sqtri:ref:02223"
         ],
         "center": {
           "x": -5.318714,
@@ -4304,34 +3427,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "300",
-        "chirality_token": "red"
-      },
-      {
-        "id": "sqtri:ref:02912",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:04840"
-        ],
-        "center": {
-          "x": -0.669204,
-          "y": -12.376375
-        },
-        "vertices": [
-          {
-            "x": -1.003067,
-            "y": -11.797612
-          },
-          {
-            "x": -0.001148,
-            "y": -12.376226
-          },
-          {
-            "x": -1.003396,
-            "y": -12.955287
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
         "chirality_token": "red"
       },
       {
@@ -4366,8 +3461,7 @@
         "id": "sqtri:ref:02916",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02226",
-          "sqtri:ref:05436"
+          "sqtri:ref:02226"
         ],
         "center": {
           "x": 5.320592,
@@ -4624,34 +3718,6 @@
         "chirality_token": "red"
       },
       {
-        "id": "sqtri:ref:03105",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:04883"
-        ],
-        "center": {
-          "x": -0.667667,
-          "y": -8.059628
-        },
-        "vertices": [
-          {
-            "x": -1.001966,
-            "y": -7.481615
-          },
-          {
-            "x": -4.7e-05,
-            "y": -8.060226
-          },
-          {
-            "x": -1.000987,
-            "y": -8.637043
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
-        "chirality_token": "red"
-      },
-      {
         "id": "sqtri:ref:03106",
         "kind": "square-triangle-triangle",
         "neighbors": [
@@ -4714,8 +3780,7 @@
         "id": "sqtri:ref:03108",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:02320",
-          "sqtri:ref:05590"
+          "sqtri:ref:02320"
         ],
         "center": {
           "x": -1.580075,
@@ -4947,7 +4012,6 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04925",
-          "sqtri:ref:04926",
           "sqtri:ref:04927"
         ],
         "center": {
@@ -4977,8 +4041,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04928",
-          "sqtri:ref:04929",
-          "sqtri:ref:04930"
+          "sqtri:ref:04929"
         ],
         "center": {
           "x": 5.898184,
@@ -5007,7 +4070,6 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04958",
-          "sqtri:ref:04959",
           "sqtri:ref:04960"
         ],
         "center": {
@@ -5036,7 +4098,6 @@
         "id": "sqtri:ref:03294",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:04973",
           "sqtri:ref:04975"
         ],
         "center": {
@@ -5066,8 +4127,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:05012",
-          "sqtri:ref:05013",
-          "sqtri:ref:05014"
+          "sqtri:ref:05013"
         ],
         "center": {
           "x": -5.89836,
@@ -5125,7 +4185,6 @@
         "id": "sqtri:ref:03309",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:05018",
           "sqtri:ref:05019",
           "sqtri:ref:05020"
         ],
@@ -5155,7 +4214,6 @@
         "id": "sqtri:ref:03312",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:05027",
           "sqtri:ref:05028",
           "sqtri:ref:05029"
         ],
@@ -5186,8 +4244,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:05036",
-          "sqtri:ref:05037",
-          "sqtri:ref:05038"
+          "sqtri:ref:05037"
         ],
         "center": {
           "x": 6.811028,
@@ -5276,8 +4333,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:05429",
-          "sqtri:ref:05430",
-          "sqtri:ref:05431"
+          "sqtri:ref:05430"
         ],
         "center": {
           "x": -3.739408,
@@ -5305,7 +4361,6 @@
         "id": "sqtri:ref:03494",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:05436",
           "sqtri:ref:05437",
           "sqtri:ref:05438"
         ],
@@ -5366,8 +4421,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:05588",
-          "sqtri:ref:05589",
-          "sqtri:ref:05590"
+          "sqtri:ref:05589"
         ],
         "center": {
           "x": 6e-06,
@@ -5425,7 +4479,6 @@
         "id": "sqtri:ref:03626",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:03627",
           "sqtri:ref:04928"
         ],
         "center": {
@@ -5451,41 +4504,11 @@
         "chirality_token": "blue"
       },
       {
-        "id": "sqtri:ref:03627",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:03626",
-          "sqtri:ref:04930"
-        ],
-        "center": {
-          "x": 7.145204,
-          "y": -11.799478
-        },
-        "vertices": [
-          {
-            "x": 6.477178,
-            "y": -11.799695
-          },
-          {
-            "x": 7.47938,
-            "y": -11.220594
-          },
-          {
-            "x": 7.479054,
-            "y": -12.378144
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "30",
-        "chirality_token": "blue"
-      },
-      {
         "id": "sqtri:ref:04132",
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04133",
-          "sqtri:ref:04746",
-          "sqtri:ref:04747"
+          "sqtri:ref:04746"
         ],
         "center": {
           "x": -4.651027,
@@ -5542,7 +4565,6 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04137",
-          "sqtri:ref:04748",
           "sqtri:ref:04749"
         ],
         "center": {
@@ -5600,8 +4622,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04141",
-          "sqtri:ref:04750",
-          "sqtri:ref:04751"
+          "sqtri:ref:04750"
         ],
         "center": {
           "x": -2.158892,
@@ -5658,8 +4679,7 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04145",
-          "sqtri:ref:04752",
-          "sqtri:ref:04753"
+          "sqtri:ref:04752"
         ],
         "center": {
           "x": 3.406156,
@@ -5716,7 +4736,6 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04149",
-          "sqtri:ref:04754",
           "sqtri:ref:04755"
         ],
         "center": {
@@ -5774,7 +4793,6 @@
         "kind": "square-triangle-triangle",
         "neighbors": [
           "sqtri:ref:04161",
-          "sqtri:ref:04760",
           "sqtri:ref:04761"
         ],
         "center": {
@@ -6271,7 +5289,6 @@
         "id": "sqtri:ref:04357",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:04358",
           "sqtri:ref:04841",
           "sqtri:ref:05430"
         ],
@@ -6295,35 +5312,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "330",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:04358",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:04357",
-          "sqtri:ref:05431"
-        ],
-        "center": {
-          "x": -4.073069,
-          "y": -13.956526
-        },
-        "vertices": [
-          {
-            "x": -3.740008,
-            "y": -14.534227
-          },
-          {
-            "x": -4.740008,
-            "y": -13.955614
-          },
-          {
-            "x": -3.739191,
-            "y": -13.379736
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "150",
         "chirality_token": "blue"
       },
       {
@@ -6356,39 +5344,9 @@
         "chirality_token": "blue"
       },
       {
-        "id": "sqtri:ref:04362",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:04363",
-          "sqtri:ref:05436"
-        ],
-        "center": {
-          "x": 4.073775,
-          "y": -13.956947
-        },
-        "vertices": [
-          {
-            "x": 3.739911,
-            "y": -13.378308
-          },
-          {
-            "x": 4.741831,
-            "y": -13.956715
-          },
-          {
-            "x": 3.739584,
-            "y": -14.535819
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "330",
-        "chirality_token": "blue"
-      },
-      {
         "id": "sqtri:ref:04363",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:04362",
           "sqtri:ref:04842",
           "sqtri:ref:05437"
         ],
@@ -6799,7 +5757,6 @@
         "id": "sqtri:ref:04531",
         "kind": "square-triangle-triangle",
         "neighbors": [
-          "sqtri:ref:04532",
           "sqtri:ref:04885",
           "sqtri:ref:05589"
         ],
@@ -6823,35 +5780,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "270",
-        "chirality_token": "blue"
-      },
-      {
-        "id": "sqtri:ref:04532",
-        "kind": "square-triangle-triangle",
-        "neighbors": [
-          "sqtri:ref:04531",
-          "sqtri:ref:05590"
-        ],
-        "center": {
-          "x": -1.246742,
-          "y": -1.581001
-        },
-        "vertices": [
-          {
-            "x": -1.581027,
-            "y": -2.159857
-          },
-          {
-            "x": -1.580537,
-            "y": -1.002349
-          },
-          {
-            "x": -0.578661,
-            "y": -1.580798
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "90",
         "chirality_token": "blue"
       },
       {
@@ -7092,70 +6020,6 @@
         "orientation_token": "180"
       },
       {
-        "id": "sqtri:ref:04747",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02667",
-          "sqtri:ref:04132"
-        ],
-        "center": {
-          "x": -5.10715,
-          "y": -3.530073
-        },
-        "vertices": [
-          {
-            "x": -4.896253,
-            "y": -2.739572
-          },
-          {
-            "x": -4.317149,
-            "y": -3.741819
-          },
-          {
-            "x": -5.318457,
-            "y": -4.319451
-          },
-          {
-            "x": -5.896741,
-            "y": -3.319451
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "300"
-      },
-      {
-        "id": "sqtri:ref:04748",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02670",
-          "sqtri:ref:04136"
-        ],
-        "center": {
-          "x": -4.317323,
-          "y": -2.160941
-        },
-        "vertices": [
-          {
-            "x": -4.896253,
-            "y": -2.739572
-          },
-          {
-            "x": -3.7387,
-            "y": -2.739901
-          },
-          {
-            "x": -3.738416,
-            "y": -1.58239
-          },
-          {
-            "x": -4.895924,
-            "y": -1.581899
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "0"
-      },
-      {
         "id": "sqtri:ref:04749",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -7220,38 +6084,6 @@
         "orientation_token": "90"
       },
       {
-        "id": "sqtri:ref:04751",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02675",
-          "sqtri:ref:04140"
-        ],
-        "center": {
-          "x": -1.368384,
-          "y": 2.946805
-        },
-        "vertices": [
-          {
-            "x": -0.577679,
-            "y": 2.735244
-          },
-          {
-            "x": -1.579926,
-            "y": 2.15614
-          },
-          {
-            "x": -2.15915,
-            "y": 3.158387
-          },
-          {
-            "x": -1.156783,
-            "y": 3.737448
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "210"
-      },
-      {
         "id": "sqtri:ref:04752",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -7278,70 +6110,6 @@
           {
             "x": 2.160034,
             "y": -3.16194
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
-      },
-      {
-        "id": "sqtri:ref:04753",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02679",
-          "sqtri:ref:04144"
-        ],
-        "center": {
-          "x": 4.317677,
-          "y": -2.160297
-        },
-        "vertices": [
-          {
-            "x": 4.895829,
-            "y": -2.737492
-          },
-          {
-            "x": 3.740401,
-            "y": -2.738471
-          },
-          {
-            "x": 3.739584,
-            "y": -1.583
-          },
-          {
-            "x": 4.894892,
-            "y": -1.582226
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "180"
-      },
-      {
-        "id": "sqtri:ref:04754",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02682",
-          "sqtri:ref:04148"
-        ],
-        "center": {
-          "x": 5.107575,
-          "y": -3.527797
-        },
-        "vertices": [
-          {
-            "x": 5.319299,
-            "y": -4.318021
-          },
-          {
-            "x": 5.897747,
-            "y": -3.316102
-          },
-          {
-            "x": 4.895829,
-            "y": -2.737492
-          },
-          {
-            "x": 4.317423,
-            "y": -3.739572
           }
         ],
         "tile_family": "square-triangle",
@@ -7378,38 +6146,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "0"
-      },
-      {
-        "id": "sqtri:ref:04760",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02694",
-          "sqtri:ref:04160"
-        ],
-        "center": {
-          "x": 1.367932,
-          "y": 2.947876
-        },
-        "vertices": [
-          {
-            "x": 1.579667,
-            "y": 2.15757
-          },
-          {
-            "x": 2.158116,
-            "y": 3.159651
-          },
-          {
-            "x": 1.156198,
-            "y": 3.738101
-          },
-          {
-            "x": 0.577749,
-            "y": 2.736181
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
       },
       {
         "id": "sqtri:ref:04761",
@@ -7647,7 +6383,6 @@
         "id": "sqtri:ref:04840",
         "kind": "square-triangle-square",
         "neighbors": [
-          "sqtri:ref:02912",
           "sqtri:ref:04355",
           "sqtri:ref:04356"
         ],
@@ -7812,7 +6547,6 @@
         "id": "sqtri:ref:04883",
         "kind": "square-triangle-square",
         "neighbors": [
-          "sqtri:ref:03105",
           "sqtri:ref:04523",
           "sqtri:ref:04527"
         ],
@@ -8006,38 +6740,6 @@
         "orientation_token": "90"
       },
       {
-        "id": "sqtri:ref:04926",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02224",
-          "sqtri:ref:03278"
-        ],
-        "center": {
-          "x": -6.688579,
-          "y": -11.007042
-        },
-        "vertices": [
-          {
-            "x": -6.475476,
-            "y": -11.796023
-          },
-          {
-            "x": -5.899436,
-            "y": -10.796511
-          },
-          {
-            "x": -6.901355,
-            "y": -10.218062
-          },
-          {
-            "x": -7.478047,
-            "y": -11.217572
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
-      },
-      {
         "id": "sqtri:ref:04927",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -8135,39 +6837,6 @@
         "orientation_token": "60"
       },
       {
-        "id": "sqtri:ref:04930",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02228",
-          "sqtri:ref:03279",
-          "sqtri:ref:03627"
-        ],
-        "center": {
-          "x": 6.688698,
-          "y": -11.008992
-        },
-        "vertices": [
-          {
-            "x": 7.47938,
-            "y": -11.220594
-          },
-          {
-            "x": 6.477178,
-            "y": -11.799695
-          },
-          {
-            "x": 5.897912,
-            "y": -10.79745
-          },
-          {
-            "x": 6.900321,
-            "y": -10.218227
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "210"
-      },
-      {
         "id": "sqtri:ref:04958",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -8200,37 +6869,6 @@
         "orientation_token": "60"
       },
       {
-        "id": "sqtri:ref:04959",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:03289"
-        ],
-        "center": {
-          "x": -8.845782,
-          "y": 2.946815
-        },
-        "vertices": [
-          {
-            "x": -9.059189,
-            "y": 2.156958
-          },
-          {
-            "x": -9.634783,
-            "y": 3.157897
-          },
-          {
-            "x": -8.632374,
-            "y": 3.736998
-          },
-          {
-            "x": -8.056783,
-            "y": 2.735406
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "120"
-      },
-      {
         "id": "sqtri:ref:04960",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -8261,38 +6899,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "0"
-      },
-      {
-        "id": "sqtri:ref:04973",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02275",
-          "sqtri:ref:03294"
-        ],
-        "center": {
-          "x": -11.004149,
-          "y": 5.105325
-        },
-        "vertices": [
-          {
-            "x": -10.791965,
-            "y": 4.315897
-          },
-          {
-            "x": -10.213516,
-            "y": 5.317815
-          },
-          {
-            "x": -11.216416,
-            "y": 5.895162
-          },
-          {
-            "x": -11.7947,
-            "y": 4.892427
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
       },
       {
         "id": "sqtri:ref:04975",
@@ -8391,38 +6997,6 @@
         "orientation_token": "270"
       },
       {
-        "id": "sqtri:ref:05014",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02317",
-          "sqtri:ref:03307"
-        ],
-        "center": {
-          "x": -5.108812,
-          "y": -9.427196
-        },
-        "vertices": [
-          {
-            "x": -4.897027,
-            "y": -10.21741
-          },
-          {
-            "x": -4.318618,
-            "y": -9.215491
-          },
-          {
-            "x": -5.320497,
-            "y": -8.636921
-          },
-          {
-            "x": -5.899108,
-            "y": -9.638961
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
-      },
-      {
         "id": "sqtri:ref:05015",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -8519,38 +7093,6 @@
         "orientation_token": "30"
       },
       {
-        "id": "sqtri:ref:05018",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02321",
-          "sqtri:ref:03309"
-        ],
-        "center": {
-          "x": 5.107626,
-          "y": -9.428195
-        },
-        "vertices": [
-          {
-            "x": 4.316932,
-            "y": -9.216635
-          },
-          {
-            "x": 5.319176,
-            "y": -8.637531
-          },
-          {
-            "x": 5.898403,
-            "y": -9.639778
-          },
-          {
-            "x": 4.895994,
-            "y": -10.218837
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "30"
-      },
-      {
         "id": "sqtri:ref:05019",
         "kind": "square-triangle-square",
         "neighbors": [
@@ -8609,38 +7151,6 @@
           {
             "x": 5.898403,
             "y": -9.639778
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
-      },
-      {
-        "id": "sqtri:ref:05027",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02330",
-          "sqtri:ref:03312"
-        ],
-        "center": {
-          "x": -7.265864,
-          "y": 2.946999
-        },
-        "vertices": [
-          {
-            "x": -7.053599,
-            "y": 2.15757
-          },
-          {
-            "x": -6.475028,
-            "y": 3.159489
-          },
-          {
-            "x": -7.478047,
-            "y": 3.73553
-          },
-          {
-            "x": -8.056783,
-            "y": 2.735406
           }
         ],
         "tile_family": "square-triangle",
@@ -8773,38 +7283,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "60"
-      },
-      {
-        "id": "sqtri:ref:05038",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02341",
-          "sqtri:ref:03315"
-        ],
-        "center": {
-          "x": 7.266656,
-          "y": 2.947447
-        },
-        "vertices": [
-          {
-            "x": 7.054645,
-            "y": 2.158549
-          },
-          {
-            "x": 6.477626,
-            "y": 3.159489
-          },
-          {
-            "x": 7.47877,
-            "y": 3.736346
-          },
-          {
-            "x": 8.055584,
-            "y": 2.735406
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "120"
       },
       {
         "id": "sqtri:ref:05386",
@@ -9000,72 +7478,6 @@
           {
             "x": -3.739191,
             "y": -13.379736
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
-      },
-      {
-        "id": "sqtri:ref:05431",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02909",
-          "sqtri:ref:03491",
-          "sqtri:ref:04358"
-        ],
-        "center": {
-          "x": -4.529221,
-          "y": -13.166716
-        },
-        "vertices": [
-          {
-            "x": -5.319393,
-            "y": -12.954186
-          },
-          {
-            "x": -4.318292,
-            "y": -12.377327
-          },
-          {
-            "x": -3.739191,
-            "y": -13.379736
-          },
-          {
-            "x": -4.740008,
-            "y": -13.955614
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "30"
-      },
-      {
-        "id": "sqtri:ref:05436",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:02916",
-          "sqtri:ref:03494",
-          "sqtri:ref:04362"
-        ],
-        "center": {
-          "x": 4.530137,
-          "y": -13.166481
-        },
-        "vertices": [
-          {
-            "x": 4.741831,
-            "y": -13.956715
-          },
-          {
-            "x": 5.320442,
-            "y": -12.954675
-          },
-          {
-            "x": 4.318362,
-            "y": -12.376226
-          },
-          {
-            "x": 3.739911,
-            "y": -13.378308
           }
         ],
         "tile_family": "square-triangle",
@@ -9304,39 +7716,6 @@
         ],
         "tile_family": "square-triangle",
         "orientation_token": "90"
-      },
-      {
-        "id": "sqtri:ref:05590",
-        "kind": "square-triangle-square",
-        "neighbors": [
-          "sqtri:ref:03108",
-          "sqtri:ref:03554",
-          "sqtri:ref:04532"
-        ],
-        "center": {
-          "x": -0.790385,
-          "y": -0.790573
-        },
-        "vertices": [
-          {
-            "x": -0.578661,
-            "y": -1.580798
-          },
-          {
-            "x": -0.000212,
-            "y": -0.57888
-          },
-          {
-            "x": -1.00213,
-            "y": -0.000267
-          },
-          {
-            "x": -1.580537,
-            "y": -1.002349
-          }
-        ],
-        "tile_family": "square-triangle",
-        "orientation_token": "60"
       },
       {
         "id": "sqtri:ref:05595",

@@ -734,68 +734,6 @@
       "graph_distance": 5
     },
     {
-      "id": "sqtri:ref:04751",
-      "kind": "square-triangle-square",
-      "center": [
-        -1.368384,
-        2.946805
-      ],
-      "vertices": [
-        [
-          -0.577679,
-          2.735244
-        ],
-        [
-          -1.579926,
-          2.15614
-        ],
-        [
-          -2.15915,
-          3.158387
-        ],
-        [
-          -1.156783,
-          3.737448
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 5
-    },
-    {
-      "id": "sqtri:ref:04760",
-      "kind": "square-triangle-square",
-      "center": [
-        1.367932,
-        2.947876
-      ],
-      "vertices": [
-        [
-          1.579667,
-          2.15757
-        ],
-        [
-          2.158116,
-          3.159651
-        ],
-        [
-          1.156198,
-          3.738101
-        ],
-        [
-          0.577749,
-          2.736181
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 5
-    },
-    {
       "id": "sqtri:ref:05589",
       "kind": "square-triangle-square",
       "center": [
@@ -822,37 +760,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "90",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 5
-    },
-    {
-      "id": "sqtri:ref:05590",
-      "kind": "square-triangle-square",
-      "center": [
-        -0.790385,
-        -0.790573
-      ],
-      "vertices": [
-        [
-          -0.578661,
-          -1.580798
-        ],
-        [
-          -0.000212,
-          -0.57888
-        ],
-        [
-          -1.00213,
-          -0.000267
-        ],
-        [
-          -1.580537,
-          -1.002349
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 5
@@ -988,33 +895,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 6
-    },
-    {
-      "id": "sqtri:ref:04532",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -1.246742,
-        -1.581001
-      ],
-      "vertices": [
-        [
-          -1.581027,
-          -2.159857
-        ],
-        [
-          -1.580537,
-          -1.002349
-        ],
-        [
-          -0.578661,
-          -1.580798
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
       "chirality_token": "blue",
       "variant": "triangle-blue",
       "graph_distance": 6
@@ -2256,37 +2136,6 @@
       "graph_distance": 10
     },
     {
-      "id": "sqtri:ref:04753",
-      "kind": "square-triangle-square",
-      "center": [
-        4.317677,
-        -2.160297
-      ],
-      "vertices": [
-        [
-          4.895829,
-          -2.737492
-        ],
-        [
-          3.740401,
-          -2.738471
-        ],
-        [
-          3.739584,
-          -1.583
-        ],
-        [
-          4.894892,
-          -1.582226
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 10
-    },
-    {
       "id": "sqtri:ref:04755",
       "kind": "square-triangle-square",
       "center": [
@@ -2627,37 +2476,6 @@
       "graph_distance": 11
     },
     {
-      "id": "sqtri:ref:04754",
-      "kind": "square-triangle-square",
-      "center": [
-        5.107575,
-        -3.527797
-      ],
-      "vertices": [
-        [
-          5.319299,
-          -4.318021
-        ],
-        [
-          5.897747,
-          -3.316102
-        ],
-        [
-          4.895829,
-          -2.737492
-        ],
-        [
-          4.317423,
-          -3.739572
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 11
-    },
-    {
       "id": "sqtri:ref:04887",
       "kind": "square-triangle-square",
       "center": [
@@ -2686,37 +2504,6 @@
       "orientation_token": "300",
       "chirality_token": null,
       "variant": "square-blue",
-      "graph_distance": 11
-    },
-    {
-      "id": "sqtri:ref:05038",
-      "kind": "square-triangle-square",
-      "center": [
-        7.266656,
-        2.947447
-      ],
-      "vertices": [
-        [
-          7.054645,
-          2.158549
-        ],
-        [
-          6.477626,
-          3.159489
-        ],
-        [
-          7.47877,
-          3.736346
-        ],
-        [
-          8.055584,
-          2.735406
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 11
     },
     {
@@ -2906,37 +2693,6 @@
       "orientation_token": "60",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 12
-    },
-    {
-      "id": "sqtri:ref:04748",
-      "kind": "square-triangle-square",
-      "center": [
-        -4.317323,
-        -2.160941
-      ],
-      "vertices": [
-        [
-          -4.896253,
-          -2.739572
-        ],
-        [
-          -3.7387,
-          -2.739901
-        ],
-        [
-          -3.738416,
-          -1.58239
-        ],
-        [
-          -4.895924,
-          -1.581899
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 12
     },
     {
@@ -3219,68 +2975,6 @@
       "orientation_token": "330",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 13
-    },
-    {
-      "id": "sqtri:ref:04747",
-      "kind": "square-triangle-square",
-      "center": [
-        -5.10715,
-        -3.530073
-      ],
-      "vertices": [
-        [
-          -4.896253,
-          -2.739572
-        ],
-        [
-          -4.317149,
-          -3.741819
-        ],
-        [
-          -5.318457,
-          -4.319451
-        ],
-        [
-          -5.896741,
-          -3.319451
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 13
-    },
-    {
-      "id": "sqtri:ref:05027",
-      "kind": "square-triangle-square",
-      "center": [
-        -7.265864,
-        2.946999
-      ],
-      "vertices": [
-        [
-          -7.053599,
-          2.15757
-        ],
-        [
-          -6.475028,
-          3.159489
-        ],
-        [
-          -7.478047,
-          3.73553
-        ],
-        [
-          -8.056783,
-          2.735406
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 13
     },
     {
@@ -4130,33 +3824,6 @@
       "graph_distance": 17
     },
     {
-      "id": "sqtri:ref:03105",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -0.667667,
-        -8.059628
-      ],
-      "vertices": [
-        [
-          -1.001966,
-          -7.481615
-        ],
-        [
-          -4.7e-05,
-          -8.060226
-        ],
-        [
-          -1.000987,
-          -8.637043
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 17
-    },
-    {
       "id": "sqtri:ref:04958",
       "kind": "square-triangle-square",
       "center": [
@@ -4389,37 +4056,6 @@
       "graph_distance": 18
     },
     {
-      "id": "sqtri:ref:05018",
-      "kind": "square-triangle-square",
-      "center": [
-        5.107626,
-        -9.428195
-      ],
-      "vertices": [
-        [
-          4.316932,
-          -9.216635
-        ],
-        [
-          5.319176,
-          -8.637531
-        ],
-        [
-          5.898403,
-          -9.639778
-        ],
-        [
-          4.895994,
-          -10.218837
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 18
-    },
-    {
       "id": "sqtri:ref:02225",
       "kind": "square-triangle-triangle",
       "center": [
@@ -4559,37 +4195,6 @@
       "graph_distance": 19
     },
     {
-      "id": "sqtri:ref:04959",
-      "kind": "square-triangle-square",
-      "center": [
-        -8.845782,
-        2.946815
-      ],
-      "vertices": [
-        [
-          -9.059189,
-          2.156958
-        ],
-        [
-          -9.634783,
-          3.157897
-        ],
-        [
-          -8.632374,
-          3.736998
-        ],
-        [
-          -8.056783,
-          2.735406
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 19
-    },
-    {
       "id": "sqtri:ref:04960",
       "kind": "square-triangle-square",
       "center": [
@@ -4616,37 +4221,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 19
-    },
-    {
-      "id": "sqtri:ref:05014",
-      "kind": "square-triangle-square",
-      "center": [
-        -5.108812,
-        -9.427196
-      ],
-      "vertices": [
-        [
-          -4.897027,
-          -10.21741
-        ],
-        [
-          -4.318618,
-          -9.215491
-        ],
-        [
-          -5.320497,
-          -8.636921
-        ],
-        [
-          -5.899108,
-          -9.638961
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 19
@@ -4817,37 +4391,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 20
-    },
-    {
-      "id": "sqtri:ref:04973",
-      "kind": "square-triangle-square",
-      "center": [
-        -11.004149,
-        5.105325
-      ],
-      "vertices": [
-        [
-          -10.791965,
-          4.315897
-        ],
-        [
-          -10.213516,
-          5.317815
-        ],
-        [
-          -11.216416,
-          5.895162
-        ],
-        [
-          -11.7947,
-          4.892427
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 20
@@ -5108,37 +4651,6 @@
       "graph_distance": 21
     },
     {
-      "id": "sqtri:ref:04930",
-      "kind": "square-triangle-square",
-      "center": [
-        6.688698,
-        -11.008992
-      ],
-      "vertices": [
-        [
-          7.47938,
-          -11.220594
-        ],
-        [
-          6.477178,
-          -11.799695
-        ],
-        [
-          5.897912,
-          -10.79745
-        ],
-        [
-          6.900321,
-          -10.218227
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 21
-    },
-    {
       "id": "sqtri:ref:05429",
       "kind": "square-triangle-square",
       "center": [
@@ -5278,33 +4790,6 @@
       "graph_distance": 22
     },
     {
-      "id": "sqtri:ref:03627",
-      "kind": "square-triangle-triangle",
-      "center": [
-        7.145204,
-        -11.799478
-      ],
-      "vertices": [
-        [
-          6.477178,
-          -11.799695
-        ],
-        [
-          7.47938,
-          -11.220594
-        ],
-        [
-          7.479054,
-          -12.378144
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 22
-    },
-    {
       "id": "sqtri:ref:04354",
       "kind": "square-triangle-triangle",
       "center": [
@@ -5385,68 +4870,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "90",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 22
-    },
-    {
-      "id": "sqtri:ref:04926",
-      "kind": "square-triangle-square",
-      "center": [
-        -6.688579,
-        -11.007042
-      ],
-      "vertices": [
-        [
-          -6.475476,
-          -11.796023
-        ],
-        [
-          -5.899436,
-          -10.796511
-        ],
-        [
-          -6.901355,
-          -10.218062
-        ],
-        [
-          -7.478047,
-          -11.217572
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 22
-    },
-    {
-      "id": "sqtri:ref:05436",
-      "kind": "square-triangle-square",
-      "center": [
-        4.530137,
-        -13.166481
-      ],
-      "vertices": [
-        [
-          4.741831,
-          -13.956715
-        ],
-        [
-          5.320442,
-          -12.954675
-        ],
-        [
-          4.318362,
-          -12.376226
-        ],
-        [
-          3.739911,
-          -13.378308
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 22
@@ -5618,33 +5041,6 @@
       "graph_distance": 23
     },
     {
-      "id": "sqtri:ref:04362",
-      "kind": "square-triangle-triangle",
-      "center": [
-        4.073775,
-        -13.956947
-      ],
-      "vertices": [
-        [
-          3.739911,
-          -13.378308
-        ],
-        [
-          4.741831,
-          -13.956715
-        ],
-        [
-          3.739584,
-          -14.535819
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 23
-    },
-    {
       "id": "sqtri:ref:04363",
       "kind": "square-triangle-triangle",
       "center": [
@@ -5729,37 +5125,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 23
-    },
-    {
-      "id": "sqtri:ref:05431",
-      "kind": "square-triangle-square",
-      "center": [
-        -4.529221,
-        -13.166716
-      ],
-      "vertices": [
-        [
-          -5.319393,
-          -12.954186
-        ],
-        [
-          -4.318292,
-          -12.377327
-        ],
-        [
-          -3.739191,
-          -13.379736
-        ],
-        [
-          -4.740008,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 23
@@ -5958,33 +5323,6 @@
       "graph_distance": 24
     },
     {
-      "id": "sqtri:ref:04358",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -4.073069,
-        -13.956526
-      ],
-      "vertices": [
-        [
-          -3.740008,
-          -14.534227
-        ],
-        [
-          -4.740008,
-          -13.955614
-        ],
-        [
-          -3.739191,
-          -13.379736
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 24
-    },
-    {
       "id": "sqtri:ref:04364",
       "kind": "square-triangle-triangle",
       "center": [
@@ -6155,37 +5493,6 @@
       "graph_distance": 25
     },
     {
-      "id": "sqtri:ref:01736",
-      "kind": "square-triangle-square",
-      "center": [
-        -7.266058,
-        -13.165083
-      ],
-      "vertices": [
-        [
-          -7.053925,
-          -13.955614
-        ],
-        [
-          -8.056783,
-          -13.377165
-        ],
-        [
-          -7.478047,
-          -12.374472
-        ],
-        [
-          -6.475476,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 25
-    },
-    {
       "id": "sqtri:ref:01817",
       "kind": "square-triangle-square",
       "center": [
@@ -6214,33 +5521,6 @@
       "orientation_token": "210",
       "chirality_token": null,
       "variant": "square-white",
-      "graph_distance": 25
-    },
-    {
-      "id": "sqtri:ref:02912",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -0.669204,
-        -12.376375
-      ],
-      "vertices": [
-        [
-          -1.003067,
-          -11.797612
-        ],
-        [
-          -0.001148,
-          -12.376226
-        ],
-        [
-          -1.003396,
-          -12.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
       "graph_distance": 25
     },
     {
@@ -6553,37 +5833,6 @@
       "graph_distance": 27
     },
     {
-      "id": "sqtri:ref:01815",
-      "kind": "square-triangle-square",
-      "center": [
-        -10.216334,
-        -12.374553
-      ],
-      "vertices": [
-        [
-          -10.7947,
-          -11.796023
-        ],
-        [
-          -9.637967,
-          -11.796023
-        ],
-        [
-          -9.637967,
-          -12.953083
-        ],
-        [
-          -10.7947,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 27
-    },
-    {
       "id": "sqtri:ref:01816",
       "kind": "square-triangle-square",
       "center": [
@@ -6754,37 +6003,6 @@
       "graph_distance": 28
     },
     {
-      "id": "sqtri:ref:02061",
-      "kind": "square-triangle-square",
-      "center": [
-        -8.847251,
-        -14.746277
-      ],
-      "vertices": [
-        [
-          -9.059189,
-          -13.955614
-        ],
-        [
-          -8.056783,
-          -14.534227
-        ],
-        [
-          -8.635067,
-          -15.53692
-        ],
-        [
-          -9.637967,
-          -14.958349
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 28
-    },
-    {
       "id": "sqtri:ref:00449",
       "kind": "square-triangle-triangle",
       "center": [
@@ -6888,33 +6106,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 29
-    },
-    {
-      "id": "sqtri:ref:01383",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -9.303667,
-        -15.536879
-      ],
-      "vertices": [
-        [
-          -9.637967,
-          -16.115369
-        ],
-        [
-          -9.637967,
-          -14.958349
-        ],
-        [
-          -8.635067,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
       "chirality_token": "blue",
       "variant": "triangle-blue",
       "graph_distance": 29
@@ -7094,37 +6285,6 @@
       "graph_distance": 30
     },
     {
-      "id": "sqtri:ref:02187",
-      "kind": "square-triangle-square",
-      "center": [
-        -12.373292,
-        -11.796022
-      ],
-      "vertices": [
-        [
-          -12.951884,
-          -11.217572
-        ],
-        [
-          -11.7947,
-          -11.217572
-        ],
-        [
-          -11.7947,
-          -12.374472
-        ],
-        [
-          -12.951884,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 30
-    },
-    {
       "id": "sqtri:ref:00212",
       "kind": "square-triangle-triangle",
       "center": [
@@ -7233,33 +6393,6 @@
       "graph_distance": 31
     },
     {
-      "id": "sqtri:ref:01529",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -13.28617,
-        -11.796022
-      ],
-      "vertices": [
-        [
-          -13.954742,
-          -11.796023
-        ],
-        [
-          -12.951884,
-          -11.217572
-        ],
-        [
-          -12.951884,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 31
-    },
-    {
       "id": "sqtri:ref:00217",
       "kind": "square-triangle-triangle",
       "center": [
@@ -7309,33 +6442,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 32
-    },
-    {
-      "id": "sqtri:ref:01528",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -13.620456,
-        -12.374526
-      ],
-      "vertices": [
-        [
-          -12.951884,
-          -12.374472
-        ],
-        [
-          -13.954742,
-          -12.953083
-        ],
-        [
-          -13.954742,
-          -11.796023
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
       "chirality_token": "blue",
       "variant": "triangle-blue",
       "graph_distance": 32
@@ -7519,37 +6625,6 @@
       "graph_distance": 33
     },
     {
-      "id": "sqtri:ref:01719",
-      "kind": "square-triangle-square",
-      "center": [
-        -14.533109,
-        -12.374553
-      ],
-      "vertices": [
-        [
-          -15.111476,
-          -11.796023
-        ],
-        [
-          -13.954742,
-          -11.796023
-        ],
-        [
-          -13.954742,
-          -12.953083
-        ],
-        [
-          -15.111476,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 33
-    },
-    {
       "id": "sqtri:ref:00619",
       "kind": "square-triangle-triangle",
       "center": [
@@ -7572,33 +6647,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "210",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 34
-    },
-    {
-      "id": "sqtri:ref:00622",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -15.445775,
-        -12.374526
-      ],
-      "vertices": [
-        [
-          -15.111476,
-          -12.953083
-        ],
-        [
-          -16.114374,
-          -12.374472
-        ],
-        [
-          -15.111476,
-          -11.796023
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
       "chirality_token": "red",
       "variant": "triangle-red",
       "graph_distance": 34
@@ -7689,33 +6737,6 @@
       "graph_distance": 34
     },
     {
-      "id": "sqtri:ref:00324",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -15.780075,
-        -11.796022
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -11.217572
-        ],
-        [
-          -15.111476,
-          -11.796023
-        ],
-        [
-          -16.114374,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 35
-    },
-    {
       "id": "sqtri:ref:01390",
       "kind": "square-triangle-triangle",
       "center": [
@@ -7768,33 +6789,6 @@
       "chirality_token": "blue",
       "variant": "triangle-blue",
       "graph_distance": 35
-    },
-    {
-      "id": "sqtri:ref:00319",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -16.448497,
-        -11.796022
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -12.374472
-        ],
-        [
-          -17.116742,
-          -11.796023
-        ],
-        [
-          -16.114374,
-          -11.217572
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 36
     },
     {
       "id": "sqtri:ref:00458",
@@ -7851,37 +6845,6 @@
       "graph_distance": 36
     },
     {
-      "id": "sqtri:ref:01640",
-      "kind": "square-triangle-square",
-      "center": [
-        -15.323619,
-        -11.006716
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -11.217572
-        ],
-        [
-          -15.535598,
-          -10.21741
-        ],
-        [
-          -14.533027,
-          -10.795859
-        ],
-        [
-          -15.111476,
-          -11.796023
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 36
-    },
-    {
       "id": "sqtri:ref:02067",
       "kind": "square-triangle-square",
       "center": [
@@ -7913,33 +6876,6 @@
       "graph_distance": 36
     },
     {
-      "id": "sqtri:ref:00610",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -16.782619,
-        -12.374526
-      ],
-      "vertices": [
-        [
-          -17.116742,
-          -11.796023
-        ],
-        [
-          -16.114374,
-          -12.374472
-        ],
-        [
-          -17.116742,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 37
-    },
-    {
       "id": "sqtri:ref:00806",
       "kind": "square-triangle-triangle",
       "center": [
@@ -7964,33 +6900,6 @@
       "orientation_token": "300",
       "chirality_token": "yellow",
       "variant": "triangle-yellow",
-      "graph_distance": 37
-    },
-    {
-      "id": "sqtri:ref:01271",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -14.867217,
-        -10.21741
-      ],
-      "vertices": [
-        [
-          -14.533027,
-          -10.795859
-        ],
-        [
-          -15.535598,
-          -10.21741
-        ],
-        [
-          -14.533027,
-          -9.638961
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
       "graph_distance": 37
     },
     {
@@ -8045,37 +6954,6 @@
       "orientation_token": "180",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 37
-    },
-    {
-      "id": "sqtri:ref:01637",
-      "kind": "square-triangle-square",
-      "center": [
-        -16.904823,
-        -11.006716
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -11.217572
-        ],
-        [
-          -16.692659,
-          -10.21741
-        ],
-        [
-          -17.695517,
-          -10.795859
-        ],
-        [
-          -17.116742,
-          -11.796023
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 37
     },
     {
@@ -8137,60 +7015,6 @@
       "graph_distance": 38
     },
     {
-      "id": "sqtri:ref:01267",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.361231,
-        -10.21741
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -9.638961
-        ],
-        [
-          -16.692659,
-          -10.21741
-        ],
-        [
-          -17.695517,
-          -10.795859
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 38
-    },
-    {
-      "id": "sqtri:ref:01272",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -14.198741,
-        -10.21741
-      ],
-      "vertices": [
-        [
-          -14.533027,
-          -9.638961
-        ],
-        [
-          -13.53017,
-          -10.21741
-        ],
-        [
-          -14.533027,
-          -10.795859
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 38
-    },
-    {
       "id": "sqtri:ref:01387",
       "kind": "square-triangle-triangle",
       "center": [
@@ -8218,37 +7042,6 @@
       "graph_distance": 38
     },
     {
-      "id": "sqtri:ref:01639",
-      "kind": "square-triangle-square",
-      "center": [
-        -15.323619,
-        -9.426839
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -9.214717
-        ],
-        [
-          -15.535598,
-          -10.21741
-        ],
-        [
-          -14.533027,
-          -9.638961
-        ],
-        [
-          -15.111476,
-          -8.636268
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 38
-    },
-    {
       "id": "sqtri:ref:01681",
       "kind": "square-triangle-square",
       "center": [
@@ -8271,37 +7064,6 @@
         [
           -7.053925,
           -22.591774
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 38
-    },
-    {
-      "id": "sqtri:ref:01716",
-      "kind": "square-triangle-square",
-      "center": [
-        -17.695354,
-        -12.374553
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -11.796023
-        ],
-        [
-          -17.116742,
-          -11.796023
-        ],
-        [
-          -17.116742,
-          -12.953083
-        ],
-        [
-          -18.273966,
-          -12.953083
         ]
       ],
       "tile_family": "square-triangle",
@@ -8369,33 +7131,6 @@
       "graph_distance": 39
     },
     {
-      "id": "sqtri:ref:00323",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -15.780075,
-        -8.636267
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -8.057816
-        ],
-        [
-          -15.111476,
-          -8.636268
-        ],
-        [
-          -16.114374,
-          -9.214717
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 39
-    },
-    {
       "id": "sqtri:ref:00457",
       "kind": "square-triangle-triangle",
       "center": [
@@ -8447,118 +7182,6 @@
       "orientation_token": "150",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 39
-    },
-    {
-      "id": "sqtri:ref:01268",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.02885,
-        -10.21741
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -10.795859
-        ],
-        [
-          -18.695517,
-          -10.21741
-        ],
-        [
-          -17.695517,
-          -9.638961
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 39
-    },
-    {
-      "id": "sqtri:ref:01518",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.607299,
-        -12.374526
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -11.796023
-        ],
-        [
-          -18.273966,
-          -12.953083
-        ],
-        [
-          -19.273966,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 39
-    },
-    {
-      "id": "sqtri:ref:01519",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.695408,
-        -13.28726
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -12.953083
-        ],
-        [
-          -17.116742,
-          -12.953083
-        ],
-        [
-          -17.695517,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 39
-    },
-    {
-      "id": "sqtri:ref:01638",
-      "kind": "square-triangle-square",
-      "center": [
-        -16.904823,
-        -9.426839
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -9.214717
-        ],
-        [
-          -16.692659,
-          -10.21741
-        ],
-        [
-          -17.695517,
-          -9.638961
-        ],
-        [
-          -17.116742,
-          -8.636268
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 39
     },
     {
@@ -8616,87 +7239,6 @@
       "graph_distance": 40
     },
     {
-      "id": "sqtri:ref:00320",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -16.448497,
-        -8.636267
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -9.214717
-        ],
-        [
-          -17.116742,
-          -8.636268
-        ],
-        [
-          -16.114374,
-          -8.057816
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 40
-    },
-    {
-      "id": "sqtri:ref:00606",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.273911,
-        -13.621437
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -13.955614
-        ],
-        [
-          -18.852251,
-          -13.955614
-        ],
-        [
-          -18.273966,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 40
-    },
-    {
-      "id": "sqtri:ref:01517",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.940633,
-        -11.796022
-      ],
-      "vertices": [
-        [
-          -19.273966,
-          -12.374472
-        ],
-        [
-          -19.273966,
-          -11.217572
-        ],
-        [
-          -18.273966,
-          -11.796023
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 40
-    },
-    {
       "id": "sqtri:ref:01738",
       "kind": "square-triangle-square",
       "center": [
@@ -8723,37 +7265,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 40
-    },
-    {
-      "id": "sqtri:ref:02179",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.06315,
-        -13.165083
-      ],
-      "vertices": [
-        [
-          -18.852251,
-          -13.955614
-        ],
-        [
-          -19.852415,
-          -13.377165
-        ],
-        [
-          -19.273966,
-          -12.374472
-        ],
-        [
-          -18.273966,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 40
@@ -8813,33 +7324,6 @@
       "graph_distance": 41
     },
     {
-      "id": "sqtri:ref:00412",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -16.782619,
-        -8.057763
-      ],
-      "vertices": [
-        [
-          -17.116742,
-          -7.479206
-        ],
-        [
-          -17.116742,
-          -8.636268
-        ],
-        [
-          -16.114374,
-          -8.057816
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 41
-    },
-    {
       "id": "sqtri:ref:00662",
       "kind": "square-triangle-triangle",
       "center": [
@@ -8864,87 +7348,6 @@
       "orientation_token": "240",
       "chirality_token": "yellow",
       "variant": "triangle-yellow",
-      "graph_distance": 41
-    },
-    {
-      "id": "sqtri:ref:00855",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.852415,
-        -12.708703
-      ],
-      "vertices": [
-        [
-          -19.852415,
-          -13.377165
-        ],
-        [
-          -20.430863,
-          -12.374472
-        ],
-        [
-          -19.273966,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 41
-    },
-    {
-      "id": "sqtri:ref:01520",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.519027,
-        -13.955669
-      ],
-      "vertices": [
-        [
-          -19.852415,
-          -13.377165
-        ],
-        [
-          -18.852251,
-          -13.955614
-        ],
-        [
-          -19.852415,
-          -14.534227
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 41
-    },
-    {
-      "id": "sqtri:ref:01524",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.273911,
-        -14.289859
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -13.955614
-        ],
-        [
-          -18.273966,
-          -14.958349
-        ],
-        [
-          -18.852251,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
       "graph_distance": 41
     },
     {
@@ -8976,37 +7379,6 @@
       "orientation_token": "300",
       "chirality_token": null,
       "variant": "square-blue",
-      "graph_distance": 41
-    },
-    {
-      "id": "sqtri:ref:02178",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.852415,
-        -11.796022
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -11.217572
-        ],
-        [
-          -19.273966,
-          -11.217572
-        ],
-        [
-          -19.273966,
-          -12.374472
-        ],
-        [
-          -20.430863,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 41
     },
     {
@@ -9095,33 +7467,6 @@
       "graph_distance": 42
     },
     {
-      "id": "sqtri:ref:00605",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.852415,
-        -10.884185
-      ],
-      "vertices": [
-        [
-          -19.852415,
-          -10.21741
-        ],
-        [
-          -19.273966,
-          -11.217572
-        ],
-        [
-          -20.430863,
-          -11.217572
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 42
-    },
-    {
       "id": "sqtri:ref:00807",
       "kind": "square-triangle-triangle",
       "center": [
@@ -9146,33 +7491,6 @@
       "orientation_token": "120",
       "chirality_token": "yellow",
       "variant": "triangle-yellow",
-      "graph_distance": 42
-    },
-    {
-      "id": "sqtri:ref:01521",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -20.186646,
-        -13.955669
-      ],
-      "vertices": [
-        [
-          -19.852415,
-          -14.534227
-        ],
-        [
-          -20.855109,
-          -13.955614
-        ],
-        [
-          -19.852415,
-          -13.377165
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
       "graph_distance": 42
     },
     {
@@ -9207,68 +7525,6 @@
       "graph_distance": 42
     },
     {
-      "id": "sqtri:ref:01670",
-      "kind": "square-triangle-square",
-      "center": [
-        -17.695354,
-        -8.057737
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -7.479206
-        ],
-        [
-          -17.116742,
-          -7.479206
-        ],
-        [
-          -17.116742,
-          -8.636268
-        ],
-        [
-          -18.273966,
-          -8.636268
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 42
-    },
-    {
-      "id": "sqtri:ref:01717",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.06315,
-        -14.746277
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -14.958349
-        ],
-        [
-          -18.852251,
-          -13.955614
-        ],
-        [
-          -19.852415,
-          -14.534227
-        ],
-        [
-          -19.273966,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 42
-    },
-    {
       "id": "sqtri:ref:01739",
       "kind": "square-triangle-square",
       "center": [
@@ -9295,37 +7551,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 42
-    },
-    {
-      "id": "sqtri:ref:02180",
-      "kind": "square-triangle-square",
-      "center": [
-        -20.642986,
-        -13.165083
-      ],
-      "vertices": [
-        [
-          -21.433558,
-          -12.953083
-        ],
-        [
-          -20.430863,
-          -12.374472
-        ],
-        [
-          -19.852415,
-          -13.377165
-        ],
-        [
-          -20.855109,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 42
@@ -9416,87 +7641,6 @@
       "graph_distance": 43
     },
     {
-      "id": "sqtri:ref:00082",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -20.430905,
-        -10.550797
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -10.21741
-        ],
-        [
-          -19.852415,
-          -10.21741
-        ],
-        [
-          -20.430863,
-          -11.217572
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 43
-    },
-    {
-      "id": "sqtri:ref:00607",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -21.433612,
-        -13.621437
-      ],
-      "vertices": [
-        [
-          -21.433558,
-          -12.953083
-        ],
-        [
-          -20.855109,
-          -13.955614
-        ],
-        [
-          -22.01217,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 43
-    },
-    {
-      "id": "sqtri:ref:00613",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.607299,
-        -15.536879
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -14.958349
-        ],
-        [
-          -18.273966,
-          -16.115369
-        ],
-        [
-          -19.273966,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 43
-    },
-    {
       "id": "sqtri:ref:00898",
       "kind": "square-triangle-triangle",
       "center": [
@@ -9519,60 +7663,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "330",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 43
-    },
-    {
-      "id": "sqtri:ref:01348",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.607299,
-        -8.057763
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -8.636268
-        ],
-        [
-          -18.273966,
-          -7.479206
-        ],
-        [
-          -19.273966,
-          -8.057816
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 43
-    },
-    {
-      "id": "sqtri:ref:01352",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.695408,
-        -7.145873
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -7.479206
-        ],
-        [
-          -17.116742,
-          -7.479206
-        ],
-        [
-          -17.695517,
-          -6.479206
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
       "chirality_token": "blue",
       "variant": "triangle-blue",
       "graph_distance": 43
@@ -9694,37 +7784,6 @@
       "graph_distance": 43
     },
     {
-      "id": "sqtri:ref:04922",
-      "kind": "square-triangle-square",
-      "center": [
-        0.001045,
-        -22.592337
-      ],
-      "vertices": [
-        [
-          -0.577517,
-          -23.170228
-        ],
-        [
-          -0.577517,
-          -22.013326
-        ],
-        [
-          0.579219,
-          -22.015244
-        ],
-        [
-          0.579993,
-          -23.170552
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 43
-    },
-    {
       "id": "sqtri:ref:04924",
       "kind": "square-triangle-square",
       "center": [
@@ -9754,168 +7813,6 @@
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 43
-    },
-    {
-      "id": "sqtri:ref:00083",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.012116,
-        -13.28726
-      ],
-      "vertices": [
-        [
-          -22.590619,
-          -12.953083
-        ],
-        [
-          -21.433558,
-          -12.953083
-        ],
-        [
-          -22.01217,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:00312",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.940633,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -19.273966,
-          -16.693818
-        ],
-        [
-          -19.273966,
-          -15.53692
-        ],
-        [
-          -18.273966,
-          -16.115369
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:00336",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -20.430905,
-        -9.883179
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -10.21741
-        ],
-        [
-          -20.430863,
-          -9.214717
-        ],
-        [
-          -19.852415,
-          -10.21741
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:00409",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.273911,
-        -6.812539
-      ],
-      "vertices": [
-        [
-          -18.852251,
-          -6.479206
-        ],
-        [
-          -18.273966,
-          -7.479206
-        ],
-        [
-          -17.695517,
-          -6.479206
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:00897",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -2.492959,
-        -24.172919
-      ],
-      "vertices": [
-        [
-          -2.158823,
-          -24.751368
-        ],
-        [
-          -3.16123,
-          -24.172919
-        ],
-        [
-          -2.158823,
-          -23.59447
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:01347",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.940633,
-        -8.636267
-      ],
-      "vertices": [
-        [
-          -19.273966,
-          -8.057816
-        ],
-        [
-          -19.273966,
-          -9.214717
-        ],
-        [
-          -18.273966,
-          -8.636268
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 44
     },
     {
       "id": "sqtri:ref:01374",
@@ -9969,68 +7866,6 @@
       "orientation_token": "300",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:01669",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.06315,
-        -7.267838
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -7.479206
-        ],
-        [
-          -19.273966,
-          -8.057816
-        ],
-        [
-          -19.852415,
-          -7.055123
-        ],
-        [
-          -18.852251,
-          -6.479206
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:01813",
-      "kind": "square-triangle-square",
-      "center": [
-        -21.221507,
-        -11.006716
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -11.217572
-        ],
-        [
-          -21.433558,
-          -11.796023
-        ],
-        [
-          -22.01217,
-          -10.795859
-        ],
-        [
-          -21.009436,
-          -10.21741
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 44
     },
     {
@@ -10146,118 +7981,6 @@
       "graph_distance": 44
     },
     {
-      "id": "sqtri:ref:05424",
-      "kind": "square-triangle-square",
-      "center": [
-        0.790627,
-        -19.643592
-      ],
-      "vertices": [
-        [
-          1.002362,
-          -20.433776
-        ],
-        [
-          1.580811,
-          -19.431857
-        ],
-        [
-          0.578892,
-          -18.853409
-        ],
-        [
-          0.000443,
-          -19.855327
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 44
-    },
-    {
-      "id": "sqtri:ref:00307",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.607299,
-        -16.693818
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -16.115369
-        ],
-        [
-          -18.273966,
-          -17.272267
-        ],
-        [
-          -19.273966,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:00315",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.590605,
-        -13.621437
-      ],
-      "vertices": [
-        [
-          -22.01217,
-          -13.955614
-        ],
-        [
-          -23.169027,
-          -13.955614
-        ],
-        [
-          -22.590619,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:00415",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.852415,
-        -9.548948
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -9.214717
-        ],
-        [
-          -19.852415,
-          -10.21741
-        ],
-        [
-          -19.273966,
-          -9.214717
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 45
-    },
-    {
       "id": "sqtri:ref:00440",
       "kind": "square-triangle-triangle",
       "center": [
@@ -10285,114 +8008,6 @@
       "graph_distance": 45
     },
     {
-      "id": "sqtri:ref:00686",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.012116,
-        -11.462635
-      ],
-      "vertices": [
-        [
-          -21.433558,
-          -11.796023
-        ],
-        [
-          -22.590619,
-          -11.796023
-        ],
-        [
-          -22.01217,
-          -10.795859
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:00790",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.519027,
-        -6.478307
-      ],
-      "vertices": [
-        [
-          -18.852251,
-          -6.479206
-        ],
-        [
-          -19.852415,
-          -5.900592
-        ],
-        [
-          -19.852415,
-          -7.055123
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:01346",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.852415,
-        -7.723585
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -8.057816
-        ],
-        [
-          -19.273966,
-          -8.057816
-        ],
-        [
-          -19.852415,
-          -7.055123
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:01349",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.273911,
-        -6.144975
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -6.479206
-        ],
-        [
-          -18.273966,
-          -5.476513
-        ],
-        [
-          -18.852251,
-          -6.479206
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 45
-    },
-    {
       "id": "sqtri:ref:01375",
       "kind": "square-triangle-triangle",
       "center": [
@@ -10417,130 +8032,6 @@
       "orientation_token": "210",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:01634",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.852415,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -15.53692
-        ],
-        [
-          -19.273966,
-          -15.53692
-        ],
-        [
-          -19.273966,
-          -16.693818
-        ],
-        [
-          -20.430863,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:01646",
-      "kind": "square-triangle-square",
-      "center": [
-        -21.221507,
-        -9.426839
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -10.21741
-        ],
-        [
-          -22.01217,
-          -9.638961
-        ],
-        [
-          -21.433558,
-          -8.636268
-        ],
-        [
-          -20.430863,
-          -9.214717
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:01671",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.852415,
-        -8.636267
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -8.057816
-        ],
-        [
-          -19.273966,
-          -8.057816
-        ],
-        [
-          -19.273966,
-          -9.214717
-        ],
-        [
-          -20.430863,
-          -9.214717
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 45
-    },
-    {
-      "id": "sqtri:ref:01814",
-      "kind": "square-triangle-square",
-      "center": [
-        -22.012089,
-        -12.374553
-      ],
-      "vertices": [
-        [
-          -22.590619,
-          -11.796023
-        ],
-        [
-          -21.433558,
-          -11.796023
-        ],
-        [
-          -21.433558,
-          -12.953083
-        ],
-        [
-          -22.590619,
-          -12.953083
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 45
     },
     {
@@ -10656,33 +8147,6 @@
       "graph_distance": 45
     },
     {
-      "id": "sqtri:ref:04350",
-      "kind": "square-triangle-triangle",
-      "center": [
-        1.246987,
-        -18.853151
-      ],
-      "vertices": [
-        [
-          1.581259,
-          -18.274187
-        ],
-        [
-          1.580811,
-          -19.431857
-        ],
-        [
-          0.578892,
-          -18.853409
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 45
-    },
-    {
       "id": "sqtri:ref:04838",
       "kind": "square-triangle-square",
       "center": [
@@ -10768,60 +8232,6 @@
       "graph_distance": 45
     },
     {
-      "id": "sqtri:ref:00406",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.590605,
-        -14.289859
-      ],
-      "vertices": [
-        [
-          -23.169027,
-          -13.955614
-        ],
-        [
-          -22.01217,
-          -13.955614
-        ],
-        [
-          -22.590619,
-          -14.958349
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:00601",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.939667,
-        -16.693818
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -17.272267
-        ],
-        [
-          -18.273966,
-          -16.115369
-        ],
-        [
-          -17.271068,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 46
-    },
-    {
       "id": "sqtri:ref:00800",
       "kind": "square-triangle-triangle",
       "center": [
@@ -10846,87 +8256,6 @@
       "orientation_token": "180",
       "chirality_token": "yellow",
       "variant": "triangle-yellow",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:01259",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -20.765095,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -15.53692
-        ],
-        [
-          -20.430863,
-          -16.693818
-        ],
-        [
-          -21.433558,
-          -16.115369
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:01283",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.012116,
-        -8.970499
-      ],
-      "vertices": [
-        [
-          -21.433558,
-          -8.636268
-        ],
-        [
-          -22.01217,
-          -9.638961
-        ],
-        [
-          -22.590619,
-          -8.636268
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:01345",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -20.430905,
-        -7.389354
-      ],
-      "vertices": [
-        [
-          -19.852415,
-          -7.055123
-        ],
-        [
-          -21.009436,
-          -7.055123
-        ],
-        [
-          -20.430863,
-          -8.057816
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
       "graph_distance": 46
     },
     {
@@ -10984,161 +8313,6 @@
       "graph_distance": 46
     },
     {
-      "id": "sqtri:ref:01631",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.06315,
-        -17.483123
-      ],
-      "vertices": [
-        [
-          -19.273966,
-          -16.693818
-        ],
-        [
-          -19.852415,
-          -17.69398
-        ],
-        [
-          -18.852251,
-          -18.272429
-        ],
-        [
-          -18.273966,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:01635",
-      "kind": "square-triangle-square",
-      "center": [
-        -23.38118,
-        -13.165083
-      ],
-      "vertices": [
-        [
-          -22.590619,
-          -12.953083
-        ],
-        [
-          -23.593313,
-          -12.374472
-        ],
-        [
-          -24.171762,
-          -13.377165
-        ],
-        [
-          -23.169027,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:01812",
-      "kind": "square-triangle-square",
-      "center": [
-        -22.802701,
-        -11.006716
-      ],
-      "vertices": [
-        [
-          -23.014701,
-          -10.21741
-        ],
-        [
-          -22.01217,
-          -10.795859
-        ],
-        [
-          -22.590619,
-          -11.796023
-        ],
-        [
-          -23.593313,
-          -11.217572
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:02029",
-      "kind": "square-triangle-square",
-      "center": [
-        -20.430926,
-        -6.477857
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -5.900592
-        ],
-        [
-          -19.852415,
-          -5.900592
-        ],
-        [
-          -19.852415,
-          -7.055123
-        ],
-        [
-          -21.009436,
-          -7.055123
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:02030",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.06315,
-        -5.688594
-      ],
-      "vertices": [
-        [
-          -19.273966,
-          -4.898064
-        ],
-        [
-          -19.852415,
-          -5.900592
-        ],
-        [
-          -18.852251,
-          -6.479206
-        ],
-        [
-          -18.273966,
-          -5.476513
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 46
-    },
-    {
       "id": "sqtri:ref:02054",
       "kind": "square-triangle-square",
       "center": [
@@ -11167,33 +8341,6 @@
       "orientation_token": "0",
       "chirality_token": null,
       "variant": "square-white",
-      "graph_distance": 46
-    },
-    {
-      "id": "sqtri:ref:02903",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -1.825013,
-        -16.69356
-      ],
-      "vertices": [
-        [
-          -2.158823,
-          -17.272267
-        ],
-        [
-          -2.158823,
-          -16.115369
-        ],
-        [
-          -1.157393,
-          -16.693043
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
       "graph_distance": 46
     },
     {
@@ -11340,87 +8487,6 @@
       "graph_distance": 46
     },
     {
-      "id": "sqtri:ref:00081",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -23.593259,
-        -10.550797
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -10.21741
-        ],
-        [
-          -23.014701,
-          -10.21741
-        ],
-        [
-          -23.593313,
-          -11.217572
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:00408",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -21.343681,
-        -6.478307
-      ],
-      "vertices": [
-        [
-          -22.01217,
-          -6.479206
-        ],
-        [
-          -21.009436,
-          -7.055123
-        ],
-        [
-          -21.009436,
-          -5.900592
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:00410",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.607299,
-        -4.898009
-      ],
-      "vertices": [
-        [
-          -19.273966,
-          -4.898064
-        ],
-        [
-          -18.273966,
-          -5.476513
-        ],
-        [
-          -18.273966,
-          -4.319451
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 47
-    },
-    {
       "id": "sqtri:ref:00441",
       "kind": "square-triangle-triangle",
       "center": [
@@ -11448,114 +8514,6 @@
       "graph_distance": 47
     },
     {
-      "id": "sqtri:ref:01255",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.519027,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -19.852415,
-          -18.850877
-        ],
-        [
-          -19.852415,
-          -17.69398
-        ],
-        [
-          -18.852251,
-          -18.272429
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:01260",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -21.099326,
-        -15.536879
-      ],
-      "vertices": [
-        [
-          -21.433558,
-          -16.115369
-        ],
-        [
-          -21.433558,
-          -14.958349
-        ],
-        [
-          -20.430863,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:01263",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.171762,
-        -12.708703
-      ],
-      "vertices": [
-        [
-          -24.750211,
-          -12.374472
-        ],
-        [
-          -23.593313,
-          -12.374472
-        ],
-        [
-          -24.171762,
-          -13.377165
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:01284",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.012116,
-        -8.302036
-      ],
-      "vertices": [
-        [
-          -22.590619,
-          -8.636268
-        ],
-        [
-          -22.01217,
-          -7.633572
-        ],
-        [
-          -21.433558,
-          -8.636268
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 47
-    },
-    {
       "id": "sqtri:ref:01371",
       "kind": "square-triangle-triangle",
       "center": [
@@ -11580,99 +8538,6 @@
       "orientation_token": "150",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:01633",
-      "kind": "square-triangle-square",
-      "center": [
-        -21.221507,
-        -16.904674
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -17.69398
-        ],
-        [
-          -20.430863,
-          -16.693818
-        ],
-        [
-          -21.433558,
-          -16.115369
-        ],
-        [
-          -22.01217,
-          -17.115531
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:01645",
-      "kind": "square-triangle-square",
-      "center": [
-        -22.802701,
-        -9.426839
-      ],
-      "vertices": [
-        [
-          -23.014701,
-          -10.21741
-        ],
-        [
-          -22.01217,
-          -9.638961
-        ],
-        [
-          -22.590619,
-          -8.636268
-        ],
-        [
-          -23.593313,
-          -9.214717
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:01668",
-      "kind": "square-triangle-square",
-      "center": [
-        -23.38118,
-        -14.746277
-      ],
-      "vertices": [
-        [
-          -22.590619,
-          -14.958349
-        ],
-        [
-          -23.593313,
-          -15.53692
-        ],
-        [
-          -24.171762,
-          -14.534227
-        ],
-        [
-          -23.169027,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 47
     },
     {
@@ -11707,37 +8572,6 @@
       "graph_distance": 47
     },
     {
-      "id": "sqtri:ref:01714",
-      "kind": "square-triangle-square",
-      "center": [
-        -17.483303,
-        -17.483123
-      ],
-      "vertices": [
-        [
-          -17.271068,
-          -16.693818
-        ],
-        [
-          -16.692659,
-          -17.69398
-        ],
-        [
-          -17.695517,
-          -18.272429
-        ],
-        [
-          -18.273966,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 47
-    },
-    {
       "id": "sqtri:ref:02052",
       "kind": "square-triangle-square",
       "center": [
@@ -11766,33 +8600,6 @@
       "orientation_token": "330",
       "chirality_token": null,
       "variant": "square-white",
-      "graph_distance": 47
-    },
-    {
-      "id": "sqtri:ref:02906",
-      "kind": "square-triangle-triangle",
-      "center": [
-        1.825422,
-        -16.694294
-      ],
-      "vertices": [
-        [
-          1.15779,
-          -16.693818
-        ],
-        [
-          2.158769,
-          -16.116796
-        ],
-        [
-          2.159708,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "red",
-      "variant": "triangle-red",
       "graph_distance": 47
     },
     {
@@ -11854,141 +8661,6 @@
       "graph_distance": 47
     },
     {
-      "id": "sqtri:ref:00102",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -21.677925,
-        -5.900661
-      ],
-      "vertices": [
-        [
-          -22.01217,
-          -6.479206
-        ],
-        [
-          -22.01217,
-          -5.322186
-        ],
-        [
-          -21.009436,
-          -5.900592
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:00104",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -18.940633,
-        -4.319506
-      ],
-      "vertices": [
-        [
-          -19.273966,
-          -4.898064
-        ],
-        [
-          -19.273966,
-          -3.741002
-        ],
-        [
-          -18.273966,
-          -4.319451
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:00311",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -21.677925,
-        -17.69398
-      ],
-      "vertices": [
-        [
-          -22.01217,
-          -18.272429
-        ],
-        [
-          -22.01217,
-          -17.115531
-        ],
-        [
-          -21.009436,
-          -17.69398
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:00316",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.171762,
-        -10.884185
-      ],
-      "vertices": [
-        [
-          -23.593313,
-          -11.217572
-        ],
-        [
-          -24.750211,
-          -11.217572
-        ],
-        [
-          -24.171762,
-          -10.21741
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:00335",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -23.593259,
-        -9.883179
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -10.21741
-        ],
-        [
-          -23.593313,
-          -9.214717
-        ],
-        [
-          -23.014701,
-          -10.21741
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 48
-    },
-    {
       "id": "sqtri:ref:00439",
       "kind": "square-triangle-triangle",
       "center": [
@@ -12040,257 +8712,6 @@
       "orientation_token": "60",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:00444",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -10.549749,
-        -18.850932
-      ],
-      "vertices": [
-        [
-          -11.216416,
-          -18.850877
-        ],
-        [
-          -10.216416,
-          -18.272429
-        ],
-        [
-          -10.216416,
-          -19.429491
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01256",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -19.185639,
-        -18.850932
-      ],
-      "vertices": [
-        [
-          -18.852251,
-          -18.272429
-        ],
-        [
-          -18.852251,
-          -19.429491
-        ],
-        [
-          -19.852415,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01264",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.750211,
-        -13.042934
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -13.377165
-        ],
-        [
-          -25.32866,
-          -13.377165
-        ],
-        [
-          -24.750211,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01338",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.171762,
-        -15.202689
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -14.534227
-        ],
-        [
-          -23.593313,
-          -15.53692
-        ],
-        [
-          -24.750211,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01339",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.92485,
-        -15.536879
-      ],
-      "vertices": [
-        [
-          -23.593313,
-          -15.53692
-        ],
-        [
-          -22.590619,
-          -14.958349
-        ],
-        [
-          -22.590619,
-          -16.115369
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01510",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.026945,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -18.272429
-        ],
-        [
-          -16.692659,
-          -17.69398
-        ],
-        [
-          -16.692659,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01511",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -16.6927,
-        -17.027205
-      ],
-      "vertices": [
-        [
-          -16.692659,
-          -17.69398
-        ],
-        [
-          -17.271068,
-          -16.693818
-        ],
-        [
-          -16.114374,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01632",
-      "kind": "square-triangle-square",
-      "center": [
-        -20.430926,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -17.69398
-        ],
-        [
-          -19.852415,
-          -17.69398
-        ],
-        [
-          -19.852415,
-          -18.850877
-        ],
-        [
-          -21.009436,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 48
-    },
-    {
-      "id": "sqtri:ref:01636",
-      "kind": "square-triangle-square",
-      "center": [
-        -24.171762,
-        -11.796022
-      ],
-      "vertices": [
-        [
-          -24.750211,
-          -11.217572
-        ],
-        [
-          -23.593313,
-          -11.217572
-        ],
-        [
-          -23.593313,
-          -12.374472
-        ],
-        [
-          -24.750211,
-          -12.374472
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 48
     },
     {
@@ -12406,292 +8827,6 @@
       "graph_distance": 49
     },
     {
-      "id": "sqtri:ref:00308",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -21.343681,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -17.69398
-        ],
-        [
-          -21.009436,
-          -18.850877
-        ],
-        [
-          -22.01217,
-          -18.272429
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:00403",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -22.346347,
-        -17.69398
-      ],
-      "vertices": [
-        [
-          -23.014701,
-          -17.69398
-        ],
-        [
-          -22.01217,
-          -17.115531
-        ],
-        [
-          -22.01217,
-          -18.272429
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:00597",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -16.11421,
-        -17.360593
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -16.693818
-        ],
-        [
-          -15.535598,
-          -17.69398
-        ],
-        [
-          -16.692659,
-          -17.69398
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:01337",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.750211,
-        -14.868458
-      ],
-      "vertices": [
-        [
-          -24.750211,
-          -15.53692
-        ],
-        [
-          -25.32866,
-          -14.534227
-        ],
-        [
-          -24.171762,
-          -14.534227
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:01340",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -23.259082,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -22.590619,
-          -16.115369
-        ],
-        [
-          -23.593313,
-          -16.693818
-        ],
-        [
-          -23.593313,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:01509",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.361231,
-        -18.850932
-      ],
-      "vertices": [
-        [
-          -16.692659,
-          -18.850877
-        ],
-        [
-          -17.695517,
-          -19.429491
-        ],
-        [
-          -17.695517,
-          -18.272429
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:01666",
-      "kind": "square-triangle-square",
-      "center": [
-        -24.171762,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -24.750211,
-          -15.53692
-        ],
-        [
-          -23.593313,
-          -15.53692
-        ],
-        [
-          -23.593313,
-          -16.693818
-        ],
-        [
-          -24.750211,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:01833",
-      "kind": "square-triangle-square",
-      "center": [
-        -21.221507,
-        -5.110073
-      ],
-      "vertices": [
-        [
-          -22.01217,
-          -5.322186
-        ],
-        [
-          -21.433558,
-          -4.319451
-        ],
-        [
-          -20.430863,
-          -4.898064
-        ],
-        [
-          -21.009436,
-          -5.900592
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:01835",
-      "kind": "square-triangle-square",
-      "center": [
-        -19.852415,
-        -4.319533
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -3.741002
-        ],
-        [
-          -19.273966,
-          -3.741002
-        ],
-        [
-          -19.273966,
-          -4.898064
-        ],
-        [
-          -20.430863,
-          -4.898064
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 49
-    },
-    {
-      "id": "sqtri:ref:02172",
-      "kind": "square-triangle-square",
-      "center": [
-        -16.114128,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -16.692659,
-          -17.69398
-        ],
-        [
-          -15.535598,
-          -17.69398
-        ],
-        [
-          -15.535598,
-          -18.850877
-        ],
-        [
-          -16.692659,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 49
-    },
-    {
       "id": "sqtri:ref:05724",
       "kind": "square-triangle-triangle",
       "center": [
@@ -12804,37 +8939,6 @@
       "graph_distance": 49
     },
     {
-      "id": "sqtri:ref:07803",
-      "kind": "square-triangle-square",
-      "center": [
-        4.31828,
-        -22.591368
-      ],
-      "vertices": [
-        [
-          3.739749,
-          -22.012837
-        ],
-        [
-          4.896811,
-          -22.012837
-        ],
-        [
-          4.896811,
-          -23.169899
-        ],
-        [
-          3.739749,
-          -23.169899
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 49
-    },
-    {
       "id": "sqtri:ref:00080",
       "kind": "square-triangle-triangle",
       "center": [
@@ -12859,199 +8963,6 @@
       "orientation_token": "120",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:00400",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.171762,
-        -17.027205
-      ],
-      "vertices": [
-        [
-          -24.750211,
-          -16.693818
-        ],
-        [
-          -23.593313,
-          -16.693818
-        ],
-        [
-          -24.171762,
-          -17.69398
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:00693",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -20.765095,
-        -4.319506
-      ],
-      "vertices": [
-        [
-          -20.430863,
-          -3.741002
-        ],
-        [
-          -20.430863,
-          -4.898064
-        ],
-        [
-          -21.433558,
-          -4.319451
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:00787",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -25.083599,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -24.750211,
-          -16.693818
-        ],
-        [
-          -25.750374,
-          -16.115369
-        ],
-        [
-          -24.750211,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:00852",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -16.11421,
-        -19.185109
-      ],
-      "vertices": [
-        [
-          -15.535598,
-          -18.850877
-        ],
-        [
-          -16.114374,
-          -19.853573
-        ],
-        [
-          -16.692659,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:01512",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -15.201408,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -15.535598,
-          -18.850877
-        ],
-        [
-          -15.535598,
-          -17.69398
-        ],
-        [
-          -14.533027,
-          -18.272429
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:01516",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -15.535707,
-        -17.027205
-      ],
-      "vertices": [
-        [
-          -16.114374,
-          -16.693818
-        ],
-        [
-          -14.95715,
-          -16.693818
-        ],
-        [
-          -15.535598,
-          -17.69398
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:01667",
-      "kind": "square-triangle-square",
-      "center": [
-        -22.802701,
-        -16.904674
-      ],
-      "vertices": [
-        [
-          -23.014701,
-          -17.69398
-        ],
-        [
-          -23.593313,
-          -16.693818
-        ],
-        [
-          -22.590619,
-          -16.115369
-        ],
-        [
-          -22.01217,
-          -17.115531
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 50
     },
     {
@@ -13086,68 +8997,6 @@
       "graph_distance": 50
     },
     {
-      "id": "sqtri:ref:02023",
-      "kind": "square-triangle-square",
-      "center": [
-        -25.539517,
-        -15.324798
-      ],
-      "vertices": [
-        [
-          -25.32866,
-          -14.534227
-        ],
-        [
-          -24.750211,
-          -15.53692
-        ],
-        [
-          -25.750374,
-          -16.115369
-        ],
-        [
-          -26.328823,
-          -15.112676
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:02171",
-      "kind": "square-triangle-square",
-      "center": [
-        -16.904823,
-        -19.641532
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -19.429491
-        ],
-        [
-          -16.692659,
-          -18.850877
-        ],
-        [
-          -16.114374,
-          -19.853573
-        ],
-        [
-          -17.116742,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 50
-    },
-    {
       "id": "sqtri:ref:06152",
       "kind": "square-triangle-triangle",
       "center": [
@@ -13172,60 +9021,6 @@
       "orientation_token": "240",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:06153",
-      "kind": "square-triangle-triangle",
-      "center": [
-        4.318307,
-        -23.503287
-      ],
-      "vertices": [
-        [
-          3.739749,
-          -23.169899
-        ],
-        [
-          4.896811,
-          -23.169899
-        ],
-        [
-          4.318362,
-          -24.170064
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 50
-    },
-    {
-      "id": "sqtri:ref:06623",
-      "kind": "square-triangle-triangle",
-      "center": [
-        1.825219,
-        -24.172622
-      ],
-      "vertices": [
-        [
-          2.158607,
-          -24.751044
-        ],
-        [
-          1.158442,
-          -24.172635
-        ],
-        [
-          2.158607,
-          -23.594186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
       "graph_distance": 50
     },
     {
@@ -13314,60 +9109,6 @@
       "graph_distance": 50
     },
     {
-      "id": "sqtri:ref:00399",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -25.995435,
-        -14.534172
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -13.955614
-        ],
-        [
-          -25.32866,
-          -14.534227
-        ],
-        [
-          -26.328823,
-          -15.112676
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 51
-    },
-    {
-      "id": "sqtri:ref:00596",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.695408,
-        -20.097954
-      ],
-      "vertices": [
-        [
-          -18.273966,
-          -20.432186
-        ],
-        [
-          -17.695517,
-          -19.429491
-        ],
-        [
-          -17.116742,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 51
-    },
-    {
       "id": "sqtri:ref:00598",
       "kind": "square-triangle-triangle",
       "center": [
@@ -13422,118 +9163,6 @@
       "graph_distance": 51
     },
     {
-      "id": "sqtri:ref:01341",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.750211,
-        -17.360593
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -17.69398
-        ],
-        [
-          -25.32866,
-          -17.69398
-        ],
-        [
-          -24.750211,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 51
-    },
-    {
-      "id": "sqtri:ref:01344",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -23.593259,
-        -17.360593
-      ],
-      "vertices": [
-        [
-          -23.593313,
-          -16.693818
-        ],
-        [
-          -23.014701,
-          -17.69398
-        ],
-        [
-          -24.171762,
-          -17.69398
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 51
-    },
-    {
-      "id": "sqtri:ref:01513",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -14.867217,
-        -18.850932
-      ],
-      "vertices": [
-        [
-          -14.533027,
-          -18.272429
-        ],
-        [
-          -14.533027,
-          -19.429491
-        ],
-        [
-          -15.535598,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 51
-    },
-    {
-      "id": "sqtri:ref:01715",
-      "kind": "square-triangle-square",
-      "center": [
-        -14.745129,
-        -17.483123
-      ],
-      "vertices": [
-        [
-          -14.95715,
-          -16.693818
-        ],
-        [
-          -15.535598,
-          -17.69398
-        ],
-        [
-          -14.533027,
-          -18.272429
-        ],
-        [
-          -13.954742,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 51
-    },
-    {
       "id": "sqtri:ref:01811",
       "kind": "square-triangle-square",
       "center": [
@@ -13560,68 +9189,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 51
-    },
-    {
-      "id": "sqtri:ref:01834",
-      "kind": "square-triangle-square",
-      "center": [
-        -21.221507,
-        -3.530185
-      ],
-      "vertices": [
-        [
-          -21.009436,
-          -2.740837
-        ],
-        [
-          -20.430863,
-          -3.741002
-        ],
-        [
-          -21.433558,
-          -4.319451
-        ],
-        [
-          -22.01217,
-          -3.319451
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 51
-    },
-    {
-      "id": "sqtri:ref:02024",
-      "kind": "square-triangle-square",
-      "center": [
-        -25.539517,
-        -16.904674
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -17.115531
-        ],
-        [
-          -25.750374,
-          -16.115369
-        ],
-        [
-          -24.750211,
-          -16.693818
-        ],
-        [
-          -25.32866,
-          -17.69398
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 51
@@ -13655,33 +9222,6 @@
       "orientation_token": "150",
       "chirality_token": null,
       "variant": "square-white",
-      "graph_distance": 51
-    },
-    {
-      "id": "sqtri:ref:06154",
-      "kind": "square-triangle-triangle",
-      "center": [
-        4.896811,
-        -23.836676
-      ],
-      "vertices": [
-        [
-          4.318362,
-          -24.170064
-        ],
-        [
-          4.896811,
-          -23.169899
-        ],
-        [
-          5.47526,
-          -24.170064
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
       "graph_distance": 51
     },
     {
@@ -13797,141 +9337,6 @@
       "graph_distance": 51
     },
     {
-      "id": "sqtri:ref:00079",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -17.695408,
-        -20.766363
-      ],
-      "vertices": [
-        [
-          -17.695517,
-          -21.434717
-        ],
-        [
-          -18.273966,
-          -20.432186
-        ],
-        [
-          -17.116742,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 52
-    },
-    {
-      "id": "sqtri:ref:00095",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.663054,
-        -14.534172
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -15.112676
-        ],
-        [
-          -27.331517,
-          -14.534227
-        ],
-        [
-          -26.328823,
-          -13.955614
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 52
-    },
-    {
-      "id": "sqtri:ref:00103",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -21.677925,
-        -2.740906
-      ],
-      "vertices": [
-        [
-          -22.01217,
-          -3.319451
-        ],
-        [
-          -22.01217,
-          -2.162431
-        ],
-        [
-          -21.009436,
-          -2.740837
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 52
-    },
-    {
-      "id": "sqtri:ref:00401",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -25.995435,
-        -17.69398
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -17.115531
-        ],
-        [
-          -25.32866,
-          -17.69398
-        ],
-        [
-          -26.328823,
-          -18.272429
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 52
-    },
-    {
-      "id": "sqtri:ref:00604",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -14.288878,
-        -16.693818
-      ],
-      "vertices": [
-        [
-          -14.95715,
-          -16.693818
-        ],
-        [
-          -13.954742,
-          -16.115369
-        ],
-        [
-          -13.954742,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 52
-    },
-    {
       "id": "sqtri:ref:00685",
       "kind": "square-triangle-triangle",
       "center": [
@@ -13956,37 +9361,6 @@
       "orientation_token": "300",
       "chirality_token": "yellow",
       "variant": "triangle-yellow",
-      "graph_distance": 52
-    },
-    {
-      "id": "sqtri:ref:01733",
-      "kind": "square-triangle-square",
-      "center": [
-        -13.164017,
-        -23.382348
-      ],
-      "vertices": [
-        [
-          -12.951884,
-          -24.172919
-        ],
-        [
-          -13.954742,
-          -23.59447
-        ],
-        [
-          -13.376006,
-          -22.591774
-        ],
-        [
-          -12.373436,
-          -23.170228
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 52
     },
     {
@@ -14042,87 +9416,6 @@
       "chirality_token": "red",
       "variant": "triangle-red",
       "graph_distance": 52
-    },
-    {
-      "id": "sqtri:ref:00005",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -12.37334,
-        -23.838689
-      ],
-      "vertices": [
-        [
-          -12.951884,
-          -24.172919
-        ],
-        [
-          -12.373436,
-          -23.170228
-        ],
-        [
-          -11.7947,
-          -24.172919
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 53
-    },
-    {
-      "id": "sqtri:ref:00093",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.663054,
-        -17.69398
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -18.272429
-        ],
-        [
-          -27.331517,
-          -17.69398
-        ],
-        [
-          -26.328823,
-          -17.115531
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 53
-    },
-    {
-      "id": "sqtri:ref:00886",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -13.620456,
-        -24.172919
-      ],
-      "vertices": [
-        [
-          -13.954742,
-          -23.59447
-        ],
-        [
-          -12.951884,
-          -24.172919
-        ],
-        [
-          -13.954742,
-          -24.751368
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 53
     },
     {
       "id": "sqtri:ref:01809",
@@ -14182,37 +9475,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "330",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 53
-    },
-    {
-      "id": "sqtri:ref:01826",
-      "kind": "square-triangle-square",
-      "center": [
-        -27.119384,
-        -15.324798
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -15.112676
-        ],
-        [
-          -26.907231,
-          -16.115369
-        ],
-        [
-          -27.909966,
-          -15.53692
-        ],
-        [
-          -27.331517,
-          -14.534227
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 53
@@ -14303,33 +9565,6 @@
       "graph_distance": 53
     },
     {
-      "id": "sqtri:ref:00053",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.997286,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -27.331517,
-          -17.69398
-        ],
-        [
-          -26.328823,
-          -18.272429
-        ],
-        [
-          -27.331517,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 54
-    },
-    {
       "id": "sqtri:ref:00078",
       "kind": "square-triangle-triangle",
       "center": [
@@ -14354,91 +9589,6 @@
       "orientation_token": "120",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 54
-    },
-    {
-      "id": "sqtri:ref:00690",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -27.575721,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -27.909966,
-          -15.53692
-        ],
-        [
-          -26.907231,
-          -16.115369
-        ],
-        [
-          -27.909966,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 54
-    },
-    {
-      "id": "sqtri:ref:00885",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -14.288878,
-        -24.172919
-      ],
-      "vertices": [
-        [
-          -13.954742,
-          -24.751368
-        ],
-        [
-          -14.95715,
-          -24.172919
-        ],
-        [
-          -13.954742,
-          -23.59447
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 54
-    },
-    {
-      "id": "sqtri:ref:01824",
-      "kind": "square-triangle-square",
-      "center": [
-        -27.119384,
-        -16.904674
-      ],
-      "vertices": [
-        [
-          -27.331517,
-          -17.69398
-        ],
-        [
-          -27.909966,
-          -16.693818
-        ],
-        [
-          -26.907231,
-          -16.115369
-        ],
-        [
-          -26.328823,
-          -17.115531
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 54
     },
     {
@@ -14612,95 +9762,6 @@
       "graph_distance": 55
     },
     {
-      "id": "sqtri:ref:00381",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.663054,
-        -18.850932
-      ],
-      "vertices": [
-        [
-          -27.331517,
-          -18.850877
-        ],
-        [
-          -26.328823,
-          -19.429491
-        ],
-        [
-          -26.328823,
-          -18.272429
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 55
-    },
-    {
-      "id": "sqtri:ref:01783",
-      "kind": "square-triangle-square",
-      "center": [
-        -27.910048,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -28.488578,
-          -17.69398
-        ],
-        [
-          -27.331517,
-          -17.69398
-        ],
-        [
-          -27.331517,
-          -18.850877
-        ],
-        [
-          -28.488578,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 55
-    },
-    {
-      "id": "sqtri:ref:01825",
-      "kind": "square-triangle-square",
-      "center": [
-        -28.488476,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -29.066986,
-          -15.53692
-        ],
-        [
-          -27.909966,
-          -15.53692
-        ],
-        [
-          -27.909966,
-          -16.693818
-        ],
-        [
-          -29.066986,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 55
-    },
-    {
       "id": "sqtri:ref:06174",
       "kind": "square-triangle-triangle",
       "center": [
@@ -14752,37 +9813,6 @@
       "orientation_token": "210",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 55
-    },
-    {
-      "id": "sqtri:ref:07322",
-      "kind": "square-triangle-square",
-      "center": [
-        2.949177,
-        -17.483676
-      ],
-      "vertices": [
-        [
-          3.160687,
-          -16.69541
-        ],
-        [
-          3.739749,
-          -17.693656
-        ],
-        [
-          2.736565,
-          -18.27337
-        ],
-        [
-          2.159708,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 55
     },
     {
@@ -14846,91 +9876,6 @@
       "chirality_token": null,
       "variant": "square-blue",
       "graph_distance": 55
-    },
-    {
-      "id": "sqtri:ref:00094",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -29.401231,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -29.066986,
-          -16.693818
-        ],
-        [
-          -30.069721,
-          -16.115369
-        ],
-        [
-          -29.066986,
-          -15.53692
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 56
-    },
-    {
-      "id": "sqtri:ref:00677",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -28.822755,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -28.488578,
-          -18.850877
-        ],
-        [
-          -29.491109,
-          -18.272429
-        ],
-        [
-          -28.488578,
-          -17.69398
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 56
-    },
-    {
-      "id": "sqtri:ref:02011",
-      "kind": "square-triangle-square",
-      "center": [
-        -27.119384,
-        -19.641532
-      ],
-      "vertices": [
-        [
-          -27.331517,
-          -18.850877
-        ],
-        [
-          -27.909966,
-          -19.853573
-        ],
-        [
-          -26.907231,
-          -20.432186
-        ],
-        [
-          -26.328823,
-          -19.429491
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 56
     },
     {
       "id": "sqtri:ref:06544",
@@ -15043,207 +9988,6 @@
       "chirality_token": null,
       "variant": "square-blue",
       "graph_distance": 56
-    },
-    {
-      "id": "sqtri:ref:07672",
-      "kind": "square-triangle-square",
-      "center": [
-        2.158799,
-        -18.85139
-      ],
-      "vertices": [
-        [
-          1.581259,
-          -18.274187
-        ],
-        [
-          2.736565,
-          -18.27337
-        ],
-        [
-          2.737217,
-          -19.429002
-        ],
-        [
-          1.580155,
-          -19.429002
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 56
-    },
-    {
-      "id": "sqtri:ref:00052",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -29.735476,
-        -16.693818
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -16.115369
-        ],
-        [
-          -29.066986,
-          -16.693818
-        ],
-        [
-          -30.069721,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 57
-    },
-    {
-      "id": "sqtri:ref:00781",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -27.575721,
-        -20.432131
-      ],
-      "vertices": [
-        [
-          -26.907231,
-          -20.432186
-        ],
-        [
-          -27.909966,
-          -19.853573
-        ],
-        [
-          -27.909966,
-          -21.010635
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 57
-    },
-    {
-      "id": "sqtri:ref:01325",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.328809,
-        -20.097954
-      ],
-      "vertices": [
-        [
-          -25.750374,
-          -20.432186
-        ],
-        [
-          -26.328823,
-          -19.429491
-        ],
-        [
-          -26.907231,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 57
-    },
-    {
-      "id": "sqtri:ref:01782",
-      "kind": "square-triangle-square",
-      "center": [
-        -29.279098,
-        -17.483123
-      ],
-      "vertices": [
-        [
-          -29.066986,
-          -16.693818
-        ],
-        [
-          -28.488578,
-          -17.69398
-        ],
-        [
-          -29.491109,
-          -18.272429
-        ],
-        [
-          -30.069721,
-          -17.272267
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 57
-    },
-    {
-      "id": "sqtri:ref:01784",
-      "kind": "square-triangle-square",
-      "center": [
-        -29.279098,
-        -19.063001
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -19.275124
-        ],
-        [
-          -29.491109,
-          -18.272429
-        ],
-        [
-          -28.488578,
-          -18.850877
-        ],
-        [
-          -29.066986,
-          -19.853573
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 57
-    },
-    {
-      "id": "sqtri:ref:05913",
-      "kind": "square-triangle-triangle",
-      "center": [
-        2.159081,
-        -19.764036
-      ],
-      "vertices": [
-        [
-          2.737217,
-          -19.429002
-        ],
-        [
-          2.15987,
-          -20.434104
-        ],
-        [
-          1.580155,
-          -19.429002
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 57
     },
     {
       "id": "sqtri:ref:06161",
@@ -15414,149 +10158,6 @@
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 57
-    },
-    {
-      "id": "sqtri:ref:00051",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -30.403952,
-        -16.693818
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -17.272267
-        ],
-        [
-          -31.072415,
-          -16.693818
-        ],
-        [
-          -30.069721,
-          -16.115369
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 58
-    },
-    {
-      "id": "sqtri:ref:00054",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -29.735476,
-        -19.853628
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -19.275124
-        ],
-        [
-          -29.066986,
-          -19.853573
-        ],
-        [
-          -30.069721,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 58
-    },
-    {
-      "id": "sqtri:ref:00380",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.328809,
-        -20.766363
-      ],
-      "vertices": [
-        [
-          -26.907231,
-          -20.432186
-        ],
-        [
-          -26.328823,
-          -21.434717
-        ],
-        [
-          -25.750374,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 58
-    },
-    {
-      "id": "sqtri:ref:01660",
-      "kind": "square-triangle-square",
-      "center": [
-        -27.119384,
-        -21.222716
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -21.434717
-        ],
-        [
-          -27.331517,
-          -22.013326
-        ],
-        [
-          -27.909966,
-          -21.010635
-        ],
-        [
-          -26.907231,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 58
-    },
-    {
-      "id": "sqtri:ref:02010",
-      "kind": "square-triangle-square",
-      "center": [
-        -28.488476,
-        -20.432104
-      ],
-      "vertices": [
-        [
-          -29.066986,
-          -19.853573
-        ],
-        [
-          -27.909966,
-          -19.853573
-        ],
-        [
-          -27.909966,
-          -21.010635
-        ],
-        [
-          -29.066986,
-          -21.010635
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 58
     },
     {
       "id": "sqtri:ref:06170",
@@ -15754,253 +10355,6 @@
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 58
-    },
-    {
-      "id": "sqtri:ref:00050",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -30.403952,
-        -19.853628
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -20.432186
-        ],
-        [
-          -31.072415,
-          -19.853573
-        ],
-        [
-          -30.069721,
-          -19.275124
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:00062",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -30.738184,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -31.072415,
-          -15.53692
-        ],
-        [
-          -30.069721,
-          -16.115369
-        ],
-        [
-          -31.072415,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:00379",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -29.401231,
-        -20.432131
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -20.432186
-        ],
-        [
-          -29.066986,
-          -21.010635
-        ],
-        [
-          -29.066986,
-          -19.853573
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:01321",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -28.48851,
-        -21.344865
-      ],
-      "vertices": [
-        [
-          -27.909966,
-          -21.010635
-        ],
-        [
-          -29.066986,
-          -21.010635
-        ],
-        [
-          -28.488578,
-          -22.013326
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:01322",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -27.91002,
-        -21.679096
-      ],
-      "vertices": [
-        [
-          -28.488578,
-          -22.013326
-        ],
-        [
-          -27.331517,
-          -22.013326
-        ],
-        [
-          -27.909966,
-          -21.010635
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:01324",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.663054,
-        -22.013272
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -22.591774
-        ],
-        [
-          -26.328823,
-          -21.434717
-        ],
-        [
-          -27.331517,
-          -22.013326
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:01328",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -25.750374,
-        -21.10054
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -21.434717
-        ],
-        [
-          -25.171925,
-          -21.434717
-        ],
-        [
-          -25.750374,
-          -20.432186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:01781",
-      "kind": "square-triangle-square",
-      "center": [
-        -30.860292,
-        -17.483123
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -17.272267
-        ],
-        [
-          -30.64817,
-          -18.272429
-        ],
-        [
-          -31.650864,
-          -17.69398
-        ],
-        [
-          -31.072415,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 59
-    },
-    {
-      "id": "sqtri:ref:06162",
-      "kind": "square-triangle-triangle",
-      "center": [
-        6.477422,
-        -14.290171
-      ],
-      "vertices": [
-        [
-          7.056401,
-          -13.955287
-        ],
-        [
-          6.476361,
-          -14.958185
-        ],
-        [
-          5.899504,
-          -13.957041
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 59
     },
     {
       "id": "sqtri:ref:06543",
@@ -16204,238 +10558,6 @@
       "graph_distance": 59
     },
     {
-      "id": "sqtri:ref:00376",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -30.738184,
-        -20.432131
-      ],
-      "vertices": [
-        [
-          -30.069721,
-          -20.432186
-        ],
-        [
-          -31.072415,
-          -21.010635
-        ],
-        [
-          -31.072415,
-          -19.853573
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 60
-    },
-    {
-      "id": "sqtri:ref:00676",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -31.316633,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -31.650864,
-          -17.69398
-        ],
-        [
-          -30.64817,
-          -18.272429
-        ],
-        [
-          -31.650864,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
-      "graph_distance": 60
-    },
-    {
-      "id": "sqtri:ref:01323",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -26.997286,
-        -22.591776
-      ],
-      "vertices": [
-        [
-          -27.331517,
-          -22.013326
-        ],
-        [
-          -27.331517,
-          -23.170228
-        ],
-        [
-          -26.328823,
-          -22.591774
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 60
-    },
-    {
-      "id": "sqtri:ref:01661",
-      "kind": "square-triangle-square",
-      "center": [
-        -25.750374,
-        -22.013246
-      ],
-      "vertices": [
-        [
-          -26.328823,
-          -21.434717
-        ],
-        [
-          -25.171925,
-          -21.434717
-        ],
-        [
-          -25.171925,
-          -22.591774
-        ],
-        [
-          -26.328823,
-          -22.591774
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 60
-    },
-    {
-      "id": "sqtri:ref:01662",
-      "kind": "square-triangle-square",
-      "center": [
-        -27.910048,
-        -22.591777
-      ],
-      "vertices": [
-        [
-          -28.488578,
-          -22.013326
-        ],
-        [
-          -27.331517,
-          -22.013326
-        ],
-        [
-          -27.331517,
-          -23.170228
-        ],
-        [
-          -28.488578,
-          -23.170228
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 60
-    },
-    {
-      "id": "sqtri:ref:01779",
-      "kind": "square-triangle-square",
-      "center": [
-        -30.860292,
-        -19.063001
-      ],
-      "vertices": [
-        [
-          -31.072415,
-          -19.853573
-        ],
-        [
-          -31.650864,
-          -18.850877
-        ],
-        [
-          -30.64817,
-          -18.272429
-        ],
-        [
-          -30.069721,
-          -19.275124
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 60
-    },
-    {
-      "id": "sqtri:ref:01793",
-      "kind": "square-triangle-square",
-      "center": [
-        -31.650864,
-        -16.115369
-      ],
-      "vertices": [
-        [
-          -32.229313,
-          -15.53692
-        ],
-        [
-          -31.072415,
-          -15.53692
-        ],
-        [
-          -31.072415,
-          -16.693818
-        ],
-        [
-          -32.229313,
-          -16.693818
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 60
-    },
-    {
-      "id": "sqtri:ref:05725",
-      "kind": "square-triangle-triangle",
-      "center": [
-        6.477953,
-        -13.621641
-      ],
-      "vertices": [
-        [
-          5.899504,
-          -13.957041
-        ],
-        [
-          6.477953,
-          -12.952594
-        ],
-        [
-          7.056401,
-          -13.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 60
-    },
-    {
       "id": "sqtri:ref:06160",
       "kind": "square-triangle-triangle",
       "center": [
@@ -16606,122 +10728,6 @@
       "graph_distance": 60
     },
     {
-      "id": "sqtri:ref:00383",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.838537,
-        -22.013272
-      ],
-      "vertices": [
-        [
-          -25.171925,
-          -21.434717
-        ],
-        [
-          -25.171925,
-          -22.591774
-        ],
-        [
-          -24.171762,
-          -22.013326
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 61
-    },
-    {
-      "id": "sqtri:ref:00386",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -27.91002,
-        -23.503615
-      ],
-      "vertices": [
-        [
-          -28.488578,
-          -23.170228
-        ],
-        [
-          -27.909966,
-          -24.170388
-        ],
-        [
-          -27.331517,
-          -23.170228
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 61
-    },
-    {
-      "id": "sqtri:ref:01780",
-      "kind": "square-triangle-square",
-      "center": [
-        -32.229313,
-        -18.272429
-      ],
-      "vertices": [
-        [
-          -32.807762,
-          -17.69398
-        ],
-        [
-          -31.650864,
-          -17.69398
-        ],
-        [
-          -31.650864,
-          -18.850877
-        ],
-        [
-          -32.807762,
-          -18.850877
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 61
-    },
-    {
-      "id": "sqtri:ref:02008",
-      "kind": "square-triangle-square",
-      "center": [
-        -31.650864,
-        -20.432104
-      ],
-      "vertices": [
-        [
-          -32.229313,
-          -19.853573
-        ],
-        [
-          -31.072415,
-          -19.853573
-        ],
-        [
-          -31.072415,
-          -21.010635
-        ],
-        [
-          -32.229313,
-          -21.010635
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 61
-    },
-    {
       "id": "sqtri:ref:05727",
       "kind": "square-triangle-triangle",
       "center": [
@@ -16803,145 +10809,6 @@
       "graph_distance": 61
     },
     {
-      "id": "sqtri:ref:06177",
-      "kind": "square-triangle-triangle",
-      "center": [
-        10.550386,
-        -18.850554
-      ],
-      "vertices": [
-        [
-          10.216154,
-          -19.429002
-        ],
-        [
-          10.216154,
-          -18.272105
-        ],
-        [
-          11.21885,
-          -18.850554
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 61
-    },
-    {
-      "id": "sqtri:ref:07492",
-      "kind": "square-triangle-square",
-      "center": [
-        7.267259,
-        -13.164716
-      ],
-      "vertices": [
-        [
-          6.477953,
-          -12.952594
-        ],
-        [
-          7.478115,
-          -12.374143
-        ],
-        [
-          8.056566,
-          -13.376839
-        ],
-        [
-          7.056401,
-          -13.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 61
-    },
-    {
-      "id": "sqtri:ref:00280",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -24.50515,
-        -22.591776
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -23.170228
-        ],
-        [
-          -25.171925,
-          -22.591774
-        ],
-        [
-          -24.171762,
-          -22.013326
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 62
-    },
-    {
-      "id": "sqtri:ref:00385",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -27.331517,
-        -23.837001
-      ],
-      "vertices": [
-        [
-          -27.909966,
-          -24.170388
-        ],
-        [
-          -26.753068,
-          -24.170388
-        ],
-        [
-          -27.331517,
-          -23.170228
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 62
-    },
-    {
-      "id": "sqtri:ref:01317",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -31.650864,
-        -21.344865
-      ],
-      "vertices": [
-        [
-          -32.229313,
-          -21.010635
-        ],
-        [
-          -31.072415,
-          -21.010635
-        ],
-        [
-          -31.650864,
-          -22.013326
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 62
-    },
-    {
       "id": "sqtri:ref:05729",
       "kind": "square-triangle-triangle",
       "center": [
@@ -16993,33 +10860,6 @@
       "orientation_token": "0",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 62
-    },
-    {
-      "id": "sqtri:ref:06402",
-      "kind": "square-triangle-triangle",
-      "center": [
-        8.056565,
-        -12.708375
-      ],
-      "vertices": [
-        [
-          8.635015,
-          -12.374143
-        ],
-        [
-          8.056566,
-          -13.376839
-        ],
-        [
-          7.478115,
-          -12.374143
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
       "graph_distance": 62
     },
     {
@@ -17081,91 +10921,6 @@
       "graph_distance": 62
     },
     {
-      "id": "sqtri:ref:00283",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -23.837517,
-        -22.591776
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -22.013326
-        ],
-        [
-          -23.169027,
-          -22.591774
-        ],
-        [
-          -24.171762,
-          -23.170228
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 63
-    },
-    {
-      "id": "sqtri:ref:01318",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -32.229313,
-        -21.679096
-      ],
-      "vertices": [
-        [
-          -31.650864,
-          -22.013326
-        ],
-        [
-          -32.807762,
-          -22.013326
-        ],
-        [
-          -32.229313,
-          -21.010635
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 63
-    },
-    {
-      "id": "sqtri:ref:01616",
-      "kind": "square-triangle-square",
-      "center": [
-        -24.961068,
-        -23.381082
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -23.170228
-        ],
-        [
-          -24.750211,
-          -24.170388
-        ],
-        [
-          -25.750374,
-          -23.591939
-        ],
-        [
-          -25.171925,
-          -22.591774
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 63
-    },
-    {
       "id": "sqtri:ref:05788",
       "kind": "square-triangle-triangle",
       "center": [
@@ -17217,64 +10972,6 @@
       "orientation_token": "300",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 63
-    },
-    {
-      "id": "sqtri:ref:06626",
-      "kind": "square-triangle-triangle",
-      "center": [
-        7.144728,
-        -11.795694
-      ],
-      "vertices": [
-        [
-          6.477953,
-          -11.795694
-        ],
-        [
-          7.478115,
-          -11.217245
-        ],
-        [
-          7.478115,
-          -12.374143
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 63
-    },
-    {
-      "id": "sqtri:ref:07493",
-      "kind": "square-triangle-square",
-      "center": [
-        8.056565,
-        -11.795694
-      ],
-      "vertices": [
-        [
-          7.478115,
-          -11.217245
-        ],
-        [
-          8.635015,
-          -11.217245
-        ],
-        [
-          8.635015,
-          -12.374143
-        ],
-        [
-          7.478115,
-          -12.374143
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 63
     },
     {
@@ -17338,68 +11035,6 @@
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 63
-    },
-    {
-      "id": "sqtri:ref:01617",
-      "kind": "square-triangle-square",
-      "center": [
-        -23.38118,
-        -23.381082
-      ],
-      "vertices": [
-        [
-          -24.171762,
-          -23.170228
-        ],
-        [
-          -23.593313,
-          -24.170388
-        ],
-        [
-          -22.590619,
-          -23.591939
-        ],
-        [
-          -23.169027,
-          -22.591774
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 64
-    },
-    {
-      "id": "sqtri:ref:01659",
-      "kind": "square-triangle-square",
-      "center": [
-        -32.229313,
-        -22.591777
-      ],
-      "vertices": [
-        [
-          -32.807762,
-          -22.013326
-        ],
-        [
-          -31.650864,
-          -22.013326
-        ],
-        [
-          -31.650864,
-          -23.170228
-        ],
-        [
-          -32.807762,
-          -23.170228
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 64
     },
     {
       "id": "sqtri:ref:05726",
@@ -17572,33 +11207,6 @@
       "graph_distance": 64
     },
     {
-      "id": "sqtri:ref:00377",
-      "kind": "square-triangle-triangle",
-      "center": [
-        -32.229313,
-        -23.503615
-      ],
-      "vertices": [
-        [
-          -31.650864,
-          -23.170228
-        ],
-        [
-          -32.229313,
-          -24.170388
-        ],
-        [
-          -32.807762,
-          -23.170228
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 65
-    },
-    {
       "id": "sqtri:ref:05782",
       "kind": "square-triangle-triangle",
       "center": [
@@ -17733,37 +11341,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 65
-    },
-    {
-      "id": "sqtri:ref:07551",
-      "kind": "square-triangle-square",
-      "center": [
-        9.425309,
-        -11.006715
-      ],
-      "vertices": [
-        [
-          9.213299,
-          -10.217736
-        ],
-        [
-          10.215217,
-          -10.796185
-        ],
-        [
-          9.637705,
-          -11.795694
-        ],
-        [
-          8.635015,
-          -11.217245
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 65
@@ -18024,68 +11601,6 @@
       "graph_distance": 66
     },
     {
-      "id": "sqtri:ref:07559",
-      "kind": "square-triangle-square",
-      "center": [
-        16.114116,
-        -22.591368
-      ],
-      "vertices": [
-        [
-          15.535664,
-          -22.012837
-        ],
-        [
-          16.692567,
-          -22.012837
-        ],
-        [
-          16.692567,
-          -23.169899
-        ],
-        [
-          15.535664,
-          -23.169899
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 66
-    },
-    {
-      "id": "sqtri:ref:07906",
-      "kind": "square-triangle-square",
-      "center": [
-        12.375912,
-        -11.795694
-      ],
-      "vertices": [
-        [
-          11.797463,
-          -11.217245
-        ],
-        [
-          12.954361,
-          -11.217245
-        ],
-        [
-          12.954361,
-          -12.374143
-        ],
-        [
-          11.797463,
-          -12.374143
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 66
-    },
-    {
       "id": "sqtri:ref:07907",
       "kind": "square-triangle-square",
       "center": [
@@ -18135,33 +11650,6 @@
         [
           17.695258,
           -21.434428
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 67
-    },
-    {
-      "id": "sqtri:ref:05790",
-      "kind": "square-triangle-triangle",
-      "center": [
-        16.114115,
-        -23.503287
-      ],
-      "vertices": [
-        [
-          15.535664,
-          -23.169899
-        ],
-        [
-          16.692567,
-          -23.169899
-        ],
-        [
-          16.114113,
-          -24.170064
         ]
       ],
       "tile_family": "square-triangle",
@@ -18222,60 +11710,6 @@
       "orientation_token": "180",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 67
-    },
-    {
-      "id": "sqtri:ref:06635",
-      "kind": "square-triangle-triangle",
-      "center": [
-        13.621137,
-        -24.172622
-      ],
-      "vertices": [
-        [
-          13.954525,
-          -24.751044
-        ],
-        [
-          12.954361,
-          -24.172635
-        ],
-        [
-          13.954525,
-          -23.594186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 67
-    },
-    {
-      "id": "sqtri:ref:07219",
-      "kind": "square-triangle-triangle",
-      "center": [
-        13.287749,
-        -11.795694
-      ],
-      "vertices": [
-        [
-          12.954361,
-          -12.374143
-        ],
-        [
-          12.954361,
-          -11.217245
-        ],
-        [
-          13.954525,
-          -11.795694
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
       "graph_distance": 67
     },
     {
@@ -18393,64 +11827,6 @@
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 67
-    },
-    {
-      "id": "sqtri:ref:07922",
-      "kind": "square-triangle-square",
-      "center": [
-        16.904687,
-        -19.641123
-      ],
-      "vertices": [
-        [
-          17.116809,
-          -20.431693
-        ],
-        [
-          16.114113,
-          -19.853244
-        ],
-        [
-          16.692567,
-          -18.850554
-        ],
-        [
-          17.695258,
-          -19.429002
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 67
-    },
-    {
-      "id": "sqtri:ref:05791",
-      "kind": "square-triangle-triangle",
-      "center": [
-        16.692618,
-        -23.836676
-      ],
-      "vertices": [
-        [
-          16.114113,
-          -24.170064
-        ],
-        [
-          16.692567,
-          -23.169899
-        ],
-        [
-          17.271175,
-          -24.170064
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 68
     },
     {
       "id": "sqtri:ref:06294",
@@ -18615,33 +11991,6 @@
       "graph_distance": 68
     },
     {
-      "id": "sqtri:ref:07239",
-      "kind": "square-triangle-triangle",
-      "center": [
-        17.361028,
-        -18.850554
-      ],
-      "vertices": [
-        [
-          17.695258,
-          -18.272105
-        ],
-        [
-          17.695258,
-          -19.429002
-        ],
-        [
-          16.692567,
-          -18.850554
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "270",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 68
-    },
-    {
       "id": "sqtri:ref:07462",
       "kind": "square-triangle-square",
       "center": [
@@ -18704,33 +12053,6 @@
       "graph_distance": 68
     },
     {
-      "id": "sqtri:ref:05779",
-      "kind": "square-triangle-triangle",
-      "center": [
-        16.692618,
-        -24.504294
-      ],
-      "vertices": [
-        [
-          17.271175,
-          -24.170064
-        ],
-        [
-          16.692567,
-          -25.172754
-        ],
-        [
-          16.114113,
-          -24.170064
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 69
-    },
-    {
       "id": "sqtri:ref:06291",
       "kind": "square-triangle-triangle",
       "center": [
@@ -18753,33 +12075,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "330",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 69
-    },
-    {
-      "id": "sqtri:ref:06309",
-      "kind": "square-triangle-triangle",
-      "center": [
-        14.288755,
-        -16.693491
-      ],
-      "vertices": [
-        [
-          13.954525,
-          -17.27194
-        ],
-        [
-          13.954525,
-          -16.115043
-        ],
-        [
-          14.957216,
-          -16.693491
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "90",
       "chirality_token": "red",
       "variant": "triangle-red",
       "graph_distance": 69
@@ -18921,37 +12216,6 @@
       "orientation_token": "30",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 70
-    },
-    {
-      "id": "sqtri:ref:07547",
-      "kind": "square-triangle-square",
-      "center": [
-        17.483218,
-        -24.960634
-      ],
-      "vertices": [
-        [
-          17.271175,
-          -24.170064
-        ],
-        [
-          18.273871,
-          -24.748513
-        ],
-        [
-          17.695258,
-          -25.751203
-        ],
-        [
-          16.692567,
-          -25.172754
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "330",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 70
     },
     {
@@ -19546,37 +12810,6 @@
       "graph_distance": 74
     },
     {
-      "id": "sqtri:ref:07378",
-      "kind": "square-triangle-square",
-      "center": [
-        16.904687,
-        -9.426512
-      ],
-      "vertices": [
-        [
-          16.114113,
-          -9.21439
-        ],
-        [
-          16.692567,
-          -10.217083
-        ],
-        [
-          17.695258,
-          -9.638635
-        ],
-        [
-          17.116809,
-          -8.635939
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 74
-    },
-    {
       "id": "sqtri:ref:07384",
       "kind": "square-triangle-square",
       "center": [
@@ -19693,33 +12926,6 @@
       "graph_distance": 75
     },
     {
-      "id": "sqtri:ref:06296",
-      "kind": "square-triangle-triangle",
-      "center": [
-        18.273816,
-        -13.621056
-      ],
-      "vertices": [
-        [
-          17.695258,
-          -13.955287
-        ],
-        [
-          18.273871,
-          -12.952594
-        ],
-        [
-          18.85232,
-          -13.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 75
-    },
-    {
       "id": "sqtri:ref:06992",
       "kind": "square-triangle-triangle",
       "center": [
@@ -19774,33 +12980,6 @@
       "graph_distance": 75
     },
     {
-      "id": "sqtri:ref:07229",
-      "kind": "square-triangle-triangle",
-      "center": [
-        18.273816,
-        -14.289532
-      ],
-      "vertices": [
-        [
-          18.85232,
-          -13.955287
-        ],
-        [
-          18.273871,
-          -14.958023
-        ],
-        [
-          17.695258,
-          -13.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 75
-    },
-    {
       "id": "sqtri:ref:07231",
       "kind": "square-triangle-triangle",
       "center": [
@@ -19825,68 +13004,6 @@
       "orientation_token": "30",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 75
-    },
-    {
-      "id": "sqtri:ref:07383",
-      "kind": "square-triangle-square",
-      "center": [
-        21.222769,
-        -16.904308
-      ],
-      "vertices": [
-        [
-          21.011913,
-          -17.693656
-        ],
-        [
-          20.433464,
-          -16.693491
-        ],
-        [
-          21.433624,
-          -16.115043
-        ],
-        [
-          22.012073,
-          -17.115043
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 75
-    },
-    {
-      "id": "sqtri:ref:07914",
-      "kind": "square-triangle-square",
-      "center": [
-        19.064412,
-        -13.164716
-      ],
-      "vertices": [
-        [
-          18.273871,
-          -12.952594
-        ],
-        [
-          19.276442,
-          -12.374143
-        ],
-        [
-          19.855015,
-          -13.376839
-        ],
-        [
-          18.85232,
-          -13.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": null,
-      "variant": "square-white",
       "graph_distance": 75
     },
     {
@@ -19941,33 +13058,6 @@
       "orientation_token": "270",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 76
-    },
-    {
-      "id": "sqtri:ref:06584",
-      "kind": "square-triangle-triangle",
-      "center": [
-        19.854974,
-        -12.708375
-      ],
-      "vertices": [
-        [
-          19.276442,
-          -12.374143
-        ],
-        [
-          20.433464,
-          -12.374143
-        ],
-        [
-          19.855015,
-          -13.376839
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "yellow",
-      "variant": "triangle-yellow",
       "graph_distance": 76
     },
     {
@@ -20114,37 +13204,6 @@
       "graph_distance": 77
     },
     {
-      "id": "sqtri:ref:07913",
-      "kind": "square-triangle-square",
-      "center": [
-        20.64432,
-        -13.164716
-      ],
-      "vertices": [
-        [
-          20.855175,
-          -13.955287
-        ],
-        [
-          19.855015,
-          -13.376839
-        ],
-        [
-          20.433464,
-          -12.374143
-        ],
-        [
-          21.433624,
-          -12.952594
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 77
-    },
-    {
       "id": "sqtri:ref:05787",
       "kind": "square-triangle-triangle",
       "center": [
@@ -20167,33 +13226,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "240",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 78
-    },
-    {
-      "id": "sqtri:ref:06295",
-      "kind": "square-triangle-triangle",
-      "center": [
-        21.433624,
-        -13.621056
-      ],
-      "vertices": [
-        [
-          22.012073,
-          -13.955287
-        ],
-        [
-          20.855175,
-          -13.955287
-        ],
-        [
-          21.433624,
-          -12.952594
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
       "chirality_token": "red",
       "variant": "triangle-red",
       "graph_distance": 78
@@ -20282,33 +13314,6 @@
       "chirality_token": null,
       "variant": "square-blue",
       "graph_distance": 78
-    },
-    {
-      "id": "sqtri:ref:05786",
-      "kind": "square-triangle-triangle",
-      "center": [
-        22.012074,
-        -13.286825
-      ],
-      "vertices": [
-        [
-          22.590526,
-          -12.952594
-        ],
-        [
-          22.012073,
-          -13.955287
-        ],
-        [
-          21.433624,
-          -12.952594
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 79
     },
     {
       "id": "sqtri:ref:06021",
@@ -20508,60 +13513,6 @@
       "graph_distance": 79
     },
     {
-      "id": "sqtri:ref:06042",
-      "kind": "square-triangle-triangle",
-      "center": [
-        22.590525,
-        -13.621056
-      ],
-      "vertices": [
-        [
-          22.590526,
-          -12.952594
-        ],
-        [
-          23.168975,
-          -13.955287
-        ],
-        [
-          22.012073,
-          -13.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 80
-    },
-    {
-      "id": "sqtri:ref:06129",
-      "kind": "square-triangle-triangle",
-      "center": [
-        19.854974,
-        -9.548621
-      ],
-      "vertices": [
-        [
-          20.433464,
-          -9.21439
-        ],
-        [
-          19.855015,
-          -10.217083
-        ],
-        [
-          19.276442,
-          -9.21439
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 80
-    },
-    {
       "id": "sqtri:ref:06132",
       "kind": "square-triangle-triangle",
       "center": [
@@ -20755,37 +13706,6 @@
       "graph_distance": 80
     },
     {
-      "id": "sqtri:ref:07424",
-      "kind": "square-triangle-square",
-      "center": [
-        19.854953,
-        -8.635859
-      ],
-      "vertices": [
-        [
-          19.276442,
-          -8.057328
-        ],
-        [
-          20.433464,
-          -8.057328
-        ],
-        [
-          20.433464,
-          -9.21439
-        ],
-        [
-          19.276442,
-          -9.21439
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-blue",
-      "graph_distance": 80
-    },
-    {
       "id": "sqtri:ref:07425",
       "kind": "square-triangle-square",
       "center": [
@@ -20846,33 +13766,6 @@
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 80
-    },
-    {
-      "id": "sqtri:ref:06138",
-      "kind": "square-triangle-triangle",
-      "center": [
-        22.590525,
-        -14.289532
-      ],
-      "vertices": [
-        [
-          23.168975,
-          -13.955287
-        ],
-        [
-          22.012073,
-          -13.955287
-        ],
-        [
-          22.590526,
-          -14.958023
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "180",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 81
     },
     {
       "id": "sqtri:ref:06531",
@@ -21007,37 +13900,6 @@
       "orientation_token": "0",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 81
-    },
-    {
-      "id": "sqtri:ref:07391",
-      "kind": "square-triangle-square",
-      "center": [
-        23.381096,
-        -13.164716
-      ],
-      "vertices": [
-        [
-          22.590526,
-          -12.952594
-        ],
-        [
-          23.593217,
-          -12.374143
-        ],
-        [
-          24.171666,
-          -13.376839
-        ],
-        [
-          23.168975,
-          -13.955287
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "30",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 81
     },
     {
@@ -21273,33 +14135,6 @@
       "graph_distance": 82
     },
     {
-      "id": "sqtri:ref:07007",
-      "kind": "square-triangle-triangle",
-      "center": [
-        24.171721,
-        -12.708375
-      ],
-      "vertices": [
-        [
-          24.171666,
-          -13.376839
-        ],
-        [
-          23.593217,
-          -12.374143
-        ],
-        [
-          24.750279,
-          -12.374143
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 82
-    },
-    {
       "id": "sqtri:ref:07085",
       "kind": "square-triangle-triangle",
       "center": [
@@ -21324,37 +14159,6 @@
       "orientation_token": "60",
       "chirality_token": "blue",
       "variant": "triangle-blue",
-      "graph_distance": 82
-    },
-    {
-      "id": "sqtri:ref:07381",
-      "kind": "square-triangle-square",
-      "center": [
-        22.802646,
-        -9.426512
-      ],
-      "vertices": [
-        [
-          23.014768,
-          -10.217083
-        ],
-        [
-          22.012073,
-          -9.638635
-        ],
-        [
-          22.590526,
-          -8.635939
-        ],
-        [
-          23.593217,
-          -9.21439
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-blue",
       "graph_distance": 82
     },
     {
@@ -21582,33 +14386,6 @@
       "graph_distance": 83
     },
     {
-      "id": "sqtri:ref:07008",
-      "kind": "square-triangle-triangle",
-      "center": [
-        24.750224,
-        -13.042607
-      ],
-      "vertices": [
-        [
-          24.750279,
-          -12.374143
-        ],
-        [
-          25.328728,
-          -13.376839
-        ],
-        [
-          24.171666,
-          -13.376839
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "300",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 83
-    },
-    {
       "id": "sqtri:ref:07390",
       "kind": "square-triangle-square",
       "center": [
@@ -21725,37 +14502,6 @@
       "graph_distance": 84
     },
     {
-      "id": "sqtri:ref:07568",
-      "kind": "square-triangle-square",
-      "center": [
-        21.222769,
-        -5.109716
-      ],
-      "vertices": [
-        [
-          21.011913,
-          -5.900308
-        ],
-        [
-          20.433464,
-          -4.897573
-        ],
-        [
-          21.433624,
-          -4.319124
-        ],
-        [
-          22.012073,
-          -5.32186
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 84
-    },
-    {
       "id": "sqtri:ref:05773",
       "kind": "square-triangle-triangle",
       "center": [
@@ -21836,37 +14582,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 85
-    },
-    {
-      "id": "sqtri:ref:07577",
-      "kind": "square-triangle-square",
-      "center": [
-        27.120728,
-        -16.904308
-      ],
-      "vertices": [
-        [
-          26.331423,
-          -17.115043
-        ],
-        [
-          26.909872,
-          -16.115043
-        ],
-        [
-          27.910032,
-          -16.693491
-        ],
-        [
-          27.331583,
-          -17.693656
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 85
@@ -22243,37 +14958,6 @@
       "graph_distance": 88
     },
     {
-      "id": "sqtri:ref:07542",
-      "kind": "square-triangle-square",
-      "center": [
-        29.279055,
-        -17.482798
-      ],
-      "vertices": [
-        [
-          30.069625,
-          -17.27194
-        ],
-        [
-          29.491176,
-          -18.272105
-        ],
-        [
-          28.488486,
-          -17.693656
-        ],
-        [
-          29.066934,
-          -16.693491
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 88
-    },
-    {
       "id": "sqtri:ref:05772",
       "kind": "square-triangle-triangle",
       "center": [
@@ -22417,37 +15101,6 @@
       "graph_distance": 89
     },
     {
-      "id": "sqtri:ref:07774",
-      "kind": "square-triangle-square",
-      "center": [
-        28.488483,
-        -20.431693
-      ],
-      "vertices": [
-        [
-          27.910032,
-          -19.853244
-        ],
-        [
-          29.066934,
-          -19.853244
-        ],
-        [
-          29.066934,
-          -21.010142
-        ],
-        [
-          27.910032,
-          -21.010142
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 89
-    },
-    {
       "id": "sqtri:ref:05780",
       "kind": "square-triangle-triangle",
       "center": [
@@ -22526,33 +15179,6 @@
       "orientation_token": "210",
       "chirality_token": "red",
       "variant": "triangle-red",
-      "graph_distance": 90
-    },
-    {
-      "id": "sqtri:ref:07065",
-      "kind": "square-triangle-triangle",
-      "center": [
-        28.488484,
-        -21.344374
-      ],
-      "vertices": [
-        [
-          27.910032,
-          -21.010142
-        ],
-        [
-          29.066934,
-          -21.010142
-        ],
-        [
-          28.488486,
-          -22.012837
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
       "graph_distance": 90
     },
     {
@@ -22806,37 +15432,6 @@
       ],
       "tile_family": "square-triangle",
       "orientation_token": "300",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 91
-    },
-    {
-      "id": "sqtri:ref:07550",
-      "kind": "square-triangle-square",
-      "center": [
-        30.860207,
-        -19.062674
-      ],
-      "vertices": [
-        [
-          30.069625,
-          -19.274795
-        ],
-        [
-          30.648074,
-          -18.272105
-        ],
-        [
-          31.650769,
-          -18.850554
-        ],
-        [
-          31.07236,
-          -19.853244
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 91
@@ -23267,37 +15862,6 @@
       "graph_distance": 94
     },
     {
-      "id": "sqtri:ref:07596",
-      "kind": "square-triangle-square",
-      "center": [
-        33.019892,
-        -16.904308
-      ],
-      "vertices": [
-        [
-          32.807831,
-          -17.693656
-        ],
-        [
-          32.229383,
-          -16.693491
-        ],
-        [
-          33.231954,
-          -16.115043
-        ],
-        [
-          33.810402,
-          -17.115043
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "120",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 94
-    },
-    {
       "id": "sqtri:ref:07598",
       "kind": "square-triangle-square",
       "center": [
@@ -23320,68 +15884,6 @@
         [
           32.807831,
           -14.533736
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "240",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 94
-    },
-    {
-      "id": "sqtri:ref:07778",
-      "kind": "square-triangle-square",
-      "center": [
-        26.542198,
-        -23.380716
-      ],
-      "vertices": [
-        [
-          26.752975,
-          -24.170064
-        ],
-        [
-          25.75281,
-          -23.591451
-        ],
-        [
-          26.331423,
-          -22.591451
-        ],
-        [
-          27.331583,
-          -23.169899
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "150",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 94
-    },
-    {
-      "id": "sqtri:ref:07781",
-      "kind": "square-triangle-square",
-      "center": [
-        33.019892,
-        -19.641123
-      ],
-      "vertices": [
-        [
-          32.807831,
-          -18.850554
-        ],
-        [
-          32.229383,
-          -19.853244
-        ],
-        [
-          33.231954,
-          -20.431693
-        ],
-        [
-          33.810402,
-          -19.429002
         ]
       ],
       "tile_family": "square-triangle",
@@ -23533,5 +16035,6 @@
       "variant": "triangle-red",
       "graph_distance": 97
     }
-  ]
+  ],
+  "selection_policy": "deterministic hole-free greedy subset ordered by (graph_distance, id)"
 }

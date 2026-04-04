@@ -61,6 +61,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - chirality metadata is part of the expected output
 - `square-triangle`
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
+  - the canonical sample now comes from a deterministic hole-free reference subset, so representative patches must stay connected, overlap-clean, and hole-free
 - `chair`
   - representative patches should expose more than one chair size class
   - low-depth samples should preserve the deterministic multiscale chair hierarchy used by the current reference patch

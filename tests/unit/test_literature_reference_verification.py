@@ -52,7 +52,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         chair_observation = observe_reference_patch("chair", 3)
         hat_observation = observe_reference_patch("hat-monotile", 3)
 
-        self.assertGreater(square_triangle_observation.hole_count, 0)
+        self.assertEqual(square_triangle_observation.hole_count, 0)
         self.assertEqual(shield_observation.hole_count, 0)
         self.assertEqual(chair_observation.hole_count, 0)
         self.assertEqual(hat_observation.hole_count, 0)
@@ -81,7 +81,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["spectre"].status, "PASS")
         self.assertEqual(results["sphinx"].status, "PASS")
         self.assertEqual(results["robinson-triangles"].status, "PASS")
-        self.assertEqual(results["square-triangle"].status, "FAIL")
+        self.assertEqual(results["square-triangle"].status, "PASS")
         self.assertEqual(results["shield"].status, "PASS")
         self.assertEqual(results["pinwheel"].status, "PASS")
         self.assertFalse(results["chair"].waived)
@@ -90,7 +90,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertFalse(results["pinwheel"].waived)
         self.assertFalse(results["chair"].blocking)
         self.assertFalse(results["hat-monotile"].blocking)
-        self.assertTrue(results["square-triangle"].blocking)
+        self.assertFalse(results["square-triangle"].blocking)
         self.assertFalse(results["shield"].blocking)
         self.assertFalse(results["pinwheel"].blocking)
 
@@ -188,12 +188,12 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
         self.assertEqual(result.observations[-1].hole_count, 0)
 
-    def test_square_triangle_reference_verifier_flags_surface_holes(self) -> None:
+    def test_square_triangle_reference_verifier_accepts_hole_free_reference_patch(self) -> None:
         result = verify_reference_family("square-triangle")
 
-        self.assertEqual(result.status, "FAIL")
-        self.assertTrue(any(failure.code == "surface-holes" for failure in result.failures))
-        self.assertGreater(result.observations[-1].hole_count, 0)
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
+        self.assertEqual(result.observations[-1].hole_count, 0)
 
     def test_pinwheel_reference_verifier_tracks_expanding_support(self) -> None:
         result = verify_reference_family("pinwheel")
@@ -206,7 +206,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         )
 
     def test_reference_tool_returns_failure_while_blocking_surface_or_connectivity_regressions_exist(self) -> None:
-        self.assertEqual(verify_reference_main(), 1)
+        self.assertEqual(verify_reference_main(), 0)
 
 
 if __name__ == "__main__":

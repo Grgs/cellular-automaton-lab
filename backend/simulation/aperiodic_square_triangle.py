@@ -7,6 +7,8 @@ from pathlib import Path
 from backend.simulation.aperiodic_support import AperiodicPatch, PatchRecord, patch_from_records
 
 
+# This checked-in patch is the deterministic hole-free subset of the raw square-triangle
+# reference data that the app previously used directly.
 _DATA_PATH = Path(__file__).with_name("data") / "square_triangle_reference_patch.json"
 _PATCH_DISTANCE_THRESHOLDS = {
     0: 4,

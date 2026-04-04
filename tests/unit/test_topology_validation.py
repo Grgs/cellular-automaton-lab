@@ -207,6 +207,7 @@ class TopologyValidationTests(unittest.TestCase):
         for geometry, patch_depth in (
             (CHAIR_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
+            (SQUARE_TRIANGLE_GEOMETRY, 3),
             (SHIELD_GEOMETRY, 3),
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
@@ -225,22 +226,7 @@ class TopologyValidationTests(unittest.TestCase):
                 self.assertEqual(validation.hole_count, 0)
 
     def test_canonical_sample_surface_holes_flag_current_hole_regressions(self) -> None:
-        for geometry, patch_depth in (
-            (SQUARE_TRIANGLE_GEOMETRY, 3),
-        ):
-            with self.subTest(geometry=geometry):
-                topology = build_topology(geometry, 0, 0, patch_depth=patch_depth)
-                validation = validate_topology(
-                    topology,
-                    check_surface=True,
-                    check_overlaps=False,
-                    check_edge_multiplicity=False,
-                    check_graph_connectivity=False,
-                )
-
-                self.assertFalse(validation.is_valid)
-                self.assertEqual(validation.surface_component_count, 1)
-                self.assertGreater(validation.hole_count, 0)
+        self.skipTest("There are currently no known canonical sample hole regressions.")
 
     def test_snub_square_regression_is_covered_by_shared_validator(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)
