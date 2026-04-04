@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from hashlib import sha1
 from importlib import import_module
 import json
+import math
+import re
 from typing import Literal
 
 from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
@@ -14,10 +16,13 @@ from backend.simulation.literature_reference_specs import (
     STAGED_REFERENCE_WAIVERS,
     BuilderSignalExpectation,
     MetadataRequirement,
+    PeriodicDescriptorExpectation,
     ReferenceDepthExpectation,
     ReferenceFamilySpec,
 )
 from backend.simulation.periodic_face_tilings import (
+    PeriodicFaceCell,
+    PeriodicFaceTilingDescriptor,
     get_periodic_face_tiling_descriptor,
     is_periodic_face_tiling,
 )
@@ -26,6 +31,7 @@ from backend.simulation.topology_types import LatticeCell, LatticeTopology
 
 
 VerificationStatus = Literal["PASS", "KNOWN_DEVIATION", "FAIL"]
+_FLOAT_TOLERANCE = 1e-6
 
 
 @dataclass(frozen=True)
@@ -370,6 +376,143 @@ def _expectation_failures(
     return failures
 
 
+def _compile_periodic_face_id_pattern(id_pattern: str) -> re.Pattern[str]:
+    token_patterns = {
+        "prefix": r"(?P<prefix>[^:]+)",
+        "slot": r"(?P<slot>[^:]+)",
+        "x": r"(?P<x>\d+)",
+        "y": r"(?P<y>\d+)",
+    }
+    parts: list[str] = []
+    position = 0
+    for match in re.finditer(r"\{(prefix|slot|x|y)\}", id_pattern):
+        parts.append(re.escape(id_pattern[position:match.start()]))
+        parts.append(token_patterns[match.group(1)])
+        position = match.end()
+    parts.append(re.escape(id_pattern[position:]))
+    return re.compile("^" + "".join(parts) + "$")
+
+
+def _parse_periodic_face_cell_id(
+    descriptor: PeriodicFaceTilingDescriptor,
+    cell_id: str,
+) -> dict[str, str] | None:
+    match = _compile_periodic_face_id_pattern(descriptor.id_pattern).fullmatch(cell_id)
+    if match is None:
+        return None
+    return {key: value for key, value in match.groupdict().items() if value is not None}
+
+
+def _verify_periodic_face_id_roundtrip(
+    descriptor: PeriodicFaceTilingDescriptor,
+    cell: PeriodicFaceCell,
+) -> ReferenceCheckFailure | None:
+    parsed = _parse_periodic_face_cell_id(descriptor, cell.id)
+    if parsed is None:
+        return ReferenceCheckFailure(
+            code="descriptor-id-pattern-mismatch",
+            message=f"{descriptor.geometry} cell id '{cell.id}' did not match descriptor pattern {descriptor.id_pattern!r}.",
+        )
+    if "slot" in parsed and parsed["slot"] != cell.slot:
+        return ReferenceCheckFailure(
+            code="descriptor-slot-roundtrip-mismatch",
+            message=(
+                f"{descriptor.geometry} cell id '{cell.id}' encoded slot {parsed['slot']!r} "
+                f"but the generated cell slot was {cell.slot!r}."
+            ),
+        )
+    if "x" not in parsed or "y" not in parsed:
+        return ReferenceCheckFailure(
+            code="descriptor-missing-grid-coordinates",
+            message=f"{descriptor.geometry} descriptor id pattern must encode both x and y coordinates.",
+        )
+    reconstructed_id = descriptor.id_pattern.format(
+        prefix=parsed.get("prefix", ""),
+        slot=cell.slot or "",
+        x=int(parsed["x"]),
+        y=int(parsed["y"]),
+    )
+    if reconstructed_id != cell.id:
+        return ReferenceCheckFailure(
+            code="descriptor-id-roundtrip-mismatch",
+            message=(
+                f"{descriptor.geometry} cell id '{cell.id}' did not round-trip through the descriptor "
+                f"pattern; reconstructed '{reconstructed_id}'."
+            ),
+        )
+    return None
+
+
+def _periodic_face_translation_failures(
+    descriptor: PeriodicFaceTilingDescriptor,
+    cells: tuple[PeriodicFaceCell, ...],
+) -> list[ReferenceCheckFailure]:
+    failures: list[ReferenceCheckFailure] = []
+    cells_by_slot_and_grid: dict[tuple[str, int, int], PeriodicFaceCell] = {}
+    for cell in cells:
+        parsed = _parse_periodic_face_cell_id(descriptor, cell.id)
+        if parsed is None or "x" not in parsed or "y" not in parsed or cell.slot is None:
+            continue
+        cells_by_slot_and_grid[(cell.slot, int(parsed["x"]), int(parsed["y"]))] = cell
+
+    for (slot, logical_x, logical_y), cell in sorted(cells_by_slot_and_grid.items()):
+        right = cells_by_slot_and_grid.get((slot, logical_x + 1, logical_y))
+        if right is not None:
+            delta_x = right.center[0] - cell.center[0]
+            delta_y = right.center[1] - cell.center[1]
+            if not math.isclose(delta_x, descriptor.unit_width, abs_tol=_FLOAT_TOLERANCE):
+                failures.append(
+                    ReferenceCheckFailure(
+                        code="descriptor-x-translation-mismatch",
+                        message=(
+                            f"{descriptor.geometry} slot {slot!r} expected x translation {descriptor.unit_width} "
+                            f"but saw {round(delta_x, 6)} between logical cells ({logical_x},{logical_y}) and ({logical_x + 1},{logical_y})."
+                        ),
+                    )
+                )
+            if not math.isclose(delta_y, 0.0, abs_tol=_FLOAT_TOLERANCE):
+                failures.append(
+                    ReferenceCheckFailure(
+                        code="descriptor-x-translation-y-drift",
+                        message=(
+                            f"{descriptor.geometry} slot {slot!r} drifted in y by {round(delta_y, 6)} "
+                            f"across x translation at logical row {logical_y}."
+                        ),
+                    )
+                )
+
+        below = cells_by_slot_and_grid.get((slot, logical_x, logical_y + 1))
+        if below is not None:
+            expected_delta_x = (
+                descriptor.row_offset_x
+                if (logical_y + 1) % 2 == 1
+                else 0.0
+            ) - (descriptor.row_offset_x if logical_y % 2 == 1 else 0.0)
+            delta_x = below.center[0] - cell.center[0]
+            delta_y = below.center[1] - cell.center[1]
+            if not math.isclose(delta_y, descriptor.unit_height, abs_tol=_FLOAT_TOLERANCE):
+                failures.append(
+                    ReferenceCheckFailure(
+                        code="descriptor-y-translation-mismatch",
+                        message=(
+                            f"{descriptor.geometry} slot {slot!r} expected y translation {descriptor.unit_height} "
+                            f"but saw {round(delta_y, 6)} between logical rows {logical_y} and {logical_y + 1}."
+                        ),
+                    )
+                )
+            if not math.isclose(delta_x, expected_delta_x, abs_tol=_FLOAT_TOLERANCE):
+                failures.append(
+                    ReferenceCheckFailure(
+                        code="descriptor-row-offset-mismatch",
+                        message=(
+                            f"{descriptor.geometry} slot {slot!r} expected row-offset delta {expected_delta_x} "
+                            f"but saw {round(delta_x, 6)} between logical rows {logical_y} and {logical_y + 1}."
+                        ),
+                    )
+                )
+    return failures
+
+
 def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[ReferenceCheckFailure]:
     if not is_periodic_face_tiling(spec.geometry):
         return []
@@ -405,6 +548,55 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
                 ),
             )
         )
+    periodic_descriptor = spec.periodic_descriptor
+    if periodic_descriptor is None:
+        return failures
+    if descriptor.face_template_count != periodic_descriptor.face_template_count:
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-face-template-count-mismatch",
+                message=(
+                    f"{spec.geometry} descriptor face template count {descriptor.face_template_count} "
+                    f"did not match the reference expectation {periodic_descriptor.face_template_count}."
+                ),
+            )
+        )
+    if descriptor.face_slots != periodic_descriptor.slot_vocabulary:
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-slot-vocabulary-mismatch",
+                message=(
+                    f"{spec.geometry} descriptor slots {descriptor.face_slots!r} "
+                    f"did not match the reference expectation {periodic_descriptor.slot_vocabulary!r}."
+                ),
+            )
+        )
+    if descriptor.id_pattern != periodic_descriptor.id_pattern:
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-id-pattern-mismatch",
+                message=(
+                    f"{spec.geometry} descriptor id pattern {descriptor.id_pattern!r} "
+                    f"did not match the reference expectation {periodic_descriptor.id_pattern!r}."
+                ),
+            )
+        )
+    if not math.isclose(descriptor.row_offset_x, periodic_descriptor.row_offset_x, abs_tol=_FLOAT_TOLERANCE):
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-row-offset-field-mismatch",
+                message=(
+                    f"{spec.geometry} descriptor row_offset_x {descriptor.row_offset_x} "
+                    f"did not match the reference expectation {periodic_descriptor.row_offset_x}."
+                ),
+            )
+        )
+    sample_cells = descriptor.build_faces(3, 3)
+    for cell in sample_cells:
+        failure = _verify_periodic_face_id_roundtrip(descriptor, cell)
+        if failure is not None:
+            failures.append(failure)
+    failures.extend(_periodic_face_translation_failures(descriptor, sample_cells))
     return failures
 
 

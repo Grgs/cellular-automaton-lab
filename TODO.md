@@ -2,17 +2,15 @@
 
 ## Now
 
-- Commit the full-catalog literature verification expansion once the current backend/docs/tooling changes are reviewed.
-- Decide whether `py -3 tools/verify_reference_tilings.py` should become its own required CI check instead of only being covered indirectly by tests.
+- Replace generic fallback periodic sources with stronger family-specific references where possible.
+- Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
 
 ## Next
 
 - Strengthen periodic-family literature verification beyond `3x3` sample signatures.
-  Use more explicit source-backed invariants such as vertex configurations, dual-family relationships, and descriptor-level face-template expectations so periodic mixed tilings are not only protected by sample drift checks.
-- Replace broad fallback sources for periodic tilings with stronger references where possible.
-  The newer periodic spec entries are currently good enough for verification, but several still rely on generic uniform-tiling references instead of the strongest family-specific sources.
-- Add verification coverage for descriptor semantics, not just generated output.
-  Extend the literature verifier to assert stable unit-cell slot vocabularies, translation behavior, and row-offset assumptions for periodic-face tilings.
+  Use more explicit source-backed invariants such as vertex configurations and dual-family relationships so periodic mixed tilings are not only protected by sample drift checks.
+- Add larger periodic sample fixtures where the open-boundary `3x3` board is too small to expose structural regressions.
+- Add stronger canonical-patch fixtures for newer substitution families that still rely mainly on counts, metadata, adjacency vocabularies, and signatures.
 
 ## Later
 

@@ -118,6 +118,9 @@ jobs:
       - name: Validate tiling descriptors
         run: python tools/validate_tilings.py
 
+      - name: Verify literature-backed tiling references
+        run: python tools/verify_reference_tilings.py
+
       - name: Run unit and API tests with coverage
         run: |
           python -m coverage erase

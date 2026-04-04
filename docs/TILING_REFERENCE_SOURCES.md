@@ -22,18 +22,25 @@ The order is intentional:
 ## Periodic Mixed / Uniform Families
 
 - `archimedean-4-8-8`
+  - [Truncated square tiling](https://en.wikipedia.org/wiki/Truncated_square_tiling)
   - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-12-12`
+  - [Truncated hexagonal tiling](https://en.wikipedia.org/wiki/Truncated_hexagonal_tiling)
   - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-4-6-4`
+  - [Rhombitrihexagonal tiling](https://en.wikipedia.org/wiki/Rhombitrihexagonal_tiling)
   - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-4-6-12`
+  - [Truncated trihexagonal tiling](https://en.wikipedia.org/wiki/Truncated_trihexagonal_tiling)
   - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-3-4-3-4`
+  - [Snub square tiling](https://en.wikipedia.org/wiki/Snub_square_tiling)
   - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-3-3-4-4`
+  - [Elongated triangular tiling](https://en.wikipedia.org/wiki/Elongated_triangular_tiling)
   - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-3-3-3-6`
+  - [Snub trihexagonal tiling](https://en.wikipedia.org/wiki/Snub_trihexagonal_tiling)
   - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `trihexagonal-3-6-3-6`
   - [Trihexagonal tiling](https://en.wikipedia.org/wiki/Trihexagonal_tiling)
@@ -45,12 +52,16 @@ The order is intentional:
   - [Rhombille tiling](https://en.wikipedia.org/wiki/Rhombille_tiling)
   - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `deltoidal-hexagonal`
+  - [Deltoidal hexagonal tiling](https://en.wikipedia.org/wiki/Deltoidal_hexagonal_tiling)
   - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `tetrakis-square`
+  - [Tetrakis square tiling](https://en.wikipedia.org/wiki/Tetrakis_square_tiling)
   - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `triakis-triangular`
+  - [Triakis triangular tiling](https://en.wikipedia.org/wiki/Triakis_triangular_tiling)
   - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `deltoidal-trihexagonal`
+  - [Deltoidal trihexagonal tiling](https://en.wikipedia.org/wiki/Deltoidal_trihexagonal_tiling)
   - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `prismatic-pentagonal`
   - [Prismatic pentagonal tiling](https://en.wikipedia.org/wiki/Prismatic_pentagonal_tiling)
@@ -59,6 +70,8 @@ The order is intentional:
   - [Floret pentagonal tiling](https://en.wikipedia.org/wiki/Floret_pentagonal_tiling)
   - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `snub-square-dual`
+  - [Snub square tiling](https://en.wikipedia.org/wiki/Snub_square_tiling)
+  - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
   - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 
 ## Aperiodic / Substitution Families
@@ -98,5 +111,5 @@ The order is intentional:
 
 ## Notes
 
-- Several periodic mixed families still rely on broad uniform-tiling references. Those should be upgraded to stronger family-specific sources when available.
+- Some periodic mixed families still keep broad uniform-tiling references as secondary backup citations, but the primary source should be family-specific whenever a stable public source exists.
 - The verifier is allowed to be stronger than the source list here, but not weaker. If a new reference drives a spec change, update this file at the same time.

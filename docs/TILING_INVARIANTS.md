@@ -21,11 +21,16 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - exact sample size
   - exact public kind counts
   - exact adjacency-pair set
+  - exact degree histogram
   - deterministic signature
 - Additional periodic-face checks:
   - `metric_model == "pattern"`
   - `cell_count_per_unit` matches the number of loaded face templates
   - descriptor face-kind vocabulary matches the expected public kind vocabulary
+  - descriptor slot vocabulary matches the expected template slots
+  - descriptor `id_pattern` round-trips generated cell ids
+  - same-slot cells repeat by `unit_width` / `unit_height`
+  - odd-row horizontal offsets match `row_offset_x`
 
 ## Aperiodic Substitution Families
 
@@ -55,4 +60,5 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 ## What Is Not Yet Proved
 
 - For many families, the verifier is strongest at the level of deterministic low-depth samples, count invariants, and adjacency vocabulary.
+- For periodic families, the verifier is now stronger than a plain sample-signature check, but it still targets finite `3x3` open-boundary boards rather than quotient-surface or large-sample proofs.
 - That is stronger than screenshot plausibility, but it is still not the same thing as a full symbolic proof that the generator exactly matches the literature’s substitution system at all depths.

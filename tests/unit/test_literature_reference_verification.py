@@ -9,10 +9,13 @@ if str(ROOT) not in sys.path:
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 from backend.simulation.literature_reference_verification import (
+    _parse_periodic_face_cell_id,
+    _verify_periodic_face_id_roundtrip,
     observe_reference_patch,
     verify_all_reference_families,
     verify_reference_family,
 )
+from backend.simulation.periodic_face_tilings import get_periodic_face_tiling_descriptor
 from tools.verify_reference_tilings import main as verify_reference_main
 
 
@@ -75,6 +78,27 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
         self.assertEqual(result.observations[0].signature, "e33351b2ed77")
+        self.assertEqual(result.observations[0].degree_histogram, ((2, 3), (3, 8), (4, 13), (5, 12)))
+
+    def test_periodic_face_reference_verifier_checks_zero_offset_family(self) -> None:
+        result = verify_reference_family("archimedean-4-8-8")
+
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
+        self.assertEqual(
+            result.observations[0].degree_histogram,
+            ((1, 4), (2, 8), (4, 4), (6, 4), (7, 4), (8, 1)),
+        )
+
+    def test_periodic_face_id_pattern_roundtrip_matches_generated_cells(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("cairo-pentagonal")
+
+        cells = descriptor.build_faces(3, 3)
+        self.assertTrue(cells)
+        for cell in cells:
+            parsed = _parse_periodic_face_cell_id(descriptor, cell.id)
+            self.assertIsNotNone(parsed)
+            self.assertIsNone(_verify_periodic_face_id_roundtrip(descriptor, cell))
 
     def test_pinwheel_reference_verifier_uses_exact_path(self) -> None:
         result = verify_reference_family("pinwheel")
