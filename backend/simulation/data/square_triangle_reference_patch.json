@@ -10863,33 +10863,6 @@
       "graph_distance": 62
     },
     {
-      "id": "sqtri:ref:06625",
-      "kind": "square-triangle-triangle",
-      "center": [
-        6.81134,
-        -12.374144
-      ],
-      "vertices": [
-        [
-          7.478115,
-          -12.374143
-        ],
-        [
-          6.477953,
-          -12.952594
-        ],
-        [
-          6.477953,
-          -11.795694
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "210",
-      "chirality_token": "blue",
-      "variant": "triangle-blue",
-      "graph_distance": 62
-    },
-    {
       "id": "sqtri:ref:07494",
       "kind": "square-triangle-square",
       "center": [
@@ -11037,33 +11010,6 @@
       "graph_distance": 63
     },
     {
-      "id": "sqtri:ref:05726",
-      "kind": "square-triangle-triangle",
-      "center": [
-        8.056986,
-        -10.884388
-      ],
-      "vertices": [
-        [
-          7.478115,
-          -11.217245
-        ],
-        [
-          8.057829,
-          -10.218675
-        ],
-        [
-          8.635015,
-          -11.217245
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "60",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 64
-    },
-    {
       "id": "sqtri:ref:06304",
       "kind": "square-triangle-triangle",
       "center": [
@@ -11205,33 +11151,6 @@
       "chirality_token": null,
       "variant": "square-white",
       "graph_distance": 64
-    },
-    {
-      "id": "sqtri:ref:05782",
-      "kind": "square-triangle-triangle",
-      "center": [
-        8.635381,
-        -10.551219
-      ],
-      "vertices": [
-        [
-          8.057829,
-          -10.218675
-        ],
-        [
-          9.213299,
-          -10.217736
-        ],
-        [
-          8.635015,
-          -11.217245
-        ]
-      ],
-      "tile_family": "square-triangle",
-      "orientation_token": "0",
-      "chirality_token": "red",
-      "variant": "triangle-red",
-      "graph_distance": 65
     },
     {
       "id": "sqtri:ref:06423",

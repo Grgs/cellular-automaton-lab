@@ -14,7 +14,7 @@
 - Promote stronger substitution-level reference fixtures for Hat, Shield, Pinwheel, and the multiscale Chair family now that Hat, Shield, and Chair pass the staged verifier.
 - Strengthen the exact-affine/render-space overlap checks so the frontend helper can use tighter epsilons for exact-path families like `pinwheel`.
 - Decide whether graph contiguity should eventually move into `recommended_validation_options(...)` for the currently relaxed aperiodic families once their generators are repaired.
-- Strengthen the square-triangle verifier beyond the repaired hole-free reference subset so it checks more of the marked 12-fold substitution structure and not just the public square/triangle shell.
+- If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample.
 
 ## Later
 

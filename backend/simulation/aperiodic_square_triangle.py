@@ -7,15 +7,23 @@ from pathlib import Path
 from backend.simulation.aperiodic_support import AperiodicPatch, PatchRecord, patch_from_records
 
 
-# This checked-in patch is the deterministic hole-free subset of the raw square-triangle
-# reference data that the app previously used directly.
+# This checked-in patch is a cleaned dense central component from the square-triangle
+# literature patch. A few stray fringe triangles are excluded to keep the public sample
+# connected and overlap-free while still presenting a visibly bulk-filled patch.
 _DATA_PATH = Path(__file__).with_name("data") / "square_triangle_reference_patch.json"
+_EXCLUDED_RECORD_IDS = frozenset(
+    {
+        "sqtri:ref:05726",
+        "sqtri:ref:05782",
+        "sqtri:ref:06625",
+    }
+)
 _PATCH_DISTANCE_THRESHOLDS = {
     0: 4,
-    1: 12,
-    2: 24,
-    3: 40,
-    4: 52,
+    1: 16,
+    2: 40,
+    3: 76,
+    4: 97,
 }
 
 
@@ -24,6 +32,8 @@ def _load_reference_records() -> tuple[PatchRecord, ...]:
     payload = json.loads(_DATA_PATH.read_text(encoding="utf-8"))
     records: list[PatchRecord] = []
     for raw_record in payload["records"]:
+        if raw_record["id"] in _EXCLUDED_RECORD_IDS:
+            continue
         records.append(
             {
                 "id": raw_record["id"],
@@ -45,6 +55,7 @@ def _load_record_distances() -> dict[str, int]:
     return {
         raw_record["id"]: int(raw_record["graph_distance"])
         for raw_record in payload["records"]
+        if raw_record["id"] not in _EXCLUDED_RECORD_IDS
     }
 
 

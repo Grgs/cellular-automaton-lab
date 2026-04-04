@@ -188,12 +188,24 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
         self.assertEqual(result.observations[-1].hole_count, 0)
 
-    def test_square_triangle_reference_verifier_accepts_hole_free_reference_patch(self) -> None:
+    def test_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(self) -> None:
         result = verify_reference_family("square-triangle")
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
-        self.assertEqual(result.observations[-1].hole_count, 0)
+        depth_three_observation = result.observations[-1]
+        self.assertEqual(depth_three_observation.depth, 3)
+        self.assertEqual(depth_three_observation.total_cells, 462)
+        self.assertEqual(depth_three_observation.connected_component_count, 1)
+        self.assertEqual(depth_three_observation.hole_count, 0)
+        self.assertEqual(
+            depth_three_observation.kind_counts,
+            (
+                ("square-triangle-square", 140),
+                ("square-triangle-triangle", 322),
+            ),
+        )
+        self.assertEqual(depth_three_observation.signature, "cdf9cac072d0")
 
     def test_pinwheel_reference_verifier_tracks_expanding_support(self) -> None:
         result = verify_reference_family("pinwheel")

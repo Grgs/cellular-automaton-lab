@@ -954,9 +954,28 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     ("square-triangle-triangle", "square-triangle-triangle"),
                 ),
             ),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=462,
+                expected_kind_counts=(
+                    ("square-triangle-square", 140),
+                    ("square-triangle-triangle", 322),
+                ),
+                required_kinds=(
+                    "square-triangle-square",
+                    "square-triangle-triangle",
+                ),
+                expected_adjacency_pairs=(
+                    ("square-triangle-square", "square-triangle-triangle"),
+                    ("square-triangle-triangle", "square-triangle-triangle"),
+                ),
+                min_unique_orientation_tokens=12,
+                min_unique_chirality_tokens=3,
+                expected_signature="cdf9cac072d0",  # pragma: allowlist secret
+            ),
         },
         notes=(
             "The public tiling collapses marked internal prototiles to squares and triangles.",
+            "The app's canonical sample uses a cleaned dense central component of the literature patch.",
         ),
     ),
     "shield": ReferenceFamilySpec(
