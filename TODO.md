@@ -9,6 +9,7 @@
 ## Next
 
 - Broaden browser-visible rendering-bounds verification beyond the current representative fixture set.
+- Tighten the frontend representative polygon-overlap path enough to add `robinson-triangles` and `tuebingen-triangle` cleanly; Robinson still reuses cell ids in its split patch payload, and Tuebingen still produces small adapter-space slivers at the current overlap epsilon.
 - Improve the adapter-space overlap helper enough to lower the frontend positive-area overlap epsilon below the current `2e-4` without regressing known-good exact-path families such as `pinwheel`.
 - Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.
 - If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample and rooted local-reference anchors.

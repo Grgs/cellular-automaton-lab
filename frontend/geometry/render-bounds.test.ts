@@ -168,9 +168,11 @@ describe("geometry/render-bounds", () => {
             topologyEntry("archimedean-4-8-8", "polygon_periodic"),
             topologyEntry("chair", "polygon_aperiodic"),
             topologyEntry("hat-monotile", "polygon_aperiodic"),
+            topologyEntry("robinson-triangles", "polygon_aperiodic"),
             topologyEntry("shield", "polygon_aperiodic"),
             topologyEntry("pinwheel", "polygon_aperiodic"),
             topologyEntry("square-triangle", "polygon_aperiodic"),
+            topologyEntry("tuebingen-triangle", "polygon_aperiodic"),
         ];
     });
 
@@ -179,9 +181,11 @@ describe("geometry/render-bounds", () => {
             "archimedean-4-8-8-3x3.json",
             "chair-depth-3.json",
             "hat-monotile-depth-3.json",
+            "robinson-triangles-depth-3.json",
             "square-triangle-depth-3.json",
             "shield-depth-3.json",
             "pinwheel-depth-3.json",
+            "tuebingen-triangle-depth-3.json",
         ]) {
             const fixture = loadFixture(filename);
             const sourceBounds = topologyBounds(fixture);
@@ -199,5 +203,16 @@ describe("geometry/render-bounds", () => {
         const rendered = await renderedMetricsAndBoundsForFixture("chair-depth-3.json");
         expect(boundsWidth(rendered.bounds) / rendered.cssWidth).toBeGreaterThan(0.8);
         expect(boundsHeight(rendered.bounds) / rendered.cssHeight).toBeGreaterThan(0.8);
+    });
+
+    it("frames Robinson and Tuebingen representative fixtures tightly enough for visual inspection", async () => {
+        for (const filename of [
+            "robinson-triangles-depth-3.json",
+            "tuebingen-triangle-depth-3.json",
+        ]) {
+            const rendered = await renderedMetricsAndBoundsForFixture(filename);
+            expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(0.8);
+            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(0.8);
+        }
     });
 });

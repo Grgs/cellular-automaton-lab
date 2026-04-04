@@ -68,9 +68,11 @@ describe("geometry/polygon-overlap", () => {
             topologyEntry("archimedean-4-8-8", "polygon_periodic"),
             topologyEntry("chair", "polygon_aperiodic"),
             topologyEntry("hat-monotile", "polygon_aperiodic"),
+            topologyEntry("robinson-triangles", "polygon_aperiodic"),
             topologyEntry("shield", "polygon_aperiodic"),
             topologyEntry("pinwheel", "polygon_aperiodic"),
             topologyEntry("square-triangle", "polygon_aperiodic"),
+            topologyEntry("tuebingen-triangle", "polygon_aperiodic"),
         ];
     });
 
@@ -97,7 +99,16 @@ describe("geometry/polygon-overlap", () => {
                 maxCachedCells: topology.cells.length,
             }),
         );
-        return findPositiveAreaPolygonOverlaps(cache.cells, undefined, maxResults);
+        // Representative render-space overlap checks should operate on the
+        // unique addressable polygon set. Some legacy aperiodic payloads,
+        // notably Robinson, still contain repeated cell ids for identical
+        // rendered shapes, which would otherwise turn this into a self-
+        // comparison test rather than a cross-cell overlap test.
+        return findPositiveAreaPolygonOverlaps(
+            Array.from(cache.cellsById.values()),
+            undefined,
+            maxResults,
+        );
     }
 
     it("keeps representative polygon fixtures free of render-space overlap", async () => {
