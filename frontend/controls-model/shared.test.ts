@@ -61,7 +61,7 @@ describe("controls-model/shared", () => {
             {
                 tiling_family: "chair",
                 label: "Chair",
-                picker_group: "Experimental",
+                picker_group: "Aperiodic",
                 picker_order: 290,
                 sizing_mode: "patch_depth",
                 family: "aperiodic",

@@ -8,7 +8,7 @@ None.
 
 ## Current Known Deviations
 
-- `chair`, `square-triangle`, `shield`, and `pinwheel` remain available in the codebase and verification suite, but are exposed under the picker's `Experimental` group until browser-visible pattern correctness is re-verified.
+- `square-triangle`, `shield`, and `pinwheel` remain available in the codebase and verification suite, but are exposed under the picker's `Experimental` group until browser-visible pattern correctness is re-verified.
 
 ## Known Limits That Are Not Currently Treated As Failures
 

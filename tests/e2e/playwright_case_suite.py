@@ -102,6 +102,149 @@ class SharedUiFlowMixin:
         self._click_canvas_center()
         self._expect("#undo-btn").to_be_enabled()
 
+    def _canvas_visual_summary(self) -> dict[str, object]:
+        case = self._case()
+        summary = case.page.evaluate(
+            """() => {
+                const canvas = document.getElementById("grid");
+                if (!(canvas instanceof HTMLCanvasElement)) {
+                    throw new Error("grid canvas is missing");
+                }
+                const context = canvas.getContext("2d");
+                if (!context) {
+                    throw new Error("2d canvas context is unavailable");
+                }
+                const image = context.getImageData(0, 0, canvas.width, canvas.height);
+                const { data, width, height } = image;
+                let minX = width;
+                let minY = height;
+                let maxX = -1;
+                let maxY = -1;
+                const dominantFillColors = new Map();
+
+                for (let y = 0; y < height; y += 1) {
+                    for (let x = 0; x < width; x += 1) {
+                        const index = ((y * width) + x) * 4;
+                        const alpha = data[index + 3];
+                        if (alpha < 32) {
+                            continue;
+                        }
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+
+                        if (alpha < 250) {
+                            continue;
+                        }
+                        const r = data[index];
+                        const g = data[index + 1];
+                        const b = data[index + 2];
+                        if (r < 140 || g < 100 || b < 60) {
+                            continue;
+                        }
+                        const key = `${r},${g},${b}`;
+                        dominantFillColors.set(key, (dominantFillColors.get(key) || 0) + 1);
+                    }
+                }
+
+                return {
+                    canvasWidth: width,
+                    canvasHeight: height,
+                    coverageWidthRatio: maxX >= minX ? (maxX - minX + 1) / width : 0,
+                    coverageHeightRatio: maxY >= minY ? (maxY - minY + 1) / height : 0,
+                    dominantFillColors: Array.from(dominantFillColors.entries())
+                        .filter(([, count]) => count >= 100)
+                        .sort((left, right) => right[1] - left[1]),
+                };
+            }""",
+        )
+        return cast(dict[str, object], summary)
+
+    def _wait_for_patch_render_complete(self) -> None:
+        case = self._case()
+        case.page.wait_for_function(
+            """() => {
+                const grid = document.getElementById("grid");
+                const overlay = document.getElementById("blocking-activity-overlay");
+                const renderCellSize = Number(grid?.getAttribute("data-render-cell-size") || "0");
+                const overlayHidden = overlay instanceof HTMLElement
+                    ? overlay.hidden || overlay.getAttribute("hidden") !== null
+                    : true;
+                return Number.isFinite(renderCellSize) && renderCellSize > 0 && overlayHidden;
+            }""",
+        )
+
+    def _wait_for_canvas_visual_patch(
+        self,
+        *,
+        minimum_fill_colors: int,
+        minimum_coverage_width_ratio: float,
+        minimum_coverage_height_ratio: float,
+    ) -> None:
+        case = self._case()
+        case.page.wait_for_function(
+            """({ minimumFillColors, minimumCoverageWidthRatio, minimumCoverageHeightRatio }) => {
+                const canvas = document.getElementById("grid");
+                if (!(canvas instanceof HTMLCanvasElement)) {
+                    return false;
+                }
+                const context = canvas.getContext("2d");
+                if (!context) {
+                    return false;
+                }
+                const overlay = document.getElementById("blocking-activity-overlay");
+                if (overlay instanceof HTMLElement && !overlay.hidden) {
+                    return false;
+                }
+                const image = context.getImageData(0, 0, canvas.width, canvas.height);
+                const { data, width, height } = image;
+                let minX = width;
+                let minY = height;
+                let maxX = -1;
+                let maxY = -1;
+                const dominantFillColors = new Map();
+
+                for (let y = 0; y < height; y += 1) {
+                    for (let x = 0; x < width; x += 1) {
+                        const index = ((y * width) + x) * 4;
+                        const alpha = data[index + 3];
+                        if (alpha < 32) {
+                            continue;
+                        }
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+
+                        if (alpha < 250) {
+                            continue;
+                        }
+                        const r = data[index];
+                        const g = data[index + 1];
+                        const b = data[index + 2];
+                        if (r < 140 || g < 100 || b < 60) {
+                            continue;
+                        }
+                        const key = `${r},${g},${b}`;
+                        dominantFillColors.set(key, (dominantFillColors.get(key) || 0) + 1);
+                    }
+                }
+
+                const dominantCount = Array.from(dominantFillColors.values()).filter((count) => count >= 100).length;
+                const coverageWidthRatio = maxX >= minX ? (maxX - minX + 1) / width : 0;
+                const coverageHeightRatio = maxY >= minY ? (maxY - minY + 1) / height : 0;
+                return dominantCount >= minimumFillColors
+                    && coverageWidthRatio > minimumCoverageWidthRatio
+                    && coverageHeightRatio > minimumCoverageHeightRatio;
+            }""",
+            arg={
+                "minimumFillColors": minimum_fill_colors,
+                "minimumCoverageWidthRatio": minimum_coverage_width_ratio,
+                "minimumCoverageHeightRatio": minimum_coverage_height_ratio,
+            },
+        )
+
     def _export_pattern_payload(self) -> dict[str, object]:
         case = self._case()
         with case.page.expect_download() as download_info:
@@ -197,12 +340,27 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("chair")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
+        self._wait_for_patch_render_complete()
+
+    def test_chair_topology_switch_renders_browser_visible_multicolor_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "chair")
+
+        self._expect("#tiling-family-select").to_have_value("chair")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        self._wait_for_patch_render_complete()
+        self._wait_for_canvas_visual_patch(
+            minimum_fill_colors=4,
+            minimum_coverage_width_ratio=0.75,
+            minimum_coverage_height_ratio=0.75,
         )
+
+        summary = self._canvas_visual_summary()
+        dominant_fill_colors = cast(list[list[object]], summary["dominantFillColors"])
+        self.assertGreater(float(summary["coverageWidthRatio"]), 0.75)
+        self.assertGreater(float(summary["coverageHeightRatio"]), 0.75)
+        self.assertGreaterEqual(len(dominant_fill_colors), 4)
 
     def test_robinson_triangles_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()

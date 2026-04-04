@@ -4,7 +4,7 @@
 
 - Extend periodic dual-family verification beyond the currently unambiguous reciprocal catalog pairs.
 - Expand the local reference-data layer from rooted neighborhood fixtures into direct canonical patch comparisons where that buys materially stronger guarantees.
-- Re-verify browser-visible pattern correctness for the experimental `chair`, `square-triangle`, `shield`, and `pinwheel` families before moving them out of the picker's `Experimental` group.
+- Re-verify browser-visible pattern correctness for the experimental `square-triangle`, `shield`, and `pinwheel` families before moving them out of the picker's `Experimental` group.
 
 ## Next
 

@@ -6,7 +6,7 @@ import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 const CHAIR_TOPOLOGY: BootstrappedTopologyDefinition = {
     tiling_family: "chair",
     label: "Chair",
-    picker_group: "Experimental",
+    picker_group: "Aperiodic",
     picker_order: 290,
     sizing_mode: "patch_depth",
     family: "aperiodic",
@@ -70,7 +70,7 @@ describe("chair topology", () => {
         expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("chair");
         expect(resolveTopologyVariantKey("chair", "edge")).toBe("chair");
         expect(getTopologyDefinition("chair")?.render_kind).toBe("polygon_aperiodic");
-        expect(getTopologyDefinition("chair")?.picker_group).toBe("Experimental");
+        expect(getTopologyDefinition("chair")?.picker_group).toBe("Aperiodic");
         expect(topologyUsesPatchDepth("chair")).toBe(true);
     });
 
