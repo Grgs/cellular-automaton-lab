@@ -35,7 +35,9 @@ function buildAperiodicMetrics(
     height = 0,
 ): AperiodicMetrics {
     const scale = Math.max(0.25, Number(cellSize) || 1) * 10;
-    const margin = Math.max(16, scale * 0.45);
+    const margin = geometry === "chair"
+        ? Math.max(8, scale * 0.15)
+        : Math.max(16, scale * 0.45);
     const cells = Array.isArray(topology?.cells) ? topology.cells : [];
     const allVertices = cells.flatMap((cell) => Array.isArray(cell.vertices) ? cell.vertices : []);
 

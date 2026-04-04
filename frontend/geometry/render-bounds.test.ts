@@ -120,6 +120,44 @@ async function renderedBoundsForFixture(filename: string): Promise<Bounds> {
     };
 }
 
+async function renderedMetricsAndBoundsForFixture(
+    filename: string,
+): Promise<{ bounds: Bounds; cssWidth: number; cssHeight: number }> {
+    const { getGeometryAdapter } = await import("./registry.js");
+    const fixture = loadFixture(filename);
+    const topology = fixture.topology;
+    const adapter = getGeometryAdapter(fixture.geometry);
+    const width = fixture.width || topology.topology_spec.width || 0;
+    const height = fixture.height || topology.topology_spec.height || 0;
+    const metrics = adapter.buildMetrics({
+        width,
+        height,
+        cellSize: fixture.cellSize,
+        topology,
+    });
+    const cache = asPolygonGeometryCache(
+        adapter.buildCache({
+            width,
+            height,
+            cellSize: fixture.cellSize,
+            metrics,
+            topology,
+            maxCachedCells: topology.cells.length,
+        }),
+    );
+    const vertices = cache.cells.flatMap((cell) => cell.vertices);
+    return {
+        bounds: {
+            minX: Math.min(...vertices.map((vertex) => vertex.x)),
+            maxX: Math.max(...vertices.map((vertex) => vertex.x)),
+            minY: Math.min(...vertices.map((vertex) => vertex.y)),
+            maxY: Math.max(...vertices.map((vertex) => vertex.y)),
+        },
+        cssWidth: metrics.cssWidth,
+        cssHeight: metrics.cssHeight,
+    };
+}
+
 describe("geometry/render-bounds", () => {
     beforeEach(() => {
         document.body.innerHTML = "";
@@ -156,4 +194,10 @@ describe("geometry/render-bounds", () => {
             );
         }
     }, 30_000);
+
+    it("frames chair tightly enough that the rendered patch occupies most of the canvas box", async () => {
+        const rendered = await renderedMetricsAndBoundsForFixture("chair-depth-3.json");
+        expect(boundsWidth(rendered.bounds) / rendered.cssWidth).toBeGreaterThan(0.8);
+        expect(boundsHeight(rendered.bounds) / rendered.cssHeight).toBeGreaterThan(0.8);
+    });
 });

@@ -40,6 +40,13 @@ const TUEBINGEN_DEAD_PALETTE = new Map<string, string>([
     ["tuebingen-thin:right", "#e1cdac"],
 ]);
 
+const CHAIR_DEAD_PALETTE = new Map<string, string>([
+    ["0", "#f8f1e5"],
+    ["1", "#e5c089"],
+    ["2", "#c88d4b"],
+    ["3", "#dbc1b2"],
+]);
+
 const SHIELD_SHIELD_DEAD_PALETTE = new Map<string, string>([
     ["arrow:ring-0", "#d5bb8f"],
     ["arrow:ring-1", "#c7a574"],
@@ -64,6 +71,19 @@ function resolveTuebingenDeadColor(
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
     const chirality = typeof topologyCell.chirality_token === "string" ? topologyCell.chirality_token : "";
     return TUEBINGEN_DEAD_PALETTE.get(`${kind}:${chirality}`) || null;
+}
+
+function resolveChairDeadColor(
+    cell: TopologyCell | PaintableCell | null | undefined,
+): string | null {
+    const topologyCell = cell as Partial<TopologyCell> | null | undefined;
+    if (topologyCell?.kind !== "chair") {
+        return null;
+    }
+    const orientation = typeof topologyCell.orientation_token === "string"
+        ? topologyCell.orientation_token
+        : "";
+    return CHAIR_DEAD_PALETTE.get(orientation) || null;
 }
 
 function resolveShieldDeadColor(
@@ -182,6 +202,10 @@ export function resolveDeadCellColor(
     const tuebingenDeadColor = resolveTuebingenDeadColor(cell);
     if (tuebingenDeadColor) {
         return tuebingenDeadColor;
+    }
+    const chairDeadColor = resolveChairDeadColor(cell);
+    if (chairDeadColor) {
+        return chairDeadColor;
     }
     const shieldDeadColor = resolveShieldDeadColor(cell);
     if (shieldDeadColor) {

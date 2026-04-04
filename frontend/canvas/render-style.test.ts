@@ -200,6 +200,43 @@ describe("canvas/render-style", () => {
         });
     });
 
+    it("uses a warm four-color dead palette for chair tiles based on orientation", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: { id: "chair:o0", state: 0, kind: "chair", orientation_token: "0" },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: { id: "chair:o1", state: 0, kind: "chair", orientation_token: "1" },
+                expectedColor: "#e5c089",
+            },
+            {
+                cell: { id: "chair:o2", state: 0, kind: "chair", orientation_token: "2" },
+                expectedColor: "#c88d4b",
+            },
+            {
+                cell: { id: "chair:o3", state: 0, kind: "chair", orientation_token: "3" },
+                expectedColor: "#dbc1b2",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "chair", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "chair",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
     it("renders Shield decoration tokens with distinct dead-state accents", async () => {
         const {
             buildStateColorLookup,
