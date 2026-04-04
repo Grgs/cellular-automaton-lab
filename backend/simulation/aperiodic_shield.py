@@ -86,7 +86,15 @@ _BASE_TRIANGLES: tuple[tuple[str, str, tuple[Vec, ...]], ...] = (
     ),
 )
 _CLUSTER_VECTOR_X = Vec(5.0, 0.0)
-_CLUSTER_VECTOR_Y = Vec(1.5, 2.5)
+_CLUSTER_VECTOR_Y = Vec(0.0, 3.0)
+_FILLER_SHIELD = (
+    Vec(0.5, 2.0),
+    Vec(1.0, 1.5),
+    Vec(0.5, 1.0),
+    Vec(4.5, 1.0),
+    Vec(4.0, 1.5),
+    Vec(4.5, 2.0),
+)
 
 
 def _orientation_token(transform: Affine) -> str:
@@ -182,15 +190,45 @@ def _cluster_phase(x: int, y: int) -> int:
     return (x - y) % 4
 
 
+def _emit_filler_records(
+    coordinates: tuple[tuple[int, int], ...],
+    records: list[PatchRecord],
+) -> None:
+    coordinate_set = set(coordinates)
+    for x, y in coordinates:
+        if (
+            (x + 1, y) not in coordinate_set
+            or (x, y + 1) not in coordinate_set
+            or (x + 1, y + 1) not in coordinate_set
+        ):
+            continue
+        phase_label = (x - y) % 4
+        transform = translation(
+            (x * _CLUSTER_VECTOR_X.x) + (y * _CLUSTER_VECTOR_Y.x),
+            (x * _CLUSTER_VECTOR_X.y) + (y * _CLUSTER_VECTOR_Y.y),
+        )
+        records.append(
+            _record(
+                f"shield:filler:{x}:{y}:phase-{phase_label}",
+                "shield-shield",
+                transform,
+                _FILLER_SHIELD,
+                decoration_tokens=(f"fill-{phase_label}", f"ring-{phase_label % 2}"),
+            )
+        )
+
+
 def build_shield_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     records: list[PatchRecord] = []
-    for x, y in _cluster_coordinates(resolved_depth):
+    coordinates = _cluster_coordinates(resolved_depth)
+    for x, y in coordinates:
         _emit_cluster_records(
             _cluster_transform(x, y),
             f"cluster:{x}:{y}",
             _cluster_phase(x, y),
             records,
         )
+    _emit_filler_records(coordinates, records)
 
     return patch_from_records(resolved_depth, records, edge_precision=6)

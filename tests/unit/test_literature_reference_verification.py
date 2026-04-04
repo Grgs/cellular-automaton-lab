@@ -56,7 +56,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         hat_observation = observe_reference_patch("hat-monotile", 3)
 
         self.assertGreater(square_triangle_observation.hole_count, 0)
-        self.assertGreater(shield_observation.hole_count, 0)
+        self.assertEqual(shield_observation.hole_count, 0)
         self.assertEqual(chair_observation.hole_count, 0)
         self.assertEqual(hat_observation.hole_count, 0)
 
@@ -85,7 +85,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["sphinx"].status, "PASS")
         self.assertEqual(results["robinson-triangles"].status, "PASS")
         self.assertEqual(results["square-triangle"].status, "FAIL")
-        self.assertEqual(results["shield"].status, "FAIL")
+        self.assertEqual(results["shield"].status, "PASS")
         self.assertEqual(results["pinwheel"].status, "FAIL")
         self.assertFalse(results["chair"].waived)
         self.assertFalse(results["hat-monotile"].waived)
@@ -94,7 +94,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertFalse(results["chair"].blocking)
         self.assertFalse(results["hat-monotile"].blocking)
         self.assertTrue(results["square-triangle"].blocking)
-        self.assertTrue(results["shield"].blocking)
+        self.assertFalse(results["shield"].blocking)
         self.assertTrue(results["pinwheel"].blocking)
 
     def test_connected_representative_families_remain_connected_under_observation(self) -> None:
@@ -182,12 +182,12 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_shield_reference_verifier_accepts_decoration_variants(self) -> None:
         result = verify_reference_family("shield")
 
-        self.assertEqual(result.status, "FAIL")
-        self.assertTrue(any(failure.code == "surface-holes" for failure in result.failures))
+        self.assertEqual(result.status, "PASS")
+        self.assertFalse(result.failures)
         decoration_counts = dict(result.observations[1].unique_decoration_variants_by_kind)
         self.assertGreaterEqual(decoration_counts["shield-shield"], 2)
         self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
-        self.assertGreater(result.observations[-1].hole_count, 0)
+        self.assertEqual(result.observations[-1].hole_count, 0)
 
     def test_square_triangle_reference_verifier_flags_surface_holes(self) -> None:
         result = verify_reference_family("square-triangle")
