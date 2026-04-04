@@ -655,6 +655,117 @@ def _verify_periodic_face_id_roundtrip(
     return None
 
 
+def _canonicalize_vertex_configuration(configuration: tuple[str, ...]) -> tuple[str, ...]:
+    if not configuration:
+        return ()
+    candidates: list[tuple[str, ...]] = []
+    for direction in (configuration, tuple(reversed(configuration))):
+        for index in range(len(direction)):
+            candidates.append(direction[index:] + direction[:index])
+    return min(candidates)
+
+
+def _periodic_face_interior_vertex_configurations(
+    cells: tuple[PeriodicFaceCell, ...],
+) -> tuple[tuple[str, ...], ...]:
+    def _matching_group_id(
+        groups: list[list[tuple[float, float]]],
+        point: tuple[float, float],
+    ) -> int | None:
+        for group_id, group in enumerate(groups):
+            representative = group[0]
+            if (
+                math.isclose(representative[0], point[0], abs_tol=_FLOAT_TOLERANCE)
+                and math.isclose(representative[1], point[1], abs_tol=_FLOAT_TOLERANCE)
+            ):
+                return group_id
+        return None
+
+    vertex_groups: list[list[tuple[float, float]]] = []
+    vertex_group_by_cell_vertex: dict[tuple[int, int], int] = {}
+    incident_cells_by_group: dict[int, set[str]] = {}
+    cells_by_id = {cell.id: cell for cell in cells}
+
+    for cell_index, cell in enumerate(cells):
+        for vertex_index, point in enumerate(cell.vertices):
+            group_id = _matching_group_id(vertex_groups, point)
+            if group_id is None:
+                group_id = len(vertex_groups)
+                vertex_groups.append([point])
+            else:
+                vertex_groups[group_id].append(point)
+            vertex_group_by_cell_vertex[(cell_index, vertex_index)] = group_id
+            incident_cells_by_group.setdefault(group_id, set()).add(cell.id)
+
+    if not vertex_groups:
+        return ()
+
+    representative_points: dict[int, tuple[float, float]] = {}
+    for group_id, group in enumerate(vertex_groups):
+        representative_points[group_id] = (
+            sum(point[0] for point in group) / len(group),
+            sum(point[1] for point in group) / len(group),
+        )
+
+    edge_counts: Counter[tuple[int, int]] = Counter()
+    for cell_index, cell in enumerate(cells):
+        for vertex_index in range(len(cell.vertices)):
+            left_group = vertex_group_by_cell_vertex[(cell_index, vertex_index)]
+            right_group = vertex_group_by_cell_vertex[
+                (cell_index, (vertex_index + 1) % len(cell.vertices))
+            ]
+            if left_group == right_group:
+                continue
+            edge = (
+                (left_group, right_group)
+                if left_group <= right_group
+                else (right_group, left_group)
+            )
+            edge_counts[edge] += 1
+
+    boundary_vertex_groups = {
+        group_id
+        for edge, count in edge_counts.items()
+        if count == 1
+        for group_id in edge
+    }
+
+    all_x = [point[0] for point in representative_points.values()]
+    all_y = [point[1] for point in representative_points.values()]
+    min_x = min(all_x)
+    max_x = max(all_x)
+    min_y = min(all_y)
+    max_y = max(all_y)
+    for group_id, point in representative_points.items():
+        if (
+            math.isclose(point[0], min_x, abs_tol=_FLOAT_TOLERANCE)
+            or math.isclose(point[0], max_x, abs_tol=_FLOAT_TOLERANCE)
+            or math.isclose(point[1], min_y, abs_tol=_FLOAT_TOLERANCE)
+            or math.isclose(point[1], max_y, abs_tol=_FLOAT_TOLERANCE)
+        ):
+            boundary_vertex_groups.add(group_id)
+
+    configurations: set[tuple[str, ...]] = set()
+    for group_id, cell_ids in incident_cells_by_group.items():
+        if group_id in boundary_vertex_groups:
+            continue
+        point = representative_points[group_id]
+        incident_cells = [cells_by_id[cell_id] for cell_id in cell_ids]
+        ordered_cells = sorted(
+            incident_cells,
+            key=lambda cell: math.atan2(
+                cell.center[1] - point[1],
+                cell.center[0] - point[0],
+            ),
+        )
+        configurations.add(
+            _canonicalize_vertex_configuration(
+                tuple(cell.kind for cell in ordered_cells)
+            )
+        )
+    return tuple(sorted(configurations))
+
+
 def _periodic_face_translation_failures(
     descriptor: PeriodicFaceTilingDescriptor,
     cells: tuple[PeriodicFaceCell, ...],
@@ -808,6 +919,21 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
         failure = _verify_periodic_face_id_roundtrip(descriptor, cell)
         if failure is not None:
             failures.append(failure)
+    observed_vertex_configurations = _periodic_face_interior_vertex_configurations(sample_cells)
+    if (
+        observed_vertex_configurations
+        != periodic_descriptor.expected_interior_vertex_configurations
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-interior-vertex-configurations-mismatch",
+                message=(
+                    f"{spec.geometry} interior vertex configurations "
+                    f"{observed_vertex_configurations!r} did not match the reference expectation "
+                    f"{periodic_descriptor.expected_interior_vertex_configurations!r}."
+                ),
+            )
+        )
     failures.extend(_periodic_face_translation_failures(descriptor, sample_cells))
     return failures
 

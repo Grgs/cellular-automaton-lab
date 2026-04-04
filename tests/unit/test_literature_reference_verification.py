@@ -1,3 +1,4 @@
+from dataclasses import replace
 import sys
 import unittest
 from pathlib import Path
@@ -9,7 +10,10 @@ if str(ROOT) not in sys.path:
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 from backend.simulation.literature_reference_verification import (
+    _canonicalize_vertex_configuration,
     _parse_periodic_face_cell_id,
+    _periodic_face_descriptor_failures,
+    _periodic_face_interior_vertex_configurations,
     _verify_periodic_face_id_roundtrip,
     observe_reference_patch,
     verify_all_reference_families,
@@ -132,6 +136,71 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(
             result.observations[0].degree_histogram,
             ((1, 4), (2, 8), (4, 4), (6, 4), (7, 4), (8, 1)),
+        )
+
+    def test_periodic_face_interior_vertex_configurations_match_zero_offset_family(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("archimedean-4-8-8")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configurations(descriptor.build_faces(3, 3)),
+            (("octagon", "octagon", "square"),),
+        )
+
+    def test_periodic_face_interior_vertex_configurations_match_odd_row_offset_family(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("trihexagonal-3-6-3-6")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configurations(descriptor.build_faces(3, 3)),
+            (("hexagon", "triangle-down", "hexagon", "triangle-up"),),
+        )
+
+    def test_periodic_face_interior_vertex_configurations_exclude_boundary_vertices(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("cairo-pentagonal")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configurations(descriptor.build_faces(3, 3)),
+            (
+                ("pentagon", "pentagon", "pentagon"),
+                ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
+        )
+
+    def test_vertex_configuration_canonicalization_normalizes_rotation_and_direction(self) -> None:
+        canonical = _canonicalize_vertex_configuration(
+            ("hexagon", "triangle-down", "hexagon", "triangle-up")
+        )
+
+        self.assertEqual(
+            canonical,
+            _canonicalize_vertex_configuration(
+                ("triangle-down", "hexagon", "triangle-up", "hexagon")
+            ),
+        )
+        self.assertEqual(
+            canonical,
+            _canonicalize_vertex_configuration(
+                ("triangle-up", "hexagon", "triangle-down", "hexagon")
+            ),
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_vertex_configuration_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-4-8-8 must define a periodic descriptor expectation")
+        wrong_periodic_descriptor = replace(
+            periodic_descriptor,
+            expected_interior_vertex_configurations=(("square", "square", "square"),),
+        )
+        wrong_spec = replace(spec, periodic_descriptor=wrong_periodic_descriptor)
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-interior-vertex-configurations-mismatch"
+                for failure in failures
+            )
         )
 
     def test_periodic_face_id_pattern_roundtrip_matches_generated_cells(self) -> None:

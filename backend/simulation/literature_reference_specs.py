@@ -24,6 +24,7 @@ class PeriodicDescriptorExpectation:
     slot_vocabulary: tuple[str, ...]
     id_pattern: str
     row_offset_x: float
+    expected_interior_vertex_configurations: tuple[tuple[str, ...], ...]
 
 
 @dataclass(frozen=True)
@@ -66,12 +67,6 @@ class ReferenceFamilySpec:
 
 REGULAR_TILING_SOURCES = (
     "https://en.wikipedia.org/wiki/Regular_tiling",
-)
-ARCHIMEDEAN_TILING_SOURCES = (
-    "https://en.wikipedia.org/wiki/Archimedean_tilings",
-)
-UNIFORM_TILING_SOURCES = (
-    "https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings",
 )
 
 
@@ -163,10 +158,7 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     "archimedean-4-8-8": ReferenceFamilySpec(
         geometry="archimedean-4-8-8",
         display_name="Square-Octagon (4.8.8)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Truncated_square_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Truncated_square_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("octagon", "square"),
         required_metadata=(),
@@ -185,15 +177,13 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=("octagon", "square"),
             id_pattern="{prefix}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(("octagon", "octagon", "square"),),
         ),
     ),
     "archimedean-3-12-12": ReferenceFamilySpec(
         geometry="archimedean-3-12-12",
         display_name="Truncated Hexagonal (3.12.12)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Truncated_hexagonal_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Truncated_hexagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("dodecagon", "triangle"),
         required_metadata=(),
@@ -212,15 +202,13 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_alphabetic_slots(18),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(("dodecagon", "dodecagon", "triangle"),),
         ),
     ),
     "archimedean-3-4-6-4": ReferenceFamilySpec(
         geometry="archimedean-3-4-6-4",
         display_name="Rhombitrihexagonal (3.4.6.4)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Rhombitrihexagonal_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Rhombitrihexagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("hexagon", "square", "triangle"),
         required_metadata=(),
@@ -239,15 +227,13 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_alphabetic_slots(12),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(("hexagon", "square", "triangle", "square"),),
         ),
     ),
     "archimedean-4-6-12": ReferenceFamilySpec(
         geometry="archimedean-4-6-12",
         display_name="Truncated Trihexagonal (4.6.12)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Truncated_trihexagonal_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Truncated_trihexagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("dodecagon", "hexagon", "square"),
         required_metadata=(),
@@ -270,15 +256,13 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_alphabetic_slots(12),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(("dodecagon", "hexagon", "square"),),
         ),
     ),
     "archimedean-3-3-4-3-4": ReferenceFamilySpec(
         geometry="archimedean-3-3-4-3-4",
         display_name="Snub Square (3.3.4.3.4)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Snub_square_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Snub_square_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("square", "triangle"),
         required_metadata=(),
@@ -297,15 +281,15 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_alphabetic_slots(12),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("square", "triangle", "square", "triangle", "triangle"),
+            ),
         ),
     ),
     "archimedean-3-3-3-4-4": ReferenceFamilySpec(
         geometry="archimedean-3-3-3-4-4",
         display_name="Elongated Triangular (3.3.3.4.4)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Elongated_triangular_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Elongated_triangular_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("square", "triangle"),
         required_metadata=(),
@@ -328,15 +312,15 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_alphabetic_slots(12),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("square", "square", "triangle", "triangle", "triangle"),
+            ),
         ),
     ),
     "archimedean-3-3-3-3-6": ReferenceFamilySpec(
         geometry="archimedean-3-3-3-3-6",
         display_name="Snub Trihexagonal (3.3.3.3.6)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Snub_trihexagonal_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Snub_trihexagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("hexagon", "triangle"),
         required_metadata=(),
@@ -355,15 +339,15 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_alphabetic_slots(126),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("hexagon", "triangle", "triangle", "triangle", "triangle"),
+            ),
         ),
     ),
     "trihexagonal-3-6-3-6": ReferenceFamilySpec(
         geometry="trihexagonal-3-6-3-6",
         display_name="Kagome / Trihexagonal (3.6.3.6)",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Trihexagonal_tiling",
-            *ARCHIMEDEAN_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Trihexagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("hexagon", "triangle-down", "triangle-up"),
         required_metadata=(),
@@ -382,15 +366,15 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=("hexagon", "triangle-down", "triangle-up"),
             id_pattern="{prefix}:{x}:{y}",
             row_offset_x=52.0,
+            expected_interior_vertex_configurations=(
+                ("hexagon", "triangle-down", "hexagon", "triangle-up"),
+            ),
         ),
     ),
     "cairo-pentagonal": ReferenceFamilySpec(
         geometry="cairo-pentagonal",
         display_name="Cairo Pentagonal",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Cairo_pentagonal_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Cairo_pentagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("pentagon",),
         required_metadata=(),
@@ -409,15 +393,16 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=("a", "b", "c", "d"),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=71.0,
+            expected_interior_vertex_configurations=(
+                ("pentagon", "pentagon", "pentagon"),
+                ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
         ),
     ),
     "rhombille": ReferenceFamilySpec(
         geometry="rhombille",
         display_name="Rhombille",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Rhombille_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Rhombille_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("rhombus",),
         required_metadata=(),
@@ -436,15 +421,16 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_prefixed_slots("s", 6),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("rhombus", "rhombus", "rhombus"),
+                ("rhombus", "rhombus", "rhombus", "rhombus", "rhombus", "rhombus"),
+            ),
         ),
     ),
     "deltoidal-hexagonal": ReferenceFamilySpec(
         geometry="deltoidal-hexagonal",
         display_name="Deltoidal Hexagonal",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Deltoidal_hexagonal_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Deltoidal_hexagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("kite",),
         required_metadata=(),
@@ -463,15 +449,17 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=tuple(sorted(_prefixed_slots("k", 12))),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("kite", "kite", "kite"),
+                ("kite", "kite", "kite", "kite"),
+                ("kite", "kite", "kite", "kite", "kite", "kite"),
+            ),
         ),
     ),
     "tetrakis-square": ReferenceFamilySpec(
         geometry="tetrakis-square",
         display_name="Tetrakis Square",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Tetrakis_square_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Tetrakis_square_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("triangle",),
         required_metadata=(),
@@ -490,15 +478,16 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_prefixed_slots("s", 4),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("triangle", "triangle", "triangle", "triangle"),
+                ("triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle"),
+            ),
         ),
     ),
     "triakis-triangular": ReferenceFamilySpec(
         geometry="triakis-triangular",
         display_name="Triakis Triangular",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Triakis_triangular_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Triakis_triangular_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("triangle",),
         required_metadata=(),
@@ -517,15 +506,16 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_prefixed_slots("s", 36),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("triangle", "triangle", "triangle"),
+                ("triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle"),
+            ),
         ),
     ),
     "deltoidal-trihexagonal": ReferenceFamilySpec(
         geometry="deltoidal-trihexagonal",
         display_name="Deltoidal Trihexagonal",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Deltoidal_trihexagonal_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Deltoidal_trihexagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("kite",),
         required_metadata=(),
@@ -544,15 +534,17 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=tuple(sorted(_prefixed_slots("s", 12))),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("kite", "kite", "kite"),
+                ("kite", "kite", "kite", "kite"),
+                ("kite", "kite", "kite", "kite", "kite", "kite"),
+            ),
         ),
     ),
     "prismatic-pentagonal": ReferenceFamilySpec(
         geometry="prismatic-pentagonal",
         display_name="Prismatic Pentagonal",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Prismatic_pentagonal_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Prismatic_pentagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("pentagon",),
         required_metadata=(),
@@ -571,15 +563,16 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_prefixed_slots("s", 8),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("pentagon", "pentagon", "pentagon"),
+                ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
         ),
     ),
     "floret-pentagonal": ReferenceFamilySpec(
         geometry="floret-pentagonal",
         display_name="Floret Pentagonal",
-        source_urls=(
-            "https://en.wikipedia.org/wiki/Floret_pentagonal_tiling",
-            *UNIFORM_TILING_SOURCES,
-        ),
+        source_urls=("https://en.wikipedia.org/wiki/Floret_pentagonal_tiling",),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("pentagon",),
         required_metadata=(),
@@ -598,6 +591,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_prefixed_slots("s", 84),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("pentagon", "pentagon", "pentagon"),
+                ("pentagon", "pentagon", "pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
         ),
     ),
     "snub-square-dual": ReferenceFamilySpec(
@@ -606,7 +603,6 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         source_urls=(
             "https://en.wikipedia.org/wiki/Snub_square_tiling",
             "https://en.wikipedia.org/wiki/Pentagonal_tiling",
-            *UNIFORM_TILING_SOURCES,
         ),
         canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("pentagon",),
@@ -626,6 +622,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             slot_vocabulary=_prefixed_slots("s", 8),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("pentagon", "pentagon", "pentagon"),
+                ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
         ),
     ),
     "penrose-p3-rhombs": ReferenceFamilySpec(
