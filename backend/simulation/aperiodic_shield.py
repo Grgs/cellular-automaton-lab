@@ -90,12 +90,12 @@ _BASE_TRIANGLES: tuple[tuple[str, str, tuple[Vec, ...]], ...] = (
     ),
 )
 _CHILD_CLUSTERS: tuple[tuple[str, Vec, float], ...] = (
-    ("north-west", Vec(-2.8, -2.8), -math.pi / 6),
-    ("north-east", Vec(2.8, -2.8), math.pi / 6),
-    ("south-west", Vec(-2.8, 2.8), math.pi / 6),
-    ("south-east", Vec(2.8, 2.8), -math.pi / 6),
+    ("north-west", Vec(-3.0, -3.0), -math.pi / 6),
+    ("north-east", Vec(3.0, -3.0), math.pi / 6),
+    ("south-west", Vec(-3.0, 3.0), math.pi / 6),
+    ("south-east", Vec(3.0, 3.0), -math.pi / 6),
 )
-_CHILD_SCALE = 0.5
+_CHILD_SCALE = 0.45
 
 
 def _orientation_token(transform: Affine) -> str:
@@ -121,7 +121,7 @@ def _record(
         "id": id_from_transform(prefix, transform),
         "kind": kind,
         "center": rounded_point(polygon_centroid(resolved_vertices)),
-        "vertices": tuple(rounded_point(vertex) for vertex in resolved_vertices),
+        "vertices": tuple((vertex.x, vertex.y) for vertex in resolved_vertices),
         "tile_family": "shield",
         "orientation_token": _orientation_token(transform),
         "chirality_token": chirality_token,

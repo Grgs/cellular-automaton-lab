@@ -8,14 +8,7 @@ None.
 
 ## Current Known Deviations
 
-- `hat-monotile`
-  - stronger no-overlap diagnostics now detect positive-area polygon overlap at depth 3
-- `square-triangle`
-  - stronger no-overlap diagnostics now detect positive-area polygon overlap at depth 3
-- `shield`
-  - stronger no-overlap diagnostics now detect positive-area polygon overlap at depth 3
-- `pinwheel`
-  - stronger no-overlap diagnostics now detect positive-area polygon overlap at depth 3
+None.
 
 ## Known Limits That Are Not Currently Treated As Failures
 

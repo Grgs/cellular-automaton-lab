@@ -171,7 +171,7 @@ def recommended_validation_options(geometry: str) -> dict[str, bool]:
     }:
         return {
             "check_surface": False,
-            "check_overlaps": False,
+            "check_overlaps": True,
             "check_edge_multiplicity": False,
             "check_graph_connectivity": False,
         }

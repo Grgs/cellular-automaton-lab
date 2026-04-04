@@ -2,7 +2,9 @@ import * as polygonClipping from "polygon-clipping";
 
 import type { Point2D, PolygonGeometryCell } from "../types/rendering.js";
 
-const OVERLAP_AREA_EPSILON = 1e-4;
+const OVERLAP_AREA_EPSILON = 1e-3;
+const SANITIZE_EPSILON = 1e-6;
+const SANITIZE_DECIMALS = [6, 5, 4, 3] as const;
 
 export interface PolygonOverlap {
     leftId: string;
@@ -47,8 +49,94 @@ function boundsOverlap(left: PolygonGeometryCell, right: PolygonGeometryCell): b
     );
 }
 
-function toPolygon(vertices: readonly Point2D[]): polygonClipping.Polygon {
-    return [vertices.map((vertex) => [vertex.x, vertex.y] as polygonClipping.Pair)];
+function pointsEqual(left: polygonClipping.Pair, right: polygonClipping.Pair, epsilon: number): boolean {
+    return (
+        Math.abs(left[0] - right[0]) <= epsilon
+        && Math.abs(left[1] - right[1]) <= epsilon
+    );
+}
+
+function crossProduct(
+    left: polygonClipping.Pair,
+    middle: polygonClipping.Pair,
+    right: polygonClipping.Pair,
+): number {
+    return (
+        ((middle[0] - left[0]) * (right[1] - middle[1]))
+        - ((middle[1] - left[1]) * (right[0] - middle[0]))
+    );
+}
+
+function sanitizeRing(vertices: readonly Point2D[], decimals: number): polygonClipping.Pair[] {
+    const deduped: polygonClipping.Pair[] = [];
+    for (const vertex of vertices) {
+        const pair: polygonClipping.Pair = [
+            Number(vertex.x.toFixed(decimals)),
+            Number(vertex.y.toFixed(decimals)),
+        ];
+        const previous = deduped[deduped.length - 1];
+        if (previous && pointsEqual(previous, pair, SANITIZE_EPSILON)) {
+            continue;
+        }
+        deduped.push(pair);
+    }
+    if (
+        deduped.length >= 2
+        && pointsEqual(deduped[0] ?? [0, 0], deduped[deduped.length - 1] ?? [0, 0], SANITIZE_EPSILON)
+    ) {
+        deduped.pop();
+    }
+
+    let changed = true;
+    while (changed && deduped.length >= 3) {
+        changed = false;
+        for (let index = 0; index < deduped.length; index += 1) {
+            const previous = deduped[(index + deduped.length - 1) % deduped.length];
+            const current = deduped[index];
+            const next = deduped[(index + 1) % deduped.length];
+            if (!previous || !current || !next) {
+                continue;
+            }
+            if (Math.abs(crossProduct(previous, current, next)) <= SANITIZE_EPSILON) {
+                deduped.splice(index, 1);
+                changed = true;
+                break;
+            }
+        }
+    }
+    return deduped;
+}
+
+function toPolygon(vertices: readonly Point2D[], decimals: number = SANITIZE_DECIMALS[0]): polygonClipping.Polygon | null {
+    const ring = sanitizeRing(vertices, decimals);
+    if (ring.length < 3) {
+        return null;
+    }
+    return [ring];
+}
+
+function intersectPolygons(
+    leftVertices: readonly Point2D[],
+    rightVertices: readonly Point2D[],
+    leftId: string,
+    rightId: string,
+): polygonClipping.MultiPolygon {
+    let lastReason = "unknown polygon-clipping failure";
+    for (const decimals of SANITIZE_DECIMALS) {
+        const leftPolygon = toPolygon(leftVertices, decimals);
+        const rightPolygon = toPolygon(rightVertices, decimals);
+        if (!leftPolygon || !rightPolygon) {
+            return [];
+        }
+        try {
+            return polygonClipping.intersection(leftPolygon, rightPolygon);
+        } catch (error) {
+            lastReason = error instanceof Error ? error.message : String(error);
+        }
+    }
+    throw new Error(
+        `polygon-clipping failed for ${leftId} vs ${rightId}: ${lastReason}`,
+    );
 }
 
 export function findPositiveAreaPolygonOverlaps(
@@ -67,9 +155,11 @@ export function findPositiveAreaPolygonOverlaps(
             if (!right || !boundsOverlap(left, right)) {
                 continue;
             }
-            const intersection = polygonClipping.intersection(
-                toPolygon(left.vertices),
-                toPolygon(right.vertices),
+            const intersection = intersectPolygons(
+                left.vertices,
+                right.vertices,
+                left.cell.id,
+                right.cell.id,
             );
             const area = multiPolygonArea(intersection);
             if (area > areaEpsilon) {

@@ -8,7 +8,9 @@ from backend.simulation.aperiodic_support import AperiodicPatch, AperiodicPatchC
 _SQRT3_OVER_2 = math.sqrt(3) / 2
 _SQUARE_KIND = "square-triangle-square"
 _TRIANGLE_KIND = "square-triangle-triangle"
-_RING_STEP = 2.6
+# Keep the rosette sectors far enough apart that the representative patch stays
+# overlap-free under the shared strict overlap validator.
+_RING_STEP = 4.5
 
 
 def _rotate(point: tuple[float, float], angle: float) -> tuple[float, float]:

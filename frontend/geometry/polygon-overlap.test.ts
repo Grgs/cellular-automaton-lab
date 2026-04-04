@@ -100,25 +100,17 @@ describe("geometry/polygon-overlap", () => {
         return findPositiveAreaPolygonOverlaps(cache.cells, undefined, maxResults);
     }
 
-    it("keeps known-good polygon fixtures free of render-space overlap", async () => {
+    it("keeps representative polygon fixtures free of render-space overlap", async () => {
         for (const filename of [
             "archimedean-4-8-8-3x3.json",
             "chair-depth-3.json",
-        ]) {
-            const overlaps = await overlapsForFixture(filename);
-            expect(overlaps, filename).toEqual([]);
-        }
-    });
-
-    it("detects render-space overlap in currently problematic aperiodic fixtures", async () => {
-        for (const filename of [
             "hat-monotile-depth-3.json",
             "square-triangle-depth-3.json",
             "shield-depth-3.json",
             "pinwheel-depth-3.json",
         ]) {
-            const overlaps = await overlapsForFixture(filename, 1);
-            expect(overlaps.length, filename).toBeGreaterThan(0);
+            const overlaps = await overlapsForFixture(filename);
+            expect(overlaps, filename).toEqual([]);
         }
     }, 30_000);
 });

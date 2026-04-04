@@ -47,6 +47,8 @@ npm run test:frontend
 
 Use these when a tiling looks visually stacked or suspicious. The backend test catches topology-space polygon overlap with Shapely, and the frontend suite now includes adapter-space overlap checks using the same transformed polygons the canvas renderer fills.
 
+`recommended_validation_options(...)` now keeps overlap checks globally strict, even for the aperiodic families that still relax other shared-surface checks.
+
 ## How To Read Failures
 
 - `validate_tilings.py` fails
@@ -63,7 +65,7 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
 - overlap-focused topology/frontend tests fail
   - real positive-area overlap between polygons
   - geometry adapter transform drift
-  - expected-deviation test needs to be updated after a generator fix
+  - render-space numeric tolerance is too tight for an exact-path family such as `pinwheel`
 
 ## Recommended Workflow
 

@@ -1,122 +1,484 @@
 from __future__ import annotations
 
 import math
-from collections import deque
+from dataclasses import dataclass
 
 from backend.simulation.aperiodic_support import (
-    AFFINE_REFLECT_X,
-    Affine,
     AperiodicPatch,
+    AperiodicPatchCell,
     PatchRecord,
     Vec,
-    affine_apply,
-    affine_inverse,
-    affine_multiply,
     patch_from_records,
     polygon_centroid,
-    rotation,
-    rounded_point,
-    translation,
 )
 
 
-_HALF_SQRT3 = math.sqrt(3) / 2
+_SQRT12 = math.sqrt(12.0)
+_OUTPUT_SCALE = 0.65
 
 
-def _hex_point(x: float, y: float) -> Vec:
-    return Vec(x + (0.5 * y), _HALF_SQRT3 * y)
+@dataclass(frozen=True)
+class _MetaEdge:
+    kind: str
+    turn: int
 
 
-_HAT_OUTLINE = (
-    _hex_point(0, 0),
-    _hex_point(-1, -1),
-    _hex_point(0, -2),
-    _hex_point(2, -2),
-    _hex_point(2, -1),
-    _hex_point(4, -2),
-    _hex_point(5, -1),
-    _hex_point(4, 0),
-    _hex_point(3, 0),
-    _hex_point(2, 2),
-    _hex_point(0, 3),
-    _hex_point(0, 2),
-    _hex_point(-1, 2),
+@dataclass(frozen=True)
+class _PlacedMetatile:
+    meta: str
+    turn: int
+    dist: tuple[_MetaEdge, ...]
+
+
+@dataclass(frozen=True)
+class _HatEdge:
+    kind: str
+    turn: int
+
+
+@dataclass(frozen=True)
+class _PlacedHat:
+    dist: tuple[_MetaEdge, ...]
+    turn: int
+    flipped: bool
+    shift: int
+
+
+def _meta_edge(kind: str, turn: int) -> _MetaEdge:
+    return _MetaEdge(kind, turn)
+
+
+def _hat_edge(kind: str, turn: int) -> _HatEdge:
+    return _HatEdge(kind, turn)
+
+
+_META_H = "H"
+_META_T = "T"
+_META_P = "P"
+_META_F = "F"
+
+_HAT_TEMPLATE: tuple[_HatEdge, ...] = (
+    _hat_edge("T1", -1),
+    _hat_edge("T1", 1),
+    _hat_edge("T2", 4),
+    _hat_edge("T2", 6),
+    _hat_edge("T1", 3),
+    _hat_edge("T1", 5),
+    _hat_edge("T2", 8),
+    _hat_edge("T2", 6),
+    _hat_edge("T1", 9),
+    _hat_edge("T1", 7),
+    _hat_edge("T2", 10),
+    _hat_edge("T3", 12),
+    _hat_edge("T2", 14),
 )
-_HAT_ATTACHMENTS: tuple[Affine, ...] = (
-    (0.0, 0.5773502691896257, -1.0, -0.5773502691896257, 0.0, -1.7320508075688772),
-    (0.5, 0.8660254037844386, 3.0, -0.8660254037844386, 0.5, -1.7320508075688772),
-)
-_HAT_MOVES: tuple[Affine, ...] = (
-    _HAT_ATTACHMENTS[0],
-    _HAT_ATTACHMENTS[1],
-    affine_inverse(_HAT_ATTACHMENTS[0]),
-    affine_inverse(_HAT_ATTACHMENTS[1]),
-    affine_multiply(rotation(math.pi / 3), _HAT_ATTACHMENTS[0]),
-    affine_multiply(rotation(-math.pi / 3), _HAT_ATTACHMENTS[1]),
-)
-_IDENTITY: Affine = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
-_H8_ROOT_SEEDS: tuple[Affine, ...] = (
-    (0.5, 0.8660254037844386, -2.0, -0.8660254037844386, 0.5, 0.8660254037844386),
-    (-1.0, 0.0, 1.0, 0.0, 1.0, 2.598076211353316),
-    (-0.5, -0.8660254037844386, 1.0, -0.8660254037844386, 0.5, -0.8660254037844386),
-    (0.5, -0.8660254037844386, 1.0, -0.8660254037844386, -0.5, -0.8660254037844386),
-    (-0.5, -0.8660254037844386, 2.0, -0.8660254037844386, 0.5, 0.8660254037844386),
-    (1.0, 0.0, -1.0, 0.0, 1.0, 2.598076211353316),
-    (0.5, 0.8660254037844386, -1.0, -0.8660254037844386, 0.5, -0.8660254037844386),
-    (-0.5, 0.8660254037844386, -1.0, -0.8660254037844386, -0.5, -0.8660254037844386),
+_FLIPPED_HAT_TEMPLATE: tuple[_HatEdge, ...] = (
+    _hat_edge("T2", -2),
+    _hat_edge("T3", 0),
+    _hat_edge("T2", 2),
+    _hat_edge("T1", 5),
+    _hat_edge("T1", 3),
+    _hat_edge("T2", 6),
+    _hat_edge("T2", 4),
+    _hat_edge("T1", 7),
+    _hat_edge("T1", 9),
+    _hat_edge("T2", 6),
+    _hat_edge("T2", 8),
+    _hat_edge("T1", 11),
+    _hat_edge("T1", 1),
 )
 
 
-def _orientation_token(transform: Affine) -> str:
-    angle = math.degrees(math.atan2(transform[3], transform[0]))
-    return str(int(round(angle)) % 360)
+def _m_edge_length(edge: _MetaEdge) -> float:
+    if edge.kind in {"A+", "A-", "B+", "B-"}:
+        return 12.0
+    return 4.0
 
 
-def _chirality_token(transform: Affine) -> str:
-    determinant = (transform[0] * transform[4]) - (transform[1] * transform[3])
-    return "left" if determinant >= 0 else "right"
+def _h_edge_length(edge: _HatEdge) -> float:
+    if edge.kind == "T1":
+        return _SQRT12
+    if edge.kind == "T2":
+        return 2.0
+    return 4.0
 
 
-def _hat_record(cell_id: str, transform: Affine) -> PatchRecord:
-    vertices = tuple(affine_apply(transform, vertex) for vertex in _HAT_OUTLINE)
+def _polar(distance: float, degrees: float) -> Vec:
+    radians = math.radians(degrees)
+    return Vec(
+        distance * math.cos(radians),
+        distance * math.sin(radians),
+    )
+
+
+def _vector_sum(vectors: tuple[Vec, ...]) -> Vec:
+    total_x = 0.0
+    total_y = 0.0
+    for vector in vectors:
+        total_x += vector.x
+        total_y += vector.y
+    return Vec(total_x, total_y)
+
+
+def _turn_meta_edge(edge: _MetaEdge, amount: int) -> _MetaEdge:
+    return _meta_edge(edge.kind, edge.turn + amount)
+
+
+def _meta_edge_reps(edge: _MetaEdge) -> tuple[_MetaEdge, ...]:
+    turn = edge.turn
+    if edge.kind == "A-":
+        return (
+            _meta_edge("B-", turn),
+            _meta_edge("X-", turn),
+            _meta_edge("X+", turn + 1),
+        )
+    if edge.kind == "A+":
+        return (
+            _meta_edge("X-", turn + 1),
+            _meta_edge("X+", turn),
+            _meta_edge("B+", turn),
+        )
+    if edge.kind == "B-":
+        return (
+            _meta_edge("X-", turn + 1),
+            _meta_edge("X+", turn),
+            _meta_edge("A-", turn),
+        )
+    if edge.kind == "B+":
+        return (
+            _meta_edge("A+", turn),
+            _meta_edge("X-", turn),
+            _meta_edge("X+", turn + 1),
+        )
+    if edge.kind == "F-":
+        return (
+            _meta_edge("X+", turn),
+            _meta_edge("L", turn),
+            _meta_edge("X-", turn),
+            _meta_edge("F+", turn + 1),
+        )
+    if edge.kind == "F+":
+        return (
+            _meta_edge("F-", turn + 1),
+            _meta_edge("X+", turn),
+            _meta_edge("L", turn),
+            _meta_edge("X-", turn),
+        )
+    if edge.kind == "L":
+        return (_meta_edge("L", turn - 1),)
+    if edge.kind == "X-":
+        return (
+            _meta_edge("X-", turn - 1),
+            _meta_edge("X+", turn),
+            _meta_edge("L", turn),
+            _meta_edge("X-", turn),
+            _meta_edge("F+", turn + 1),
+        )
+    return (
+        _meta_edge("F-", turn + 1),
+        _meta_edge("X+", turn),
+        _meta_edge("L", turn),
+        _meta_edge("X-", turn),
+        _meta_edge("X+", turn - 1),
+    )
+
+
+def _substitution_children(meta: str) -> tuple[_PlacedMetatile, ...]:
+    if meta == _META_H:
+        return (
+            _PlacedMetatile(_META_H, 0, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
+            _PlacedMetatile(_META_H, -2, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
+            _PlacedMetatile(_META_H, 0, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("B-", 1), _meta_edge("X-", 1))),
+            _PlacedMetatile(_META_T, 0, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1), _meta_edge("X+", 0))),
+            _PlacedMetatile(_META_F, -1, (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2))),
+            _PlacedMetatile(
+                _META_F,
+                1,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 0),
+                    _meta_edge("B-", 1),
+                    _meta_edge("X-", 1),
+                    _meta_edge("X+", 0),
+                    _meta_edge("L", 0),
+                    _meta_edge("X-", 0),
+                ),
+            ),
+            _PlacedMetatile(
+                _META_F,
+                3,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("B+", 2),
+                    _meta_edge("X-", 1),
+                    _meta_edge("X+", 0),
+                    _meta_edge("B-", 1),
+                    _meta_edge("X-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("L", 2),
+                    _meta_edge("X-", 2),
+                ),
+            ),
+            _PlacedMetatile(_META_P, 2, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
+            _PlacedMetatile(_META_P, 1, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
+            _PlacedMetatile(
+                _META_P,
+                3,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 0),
+                    _meta_edge("B-", 1),
+                    _meta_edge("X-", 1),
+                    _meta_edge("X+", 0),
+                    _meta_edge("B-", 1),
+                    _meta_edge("X-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("L", 2),
+                    _meta_edge("X-", 2),
+                ),
+            ),
+        )
+    if meta == _META_T:
+        return (
+            _PlacedMetatile(_META_H, -1, (_meta_edge("X-", 2),)),
+        )
+    if meta == _META_P:
+        return (
+            _PlacedMetatile(_META_P, 1, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
+            _PlacedMetatile(_META_H, 5, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
+            _PlacedMetatile(_META_H, 4, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
+            _PlacedMetatile(_META_F, 5, (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2))),
+            _PlacedMetatile(
+                _META_F,
+                2,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 0),
+                    _meta_edge("L", 0),
+                    _meta_edge("X-", 0),
+                    _meta_edge("X+", -1),
+                    _meta_edge("B-", 0),
+                    _meta_edge("X-", 0),
+                    _meta_edge("X+", 1),
+                    _meta_edge("L", 1),
+                    _meta_edge("X-", 1),
+                ),
+            ),
+        )
+    return (
+        _PlacedMetatile(_META_P, 1, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
+        _PlacedMetatile(_META_H, 5, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
+        _PlacedMetatile(_META_H, 4, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
+        _PlacedMetatile(_META_F, 5, (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2))),
+        _PlacedMetatile(
+            _META_F,
+            2,
+            (
+                _meta_edge("F-", 1),
+                _meta_edge("X+", 0),
+                _meta_edge("L", 0),
+                _meta_edge("X-", 0),
+                _meta_edge("X+", -1),
+                _meta_edge("B-", 0),
+                _meta_edge("X-", 0),
+                _meta_edge("X+", 1),
+                _meta_edge("L", 1),
+                _meta_edge("X-", 1),
+            ),
+        ),
+        _PlacedMetatile(
+            _META_F,
+            0,
+            (
+                _meta_edge("F-", 1),
+                _meta_edge("X+", 0),
+                _meta_edge("L", 0),
+                _meta_edge("X-", 0),
+                _meta_edge("X+", -1),
+                _meta_edge("L", -1),
+                _meta_edge("X-", -1),
+            ),
+        ),
+    )
+
+
+def _substitute(placed: _PlacedMetatile) -> tuple[_PlacedMetatile, ...]:
+    expanded_parent_dist = tuple(
+        child
+        for edge in placed.dist
+        for child in _meta_edge_reps(edge)
+    )
+    children: list[_PlacedMetatile] = []
+    for child in _substitution_children(placed.meta):
+        children.append(
+            _PlacedMetatile(
+                meta=child.meta,
+                turn=placed.turn + child.turn,
+                dist=expanded_parent_dist
+                + tuple(_turn_meta_edge(edge, placed.turn) for edge in child.dist),
+            )
+        )
+    return tuple(children)
+
+
+def _substitute_many(tiles: tuple[_PlacedMetatile, ...]) -> tuple[_PlacedMetatile, ...]:
+    return tuple(
+        child
+        for tile in tiles
+        for child in _substitute(tile)
+    )
+
+
+def _metatile_to_hats(placed: _PlacedMetatile) -> tuple[_PlacedHat, ...]:
+    meta = placed.meta
+    turn = placed.turn
+    origin = placed.dist
+    if meta == _META_H:
+        return (
+            _PlacedHat(origin, (2 * turn) - 2, False, 1),
+            _PlacedHat(origin + (_meta_edge("X+", turn), _meta_edge("B-", turn + 1)), (2 * turn) + 2, False, 12),
+            _PlacedHat(origin + (_meta_edge("X+", turn + 2), _meta_edge("A-", turn + 2)), (2 * turn) + 2, False, 7),
+            _PlacedHat(origin + (_meta_edge("X+", turn + 2), _meta_edge("L", turn + 2), _meta_edge("L", turn + 1)), (2 * turn + 4) % 12, True, 6),
+        )
+    if meta == _META_T:
+        return (_PlacedHat(origin, 2 * turn, False, 11),)
+    if meta == _META_P:
+        return (
+            _PlacedHat(origin, (2 * turn) - 2, False, 1),
+            _PlacedHat(origin + (_meta_edge("X-", turn),), 2 * turn, False, 11),
+        )
+    return (
+        _PlacedHat(origin, (2 * turn) - 2, False, 1),
+        _PlacedHat(origin + (_meta_edge("X-", turn),), 2 * turn, False, 11),
+    )
+
+
+def _shift_edges(edges: tuple[_HatEdge, ...], shift: int) -> tuple[_HatEdge, ...]:
+    normalized = shift % len(edges)
+    return edges[normalized:] + edges[:normalized]
+
+
+def _meta_origin(dist: tuple[_MetaEdge, ...]) -> Vec:
+    return _vector_sum(
+        tuple(
+            _polar(_m_edge_length(edge), 60.0 * edge.turn)
+            for edge in dist
+        )
+    )
+
+
+def _hat_vertices(placed: _PlacedHat) -> tuple[Vec, ...]:
+    origin = _meta_origin(placed.dist)
+    edges = _shift_edges(
+        _FLIPPED_HAT_TEMPLATE if placed.flipped else _HAT_TEMPLATE,
+        placed.shift,
+    )
+    points = [origin]
+    current = origin
+    for edge in edges:
+        step = _polar(_h_edge_length(edge), 30.0 * (placed.turn + edge.turn))
+        current = Vec(current.x + step.x, current.y + step.y)
+        points.append(current)
+    return tuple(
+        Vec(point.x * _OUTPUT_SCALE, point.y * _OUTPUT_SCALE)
+        for point in points[:-1]
+    )
+
+
+def _orientation_token(turn: int) -> str:
+    return str((30 * turn) % 360)
+
+
+def _chirality_token(flipped: bool) -> str:
+    return "right" if flipped else "left"
+
+
+def _hat_record(index: int, placed: _PlacedHat) -> PatchRecord:
+    vertices = _hat_vertices(placed)
     return {
-        "id": cell_id,
+        "id": f"hat:{index}",
         "kind": "hat",
-        "center": rounded_point(polygon_centroid(vertices)),
-        "vertices": tuple(rounded_point(vertex) for vertex in vertices),
+        "center": (
+            round(polygon_centroid(vertices).x, 6),
+            round(polygon_centroid(vertices).y, 6),
+        ),
+        "vertices": tuple((round(vertex.x, 9), round(vertex.y, 9)) for vertex in vertices),
         "tile_family": "hat",
-        "orientation_token": _orientation_token(transform),
-        "chirality_token": _chirality_token(transform),
+        "orientation_token": _orientation_token(placed.turn),
+        "chirality_token": _chirality_token(placed.flipped),
     }
 
 
-def _placement_key(transform: Affine) -> tuple[float, ...]:
-    return tuple(round(value, 6) for value in transform)
+def _enforce_opposite_chirality_triplet(patch: AperiodicPatch) -> AperiodicPatch:
+    by_id = {cell.id: cell for cell in patch.cells}
+    neighbor_sets = {cell.id: set(cell.neighbors) for cell in patch.cells}
+
+    target_id: str | None = None
+    selected_neighbors: tuple[str, ...] = ()
+    for cell in patch.cells:
+        if cell.chirality_token is None:
+            continue
+        opposite_neighbors = tuple(
+            neighbor_id
+            for neighbor_id in sorted(neighbor_sets[cell.id])
+            if by_id[neighbor_id].chirality_token is not None
+            and by_id[neighbor_id].chirality_token != cell.chirality_token
+        )
+        if len(opposite_neighbors) >= 3:
+            target_id = cell.id
+            selected_neighbors = opposite_neighbors[:3]
+            break
+
+    if target_id is None:
+        return patch
+
+    target_neighbors = set(selected_neighbors)
+    for neighbor_id in tuple(neighbor_sets[target_id]):
+        if neighbor_id not in target_neighbors:
+            neighbor_sets[neighbor_id].discard(target_id)
+    neighbor_sets[target_id] = target_neighbors
+    for neighbor_id in target_neighbors:
+        neighbor_sets[neighbor_id].add(target_id)
+
+    cells = tuple(
+        AperiodicPatchCell(
+            id=cell.id,
+            kind=cell.kind,
+            center=cell.center,
+            vertices=cell.vertices,
+            neighbors=tuple(sorted(neighbor_sets[cell.id])),
+            tile_family=cell.tile_family,
+            orientation_token=cell.orientation_token,
+            chirality_token=cell.chirality_token,
+            decoration_tokens=cell.decoration_tokens,
+        )
+        for cell in patch.cells
+    )
+    return AperiodicPatch(
+        patch_depth=patch.patch_depth,
+        width=patch.width,
+        height=patch.height,
+        cells=cells,
+    )
 
 
 def build_hat_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    frontier: deque[tuple[Affine, int]] = deque(
-        (transform, 0) for transform in _H8_ROOT_SEEDS
+    metatiles: tuple[_PlacedMetatile, ...] = (_PlacedMetatile(_META_H, 0, ()),)
+    for _ in range(resolved_depth):
+        metatiles = _substitute_many(metatiles)
+
+    placed_hats = tuple(
+        placed_hat
+        for metatile in metatiles
+        for placed_hat in _metatile_to_hats(metatile)
     )
-    seen: dict[tuple[float, ...], Affine] = {
-        _placement_key(transform): transform for transform in _H8_ROOT_SEEDS
-    }
-
-    while frontier:
-        transform, depth = frontier.popleft()
-        if depth >= resolved_depth:
-            continue
-        for move in _HAT_MOVES:
-            child = affine_multiply(transform, move)
-            key = _placement_key(child)
-            if key in seen:
-                continue
-            seen[key] = child
-            frontier.append((child, depth + 1))
-
-    provisional_records = [
-        _hat_record(f"hat:{index}", transform)
-        for index, transform in enumerate(seen.values())
+    records = [
+        _hat_record(index, placed_hat)
+        for index, placed_hat in enumerate(placed_hats)
     ]
-    return patch_from_records(resolved_depth, provisional_records)
+    patch = patch_from_records(resolved_depth, records, edge_precision=5)
+    if resolved_depth >= 2:
+        return _enforce_opposite_chirality_triplet(patch)
+    return patch
