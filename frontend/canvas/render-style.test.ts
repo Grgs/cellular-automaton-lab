@@ -200,6 +200,69 @@ describe("canvas/render-style", () => {
         });
     });
 
+    it("renders Shield decoration tokens with distinct dead-state accents", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: {
+                    id: "shield:arrow",
+                    state: 0,
+                    kind: "shield-shield",
+                    tile_family: "shield",
+                    decoration_tokens: ["arrow-0", "ring-0"],
+                },
+                expectedColor: "#d5bb8f",
+            },
+            {
+                cell: {
+                    id: "shield:fill",
+                    state: 0,
+                    kind: "shield-shield",
+                    tile_family: "shield",
+                    decoration_tokens: ["fill-1", "ring-1"],
+                },
+                expectedColor: "#e1cdac",
+            },
+            {
+                cell: {
+                    id: "shield:tri-left",
+                    state: 0,
+                    kind: "shield-triangle",
+                    tile_family: "shield",
+                    chirality_token: "left",
+                    decoration_tokens: ["arm-bottom-left", "phase-0"],
+                },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: {
+                    id: "shield:tri-right",
+                    state: 0,
+                    kind: "shield-triangle",
+                    tile_family: "shield",
+                    chirality_token: "right",
+                    decoration_tokens: ["arm-top-right", "phase-1"],
+                },
+                expectedColor: "#dcc39a",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "shield", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "shield",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
     it("reads canvas line tokens and applies them to the resolved render style", async () => {
         const { readCanvasColors, resolveCanvasRenderStyle } = await import("./render-style.js");
         const canvas = document.createElement("canvas");

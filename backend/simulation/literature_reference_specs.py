@@ -27,6 +27,7 @@ class PeriodicDescriptorExpectation:
     expected_interior_vertex_configurations: tuple[tuple[str, ...], ...]
     expected_interior_vertex_configuration_frequencies: tuple[tuple[tuple[str, ...], int], ...]
     expected_dual_geometry: str | None = None
+    canonical_grid_size: tuple[int, int] | None = None
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,10 @@ class ReferenceDepthExpectation:
     min_unique_chirality_tokens: int | None = None
     min_three_opposite_chirality_neighbor_cells: int | None = None
     min_unique_polygon_areas_by_kind: tuple[tuple[str, int], ...] | None = None
+    expected_polygon_area_frequencies_by_kind: tuple[
+        tuple[str, tuple[tuple[float, int], ...]],
+        ...
+    ] | None = None
     min_unique_decoration_variants_by_kind: tuple[tuple[str, int], ...] | None = None
     min_bounds_longest_span: float | None = None
     max_bounds_aspect_ratio: float | None = None
@@ -888,9 +893,22 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 exact_total_cells=13,
                 required_adjacency_pairs=(("chair", "chair"),),
                 min_unique_polygon_areas_by_kind=(("chair", 2),),
+                expected_polygon_area_frequencies_by_kind=(
+                    ("chair", ((3.0, 12), (12.0, 1))),
+                ),
             ),
-            2: ReferenceDepthExpectation(exact_total_cells=25),
-            3: ReferenceDepthExpectation(exact_total_cells=37),
+            2: ReferenceDepthExpectation(
+                exact_total_cells=25,
+                expected_polygon_area_frequencies_by_kind=(
+                    ("chair", ((3.0, 12), (12.0, 13))),
+                ),
+            ),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=37,
+                expected_polygon_area_frequencies_by_kind=(
+                    ("chair", ((3.0, 12), (12.0, 13), (48.0, 12))),
+                ),
+            ),
         },
         notes=(
             "The representative patch is a deterministic multiscale chair hierarchy.",

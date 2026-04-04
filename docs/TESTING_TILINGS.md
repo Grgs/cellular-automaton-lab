@@ -24,6 +24,8 @@ It now also checks that canonical samples are contiguous in the topology neighbo
 
 It also now checks that canonical samples do not enclose empty holes in the merged topology surface. That means a tiling can be connected and overlap-free, yet still fail literature verification if it forms a ring of cells around bounded empty gaps.
 
+For periodic families, it also checks periodic-face descriptor semantics, exact interior vertex-star sets/frequencies, and selected reciprocal dual-family invariants. For strengthened substitution families, it can also check exact polygon-area frequencies and rooted local-reference fixtures rather than relying only on counts/signatures.
+
 ### 3. Focused verifier unit tests
 
 ```powershell
@@ -53,6 +55,24 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
 
 `recommended_validation_options(...)` now keeps overlap checks globally strict, even for the aperiodic families that still relax other shared-surface checks.
 
+The frontend adapter-space overlap helper is intentionally looser than the backend check: its current positive-area epsilon is `2e-4` so known-good exact-path families such as `pinwheel` do not fail on polygon-clipping noise.
+
+### 6. Verification-strength report
+
+```powershell
+py -3 tools/report_tiling_verification_strength.py
+```
+
+Use this when you want a quick per-family summary of which invariant layers are currently active, such as descriptor checks, local-reference fixtures, exact-path verification, or strict validation.
+
+### 7. Browser-visible geometry sanity
+
+```powershell
+npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geometry/render-bounds.test.ts
+```
+
+Use these when you need a browser-side sanity pass on representative rendered fixtures, not just backend topology-space geometry.
+
 ## How To Read Failures
 
 - `validate_tilings.py` fails
@@ -72,6 +92,9 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
   - real positive-area overlap between polygons
   - geometry adapter transform drift
   - render-space numeric tolerance is too tight for an exact-path family such as `pinwheel`
+- render-bounds tests fail
+  - rendered geometry is collapsing or stretching relative to the source topology
+  - geometry adapter metrics changed in a way that the backend topology validator cannot see
 
 ## Recommended Workflow
 
@@ -86,7 +109,9 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
 ## Notes
 
 - Regular and periodic families are verified on canonical `3x3` samples.
+- Periodic families now read their canonical sample size from the reference spec; the current shipped catalog still uses `3x3`.
 - Aperiodic families are verified on patch-depth samples.
+- Several strengthened substitution families also use checked-in rooted local-reference fixtures.
 - Pinwheel has an exact-affine verification path and derives contiguity from exact positive-length segment-overlap neighbors, so it should not be treated like the other families when debugging verification failures.
 - The strongest “tiles do not obscure each other” check is now split across backend topology-space overlap detection and frontend adapter-space overlap detection.
 - Canonical-sample contiguity is now part of literature verification, so a family can be geometrically sane but still blocked if its neighbor graph splits into multiple components.

@@ -239,18 +239,27 @@ class TopologyValidationTests(unittest.TestCase):
         self.assertEqual(validation.hole_count, 0)
         self.assertFalse(validation.edge_multiplicity_issues)
 
-    def test_kagome_uses_strict_exact_surface_policy(self) -> None:
-        options = recommended_validation_options("trihexagonal-3-6-3-6")
+    def test_strict_validation_defaults_apply_to_periodic_and_repaired_aperiodic_families(self) -> None:
+        for geometry in (
+            "trihexagonal-3-6-3-6",
+            HAT_MONOTILE_GEOMETRY,
+            TUEBINGEN_TRIANGLE_GEOMETRY,
+            SQUARE_TRIANGLE_GEOMETRY,
+            SHIELD_GEOMETRY,
+            PINWHEEL_GEOMETRY,
+        ):
+            with self.subTest(geometry=geometry):
+                options = recommended_validation_options(geometry)
 
-        self.assertEqual(
-            options,
-            {
-                "check_surface": True,
-                "check_overlaps": True,
-                "check_edge_multiplicity": True,
-                "check_graph_connectivity": True,
-            },
-        )
+                self.assertEqual(
+                    options,
+                    {
+                        "check_surface": True,
+                        "check_overlaps": True,
+                        "check_edge_multiplicity": True,
+                        "check_graph_connectivity": True,
+                    },
+                )
 
     def test_validator_flags_asymmetric_neighbor_links(self) -> None:
         topology = LatticeTopology(
