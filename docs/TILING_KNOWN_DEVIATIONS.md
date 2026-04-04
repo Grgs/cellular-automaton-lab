@@ -4,6 +4,12 @@ This file tracks known mismatches between the current app implementation and the
 
 ## Current Blocking Deviations
 
+- `square-triangle`
+  Canonical literature verification now blocks because the depth-3 sample is connected but still leaves enclosed empty gaps rather than a hole-free surface.
+
+- `shield`
+  Canonical literature verification now blocks because the depth-3 sample is connected but still encloses empty holes inside the merged polygon surface.
+
 - `pinwheel`
   Canonical literature verification now blocks because the depth-3 sample splits into many disconnected topology-graph components in the neighbor graph the app actually uses.
 

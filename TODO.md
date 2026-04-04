@@ -2,6 +2,7 @@
 
 ## Now
 
+- Repair `square-triangle` and `shield` so their canonical depth-3 samples are hole-free.
 - Repair `pinwheel` so the canonical depth-3 sample forms one connected topology component.
 - Replace generic fallback periodic sources with stronger family-specific references where possible.
 - Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.

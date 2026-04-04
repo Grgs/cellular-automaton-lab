@@ -31,6 +31,7 @@ class ReferenceDepthExpectation:
     exact_total_cells: int | None = None
     minimum_total_cells: int | None = None
     require_connected_graph: bool = True
+    require_hole_free_surface: bool = True
     expected_kind_counts: tuple[tuple[str, int], ...] | None = None
     required_kinds: tuple[str, ...] = ()
     expected_adjacency_pairs: tuple[tuple[str, str], ...] | None = None

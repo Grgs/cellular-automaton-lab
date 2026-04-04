@@ -22,6 +22,8 @@ Use this second. It checks the canonical samples against the source-backed invar
 
 It now also checks that canonical samples are contiguous in the topology neighbor graph. That means `verify_reference_tilings.py` can fail even when `validate_tilings.py` still passes, because graph contiguity is now treated as a literature-backed invariant rather than only a shared-validator option.
 
+It also now checks that canonical samples do not enclose empty holes in the merged topology surface. That means a tiling can be connected and overlap-free, yet still fail literature verification if it forms a ring of cells around bounded empty gaps.
+
 ### 3. Focused verifier unit tests
 
 ```powershell
@@ -61,6 +63,7 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
   - wrong source-backed invariant
   - stale expected signature after an intentional generator change
   - canonical sample is disconnected in the topology graph even though geometry sanity still passes
+  - canonical sample leaves enclosed empty holes even though connectivity and overlap checks still pass
 - `test_literature_reference_verification` fails
   - spec coverage mismatch
   - verifier behavior changed
@@ -87,3 +90,4 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
 - Pinwheel has an exact-affine verification path and should not be treated like the other families when debugging verification failures.
 - The strongest “tiles do not obscure each other” check is now split across backend topology-space overlap detection and frontend adapter-space overlap detection.
 - Canonical-sample contiguity is now part of literature verification, so a family can be geometrically sane but still blocked if its neighbor graph splits into multiple components.
+- Canonical-sample hole freedom is now part of literature verification too, so a family can be connected and overlap-clean but still blocked if it surrounds bounded empty regions.

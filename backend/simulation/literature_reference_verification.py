@@ -30,7 +30,7 @@ from backend.simulation.periodic_face_tilings import (
 )
 from backend.simulation.topology import build_topology
 from backend.simulation.topology_types import LatticeCell, LatticeTopology
-from backend.simulation.topology_validation import build_topology_graph
+from backend.simulation.topology_validation import build_topology_graph, validate_topology
 
 
 VerificationStatus = Literal["PASS", "KNOWN_DEVIATION", "FAIL"]
@@ -56,6 +56,8 @@ class ReferencePatchObservation:
     disconnected_component_sizes: tuple[int, ...]
     largest_component_size: int
     isolated_cell_count: int
+    surface_component_count: int | None
+    hole_count: int
     unique_orientation_tokens: int
     unique_chirality_tokens: int
     chirality_adjacency_pairs: tuple[tuple[str, str], ...]
@@ -251,6 +253,13 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
         largest_component_size,
         isolated_cell_count,
     ) = _topology_connectivity_stats(topology)
+    surface_validation = validate_topology(
+        topology,
+        check_surface=True,
+        check_overlaps=False,
+        check_edge_multiplicity=False,
+        check_graph_connectivity=False,
+    )
     unique_orientation_tokens = len(
         {
             cell.orientation_token
@@ -277,6 +286,8 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
         disconnected_component_sizes=disconnected_component_sizes,
         largest_component_size=largest_component_size,
         isolated_cell_count=isolated_cell_count,
+        surface_component_count=surface_validation.surface_component_count,
+        hole_count=surface_validation.hole_count,
         unique_orientation_tokens=unique_orientation_tokens,
         unique_chirality_tokens=unique_chirality_tokens,
         chirality_adjacency_pairs=tuple(sorted(chirality_adjacency_pairs)),
@@ -366,6 +377,17 @@ def _expectation_failures(
                     f"Depth {observation.depth} expected a single connected topology component but saw "
                     f"{observation.connected_component_count} components with sizes "
                     f"{_component_size_summary(observation.disconnected_component_sizes)}."
+                ),
+                depth=observation.depth,
+            )
+        )
+    if expectation.require_hole_free_surface and observation.hole_count != 0:
+        failures.append(
+            ReferenceCheckFailure(
+                code="surface-holes",
+                message=(
+                    f"Depth {observation.depth} expected a hole-free surface but saw "
+                    f"{observation.hole_count} enclosed gap(s)."
                 ),
                 depth=observation.depth,
             )

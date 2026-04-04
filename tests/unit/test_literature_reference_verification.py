@@ -36,6 +36,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(first.adjacency_pairs, second.adjacency_pairs)
         self.assertEqual(first.connected_component_count, second.connected_component_count)
         self.assertEqual(first.disconnected_component_sizes, second.disconnected_component_sizes)
+        self.assertEqual(first.hole_count, second.hole_count)
 
     def test_reference_observation_records_connectivity_stats(self) -> None:
         observation = observe_reference_patch("pinwheel", 3)
@@ -48,7 +49,18 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         )
         self.assertGreater(observation.isolated_cell_count, 0)
 
-    def test_reference_verifier_reports_passes_and_blocking_connectivity_failures(self) -> None:
+    def test_reference_observation_records_surface_hole_stats(self) -> None:
+        square_triangle_observation = observe_reference_patch("square-triangle", 3)
+        shield_observation = observe_reference_patch("shield", 3)
+        chair_observation = observe_reference_patch("chair", 3)
+        hat_observation = observe_reference_patch("hat-monotile", 3)
+
+        self.assertGreater(square_triangle_observation.hole_count, 0)
+        self.assertGreater(shield_observation.hole_count, 0)
+        self.assertEqual(chair_observation.hole_count, 0)
+        self.assertEqual(hat_observation.hole_count, 0)
+
+    def test_reference_verifier_reports_passes_and_blocking_surface_or_connectivity_failures(self) -> None:
         results = {
             result.geometry: result
             for result in verify_all_reference_families()
@@ -72,8 +84,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["spectre"].status, "PASS")
         self.assertEqual(results["sphinx"].status, "PASS")
         self.assertEqual(results["robinson-triangles"].status, "PASS")
-        self.assertEqual(results["square-triangle"].status, "PASS")
-        self.assertEqual(results["shield"].status, "PASS")
+        self.assertEqual(results["square-triangle"].status, "FAIL")
+        self.assertEqual(results["shield"].status, "FAIL")
         self.assertEqual(results["pinwheel"].status, "FAIL")
         self.assertFalse(results["chair"].waived)
         self.assertFalse(results["hat-monotile"].waived)
@@ -81,10 +93,11 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertFalse(results["pinwheel"].waived)
         self.assertFalse(results["chair"].blocking)
         self.assertFalse(results["hat-monotile"].blocking)
-        self.assertFalse(results["shield"].blocking)
+        self.assertTrue(results["square-triangle"].blocking)
+        self.assertTrue(results["shield"].blocking)
         self.assertTrue(results["pinwheel"].blocking)
 
-    def test_connected_representative_families_remain_connected_under_verifier(self) -> None:
+    def test_connected_representative_families_remain_connected_under_observation(self) -> None:
         for geometry in (
             "chair",
             "hat-monotile",
@@ -95,7 +108,6 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             with self.subTest(geometry=geometry):
                 result = verify_reference_family(geometry)
                 deepest_observation = result.observations[-1]
-                self.assertEqual(result.status, "PASS")
                 self.assertEqual(deepest_observation.connected_component_count, 1)
                 self.assertEqual(deepest_observation.disconnected_component_sizes, ())
 
@@ -165,15 +177,24 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             result.observations[2].three_opposite_chirality_neighbor_cells,
             1,
         )
+        self.assertEqual(result.observations[-1].hole_count, 0)
 
     def test_shield_reference_verifier_accepts_decoration_variants(self) -> None:
         result = verify_reference_family("shield")
 
-        self.assertEqual(result.status, "PASS")
-        self.assertFalse(result.failures)
+        self.assertEqual(result.status, "FAIL")
+        self.assertTrue(any(failure.code == "surface-holes" for failure in result.failures))
         decoration_counts = dict(result.observations[1].unique_decoration_variants_by_kind)
         self.assertGreaterEqual(decoration_counts["shield-shield"], 2)
         self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
+        self.assertGreater(result.observations[-1].hole_count, 0)
+
+    def test_square_triangle_reference_verifier_flags_surface_holes(self) -> None:
+        result = verify_reference_family("square-triangle")
+
+        self.assertEqual(result.status, "FAIL")
+        self.assertTrue(any(failure.code == "surface-holes" for failure in result.failures))
+        self.assertGreater(result.observations[-1].hole_count, 0)
 
     def test_pinwheel_reference_verifier_tracks_expanding_support(self) -> None:
         result = verify_reference_family("pinwheel")
@@ -185,7 +206,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             all(left < right for left, right in zip(spans, spans[1:]))
         )
 
-    def test_reference_tool_returns_failure_while_blocking_connectivity_regressions_exist(self) -> None:
+    def test_reference_tool_returns_failure_while_blocking_surface_or_connectivity_regressions_exist(self) -> None:
         self.assertEqual(verify_reference_main(), 1)
 
 

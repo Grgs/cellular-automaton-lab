@@ -150,6 +150,15 @@ def _bounds_overlap(left: Polygon, right: Polygon) -> bool:
     )
 
 
+def _significant_surface_hole_count(surfaces: tuple[Polygon, ...]) -> int:
+    count = 0
+    for surface in surfaces:
+        for interior in surface.interiors:
+            if Polygon(interior).area > _AREA_TOLERANCE:
+                count += 1
+    return count
+
+
 def build_topology_graph(topology: LatticeTopology) -> nx.Graph:
     graph = nx.Graph()
     graph.add_nodes_from(cell.id for cell in topology.cells)
@@ -271,7 +280,7 @@ def validate_topology(
                 if geometry.geom_type == "Polygon"
             )
         surface_component_count = len(surfaces)
-        hole_count = sum(len(surface.interiors) for surface in surfaces)
+        hole_count = _significant_surface_hole_count(surfaces)
 
     return TopologyValidationResult(
         geometry=topology.geometry,
