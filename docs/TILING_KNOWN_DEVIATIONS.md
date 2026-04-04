@@ -4,7 +4,10 @@ This file tracks known mismatches between the current app implementation and the
 
 ## Current Blocking Deviations
 
-None.
+- `shield`
+  Canonical literature verification now blocks because the depth-3 sample splits into many disconnected topology-graph components even though geometric sanity still passes.
+- `pinwheel`
+  Canonical literature verification now blocks because the depth-3 sample splits into many disconnected topology-graph components in the neighbor graph the app actually uses.
 
 ## Current Known Deviations
 

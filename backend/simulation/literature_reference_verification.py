@@ -9,6 +9,8 @@ import math
 import re
 from typing import Literal
 
+import networkx as nx
+
 from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
 from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.literature_reference_specs import (
@@ -28,6 +30,7 @@ from backend.simulation.periodic_face_tilings import (
 )
 from backend.simulation.topology import build_topology
 from backend.simulation.topology_types import LatticeCell, LatticeTopology
+from backend.simulation.topology_validation import build_topology_graph
 
 
 VerificationStatus = Literal["PASS", "KNOWN_DEVIATION", "FAIL"]
@@ -49,6 +52,10 @@ class ReferencePatchObservation:
     total_cells: int
     kind_counts: tuple[tuple[str, int], ...]
     degree_histogram: tuple[tuple[int, int], ...]
+    connected_component_count: int
+    disconnected_component_sizes: tuple[int, ...]
+    largest_component_size: int
+    isolated_cell_count: int
     unique_orientation_tokens: int
     unique_chirality_tokens: int
     chirality_adjacency_pairs: tuple[tuple[str, str], ...]
@@ -111,6 +118,33 @@ def _cells_bounds(cells: tuple[LatticeCell, ...]) -> tuple[float, float]:
     if not all_x or not all_y:
         return (0.0, 0.0)
     return (max(all_x) - min(all_x), max(all_y) - min(all_y))
+
+
+def _topology_connectivity_stats(topology: LatticeTopology) -> tuple[int, tuple[int, ...], int, int]:
+    graph = build_topology_graph(topology)
+    if graph.number_of_nodes() == 0:
+        return (0, (), 0, 0)
+    component_sizes = tuple(
+        sorted((len(component) for component in nx.connected_components(graph)), reverse=True)
+    )
+    largest_component_size = component_sizes[0] if component_sizes else 0
+    isolated_cell_count = sum(1 for size in component_sizes if size == 1)
+    disconnected_component_sizes = component_sizes if len(component_sizes) > 1 else ()
+    return (
+        len(component_sizes),
+        disconnected_component_sizes,
+        largest_component_size,
+        isolated_cell_count,
+    )
+
+
+def _component_size_summary(component_sizes: tuple[int, ...], *, limit: int = 12) -> str:
+    if not component_sizes:
+        return "()"
+    if len(component_sizes) <= limit:
+        return repr(component_sizes)
+    preview = ", ".join(str(size) for size in component_sizes[:limit])
+    return f"({preview}, ...)"
 
 
 def _polygon_area(vertices: tuple[tuple[float, float], ...]) -> float:
@@ -211,6 +245,12 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
         sum(1 for neighbor_id in cell.neighbors if neighbor_id is not None)
         for cell in topology.cells
     )
+    (
+        connected_component_count,
+        disconnected_component_sizes,
+        largest_component_size,
+        isolated_cell_count,
+    ) = _topology_connectivity_stats(topology)
     unique_orientation_tokens = len(
         {
             cell.orientation_token
@@ -233,6 +273,10 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
         total_cells=len(topology.cells),
         kind_counts=tuple(sorted(kind_counts.items())),
         degree_histogram=tuple(sorted(degree_histogram.items())),
+        connected_component_count=connected_component_count,
+        disconnected_component_sizes=disconnected_component_sizes,
+        largest_component_size=largest_component_size,
+        isolated_cell_count=isolated_cell_count,
         unique_orientation_tokens=unique_orientation_tokens,
         unique_chirality_tokens=unique_chirality_tokens,
         chirality_adjacency_pairs=tuple(sorted(chirality_adjacency_pairs)),
@@ -310,6 +354,18 @@ def _expectation_failures(
                 message=(
                     f"Depth {observation.depth} expected at least "
                     f"{expectation.minimum_total_cells} cells but saw {observation.total_cells}."
+                ),
+                depth=observation.depth,
+            )
+        )
+    if expectation.require_connected_graph and observation.connected_component_count != 1:
+        failures.append(
+            ReferenceCheckFailure(
+                code="disconnected-topology-graph",
+                message=(
+                    f"Depth {observation.depth} expected a single connected topology component but saw "
+                    f"{observation.connected_component_count} components with sizes "
+                    f"{_component_size_summary(observation.disconnected_component_sizes)}."
                 ),
                 depth=observation.depth,
             )

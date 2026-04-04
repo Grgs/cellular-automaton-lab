@@ -20,6 +20,8 @@ py -3 tools/verify_reference_tilings.py
 
 Use this second. It checks the canonical samples against the source-backed invariants in `backend/simulation/literature_reference_specs.py`.
 
+It now also checks that canonical samples are contiguous in the topology neighbor graph. That means `verify_reference_tilings.py` can fail even when `validate_tilings.py` still passes, because graph contiguity is now treated as a literature-backed invariant rather than only a shared-validator option.
+
 ### 3. Focused verifier unit tests
 
 ```powershell
@@ -58,6 +60,7 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
   - generator drift
   - wrong source-backed invariant
   - stale expected signature after an intentional generator change
+  - canonical sample is disconnected in the topology graph even though geometry sanity still passes
 - `test_literature_reference_verification` fails
   - spec coverage mismatch
   - verifier behavior changed
@@ -83,3 +86,4 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
 - Aperiodic families are verified on patch-depth samples.
 - Pinwheel has an exact-affine verification path and should not be treated like the other families when debugging verification failures.
 - The strongest “tiles do not obscure each other” check is now split across backend topology-space overlap detection and frontend adapter-space overlap detection.
+- Canonical-sample contiguity is now part of literature verification, so a family can be geometrically sane but still blocked if its neighbor graph splits into multiple components.

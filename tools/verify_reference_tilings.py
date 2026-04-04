@@ -27,6 +27,8 @@ def _print_result(result: ReferenceVerificationResult) -> None:
             "  "
             + (
                 f"{sample_label}: cells={observation.total_cells} "
+                f"components={observation.connected_component_count} "
+                f"isolated={observation.isolated_cell_count} "
                 f"orientations={observation.unique_orientation_tokens} "
                 f"chirality={observation.unique_chirality_tokens} "
                 f"span={observation.bounds_longest_span} "
