@@ -37,6 +37,7 @@ class ReferenceDepthExpectation:
     require_connected_graph: bool = True
     require_hole_free_surface: bool = True
     expected_kind_counts: tuple[tuple[str, int], ...] | None = None
+    expected_orientation_token_counts: tuple[tuple[str, int], ...] | None = None
     required_kinds: tuple[str, ...] = ()
     expected_adjacency_pairs: tuple[tuple[str, str], ...] | None = None
     required_adjacency_pairs: tuple[tuple[str, str], ...] = ()
@@ -884,35 +885,40 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         source_urls=(
             "https://tilings.math.uni-bielefeld.de/substitution/chair/",
         ),
-        canonical_root_seed_policy="nested multiscale chair supertile",
+        canonical_root_seed_policy="single chair substitution seed",
         allowed_public_cell_kinds=("chair",),
-        required_metadata=(),
+        required_metadata=(
+            MetadataRequirement(
+                kind="chair",
+                fields=("orientation_token",),
+            ),
+        ),
         depth_expectations={
-            0: ReferenceDepthExpectation(exact_total_cells=1, required_kinds=("chair",)),
+            0: ReferenceDepthExpectation(
+                exact_total_cells=1,
+                expected_orientation_token_counts=(("0", 1),),
+                required_kinds=("chair",),
+            ),
             1: ReferenceDepthExpectation(
-                exact_total_cells=13,
+                exact_total_cells=4,
+                expected_orientation_token_counts=(("0", 2), ("1", 1), ("3", 1)),
                 required_adjacency_pairs=(("chair", "chair"),),
-                min_unique_polygon_areas_by_kind=(("chair", 2),),
-                expected_polygon_area_frequencies_by_kind=(
-                    ("chair", ((3.0, 12), (12.0, 1))),
-                ),
+                min_unique_orientation_tokens=3,
             ),
             2: ReferenceDepthExpectation(
-                exact_total_cells=25,
-                expected_polygon_area_frequencies_by_kind=(
-                    ("chair", ((3.0, 12), (12.0, 13))),
-                ),
+                exact_total_cells=16,
+                expected_orientation_token_counts=(("0", 6), ("1", 4), ("2", 2), ("3", 4)),
+                min_unique_orientation_tokens=4,
             ),
             3: ReferenceDepthExpectation(
-                exact_total_cells=37,
-                expected_polygon_area_frequencies_by_kind=(
-                    ("chair", ((3.0, 12), (12.0, 13), (48.0, 12))),
-                ),
+                exact_total_cells=64,
+                expected_orientation_token_counts=(("0", 20), ("1", 16), ("2", 12), ("3", 16)),
+                min_unique_orientation_tokens=4,
             ),
         },
         notes=(
-            "The representative patch is a deterministic multiscale chair hierarchy.",
-            "Low-depth samples must expose at least two chair size classes.",
+            "The representative patch is a true chair substitution over four orientation classes.",
+            "Patch depth counts substitution rounds, not the earlier nested-corner hierarchy.",
         ),
     ),
     "robinson-triangles": ReferenceFamilySpec(

@@ -76,9 +76,9 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - that depth-3 sample must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
   - rooted local-reference fixtures now pin a few canonical square/triangle neighborhoods inside that dense sample
 - `chair`
-  - representative patches should expose more than one chair size class
-  - low-depth samples should preserve the deterministic multiscale chair hierarchy used by the current reference patch
-  - the hierarchy is now checked both by exact polygon-area frequencies and by rooted local-reference fixtures
+  - representative patches should follow the true inflation-by-2 chair substitution from a single chair seed
+  - low-depth samples should preserve exact substitution depth totals and orientation-token distributions
+  - rooted local-reference fixtures now pin a canonical depth-3 neighborhood inside the corrected substitution patch
 
 ## What Is Not Yet Proved
 

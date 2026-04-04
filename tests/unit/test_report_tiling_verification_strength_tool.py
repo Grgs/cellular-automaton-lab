@@ -25,7 +25,7 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("pinwheel\tpatch_depth\t", output)
         self.assertIn("pinwheel\tpatch_depth\tsample-exact,metadata,local-reference,exact-path,strict-validation", output)
         self.assertIn("archimedean-4-8-8\tgrid\tsample-exact,descriptor,vertex-stars,dual-checks,strict-validation", output)
-        self.assertIn("chair\tpatch_depth\tsample-exact,area-hierarchy,local-reference,strict-validation", output)
+        self.assertIn("chair\tpatch_depth\tsample-exact,metadata,local-reference,strict-validation", output)
 
 
 if __name__ == "__main__":

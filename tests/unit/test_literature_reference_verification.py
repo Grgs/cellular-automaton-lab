@@ -326,14 +326,18 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertGreater(result.observations[1].bounds_longest_span, result.observations[0].bounds_longest_span)
         self.assertEqual(result.observations[-1].connected_component_count, 1)
 
-    def test_chair_reference_verifier_accepts_multiscale_chair_tiles(self) -> None:
+    def test_chair_reference_verifier_accepts_true_substitution_chair_tiles(self) -> None:
         result = verify_reference_family("chair")
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
-        self.assertGreaterEqual(
-            dict(result.observations[1].unique_polygon_areas_by_kind)["chair"],
-            2,
+        self.assertEqual(
+            [observation.total_cells for observation in result.observations],
+            [1, 4, 16, 64],
+        )
+        self.assertEqual(
+            result.observations[-1].orientation_token_counts,
+            (("0", 20), ("1", 16), ("2", 12), ("3", 16)),
         )
 
     def test_hat_reference_verifier_accepts_reflected_neighbor_pattern(self) -> None:
@@ -405,13 +409,11 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
         self.assertEqual(result.observations[-1].hole_count, 0)
 
-    def test_chair_area_histogram_expectation_reports_mismatch(self) -> None:
+    def test_chair_orientation_count_expectation_reports_mismatch(self) -> None:
         spec = REFERENCE_FAMILY_SPECS["chair"]
         expectation = replace(
             spec.depth_expectations[3],
-            expected_polygon_area_frequencies_by_kind=(
-                ("chair", ((3.0, 12), (12.0, 13), (48.0, 11))),
-            ),
+            expected_orientation_token_counts=(("0", 20), ("1", 16), ("2", 11), ("3", 17)),
         )
         topology = build_topology("chair", 0, 0, 3)
 
@@ -423,7 +425,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         )
 
         self.assertTrue(
-            any(failure.code == "unexpected-polygon-area-frequencies" for failure in failures)
+            any(failure.code == "unexpected-orientation-token-counts" for failure in failures)
         )
 
     def test_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(self) -> None:

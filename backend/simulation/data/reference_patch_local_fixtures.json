@@ -1,104 +1,82 @@
 {
   "chair": {
     "3": {
-      "chair:root.leaf3:o0:sp4000000:p8000000:p8000000": {
+      "chair:root.child1.child0.child0:o0:sp125000:p500000:p500000": {
         "neighbors": [
           {
-            "area": 12.0,
+            "area": 0.046875,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
-              -5.666666,
-              -1.0
+              -0.125,
+              -0.125
             ],
             "kind": "chair",
-            "orientation_token": null
+            "orientation_token": "0"
           },
           {
-            "area": 12.0,
+            "area": 0.046875,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
-              -5.0,
-              3.0
+              0.125,
+              0.125
             ],
             "kind": "chair",
-            "orientation_token": null
+            "orientation_token": "0"
           },
           {
-            "area": 12.0,
+            "area": 0.046875,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
-              -3.666666,
-              -3.666666
+              0.041666,
+              -0.25
             ],
             "kind": "chair",
-            "orientation_token": null
+            "orientation_token": "1"
           },
           {
-            "area": 12.0,
+            "area": 0.046875,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
-              -1.0,
-              -5.666666
+              0.291666,
+              0.0
             ],
             "kind": "chair",
-            "orientation_token": null
+            "orientation_token": "1"
           },
           {
-            "area": 48.0,
+            "area": 0.046875,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -0.25,
+              0.041666
+            ],
+            "kind": "chair",
+            "orientation_token": "3"
+          },
+          {
+            "area": 0.046875,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
               0.0,
-              9.333334
+              0.291666
             ],
             "kind": "chair",
-            "orientation_token": null
-          },
-          {
-            "area": 12.0,
-            "chirality_token": null,
-            "decoration_tokens": null,
-            "delta": [
-              3.0,
-              -5.0
-            ],
-            "kind": "chair",
-            "orientation_token": null
-          },
-          {
-            "area": 48.0,
-            "chirality_token": null,
-            "decoration_tokens": null,
-            "delta": [
-              4.0,
-              4.0
-            ],
-            "kind": "chair",
-            "orientation_token": null
-          },
-          {
-            "area": 48.0,
-            "chirality_token": null,
-            "decoration_tokens": null,
-            "delta": [
-              9.333334,
-              0.0
-            ],
-            "kind": "chair",
-            "orientation_token": null
+            "orientation_token": "3"
           }
         ],
         "root": {
-          "area": 48.0,
+          "area": 0.046875,
           "chirality_token": null,
           "decoration_tokens": null,
-          "degree": 8,
+          "degree": 6,
           "kind": "chair",
-          "orientation_token": null
+          "orientation_token": "0"
         }
       }
     }

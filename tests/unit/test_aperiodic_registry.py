@@ -58,10 +58,13 @@ class AperiodicRegistryTests(unittest.TestCase):
                 self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
 
     def test_new_tiling_metadata_survives_patch_build(self) -> None:
+        chair_patch = build_aperiodic_patch("chair", 3)
         hat_patch = build_aperiodic_patch("hat-monotile", 2)
         tuebingen_patch = build_aperiodic_patch("tuebingen-triangle", 2)
         shield_patch = build_aperiodic_patch("shield", 2)
         pinwheel_patch = build_aperiodic_patch("pinwheel", 2)
+
+        self.assertTrue(all(cell.orientation_token is not None for cell in chair_patch.cells))
 
         self.assertTrue(all(cell.tile_family == "hat" for cell in hat_patch.cells))
         self.assertTrue(all(cell.orientation_token is not None for cell in hat_patch.cells))

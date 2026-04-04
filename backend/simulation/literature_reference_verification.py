@@ -53,6 +53,7 @@ class ReferencePatchObservation:
     depth: int
     total_cells: int
     kind_counts: tuple[tuple[str, int], ...]
+    orientation_token_counts: tuple[tuple[str, int], ...]
     degree_histogram: tuple[tuple[int, int], ...]
     connected_component_count: int
     disconnected_component_sizes: tuple[int, ...]
@@ -369,10 +370,19 @@ def _local_reference_fixture_failures(
     return failures
 
 
-def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservation:
-    spec = REFERENCE_FAMILY_SPECS[geometry]
-    topology = _build_reference_topology(spec, depth)
+def _observe_reference_topology(
+    *,
+    geometry: str,
+    sample_mode: str,
+    depth: int,
+    topology: LatticeTopology,
+) -> ReferencePatchObservation:
     kind_counts = Counter(cell.kind for cell in topology.cells)
+    orientation_token_counts = Counter(
+        cell.orientation_token
+        for cell in topology.cells
+        if cell.orientation_token is not None
+    )
     area_classes_by_kind: dict[str, set[float]] = {}
     decoration_variants_by_kind: dict[str, set[tuple[str, ...]]] = {}
     chirality_adjacency_pairs: set[tuple[str, str]] = set()
@@ -380,9 +390,13 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
     by_id = {cell.id: cell for cell in topology.cells}
     for cell in topology.cells:
         if cell.vertices is not None:
-            area_classes_by_kind.setdefault(cell.kind, set()).add(round(_polygon_area(cell.vertices), 6))
+            area_classes_by_kind.setdefault(cell.kind, set()).add(
+                round(_polygon_area(cell.vertices), 6)
+            )
         if cell.decoration_tokens is not None:
-            decoration_variants_by_kind.setdefault(cell.kind, set()).add(tuple(cell.decoration_tokens))
+            decoration_variants_by_kind.setdefault(cell.kind, set()).add(
+                tuple(cell.decoration_tokens)
+            )
         neighbor_chiralities = []
         for neighbor_id in cell.neighbors:
             if neighbor_id is None or cell.chirality_token is None:
@@ -392,12 +406,16 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
                 continue
             left = cell.chirality_token
             right = neighbor.chirality_token
-            chirality_adjacency_pairs.add((left, right) if left <= right else (right, left))
+            chirality_adjacency_pairs.add(
+                (left, right) if left <= right else (right, left)
+            )
             neighbor_chiralities.append(neighbor.chirality_token)
         if (
             cell.chirality_token is not None
             and len(neighbor_chiralities) == 3
-            and all(chirality != cell.chirality_token for chirality in neighbor_chiralities)
+            and all(
+                chirality != cell.chirality_token for chirality in neighbor_chiralities
+            )
         ):
             three_opposite_chirality_neighbor_cells += 1
     degree_histogram = Counter(
@@ -434,10 +452,11 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
     bounds_width, bounds_height = _cells_bounds(topology.cells)
     return ReferencePatchObservation(
         geometry=geometry,
-        sample_mode=spec.sample_mode,
+        sample_mode=sample_mode,
         depth=int(depth),
         total_cells=len(topology.cells),
         kind_counts=tuple(sorted(kind_counts.items())),
+        orientation_token_counts=tuple(sorted(orientation_token_counts.items())),
         degree_histogram=tuple(sorted(degree_histogram.items())),
         connected_component_count=connected_component_count,
         disconnected_component_sizes=disconnected_component_sizes,
@@ -460,7 +479,18 @@ def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservat
         bounds_height=round(bounds_height, 6),
         bounds_longest_span=round(max(bounds_width, bounds_height), 6),
         bounds_aspect_ratio=round(_cells_bounds_aspect_ratio(topology.cells), 6),
-        signature=_topology_signature(geometry, spec.sample_mode, depth, topology),
+        signature=_topology_signature(geometry, sample_mode, depth, topology),
+    )
+
+
+def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservation:
+    spec = REFERENCE_FAMILY_SPECS[geometry]
+    topology = _build_reference_topology(spec, depth)
+    return _observe_reference_topology(
+        geometry=geometry,
+        sample_mode=spec.sample_mode,
+        depth=depth,
+        topology=topology,
     )
 
 
@@ -559,6 +589,21 @@ def _expectation_failures(
                 message=(
                     f"Depth {observation.depth} expected kind counts "
                     f"{expectation.expected_kind_counts!r} but saw {observation.kind_counts!r}."
+                ),
+                depth=observation.depth,
+            )
+        )
+    if (
+        expectation.expected_orientation_token_counts is not None
+        and observation.orientation_token_counts != expectation.expected_orientation_token_counts
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="unexpected-orientation-token-counts",
+                message=(
+                    f"Depth {observation.depth} expected orientation-token counts "
+                    f"{expectation.expected_orientation_token_counts!r} but saw "
+                    f"{observation.orientation_token_counts!r}."
                 ),
                 depth=observation.depth,
             )
@@ -751,8 +796,20 @@ def _depth_topology_expectation_failures(
     depth: int,
     topology: LatticeTopology,
     expectation: ReferenceDepthExpectation,
+    observation: ReferencePatchObservation | None = None,
 ) -> list[ReferenceCheckFailure]:
-    failures: list[ReferenceCheckFailure] = []
+    active_observation = observation
+    if active_observation is None:
+        active_observation = _observe_reference_topology(
+            geometry=geometry,
+            sample_mode=REFERENCE_FAMILY_SPECS[geometry].sample_mode,
+            depth=depth,
+            topology=topology,
+        )
+
+    failures: list[ReferenceCheckFailure] = list(
+        _expectation_failures(active_observation, expectation)
+    )
     if expectation.expected_polygon_area_frequencies_by_kind is not None:
         observed = _polygon_area_frequencies_by_kind(topology)
         if observed != expectation.expected_polygon_area_frequencies_by_kind:
@@ -1311,7 +1368,6 @@ def _verify_spec(spec: ReferenceFamilySpec) -> ReferenceVerificationResult:
         failures.extend(_pinwheel_exact_path_failures())
     for observation in observations:
         expectation = spec.depth_expectations[observation.depth]
-        failures.extend(_expectation_failures(observation, expectation))
         depth_topology = _build_reference_topology(spec, observation.depth)
         failures.extend(
             _depth_topology_expectation_failures(
@@ -1319,6 +1375,7 @@ def _verify_spec(spec: ReferenceFamilySpec) -> ReferenceVerificationResult:
                 depth=observation.depth,
                 topology=depth_topology,
                 expectation=expectation,
+                observation=observation,
             )
         )
 

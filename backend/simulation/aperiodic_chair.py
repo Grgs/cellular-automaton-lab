@@ -55,21 +55,32 @@ _UNIT_CHAIR_POLYGONS: dict[int, tuple[Vec, ...]] = {
     ),
 }
 
-# A scale-4 chair can be tiled by one scale-2 chair plus these 12 unit chairs.
-_SMALL_CHAIR_PLACEMENTS: tuple[tuple[int, float, float], ...] = (
-    (0, 0.0, 4.0),
-    (3, 0.0, 6.0),
-    (3, 1.0, 5.0),
-    (0, 2.0, 2.0),
-    (3, 2.0, 4.0),
-    (2, 2.0, 6.0),
-    (0, 3.0, 3.0),
-    (0, 4.0, 0.0),
-    (1, 4.0, 2.0),
-    (1, 5.0, 1.0),
-    (1, 6.0, 0.0),
-    (2, 6.0, 2.0),
-)
+_CHAIR_SUBSTITUTION_RULES: dict[int, tuple[tuple[int, float, float], ...]] = {
+    0: (
+        (0, 0.0, 0.0),
+        (0, 1.0, 1.0),
+        (1, 2.0, 0.0),
+        (3, 0.0, 2.0),
+    ),
+    1: (
+        (0, 0.0, 0.0),
+        (1, 1.0, 1.0),
+        (1, 2.0, 0.0),
+        (2, 2.0, 2.0),
+    ),
+    2: (
+        (1, 2.0, 0.0),
+        (2, 1.0, 1.0),
+        (2, 2.0, 2.0),
+        (3, 0.0, 2.0),
+    ),
+    3: (
+        (0, 0.0, 0.0),
+        (2, 2.0, 2.0),
+        (3, 0.0, 2.0),
+        (3, 1.0, 1.0),
+    ),
+}
 
 
 def _chair_id(path: str, orientation: int, scale_factor: float, anchor_x: float, anchor_y: float) -> str:
@@ -107,11 +118,13 @@ def _chair_record(
         "kind": _CHAIR_KIND,
         "center": rounded_point(polygon_centroid(polygon)),
         "vertices": tuple(rounded_point(vertex) for vertex in polygon),
+        "orientation_token": str(orientation),
     }
 
 
 def _collect_chair_records(
     remaining_depth: int,
+    orientation: int,
     parent_scale: float,
     anchor_x: float,
     anchor_y: float,
@@ -119,45 +132,36 @@ def _collect_chair_records(
     records: list[PatchRecord],
 ) -> None:
     if remaining_depth <= 0:
-        records.append(_chair_record(path, 0, parent_scale, anchor_x, anchor_y))
+        records.append(_chair_record(path, orientation, parent_scale, anchor_x, anchor_y))
         return
 
-    leaf_scale = parent_scale / 4.0
-    for index, (orientation, local_x, local_y) in enumerate(_SMALL_CHAIR_PLACEMENTS):
-        records.append(
-            _chair_record(
-                f"{path}.leaf{index}",
-                orientation,
-                leaf_scale,
-                anchor_x + (leaf_scale * local_x),
-                anchor_y + (leaf_scale * local_y),
-            )
+    child_scale = parent_scale / 2.0
+    for index, (child_orientation, grid_x, grid_y) in enumerate(
+        _CHAIR_SUBSTITUTION_RULES[orientation]
+    ):
+        _collect_chair_records(
+            remaining_depth - 1,
+            child_orientation,
+            child_scale,
+            anchor_x + (grid_x * child_scale),
+            anchor_y + (grid_y * child_scale),
+            f"{path}.child{index}",
+            records,
         )
-
-    _collect_chair_records(
-        remaining_depth - 1,
-        parent_scale / 2.0,
-        anchor_x,
-        anchor_y,
-        f"{path}.macro",
-        records,
-    )
 
 
 def build_chair_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     records: list[PatchRecord] = []
-    if resolved_depth == 0:
-        records.append(_chair_record("root", 0, 1.0, 0.0, 0.0))
-    else:
-        _collect_chair_records(
-            resolved_depth,
-            float(2 ** (resolved_depth + 1)),
-            0.0,
-            0.0,
-            "root",
-            records,
-        )
+    _collect_chair_records(
+        resolved_depth,
+        0,
+        1.0,
+        0.0,
+        0.0,
+        "root",
+        records,
+    )
     return patch_from_records(
         resolved_depth,
         records,

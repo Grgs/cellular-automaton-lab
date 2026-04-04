@@ -242,6 +242,7 @@ class TopologyValidationTests(unittest.TestCase):
     def test_strict_validation_defaults_apply_to_periodic_and_repaired_aperiodic_families(self) -> None:
         for geometry in (
             "trihexagonal-3-6-3-6",
+            CHAIR_GEOMETRY,
             HAT_MONOTILE_GEOMETRY,
             TUEBINGEN_TRIANGLE_GEOMETRY,
             SQUARE_TRIANGLE_GEOMETRY,

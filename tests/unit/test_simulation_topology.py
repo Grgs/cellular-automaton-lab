@@ -441,15 +441,26 @@ class SimulationTopologyTests(unittest.TestCase):
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
     def test_chair_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
+        seed = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=0)
         shallow = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=1)
+        medium = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=2)
         deep = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
         repeated = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
 
+        self.assertEqual(seed.cell_count, 1)
+        self.assertEqual(shallow.cell_count, 4)
+        self.assertEqual(medium.cell_count, 16)
+        self.assertEqual(deep.cell_count, 64)
         self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "chair" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
         self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells))
+        self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
+        self.assertEqual(
+            Counter(cell.orientation_token for cell in deep.cells),
+            Counter({"0": 20, "1": 16, "2": 12, "3": 16}),
+        )
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:
