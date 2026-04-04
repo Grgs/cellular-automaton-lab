@@ -61,7 +61,7 @@ describe("controls-model/shared", () => {
             {
                 tiling_family: "chair",
                 label: "Chair",
-                picker_group: "Aperiodic",
+                picker_group: "Experimental",
                 picker_order: 290,
                 sizing_mode: "patch_depth",
                 family: "aperiodic",
@@ -121,7 +121,7 @@ describe("controls-model/shared", () => {
             {
                 tiling_family: "square-triangle",
                 label: "Square-Triangle",
-                picker_group: "Aperiodic",
+                picker_group: "Experimental",
                 picker_order: 320,
                 sizing_mode: "patch_depth",
                 family: "aperiodic",
@@ -136,7 +136,7 @@ describe("controls-model/shared", () => {
             {
                 tiling_family: "shield",
                 label: "Shield",
-                picker_group: "Aperiodic",
+                picker_group: "Experimental",
                 picker_order: 330,
                 sizing_mode: "patch_depth",
                 family: "aperiodic",
@@ -151,7 +151,7 @@ describe("controls-model/shared", () => {
             {
                 tiling_family: "pinwheel",
                 label: "Pinwheel",
-                picker_group: "Aperiodic",
+                picker_group: "Experimental",
                 picker_order: 340,
                 sizing_mode: "patch_depth",
                 family: "aperiodic",

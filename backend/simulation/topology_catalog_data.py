@@ -48,6 +48,7 @@ PICKER_GROUP_ORDER = {
     "Classic": 0,
     "Periodic Mixed": 1,
     "Aperiodic": 2,
+    "Experimental": 3,
 }
 
 CELL_SIZE_CONTROL = "cell_size"
@@ -431,7 +432,7 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         tiling_family=CHAIR_GEOMETRY,
         adjacency_mode=EDGE_ADJACENCY,
         label="Chair",
-        picker_group="Aperiodic",
+        picker_group="Experimental",
         picker_order=290,
         default_rule="life-b2-s23",
         sizing_mode="patch_depth",
@@ -467,7 +468,7 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         tiling_family=SQUARE_TRIANGLE_GEOMETRY,
         adjacency_mode=EDGE_ADJACENCY,
         label="Square-Triangle",
-        picker_group="Aperiodic",
+        picker_group="Experimental",
         picker_order=320,
         default_rule="life-b2-s23",
         sizing_mode="patch_depth",
@@ -479,7 +480,7 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         tiling_family=SHIELD_GEOMETRY,
         adjacency_mode=EDGE_ADJACENCY,
         label="Shield",
-        picker_group="Aperiodic",
+        picker_group="Experimental",
         picker_order=330,
         default_rule="life-b2-s23",
         sizing_mode="patch_depth",
@@ -491,7 +492,7 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         tiling_family=PINWHEEL_GEOMETRY,
         adjacency_mode=EDGE_ADJACENCY,
         label="Pinwheel",
-        picker_group="Aperiodic",
+        picker_group="Experimental",
         picker_order=340,
         default_rule="life-b2-s23",
         sizing_mode="patch_depth",
