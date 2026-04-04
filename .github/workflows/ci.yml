@@ -15,6 +15,58 @@ permissions:
   contents: read
 
 jobs:
+  build-frontend-artifacts:
+    name: Build Frontend Artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Build frontend artifacts
+        run: |
+          npm run build:frontend
+          npm run build:frontend:standalone
+
+      - name: Package frontend build outputs
+        run: |
+          tar -czf frontend-dist.tgz static/dist
+          tar -czf standalone-output.tgz output/standalone
+
+      - name: Upload frontend dist artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: frontend-dist-tarball
+          path: frontend-dist.tgz
+
+      - name: Upload standalone output artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: standalone-output-tarball
+          path: standalone-output.tgz
+
   frontend-backend:
     name: Frontend, Backend, And Tooling
     runs-on: ubuntu-latest
@@ -46,9 +98,7 @@ jobs:
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Run local git hooks in CI
-        run: |
-          python -m pre_commit run --all-files --show-diff-on-failure
-          python -m pre_commit run --hook-stage pre-push --all-files --show-diff-on-failure
+        run: python -m pre_commit run --hook-stage pre-push --all-files --show-diff-on-failure
 
       - name: Enforce typed frontend source
         run: |
@@ -103,12 +153,6 @@ jobs:
       - name: Type check frontend
         run: npm run typecheck:frontend
 
-      - name: Build frontend
-        run: npm run build:frontend
-
-      - name: Build standalone frontend
-        run: npm run build:frontend:standalone
-
       - name: Run frontend unit tests
         run: npm run test:frontend
 
@@ -144,7 +188,7 @@ jobs:
     name: Playwright Server Subset ${{ matrix.subset_index }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: frontend-backend
+    needs: build-frontend-artifacts
     strategy:
       fail-fast: false
       matrix:
@@ -153,12 +197,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -175,12 +213,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          npm ci
-          npm run build:frontend
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Download frontend dist artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: frontend-dist-tarball
+
+      - name: Extract frontend dist artifact
+        run: tar -xzf frontend-dist.tgz -C .
 
       - name: Install Chromium for Playwright
         run: python -m playwright install --with-deps chromium
@@ -204,17 +248,11 @@ jobs:
     name: Playwright Standalone Browser
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: frontend-backend
+    needs: build-frontend-artifacts
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -231,11 +269,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          npm ci
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Download standalone output artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: standalone-output-tarball
+
+      - name: Extract standalone output artifact
+        run: tar -xzf standalone-output.tgz -C .
 
       - name: Install Chromium for Playwright
         run: python -m playwright install --with-deps chromium
@@ -259,40 +304,22 @@ jobs:
     timeout-minutes: 20
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs:
+      - build-frontend-artifacts
       - frontend-backend
       - e2e-playwright
       - e2e-playwright-standalone
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            requirements-dev.txt
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt -r requirements-dev.txt
-
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Build standalone frontend
-        run: npm run build:frontend:standalone
+      - name: Download standalone output artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: standalone-output-tarball
+
+      - name: Extract standalone output artifact
+        run: tar -xzf standalone-output.tgz -C .
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4

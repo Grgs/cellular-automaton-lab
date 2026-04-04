@@ -58,6 +58,15 @@ def _resolve_npm_executable() -> str | None:
     return shutil.which("npm") or shutil.which("npm.cmd")
 
 
+def _standalone_output_dir(root: Path) -> Path:
+    return root / "output" / "standalone"
+
+
+def _standalone_outputs_exist(root: Path) -> bool:
+    output_dir = _standalone_output_dir(root)
+    return all((output_dir / relative_path).exists() for relative_path in _STANDALONE_REQUIRED_OUTPUTS)
+
+
 class BrowserRuntimeHost(ABC):
     def __init__(self) -> None:
         self.root = Path(__file__).resolve().parents[2]
@@ -160,6 +169,9 @@ def ensure_standalone_build(root: Path) -> None:
         return
     with _STANDALONE_BUILD_LOCK:
         if _STANDALONE_BUILD_READY:
+            return
+        if _standalone_outputs_exist(root):
+            _STANDALONE_BUILD_READY = True
             return
         npm_executable = _resolve_npm_executable()
         if npm_executable is None:
