@@ -147,6 +147,43 @@ class TopologyValidationTests(unittest.TestCase):
                 validation = validate_topology(topology, **recommended_validation_options(geometry))
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 
+    def test_overlap_only_validation_passes_for_known_good_polygon_tilings(self) -> None:
+        for geometry, patch_depth in (
+            (CHAIR_GEOMETRY, 3),
+            (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
+        ):
+            with self.subTest(geometry=geometry):
+                topology = build_topology(geometry, 0, 0, patch_depth=patch_depth)
+                validation = validate_topology(
+                    topology,
+                    check_surface=False,
+                    check_overlaps=True,
+                    check_edge_multiplicity=False,
+                    check_graph_connectivity=False,
+                )
+
+                self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+
+    def test_overlap_only_validation_detects_current_aperiodic_overlap_deviations(self) -> None:
+        for geometry in (
+            HAT_MONOTILE_GEOMETRY,
+            SQUARE_TRIANGLE_GEOMETRY,
+            SHIELD_GEOMETRY,
+            PINWHEEL_GEOMETRY,
+        ):
+            with self.subTest(geometry=geometry):
+                topology = build_topology(geometry, 0, 0, patch_depth=3)
+                validation = validate_topology(
+                    topology,
+                    check_surface=False,
+                    check_overlaps=True,
+                    check_edge_multiplicity=False,
+                    check_graph_connectivity=False,
+                )
+
+                self.assertFalse(validation.is_valid)
+                self.assertGreater(len(validation.overlapping_pairs), 0)
+
     def test_snub_square_regression_is_covered_by_shared_validator(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)
         validation = validate_topology(
