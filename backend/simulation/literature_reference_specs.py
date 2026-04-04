@@ -869,8 +869,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         ),
         depth_expectations={
             0: ReferenceDepthExpectation(
-                minimum_total_cells=2,
+                exact_total_cells=8,
                 required_kinds=("hat",),
+                min_unique_chirality_tokens=2,
+                required_chirality_adjacency_pairs=(("left", "right"),),
             ),
             1: ReferenceDepthExpectation(
                 min_unique_chirality_tokens=2,

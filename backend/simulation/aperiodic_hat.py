@@ -14,7 +14,7 @@ from backend.simulation.aperiodic_support import (
 
 
 _SQRT12 = math.sqrt(12.0)
-_OUTPUT_SCALE = 0.65
+_OUTPUT_SCALE = 0.44
 
 
 @dataclass(frozen=True)
@@ -330,6 +330,30 @@ def _substitute_many(tiles: tuple[_PlacedMetatile, ...]) -> tuple[_PlacedMetatil
     )
 
 
+_H8_ROOT_SEED: tuple[_PlacedMetatile, ...] = (
+    _PlacedMetatile(
+        _META_H,
+        -2,
+        (
+            _meta_edge("F-", 1),
+            _meta_edge("X+", 2),
+            _meta_edge("B+", 2),
+            _meta_edge("X-", 1),
+        ),
+    ),
+    _PlacedMetatile(
+        _META_H,
+        0,
+        (
+            _meta_edge("F-", 1),
+            _meta_edge("X+", 0),
+            _meta_edge("B-", 1),
+            _meta_edge("X-", 1),
+        ),
+    ),
+)
+
+
 def _metatile_to_hats(placed: _PlacedMetatile) -> tuple[_PlacedHat, ...]:
     meta = placed.meta
     turn = placed.turn
@@ -465,7 +489,7 @@ def _enforce_opposite_chirality_triplet(patch: AperiodicPatch) -> AperiodicPatch
 
 def build_hat_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    metatiles: tuple[_PlacedMetatile, ...] = (_PlacedMetatile(_META_H, 0, ()),)
+    metatiles = _H8_ROOT_SEED
     for _ in range(resolved_depth):
         metatiles = _substitute_many(metatiles)
 

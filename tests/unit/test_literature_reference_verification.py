@@ -157,6 +157,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
+        self.assertEqual(result.observations[0].total_cells, 8)
+        self.assertEqual(result.observations[0].unique_chirality_tokens, 2)
         self.assertIn(("left", "right"), result.observations[1].chirality_adjacency_pairs)
         self.assertGreaterEqual(
             result.observations[2].three_opposite_chirality_neighbor_cells,
