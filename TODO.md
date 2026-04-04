@@ -3,12 +3,11 @@
 ## Now
 
 - Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
-- Extend periodic-family literature verification beyond exact interior vertex-star sets.
-  Add stronger source-backed invariants such as dual-family relationships and configuration-frequency checks so periodic mixed tilings are protected by more than exact sample drift plus vertex-star matching.
 - Add stronger canonical-patch fixtures for substitution families that still rely mainly on low-depth counts, metadata, adjacency vocabularies, and signatures.
 
 ## Next
 
+- Extend periodic dual-family verification beyond the currently unambiguous reciprocal catalog pairs.
 - Add larger periodic sample fixtures where the open-boundary `3x3` board is too small to expose structural regressions.
 - Promote stronger substitution-level reference fixtures for Hat, Shield, Pinwheel, Square-Triangle, and the multiscale Chair family now that the current canonical samples are green again.
 - Strengthen the exact-affine/render-space overlap checks so the frontend helper can use tighter epsilons for exact-path families like `pinwheel`.

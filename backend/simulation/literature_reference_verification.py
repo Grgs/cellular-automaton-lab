@@ -665,7 +665,7 @@ def _canonicalize_vertex_configuration(configuration: tuple[str, ...]) -> tuple[
     return min(candidates)
 
 
-def _periodic_face_interior_vertex_configurations(
+def _periodic_face_interior_vertex_configuration_occurrences(
     cells: tuple[PeriodicFaceCell, ...],
 ) -> tuple[tuple[str, ...], ...]:
     def _matching_group_id(
@@ -745,7 +745,7 @@ def _periodic_face_interior_vertex_configurations(
         ):
             boundary_vertex_groups.add(group_id)
 
-    configurations: set[tuple[str, ...]] = set()
+    configurations: list[tuple[str, ...]] = []
     for group_id, cell_ids in incident_cells_by_group.items():
         if group_id in boundary_vertex_groups:
             continue
@@ -758,12 +758,90 @@ def _periodic_face_interior_vertex_configurations(
                 cell.center[0] - point[0],
             ),
         )
-        configurations.add(
+        configurations.append(
             _canonicalize_vertex_configuration(
                 tuple(cell.kind for cell in ordered_cells)
             )
         )
     return tuple(sorted(configurations))
+
+
+def _periodic_face_interior_vertex_configurations(
+    cells: tuple[PeriodicFaceCell, ...],
+) -> tuple[tuple[str, ...], ...]:
+    return tuple(
+        sorted(set(_periodic_face_interior_vertex_configuration_occurrences(cells)))
+    )
+
+
+def _periodic_face_interior_vertex_configuration_frequencies(
+    cells: tuple[PeriodicFaceCell, ...],
+) -> tuple[tuple[tuple[str, ...], int], ...]:
+    return tuple(
+        sorted(
+            Counter(
+                _periodic_face_interior_vertex_configuration_occurrences(cells)
+            ).items()
+        )
+    )
+
+
+def _periodic_face_unique_polygon_side_counts(
+    cells: tuple[PeriodicFaceCell, ...],
+) -> tuple[int, ...]:
+    return tuple(sorted({len(cell.vertices) for cell in cells}))
+
+
+def _periodic_face_dual_structure_failure(
+    *,
+    geometry: str,
+    periodic_descriptor: PeriodicDescriptorExpectation,
+    sample_cells: tuple[PeriodicFaceCell, ...],
+    observed_vertex_configurations: tuple[tuple[str, ...], ...],
+) -> ReferenceCheckFailure | None:
+    dual_geometry = periodic_descriptor.expected_dual_geometry
+    if dual_geometry is None:
+        return None
+    dual_spec = REFERENCE_FAMILY_SPECS.get(dual_geometry)
+    if dual_spec is None or dual_spec.periodic_descriptor is None or not is_periodic_face_tiling(dual_geometry):
+        return ReferenceCheckFailure(
+            code="descriptor-dual-geometry-missing",
+            message=(
+                f"{geometry} expected periodic dual geometry {dual_geometry!r}, "
+                "but no matching periodic reference spec was available."
+            ),
+        )
+    if dual_spec.periodic_descriptor.expected_dual_geometry != geometry:
+        return ReferenceCheckFailure(
+            code="descriptor-dual-geometry-not-reciprocal",
+            message=(
+                f"{geometry} expected reciprocal dual geometry {dual_geometry!r}, "
+                f"but that spec pointed to {dual_spec.periodic_descriptor.expected_dual_geometry!r}."
+            ),
+        )
+
+    dual_cells = get_periodic_face_tiling_descriptor(dual_geometry).build_faces(3, 3)
+    observed_side_counts = _periodic_face_unique_polygon_side_counts(sample_cells)
+    observed_vertex_valences = tuple(sorted({len(configuration) for configuration in observed_vertex_configurations}))
+    dual_side_counts = _periodic_face_unique_polygon_side_counts(dual_cells)
+    dual_vertex_valences = tuple(
+        sorted(
+            {
+                len(configuration)
+                for configuration in _periodic_face_interior_vertex_configurations(dual_cells)
+            }
+        )
+    )
+    if observed_side_counts != dual_vertex_valences or dual_side_counts != observed_vertex_valences:
+        return ReferenceCheckFailure(
+            code="descriptor-dual-structure-mismatch",
+            message=(
+                f"{geometry} expected reciprocal dual structure with {dual_geometry}: "
+                f"face side counts {observed_side_counts!r} vs dual interior vertex valences {dual_vertex_valences!r}, "
+                f"and interior vertex valences {observed_vertex_valences!r} vs dual face side counts {dual_side_counts!r}."
+            ),
+        )
+    return None
 
 
 def _periodic_face_translation_failures(
@@ -920,6 +998,7 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
         if failure is not None:
             failures.append(failure)
     observed_vertex_configurations = _periodic_face_interior_vertex_configurations(sample_cells)
+    observed_vertex_configuration_frequencies = _periodic_face_interior_vertex_configuration_frequencies(sample_cells)
     if (
         observed_vertex_configurations
         != periodic_descriptor.expected_interior_vertex_configurations
@@ -934,6 +1013,28 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
                 ),
             )
         )
+    if (
+        observed_vertex_configuration_frequencies
+        != periodic_descriptor.expected_interior_vertex_configuration_frequencies
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="descriptor-interior-vertex-configuration-frequencies-mismatch",
+                message=(
+                    f"{spec.geometry} interior vertex configuration frequencies "
+                    f"{observed_vertex_configuration_frequencies!r} did not match the reference expectation "
+                    f"{periodic_descriptor.expected_interior_vertex_configuration_frequencies!r}."
+                ),
+            )
+        )
+    dual_failure = _periodic_face_dual_structure_failure(
+        geometry=spec.geometry,
+        periodic_descriptor=periodic_descriptor,
+        sample_cells=sample_cells,
+        observed_vertex_configurations=observed_vertex_configurations,
+    )
+    if dual_failure is not None:
+        failures.append(dual_failure)
     failures.extend(_periodic_face_translation_failures(descriptor, sample_cells))
     return failures
 

@@ -25,6 +25,8 @@ class PeriodicDescriptorExpectation:
     id_pattern: str
     row_offset_x: float
     expected_interior_vertex_configurations: tuple[tuple[str, ...], ...]
+    expected_interior_vertex_configuration_frequencies: tuple[tuple[tuple[str, ...], int], ...]
+    expected_dual_geometry: str | None = None
 
 
 @dataclass(frozen=True)
@@ -178,6 +180,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             id_pattern="{prefix}:{x}:{y}",
             row_offset_x=0.0,
             expected_interior_vertex_configurations=(("octagon", "octagon", "square"),),
+            expected_interior_vertex_configuration_frequencies=(
+                (("octagon", "octagon", "square"), 24),
+            ),
+            expected_dual_geometry="tetrakis-square",
         ),
     ),
     "archimedean-3-12-12": ReferenceFamilySpec(
@@ -203,6 +209,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
             expected_interior_vertex_configurations=(("dodecagon", "dodecagon", "triangle"),),
+            expected_interior_vertex_configuration_frequencies=(
+                (("dodecagon", "dodecagon", "triangle"), 258),
+            ),
+            expected_dual_geometry="triakis-triangular",
         ),
     ),
     "archimedean-3-4-6-4": ReferenceFamilySpec(
@@ -228,6 +238,9 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
             expected_interior_vertex_configurations=(("hexagon", "square", "triangle", "square"),),
+            expected_interior_vertex_configuration_frequencies=(
+                (("hexagon", "square", "triangle", "square"), 82),
+            ),
         ),
     ),
     "archimedean-4-6-12": ReferenceFamilySpec(
@@ -257,6 +270,9 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
             expected_interior_vertex_configurations=(("dodecagon", "hexagon", "square"),),
+            expected_interior_vertex_configuration_frequencies=(
+                (("dodecagon", "hexagon", "square"), 170),
+            ),
         ),
     ),
     "archimedean-3-3-4-3-4": ReferenceFamilySpec(
@@ -283,6 +299,9 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             row_offset_x=0.0,
             expected_interior_vertex_configurations=(
                 ("square", "triangle", "square", "triangle", "triangle"),
+            ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("square", "triangle", "square", "triangle", "triangle"), 53),
             ),
         ),
     ),
@@ -315,6 +334,9 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configurations=(
                 ("square", "square", "triangle", "triangle", "triangle"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("square", "square", "triangle", "triangle", "triangle"), 55),
+            ),
         ),
     ),
     "archimedean-3-3-3-3-6": ReferenceFamilySpec(
@@ -342,6 +364,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configurations=(
                 ("hexagon", "triangle", "triangle", "triangle", "triangle"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("hexagon", "triangle", "triangle", "triangle", "triangle"), 691),
+            ),
+            expected_dual_geometry="floret-pentagonal",
         ),
     ),
     "trihexagonal-3-6-3-6": ReferenceFamilySpec(
@@ -369,6 +395,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configurations=(
                 ("hexagon", "triangle-down", "hexagon", "triangle-up"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("hexagon", "triangle-down", "hexagon", "triangle-up"), 13),
+            ),
+            expected_dual_geometry="rhombille",
         ),
     ),
     "cairo-pentagonal": ReferenceFamilySpec(
@@ -396,6 +426,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configurations=(
                 ("pentagon", "pentagon", "pentagon"),
                 ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("pentagon", "pentagon", "pentagon"), 26),
+                (("pentagon", "pentagon", "pentagon", "pentagon"), 10),
             ),
         ),
     ),
@@ -425,6 +459,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ("rhombus", "rhombus", "rhombus"),
                 ("rhombus", "rhombus", "rhombus", "rhombus", "rhombus", "rhombus"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("rhombus", "rhombus", "rhombus"), 27),
+                (("rhombus", "rhombus", "rhombus", "rhombus", "rhombus", "rhombus"), 10),
+            ),
+            expected_dual_geometry="trihexagonal-3-6-3-6",
         ),
     ),
     "deltoidal-hexagonal": ReferenceFamilySpec(
@@ -454,6 +493,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ("kite", "kite", "kite", "kite"),
                 ("kite", "kite", "kite", "kite", "kite", "kite"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("kite", "kite", "kite"), 30),
+                (("kite", "kite", "kite", "kite"), 43),
+                (("kite", "kite", "kite", "kite", "kite", "kite"), 12),
+            ),
         ),
     ),
     "tetrakis-square": ReferenceFamilySpec(
@@ -482,6 +526,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ("triangle", "triangle", "triangle", "triangle"),
                 ("triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("triangle", "triangle", "triangle", "triangle"), 9),
+                (("triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle"), 4),
+            ),
+            expected_dual_geometry="archimedean-4-8-8",
         ),
     ),
     "triakis-triangular": ReferenceFamilySpec(
@@ -510,6 +559,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ("triangle", "triangle", "triangle"),
                 ("triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("triangle", "triangle", "triangle"), 94),
+                (("triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle", "triangle"), 40),
+            ),
+            expected_dual_geometry="archimedean-3-12-12",
         ),
     ),
     "deltoidal-trihexagonal": ReferenceFamilySpec(
@@ -539,6 +593,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ("kite", "kite", "kite", "kite"),
                 ("kite", "kite", "kite", "kite", "kite", "kite"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("kite", "kite", "kite"), 28),
+                (("kite", "kite", "kite", "kite"), 40),
+                (("kite", "kite", "kite", "kite", "kite", "kite"), 12),
+            ),
         ),
     ),
     "prismatic-pentagonal": ReferenceFamilySpec(
@@ -566,6 +625,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configurations=(
                 ("pentagon", "pentagon", "pentagon"),
                 ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("pentagon", "pentagon", "pentagon"), 60),
+                (("pentagon", "pentagon", "pentagon", "pentagon"), 25),
             ),
         ),
     ),
@@ -595,6 +658,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ("pentagon", "pentagon", "pentagon"),
                 ("pentagon", "pentagon", "pentagon", "pentagon", "pentagon", "pentagon"),
             ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("pentagon", "pentagon", "pentagon"), 938),
+                (("pentagon", "pentagon", "pentagon", "pentagon", "pentagon", "pentagon"), 108),
+            ),
+            expected_dual_geometry="archimedean-3-3-3-3-6",
         ),
     ),
     "snub-square-dual": ReferenceFamilySpec(
@@ -625,6 +693,10 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configurations=(
                 ("pentagon", "pentagon", "pentagon"),
                 ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("pentagon", "pentagon", "pentagon"), 55),
+                (("pentagon", "pentagon", "pentagon", "pentagon"), 25),
             ),
         ),
     ),

@@ -23,6 +23,8 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - exact adjacency-pair set
   - exact degree histogram
   - deterministic signature
+  - exact interior vertex-configuration set
+  - exact interior vertex-configuration frequencies
 - Additional periodic-face checks:
   - `metric_model == "pattern"`
   - `cell_count_per_unit` matches the number of loaded face templates
@@ -31,6 +33,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - descriptor `id_pattern` round-trips generated cell ids
   - same-slot cells repeat by `unit_width` / `unit_height`
   - odd-row horizontal offsets match `row_offset_x`
+  - reciprocal dual-family edge-count / vertex-valence compatibility for the periodic pairs that have an unambiguous dual already present in the catalog
 
 ## Aperiodic Substitution Families
 
@@ -71,4 +74,5 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 
 - For many families, the verifier is strongest at the level of deterministic low-depth samples, count invariants, and adjacency vocabulary.
 - For periodic families, the verifier is now stronger than a plain sample-signature check, but it still targets finite `3x3` open-boundary boards rather than quotient-surface or large-sample proofs.
+- Reciprocal dual-family checks currently cover only the periodic pairs whose dual matches are unambiguous in the current catalog.
 - That is stronger than screenshot plausibility, but it is still not the same thing as a full symbolic proof that the generator exactly matches the literature’s substitution system at all depths.
