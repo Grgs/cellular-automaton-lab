@@ -8,7 +8,7 @@ import json
 import math
 from pathlib import Path
 import re
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 import networkx as nx
 
@@ -37,6 +37,7 @@ from backend.simulation.topology_validation import build_topology_graph, validat
 VerificationStatus = Literal["PASS", "KNOWN_DEVIATION", "FAIL"]
 _FLOAT_TOLERANCE = 1e-6
 _LOCAL_REFERENCE_FIXTURE_PATH = Path(__file__).with_name("data") / "reference_patch_local_fixtures.json"
+_CANONICAL_REFERENCE_FIXTURE_PATH = Path(__file__).with_name("data") / "reference_patch_canonical_fixtures.json"
 
 
 @dataclass(frozen=True)
@@ -110,6 +111,22 @@ class _LocalReferenceNeighborPayload(_LocalReferencePayload):
 class _LocalReferenceAnchorPayload(TypedDict):
     root: _LocalReferenceRootPayload
     neighbors: list[_LocalReferenceNeighborPayload]
+
+
+class _CanonicalPatchCellPayload(TypedDict):
+    kind: str
+    orientation_token: str | None
+    chirality_token: str | None
+    decoration_tokens: list[str] | None
+    center: list[float]
+    vertices: list[list[float]]
+    id: NotRequired[str]
+
+
+class _CanonicalPatchFixturePayload(TypedDict):
+    depth: int
+    include_id: bool
+    cells: list[_CanonicalPatchCellPayload]
 
 
 def _topology_adjacency_pairs(topology: LatticeTopology) -> tuple[tuple[str, str], ...]:
@@ -270,6 +287,67 @@ def _load_local_reference_fixtures() -> dict[str, dict[str, dict[str, object]]]:
     return json.loads(_LOCAL_REFERENCE_FIXTURE_PATH.read_text(encoding="utf-8"))
 
 
+def _load_canonical_reference_fixtures() -> dict[str, dict[str, _CanonicalPatchFixturePayload]]:
+    return json.loads(_CANONICAL_REFERENCE_FIXTURE_PATH.read_text(encoding="utf-8"))
+
+
+def _canonical_patch_payload(
+    topology: LatticeTopology,
+    *,
+    include_id: bool,
+) -> list[_CanonicalPatchCellPayload]:
+    polygon_cells = [
+        cell
+        for cell in topology.cells
+        if cell.vertices is not None and cell.center is not None
+    ]
+    if not polygon_cells:
+        return []
+    min_x = min(vertex[0] for cell in polygon_cells for vertex in cell.vertices or ())
+    min_y = min(vertex[1] for cell in polygon_cells for vertex in cell.vertices or ())
+
+    normalized: list[tuple[tuple[object, ...], _CanonicalPatchCellPayload]] = []
+    for cell in polygon_cells:
+        if cell.vertices is None or cell.center is None:
+            continue
+        decoration_tokens = (
+            sorted(cell.decoration_tokens)
+            if cell.decoration_tokens is not None
+            else None
+        )
+        payload: _CanonicalPatchCellPayload = {
+            "kind": cell.kind,
+            "orientation_token": cell.orientation_token,
+            "chirality_token": cell.chirality_token,
+            "decoration_tokens": decoration_tokens,
+            "center": [
+                round(cell.center[0] - min_x, 6),
+                round(cell.center[1] - min_y, 6),
+            ],
+            "vertices": [
+                [round(vertex[0] - min_x, 6), round(vertex[1] - min_y, 6)]
+                for vertex in cell.vertices
+            ],
+        }
+        if include_id:
+            payload["id"] = cell.id
+        normalized.append(
+            (
+                (
+                    payload["kind"],
+                    payload["orientation_token"] or "",
+                    payload["chirality_token"] or "",
+                    tuple(payload["decoration_tokens"] or []),
+                    tuple(payload["center"]),
+                    tuple(tuple(vertex) for vertex in payload["vertices"]),
+                    payload.get("id", ""),
+                ),
+                payload,
+            )
+        )
+    return [payload for _, payload in sorted(normalized, key=lambda item: item[0])]
+
+
 def _cell_local_reference_payload(
     topology: LatticeTopology,
     anchor_id: str,
@@ -368,6 +446,57 @@ def _local_reference_fixture_failures(
                 )
             )
     return failures
+
+
+def _canonical_patch_fixture_failures(
+    geometry: str,
+    depth: int,
+    topology: LatticeTopology,
+    expectation: ReferenceDepthExpectation,
+) -> list[ReferenceCheckFailure]:
+    fixture_key = expectation.canonical_patch_fixture_key
+    if fixture_key is None:
+        return []
+    geometry_fixtures = _load_canonical_reference_fixtures().get(geometry, {})
+    fixture = geometry_fixtures.get(fixture_key)
+    if fixture is None:
+        return [
+            ReferenceCheckFailure(
+                code="missing-canonical-patch-fixture",
+                message=(
+                    f"Depth {depth} expected canonical patch fixture {fixture_key!r} "
+                    f"for {geometry} but none was checked in."
+                ),
+                depth=depth,
+            )
+        ]
+    fixture_depth = int(fixture.get("depth", depth))
+    if fixture_depth != depth:
+        return [
+            ReferenceCheckFailure(
+                code="canonical-patch-fixture-depth-mismatch",
+                message=(
+                    f"Depth {depth} expected canonical patch fixture {fixture_key!r} "
+                    f"for {geometry}, but the checked-in fixture declared depth {fixture_depth}."
+                ),
+                depth=depth,
+            )
+        ]
+    include_id = bool(fixture.get("include_id", False))
+    observed_payload = _canonical_patch_payload(topology, include_id=include_id)
+    expected_payload = fixture.get("cells", [])
+    if observed_payload != expected_payload:
+        return [
+            ReferenceCheckFailure(
+                code="canonical-patch-fixture-mismatch",
+                message=(
+                    f"Depth {depth} canonical patch payload for {geometry} fixture "
+                    f"{fixture_key!r} did not match the checked-in canonical serialization."
+                ),
+                depth=depth,
+            )
+        ]
+    return []
 
 
 def _observe_reference_topology(
@@ -825,6 +954,7 @@ def _depth_topology_expectation_failures(
                 )
             )
     failures.extend(_local_reference_fixture_failures(geometry, depth, topology))
+    failures.extend(_canonical_patch_fixture_failures(geometry, depth, topology, expectation))
     return failures
 
 
@@ -1026,6 +1156,17 @@ def _periodic_face_interior_vertex_configuration_frequencies(
     )
 
 
+def _periodic_face_vertex_valence_frequency_signature(
+    configuration_frequencies: tuple[tuple[tuple[str, ...], int], ...],
+) -> tuple[tuple[int, int], ...]:
+    return tuple(
+        sorted(
+            (len(configuration), count)
+            for configuration, count in configuration_frequencies
+        )
+    )
+
+
 def _periodic_face_unique_polygon_side_counts(
     cells: tuple[PeriodicFaceCell, ...],
 ) -> tuple[int, ...]:
@@ -1086,6 +1227,70 @@ def _periodic_face_dual_structure_failure(
                 f"{geometry} expected reciprocal dual structure with {dual_geometry}: "
                 f"face side counts {observed_side_counts!r} vs dual interior vertex valences {dual_vertex_valences!r}, "
                 f"and interior vertex valences {observed_vertex_valences!r} vs dual face side counts {dual_side_counts!r}."
+            ),
+        )
+    return None
+
+
+def _periodic_face_dual_candidate_failure(
+    *,
+    geometry: str,
+    periodic_descriptor: PeriodicDescriptorExpectation,
+    sample_cells: tuple[PeriodicFaceCell, ...],
+    observed_vertex_configurations: tuple[tuple[str, ...], ...],
+    observed_vertex_configuration_frequencies: tuple[tuple[tuple[str, ...], int], ...],
+) -> ReferenceCheckFailure | None:
+    expected_candidates = tuple(sorted(periodic_descriptor.expected_dual_candidate_geometries))
+    expected_signature = periodic_descriptor.expected_dual_structure_signature
+    if not expected_candidates and expected_signature is None:
+        return None
+
+    observed_side_counts = _periodic_face_unique_polygon_side_counts(sample_cells)
+    observed_vertex_valences = tuple(sorted({len(configuration) for configuration in observed_vertex_configurations}))
+    candidate_geometries: list[str] = []
+    for candidate_geometry, candidate_spec in sorted(REFERENCE_FAMILY_SPECS.items()):
+        if candidate_geometry == geometry:
+            continue
+        if candidate_spec.periodic_descriptor is None or not is_periodic_face_tiling(candidate_geometry):
+            continue
+        candidate_width, candidate_height = _periodic_face_sample_size(
+            candidate_spec,
+            max(candidate_spec.depth_expectations, default=3),
+        )
+        candidate_cells = get_periodic_face_tiling_descriptor(candidate_geometry).build_faces(
+            candidate_width,
+            candidate_height,
+        )
+        candidate_side_counts = _periodic_face_unique_polygon_side_counts(candidate_cells)
+        candidate_vertex_valences = tuple(
+            sorted(
+                {
+                    len(configuration)
+                    for configuration in _periodic_face_interior_vertex_configurations(candidate_cells)
+                }
+            )
+        )
+        if observed_side_counts == candidate_vertex_valences and candidate_side_counts == observed_vertex_valences:
+            candidate_geometries.append(candidate_geometry)
+    observed_candidates = tuple(candidate_geometries)
+    if expected_candidates and observed_candidates != expected_candidates:
+        return ReferenceCheckFailure(
+            code="descriptor-dual-candidate-class-mismatch",
+            message=(
+                f"{geometry} expected periodic dual candidate class {expected_candidates!r} "
+                f"but observed {observed_candidates!r}."
+            ),
+        )
+
+    observed_signature = _periodic_face_vertex_valence_frequency_signature(
+        observed_vertex_configuration_frequencies
+    )
+    if expected_signature is not None and observed_signature != expected_signature:
+        return ReferenceCheckFailure(
+            code="descriptor-dual-candidate-structure-mismatch",
+            message=(
+                f"{geometry} expected periodic dual-structure signature "
+                f"{expected_signature!r} but saw {observed_signature!r}."
             ),
         )
     return None
@@ -1278,6 +1483,15 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
                 ),
             )
         )
+    dual_candidate_failure = _periodic_face_dual_candidate_failure(
+        geometry=spec.geometry,
+        periodic_descriptor=periodic_descriptor,
+        sample_cells=sample_cells,
+        observed_vertex_configurations=observed_vertex_configurations,
+        observed_vertex_configuration_frequencies=observed_vertex_configuration_frequencies,
+    )
+    if dual_candidate_failure is not None:
+        failures.append(dual_candidate_failure)
     dual_failure = _periodic_face_dual_structure_failure(
         geometry=spec.geometry,
         periodic_descriptor=periodic_descriptor,

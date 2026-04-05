@@ -2,17 +2,16 @@
 
 ## Now
 
-- Extend periodic dual-family verification beyond the currently unambiguous reciprocal catalog pairs.
-- Expand the local reference-data layer from rooted neighborhood fixtures into direct canonical patch comparisons where that buys materially stronger guarantees.
-- Re-verify browser-visible pattern correctness for the experimental `square-triangle`, `shield`, and `pinwheel` families before moving them out of the picker's `Experimental` group.
-
-## Next
-
+- Revisit browser-visible shape and pattern correctness for `square-triangle`, `shield`, and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
 - Broaden browser-visible rendering-bounds verification beyond the current representative fixture set.
 - Tighten the frontend representative polygon-overlap path enough to add `robinson-triangles` and `tuebingen-triangle` cleanly; Robinson still reuses cell ids in its split patch payload, and Tuebingen still produces small adapter-space slivers at the current overlap epsilon.
 - Improve the adapter-space overlap helper enough to lower the frontend positive-area overlap epsilon below the current `2e-4` without regressing known-good exact-path families such as `pinwheel`.
+
+## Next
+
 - Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.
-- If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample and rooted local-reference anchors.
+- Extend direct canonical patch comparisons beyond `square-triangle`, `shield`, and `pinwheel` where they buy materially stronger guarantees.
+- If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
 
 ## Later
 
@@ -24,5 +23,4 @@
 
 ## Maybe
 
-- Add full canonical patch-diff workflows on top of the current local-reference fixture layer.
 - Extend browser-visible rendering-bounds verification from geometry-level sanity into richer layout regression checks.

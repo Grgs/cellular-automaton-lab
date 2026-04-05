@@ -27,6 +27,8 @@ class PeriodicDescriptorExpectation:
     expected_interior_vertex_configurations: tuple[tuple[str, ...], ...]
     expected_interior_vertex_configuration_frequencies: tuple[tuple[tuple[str, ...], int], ...]
     expected_dual_geometry: str | None = None
+    expected_dual_candidate_geometries: tuple[str, ...] = ()
+    expected_dual_structure_signature: tuple[tuple[int, int], ...] | None = None
     canonical_grid_size: tuple[int, int] | None = None
 
 
@@ -55,6 +57,7 @@ class ReferenceDepthExpectation:
     min_bounds_longest_span: float | None = None
     max_bounds_aspect_ratio: float | None = None
     expected_signature: str | None = None
+    canonical_patch_fixture_key: str | None = None
 
 
 @dataclass(frozen=True)
@@ -247,6 +250,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configuration_frequencies=(
                 (("hexagon", "square", "triangle", "square"), 82),
             ),
+            expected_dual_candidate_geometries=(
+                "deltoidal-hexagonal",
+                "deltoidal-trihexagonal",
+            ),
+            expected_dual_structure_signature=((4, 82),),
         ),
     ),
     "archimedean-4-6-12": ReferenceFamilySpec(
@@ -309,6 +317,12 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configuration_frequencies=(
                 (("square", "triangle", "square", "triangle", "triangle"), 53),
             ),
+            expected_dual_candidate_geometries=(
+                "cairo-pentagonal",
+                "prismatic-pentagonal",
+                "snub-square-dual",
+            ),
+            expected_dual_structure_signature=((5, 53),),
         ),
     ),
     "archimedean-3-3-3-4-4": ReferenceFamilySpec(
@@ -343,6 +357,12 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configuration_frequencies=(
                 (("square", "square", "triangle", "triangle", "triangle"), 55),
             ),
+            expected_dual_candidate_geometries=(
+                "cairo-pentagonal",
+                "prismatic-pentagonal",
+                "snub-square-dual",
+            ),
+            expected_dual_structure_signature=((5, 55),),
         ),
     ),
     "archimedean-3-3-3-3-6": ReferenceFamilySpec(
@@ -437,6 +457,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 (("pentagon", "pentagon", "pentagon"), 26),
                 (("pentagon", "pentagon", "pentagon", "pentagon"), 10),
             ),
+            expected_dual_candidate_geometries=(
+                "archimedean-3-3-3-4-4",
+                "archimedean-3-3-4-3-4",
+            ),
+            expected_dual_structure_signature=((3, 26), (4, 10)),
         ),
     ),
     "rhombille": ReferenceFamilySpec(
@@ -504,6 +529,8 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 (("kite", "kite", "kite", "kite"), 43),
                 (("kite", "kite", "kite", "kite", "kite", "kite"), 12),
             ),
+            expected_dual_candidate_geometries=("archimedean-3-4-6-4",),
+            expected_dual_structure_signature=((3, 30), (4, 43), (6, 12)),
         ),
     ),
     "tetrakis-square": ReferenceFamilySpec(
@@ -604,6 +631,8 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 (("kite", "kite", "kite", "kite"), 40),
                 (("kite", "kite", "kite", "kite", "kite", "kite"), 12),
             ),
+            expected_dual_candidate_geometries=("archimedean-3-4-6-4",),
+            expected_dual_structure_signature=((3, 28), (4, 40), (6, 12)),
         ),
     ),
     "prismatic-pentagonal": ReferenceFamilySpec(
@@ -636,6 +665,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 (("pentagon", "pentagon", "pentagon"), 60),
                 (("pentagon", "pentagon", "pentagon", "pentagon"), 25),
             ),
+            expected_dual_candidate_geometries=(
+                "archimedean-3-3-3-4-4",
+                "archimedean-3-3-4-3-4",
+            ),
+            expected_dual_structure_signature=((3, 60), (4, 25)),
         ),
     ),
     "floret-pentagonal": ReferenceFamilySpec(
@@ -704,6 +738,11 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 (("pentagon", "pentagon", "pentagon"), 55),
                 (("pentagon", "pentagon", "pentagon", "pentagon"), 25),
             ),
+            expected_dual_candidate_geometries=(
+                "archimedean-3-3-3-4-4",
+                "archimedean-3-3-4-3-4",
+            ),
+            expected_dual_structure_signature=((3, 55), (4, 25)),
         ),
     ),
     "penrose-p3-rhombs": ReferenceFamilySpec(
@@ -1067,6 +1106,7 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 min_unique_orientation_tokens=12,
                 min_unique_chirality_tokens=3,
                 expected_signature="cdf9cac072d0",  # pragma: allowlist secret
+                canonical_patch_fixture_key="dense-depth-3",
             ),
         },
         notes=(
@@ -1115,6 +1155,7 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     ("shield-shield", 2),
                     ("shield-triangle", 2),
                 ),
+                canonical_patch_fixture_key="decorated-depth-1",
             ),
         },
         notes=(
@@ -1157,6 +1198,7 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 exact_total_cells=250,
                 min_unique_orientation_tokens=30,
                 min_bounds_longest_span=12.0,
+                canonical_patch_fixture_key="exact-depth-3",
             ),
         },
         builder_signals=(

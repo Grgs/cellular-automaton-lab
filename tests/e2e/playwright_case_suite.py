@@ -48,6 +48,7 @@ class SharedUiFlowCase(Protocol):
     def assertEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
     def assertTrue(self, expr: Any, msg: str | None = None) -> None: ...
     def assertGreater(self, first: Any, second: Any, msg: str | None = None) -> None: ...
+    def assertGreaterEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
 
 
 class SharedUiFlowMixin:
@@ -175,6 +176,20 @@ class SharedUiFlowMixin:
             }""",
         )
 
+    def _select_tiling_family_and_wait_for_reset(
+        self,
+        tiling_family: str,
+        *,
+        timeout_ms: int = 60_000,
+    ) -> None:
+        case = self._case()
+        with case.page.expect_response(
+            lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
+            timeout=timeout_ms,
+        ) as response_info:
+            case.page.select_option("#tiling-family-select", tiling_family)
+        case.assertEqual(response_info.value.status, 200)
+
     def _wait_for_canvas_visual_patch(
         self,
         *,
@@ -258,11 +273,14 @@ class SharedUiFlowMixin:
             minimum_coverage_width_ratio=minimum_coverage_width_ratio,
             minimum_coverage_height_ratio=minimum_coverage_height_ratio,
         )
+        case = self._case()
         summary = self._canvas_visual_summary()
         dominant_fill_colors = cast(list[list[object]], summary["dominantFillColors"])
-        self.assertGreater(float(summary["coverageWidthRatio"]), minimum_coverage_width_ratio)
-        self.assertGreater(float(summary["coverageHeightRatio"]), minimum_coverage_height_ratio)
-        self.assertGreaterEqual(len(dominant_fill_colors), minimum_fill_colors)
+        coverage_width_ratio = cast(float, summary["coverageWidthRatio"])
+        coverage_height_ratio = cast(float, summary["coverageHeightRatio"])
+        case.assertGreater(coverage_width_ratio, minimum_coverage_width_ratio)
+        case.assertGreater(coverage_height_ratio, minimum_coverage_height_ratio)
+        case.assertGreaterEqual(len(dominant_fill_colors), minimum_fill_colors)
 
     def _export_pattern_payload(self) -> dict[str, object]:
         case = self._case()
@@ -398,46 +416,28 @@ class SharedUiFlowMixin:
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_square_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
-        case = self._case()
-        case.page.select_option("#tiling-family-select", "square-triangle")
+        self._select_tiling_family_and_wait_for_reset("square-triangle")
 
         self._expect("#tiling-family-select").to_have_value("square-triangle")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=3)
 
     def test_shield_topology_switch_renders_aperiodic_patch(self) -> None:
-        case = self._case()
-        case.page.select_option("#tiling-family-select", "shield")
+        self._select_tiling_family_and_wait_for_reset("shield")
 
         self._expect("#tiling-family-select").to_have_value("shield")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_pinwheel_topology_switch_renders_aperiodic_patch(self) -> None:
-        case = self._case()
-        case.page.select_option("#tiling-family-select", "pinwheel")
+        self._select_tiling_family_and_wait_for_reset("pinwheel")
 
         self._expect("#tiling-family-select").to_have_value("pinwheel")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_deltoidal_hexagonal_topology_switch_renders_periodic_patch(self) -> None:
         case = self._case()

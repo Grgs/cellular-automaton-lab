@@ -215,4 +215,16 @@ describe("geometry/render-bounds", () => {
             expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(0.8);
         }
     });
+
+    it("frames promoted-experimental candidate fixtures tightly enough for browser-visible review", async () => {
+        for (const filename of [
+            "square-triangle-depth-3.json",
+            "shield-depth-3.json",
+            "pinwheel-depth-3.json",
+        ]) {
+            const rendered = await renderedMetricsAndBoundsForFixture(filename);
+            expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(0.75);
+            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(0.75);
+        }
+    });
 });

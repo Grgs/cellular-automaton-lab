@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 from backend.simulation.literature_reference_verification import (
+    _canonical_patch_payload,
     _depth_topology_expectation_failures,
     _canonicalize_vertex_configuration,
     _local_reference_fixture_failures,
@@ -287,6 +288,50 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             )
         )
 
+    def test_periodic_face_descriptor_reports_wrong_dual_candidate_class_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-3-4-6-4"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-3-4-6-4 must define a periodic descriptor expectation")
+        wrong_spec = replace(
+            spec,
+            periodic_descriptor=replace(
+                periodic_descriptor,
+                expected_dual_candidate_geometries=("deltoidal-hexagonal",),
+            ),
+        )
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-dual-candidate-class-mismatch"
+                for failure in failures
+            )
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_dual_candidate_structure_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-3-3-4-3-4"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-3-3-4-3-4 must define a periodic descriptor expectation")
+        wrong_spec = replace(
+            spec,
+            periodic_descriptor=replace(
+                periodic_descriptor,
+                expected_dual_structure_signature=((5, 54),),
+            ),
+        )
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-dual-candidate-structure-mismatch"
+                for failure in failures
+            )
+        )
+
     def test_periodic_face_descriptor_reports_wrong_canonical_grid_size(self) -> None:
         spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
         periodic_descriptor = spec.periodic_descriptor
@@ -368,6 +413,69 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
                     _local_reference_fixture_failures(geometry, depth, topology),
                     [],
                 )
+
+    def test_canonical_patch_payload_is_deterministic(self) -> None:
+        first = _canonical_patch_payload(
+            build_topology("square-triangle", 0, 0, 3),
+            include_id=False,
+        )
+        second = _canonical_patch_payload(
+            build_topology("square-triangle", 0, 0, 3),
+            include_id=False,
+        )
+
+        self.assertEqual(first, second)
+
+    def test_stronger_substitution_families_match_checked_in_canonical_patch_fixtures(self) -> None:
+        for geometry, depth in (
+            ("square-triangle", 3),
+            ("shield", 1),
+            ("pinwheel", 3),
+        ):
+            with self.subTest(geometry=geometry, depth=depth):
+                result = verify_reference_family(geometry)
+                self.assertEqual(result.status, "PASS")
+                self.assertFalse(
+                    [
+                        failure
+                        for failure in result.failures
+                        if failure.code == "canonical-patch-fixture-mismatch"
+                    ]
+                )
+
+    def test_canonical_patch_fixture_reports_mismatch(self) -> None:
+        topology = build_topology("shield", 0, 0, 1)
+        observed_cells = _canonical_patch_payload(topology, include_id=False)
+        bad_cells = list(observed_cells)
+        bad_cells[0] = {
+            **bad_cells[0],
+            "kind": "not-a-shield",
+        }
+        bad_fixtures = {
+            "shield": {
+                "decorated-depth-1": {
+                    "depth": 1,
+                    "include_id": False,
+                    "cells": bad_cells,
+                }
+            }
+        }
+
+        expectation = REFERENCE_FAMILY_SPECS["shield"].depth_expectations[1]
+        with patch(
+            "backend.simulation.literature_reference_verification._load_canonical_reference_fixtures",
+            return_value=bad_fixtures,
+        ):
+            failures = _depth_topology_expectation_failures(
+                geometry="shield",
+                depth=1,
+                topology=topology,
+                expectation=expectation,
+            )
+
+        self.assertTrue(
+            any(failure.code == "canonical-patch-fixture-mismatch" for failure in failures)
+        )
 
     def test_local_reference_fixture_reports_mismatch(self) -> None:
         topology = build_topology("hat-monotile", 0, 0, 2)

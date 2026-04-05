@@ -8,16 +8,15 @@ None.
 
 ## Current Known Deviations
 
-- `square-triangle`, `shield`, and `pinwheel` remain available in the codebase and verification suite, but are exposed under the picker's `Experimental` group until browser-visible pattern correctness is re-verified.
+- `square-triangle`, `shield`, and `pinwheel` still fail manual visible review even though they now pass stronger backend, canonical-patch, and browser-visible automated checks. They remain in `Experimental` until the rendered patterns look correct enough to justify promotion.
 
 ## Known Limits That Are Not Currently Treated As Failures
 
 - Periodic mixed families are still verified on finite open-boundary canonical samples rather than larger-sample or quotient-surface proofs. The reference layer now supports per-family periodic sample sizes, but the current audit kept the shipped catalog on `3x3`.
-- Reciprocal dual-family invariants currently cover only the periodic pairs whose dual matches are unambiguous in the current catalog.
-- The new local-reference layer compares rooted canonical neighborhoods, not full canonical patch diffs.
+- Periodic dual-family invariants now cover the unambiguous reciprocal pairs plus candidate-class signature checks for the currently ambiguous catalog groups, but they are still finite-sample descriptor checks rather than full dual-construction proofs.
+- The reference layer now mixes rooted local-reference anchors with direct canonical patch diffs for `square-triangle`, `shield`, and `pinwheel`; it is not yet full canonical patch coverage for every family.
 - Several aperiodic families are verified through deterministic low-depth samples, count invariants, adjacency rules, and metadata presence rather than a full symbolic substitution proof.
 - Render-space overlap checks still need a tolerance of `2e-4` because the adapter-space polygon-clipping path for exact-path families like `pinwheel` is noisier than the backend topology-space overlap check.
-- Shield decorations now influence dead-state rendering accents, but that does not yet count as full browser-visible re-approval of the family.
 - Pinwheel contiguity now uses exact positive-length segment-overlap neighbors on the exact-affine path because the substitution is not edge-to-edge at every subdivision step.
 
 ## When To Add An Entry Here

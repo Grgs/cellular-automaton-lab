@@ -17,11 +17,22 @@ from backend.simulation.topology_validation import recommended_validation_option
 _LOCAL_REFERENCE_FIXTURE_PATH = (
     ROOT / "backend" / "simulation" / "data" / "reference_patch_local_fixtures.json"
 )
+_CANONICAL_REFERENCE_FIXTURE_PATH = (
+    ROOT / "backend" / "simulation" / "data" / "reference_patch_canonical_fixtures.json"
+)
 
 
 @lru_cache(maxsize=1)
 def _load_local_reference_geometries() -> set[str]:
     payload = json.loads(_LOCAL_REFERENCE_FIXTURE_PATH.read_text(encoding="utf-8"))
+    return set(payload)
+
+
+@lru_cache(maxsize=1)
+def _load_canonical_reference_geometries() -> set[str]:
+    if not _CANONICAL_REFERENCE_FIXTURE_PATH.exists():
+        return set()
+    payload = json.loads(_CANONICAL_REFERENCE_FIXTURE_PATH.read_text(encoding="utf-8"))
     return set(payload)
 
 
@@ -39,6 +50,8 @@ def _strength_tags(geometry: str) -> tuple[str, ...]:
         tags.extend(("descriptor", "vertex-stars"))
         if spec.periodic_descriptor.expected_dual_geometry is not None:
             tags.append("dual-checks")
+        if spec.periodic_descriptor.expected_dual_candidate_geometries:
+            tags.append("dual-candidate-checks")
     if any(
         expectation.expected_polygon_area_frequencies_by_kind is not None
         for expectation in spec.depth_expectations.values()
@@ -46,6 +59,8 @@ def _strength_tags(geometry: str) -> tuple[str, ...]:
         tags.append("area-hierarchy")
     if geometry in _load_local_reference_geometries():
         tags.append("local-reference")
+    if geometry in _load_canonical_reference_geometries():
+        tags.append("canonical-patch")
     if spec.exact_reference_mode is not None:
         tags.append("exact-path")
     if all(recommended_validation_options(geometry).values()):

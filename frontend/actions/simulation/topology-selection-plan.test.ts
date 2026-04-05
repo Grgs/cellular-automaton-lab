@@ -91,6 +91,39 @@ describe("topology-selection-plan", () => {
         expect(result.resetBody.topology_spec.patch_depth).toBe(5);
     });
 
+    it("falls back to the tiling-family patch-depth default when no memory exists", async () => {
+        window.APP_TOPOLOGIES = [
+            ...window.APP_TOPOLOGIES,
+            {
+                tiling_family: "pinwheel",
+                label: "Pinwheel",
+                picker_group: "Experimental",
+                picker_order: 340,
+                sizing_mode: "patch_depth",
+                family: "aperiodic",
+                render_kind: "polygon_aperiodic",
+                viewport_sync_mode: "presentation-only",
+                supported_adjacency_modes: ["edge"],
+                default_adjacency_mode: "edge",
+                default_rules: { edge: "life-b2-s23" },
+                geometry_keys: { edge: "pinwheel" },
+                sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 4 },
+            },
+        ];
+        const { createAppState } = await import("../../state/simulation-state.js");
+        const { resolveSelectedPatchDepthForTopology } = await import("./topology-selection-plan.js");
+
+        const state = createAppState();
+        state.activeRule = makeRule("conway");
+
+        expect(
+            resolveSelectedPatchDepthForTopology(state, {
+                tiling_family: "pinwheel",
+                adjacency_mode: "edge",
+            }),
+        ).toBe(3);
+    });
+
     it("computes viewport dimensions for non-patch-depth selections when requested", async () => {
         const { createAppState } = await import("../../state/simulation-state.js");
         const { planTopologySelection } = await import("./topology-selection-plan.js");

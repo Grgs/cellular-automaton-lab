@@ -26,7 +26,8 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - deterministic signature
   - exact interior vertex-configuration set
   - exact interior vertex-configuration frequencies
-  - selected reciprocal dual-family edge-count / vertex-valence compatibility
+  - reciprocal dual-family edge-count / vertex-valence compatibility for unambiguous pairs
+  - dual-candidate class and interior-valence signature checks for the currently ambiguous catalog groups
 - Additional periodic-face checks:
   - `metric_model == "pattern"`
   - `cell_count_per_unit` matches the number of loaded face templates
@@ -47,6 +48,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - deterministic signature
   - metadata presence for families that expose orientation, chirality, tile family, or decorations
   - family-specific rooted local-reference fixtures where low-depth counts/signatures alone are too weak
+  - direct canonical patch comparisons where rooted local anchors are still too weak
   - exact polygon-area frequency checks where multiscale hierarchy is part of the family model
 
 ## Family-Specific Notes
@@ -58,11 +60,12 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - exact-record ids must match serialized patch ids
   - representative support should expand with depth on the exact-affine inflation path
   - a rooted local-reference anchor now checks the exact-path neighborhood around a canonical depth-3 tile
+  - a direct canonical depth-3 patch fixture now checks the exact serialized patch on that exact-affine path
 - `shield`
   - `decoration_tokens` are part of the verification surface
   - decorated cell kinds should expose multiple decoration-token variants in representative patches
   - rooted local-reference fixtures now check canonical decorated neighborhoods
-  - dead-state rendering now uses decoration-aware accents, but picker promotion still depends on separate browser-visible approval
+  - a direct decorated depth-1 canonical patch fixture now checks exact public geometry plus decoration tokens
 - `hat-monotile`
   - verification assumes an `H8`-rooted representative patch rather than a one-tile seed
   - representative patches should include opposite-chirality Hat adjacencies
@@ -75,6 +78,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - the authoritative verifier sample is now a cleaned dense depth-3 central component of the literature patch, not just a shallow adjacency shell
   - that depth-3 sample must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
   - rooted local-reference fixtures now pin a few canonical square/triangle neighborhoods inside that dense sample
+  - a direct canonical depth-3 patch fixture now checks the normalized public square/triangle serialization exactly
 - `chair`
   - representative patches should follow the true inflation-by-2 chair substitution from a single chair seed
   - low-depth samples should preserve exact substitution depth totals and orientation-token distributions
@@ -84,6 +88,6 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 
 - For many families, the verifier is strongest at the level of deterministic low-depth samples, count invariants, and adjacency vocabulary.
 - For periodic families, the verifier is now stronger than a plain sample-signature check, but it still targets finite family-specific open-boundary boards rather than quotient-surface or large-sample proofs.
-- Reciprocal dual-family checks currently cover only the periodic pairs whose dual matches are unambiguous in the current catalog.
-- The new local-reference layer is rooted-neighborhood based; it is not yet a full canonical patch-diff system.
+- Periodic dual-family checks now cover unambiguous reciprocal pairs and the current ambiguous candidate classes, but they are still finite-sample descriptor checks rather than full dual constructions.
+- The new reference layer mixes rooted neighborhoods with direct canonical patch diffs for selected families; it is not yet a full canonical patch-diff system across the whole catalog.
 - That is stronger than screenshot plausibility, but it is still not the same thing as a full symbolic proof that the generator exactly matches the literature’s substitution system at all depths.

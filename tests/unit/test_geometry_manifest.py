@@ -195,7 +195,7 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertTrue(geometry_uses_patch_depth(SPECTRE_GEOMETRY))
         self.assertFalse(geometry_uses_backend_viewport_sync(SPECTRE_GEOMETRY))
 
-    def test_experimental_aperiodic_geometries_are_grouped_as_experimental(self) -> None:
+    def test_recent_aperiodic_geometries_remain_experimental(self) -> None:
         for geometry in (SQUARE_TRIANGLE_GEOMETRY, SHIELD_GEOMETRY, PINWHEEL_GEOMETRY):
             with self.subTest(geometry=geometry):
                 definition = get_topology_variant_for_geometry(geometry)
