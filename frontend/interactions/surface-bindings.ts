@@ -14,6 +14,7 @@ export function createInteractionSurfaceBindings({
     setHoveredCell,
     setSelectedCell,
     getSelectedCell,
+    clearGestureOutline,
     paintCell,
     resolveDirectGestureTargetState,
     bindGridInteractionsFn = bindGridInteractionsToSurface,
@@ -36,10 +37,12 @@ export function createInteractionSurfaceBindings({
         begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
         update(cell: PaintableCell): void;
         end(): Promise<unknown>;
+        cancel(): Promise<null>;
     };
     setHoveredCell: (cell: PaintableCell | null) => void;
     setSelectedCell: (cell: PaintableCell | null) => void;
     getSelectedCell: () => PaintableCell | null;
+    clearGestureOutline: () => void;
     paintCell: (cell: PaintableCell, stateValue?: number) => Promise<void>;
     resolveDirectGestureTargetState: (cell: PaintableCell) => number;
     bindGridInteractionsFn?: ((options: GridInteractionBindings) => void) | undefined;
@@ -83,6 +86,7 @@ export function createInteractionSurfaceBindings({
                 resolveCellFromEvent,
                 onPointerDown(event: PointerEvent, cell: PaintableCell) {
                     setHoveredCell(null);
+                    clearGestureOutline();
                     const editModeActive = editPolicy.supportsEditorTools() && editPolicy.isEditArmed();
                     if (!editModeActive) {
                         editPolicy.prepareDirectGridInteraction(event);
@@ -148,8 +152,9 @@ export function createInteractionSurfaceBindings({
                     consumeNextClick = false;
                     clearPendingDirectGesture();
                     setHoveredCell(null);
+                    clearGestureOutline();
                     if (legacyDrag.isActive()) {
-                        void legacyDrag.end();
+                        void legacyDrag.cancel();
                         return;
                     }
                     if (!editPolicy.supportsEditorTools()) {

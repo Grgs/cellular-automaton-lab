@@ -265,24 +265,28 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
             if (!geometryCell) {
                 return;
             }
-            if (context.fillStyle !== color) {
-                context.fillStyle = color;
-            }
-            tracePolygonPath(context, geometryCell.vertices);
-            context.fill();
-            const strokeColor = renderStyle?.aperiodicLineColor || renderStyle?.lineColor;
-            if (strokeColor) {
-                if (context.strokeStyle !== strokeColor) {
-                    context.strokeStyle = strokeColor;
-                }
-                context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
-                context.stroke();
-            }
             const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-            if (overlayStyle) {
-                context.fillStyle = overlayStyle.tintColor;
+            if (!overlayStyle || overlayStyle.drawBaseFill) {
+                if (context.fillStyle !== color) {
+                    context.fillStyle = color;
+                }
                 tracePolygonPath(context, geometryCell.vertices);
                 context.fill();
+                const strokeColor = renderStyle?.aperiodicLineColor || renderStyle?.lineColor;
+                if (strokeColor) {
+                    if (context.strokeStyle !== strokeColor) {
+                        context.strokeStyle = strokeColor;
+                    }
+                    context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
+                    context.stroke();
+                }
+            }
+            if (overlayStyle) {
+                if (overlayStyle.tintColor) {
+                    context.fillStyle = overlayStyle.tintColor;
+                    tracePolygonPath(context, geometryCell.vertices);
+                    context.fill();
+                }
                 context.strokeStyle = overlayStyle.strokeColor;
                 context.lineWidth = overlayStyle.strokeWidth;
                 tracePolygonPath(context, geometryCell.vertices);

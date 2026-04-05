@@ -11,7 +11,7 @@ import {
     topologyWidth,
 } from "./topology.js";
 import { resolveGeometryCache } from "./canvas/cache.js";
-import { drawCommittedLayer, drawHoverLayer, drawPreviewLayer, drawSelectionLayer } from "./canvas/render-layers.js";
+import { drawCommittedLayer, drawGestureOutlineLayer, drawHoverLayer, drawPreviewLayer, drawSelectionLayer } from "./canvas/render-layers.js";
 import {
     buildStateColorLookup,
     DEFAULT_COLORS,
@@ -25,7 +25,7 @@ import {
 } from "./canvas/render-style.js";
 import { createCanvasSurface, type CanvasSurfaceMetrics } from "./canvas/surface.js";
 import type { CellStateDefinition, TopologyPayload } from "./types/domain.js";
-import type { PaintableCell, PreviewPaintCell } from "./types/editor.js";
+import type { GestureOutlineTone, PaintableCell, PreviewPaintCell } from "./types/editor.js";
 import type {
     CanvasColors,
     CanvasGridView,
@@ -38,6 +38,8 @@ interface CreateCanvasGridViewOptions {
     canvas: HTMLCanvasElement;
     getDevicePixelRatio?: () => number;
     getComputedStyleFn?: (node: Element) => CSSStyleDeclaration;
+    setTimeoutFn?: (callback: () => void, delay: number) => number;
+    clearTimeoutFn?: (timerId: number) => void;
 }
 
 type RuntimeCanvasGridView = CanvasGridView & {
@@ -127,6 +129,8 @@ export function createCanvasGridView({
     canvas,
     getDevicePixelRatio = () => window.devicePixelRatio || 1,
     getComputedStyleFn = (node) => window.getComputedStyle(node),
+    setTimeoutFn = (callback: () => void, delay: number) => window.setTimeout(callback, delay),
+    clearTimeoutFn = (timerId: number) => window.clearTimeout(timerId),
 }: CreateCanvasGridViewOptions): RuntimeCanvasGridView {
     const surface = createCanvasSurface(canvas);
     let topology: TopologyPayload | null = null;
@@ -143,6 +147,9 @@ export function createCanvasGridView({
     let currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
     let hoveredCell: PaintableCell | null = null;
     let selectedCell: PaintableCell | null = null;
+    let gestureOutlineCells = new Map<string, PaintableCell>();
+    let gestureOutlineTone: GestureOutlineTone | null = null;
+    let gestureOutlineTimerId: number | null = null;
     let lastTopologyRevision: string | null = null;
     let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
@@ -223,11 +230,65 @@ export function createCanvasGridView({
         });
     }
 
+    function drawGestureOutlineOverlay(): void {
+        if (gestureOutlineTone === null || gestureOutlineCells.size === 0) {
+            return;
+        }
+        drawGestureOutlineLayer({
+            context: surface.context,
+            geometry,
+            topology,
+            metrics,
+            geometryCache,
+            canvasColors,
+            renderStyle: currentRenderStyle,
+            colorLookup,
+            resolveRenderedCellColor,
+            outlinedCells: Array.from(gestureOutlineCells.values()),
+            tone: gestureOutlineTone,
+            cellStates,
+        });
+    }
+
     function redrawTransientLayers(): void {
         surface.restoreCommittedSurface(metrics);
         drawHoverOverlay();
         drawSelectionOverlay();
         drawPreviewOverlay();
+        drawGestureOutlineOverlay();
+    }
+
+    function normalizeGestureOutlineCells(cells: PaintableCell[]): Map<string, PaintableCell> {
+        return new Map(
+            cells
+                .map((cell) => [paintableCellKey(cell), { ...cell }])
+                .filter((entry): entry is [string, PaintableCell] => typeof entry[0] === "string" && entry[0].length > 0),
+        );
+    }
+
+    function clearGestureOutlineTimer(): void {
+        if (gestureOutlineTimerId === null) {
+            return;
+        }
+        clearTimeoutFn(gestureOutlineTimerId);
+        gestureOutlineTimerId = null;
+    }
+
+    function clearGestureOutlineState(): void {
+        clearGestureOutlineTimer();
+        gestureOutlineCells = new Map();
+        gestureOutlineTone = null;
+    }
+
+    function shouldClearGestureOutlineForTopology(nextTopology: TopologyPayload | null): boolean {
+        if (gestureOutlineCells.size === 0) {
+            return false;
+        }
+        if (!Array.isArray(nextTopology?.cells)) {
+            return true;
+        }
+        const nextIds = new Set(nextTopology.cells.map((cell) => cell.id));
+        return Array.from(gestureOutlineCells.keys()).some((cellId) => !nextIds.has(cellId));
     }
 
     function drawGrid(): void {
@@ -272,12 +333,16 @@ export function createCanvasGridView({
         const topologyRevisionChanged = lastTopologyRevision !== null && nextTopologyRevision !== lastTopologyRevision;
         if (topologyRevisionChanged) {
             selectedCell = null;
+            clearGestureOutlineState();
         }
         if (
             selectedCell
             && (!Array.isArray(nextTopology?.cells) || !nextTopology.cells.some((cell) => cell.id === selectedCell?.id))
         ) {
             selectedCell = null;
+        }
+        if (!topologyRevisionChanged && shouldClearGestureOutlineForTopology(nextTopology)) {
+            clearGestureOutlineState();
         }
         topology = nextTopology;
         lastTopologyRevision = nextTopologyRevision;
@@ -330,6 +395,48 @@ export function createCanvasGridView({
         return selectedCell ? { ...selectedCell } : null;
     }
 
+    function setGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone): void {
+        clearGestureOutlineTimer();
+        const nextCells = normalizeGestureOutlineCells(cells);
+        const sameTone = gestureOutlineTone === tone;
+        const sameCells = gestureOutlineCells.size === nextCells.size
+            && Array.from(nextCells.keys()).every((key) => gestureOutlineCells.has(key));
+        if (sameTone && sameCells) {
+            return;
+        }
+        gestureOutlineCells = nextCells;
+        gestureOutlineTone = nextCells.size > 0 ? tone : null;
+        redrawTransientLayers();
+    }
+
+    function flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs = 150): void {
+        const nextCells = normalizeGestureOutlineCells(cells);
+        clearGestureOutlineTimer();
+        gestureOutlineCells = nextCells;
+        gestureOutlineTone = nextCells.size > 0 ? tone : null;
+        redrawTransientLayers();
+        if (nextCells.size === 0) {
+            return;
+        }
+        gestureOutlineTimerId = setTimeoutFn(() => {
+            gestureOutlineTimerId = null;
+            if (gestureOutlineCells.size === 0) {
+                return;
+            }
+            gestureOutlineCells = new Map();
+            gestureOutlineTone = null;
+            redrawTransientLayers();
+        }, durationMs);
+    }
+
+    function clearGestureOutline(): void {
+        if (gestureOutlineCells.size === 0 && gestureOutlineTone === null && gestureOutlineTimerId === null) {
+            return;
+        }
+        clearGestureOutlineState();
+        redrawTransientLayers();
+    }
+
     function getCellFromPointerEvent(event: MouseEvent | PointerEvent): PaintableCell | null {
         const rect = canvas.getBoundingClientRect();
         return resolveGeometryCellFromOffset(
@@ -356,6 +463,9 @@ export function createCanvasGridView({
         setHoveredCell,
         setSelectedCell,
         getSelectedCell,
+        setGestureOutline,
+        flashGestureOutline,
+        clearGestureOutline,
         getCellFromPointerEvent,
         getMetrics,
     };

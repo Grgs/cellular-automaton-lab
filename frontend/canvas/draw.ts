@@ -86,7 +86,7 @@ export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): numbe
 export function resolveTransientOverlayStyle(
     renderLayer: RenderedCellArgs["renderLayer"],
     renderStyle: CanvasRenderStyle | undefined,
-): { tintColor: string; strokeColor: string; strokeWidth: number } | null {
+): { tintColor: string | null; strokeColor: string; strokeWidth: number; drawBaseFill: boolean } | null {
     if (!renderStyle) {
         return null;
     }
@@ -95,6 +95,7 @@ export function resolveTransientOverlayStyle(
             tintColor: renderStyle.hoverTintColor,
             strokeColor: renderStyle.hoverStrokeColor,
             strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5),
+            drawBaseFill: true,
         };
     }
     if (renderLayer === "selected") {
@@ -102,6 +103,23 @@ export function resolveTransientOverlayStyle(
             tintColor: renderStyle.selectionTintColor,
             strokeColor: renderStyle.selectionStrokeColor,
             strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, 2.5),
+            drawBaseFill: true,
+        };
+    }
+    if (renderLayer === "gesture-paint") {
+        return {
+            tintColor: null,
+            strokeColor: renderStyle.gesturePaintStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, 2.25),
+            drawBaseFill: false,
+        };
+    }
+    if (renderLayer === "gesture-erase") {
+        return {
+            tintColor: null,
+            strokeColor: renderStyle.gestureEraseStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, 2.25),
+            drawBaseFill: false,
         };
     }
     return null;

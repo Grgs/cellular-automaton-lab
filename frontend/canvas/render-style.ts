@@ -318,6 +318,8 @@ export function resolveCanvasRenderStyle(
             : canvasColors.live,
         selectionTintColor: withAlpha(canvasColors.accent, useDarkHoverPalette ? 0.18 : 0.16),
         selectionStrokeColor: canvasColors.accentStrong || canvasColors.accent,
+        gesturePaintStrokeColor: canvasColors.accentStrong || canvasColors.accent,
+        gestureEraseStrokeColor: canvasColors.lineAperiodic || canvasColors.lineStrong || canvasColors.line,
     };
 }
 

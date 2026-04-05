@@ -36,6 +36,7 @@ export interface PreviewPaintCell extends PaintableCell {
 }
 
 export type PreviewPaintCells = PreviewPaintCell[];
+export type GestureOutlineTone = "paint" | "erase";
 
 export interface DragPaintResult {
     changed: boolean;
@@ -86,6 +87,7 @@ export interface LegacyDragController {
     begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
     update(cell: PaintableCell): void;
     end(): Promise<SimulationSnapshot | null>;
+    cancel(): Promise<null>;
     isActive(): boolean;
     currentPointerId(): number | null;
 }
@@ -109,6 +111,9 @@ export interface EditorSessionOptions {
     getBrushSize?: () => number;
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
+    setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
+    flashGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number) => void;
+    clearGestureOutline: () => void;
     setCellsRequest: SetCellsRequestFunction;
     postControl: PostControlFunction;
     renderControlPanel?: () => void;
@@ -135,6 +140,9 @@ export interface LegacyDragOptions {
     getPaintState: () => number;
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
+    setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
+    flashGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number) => void;
+    clearGestureOutline: () => void;
     setCellsRequest: SetCellsRequestFunction;
     runStateMutation: (
         task: () => Promise<SimulationSnapshot>,
@@ -154,6 +162,9 @@ export interface InteractionControllerOptions {
     setHoveredCell: (cell: PaintableCell | null) => void;
     setSelectedCell: (cell: PaintableCell | null) => void;
     getSelectedCell: () => PaintableCell | null;
+    setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
+    flashGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number) => void;
+    clearGestureOutline: () => void;
     mutationRunner: MutationRunner;
     onError: (error: unknown) => void;
     applySimulationState: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;

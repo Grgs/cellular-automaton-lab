@@ -479,6 +479,10 @@ describe("canvas/render-style", () => {
         expect(resolveCanvasRenderStyle(12, "square", colors).hoverStrokeColor).toBe("#131722");
         expect(resolveCanvasRenderStyle(12, "square", colors).selectionTintColor).toBe("rgba(191, 90, 54, 0.16)");
         expect(resolveCanvasRenderStyle(12, "square", colors).selectionStrokeColor).toBe("#8a3d20");
+        expect(resolveCanvasRenderStyle(12, "square", colors).gesturePaintStrokeColor).toBe("#8a3d20");
+        expect(resolveCanvasRenderStyle(12, "square", colors).gestureEraseStrokeColor).toBe(
+            "rgba(31, 36, 48, 0.24)",
+        );
     });
 
     it("boosts hover contrast in dark theme while keeping the same token inputs", async () => {
@@ -499,6 +503,8 @@ describe("canvas/render-style", () => {
         expect(style.hoverStrokeColor).toBe("rgba(7, 11, 17, 0.9)");
         expect(style.selectionTintColor).toBe("rgba(214, 122, 76, 0.18)");
         expect(style.selectionStrokeColor).toBe("#f1a275");
+        expect(style.gesturePaintStrokeColor).toBe("#f1a275");
+        expect(style.gestureEraseStrokeColor).toBe("rgba(7, 11, 17, 0.42)");
     });
 });
 

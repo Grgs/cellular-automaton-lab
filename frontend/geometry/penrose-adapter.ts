@@ -174,16 +174,20 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             if (!geometryCell) {
                 return;
             }
-            if (context.fillStyle !== color) {
-                context.fillStyle = color;
-            }
-            tracePolygonPath(context, geometryCell.vertices);
-            context.fill();
             const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-            if (overlayStyle) {
-                context.fillStyle = overlayStyle.tintColor;
+            if (!overlayStyle || overlayStyle.drawBaseFill) {
+                if (context.fillStyle !== color) {
+                    context.fillStyle = color;
+                }
                 tracePolygonPath(context, geometryCell.vertices);
                 context.fill();
+            }
+            if (overlayStyle) {
+                if (overlayStyle.tintColor) {
+                    context.fillStyle = overlayStyle.tintColor;
+                    tracePolygonPath(context, geometryCell.vertices);
+                    context.fill();
+                }
                 context.strokeStyle = overlayStyle.strokeColor;
                 context.lineWidth = overlayStyle.strokeWidth;
                 tracePolygonPath(context, geometryCell.vertices);

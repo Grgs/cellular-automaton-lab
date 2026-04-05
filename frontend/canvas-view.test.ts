@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { installFrontendGlobals } from "./test-helpers/bootstrap.js";
 import type { TopologyPayload } from "./types/domain.js";
@@ -44,6 +44,11 @@ describe("canvas-view", () => {
         document.body.innerHTML = "";
         vi.resetModules();
         installFrontendGlobals();
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it("redraws transient layers for hover changes without redrawing the committed layer", async () => {
@@ -51,6 +56,7 @@ describe("canvas-view", () => {
         const drawHoverLayer = vi.fn();
         const drawSelectionLayer = vi.fn();
         const drawPreviewLayer = vi.fn();
+        const drawGestureOutlineLayer = vi.fn();
         const restoreCommittedSurface = vi.fn();
 
         vi.doMock("./canvas/surface.js", () => ({
@@ -67,6 +73,7 @@ describe("canvas-view", () => {
             drawHoverLayer,
             drawSelectionLayer,
             drawPreviewLayer,
+            drawGestureOutlineLayer,
         }));
         vi.doMock("./geometry/registry.js", () => ({
             getGeometryAdapter: () => ({
@@ -113,6 +120,8 @@ describe("canvas-view", () => {
                 hoverStrokeColor: "#1f2430",
                 selectionTintColor: "rgba(191, 90, 54, 0.16)",
                 selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
             }),
             resolveDeadCellColor: vi.fn(),
             resolveRenderedCellColor: () => "#f8f1e5",
@@ -157,11 +166,18 @@ describe("canvas-view", () => {
             drawPreviewLayer.mock.invocationCallOrder.at(-1) ?? Number.POSITIVE_INFINITY,
         );
 
+        view.setGestureOutline([{ id: "square:0:0", x: 0, y: 0 }], "paint");
+
+        expect(drawGestureOutlineLayer).toHaveBeenCalledTimes(1);
+        expect(drawPreviewLayer.mock.invocationCallOrder.at(-1)).toBeLessThan(
+            drawGestureOutlineLayer.mock.invocationCallOrder.at(-1) ?? Number.POSITIVE_INFINITY,
+        );
+
         const restoreCallsBeforeClear = restoreCommittedSurface.mock.calls.length;
         view.setHoveredCell(null);
 
         expect(restoreCommittedSurface).toHaveBeenCalledTimes(restoreCallsBeforeClear + 1);
-        expect(drawHoverLayer).toHaveBeenCalledTimes(2);
+        expect(drawHoverLayer).toHaveBeenCalledTimes(3);
 
         view.setSelectedCell({ id: "square:0:0", x: 0, y: 0 });
 
@@ -172,6 +188,15 @@ describe("canvas-view", () => {
         view.setSelectedCell({ id: "square:0:0", x: 0, y: 0 });
 
         expect(drawSelectionLayer).toHaveBeenCalledTimes(1);
+
+        view.flashGestureOutline([{ id: "square:0:0", x: 0, y: 0 }], "erase", 150);
+
+        expect(drawGestureOutlineLayer.mock.calls.length).toBeGreaterThanOrEqual(2);
+
+        vi.advanceTimersByTime(151);
+
+        expect(restoreCommittedSurface.mock.calls.length).toBeGreaterThan(restoreCallsBeforeClear);
+        const gestureCallsBeforeRevisionChange = drawGestureOutlineLayer.mock.calls.length;
 
         view.render(
             {
@@ -188,5 +213,6 @@ describe("canvas-view", () => {
         );
 
         expect(view.getSelectedCell()).toBeNull();
+        expect(drawGestureOutlineLayer).toHaveBeenCalledTimes(gestureCallsBeforeRevisionChange);
     });
 });

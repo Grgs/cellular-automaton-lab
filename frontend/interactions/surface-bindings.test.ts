@@ -29,6 +29,7 @@ function createSubject({
     setHoveredCell: ReturnType<typeof vi.fn>;
     setSelectedCell: ReturnType<typeof vi.fn>;
     getSelectedCell: ReturnType<typeof vi.fn>;
+    clearGestureOutline: ReturnType<typeof vi.fn>;
     paintCell: ReturnType<typeof vi.fn>;
     resolveDirectGestureTargetState: ReturnType<typeof vi.fn>;
     beginPointerSession: ReturnType<typeof vi.fn>;
@@ -43,6 +44,7 @@ function createSubject({
     const setHoveredCell = vi.fn();
     const setSelectedCell = vi.fn();
     const getSelectedCell = vi.fn(() => null);
+    const clearGestureOutline = vi.fn(() => undefined);
     const editorPointerActive = vi.fn(() => false);
     const legacyPointerActive = vi.fn(() => false);
     const paintCell = vi.fn().mockResolvedValue(undefined);
@@ -82,10 +84,12 @@ function createSubject({
             begin: legacyBegin,
             update: vi.fn(),
             end: vi.fn().mockResolvedValue(null),
+            cancel: vi.fn().mockResolvedValue(null),
         },
         setHoveredCell,
         setSelectedCell,
         getSelectedCell,
+        clearGestureOutline,
         paintCell,
         resolveDirectGestureTargetState,
         bindGridInteractionsFn(options) {
@@ -104,6 +108,7 @@ function createSubject({
         setHoveredCell,
         setSelectedCell,
         getSelectedCell,
+        clearGestureOutline,
         paintCell,
         resolveDirectGestureTargetState,
         beginPointerSession,
@@ -122,11 +127,12 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("clears hover on pointer down before interaction handling", () => {
-        const { handlers, setHoveredCell } = createSubject();
+        const { handlers, setHoveredCell, clearGestureOutline } = createSubject();
 
         handlers.onPointerDown(createEventStub(), { id: "square:1:1", x: 1, y: 1 });
 
         expect(setHoveredCell).toHaveBeenCalledWith(null);
+        expect(clearGestureOutline).toHaveBeenCalledTimes(1);
     });
 
     it("suppresses hover updates while a pointer interaction is active", () => {
@@ -262,6 +268,58 @@ describe("interactions/surface-bindings", () => {
 
         expect(legacyBegin).toHaveBeenCalledWith(cell, undefined);
         expect(resolveDirectGestureTargetState).not.toHaveBeenCalled();
+    });
+
+    it("clears the gesture outline and cancels legacy drag on pointer cancel", () => {
+        const clearGestureOutlineSpy = vi.fn(() => undefined);
+        const cancel = vi.fn().mockResolvedValue(null);
+        const legacyActive = vi.fn(() => true);
+        const localHandlers = createInteractionSurfaceBindings({
+            surfaceElement: document.createElement("canvas"),
+            resolveCellFromEvent: () => ({ id: "square:1:1", x: 1, y: 1 }),
+            editPolicy: {
+                runningBrushEditingEnabled: () => false,
+                dismissEditingUi: () => Promise.resolve(false),
+                prepareDirectGridInteraction: vi.fn(),
+                runningAdvancedToolBlocked: () => false,
+                blockRunningAdvancedTool: vi.fn(),
+                supportsEditorTools: () => false,
+                editingBlockedByRun: () => false,
+                isEditArmed: () => false,
+                armEditingFromGrid: vi.fn(() => ({ consumeNextClick: false })),
+                currentTool: () => "brush",
+            },
+            editorSession: {
+                isPointerActive: vi.fn(() => false),
+                beginPointerSession: vi.fn().mockResolvedValue(true),
+                handlePointerMove: vi.fn(),
+                handlePointerUp: vi.fn().mockResolvedValue(null),
+                cancelActivePreview: vi.fn().mockResolvedValue(undefined),
+                isClickSuppressed: vi.fn(() => false),
+                handleClick: vi.fn().mockResolvedValue({ handled: true }),
+            },
+            legacyDrag: {
+                isActive: legacyActive,
+                begin: vi.fn(),
+                update: vi.fn(),
+                end: vi.fn().mockResolvedValue(null),
+                cancel,
+            },
+            setHoveredCell: vi.fn(),
+            setSelectedCell: vi.fn(),
+            getSelectedCell: vi.fn(() => null),
+            clearGestureOutline: clearGestureOutlineSpy,
+            paintCell: vi.fn().mockResolvedValue(undefined),
+            resolveDirectGestureTargetState: vi.fn(() => 1),
+            bindGridInteractionsFn(options) {
+                options.onPointerCancel({} as PointerEvent);
+            },
+        });
+
+        localHandlers.bindGridInteractions();
+
+        expect(clearGestureOutlineSpy).toHaveBeenCalled();
+        expect(cancel).toHaveBeenCalledTimes(1);
     });
 
     it("selects a cell on right click", () => {

@@ -1,6 +1,6 @@
 import type { ViewportDimensions } from "./controller.js";
 import type { CellStateDefinition, TopologyCell, TopologyPayload } from "./domain.js";
-import type { PaintableCell, PreviewPaintCell, PreviewPaintCells } from "./editor.js";
+import type { GestureOutlineTone, PaintableCell, PreviewPaintCell, PreviewPaintCells } from "./editor.js";
 import type { AppState } from "./state.js";
 
 export interface Point2D {
@@ -69,6 +69,8 @@ export interface CanvasRenderStyle extends RenderStyle {
     hoverStrokeColor: string;
     selectionTintColor: string;
     selectionStrokeColor: string;
+    gesturePaintStrokeColor: string;
+    gestureEraseStrokeColor: string;
 }
 
 export interface HexGeometryCell {
@@ -150,7 +152,7 @@ export interface RenderedCellArgs {
     colors: CanvasColors;
     colorLookup: Map<number, string>;
     renderStyle?: CanvasRenderStyle;
-    renderLayer?: "committed" | "hover" | "selected" | "preview";
+    renderLayer?: "committed" | "hover" | "selected" | "preview" | "gesture-paint" | "gesture-erase";
     resolveRenderedCellColor: (
         stateValue: number,
         colorLookup: Map<number, string>,
@@ -293,5 +295,8 @@ export interface CanvasGridView {
     setHoveredCell(cell: PaintableCell | null): void;
     setSelectedCell(cell: PaintableCell | null): void;
     getSelectedCell(): PaintableCell | null;
+    setGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone): void;
+    flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number): void;
+    clearGestureOutline(): void;
     getCellFromPointerEvent(event: Event): PaintableCell | null;
 }

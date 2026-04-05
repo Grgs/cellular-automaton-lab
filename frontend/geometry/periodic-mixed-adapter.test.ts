@@ -85,6 +85,8 @@ describe("geometry/periodic-mixed-adapter", () => {
                 hoverStrokeColor: "#1f2430",
                 selectionTintColor: "rgba(191, 90, 54, 0.16)",
                 selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
             },
             cellSize: 10,
         });
@@ -155,6 +157,8 @@ describe("geometry/periodic-mixed-adapter", () => {
                 hoverStrokeColor: "#1f2430",
                 selectionTintColor: "rgba(191, 90, 54, 0.16)",
                 selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
             },
             renderLayer: "preview",
             resolveRenderedCellColor: () => "#f8f1e5",
@@ -210,6 +214,8 @@ describe("geometry/periodic-mixed-adapter", () => {
                 hoverStrokeColor: "#1f2430",
                 selectionTintColor: "rgba(191, 90, 54, 0.16)",
                 selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
             },
             renderLayer: "committed",
             resolveRenderedCellColor: () => "#f8f1e5",
@@ -280,6 +286,8 @@ describe("geometry/periodic-mixed-adapter", () => {
                 hoverStrokeColor: "#1f2430",
                 selectionTintColor: "rgba(191, 90, 54, 0.16)",
                 selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
             },
             renderLayer: "hover",
             resolveRenderedCellColor: () => "#f8f1e5",
@@ -351,6 +359,8 @@ describe("geometry/periodic-mixed-adapter", () => {
                 hoverStrokeColor: "#1f2430",
                 selectionTintColor: "rgba(191, 90, 54, 0.16)",
                 selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
             },
             renderLayer: "selected",
             resolveRenderedCellColor: () => "#f8f1e5",
@@ -361,5 +371,78 @@ describe("geometry/periodic-mixed-adapter", () => {
         expect(context.strokeStyle).toBe("#8a3d20");
         expect(context.fillStyle).toBe("rgba(191, 90, 54, 0.16)");
         expect(context.lineWidth).toBe(2.5);
+    });
+
+    it("draws a stroke-only outline for erase gesture polygons", async () => {
+        const { createPeriodicMixedGeometryAdapter } = await import("./periodic-mixed-adapter.js");
+        const adapter = createPeriodicMixedGeometryAdapter(SNUB_SQUARE_GEOMETRY);
+        const context = createContextStub();
+        const cell = {
+            id: "triangle:0",
+            kind: "triangle",
+            center: { x: 71, y: 15 },
+            vertices: [
+                { x: 45, y: 0 },
+                { x: 71, y: 45 },
+                { x: 97, y: 0 },
+            ],
+        };
+
+        adapter.drawCell({
+            context,
+            cell,
+            stateValue: 1,
+            metrics: {
+                geometry: SNUB_SQUARE_GEOMETRY,
+                width: 1,
+                height: 1,
+                cellSize: 10,
+                gap: 0,
+                cssWidth: 10,
+                cssHeight: 10,
+                xInset: 1,
+                yInset: 1,
+                scale: 1,
+                baseMinX: 0,
+                baseMinY: 0,
+                unitWidth: 142,
+                unitHeight: 142,
+                rowOffsetX: 0,
+            },
+            cache: null,
+            colors: {
+                line: "rgba(31, 36, 48, 0.16)",
+                dead: "#f8f1e5",
+                deadAlt: "#d5bb8f",
+                lineSoft: "rgba(31, 36, 48, 0.10)",
+                lineStrong: "rgba(31, 36, 48, 0.20)",
+                lineAperiodic: "rgba(31, 36, 48, 0.24)",
+                live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
+            },
+            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            renderStyle: {
+                mode: "standard",
+                geometry: SNUB_SQUARE_GEOMETRY,
+                lineColorToken: "lineSoft",
+                triangleStrokeEnabled: false,
+                lineColor: "rgba(31, 36, 48, 0.10)",
+                aperiodicLineColor: "rgba(31, 36, 48, 0.24)",
+                hoverTintColor: "rgba(31, 36, 48, 0.20)",
+                hoverStrokeColor: "#1f2430",
+                selectionTintColor: "rgba(191, 90, 54, 0.16)",
+                selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
+            },
+            renderLayer: "gesture-erase",
+            resolveRenderedCellColor: () => "#1f2430",
+        });
+
+        expect(context.fill).not.toHaveBeenCalled();
+        expect(context.stroke).toHaveBeenCalledTimes(1);
+        expect(context.strokeStyle).toBe("rgba(31, 36, 48, 0.24)");
+        expect(context.lineWidth).toBe(2.25);
     });
 });

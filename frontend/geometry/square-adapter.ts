@@ -112,22 +112,26 @@ export const squareGeometryAdapter: GeometryAdapter = {
     drawCell({ context, cell, stateValue, metrics, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
         const squareMetrics = metrics as SquareMetrics;
         const { x, y } = resolveSquareCoordinates(cell);
+        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
         const color = resolveRenderedCellColor(
             stateValue,
             colorLookup,
             colors,
             { geometry: this.geometry, x, y },
         );
-        if (context.fillStyle !== color) {
-            context.fillStyle = color;
-        }
         const cellLeft = squareMetrics.gap + (x * squareMetrics.pitch);
         const cellTop = squareMetrics.gap + (y * squareMetrics.pitch);
-        context.fillRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
-        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-        if (overlayStyle) {
-            context.fillStyle = overlayStyle.tintColor;
+        if (!overlayStyle || overlayStyle.drawBaseFill) {
+            if (context.fillStyle !== color) {
+                context.fillStyle = color;
+            }
             context.fillRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
+        }
+        if (overlayStyle) {
+            if (overlayStyle.tintColor) {
+                context.fillStyle = overlayStyle.tintColor;
+                context.fillRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
+            }
             context.strokeStyle = overlayStyle.strokeColor;
             context.lineWidth = overlayStyle.strokeWidth;
             context.strokeRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);

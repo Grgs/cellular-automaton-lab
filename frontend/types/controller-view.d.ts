@@ -2,7 +2,7 @@ import type { SimulationMutationOptions } from "./controller-runtime.js";
 import type { BlockingActivityConfig, MutationRunnerOptions } from "./controller-runtime.js";
 import type { ConfigSyncBody, EmptyControlCommandPath, ResetControlBody } from "./controller-api.js";
 import type { CellIdentifier, CellStateDefinition, SimulationSnapshot } from "./domain.js";
-import type { PaintableCell, PreviewPaintCells } from "./editor.js";
+import type { GestureOutlineTone, PaintableCell, PreviewPaintCells } from "./editor.js";
 import type { TopologyRenderPayload } from "./state.js";
 
 export interface ViewportDimensions {
@@ -71,6 +71,9 @@ export interface GridView {
     setHoveredCell(cell: PaintableCell | null): void;
     setSelectedCell(cell: PaintableCell | null): void;
     getSelectedCell(): PaintableCell | null;
+    setGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone): void;
+    flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number): void;
+    clearGestureOutline(): void;
 }
 
 export interface ViewportControllerDependencies {

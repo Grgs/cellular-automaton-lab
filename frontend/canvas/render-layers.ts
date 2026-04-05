@@ -1,7 +1,7 @@
 import { getGeometryAdapter } from "../geometry/registry.js";
 import { asPolygonGeometryCache } from "../geometry/cache-guards.js";
 import type { TopologyCell, TopologyPayload } from "../types/domain.js";
-import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
+import type { GestureOutlineTone, PaintableCell, PreviewPaintCell } from "../types/editor.js";
 import type {
     CanvasColors,
     CanvasRenderStyle,
@@ -242,5 +242,44 @@ export function drawSelectionLayer({
         resolveRenderedCellColor: shared.resolveRenderedCellColor,
         renderStyle: shared.renderStyle,
         renderLayer: "selected",
+    });
+}
+
+export function drawGestureOutlineLayer({
+    context,
+    outlinedCells,
+    tone,
+    cellStates,
+    ...shared
+}: SharedRenderInputs & {
+    context: CanvasRenderingContext2D;
+    outlinedCells: PaintableCell[];
+    tone: GestureOutlineTone | null;
+    cellStates: number[];
+}): void {
+    if (!tone || outlinedCells.length === 0) {
+        return;
+    }
+
+    const adapter = getGeometryAdapter(shared.geometry);
+    outlinedCells.forEach((cell) => {
+        const renderCell = resolveTransientRenderCell(
+            cell,
+            shared.geometry,
+            shared.topology,
+            shared.geometryCache,
+        );
+        adapter.drawCell({
+            context,
+            cell: renderCell,
+            stateValue: resolveTransientStateValue(cell, shared.topology, cellStates),
+            metrics: shared.metrics,
+            cache: shared.geometryCache,
+            colors: shared.canvasColors,
+            colorLookup: shared.colorLookup,
+            resolveRenderedCellColor: shared.resolveRenderedCellColor,
+            renderStyle: shared.renderStyle,
+            renderLayer: tone === "paint" ? "gesture-paint" : "gesture-erase",
+        });
     });
 }

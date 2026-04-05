@@ -5,7 +5,9 @@ import type { EditorTool } from "../editor-tools.js";
 import type {
     EditorHistoryCommands,
     EditorSessionController,
+    GestureOutlineTone,
     LegacyDragController,
+    PaintableCell,
     PreviewPaintCells,
 } from "../types/editor.js";
 import type {
@@ -30,6 +32,9 @@ export function createInteractionSessionRuntime({
     getBrushSize,
     previewPaintCells,
     clearPreview,
+    setGestureOutline,
+    flashGestureOutline,
+    clearGestureOutline,
     setCellsRequest,
     postControl,
     renderControlPanel,
@@ -46,6 +51,13 @@ export function createInteractionSessionRuntime({
     getBrushSize: () => number;
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
+    setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
+    flashGestureOutline: (
+        cells: PaintableCell[],
+        tone: GestureOutlineTone,
+        durationMs?: number,
+    ) => void;
+    clearGestureOutline: () => void;
     setCellsRequest: SetCellsRequestFunction;
     postControl: PostControlFunction;
     renderControlPanel: () => void;
@@ -87,6 +99,9 @@ export function createInteractionSessionRuntime({
         getBrushSize,
         previewPaintCells,
         clearPreview,
+        setGestureOutline,
+        flashGestureOutline,
+        clearGestureOutline,
         setCellsRequest,
         postControl,
         renderControlPanel,
@@ -99,6 +114,9 @@ export function createInteractionSessionRuntime({
         getPaintState,
         previewPaintCells,
         clearPreview,
+        setGestureOutline,
+        flashGestureOutline,
+        clearGestureOutline,
         setCellsRequest,
         runStateMutation,
         setPointerCapture,

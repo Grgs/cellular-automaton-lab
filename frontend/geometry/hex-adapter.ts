@@ -246,28 +246,32 @@ export const hexGeometryAdapter: GeometryAdapter = {
         const { x, y } = resolveHexCoordinates(cell);
         const hexMetrics = metrics as HexMetrics;
         const hexCache = asHexGeometryCache(cache);
+        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
         const color = resolveRenderedCellColor(
             stateValue,
             colorLookup,
             colors,
             { geometry: this.geometry, x, y },
         );
-        if (context.fillStyle !== color) {
-            context.fillStyle = color;
-        }
         const cachedRow = hexCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x]
             ? cachedRow[x]
             : pointyHexCenterOffset(x, y, hexMetrics.cellSize, hexMetrics);
         const centerX = "centerX" in resolvedCell ? resolvedCell.centerX : resolvedCell.x;
         const centerY = "centerY" in resolvedCell ? resolvedCell.centerY : resolvedCell.y;
-        traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
-        context.fill();
-        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-        if (overlayStyle) {
-            context.fillStyle = overlayStyle.tintColor;
+        if (!overlayStyle || overlayStyle.drawBaseFill) {
+            if (context.fillStyle !== color) {
+                context.fillStyle = color;
+            }
             traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
             context.fill();
+        }
+        if (overlayStyle) {
+            if (overlayStyle.tintColor) {
+                context.fillStyle = overlayStyle.tintColor;
+                traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
+                context.fill();
+            }
             context.strokeStyle = overlayStyle.strokeColor;
             context.lineWidth = overlayStyle.strokeWidth;
             traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);

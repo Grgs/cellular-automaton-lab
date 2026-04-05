@@ -36,6 +36,9 @@ interface InteractionEditorRuntimeOptions {
     getBrushSize: NonNullable<InteractionControllerOptions["getBrushSize"]>;
     previewPaintCells: InteractionControllerOptions["previewPaintCells"];
     clearPreview: InteractionControllerOptions["clearPreview"];
+    setGestureOutline: InteractionControllerOptions["setGestureOutline"];
+    flashGestureOutline: InteractionControllerOptions["flashGestureOutline"];
+    clearGestureOutline: InteractionControllerOptions["clearGestureOutline"];
     setCellsRequest: InteractionControllerOptions["setCellsRequest"];
     postControl: InteractionControllerOptions["postControl"];
     renderControlPanel: NonNullable<InteractionControllerOptions["renderControlPanel"]>;
@@ -56,6 +59,7 @@ interface InteractionCommandSurfaceOptions {
     setHoveredCell: InteractionControllerOptions["setHoveredCell"];
     setSelectedCell: InteractionControllerOptions["setSelectedCell"];
     getSelectedCell: InteractionControllerOptions["getSelectedCell"];
+    clearGestureOutline: InteractionControllerOptions["clearGestureOutline"];
     toggleCellRequest: InteractionControllerOptions["toggleCellRequest"];
     setCellRequest: InteractionControllerOptions["setCellRequest"];
     postControl: InteractionControllerOptions["postControl"];
@@ -118,6 +122,9 @@ export function createInteractionEditorRuntime({
     getBrushSize,
     previewPaintCells,
     clearPreview,
+    setGestureOutline,
+    flashGestureOutline,
+    clearGestureOutline,
     setCellsRequest,
     postControl,
     renderControlPanel,
@@ -135,6 +142,9 @@ export function createInteractionEditorRuntime({
         getBrushSize,
         previewPaintCells,
         clearPreview,
+        setGestureOutline,
+        flashGestureOutline,
+        clearGestureOutline,
         setCellsRequest,
         postControl,
         renderControlPanel,
@@ -156,6 +166,7 @@ export function createInteractionCommandSurface({
     setHoveredCell,
     setSelectedCell,
     getSelectedCell,
+    clearGestureOutline,
     toggleCellRequest,
     setCellRequest,
     postControl,
@@ -182,6 +193,7 @@ export function createInteractionCommandSurface({
         setHoveredCell,
         setSelectedCell,
         getSelectedCell,
+        clearGestureOutline,
         paintCell: commandDispatch.paintCell,
         resolveDirectGestureTargetState: commandDispatch.resolveDirectGestureTargetState,
         bindGridInteractionsFn,

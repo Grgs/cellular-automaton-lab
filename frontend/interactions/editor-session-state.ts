@@ -27,6 +27,7 @@ export interface ShapeEditorSession {
     currentCell: PaintableCell;
     pointerId: number | null;
     previewCells: PreviewPaintCell[];
+    moved: boolean;
 }
 
 export type ActiveEditorSession = BrushEditorSession | ShapeEditorSession;
@@ -111,6 +112,7 @@ export function createEditorPointerState(): EditorPointerState {
             currentCell: cell,
             pointerId: pointerId ?? null,
             previewCells: [],
+            moved: false,
         };
         activePointerId = pointerId ?? null;
     }
@@ -122,6 +124,7 @@ export function createEditorPointerState(): EditorPointerState {
         }
         session.currentCell = cell;
         session.previewCells = nextCells;
+        session.moved = true;
         return session.previewCells;
     }
 
