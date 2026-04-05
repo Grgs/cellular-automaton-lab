@@ -476,6 +476,22 @@ describe("canvas/render-style", () => {
         expect(resolveCanvasRenderStyle(12, "square", colors).hoverTintColor).toBe("rgba(31, 36, 48, 0.21)");
         expect(resolveCanvasRenderStyle(12, "square", colors).hoverStrokeColor).toBe("#131722");
     });
+
+    it("boosts hover contrast in dark theme while keeping the same token inputs", async () => {
+        const { resolveCanvasRenderStyle } = await import("./render-style.js");
+        const style = resolveCanvasRenderStyle(12, "square", {
+            line: "rgba(231, 237, 248, 0.12)",
+            dead: "#f8f1e5",
+            deadAlt: "#d5bb8f",
+            lineSoft: "rgba(231, 237, 248, 0.07)",
+            lineStrong: "rgba(231, 237, 248, 0.14)",
+            lineAperiodic: "rgba(7, 11, 17, 0.42)",
+            live: "#f2f5ff",
+        });
+
+        expect(style.hoverTintColor).toBe("rgba(7, 11, 17, 0.18)");
+        expect(style.hoverStrokeColor).toBe("rgba(7, 11, 17, 0.9)");
+    });
 });
 
 function readCanvasColorsForTests() {
