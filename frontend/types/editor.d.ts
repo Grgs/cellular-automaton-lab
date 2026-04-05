@@ -83,7 +83,7 @@ export interface EditorSessionController {
 }
 
 export interface LegacyDragController {
-    begin(cell: PaintableCell, pointerId?: number | null): void;
+    begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
     update(cell: PaintableCell): void;
     end(): Promise<SimulationSnapshot | null>;
     isActive(): boolean;
@@ -98,6 +98,7 @@ export interface GridInteractionBindings {
     onPointerUp(event: PointerEvent): void;
     onPointerCancel(event: PointerEvent): void;
     onClick(event: MouseEvent, cell: PaintableCell): void;
+    onContextMenu(cell: PaintableCell | null): void;
     onHoverChange(cell: PaintableCell | null): void;
 }
 
@@ -151,6 +152,8 @@ export interface InteractionControllerOptions {
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
     setHoveredCell: (cell: PaintableCell | null) => void;
+    setSelectedCell: (cell: PaintableCell | null) => void;
+    getSelectedCell: () => PaintableCell | null;
     mutationRunner: MutationRunner;
     onError: (error: unknown) => void;
     applySimulationState: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;

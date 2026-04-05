@@ -1,4 +1,4 @@
-import { resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
+import { resolvePolygonStrokeWidth, resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -278,12 +278,13 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
                 context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
                 context.stroke();
             }
-            if (renderLayer === "hover" && renderStyle) {
-                context.fillStyle = renderStyle.hoverTintColor;
+            const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+            if (overlayStyle) {
+                context.fillStyle = overlayStyle.tintColor;
                 tracePolygonPath(context, geometryCell.vertices);
                 context.fill();
-                context.strokeStyle = renderStyle.hoverStrokeColor;
-                context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+                context.strokeStyle = overlayStyle.strokeColor;
+                context.lineWidth = overlayStyle.strokeWidth;
                 tracePolygonPath(context, geometryCell.vertices);
                 context.stroke();
             }

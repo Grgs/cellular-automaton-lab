@@ -1,4 +1,4 @@
-import { drawTriangleGrid, resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
+import { drawTriangleGrid, resolvePolygonStrokeWidth, resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
     clampGridDimension,
@@ -282,12 +282,13 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, metrics.cellSize) };
         tracePolygonPath(context, resolvedCell.vertices);
         context.fill();
-        if (renderLayer === "hover" && renderStyle) {
-            context.fillStyle = renderStyle.hoverTintColor;
+        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+        if (overlayStyle) {
+            context.fillStyle = overlayStyle.tintColor;
             tracePolygonPath(context, resolvedCell.vertices);
             context.fill();
-            context.strokeStyle = renderStyle.hoverStrokeColor;
-            context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+            context.strokeStyle = overlayStyle.strokeColor;
+            context.lineWidth = overlayStyle.strokeWidth;
             tracePolygonPath(context, resolvedCell.vertices);
             context.stroke();
             return;

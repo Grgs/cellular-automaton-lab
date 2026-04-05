@@ -7,7 +7,7 @@ import { createInteractionSessionRuntime } from "./interactions/session-runtime.
 import { createInteractionSurfaceBindings } from "./interactions/surface-bindings.js";
 import { createSimulationMutations } from "./interactions/simulation-mutations.js";
 import type { CreateSimulationMutationsFunction } from "./types/controller-runtime.js";
-import type { GridInteractionBindings, InteractionControllerOptions } from "./types/editor.js";
+import type { GridInteractionBindings, InteractionControllerOptions, PaintableCell } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 interface InteractionMutationRuntimeOptions {
@@ -54,10 +54,13 @@ interface InteractionCommandSurfaceOptions {
     legacyDrag: ReturnType<typeof createInteractionSessionRuntime>["legacyDrag"];
     mutations: NonNullable<InteractionControllerOptions["simulationMutations"]>;
     setHoveredCell: InteractionControllerOptions["setHoveredCell"];
+    setSelectedCell: InteractionControllerOptions["setSelectedCell"];
+    getSelectedCell: InteractionControllerOptions["getSelectedCell"];
     toggleCellRequest: InteractionControllerOptions["toggleCellRequest"];
     setCellRequest: InteractionControllerOptions["setCellRequest"];
     postControl: InteractionControllerOptions["postControl"];
     getPaintState: InteractionControllerOptions["getPaintState"];
+    getCellState: (cell: PaintableCell) => number;
     bindGridInteractionsFn?: ((options: GridInteractionBindings) => void) | undefined;
     setTimeoutFn?: InteractionControllerOptions["setTimeoutFn"] | undefined;
 }
@@ -151,10 +154,13 @@ export function createInteractionCommandSurface({
     legacyDrag,
     mutations,
     setHoveredCell,
+    setSelectedCell,
+    getSelectedCell,
     toggleCellRequest,
     setCellRequest,
     postControl,
     getPaintState,
+    getCellState,
     bindGridInteractionsFn,
     setTimeoutFn,
 }: InteractionCommandSurfaceOptions) {
@@ -164,6 +170,7 @@ export function createInteractionCommandSurface({
         setCellRequest,
         postControl,
         getPaintState,
+        getCellState,
     });
 
     const surfaceBindings = createInteractionSurfaceBindings({
@@ -173,7 +180,10 @@ export function createInteractionCommandSurface({
         editorSession,
         legacyDrag,
         setHoveredCell,
+        setSelectedCell,
+        getSelectedCell,
         paintCell: commandDispatch.paintCell,
+        resolveDirectGestureTargetState: commandDispatch.resolveDirectGestureTargetState,
         bindGridInteractionsFn,
         setTimeoutFn,
     });

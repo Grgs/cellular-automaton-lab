@@ -1,4 +1,4 @@
-import { resolvePolygonStrokeWidth, traceHexPath } from "../canvas/draw.js";
+import { resolveTransientOverlayStyle, traceHexPath } from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
     clampGridDimension,
@@ -263,12 +263,13 @@ export const hexGeometryAdapter: GeometryAdapter = {
         const centerY = "centerY" in resolvedCell ? resolvedCell.centerY : resolvedCell.y;
         traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
         context.fill();
-        if (renderLayer === "hover" && renderStyle) {
-            context.fillStyle = renderStyle.hoverTintColor;
+        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+        if (overlayStyle) {
+            context.fillStyle = overlayStyle.tintColor;
             traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
             context.fill();
-            context.strokeStyle = renderStyle.hoverStrokeColor;
-            context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+            context.strokeStyle = overlayStyle.strokeColor;
+            context.lineWidth = overlayStyle.strokeWidth;
             traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
             context.stroke();
         }

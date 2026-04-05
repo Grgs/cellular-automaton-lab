@@ -47,6 +47,7 @@ describe("interactions/grid-bindings", () => {
             onPointerUp: vi.fn(),
             onPointerCancel: vi.fn(),
             onClick: vi.fn(),
+            onContextMenu: vi.fn(),
             onHoverChange,
         });
 
@@ -69,6 +70,7 @@ describe("interactions/grid-bindings", () => {
             onPointerUp: vi.fn(),
             onPointerCancel: vi.fn(),
             onClick: vi.fn(),
+            onContextMenu: vi.fn(),
             onHoverChange,
         });
 
@@ -90,11 +92,60 @@ describe("interactions/grid-bindings", () => {
             onPointerUp: vi.fn(),
             onPointerCancel: vi.fn(),
             onClick: vi.fn(),
+            onContextMenu: vi.fn(),
             onHoverChange,
         });
 
         surface.dispatchEvent(createPointerEvent("pointermove", { pointerType: "touch" }));
 
         expect(onHoverChange).not.toHaveBeenCalled();
+    });
+
+    it("suppresses the browser context menu and resolves the clicked cell", () => {
+        const surface = document.createElement("div");
+        document.body.append(surface);
+        const cell = { id: "square:1:1", x: 1, y: 1 };
+        const onContextMenu = vi.fn();
+
+        bindGridInteractions({
+            surfaceElement: surface,
+            resolveCellFromEvent: () => cell,
+            onPointerDown: vi.fn(),
+            onPointerMove: vi.fn(),
+            onPointerUp: vi.fn(),
+            onPointerCancel: vi.fn(),
+            onClick: vi.fn(),
+            onContextMenu,
+            onHoverChange: vi.fn(),
+        });
+
+        const event = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+        const preventDefaultSpy = vi.spyOn(event, "preventDefault");
+        surface.dispatchEvent(event);
+
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+        expect(onContextMenu).toHaveBeenCalledWith(cell);
+    });
+
+    it("reports empty-space context menu selections as null", () => {
+        const surface = document.createElement("div");
+        document.body.append(surface);
+        const onContextMenu = vi.fn();
+
+        bindGridInteractions({
+            surfaceElement: surface,
+            resolveCellFromEvent: () => null,
+            onPointerDown: vi.fn(),
+            onPointerMove: vi.fn(),
+            onPointerUp: vi.fn(),
+            onPointerCancel: vi.fn(),
+            onClick: vi.fn(),
+            onContextMenu,
+            onHoverChange: vi.fn(),
+        });
+
+        surface.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true }));
+
+        expect(onContextMenu).toHaveBeenCalledWith(null);
     });
 });

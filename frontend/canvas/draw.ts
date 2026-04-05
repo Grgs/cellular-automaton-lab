@@ -4,6 +4,7 @@ import type {
     GeometryCache,
     Point2D,
     PolygonGeometryCache,
+    RenderedCellArgs,
 } from "../types/rendering.js";
 
 type PathTarget = CanvasRenderingContext2D | Path2D;
@@ -80,6 +81,30 @@ export function drawTriangleGrid(
 
 export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): number {
     return renderStyle.mode === "compact" ? 1 : 1.25;
+}
+
+export function resolveTransientOverlayStyle(
+    renderLayer: RenderedCellArgs["renderLayer"],
+    renderStyle: CanvasRenderStyle | undefined,
+): { tintColor: string; strokeColor: string; strokeWidth: number } | null {
+    if (!renderStyle) {
+        return null;
+    }
+    if (renderLayer === "hover") {
+        return {
+            tintColor: renderStyle.hoverTintColor,
+            strokeColor: renderStyle.hoverStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5),
+        };
+    }
+    if (renderLayer === "selected") {
+        return {
+            tintColor: renderStyle.selectionTintColor,
+            strokeColor: renderStyle.selectionStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, 2.5),
+        };
+    }
+    return null;
 }
 
 export function drawPolygonGrid(

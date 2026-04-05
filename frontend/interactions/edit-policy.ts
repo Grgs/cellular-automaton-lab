@@ -20,6 +20,7 @@ export interface InteractionEditPolicy {
     editingBlockedByRun(): boolean;
     isEditArmed(): boolean;
     currentTool(): EditorTool;
+    prepareDirectGridInteraction(event?: PointerEvent | MouseEvent | null): void;
     runningBrushEditingEnabled(): boolean;
     runningAdvancedToolBlocked(): boolean;
     armEditingFromGrid(
@@ -119,6 +120,22 @@ export function createInteractionEditPolicy({
         return Boolean(overlayDismissed || cueHidden);
     }
 
+    function prepareDirectGridInteraction(event: PointerEvent | MouseEvent | null = null): void {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const hintDismissedChanged = Boolean(state && !runtimeState.firstRunHintDismissed);
+        if (hintDismissedChanged) {
+            dismissFirstRunHintState(runtimeState);
+        }
+        void dismissOverlays();
+        const cueHidden = hideEditCueAction();
+        if (hintDismissedChanged && !cueHidden) {
+            renderControlPanel();
+        }
+    }
+
     function armEditingFromGrid(
         event: PointerEvent | MouseEvent | null,
         { suppressFollowupClick = false }: { suppressFollowupClick?: boolean } = {},
@@ -181,6 +198,7 @@ export function createInteractionEditPolicy({
         editingBlockedByRun,
         isEditArmed,
         currentTool,
+        prepareDirectGridInteraction,
         runningBrushEditingEnabled,
         runningAdvancedToolBlocked,
         armEditingFromGrid,

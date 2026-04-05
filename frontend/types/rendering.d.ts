@@ -51,6 +51,8 @@ export interface CanvasColors {
     lineStrong: string;
     lineAperiodic: string;
     live: string;
+    accent: string;
+    accentStrong: string;
 }
 
 export interface RenderStyle {
@@ -65,6 +67,8 @@ export interface CanvasRenderStyle extends RenderStyle {
     aperiodicLineColor: string;
     hoverTintColor: string;
     hoverStrokeColor: string;
+    selectionTintColor: string;
+    selectionStrokeColor: string;
 }
 
 export interface HexGeometryCell {
@@ -146,7 +150,7 @@ export interface RenderedCellArgs {
     colors: CanvasColors;
     colorLookup: Map<number, string>;
     renderStyle?: CanvasRenderStyle;
-    renderLayer?: "committed" | "hover" | "preview";
+    renderLayer?: "committed" | "hover" | "selected" | "preview";
     resolveRenderedCellColor: (
         stateValue: number,
         colorLookup: Map<number, string>,
@@ -287,5 +291,7 @@ export interface CanvasGridView {
     setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
     setHoveredCell(cell: PaintableCell | null): void;
+    setSelectedCell(cell: PaintableCell | null): void;
+    getSelectedCell(): PaintableCell | null;
     getCellFromPointerEvent(event: Event): PaintableCell | null;
 }

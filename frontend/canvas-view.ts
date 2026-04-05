@@ -11,7 +11,7 @@ import {
     topologyWidth,
 } from "./topology.js";
 import { resolveGeometryCache } from "./canvas/cache.js";
-import { drawCommittedLayer, drawHoverLayer, drawPreviewLayer } from "./canvas/render-layers.js";
+import { drawCommittedLayer, drawHoverLayer, drawPreviewLayer, drawSelectionLayer } from "./canvas/render-layers.js";
 import {
     buildStateColorLookup,
     DEFAULT_COLORS,
@@ -49,7 +49,7 @@ function previewKey(cell: PreviewPaintCell | null | undefined): string | null {
     return cell?.id || null;
 }
 
-function hoverKey(cell: PaintableCell | null | undefined): string | null {
+function paintableCellKey(cell: PaintableCell | null | undefined): string | null {
     if (!cell) {
         return null;
     }
@@ -142,6 +142,8 @@ export function createCanvasGridView({
     let colorLookup = buildStateColorLookup([], canvasColors);
     let currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
     let hoveredCell: PaintableCell | null = null;
+    let selectedCell: PaintableCell | null = null;
+    let lastTopologyRevision: string | null = null;
     let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
         pixelWidth: canvas.width,
@@ -184,7 +186,7 @@ export function createCanvasGridView({
     }
 
     function drawHoverOverlay(): void {
-        if (!hoveredCell) {
+        if (!hoveredCell || paintableCellKey(hoveredCell) === paintableCellKey(selectedCell)) {
             return;
         }
         drawHoverLayer({
@@ -202,9 +204,29 @@ export function createCanvasGridView({
         });
     }
 
+    function drawSelectionOverlay(): void {
+        if (!selectedCell) {
+            return;
+        }
+        drawSelectionLayer({
+            context: surface.context,
+            geometry,
+            topology,
+            metrics,
+            geometryCache,
+            canvasColors,
+            renderStyle: currentRenderStyle,
+            colorLookup,
+            resolveRenderedCellColor,
+            selectedCell,
+            cellStates,
+        });
+    }
+
     function redrawTransientLayers(): void {
         surface.restoreCommittedSurface(metrics);
         drawHoverOverlay();
+        drawSelectionOverlay();
         drawPreviewOverlay();
     }
 
@@ -245,7 +267,20 @@ export function createCanvasGridView({
         nextStateDefinitions = stateDefinitions,
         nextGeometry = geometry,
     ): void {
-        topology = nextState.topology;
+        const nextTopology = nextState.topology;
+        const nextTopologyRevision = nextTopology?.topology_revision ?? null;
+        const topologyRevisionChanged = lastTopologyRevision !== null && nextTopologyRevision !== lastTopologyRevision;
+        if (topologyRevisionChanged) {
+            selectedCell = null;
+        }
+        if (
+            selectedCell
+            && (!Array.isArray(nextTopology?.cells) || !nextTopology.cells.some((cell) => cell.id === selectedCell?.id))
+        ) {
+            selectedCell = null;
+        }
+        topology = nextTopology;
+        lastTopologyRevision = nextTopologyRevision;
         cellStates = nextState.cellStates;
         previewCellStatesById = nextState.previewCellStatesById;
         cellSize = nextCellSize;
@@ -276,11 +311,23 @@ export function createCanvasGridView({
     }
 
     function setHoveredCell(cell: PaintableCell | null): void {
-        if (hoverKey(hoveredCell) === hoverKey(cell)) {
+        if (paintableCellKey(hoveredCell) === paintableCellKey(cell)) {
             return;
         }
         hoveredCell = cell ? { ...cell } : null;
         redrawTransientLayers();
+    }
+
+    function setSelectedCell(cell: PaintableCell | null): void {
+        if (paintableCellKey(selectedCell) === paintableCellKey(cell)) {
+            return;
+        }
+        selectedCell = cell ? { ...cell } : null;
+        redrawTransientLayers();
+    }
+
+    function getSelectedCell(): PaintableCell | null {
+        return selectedCell ? { ...selectedCell } : null;
     }
 
     function getCellFromPointerEvent(event: MouseEvent | PointerEvent): PaintableCell | null {
@@ -307,6 +354,8 @@ export function createCanvasGridView({
         setPreviewCells,
         clearPreview,
         setHoveredCell,
+        setSelectedCell,
+        getSelectedCell,
         getCellFromPointerEvent,
         getMetrics,
     };

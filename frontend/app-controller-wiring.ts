@@ -50,6 +50,8 @@ export function wireAppController({
         previewPaintCells: (cells: PreviewPaintCells) => gridView.setPreviewCells(cells),
         clearPreview: () => gridView.clearPreview(),
         setHoveredCell: (cell) => gridView.setHoveredCell(cell),
+        setSelectedCell: (cell) => gridView.setSelectedCell(cell),
+        getSelectedCell: () => gridView.getSelectedCell(),
         mutationRunner,
         simulationMutations: services.getSimulationMutations(),
         onError,

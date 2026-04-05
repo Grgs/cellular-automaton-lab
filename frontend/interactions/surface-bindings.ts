@@ -12,7 +12,10 @@ export function createInteractionSurfaceBindings({
     editorSession,
     legacyDrag,
     setHoveredCell,
+    setSelectedCell,
+    getSelectedCell,
     paintCell,
+    resolveDirectGestureTargetState,
     bindGridInteractionsFn = bindGridInteractionsToSurface,
     setTimeoutFn = (callback, delay) => window.setTimeout(callback, delay),
 }: {
@@ -30,16 +33,48 @@ export function createInteractionSurfaceBindings({
     };
     legacyDrag: {
         isActive(): boolean;
-        begin(cell: PaintableCell, pointerId?: number | null): void;
+        begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
         update(cell: PaintableCell): void;
         end(): Promise<unknown>;
     };
     setHoveredCell: (cell: PaintableCell | null) => void;
-    paintCell: (cell: PaintableCell) => Promise<void>;
+    setSelectedCell: (cell: PaintableCell | null) => void;
+    getSelectedCell: () => PaintableCell | null;
+    paintCell: (cell: PaintableCell, stateValue?: number) => Promise<void>;
+    resolveDirectGestureTargetState: (cell: PaintableCell) => number;
     bindGridInteractionsFn?: ((options: GridInteractionBindings) => void) | undefined;
     setTimeoutFn?: ((callback: () => void, delay: number) => number) | undefined;
 }): { bindGridInteractions(): void } {
     let consumeNextClick = false;
+    let pendingDirectGestureTargetState: number | null = null;
+    let pendingDirectGestureCellId: string | null = null;
+
+    function identifyGestureCell(cell: PaintableCell): string {
+        if (typeof cell.id === "string" && cell.id.length > 0) {
+            return cell.id;
+        }
+        return `${cell.x ?? 0}:${cell.y ?? 0}`;
+    }
+
+    function rememberDirectGesture(cell: PaintableCell, targetState: number): void {
+        pendingDirectGestureCellId = identifyGestureCell(cell);
+        pendingDirectGestureTargetState = targetState;
+    }
+
+    function clearPendingDirectGesture(): void {
+        pendingDirectGestureCellId = null;
+        pendingDirectGestureTargetState = null;
+    }
+
+    function resolvePendingDirectGestureTargetState(cell: PaintableCell): number {
+        if (
+            pendingDirectGestureTargetState !== null
+            && pendingDirectGestureCellId === identifyGestureCell(cell)
+        ) {
+            return pendingDirectGestureTargetState;
+        }
+        return resolveDirectGestureTargetState(cell);
+    }
 
     return {
         bindGridInteractions() {
@@ -48,6 +83,15 @@ export function createInteractionSurfaceBindings({
                 resolveCellFromEvent,
                 onPointerDown(event: PointerEvent, cell: PaintableCell) {
                     setHoveredCell(null);
+                    const editModeActive = editPolicy.supportsEditorTools() && editPolicy.isEditArmed();
+                    if (!editModeActive) {
+                        editPolicy.prepareDirectGridInteraction(event);
+                        const targetState = resolveDirectGestureTargetState(cell);
+                        rememberDirectGesture(cell, targetState);
+                        legacyDrag.begin(cell, event.pointerId, targetState);
+                        return;
+                    }
+                    clearPendingDirectGesture();
                     if (editPolicy.runningBrushEditingEnabled()) {
                         void editPolicy.dismissEditingUi();
                         event.preventDefault();
@@ -62,19 +106,7 @@ export function createInteractionSurfaceBindings({
                     if (editPolicy.supportsEditorTools() && editPolicy.editingBlockedByRun()) {
                         return;
                     }
-                    if (editPolicy.supportsEditorTools() && !editPolicy.isEditArmed()) {
-                        consumeNextClick = editPolicy.armEditingFromGrid(event, {
-                            suppressFollowupClick: true,
-                        }).consumeNextClick;
-                        return;
-                    }
                     void editPolicy.dismissEditingUi();
-                    if (!editPolicy.supportsEditorTools()) {
-                        event.preventDefault();
-                        legacyDrag.begin(cell, event.pointerId);
-                        return;
-                    }
-
                     if (editPolicy.currentTool() === EDITOR_TOOL_FILL) {
                         return;
                     }
@@ -114,6 +146,7 @@ export function createInteractionSurfaceBindings({
                 },
                 onPointerCancel() {
                     consumeNextClick = false;
+                    clearPendingDirectGesture();
                     setHoveredCell(null);
                     if (legacyDrag.isActive()) {
                         void legacyDrag.end();
@@ -134,40 +167,58 @@ export function createInteractionSurfaceBindings({
                     }
                     setHoveredCell(cell);
                 },
+                onContextMenu(cell) {
+                    const selectedCell = getSelectedCell();
+                    if (!cell) {
+                        setSelectedCell(null);
+                        return;
+                    }
+                    if (selectedCell?.id === cell.id) {
+                        setSelectedCell(null);
+                        return;
+                    }
+                    setSelectedCell(cell);
+                },
                 onClick(event: MouseEvent, cell: PaintableCell) {
                     if (editorSession.isClickSuppressed()) {
+                        clearPendingDirectGesture();
                         event.preventDefault();
                         event.stopPropagation();
                         return;
                     }
                     if (consumeNextClick) {
                         consumeNextClick = false;
+                        clearPendingDirectGesture();
                         event.preventDefault();
                         event.stopPropagation();
                         return;
                     }
+                    const editModeActive = editPolicy.supportsEditorTools() && editPolicy.isEditArmed();
+                    if (!editModeActive) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const targetState = resolvePendingDirectGestureTargetState(cell);
+                        if (pendingDirectGestureTargetState === null) {
+                            editPolicy.prepareDirectGridInteraction();
+                        }
+                        clearPendingDirectGesture();
+                        void paintCell(cell, targetState);
+                        return;
+                    }
+                    clearPendingDirectGesture();
                     if (editPolicy.runningAdvancedToolBlocked()) {
                         editPolicy.blockRunningAdvancedTool(event);
                         return;
                     }
-                    if (editPolicy.supportsEditorTools() && editPolicy.editingBlockedByRun()) {
+                    if (editPolicy.editingBlockedByRun()) {
                         event.preventDefault();
                         event.stopPropagation();
                         void editPolicy.dismissEditingUi();
                         void paintCell(cell);
                         return;
                     }
-                    if (editPolicy.supportsEditorTools() && !editPolicy.isEditArmed()) {
-                        consumeNextClick = editPolicy.armEditingFromGrid(event).consumeNextClick;
-                        return;
-                    }
 
                     void editPolicy.dismissEditingUi();
-                    if (!editPolicy.supportsEditorTools()) {
-                        void paintCell(cell);
-                        return;
-                    }
-
                     void editorSession.handleClick(cell);
                 },
             });

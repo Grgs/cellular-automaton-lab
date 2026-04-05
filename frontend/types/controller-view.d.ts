@@ -69,6 +69,8 @@ export interface GridView {
     setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
     setHoveredCell(cell: PaintableCell | null): void;
+    setSelectedCell(cell: PaintableCell | null): void;
+    getSelectedCell(): PaintableCell | null;
 }
 
 export interface ViewportControllerDependencies {

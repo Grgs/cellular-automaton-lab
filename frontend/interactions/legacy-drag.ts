@@ -14,8 +14,12 @@ export function createLegacyDragController({
     const dragSession = createDragPaintSession();
     let activePointerId: number | null = null;
 
-    function begin(cell: Parameters<typeof dragSession.start>[0], pointerId?: number | null): void {
-        dragSession.start(cell, getPaintState(), pointerId ?? null);
+    function begin(
+        cell: Parameters<typeof dragSession.start>[0],
+        pointerId?: number | null,
+        paintStateOverride?: number,
+    ): void {
+        dragSession.start(cell, paintStateOverride ?? getPaintState(), pointerId ?? null);
         activePointerId = pointerId ?? null;
         setPointerCapture(activePointerId);
     }

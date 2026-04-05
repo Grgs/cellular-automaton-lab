@@ -8,6 +8,7 @@ export function bindGridInteractions({
     onPointerUp,
     onPointerCancel,
     onClick,
+    onContextMenu,
     onHoverChange,
 }: GridInteractionBindings): void {
     if (!surfaceElement) {
@@ -64,5 +65,10 @@ export function bindGridInteractions({
         }
 
         onClick(event, cell);
+    });
+
+    surfaceElement.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+        onContextMenu(resolveCellFromEvent(event));
     });
 }

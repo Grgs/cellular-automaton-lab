@@ -1,5 +1,5 @@
 import {
-    resolvePolygonStrokeWidth,
+    resolveTransientOverlayStyle,
 } from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
@@ -124,11 +124,12 @@ export const squareGeometryAdapter: GeometryAdapter = {
         const cellLeft = squareMetrics.gap + (x * squareMetrics.pitch);
         const cellTop = squareMetrics.gap + (y * squareMetrics.pitch);
         context.fillRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
-        if (renderLayer === "hover" && renderStyle) {
-            context.fillStyle = renderStyle.hoverTintColor;
+        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+        if (overlayStyle) {
+            context.fillStyle = overlayStyle.tintColor;
             context.fillRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
-            context.strokeStyle = renderStyle.hoverStrokeColor;
-            context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+            context.strokeStyle = overlayStyle.strokeColor;
+            context.lineWidth = overlayStyle.strokeWidth;
             context.strokeRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
         }
     },

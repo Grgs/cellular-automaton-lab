@@ -22,6 +22,8 @@ export const DEFAULT_COLORS: CanvasColors = {
     lineStrong: "rgba(31, 36, 48, 0.14)",
     lineAperiodic: "rgba(31, 36, 48, 0.18)",
     live: "#1f2430",
+    accent: "#bf5a36",
+    accentStrong: "#8a3d20",
 };
 
 const COMPACT_MAX_CELL_SIZE = 4;
@@ -191,6 +193,10 @@ export function readCanvasColors(
             || canvasStyle.backgroundColor
             || DEFAULT_COLORS.lineAperiodic,
         live: rootStyle.getPropertyValue("--live").trim() || DEFAULT_COLORS.live,
+        accent: rootStyle.getPropertyValue("--accent").trim() || DEFAULT_COLORS.accent,
+        accentStrong: rootStyle.getPropertyValue("--accent-dark").trim()
+            || rootStyle.getPropertyValue("--accent").trim()
+            || DEFAULT_COLORS.accentStrong,
     };
 }
 
@@ -310,6 +316,8 @@ export function resolveCanvasRenderStyle(
         hoverStrokeColor: useDarkHoverPalette
             ? withAlpha(canvasColors.lineAperiodic || canvasColors.line || canvasColors.live, 0.9)
             : canvasColors.live,
+        selectionTintColor: withAlpha(canvasColors.accent, useDarkHoverPalette ? 0.18 : 0.16),
+        selectionStrokeColor: canvasColors.accentStrong || canvasColors.accent,
     };
 }
 

@@ -17,7 +17,7 @@ import type {
     CreateSimulationMutationsFunction,
     InteractionController,
 } from "./types/controller.js";
-import type { GridInteractionBindings, InteractionControllerOptions } from "./types/editor.js";
+import type { GridInteractionBindings, InteractionControllerOptions, PaintableCell } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 export { cellKey, interpolateCellPath, createDragPaintSession } from "./drag-session.js";
@@ -29,6 +29,8 @@ export function createInteractionController({
     previewPaintCells,
     clearPreview,
     setHoveredCell,
+    setSelectedCell,
+    getSelectedCell,
     mutationRunner,
     onError,
     applySimulationState,
@@ -104,10 +106,25 @@ export function createInteractionController({
         legacyDrag: sessionRuntime.legacyDrag,
         mutations,
         setHoveredCell,
+        setSelectedCell,
+        getSelectedCell,
         toggleCellRequest,
         setCellRequest,
         postControl,
         getPaintState,
+        getCellState: (cell: PaintableCell) => {
+            if (typeof cell.state === "number") {
+                return cell.state;
+            }
+            if (!state || typeof cell.id !== "string" || cell.id.length === 0) {
+                return 0;
+            }
+            const indexedCell = state.topologyIndex?.byId?.get(cell.id);
+            if (!indexedCell || typeof indexedCell.index !== "number") {
+                return 0;
+            }
+            return Number(state.cellStates[indexedCell.index] ?? 0);
+        },
         bindGridInteractionsFn,
         setTimeoutFn,
     });

@@ -49,6 +49,7 @@ describe("canvas-view", () => {
     it("redraws transient layers for hover changes without redrawing the committed layer", async () => {
         const drawCommittedLayer = vi.fn();
         const drawHoverLayer = vi.fn();
+        const drawSelectionLayer = vi.fn();
         const drawPreviewLayer = vi.fn();
         const restoreCommittedSurface = vi.fn();
 
@@ -64,6 +65,7 @@ describe("canvas-view", () => {
         vi.doMock("./canvas/render-layers.js", () => ({
             drawCommittedLayer,
             drawHoverLayer,
+            drawSelectionLayer,
             drawPreviewLayer,
         }));
         vi.doMock("./geometry/registry.js", () => ({
@@ -85,6 +87,8 @@ describe("canvas-view", () => {
                 lineStrong: "rgba(31, 36, 48, 0.20)",
                 lineAperiodic: "rgba(31, 36, 48, 0.24)",
                 live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
             },
             buildStateColorLookup: () => new Map([[0, "#f8f1e5"]]),
             readCanvasColors: () => ({
@@ -95,6 +99,8 @@ describe("canvas-view", () => {
                 lineStrong: "rgba(31, 36, 48, 0.20)",
                 lineAperiodic: "rgba(31, 36, 48, 0.24)",
                 live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
             }),
             resolveCanvasRenderStyle: () => ({
                 mode: "standard",
@@ -105,6 +111,8 @@ describe("canvas-view", () => {
                 aperiodicLineColor: "rgba(31, 36, 48, 0.24)",
                 hoverTintColor: "rgba(31, 36, 48, 0.20)",
                 hoverStrokeColor: "#1f2430",
+                selectionTintColor: "rgba(191, 90, 54, 0.16)",
+                selectionStrokeColor: "#8a3d20",
             }),
             resolveDeadCellColor: vi.fn(),
             resolveRenderedCellColor: () => "#f8f1e5",
@@ -154,5 +162,31 @@ describe("canvas-view", () => {
 
         expect(restoreCommittedSurface).toHaveBeenCalledTimes(restoreCallsBeforeClear + 1);
         expect(drawHoverLayer).toHaveBeenCalledTimes(2);
+
+        view.setSelectedCell({ id: "square:0:0", x: 0, y: 0 });
+
+        expect(drawCommittedLayer).toHaveBeenCalledTimes(1);
+        expect(drawSelectionLayer).toHaveBeenCalledTimes(1);
+        expect(view.getSelectedCell()).toEqual({ id: "square:0:0", x: 0, y: 0 });
+
+        view.setSelectedCell({ id: "square:0:0", x: 0, y: 0 });
+
+        expect(drawSelectionLayer).toHaveBeenCalledTimes(1);
+
+        view.render(
+            {
+                topology: {
+                    ...topologyPayload(),
+                    topology_revision: "test:topology:next",
+                },
+                cellStates: [0],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "square",
+        );
+
+        expect(view.getSelectedCell()).toBeNull();
     });
 });

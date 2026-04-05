@@ -460,6 +460,8 @@ describe("canvas/render-style", () => {
                     "--cell-line-strong": "rgba(31, 36, 48, 0.21)",
                     "--cell-line-aperiodic": "rgba(31, 36, 48, 0.24)",
                     "--live": "#131722",
+                    "--accent": "#bf5a36",
+                    "--accent-dark": "#8a3d20",
                 })
                 : styleDeclaration({ backgroundColor: "rgba(255, 255, 255, 0.9)" }),
         );
@@ -475,6 +477,8 @@ describe("canvas/render-style", () => {
         );
         expect(resolveCanvasRenderStyle(12, "square", colors).hoverTintColor).toBe("rgba(31, 36, 48, 0.21)");
         expect(resolveCanvasRenderStyle(12, "square", colors).hoverStrokeColor).toBe("#131722");
+        expect(resolveCanvasRenderStyle(12, "square", colors).selectionTintColor).toBe("rgba(191, 90, 54, 0.16)");
+        expect(resolveCanvasRenderStyle(12, "square", colors).selectionStrokeColor).toBe("#8a3d20");
     });
 
     it("boosts hover contrast in dark theme while keeping the same token inputs", async () => {
@@ -487,10 +491,14 @@ describe("canvas/render-style", () => {
             lineStrong: "rgba(231, 237, 248, 0.14)",
             lineAperiodic: "rgba(7, 11, 17, 0.42)",
             live: "#f2f5ff",
+            accent: "#d67a4c",
+            accentStrong: "#f1a275",
         });
 
         expect(style.hoverTintColor).toBe("rgba(7, 11, 17, 0.18)");
         expect(style.hoverStrokeColor).toBe("rgba(7, 11, 17, 0.9)");
+        expect(style.selectionTintColor).toBe("rgba(214, 122, 76, 0.18)");
+        expect(style.selectionStrokeColor).toBe("#f1a275");
     });
 });
 
@@ -503,5 +511,7 @@ function readCanvasColorsForTests() {
         lineStrong: "rgba(31, 36, 48, 0.20)",
         lineAperiodic: "rgba(31, 36, 48, 0.24)",
         live: "#1f2430",
+        accent: "#bf5a36",
+        accentStrong: "#8a3d20",
     };
 }
