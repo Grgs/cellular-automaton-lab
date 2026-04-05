@@ -180,13 +180,13 @@ describe("canvas-view", () => {
         expect(restoreCommittedSurface).toHaveBeenCalledTimes(restoreCallsBeforeClear + 1);
         expect(drawHoverLayer).toHaveBeenCalledTimes(3);
 
-        view.setSelectedCell({ id: "square:0:0", x: 0, y: 0 });
+        view.setSelectedCells([{ id: "square:0:0", x: 0, y: 0 }]);
 
         expect(drawCommittedLayer).toHaveBeenCalledTimes(1);
         expect(drawSelectionLayer).toHaveBeenCalledTimes(1);
-        expect(view.getSelectedCell()).toEqual({ id: "square:0:0", x: 0, y: 0 });
+        expect(view.getSelectedCells()).toEqual([{ id: "square:0:0", x: 0, y: 0 }]);
 
-        view.setSelectedCell({ id: "square:0:0", x: 0, y: 0 });
+        view.setSelectedCells([{ id: "square:0:0", x: 0, y: 0 }]);
 
         expect(drawSelectionLayer).toHaveBeenCalledTimes(1);
 
@@ -217,7 +217,7 @@ describe("canvas-view", () => {
             "square",
         );
 
-        expect(view.getSelectedCell()).toBeNull();
+        expect(view.getSelectedCells()).toEqual([]);
         expect(drawGestureOutlineLayer).toHaveBeenCalledTimes(gestureCallsBeforeRevisionChange);
     });
 });

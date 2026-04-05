@@ -13,8 +13,8 @@ export function createInteractionSurfaceBindings({
     editorSession,
     legacyDrag,
     setHoveredCell,
-    setSelectedCell,
-    getSelectedCell,
+    setSelectedCells,
+    getSelectedCells,
     clearGestureOutline,
     paintCell,
     resolveDirectGestureTargetState,
@@ -41,8 +41,8 @@ export function createInteractionSurfaceBindings({
         cancel(): Promise<null>;
     };
     setHoveredCell: (cell: PaintableCell | null) => void;
-    setSelectedCell: (cell: PaintableCell | null) => void;
-    getSelectedCell: () => PaintableCell | null;
+    setSelectedCells: (cells: PaintableCell[]) => void;
+    getSelectedCells: () => PaintableCell[];
     clearGestureOutline: () => void;
     paintCell: (cell: PaintableCell, stateValue?: number) => Promise<void>;
     resolveDirectGestureTargetState: (cell: PaintableCell) => number;
@@ -52,6 +52,11 @@ export function createInteractionSurfaceBindings({
     let consumeNextClick = false;
     let pendingDirectGestureTargetState: number | null = null;
     let pendingDirectGestureCellId: string | null = null;
+    let selectionPointerId: number | null = null;
+    let selectionGestureMode: "select" | "deselect" | null = null;
+    let selectionGestureInitialCells = new Map<string, PaintableCell>();
+    let selectionGestureWorkingCells = new Map<string, PaintableCell>();
+    let suppressNextContextMenu = false;
 
     function identifyGestureCell(cell: PaintableCell): string {
         if (typeof cell.id === "string" && cell.id.length > 0) {
@@ -68,6 +73,93 @@ export function createInteractionSurfaceBindings({
     function clearPendingDirectGesture(): void {
         pendingDirectGestureCellId = null;
         pendingDirectGestureTargetState = null;
+    }
+
+    function cloneSelectedCells(cells: PaintableCell[]): Map<string, PaintableCell> {
+        return new Map(
+            cells
+                .map((cell) => [identifyGestureCell(cell), { ...cell }])
+                .filter((entry): entry is [string, PaintableCell] => typeof entry[0] === "string" && entry[0].length > 0),
+        );
+    }
+
+    function setSurfacePointerCapture(pointerId: number | null): void {
+        if (!surfaceElement || typeof surfaceElement.setPointerCapture !== "function" || pointerId === null) {
+            return;
+        }
+        try {
+            surfaceElement.setPointerCapture(pointerId);
+        } catch {
+            // Ignore unsupported pointer capture implementations.
+        }
+    }
+
+    function releaseSurfacePointerCapture(pointerId: number | null): void {
+        if (!surfaceElement || typeof surfaceElement.releasePointerCapture !== "function" || pointerId === null) {
+            return;
+        }
+        try {
+            surfaceElement.releasePointerCapture(pointerId);
+        } catch {
+            // Pointer capture may already be released.
+        }
+    }
+
+    function clearSelectionGestureState(): void {
+        selectionPointerId = null;
+        selectionGestureMode = null;
+        selectionGestureInitialCells = new Map();
+        selectionGestureWorkingCells = new Map();
+    }
+
+    function updateSelectionGesture(cell: PaintableCell): void {
+        if (selectionGestureMode === null) {
+            return;
+        }
+        const cellKey = identifyGestureCell(cell);
+        const hasCell = selectionGestureWorkingCells.has(cellKey);
+        if (selectionGestureMode === "select") {
+            if (hasCell) {
+                return;
+            }
+            selectionGestureWorkingCells.set(cellKey, { ...cell });
+        } else {
+            if (!hasCell) {
+                return;
+            }
+            selectionGestureWorkingCells.delete(cellKey);
+        }
+        setSelectedCells(Array.from(selectionGestureWorkingCells.values()));
+    }
+
+    function beginSelectionGesture(event: PointerEvent, cell: PaintableCell): void {
+        editPolicy.prepareDirectGridInteraction(event);
+        const currentSelectedCells = cloneSelectedCells(getSelectedCells());
+        const cellKey = identifyGestureCell(cell);
+        selectionPointerId = event.pointerId ?? null;
+        selectionGestureMode = currentSelectedCells.has(cellKey) ? "deselect" : "select";
+        selectionGestureInitialCells = new Map(currentSelectedCells);
+        selectionGestureWorkingCells = new Map(currentSelectedCells);
+        suppressNextContextMenu = true;
+        setSurfacePointerCapture(selectionPointerId);
+        updateSelectionGesture(cell);
+    }
+
+    function endSelectionGesture(): void {
+        releaseSurfacePointerCapture(selectionPointerId);
+        clearSelectionGestureState();
+        if (suppressNextContextMenu) {
+            setTimeoutFn(() => {
+                suppressNextContextMenu = false;
+            }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
+        }
+    }
+
+    function cancelSelectionGesture(): void {
+        setSelectedCells(Array.from(selectionGestureInitialCells.values()));
+        releaseSurfacePointerCapture(selectionPointerId);
+        clearSelectionGestureState();
+        suppressNextContextMenu = false;
     }
 
     function resolvePendingDirectGestureTargetState(cell: PaintableCell): number {
@@ -88,6 +180,13 @@ export function createInteractionSurfaceBindings({
                 onPointerDown(event: PointerEvent, cell: PaintableCell) {
                     setHoveredCell(null);
                     clearGestureOutline();
+                    if (event.button === 2) {
+                        beginSelectionGesture(event, cell);
+                        return;
+                    }
+                    if (event.button !== 0) {
+                        return;
+                    }
                     const editModeActive = editPolicy.supportsEditorTools() && editPolicy.isEditArmed();
                     if (!editModeActive) {
                         editPolicy.prepareDirectGridInteraction(event);
@@ -120,6 +219,13 @@ export function createInteractionSurfaceBindings({
                     void editorSession.beginPointerSession(cell, event.pointerId);
                 },
                 onPointerMove(event: PointerEvent, cell: PaintableCell) {
+                    if (selectionPointerId !== null) {
+                        if (event.pointerId !== selectionPointerId || (event.buttons & 2) === 0) {
+                            return;
+                        }
+                        updateSelectionGesture(cell);
+                        return;
+                    }
                     const hasActivePointer = editorSession.isPointerActive() || legacyDrag.isActive();
                     if (!hasActivePointer || (event.buttons & 1) === 0) {
                         return;
@@ -132,7 +238,11 @@ export function createInteractionSurfaceBindings({
 
                     editorSession.handlePointerMove(cell);
                 },
-                onPointerUp() {
+                onPointerUp(event: PointerEvent) {
+                    if (selectionPointerId !== null && event.pointerId === selectionPointerId) {
+                        endSelectionGesture();
+                        return;
+                    }
                     if (consumeNextClick && editPolicy.supportsEditorTools() && !editorSession.isPointerActive() && !legacyDrag.isActive()) {
                         setTimeoutFn(() => {
                             consumeNextClick = false;
@@ -154,6 +264,10 @@ export function createInteractionSurfaceBindings({
                     clearPendingDirectGesture();
                     setHoveredCell(null);
                     clearGestureOutline();
+                    if (selectionPointerId !== null) {
+                        cancelSelectionGesture();
+                        return;
+                    }
                     if (legacyDrag.isActive()) {
                         void legacyDrag.cancel();
                         return;
@@ -166,7 +280,7 @@ export function createInteractionSurfaceBindings({
                     void editorSession.cancelActivePreview();
                 },
                 onHoverChange(cell) {
-                    const hasActivePointer = editorSession.isPointerActive() || legacyDrag.isActive();
+                    const hasActivePointer = selectionPointerId !== null || editorSession.isPointerActive() || legacyDrag.isActive();
                     if (hasActivePointer) {
                         setHoveredCell(null);
                         return;
@@ -174,16 +288,23 @@ export function createInteractionSurfaceBindings({
                     setHoveredCell(cell);
                 },
                 onContextMenu(cell) {
-                    const selectedCell = getSelectedCell();
+                    if (suppressNextContextMenu) {
+                        suppressNextContextMenu = false;
+                        return;
+                    }
                     if (!cell) {
-                        setSelectedCell(null);
+                        setSelectedCells([]);
                         return;
                     }
-                    if (selectedCell?.id === cell.id) {
-                        setSelectedCell(null);
+                    const selectedCells = cloneSelectedCells(getSelectedCells());
+                    const cellKey = identifyGestureCell(cell);
+                    if (selectedCells.has(cellKey)) {
+                        selectedCells.delete(cellKey);
+                        setSelectedCells(Array.from(selectedCells.values()));
                         return;
                     }
-                    setSelectedCell(cell);
+                    selectedCells.set(cellKey, { ...cell });
+                    setSelectedCells(Array.from(selectedCells.values()));
                 },
                 onClick(event: MouseEvent, cell: PaintableCell) {
                     if (editorSession.isClickSuppressed()) {

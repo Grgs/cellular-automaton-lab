@@ -22,7 +22,7 @@ export function bindGridInteractions({
 
     surfaceElement.addEventListener("pointerdown", (event) => {
         onHoverChange(null);
-        if (event.button !== 0) {
+        if (event.button !== 0 && event.button !== 2) {
             return;
         }
 

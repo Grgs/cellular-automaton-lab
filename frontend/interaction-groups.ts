@@ -57,8 +57,8 @@ interface InteractionCommandSurfaceOptions {
     legacyDrag: ReturnType<typeof createInteractionSessionRuntime>["legacyDrag"];
     mutations: NonNullable<InteractionControllerOptions["simulationMutations"]>;
     setHoveredCell: InteractionControllerOptions["setHoveredCell"];
-    setSelectedCell: InteractionControllerOptions["setSelectedCell"];
-    getSelectedCell: InteractionControllerOptions["getSelectedCell"];
+    setSelectedCells: InteractionControllerOptions["setSelectedCells"];
+    getSelectedCells: InteractionControllerOptions["getSelectedCells"];
     clearGestureOutline: InteractionControllerOptions["clearGestureOutline"];
     toggleCellRequest: InteractionControllerOptions["toggleCellRequest"];
     setCellRequest: InteractionControllerOptions["setCellRequest"];
@@ -164,8 +164,8 @@ export function createInteractionCommandSurface({
     legacyDrag,
     mutations,
     setHoveredCell,
-    setSelectedCell,
-    getSelectedCell,
+    setSelectedCells,
+    getSelectedCells,
     clearGestureOutline,
     toggleCellRequest,
     setCellRequest,
@@ -191,8 +191,8 @@ export function createInteractionCommandSurface({
         editorSession,
         legacyDrag,
         setHoveredCell,
-        setSelectedCell,
-        getSelectedCell,
+        setSelectedCells,
+        getSelectedCells,
         clearGestureOutline,
         paintCell: commandDispatch.paintCell,
         resolveDirectGestureTargetState: commandDispatch.resolveDirectGestureTargetState,

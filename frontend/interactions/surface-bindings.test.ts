@@ -3,10 +3,21 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createInteractionSurfaceBindings } from "./surface-bindings.js";
 import type { GridInteractionBindings, PaintableCell } from "../types/editor.js";
 
-function createEventStub() {
+function createEventStub({
+    button = 0,
+    buttons = button === 2 ? 2 : 1,
+    pointerId = 1,
+}: {
+    button?: number;
+    buttons?: number;
+    pointerId?: number;
+} = {}) {
     return {
         preventDefault: vi.fn(),
         stopPropagation: vi.fn(),
+        button,
+        buttons,
+        pointerId,
     } as unknown as PointerEvent & MouseEvent;
 }
 
@@ -27,8 +38,8 @@ function createSubject({
 }: SurfaceBindingSubjectOptions = {}): {
     handlers: GridInteractionBindings;
     setHoveredCell: ReturnType<typeof vi.fn>;
-    setSelectedCell: ReturnType<typeof vi.fn>;
-    getSelectedCell: ReturnType<typeof vi.fn>;
+    setSelectedCells: ReturnType<typeof vi.fn>;
+    getSelectedCells: ReturnType<typeof vi.fn>;
     clearGestureOutline: ReturnType<typeof vi.fn>;
     paintCell: ReturnType<typeof vi.fn>;
     resolveDirectGestureTargetState: ReturnType<typeof vi.fn>;
@@ -42,8 +53,8 @@ function createSubject({
 } {
     let handlers: GridInteractionBindings | null = null;
     const setHoveredCell = vi.fn();
-    const setSelectedCell = vi.fn();
-    const getSelectedCell = vi.fn(() => null);
+    const setSelectedCells = vi.fn();
+    const getSelectedCells = vi.fn(() => []);
     const clearGestureOutline = vi.fn(() => undefined);
     const editorPointerActive = vi.fn(() => false);
     const legacyPointerActive = vi.fn(() => false);
@@ -87,8 +98,8 @@ function createSubject({
             cancel: vi.fn().mockResolvedValue(null),
         },
         setHoveredCell,
-        setSelectedCell,
-        getSelectedCell,
+        setSelectedCells,
+        getSelectedCells,
         clearGestureOutline,
         paintCell,
         resolveDirectGestureTargetState,
@@ -106,8 +117,8 @@ function createSubject({
     return {
         handlers: capturedHandlers,
         setHoveredCell,
-        setSelectedCell,
-        getSelectedCell,
+        setSelectedCells,
+        getSelectedCells,
         clearGestureOutline,
         paintCell,
         resolveDirectGestureTargetState,
@@ -169,7 +180,7 @@ describe("interactions/surface-bindings", () => {
 
         expect(beginPointerSession).not.toHaveBeenCalled();
         expect(prepareDirectGridInteraction).toHaveBeenCalledTimes(1);
-        expect(legacyBegin).toHaveBeenCalledWith(deadCell, undefined, 2);
+        expect(legacyBegin).toHaveBeenCalledWith(deadCell, 1, 2);
         expect(armEditingFromGrid).not.toHaveBeenCalled();
     });
 
@@ -212,7 +223,7 @@ describe("interactions/surface-bindings", () => {
         handlers.onPointerDown(createEventStub(), cell);
 
         expect(blockRunningAdvancedTool).not.toHaveBeenCalled();
-        expect(legacyBegin).toHaveBeenCalledWith(cell, undefined, 2);
+        expect(legacyBegin).toHaveBeenCalledWith(cell, 1, 2);
     });
 
     it("uses the original pointer-down target state for a mixed unarmed drag gesture", () => {
@@ -226,7 +237,7 @@ describe("interactions/surface-bindings", () => {
         handlers.onPointerMove({ buttons: 1 } as PointerEvent, { id: "square:2:1", x: 2, y: 1, state: 0 });
 
         expect(resolveDirectGestureTargetState).toHaveBeenCalledWith(originCell);
-        expect(legacyBegin).toHaveBeenCalledWith(originCell, undefined, 0);
+        expect(legacyBegin).toHaveBeenCalledWith(originCell, 1, 0);
     });
 
     it("keeps armed clicks on the editor-session path", () => {
@@ -243,7 +254,7 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("keeps the persistent selection unchanged during left-click interactions", () => {
-        const { handlers, setSelectedCell } = createSubject({
+        const { handlers, setSelectedCells } = createSubject({
             supportsEditorTools: true,
             isEditArmed: false,
         });
@@ -252,7 +263,7 @@ describe("interactions/surface-bindings", () => {
         handlers.onPointerDown(createEventStub(), cell);
         handlers.onClick(createEventStub(), cell);
 
-        expect(setSelectedCell).not.toHaveBeenCalled();
+        expect(setSelectedCells).not.toHaveBeenCalled();
     });
 
     it("keeps armed running brush interactions on the legacy paint path", () => {
@@ -266,7 +277,7 @@ describe("interactions/surface-bindings", () => {
 
         handlers.onPointerDown(createEventStub(), cell);
 
-        expect(legacyBegin).toHaveBeenCalledWith(cell, undefined);
+        expect(legacyBegin).toHaveBeenCalledWith(cell, 1);
         expect(resolveDirectGestureTargetState).not.toHaveBeenCalled();
     });
 
@@ -306,8 +317,8 @@ describe("interactions/surface-bindings", () => {
                 cancel,
             },
             setHoveredCell: vi.fn(),
-            setSelectedCell: vi.fn(),
-            getSelectedCell: vi.fn(() => null),
+            setSelectedCells: vi.fn(),
+            getSelectedCells: vi.fn(() => []),
             clearGestureOutline: clearGestureOutlineSpy,
             paintCell: vi.fn().mockResolvedValue(undefined),
             resolveDirectGestureTargetState: vi.fn(() => 1),
@@ -322,40 +333,65 @@ describe("interactions/surface-bindings", () => {
         expect(cancel).toHaveBeenCalledTimes(1);
     });
 
-    it("selects a cell on right click", () => {
-        const { handlers, setSelectedCell } = createSubject();
+    it("selects a cell on right-button pointer down", () => {
+        const { handlers, setSelectedCells } = createSubject();
         const cell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
 
-        handlers.onContextMenu(cell);
+        handlers.onPointerDown({ button: 2, pointerId: 7 } as PointerEvent, cell);
 
-        expect(setSelectedCell).toHaveBeenCalledWith(cell);
+        expect(setSelectedCells).toHaveBeenCalledWith([cell]);
     });
 
-    it("clears the selection when right clicking the selected cell", () => {
-        const { handlers, setSelectedCell, getSelectedCell } = createSubject();
-        const cell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
-        getSelectedCell.mockReturnValue(cell);
+    it("adds multiple cells during a right-drag select gesture", () => {
+        const { handlers, setSelectedCells } = createSubject();
+        const firstCell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
+        const secondCell: PaintableCell = { id: "square:2:1", x: 2, y: 1 };
 
-        handlers.onContextMenu(cell);
+        handlers.onPointerDown({ button: 2, pointerId: 9 } as PointerEvent, firstCell);
+        handlers.onPointerMove({ buttons: 2, pointerId: 9 } as PointerEvent, secondCell);
+        handlers.onPointerUp({ button: 2, pointerId: 9 } as PointerEvent);
+        handlers.onContextMenu(secondCell);
 
-        expect(setSelectedCell).toHaveBeenCalledWith(null);
+        expect(setSelectedCells).toHaveBeenNthCalledWith(1, [firstCell]);
+        expect(setSelectedCells).toHaveBeenNthCalledWith(2, [firstCell, secondCell]);
+        expect(setSelectedCells).toHaveBeenCalledTimes(2);
     });
 
-    it("replaces the selection when right clicking a different cell", () => {
-        const { handlers, setSelectedCell, getSelectedCell } = createSubject();
-        getSelectedCell.mockReturnValue({ id: "square:1:1", x: 1, y: 1 });
-        const replacement: PaintableCell = { id: "square:2:2", x: 2, y: 2 };
+    it("removes multiple cells during a right-drag deselect gesture", () => {
+        const firstCell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
+        const secondCell: PaintableCell = { id: "square:2:2", x: 2, y: 2 };
+        const thirdCell: PaintableCell = { id: "square:3:3", x: 3, y: 3 };
+        const { handlers, setSelectedCells, getSelectedCells } = createSubject();
+        getSelectedCells.mockReturnValue([firstCell, secondCell, thirdCell]);
 
-        handlers.onContextMenu(replacement);
+        handlers.onPointerDown({ button: 2, pointerId: 5 } as PointerEvent, firstCell);
+        handlers.onPointerMove({ buttons: 2, pointerId: 5 } as PointerEvent, secondCell);
 
-        expect(setSelectedCell).toHaveBeenCalledWith(replacement);
+        expect(setSelectedCells).toHaveBeenNthCalledWith(1, [secondCell, thirdCell]);
+        expect(setSelectedCells).toHaveBeenNthCalledWith(2, [thirdCell]);
     });
 
     it("clears the selection on empty-space right click", () => {
-        const { handlers, setSelectedCell } = createSubject();
+        const { handlers, setSelectedCells } = createSubject();
 
         handlers.onContextMenu(null);
 
-        expect(setSelectedCell).toHaveBeenCalledWith(null);
+        expect(setSelectedCells).toHaveBeenCalledWith([]);
+    });
+
+    it("reverts an in-progress right-drag selection on pointer cancel", () => {
+        const firstCell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
+        const secondCell: PaintableCell = { id: "square:2:1", x: 2, y: 1 };
+        const thirdCell: PaintableCell = { id: "square:3:1", x: 3, y: 1 };
+        const { handlers, setSelectedCells, getSelectedCells } = createSubject();
+        getSelectedCells.mockReturnValue([firstCell, secondCell, thirdCell]);
+
+        handlers.onPointerDown({ button: 2, pointerId: 12 } as PointerEvent, firstCell);
+        handlers.onPointerMove({ buttons: 2, pointerId: 12 } as PointerEvent, secondCell);
+        handlers.onPointerCancel({ pointerId: 12 } as PointerEvent);
+
+        expect(setSelectedCells).toHaveBeenNthCalledWith(1, [secondCell, thirdCell]);
+        expect(setSelectedCells).toHaveBeenNthCalledWith(2, [thirdCell]);
+        expect(setSelectedCells).toHaveBeenNthCalledWith(3, [firstCell, secondCell, thirdCell]);
     });
 });

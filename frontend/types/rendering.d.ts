@@ -293,8 +293,8 @@ export interface CanvasGridView {
     setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
     setHoveredCell(cell: PaintableCell | null): void;
-    setSelectedCell(cell: PaintableCell | null): void;
-    getSelectedCell(): PaintableCell | null;
+    setSelectedCells(cells: PaintableCell[]): void;
+    getSelectedCells(): PaintableCell[];
     setGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone): void;
     flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number): void;
     clearGestureOutline(): void;

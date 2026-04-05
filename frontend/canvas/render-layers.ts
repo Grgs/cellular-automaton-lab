@@ -212,36 +212,38 @@ export function drawHoverLayer({
 
 export function drawSelectionLayer({
     context,
-    selectedCell,
+    selectedCells,
     cellStates,
     ...shared
 }: SharedRenderInputs & {
     context: CanvasRenderingContext2D;
-    selectedCell: PaintableCell | null;
+    selectedCells: PaintableCell[];
     cellStates: number[];
 }): void {
-    if (!selectedCell) {
+    if (selectedCells.length === 0) {
         return;
     }
 
-    const renderCell = resolveTransientRenderCell(
-        selectedCell,
-        shared.geometry,
-        shared.topology,
-        shared.geometryCache,
-    );
     const adapter = getGeometryAdapter(shared.geometry);
-    adapter.drawCell({
-        context,
-        cell: renderCell,
-        stateValue: resolveTransientStateValue(selectedCell, shared.topology, cellStates),
-        metrics: shared.metrics,
-        cache: shared.geometryCache,
-        colors: shared.canvasColors,
-        colorLookup: shared.colorLookup,
-        resolveRenderedCellColor: shared.resolveRenderedCellColor,
-        renderStyle: shared.renderStyle,
-        renderLayer: "selected",
+    selectedCells.forEach((selectedCell) => {
+        const renderCell = resolveTransientRenderCell(
+            selectedCell,
+            shared.geometry,
+            shared.topology,
+            shared.geometryCache,
+        );
+        adapter.drawCell({
+            context,
+            cell: renderCell,
+            stateValue: resolveTransientStateValue(selectedCell, shared.topology, cellStates),
+            metrics: shared.metrics,
+            cache: shared.geometryCache,
+            colors: shared.canvasColors,
+            colorLookup: shared.colorLookup,
+            resolveRenderedCellColor: shared.resolveRenderedCellColor,
+            renderStyle: shared.renderStyle,
+            renderLayer: "selected",
+        });
     });
 }
 

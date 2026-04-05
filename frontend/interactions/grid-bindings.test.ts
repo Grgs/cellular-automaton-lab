@@ -148,4 +148,27 @@ describe("interactions/grid-bindings", () => {
 
         expect(onContextMenu).toHaveBeenCalledWith(null);
     });
+
+    it("forwards right-button pointer down events to the interaction handler", () => {
+        const surface = document.createElement("div");
+        document.body.append(surface);
+        const cell = { id: "square:1:1", x: 1, y: 1 };
+        const onPointerDown = vi.fn();
+
+        bindGridInteractions({
+            surfaceElement: surface,
+            resolveCellFromEvent: () => cell,
+            onPointerDown,
+            onPointerMove: vi.fn(),
+            onPointerUp: vi.fn(),
+            onPointerCancel: vi.fn(),
+            onClick: vi.fn(),
+            onContextMenu: vi.fn(),
+            onHoverChange: vi.fn(),
+        });
+
+        surface.dispatchEvent(createPointerEvent("pointerdown", { button: 2, buttons: 2 }));
+
+        expect(onPointerDown).toHaveBeenCalledWith(expect.objectContaining({ button: 2 }), cell);
+    });
 });
