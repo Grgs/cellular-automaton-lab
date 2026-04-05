@@ -1,234 +1,188 @@
 from __future__ import annotations
 
+from functools import lru_cache
+import json
 import math
+from pathlib import Path
+from typing import TypedDict
 
 from backend.simulation.aperiodic_support import (
-    AFFINE_IDENTITY,
-    Affine,
     AperiodicPatch,
-    PatchRecord,
-    Vec,
-    affine_apply,
-    affine_multiply,
-    id_from_transform,
-    patch_from_records,
-    polygon_centroid,
-    rotation,
-    rounded_point,
-    translation,
+    AperiodicPatchCell,
+    patch_from_cells,
 )
 
 
-_BASE_SHIELD = (
-    Vec(-0.5, -1.0),
-    Vec(0.0, -1.5),
-    Vec(0.5, -1.0),
-    Vec(0.5, 1.0),
-    Vec(0.0, 1.5),
-    Vec(-0.5, 1.0),
-)
-_BASE_SQUARES: tuple[tuple[str, tuple[Vec, ...]], ...] = (
-    (
-        "left",
-        (
-            Vec(-2.5, -1.0),
-            Vec(-0.5, -1.0),
-            Vec(-0.5, 1.0),
-            Vec(-2.5, 1.0),
-        ),
-    ),
-    (
-        "right",
-        (
-            Vec(0.5, -1.0),
-            Vec(2.5, -1.0),
-            Vec(2.5, 1.0),
-            Vec(0.5, 1.0),
-        ),
-    ),
-)
-_BASE_TRIANGLES: tuple[tuple[str, str, tuple[Vec, ...]], ...] = (
-    (
-        "top-left",
-        "left",
-        (
-            Vec(-0.5, -1.0),
-            Vec(0.0, -1.5),
-            Vec(-1.0, -1.5),
-        ),
-    ),
-    (
-        "top-right",
-        "right",
-        (
-            Vec(0.0, -1.5),
-            Vec(0.5, -1.0),
-            Vec(1.0, -1.5),
-        ),
-    ),
-    (
-        "bottom-left",
-        "left",
-        (
-            Vec(-1.0, 1.5),
-            Vec(0.0, 1.5),
-            Vec(-0.5, 1.0),
-        ),
-    ),
-    (
-        "bottom-right",
-        "right",
-        (
-            Vec(0.0, 1.5),
-            Vec(1.0, 1.5),
-            Vec(0.5, 1.0),
-        ),
-    ),
-)
-_CLUSTER_VECTOR_X = Vec(5.0, 0.0)
-_CLUSTER_VECTOR_Y = Vec(0.0, 3.0)
-_FILLER_SHIELD = (
-    Vec(0.5, 2.0),
-    Vec(1.0, 1.5),
-    Vec(0.5, 1.0),
-    Vec(4.5, 1.0),
-    Vec(4.0, 1.5),
-    Vec(4.5, 2.0),
-)
+_DATA_PATH = Path(__file__).with_name("data") / "shield_reference_patch.json"
+_ROTATION_STEP_DEGREES = 15
+_ROTATION_STEP_RADIANS = math.radians(_ROTATION_STEP_DEGREES)
+_POLYGON_SCALE = 1.62 / 1.11
 
 
-def _orientation_token(transform: Affine) -> str:
-    angle = math.degrees(math.atan2(transform[3], transform[0]))
-    return str(int(round(angle)) % 360)
+class _ShieldReferenceRecord(TypedDict):
+    id: str
+    kind: str
+    center: list[float]
+    vertices: list[list[float]]
+    tile_family: str | None
+    orientation_token: str | None
+    chirality_token: str | None
+    decoration_tokens: list[str] | None
+    graph_distance: int
+    neighbors: list[str]
 
 
-def _apply_polygon(transform: Affine, vertices: tuple[Vec, ...]) -> tuple[Vec, ...]:
-    return tuple(affine_apply(transform, vertex) for vertex in vertices)
+class _ShieldReferencePayload(TypedDict):
+    source: str
+    contact_threshold: int
+    rotation_step_degrees: int
+    graph_distance_thresholds: dict[str, int]
+    records: list[_ShieldReferenceRecord]
 
 
-def _record(
-    prefix: str,
-    kind: str,
-    transform: Affine,
-    vertices: tuple[Vec, ...],
-    *,
-    chirality_token: str | None = None,
-    decoration_tokens: tuple[str, ...] | None = None,
-) -> PatchRecord:
-    resolved_vertices = _apply_polygon(transform, vertices)
+@lru_cache(maxsize=1)
+def _load_reference_payload() -> _ShieldReferencePayload:
+    return json.loads(_DATA_PATH.read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=1)
+def _load_reference_records() -> tuple[_ShieldReferenceRecord, ...]:
+    return tuple(_load_reference_payload()["records"])
+
+
+@lru_cache(maxsize=1)
+def _distance_thresholds() -> dict[int, int]:
+    payload = _load_reference_payload()
     return {
-        "id": id_from_transform(prefix, transform),
-        "kind": kind,
-        "center": rounded_point(polygon_centroid(resolved_vertices)),
-        "vertices": tuple((vertex.x, vertex.y) for vertex in resolved_vertices),
-        "tile_family": "shield",
-        "orientation_token": _orientation_token(transform),
-        "chirality_token": chirality_token,
-        "decoration_tokens": decoration_tokens,
+        int(depth): int(distance)
+        for depth, distance in payload["graph_distance_thresholds"].items()
     }
 
 
-def _emit_cluster_records(
-    transform: Affine,
-    path: str,
-    phase: int,
-    records: list[PatchRecord],
-) -> None:
-    phase_label = phase % 4
-    records.append(
-        _record(
-            f"shield:{path}:shield:phase-{phase_label}",
-            "shield-shield",
-            transform,
-            _BASE_SHIELD,
-            decoration_tokens=(f"arrow-{phase_label}", f"ring-{phase_label % 2}"),
-        )
-    )
-    for square_role, polygon in _BASE_SQUARES:
-        records.append(
-            _record(
-                f"shield:{path}:square:{square_role}",
-                "shield-square",
-                transform,
-                polygon,
-            )
-        )
-    for role, chirality_token, polygon in _BASE_TRIANGLES:
-        records.append(
-            _record(
-                f"shield:{path}:triangle:{role}:phase-{phase_label}",
-                "shield-triangle",
-                transform,
-                polygon,
-                chirality_token=chirality_token,
-                decoration_tokens=(f"arm-{role}", f"phase-{phase_label % 2}"),
-            )
-        )
+@lru_cache(maxsize=1)
+def _reference_pivot() -> tuple[float, float]:
+    seed_records = [
+        record
+        for record in _load_reference_records()
+        if int(record["graph_distance"]) == 0
+    ]
+    if not seed_records:
+        raise ValueError("Shield reference patch is missing a graph-distance seed cell.")
+    center = seed_records[0]["center"]
+    return (float(center[0]), float(center[1]))
 
 
-def _cluster_transform(x: int, y: int) -> Affine:
-    return affine_multiply(
-        translation(
-            (x * _CLUSTER_VECTOR_X.x) + (y * _CLUSTER_VECTOR_Y.x),
-            (x * _CLUSTER_VECTOR_X.y) + (y * _CLUSTER_VECTOR_Y.y),
-        ),
-        AFFINE_IDENTITY,
+def _distance_threshold(patch_depth: int) -> int:
+    resolved_depth = max(0, int(patch_depth))
+    thresholds = _distance_thresholds()
+    if resolved_depth in thresholds:
+        return thresholds[resolved_depth]
+    return thresholds[max(thresholds)]
+
+
+def _rotate_point(
+    point: tuple[float, float],
+    *,
+    pivot: tuple[float, float],
+    radians: float,
+) -> tuple[float, float]:
+    translated_x = point[0] - pivot[0]
+    translated_y = point[1] - pivot[1]
+    cosine = math.cos(radians)
+    sine = math.sin(radians)
+    return (
+        round((translated_x * cosine) - (translated_y * sine) + pivot[0], 6),
+        round((translated_x * sine) + (translated_y * cosine) + pivot[1], 6),
     )
 
 
-def _cluster_coordinates(patch_depth: int) -> tuple[tuple[int, int], ...]:
-    radius = max(0, int(patch_depth))
+def _rotate_orientation_token(
+    token: str | None,
+    *,
+    degrees: int,
+) -> str | None:
+    if token is None:
+        return None
+    try:
+        return str((int(token) + degrees) % 360)
+    except ValueError:
+        return token
+
+
+def _scale_vertices(
+    vertices: tuple[tuple[float, float], ...],
+    *,
+    center: tuple[float, float],
+) -> tuple[tuple[float, float], ...]:
     return tuple(
-        (x, y)
-        for y in range(-radius, radius + 1)
-        for x in range(-radius, radius + 1)
-        if abs(x) + abs(y) <= radius
+        (
+            round(center[0] + ((vertex[0] - center[0]) * _POLYGON_SCALE), 6),
+            round(center[1] + ((vertex[1] - center[1]) * _POLYGON_SCALE), 6),
+        )
+        for vertex in vertices
     )
-
-
-def _cluster_phase(x: int, y: int) -> int:
-    return (x - y) % 4
-
-
-def _emit_filler_records(
-    coordinates: tuple[tuple[int, int], ...],
-    records: list[PatchRecord],
-) -> None:
-    coordinate_set = set(coordinates)
-    for x, y in coordinates:
-        if (
-            (x + 1, y) not in coordinate_set
-            or (x, y + 1) not in coordinate_set
-            or (x + 1, y + 1) not in coordinate_set
-        ):
-            continue
-        phase_label = (x - y) % 4
-        transform = translation(
-            (x * _CLUSTER_VECTOR_X.x) + (y * _CLUSTER_VECTOR_Y.x),
-            (x * _CLUSTER_VECTOR_X.y) + (y * _CLUSTER_VECTOR_Y.y),
-        )
-        records.append(
-            _record(
-                f"shield:filler:{x}:{y}:phase-{phase_label}",
-                "shield-shield",
-                transform,
-                _FILLER_SHIELD,
-                decoration_tokens=(f"fill-{phase_label}", f"ring-{phase_label % 2}"),
-            )
-        )
 
 
 def build_shield_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    records: list[PatchRecord] = []
-    coordinates = _cluster_coordinates(resolved_depth)
-    for x, y in coordinates:
-        _emit_cluster_records(
-            _cluster_transform(x, y),
-            f"cluster:{x}:{y}",
-            _cluster_phase(x, y),
-            records,
-        )
-    _emit_filler_records(coordinates, records)
+    max_distance = _distance_threshold(resolved_depth)
+    selected_records = tuple(
+        record
+        for record in _load_reference_records()
+        if int(record["graph_distance"]) <= max_distance
+    )
+    selected_ids = {record["id"] for record in selected_records}
 
-    return patch_from_records(resolved_depth, records, edge_precision=6)
+    rotate_patch = resolved_depth % 2 == 1
+    pivot = _reference_pivot()
+    cells: list[AperiodicPatchCell] = []
+    for record in selected_records:
+        center = (float(record["center"][0]), float(record["center"][1]))
+        vertices = tuple(
+            (float(vertex[0]), float(vertex[1]))
+            for vertex in record["vertices"]
+        )
+        orientation_token = record.get("orientation_token")
+        decoration_tokens = record["decoration_tokens"]
+        vertices = _scale_vertices(vertices, center=center)
+        if rotate_patch:
+            center = _rotate_point(
+                center,
+                pivot=pivot,
+                radians=_ROTATION_STEP_RADIANS,
+            )
+            vertices = tuple(
+                _rotate_point(vertex, pivot=pivot, radians=_ROTATION_STEP_RADIANS)
+                for vertex in vertices
+            )
+            orientation_token = _rotate_orientation_token(
+                orientation_token,
+                degrees=_ROTATION_STEP_DEGREES,
+            )
+
+        cells.append(
+            AperiodicPatchCell(
+                id=record["id"],
+                kind=record["kind"],
+                center=center,
+                vertices=vertices,
+                neighbors=tuple(
+                    neighbor_id
+                    for neighbor_id in record["neighbors"]
+                    if neighbor_id in selected_ids
+                ),
+                tile_family=record.get("tile_family"),
+                orientation_token=orientation_token,
+                chirality_token=record.get("chirality_token"),
+                decoration_tokens=(
+                    tuple(decoration_tokens)
+                    if decoration_tokens is not None
+                    else None
+                ),
+            )
+        )
+
+    return patch_from_cells(
+        resolved_depth,
+        sorted(cells, key=lambda cell: cell.id),
+    )

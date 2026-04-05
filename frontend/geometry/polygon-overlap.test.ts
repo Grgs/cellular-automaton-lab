@@ -116,8 +116,8 @@ describe("geometry/polygon-overlap", () => {
             "archimedean-4-8-8-3x3.json",
             "chair-depth-3.json",
             "hat-monotile-depth-3.json",
-            "square-triangle-depth-3.json",
             "shield-depth-3.json",
+            "square-triangle-depth-3.json",
             "pinwheel-depth-3.json",
         ]) {
             const overlaps = await overlapsForFixture(filename);

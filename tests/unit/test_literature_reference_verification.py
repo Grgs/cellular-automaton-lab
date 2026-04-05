@@ -402,7 +402,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_stronger_substitution_families_match_checked_in_local_reference_fixtures(self) -> None:
         for geometry, depth in (
             ("hat-monotile", 2),
-            ("shield", 2),
+            ("shield", 3),
             ("pinwheel", 3),
             ("square-triangle", 3),
             ("chair", 3),
@@ -429,7 +429,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_stronger_substitution_families_match_checked_in_canonical_patch_fixtures(self) -> None:
         for geometry, depth in (
             ("square-triangle", 3),
-            ("shield", 1),
+            ("shield", 3),
             ("pinwheel", 3),
         ):
             with self.subTest(geometry=geometry, depth=depth):
@@ -444,7 +444,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
                 )
 
     def test_canonical_patch_fixture_reports_mismatch(self) -> None:
-        topology = build_topology("shield", 0, 0, 1)
+        topology = build_topology("shield", 0, 0, 3)
         observed_cells = _canonical_patch_payload(topology, include_id=False)
         bad_cells = list(observed_cells)
         bad_cells[0] = {
@@ -453,22 +453,22 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         }
         bad_fixtures = {
             "shield": {
-                "decorated-depth-1": {
-                    "depth": 1,
+                "dense-depth-3": {
+                    "depth": 3,
                     "include_id": False,
                     "cells": bad_cells,
                 }
             }
         }
 
-        expectation = REFERENCE_FAMILY_SPECS["shield"].depth_expectations[1]
+        expectation = REFERENCE_FAMILY_SPECS["shield"].depth_expectations[3]
         with patch(
             "backend.simulation.literature_reference_verification._load_canonical_reference_fixtures",
             return_value=bad_fixtures,
         ):
             failures = _depth_topology_expectation_failures(
                 geometry="shield",
-                depth=1,
+                depth=3,
                 topology=topology,
                 expectation=expectation,
             )
@@ -507,14 +507,13 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             any(failure.code == "local-reference-fixture-mismatch" for failure in failures)
         )
 
-    def test_shield_reference_verifier_accepts_decoration_variants(self) -> None:
+    def test_shield_reference_verifier_accepts_orientation_diversity(self) -> None:
         result = verify_reference_family("shield")
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
-        decoration_counts = dict(result.observations[1].unique_decoration_variants_by_kind)
-        self.assertGreaterEqual(decoration_counts["shield-shield"], 2)
-        self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
+        self.assertGreaterEqual(result.observations[0].unique_orientation_tokens, 10)
+        self.assertGreaterEqual(result.observations[1].unique_orientation_tokens, 12)
         self.assertEqual(result.observations[-1].hole_count, 0)
 
     def test_chair_orientation_count_expectation_reports_mismatch(self) -> None:

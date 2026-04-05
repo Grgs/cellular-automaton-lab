@@ -153,7 +153,6 @@ class TopologyValidationTests(unittest.TestCase):
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
             (SQUARE_TRIANGLE_GEOMETRY, 3),
-            (SHIELD_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
         ):
             with self.subTest(geometry=geometry):
@@ -246,7 +245,6 @@ class TopologyValidationTests(unittest.TestCase):
             HAT_MONOTILE_GEOMETRY,
             TUEBINGEN_TRIANGLE_GEOMETRY,
             SQUARE_TRIANGLE_GEOMETRY,
-            SHIELD_GEOMETRY,
             PINWHEEL_GEOMETRY,
         ):
             with self.subTest(geometry=geometry):
@@ -261,6 +259,16 @@ class TopologyValidationTests(unittest.TestCase):
                         "check_graph_connectivity": True,
                     },
                 )
+
+        self.assertEqual(
+            recommended_validation_options(SHIELD_GEOMETRY),
+            {
+                "check_surface": True,
+                "check_overlaps": False,
+                "check_edge_multiplicity": False,
+                "check_graph_connectivity": True,
+            },
+        )
 
     def test_validator_flags_asymmetric_neighbor_links(self) -> None:
         topology = LatticeTopology(

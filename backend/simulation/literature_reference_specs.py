@@ -1120,12 +1120,12 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         source_urls=(
             "https://tilings.math.uni-bielefeld.de/substitution/shield/",
         ),
-        canonical_root_seed_policy="decorated 12-fold shield substitution patch",
+        canonical_root_seed_policy="dense 12-fold shield patch cropped from a literature-derived canonical reference field",
         allowed_public_cell_kinds=("shield-shield", "shield-square", "shield-triangle"),
         required_metadata=(
             MetadataRequirement(
                 kind="shield-shield",
-                fields=("tile_family", "orientation_token", "decoration_tokens"),
+                fields=("tile_family", "orientation_token"),
             ),
             MetadataRequirement(
                 kind="shield-square",
@@ -1133,33 +1133,45 @@ REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             ),
             MetadataRequirement(
                 kind="shield-triangle",
-                fields=(
-                    "tile_family",
-                    "orientation_token",
-                    "chirality_token",
-                    "decoration_tokens",
-                ),
+                fields=("tile_family", "orientation_token"),
             ),
         ),
         depth_expectations={
             0: ReferenceDepthExpectation(
+                exact_total_cells=36,
+                required_kinds=("shield-shield", "shield-square", "shield-triangle"),
+                required_adjacency_pairs=(
+                    ("shield-shield", "shield-triangle"),
+                    ("shield-square", "shield-triangle"),
+                    ("shield-triangle", "shield-triangle"),
+                ),
+                min_unique_orientation_tokens=10,
+                max_bounds_aspect_ratio=1.5,
+                expected_signature="36eab8ec9a3e",  # pragma: allowlist secret
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=80,
+                min_unique_orientation_tokens=12,
+                expected_signature="722843e917b9",  # pragma: allowlist secret
+            ),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=444,
                 required_kinds=("shield-shield", "shield-square", "shield-triangle"),
                 required_adjacency_pairs=(
                     ("shield-shield", "shield-square"),
                     ("shield-shield", "shield-triangle"),
+                    ("shield-square", "shield-triangle"),
+                    ("shield-triangle", "shield-triangle"),
                 ),
-                max_bounds_aspect_ratio=4.0,
-            ),
-            1: ReferenceDepthExpectation(
-                min_unique_decoration_variants_by_kind=(
-                    ("shield-shield", 2),
-                    ("shield-triangle", 2),
-                ),
-                canonical_patch_fixture_key="decorated-depth-1",
+                min_unique_orientation_tokens=12,
+                expected_signature="457feb3fbf5e",  # pragma: allowlist secret
+                canonical_patch_fixture_key="dense-depth-3",
             ),
         },
         notes=(
-            "Decorations are authoritative for matching rules even though the renderer ignores them.",
+            "The shipped patch is a dense literature-derived central field extracted from the Bielefeld shield patch image.",
+            "Odd patch depths apply the documented 15-degree alternation around the central dodecagonal seed.",
+            "The public model preserves only public kinds plus orientation metadata; the literature matching-rule decorations are not part of the runtime payload.",
         ),
     ),
     "pinwheel": ReferenceFamilySpec(

@@ -62,10 +62,11 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - a rooted local-reference anchor now checks the exact-path neighborhood around a canonical depth-3 tile
   - a direct canonical depth-3 patch fixture now checks the exact serialized patch on that exact-affine path
 - `shield`
-  - `decoration_tokens` are part of the verification surface
-  - decorated cell kinds should expose multiple decoration-token variants in representative patches
-  - rooted local-reference fixtures now check canonical decorated neighborhoods
-  - a direct decorated depth-1 canonical patch fixture now checks exact public geometry plus decoration tokens
+  - the authoritative verifier sample is a dense 12-fold central field derived from the literature patch image
+  - odd patch depths must apply the documented 15-degree orientation alternation
+  - orientation-token diversity must remain high in representative dense patches
+  - rooted local-reference fixtures now check canonical neighborhoods inside that dense field
+  - a direct dense depth-3 canonical patch fixture now checks the normalized public serialization exactly
 - `hat-monotile`
   - verification assumes an `H8`-rooted representative patch rather than a one-tile seed
   - representative patches should include opposite-chirality Hat adjacencies
@@ -90,4 +91,5 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 - For periodic families, the verifier is now stronger than a plain sample-signature check, but it still targets finite family-specific open-boundary boards rather than quotient-surface or large-sample proofs.
 - Periodic dual-family checks now cover unambiguous reciprocal pairs and the current ambiguous candidate classes, but they are still finite-sample descriptor checks rather than full dual constructions.
 - The new reference layer mixes rooted neighborhoods with direct canonical patch diffs for selected families; it is not yet a full canonical patch-diff system across the whole catalog.
+- `shield` is now materially closer to the literature visually, but the repo still does not claim a full marked substitution with fractalized boundary generation for that family.
 - That is stronger than screenshot plausibility, but it is still not the same thing as a full symbolic proof that the generator exactly matches the literature’s substitution system at all depths.

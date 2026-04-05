@@ -71,18 +71,10 @@ const PINWHEEL_DEAD_PALETTE = new Map<string, string>([
     ["right", "#d5bb8f"],
 ]);
 
-const SHIELD_SHIELD_DEAD_PALETTE = new Map<string, string>([
-    ["arrow:ring-0", "#d5bb8f"],
-    ["arrow:ring-1", "#c7a574"],
-    ["fill:ring-0", "#efe4d0"],
-    ["fill:ring-1", "#e1cdac"],
-]);
-
-const SHIELD_TRIANGLE_DEAD_PALETTE = new Map<string, string>([
-    ["phase-0:left", "#f8f1e5"],
-    ["phase-0:right", "#ead6b6"],
-    ["phase-1:left", "#efe4d0"],
-    ["phase-1:right", "#dcc39a"],
+const SHIELD_DEAD_PALETTE = new Map<string, string>([
+    ["shield-shield", "#d5bb8f"],
+    ["shield-square", "#f8f1e5"],
+    ["shield-triangle", "#c88d4b"],
 ]);
 
 function resolveTuebingenDeadColor(
@@ -169,21 +161,7 @@ function resolveShieldDeadColor(
         return null;
     }
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
-    const decorations = Array.isArray(topologyCell.decoration_tokens)
-        ? topologyCell.decoration_tokens
-        : [];
-    if (kind === "shield-shield") {
-        const first = decorations[0] ?? "";
-        const ring = decorations.find((token) => token.startsWith("ring-")) ?? "ring-0";
-        const key = `${first.startsWith("fill-") ? "fill" : "arrow"}:${ring}`;
-        return SHIELD_SHIELD_DEAD_PALETTE.get(key) || null;
-    }
-    if (kind === "shield-triangle") {
-        const phase = decorations.find((token) => token.startsWith("phase-")) ?? "phase-0";
-        const chirality = typeof topologyCell.chirality_token === "string" ? topologyCell.chirality_token : "";
-        return SHIELD_TRIANGLE_DEAD_PALETTE.get(`${phase}:${chirality}`) || null;
-    }
-    return null;
+    return SHIELD_DEAD_PALETTE.get(kind) || null;
 }
 
 export function readCanvasColors(

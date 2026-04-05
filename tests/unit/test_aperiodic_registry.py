@@ -74,8 +74,9 @@ class AperiodicRegistryTests(unittest.TestCase):
         self.assertTrue(all(cell.orientation_token is not None for cell in tuebingen_patch.cells))
         self.assertTrue(all(cell.chirality_token is not None for cell in tuebingen_patch.cells))
 
+        self.assertTrue(all(cell.tile_family == "shield" for cell in shield_patch.cells))
+        self.assertTrue(all(cell.orientation_token is not None for cell in shield_patch.cells))
         self.assertTrue(any(cell.kind == "shield-square" for cell in shield_patch.cells))
-        self.assertTrue(any(cell.decoration_tokens for cell in shield_patch.cells if cell.kind == "shield-shield"))
 
         self.assertTrue(all(cell.tile_family == "pinwheel" for cell in pinwheel_patch.cells))
         self.assertTrue(all(cell.orientation_token is not None for cell in pinwheel_patch.cells))

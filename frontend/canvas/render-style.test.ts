@@ -397,7 +397,7 @@ describe("canvas/render-style", () => {
         });
     });
 
-    it("renders Shield decoration tokens with distinct dead-state accents", async () => {
+    it("renders Shield public kinds with distinct dead-state accents", async () => {
         const {
             buildStateColorLookup,
             resolveDeadCellColor,
@@ -407,45 +407,30 @@ describe("canvas/render-style", () => {
         const cases = [
             {
                 cell: {
-                    id: "shield:arrow",
+                    id: "shield:hex",
                     state: 0,
                     kind: "shield-shield",
                     tile_family: "shield",
-                    decoration_tokens: ["arrow-0", "ring-0"],
                 },
                 expectedColor: "#d5bb8f",
             },
             {
                 cell: {
-                    id: "shield:fill",
+                    id: "shield:square",
                     state: 0,
-                    kind: "shield-shield",
+                    kind: "shield-square",
                     tile_family: "shield",
-                    decoration_tokens: ["fill-1", "ring-1"],
-                },
-                expectedColor: "#e1cdac",
-            },
-            {
-                cell: {
-                    id: "shield:tri-left",
-                    state: 0,
-                    kind: "shield-triangle",
-                    tile_family: "shield",
-                    chirality_token: "left",
-                    decoration_tokens: ["arm-bottom-left", "phase-0"],
                 },
                 expectedColor: "#f8f1e5",
             },
             {
                 cell: {
-                    id: "shield:tri-right",
+                    id: "shield:tri",
                     state: 0,
                     kind: "shield-triangle",
                     tile_family: "shield",
-                    chirality_token: "right",
-                    decoration_tokens: ["arm-top-right", "phase-1"],
                 },
-                expectedColor: "#dcc39a",
+                expectedColor: "#c88d4b",
             },
         ];
 

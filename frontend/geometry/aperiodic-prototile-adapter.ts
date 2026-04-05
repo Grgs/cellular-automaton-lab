@@ -27,6 +27,8 @@ interface AperiodicMetrics extends GridMetrics {
     maxRawY: number;
 }
 
+const SHIELD_RENDER_POLYGON_SCALE = 0.64;
+
 function buildAperiodicMetrics(
     geometry: string,
     topology: TopologyPayload | null,
@@ -92,20 +94,30 @@ function topologyCellGeometry(
     if (!Array.isArray(cell?.vertices) || cell.vertices.length === 0) {
         return null;
     }
-    const vertices = cell.vertices.map((vertex) => ({
+    let vertices = cell.vertices.map((vertex) => ({
         x: metrics.xInset + (Number(vertex.x) * metrics.scale),
         y: metrics.yInset - (Number(vertex.y) * metrics.scale),
     }));
+    const initialMinX = Math.min(...vertices.map((vertex) => vertex.x));
+    const initialMaxX = Math.max(...vertices.map((vertex) => vertex.x));
+    const initialMinY = Math.min(...vertices.map((vertex) => vertex.y));
+    const initialMaxY = Math.max(...vertices.map((vertex) => vertex.y));
+    const centerX = Number.isFinite(Number(cell.center?.x))
+        ? metrics.xInset + (Number(cell.center?.x) * metrics.scale)
+        : (initialMinX + initialMaxX) / 2;
+    const centerY = Number.isFinite(Number(cell.center?.y))
+        ? metrics.yInset - (Number(cell.center?.y) * metrics.scale)
+        : (initialMinY + initialMaxY) / 2;
+    if (metrics.geometry === "shield") {
+        vertices = vertices.map((vertex) => ({
+            x: centerX + ((vertex.x - centerX) * SHIELD_RENDER_POLYGON_SCALE),
+            y: centerY + ((vertex.y - centerY) * SHIELD_RENDER_POLYGON_SCALE),
+        }));
+    }
     const minX = Math.min(...vertices.map((vertex) => vertex.x));
     const maxX = Math.max(...vertices.map((vertex) => vertex.x));
     const minY = Math.min(...vertices.map((vertex) => vertex.y));
     const maxY = Math.max(...vertices.map((vertex) => vertex.y));
-    const centerX = Number.isFinite(Number(cell.center?.x))
-        ? metrics.xInset + (Number(cell.center?.x) * metrics.scale)
-        : (minX + maxX) / 2;
-    const centerY = Number.isFinite(Number(cell.center?.y))
-        ? metrics.yInset - (Number(cell.center?.y) * metrics.scale)
-        : (minY + maxY) / 2;
     return {
         cell,
         vertices,
