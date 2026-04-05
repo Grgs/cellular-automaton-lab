@@ -2,29 +2,26 @@
 
 ## Now
 
-- Replace generic fallback periodic sources with stronger family-specific references where possible.
-- Decide whether periodic verification should add larger canonical samples beyond the current open-boundary `3x3` boards.
-- Add stronger canonical-patch fixtures for substitution families that still rely mainly on low-depth counts, metadata, adjacency vocabularies, and signatures.
+- Revisit browser-visible shape and pattern correctness for `square-triangle`, `shield`, and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
+- Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
+- Broaden browser-visible rendering-bounds verification beyond the current representative fixture set.
+- Tighten the frontend representative polygon-overlap path enough to add `robinson-triangles` and `tuebingen-triangle` cleanly; Robinson still reuses cell ids in its split patch payload, and Tuebingen still produces small adapter-space slivers at the current overlap epsilon.
+- Improve the adapter-space overlap helper enough to lower the frontend positive-area overlap epsilon below the current `2e-4` without regressing known-good exact-path families such as `pinwheel`.
 
 ## Next
 
-- Strengthen periodic-family literature verification beyond `3x3` sample signatures.
-  Use more explicit source-backed invariants such as vertex configurations and dual-family relationships so periodic mixed tilings are not only protected by sample drift checks.
-- Add larger periodic sample fixtures where the open-boundary `3x3` board is too small to expose structural regressions.
-- Promote stronger substitution-level reference fixtures for Hat, Shield, Pinwheel, Square-Triangle, and the multiscale Chair family now that the current canonical samples are green again.
-- Strengthen the exact-affine/render-space overlap checks so the frontend helper can use tighter epsilons for exact-path families like `pinwheel`.
-- Decide whether graph contiguity should eventually move into `recommended_validation_options(...)` for the currently relaxed aperiodic families once their generators are repaired.
-- If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample.
+- Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.
+- Extend direct canonical patch comparisons beyond `square-triangle`, `shield`, and `pinwheel` where they buy materially stronger guarantees.
+- If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
 
 ## Later
 
 - Add `turtle-monotile` on top of the existing Hat-family support.
 - Add another verified substitution tiling family such as `socolar-12-fold`.
-- Add Shield decoration rendering once decoration metadata is ready to affect visuals.
-- Revisit `pinwheel` verification with stronger substitution-matrix and local-patch invariants, now that its contiguity is derived from exact segment-overlap neighbors on the exact-affine path.
-- Add a richer “reference data” fixture layer so literature-faithfulness checks can compare canonical low-depth patches directly instead of relying mainly on counts/signatures.
+- Revisit `pinwheel` verification with stronger substitution-matrix and direct local-patch invariants, now that its contiguity is derived from exact segment-overlap neighbors on the exact-affine path.
+- Explore larger-sample or quotient-surface periodic proofs if the current finite-sample verifier ever stops being discriminating enough for the catalog.
+- Extend Shield decoration rendering beyond the current dead-state accenting if decoration metadata becomes authoritative across more visual states.
 
 ## Maybe
 
-- Add literature verification for browser-visible rendering bounds so obviously collapsed but topologically valid patches are caught earlier.
-- Expose a lightweight developer-facing report that summarizes which tilings are verified by geometric sanity only, sample-level literature invariants, or stronger substitution-level reference checks.
+- Extend browser-visible rendering-bounds verification from geometry-level sanity into richer layout regression checks.

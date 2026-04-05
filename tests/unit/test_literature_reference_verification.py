@@ -1,6 +1,8 @@
+from dataclasses import replace
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -9,13 +11,22 @@ if str(ROOT) not in sys.path:
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 from backend.simulation.literature_reference_verification import (
+    _canonical_patch_payload,
+    _depth_topology_expectation_failures,
+    _canonicalize_vertex_configuration,
+    _local_reference_fixture_failures,
     _parse_periodic_face_cell_id,
+    _periodic_face_sample_size,
+    _periodic_face_descriptor_failures,
+    _periodic_face_interior_vertex_configuration_frequencies,
+    _periodic_face_interior_vertex_configurations,
     _verify_periodic_face_id_roundtrip,
     observe_reference_patch,
     verify_all_reference_families,
     verify_reference_family,
 )
 from backend.simulation.periodic_face_tilings import get_periodic_face_tiling_descriptor
+from backend.simulation.topology import build_topology
 from tools.verify_reference_tilings import main as verify_reference_main
 
 
@@ -134,6 +145,212 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             ((1, 4), (2, 8), (4, 4), (6, 4), (7, 4), (8, 1)),
         )
 
+    def test_periodic_face_interior_vertex_configurations_match_zero_offset_family(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("archimedean-4-8-8")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configurations(descriptor.build_faces(3, 3)),
+            (("octagon", "octagon", "square"),),
+        )
+
+    def test_periodic_face_interior_vertex_configuration_frequencies_match_zero_offset_family(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("archimedean-4-8-8")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configuration_frequencies(descriptor.build_faces(3, 3)),
+            ((("octagon", "octagon", "square"), 24),),
+        )
+
+    def test_periodic_face_interior_vertex_configurations_match_odd_row_offset_family(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("trihexagonal-3-6-3-6")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configurations(descriptor.build_faces(3, 3)),
+            (("hexagon", "triangle-down", "hexagon", "triangle-up"),),
+        )
+
+    def test_periodic_face_interior_vertex_configuration_frequencies_match_odd_row_offset_family(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("trihexagonal-3-6-3-6")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configuration_frequencies(descriptor.build_faces(3, 3)),
+            ((("hexagon", "triangle-down", "hexagon", "triangle-up"), 13),),
+        )
+
+    def test_periodic_face_sample_size_defaults_to_3x3(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
+
+        self.assertEqual(_periodic_face_sample_size(spec, 3), (3, 3))
+
+    def test_periodic_face_sample_size_honors_explicit_override(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-4-8-8 must define a periodic descriptor expectation")
+        overridden_spec = replace(
+            spec,
+            periodic_descriptor=replace(periodic_descriptor, canonical_grid_size=(4, 4)),
+        )
+
+        self.assertEqual(_periodic_face_sample_size(overridden_spec, 3), (4, 4))
+
+    def test_periodic_face_interior_vertex_configurations_exclude_boundary_vertices(self) -> None:
+        descriptor = get_periodic_face_tiling_descriptor("cairo-pentagonal")
+
+        self.assertEqual(
+            _periodic_face_interior_vertex_configurations(descriptor.build_faces(3, 3)),
+            (
+                ("pentagon", "pentagon", "pentagon"),
+                ("pentagon", "pentagon", "pentagon", "pentagon"),
+            ),
+        )
+
+    def test_vertex_configuration_canonicalization_normalizes_rotation_and_direction(self) -> None:
+        canonical = _canonicalize_vertex_configuration(
+            ("hexagon", "triangle-down", "hexagon", "triangle-up")
+        )
+
+        self.assertEqual(
+            canonical,
+            _canonicalize_vertex_configuration(
+                ("triangle-down", "hexagon", "triangle-up", "hexagon")
+            ),
+        )
+        self.assertEqual(
+            canonical,
+            _canonicalize_vertex_configuration(
+                ("triangle-up", "hexagon", "triangle-down", "hexagon")
+            ),
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_vertex_configuration_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-4-8-8 must define a periodic descriptor expectation")
+        wrong_periodic_descriptor = replace(
+            periodic_descriptor,
+            expected_interior_vertex_configurations=(("square", "square", "square"),),
+        )
+        wrong_spec = replace(spec, periodic_descriptor=wrong_periodic_descriptor)
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-interior-vertex-configurations-mismatch"
+                for failure in failures
+            )
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_vertex_configuration_frequency_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-4-8-8 must define a periodic descriptor expectation")
+        wrong_periodic_descriptor = replace(
+            periodic_descriptor,
+            expected_interior_vertex_configuration_frequencies=(
+                (("octagon", "octagon", "square"), 23),
+            ),
+        )
+        wrong_spec = replace(spec, periodic_descriptor=wrong_periodic_descriptor)
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-interior-vertex-configuration-frequencies-mismatch"
+                for failure in failures
+            )
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_dual_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-4-8-8 must define a periodic descriptor expectation")
+        wrong_periodic_descriptor = replace(
+            periodic_descriptor,
+            expected_dual_geometry="triakis-triangular",
+        )
+        wrong_spec = replace(spec, periodic_descriptor=wrong_periodic_descriptor)
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code in {
+                    "descriptor-dual-geometry-not-reciprocal",
+                    "descriptor-dual-structure-mismatch",
+                }
+                for failure in failures
+            )
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_dual_candidate_class_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-3-4-6-4"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-3-4-6-4 must define a periodic descriptor expectation")
+        wrong_spec = replace(
+            spec,
+            periodic_descriptor=replace(
+                periodic_descriptor,
+                expected_dual_candidate_geometries=("deltoidal-hexagonal",),
+            ),
+        )
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-dual-candidate-class-mismatch"
+                for failure in failures
+            )
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_dual_candidate_structure_expectation(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-3-3-4-3-4"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-3-3-4-3-4 must define a periodic descriptor expectation")
+        wrong_spec = replace(
+            spec,
+            periodic_descriptor=replace(
+                periodic_descriptor,
+                expected_dual_structure_signature=((5, 54),),
+            ),
+        )
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-dual-candidate-structure-mismatch"
+                for failure in failures
+            )
+        )
+
+    def test_periodic_face_descriptor_reports_wrong_canonical_grid_size(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
+        periodic_descriptor = spec.periodic_descriptor
+        if periodic_descriptor is None:
+            self.fail("archimedean-4-8-8 must define a periodic descriptor expectation")
+        wrong_spec = replace(
+            spec,
+            periodic_descriptor=replace(periodic_descriptor, canonical_grid_size=(4, 4)),
+        )
+
+        failures = _periodic_face_descriptor_failures(wrong_spec)
+
+        self.assertTrue(
+            any(
+                failure.code == "descriptor-interior-vertex-configuration-frequencies-mismatch"
+                for failure in failures
+            )
+        )
+
     def test_periodic_face_id_pattern_roundtrip_matches_generated_cells(self) -> None:
         descriptor = get_periodic_face_tiling_descriptor("cairo-pentagonal")
 
@@ -154,14 +371,18 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertGreater(result.observations[1].bounds_longest_span, result.observations[0].bounds_longest_span)
         self.assertEqual(result.observations[-1].connected_component_count, 1)
 
-    def test_chair_reference_verifier_accepts_multiscale_chair_tiles(self) -> None:
+    def test_chair_reference_verifier_accepts_true_substitution_chair_tiles(self) -> None:
         result = verify_reference_family("chair")
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
-        self.assertGreaterEqual(
-            dict(result.observations[1].unique_polygon_areas_by_kind)["chair"],
-            2,
+        self.assertEqual(
+            [observation.total_cells for observation in result.observations],
+            [1, 4, 16, 64],
+        )
+        self.assertEqual(
+            result.observations[-1].orientation_token_counts,
+            (("0", 20), ("1", 16), ("2", 12), ("3", 16)),
         )
 
     def test_hat_reference_verifier_accepts_reflected_neighbor_pattern(self) -> None:
@@ -178,15 +399,141 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         )
         self.assertEqual(result.observations[-1].hole_count, 0)
 
-    def test_shield_reference_verifier_accepts_decoration_variants(self) -> None:
+    def test_stronger_substitution_families_match_checked_in_local_reference_fixtures(self) -> None:
+        for geometry, depth in (
+            ("hat-monotile", 2),
+            ("shield", 3),
+            ("pinwheel", 3),
+            ("square-triangle", 3),
+            ("chair", 3),
+        ):
+            with self.subTest(geometry=geometry, depth=depth):
+                topology = build_topology(geometry, 0, 0, depth)
+                self.assertEqual(
+                    _local_reference_fixture_failures(geometry, depth, topology),
+                    [],
+                )
+
+    def test_canonical_patch_payload_is_deterministic(self) -> None:
+        first = _canonical_patch_payload(
+            build_topology("square-triangle", 0, 0, 3),
+            include_id=False,
+        )
+        second = _canonical_patch_payload(
+            build_topology("square-triangle", 0, 0, 3),
+            include_id=False,
+        )
+
+        self.assertEqual(first, second)
+
+    def test_stronger_substitution_families_match_checked_in_canonical_patch_fixtures(self) -> None:
+        for geometry, depth in (
+            ("square-triangle", 3),
+            ("shield", 3),
+            ("pinwheel", 3),
+        ):
+            with self.subTest(geometry=geometry, depth=depth):
+                result = verify_reference_family(geometry)
+                self.assertEqual(result.status, "PASS")
+                self.assertFalse(
+                    [
+                        failure
+                        for failure in result.failures
+                        if failure.code == "canonical-patch-fixture-mismatch"
+                    ]
+                )
+
+    def test_canonical_patch_fixture_reports_mismatch(self) -> None:
+        topology = build_topology("shield", 0, 0, 3)
+        observed_cells = _canonical_patch_payload(topology, include_id=False)
+        bad_cells = list(observed_cells)
+        bad_cells[0] = {
+            **bad_cells[0],
+            "kind": "not-a-shield",
+        }
+        bad_fixtures = {
+            "shield": {
+                "dense-depth-3": {
+                    "depth": 3,
+                    "include_id": False,
+                    "cells": bad_cells,
+                }
+            }
+        }
+
+        expectation = REFERENCE_FAMILY_SPECS["shield"].depth_expectations[3]
+        with patch(
+            "backend.simulation.literature_reference_verification._load_canonical_reference_fixtures",
+            return_value=bad_fixtures,
+        ):
+            failures = _depth_topology_expectation_failures(
+                geometry="shield",
+                depth=3,
+                topology=topology,
+                expectation=expectation,
+            )
+
+        self.assertTrue(
+            any(failure.code == "canonical-patch-fixture-mismatch" for failure in failures)
+        )
+
+    def test_local_reference_fixture_reports_mismatch(self) -> None:
+        topology = build_topology("hat-monotile", 0, 0, 2)
+        bad_fixtures = {
+            "hat-monotile": {
+                "2": {
+                    "hat:100": {
+                        "root": {
+                            "kind": "hat",
+                            "orientation_token": "999",
+                            "chirality_token": "right",
+                            "decoration_tokens": None,
+                            "area": 10.730401,
+                            "degree": 3,
+                        },
+                        "neighbors": [],
+                    }
+                }
+            }
+        }
+
+        with patch(
+            "backend.simulation.literature_reference_verification._load_local_reference_fixtures",
+            return_value=bad_fixtures,
+        ):
+            failures = _local_reference_fixture_failures("hat-monotile", 2, topology)
+
+        self.assertTrue(
+            any(failure.code == "local-reference-fixture-mismatch" for failure in failures)
+        )
+
+    def test_shield_reference_verifier_accepts_orientation_diversity(self) -> None:
         result = verify_reference_family("shield")
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
-        decoration_counts = dict(result.observations[1].unique_decoration_variants_by_kind)
-        self.assertGreaterEqual(decoration_counts["shield-shield"], 2)
-        self.assertGreaterEqual(decoration_counts["shield-triangle"], 2)
+        self.assertGreaterEqual(result.observations[0].unique_orientation_tokens, 10)
+        self.assertGreaterEqual(result.observations[1].unique_orientation_tokens, 12)
         self.assertEqual(result.observations[-1].hole_count, 0)
+
+    def test_chair_orientation_count_expectation_reports_mismatch(self) -> None:
+        spec = REFERENCE_FAMILY_SPECS["chair"]
+        expectation = replace(
+            spec.depth_expectations[3],
+            expected_orientation_token_counts=(("0", 20), ("1", 16), ("2", 11), ("3", 17)),
+        )
+        topology = build_topology("chair", 0, 0, 3)
+
+        failures = _depth_topology_expectation_failures(
+            geometry="chair",
+            depth=3,
+            topology=topology,
+            expectation=expectation,
+        )
+
+        self.assertTrue(
+            any(failure.code == "unexpected-orientation-token-counts" for failure in failures)
+        )
 
     def test_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(self) -> None:
         result = verify_reference_family("square-triangle")

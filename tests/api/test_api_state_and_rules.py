@@ -584,7 +584,7 @@ class ApiStateAndRulesTests(ApiTestCase):
                     self.assertTrue(all(cell.get('orientation_token') is not None for cell in topology['cells']))
                 if geometry == 'shield':
                     self.assertTrue(any(cell['kind'] == 'shield-square' for cell in topology['cells']))
-                    self.assertTrue(any(cell.get('decoration_tokens') for cell in topology['cells'] if cell['kind'] != 'shield-square'))
+                    self.assertTrue(all(cell.get('orientation_token') is not None for cell in topology['cells']))
 
     def test_unsafe_size_override_allows_patch_depth_above_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={

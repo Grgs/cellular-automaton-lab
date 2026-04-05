@@ -200,6 +200,251 @@ describe("canvas/render-style", () => {
         });
     });
 
+    it("uses a warm four-color dead palette for chair tiles based on orientation", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: { id: "chair:o0", state: 0, kind: "chair", orientation_token: "0" },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: { id: "chair:o1", state: 0, kind: "chair", orientation_token: "1" },
+                expectedColor: "#e5c089",
+            },
+            {
+                cell: { id: "chair:o2", state: 0, kind: "chair", orientation_token: "2" },
+                expectedColor: "#c88d4b",
+            },
+            {
+                cell: { id: "chair:o3", state: 0, kind: "chair", orientation_token: "3" },
+                expectedColor: "#dbc1b2",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "chair", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "chair",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("uses differentiated dead-state colors for Robinson thick and thin triangles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: { id: "rob:thick", state: 0, kind: "robinson-thick", tile_family: "robinson" },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: { id: "rob:thin", state: 0, kind: "robinson-thin", tile_family: "robinson" },
+                expectedColor: "#d5bb8f",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "robinson-triangles", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "robinson-triangles",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("uses chirality-based dead-state colors for hat monotiles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: { id: "hat:left", state: 0, kind: "hat", tile_family: "hat", chirality_token: "left" },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: { id: "hat:right", state: 0, kind: "hat", tile_family: "hat", chirality_token: "right" },
+                expectedColor: "#c88d4b",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "hat-monotile", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "hat-monotile",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("uses warm metadata-based dead-state colors for square-triangle tiles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: {
+                    id: "st:square-blue",
+                    state: 0,
+                    kind: "square-triangle-square",
+                    tile_family: "square-triangle",
+                    chirality_token: "blue",
+                },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: {
+                    id: "st:square-yellow",
+                    state: 0,
+                    kind: "square-triangle-square",
+                    tile_family: "square-triangle",
+                    chirality_token: "yellow",
+                },
+                expectedColor: "#d5bb8f",
+            },
+            {
+                cell: {
+                    id: "st:triangle-red",
+                    state: 0,
+                    kind: "square-triangle-triangle",
+                    tile_family: "square-triangle",
+                    chirality_token: "red",
+                },
+                expectedColor: "#e1cdac",
+            },
+            {
+                cell: {
+                    id: "st:triangle-yellow",
+                    state: 0,
+                    kind: "square-triangle-triangle",
+                    tile_family: "square-triangle",
+                    chirality_token: "yellow",
+                },
+                expectedColor: "#c88d4b",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "square-triangle", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "square-triangle",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("uses chirality-based dead-state colors for pinwheel triangles", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: {
+                    id: "pin:left",
+                    state: 0,
+                    kind: "pinwheel-triangle",
+                    tile_family: "pinwheel",
+                    chirality_token: "left",
+                },
+                expectedColor: "#efe4d0",
+            },
+            {
+                cell: {
+                    id: "pin:right",
+                    state: 0,
+                    kind: "pinwheel-triangle",
+                    tile_family: "pinwheel",
+                    chirality_token: "right",
+                },
+                expectedColor: "#d5bb8f",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "pinwheel", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "pinwheel",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
+    it("renders Shield public kinds with distinct dead-state accents", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const cases = [
+            {
+                cell: {
+                    id: "shield:hex",
+                    state: 0,
+                    kind: "shield-shield",
+                    tile_family: "shield",
+                },
+                expectedColor: "#d5bb8f",
+            },
+            {
+                cell: {
+                    id: "shield:square",
+                    state: 0,
+                    kind: "shield-square",
+                    tile_family: "shield",
+                },
+                expectedColor: "#f8f1e5",
+            },
+            {
+                cell: {
+                    id: "shield:tri",
+                    state: 0,
+                    kind: "shield-triangle",
+                    tile_family: "shield",
+                },
+                expectedColor: "#c88d4b",
+            },
+        ];
+
+        cases.forEach(({ cell, expectedColor }) => {
+            expect(resolveDeadCellColor(0, { geometry: "shield", cell })).toBe(expectedColor);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
+                    geometry: "shield",
+                    cell,
+                }),
+            ).toBe(expectedColor);
+        });
+    });
+
     it("reads canvas line tokens and applies them to the resolved render style", async () => {
         const { readCanvasColors, resolveCanvasRenderStyle } = await import("./render-style.js");
         const canvas = document.createElement("canvas");
@@ -215,6 +460,8 @@ describe("canvas/render-style", () => {
                     "--cell-line-strong": "rgba(31, 36, 48, 0.21)",
                     "--cell-line-aperiodic": "rgba(31, 36, 48, 0.24)",
                     "--live": "#131722",
+                    "--accent": "#bf5a36",
+                    "--accent-dark": "#8a3d20",
                 })
                 : styleDeclaration({ backgroundColor: "rgba(255, 255, 255, 0.9)" }),
         );
@@ -228,6 +475,36 @@ describe("canvas/render-style", () => {
         expect(resolveCanvasRenderStyle(12, "penrose-p3-rhombs", colors).aperiodicLineColor).toBe(
             "rgba(31, 36, 48, 0.24)",
         );
+        expect(resolveCanvasRenderStyle(12, "square", colors).hoverTintColor).toBe("rgba(31, 36, 48, 0.21)");
+        expect(resolveCanvasRenderStyle(12, "square", colors).hoverStrokeColor).toBe("#131722");
+        expect(resolveCanvasRenderStyle(12, "square", colors).selectionTintColor).toBe("rgba(191, 90, 54, 0.16)");
+        expect(resolveCanvasRenderStyle(12, "square", colors).selectionStrokeColor).toBe("#8a3d20");
+        expect(resolveCanvasRenderStyle(12, "square", colors).gesturePaintStrokeColor).toBe("#8a3d20");
+        expect(resolveCanvasRenderStyle(12, "square", colors).gestureEraseStrokeColor).toBe(
+            "rgba(31, 36, 48, 0.24)",
+        );
+    });
+
+    it("boosts hover contrast in dark theme while keeping the same token inputs", async () => {
+        const { resolveCanvasRenderStyle } = await import("./render-style.js");
+        const style = resolveCanvasRenderStyle(12, "square", {
+            line: "rgba(231, 237, 248, 0.12)",
+            dead: "#f8f1e5",
+            deadAlt: "#d5bb8f",
+            lineSoft: "rgba(231, 237, 248, 0.07)",
+            lineStrong: "rgba(231, 237, 248, 0.14)",
+            lineAperiodic: "rgba(7, 11, 17, 0.42)",
+            live: "#f2f5ff",
+            accent: "#d67a4c",
+            accentStrong: "#f1a275",
+        });
+
+        expect(style.hoverTintColor).toBe("rgba(7, 11, 17, 0.18)");
+        expect(style.hoverStrokeColor).toBe("rgba(7, 11, 17, 0.9)");
+        expect(style.selectionTintColor).toBe("rgba(214, 122, 76, 0.18)");
+        expect(style.selectionStrokeColor).toBe("#f1a275");
+        expect(style.gesturePaintStrokeColor).toBe("#f1a275");
+        expect(style.gestureEraseStrokeColor).toBe("rgba(7, 11, 17, 0.42)");
     });
 });
 
@@ -240,5 +517,7 @@ function readCanvasColorsForTests() {
         lineStrong: "rgba(31, 36, 48, 0.20)",
         lineAperiodic: "rgba(31, 36, 48, 0.24)",
         live: "#1f2430",
+        accent: "#bf5a36",
+        accentStrong: "#8a3d20",
     };
 }

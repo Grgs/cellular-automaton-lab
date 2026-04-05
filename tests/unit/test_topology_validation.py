@@ -153,7 +153,6 @@ class TopologyValidationTests(unittest.TestCase):
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
             (SQUARE_TRIANGLE_GEOMETRY, 3),
-            (SHIELD_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
         ):
             with self.subTest(geometry=geometry):
@@ -239,15 +238,34 @@ class TopologyValidationTests(unittest.TestCase):
         self.assertEqual(validation.hole_count, 0)
         self.assertFalse(validation.edge_multiplicity_issues)
 
-    def test_kagome_uses_strict_exact_surface_policy(self) -> None:
-        options = recommended_validation_options("trihexagonal-3-6-3-6")
+    def test_strict_validation_defaults_apply_to_periodic_and_repaired_aperiodic_families(self) -> None:
+        for geometry in (
+            "trihexagonal-3-6-3-6",
+            CHAIR_GEOMETRY,
+            HAT_MONOTILE_GEOMETRY,
+            TUEBINGEN_TRIANGLE_GEOMETRY,
+            SQUARE_TRIANGLE_GEOMETRY,
+            PINWHEEL_GEOMETRY,
+        ):
+            with self.subTest(geometry=geometry):
+                options = recommended_validation_options(geometry)
+
+                self.assertEqual(
+                    options,
+                    {
+                        "check_surface": True,
+                        "check_overlaps": True,
+                        "check_edge_multiplicity": True,
+                        "check_graph_connectivity": True,
+                    },
+                )
 
         self.assertEqual(
-            options,
+            recommended_validation_options(SHIELD_GEOMETRY),
             {
                 "check_surface": True,
-                "check_overlaps": True,
-                "check_edge_multiplicity": True,
+                "check_overlaps": False,
+                "check_edge_multiplicity": False,
                 "check_graph_connectivity": True,
             },
         )

@@ -1,7 +1,56 @@
 import { renderThemeToggle, renderPaintPalette, renderRangeControl, renderToggleButtons } from "./view-primitives.js";
 import { populateAdjacencyModes, populatePresetSeeds, populateRules, populateTilingFamilies } from "./view-options.js";
 import type { DomElements } from "../types/dom.js";
-import type { ControlsViewModel } from "../types/ui.js";
+import type { ControlsViewModel, SelectionInspectorSummaryRow } from "../types/ui.js";
+
+function renderSelectionInspectorRows(container: HTMLElement | null, rows: readonly SelectionInspectorSummaryRow[]): void {
+    if (!container) {
+        return;
+    }
+    container.replaceChildren(
+        ...rows.map((row) => {
+            const rowElement = document.createElement("div");
+            rowElement.className = "selection-inspector-row";
+
+            const labelElement = document.createElement("span");
+            labelElement.className = "selection-inspector-row-label";
+            labelElement.textContent = row.label;
+
+            const valueElement = document.createElement("span");
+            valueElement.className = "selection-inspector-row-value";
+            valueElement.textContent = row.value;
+
+            rowElement.append(labelElement, valueElement);
+            return rowElement;
+        }),
+    );
+}
+
+export function renderSelectionInspectorSection(elements: DomElements, viewModel: ControlsViewModel): void {
+    const inspector = viewModel.selectionInspector;
+    if (elements.selectionInspectorTitle) {
+        elements.selectionInspectorTitle.textContent = inspector.title;
+    }
+    if (elements.selectionInspectorSubtitle) {
+        elements.selectionInspectorSubtitle.textContent = inspector.subtitle;
+        elements.selectionInspectorSubtitle.hidden = inspector.subtitle === "";
+    }
+    if (elements.selectionInspectorHint) {
+        elements.selectionInspectorHint.textContent = inspector.hintText;
+        elements.selectionInspectorHint.hidden = inspector.mode !== "empty";
+    }
+    renderSelectionInspectorRows(elements.selectionInspectorSummaryRows, inspector.summaryRows);
+    renderSelectionInspectorRows(elements.selectionInspectorAdvancedRows, inspector.advancedRows);
+    if (elements.selectionInspectorAdvancedSummary) {
+        elements.selectionInspectorAdvancedSummary.textContent = inspector.advancedSummaryText;
+    }
+    if (elements.selectionInspectorAdvanced) {
+        elements.selectionInspectorAdvanced.hidden = !inspector.advancedVisible;
+        if (!inspector.advancedVisible) {
+            elements.selectionInspectorAdvanced.open = false;
+        }
+    }
+}
 
 export function renderControlShell(elements: DomElements, viewModel: ControlsViewModel): void {
     elements.statusText!.textContent = viewModel.statusText;

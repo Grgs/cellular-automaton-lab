@@ -2,7 +2,9 @@ import * as polygonClipping from "polygon-clipping";
 
 import type { Point2D, PolygonGeometryCell } from "../types/rendering.js";
 
-const OVERLAP_AREA_EPSILON = 1e-3;
+// Keep the render-space overlap threshold tighter than the historical 1e-3
+// helper tolerance while allowing current exact-path adapter noise for pinwheel.
+const OVERLAP_AREA_EPSILON = 2e-4;
 const SANITIZE_EPSILON = 1e-6;
 const SANITIZE_DECIMALS = [6, 5, 4, 3] as const;
 

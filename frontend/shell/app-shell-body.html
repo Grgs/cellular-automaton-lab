@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div id="canvas-edit-cue" class="canvas-edit-cue" hidden aria-live="polite">
-                Edit mode active. Click or drag to paint.
+                Edit mode active. Click or drag to paint. Unarmed click or drag paints or erases based on the first cell.
             </div>
             <div id="grid-viewport" class="grid-viewport">
                 <div
@@ -141,6 +141,22 @@
                     </div>
                     <div id="pattern-status" class="pattern-status inspector-status" hidden aria-live="polite"></div>
                 </header>
+
+                <section id="selection-inspector-section" class="panel-section drawer-section">
+                    <h2>Cell Metadata</h2>
+                    <div class="selection-inspector-header">
+                        <strong id="selection-inspector-title" class="selection-inspector-title">No Cells Selected</strong>
+                        <span id="selection-inspector-subtitle" class="selection-inspector-subtitle"></span>
+                    </div>
+                    <p id="selection-inspector-hint" class="hint selection-inspector-hint">
+                        Right-click a cell to inspect it. Right-drag to summarize a selection.
+                    </p>
+                    <div id="selection-inspector-summary-rows" class="selection-inspector-rows"></div>
+                    <details id="selection-inspector-advanced" class="rule-help-toggle selection-inspector-advanced" hidden>
+                        <summary id="selection-inspector-advanced-summary">Advanced Details</summary>
+                        <div id="selection-inspector-advanced-rows" class="selection-inspector-rows selection-inspector-advanced-rows"></div>
+                    </details>
+                </section>
 
                 <section id="rule-palette-section" class="panel-section drawer-section">
                     <h2>Rule &amp; Palette</h2>

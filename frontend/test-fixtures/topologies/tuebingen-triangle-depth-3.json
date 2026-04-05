@@ -1,0 +1,6286 @@
+{
+  "geometry": "tuebingen-triangle",
+  "width": 0,
+  "height": 0,
+  "patchDepth": 3,
+  "cellSize": 12,
+  "topology": {
+    "topology_spec": {
+      "tiling_family": "tuebingen-triangle",
+      "adjacency_mode": "edge",
+      "sizing_mode": "patch_depth",
+      "width": 9,
+      "height": 9,
+      "patch_depth": 3
+    },
+    "topology_revision": "fixture-tuebingen-triangle-depth-3",
+    "cells": [
+      {
+        "id": "tuebingen:thick:n1000000:0:0:0:n1000000:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:0:p587785:n809017:0",
+          "tuebingen:thick:n809017:p587785:0:n587785:n809017:0",
+          "tuebingen:thin:n309017:p951057:n1000000:n951057:n309017:0"
+        ],
+        "center": {
+          "x": -0.603006,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -1.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:0:0:n1000000:p3077684",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n809017:p587785:0:n587785:n809017:p3077684",
+          "tuebingen:thin:p1000000:0:n1000000:0:p1000000:p3077684",
+          "tuebingen:thin:p809017:p587785:n1618034:n587785:p809017:p3077684"
+        ],
+        "center": {
+          "x": -0.603006,
+          "y": 2.881755
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 3.077684
+          },
+          {
+            "x": -1.0,
+            "y": 3.077684
+          },
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:n2118034:0:n1000000:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:n2118034:n587785:n809017:p1538842",
+          "tuebingen:thin:p1000000:0:n3118034:0:p1000000:p1538842",
+          "tuebingen:thin:p809017:p587785:n3736068:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": -2.72104,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -3.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -2.927051,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:n809017:0:n1000000:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:n809017:p587785:n809017:p2489898",
+          "tuebingen:thick:p1000000:0:n2118034:0:p1000000:p1538842",
+          "tuebingen:thin:n309017:p951057:n1809017:n951057:n309017:p2489898",
+          "tuebingen:thin:p309017:n951057:n1118034:p951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": -1.412023,
+          "y": 2.29397
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -1.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p1309017:0:n1000000:n951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n809017:p587785:p1309017:n587785:n809017:n951057",
+          "tuebingen:thin:p1000000:0:p309017:0:p1000000:n951057",
+          "tuebingen:thin:p809017:p587785:n309017:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": 0.706011,
+          "y": -1.146985
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 0.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 0.5,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p1309017:0:n1000000:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p1309017:n587785:n809017:p4028740",
+          "tuebingen:thin:n309017:p951057:p309017:n951057:n309017:p4028740"
+        ],
+        "center": {
+          "x": 0.706011,
+          "y": 3.832812
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": 0.309017,
+            "y": 4.02874
+          },
+          {
+            "x": 0.5,
+            "y": 3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p2118034:0:n1000000:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p2118034:p587785:n809017:n1538842",
+          "tuebingen:thick:p1000000:0:p809017:0:p1000000:n2489898",
+          "tuebingen:thin:n309017:p951057:p1118034:n951057:n309017:n1538842",
+          "tuebingen:thin:p309017:n951057:p1809017:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": 1.515028,
+          "y": -1.73477
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 1.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 1.309017,
+            "y": -2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p2118034:0:n1000000:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p2118034:n587785:n809017:p1538842",
+          "tuebingen:thin:p1000000:0:p1118034:0:p1000000:p1538842",
+          "tuebingen:thin:p809017:p587785:p500000:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": 1.515028,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 1.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 1.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p2618034:0:n1000000:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p2618034:p587785:n809017:0",
+          "tuebingen:thick:n809017:p587785:p2618034:n587785:n809017:0",
+          "tuebingen:thin:n309017:p951057:p1618034:n951057:n309017:0"
+        ],
+        "center": {
+          "x": 2.015028,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 1.618034,
+            "y": -0.0
+          },
+          {
+            "x": 1.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p2618034:0:n1000000:p3077684",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:p3077684",
+          "tuebingen:thin:p1000000:0:p1618034:0:p1000000:p3077684",
+          "tuebingen:thin:p809017:p587785:p1000000:n587785:p809017:p3077684"
+        ],
+        "center": {
+          "x": 2.015028,
+          "y": 2.881755
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": 3.077684
+          },
+          {
+            "x": 1.618034,
+            "y": 3.077684
+          },
+          {
+            "x": 1.809017,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p3427051:0:n1000000:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p3427051:p587785:n809017:n2489898",
+          "tuebingen:thin:n309017:p951057:p2427051:n951057:n309017:n2489898"
+        ],
+        "center": {
+          "x": 2.824045,
+          "y": -2.685827
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": 2.427051,
+            "y": -2.489898
+          },
+          {
+            "x": 2.618034,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p3427051:0:n1000000:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p3427051:p587785:n809017:p2489898",
+          "tuebingen:thick:n809017:p587785:p3427051:n587785:n809017:p2489898",
+          "tuebingen:thin:n309017:p951057:p2427051:n951057:n309017:p2489898"
+        ],
+        "center": {
+          "x": 2.824045,
+          "y": 2.29397
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": 2.427051,
+            "y": 2.489898
+          },
+          {
+            "x": 2.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n1000000:0:p4236068:0:n1000000:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p4236068:p587785:n809017:0",
+          "tuebingen:thick:n809017:p587785:p4236068:n587785:n809017:0",
+          "tuebingen:thin:n309017:p951057:p3236068:n951057:n309017:0"
+        ],
+        "center": {
+          "x": 3.633062,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": 4.236068,
+            "y": -0.0
+          },
+          {
+            "x": 3.236068,
+            "y": -0.0
+          },
+          {
+            "x": 3.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:0:p951057:n309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:0:p587785:n809017:0",
+          "tuebingen:thick:p309017:n951057:0:p951057:p309017:0",
+          "tuebingen:thin:n1000000:0:n309017:0:n1000000:p951057"
+        ],
+        "center": {
+          "x": -0.372678,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -0.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:n1309017:p951057:n309017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n4028740",
+          "tuebingen:thin:n1000000:0:n1618034:0:n1000000:n3077684"
+        ],
+        "center": {
+          "x": -1.681695,
+          "y": -3.515793
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": -1.618034,
+            "y": -3.077684
+          },
+          {
+            "x": -2.118034,
+            "y": -3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:n500000:p951057:n309017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:p951057:n1000000:n951057:n309017:0",
+          "tuebingen:thin:n809017:n587785:n500000:p587785:n809017:n1538842",
+          "tuebingen:thin:p309017:p951057:n809017:n951057:p309017:n587785"
+        ],
+        "center": {
+          "x": -0.872678,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -0.809017,
+            "y": -0.587785
+          },
+          {
+            "x": -1.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:n809017:p951057:n309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:n809017:p951057:p309017:n2489898",
+          "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:n1538842",
+          "tuebingen:thin:n1000000:0:n1118034:0:n1000000:n1538842",
+          "tuebingen:thin:p1000000:0:n1809017:0:p1000000:n2489898"
+        ],
+        "center": {
+          "x": -1.181695,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -1.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -1.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p1309017:p951057:n309017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p1309017:p587785:n809017:n4028740",
+          "tuebingen:thick:p309017:n951057:p1309017:p951057:p309017:n4028740",
+          "tuebingen:thin:n1000000:0:p1000000:0:n1000000:n3077684"
+        ],
+        "center": {
+          "x": 0.936339,
+          "y": -3.515793
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": 1.0,
+            "y": -3.077684
+          },
+          {
+            "x": 0.5,
+            "y": -3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p2118034:p587785:n809017:n1538842",
+          "tuebingen:thin:n309017:p951057:p1618034:n951057:n309017:0",
+          "tuebingen:thin:p309017:p951057:p1809017:n951057:p309017:n587785"
+        ],
+        "center": {
+          "x": 1.745356,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 1.809017,
+            "y": -0.587785
+          },
+          {
+            "x": 1.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:p1538842",
+          "tuebingen:thick:p309017:p951057:p809017:n951057:p309017:p2489898",
+          "tuebingen:thin:n1000000:0:p1809017:0:n1000000:p2489898",
+          "tuebingen:thin:p1000000:0:p1118034:0:p1000000:p1538842"
+        ],
+        "center": {
+          "x": 1.745356,
+          "y": 2.051789
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 1.309017,
+            "y": 2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p2927051:p951057:n309017:p951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:p951057:p2427051:n951057:n309017:p2489898",
+          "tuebingen:thin:n809017:n587785:p2927051:p587785:n809017:p951057",
+          "tuebingen:thin:p309017:p951057:p2618034:n951057:p309017:p1902113"
+        ],
+        "center": {
+          "x": 2.554373,
+          "y": 1.464004
+        },
+        "vertices": [
+          {
+            "x": 2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 2.618034,
+            "y": 1.902113
+          },
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p3427051:p951057:n309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p3427051:p587785:n809017:n2489898",
+          "tuebingen:thick:p309017:n951057:p3427051:p951057:p309017:n2489898",
+          "tuebingen:thin:n1000000:0:p3118034:0:n1000000:n1538842"
+        ],
+        "center": {
+          "x": 3.054373,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": 3.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 2.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p3736068:p951057:n309017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:p951057:p3236068:n951057:n309017:0",
+          "tuebingen:thin:n809017:n587785:p3736068:p587785:n809017:n1538842",
+          "tuebingen:thin:p309017:p951057:p3427051:n951057:p309017:n587785"
+        ],
+        "center": {
+          "x": 3.36339,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": 3.736068,
+            "y": -1.538842
+          },
+          {
+            "x": 3.427051,
+            "y": -0.587785
+          },
+          {
+            "x": 2.927051,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p4236068:p951057:n309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p4236068:p587785:n809017:0",
+          "tuebingen:thin:n1000000:0:p3927051:0:n1000000:p951057"
+        ],
+        "center": {
+          "x": 3.86339,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": 4.236068,
+            "y": -0.0
+          },
+          {
+            "x": 3.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 3.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:n2489898",
+          "tuebingen:thick:p309017:n951057:p809017:p951057:p309017:n2489898",
+          "tuebingen:thin:n1000000:0:p500000:0:n1000000:n1538842"
+        ],
+        "center": {
+          "x": 0.436339,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -0.0,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:p2489898",
+          "tuebingen:thin:n309017:p951057:p309017:n951057:n309017:p4028740",
+          "tuebingen:thin:p309017:p951057:p500000:n951057:p309017:p3440955"
+        ],
+        "center": {
+          "x": 0.436339,
+          "y": 3.002846
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 0.5,
+            "y": 3.440955
+          },
+          {
+            "x": 0.0,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:0:n951057:n309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:0:n587785:n809017:0",
+          "tuebingen:thick:p309017:p951057:0:n951057:p309017:0",
+          "tuebingen:thin:p809017:p587785:n309017:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": 0.0,
+          "y": -0.634038
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 0.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:n1309017:n951057:n309017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:n1309017:n587785:n809017:p4028740",
+          "tuebingen:thick:p309017:p951057:n1309017:n951057:p309017:p4028740",
+          "tuebingen:thin:p809017:p587785:n1618034:n587785:p809017:p3077684"
+        ],
+        "center": {
+          "x": -1.309017,
+          "y": 3.394703
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": -1.618034,
+            "y": 3.077684
+          },
+          {
+            "x": -1.0,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:n1538842",
+          "tuebingen:thin:p309017:n951057:n2427051:p951057:p309017:n2489898",
+          "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:n3077684"
+        ],
+        "center": {
+          "x": -2.118034,
+          "y": -2.172879
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -2.427051,
+            "y": -2.489898
+          },
+          {
+            "x": -1.809017,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:p3440955",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:p309017:n951057:n2427051:p951057:p309017:p2489898",
+          "tuebingen:thin:p309017:p951057:n2118034:n951057:p309017:p3440955",
+          "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:p1902113"
+        ],
+        "center": {
+          "x": -2.118034,
+          "y": 2.806917
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": 3.440955
+          },
+          {
+            "x": -2.427051,
+            "y": 2.489898
+          },
+          {
+            "x": -1.809017,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:n2618034:n951057:n309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:n2618034:n587785:n809017:0",
+          "tuebingen:thin:p809017:p587785:n2927051:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": -2.618034,
+          "y": -0.634038
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -2.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:n2927051:n951057:n309017:p951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:p309017:n951057:n3236068:p951057:p309017:0",
+          "tuebingen:thin:p309017:p951057:n2927051:n951057:p309017:p951057",
+          "tuebingen:thin:p809017:n587785:n3427051:p587785:p809017:n587785"
+        ],
+        "center": {
+          "x": -2.927051,
+          "y": 0.317019
+        },
+        "vertices": [
+          {
+            "x": -2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": -3.236068,
+            "y": 0.0
+          },
+          {
+            "x": -2.618034,
+            "y": 0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:n3427051:n951057:n309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n3427051:n951057:p309017:p2489898",
+          "tuebingen:thin:p809017:p587785:n3736068:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": -3.427051,
+          "y": 1.855861
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": -3.736068,
+            "y": 1.538842
+          },
+          {
+            "x": -3.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:n809017:n951057:n309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:p2489898",
+          "tuebingen:thin:p309017:n951057:n1118034:p951057:p309017:p1538842",
+          "tuebingen:thin:p809017:n587785:n1309017:p587785:p809017:p951057"
+        ],
+        "center": {
+          "x": -0.809017,
+          "y": 1.855861
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -1.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -0.5,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p1309017:n587785:n809017:p4028740",
+          "tuebingen:thick:p309017:p951057:p1309017:n951057:p309017:p4028740",
+          "tuebingen:thin:p809017:p587785:p1000000:n587785:p809017:p3077684"
+        ],
+        "center": {
+          "x": 1.309017,
+          "y": 3.394703
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": 1.0,
+            "y": 3.077684
+          },
+          {
+            "x": 1.618034,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:p309017:n951057:p1000000:p951057:p309017:0",
+          "tuebingen:thin:p309017:p951057:p1309017:n951057:p309017:p951057",
+          "tuebingen:thin:p809017:n587785:p809017:p587785:p809017:n587785"
+        ],
+        "center": {
+          "x": 1.309017,
+          "y": 0.317019
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": 1.0,
+            "y": -0.0
+          },
+          {
+            "x": 1.618034,
+            "y": -0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:p2118034:n951057:n309017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p2118034:n587785:n809017:p1538842",
+          "tuebingen:thin:p809017:p587785:p1809017:n587785:p809017:p587785"
+        ],
+        "center": {
+          "x": 2.118034,
+          "y": 0.904804
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 1.809017,
+            "y": 0.587785
+          },
+          {
+            "x": 2.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:p3427051:n951057:n309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p3427051:n587785:n809017:p2489898",
+          "tuebingen:thin:p809017:p587785:p3118034:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": 3.427051,
+          "y": 1.855861
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": 3.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 3.736068,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n309017:p951057:p809017:n951057:n309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p809017:n587785:n809017:p2489898",
+          "tuebingen:thick:p309017:p951057:p809017:n951057:p309017:p2489898",
+          "tuebingen:thin:p809017:p587785:p500000:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": 0.809017,
+          "y": 1.855861
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 1.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:0:p587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:0:0:n1000000:0",
+          "tuebingen:thick:n309017:n951057:0:p951057:n309017:0",
+          "tuebingen:thin:n809017:p587785:n809017:n587785:n809017:p587785"
+        ],
+        "center": {
+          "x": -0.603006,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.809017,
+            "y": 0.587785
+          },
+          {
+            "x": -1.0,
+            "y": 0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:n809017:p587785:n809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:n809017:0:n1000000:p2489898",
+          "tuebingen:thin:p309017:p951057:n2118034:n951057:p309017:p3440955",
+          "tuebingen:thin:p809017:p587785:n1618034:n587785:p809017:p3077684"
+        ],
+        "center": {
+          "x": -1.412023,
+          "y": 2.685827
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -1.618034,
+            "y": 3.077684
+          },
+          {
+            "x": -1.809017,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p1309017:p587785:n809017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p1309017:p951057:n309017:n4028740",
+          "tuebingen:thin:n809017:p587785:p500000:n587785:n809017:n3440955"
+        ],
+        "center": {
+          "x": 0.706011,
+          "y": -3.832812
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": 0.5,
+            "y": -3.440955
+          },
+          {
+            "x": 0.309017,
+            "y": -4.02874
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p1809017:p587785:n809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:p1809017:0:n1000000:p2489898",
+          "tuebingen:thin:p309017:p951057:p500000:n951057:p309017:p3440955",
+          "tuebingen:thin:p809017:p587785:p1000000:n587785:p809017:p3077684"
+        ],
+        "center": {
+          "x": 1.206011,
+          "y": 2.685827
+        },
+        "vertices": [
+          {
+            "x": 1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 1.0,
+            "y": 3.077684
+          },
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p2118034:p587785:n809017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2118034:0:n1000000:n1538842",
+          "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:n1538842",
+          "tuebingen:thin:n809017:p587785:p1309017:n587785:n809017:n951057"
+        ],
+        "center": {
+          "x": 1.515028,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 1.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p2618034:p587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2618034:0:n1000000:0",
+          "tuebingen:thin:p309017:p951057:p1309017:n951057:p309017:p951057",
+          "tuebingen:thin:p809017:p587785:p1809017:n587785:p809017:p587785"
+        ],
+        "center": {
+          "x": 2.015028,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 1.809017,
+            "y": 0.587785
+          },
+          {
+            "x": 1.618034,
+            "y": -0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p3427051:p587785:n809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p3427051:0:n1000000:n2489898",
+          "tuebingen:thick:n309017:n951057:p3427051:p951057:n309017:n2489898",
+          "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:n1902113"
+        ],
+        "center": {
+          "x": 2.824045,
+          "y": -2.29397
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": 2.618034,
+            "y": -1.902113
+          },
+          {
+            "x": 2.427051,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p3427051:p587785:n809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p3427051:0:n1000000:p2489898",
+          "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:p3077684"
+        ],
+        "center": {
+          "x": 2.824045,
+          "y": 2.685827
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": 2.618034,
+            "y": 3.077684
+          },
+          {
+            "x": 2.427051,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p3927051:p587785:n809017:p951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:p3927051:0:n1000000:p951057",
+          "tuebingen:thin:p309017:p951057:p2618034:n951057:p309017:p1902113",
+          "tuebingen:thin:p809017:p587785:p3118034:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": 3.324045,
+          "y": 1.146985
+        },
+        "vertices": [
+          {
+            "x": 3.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 3.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 2.927051,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p4236068:p587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p4236068:0:n1000000:0",
+          "tuebingen:thick:n309017:n951057:p4236068:p951057:n309017:0",
+          "tuebingen:thin:n809017:p587785:p3427051:n587785:n809017:p587785"
+        ],
+        "center": {
+          "x": 3.633062,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": 4.236068,
+            "y": -0.0
+          },
+          {
+            "x": 3.427051,
+            "y": 0.587785
+          },
+          {
+            "x": 3.236068,
+            "y": -0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p500000:p587785:n809017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:p500000:0:n1000000:n1538842",
+          "tuebingen:thin:p309017:p951057:n809017:n951057:p309017:n587785",
+          "tuebingen:thin:p809017:p587785:n309017:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": -0.103006,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -0.309017,
+            "y": -0.951057
+          },
+          {
+            "x": -0.5,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:n2489898",
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:n2489898",
+          "tuebingen:thin:n809017:p587785:0:n587785:n809017:n1902113",
+          "tuebingen:thin:p809017:n587785:0:p587785:p809017:n3077684"
+        ],
+        "center": {
+          "x": 0.206011,
+          "y": -2.29397
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -0.0,
+            "y": -1.902113
+          },
+          {
+            "x": -0.190983,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:p2489898",
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:p2489898",
+          "tuebingen:thin:n809017:p587785:0:n587785:n809017:p3077684",
+          "tuebingen:thin:p809017:n587785:0:p587785:p809017:p1902113"
+        ],
+        "center": {
+          "x": 0.206011,
+          "y": 2.685827
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 0.0,
+            "y": 3.077684
+          },
+          {
+            "x": -0.190983,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:0:n587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:0:0:n1000000:0",
+          "tuebingen:thick:n309017:p951057:0:n951057:n309017:0",
+          "tuebingen:thin:p309017:p951057:n809017:n951057:p309017:n587785"
+        ],
+        "center": {
+          "x": -0.372678,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.809017,
+            "y": -0.587785
+          },
+          {
+            "x": -0.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:n1309017:n587785:n809017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n1309017:n951057:n309017:p4028740",
+          "tuebingen:thin:p309017:p951057:n2118034:n951057:p309017:p3440955"
+        ],
+        "center": {
+          "x": -1.681695,
+          "y": 3.515793
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": -2.118034,
+            "y": 3.440955
+          },
+          {
+            "x": -1.618034,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:n1809017:n587785:n809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:p951057:n1809017:n951057:n309017:p2489898",
+          "tuebingen:thin:p1000000:0:n3118034:0:p1000000:p1538842",
+          "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:p1902113"
+        ],
+        "center": {
+          "x": -2.181695,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": -1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -2.618034,
+            "y": 1.902113
+          },
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:n2118034:n587785:n809017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:n2118034:0:n1000000:p1538842",
+          "tuebingen:thin:p309017:p951057:n2927051:n951057:p309017:p951057"
+        ],
+        "center": {
+          "x": -2.490712,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": -2.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:n2618034:n587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2618034:n951057:n309017:0",
+          "tuebingen:thin:p1000000:0:n3927051:0:p1000000:n951057",
+          "tuebingen:thin:p809017:n587785:n3427051:p587785:p809017:n587785"
+        ],
+        "center": {
+          "x": -2.990712,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -3.427051,
+            "y": -0.587785
+          },
+          {
+            "x": -2.927051,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p1309017:n587785:n809017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p1309017:0:n1000000:p4028740",
+          "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p4028740",
+          "tuebingen:thin:p309017:p951057:p500000:n951057:p309017:p3440955"
+        ],
+        "center": {
+          "x": 0.936339,
+          "y": 3.515793
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": 0.5,
+            "y": 3.440955
+          },
+          {
+            "x": 1.0,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p1618034:n587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:p951057:p1618034:n951057:n309017:0",
+          "tuebingen:thin:p1000000:0:p309017:0:p1000000:n951057",
+          "tuebingen:thin:p809017:n587785:p809017:p587785:p809017:n587785"
+        ],
+        "center": {
+          "x": 1.245356,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 1.618034,
+            "y": -0.0
+          },
+          {
+            "x": 0.809017,
+            "y": -0.587785
+          },
+          {
+            "x": 1.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p2118034:n587785:n809017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2118034:0:n1000000:p1538842",
+          "tuebingen:thick:n309017:p951057:p2118034:n951057:n309017:p1538842",
+          "tuebingen:thin:p309017:p951057:p1309017:n951057:p309017:p951057"
+        ],
+        "center": {
+          "x": 1.745356,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": 1.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p2618034:n587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2618034:0:n1000000:0",
+          "tuebingen:thin:p309017:p951057:p1809017:n951057:p309017:n587785"
+        ],
+        "center": {
+          "x": 2.245356,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 1.809017,
+            "y": -0.587785
+          },
+          {
+            "x": 2.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p309017:n587785:n809017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:p951057:p309017:n951057:n309017:p4028740",
+          "tuebingen:thin:p1000000:0:n1000000:0:p1000000:p3077684",
+          "tuebingen:thin:p809017:n587785:n500000:p587785:p809017:p3440955"
+        ],
+        "center": {
+          "x": -0.063661,
+          "y": 3.515793
+        },
+        "vertices": [
+          {
+            "x": 0.309017,
+            "y": 4.02874
+          },
+          {
+            "x": -0.5,
+            "y": 3.440955
+          },
+          {
+            "x": 0.0,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p3427051:n587785:n809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p3427051:0:n1000000:p2489898",
+          "tuebingen:thick:n309017:p951057:p3427051:n951057:n309017:p2489898",
+          "tuebingen:thin:p309017:p951057:p2618034:n951057:p309017:p1902113"
+        ],
+        "center": {
+          "x": 3.054373,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": 2.618034,
+            "y": 1.902113
+          },
+          {
+            "x": 3.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p4236068:n587785:n809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p4236068:0:n1000000:0",
+          "tuebingen:thin:p309017:p951057:p3427051:n951057:p309017:n587785"
+        ],
+        "center": {
+          "x": 3.86339,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 4.236068,
+            "y": -0.0
+          },
+          {
+            "x": 3.427051,
+            "y": -0.587785
+          },
+          {
+            "x": 3.927051,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:n809017:p587785:p809017:n587785:n809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:p809017:n951057:n309017:p2489898",
+          "tuebingen:thin:p1000000:0:n500000:0:p1000000:p1538842",
+          "tuebingen:thin:p809017:n587785:0:p587785:p809017:p1902113"
+        ],
+        "center": {
+          "x": 0.436339,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 0.0,
+            "y": 1.902113
+          },
+          {
+            "x": 0.5,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:0:0:p1000000:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:0:p587785:p809017:0",
+          "tuebingen:thick:p809017:p587785:0:n587785:p809017:0",
+          "tuebingen:thin:p309017:n951057:p1000000:p951057:p309017:0"
+        ],
+        "center": {
+          "x": 0.603006,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.0,
+            "y": -0.0
+          },
+          {
+            "x": 0.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:0:0:p1000000:n3077684",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:p1000000:0:n1000000:n3077684",
+          "tuebingen:thin:n809017:n587785:p1618034:p587785:n809017:n3077684",
+          "tuebingen:thin:p809017:n587785:0:p587785:p809017:n3077684"
+        ],
+        "center": {
+          "x": 0.603006,
+          "y": -2.881755
+        },
+        "vertices": [
+          {
+            "x": -0.0,
+            "y": -3.077684
+          },
+          {
+            "x": 1.0,
+            "y": -3.077684
+          },
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n1309017:0:p1000000:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:n1309017:p587785:p809017:n4028740",
+          "tuebingen:thin:p309017:n951057:n309017:p951057:p309017:n4028740"
+        ],
+        "center": {
+          "x": -0.706011,
+          "y": -3.832812
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": -0.309017,
+            "y": -4.02874
+          },
+          {
+            "x": -0.5,
+            "y": -3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n1309017:0:p1000000:p951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:n309017:0:n1000000:p951057",
+          "tuebingen:thin:n809017:n587785:p309017:p587785:n809017:p951057",
+          "tuebingen:thin:p809017:n587785:n1309017:p587785:p809017:p951057"
+        ],
+        "center": {
+          "x": -0.706011,
+          "y": 1.146985
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -0.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -0.5,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n2118034:0:p1000000:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:n2118034:p587785:p809017:n1538842",
+          "tuebingen:thin:n1000000:0:n1118034:0:n1000000:n1538842",
+          "tuebingen:thin:n809017:n587785:n500000:p587785:n809017:n1538842"
+        ],
+        "center": {
+          "x": -1.515028,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -1.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -1.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n2118034:0:p1000000:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:n809017:0:n1000000:p2489898",
+          "tuebingen:thick:p809017:p587785:n2118034:n587785:p809017:p1538842",
+          "tuebingen:thin:n309017:p951057:n1809017:n951057:n309017:p2489898",
+          "tuebingen:thin:p309017:n951057:n1118034:p951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": -1.515028,
+          "y": 1.73477
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -1.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -1.309017,
+            "y": 2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n2618034:0:p1000000:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:n2618034:p587785:p809017:0",
+          "tuebingen:thick:p809017:p587785:n2618034:n587785:p809017:0",
+          "tuebingen:thin:p309017:n951057:n1618034:p951057:p309017:0"
+        ],
+        "center": {
+          "x": -2.015028,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -1.618034,
+            "y": 0.0
+          },
+          {
+            "x": -1.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n2618034:0:p1000000:n3077684",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:n1618034:0:n1000000:n3077684",
+          "tuebingen:thin:n809017:n587785:n1000000:p587785:n809017:n3077684",
+          "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:n3077684"
+        ],
+        "center": {
+          "x": -2.015028,
+          "y": -2.881755
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": -3.077684
+          },
+          {
+            "x": -1.618034,
+            "y": -3.077684
+          },
+          {
+            "x": -1.809017,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n3427051:0:p1000000:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:n3427051:p587785:p809017:n2489898",
+          "tuebingen:thick:p809017:p587785:n3427051:n587785:p809017:n2489898",
+          "tuebingen:thin:p309017:n951057:n2427051:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": -2.824045,
+          "y": -2.29397
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": -2.427051,
+            "y": -2.489898
+          },
+          {
+            "x": -2.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n3427051:0:p1000000:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:p587785:n3427051:n587785:p809017:p2489898",
+          "tuebingen:thin:p309017:n951057:n2427051:p951057:p309017:p2489898"
+        ],
+        "center": {
+          "x": -2.824045,
+          "y": 2.685827
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": -2.427051,
+            "y": 2.489898
+          },
+          {
+            "x": -2.618034,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:n4236068:0:p1000000:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:n4236068:p587785:p809017:0",
+          "tuebingen:thick:p809017:p587785:n4236068:n587785:p809017:0",
+          "tuebingen:thin:p309017:n951057:n3236068:p951057:p309017:0"
+        ],
+        "center": {
+          "x": -3.633062,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": -4.236068,
+            "y": 0.0
+          },
+          {
+            "x": -3.236068,
+            "y": 0.0
+          },
+          {
+            "x": -3.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:p2118034:0:p1000000:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:p2118034:p587785:p809017:n1538842",
+          "tuebingen:thin:n1000000:0:p3118034:0:n1000000:n1538842",
+          "tuebingen:thin:n809017:n587785:p3736068:p587785:n809017:n1538842"
+        ],
+        "center": {
+          "x": 2.72104,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 3.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 2.927051,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p1000000:0:p809017:0:p1000000:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2118034:0:n1000000:n1538842",
+          "tuebingen:thick:p809017:p587785:p809017:n587785:p809017:n2489898",
+          "tuebingen:thin:n309017:p951057:p1118034:n951057:n309017:n1538842",
+          "tuebingen:thin:p309017:n951057:p1809017:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": 1.412023,
+          "y": -2.29397
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 1.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:0:p951057:p309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:0:p951057:n309017:0",
+          "tuebingen:thick:p809017:n587785:0:p587785:p809017:0",
+          "tuebingen:thin:n809017:n587785:p309017:p587785:n809017:p951057"
+        ],
+        "center": {
+          "x": 0.0,
+          "y": 0.634038
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -0.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n1309017:p951057:n309017:n4028740",
+          "tuebingen:thick:p809017:n587785:n1309017:p587785:p809017:n4028740",
+          "tuebingen:thin:n809017:n587785:n1000000:p587785:n809017:n3077684"
+        ],
+        "center": {
+          "x": -1.309017,
+          "y": -3.394703
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": -1.0,
+            "y": -3.077684
+          },
+          {
+            "x": -1.618034,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:n1309017:p951057:n309017:n951057",
+          "tuebingen:thin:n309017:p951057:n1000000:n951057:n309017:0",
+          "tuebingen:thin:n809017:p587785:n809017:n587785:n809017:p587785"
+        ],
+        "center": {
+          "x": -1.309017,
+          "y": -0.317019
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": -1.0,
+            "y": 0.0
+          },
+          {
+            "x": -1.618034,
+            "y": 0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:n2118034:p951057:p309017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:n2118034:p587785:p809017:n1538842",
+          "tuebingen:thin:n809017:n587785:n1809017:p587785:n809017:n587785"
+        ],
+        "center": {
+          "x": -2.118034,
+          "y": -0.904804
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -1.809017,
+            "y": -0.587785
+          },
+          {
+            "x": -2.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:n3427051:p951057:p309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:n3427051:p587785:p809017:n2489898",
+          "tuebingen:thin:n809017:n587785:n3118034:p587785:n809017:n1538842"
+        ],
+        "center": {
+          "x": -3.427051,
+          "y": -1.855861
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": -3.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -3.736068,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:n809017:p951057:p309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n809017:p951057:n309017:n2489898",
+          "tuebingen:thick:p809017:n587785:n809017:p587785:p809017:n2489898",
+          "tuebingen:thin:n809017:n587785:n500000:p587785:n809017:n1538842"
+        ],
+        "center": {
+          "x": -0.809017,
+          "y": -1.855861
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -1.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:p1309017:p951057:p309017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p1309017:p951057:n309017:n4028740",
+          "tuebingen:thick:p809017:n587785:p1309017:p587785:p809017:n4028740",
+          "tuebingen:thin:n809017:n587785:p1618034:p587785:n809017:n3077684"
+        ],
+        "center": {
+          "x": 1.309017,
+          "y": -3.394703
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": 1.618034,
+            "y": -3.077684
+          },
+          {
+            "x": 1.0,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:n3440955",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:p2118034:p951057:n309017:n3440955",
+          "tuebingen:thin:n309017:p951057:p2427051:n951057:n309017:n2489898",
+          "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:n1902113"
+        ],
+        "center": {
+          "x": 2.118034,
+          "y": -2.806917
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": -3.440955
+          },
+          {
+            "x": 2.427051,
+            "y": -2.489898
+          },
+          {
+            "x": 1.809017,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:p1538842",
+          "tuebingen:thin:n309017:p951057:p2427051:n951057:n309017:p2489898",
+          "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:p3077684"
+        ],
+        "center": {
+          "x": 2.118034,
+          "y": 2.172879
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 2.427051,
+            "y": 2.489898
+          },
+          {
+            "x": 1.809017,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:p2618034:p951057:p309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:n587785:p2618034:p587785:p809017:0",
+          "tuebingen:thin:n809017:n587785:p2927051:p587785:n809017:p951057"
+        ],
+        "center": {
+          "x": 2.618034,
+          "y": 0.634038
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 2.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:p2927051:p951057:p309017:n951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:p2927051:p951057:n309017:n951057",
+          "tuebingen:thin:n309017:p951057:p3236068:n951057:n309017:0",
+          "tuebingen:thin:n809017:p587785:p3427051:n587785:n809017:p587785"
+        ],
+        "center": {
+          "x": 2.927051,
+          "y": -0.317019
+        },
+        "vertices": [
+          {
+            "x": 2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": 3.236068,
+            "y": -0.0
+          },
+          {
+            "x": 2.618034,
+            "y": -0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:p3427051:p951057:p309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p3427051:p951057:n309017:n2489898",
+          "tuebingen:thin:n809017:n587785:p3736068:p587785:n809017:n1538842"
+        ],
+        "center": {
+          "x": 3.427051,
+          "y": -1.855861
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": 3.736068,
+            "y": -1.538842
+          },
+          {
+            "x": 3.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:n951057:p809017:p951057:p309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:n2489898",
+          "tuebingen:thin:n309017:p951057:p1118034:n951057:n309017:n1538842",
+          "tuebingen:thin:n809017:p587785:p1309017:n587785:n809017:n951057"
+        ],
+        "center": {
+          "x": 0.809017,
+          "y": -1.855861
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 1.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 0.5,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:0:n951057:p309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:0:n951057:n309017:0",
+          "tuebingen:thick:p809017:p587785:0:n587785:p809017:0",
+          "tuebingen:thin:p1000000:0:p309017:0:p1000000:n951057"
+        ],
+        "center": {
+          "x": 0.372678,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 0.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n1309017:n951057:p309017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n1309017:n951057:n309017:p4028740",
+          "tuebingen:thick:p809017:p587785:n1309017:n587785:p809017:p4028740",
+          "tuebingen:thin:p1000000:0:n1000000:0:p1000000:p3077684"
+        ],
+        "center": {
+          "x": -0.936339,
+          "y": 3.515793
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": -1.0,
+            "y": 3.077684
+          },
+          {
+            "x": -0.5,
+            "y": 3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n809017:p951057:n309017:n2489898",
+          "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:n1538842",
+          "tuebingen:thin:n1000000:0:n1118034:0:n1000000:n1538842",
+          "tuebingen:thin:p1000000:0:n1809017:0:p1000000:n2489898"
+        ],
+        "center": {
+          "x": -1.745356,
+          "y": -2.051789
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -1.309017,
+            "y": -2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:p587785:n2118034:n587785:p809017:p1538842",
+          "tuebingen:thin:n309017:n951057:n1809017:p951057:n309017:p587785",
+          "tuebingen:thin:p309017:n951057:n1618034:p951057:p309017:0"
+        ],
+        "center": {
+          "x": -1.745356,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -1.809017,
+            "y": 0.587785
+          },
+          {
+            "x": -1.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n2927051:n951057:p309017:n951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:n2618034:p951057:n309017:n1902113",
+          "tuebingen:thin:p309017:n951057:n2427051:p951057:p309017:n2489898",
+          "tuebingen:thin:p809017:p587785:n2927051:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": -2.554373,
+          "y": -1.464004
+        },
+        "vertices": [
+          {
+            "x": -2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -2.618034,
+            "y": -1.902113
+          },
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n3427051:n951057:p309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n3427051:n951057:n309017:p2489898",
+          "tuebingen:thick:p809017:p587785:n3427051:n587785:p809017:p2489898",
+          "tuebingen:thin:p1000000:0:n3118034:0:p1000000:p1538842"
+        ],
+        "center": {
+          "x": -3.054373,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": -3.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -2.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n3736068:n951057:p309017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:n3427051:p951057:n309017:p587785",
+          "tuebingen:thin:p309017:n951057:n3236068:p951057:p309017:0",
+          "tuebingen:thin:p809017:p587785:n3736068:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": -3.36339,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": -3.736068,
+            "y": 1.538842
+          },
+          {
+            "x": -3.427051,
+            "y": 0.587785
+          },
+          {
+            "x": -2.927051,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n4236068:n951057:p309017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:p587785:n4236068:n587785:p809017:0",
+          "tuebingen:thin:p1000000:0:n3927051:0:p1000000:n951057"
+        ],
+        "center": {
+          "x": -3.86339,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": -4.236068,
+            "y": 0.0
+          },
+          {
+            "x": -3.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -3.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:n2489898",
+          "tuebingen:thin:n309017:n951057:n500000:p951057:n309017:n3440955",
+          "tuebingen:thin:p309017:n951057:n309017:p951057:p309017:n4028740"
+        ],
+        "center": {
+          "x": -0.436339,
+          "y": -3.002846
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -0.5,
+            "y": -3.440955
+          },
+          {
+            "x": -0.0,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n809017:n951057:n309017:p2489898",
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:p2489898",
+          "tuebingen:thin:p1000000:0:n500000:0:p1000000:p1538842"
+        ],
+        "center": {
+          "x": -0.436339,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 0.0,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:p1309017:n951057:p309017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p4028740",
+          "tuebingen:thin:p1000000:0:p1618034:0:p1000000:p3077684"
+        ],
+        "center": {
+          "x": 1.681695,
+          "y": 3.515793
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": 1.618034,
+            "y": 3.077684
+          },
+          {
+            "x": 2.118034,
+            "y": 3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:p500000:n951057:p309017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:p809017:p951057:n309017:p587785",
+          "tuebingen:thin:p309017:n951057:p1000000:p951057:p309017:0",
+          "tuebingen:thin:p809017:p587785:p500000:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": 0.872678,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 0.809017,
+            "y": 0.587785
+          },
+          {
+            "x": 1.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p309017:p951057:p809017:n951057:p309017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:p1538842",
+          "tuebingen:thick:n309017:p951057:p809017:n951057:n309017:p2489898",
+          "tuebingen:thin:n1000000:0:p1809017:0:n1000000:p2489898",
+          "tuebingen:thin:p1000000:0:p1118034:0:p1000000:p1538842"
+        ],
+        "center": {
+          "x": 1.181695,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 1.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 1.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:0:p587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:0:0:p1000000:0",
+          "tuebingen:thick:p309017:n951057:0:p951057:p309017:0",
+          "tuebingen:thin:n309017:n951057:p809017:p951057:n309017:p587785"
+        ],
+        "center": {
+          "x": 0.372678,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.809017,
+            "y": 0.587785
+          },
+          {
+            "x": 0.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n1309017:p587785:p809017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n1309017:0:p1000000:n4028740",
+          "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n4028740",
+          "tuebingen:thin:n309017:n951057:n500000:p951057:n309017:n3440955"
+        ],
+        "center": {
+          "x": -0.936339,
+          "y": -3.515793
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": -0.5,
+            "y": -3.440955
+          },
+          {
+            "x": -1.0,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n1618034:p587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:n309017:0:n1000000:p951057",
+          "tuebingen:thin:n809017:p587785:n809017:n587785:n809017:p587785",
+          "tuebingen:thin:p309017:n951057:n1618034:p951057:p309017:0"
+        ],
+        "center": {
+          "x": -1.245356,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": -1.618034,
+            "y": 0.0
+          },
+          {
+            "x": -0.809017,
+            "y": 0.587785
+          },
+          {
+            "x": -1.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n2118034:p587785:p809017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n2118034:0:p1000000:n1538842",
+          "tuebingen:thick:p309017:n951057:n2118034:p951057:p309017:n1538842",
+          "tuebingen:thin:n309017:n951057:n1309017:p951057:n309017:n951057"
+        ],
+        "center": {
+          "x": -1.745356,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": -1.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n2618034:p587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n2618034:0:p1000000:0",
+          "tuebingen:thin:n309017:n951057:n1809017:p951057:n309017:p587785"
+        ],
+        "center": {
+          "x": -2.245356,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -1.809017,
+            "y": 0.587785
+          },
+          {
+            "x": -2.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n309017:p587785:p809017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:p1000000:0:n1000000:n3077684",
+          "tuebingen:thin:n809017:p587785:p500000:n587785:n809017:n3440955",
+          "tuebingen:thin:p309017:n951057:n309017:p951057:p309017:n4028740"
+        ],
+        "center": {
+          "x": 0.063661,
+          "y": -3.515793
+        },
+        "vertices": [
+          {
+            "x": -0.309017,
+            "y": -4.02874
+          },
+          {
+            "x": 0.5,
+            "y": -3.440955
+          },
+          {
+            "x": -0.0,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n3427051:p587785:p809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n3427051:0:p1000000:n2489898",
+          "tuebingen:thick:p309017:n951057:n3427051:p951057:p309017:n2489898",
+          "tuebingen:thin:n309017:n951057:n2618034:p951057:n309017:n1902113"
+        ],
+        "center": {
+          "x": -3.054373,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": -2.618034,
+            "y": -1.902113
+          },
+          {
+            "x": -3.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n4236068:p587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n4236068:0:p1000000:0",
+          "tuebingen:thin:n309017:n951057:n3427051:p951057:n309017:p587785"
+        ],
+        "center": {
+          "x": -3.86339,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": -4.236068,
+            "y": 0.0
+          },
+          {
+            "x": -3.427051,
+            "y": 0.587785
+          },
+          {
+            "x": -3.927051,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:n809017:p587785:p809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:n809017:p951057:p309017:n2489898",
+          "tuebingen:thin:n1000000:0:p500000:0:n1000000:n1538842",
+          "tuebingen:thin:n809017:p587785:0:n587785:n809017:n1902113"
+        ],
+        "center": {
+          "x": -0.436339,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -0.0,
+            "y": -1.902113
+          },
+          {
+            "x": -0.5,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:p1309017:p587785:p809017:n4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:p1309017:p951057:p309017:n4028740",
+          "tuebingen:thin:n309017:n951057:p2118034:p951057:n309017:n3440955"
+        ],
+        "center": {
+          "x": 1.681695,
+          "y": -3.515793
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": -4.02874
+          },
+          {
+            "x": 2.118034,
+            "y": -3.440955
+          },
+          {
+            "x": 1.618034,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:p1809017:p587785:p809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n1000000:0:p3118034:0:n1000000:n1538842",
+          "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:n1902113",
+          "tuebingen:thin:p309017:n951057:p1809017:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": 2.181695,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": 1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 2.618034,
+            "y": -1.902113
+          },
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:p2118034:p587785:p809017:n1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:p2118034:0:p1000000:n1538842",
+          "tuebingen:thin:n309017:n951057:p2927051:p951057:n309017:n951057"
+        ],
+        "center": {
+          "x": 2.490712,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": 2.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:n587785:p2618034:p587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:p2618034:p951057:p309017:0",
+          "tuebingen:thin:n1000000:0:p3927051:0:n1000000:p951057",
+          "tuebingen:thin:n809017:p587785:p3427051:n587785:n809017:p587785"
+        ],
+        "center": {
+          "x": 2.990712,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 3.427051,
+            "y": 0.587785
+          },
+          {
+            "x": 2.927051,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:0:n587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:0:0:p1000000:0",
+          "tuebingen:thick:p309017:p951057:0:n951057:p309017:0",
+          "tuebingen:thin:p809017:n587785:p809017:p587785:p809017:n587785"
+        ],
+        "center": {
+          "x": 0.603006,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.809017,
+            "y": -0.587785
+          },
+          {
+            "x": 1.0,
+            "y": -0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n1309017:n587785:p809017:p4028740",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n1309017:n951057:p309017:p4028740",
+          "tuebingen:thin:p809017:n587785:n500000:p587785:p809017:p3440955"
+        ],
+        "center": {
+          "x": -0.706011,
+          "y": 3.832812
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": 4.02874
+          },
+          {
+            "x": -0.5,
+            "y": 3.440955
+          },
+          {
+            "x": -0.309017,
+            "y": 4.02874
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n1809017:n587785:p809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:n500000:p951057:n309017:n3440955",
+          "tuebingen:thin:n809017:n587785:n1000000:p587785:n809017:n3077684",
+          "tuebingen:thin:p1000000:0:n1809017:0:p1000000:n2489898"
+        ],
+        "center": {
+          "x": -1.206011,
+          "y": -2.685827
+        },
+        "vertices": [
+          {
+            "x": -1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -1.0,
+            "y": -3.077684
+          },
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n2118034:n587785:p809017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n2118034:0:p1000000:p1538842",
+          "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:p1538842",
+          "tuebingen:thin:p809017:n587785:n1309017:p587785:p809017:p951057"
+        ],
+        "center": {
+          "x": -1.515028,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -1.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n2618034:n587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n2618034:0:p1000000:0",
+          "tuebingen:thin:n309017:n951057:n1309017:p951057:n309017:n951057",
+          "tuebingen:thin:n809017:n587785:n1809017:p587785:n809017:n587785"
+        ],
+        "center": {
+          "x": -2.015028,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -1.809017,
+            "y": -0.587785
+          },
+          {
+            "x": -1.618034,
+            "y": 0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n3427051:n587785:p809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n3427051:0:p1000000:n2489898",
+          "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:n3077684"
+        ],
+        "center": {
+          "x": -2.824045,
+          "y": -2.685827
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": -2.489898
+          },
+          {
+            "x": -2.618034,
+            "y": -3.077684
+          },
+          {
+            "x": -2.427051,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n3427051:n587785:p809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n3427051:0:p1000000:p2489898",
+          "tuebingen:thick:p309017:p951057:n3427051:n951057:p309017:p2489898",
+          "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:p1902113"
+        ],
+        "center": {
+          "x": -2.824045,
+          "y": 2.29397
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": 2.489898
+          },
+          {
+            "x": -2.618034,
+            "y": 1.902113
+          },
+          {
+            "x": -2.427051,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n3927051:n587785:p809017:n951057",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:n2618034:p951057:n309017:n1902113",
+          "tuebingen:thin:n809017:n587785:n3118034:p587785:n809017:n1538842",
+          "tuebingen:thin:p1000000:0:n3927051:0:p1000000:n951057"
+        ],
+        "center": {
+          "x": -3.324045,
+          "y": -1.146985
+        },
+        "vertices": [
+          {
+            "x": -3.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -3.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -2.927051,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n4236068:n587785:p809017:0",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n4236068:0:p1000000:0",
+          "tuebingen:thick:p309017:p951057:n4236068:n951057:p309017:0",
+          "tuebingen:thin:p809017:n587785:n3427051:p587785:p809017:n587785"
+        ],
+        "center": {
+          "x": -3.633062,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": -4.236068,
+            "y": 0.0
+          },
+          {
+            "x": -3.427051,
+            "y": -0.587785
+          },
+          {
+            "x": -3.236068,
+            "y": 0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n500000:n587785:p809017:p1538842",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thin:n309017:n951057:p809017:p951057:n309017:p587785",
+          "tuebingen:thin:n809017:n587785:p309017:p587785:n809017:p951057",
+          "tuebingen:thin:p1000000:0:n500000:0:p1000000:p1538842"
+        ],
+        "center": {
+          "x": 0.103006,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 0.309017,
+            "y": 0.951057
+          },
+          {
+            "x": 0.5,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:n2489898",
+          "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:n2489898",
+          "tuebingen:thin:n809017:p587785:0:n587785:n809017:n1902113",
+          "tuebingen:thin:p809017:n587785:0:p587785:p809017:n3077684"
+        ],
+        "center": {
+          "x": -0.206011,
+          "y": -2.685827
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -0.0,
+            "y": -3.077684
+          },
+          {
+            "x": 0.190983,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:p2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:p2489898",
+          "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:p2489898",
+          "tuebingen:thin:n809017:p587785:0:n587785:n809017:p3077684",
+          "tuebingen:thin:p809017:n587785:0:p587785:p809017:p1902113"
+        ],
+        "center": {
+          "x": -0.206011,
+          "y": 2.29397
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 0.0,
+            "y": 1.902113
+          },
+          {
+            "x": 0.190983,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thick:p809017:p587785:p809017:n587785:p809017:n2489898",
+        "kind": "tuebingen-thick",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:p809017:0:p1000000:n2489898",
+          "tuebingen:thin:n309017:n951057:p2118034:p951057:n309017:n3440955",
+          "tuebingen:thin:n809017:n587785:p1618034:p587785:n809017:n3077684"
+        ],
+        "center": {
+          "x": 1.412023,
+          "y": -2.685827
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 1.618034,
+            "y": -3.077684
+          },
+          {
+            "x": 1.809017,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:n1118034:0:n1000000:n1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n809017:p951057:n309017:n2489898",
+          "tuebingen:thick:p1000000:0:n2118034:0:p1000000:n1538842",
+          "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:n1538842"
+        ],
+        "center": {
+          "x": -1.618034,
+          "y": -1.659932
+        },
+        "vertices": [
+          {
+            "x": -1.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -1.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:n1618034:0:n1000000:n3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n1309017:p951057:n309017:n4028740",
+          "tuebingen:thick:p1000000:0:n2618034:0:p1000000:n3077684"
+        ],
+        "center": {
+          "x": -2.118034,
+          "y": -3.198774
+        },
+        "vertices": [
+          {
+            "x": -1.618034,
+            "y": -3.077684
+          },
+          {
+            "x": -2.618034,
+            "y": -3.077684
+          },
+          {
+            "x": -2.118034,
+            "y": -3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:n309017:0:n1000000:p951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:0:p951057:n309017:0",
+          "tuebingen:thick:p1000000:0:n1309017:0:p1000000:p951057",
+          "tuebingen:thick:p809017:n587785:n1618034:p587785:p809017:0"
+        ],
+        "center": {
+          "x": -0.809017,
+          "y": 0.829966
+        },
+        "vertices": [
+          {
+            "x": -0.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -0.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:p1000000:0:n1000000:n3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p1309017:p951057:n309017:n4028740",
+          "tuebingen:thick:p1000000:0:0:0:p1000000:n3077684",
+          "tuebingen:thick:p809017:n587785:n309017:p587785:p809017:n4028740"
+        ],
+        "center": {
+          "x": 0.5,
+          "y": -3.198774
+        },
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -3.077684
+          },
+          {
+            "x": -0.0,
+            "y": -3.077684
+          },
+          {
+            "x": 0.5,
+            "y": -3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:p1809017:0:n1000000:p2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:p1538842",
+          "tuebingen:thick:n809017:n587785:p1809017:p587785:n809017:p2489898",
+          "tuebingen:thick:p309017:p951057:p809017:n951057:p309017:p2489898"
+        ],
+        "center": {
+          "x": 1.309017,
+          "y": 2.368808
+        },
+        "vertices": [
+          {
+            "x": 1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 1.309017,
+            "y": 2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:p3118034:0:n1000000:n1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p3427051:p951057:n309017:n2489898",
+          "tuebingen:thick:p1000000:0:p2118034:0:p1000000:n1538842",
+          "tuebingen:thick:p809017:n587785:p1809017:p587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": 2.618034,
+          "y": -1.659932
+        },
+        "vertices": [
+          {
+            "x": 3.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 2.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:p3927051:0:n1000000:p951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p4236068:p951057:n309017:0",
+          "tuebingen:thick:n809017:n587785:p3927051:p587785:n809017:p951057",
+          "tuebingen:thick:p809017:n587785:p2618034:p587785:p809017:0"
+        ],
+        "center": {
+          "x": 3.427051,
+          "y": 0.829966
+        },
+        "vertices": [
+          {
+            "x": 3.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 3.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n1000000:0:p500000:0:n1000000:n1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:n2489898",
+          "tuebingen:thick:n809017:n587785:p500000:p587785:n809017:n1538842",
+          "tuebingen:thick:p809017:n587785:n809017:p587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": 0.0,
+          "y": -1.659932
+        },
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -0.0,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "180",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:n1309017:p951057:n309017:n951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n951057",
+          "tuebingen:thick:p809017:n587785:n2118034:p587785:p809017:n1538842",
+          "tuebingen:thick:p809017:p587785:n2618034:n587785:p809017:0"
+        ],
+        "center": {
+          "x": -1.578689,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": -1.618034,
+            "y": 0.0
+          },
+          {
+            "x": -1.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:n1809017:p951057:n309017:p587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:p1538842",
+          "tuebingen:thick:p809017:n587785:n2618034:p587785:p809017:0"
+        ],
+        "center": {
+          "x": -2.078689,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": -1.809017,
+            "y": 0.587785
+          },
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -2.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:n2618034:p951057:n309017:n1902113",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n2927051:n951057:p309017:n951057",
+          "tuebingen:thick:p809017:n587785:n3427051:p587785:p809017:n2489898",
+          "tuebingen:thick:p809017:p587785:n3927051:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": -2.887706,
+          "y": -1.464004
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": -1.902113
+          },
+          {
+            "x": -2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -3.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:n3427051:p951057:n309017:p587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n3736068:n951057:p309017:p1538842",
+          "tuebingen:thick:p809017:n587785:n4236068:p587785:p809017:0"
+        ],
+        "center": {
+          "x": -3.696723,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": 0.587785
+          },
+          {
+            "x": -3.736068,
+            "y": 1.538842
+          },
+          {
+            "x": -3.927051,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:n500000:p951057:n309017:n3440955",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:n2489898",
+          "tuebingen:thick:p809017:n587785:n1309017:p587785:p809017:n4028740",
+          "tuebingen:thick:p809017:p587785:n1809017:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": -0.769672,
+          "y": -3.002846
+        },
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": -3.440955
+          },
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -1.0,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:p2118034:p951057:n309017:n3440955",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:n3440955",
+          "tuebingen:thick:p809017:n587785:p1309017:p587785:p809017:n4028740",
+          "tuebingen:thick:p809017:p587785:p809017:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": 1.848362,
+          "y": -3.002846
+        },
+        "vertices": [
+          {
+            "x": 2.118034,
+            "y": -3.440955
+          },
+          {
+            "x": 1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 1.618034,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:p2927051:p951057:n309017:n951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:p2927051:p951057:p309017:n951057",
+          "tuebingen:thick:p809017:n587785:p2118034:p587785:p809017:n1538842"
+        ],
+        "center": {
+          "x": 2.657379,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 2.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n309017:n951057:p809017:p951057:n309017:p587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:p951057:p500000:n951057:p309017:p1538842",
+          "tuebingen:thick:p809017:n587785:0:p587785:p809017:0",
+          "tuebingen:thick:p809017:p587785:n500000:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": 0.539345,
+          "y": 1.025895
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": 0.587785
+          },
+          {
+            "x": 0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 0.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "108",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:n1000000:n951057:n309017:0",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:0:0:n1000000:0",
+          "tuebingen:thick:n309017:n951057:n500000:p951057:n309017:n1538842",
+          "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n951057"
+        ],
+        "center": {
+          "x": -1.039345,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": -1.0,
+            "y": 0.0
+          },
+          {
+            "x": -1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": -0.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:n1809017:n951057:n309017:p2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:n809017:0:n1000000:p2489898",
+          "tuebingen:thick:n809017:p587785:n1809017:n587785:n809017:p2489898",
+          "tuebingen:thick:p1000000:0:n2118034:0:p1000000:p1538842"
+        ],
+        "center": {
+          "x": -1.848362,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": -1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -1.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:p1118034:n951057:n309017:n1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2118034:0:n1000000:n1538842",
+          "tuebingen:thick:p1000000:0:p809017:0:p1000000:n2489898",
+          "tuebingen:thick:p309017:n951057:p809017:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": 1.078689,
+          "y": -2.051789
+        },
+        "vertices": [
+          {
+            "x": 1.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 1.309017,
+            "y": -2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:p1618034:n951057:n309017:0",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2618034:0:n1000000:0",
+          "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:n1538842",
+          "tuebingen:thick:n809017:p587785:p1618034:n587785:n809017:0"
+        ],
+        "center": {
+          "x": 1.578689,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 1.618034,
+            "y": -0.0
+          },
+          {
+            "x": 1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 1.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:p2427051:n951057:n309017:n2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p3427051:0:n1000000:n2489898",
+          "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:n3440955"
+        ],
+        "center": {
+          "x": 2.387706,
+          "y": -3.002846
+        },
+        "vertices": [
+          {
+            "x": 2.427051,
+            "y": -2.489898
+          },
+          {
+            "x": 2.118034,
+            "y": -3.440955
+          },
+          {
+            "x": 2.618034,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:p2427051:n951057:n309017:p2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p3427051:0:n1000000:p2489898",
+          "tuebingen:thick:n309017:n951057:p2927051:p951057:n309017:p951057",
+          "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": 2.387706,
+          "y": 1.976951
+        },
+        "vertices": [
+          {
+            "x": 2.427051,
+            "y": 2.489898
+          },
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 2.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:p309017:n951057:n309017:p4028740",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p1309017:0:n1000000:p4028740",
+          "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:p2489898",
+          "tuebingen:thick:n809017:p587785:p309017:n587785:n809017:p4028740"
+        ],
+        "center": {
+          "x": 0.269672,
+          "y": 3.515793
+        },
+        "vertices": [
+          {
+            "x": 0.309017,
+            "y": 4.02874
+          },
+          {
+            "x": 0.0,
+            "y": 3.077684
+          },
+          {
+            "x": 0.5,
+            "y": 3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n309017:p951057:p3236068:n951057:n309017:0",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p4236068:0:n1000000:0",
+          "tuebingen:thick:n309017:n951057:p3736068:p951057:n309017:n1538842",
+          "tuebingen:thick:p309017:n951057:p2927051:p951057:p309017:n951057"
+        ],
+        "center": {
+          "x": 3.196723,
+          "y": -0.512947
+        },
+        "vertices": [
+          {
+            "x": 3.236068,
+            "y": -0.0
+          },
+          {
+            "x": 2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": 3.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "252",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:n1000000:p587785:n809017:n3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n2618034:0:p1000000:n3077684",
+          "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n4028740",
+          "tuebingen:thick:p809017:p587785:n1809017:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": -1.475684,
+          "y": -2.881755
+        },
+        "vertices": [
+          {
+            "x": -1.0,
+            "y": -3.077684
+          },
+          {
+            "x": -1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -1.618034,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:n1809017:p587785:n809017:n587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:n2118034:p951057:p309017:n1538842",
+          "tuebingen:thick:p809017:p587785:n2618034:n587785:p809017:0"
+        ],
+        "center": {
+          "x": -2.284701,
+          "y": -0.391857
+        },
+        "vertices": [
+          {
+            "x": -1.809017,
+            "y": -0.587785
+          },
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -2.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:n3118034:p587785:n809017:n1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p309017:n951057:n3427051:p951057:p309017:n2489898",
+          "tuebingen:thick:p809017:p587785:n3927051:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": -3.593718,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": -3.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -3.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -3.736068,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:n500000:p587785:n809017:n1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n500000:p951057:n309017:n1538842",
+          "tuebingen:thick:p1000000:0:n2118034:0:p1000000:n1538842",
+          "tuebingen:thick:p309017:n951057:n809017:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": -0.975684,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": -1.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:p1618034:p587785:n809017:n3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:0:0:p1000000:n3077684",
+          "tuebingen:thick:p309017:n951057:p1309017:p951057:p309017:n4028740",
+          "tuebingen:thick:p809017:p587785:p809017:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": 1.14235,
+          "y": -2.881755
+        },
+        "vertices": [
+          {
+            "x": 1.618034,
+            "y": -3.077684
+          },
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 1.0,
+            "y": -3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:p2927051:p587785:n809017:p951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p2927051:p951057:n309017:p951057",
+          "tuebingen:thick:p309017:n951057:p2618034:p951057:p309017:0"
+        ],
+        "center": {
+          "x": 2.451367,
+          "y": 1.146985
+        },
+        "vertices": [
+          {
+            "x": 2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 2.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:p309017:p587785:n809017:p951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n1309017:0:p1000000:p951057",
+          "tuebingen:thick:p309017:n951057:0:p951057:p309017:0",
+          "tuebingen:thick:p809017:p587785:n500000:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": -0.166667,
+          "y": 1.146985
+        },
+        "vertices": [
+          {
+            "x": 0.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -0.5,
+            "y": 1.538842
+          },
+          {
+            "x": -0.309017,
+            "y": 0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:n587785:p3736068:p587785:n809017:n1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p3736068:p951057:n309017:n1538842",
+          "tuebingen:thick:p1000000:0:p2118034:0:p1000000:n1538842",
+          "tuebingen:thick:p309017:n951057:p3427051:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": 3.260384,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": 3.736068,
+            "y": -1.538842
+          },
+          {
+            "x": 2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": 3.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "144",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:0:n587785:n809017:n1902113",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:n2489898",
+          "tuebingen:thick:p809017:n587785:n809017:p587785:p809017:n2489898",
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": -0.333333,
+          "y": -2.29397
+        },
+        "vertices": [
+          {
+            "x": -0.0,
+            "y": -1.902113
+          },
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -0.190983,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:0:n587785:n809017:p3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:0:0:n1000000:p3077684",
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:p2489898",
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:p2489898"
+        ],
+        "center": {
+          "x": -0.333333,
+          "y": 2.685827
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 3.077684
+          },
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -0.190983,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:n809017:n587785:n809017:p587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:0:p587785:n809017:0",
+          "tuebingen:thick:p309017:n951057:n1309017:p951057:p309017:n951057",
+          "tuebingen:thick:p809017:n587785:n1618034:p587785:p809017:0"
+        ],
+        "center": {
+          "x": -1.14235,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": 0.587785
+          },
+          {
+            "x": -1.618034,
+            "y": 0.0
+          },
+          {
+            "x": -1.0,
+            "y": 0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:p1309017:n587785:n809017:n951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p1309017:0:n1000000:n951057",
+          "tuebingen:thick:n809017:n587785:p2118034:p587785:n809017:n1538842",
+          "tuebingen:thick:p309017:n951057:p809017:p951057:p309017:n2489898"
+        ],
+        "center": {
+          "x": 0.975684,
+          "y": -1.342914
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 0.5,
+            "y": -1.538842
+          },
+          {
+            "x": 1.118034,
+            "y": -1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:n1902113",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p3427051:p587785:n809017:n2489898",
+          "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:n3440955",
+          "tuebingen:thick:p809017:n587785:p1809017:p587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": 2.284701,
+          "y": -2.29397
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": -1.902113
+          },
+          {
+            "x": 1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 2.427051,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:p2618034:n587785:n809017:p3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2618034:0:n1000000:p3077684",
+          "tuebingen:thick:n809017:n587785:p3427051:p587785:n809017:p2489898",
+          "tuebingen:thick:p309017:n951057:p2118034:p951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": 2.284701,
+          "y": 2.685827
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": 3.077684
+          },
+          {
+            "x": 1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 2.427051,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:p3427051:n587785:n809017:p587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p4236068:p587785:n809017:0",
+          "tuebingen:thick:p309017:n951057:p2927051:p951057:p309017:n951057",
+          "tuebingen:thick:p809017:n587785:p2618034:p587785:p809017:0"
+        ],
+        "center": {
+          "x": 3.093718,
+          "y": 0.195928
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": 0.587785
+          },
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 3.236068,
+            "y": -0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:n809017:p587785:p500000:n587785:n809017:n3440955",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p1309017:p587785:n809017:n4028740",
+          "tuebingen:thick:p809017:n587785:n309017:p587785:p809017:n4028740"
+        ],
+        "center": {
+          "x": 0.166667,
+          "y": -3.832812
+        },
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": -3.440955
+          },
+          {
+            "x": -0.309017,
+            "y": -4.02874
+          },
+          {
+            "x": 0.309017,
+            "y": -4.02874
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "216",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:n1000000:0:p1000000:p3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:0:0:n1000000:p3077684",
+          "tuebingen:thick:n809017:p587785:p309017:n587785:n809017:p4028740",
+          "tuebingen:thick:p309017:p951057:n1309017:n951057:p309017:p4028740"
+        ],
+        "center": {
+          "x": -0.5,
+          "y": 3.198774
+        },
+        "vertices": [
+          {
+            "x": -1.0,
+            "y": 3.077684
+          },
+          {
+            "x": 0.0,
+            "y": 3.077684
+          },
+          {
+            "x": -0.5,
+            "y": 3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:n1809017:0:p1000000:n2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n809017:p951057:n309017:n2489898",
+          "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:n1538842",
+          "tuebingen:thick:p809017:p587785:n1809017:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": -1.309017,
+          "y": -2.368808
+        },
+        "vertices": [
+          {
+            "x": -1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -1.309017,
+            "y": -2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:n3118034:0:p1000000:p1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:n2118034:0:n1000000:p1538842",
+          "tuebingen:thick:n809017:p587785:n1809017:n587785:n809017:p2489898",
+          "tuebingen:thick:p309017:p951057:n3427051:n951057:p309017:p2489898"
+        ],
+        "center": {
+          "x": -2.618034,
+          "y": 1.659932
+        },
+        "vertices": [
+          {
+            "x": -3.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -2.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:n3927051:0:p1000000:n951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:n2618034:n587785:n809017:0",
+          "tuebingen:thick:p309017:p951057:n4236068:n951057:p309017:0",
+          "tuebingen:thick:p809017:p587785:n3927051:n587785:p809017:n951057"
+        ],
+        "center": {
+          "x": -3.427051,
+          "y": -0.829966
+        },
+        "vertices": [
+          {
+            "x": -3.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -3.427051,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:n500000:0:p1000000:p1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p809017:n587785:n809017:p2489898",
+          "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:p2489898",
+          "tuebingen:thick:p809017:p587785:n500000:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": 0.0,
+          "y": 1.659932
+        },
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 0.0,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:p1118034:0:p1000000:p1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2118034:0:n1000000:p1538842",
+          "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:p1538842",
+          "tuebingen:thick:p309017:p951057:p809017:n951057:p309017:p2489898"
+        ],
+        "center": {
+          "x": 1.618034,
+          "y": 1.659932
+        },
+        "vertices": [
+          {
+            "x": 1.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 2.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 1.618034,
+            "y": 1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:p1618034:0:p1000000:p3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2618034:0:n1000000:p3077684",
+          "tuebingen:thick:p309017:p951057:p1309017:n951057:p309017:p4028740"
+        ],
+        "center": {
+          "x": 2.118034,
+          "y": 3.198774
+        },
+        "vertices": [
+          {
+            "x": 1.618034,
+            "y": 3.077684
+          },
+          {
+            "x": 2.618034,
+            "y": 3.077684
+          },
+          {
+            "x": 2.118034,
+            "y": 3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p1000000:0:p309017:0:p1000000:n951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p1309017:0:n1000000:n951057",
+          "tuebingen:thick:n809017:p587785:p1618034:n587785:n809017:0",
+          "tuebingen:thick:p309017:p951057:0:n951057:p309017:0"
+        ],
+        "center": {
+          "x": 0.809017,
+          "y": -0.829966
+        },
+        "vertices": [
+          {
+            "x": 0.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 1.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 0.809017,
+            "y": -0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "0",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:n1118034:p951057:p309017:p1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:n809017:0:n1000000:p2489898",
+          "tuebingen:thick:n309017:p951057:n809017:n951057:n309017:p2489898",
+          "tuebingen:thick:p1000000:0:n2118034:0:p1000000:p1538842"
+        ],
+        "center": {
+          "x": -1.078689,
+          "y": 2.051789
+        },
+        "vertices": [
+          {
+            "x": -1.118034,
+            "y": 1.538842
+          },
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -1.309017,
+            "y": 2.126627
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:n1618034:p951057:p309017:0",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n2618034:0:p1000000:0",
+          "tuebingen:thick:p309017:p951057:n2118034:n951057:p309017:p1538842",
+          "tuebingen:thick:p809017:n587785:n1618034:p587785:p809017:0"
+        ],
+        "center": {
+          "x": -1.578689,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": -1.618034,
+            "y": 0.0
+          },
+          {
+            "x": -1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -1.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:n2427051:p951057:p309017:n2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:n1538842",
+          "tuebingen:thick:p1000000:0:n3427051:0:p1000000:n2489898",
+          "tuebingen:thick:p309017:p951057:n2927051:n951057:p309017:n951057"
+        ],
+        "center": {
+          "x": -2.387706,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": -2.427051,
+            "y": -2.489898
+          },
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -2.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:n2427051:p951057:p309017:p2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:p3440955",
+          "tuebingen:thick:p1000000:0:n3427051:0:p1000000:p2489898"
+        ],
+        "center": {
+          "x": -2.387706,
+          "y": 3.002846
+        },
+        "vertices": [
+          {
+            "x": -2.427051,
+            "y": 2.489898
+          },
+          {
+            "x": -2.118034,
+            "y": 3.440955
+          },
+          {
+            "x": -2.618034,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:n309017:p951057:p309017:n4028740",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:p1000000:0:n1309017:0:p1000000:n4028740",
+          "tuebingen:thick:p309017:p951057:n809017:n951057:p309017:n2489898",
+          "tuebingen:thick:p809017:n587785:n309017:p587785:p809017:n4028740"
+        ],
+        "center": {
+          "x": -0.269672,
+          "y": -3.515793
+        },
+        "vertices": [
+          {
+            "x": -0.309017,
+            "y": -4.02874
+          },
+          {
+            "x": -0.0,
+            "y": -3.077684
+          },
+          {
+            "x": -0.5,
+            "y": -3.440955
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:n3236068:p951057:p309017:0",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2927051:n951057:n309017:p951057",
+          "tuebingen:thick:p1000000:0:n4236068:0:p1000000:0",
+          "tuebingen:thick:p309017:p951057:n3736068:n951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": -3.196723,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": -3.236068,
+            "y": 0.0
+          },
+          {
+            "x": -2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": -3.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:p1000000:p951057:p309017:0",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p951057",
+          "tuebingen:thick:p1000000:0:0:0:p1000000:0",
+          "tuebingen:thick:p309017:p951057:p500000:n951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": 1.039345,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -0.0
+          },
+          {
+            "x": 1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": 0.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p309017:n951057:p1809017:p951057:p309017:n2489898",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2118034:0:n1000000:n1538842",
+          "tuebingen:thick:p1000000:0:p809017:0:p1000000:n2489898",
+          "tuebingen:thick:p809017:n587785:p1809017:p587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": 1.848362,
+          "y": -1.976951
+        },
+        "vertices": [
+          {
+            "x": 1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 1.618034,
+            "y": -1.902113
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "72",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:n2118034:n951057:p309017:p3440955",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:p3440955",
+          "tuebingen:thick:n809017:n587785:n809017:p587785:n809017:p2489898",
+          "tuebingen:thick:n809017:p587785:n1309017:n587785:n809017:p4028740"
+        ],
+        "center": {
+          "x": -1.848362,
+          "y": 3.002846
+        },
+        "vertices": [
+          {
+            "x": -2.118034,
+            "y": 3.440955
+          },
+          {
+            "x": -1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -1.618034,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:n2927051:n951057:p309017:p951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2927051:n951057:n309017:p951057",
+          "tuebingen:thick:n809017:p587785:n2118034:n587785:n809017:p1538842"
+        ],
+        "center": {
+          "x": -2.657379,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": -2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -2.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:n809017:n951057:p309017:n587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:n500000:p951057:n309017:n1538842",
+          "tuebingen:thick:n809017:n587785:p500000:p587785:n809017:n1538842",
+          "tuebingen:thick:n809017:p587785:0:n587785:n809017:0"
+        ],
+        "center": {
+          "x": -0.539345,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": -0.809017,
+            "y": -0.587785
+          },
+          {
+            "x": -0.5,
+            "y": -1.538842
+          },
+          {
+            "x": -0.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:p1309017:n951057:p309017:p951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p951057",
+          "tuebingen:thick:n809017:n587785:p2618034:p587785:n809017:0",
+          "tuebingen:thick:n809017:p587785:p2118034:n587785:n809017:p1538842"
+        ],
+        "center": {
+          "x": 1.578689,
+          "y": 0.512947
+        },
+        "vertices": [
+          {
+            "x": 1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": 1.618034,
+            "y": -0.0
+          },
+          {
+            "x": 1.809017,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:p1809017:n951057:p309017:n587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p2118034:p951057:n309017:n1538842",
+          "tuebingen:thick:n809017:p587785:p2618034:n587785:n809017:0"
+        ],
+        "center": {
+          "x": 2.078689,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": 1.809017,
+            "y": -0.587785
+          },
+          {
+            "x": 2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": 2.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:p2618034:n951057:p309017:p1902113",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p2927051:p951057:n309017:p951057",
+          "tuebingen:thick:n809017:n587785:p3927051:p587785:n809017:p951057",
+          "tuebingen:thick:n809017:p587785:p3427051:n587785:n809017:p2489898"
+        ],
+        "center": {
+          "x": 2.887706,
+          "y": 1.464004
+        },
+        "vertices": [
+          {
+            "x": 2.618034,
+            "y": 1.902113
+          },
+          {
+            "x": 2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 3.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:p3427051:n951057:p309017:n587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p3736068:p951057:n309017:n1538842",
+          "tuebingen:thick:n809017:p587785:p4236068:n587785:n809017:0"
+        ],
+        "center": {
+          "x": 3.696723,
+          "y": -1.025895
+        },
+        "vertices": [
+          {
+            "x": 3.427051,
+            "y": -0.587785
+          },
+          {
+            "x": 3.736068,
+            "y": -1.538842
+          },
+          {
+            "x": 3.927051,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p309017:p951057:p500000:n951057:p309017:p3440955",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:n951057:p809017:p951057:n309017:p2489898",
+          "tuebingen:thick:n809017:n587785:p1809017:p587785:n809017:p2489898",
+          "tuebingen:thick:n809017:p587785:p1309017:n587785:n809017:p4028740"
+        ],
+        "center": {
+          "x": 0.769672,
+          "y": 3.002846
+        },
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 3.440955
+          },
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 1.0,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "288",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:0:p587785:p809017:n3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:n2489898",
+          "tuebingen:thick:p1000000:0:0:0:p1000000:n3077684",
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": 0.333333,
+          "y": -2.685827
+        },
+        "vertices": [
+          {
+            "x": -0.0,
+            "y": -3.077684
+          },
+          {
+            "x": 0.809017,
+            "y": -2.489898
+          },
+          {
+            "x": 0.190983,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:0:p587785:p809017:p1902113",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:n587785:p809017:p587785:n809017:p2489898",
+          "tuebingen:thick:n809017:p587785:p809017:n587785:n809017:p2489898",
+          "tuebingen:thick:p809017:p587785:n809017:n587785:p809017:p2489898"
+        ],
+        "center": {
+          "x": 0.333333,
+          "y": 2.29397
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 1.902113
+          },
+          {
+            "x": 0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 0.190983,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:n1309017:p587785:p809017:p951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n809017:n951057:n309017:p2489898",
+          "tuebingen:thick:p1000000:0:n1309017:0:p1000000:p951057",
+          "tuebingen:thick:p809017:p587785:n2118034:n587785:p809017:p1538842"
+        ],
+        "center": {
+          "x": -0.975684,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": -1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": -0.5,
+            "y": 1.538842
+          },
+          {
+            "x": -1.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:n3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:n1538842",
+          "tuebingen:thick:p1000000:0:n2618034:0:p1000000:n3077684",
+          "tuebingen:thick:p809017:p587785:n3427051:n587785:p809017:n2489898"
+        ],
+        "center": {
+          "x": -2.284701,
+          "y": -2.685827
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": -3.077684
+          },
+          {
+            "x": -1.809017,
+            "y": -2.489898
+          },
+          {
+            "x": -2.427051,
+            "y": -2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:n2618034:p587785:p809017:p1902113",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2118034:n951057:n309017:p3440955",
+          "tuebingen:thick:n809017:p587785:n1809017:n587785:n809017:p2489898",
+          "tuebingen:thick:p809017:p587785:n3427051:n587785:p809017:p2489898"
+        ],
+        "center": {
+          "x": -2.284701,
+          "y": 2.29397
+        },
+        "vertices": [
+          {
+            "x": -2.618034,
+            "y": 1.902113
+          },
+          {
+            "x": -1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -2.427051,
+            "y": 2.489898
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:n3427051:p587785:p809017:n587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2927051:n951057:n309017:p951057",
+          "tuebingen:thick:n809017:p587785:n2618034:n587785:n809017:0",
+          "tuebingen:thick:p809017:p587785:n4236068:n587785:p809017:0"
+        ],
+        "center": {
+          "x": -3.093718,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": -3.427051,
+            "y": -0.587785
+          },
+          {
+            "x": -2.618034,
+            "y": 0.0
+          },
+          {
+            "x": -3.236068,
+            "y": 0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:n500000:p587785:p809017:p3440955",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n809017:p587785:p309017:n587785:n809017:p4028740",
+          "tuebingen:thick:p809017:p587785:n1309017:n587785:p809017:p4028740"
+        ],
+        "center": {
+          "x": -0.166667,
+          "y": 3.832812
+        },
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": 3.440955
+          },
+          {
+            "x": 0.309017,
+            "y": 4.02874
+          },
+          {
+            "x": -0.309017,
+            "y": 4.02874
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:n587785:p809017:p587785:p809017:n587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p951057",
+          "tuebingen:thick:n809017:p587785:p1618034:n587785:n809017:0",
+          "tuebingen:thick:p809017:p587785:0:n587785:p809017:0"
+        ],
+        "center": {
+          "x": 1.14235,
+          "y": -0.195928
+        },
+        "vertices": [
+          {
+            "x": 0.809017,
+            "y": -0.587785
+          },
+          {
+            "x": 1.618034,
+            "y": -0.0
+          },
+          {
+            "x": 1.0,
+            "y": -0.0
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "36",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:n1618034:n587785:p809017:p3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:0:0:n1000000:p3077684",
+          "tuebingen:thick:n309017:p951057:n1309017:n951057:n309017:p4028740",
+          "tuebingen:thick:n809017:n587785:n809017:p587785:n809017:p2489898"
+        ],
+        "center": {
+          "x": -1.14235,
+          "y": 2.881755
+        },
+        "vertices": [
+          {
+            "x": -1.618034,
+            "y": 3.077684
+          },
+          {
+            "x": -0.809017,
+            "y": 2.489898
+          },
+          {
+            "x": -1.0,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:n2927051:n587785:p809017:n951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:n2618034:n951057:n309017:0",
+          "tuebingen:thick:p309017:p951057:n2927051:n951057:p309017:n951057"
+        ],
+        "center": {
+          "x": -2.451367,
+          "y": -1.146985
+        },
+        "vertices": [
+          {
+            "x": -2.927051,
+            "y": -0.951057
+          },
+          {
+            "x": -2.118034,
+            "y": -1.538842
+          },
+          {
+            "x": -2.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:n309017:n587785:p809017:n951057",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p1309017:0:n1000000:n951057",
+          "tuebingen:thick:n309017:p951057:0:n951057:n309017:0",
+          "tuebingen:thick:n809017:n587785:p500000:p587785:n809017:n1538842"
+        ],
+        "center": {
+          "x": 0.166667,
+          "y": -1.146985
+        },
+        "vertices": [
+          {
+            "x": -0.309017,
+            "y": -0.951057
+          },
+          {
+            "x": 0.5,
+            "y": -1.538842
+          },
+          {
+            "x": 0.309017,
+            "y": -0.951057
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:n3736068:n587785:p809017:p1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:n2118034:0:n1000000:p1538842",
+          "tuebingen:thick:n309017:p951057:n3427051:n951057:n309017:p2489898",
+          "tuebingen:thick:p309017:p951057:n3736068:n951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": -3.260384,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": -3.736068,
+            "y": 1.538842
+          },
+          {
+            "x": -2.927051,
+            "y": 0.951057
+          },
+          {
+            "x": -3.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "right"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:p1000000:n587785:p809017:p3077684",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2618034:0:n1000000:p3077684",
+          "tuebingen:thick:n309017:p951057:p1309017:n951057:n309017:p4028740",
+          "tuebingen:thick:n809017:n587785:p1809017:p587785:n809017:p2489898"
+        ],
+        "center": {
+          "x": 1.475684,
+          "y": 2.881755
+        },
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 3.077684
+          },
+          {
+            "x": 1.809017,
+            "y": 2.489898
+          },
+          {
+            "x": 1.618034,
+            "y": 3.077684
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:p1809017:n587785:p809017:p587785",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:p2118034:n951057:n309017:p1538842",
+          "tuebingen:thick:n809017:n587785:p2618034:p587785:n809017:0"
+        ],
+        "center": {
+          "x": 2.284701,
+          "y": 0.391857
+        },
+        "vertices": [
+          {
+            "x": 1.809017,
+            "y": 0.587785
+          },
+          {
+            "x": 2.618034,
+            "y": -0.0
+          },
+          {
+            "x": 2.427051,
+            "y": 0.587785
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:p3118034:n587785:p809017:p1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n309017:p951057:p3427051:n951057:n309017:p2489898",
+          "tuebingen:thick:n809017:n587785:p3927051:p587785:n809017:p951057"
+        ],
+        "center": {
+          "x": 3.593718,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": 3.118034,
+            "y": 1.538842
+          },
+          {
+            "x": 3.927051,
+            "y": 0.951057
+          },
+          {
+            "x": 3.736068,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      },
+      {
+        "id": "tuebingen:thin:p809017:p587785:p500000:n587785:p809017:p1538842",
+        "kind": "tuebingen-thin",
+        "neighbors": [
+          "tuebingen:thick:n1000000:0:p2118034:0:n1000000:p1538842",
+          "tuebingen:thick:n309017:p951057:p809017:n951057:n309017:p2489898",
+          "tuebingen:thick:p309017:p951057:p500000:n951057:p309017:p1538842"
+        ],
+        "center": {
+          "x": 0.975684,
+          "y": 1.342914
+        },
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.538842
+          },
+          {
+            "x": 1.309017,
+            "y": 0.951057
+          },
+          {
+            "x": 1.118034,
+            "y": 1.538842
+          }
+        ],
+        "tile_family": "tuebingen",
+        "orientation_token": "324",
+        "chirality_token": "left"
+      }
+    ]
+  }
+}

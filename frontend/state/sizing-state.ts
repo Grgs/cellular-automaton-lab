@@ -286,7 +286,7 @@ export function rememberedPatchDepthForTilingFamily(
     }
     return normalizePatchDepthForTilingFamily(
         tilingFamily,
-        state.patchDepthByTilingFamily[String(tilingFamily)] ?? DEFAULT_PATCH_DEPTH,
+        state.patchDepthByTilingFamily[String(tilingFamily)] ?? defaultPatchDepthForTilingFamily(tilingFamily),
         { unsafe: state.unsafeSizingEnabled },
     );
 }

@@ -1,0 +1,492 @@
+{
+  "chair": {
+    "3": {
+      "chair:root.child1.child0.child0:o0:sp125000:p500000:p500000": {
+        "neighbors": [
+          {
+            "area": 0.046875,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -0.125,
+              -0.125
+            ],
+            "kind": "chair",
+            "orientation_token": "0"
+          },
+          {
+            "area": 0.046875,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              0.125,
+              0.125
+            ],
+            "kind": "chair",
+            "orientation_token": "0"
+          },
+          {
+            "area": 0.046875,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              0.041666,
+              -0.25
+            ],
+            "kind": "chair",
+            "orientation_token": "1"
+          },
+          {
+            "area": 0.046875,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              0.291666,
+              0.0
+            ],
+            "kind": "chair",
+            "orientation_token": "1"
+          },
+          {
+            "area": 0.046875,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -0.25,
+              0.041666
+            ],
+            "kind": "chair",
+            "orientation_token": "3"
+          },
+          {
+            "area": 0.046875,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              0.0,
+              0.291666
+            ],
+            "kind": "chair",
+            "orientation_token": "3"
+          }
+        ],
+        "root": {
+          "area": 0.046875,
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "degree": 6,
+          "kind": "chair",
+          "orientation_token": "0"
+        }
+      }
+    }
+  },
+  "hat-monotile": {
+    "2": {
+      "hat:100": {
+        "neighbors": [
+          {
+            "area": 10.730401,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              2.64,
+              -3.048409
+            ],
+            "kind": "hat",
+            "orientation_token": "0"
+          },
+          {
+            "area": 10.730401,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              -2.64,
+              1.524205
+            ],
+            "kind": "hat",
+            "orientation_token": "180"
+          },
+          {
+            "area": 10.730401,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              -0.66,
+              -2.667358
+            ],
+            "kind": "hat",
+            "orientation_token": "300"
+          }
+        ],
+        "root": {
+          "area": 10.730401,
+          "chirality_token": "right",
+          "decoration_tokens": null,
+          "degree": 3,
+          "kind": "hat",
+          "orientation_token": "0"
+        }
+      }
+    }
+  },
+  "pinwheel": {
+    "3": {
+      "pinwheel:root1.1.4.4": {
+        "neighbors": [
+          {
+            "area": 1.0,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              -10.017585,
+              -1.65469
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "11"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              -1.073313,
+              0.022361
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "11"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              -0.357771,
+              -0.178885
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "12"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              -6.201362,
+              -1.237291
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "190"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "right",
+            "decoration_tokens": null,
+            "delta": [
+              -5.247306,
+              -0.573924
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "359"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "right",
+            "decoration_tokens": null,
+            "delta": [
+              3.696966,
+              1.103127
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "359"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "right",
+            "decoration_tokens": null,
+            "delta": [
+              -7.632445,
+              -1.207476
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "5"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "right",
+            "decoration_tokens": null,
+            "delta": [
+              1.311826,
+              0.469575
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "5"
+          },
+          {
+            "area": 1.0,
+            "chirality_token": "left",
+            "decoration_tokens": null,
+            "delta": [
+              3.72678,
+              -1.86339
+            ],
+            "kind": "pinwheel-triangle",
+            "orientation_token": "53"
+          }
+        ],
+        "root": {
+          "area": 1.0,
+          "chirality_token": "right",
+          "decoration_tokens": null,
+          "degree": 9,
+          "kind": "pinwheel-triangle",
+          "orientation_token": "11"
+        }
+      }
+    }
+  },
+  "shield": {
+    "3": {
+      "shield:ref:2007": {
+        "neighbors": [
+          {
+            "area": 312.303594,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -4.698783,
+              14.960292
+            ],
+            "kind": "shield-triangle",
+            "orientation_token": "225"
+          },
+          {
+            "area": 293.932811,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              15.132838,
+              4.054832
+            ],
+            "kind": "shield-triangle",
+            "orientation_token": "255"
+          },
+          {
+            "area": 312.303605,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              3.410881,
+              -15.305384
+            ],
+            "kind": "shield-triangle",
+            "orientation_token": "285"
+          }
+        ],
+        "root": {
+          "area": 850.305589,
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "degree": 3,
+          "kind": "shield-square",
+          "orientation_token": "105"
+        }
+      },
+      "shield:ref:2063": {
+        "neighbors": [
+          {
+            "area": 850.305589,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              4.698783,
+              -14.960292
+            ],
+            "kind": "shield-square",
+            "orientation_token": "105"
+          },
+          {
+            "area": 820.124998,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -15.218365,
+              4.422963
+            ],
+            "kind": "shield-square",
+            "orientation_token": "165"
+          },
+          {
+            "area": 820.125016,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              11.289986,
+              11.525854
+            ],
+            "kind": "shield-square",
+            "orientation_token": "45"
+          }
+        ],
+        "root": {
+          "area": 312.303594,
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "degree": 3,
+          "kind": "shield-triangle",
+          "orientation_token": "225"
+        }
+      },
+      "shield:ref:2081": {
+        "neighbors": [
+          {
+            "area": 312.303594,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              15.218365,
+              -4.422963
+            ],
+            "kind": "shield-triangle",
+            "orientation_token": "225"
+          },
+          {
+            "area": 293.932798,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -4.243386,
+              -15.504289
+            ],
+            "kind": "shield-triangle",
+            "orientation_token": "255"
+          },
+          {
+            "area": 293.932789,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -15.497258,
+              4.601413
+            ],
+            "kind": "shield-triangle",
+            "orientation_token": "285"
+          },
+          {
+            "area": 293.932811,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              3.642518,
+              15.596466
+            ],
+            "kind": "shield-triangle",
+            "orientation_token": "315"
+          }
+        ],
+        "root": {
+          "area": 820.124998,
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "degree": 4,
+          "kind": "shield-square",
+          "orientation_token": "165"
+        }
+      }
+    }
+  },
+  "square-triangle": {
+    "3": {
+      "sqtri:ref:04365": {
+        "neighbors": [
+          {
+            "area": 1.340067,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              -0.912861,
+              9.1e-05
+            ],
+            "kind": "square-triangle-square",
+            "orientation_token": "0"
+          },
+          {
+            "area": 1.340099,
+            "chirality_token": null,
+            "decoration_tokens": null,
+            "delta": [
+              0.456476,
+              -0.790531
+            ],
+            "kind": "square-triangle-square",
+            "orientation_token": "30"
+          },
+          {
+            "area": 0.578559,
+            "chirality_token": "blue",
+            "decoration_tokens": null,
+            "delta": [
+              0.333809,
+              0.578177
+            ],
+            "kind": "square-triangle-triangle",
+            "orientation_token": "30"
+          }
+        ],
+        "root": {
+          "area": 0.580008,
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "degree": 3,
+          "kind": "square-triangle-triangle",
+          "orientation_token": "210"
+        }
+      },
+      "sqtri:ref:04843": {
+        "neighbors": [
+          {
+            "area": 0.580042,
+            "chirality_token": "blue",
+            "decoration_tokens": null,
+            "delta": [
+              -9.2e-05,
+              -0.91288
+            ],
+            "kind": "square-triangle-triangle",
+            "orientation_token": "120"
+          },
+          {
+            "area": 0.580144,
+            "chirality_token": "red",
+            "decoration_tokens": null,
+            "delta": [
+              -0.91288,
+              5.8e-05
+            ],
+            "kind": "square-triangle-triangle",
+            "orientation_token": "150"
+          },
+          {
+            "area": 0.580008,
+            "chirality_token": "blue",
+            "decoration_tokens": null,
+            "delta": [
+              0.912861,
+              -9.1e-05
+            ],
+            "kind": "square-triangle-triangle",
+            "orientation_token": "210"
+          }
+        ],
+        "root": {
+          "area": 1.340067,
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "degree": 3,
+          "kind": "square-triangle-square",
+          "orientation_token": "0"
+        }
+      }
+    }
+  }
+}

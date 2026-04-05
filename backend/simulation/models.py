@@ -58,6 +58,10 @@ def _coerce_optional_int(value: object, fallback: int) -> int:
     raise TypeError(f"Expected an int-compatible value, received {type(value).__name__}.")
 
 
+def _normalize_realized_extent(value: int) -> int:
+    return max(1, int(value))
+
+
 def _topology_spec_string_value(
     topology_spec: TopologySpecInput,
     key: str,
@@ -137,12 +141,18 @@ class TopologySpec:
                 minimum_patch_depth_for_tiling_family(tiling_family_id),
                 maximum_patch_depth_for_tiling_family(tiling_family_id),
             )
+        if definition.sizing_mode == "patch_depth":
+            normalized_width = _normalize_realized_extent(width)
+            normalized_height = _normalize_realized_extent(height)
+        else:
+            normalized_width = clamp_int(width, minimum_grid_size, MAX_GRID_SIZE)
+            normalized_height = clamp_int(height, minimum_grid_size, MAX_GRID_SIZE)
         return cls(
             tiling_family=tiling_family_id,
             adjacency_mode=resolved_adjacency_mode,
             sizing_mode=definition.sizing_mode,
-            width=clamp_int(width, minimum_grid_size, MAX_GRID_SIZE),
-            height=clamp_int(height, minimum_grid_size, MAX_GRID_SIZE),
+            width=normalized_width,
+            height=normalized_height,
             patch_depth=normalized_patch_depth,
             unsafe_size_override=bool(unsafe_size_override),
         )

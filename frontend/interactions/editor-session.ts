@@ -15,6 +15,7 @@ import type {
 } from "../types/editor.js";
 import { createEditorCommitRuntime } from "./editor-session-commit.js";
 import { createEditorPointerState } from "./editor-session-state.js";
+import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import type { ShapeEditorSession } from "./editor-session-state.js";
 
 export function createEditorSessionController({
@@ -24,6 +25,9 @@ export function createEditorSessionController({
     getBrushSize = () => state?.brushSize ?? DEFAULT_BRUSH_SIZE,
     previewPaintCells,
     clearPreview,
+    setGestureOutline,
+    flashGestureOutline,
+    clearGestureOutline,
     setCellsRequest,
     postControl,
     renderControlPanel = () => {},
@@ -77,6 +81,7 @@ export function createEditorSessionController({
         if (!await commitRuntime.ensurePausedForEditing()) {
             return null;
         }
+        clearGestureOutline();
         return commitRuntime.commitEditorCells(
             buildBrushCells(runtimeState, cell, getPaintState(), getBrushSize()),
         );
@@ -86,6 +91,7 @@ export function createEditorSessionController({
         if (!await commitRuntime.ensurePausedForEditing()) {
             return null;
         }
+        clearGestureOutline();
         return commitRuntime.commitEditorCells(
             buildEditorToolCells(runtimeState, EDITOR_TOOL_FILL, cell, cell, getPaintState(), getBrushSize()),
         );
@@ -122,6 +128,7 @@ export function createEditorSessionController({
         if (pointerId !== null) {
             releasePointerCapture(pointerId);
         }
+        clearGestureOutline();
         clearPreview();
     }
 
@@ -146,6 +153,7 @@ export function createEditorSessionController({
                 const previewCells = pointerState.updateBrushSession(cell, nextCells);
                 if (previewCells.length > 0) {
                     previewPaintCells(previewCells);
+                    setGestureOutline(previewCells, "paint");
                 }
                 return;
             }
@@ -161,6 +169,9 @@ export function createEditorSessionController({
                 ),
             );
             previewPaintCells(previewCells);
+            if (previewCells.length > 0) {
+                setGestureOutline(previewCells, "paint");
+            }
         },
         handlePointerUp() {
             const activeSession = pointerState.activeSession();
@@ -173,6 +184,7 @@ export function createEditorSessionController({
                     return Promise.resolve(null);
                 }
                 releasePointerCapture(session.pointerId);
+                clearGestureOutline();
                 return commitRuntime.commitEditorCells(
                     !session.moved || session.paintedCells.size === 0
                         ? []
@@ -184,6 +196,13 @@ export function createEditorSessionController({
                     return result;
                 }).catch(() => null).finally(() => {
                     clearPreview();
+                    if (session.moved && session.paintedCells.size > 0) {
+                        flashGestureOutline(
+                            Array.from(session.paintedCells.values()),
+                            "paint",
+                            DRAG_GESTURE_FLASH_DURATION_MS,
+                        );
+                    }
                 });
             }
 
@@ -192,8 +211,13 @@ export function createEditorSessionController({
                 return Promise.resolve(null);
             }
             releasePointerCapture(session.pointerId);
-            return commitRuntime.commitEditorCells(buildShapeCells(session)).catch(() => null).finally(() => {
+            const shapeCells = buildShapeCells(session);
+            clearGestureOutline();
+            return commitRuntime.commitEditorCells(shapeCells).catch(() => null).finally(() => {
                 clearPreview();
+                if (session.moved && shapeCells.length > 0) {
+                    flashGestureOutline(shapeCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
+                }
             });
         },
         handleClick: (cell) => handleClick(cell),

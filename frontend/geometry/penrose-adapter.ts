@@ -1,4 +1,4 @@
-import { tracePolygonPath } from "../canvas/draw.js";
+import { resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -159,7 +159,7 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             };
         },
 
-        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
+        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 metrics as PenroseMetrics,
@@ -174,11 +174,25 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             if (!geometryCell) {
                 return;
             }
-            if (context.fillStyle !== color) {
-                context.fillStyle = color;
+            const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+            if (!overlayStyle || overlayStyle.drawBaseFill) {
+                if (context.fillStyle !== color) {
+                    context.fillStyle = color;
+                }
+                tracePolygonPath(context, geometryCell.vertices);
+                context.fill();
             }
-            tracePolygonPath(context, geometryCell.vertices);
-            context.fill();
+            if (overlayStyle) {
+                if (overlayStyle.tintColor) {
+                    context.fillStyle = overlayStyle.tintColor;
+                    tracePolygonPath(context, geometryCell.vertices);
+                    context.fill();
+                }
+                context.strokeStyle = overlayStyle.strokeColor;
+                context.lineWidth = overlayStyle.strokeWidth;
+                tracePolygonPath(context, geometryCell.vertices);
+                context.stroke();
+            }
         },
 
         applyViewportPreview() {

@@ -19,6 +19,7 @@ export function buildControlsViewModel({
     state,
     syncState,
     theme,
+    selectionInspectorSource,
 }: ControlsViewModelInput): ControlsViewModel {
     const activeRule = state.activeRule;
     const paletteRule = currentEditorRule(state) || activeRule;
@@ -37,6 +38,7 @@ export function buildControlsViewModel({
             activeRule,
             paletteRule,
             presetSelection,
+            selectionInspectorSource,
         }),
         ...buildEditorViewModel({ state }),
         theme,

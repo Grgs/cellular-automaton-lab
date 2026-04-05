@@ -8,14 +8,17 @@ None.
 
 ## Current Known Deviations
 
-- `chair`, `square-triangle`, `shield`, and `pinwheel` remain available in the codebase and verification suite, but are exposed under the picker's `Experimental` group until browser-visible pattern correctness is re-verified.
+- `square-triangle`, `shield`, and `pinwheel` still fail manual visible review even though they now pass stronger backend, canonical-patch, and browser-visible automated checks. They remain in `Experimental` until the rendered patterns look correct enough to justify promotion.
+- `shield` now uses a dense literature-derived central field rather than the old translated-cluster motif, but it is still not a full marked fractal substitution with explicit bond rules. The repo treats that as an approximation gap, not as a blocker for the current canonical-patch verifier.
 
 ## Known Limits That Are Not Currently Treated As Failures
 
-- Some periodic mixed families are verified through exact `3x3` sample signatures and descriptor checks, but not yet through richer family-specific structural proofs such as vertex-configuration or dual-family invariants.
-- Some periodic families still rely on broad fallback sources rather than the strongest family-specific references.
+- Periodic mixed families are still verified on finite open-boundary canonical samples rather than larger-sample or quotient-surface proofs. The reference layer now supports per-family periodic sample sizes, but the current audit kept the shipped catalog on `3x3`.
+- Periodic dual-family invariants now cover the unambiguous reciprocal pairs plus candidate-class signature checks for the currently ambiguous catalog groups, but they are still finite-sample descriptor checks rather than full dual-construction proofs.
+- The reference layer now mixes rooted local-reference anchors with direct canonical patch diffs for `square-triangle`, `shield`, and `pinwheel`; it is not yet full canonical patch coverage for every family.
+- `shield` uses relaxed topology validation (`surface` + `graph connectivity`, without strict overlap or edge-multiplicity checks) because the dense image-derived polygons are not exact edge-sharing substitution polygons.
 - Several aperiodic families are verified through deterministic low-depth samples, count invariants, adjacency rules, and metadata presence rather than a full symbolic substitution proof.
-- Shield decorations are verified as metadata only; they are not rendered.
+- Render-space overlap checks still need a tolerance of `2e-4` because the adapter-space polygon-clipping path for exact-path families like `pinwheel` is noisier than the backend topology-space overlap check.
 - Pinwheel contiguity now uses exact positive-length segment-overlap neighbors on the exact-affine path because the substitution is not edge-to-edge at every subdivision step.
 
 ## When To Add An Entry Here

@@ -1,4 +1,4 @@
-import { drawPolygonGrid, resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
+import { drawPolygonGrid, resolvePolygonStrokeWidth, resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -398,11 +398,26 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
             if (!geometryCell) {
                 return;
             }
-            if (context.fillStyle !== color) {
-                context.fillStyle = color;
+            const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+            if (!overlayStyle || overlayStyle.drawBaseFill) {
+                if (context.fillStyle !== color) {
+                    context.fillStyle = color;
+                }
+                tracePolygonPath(context, geometryCell.vertices);
+                context.fill();
             }
-            tracePolygonPath(context, geometryCell.vertices);
-            context.fill();
+            if (overlayStyle) {
+                if (overlayStyle.tintColor) {
+                    context.fillStyle = overlayStyle.tintColor;
+                    tracePolygonPath(context, geometryCell.vertices);
+                    context.fill();
+                }
+                context.strokeStyle = overlayStyle.strokeColor;
+                context.lineWidth = overlayStyle.strokeWidth;
+                tracePolygonPath(context, geometryCell.vertices);
+                context.stroke();
+                return;
+            }
             if (renderLayer === "preview" && renderStyle) {
                 context.strokeStyle = renderStyle.lineColor;
                 context.lineWidth = resolvePolygonStrokeWidth(renderStyle);

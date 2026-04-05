@@ -1,9 +1,22 @@
-import { resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
+import { resolvePolygonStrokeWidth, resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
 } from "../canvas/geometry-mixed.js";
 import { asPolygonGeometryCache } from "./cache-guards.js";
+import {
+    APERIODIC_MIN_CENTER_CELL_SIZE,
+    APERIODIC_MIN_METRIC_CELL_SIZE,
+    APERIODIC_RENDER_SCALE_MULTIPLIER,
+    CHAIR_RENDER_MARGIN_MIN,
+    CHAIR_RENDER_MARGIN_SCALE,
+    DEFAULT_APERIODIC_RENDER_MARGIN_MIN,
+    DEFAULT_APERIODIC_RENDER_MARGIN_SCALE,
+    SHIELD_RENDER_COORDINATE_SCALE,
+    SHIELD_RENDER_MARGIN_MIN,
+    SHIELD_RENDER_MARGIN_SCALE,
+    SHIELD_RENDER_POLYGON_SCALE,
+} from "./render-constants.js";
 import { fitRenderCellSizeWithMetrics } from "./shared.js";
 import type {
     GeometryAdapter,
@@ -27,6 +40,30 @@ interface AperiodicMetrics extends GridMetrics {
     maxRawY: number;
 }
 
+function displayCoordinateScale(geometry: string): number {
+    return geometry === "shield" ? SHIELD_RENDER_COORDINATE_SCALE : 1;
+}
+
+function scaleVerticesAroundCenter(
+    vertices: { x: number; y: number }[],
+    centerX: number,
+    centerY: number,
+    scale: number,
+): { x: number; y: number }[] {
+    return vertices.map((vertex) => ({
+        x: centerX + ((vertex.x - centerX) * scale),
+        y: centerY + ((vertex.y - centerY) * scale),
+    }));
+}
+
+function shieldDisplayVertices(
+    rawVertices: readonly { x: number; y: number }[],
+    centerX: number,
+    centerY: number,
+): { x: number; y: number }[] {
+    return scaleVerticesAroundCenter([...rawVertices], centerX, centerY, SHIELD_RENDER_POLYGON_SCALE);
+}
+
 function buildAperiodicMetrics(
     geometry: string,
     topology: TopologyPayload | null,
@@ -34,10 +71,35 @@ function buildAperiodicMetrics(
     width = 0,
     height = 0,
 ): AperiodicMetrics {
-    const scale = Math.max(0.25, Number(cellSize) || 1) * 10;
-    const margin = Math.max(16, scale * 0.45);
+    const scale = Math.max(APERIODIC_MIN_METRIC_CELL_SIZE, Number(cellSize) || 1) * APERIODIC_RENDER_SCALE_MULTIPLIER;
+    const coordinateScale = displayCoordinateScale(geometry);
+    const margin = geometry === "chair"
+        ? Math.max(CHAIR_RENDER_MARGIN_MIN, scale * CHAIR_RENDER_MARGIN_SCALE)
+        : geometry === "shield"
+            ? Math.max(SHIELD_RENDER_MARGIN_MIN, scale * SHIELD_RENDER_MARGIN_SCALE)
+        : Math.max(DEFAULT_APERIODIC_RENDER_MARGIN_MIN, scale * DEFAULT_APERIODIC_RENDER_MARGIN_SCALE);
     const cells = Array.isArray(topology?.cells) ? topology.cells : [];
-    const allVertices = cells.flatMap((cell) => Array.isArray(cell.vertices) ? cell.vertices : []);
+    const allVertices = geometry === "shield"
+        ? cells.flatMap((cell) => {
+            if (!Array.isArray(cell.vertices) || cell.vertices.length === 0) {
+                return [];
+            }
+            const centerX = Number.isFinite(Number(cell.center?.x))
+                ? Number(cell.center?.x) * coordinateScale
+                : (cell.vertices.reduce((sum, vertex) => sum + Number(vertex.x), 0) / cell.vertices.length) * coordinateScale;
+            const centerY = Number.isFinite(Number(cell.center?.y))
+                ? Number(cell.center?.y) * coordinateScale
+                : (cell.vertices.reduce((sum, vertex) => sum + Number(vertex.y), 0) / cell.vertices.length) * coordinateScale;
+            return shieldDisplayVertices(
+                cell.vertices.map((vertex) => ({
+                    x: Number(vertex.x) * coordinateScale,
+                    y: Number(vertex.y) * coordinateScale,
+                })),
+                centerX,
+                centerY,
+            );
+        })
+        : cells.flatMap((cell) => Array.isArray(cell.vertices) ? cell.vertices : []);
 
     if (allVertices.length === 0) {
         return {
@@ -90,20 +152,28 @@ function topologyCellGeometry(
     if (!Array.isArray(cell?.vertices) || cell.vertices.length === 0) {
         return null;
     }
-    const vertices = cell.vertices.map((vertex) => ({
-        x: metrics.xInset + (Number(vertex.x) * metrics.scale),
-        y: metrics.yInset - (Number(vertex.y) * metrics.scale),
+    const coordinateScale = displayCoordinateScale(metrics.geometry);
+    let vertices = cell.vertices.map((vertex) => ({
+        x: metrics.xInset + ((Number(vertex.x) * coordinateScale) * metrics.scale),
+        y: metrics.yInset - ((Number(vertex.y) * coordinateScale) * metrics.scale),
     }));
+    const initialMinX = Math.min(...vertices.map((vertex) => vertex.x));
+    const initialMaxX = Math.max(...vertices.map((vertex) => vertex.x));
+    const initialMinY = Math.min(...vertices.map((vertex) => vertex.y));
+    const initialMaxY = Math.max(...vertices.map((vertex) => vertex.y));
+    const centerX = Number.isFinite(Number(cell.center?.x))
+        ? metrics.xInset + ((Number(cell.center?.x) * coordinateScale) * metrics.scale)
+        : (initialMinX + initialMaxX) / 2;
+    const centerY = Number.isFinite(Number(cell.center?.y))
+        ? metrics.yInset - ((Number(cell.center?.y) * coordinateScale) * metrics.scale)
+        : (initialMinY + initialMaxY) / 2;
+    if (metrics.geometry === "shield") {
+        vertices = shieldDisplayVertices(vertices, centerX, centerY);
+    }
     const minX = Math.min(...vertices.map((vertex) => vertex.x));
     const maxX = Math.max(...vertices.map((vertex) => vertex.x));
     const minY = Math.min(...vertices.map((vertex) => vertex.y));
     const maxY = Math.max(...vertices.map((vertex) => vertex.y));
-    const centerX = Number.isFinite(Number(cell.center?.x))
-        ? metrics.xInset + (Number(cell.center?.x) * metrics.scale)
-        : (minX + maxX) / 2;
-    const centerY = Number.isFinite(Number(cell.center?.y))
-        ? metrics.yInset - (Number(cell.center?.y) * metrics.scale)
-        : (minY + maxY) / 2;
     return {
         cell,
         vertices,
@@ -183,14 +253,14 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
         },
 
         resolveCoordinateCenter({ x, y, cellSize }: GeometryResolveCoordinateCenterArgs) {
-            const scale = Math.max(6, Number(cellSize) || 1) * 10;
+            const scale = Math.max(APERIODIC_MIN_CENTER_CELL_SIZE, Number(cellSize) || 1) * APERIODIC_RENDER_SCALE_MULTIPLIER;
             return {
                 x: x * scale,
                 y: y * scale,
             };
         },
 
-        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle }: RenderedCellArgs) {
+        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 metrics as AperiodicMetrics,
@@ -205,17 +275,31 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
             if (!geometryCell) {
                 return;
             }
-            if (context.fillStyle !== color) {
-                context.fillStyle = color;
-            }
-            tracePolygonPath(context, geometryCell.vertices);
-            context.fill();
-            const strokeColor = renderStyle?.aperiodicLineColor || renderStyle?.lineColor;
-            if (strokeColor) {
-                if (context.strokeStyle !== strokeColor) {
-                    context.strokeStyle = strokeColor;
+            const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+            if (!overlayStyle || overlayStyle.drawBaseFill) {
+                if (context.fillStyle !== color) {
+                    context.fillStyle = color;
                 }
-                context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
+                tracePolygonPath(context, geometryCell.vertices);
+                context.fill();
+                const strokeColor = renderStyle?.aperiodicLineColor || renderStyle?.lineColor;
+                if (strokeColor) {
+                    if (context.strokeStyle !== strokeColor) {
+                        context.strokeStyle = strokeColor;
+                    }
+                    context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
+                    context.stroke();
+                }
+            }
+            if (overlayStyle) {
+                if (overlayStyle.tintColor) {
+                    context.fillStyle = overlayStyle.tintColor;
+                    tracePolygonPath(context, geometryCell.vertices);
+                    context.fill();
+                }
+                context.strokeStyle = overlayStyle.strokeColor;
+                context.lineWidth = overlayStyle.strokeWidth;
+                tracePolygonPath(context, geometryCell.vertices);
                 context.stroke();
             }
         },

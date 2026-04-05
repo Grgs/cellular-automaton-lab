@@ -3,6 +3,7 @@ import {
     EDITOR_TOOL_LINE,
     EDITOR_TOOL_RECTANGLE,
 } from "../editor-tools.js";
+import { FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS } from "./constants.js";
 import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
 
 function identifyCell(cell: PaintableCell): string | null {
@@ -27,6 +28,7 @@ export interface ShapeEditorSession {
     currentCell: PaintableCell;
     pointerId: number | null;
     previewCells: PreviewPaintCell[];
+    moved: boolean;
 }
 
 export type ActiveEditorSession = BrushEditorSession | ShapeEditorSession;
@@ -63,7 +65,7 @@ export function createEditorPointerState(): EditorPointerState {
         suppressClick = true;
         window.setTimeout(() => {
             suppressClick = false;
-        }, 0);
+        }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
     }
 
     function beginBrushSession(cell: PaintableCell, pointerId: number | null): void {
@@ -111,6 +113,7 @@ export function createEditorPointerState(): EditorPointerState {
             currentCell: cell,
             pointerId: pointerId ?? null,
             previewCells: [],
+            moved: false,
         };
         activePointerId = pointerId ?? null;
     }
@@ -122,6 +125,7 @@ export function createEditorPointerState(): EditorPointerState {
         }
         session.currentCell = cell;
         session.previewCells = nextCells;
+        session.moved = true;
         return session.previewCells;
     }
 

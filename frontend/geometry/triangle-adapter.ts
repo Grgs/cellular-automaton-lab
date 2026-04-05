@@ -1,4 +1,4 @@
-import { drawTriangleGrid, resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
+import { drawTriangleGrid, resolvePolygonStrokeWidth, resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
     clampGridDimension,
@@ -268,20 +268,35 @@ export const triangleGeometryAdapter: GeometryAdapter = {
 
     drawCell({ context, cell, stateValue, cache, colors, colorLookup, renderStyle, metrics, renderLayer, resolveRenderedCellColor }: RenderedCellArgs) {
         const { x, y } = resolveTriangleCoordinates(cell);
+        const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
         const color = resolveRenderedCellColor(
             stateValue,
             colorLookup,
             colors,
             { geometry: this.geometry, x, y },
         );
-        if (context.fillStyle !== color) {
-            context.fillStyle = color;
-        }
         const triangleCache = asTriangleGeometryCache(cache);
         const cachedRow = triangleCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, metrics.cellSize) };
-        tracePolygonPath(context, resolvedCell.vertices);
-        context.fill();
+        if (!overlayStyle || overlayStyle.drawBaseFill) {
+            if (context.fillStyle !== color) {
+                context.fillStyle = color;
+            }
+            tracePolygonPath(context, resolvedCell.vertices);
+            context.fill();
+        }
+        if (overlayStyle) {
+            if (overlayStyle.tintColor) {
+                context.fillStyle = overlayStyle.tintColor;
+                tracePolygonPath(context, resolvedCell.vertices);
+                context.fill();
+            }
+            context.strokeStyle = overlayStyle.strokeColor;
+            context.lineWidth = overlayStyle.strokeWidth;
+            tracePolygonPath(context, resolvedCell.vertices);
+            context.stroke();
+            return;
+        }
         if (renderLayer === "preview" && renderStyle?.triangleStrokeEnabled) {
             context.strokeStyle = renderStyle.lineColor;
             context.lineWidth = resolvePolygonStrokeWidth(renderStyle);

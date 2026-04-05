@@ -1,9 +1,17 @@
 import { triangleVertices } from "./geometry-triangle.js";
+import {
+    COMPACT_POLYGON_STROKE_WIDTH,
+    GESTURE_OUTLINE_MIN_STROKE_WIDTH,
+    HOVER_MIN_STROKE_WIDTH,
+    SELECTION_MIN_STROKE_WIDTH,
+    STANDARD_POLYGON_STROKE_WIDTH,
+} from "./render-constants.js";
 import type {
     CanvasRenderStyle,
     GeometryCache,
     Point2D,
     PolygonGeometryCache,
+    RenderedCellArgs,
 } from "../types/rendering.js";
 
 type PathTarget = CanvasRenderingContext2D | Path2D;
@@ -79,7 +87,49 @@ export function drawTriangleGrid(
 }
 
 export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): number {
-    return renderStyle.mode === "compact" ? 1 : 1.25;
+    return renderStyle.mode === "compact" ? COMPACT_POLYGON_STROKE_WIDTH : STANDARD_POLYGON_STROKE_WIDTH;
+}
+
+export function resolveTransientOverlayStyle(
+    renderLayer: RenderedCellArgs["renderLayer"],
+    renderStyle: CanvasRenderStyle | undefined,
+): { tintColor: string | null; strokeColor: string; strokeWidth: number; drawBaseFill: boolean } | null {
+    if (!renderStyle) {
+        return null;
+    }
+    if (renderLayer === "hover") {
+        return {
+            tintColor: renderStyle.hoverTintColor,
+            strokeColor: renderStyle.hoverStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle), HOVER_MIN_STROKE_WIDTH),
+            drawBaseFill: true,
+        };
+    }
+    if (renderLayer === "selected") {
+        return {
+            tintColor: renderStyle.selectionTintColor,
+            strokeColor: renderStyle.selectionStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, SELECTION_MIN_STROKE_WIDTH),
+            drawBaseFill: true,
+        };
+    }
+    if (renderLayer === "gesture-paint") {
+        return {
+            tintColor: null,
+            strokeColor: renderStyle.gesturePaintStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, GESTURE_OUTLINE_MIN_STROKE_WIDTH),
+            drawBaseFill: false,
+        };
+    }
+    if (renderLayer === "gesture-erase") {
+        return {
+            tintColor: null,
+            strokeColor: renderStyle.gestureEraseStrokeColor,
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, GESTURE_OUTLINE_MIN_STROKE_WIDTH),
+            drawBaseFill: false,
+        };
+    }
+    return null;
 }
 
 export function drawPolygonGrid(

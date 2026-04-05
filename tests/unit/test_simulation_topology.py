@@ -441,15 +441,26 @@ class SimulationTopologyTests(unittest.TestCase):
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
     def test_chair_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
+        seed = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=0)
         shallow = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=1)
+        medium = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=2)
         deep = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
         repeated = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
 
+        self.assertEqual(seed.cell_count, 1)
+        self.assertEqual(shallow.cell_count, 4)
+        self.assertEqual(medium.cell_count, 16)
+        self.assertEqual(deep.cell_count, 64)
         self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "chair" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
         self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells))
+        self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
+        self.assertEqual(
+            Counter(cell.orientation_token for cell in deep.cells),
+            Counter({"0": 20, "1": 16, "2": 12, "3": 16}),
+        )
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:
@@ -500,14 +511,53 @@ class SimulationTopologyTests(unittest.TestCase):
                 if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY, SQUARE_TRIANGLE_GEOMETRY}:
                     self.assertTrue(all(cell.chirality_token is not None for cell in deep.cells if cell.kind != "square-triangle-square"))
                 if geometry == SHIELD_GEOMETRY:
-                    self.assertTrue(any(cell.orientation_token is not None for cell in deep.cells if cell.kind == "shield-shield"))
-                    self.assertTrue(any(cell.chirality_token is not None for cell in deep.cells if cell.kind == "shield-triangle"))
-                    self.assertTrue(any(cell.decoration_tokens for cell in deep.cells if cell.kind != "shield-square"))
+                    self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
+                    self.assertGreaterEqual(
+                        len({cell.orientation_token for cell in deep.cells if cell.orientation_token is not None}),
+                        8,
+                    )
                 for cell in deep.cells:
                     self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
                     for neighbor_id in cell.neighbors:
                         assert neighbor_id is not None
                         self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
+
+    def test_shield_topology_uses_dense_reference_patch_with_orientation_rotation_step(self) -> None:
+        depth_zero = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=0)
+        depth_one = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=1)
+        depth_three = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=3)
+        repeated_depth_three = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertEqual(depth_zero.cell_count, 36)
+        self.assertEqual(depth_one.cell_count, 80)
+        self.assertEqual(depth_three.cell_count, 444)
+        self.assertEqual(
+            [cell.id for cell in depth_three.cells],
+            [cell.id for cell in repeated_depth_three.cells],
+        )
+        self.assertGreaterEqual(
+            len(
+                {
+                    cell.orientation_token
+                    for cell in depth_three.cells
+                    if cell.orientation_token is not None
+                }
+            ),
+            12,
+        )
+        rotated_pairs = []
+        by_id_even = {cell.id: cell for cell in build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=2).cells}
+        for odd_cell in depth_three.cells:
+            even_cell = by_id_even.get(odd_cell.id)
+            if even_cell is None:
+                continue
+            if even_cell.orientation_token is None or odd_cell.orientation_token is None:
+                continue
+            rotated_pairs.append(
+                ((int(odd_cell.orientation_token) - int(even_cell.orientation_token)) % 360)
+            )
+        self.assertTrue(rotated_pairs)
+        self.assertTrue(all(delta == 15 for delta in rotated_pairs))
 
     def test_penrose_vertex_topology_is_symmetric_duplicate_free_and_larger_than_edge_neighbors(self) -> None:
         edge = build_topology(PENROSE_GEOMETRY, 0, 0, patch_depth=3)

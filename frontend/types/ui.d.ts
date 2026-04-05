@@ -6,6 +6,7 @@ import type {
     TopologyOption,
 } from "./domain.js";
 import type { AppState } from "./state.js";
+import type { PaintableCell } from "./editor.js";
 import type { EditorTool } from "../editor-tools.js";
 import type { ThemeName } from "../theme.js";
 
@@ -47,6 +48,28 @@ export interface OverlayVisibilityState {
 export interface PatternStatusViewState {
     patternStatusText: string;
     patternStatusTone: string;
+}
+
+export type SelectionInspectorMode = "empty" | "single" | "multi";
+
+export interface SelectionInspectorSource {
+    selectedCells: PaintableCell[];
+}
+
+export interface SelectionInspectorSummaryRow {
+    label: string;
+    value: string;
+}
+
+export interface SelectionInspectorViewModel {
+    mode: SelectionInspectorMode;
+    title: string;
+    subtitle: string;
+    hintText: string;
+    summaryRows: readonly SelectionInspectorSummaryRow[];
+    advancedRows: readonly SelectionInspectorSummaryRow[];
+    advancedVisible: boolean;
+    advancedSummaryText: string;
 }
 
 export interface BlockingActivityViewState {
@@ -96,6 +119,7 @@ export interface TopBarViewModel {
 export interface DrawerViewModel {
     inspectorTilingText: string;
     inspectorRuleText: string;
+    selectionInspector: SelectionInspectorViewModel;
     ruleSummaryText: string;
     overlaysDismissed: boolean;
     drawerVisible: boolean;
@@ -179,6 +203,7 @@ export interface ControlsViewModelInput {
     state: AppState;
     syncState: ConfigSyncViewState;
     theme: ThemeName;
+    selectionInspectorSource: SelectionInspectorSource;
 }
 
 export interface ControlsModelRuleContext {

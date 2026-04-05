@@ -48,6 +48,7 @@ class SharedUiFlowCase(Protocol):
     def assertEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
     def assertTrue(self, expr: Any, msg: str | None = None) -> None: ...
     def assertGreater(self, first: Any, second: Any, msg: str | None = None) -> None: ...
+    def assertGreaterEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
 
 
 class SharedUiFlowMixin:
@@ -101,6 +102,185 @@ class SharedUiFlowMixin:
         self._click_canvas_center()
         self._click_canvas_center()
         self._expect("#undo-btn").to_be_enabled()
+
+    def _canvas_visual_summary(self) -> dict[str, object]:
+        case = self._case()
+        summary = case.page.evaluate(
+            """() => {
+                const canvas = document.getElementById("grid");
+                if (!(canvas instanceof HTMLCanvasElement)) {
+                    throw new Error("grid canvas is missing");
+                }
+                const context = canvas.getContext("2d");
+                if (!context) {
+                    throw new Error("2d canvas context is unavailable");
+                }
+                const image = context.getImageData(0, 0, canvas.width, canvas.height);
+                const { data, width, height } = image;
+                let minX = width;
+                let minY = height;
+                let maxX = -1;
+                let maxY = -1;
+                const dominantFillColors = new Map();
+
+                for (let y = 0; y < height; y += 1) {
+                    for (let x = 0; x < width; x += 1) {
+                        const index = ((y * width) + x) * 4;
+                        const alpha = data[index + 3];
+                        if (alpha < 32) {
+                            continue;
+                        }
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+
+                        if (alpha < 250) {
+                            continue;
+                        }
+                        const r = data[index];
+                        const g = data[index + 1];
+                        const b = data[index + 2];
+                        if (r < 140 || g < 100 || b < 60) {
+                            continue;
+                        }
+                        const key = `${r},${g},${b}`;
+                        dominantFillColors.set(key, (dominantFillColors.get(key) || 0) + 1);
+                    }
+                }
+
+                return {
+                    canvasWidth: width,
+                    canvasHeight: height,
+                    coverageWidthRatio: maxX >= minX ? (maxX - minX + 1) / width : 0,
+                    coverageHeightRatio: maxY >= minY ? (maxY - minY + 1) / height : 0,
+                    dominantFillColors: Array.from(dominantFillColors.entries())
+                        .filter(([, count]) => count >= 100)
+                        .sort((left, right) => right[1] - left[1]),
+                };
+            }""",
+        )
+        return cast(dict[str, object], summary)
+
+    def _wait_for_patch_render_complete(self) -> None:
+        case = self._case()
+        case.page.wait_for_function(
+            """() => {
+                const grid = document.getElementById("grid");
+                const overlay = document.getElementById("blocking-activity-overlay");
+                const renderCellSize = Number(grid?.getAttribute("data-render-cell-size") || "0");
+                const overlayHidden = overlay instanceof HTMLElement
+                    ? overlay.hidden || overlay.getAttribute("hidden") !== null
+                    : true;
+                return Number.isFinite(renderCellSize) && renderCellSize > 0 && overlayHidden;
+            }""",
+        )
+
+    def _select_tiling_family_and_wait_for_reset(
+        self,
+        tiling_family: str,
+        *,
+        timeout_ms: int = 60_000,
+    ) -> None:
+        case = self._case()
+        with case.page.expect_response(
+            lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
+            timeout=timeout_ms,
+        ) as response_info:
+            case.page.select_option("#tiling-family-select", tiling_family)
+        case.assertEqual(response_info.value.status, 200)
+
+    def _wait_for_canvas_visual_patch(
+        self,
+        *,
+        minimum_fill_colors: int,
+        minimum_coverage_width_ratio: float,
+        minimum_coverage_height_ratio: float,
+    ) -> None:
+        case = self._case()
+        case.page.wait_for_function(
+            """({ minimumFillColors, minimumCoverageWidthRatio, minimumCoverageHeightRatio }) => {
+                const canvas = document.getElementById("grid");
+                if (!(canvas instanceof HTMLCanvasElement)) {
+                    return false;
+                }
+                const context = canvas.getContext("2d");
+                if (!context) {
+                    return false;
+                }
+                const overlay = document.getElementById("blocking-activity-overlay");
+                if (overlay instanceof HTMLElement && !overlay.hidden) {
+                    return false;
+                }
+                const image = context.getImageData(0, 0, canvas.width, canvas.height);
+                const { data, width, height } = image;
+                let minX = width;
+                let minY = height;
+                let maxX = -1;
+                let maxY = -1;
+                const dominantFillColors = new Map();
+
+                for (let y = 0; y < height; y += 1) {
+                    for (let x = 0; x < width; x += 1) {
+                        const index = ((y * width) + x) * 4;
+                        const alpha = data[index + 3];
+                        if (alpha < 32) {
+                            continue;
+                        }
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+
+                        if (alpha < 250) {
+                            continue;
+                        }
+                        const r = data[index];
+                        const g = data[index + 1];
+                        const b = data[index + 2];
+                        if (r < 140 || g < 100 || b < 60) {
+                            continue;
+                        }
+                        const key = `${r},${g},${b}`;
+                        dominantFillColors.set(key, (dominantFillColors.get(key) || 0) + 1);
+                    }
+                }
+
+                const dominantCount = Array.from(dominantFillColors.values()).filter((count) => count >= 100).length;
+                const coverageWidthRatio = maxX >= minX ? (maxX - minX + 1) / width : 0;
+                const coverageHeightRatio = maxY >= minY ? (maxY - minY + 1) / height : 0;
+                return dominantCount >= minimumFillColors
+                    && coverageWidthRatio > minimumCoverageWidthRatio
+                    && coverageHeightRatio > minimumCoverageHeightRatio;
+            }""",
+            arg={
+                "minimumFillColors": minimum_fill_colors,
+                "minimumCoverageWidthRatio": minimum_coverage_width_ratio,
+                "minimumCoverageHeightRatio": minimum_coverage_height_ratio,
+            },
+        )
+
+    def _assert_browser_visible_aperiodic_patch(
+        self,
+        *,
+        minimum_fill_colors: int,
+        minimum_coverage_width_ratio: float = 0.75,
+        minimum_coverage_height_ratio: float = 0.75,
+    ) -> None:
+        self._wait_for_patch_render_complete()
+        self._wait_for_canvas_visual_patch(
+            minimum_fill_colors=minimum_fill_colors,
+            minimum_coverage_width_ratio=minimum_coverage_width_ratio,
+            minimum_coverage_height_ratio=minimum_coverage_height_ratio,
+        )
+        case = self._case()
+        summary = self._canvas_visual_summary()
+        dominant_fill_colors = cast(list[list[object]], summary["dominantFillColors"])
+        coverage_width_ratio = cast(float, summary["coverageWidthRatio"])
+        coverage_height_ratio = cast(float, summary["coverageHeightRatio"])
+        case.assertGreater(coverage_width_ratio, minimum_coverage_width_ratio)
+        case.assertGreater(coverage_height_ratio, minimum_coverage_height_ratio)
+        case.assertGreaterEqual(len(dominant_fill_colors), minimum_fill_colors)
 
     def _export_pattern_payload(self) -> dict[str, object]:
         case = self._case()
@@ -197,12 +377,16 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("chair")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._wait_for_patch_render_complete()
+
+    def test_chair_topology_switch_renders_browser_visible_multicolor_patch(self) -> None:
+        case = self._case()
+        case.page.select_option("#tiling-family-select", "chair")
+
+        self._expect("#tiling-family-select").to_have_value("chair")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#grid-size-text").to_contain_text("Depth")
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=4)
 
     def test_robinson_triangles_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
@@ -211,12 +395,7 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("robinson-triangles")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_hat_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
@@ -225,12 +404,7 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("hat-monotile")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_tuebingen_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
@@ -239,54 +413,31 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("tuebingen-triangle")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_square_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
-        case = self._case()
-        case.page.select_option("#tiling-family-select", "square-triangle")
+        self._select_tiling_family_and_wait_for_reset("square-triangle")
 
         self._expect("#tiling-family-select").to_have_value("square-triangle")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=3)
 
     def test_shield_topology_switch_renders_aperiodic_patch(self) -> None:
-        case = self._case()
-        case.page.select_option("#tiling-family-select", "shield")
+        self._select_tiling_family_and_wait_for_reset("shield")
 
         self._expect("#tiling-family-select").to_have_value("shield")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_pinwheel_topology_switch_renders_aperiodic_patch(self) -> None:
-        case = self._case()
-        case.page.select_option("#tiling-family-select", "pinwheel")
+        self._select_tiling_family_and_wait_for_reset("pinwheel")
 
         self._expect("#tiling-family-select").to_have_value("pinwheel")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
-        )
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_deltoidal_hexagonal_topology_switch_renders_periodic_patch(self) -> None:
         case = self._case()

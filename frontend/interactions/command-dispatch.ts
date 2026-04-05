@@ -14,6 +14,7 @@ import type { SimulationMutations } from "../types/controller.js";
 
 interface InteractionCommandDispatch {
     paintCell(cell: PaintableCell, stateValue?: number): Promise<void>;
+    resolveDirectGestureTargetState(cell: PaintableCell): number;
     toggleCell(cell: PaintableCell): Promise<void>;
     sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
     sendControl(
@@ -35,12 +36,14 @@ export function createInteractionCommandDispatch({
     setCellRequest,
     postControl,
     getPaintState,
+    getCellState,
 }: {
     mutations: Pick<SimulationMutations, "runStateMutation" | "runSerialized">;
     toggleCellRequest: ToggleCellRequestFunction;
     setCellRequest: SetCellRequestFunction;
     postControl: PostControlFunction;
     getPaintState: () => number;
+    getCellState: (cell: PaintableCell) => number;
 }): InteractionCommandDispatch {
     async function paintCell(cell: PaintableCell, stateValue = getPaintState()): Promise<void> {
         if (typeof cell !== "object" || cell === null) {
@@ -54,6 +57,13 @@ export function createInteractionCommandDispatch({
             throw new Error("Cell toggles require a resolved topology cell.");
         }
         await mutations.runStateMutation(() => toggleCellRequest(cell), { source: "editor" }).catch(() => null);
+    }
+
+    function resolveDirectGestureTargetState(cell: PaintableCell): number {
+        if (typeof cell !== "object" || cell === null) {
+            throw new Error("Cell toggles require a resolved topology cell.");
+        }
+        return getCellState(cell) === 0 ? getPaintState() : 0;
     }
 
     async function sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
@@ -96,6 +106,7 @@ export function createInteractionCommandDispatch({
 
     return {
         paintCell,
+        resolveDirectGestureTargetState,
         toggleCell,
         sendControl,
         runSerialized: (task, options = {}) => mutations.runSerialized(task, options),

@@ -5,7 +5,7 @@ This file lists the current literature or catalog references used when writing a
 The order is intentional:
 
 1. family-specific substitution or tiling source
-2. broader reference fallback if the family-specific source is weaker or unavailable
+2. broader reference fallback only when the family-specific source is weaker or unavailable
 
 ## Regular Grids
 
@@ -23,56 +23,39 @@ The order is intentional:
 
 - `archimedean-4-8-8`
   - [Truncated square tiling](https://en.wikipedia.org/wiki/Truncated_square_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-12-12`
   - [Truncated hexagonal tiling](https://en.wikipedia.org/wiki/Truncated_hexagonal_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-4-6-4`
   - [Rhombitrihexagonal tiling](https://en.wikipedia.org/wiki/Rhombitrihexagonal_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-4-6-12`
   - [Truncated trihexagonal tiling](https://en.wikipedia.org/wiki/Truncated_trihexagonal_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-3-4-3-4`
   - [Snub square tiling](https://en.wikipedia.org/wiki/Snub_square_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-3-3-4-4`
   - [Elongated triangular tiling](https://en.wikipedia.org/wiki/Elongated_triangular_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `archimedean-3-3-3-3-6`
   - [Snub trihexagonal tiling](https://en.wikipedia.org/wiki/Snub_trihexagonal_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `trihexagonal-3-6-3-6`
   - [Trihexagonal tiling](https://en.wikipedia.org/wiki/Trihexagonal_tiling)
-  - [Archimedean tilings](https://en.wikipedia.org/wiki/Archimedean_tilings)
 - `cairo-pentagonal`
   - [Cairo pentagonal tiling](https://en.wikipedia.org/wiki/Cairo_pentagonal_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `rhombille`
   - [Rhombille tiling](https://en.wikipedia.org/wiki/Rhombille_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `deltoidal-hexagonal`
   - [Deltoidal hexagonal tiling](https://en.wikipedia.org/wiki/Deltoidal_hexagonal_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `tetrakis-square`
   - [Tetrakis square tiling](https://en.wikipedia.org/wiki/Tetrakis_square_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `triakis-triangular`
   - [Triakis triangular tiling](https://en.wikipedia.org/wiki/Triakis_triangular_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `deltoidal-trihexagonal`
   - [Deltoidal trihexagonal tiling](https://en.wikipedia.org/wiki/Deltoidal_trihexagonal_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `prismatic-pentagonal`
   - [Prismatic pentagonal tiling](https://en.wikipedia.org/wiki/Prismatic_pentagonal_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `floret-pentagonal`
   - [Floret pentagonal tiling](https://en.wikipedia.org/wiki/Floret_pentagonal_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 - `snub-square-dual`
   - [Snub square tiling](https://en.wikipedia.org/wiki/Snub_square_tiling)
   - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
-  - [List of Euclidean uniform tilings](https://en.wikipedia.org/wiki/List_of_Euclidean_uniform_tilings)
 
 ## Aperiodic / Substitution Families
 
@@ -111,5 +94,5 @@ The order is intentional:
 
 ## Notes
 
-- Some periodic mixed families still keep broad uniform-tiling references as secondary backup citations, but the primary source should be family-specific whenever a stable public source exists.
+- Periodic mixed families now default to family-specific citations. `snub-square-dual` still keeps a pentagonal-tiling background reference because the public dual-family material is weaker than the primary snub-square source alone.
 - The verifier is allowed to be stronger than the source list here, but not weaker. If a new reference drives a spec change, update this file at the same time.

@@ -94,4 +94,7 @@ def apply_config_transition(
     if plan.coerce_rule_states:
         state.board = coerce_board_to_rule(state.board, plan.rule)
         state.rule = plan.rule
-    state.config = plan.config
+    state.config = plan.config.updated(
+        width=state.board.topology.width,
+        height=state.board.topology.height,
+    )

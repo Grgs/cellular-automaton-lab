@@ -1,6 +1,6 @@
 import type { ViewportDimensions } from "./controller.js";
 import type { CellStateDefinition, TopologyCell, TopologyPayload } from "./domain.js";
-import type { PaintableCell, PreviewPaintCell, PreviewPaintCells } from "./editor.js";
+import type { GestureOutlineTone, PaintableCell, PreviewPaintCell, PreviewPaintCells } from "./editor.js";
 import type { AppState } from "./state.js";
 
 export interface Point2D {
@@ -51,6 +51,8 @@ export interface CanvasColors {
     lineStrong: string;
     lineAperiodic: string;
     live: string;
+    accent: string;
+    accentStrong: string;
 }
 
 export interface RenderStyle {
@@ -63,6 +65,12 @@ export interface RenderStyle {
 export interface CanvasRenderStyle extends RenderStyle {
     lineColor: string;
     aperiodicLineColor: string;
+    hoverTintColor: string;
+    hoverStrokeColor: string;
+    selectionTintColor: string;
+    selectionStrokeColor: string;
+    gesturePaintStrokeColor: string;
+    gestureEraseStrokeColor: string;
 }
 
 export interface HexGeometryCell {
@@ -144,7 +152,7 @@ export interface RenderedCellArgs {
     colors: CanvasColors;
     colorLookup: Map<number, string>;
     renderStyle?: CanvasRenderStyle;
-    renderLayer?: "committed" | "preview";
+    renderLayer?: "committed" | "hover" | "selected" | "preview" | "gesture-paint" | "gesture-erase";
     resolveRenderedCellColor: (
         stateValue: number,
         colorLookup: Map<number, string>,
@@ -284,5 +292,11 @@ export interface CanvasGridView {
     ): void;
     setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
+    setHoveredCell(cell: PaintableCell | null): void;
+    setSelectedCells(cells: PaintableCell[]): void;
+    getSelectedCells(): PaintableCell[];
+    setGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone): void;
+    flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number): void;
+    clearGestureOutline(): void;
     getCellFromPointerEvent(event: Event): PaintableCell | null;
 }

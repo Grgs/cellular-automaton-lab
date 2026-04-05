@@ -172,18 +172,12 @@ def build_topology_graph(topology: LatticeTopology) -> nx.Graph:
 
 
 def recommended_validation_options(geometry: str) -> dict[str, bool]:
-    if geometry in {
-        "hat-monotile",
-        "tuebingen-triangle",
-        "square-triangle",
-        "shield",
-        "pinwheel",
-    }:
+    if geometry == "shield":
         return {
-            "check_surface": False,
-            "check_overlaps": True,
+            "check_surface": True,
+            "check_overlaps": False,
             "check_edge_multiplicity": False,
-            "check_graph_connectivity": False,
+            "check_graph_connectivity": True,
         }
     return {
         "check_surface": True,

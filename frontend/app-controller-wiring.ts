@@ -2,7 +2,12 @@ import { collectConfig } from "./controls-model.js";
 import { createAppActions } from "./app-actions.js";
 import { createInteractionController } from "./interactions.js";
 import { sameDimensions } from "./layout.js";
-import { applyOverlayIntent, OVERLAY_INTENT_WORKSPACE_EMPTY_CLICK } from "./overlay-policy.js";
+import {
+    applyOverlayIntent,
+    OVERLAY_INTENT_MANUAL_RESTORE,
+    OVERLAY_INTENT_WORKSPACE_EMPTY_CLICK,
+} from "./overlay-policy.js";
+import { setDrawerOpen } from "./state/overlay-state.js";
 import { createViewportController } from "./viewport-controller.js";
 import { createSurfaceCellResolver } from "./cell-resolution.js";
 import { currentPaintState } from "./state/selectors.js";
@@ -49,6 +54,12 @@ export function wireAppController({
         resolveCellFromEvent: createSurfaceCellResolver({ state, gridView }),
         previewPaintCells: (cells: PreviewPaintCells) => gridView.setPreviewCells(cells),
         clearPreview: () => gridView.clearPreview(),
+        setHoveredCell: (cell) => gridView.setHoveredCell(cell),
+        setSelectedCells: (cells) => gridView.setSelectedCells(cells),
+        getSelectedCells: () => gridView.getSelectedCells(),
+        setGestureOutline: (cells, tone) => gridView.setGestureOutline(cells, tone),
+        flashGestureOutline: (cells, tone, durationMs) => gridView.flashGestureOutline(cells, tone, durationMs),
+        clearGestureOutline: () => gridView.clearGestureOutline(),
         mutationRunner,
         simulationMutations: services.getSimulationMutations(),
         onError,
@@ -67,6 +78,17 @@ export function wireAppController({
                 appView.renderControlsPanel();
             }
             return Promise.resolve(changed);
+        },
+        openInspectorDrawer: () => {
+            const overlayChanged = applyOverlayIntent(state, OVERLAY_INTENT_MANUAL_RESTORE);
+            const drawerChanged = !state.drawerOpen;
+            setDrawerOpen(state, true);
+            if (drawerChanged) {
+                services.uiSessionController.persistDrawerState(true);
+            }
+            if (overlayChanged && !drawerChanged) {
+                services.uiSessionController.persistDrawerState(true);
+            }
         },
         renderControlPanel: appView.renderControlsPanel,
     });

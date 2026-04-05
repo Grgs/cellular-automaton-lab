@@ -1,7 +1,7 @@
 import { getGeometryAdapter } from "../geometry/registry.js";
 import { asPolygonGeometryCache } from "../geometry/cache-guards.js";
 import type { TopologyCell, TopologyPayload } from "../types/domain.js";
-import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
+import type { GestureOutlineTone, PaintableCell, PreviewPaintCell } from "../types/editor.js";
 import type {
     CanvasColors,
     CanvasRenderStyle,
@@ -32,7 +32,7 @@ interface SharedRenderInputs {
 }
 
 function resolvePreviewTopologyCell(
-    cell: PreviewPaintCell,
+    cell: PaintableCell,
     topology: TopologyPayload | null,
     geometryCache: GeometryCache | null,
 ): RenderableTopologyCell | null {
@@ -40,6 +40,41 @@ function resolvePreviewTopologyCell(
     return polygonCache?.cellsById.get(cell.id)?.cell
         || topology?.cells?.find((candidate) => candidate.id === cell.id)
         || null;
+}
+
+function resolveTransientRenderCell(
+    cell: PaintableCell,
+    geometry: string,
+    topology: TopologyPayload | null,
+    geometryCache: GeometryCache | null,
+): TopologyCell | PaintableCell {
+    const adapter = getGeometryAdapter(geometry);
+    if (adapter.family !== "mixed") {
+        return cell;
+    }
+    return resolvePreviewTopologyCell(cell, topology, geometryCache) || cell;
+}
+
+function resolveTransientStateValue(
+    cell: PaintableCell,
+    topology: TopologyPayload | null,
+    cellStates: number[],
+): number {
+    if (typeof cell.state === "number") {
+        return cell.state;
+    }
+    if (!Array.isArray(topology?.cells)) {
+        return 0;
+    }
+
+    const topologyCellIndex = typeof cell.id === "string" && cell.id.length > 0
+        ? topology.cells.findIndex((candidate) => candidate.id === cell.id)
+        : -1;
+
+    if (topologyCellIndex < 0) {
+        return 0;
+    }
+    return cellStates[topologyCellIndex] ?? 0;
 }
 
 export function drawCommittedLayer({
@@ -136,6 +171,117 @@ export function drawPreviewLayer({
             resolveRenderedCellColor: shared.resolveRenderedCellColor,
             renderStyle: shared.renderStyle,
             renderLayer: "preview",
+        });
+    });
+}
+
+export function drawHoverLayer({
+    context,
+    hoveredCell,
+    cellStates,
+    ...shared
+}: SharedRenderInputs & {
+    context: CanvasRenderingContext2D;
+    hoveredCell: PaintableCell | null;
+    cellStates: number[];
+}): void {
+    if (!hoveredCell) {
+        return;
+    }
+
+    const renderCell = resolveTransientRenderCell(
+        hoveredCell,
+        shared.geometry,
+        shared.topology,
+        shared.geometryCache,
+    );
+    const adapter = getGeometryAdapter(shared.geometry);
+    adapter.drawCell({
+        context,
+        cell: renderCell,
+        stateValue: resolveTransientStateValue(hoveredCell, shared.topology, cellStates),
+        metrics: shared.metrics,
+        cache: shared.geometryCache,
+        colors: shared.canvasColors,
+        colorLookup: shared.colorLookup,
+        resolveRenderedCellColor: shared.resolveRenderedCellColor,
+        renderStyle: shared.renderStyle,
+        renderLayer: "hover",
+    });
+}
+
+export function drawSelectionLayer({
+    context,
+    selectedCells,
+    cellStates,
+    ...shared
+}: SharedRenderInputs & {
+    context: CanvasRenderingContext2D;
+    selectedCells: PaintableCell[];
+    cellStates: number[];
+}): void {
+    if (selectedCells.length === 0) {
+        return;
+    }
+
+    const adapter = getGeometryAdapter(shared.geometry);
+    selectedCells.forEach((selectedCell) => {
+        const renderCell = resolveTransientRenderCell(
+            selectedCell,
+            shared.geometry,
+            shared.topology,
+            shared.geometryCache,
+        );
+        adapter.drawCell({
+            context,
+            cell: renderCell,
+            stateValue: resolveTransientStateValue(selectedCell, shared.topology, cellStates),
+            metrics: shared.metrics,
+            cache: shared.geometryCache,
+            colors: shared.canvasColors,
+            colorLookup: shared.colorLookup,
+            resolveRenderedCellColor: shared.resolveRenderedCellColor,
+            renderStyle: shared.renderStyle,
+            renderLayer: "selected",
+        });
+    });
+}
+
+export function drawGestureOutlineLayer({
+    context,
+    outlinedCells,
+    tone,
+    cellStates,
+    ...shared
+}: SharedRenderInputs & {
+    context: CanvasRenderingContext2D;
+    outlinedCells: PaintableCell[];
+    tone: GestureOutlineTone | null;
+    cellStates: number[];
+}): void {
+    if (!tone || outlinedCells.length === 0) {
+        return;
+    }
+
+    const adapter = getGeometryAdapter(shared.geometry);
+    outlinedCells.forEach((cell) => {
+        const renderCell = resolveTransientRenderCell(
+            cell,
+            shared.geometry,
+            shared.topology,
+            shared.geometryCache,
+        );
+        adapter.drawCell({
+            context,
+            cell: renderCell,
+            stateValue: resolveTransientStateValue(cell, shared.topology, cellStates),
+            metrics: shared.metrics,
+            cache: shared.geometryCache,
+            colors: shared.canvasColors,
+            colorLookup: shared.colorLookup,
+            resolveRenderedCellColor: shared.resolveRenderedCellColor,
+            renderStyle: shared.renderStyle,
+            renderLayer: tone === "paint" ? "gesture-paint" : "gesture-erase",
         });
     });
 }

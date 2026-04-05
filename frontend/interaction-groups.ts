@@ -7,7 +7,7 @@ import { createInteractionSessionRuntime } from "./interactions/session-runtime.
 import { createInteractionSurfaceBindings } from "./interactions/surface-bindings.js";
 import { createSimulationMutations } from "./interactions/simulation-mutations.js";
 import type { CreateSimulationMutationsFunction } from "./types/controller-runtime.js";
-import type { GridInteractionBindings, InteractionControllerOptions } from "./types/editor.js";
+import type { GridInteractionBindings, InteractionControllerOptions, PaintableCell } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 interface InteractionMutationRuntimeOptions {
@@ -36,6 +36,9 @@ interface InteractionEditorRuntimeOptions {
     getBrushSize: NonNullable<InteractionControllerOptions["getBrushSize"]>;
     previewPaintCells: InteractionControllerOptions["previewPaintCells"];
     clearPreview: InteractionControllerOptions["clearPreview"];
+    setGestureOutline: InteractionControllerOptions["setGestureOutline"];
+    flashGestureOutline: InteractionControllerOptions["flashGestureOutline"];
+    clearGestureOutline: InteractionControllerOptions["clearGestureOutline"];
     setCellsRequest: InteractionControllerOptions["setCellsRequest"];
     postControl: InteractionControllerOptions["postControl"];
     renderControlPanel: NonNullable<InteractionControllerOptions["renderControlPanel"]>;
@@ -53,10 +56,17 @@ interface InteractionCommandSurfaceOptions {
     editorSession: ReturnType<typeof createInteractionSessionRuntime>["editorSession"];
     legacyDrag: ReturnType<typeof createInteractionSessionRuntime>["legacyDrag"];
     mutations: NonNullable<InteractionControllerOptions["simulationMutations"]>;
+    setHoveredCell: InteractionControllerOptions["setHoveredCell"];
+    setSelectedCells: InteractionControllerOptions["setSelectedCells"];
+    getSelectedCells: InteractionControllerOptions["getSelectedCells"];
+    clearGestureOutline: InteractionControllerOptions["clearGestureOutline"];
+    openInspectorDrawer: NonNullable<InteractionControllerOptions["openInspectorDrawer"]>;
+    renderControlPanel: NonNullable<InteractionControllerOptions["renderControlPanel"]>;
     toggleCellRequest: InteractionControllerOptions["toggleCellRequest"];
     setCellRequest: InteractionControllerOptions["setCellRequest"];
     postControl: InteractionControllerOptions["postControl"];
     getPaintState: InteractionControllerOptions["getPaintState"];
+    getCellState: (cell: PaintableCell) => number;
     bindGridInteractionsFn?: ((options: GridInteractionBindings) => void) | undefined;
     setTimeoutFn?: InteractionControllerOptions["setTimeoutFn"] | undefined;
 }
@@ -114,6 +124,9 @@ export function createInteractionEditorRuntime({
     getBrushSize,
     previewPaintCells,
     clearPreview,
+    setGestureOutline,
+    flashGestureOutline,
+    clearGestureOutline,
     setCellsRequest,
     postControl,
     renderControlPanel,
@@ -131,6 +144,9 @@ export function createInteractionEditorRuntime({
         getBrushSize,
         previewPaintCells,
         clearPreview,
+        setGestureOutline,
+        flashGestureOutline,
+        clearGestureOutline,
         setCellsRequest,
         postControl,
         renderControlPanel,
@@ -149,10 +165,17 @@ export function createInteractionCommandSurface({
     editorSession,
     legacyDrag,
     mutations,
+    setHoveredCell,
+    setSelectedCells,
+    getSelectedCells,
+    clearGestureOutline,
+    openInspectorDrawer,
+    renderControlPanel,
     toggleCellRequest,
     setCellRequest,
     postControl,
     getPaintState,
+    getCellState,
     bindGridInteractionsFn,
     setTimeoutFn,
 }: InteractionCommandSurfaceOptions) {
@@ -162,6 +185,7 @@ export function createInteractionCommandSurface({
         setCellRequest,
         postControl,
         getPaintState,
+        getCellState,
     });
 
     const surfaceBindings = createInteractionSurfaceBindings({
@@ -170,7 +194,14 @@ export function createInteractionCommandSurface({
         editPolicy,
         editorSession,
         legacyDrag,
+        setHoveredCell,
+        setSelectedCells,
+        getSelectedCells,
+        clearGestureOutline,
+        openInspectorDrawer,
+        renderControlPanel,
         paintCell: commandDispatch.paintCell,
+        resolveDirectGestureTargetState: commandDispatch.resolveDirectGestureTargetState,
         bindGridInteractionsFn,
         setTimeoutFn,
     });

@@ -17,7 +17,7 @@ import type {
     CreateSimulationMutationsFunction,
     InteractionController,
 } from "./types/controller.js";
-import type { GridInteractionBindings, InteractionControllerOptions } from "./types/editor.js";
+import type { GridInteractionBindings, InteractionControllerOptions, PaintableCell } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 export { cellKey, interpolateCellPath, createDragPaintSession } from "./drag-session.js";
@@ -28,8 +28,15 @@ export function createInteractionController({
     resolveCellFromEvent,
     previewPaintCells,
     clearPreview,
-    mutationRunner,
-    onError,
+    setHoveredCell,
+        setSelectedCells,
+        getSelectedCells,
+        setGestureOutline,
+        flashGestureOutline,
+        clearGestureOutline,
+        openInspectorDrawer = () => {},
+        mutationRunner,
+        onError,
     applySimulationState,
     refreshState,
     toggleCellRequest,
@@ -85,6 +92,9 @@ export function createInteractionController({
         getBrushSize,
         previewPaintCells,
         clearPreview,
+        setGestureOutline,
+        flashGestureOutline,
+        clearGestureOutline,
         setCellsRequest,
         postControl,
         renderControlPanel,
@@ -102,10 +112,29 @@ export function createInteractionController({
         editorSession: sessionRuntime.editorSession,
         legacyDrag: sessionRuntime.legacyDrag,
         mutations,
+        setHoveredCell,
+        setSelectedCells,
+        getSelectedCells,
+        clearGestureOutline,
+        openInspectorDrawer,
+        renderControlPanel,
         toggleCellRequest,
         setCellRequest,
         postControl,
         getPaintState,
+        getCellState: (cell: PaintableCell) => {
+            if (typeof cell.state === "number") {
+                return cell.state;
+            }
+            if (!state || typeof cell.id !== "string" || cell.id.length === 0) {
+                return 0;
+            }
+            const indexedCell = state.topologyIndex?.byId?.get(cell.id);
+            if (!indexedCell || typeof indexedCell.index !== "number") {
+                return 0;
+            }
+            return Number(state.cellStates[indexedCell.index] ?? 0);
+        },
         bindGridInteractionsFn,
         setTimeoutFn,
     });

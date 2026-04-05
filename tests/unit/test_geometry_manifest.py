@@ -195,13 +195,20 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertTrue(geometry_uses_patch_depth(SPECTRE_GEOMETRY))
         self.assertFalse(geometry_uses_backend_viewport_sync(SPECTRE_GEOMETRY))
 
-    def test_experimental_aperiodic_geometries_are_grouped_as_experimental(self) -> None:
-        for geometry in (CHAIR_GEOMETRY, SQUARE_TRIANGLE_GEOMETRY, SHIELD_GEOMETRY, PINWHEEL_GEOMETRY):
+    def test_recent_aperiodic_geometries_remain_experimental(self) -> None:
+        for geometry in (SQUARE_TRIANGLE_GEOMETRY, SHIELD_GEOMETRY, PINWHEEL_GEOMETRY):
             with self.subTest(geometry=geometry):
                 definition = get_topology_variant_for_geometry(geometry)
                 family_definition = get_topology_definition(geometry)
                 self.assertEqual(definition.picker_group, "Experimental")
                 self.assertEqual(family_definition.picker_group, "Experimental")
+
+    def test_chair_geometry_is_grouped_as_aperiodic(self) -> None:
+        definition = get_topology_variant_for_geometry(CHAIR_GEOMETRY)
+        family_definition = get_topology_definition(CHAIR_GEOMETRY)
+
+        self.assertEqual(definition.picker_group, "Aperiodic")
+        self.assertEqual(family_definition.picker_group, "Aperiodic")
 
     def test_taylor_socolar_geometry_uses_aperiodic_patch_depth_defaults(self) -> None:
         definition = get_topology_variant_for_geometry(TAYLOR_SOCOLAR_GEOMETRY)

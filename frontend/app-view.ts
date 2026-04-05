@@ -154,6 +154,9 @@ export function createAppView({
                 state,
                 syncState: getSyncState(),
                 theme: currentTheme(),
+                selectionInspectorSource: {
+                    selectedCells: gridView?.getSelectedCells ? gridView.getSelectedCells() : [],
+                },
             }),
         );
     }

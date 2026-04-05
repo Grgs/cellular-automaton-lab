@@ -13,6 +13,7 @@ import {
     hideEditCue as hideEditCueState,
     setPatternStatus as setPatternStatusState,
 } from "../state/overlay-state.js";
+import { EDIT_CUE_HIDE_DELAY_MS } from "./constants.js";
 import type { AppState } from "../types/state.js";
 
 export interface InteractionEditPolicy {
@@ -20,6 +21,7 @@ export interface InteractionEditPolicy {
     editingBlockedByRun(): boolean;
     isEditArmed(): boolean;
     currentTool(): EditorTool;
+    prepareDirectGridInteraction(event?: PointerEvent | MouseEvent | null): void;
     runningBrushEditingEnabled(): boolean;
     runningAdvancedToolBlocked(): boolean;
     armEditingFromGrid(
@@ -110,13 +112,29 @@ export function createInteractionEditPolicy({
                 return;
             }
             hideEditCueAction();
-        }, 2000);
+        }, EDIT_CUE_HIDE_DELAY_MS);
     }
 
     async function dismissEditingUi(): Promise<boolean> {
         const overlayDismissed = await dismissOverlays();
         const cueHidden = hideEditCueAction();
         return Boolean(overlayDismissed || cueHidden);
+    }
+
+    function prepareDirectGridInteraction(event: PointerEvent | MouseEvent | null = null): void {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const hintDismissedChanged = Boolean(state && !runtimeState.firstRunHintDismissed);
+        if (hintDismissedChanged) {
+            dismissFirstRunHintState(runtimeState);
+        }
+        void dismissOverlays();
+        const cueHidden = hideEditCueAction();
+        if (hintDismissedChanged && !cueHidden) {
+            renderControlPanel();
+        }
     }
 
     function armEditingFromGrid(
@@ -181,6 +199,7 @@ export function createInteractionEditPolicy({
         editingBlockedByRun,
         isEditArmed,
         currentTool,
+        prepareDirectGridInteraction,
         runningBrushEditingEnabled,
         runningAdvancedToolBlocked,
         armEditingFromGrid,
