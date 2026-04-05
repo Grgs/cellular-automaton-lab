@@ -1,4 +1,4 @@
-import { tracePolygonPath } from "../canvas/draw.js";
+import { resolvePolygonStrokeWidth, tracePolygonPath } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -159,7 +159,7 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             };
         },
 
-        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
+        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 metrics as PenroseMetrics,
@@ -179,6 +179,15 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             }
             tracePolygonPath(context, geometryCell.vertices);
             context.fill();
+            if (renderLayer === "hover" && renderStyle) {
+                context.fillStyle = renderStyle.hoverTintColor;
+                tracePolygonPath(context, geometryCell.vertices);
+                context.fill();
+                context.strokeStyle = renderStyle.hoverStrokeColor;
+                context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+                tracePolygonPath(context, geometryCell.vertices);
+                context.stroke();
+            }
         },
 
         applyViewportPreview() {

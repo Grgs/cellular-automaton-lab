@@ -1,4 +1,4 @@
-import { traceHexPath } from "../canvas/draw.js";
+import { resolvePolygonStrokeWidth, traceHexPath } from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
     clampGridDimension,
@@ -242,7 +242,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
         });
     },
 
-    drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
+    drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
         const { x, y } = resolveHexCoordinates(cell);
         const hexMetrics = metrics as HexMetrics;
         const hexCache = asHexGeometryCache(cache);
@@ -263,6 +263,15 @@ export const hexGeometryAdapter: GeometryAdapter = {
         const centerY = "centerY" in resolvedCell ? resolvedCell.centerY : resolvedCell.y;
         traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
         context.fill();
+        if (renderLayer === "hover" && renderStyle) {
+            context.fillStyle = renderStyle.hoverTintColor;
+            traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
+            context.fill();
+            context.strokeStyle = renderStyle.hoverStrokeColor;
+            context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+            traceHexPath(context, centerX, centerY, resolvedCell.radius, resolvedCell.hexWidth);
+            context.stroke();
+        }
     },
 
     applyViewportPreview(args: GeometryViewportPreviewArgs) {

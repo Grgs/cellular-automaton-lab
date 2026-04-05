@@ -250,7 +250,7 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
             };
         },
 
-        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle }: RenderedCellArgs) {
+        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
             const geometryCell = resolveGeometryCell(
                 cell as RenderableTopologyCell,
                 metrics as AperiodicMetrics,
@@ -276,6 +276,15 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
                     context.strokeStyle = strokeColor;
                 }
                 context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
+                context.stroke();
+            }
+            if (renderLayer === "hover" && renderStyle) {
+                context.fillStyle = renderStyle.hoverTintColor;
+                tracePolygonPath(context, geometryCell.vertices);
+                context.fill();
+                context.strokeStyle = renderStyle.hoverStrokeColor;
+                context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+                tracePolygonPath(context, geometryCell.vertices);
                 context.stroke();
             }
         },

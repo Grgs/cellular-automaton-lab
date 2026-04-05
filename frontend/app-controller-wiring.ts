@@ -49,6 +49,7 @@ export function wireAppController({
         resolveCellFromEvent: createSurfaceCellResolver({ state, gridView }),
         previewPaintCells: (cells: PreviewPaintCells) => gridView.setPreviewCells(cells),
         clearPreview: () => gridView.clearPreview(),
+        setHoveredCell: (cell) => gridView.setHoveredCell(cell),
         mutationRunner,
         simulationMutations: services.getSimulationMutations(),
         onError,

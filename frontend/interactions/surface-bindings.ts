@@ -11,6 +11,7 @@ export function createInteractionSurfaceBindings({
     editPolicy,
     editorSession,
     legacyDrag,
+    setHoveredCell,
     paintCell,
     bindGridInteractionsFn = bindGridInteractionsToSurface,
     setTimeoutFn = (callback, delay) => window.setTimeout(callback, delay),
@@ -33,6 +34,7 @@ export function createInteractionSurfaceBindings({
         update(cell: PaintableCell): void;
         end(): Promise<unknown>;
     };
+    setHoveredCell: (cell: PaintableCell | null) => void;
     paintCell: (cell: PaintableCell) => Promise<void>;
     bindGridInteractionsFn?: ((options: GridInteractionBindings) => void) | undefined;
     setTimeoutFn?: ((callback: () => void, delay: number) => number) | undefined;
@@ -45,6 +47,7 @@ export function createInteractionSurfaceBindings({
                 surfaceElement,
                 resolveCellFromEvent,
                 onPointerDown(event: PointerEvent, cell: PaintableCell) {
+                    setHoveredCell(null);
                     if (editPolicy.runningBrushEditingEnabled()) {
                         void editPolicy.dismissEditingUi();
                         event.preventDefault();
@@ -111,6 +114,7 @@ export function createInteractionSurfaceBindings({
                 },
                 onPointerCancel() {
                     consumeNextClick = false;
+                    setHoveredCell(null);
                     if (legacyDrag.isActive()) {
                         void legacyDrag.end();
                         return;
@@ -121,6 +125,14 @@ export function createInteractionSurfaceBindings({
                     }
 
                     void editorSession.cancelActivePreview();
+                },
+                onHoverChange(cell) {
+                    const hasActivePointer = editorSession.isPointerActive() || legacyDrag.isActive();
+                    if (hasActivePointer) {
+                        setHoveredCell(null);
+                        return;
+                    }
+                    setHoveredCell(cell);
                 },
                 onClick(event: MouseEvent, cell: PaintableCell) {
                     if (editorSession.isClickSuppressed()) {

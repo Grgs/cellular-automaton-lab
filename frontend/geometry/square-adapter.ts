@@ -1,4 +1,7 @@
 import {
+    resolvePolygonStrokeWidth,
+} from "../canvas/draw.js";
+import {
     applyRegularViewportPreview,
     clampGridDimension,
     fitRenderCellSizeWithMetrics,
@@ -106,7 +109,7 @@ export const squareGeometryAdapter: GeometryAdapter = {
         });
     },
 
-    drawCell({ context, cell, stateValue, metrics, colors, colorLookup, resolveRenderedCellColor }: RenderedCellArgs) {
+    drawCell({ context, cell, stateValue, metrics, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
         const squareMetrics = metrics as SquareMetrics;
         const { x, y } = resolveSquareCoordinates(cell);
         const color = resolveRenderedCellColor(
@@ -118,12 +121,16 @@ export const squareGeometryAdapter: GeometryAdapter = {
         if (context.fillStyle !== color) {
             context.fillStyle = color;
         }
-        context.fillRect(
-            squareMetrics.gap + (x * squareMetrics.pitch),
-            squareMetrics.gap + (y * squareMetrics.pitch),
-            squareMetrics.cellSize,
-            squareMetrics.cellSize,
-        );
+        const cellLeft = squareMetrics.gap + (x * squareMetrics.pitch);
+        const cellTop = squareMetrics.gap + (y * squareMetrics.pitch);
+        context.fillRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
+        if (renderLayer === "hover" && renderStyle) {
+            context.fillStyle = renderStyle.hoverTintColor;
+            context.fillRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
+            context.strokeStyle = renderStyle.hoverStrokeColor;
+            context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+            context.strokeRect(cellLeft, cellTop, squareMetrics.cellSize, squareMetrics.cellSize);
+        }
     },
 
     applyViewportPreview(args: GeometryViewportPreviewArgs) {

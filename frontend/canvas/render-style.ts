@@ -230,6 +230,8 @@ export function resolveCanvasRenderStyle(
             || canvasColors.lineStrong
             || canvasColors.line
             || canvasColors.lineSoft,
+        hoverTintColor: canvasColors.lineStrong,
+        hoverStrokeColor: canvasColors.live,
     };
 }
 

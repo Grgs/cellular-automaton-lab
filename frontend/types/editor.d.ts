@@ -98,6 +98,7 @@ export interface GridInteractionBindings {
     onPointerUp(event: PointerEvent): void;
     onPointerCancel(event: PointerEvent): void;
     onClick(event: MouseEvent, cell: PaintableCell): void;
+    onHoverChange(cell: PaintableCell | null): void;
 }
 
 export interface EditorSessionOptions {
@@ -149,6 +150,7 @@ export interface InteractionControllerOptions {
     resolveCellFromEvent: (event: PointerEvent | MouseEvent) => PaintableCell | null;
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
+    setHoveredCell: (cell: PaintableCell | null) => void;
     mutationRunner: MutationRunner;
     onError: (error: unknown) => void;
     applySimulationState: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;

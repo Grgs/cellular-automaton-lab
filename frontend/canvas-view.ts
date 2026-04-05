@@ -11,7 +11,7 @@ import {
     topologyWidth,
 } from "./topology.js";
 import { resolveGeometryCache } from "./canvas/cache.js";
-import { drawCommittedLayer, drawPreviewLayer } from "./canvas/render-layers.js";
+import { drawCommittedLayer, drawHoverLayer, drawPreviewLayer } from "./canvas/render-layers.js";
 import {
     buildStateColorLookup,
     DEFAULT_COLORS,
@@ -47,6 +47,19 @@ type RuntimeCanvasGridView = CanvasGridView & {
 
 function previewKey(cell: PreviewPaintCell | null | undefined): string | null {
     return cell?.id || null;
+}
+
+function hoverKey(cell: PaintableCell | null | undefined): string | null {
+    if (!cell) {
+        return null;
+    }
+    if (typeof cell.id === "string" && cell.id.length > 0) {
+        return cell.id;
+    }
+    if (typeof cell.x === "number" && typeof cell.y === "number") {
+        return `${cell.x}:${cell.y}`;
+    }
+    return null;
 }
 
 function canvasBorderRadius(gap: number): string {
@@ -128,6 +141,7 @@ export function createCanvasGridView({
     let canvasColors: CanvasColors = { ...DEFAULT_COLORS };
     let colorLookup = buildStateColorLookup([], canvasColors);
     let currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
+    let hoveredCell: PaintableCell | null = null;
     let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
         pixelWidth: canvas.width,
@@ -169,6 +183,31 @@ export function createCanvasGridView({
         });
     }
 
+    function drawHoverOverlay(): void {
+        if (!hoveredCell) {
+            return;
+        }
+        drawHoverLayer({
+            context: surface.context,
+            geometry,
+            topology,
+            metrics,
+            geometryCache,
+            canvasColors,
+            renderStyle: currentRenderStyle,
+            colorLookup,
+            resolveRenderedCellColor,
+            hoveredCell,
+            cellStates,
+        });
+    }
+
+    function redrawTransientLayers(): void {
+        surface.restoreCommittedSurface(metrics);
+        drawHoverOverlay();
+        drawPreviewOverlay();
+    }
+
     function drawGrid(): void {
         const adapter = getGeometryAdapter(geometry);
         const width = topologyWidth(topology);
@@ -197,8 +236,7 @@ export function createCanvasGridView({
         geometryCache = nextCache.geometryCache;
 
         drawCommittedGrid();
-        surface.restoreCommittedSurface(metrics);
-        drawPreviewOverlay();
+        redrawTransientLayers();
     }
 
     function render(
@@ -226,8 +264,7 @@ export function createCanvasGridView({
                 .map((cell) => [previewKey(cell), cell])
                 .filter((entry): entry is [string, PreviewPaintCell] => typeof entry[0] === "string" && entry[0].length > 0),
         );
-        surface.restoreCommittedSurface(metrics);
-        drawPreviewOverlay();
+        redrawTransientLayers();
     }
 
     function clearPreview(): void {
@@ -235,7 +272,15 @@ export function createCanvasGridView({
             return;
         }
         previewCells = new Map();
-        surface.restoreCommittedSurface(metrics);
+        redrawTransientLayers();
+    }
+
+    function setHoveredCell(cell: PaintableCell | null): void {
+        if (hoverKey(hoveredCell) === hoverKey(cell)) {
+            return;
+        }
+        hoveredCell = cell ? { ...cell } : null;
+        redrawTransientLayers();
     }
 
     function getCellFromPointerEvent(event: MouseEvent | PointerEvent): PaintableCell | null {
@@ -261,6 +306,7 @@ export function createCanvasGridView({
         render,
         setPreviewCells,
         clearPreview,
+        setHoveredCell,
         getCellFromPointerEvent,
         getMetrics,
     };

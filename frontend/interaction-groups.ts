@@ -53,6 +53,7 @@ interface InteractionCommandSurfaceOptions {
     editorSession: ReturnType<typeof createInteractionSessionRuntime>["editorSession"];
     legacyDrag: ReturnType<typeof createInteractionSessionRuntime>["legacyDrag"];
     mutations: NonNullable<InteractionControllerOptions["simulationMutations"]>;
+    setHoveredCell: InteractionControllerOptions["setHoveredCell"];
     toggleCellRequest: InteractionControllerOptions["toggleCellRequest"];
     setCellRequest: InteractionControllerOptions["setCellRequest"];
     postControl: InteractionControllerOptions["postControl"];
@@ -149,6 +150,7 @@ export function createInteractionCommandSurface({
     editorSession,
     legacyDrag,
     mutations,
+    setHoveredCell,
     toggleCellRequest,
     setCellRequest,
     postControl,
@@ -170,6 +172,7 @@ export function createInteractionCommandSurface({
         editPolicy,
         editorSession,
         legacyDrag,
+        setHoveredCell,
         paintCell: commandDispatch.paintCell,
         bindGridInteractionsFn,
         setTimeoutFn,

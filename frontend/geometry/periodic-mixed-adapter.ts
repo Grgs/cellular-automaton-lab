@@ -403,6 +403,16 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
             }
             tracePolygonPath(context, geometryCell.vertices);
             context.fill();
+            if (renderLayer === "hover" && renderStyle) {
+                context.fillStyle = renderStyle.hoverTintColor;
+                tracePolygonPath(context, geometryCell.vertices);
+                context.fill();
+                context.strokeStyle = renderStyle.hoverStrokeColor;
+                context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+                tracePolygonPath(context, geometryCell.vertices);
+                context.stroke();
+                return;
+            }
             if (renderLayer === "preview" && renderStyle) {
                 context.strokeStyle = renderStyle.lineColor;
                 context.lineWidth = resolvePolygonStrokeWidth(renderStyle);

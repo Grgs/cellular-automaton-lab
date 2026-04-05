@@ -473,6 +473,8 @@ describe("canvas/render-style", () => {
         expect(resolveCanvasRenderStyle(12, "penrose-p3-rhombs", colors).aperiodicLineColor).toBe(
             "rgba(31, 36, 48, 0.24)",
         );
+        expect(resolveCanvasRenderStyle(12, "square", colors).hoverTintColor).toBe("rgba(31, 36, 48, 0.21)");
+        expect(resolveCanvasRenderStyle(12, "square", colors).hoverStrokeColor).toBe("#131722");
     });
 });
 

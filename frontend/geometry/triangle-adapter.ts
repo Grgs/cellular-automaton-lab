@@ -282,6 +282,16 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, metrics.cellSize) };
         tracePolygonPath(context, resolvedCell.vertices);
         context.fill();
+        if (renderLayer === "hover" && renderStyle) {
+            context.fillStyle = renderStyle.hoverTintColor;
+            tracePolygonPath(context, resolvedCell.vertices);
+            context.fill();
+            context.strokeStyle = renderStyle.hoverStrokeColor;
+            context.lineWidth = Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5);
+            tracePolygonPath(context, resolvedCell.vertices);
+            context.stroke();
+            return;
+        }
         if (renderLayer === "preview" && renderStyle?.triangleStrokeEnabled) {
             context.strokeStyle = renderStyle.lineColor;
             context.lineWidth = resolvePolygonStrokeWidth(renderStyle);

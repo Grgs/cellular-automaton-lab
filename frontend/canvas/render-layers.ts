@@ -32,7 +32,7 @@ interface SharedRenderInputs {
 }
 
 function resolvePreviewTopologyCell(
-    cell: PreviewPaintCell,
+    cell: PaintableCell,
     topology: TopologyPayload | null,
     geometryCache: GeometryCache | null,
 ): RenderableTopologyCell | null {
@@ -40,6 +40,28 @@ function resolvePreviewTopologyCell(
     return polygonCache?.cellsById.get(cell.id)?.cell
         || topology?.cells?.find((candidate) => candidate.id === cell.id)
         || null;
+}
+
+function resolveHoverStateValue(
+    cell: PaintableCell,
+    topology: TopologyPayload | null,
+    cellStates: number[],
+): number {
+    if (typeof cell.state === "number") {
+        return cell.state;
+    }
+    if (!Array.isArray(topology?.cells)) {
+        return 0;
+    }
+
+    const topologyCellIndex = typeof cell.id === "string" && cell.id.length > 0
+        ? topology.cells.findIndex((candidate) => candidate.id === cell.id)
+        : -1;
+
+    if (topologyCellIndex < 0) {
+        return 0;
+    }
+    return cellStates[topologyCellIndex] ?? 0;
 }
 
 export function drawCommittedLayer({
@@ -137,5 +159,38 @@ export function drawPreviewLayer({
             renderStyle: shared.renderStyle,
             renderLayer: "preview",
         });
+    });
+}
+
+export function drawHoverLayer({
+    context,
+    hoveredCell,
+    cellStates,
+    ...shared
+}: SharedRenderInputs & {
+    context: CanvasRenderingContext2D;
+    hoveredCell: PaintableCell | null;
+    cellStates: number[];
+}): void {
+    if (!hoveredCell) {
+        return;
+    }
+
+    const adapter = getGeometryAdapter(shared.geometry);
+    const topologyCell = adapter.family === "mixed"
+        ? resolvePreviewTopologyCell(hoveredCell, shared.topology, shared.geometryCache)
+        : null;
+    const renderCell = topologyCell || hoveredCell;
+    adapter.drawCell({
+        context,
+        cell: renderCell,
+        stateValue: resolveHoverStateValue(hoveredCell, shared.topology, cellStates),
+        metrics: shared.metrics,
+        cache: shared.geometryCache,
+        colors: shared.canvasColors,
+        colorLookup: shared.colorLookup,
+        resolveRenderedCellColor: shared.resolveRenderedCellColor,
+        renderStyle: shared.renderStyle,
+        renderLayer: "hover",
     });
 }

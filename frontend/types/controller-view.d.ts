@@ -2,7 +2,7 @@ import type { SimulationMutationOptions } from "./controller-runtime.js";
 import type { BlockingActivityConfig, MutationRunnerOptions } from "./controller-runtime.js";
 import type { ConfigSyncBody, EmptyControlCommandPath, ResetControlBody } from "./controller-api.js";
 import type { CellIdentifier, CellStateDefinition, SimulationSnapshot } from "./domain.js";
-import type { PreviewPaintCells } from "./editor.js";
+import type { PaintableCell, PreviewPaintCells } from "./editor.js";
 import type { TopologyRenderPayload } from "./state.js";
 
 export interface ViewportDimensions {
@@ -68,6 +68,7 @@ export interface GridView {
     getCellFromPointerEvent?(event: Event): CellIdentifier | null;
     setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
+    setHoveredCell(cell: PaintableCell | null): void;
 }
 
 export interface ViewportControllerDependencies {

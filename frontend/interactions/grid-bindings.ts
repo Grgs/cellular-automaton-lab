@@ -8,12 +8,19 @@ export function bindGridInteractions({
     onPointerUp,
     onPointerCancel,
     onClick,
+    onHoverChange,
 }: GridInteractionBindings): void {
     if (!surfaceElement) {
         return;
     }
 
+    function shouldTrackHover(event: PointerEvent): boolean {
+        const pointerType = event.pointerType || "mouse";
+        return pointerType !== "touch";
+    }
+
     surfaceElement.addEventListener("pointerdown", (event) => {
+        onHoverChange(null);
         if (event.button !== 0) {
             return;
         }
@@ -28,6 +35,9 @@ export function bindGridInteractions({
 
     surfaceElement.addEventListener("pointermove", (event) => {
         const cell = resolveCellFromEvent(event);
+        if (shouldTrackHover(event) && event.buttons === 0) {
+            onHoverChange(cell);
+        }
         if (!cell) {
             return;
         }
@@ -39,7 +49,12 @@ export function bindGridInteractions({
     });
 
     surfaceElement.addEventListener("pointercancel", (event) => {
+        onHoverChange(null);
         onPointerCancel(event);
+    });
+
+    surfaceElement.addEventListener("pointerleave", () => {
+        onHoverChange(null);
     });
 
     surfaceElement.addEventListener("click", (event) => {
