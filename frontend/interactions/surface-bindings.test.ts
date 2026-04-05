@@ -41,6 +41,8 @@ function createSubject({
     setSelectedCells: ReturnType<typeof vi.fn>;
     getSelectedCells: ReturnType<typeof vi.fn>;
     clearGestureOutline: ReturnType<typeof vi.fn>;
+    openInspectorDrawer: ReturnType<typeof vi.fn>;
+    renderControlPanel: ReturnType<typeof vi.fn>;
     paintCell: ReturnType<typeof vi.fn>;
     resolveDirectGestureTargetState: ReturnType<typeof vi.fn>;
     beginPointerSession: ReturnType<typeof vi.fn>;
@@ -56,6 +58,8 @@ function createSubject({
     const setSelectedCells = vi.fn();
     const getSelectedCells = vi.fn(() => []);
     const clearGestureOutline = vi.fn(() => undefined);
+    const openInspectorDrawer = vi.fn();
+    const renderControlPanel = vi.fn();
     const editorPointerActive = vi.fn(() => false);
     const legacyPointerActive = vi.fn(() => false);
     const paintCell = vi.fn().mockResolvedValue(undefined);
@@ -101,6 +105,8 @@ function createSubject({
         setSelectedCells,
         getSelectedCells,
         clearGestureOutline,
+        openInspectorDrawer,
+        renderControlPanel,
         paintCell,
         resolveDirectGestureTargetState,
         bindGridInteractionsFn(options) {
@@ -120,6 +126,8 @@ function createSubject({
         setSelectedCells,
         getSelectedCells,
         clearGestureOutline,
+        openInspectorDrawer,
+        renderControlPanel,
         paintCell,
         resolveDirectGestureTargetState,
         beginPointerSession,
@@ -320,6 +328,8 @@ describe("interactions/surface-bindings", () => {
             setSelectedCells: vi.fn(),
             getSelectedCells: vi.fn(() => []),
             clearGestureOutline: clearGestureOutlineSpy,
+            openInspectorDrawer: vi.fn(),
+            renderControlPanel: vi.fn(),
             paintCell: vi.fn().mockResolvedValue(undefined),
             resolveDirectGestureTargetState: vi.fn(() => 1),
             bindGridInteractionsFn(options) {
@@ -334,16 +344,18 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("selects a cell on right-button pointer down", () => {
-        const { handlers, setSelectedCells } = createSubject();
+        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } = createSubject();
         const cell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
 
         handlers.onPointerDown({ button: 2, pointerId: 7 } as PointerEvent, cell);
 
         expect(setSelectedCells).toHaveBeenCalledWith([cell]);
+        expect(openInspectorDrawer).toHaveBeenCalledTimes(1);
+        expect(renderControlPanel).toHaveBeenCalledTimes(1);
     });
 
     it("adds multiple cells during a right-drag select gesture", () => {
-        const { handlers, setSelectedCells } = createSubject();
+        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } = createSubject();
         const firstCell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
         const secondCell: PaintableCell = { id: "square:2:1", x: 2, y: 1 };
 
@@ -355,6 +367,8 @@ describe("interactions/surface-bindings", () => {
         expect(setSelectedCells).toHaveBeenNthCalledWith(1, [firstCell]);
         expect(setSelectedCells).toHaveBeenNthCalledWith(2, [firstCell, secondCell]);
         expect(setSelectedCells).toHaveBeenCalledTimes(2);
+        expect(openInspectorDrawer).toHaveBeenCalledTimes(2);
+        expect(renderControlPanel).toHaveBeenCalledTimes(2);
     });
 
     it("removes multiple cells during a right-drag deselect gesture", () => {
@@ -372,11 +386,13 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("clears the selection on empty-space right click", () => {
-        const { handlers, setSelectedCells } = createSubject();
+        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } = createSubject();
 
         handlers.onContextMenu(null);
 
         expect(setSelectedCells).toHaveBeenCalledWith([]);
+        expect(openInspectorDrawer).not.toHaveBeenCalled();
+        expect(renderControlPanel).toHaveBeenCalledTimes(1);
     });
 
     it("reverts an in-progress right-drag selection on pointer cancel", () => {

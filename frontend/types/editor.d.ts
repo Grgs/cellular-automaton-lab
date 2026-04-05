@@ -165,6 +165,7 @@ export interface InteractionControllerOptions {
     setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
     flashGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number) => void;
     clearGestureOutline: () => void;
+    openInspectorDrawer?: () => void;
     mutationRunner: MutationRunner;
     onError: (error: unknown) => void;
     applySimulationState: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;

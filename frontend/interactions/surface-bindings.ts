@@ -16,6 +16,8 @@ export function createInteractionSurfaceBindings({
     setSelectedCells,
     getSelectedCells,
     clearGestureOutline,
+    openInspectorDrawer,
+    renderControlPanel,
     paintCell,
     resolveDirectGestureTargetState,
     bindGridInteractionsFn = bindGridInteractionsToSurface,
@@ -44,6 +46,8 @@ export function createInteractionSurfaceBindings({
     setSelectedCells: (cells: PaintableCell[]) => void;
     getSelectedCells: () => PaintableCell[];
     clearGestureOutline: () => void;
+    openInspectorDrawer: () => void;
+    renderControlPanel: () => void;
     paintCell: (cell: PaintableCell, stateValue?: number) => Promise<void>;
     resolveDirectGestureTargetState: (cell: PaintableCell) => number;
     bindGridInteractionsFn?: ((options: GridInteractionBindings) => void) | undefined;
@@ -129,7 +133,12 @@ export function createInteractionSurfaceBindings({
             }
             selectionGestureWorkingCells.delete(cellKey);
         }
-        setSelectedCells(Array.from(selectionGestureWorkingCells.values()));
+        const nextSelectedCells = Array.from(selectionGestureWorkingCells.values());
+        setSelectedCells(nextSelectedCells);
+        if (nextSelectedCells.length > 0) {
+            openInspectorDrawer();
+        }
+        renderControlPanel();
     }
 
     function beginSelectionGesture(event: PointerEvent, cell: PaintableCell): void {
@@ -160,6 +169,7 @@ export function createInteractionSurfaceBindings({
         releaseSurfacePointerCapture(selectionPointerId);
         clearSelectionGestureState();
         suppressNextContextMenu = false;
+        renderControlPanel();
     }
 
     function resolvePendingDirectGestureTargetState(cell: PaintableCell): number {
@@ -294,6 +304,7 @@ export function createInteractionSurfaceBindings({
                     }
                     if (!cell) {
                         setSelectedCells([]);
+                        renderControlPanel();
                         return;
                     }
                     const selectedCells = cloneSelectedCells(getSelectedCells());
@@ -301,10 +312,13 @@ export function createInteractionSurfaceBindings({
                     if (selectedCells.has(cellKey)) {
                         selectedCells.delete(cellKey);
                         setSelectedCells(Array.from(selectedCells.values()));
+                        renderControlPanel();
                         return;
                     }
                     selectedCells.set(cellKey, { ...cell });
                     setSelectedCells(Array.from(selectedCells.values()));
+                    openInspectorDrawer();
+                    renderControlPanel();
                 },
                 onClick(event: MouseEvent, cell: PaintableCell) {
                     if (editorSession.isClickSuppressed()) {

@@ -60,6 +60,8 @@ interface InteractionCommandSurfaceOptions {
     setSelectedCells: InteractionControllerOptions["setSelectedCells"];
     getSelectedCells: InteractionControllerOptions["getSelectedCells"];
     clearGestureOutline: InteractionControllerOptions["clearGestureOutline"];
+    openInspectorDrawer: NonNullable<InteractionControllerOptions["openInspectorDrawer"]>;
+    renderControlPanel: NonNullable<InteractionControllerOptions["renderControlPanel"]>;
     toggleCellRequest: InteractionControllerOptions["toggleCellRequest"];
     setCellRequest: InteractionControllerOptions["setCellRequest"];
     postControl: InteractionControllerOptions["postControl"];
@@ -167,6 +169,8 @@ export function createInteractionCommandSurface({
     setSelectedCells,
     getSelectedCells,
     clearGestureOutline,
+    openInspectorDrawer,
+    renderControlPanel,
     toggleCellRequest,
     setCellRequest,
     postControl,
@@ -194,6 +198,8 @@ export function createInteractionCommandSurface({
         setSelectedCells,
         getSelectedCells,
         clearGestureOutline,
+        openInspectorDrawer,
+        renderControlPanel,
         paintCell: commandDispatch.paintCell,
         resolveDirectGestureTargetState: commandDispatch.resolveDirectGestureTargetState,
         bindGridInteractionsFn,

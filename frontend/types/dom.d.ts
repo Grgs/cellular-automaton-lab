@@ -26,6 +26,14 @@ export interface DomElements {
     gridSizePanelText: HTMLElement | null;
     inspectorTilingText: HTMLElement | null;
     inspectorRuleText: HTMLElement | null;
+    selectionInspectorSection: HTMLElement | null;
+    selectionInspectorTitle: HTMLElement | null;
+    selectionInspectorSubtitle: HTMLElement | null;
+    selectionInspectorHint: HTMLElement | null;
+    selectionInspectorSummaryRows: HTMLElement | null;
+    selectionInspectorAdvanced: HTMLDetailsElement | null;
+    selectionInspectorAdvancedSummary: HTMLElement | null;
+    selectionInspectorAdvancedRows: HTMLElement | null;
     quickStartHint: HTMLElement | null;
     quickStartHintText: HTMLElement | null;
     showcaseWhirlpoolBtn: HTMLButtonElement | null;

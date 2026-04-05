@@ -1110,6 +1110,62 @@ button.theme-toggle .theme-icon-moon {
     font-size: 0.84rem;
 }
 
+.selection-inspector-header {
+    display: grid;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.selection-inspector-title {
+    font-size: 0.95rem;
+    line-height: 1.3;
+}
+
+.selection-inspector-subtitle,
+.selection-inspector-hint {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.selection-inspector-hint {
+    margin: 0;
+}
+
+.selection-inspector-rows {
+    display: grid;
+    gap: 8px;
+}
+
+.selection-inspector-row {
+    display: grid;
+    grid-template-columns: minmax(0, 110px) minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+
+.selection-inspector-row-label {
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.selection-inspector-row-value {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.selection-inspector-advanced {
+    margin-top: 10px;
+}
+
+.selection-inspector-advanced-rows {
+    padding: 10px 12px 12px;
+}
+
 .editor-brush-block {
     margin-top: 10px;
 }
