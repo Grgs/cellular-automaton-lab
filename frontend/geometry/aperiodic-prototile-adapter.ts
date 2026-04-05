@@ -4,6 +4,19 @@ import {
     resolveMixedCellFromOffset,
 } from "../canvas/geometry-mixed.js";
 import { asPolygonGeometryCache } from "./cache-guards.js";
+import {
+    APERIODIC_MIN_CENTER_CELL_SIZE,
+    APERIODIC_MIN_METRIC_CELL_SIZE,
+    APERIODIC_RENDER_SCALE_MULTIPLIER,
+    CHAIR_RENDER_MARGIN_MIN,
+    CHAIR_RENDER_MARGIN_SCALE,
+    DEFAULT_APERIODIC_RENDER_MARGIN_MIN,
+    DEFAULT_APERIODIC_RENDER_MARGIN_SCALE,
+    SHIELD_RENDER_COORDINATE_SCALE,
+    SHIELD_RENDER_MARGIN_MIN,
+    SHIELD_RENDER_MARGIN_SCALE,
+    SHIELD_RENDER_POLYGON_SCALE,
+} from "./render-constants.js";
 import { fitRenderCellSizeWithMetrics } from "./shared.js";
 import type {
     GeometryAdapter,
@@ -26,9 +39,6 @@ interface AperiodicMetrics extends GridMetrics {
     maxRawX: number;
     maxRawY: number;
 }
-
-const SHIELD_RENDER_POLYGON_SCALE = 0.64;
-const SHIELD_RENDER_COORDINATE_SCALE = 0.35;
 
 function displayCoordinateScale(geometry: string): number {
     return geometry === "shield" ? SHIELD_RENDER_COORDINATE_SCALE : 1;
@@ -61,13 +71,13 @@ function buildAperiodicMetrics(
     width = 0,
     height = 0,
 ): AperiodicMetrics {
-    const scale = Math.max(0.25, Number(cellSize) || 1) * 10;
+    const scale = Math.max(APERIODIC_MIN_METRIC_CELL_SIZE, Number(cellSize) || 1) * APERIODIC_RENDER_SCALE_MULTIPLIER;
     const coordinateScale = displayCoordinateScale(geometry);
     const margin = geometry === "chair"
-        ? Math.max(8, scale * 0.15)
+        ? Math.max(CHAIR_RENDER_MARGIN_MIN, scale * CHAIR_RENDER_MARGIN_SCALE)
         : geometry === "shield"
-            ? Math.max(10, scale * 0.18)
-        : Math.max(16, scale * 0.45);
+            ? Math.max(SHIELD_RENDER_MARGIN_MIN, scale * SHIELD_RENDER_MARGIN_SCALE)
+        : Math.max(DEFAULT_APERIODIC_RENDER_MARGIN_MIN, scale * DEFAULT_APERIODIC_RENDER_MARGIN_SCALE);
     const cells = Array.isArray(topology?.cells) ? topology.cells : [];
     const allVertices = geometry === "shield"
         ? cells.flatMap((cell) => {
@@ -243,7 +253,7 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
         },
 
         resolveCoordinateCenter({ x, y, cellSize }: GeometryResolveCoordinateCenterArgs) {
-            const scale = Math.max(6, Number(cellSize) || 1) * 10;
+            const scale = Math.max(APERIODIC_MIN_CENTER_CELL_SIZE, Number(cellSize) || 1) * APERIODIC_RENDER_SCALE_MULTIPLIER;
             return {
                 x: x * scale,
                 y: y * scale,

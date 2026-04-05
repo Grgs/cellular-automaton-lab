@@ -1,6 +1,7 @@
 import {
     EDITOR_TOOL_FILL,
 } from "../editor-tools.js";
+import { FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS } from "./constants.js";
 import { bindGridInteractions as bindGridInteractionsToSurface } from "./grid-bindings.js";
 import type { InteractionEditPolicy } from "./edit-policy.js";
 import type { PaintableCell, GridInteractionBindings } from "../types/editor.js";
@@ -135,7 +136,7 @@ export function createInteractionSurfaceBindings({
                     if (consumeNextClick && editPolicy.supportsEditorTools() && !editorSession.isPointerActive() && !legacyDrag.isActive()) {
                         setTimeoutFn(() => {
                             consumeNextClick = false;
-                        }, 0);
+                        }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
                     }
                     if (legacyDrag.isActive()) {
                         void legacyDrag.end();

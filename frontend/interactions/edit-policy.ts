@@ -13,6 +13,7 @@ import {
     hideEditCue as hideEditCueState,
     setPatternStatus as setPatternStatusState,
 } from "../state/overlay-state.js";
+import { EDIT_CUE_HIDE_DELAY_MS } from "./constants.js";
 import type { AppState } from "../types/state.js";
 
 export interface InteractionEditPolicy {
@@ -111,7 +112,7 @@ export function createInteractionEditPolicy({
                 return;
             }
             hideEditCueAction();
-        }, 2000);
+        }, EDIT_CUE_HIDE_DELAY_MS);
     }
 
     async function dismissEditingUi(): Promise<boolean> {

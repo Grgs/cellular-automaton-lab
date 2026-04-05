@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import { createLegacyDragController } from "./legacy-drag.js";
 import type { SimulationSnapshot } from "../types/domain.js";
 
@@ -46,7 +47,7 @@ describe("interactions/legacy-drag", () => {
         expect(flashGestureOutline).toHaveBeenCalledWith([
             { id: "c:0:0", x: 0, y: 0, state: 0 },
             { id: "c:1:0", x: 1, y: 0, state: 0 },
-        ], "erase", 150);
+        ], "erase", DRAG_GESTURE_FLASH_DURATION_MS);
         expect(clearGestureOutline).toHaveBeenCalledTimes(1);
         expect(enableClickSuppression).toHaveBeenCalledTimes(1);
         expect(clearPreview).toHaveBeenCalledTimes(1);

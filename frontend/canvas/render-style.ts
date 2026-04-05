@@ -6,6 +6,15 @@ import {
     KAGOME_GEOMETRY,
 } from "../topology.js";
 import { triangleOrientation } from "./geometry-triangle.js";
+import {
+    COMPACT_RENDER_MAX_CELL_SIZE,
+    DARK_HOVER_PALETTE_LUMINANCE_THRESHOLD,
+    DARK_HOVER_STROKE_ALPHA,
+    DARK_HOVER_TINT_ALPHA,
+    DARK_SELECTION_TINT_ALPHA,
+    LIGHT_SELECTION_TINT_ALPHA,
+    STANDARD_RENDER_MAX_CELL_SIZE,
+} from "./render-constants.js";
 import type {
     CanvasColors,
     CanvasRenderStyle,
@@ -26,8 +35,6 @@ export const DEFAULT_COLORS: CanvasColors = {
     accentStrong: "#8a3d20",
 };
 
-const COMPACT_MAX_CELL_SIZE = 4;
-const STANDARD_MAX_CELL_SIZE = 8;
 const MIXED_DEAD_ALT_CELL_KINDS = new Map<string, ReadonlySet<string>>([
     [ARCHIMEDEAN_488_GEOMETRY, new Set(["square"])],
     [ARCHIMEDEAN_31212_GEOMETRY, new Set(["triangle"])],
@@ -201,10 +208,10 @@ export function readCanvasColors(
 }
 
 export function resolveRenderDetailLevel(cellSize: number): RenderStyle["mode"] {
-    if (cellSize <= COMPACT_MAX_CELL_SIZE) {
+    if (cellSize <= COMPACT_RENDER_MAX_CELL_SIZE) {
         return "compact";
     }
-    if (cellSize <= STANDARD_MAX_CELL_SIZE) {
+    if (cellSize <= STANDARD_RENDER_MAX_CELL_SIZE) {
         return "standard";
     }
     return "detailed";
@@ -291,7 +298,7 @@ function withAlpha(color: string, alpha: number): string {
 
 function isDarkThemeHoverPalette(canvasColors: CanvasColors): boolean {
     const parsed = parseColorChannels(canvasColors.lineStrong);
-    return parsed ? relativeLuminance(parsed) > 0.6 : false;
+    return parsed ? relativeLuminance(parsed) > DARK_HOVER_PALETTE_LUMINANCE_THRESHOLD : false;
 }
 
 export function resolveCanvasRenderStyle(
@@ -311,12 +318,15 @@ export function resolveCanvasRenderStyle(
             || canvasColors.line
             || canvasColors.lineSoft,
         hoverTintColor: useDarkHoverPalette
-            ? withAlpha(canvasColors.lineAperiodic || canvasColors.line || canvasColors.live, 0.18)
+            ? withAlpha(canvasColors.lineAperiodic || canvasColors.line || canvasColors.live, DARK_HOVER_TINT_ALPHA)
             : canvasColors.lineStrong,
         hoverStrokeColor: useDarkHoverPalette
-            ? withAlpha(canvasColors.lineAperiodic || canvasColors.line || canvasColors.live, 0.9)
+            ? withAlpha(canvasColors.lineAperiodic || canvasColors.line || canvasColors.live, DARK_HOVER_STROKE_ALPHA)
             : canvasColors.live,
-        selectionTintColor: withAlpha(canvasColors.accent, useDarkHoverPalette ? 0.18 : 0.16),
+        selectionTintColor: withAlpha(
+            canvasColors.accent,
+            useDarkHoverPalette ? DARK_SELECTION_TINT_ALPHA : LIGHT_SELECTION_TINT_ALPHA,
+        ),
         selectionStrokeColor: canvasColors.accentStrong || canvasColors.accent,
         gesturePaintStrokeColor: canvasColors.accentStrong || canvasColors.accent,
         gestureEraseStrokeColor: canvasColors.lineAperiodic || canvasColors.lineStrong || canvasColors.line,

@@ -23,6 +23,7 @@ import {
     resolveRenderStyle,
     resolveStateColor,
 } from "./canvas/render-style.js";
+import { DRAG_GESTURE_FLASH_DURATION_MS } from "./interactions/constants.js";
 import { createCanvasSurface, type CanvasSurfaceMetrics } from "./canvas/surface.js";
 import type { CellStateDefinition, TopologyPayload } from "./types/domain.js";
 import type { GestureOutlineTone, PaintableCell, PreviewPaintCell } from "./types/editor.js";
@@ -409,7 +410,11 @@ export function createCanvasGridView({
         redrawTransientLayers();
     }
 
-    function flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs = 150): void {
+    function flashGestureOutline(
+        cells: PaintableCell[],
+        tone: GestureOutlineTone,
+        durationMs = DRAG_GESTURE_FLASH_DURATION_MS,
+    ): void {
         const nextCells = normalizeGestureOutlineCells(cells);
         clearGestureOutlineTimer();
         gestureOutlineCells = nextCells;

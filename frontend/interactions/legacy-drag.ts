@@ -1,4 +1,5 @@
 import { createDragPaintSession } from "../drag-session.js";
+import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import type { LegacyDragController, LegacyDragOptions } from "../types/editor.js";
 
 export function createLegacyDragController({
@@ -73,7 +74,7 @@ export function createLegacyDragController({
         } finally {
             clearPreview();
             if (dragState.moved && dragState.paintedCells.length > 0 && gestureTone) {
-                flashGestureOutline(dragState.paintedCells, gestureTone, 150);
+                flashGestureOutline(dragState.paintedCells, gestureTone, DRAG_GESTURE_FLASH_DURATION_MS);
             }
         }
     }

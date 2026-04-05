@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type { SimulationSnapshot } from "../types/domain.js";
 
@@ -67,7 +68,7 @@ describe("interactions/editor-session", () => {
         expect(previewPaintCells).toHaveBeenCalledWith(previewCells);
         expect(setGestureOutline).toHaveBeenCalledWith(previewCells, "paint");
         expect(commitEditorCells).toHaveBeenCalledWith(previewCells);
-        expect(flashGestureOutline).toHaveBeenCalledWith(previewCells, "paint", 150);
+        expect(flashGestureOutline).toHaveBeenCalledWith(previewCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
         expect(clearGestureOutline).toHaveBeenCalled();
     });
 
@@ -121,7 +122,7 @@ describe("interactions/editor-session", () => {
         expect(previewPaintCells).toHaveBeenCalledWith(previewCells);
         expect(setGestureOutline).toHaveBeenCalledWith(previewCells, "paint");
         expect(commitEditorCells).toHaveBeenCalledWith(previewCells);
-        expect(flashGestureOutline).toHaveBeenCalledWith(previewCells, "paint", 150);
+        expect(flashGestureOutline).toHaveBeenCalledWith(previewCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
         expect(clearGestureOutline).toHaveBeenCalled();
     });
 

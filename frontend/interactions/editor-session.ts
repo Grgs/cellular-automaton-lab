@@ -15,6 +15,7 @@ import type {
 } from "../types/editor.js";
 import { createEditorCommitRuntime } from "./editor-session-commit.js";
 import { createEditorPointerState } from "./editor-session-state.js";
+import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import type { ShapeEditorSession } from "./editor-session-state.js";
 
 export function createEditorSessionController({
@@ -196,7 +197,11 @@ export function createEditorSessionController({
                 }).catch(() => null).finally(() => {
                     clearPreview();
                     if (session.moved && session.paintedCells.size > 0) {
-                        flashGestureOutline(Array.from(session.paintedCells.values()), "paint", 150);
+                        flashGestureOutline(
+                            Array.from(session.paintedCells.values()),
+                            "paint",
+                            DRAG_GESTURE_FLASH_DURATION_MS,
+                        );
                     }
                 });
             }
@@ -211,7 +216,7 @@ export function createEditorSessionController({
             return commitRuntime.commitEditorCells(shapeCells).catch(() => null).finally(() => {
                 clearPreview();
                 if (session.moved && shapeCells.length > 0) {
-                    flashGestureOutline(shapeCells, "paint", 150);
+                    flashGestureOutline(shapeCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
                 }
             });
         },

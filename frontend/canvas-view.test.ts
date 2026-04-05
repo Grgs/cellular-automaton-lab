@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { DRAG_GESTURE_FLASH_DURATION_MS } from "./interactions/constants.js";
 import { installFrontendGlobals } from "./test-helpers/bootstrap.js";
 import type { TopologyPayload } from "./types/domain.js";
 
@@ -189,11 +190,15 @@ describe("canvas-view", () => {
 
         expect(drawSelectionLayer).toHaveBeenCalledTimes(1);
 
-        view.flashGestureOutline([{ id: "square:0:0", x: 0, y: 0 }], "erase", 150);
+        view.flashGestureOutline(
+            [{ id: "square:0:0", x: 0, y: 0 }],
+            "erase",
+            DRAG_GESTURE_FLASH_DURATION_MS,
+        );
 
         expect(drawGestureOutlineLayer.mock.calls.length).toBeGreaterThanOrEqual(2);
 
-        vi.advanceTimersByTime(151);
+        vi.advanceTimersByTime(DRAG_GESTURE_FLASH_DURATION_MS + 1);
 
         expect(restoreCommittedSurface.mock.calls.length).toBeGreaterThan(restoreCallsBeforeClear);
         const gestureCallsBeforeRevisionChange = drawGestureOutlineLayer.mock.calls.length;

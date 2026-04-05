@@ -3,6 +3,7 @@ import {
     EDITOR_TOOL_LINE,
     EDITOR_TOOL_RECTANGLE,
 } from "../editor-tools.js";
+import { FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS } from "./constants.js";
 import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
 
 function identifyCell(cell: PaintableCell): string | null {
@@ -64,7 +65,7 @@ export function createEditorPointerState(): EditorPointerState {
         suppressClick = true;
         window.setTimeout(() => {
             suppressClick = false;
-        }, 0);
+        }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
     }
 
     function beginBrushSession(cell: PaintableCell, pointerId: number | null): void {

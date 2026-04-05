@@ -1,4 +1,11 @@
 import { triangleVertices } from "./geometry-triangle.js";
+import {
+    COMPACT_POLYGON_STROKE_WIDTH,
+    GESTURE_OUTLINE_MIN_STROKE_WIDTH,
+    HOVER_MIN_STROKE_WIDTH,
+    SELECTION_MIN_STROKE_WIDTH,
+    STANDARD_POLYGON_STROKE_WIDTH,
+} from "./render-constants.js";
 import type {
     CanvasRenderStyle,
     GeometryCache,
@@ -80,7 +87,7 @@ export function drawTriangleGrid(
 }
 
 export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): number {
-    return renderStyle.mode === "compact" ? 1 : 1.25;
+    return renderStyle.mode === "compact" ? COMPACT_POLYGON_STROKE_WIDTH : STANDARD_POLYGON_STROKE_WIDTH;
 }
 
 export function resolveTransientOverlayStyle(
@@ -94,7 +101,7 @@ export function resolveTransientOverlayStyle(
         return {
             tintColor: renderStyle.hoverTintColor,
             strokeColor: renderStyle.hoverStrokeColor,
-            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle), 1.5),
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle), HOVER_MIN_STROKE_WIDTH),
             drawBaseFill: true,
         };
     }
@@ -102,7 +109,7 @@ export function resolveTransientOverlayStyle(
         return {
             tintColor: renderStyle.selectionTintColor,
             strokeColor: renderStyle.selectionStrokeColor,
-            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, 2.5),
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, SELECTION_MIN_STROKE_WIDTH),
             drawBaseFill: true,
         };
     }
@@ -110,7 +117,7 @@ export function resolveTransientOverlayStyle(
         return {
             tintColor: null,
             strokeColor: renderStyle.gesturePaintStrokeColor,
-            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, 2.25),
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, GESTURE_OUTLINE_MIN_STROKE_WIDTH),
             drawBaseFill: false,
         };
     }
@@ -118,7 +125,7 @@ export function resolveTransientOverlayStyle(
         return {
             tintColor: null,
             strokeColor: renderStyle.gestureEraseStrokeColor,
-            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, 2.25),
+            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, GESTURE_OUTLINE_MIN_STROKE_WIDTH),
             drawBaseFill: false,
         };
     }
