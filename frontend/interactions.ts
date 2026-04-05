@@ -142,6 +142,10 @@ export function createInteractionController({
     return {
         bindGridInteractions: surfaceBindings.bindGridInteractions,
         toggleCell: commandDispatch.toggleCell,
+        clearSelection: () => {
+            setSelectedCells([]);
+            renderControlPanel();
+        },
         sendControl: commandDispatch.sendControl,
         undo: () => sessionRuntime.historyCommands.undo(),
         redo: () => sessionRuntime.historyCommands.redo(),

@@ -32,6 +32,7 @@ export interface AppView {
 export interface InteractionController {
     bindGridInteractions(): void;
     toggleCell?(cell: CellIdentifier): Promise<void>;
+    clearSelection?(): void;
     sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
     sendControl(
         path: "/api/control/reset",

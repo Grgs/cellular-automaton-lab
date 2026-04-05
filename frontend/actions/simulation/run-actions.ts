@@ -46,6 +46,7 @@ export function createRunActions(runtime: SimulationActionRuntime): Pick<
 
         reset() {
             dismissHintsAndStatus();
+            interactions.clearSelection?.();
             applyOverlayIntentAndRender(OVERLAY_INTENT_BOARD_RESET);
             return interactions.sendControl("/api/control/reset", buildResetPayload(false), {
                 blockingActivity: BLOCKING_ACTIVITY_RESET_BOARD,
@@ -57,6 +58,7 @@ export function createRunActions(runtime: SimulationActionRuntime): Pick<
 
         randomReset() {
             dismissHintsAndStatus();
+            interactions.clearSelection?.();
             applyOverlayIntentAndRender(OVERLAY_INTENT_BOARD_RESET);
             return interactions.sendControl("/api/control/reset", buildResetPayload(true), {
                 blockingActivity: BLOCKING_ACTIVITY_RESET_BOARD,
