@@ -1,3 +1,4 @@
+import { buildCommittedEdit, pushUndoEntry } from "../editor-history.js";
 import type {
     ConfigSyncBody,
     ControlCommandMap,
@@ -11,6 +12,7 @@ import type {
 import type { PaintableCell } from "../types/editor.js";
 import type { SimulationSnapshot } from "../types/domain.js";
 import type { SimulationMutations } from "../types/controller.js";
+import type { AppState } from "../types/state.js";
 
 interface InteractionCommandDispatch {
     paintCell(cell: PaintableCell, stateValue?: number): Promise<void>;
@@ -31,25 +33,40 @@ interface InteractionCommandDispatch {
 }
 
 export function createInteractionCommandDispatch({
+    state = null,
     mutations,
     toggleCellRequest,
     setCellRequest,
     postControl,
     getPaintState,
     getCellState,
+    renderControlPanel = () => {},
 }: {
+    state?: AppState | null;
     mutations: Pick<SimulationMutations, "runStateMutation" | "runSerialized">;
     toggleCellRequest: ToggleCellRequestFunction;
     setCellRequest: SetCellRequestFunction;
     postControl: PostControlFunction;
     getPaintState: () => number;
     getCellState: (cell: PaintableCell) => number;
+    renderControlPanel?: () => void;
 }): InteractionCommandDispatch {
     async function paintCell(cell: PaintableCell, stateValue = getPaintState()): Promise<void> {
         if (typeof cell !== "object" || cell === null) {
             throw new Error("Cell painting requires a resolved topology cell.");
         }
-        await mutations.runStateMutation(() => setCellRequest(cell, stateValue), { source: "editor" }).catch(() => null);
+        const edit = state ? buildCommittedEdit(state, [{ ...cell, state: stateValue }]) : null;
+        if (state?.topologyIndex && !edit) {
+            return;
+        }
+        const simulationState = await mutations.runStateMutation(
+            () => setCellRequest(cell, stateValue),
+            { source: "editor" },
+        ).catch(() => null);
+        if (simulationState && edit && state) {
+            pushUndoEntry(state, edit);
+            renderControlPanel();
+        }
     }
 
     async function toggleCell(cell: PaintableCell): Promise<void> {

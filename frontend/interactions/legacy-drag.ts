@@ -1,8 +1,10 @@
+import { buildCommittedEdit, pushUndoEntry } from "../editor-history.js";
 import { createDragPaintSession } from "../drag-session.js";
 import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import type { LegacyDragController, LegacyDragOptions } from "../types/editor.js";
 
 export function createLegacyDragController({
+    state = null,
     getPaintState,
     previewPaintCells,
     clearPreview,
@@ -11,6 +13,7 @@ export function createLegacyDragController({
     clearGestureOutline,
     setCellsRequest,
     runStateMutation,
+    renderControlPanel = () => {},
     setPointerCapture,
     releasePointerCapture,
     enableClickSuppression,
@@ -64,10 +67,18 @@ export function createLegacyDragController({
         clearGestureOutline();
         try {
             if (dragState.moved && dragState.paintedCells.length > 0) {
+                const edit = state ? buildCommittedEdit(state, dragState.paintedCells) : null;
+                if (state?.topologyIndex && !edit) {
+                    return null;
+                }
                 const result = await runStateMutation(
                     () => setCellsRequest(dragState.paintedCells),
                     { recoverWithRefresh: true, source: "editor" },
                 );
+                if (result && edit && state) {
+                    pushUndoEntry(state, edit);
+                    renderControlPanel();
+                }
                 return result;
             }
             return null;

@@ -52,6 +52,7 @@ interface InteractionEditorRuntimeOptions {
 interface InteractionCommandSurfaceOptions {
     surfaceElement: InteractionControllerOptions["surfaceElement"];
     resolveCellFromEvent: InteractionControllerOptions["resolveCellFromEvent"];
+    state: AppState | null;
     editPolicy: ReturnType<typeof createInteractionEditPolicy>;
     editorSession: ReturnType<typeof createInteractionSessionRuntime>["editorSession"];
     legacyDrag: ReturnType<typeof createInteractionSessionRuntime>["legacyDrag"];
@@ -161,6 +162,7 @@ export function createInteractionEditorRuntime({
 export function createInteractionCommandSurface({
     surfaceElement,
     resolveCellFromEvent,
+    state,
     editPolicy,
     editorSession,
     legacyDrag,
@@ -180,12 +182,14 @@ export function createInteractionCommandSurface({
     setTimeoutFn,
 }: InteractionCommandSurfaceOptions) {
     const commandDispatch = createInteractionCommandDispatch({
+        state,
         mutations,
         toggleCellRequest,
         setCellRequest,
         postControl,
         getPaintState,
         getCellState,
+        renderControlPanel,
     });
 
     const surfaceBindings = createInteractionSurfaceBindings({

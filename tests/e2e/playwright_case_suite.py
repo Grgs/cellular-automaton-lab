@@ -100,7 +100,6 @@ class SharedUiFlowMixin:
 
     def _paint_canvas_center(self) -> None:
         self._click_canvas_center()
-        self._click_canvas_center()
         self._expect("#undo-btn").to_be_enabled()
 
     def _canvas_visual_summary(self) -> dict[str, object]:
@@ -183,6 +182,17 @@ class SharedUiFlowMixin:
         timeout_ms: int = 60_000,
     ) -> None:
         case = self._case()
+        if case.api is None:
+            case.page.select_option("#tiling-family-select", tiling_family)
+            case.page.wait_for_function(
+                """(nextTilingFamily) => {
+                    const select = document.getElementById("tiling-family-select");
+                    return select instanceof HTMLSelectElement && select.value === nextTilingFamily;
+                }""",
+                arg=tiling_family,
+                timeout=timeout_ms,
+            )
+            return
         with case.page.expect_response(
             lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
             timeout=timeout_ms,

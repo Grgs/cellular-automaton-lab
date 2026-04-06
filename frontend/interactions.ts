@@ -108,6 +108,7 @@ export function createInteractionController({
     const { commandDispatch, surfaceBindings } = createInteractionCommandSurface({
         surfaceElement,
         resolveCellFromEvent,
+        state,
         editPolicy,
         editorSession: sessionRuntime.editorSession,
         legacyDrag: sessionRuntime.legacyDrag,

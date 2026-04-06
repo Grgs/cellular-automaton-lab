@@ -137,6 +137,7 @@ export interface HistoryCommandsOptions {
 }
 
 export interface LegacyDragOptions {
+    state?: AppState | null;
     getPaintState: () => number;
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
@@ -148,6 +149,7 @@ export interface LegacyDragOptions {
         task: () => Promise<SimulationSnapshot>,
         options?: MutationRunnerOptions & { recoverWithRefresh?: boolean; source?: string },
     ) => Promise<SimulationSnapshot>;
+    renderControlPanel?: () => void;
     setPointerCapture: (pointerId: number | null) => void;
     releasePointerCapture: (pointerId: number | null) => void;
     enableClickSuppression: () => void;

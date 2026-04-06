@@ -111,6 +111,7 @@ export function createInteractionSessionRuntime({
     });
 
     const legacyDrag = createLegacyDragControllerFn({
+        state,
         getPaintState,
         previewPaintCells,
         clearPreview,
@@ -119,6 +120,7 @@ export function createInteractionSessionRuntime({
         clearGestureOutline,
         setCellsRequest,
         runStateMutation,
+        renderControlPanel,
         setPointerCapture,
         releasePointerCapture,
         enableClickSuppression: () => editorSession.enableClickSuppression(),
