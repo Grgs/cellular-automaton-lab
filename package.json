@@ -5,10 +5,17 @@
     "build:frontend": "vite build --mode server",
     "build:frontend:server": "vite build --mode server",
     "build:frontend:standalone": "node ./tools/build-standalone.mjs",
+    "build:standalone-and-test": "npm run build:frontend:standalone && node ./tools/run-playwright.mjs --skip-standalone-build tests.e2e.test_playwright_standalone_runtime",
     "dev:frontend": "vite build --watch --mode server",
     "typecheck:frontend": "tsc -p tsconfig.json --noEmit",
     "test:frontend": "vitest run",
-    "check:frontend": "npm run typecheck:frontend && npm run build:frontend && npm run test:frontend"
+    "test:e2e:playwright": "node ./tools/run-playwright.mjs",
+    "test:e2e:playwright:server": "node ./tools/run-playwright.mjs --env PLAYWRIGHT_SUBSET_INDEX=0 --env PLAYWRIGHT_SUBSET_COUNT=1 tests.e2e.playwright_chunk_subset",
+    "test:e2e:playwright:subset": "node ./tools/run-playwright.mjs tests.e2e.playwright_chunk_subset",
+    "test:e2e:playwright:standalone": "node ./tools/run-playwright.mjs tests.e2e.test_playwright_standalone_runtime",
+    "check:frontend": "npm run typecheck:frontend && npm run build:frontend && npm run test:frontend",
+    "check:e2e": "npm run typecheck:frontend && npm run build:frontend && npm run test:e2e:playwright",
+    "check:ci-local": "npm run check:frontend && node ./tools/run-python.mjs tools/validate_tilings.py && node ./tools/run-python.mjs tools/verify_reference_tilings.py && npm run test:e2e:playwright"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
