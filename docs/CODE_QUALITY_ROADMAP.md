@@ -77,6 +77,10 @@ Target outcome:
 
 Adding a new gesture should require adding one session implementation, not editing many unrelated branches. Undo/history and metadata refresh should become session outcomes instead of side effects hidden in surface bindings.
 
+Implementation status:
+
+The first extraction is in place. `surface-bindings.ts` now delegates pointer lifecycle behavior to `frontend/interactions/gesture-sessions.ts`, while the existing legacy drag and editor session controllers still own the actual paint/edit commits.
+
 ### 2. Canvas Transient Overlay Rendering
 
 Primary files:
@@ -111,6 +115,10 @@ Target outcome:
 
 Canvas view becomes smaller and easier to reason about. Overlay behavior can be tested without constructing the full canvas view.
 
+Implementation status:
+
+The first extraction is in place. `frontend/canvas/transient-overlays.ts` owns hover, selection, preview, gesture outline, flash timing, and topology cleanup state; `canvas-view.ts` renders snapshots from that controller.
+
 ### 3. Drawer And Inspector View Models
 
 Primary files:
@@ -140,6 +148,10 @@ The right-click metadata inspector should be built from a typed selector over `g
 Target outcome:
 
 Adding a drawer section should not increase coupling between unrelated controls. Section tests should be able to exercise their model builders independently.
+
+Implementation status:
+
+The right-click metadata builder now lives in `frontend/controls-model/selection-inspector.ts`. `drawer.ts` remains the drawer aggregator and imports that section-specific model.
 
 ### 4. Aperiodic Tiling Implementations
 
@@ -303,8 +315,6 @@ Developers run the same entrypoints locally and in CI, reducing stale assumption
 These are low-risk cleanup tasks worth doing before larger refactors:
 
 - Split `frontend/canvas/render-style.ts` into base palette resolution, state color resolution, and overlay color resolution.
-- Move right-click metadata inspector model logic out of `controls-model/drawer.ts` into a section-specific module.
-- Move `surface-bindings.ts` gesture-mode branches behind small session objects without changing behavior.
 - Add a `docs` note for which npm script to run for each E2E failure class.
 - Split `backend/simulation/literature_reference_specs.py` into periodic, regular, and aperiodic spec modules.
 - Add a small fixture-regeneration command for canonical and local reference patch fixtures.
@@ -318,10 +328,7 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Suggested Order
 
-1. Extract frontend gesture sessions from `surface-bindings.ts`.
-2. Extract canvas transient overlay state/rendering from `canvas-view.ts`.
-3. Split drawer metadata inspector into its own model/render module.
-4. Split literature verification specs and canonical fixture comparison helpers.
-5. Define per-family aperiodic implementation contracts.
-6. Normalize shared polygon adapter overlay drawing.
-7. Add schema or contract-snapshot protection for frontend/backend payload drift.
+1. Split literature verification specs and canonical fixture comparison helpers.
+2. Define per-family aperiodic implementation contracts.
+3. Normalize shared polygon adapter overlay drawing.
+4. Add schema or contract-snapshot protection for frontend/backend payload drift.
