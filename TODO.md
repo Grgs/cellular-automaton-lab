@@ -10,7 +10,6 @@
 
 ## Next
 
-- Add a fixture-regeneration command for canonical and local reference patch fixtures.
 - Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
 - Extend frontend/backend contract drift protection beyond domain payload fields into controller and standalone-worker command payloads.
 - Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.

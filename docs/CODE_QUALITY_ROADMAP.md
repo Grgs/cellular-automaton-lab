@@ -230,7 +230,7 @@ The verifier remains strict without becoming a single-file policy engine. Adding
 
 Implementation status:
 
-The first split is in place. `backend/simulation/literature_reference_specs.py` now merges grouped spec modules from `backend/simulation/reference_specs/`, and `backend/simulation/literature_reference_verification.py` is a compatibility facade over `backend/simulation/reference_verification/` modules for observation, fixtures, depth checks, periodic checks, shared types, and runner orchestration.
+The first split is in place. `backend/simulation/literature_reference_specs.py` now merges grouped spec modules from `backend/simulation/reference_specs/`, and `backend/simulation/literature_reference_verification.py` is a compatibility facade over `backend/simulation/reference_verification/` modules for observation, fixtures, depth checks, periodic checks, shared types, and runner orchestration. `tools/regenerate_reference_fixtures.py` now makes local and canonical fixture regeneration explicit, deterministic, and checkable.
 
 ### 6. Frontend Geometry Adapter Common Path
 
@@ -331,7 +331,6 @@ Developers run the same entrypoints locally and in CI, reducing stale assumption
 These are low-risk cleanup tasks worth doing before larger refactors:
 
 - Add a `docs` note for which npm script to run for each E2E failure class.
-- Add a small fixture-regeneration command for canonical and local reference patch fixtures.
 
 ## Do Not Do Yet
 
@@ -342,7 +341,6 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Suggested Order
 
-1. Add a fixture-regeneration command for canonical and local reference patch fixtures.
-2. Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
-3. Expand payload drift protection from domain payload fields into controller/worker command payloads.
-4. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
+1. Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
+2. Expand payload drift protection from domain payload fields into controller/worker command payloads.
+3. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.

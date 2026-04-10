@@ -73,6 +73,14 @@ npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geom
 
 Use these when you need a browser-side sanity pass on representative rendered fixtures, not just backend topology-space geometry.
 
+### 8. Reference fixture drift check
+
+```powershell
+npm run fixtures:reference:check
+```
+
+Use this when generator or verifier changes may affect checked-in rooted local-reference or canonical patch fixtures. It reports fixture drift without rewriting the JSON files. To intentionally update fixtures, run `py -3 tools/regenerate_reference_fixtures.py --all --mode both` and review the resulting git diff.
+
 ## How To Read Failures
 
 - `validate_tilings.py` fails
