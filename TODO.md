@@ -2,6 +2,7 @@
 
 ## Now
 
+- Start the code-quality cleanup sequence in `docs/CODE_QUALITY_ROADMAP.md`, beginning with explicit frontend gesture sessions and a separate canvas transient-overlay state/renderer.
 - Revisit browser-visible shape and pattern correctness for `square-triangle`, `shield`, and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 - Broaden browser-visible rendering-bounds verification beyond the current representative fixture set.
@@ -10,6 +11,8 @@
 
 ## Next
 
+- Split the right-click metadata inspector model out of `frontend/controls-model/drawer.ts` into a section-owned model module.
+- Split `backend/simulation/literature_reference_specs.py` and `backend/simulation/literature_reference_verification.py` by verification mode before adding more fixture types.
 - Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.
 - Extend direct canonical patch comparisons beyond `square-triangle`, `shield`, and `pinwheel` where they buy materially stronger guarantees.
 - If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.

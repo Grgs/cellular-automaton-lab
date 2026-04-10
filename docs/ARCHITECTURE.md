@@ -40,6 +40,19 @@ Important rules:
 - Backend snapshots are authoritative for topology, rule, speed, running state, generation, and cell states.
 - Frontend edits and control changes are explicit mutations that return the next canonical snapshot.
 
+## Current Code Quality Focus
+
+The app has usable subsystem boundaries, but the next cleanup work should focus on high-change seams rather than broad rewrites. The current priorities are documented in [CODE_QUALITY_ROADMAP.md](./CODE_QUALITY_ROADMAP.md).
+
+The short version:
+
+- Interaction state needs an explicit gesture/session model. `surface-bindings.ts` currently coordinates too many pointer modes directly.
+- Canvas transient overlays need their own state and renderer. `canvas-view.ts` should not keep accumulating hover, selection, preview, and gesture-flash lifecycle policy.
+- Drawer sections should be independently owned. The right-click metadata inspector should move out of the broad drawer model into a section-specific model.
+- Aperiodic tilings need per-family implementation contracts so true substitutions, exact-affine paths, canonical reference patches, and known deviations are not treated as equivalent.
+- Literature verification should be split into smaller modules before more families or fixture modes are added.
+- Frontend/backend payload drift needs stronger mechanical protection as the API, standalone worker protocol, and topology metadata grow.
+
 ## Backend
 
 ### HTTP Layer

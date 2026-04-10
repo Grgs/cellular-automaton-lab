@@ -218,6 +218,16 @@ The main Playwright-backed suites cover flows such as:
 Useful entrypoints include:
 
 ```powershell
+npm run test:e2e:playwright
+npm run test:e2e:playwright:server
+npm run test:e2e:playwright:standalone
+npm run test:e2e:playwright:subset
+npm run build:standalone-and-test
+```
+
+These npm scripts are the preferred local entrypoints because they also handle local Playwright browser-runtime setup. Direct Python entrypoints are still useful when debugging CI internals:
+
+```powershell
 py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
 py -3 -m unittest -q tests.e2e.test_playwright_overlays_and_editor
 py -3 -m unittest -q tests.e2e.test_playwright_pattern_and_showcase

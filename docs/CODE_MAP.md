@@ -6,6 +6,7 @@ This is a runtime-focused map of the app. It is meant to answer two questions qu
 2. Which files and functions should you follow for a given kind of change?
 
 For the higher-level architecture, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+For cleanup priorities and known structural pressure points, see [CODE_QUALITY_ROADMAP.md](./CODE_QUALITY_ROADMAP.md).
 
 ## Start Here
 
@@ -402,6 +403,10 @@ Browser UI
 
 - [tools/build-standalone.mjs](../tools/build-standalone.mjs)
   Builds the static standalone site.
+- [tools/run-playwright.mjs](../tools/run-playwright.mjs)
+  Local Playwright runner used by npm scripts. It prepares Linux browser runtime libraries when needed, builds standalone output for standalone suites, and dispatches Python `unittest` modules.
+- [tools/run-python.mjs](../tools/run-python.mjs)
+  Cross-platform Python command wrapper used by npm scripts for repo tools.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
   Manifest-wide geometric sanity checker for catalog tilings. Prints a reminder to run the literature verifier for the full catalog companion checks.
 - [tools/verify_reference_tilings.py](../tools/verify_reference_tilings.py)
@@ -414,6 +419,37 @@ Browser UI
   Validates topology descriptors and generated tilings.
 - [vite.config.ts](../vite.config.ts)
   Frontend build configuration.
+
+## Current Refactor Targets
+
+Use this list to decide where cleanup work should start. These are the files with the most structural pressure today, not necessarily the files with the most defects.
+
+- Frontend gesture orchestration:
+  [surface-bindings.ts](../frontend/interactions/surface-bindings.ts),
+  [legacy-drag.ts](../frontend/interactions/legacy-drag.ts),
+  [editor-session.ts](../frontend/interactions/editor-session.ts),
+  [command-dispatch.ts](../frontend/interactions/command-dispatch.ts)
+- Canvas transient overlays:
+  [canvas-view.ts](../frontend/canvas-view.ts),
+  [render-layers.ts](../frontend/canvas/render-layers.ts),
+  [render-style.ts](../frontend/canvas/render-style.ts)
+- Drawer metadata and inspector modeling:
+  [drawer.ts](../frontend/controls-model/drawer.ts),
+  [view-sections.ts](../frontend/controls/view-sections.ts),
+  [app-view.ts](../frontend/app-view.ts)
+- Aperiodic implementation quality:
+  [aperiodic_registry.py](../backend/simulation/aperiodic_registry.py),
+  [aperiodic_substitution.py](../backend/simulation/aperiodic_substitution.py),
+  [aperiodic_support.py](../backend/simulation/aperiodic_support.py),
+  [aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
+- Literature verification size and ownership:
+  [literature_reference_specs.py](../backend/simulation/literature_reference_specs.py),
+  [literature_reference_verification.py](../backend/simulation/literature_reference_verification.py)
+- Frontend/backend contract drift:
+  [types/domain.d.ts](../frontend/types/domain.d.ts),
+  [types/controller-api.d.ts](../frontend/types/controller-api.d.ts),
+  [payload_types.py](../backend/payload_types.py),
+  [contract_validation.py](../backend/contract_validation.py)
 
 ## If You Want To Change...
 
