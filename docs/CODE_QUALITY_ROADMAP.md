@@ -117,7 +117,7 @@ Canvas view becomes smaller and easier to reason about. Overlay behavior can be 
 
 Implementation status:
 
-The first extraction is in place. `frontend/canvas/transient-overlays.ts` owns hover, selection, preview, gesture outline, flash timing, and topology cleanup state; `canvas-view.ts` renders snapshots from that controller.
+The first extraction is in place. `frontend/canvas/transient-overlays.ts` owns hover, selection, preview, gesture outline, flash timing, and topology cleanup state; `canvas-view.ts` renders snapshots from that controller. Render-style ownership is also split: `theme-colors.ts` owns CSS token/color utilities, `state-colors.ts` owns cell-state and dead-state palette resolution, and `overlay-style.ts` owns transient overlay color policy.
 
 ### 3. Drawer And Inspector View Models
 
@@ -330,7 +330,6 @@ Developers run the same entrypoints locally and in CI, reducing stale assumption
 
 These are low-risk cleanup tasks worth doing before larger refactors:
 
-- Split `frontend/canvas/render-style.ts` into base palette resolution, state color resolution, and overlay color resolution.
 - Add a `docs` note for which npm script to run for each E2E failure class.
 - Add a small fixture-regeneration command for canonical and local reference patch fixtures.
 
@@ -343,7 +342,7 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Suggested Order
 
-1. Split `frontend/canvas/render-style.ts` into smaller palette, state-color, and overlay-style modules.
-2. Add a fixture-regeneration command for canonical and local reference patch fixtures.
-3. Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
-4. Expand payload drift protection from domain payload fields into controller/worker command payloads.
+1. Add a fixture-regeneration command for canonical and local reference patch fixtures.
+2. Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
+3. Expand payload drift protection from domain payload fields into controller/worker command payloads.
+4. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
