@@ -16,6 +16,16 @@ import type {
 
 type PathTarget = CanvasRenderingContext2D | Path2D;
 
+interface DrawPolygonCellArgs {
+    context: CanvasRenderingContext2D;
+    vertices: readonly Point2D[];
+    fillColor: string;
+    renderLayer: RenderedCellArgs["renderLayer"];
+    renderStyle: CanvasRenderStyle | undefined;
+    committedStrokeColor?: string | null;
+    drawPreviewStroke?: boolean;
+}
+
 export function tracePolygonPath(context: CanvasRenderingContext2D, vertices: readonly Point2D[]): void {
     const [first, ...rest] = vertices;
     if (!first) {
@@ -130,6 +140,49 @@ export function resolveTransientOverlayStyle(
         };
     }
     return null;
+}
+
+export function drawPolygonCellWithTransientOverlay({
+    context,
+    vertices,
+    fillColor,
+    renderLayer,
+    renderStyle,
+    committedStrokeColor = null,
+    drawPreviewStroke = false,
+}: DrawPolygonCellArgs): void {
+    const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
+    if (!overlayStyle || overlayStyle.drawBaseFill) {
+        if (context.fillStyle !== fillColor) {
+            context.fillStyle = fillColor;
+        }
+        tracePolygonPath(context, vertices);
+        context.fill();
+        if (committedStrokeColor) {
+            if (context.strokeStyle !== committedStrokeColor) {
+                context.strokeStyle = committedStrokeColor;
+            }
+            context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
+            context.stroke();
+        }
+    }
+    if (overlayStyle) {
+        if (overlayStyle.tintColor) {
+            context.fillStyle = overlayStyle.tintColor;
+            tracePolygonPath(context, vertices);
+            context.fill();
+        }
+        context.strokeStyle = overlayStyle.strokeColor;
+        context.lineWidth = overlayStyle.strokeWidth;
+        tracePolygonPath(context, vertices);
+        context.stroke();
+        return;
+    }
+    if (drawPreviewStroke && renderLayer === "preview" && renderStyle) {
+        context.strokeStyle = renderStyle.lineColor;
+        context.lineWidth = resolvePolygonStrokeWidth(renderStyle);
+        context.stroke();
+    }
 }
 
 export function drawPolygonGrid(

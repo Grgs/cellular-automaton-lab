@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from backend.simulation.aperiodic_contracts import APERIODIC_IMPLEMENTATION_CONTRACTS
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_validation import recommended_validation_options
 
@@ -69,11 +70,16 @@ def _strength_tags(geometry: str) -> tuple[str, ...]:
 
 
 def main() -> int:
-    print("geometry\tsample_mode\tstrength_tags")
+    print("geometry\tsample_mode\timplementation_status\tstrength_tags")
     for geometry in sorted(REFERENCE_FAMILY_SPECS):
         spec = REFERENCE_FAMILY_SPECS[geometry]
+        implementation_status = (
+            APERIODIC_IMPLEMENTATION_CONTRACTS[geometry].implementation_status
+            if geometry in APERIODIC_IMPLEMENTATION_CONTRACTS
+            else ""
+        )
         print(
-            f"{geometry}\t{spec.sample_mode}\t{','.join(_strength_tags(geometry))}"
+            f"{geometry}\t{spec.sample_mode}\t{implementation_status}\t{','.join(_strength_tags(geometry))}"
         )
     return 0
 

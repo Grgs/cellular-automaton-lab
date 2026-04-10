@@ -1,4 +1,4 @@
-import { resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
+import { drawPolygonCellWithTransientOverlay } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -174,25 +174,13 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             if (!geometryCell) {
                 return;
             }
-            const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-            if (!overlayStyle || overlayStyle.drawBaseFill) {
-                if (context.fillStyle !== color) {
-                    context.fillStyle = color;
-                }
-                tracePolygonPath(context, geometryCell.vertices);
-                context.fill();
-            }
-            if (overlayStyle) {
-                if (overlayStyle.tintColor) {
-                    context.fillStyle = overlayStyle.tintColor;
-                    tracePolygonPath(context, geometryCell.vertices);
-                    context.fill();
-                }
-                context.strokeStyle = overlayStyle.strokeColor;
-                context.lineWidth = overlayStyle.strokeWidth;
-                tracePolygonPath(context, geometryCell.vertices);
-                context.stroke();
-            }
+            drawPolygonCellWithTransientOverlay({
+                context,
+                vertices: geometryCell.vertices,
+                fillColor: color,
+                renderLayer,
+                renderStyle,
+            });
         },
 
         applyViewportPreview() {

@@ -4,15 +4,42 @@ import unittest
 from pathlib import Path
 
 try:
+    from backend.simulation.aperiodic_contracts import APERIODIC_IMPLEMENTATION_CONTRACTS
     from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
     from backend.simulation.topology import build_topology
+    from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from backend.simulation.aperiodic_contracts import APERIODIC_IMPLEMENTATION_CONTRACTS
     from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
     from backend.simulation.topology import build_topology
+    from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 
 
 class AperiodicRegistryTests(unittest.TestCase):
+    def test_every_aperiodic_family_has_an_implementation_contract(self) -> None:
+        aperiodic_geometries = {
+            variant.geometry_key
+            for variant in TOPOLOGY_VARIANTS
+            if variant.family == "aperiodic"
+        }
+
+        self.assertEqual(set(APERIODIC_IMPLEMENTATION_CONTRACTS), aperiodic_geometries)
+        for geometry, contract in APERIODIC_IMPLEMENTATION_CONTRACTS.items():
+            with self.subTest(geometry=geometry):
+                self.assertEqual(contract.geometry, geometry)
+                self.assertTrue(contract.source_urls)
+                self.assertTrue(contract.public_cell_kinds)
+                self.assertTrue(contract.depth_semantics)
+                self.assertTrue(contract.verification_modes)
+
+    def test_experimental_aperiodics_keep_explicit_promotion_blockers(self) -> None:
+        for geometry in ("square-triangle", "shield", "pinwheel"):
+            with self.subTest(geometry=geometry):
+                self.assertIsNotNone(
+                    APERIODIC_IMPLEMENTATION_CONTRACTS[geometry].promotion_blocker
+                )
+
     def test_taylor_socolar_patch_builder_matches_topology_builder_output(self) -> None:
         patch = build_aperiodic_patch("taylor-socolar", 2)
         topology = build_topology("taylor-socolar", 0, 0, patch_depth=2)

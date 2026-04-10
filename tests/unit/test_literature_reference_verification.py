@@ -463,7 +463,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
         expectation = REFERENCE_FAMILY_SPECS["shield"].depth_expectations[3]
         with patch(
-            "backend.simulation.literature_reference_verification._load_canonical_reference_fixtures",
+            "backend.simulation.reference_verification.fixtures._load_canonical_reference_fixtures",
             return_value=bad_fixtures,
         ):
             failures = _depth_topology_expectation_failures(
@@ -498,7 +498,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         }
 
         with patch(
-            "backend.simulation.literature_reference_verification._load_local_reference_fixtures",
+            "backend.simulation.reference_verification.fixtures._load_local_reference_fixtures",
             return_value=bad_fixtures,
         ):
             failures = _local_reference_fixture_failures("hat-monotile", 2, topology)

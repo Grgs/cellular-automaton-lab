@@ -1,4 +1,4 @@
-import { resolvePolygonStrokeWidth, resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
+import { drawPolygonCellWithTransientOverlay } from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -275,33 +275,14 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
             if (!geometryCell) {
                 return;
             }
-            const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-            if (!overlayStyle || overlayStyle.drawBaseFill) {
-                if (context.fillStyle !== color) {
-                    context.fillStyle = color;
-                }
-                tracePolygonPath(context, geometryCell.vertices);
-                context.fill();
-                const strokeColor = renderStyle?.aperiodicLineColor || renderStyle?.lineColor;
-                if (strokeColor) {
-                    if (context.strokeStyle !== strokeColor) {
-                        context.strokeStyle = strokeColor;
-                    }
-                    context.lineWidth = renderStyle ? resolvePolygonStrokeWidth(renderStyle) : 1;
-                    context.stroke();
-                }
-            }
-            if (overlayStyle) {
-                if (overlayStyle.tintColor) {
-                    context.fillStyle = overlayStyle.tintColor;
-                    tracePolygonPath(context, geometryCell.vertices);
-                    context.fill();
-                }
-                context.strokeStyle = overlayStyle.strokeColor;
-                context.lineWidth = overlayStyle.strokeWidth;
-                tracePolygonPath(context, geometryCell.vertices);
-                context.stroke();
-            }
+            drawPolygonCellWithTransientOverlay({
+                context,
+                vertices: geometryCell.vertices,
+                fillColor: color,
+                renderLayer,
+                renderStyle,
+                committedStrokeColor: renderStyle?.aperiodicLineColor || renderStyle?.lineColor || null,
+            });
         },
 
         applyViewportPreview() {

@@ -2,6 +2,8 @@
 
 This file tracks the current verification level for every tiling family in the app.
 
+Implementation-status contracts for aperiodic families live in `backend/simulation/aperiodic_contracts.py`. The developer-facing strength report includes those statuses beside verification coverage, so promotion decisions can distinguish true substitutions, exact-affine paths, canonical patches, and known deviations.
+
 Legend:
 
 - `Geometric sanity`: passes `py -3 tools/validate_tilings.py`

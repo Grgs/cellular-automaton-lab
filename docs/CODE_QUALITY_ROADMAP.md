@@ -22,7 +22,7 @@ This assessment is based on the current code shape, recent feature work, and the
 - `frontend/canvas-view.ts` has become the owner for committed canvas caching plus multiple transient visual layers.
 - `frontend/interactions/surface-bindings.ts`, `legacy-drag.ts`, and `editor-session.ts` coordinate several pointer gestures with overlapping lifecycle rules.
 - `frontend/controls-model/drawer.ts` is now both the drawer aggregator and the right-click cell metadata model.
-- `backend/simulation/literature_reference_specs.py` and `backend/simulation/literature_reference_verification.py` contain too many verification modes in large single modules.
+- `backend/simulation/literature_reference_specs.py` and `backend/simulation/literature_reference_verification.py` are now compatibility facades, but the newly split verifier/spec modules should stay small as more verification modes are added.
 - Aperiodic tiling builders vary in implementation strength, so implementation status, picker status, and verification language need explicit per-family contracts.
 - Browser E2E tooling has grown into a real runtime subsystem and should be treated as such instead of as loose Python commands.
 
@@ -193,6 +193,10 @@ Target outcome:
 
 The code stops treating all aperiodic builders as equally authoritative. Product status, verification status, and implementation quality stay aligned.
 
+Implementation status:
+
+The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `square-triangle`, `shield`, and `pinwheel` still explicitly blocked from promotion pending visual or implementation work.
+
 ### 5. Literature Verification And Fixtures
 
 Primary files:
@@ -223,6 +227,10 @@ Also add a fixture-regeneration workflow that makes intentional fixture updates 
 Target outcome:
 
 The verifier remains strict without becoming a single-file policy engine. Adding a family should not require understanding every verification mode.
+
+Implementation status:
+
+The first split is in place. `backend/simulation/literature_reference_specs.py` now merges grouped spec modules from `backend/simulation/reference_specs/`, and `backend/simulation/literature_reference_verification.py` is a compatibility facade over `backend/simulation/reference_verification/` modules for observation, fixtures, depth checks, periodic checks, shared types, and runner orchestration.
 
 ### 6. Frontend Geometry Adapter Common Path
 
@@ -256,6 +264,10 @@ Target outcome:
 
 Visual behavior stays consistent across tilings, and changing overlay or selection rendering no longer requires editing every adapter.
 
+Implementation status:
+
+The polygon overlay drawing path is now shared for the mixed periodic, Penrose, and generic aperiodic polygon adapters through `drawPolygonCellWithTransientOverlay(...)` in `frontend/canvas/draw.ts`. Regular square, hex, and triangle adapters remain local because their grid math is still clearer outside a polygon abstraction.
+
 ### 7. Frontend Type Surfaces
 
 Primary files:
@@ -282,6 +294,10 @@ Choose one of these approaches:
 Target outcome:
 
 Payload drift becomes mechanically visible before it reaches runtime or E2E tests.
+
+Implementation status:
+
+The first drift guard is in place. `backend/payload_contracts.py` emits the backend-owned payload field surface for the core topology, rule, and pattern payloads, and `tests/unit/test_payload_contracts.py` asserts that `frontend/types/domain.d.ts` stays aligned.
 
 ### 8. E2E Tooling And Browser Runtime
 
@@ -316,7 +332,6 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 - Split `frontend/canvas/render-style.ts` into base palette resolution, state color resolution, and overlay color resolution.
 - Add a `docs` note for which npm script to run for each E2E failure class.
-- Split `backend/simulation/literature_reference_specs.py` into periodic, regular, and aperiodic spec modules.
 - Add a small fixture-regeneration command for canonical and local reference patch fixtures.
 
 ## Do Not Do Yet
@@ -328,7 +343,7 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Suggested Order
 
-1. Split literature verification specs and canonical fixture comparison helpers.
-2. Define per-family aperiodic implementation contracts.
-3. Normalize shared polygon adapter overlay drawing.
-4. Add schema or contract-snapshot protection for frontend/backend payload drift.
+1. Split `frontend/canvas/render-style.ts` into smaller palette, state-color, and overlay-style modules.
+2. Add a fixture-regeneration command for canonical and local reference patch fixtures.
+3. Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
+4. Expand payload drift protection from domain payload fields into controller/worker command payloads.

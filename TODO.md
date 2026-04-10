@@ -10,8 +10,10 @@
 
 ## Next
 
-- Split `backend/simulation/literature_reference_specs.py` and `backend/simulation/literature_reference_verification.py` by verification mode before adding more fixture types.
-- Continue the code-quality cleanup sequence in `docs/CODE_QUALITY_ROADMAP.md` with shared polygon overlay drawing or frontend/backend contract drift protection.
+- Split `frontend/canvas/render-style.ts` into base palette resolution, state color resolution, and overlay color resolution.
+- Add a fixture-regeneration command for canonical and local reference patch fixtures.
+- Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
+- Extend frontend/backend contract drift protection beyond domain payload fields into controller and standalone-worker command payloads.
 - Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.
 - Extend direct canonical patch comparisons beyond `square-triangle`, `shield`, and `pinwheel` where they buy materially stronger guarantees.
 - If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
