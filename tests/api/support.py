@@ -10,10 +10,10 @@ from flask.testing import FlaskClient
 
 from backend.payload_types import (
     ResetControlRequestPayload,
+    ResetTopologySpecPayload,
     RuleDefinitionPayload,
     SimulationStatePayload,
     TopologyPayload,
-    TopologySpecPayload,
 )
 
 try:
@@ -73,7 +73,7 @@ class ApiTestCase(unittest.TestCase):
         self.reset_simulation()
 
     def build_reset_payload(self, **overrides: Unpack[ResetSimulationOverrides]) -> ResetControlRequestPayload:
-        topology_spec: TopologySpecPayload = {
+        topology_spec: ResetTopologySpecPayload = {
             'tiling_family': 'square',
             'adjacency_mode': 'edge',
             'sizing_mode': 'grid',
