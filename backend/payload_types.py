@@ -88,6 +88,22 @@ class TopologySpecPatch(TypedDict, total=False):
 TopologySpecInput: TypeAlias = TopologySpecPayload | TopologySpecRequestPayload | TopologySpecPatch
 
 
+class ConfigTopologySpecPatchPayload(TypedDict, total=False):
+    width: int
+    height: int
+    unsafe_size_override: bool
+
+
+class ResetTopologySpecPayload(TopologySpecPayload):
+    unsafe_size_override: NotRequired[bool]
+
+
+class ConfigSyncRequestPayload(TypedDict, total=False):
+    topology_spec: ConfigTopologySpecPatchPayload
+    speed: float
+    rule: str | None
+
+
 class PersistedSimulationSnapshotV5(TypedDict):
     version: Literal[5]
     topology_spec: TopologySpecPayload
@@ -233,9 +249,9 @@ class AppBootstrapPayload(TypedDict):
 
 
 class ResetControlRequestPayload(TypedDict):
-    topology_spec: TopologySpecPayload
+    topology_spec: ResetTopologySpecPayload
     speed: float
-    rule: str
+    rule: str | None
     randomize: bool
 
 
@@ -248,3 +264,7 @@ class CellUpdatePayload(CellTargetPayload):
 
 
 CellUpdatesPayload: TypeAlias = list[CellUpdatePayload]
+
+
+class CellUpdatesRequestPayload(TypedDict):
+    cells: CellUpdatesPayload

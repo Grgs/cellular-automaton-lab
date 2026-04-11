@@ -1,6 +1,5 @@
 import type {
     AppBootstrapData,
-    CellIdentifier,
     PersistedSimulationSnapshotV5,
     RulesResponse,
     SimulationSnapshot,
@@ -28,6 +27,18 @@ export interface ResetControlBody {
     speed: number;
     rule: string | null;
     randomize: boolean;
+}
+
+export interface CellTargetRequest {
+    id: string;
+}
+
+export interface CellUpdateRequest extends CellTargetRequest {
+    state: number;
+}
+
+export interface CellUpdatesRequest {
+    cells: CellUpdateRequest[];
 }
 
 export interface ControlCommandMap {
@@ -58,9 +69,9 @@ export interface SimulationBackend {
     postControl(path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
     postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
     postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
-    toggleCell(cell: CellIdentifier): Promise<SimulationSnapshot>;
-    setCell(cell: CellIdentifier, state: number): Promise<SimulationSnapshot>;
-    setCells(cells: Array<{ id: string; state: number }>): Promise<SimulationSnapshot>;
+    toggleCell(cell: CellTargetRequest): Promise<SimulationSnapshot>;
+    setCell(cell: CellTargetRequest, state: number): Promise<SimulationSnapshot>;
+    setCells(cells: CellUpdateRequest[]): Promise<SimulationSnapshot>;
 }
 
 export interface SimulationStatePersistence {
@@ -75,19 +86,19 @@ export interface PostControlFunction {
 }
 
 export interface CellMutationRequestFunction {
-    (cell: { id: string }, state?: number): Promise<SimulationSnapshot>;
+    (cell: CellTargetRequest, state?: number): Promise<SimulationSnapshot>;
 }
 
 export interface ToggleCellRequestFunction {
-    (cell: CellIdentifier): Promise<SimulationSnapshot>;
+    (cell: CellTargetRequest): Promise<SimulationSnapshot>;
 }
 
 export interface SetCellRequestFunction {
-    (cell: CellIdentifier, state: number): Promise<SimulationSnapshot>;
+    (cell: CellTargetRequest, state: number): Promise<SimulationSnapshot>;
 }
 
 export interface SetCellsRequestFunction {
-    (cells: Array<{ id: string; state: number }>): Promise<SimulationSnapshot>;
+    (cells: CellUpdateRequest[]): Promise<SimulationSnapshot>;
 }
 
 export interface InitAppOptions {

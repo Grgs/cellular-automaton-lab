@@ -11,6 +11,7 @@ import type {
     StandaloneInitErrorResponse,
     StandaloneReadyResponse,
     StandaloneRequestMessage,
+    StandaloneRequestPayload,
     StandaloneSuccessResponse,
     StandaloneWorkerIncomingMessage,
     StandaloneWorkerOutgoingMessage,
@@ -126,7 +127,7 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
 
     async function request(
         path: StandaloneCommandPath,
-        payload?: ResetControlBody | ConfigSyncBody | { id: string } | { id: string; state: number } | { cells: Array<{ id: string; state: number }> },
+        payload?: StandaloneRequestPayload,
     ): Promise<StandaloneSuccessResponse> {
         if (fatalError) {
             throw fatalError;
@@ -149,10 +150,12 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
         return response;
     }
 
+    type ControlRequestPayload = ResetControlBody | ConfigSyncBody;
+
     async function postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
     async function postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
     async function postControl(path: "/api/control/start" | "/api/control/pause" | "/api/control/resume" | "/api/control/step"): Promise<SimulationSnapshot>;
-    async function postControl(path: StandaloneCommandPath, body?: ResetControlBody | ConfigSyncBody): Promise<SimulationSnapshot> {
+    async function postControl(path: StandaloneCommandPath, body?: ControlRequestPayload): Promise<SimulationSnapshot> {
         const response = await request(path, body);
         return requireSnapshot(response.snapshot);
     }

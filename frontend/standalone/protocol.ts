@@ -1,5 +1,12 @@
 import type { PersistedSimulationSnapshotV5, RulesResponse, SimulationSnapshot } from "../types/domain.js";
-import type { ConfigSyncBody, EmptyControlCommandPath, ResetControlBody } from "../types/controller.js";
+import type {
+    CellTargetRequest,
+    CellUpdateRequest,
+    CellUpdatesRequest,
+    ConfigSyncBody,
+    EmptyControlCommandPath,
+    ResetControlBody,
+} from "../types/controller.js";
 
 export type StandaloneCommandPath =
     | "/api/state"
@@ -19,11 +26,18 @@ export interface StandaloneInitMessage {
     pyodideBaseUrl: string;
 }
 
+export type StandaloneRequestPayload =
+    | ResetControlBody
+    | ConfigSyncBody
+    | CellTargetRequest
+    | CellUpdateRequest
+    | CellUpdatesRequest;
+
 export interface StandaloneRequestMessage {
     type: "request";
     requestId: string;
     path: StandaloneCommandPath;
-    payload?: ResetControlBody | ConfigSyncBody | { id: string } | { id: string; state: number } | { cells: Array<{ id: string; state: number }> };
+    payload?: StandaloneRequestPayload;
 }
 
 export interface StandaloneTickPersistEvent {

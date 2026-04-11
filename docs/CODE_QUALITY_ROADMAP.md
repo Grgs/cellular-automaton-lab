@@ -297,7 +297,7 @@ Payload drift becomes mechanically visible before it reaches runtime or E2E test
 
 Implementation status:
 
-The first drift guard is in place. `backend/payload_contracts.py` emits the backend-owned payload field surface for the core topology, rule, and pattern payloads, and `tests/unit/test_payload_contracts.py` asserts that `frontend/types/domain.d.ts` stays aligned.
+The first drift guard now covers both the core domain payloads and the request-side controller and standalone worker command shapes. `backend/payload_contracts.py` emits backend-owned contract metadata for `frontend/types/domain.d.ts`, `frontend/types/controller-api.d.ts`, and the standalone request payload union in `frontend/standalone/protocol.ts`, and `tests/unit/test_payload_contracts.py` asserts that those frontend declarations stay aligned.
 
 ### 8. E2E Tooling And Browser Runtime
 
@@ -341,5 +341,4 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Suggested Order
 
-1. Expand payload drift protection from domain payload fields into controller/worker command payloads.
-2. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
+1. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
