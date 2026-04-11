@@ -9,12 +9,28 @@ const rootDir = path.resolve(dirname, "..");
 const playwrightLibRoot = path.join(rootDir, "output", "playwright-linux-libs");
 const playwrightLibDebDir = path.join(playwrightLibRoot, "debs");
 const playwrightLibExtractRoot = path.join(playwrightLibRoot, "root");
-const defaultModule = "tests.e2e.test_playwright_all";
+const defaultSuiteName = "all";
+const manifestToolPath = path.join("tools", "print_playwright_suite_manifest.py");
 const envOverrides = {};
-const requestedModules = [];
+let listSuites = false;
 let skipStandaloneBuild = false;
+let suiteName = defaultSuiteName;
+
 for (let index = 2; index < process.argv.length; index += 1) {
     const token = process.argv[index];
+    if (token === "--suite") {
+        const value = process.argv[index + 1];
+        if (!value) {
+            throw new Error("Expected a suite name after --suite.");
+        }
+        suiteName = value;
+        index += 1;
+        continue;
+    }
+    if (token === "--list-suites") {
+        listSuites = true;
+        continue;
+    }
     if (token === "--skip-standalone-build") {
         skipStandaloneBuild = true;
         continue;
@@ -29,9 +45,9 @@ for (let index = 2; index < process.argv.length; index += 1) {
         index += 1;
         continue;
     }
-    requestedModules.push(token);
+    throw new Error(`Unknown argument '${token}'. Use --suite <name>, --list-suites, or --env KEY=VALUE.`);
 }
-const modules = requestedModules.length > 0 ? requestedModules : [defaultModule];
+
 const pythonCandidates = process.platform === "win32"
     ? [
         [process.env.PYTHON, []],
@@ -85,7 +101,41 @@ function findChromiumHeadlessShell() {
     return entries.at(-1) ?? null;
 }
 
-function chooseAlsaPackage() {
+function commandExists(command) {
+    const result = spawnSync("bash", ["-lc", `command -v ${command}`], {
+        cwd: rootDir,
+        encoding: "utf8",
+        shell: false,
+    });
+    return result.status === 0;
+}
+
+function linuxRepairError({ missingLibraries, packages = [], missingTools = [], extraDetail = "" }) {
+    const lines = [
+        "Playwright browser is missing shared libraries on Linux.",
+        `Missing libraries: ${missingLibraries.join(", ")}`,
+    ];
+    if (packages.length > 0) {
+        lines.push(`Attempted repair packages: ${packages.join(", ")}`);
+    }
+    if (missingTools.length > 0) {
+        lines.push(`Missing repair tools: ${missingTools.join(", ")}`);
+    }
+    lines.push("The local self-repair path currently assumes Debian/Ubuntu-style tooling (`apt`, `apt-cache`, and `dpkg-deb`).");
+    lines.push("Install the required runtime libraries manually or rerun in an environment with those packaging tools available.");
+    if (extraDetail) {
+        lines.push(extraDetail.trim());
+    }
+    return new Error(lines.join("\n"));
+}
+
+function chooseAlsaPackage(missingLibraries) {
+    if (!commandExists("apt-cache")) {
+        throw linuxRepairError({
+            missingLibraries,
+            missingTools: ["apt-cache"],
+        });
+    }
     const preferred = ["libasound2t64", "libasound2"];
     for (const packageName of preferred) {
         const result = runCommandCapture("apt-cache", ["policy", packageName]);
@@ -93,7 +143,11 @@ function chooseAlsaPackage() {
             return packageName;
         }
     }
-    throw new Error("Unable to resolve an ALSA runtime package for Playwright.");
+    throw linuxRepairError({
+        missingLibraries,
+        packages: preferred,
+        extraDetail: "Unable to resolve an installable ALSA runtime package with `apt-cache policy`.",
+    });
 }
 
 function lddMissingLibraries(binaryPath, env) {
@@ -135,14 +189,29 @@ function ensureLinuxPlaywrightRuntime(env) {
         return env;
     }
 
-    const packages = ["libnspr4", "libnss3", chooseAlsaPackage()];
+    const missingTools = ["apt", "apt-cache", "dpkg-deb"].filter((command) => !commandExists(command));
+    if (missingTools.length > 0) {
+        throw linuxRepairError({
+            missingLibraries: currentMissing,
+            missingTools,
+        });
+    }
+
+    const packages = ["libnspr4", "libnss3", chooseAlsaPackage(currentMissing)];
     fs.mkdirSync(playwrightLibDebDir, { recursive: true });
     fs.mkdirSync(playwrightLibExtractRoot, { recursive: true });
 
-    runCommand("apt", ["download", ...packages], {
+    const downloadResult = runCommandCapture("apt", ["download", ...packages], {
         cwd: playwrightLibDebDir,
         stdio: "inherit",
     });
+    if (downloadResult.status !== 0) {
+        throw linuxRepairError({
+            missingLibraries: currentMissing,
+            packages,
+            extraDetail: downloadResult.stderr || downloadResult.stdout || "The `apt download` command failed.",
+        });
+    }
 
     const debFiles = fs.readdirSync(playwrightLibDebDir)
         .filter((filename) => filename.endsWith(".deb"))
@@ -160,19 +229,47 @@ function ensureLinuxPlaywrightRuntime(env) {
     };
     const remainingMissing = lddMissingLibraries(browserBinary, nextEnv);
     if (remainingMissing.length > 0) {
-        throw new Error(`Playwright browser is still missing shared libraries: ${remainingMissing.join(", ")}`);
+        throw linuxRepairError({
+            missingLibraries: remainingMissing,
+            packages,
+            extraDetail: "Playwright browser is still missing shared libraries after the local repair attempt.",
+        });
     }
     return nextEnv;
 }
 
-function shouldBuildStandaloneOutputs() {
-    return modules.some((moduleName) => (
-        moduleName.includes("standalone")
-        || moduleName.endsWith("test_playwright_all")
-    ));
+function runPythonCapture(args, options = {}) {
+    let commandFailure = null;
+    for (const [command, prefixArgs] of pythonCandidates) {
+        if (!command) {
+            continue;
+        }
+        const result = spawnSync(command, [...prefixArgs, ...args], {
+            cwd: rootDir,
+            encoding: "utf8",
+            shell: false,
+            ...options,
+        });
+        if (result.status === 0) {
+            return result;
+        }
+        if (result.error) {
+            continue;
+        }
+        commandFailure = { command, prefixArgs, result };
+        break;
+    }
+    if (commandFailure !== null) {
+        const { command, prefixArgs, result } = commandFailure;
+        const stdout = result.stdout ? `\nstdout:\n${result.stdout}` : "";
+        const stderr = result.stderr ? `\nstderr:\n${result.stderr}` : "";
+        throw new Error(`Python command failed: ${command} ${prefixArgs.join(" ")} ${args.join(" ")}`.trim() + stdout + stderr);
+    }
+    throw new Error("Unable to find a working Python interpreter.");
 }
 
-function runPythonModules(env) {
+function runPythonModules(modules, env) {
+    let commandFailure = null;
     for (const [command, prefixArgs] of pythonCandidates) {
         if (!command) {
             continue;
@@ -189,17 +286,47 @@ function runPythonModules(env) {
         if (result.error) {
             continue;
         }
+        commandFailure = { command, prefixArgs };
+        break;
+    }
+    if (commandFailure !== null) {
+        const { command, prefixArgs } = commandFailure;
         throw new Error(`Playwright tests failed with ${command} ${prefixArgs.join(" ")}`.trim());
     }
     throw new Error("Unable to run Playwright tests because no working Python interpreter was found.");
 }
 
-const baseEnv = { ...process.env, ...envOverrides };
+function loadSuiteManifest() {
+    const result = runPythonCapture([manifestToolPath]);
+    const payload = JSON.parse(result.stdout || "[]");
+    if (!Array.isArray(payload)) {
+        throw new Error("Playwright suite manifest did not produce a JSON array.");
+    }
+    return payload;
+}
+
+const suiteManifest = loadSuiteManifest();
+if (listSuites) {
+    console.log(JSON.stringify(suiteManifest, null, 2));
+    process.exit(0);
+}
+
+const selectedSuite = suiteManifest.find((entry) => entry.name === suiteName);
+if (!selectedSuite) {
+    const availableSuites = suiteManifest.map((entry) => entry.name).join(", ");
+    throw new Error(`Unknown Playwright suite '${suiteName}'. Available suites: ${availableSuites}`);
+}
+
+const baseEnv = {
+    ...process.env,
+    ...(selectedSuite.env || {}),
+    ...envOverrides,
+};
 const runtimeEnv = ensureLinuxPlaywrightRuntime(baseEnv);
-if (!skipStandaloneBuild && shouldBuildStandaloneOutputs()) {
+if (!skipStandaloneBuild && selectedSuite.requires_standalone_build) {
     runCommand(resolveNpmExecutable(), ["run", "build:frontend:standalone"], {
         env: runtimeEnv,
         stdio: "inherit",
     });
 }
-runPythonModules(runtimeEnv);
+runPythonModules([selectedSuite.module], runtimeEnv);

@@ -326,6 +326,10 @@ Target outcome:
 
 Developers run the same entrypoints locally and in CI, reducing stale assumptions like waiting for server HTTP responses in standalone mode.
 
+Implementation status:
+
+The first consolidation is in place. `tests/e2e/playwright_suite_support.py` now owns the public Playwright suite manifest, `tools/run-playwright.mjs` selects suites by semantic name and can list them without running tests, and standalone-build ownership now lives in the npm runner/CI path instead of in `tests/e2e/support_runtime_host.py`. The runner also fails with explicit Linux browser-library repair guidance when Debian-style repair tooling is unavailable.
+
 ## Quick Wins
 
 These are low-risk cleanup tasks worth doing before larger refactors:
@@ -342,3 +346,4 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 ## Suggested Order
 
 1. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
+2. Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.

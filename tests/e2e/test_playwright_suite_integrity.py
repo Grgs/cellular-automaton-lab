@@ -6,7 +6,9 @@ from tests.e2e.playwright_suite_support import (
     DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
     PLAYWRIGHT_FEATURE_NAMES,
     build_playwright_suite,
+    iter_public_playwright_suite_names,
     iter_playwright_feature_test_names,
+    playwright_suite_manifest_payload,
     iter_server_playwright_test_names,
     iter_server_playwright_subset_test_names,
     iter_standalone_runtime_test_names,
@@ -27,6 +29,36 @@ def _iter_suite_test_names(suite: unittest.TestSuite) -> list[str]:
 
 
 class PlaywrightSuiteIntegrityTests(unittest.TestCase):
+    def test_public_suite_manifest_declares_every_runner_entrypoint(self) -> None:
+        manifest = playwright_suite_manifest_payload()
+        suite_names = [entry["name"] for entry in manifest]
+
+        self.assertEqual(suite_names, iter_public_playwright_suite_names())
+        self.assertEqual(
+            suite_names,
+            [
+                "all",
+                "server",
+                "standalone",
+                "subset",
+                *PLAYWRIGHT_FEATURE_NAMES,
+            ],
+        )
+
+    def test_standalone_build_flags_match_suite_scope(self) -> None:
+        manifest = {
+            entry["name"]: entry
+            for entry in playwright_suite_manifest_payload()
+        }
+
+        self.assertTrue(manifest["all"]["requires_standalone_build"])
+        self.assertTrue(manifest["standalone"]["requires_standalone_build"])
+        self.assertTrue(manifest["standalone_runtime"]["requires_standalone_build"])
+        self.assertFalse(manifest["server"]["requires_standalone_build"])
+        self.assertFalse(manifest["subset"]["requires_standalone_build"])
+        self.assertFalse(manifest["rules_and_picker"]["requires_standalone_build"])
+        self.assertFalse(manifest["topology_and_persistence"]["requires_standalone_build"])
+
     def test_default_playwright_loader_covers_every_master_browser_test(self) -> None:
         expected = iter_playwright_test_names()
         self.assertEqual(iter_playwright_test_names(), expected)

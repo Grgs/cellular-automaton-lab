@@ -222,10 +222,14 @@ npm run test:e2e:playwright
 npm run test:e2e:playwright:server
 npm run test:e2e:playwright:standalone
 npm run test:e2e:playwright:subset
+npm run build:frontend:standalone
 npm run build:standalone-and-test
+node ./tools/run-playwright.mjs --list-suites
 ```
 
-These npm scripts are the preferred local entrypoints because they also handle local Playwright browser-runtime setup. Direct Python entrypoints are still useful when debugging CI internals:
+These npm scripts are the preferred local entrypoints because they own Playwright suite selection, Linux browser-runtime repair, and standalone-build setup when a suite needs it. The suite list comes from the Python Playwright manifest in `tests/e2e/playwright_suite_support.py`.
+
+Direct Python entrypoints are still useful when debugging CI internals:
 
 ```powershell
 py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
@@ -233,6 +237,19 @@ py -3 -m unittest -q tests.e2e.test_playwright_overlays_and_editor
 py -3 -m unittest -q tests.e2e.test_playwright_pattern_and_showcase
 py -3 -m unittest -q tests.e2e.test_playwright_rules_and_picker
 py -3 -m unittest -q tests.e2e.test_playwright_topology_and_persistence
+```
+
+For standalone specifically, direct Python entrypoints now expect prebuilt outputs under `output/standalone/`. Use:
+
+```powershell
+npm run test:e2e:playwright:standalone
+```
+
+or build the artifacts first:
+
+```powershell
+npm run build:frontend:standalone
+py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
 ```
 
 The repo also supports a chunked subset runner for CI:
@@ -272,9 +289,21 @@ py -3 tools\validate_tilings.py
 For changes that affect real UI flows, controls, persistence, or topology switching, add the relevant Playwright suite:
 
 ```powershell
-py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
-py -3 -m unittest -q tests.e2e.test_playwright_overlays_and_editor
+npm run test:e2e:playwright:server
+npm run test:e2e:playwright:standalone
 ```
+
+Quick failure-class mapping:
+
+- server-host browser failures: `npm run test:e2e:playwright:server`
+- standalone browser failures: `npm run test:e2e:playwright:standalone`
+- full browser sweep: `npm run test:e2e:playwright`
+- shard debugging with `PLAYWRIGHT_SUBSET_*`: `npm run test:e2e:playwright:subset`
+
+Linux note:
+
+- `node ./tools/run-playwright.mjs` can repair missing Playwright browser libraries only on Debian/Ubuntu-style environments with `apt`, `apt-cache`, and `dpkg-deb`.
+- If those tools are missing, the runner now fails with an explicit message listing the missing libraries and expected packaging tools.
 
 For broad refactors or release confidence, run the full local sweep:
 

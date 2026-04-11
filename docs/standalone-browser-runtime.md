@@ -120,10 +120,18 @@ The worker command paths intentionally stay aligned with the existing `/api/...`
   - browser storage restore on reload
   - visible startup error messaging when Pyodide initialization fails
 - The shard machinery in `tests/e2e/playwright_suite_support.py` now targets server-host tests only. Standalone tests are intentionally excluded from those shards and run through their dedicated suite entrypoint.
+- `tests/e2e/playwright_suite_support.py` is also the canonical suite manifest for the Node Playwright runner. npm entrypoints now select suites by semantic name instead of hardcoding Python module names.
 
-The committed standalone suite entrypoint is:
+The preferred local standalone suite entrypoint is:
 
 ```powershell
+npm run test:e2e:playwright:standalone
+```
+
+Direct Python debugging is still supported, but it now expects prebuilt `output/standalone/` artifacts:
+
+```powershell
+npm run build:frontend:standalone
 py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
 ```
 
@@ -183,15 +191,12 @@ The current implementation was verified with:
 npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
-npm run build:frontend:standalone
+node .\tools\run-playwright.mjs --list-suites
+npm run test:e2e:playwright:server
+npm run test:e2e:playwright:standalone
 Test-Path .\output\standalone\.nojekyll
 py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
-$env:PLAYWRIGHT_SUBSET_INDEX='0'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
-$env:PLAYWRIGHT_SUBSET_INDEX='1'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
-$env:PLAYWRIGHT_SUBSET_INDEX='2'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
-$env:PLAYWRIGHT_SUBSET_INDEX='3'; $env:PLAYWRIGHT_SUBSET_COUNT='4'; py -3 -m unittest -q tests.e2e.playwright_chunk_subset
-Remove-Item Env:PLAYWRIGHT_SUBSET_INDEX -ErrorAction SilentlyContinue
-Remove-Item Env:PLAYWRIGHT_SUBSET_COUNT -ErrorAction SilentlyContinue
+npm run build:frontend:standalone
 py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
 ```
 
@@ -211,6 +216,7 @@ That browser coverage now exercises:
 - Pyodide is loaded from the CDN configured in `frontend/standalone/worker-client.ts`; the standalone build does not yet vend Pyodide assets locally for fully offline use.
 - The standalone Python runtime still bypasses Flask-specific HTTP concerns such as request objects and response wrappers; only payload validation and simulation contracts are shared.
 - The standalone build is aimed at static hosting with network access. If offline hosting becomes a requirement, Pyodide must be vendored into the output and loaded locally.
+- The Node Playwright runner can self-repair missing Chromium shared libraries only on Debian/Ubuntu-style Linux environments with `apt`, `apt-cache`, and `dpkg-deb`.
 
 ## Remaining Work Checklist
 

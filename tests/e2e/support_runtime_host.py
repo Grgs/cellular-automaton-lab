@@ -2,12 +2,10 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 import socket
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 import urllib.request
 from abc import ABC, abstractmethod
@@ -19,8 +17,6 @@ from playwright.sync_api import Page
 from tests.e2e.support_server import AppServer, JsonApiClient
 
 
-_STANDALONE_BUILD_LOCK = threading.Lock()
-_STANDALONE_BUILD_READY = False
 _STANDALONE_REQUIRED_OUTPUTS = (
     "index.html",
     "standalone-bootstrap.json",
@@ -52,19 +48,8 @@ def _wait_until_ready(base_url: str, *, timeout_seconds: float = 20, process: su
             time.sleep(0.25)
 
 
-def _resolve_npm_executable() -> str | None:
-    if os.name == "nt":
-        return shutil.which("npm.cmd") or shutil.which("npm")
-    return shutil.which("npm") or shutil.which("npm.cmd")
-
-
 def _standalone_output_dir(root: Path) -> Path:
     return root / "output" / "standalone"
-
-
-def _standalone_outputs_exist(root: Path) -> bool:
-    output_dir = _standalone_output_dir(root)
-    return all((output_dir / relative_path).exists() for relative_path in _STANDALONE_REQUIRED_OUTPUTS)
 
 
 class BrowserRuntimeHost(ABC):
@@ -163,28 +148,6 @@ class ServerRuntimeHost(BrowserRuntimeHost):
         )
 
 
-def ensure_standalone_build(root: Path) -> None:
-    global _STANDALONE_BUILD_READY
-    if _STANDALONE_BUILD_READY:
-        return
-    with _STANDALONE_BUILD_LOCK:
-        if _STANDALONE_BUILD_READY:
-            return
-        if _standalone_outputs_exist(root):
-            _STANDALONE_BUILD_READY = True
-            return
-        npm_executable = _resolve_npm_executable()
-        if npm_executable is None:
-            raise RuntimeError("npm is required to build the standalone frontend for browser tests.")
-        subprocess.run(
-            [npm_executable, "run", "build:frontend:standalone"],
-            cwd=root,
-            check=True,
-            env=os.environ.copy(),
-        )
-        _STANDALONE_BUILD_READY = True
-
-
 class StandaloneRuntimeHost(BrowserRuntimeHost):
     def __init__(self) -> None:
         super().__init__()
@@ -222,13 +185,14 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
                 for relative_path in missing_outputs
             )
             raise RuntimeError(
-                "Standalone build is missing required packaging outputs before the static host can start.\n"
+                "Standalone build outputs are missing before the static host can start.\n"
                 f"{formatted_outputs}\n"
-                "Run `npm run build:frontend:standalone` and verify the standalone packager completed successfully."
+                "Direct Python standalone browser suites now expect prebuilt standalone outputs.\n"
+                "Preferred local path: `npm run test:e2e:playwright:standalone`\n"
+                "Build only: `npm run build:frontend:standalone`"
             )
 
     def _start_process(self) -> None:
-        ensure_standalone_build(self.root)
         self._ensure_required_output_files()
         self.port = _find_available_port()
         self._base_url = f"http://127.0.0.1:{self.port}"

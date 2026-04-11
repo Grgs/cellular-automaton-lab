@@ -36,7 +36,7 @@ def run_playwright_subsets(subset_count: int) -> None:
     run_command(["npm", "run", "build:frontend"])
     for subset_index in range(subset_count):
         run_command(
-            [sys.executable, "-m", "unittest", "-q", "tests.e2e.playwright_chunk_subset"],
+            ["node", "./tools/run-playwright.mjs", "--suite", "subset"],
             env={
                 "PLAYWRIGHT_SUBSET_INDEX": str(subset_index),
                 "PLAYWRIGHT_SUBSET_COUNT": str(subset_count),

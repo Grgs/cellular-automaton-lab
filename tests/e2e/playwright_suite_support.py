@@ -1,7 +1,9 @@
 import inspect
+import json
 import sys
 import unittest
 from collections import OrderedDict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 
@@ -45,6 +47,22 @@ PLAYWRIGHT_STANDALONE_CASES = (
     StandaloneCellularAutomatonUITests,
     StandaloneRuntimeFailureTests,
 )
+
+
+@dataclass(frozen=True)
+class PlaywrightSuiteDefinition:
+    name: str
+    label: str
+    module: str
+    includes_standalone: bool
+    requires_standalone_build: bool
+    shardable: bool
+    env: tuple[tuple[str, str], ...] = ()
+
+    def payload(self) -> dict[str, object]:
+        payload = asdict(self)
+        payload["env"] = dict(self.env)
+        return payload
 
 
 def should_skip_playwright_under_discovery(pattern: str | None) -> bool:
@@ -154,6 +172,106 @@ def _playwright_feature_map() -> OrderedDict[str, list[str]]:
         grouped["rules_and_picker"].append(test_id)
 
     return grouped
+
+
+def _playwright_feature_modules() -> OrderedDict[str, str]:
+    return OrderedDict(
+        (
+            ("rules_and_picker", "tests.e2e.test_playwright_rules_and_picker"),
+            ("overlays_and_editor", "tests.e2e.test_playwright_overlays_and_editor"),
+            ("topology_and_persistence", "tests.e2e.test_playwright_topology_and_persistence"),
+            ("pattern_and_showcase", "tests.e2e.test_playwright_pattern_and_showcase"),
+            ("standalone_runtime", "tests.e2e.test_playwright_standalone_runtime"),
+        )
+    )
+
+
+def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinition]:
+    feature_modules = _playwright_feature_modules()
+    definitions: OrderedDict[str, PlaywrightSuiteDefinition] = OrderedDict(
+        (
+            (
+                "all",
+                PlaywrightSuiteDefinition(
+                    name="all",
+                    label="All browser suites",
+                    module="tests.e2e.test_playwright_all",
+                    includes_standalone=True,
+                    requires_standalone_build=True,
+                    shardable=False,
+                ),
+            ),
+            (
+                "server",
+                PlaywrightSuiteDefinition(
+                    name="server",
+                    label="Server-host browser suites",
+                    module="tests.e2e.playwright_chunk_subset",
+                    includes_standalone=False,
+                    requires_standalone_build=False,
+                    shardable=False,
+                    env=(
+                        ("PLAYWRIGHT_SUBSET_INDEX", "0"),
+                        ("PLAYWRIGHT_SUBSET_COUNT", "1"),
+                    ),
+                ),
+            ),
+            (
+                "standalone",
+                PlaywrightSuiteDefinition(
+                    name="standalone",
+                    label="Standalone browser suite",
+                    module="tests.e2e.test_playwright_standalone_runtime",
+                    includes_standalone=True,
+                    requires_standalone_build=True,
+                    shardable=False,
+                ),
+            ),
+            (
+                "subset",
+                PlaywrightSuiteDefinition(
+                    name="subset",
+                    label="Server browser shard",
+                    module="tests.e2e.playwright_chunk_subset",
+                    includes_standalone=False,
+                    requires_standalone_build=False,
+                    shardable=True,
+                ),
+            ),
+        )
+    )
+    for feature_name in PLAYWRIGHT_FEATURE_NAMES:
+        definitions[feature_name] = PlaywrightSuiteDefinition(
+            name=feature_name,
+            label=feature_name.replace("_", " "),
+            module=feature_modules[feature_name],
+            includes_standalone=feature_name == "standalone_runtime",
+            requires_standalone_build=feature_name == "standalone_runtime",
+            shardable=False,
+        )
+    return definitions
+
+
+def iter_public_playwright_suite_names() -> list[str]:
+    return list(_playwright_suite_definitions())
+
+
+def resolve_playwright_suite_definition(suite_name: str) -> PlaywrightSuiteDefinition:
+    definitions = _playwright_suite_definitions()
+    if suite_name not in definitions:
+        raise ValueError(f"Unknown Playwright suite '{suite_name}'.")
+    return definitions[suite_name]
+
+
+def playwright_suite_manifest_payload() -> list[dict[str, object]]:
+    return [
+        definition.payload()
+        for definition in _playwright_suite_definitions().values()
+    ]
+
+
+def playwright_suite_manifest_json() -> str:
+    return json.dumps(playwright_suite_manifest_payload(), indent=2)
 
 
 def build_named_playwright_suite(test_ids: list[str]) -> unittest.TestSuite:

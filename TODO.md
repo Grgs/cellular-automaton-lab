@@ -10,6 +10,7 @@
 
 ## Next
 
+- Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - Extend the developer-facing verification-strength report with per-family detail or CI artifact output once the current summary format settles.
 - Extend direct canonical patch comparisons beyond `square-triangle`, `shield`, and `pinwheel` where they buy materially stronger guarantees.
 - If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
