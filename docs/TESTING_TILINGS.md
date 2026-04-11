@@ -55,7 +55,9 @@ Use these when a tiling looks visually stacked or suspicious. The backend test c
 
 `recommended_validation_options(...)` now keeps overlap checks globally strict, even for the aperiodic families that still relax other shared-surface checks.
 
-The frontend adapter-space overlap helper is intentionally looser than the backend check: its current positive-area epsilon is `2e-4` so known-good exact-path families such as `pinwheel` do not fail on polygon-clipping noise.
+The frontend adapter-space overlap helper is intentionally looser than the backend check: its current positive-area epsilon is `1e-4`, and it now compares overlap area across multiple snapped precisions so known-good exact-path families such as `pinwheel` do not fail on polygon-clipping noise.
+
+Representative render-space overlap checks also dedupe exact rendered duplicate polygons by geometry rather than by `cell.id`, so families such as `robinson-triangles` can be checked cleanly even when the frontend fixture still reuses ids across identical rendered shapes.
 
 ### 6. Verification-strength report
 

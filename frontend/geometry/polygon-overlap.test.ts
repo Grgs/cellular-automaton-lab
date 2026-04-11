@@ -4,7 +4,10 @@ import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
-import { findPositiveAreaPolygonOverlaps } from "../test-helpers/polygon-overlap.js";
+import {
+    findPositiveAreaPolygonOverlaps,
+    representativePolygonCells,
+} from "../test-helpers/polygon-overlap.js";
 import type { BootstrappedTopologyDefinition, TopologyPayload } from "../types/domain.js";
 import type { GeometryCache, PolygonGeometryCache } from "../types/rendering.js";
 
@@ -99,13 +102,11 @@ describe("geometry/polygon-overlap", () => {
                 maxCachedCells: topology.cells.length,
             }),
         );
-        // Representative render-space overlap checks should operate on the
-        // unique addressable polygon set. Some legacy aperiodic payloads,
-        // notably Robinson, still contain repeated cell ids for identical
-        // rendered shapes, which would otherwise turn this into a self-
-        // comparison test rather than a cross-cell overlap test.
+        // Representative render-space overlap checks should compare one
+        // polygon per exact rendered geometry, not one polygon per cell id.
+        // Robinson still reuses ids across duplicate rendered triangles.
         return findPositiveAreaPolygonOverlaps(
-            Array.from(cache.cellsById.values()),
+            representativePolygonCells(cache.cells),
             undefined,
             maxResults,
         );
@@ -116,9 +117,11 @@ describe("geometry/polygon-overlap", () => {
             "archimedean-4-8-8-3x3.json",
             "chair-depth-3.json",
             "hat-monotile-depth-3.json",
+            "robinson-triangles-depth-3.json",
             "shield-depth-3.json",
             "square-triangle-depth-3.json",
             "pinwheel-depth-3.json",
+            "tuebingen-triangle-depth-3.json",
         ]) {
             const overlaps = await overlapsForFixture(filename);
             expect(overlaps, filename).toEqual([]);

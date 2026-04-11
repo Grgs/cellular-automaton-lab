@@ -18,7 +18,7 @@ None.
 - The reference layer now mixes rooted local-reference anchors with direct canonical patch diffs for `square-triangle`, `shield`, and `pinwheel`; it is not yet full canonical patch coverage for every family.
 - `shield` uses relaxed topology validation (`surface` + `graph connectivity`, without strict overlap or edge-multiplicity checks) because the dense image-derived polygons are not exact edge-sharing substitution polygons.
 - Several aperiodic families are verified through deterministic low-depth samples, count invariants, adjacency rules, and metadata presence rather than a full symbolic substitution proof.
-- Render-space overlap checks still need a tolerance of `2e-4` because the adapter-space polygon-clipping path for exact-path families like `pinwheel` is noisier than the backend topology-space overlap check.
+- Render-space overlap checks still need a looser tolerance than the backend topology-space overlap check; the current frontend helper uses a `1e-4` positive-area threshold plus multi-precision snapped comparison because exact-path families like `pinwheel` are still noisier in adapter space.
 - Pinwheel contiguity now uses exact positive-length segment-overlap neighbors on the exact-affine path because the substitution is not edge-to-edge at every subdivision step.
 
 ## When To Add An Entry Here

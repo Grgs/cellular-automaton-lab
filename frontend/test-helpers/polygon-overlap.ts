@@ -4,9 +4,9 @@ import type { Point2D, PolygonGeometryCell } from "../types/rendering.js";
 
 // Keep the render-space overlap threshold tighter than the historical 1e-3
 // helper tolerance while allowing current exact-path adapter noise for pinwheel.
-const OVERLAP_AREA_EPSILON = 2e-4;
+export const OVERLAP_AREA_EPSILON = 1e-4;
 const SANITIZE_EPSILON = 1e-6;
-const SANITIZE_DECIMALS = [6, 5, 4, 3] as const;
+const SANITIZE_DECIMALS = [6, 5, 4, 3, 2, 1] as const;
 
 export interface PolygonOverlap {
     leftId: string;
@@ -109,6 +109,27 @@ function sanitizeRing(vertices: readonly Point2D[], decimals: number): polygonCl
     return deduped;
 }
 
+function canonicalRingSignature(ring: readonly polygonClipping.Pair[]): string {
+    if (ring.length === 0) {
+        return "";
+    }
+    const candidateSignatures: string[] = [];
+    const forward = [...ring];
+    const backward = [...ring].reverse();
+    for (const candidate of [forward, backward]) {
+        for (let index = 0; index < candidate.length; index += 1) {
+            const rotated = candidate
+                .slice(index)
+                .concat(candidate.slice(0, index))
+                .map(([x, y]) => `${x},${y}`)
+                .join("|");
+            candidateSignatures.push(rotated);
+        }
+    }
+    candidateSignatures.sort();
+    return candidateSignatures[0] ?? "";
+}
+
 function toPolygon(vertices: readonly Point2D[], decimals: number = SANITIZE_DECIMALS[0]): polygonClipping.Polygon | null {
     const ring = sanitizeRing(vertices, decimals);
     if (ring.length < 3) {
@@ -117,28 +138,60 @@ function toPolygon(vertices: readonly Point2D[], decimals: number = SANITIZE_DEC
     return [ring];
 }
 
-function intersectPolygons(
-    leftVertices: readonly Point2D[],
-    rightVertices: readonly Point2D[],
-    leftId: string,
-    rightId: string,
-): polygonClipping.MultiPolygon {
-    let lastReason = "unknown polygon-clipping failure";
+export function representativePolygonCells(
+    cells: readonly PolygonGeometryCell[],
+    decimals: number = SANITIZE_DECIMALS[0],
+): PolygonGeometryCell[] {
+    const seenSignatures = new Set<string>();
+    const representatives: PolygonGeometryCell[] = [];
+    for (const cell of cells) {
+        const ring = sanitizeRing(cell.vertices, decimals);
+        if (ring.length < 3) {
+            continue;
+        }
+        const signature = canonicalRingSignature(ring);
+        if (seenSignatures.has(signature)) {
+            continue;
+        }
+        seenSignatures.add(signature);
+        representatives.push(cell);
+    }
+    return representatives;
+}
+
+function effectiveOverlapArea(
+    left: PolygonGeometryCell,
+    right: PolygonGeometryCell,
+): number {
+    let minimumArea = Number.POSITIVE_INFINITY;
+    let sawSuccessfulIntersection = false;
+
     for (const decimals of SANITIZE_DECIMALS) {
-        const leftPolygon = toPolygon(leftVertices, decimals);
-        const rightPolygon = toPolygon(rightVertices, decimals);
+        const leftPolygon = toPolygon(left.vertices, decimals);
+        const rightPolygon = toPolygon(right.vertices, decimals);
         if (!leftPolygon || !rightPolygon) {
-            return [];
+            minimumArea = Math.min(minimumArea, 0);
+            sawSuccessfulIntersection = true;
+            continue;
         }
         try {
-            return polygonClipping.intersection(leftPolygon, rightPolygon);
+            const intersection = polygonClipping.intersection(leftPolygon, rightPolygon);
+            const area = multiPolygonArea(intersection);
+            minimumArea = Math.min(minimumArea, area);
+            sawSuccessfulIntersection = true;
+            continue;
         } catch (error) {
-            lastReason = error instanceof Error ? error.message : String(error);
+            if (decimals === SANITIZE_DECIMALS[SANITIZE_DECIMALS.length - 1]) {
+                throw new Error(
+                    `polygon-clipping failed for ${left.cell.id} vs ${right.cell.id}: ${
+                        error instanceof Error ? error.message : String(error)
+                    }`,
+                );
+            }
         }
     }
-    throw new Error(
-        `polygon-clipping failed for ${leftId} vs ${rightId}: ${lastReason}`,
-    );
+
+    return sawSuccessfulIntersection ? minimumArea : 0;
 }
 
 export function findPositiveAreaPolygonOverlaps(
@@ -157,13 +210,7 @@ export function findPositiveAreaPolygonOverlaps(
             if (!right || !boundsOverlap(left, right)) {
                 continue;
             }
-            const intersection = intersectPolygons(
-                left.vertices,
-                right.vertices,
-                left.cell.id,
-                right.cell.id,
-            );
-            const area = multiPolygonArea(intersection);
+            const area = effectiveOverlapArea(left, right);
             if (area > areaEpsilon) {
                 overlaps.push({
                     leftId: left.cell.id,
