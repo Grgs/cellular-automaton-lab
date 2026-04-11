@@ -284,6 +284,9 @@ py -3 -m mypy --config-file mypy.ini
 py -3 -m unittest discover -s tests/unit -p "test_*.py"
 py -3 -m unittest discover -s tests/api -p "test_*.py"
 py -3 tools\validate_tilings.py
+py -3 tools\report_tiling_verification_strength.py
+py -3 tools\report_tiling_verification_strength.py --format detail
+py -3 tools\report_tiling_verification_strength.py --format json
 ```
 
 For changes that affect real UI flows, controls, persistence, or topology switching, add the relevant Playwright suite:
