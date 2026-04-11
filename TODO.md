@@ -11,7 +11,7 @@
 ## Next
 
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
-- Extend direct canonical patch comparisons beyond `square-triangle`, `shield`, and `pinwheel` where they buy materially stronger guarantees.
+- Broaden direct canonical patch comparisons beyond the current exact-depth set (`square-triangle`, `shield`, `pinwheel`, `robinson-triangles`, and `tuebingen-triangle`) where they buy materially stronger guarantees.
 - If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 

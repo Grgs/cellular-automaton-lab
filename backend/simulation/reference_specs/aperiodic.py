@@ -251,7 +251,14 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ),
             ),
             2: ReferenceDepthExpectation(exact_total_cells=140),
-            3: ReferenceDepthExpectation(exact_total_cells=480),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=480,
+                expected_kind_counts=(
+                    ("robinson-thick", 200),
+                    ("robinson-thin", 280),
+                ),
+                canonical_patch_fixture_key="exact-depth-3",
+            ),
         },
     ),
     "hat-monotile": ReferenceFamilySpec(
@@ -317,6 +324,20 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     ("tuebingen-thick", "tuebingen-thin"),
                 ),
                 min_unique_chirality_tokens=2,
+            ),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=210,
+                expected_kind_counts=(
+                    ("tuebingen-thick", 130),
+                    ("tuebingen-thin", 80),
+                ),
+                required_kinds=("tuebingen-thick", "tuebingen-thin"),
+                required_adjacency_pairs=(
+                    ("tuebingen-thick", "tuebingen-thick"),
+                    ("tuebingen-thick", "tuebingen-thin"),
+                ),
+                min_unique_chirality_tokens=2,
+                canonical_patch_fixture_key="exact-depth-3",
             ),
         },
         notes=(

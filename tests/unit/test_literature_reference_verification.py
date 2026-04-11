@@ -428,6 +428,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
     def test_stronger_substitution_families_match_checked_in_canonical_patch_fixtures(self) -> None:
         for geometry, depth in (
+            ("robinson-triangles", 3),
+            ("tuebingen-triangle", 3),
             ("square-triangle", 3),
             ("shield", 3),
             ("pinwheel", 3),
@@ -468,6 +470,40 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         ):
             failures = _depth_topology_expectation_failures(
                 geometry="shield",
+                depth=3,
+                topology=topology,
+                expectation=expectation,
+            )
+
+        self.assertTrue(
+            any(failure.code == "canonical-patch-fixture-mismatch" for failure in failures)
+        )
+
+    def test_exact_substitution_canonical_patch_fixture_reports_mismatch(self) -> None:
+        topology = build_topology("tuebingen-triangle", 0, 0, 3)
+        observed_cells = _canonical_patch_payload(topology, include_id=False)
+        bad_cells = list(observed_cells)
+        bad_cells[0] = {
+            **bad_cells[0],
+            "kind": "not-a-tuebingen-triangle",
+        }
+        bad_fixtures = {
+            "tuebingen-triangle": {
+                "exact-depth-3": {
+                    "depth": 3,
+                    "include_id": False,
+                    "cells": bad_cells,
+                }
+            }
+        }
+
+        expectation = REFERENCE_FAMILY_SPECS["tuebingen-triangle"].depth_expectations[3]
+        with patch(
+            "backend.simulation.reference_verification.fixtures._load_canonical_reference_fixtures",
+            return_value=bad_fixtures,
+        ):
+            failures = _depth_topology_expectation_failures(
+                geometry="tuebingen-triangle",
                 depth=3,
                 topology=topology,
                 expectation=expectation,

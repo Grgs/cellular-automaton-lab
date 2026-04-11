@@ -73,6 +73,14 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
             "sample-exact,metadata,local-reference,strict-validation",
             output,
         )
+        self.assertIn(
+            "robinson-triangles\tpatch_depth\ttrue_substitution\tPASS\t",
+            output,
+        )
+        self.assertIn(
+            "tuebingen-triangle\tpatch_depth\ttrue_substitution\tPASS\t",
+            output,
+        )
         self.assertIn("shield\tpatch_depth\tknown_deviation\tPASS\t", output)
 
     def test_json_output_is_deterministic_and_contains_required_fields(self) -> None:
@@ -100,6 +108,20 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertTrue(shield["verification_modes"])
         self.assertTrue(shield["observations"])
 
+        robinson = next(family for family in families if family["geometry"] == "robinson-triangles")
+        self.assertEqual(robinson["implementation_status"], "true_substitution")
+        self.assertEqual(robinson["verification_status"], "PASS")
+        self.assertTrue(robinson["has_canonical_patch"])
+        self.assertIn("canonical-patch", robinson["strength_tags"])
+        self.assertIn("canonical-patch", robinson["verification_modes"])
+
+        tuebingen = next(family for family in families if family["geometry"] == "tuebingen-triangle")
+        self.assertEqual(tuebingen["implementation_status"], "true_substitution")
+        self.assertEqual(tuebingen["verification_status"], "PASS")
+        self.assertTrue(tuebingen["has_canonical_patch"])
+        self.assertIn("canonical-patch", tuebingen["strength_tags"])
+        self.assertIn("canonical-patch", tuebingen["verification_modes"])
+
     def test_detail_output_includes_promotion_blocker_and_live_observation_data(self) -> None:
         output = render_verification_strength_report(self.rows, output_format="detail")
 
@@ -109,6 +131,8 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("promotion_blocker: Experimental until the known translated-cluster deviation is replaced by a marked fractal substitution.", output)
         self.assertIn("pinwheel (Pinwheel)", output)
         self.assertIn("exact_reference_mode: pinwheel_exact", output)
+        self.assertIn("robinson-triangles (Robinson Triangles)", output)
+        self.assertIn("tuebingen-triangle (Tuebingen Triangle)", output)
         self.assertIn("archimedean-4-8-8 (Square-Octagon (4.8.8))", output)
         self.assertIn("archimedean-3-4-6-4 (Rhombitrihexagonal (3.4.6.4))", output)
 
@@ -157,7 +181,15 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("fixture-mismatch[d2]: Synthetic mismatch for renderer coverage.", output)
 
     def test_live_verification_status_matches_reference_verifier(self) -> None:
-        for geometry in ("pinwheel", "chair", "shield", "archimedean-4-8-8", "archimedean-3-4-6-4"):
+        for geometry in (
+            "pinwheel",
+            "chair",
+            "shield",
+            "robinson-triangles",
+            "tuebingen-triangle",
+            "archimedean-4-8-8",
+            "archimedean-3-4-6-4",
+        ):
             self.assertEqual(
                 self.rows_by_geometry[geometry].verification_status,
                 self.live_results[geometry].status,
@@ -170,6 +202,14 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
                 self.rows_by_geometry[geometry].waived,
                 self.live_results[geometry].waived,
             )
+
+    def test_canonical_patch_strength_tags_are_present_for_robinson_and_tuebingen(self) -> None:
+        for geometry in ("robinson-triangles", "tuebingen-triangle"):
+            row = self.rows_by_geometry[geometry]
+            self.assertTrue(row.has_canonical_patch)
+            self.assertIn("canonical-patch", row.strength_tags)
+            self.assertIn("canonical-patch", row.verification_modes)
+            self.assertEqual(row.verification_status, "PASS")
 
     def test_main_can_write_json_output_to_a_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
