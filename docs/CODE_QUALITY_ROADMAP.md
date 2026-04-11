@@ -79,7 +79,7 @@ Adding a new gesture should require adding one session implementation, not editi
 
 Implementation status:
 
-The first extraction is in place. `surface-bindings.ts` now delegates pointer lifecycle behavior to `frontend/interactions/gesture-sessions.ts`, while the existing legacy drag and editor session controllers still own the actual paint/edit commits.
+The first extraction is in place. `surface-bindings.ts` now delegates pointer lifecycle behavior to `frontend/interactions/gesture-sessions.ts`, and the gesture router now hands off concrete behavior to per-session modules for legacy drag, armed editor pointer sessions, and right-button selection gestures. The router still owns cross-session click/context-menu policy, which is acceptable for now.
 
 ### 2. Canvas Transient Overlay Rendering
 
@@ -341,6 +341,5 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Suggested Order
 
-1. Continue reducing `frontend/interactions/gesture-sessions.ts` by moving individual gesture implementations into per-session files.
-2. Expand payload drift protection from domain payload fields into controller/worker command payloads.
-3. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
+1. Expand payload drift protection from domain payload fields into controller/worker command payloads.
+2. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
