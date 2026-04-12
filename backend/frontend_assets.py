@@ -14,9 +14,16 @@ class FrontendEntryAssets:
 
 
 class FrontendAssetManifest:
-    def __init__(self, manifest_path: Path, manifest: FrontendManifestPayload) -> None:
+    def __init__(
+        self,
+        manifest_path: Path,
+        manifest: FrontendManifestPayload,
+        *,
+        manifest_mtime_ns: int,
+    ) -> None:
         self._manifest_path = manifest_path
         self._manifest = manifest
+        self._manifest_mtime_ns = manifest_mtime_ns
 
     @classmethod
     def load(cls, static_folder: str | None) -> "FrontendAssetManifest":
@@ -24,6 +31,15 @@ class FrontendAssetManifest:
             raise RuntimeError("Frontend assets could not be resolved because Flask static_folder is not configured.")
 
         manifest_path = Path(static_folder) / "dist" / "manifest.json"
+        manifest, manifest_mtime_ns = cls._read_manifest(manifest_path)
+        return cls(
+            manifest_path=manifest_path,
+            manifest=manifest,
+            manifest_mtime_ns=manifest_mtime_ns,
+        )
+
+    @classmethod
+    def _read_manifest(cls, manifest_path: Path) -> tuple[FrontendManifestPayload, int]:
         if not manifest_path.exists():
             raise RuntimeError(
                 "Frontend build manifest is missing at "
@@ -40,9 +56,10 @@ class FrontendAssetManifest:
                 raise RuntimeError(f"Frontend build manifest at {manifest_path} is invalid.")
             normalized_manifest[entry_name] = cls._normalize_record(record)
 
-        return cls(manifest_path=manifest_path, manifest=normalized_manifest)
+        return normalized_manifest, manifest_path.stat().st_mtime_ns
 
     def entry_assets(self, entry_name: str) -> FrontendEntryAssets:
+        self._refresh_if_stale()
         record = self._resolve_record(entry_name)
         script_filename = record.get("file")
         if not isinstance(script_filename, str) or not script_filename:
@@ -85,6 +102,14 @@ class FrontendAssetManifest:
             ]
 
         return normalized_record
+
+    def _refresh_if_stale(self) -> None:
+        current_mtime_ns = self._manifest_path.stat().st_mtime_ns
+        if current_mtime_ns == self._manifest_mtime_ns:
+            return
+        manifest, manifest_mtime_ns = self._read_manifest(self._manifest_path)
+        self._manifest = manifest
+        self._manifest_mtime_ns = manifest_mtime_ns
 
     def _resolve_record(self, entry_name: str) -> FrontendManifestRecord:
         if entry_name in self._manifest:
