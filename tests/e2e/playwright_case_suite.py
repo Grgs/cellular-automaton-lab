@@ -161,6 +161,40 @@ class SharedUiFlowMixin:
         )
         return cast(dict[str, object], summary)
 
+    def _assert_canvas_centered_within_viewport(
+        self,
+        *,
+        maximum_vertical_gap_delta: float = 4.0,
+        maximum_horizontal_gap_delta: float = 4.0,
+    ) -> None:
+        case = self._case()
+        summary = case.page.evaluate(
+            """() => {
+                const viewport = document.getElementById("grid-viewport");
+                const canvas = document.getElementById("grid");
+                if (!(viewport instanceof HTMLElement) || !(canvas instanceof HTMLCanvasElement)) {
+                    throw new Error("grid viewport or canvas is missing");
+                }
+                const viewportRect = viewport.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                return {
+                    topGap: canvasRect.top - viewportRect.top,
+                    bottomGap: viewportRect.bottom - canvasRect.bottom,
+                    leftGap: canvasRect.left - viewportRect.left,
+                    rightGap: viewportRect.right - canvasRect.right,
+                };
+            }""",
+        )
+        viewport_summary = cast(dict[str, float], summary)
+        case.assertLessEqual(
+            abs(viewport_summary["topGap"] - viewport_summary["bottomGap"]),
+            maximum_vertical_gap_delta,
+        )
+        case.assertLessEqual(
+            abs(viewport_summary["leftGap"] - viewport_summary["rightGap"]),
+            maximum_horizontal_gap_delta,
+        )
+
     def _wait_for_patch_render_complete(self) -> None:
         case = self._case()
         case.page.wait_for_function(
@@ -445,6 +479,7 @@ class SharedUiFlowMixin:
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
+        self._assert_canvas_centered_within_viewport()
 
     def test_deltoidal_hexagonal_topology_switch_renders_periodic_patch(self) -> None:
         case = self._case()

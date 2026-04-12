@@ -12,6 +12,7 @@ import {
 } from "./topology.js";
 import { resolveGeometryCache } from "./canvas/cache.js";
 import { drawCommittedLayer, drawGestureOutlineLayer, drawHoverLayer, drawPreviewLayer, drawSelectionLayer } from "./canvas/render-layers.js";
+import { topologyUsesBackendViewportSync } from "./topology-catalog.js";
 import {
     buildStateColorLookup,
     DEFAULT_COLORS,
@@ -241,6 +242,21 @@ export function createCanvasGridView({
         drawGestureOutlineOverlay(overlaySnapshot);
     }
 
+    function syncCanvasViewportAlignment(nextMetrics: GridMetrics): void {
+        const viewport = canvas.parentElement;
+        if (!(viewport instanceof HTMLElement)) {
+            return;
+        }
+        if (topologyUsesBackendViewportSync(topology?.topology_spec)) {
+            canvas.style.margin = "0";
+            return;
+        }
+
+        const horizontalInset = Math.max(0, (viewport.clientWidth - nextMetrics.cssWidth) / 2);
+        const verticalInset = Math.max(0, (viewport.clientHeight - nextMetrics.cssHeight) / 2);
+        canvas.style.margin = `${verticalInset}px ${horizontalInset}px`;
+    }
+
     function drawGrid(): void {
         const adapter = getGeometryAdapter(geometry);
         const width = topologyWidth(topology);
@@ -249,6 +265,7 @@ export function createCanvasGridView({
         const dpr = Math.max(1, getDevicePixelRatio());
         canvas.dataset.renderCellSize = String(cellSize);
         metrics = surface.resize(nextMetrics, dpr, canvasBorderRadius(nextMetrics.gap));
+        syncCanvasViewportAlignment(nextMetrics);
         metrics = {
             ...metrics,
             width,

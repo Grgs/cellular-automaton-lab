@@ -220,4 +220,130 @@ describe("canvas-view", () => {
         expect(view.getSelectedCells()).toEqual([]);
         expect(drawGestureOutlineLayer).toHaveBeenCalledTimes(gestureCallsBeforeRevisionChange);
     });
+
+    it("centers presentation-only canvases inside larger viewports without centering backend-synced grids", async () => {
+        const resize = vi.fn(() => ({ ...BASE_METRICS, cssWidth: 120, cssHeight: 60 }));
+
+        vi.doMock("./canvas/surface.js", () => ({
+            createCanvasSurface: () => ({
+                context: {} as CanvasRenderingContext2D,
+                committedCanvas: document.createElement("canvas"),
+                committedContext: {} as CanvasRenderingContext2D,
+                resize,
+                restoreCommittedSurface: vi.fn(),
+            }),
+        }));
+        vi.doMock("./canvas/render-layers.js", () => ({
+            drawCommittedLayer: vi.fn(),
+            drawHoverLayer: vi.fn(),
+            drawSelectionLayer: vi.fn(),
+            drawPreviewLayer: vi.fn(),
+            drawGestureOutlineLayer: vi.fn(),
+        }));
+        vi.doMock("./geometry/registry.js", () => ({
+            getGeometryAdapter: () => ({
+                buildMetrics: () => ({ ...BASE_METRICS, cssWidth: 120, cssHeight: 60 }),
+                family: "mixed",
+            }),
+            isSupportedGeometry: () => true,
+        }));
+        vi.doMock("./canvas/cache.js", () => ({
+            resolveGeometryCache: () => ({ cacheKey: "cache", geometryCache: null }),
+        }));
+        vi.doMock("./topology-catalog.js", async () => {
+            const actual = await vi.importActual<typeof import("./topology-catalog.js")>("./topology-catalog.js");
+            return {
+                ...actual,
+                topologyUsesBackendViewportSync: (spec: { tiling_family?: string } | null | undefined) => (
+                    String(spec?.tiling_family) === "square"
+                ),
+            };
+        });
+        vi.doMock("./canvas/render-style.js", () => ({
+            DEFAULT_COLORS: {
+                line: "rgba(31, 36, 48, 0.16)",
+                dead: "#f8f1e5",
+                deadAlt: "#d5bb8f",
+                lineSoft: "rgba(31, 36, 48, 0.10)",
+                lineStrong: "rgba(31, 36, 48, 0.20)",
+                lineAperiodic: "rgba(31, 36, 48, 0.24)",
+                live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
+            },
+            buildStateColorLookup: () => new Map([[0, "#f8f1e5"]]),
+            readCanvasColors: () => ({
+                line: "rgba(31, 36, 48, 0.16)",
+                dead: "#f8f1e5",
+                deadAlt: "#d5bb8f",
+                lineSoft: "rgba(31, 36, 48, 0.10)",
+                lineStrong: "rgba(31, 36, 48, 0.20)",
+                lineAperiodic: "rgba(31, 36, 48, 0.24)",
+                live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
+            }),
+            resolveCanvasRenderStyle: () => ({
+                mode: "standard",
+                geometry: "square",
+                lineColorToken: "lineSoft",
+                triangleStrokeEnabled: false,
+                lineColor: "rgba(31, 36, 48, 0.10)",
+                aperiodicLineColor: "rgba(31, 36, 48, 0.24)",
+                hoverTintColor: "rgba(31, 36, 48, 0.20)",
+                hoverStrokeColor: "#1f2430",
+                selectionTintColor: "rgba(191, 90, 54, 0.16)",
+                selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
+            }),
+            resolveDeadCellColor: vi.fn(),
+            resolveRenderedCellColor: () => "#f8f1e5",
+            resolveRenderDetailLevel: vi.fn(),
+            resolveRenderStyle: vi.fn(),
+            resolveStateColor: vi.fn(),
+        }));
+
+        const { createCanvasGridView } = await import("./canvas-view.js");
+        const viewport = document.createElement("div");
+        const canvas = document.createElement("canvas");
+        viewport.append(canvas);
+        document.body.append(viewport);
+        Object.defineProperty(viewport, "clientWidth", { configurable: true, value: 220 });
+        Object.defineProperty(viewport, "clientHeight", { configurable: true, value: 160 });
+
+        const view = createCanvasGridView({ canvas });
+
+        view.render(
+            {
+                topology: {
+                    ...topologyPayload(),
+                    topology_spec: {
+                        ...topologyPayload().topology_spec,
+                        tiling_family: "pinwheel",
+                    },
+                },
+                cellStates: [0],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "pinwheel",
+        );
+
+        expect(canvas.style.margin).toBe("50px");
+
+        view.render(
+            {
+                topology: topologyPayload(),
+                cellStates: [0],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "square",
+        );
+
+        expect(canvas.style.margin).toBe("0px");
+    });
 });
