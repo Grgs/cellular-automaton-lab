@@ -72,9 +72,12 @@ describe("geometry/polygon-overlap", () => {
             topologyEntry("chair", "polygon_aperiodic"),
             topologyEntry("hat-monotile", "polygon_aperiodic"),
             topologyEntry("robinson-triangles", "polygon_aperiodic"),
+            topologyEntry("spectre", "polygon_aperiodic"),
             topologyEntry("shield", "polygon_aperiodic"),
+            topologyEntry("sphinx", "polygon_aperiodic"),
             topologyEntry("pinwheel", "polygon_aperiodic"),
             topologyEntry("square-triangle", "polygon_aperiodic"),
+            topologyEntry("taylor-socolar", "polygon_aperiodic"),
             topologyEntry("tuebingen-triangle", "polygon_aperiodic"),
         ];
     });
@@ -118,8 +121,11 @@ describe("geometry/polygon-overlap", () => {
             "chair-depth-3.json",
             "hat-monotile-depth-3.json",
             "robinson-triangles-depth-3.json",
+            "spectre-depth-3.json",
             "shield-depth-3.json",
+            "sphinx-depth-3.json",
             "square-triangle-depth-3.json",
+            "taylor-socolar-depth-3.json",
             "pinwheel-depth-3.json",
             "tuebingen-triangle-depth-3.json",
         ]) {

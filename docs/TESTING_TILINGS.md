@@ -75,6 +75,8 @@ npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geom
 
 Use these when you need a browser-side sanity pass on representative rendered fixtures, not just backend topology-space geometry.
 
+The checked-in representative fixture set now includes `spectre`, `taylor-socolar`, and `sphinx` at depth `3`, so both render-bounds and adapter-space overlap coverage now span the full current aperiodic representative set rather than only the previously strengthened families.
+
 ### 8. Reference fixture drift check
 
 ```powershell

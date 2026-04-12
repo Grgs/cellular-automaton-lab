@@ -168,10 +168,13 @@ describe("geometry/render-bounds", () => {
             topologyEntry("archimedean-4-8-8", "polygon_periodic"),
             topologyEntry("chair", "polygon_aperiodic"),
             topologyEntry("hat-monotile", "polygon_aperiodic"),
+            topologyEntry("spectre", "polygon_aperiodic"),
             topologyEntry("robinson-triangles", "polygon_aperiodic"),
             topologyEntry("shield", "polygon_aperiodic"),
+            topologyEntry("sphinx", "polygon_aperiodic"),
             topologyEntry("pinwheel", "polygon_aperiodic"),
             topologyEntry("square-triangle", "polygon_aperiodic"),
+            topologyEntry("taylor-socolar", "polygon_aperiodic"),
             topologyEntry("tuebingen-triangle", "polygon_aperiodic"),
         ];
     });
@@ -182,8 +185,11 @@ describe("geometry/render-bounds", () => {
             "chair-depth-3.json",
             "hat-monotile-depth-3.json",
             "robinson-triangles-depth-3.json",
+            "spectre-depth-3.json",
             "square-triangle-depth-3.json",
             "shield-depth-3.json",
+            "sphinx-depth-3.json",
+            "taylor-socolar-depth-3.json",
             "pinwheel-depth-3.json",
             "tuebingen-triangle-depth-3.json",
         ]) {
@@ -213,6 +219,18 @@ describe("geometry/render-bounds", () => {
             const rendered = await renderedMetricsAndBoundsForFixture(filename);
             expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(0.8);
             expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(0.8);
+        }
+    });
+
+    it("frames newer substitution representative fixtures tightly enough for geometry review", async () => {
+        for (const [filename, widthThreshold, heightThreshold] of [
+            ["spectre-depth-3.json", 0.95, 0.95],
+            ["taylor-socolar-depth-3.json", 0.9, 0.9],
+            ["sphinx-depth-3.json", 0.9, 0.9],
+        ] as const) {
+            const rendered = await renderedMetricsAndBoundsForFixture(filename);
+            expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(widthThreshold);
+            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(heightThreshold);
         }
     });
 

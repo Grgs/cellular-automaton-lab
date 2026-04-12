@@ -345,11 +345,10 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("spectre")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
+        self._assert_browser_visible_aperiodic_patch(
+            minimum_fill_colors=1,
+            minimum_coverage_width_ratio=0.95,
+            minimum_coverage_height_ratio=0.95,
         )
 
     def test_taylor_socolar_topology_switch_renders_aperiodic_patch(self) -> None:
@@ -359,11 +358,10 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("taylor-socolar")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
+        self._assert_browser_visible_aperiodic_patch(
+            minimum_fill_colors=1,
+            minimum_coverage_width_ratio=0.9,
+            minimum_coverage_height_ratio=0.9,
         )
 
     def test_sphinx_topology_switch_renders_aperiodic_patch(self) -> None:
@@ -373,11 +371,10 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("sphinx")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
-        case.page.wait_for_function(
-            """() => {
-                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
-                return Number.isFinite(value) && value > 0;
-            }""",
+        self._assert_browser_visible_aperiodic_patch(
+            minimum_fill_colors=1,
+            minimum_coverage_width_ratio=0.9,
+            minimum_coverage_height_ratio=0.9,
         )
 
     def test_chair_topology_switch_renders_aperiodic_patch(self) -> None:
