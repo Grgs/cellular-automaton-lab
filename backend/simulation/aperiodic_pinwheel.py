@@ -3,6 +3,10 @@ from __future__ import annotations
 import math
 from fractions import Fraction
 
+from backend.simulation.aperiodic_family_manifest import (
+    PINWHEEL_TILE_FAMILY,
+    PINWHEEL_TRIANGLE_KIND,
+)
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     ExactPatchRecord,
@@ -89,9 +93,9 @@ def _subdivide(parent: ExactTriangle) -> tuple[ExactTriangle, ...]:
 def _pinwheel_record(path: str, vertices: ExactTriangle) -> ExactPatchRecord:
     return {
         "id": f"pinwheel:{path}",
-        "kind": "pinwheel-triangle",
+        "kind": PINWHEEL_TRIANGLE_KIND,
         "vertices": vertices,
-        "tile_family": "pinwheel",
+        "tile_family": PINWHEEL_TILE_FAMILY,
         "orientation_token": _orientation_token(vertices),
         "chirality_token": _chirality_token(vertices),
     }

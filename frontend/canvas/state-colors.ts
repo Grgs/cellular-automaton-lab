@@ -3,7 +3,23 @@ import {
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_4612_GEOMETRY,
     ARCHIMEDEAN_488_GEOMETRY,
+    CHAIR_KIND,
+    DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
+    DODECAGONAL_SQUARE_TRIANGLE_TILE_FAMILY,
+    DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
+    HAT_TILE_FAMILY,
     KAGOME_GEOMETRY,
+    PINWHEEL_TILE_FAMILY,
+    ROBINSON_THICK_KIND,
+    ROBINSON_THIN_KIND,
+    ROBINSON_TILE_FAMILY,
+    SHIELD_SHIELD_KIND,
+    SHIELD_SQUARE_KIND,
+    SHIELD_TILE_FAMILY,
+    SHIELD_TRIANGLE_KIND,
+    TUEBINGEN_THICK_KIND,
+    TUEBINGEN_THIN_KIND,
+    TUEBINGEN_TILE_FAMILY,
 } from "../topology.js";
 import { triangleOrientation } from "./geometry-triangle.js";
 import { DEFAULT_COLORS } from "./theme-colors.js";
@@ -19,15 +35,15 @@ const MIXED_DEAD_ALT_CELL_KINDS = new Map<string, ReadonlySet<string>>([
 ]);
 
 const TUEBINGEN_DEAD_PALETTE = new Map<string, string>([
-    ["tuebingen-thick:left", "#f8f1e5"],
-    ["tuebingen-thick:right", "#d5bb8f"],
-    ["tuebingen-thin:left", "#efe4d0"],
-    ["tuebingen-thin:right", "#e1cdac"],
+    [`${TUEBINGEN_THICK_KIND}:left`, "#f8f1e5"],
+    [`${TUEBINGEN_THICK_KIND}:right`, "#d5bb8f"],
+    [`${TUEBINGEN_THIN_KIND}:left`, "#efe4d0"],
+    [`${TUEBINGEN_THIN_KIND}:right`, "#e1cdac"],
 ]);
 
 const ROBINSON_DEAD_PALETTE = new Map<string, string>([
-    ["robinson-thick", "#f8f1e5"],
-    ["robinson-thin", "#d5bb8f"],
+    [ROBINSON_THICK_KIND, "#f8f1e5"],
+    [ROBINSON_THIN_KIND, "#d5bb8f"],
 ]);
 
 const HAT_DEAD_PALETTE = new Map<string, string>([
@@ -43,12 +59,12 @@ const CHAIR_DEAD_PALETTE = new Map<string, string>([
 ]);
 
 const DODECAGONAL_SQUARE_TRIANGLE_DEAD_PALETTE = new Map<string, string>([
-    ["dodecagonal-square-triangle-square:blue", "#f8f1e5"],
-    ["dodecagonal-square-triangle-square:red", "#ead6b6"],
-    ["dodecagonal-square-triangle-square:yellow", "#d5bb8f"],
-    ["dodecagonal-square-triangle-triangle:blue", "#efe4d0"],
-    ["dodecagonal-square-triangle-triangle:red", "#e1cdac"],
-    ["dodecagonal-square-triangle-triangle:yellow", "#c88d4b"],
+    [`${DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND}:blue`, "#f8f1e5"],
+    [`${DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND}:red`, "#ead6b6"],
+    [`${DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND}:yellow`, "#d5bb8f"],
+    [`${DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND}:blue`, "#efe4d0"],
+    [`${DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND}:red`, "#e1cdac"],
+    [`${DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND}:yellow`, "#c88d4b"],
 ]);
 
 const PINWHEEL_DEAD_PALETTE = new Map<string, string>([
@@ -57,16 +73,16 @@ const PINWHEEL_DEAD_PALETTE = new Map<string, string>([
 ]);
 
 const SHIELD_DEAD_PALETTE = new Map<string, string>([
-    ["shield-shield", "#d5bb8f"],
-    ["shield-square", "#f8f1e5"],
-    ["shield-triangle", "#c88d4b"],
+    [SHIELD_SHIELD_KIND, "#d5bb8f"],
+    [SHIELD_SQUARE_KIND, "#f8f1e5"],
+    [SHIELD_TRIANGLE_KIND, "#c88d4b"],
 ]);
 
 function resolveTuebingenDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.tile_family !== "tuebingen") {
+    if (topologyCell?.tile_family !== TUEBINGEN_TILE_FAMILY) {
         return null;
     }
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
@@ -78,7 +94,7 @@ function resolveRobinsonDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.tile_family !== "robinson") {
+    if (topologyCell?.tile_family !== ROBINSON_TILE_FAMILY) {
         return null;
     }
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
@@ -89,7 +105,7 @@ function resolveHatDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.tile_family !== "hat") {
+    if (topologyCell?.tile_family !== HAT_TILE_FAMILY) {
         return null;
     }
     const chirality = typeof topologyCell.chirality_token === "string"
@@ -102,10 +118,10 @@ function resolveChairDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.kind !== "chair") {
+    if (topologyCell?.kind !== CHAIR_KIND) {
         return null;
     }
-    const orientation = typeof topologyCell.orientation_token === "string"
+    const orientation = typeof topologyCell?.orientation_token === "string"
         ? topologyCell.orientation_token
         : "";
     return CHAIR_DEAD_PALETTE.get(orientation) || null;
@@ -115,7 +131,7 @@ function resolveDodecagonalSquareTriangleDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.tile_family !== "dodecagonal-square-triangle") {
+    if (topologyCell?.tile_family !== DODECAGONAL_SQUARE_TRIANGLE_TILE_FAMILY) {
         return null;
     }
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
@@ -129,7 +145,7 @@ function resolvePinwheelDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.tile_family !== "pinwheel") {
+    if (topologyCell?.tile_family !== PINWHEEL_TILE_FAMILY) {
         return null;
     }
     const chirality = typeof topologyCell.chirality_token === "string"
@@ -142,7 +158,7 @@ function resolveShieldDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.tile_family !== "shield") {
+    if (topologyCell?.tile_family !== SHIELD_TILE_FAMILY) {
         return null;
     }
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";

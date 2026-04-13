@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from backend.simulation.aperiodic_family_manifest import DART_KIND, KITE_KIND
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     PatchRecord,
@@ -77,7 +78,7 @@ def _inflate_p2_kite(
         vertices = _kite_vertices(anchor, heading, length)
         tiles.append(
             _LeafTile(
-                kind="kite",
+                kind=KITE_KIND,
                 vertices=vertices,
                 center=polygon_centroid(vertices),
                 anchor=anchor,
@@ -116,7 +117,7 @@ def _inflate_p2_dart(
         vertices = _dart_vertices(anchor, heading, length)
         tiles.append(
             _LeafTile(
-                kind="dart",
+                kind=DART_KIND,
                 vertices=vertices,
                 center=polygon_centroid(vertices),
                 anchor=anchor,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from backend.simulation.aperiodic_family_manifest import CHAIR_KIND
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     PatchRecord,
@@ -9,9 +10,6 @@ from backend.simulation.aperiodic_support import (
     polygon_centroid,
     rounded_point,
 )
-
-
-_CHAIR_KIND = "chair"
 _UNIT_CHAIR_POLYGONS: dict[int, tuple[Vec, ...]] = {
     0: (
         Vec(0.0, 0.0),
@@ -115,7 +113,7 @@ def _chair_record(
     polygon = _scaled_polygon(orientation, scale_factor, anchor_x, anchor_y)
     return {
         "id": _chair_id(path, orientation, scale_factor, anchor_x, anchor_y),
-        "kind": _CHAIR_KIND,
+        "kind": CHAIR_KIND,
         "center": rounded_point(polygon_centroid(polygon)),
         "vertices": tuple(rounded_point(vertex) for vertex in polygon),
         "orientation_token": str(orientation),

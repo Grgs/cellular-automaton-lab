@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
 
+from backend.simulation.aperiodic_family_manifest import THICK_RHOMB_KIND, THIN_RHOMB_KIND
 
 PHI = (1 + math.sqrt(5)) / 2
 PENROSE_P3_OFFSETS = (0.2, 0.2, 0.2, 0.2, 0.2)
@@ -45,8 +46,8 @@ class _ProvisionalPenroseCell:
 
 
 class _RhombusType(Enum):
-    THIN = "thin-rhomb"
-    THICK = "thick-rhomb"
+    THIN = THIN_RHOMB_KIND
+    THICK = THICK_RHOMB_KIND
 
 
 @dataclass(frozen=True)

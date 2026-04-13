@@ -2,18 +2,19 @@ from __future__ import annotations
 
 import math
 
+from backend.simulation.aperiodic_family_manifest import (
+    ROBINSON_THICK_KIND,
+    ROBINSON_THIN_KIND,
+    ROBINSON_TILE_FAMILY,
+    TUEBINGEN_THICK_KIND,
+    TUEBINGEN_THIN_KIND,
+)
 from backend.simulation.aperiodic_support import (
     PatchRecord,
     Vec,
     polygon_centroid,
     rounded_point,
 )
-
-
-ROBINSON_THICK_KIND = "robinson-thick"
-ROBINSON_THIN_KIND = "robinson-thin"
-TUEBINGEN_THICK_KIND = "tuebingen-thick"
-TUEBINGEN_THIN_KIND = "tuebingen-thin"
 
 PHI = (1 + math.sqrt(5)) / 2
 
@@ -97,7 +98,7 @@ def split_penrose_p2_cell_to_robinson_records(
                 cell_id=f"{cell_id}:{index}",
                 kind=triangle_kind,
                 vertices=triangle,
-                tile_family="robinson",
+                tile_family=ROBINSON_TILE_FAMILY,
             )
         )
     return records[0], records[1]

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 
+from backend.simulation.aperiodic_family_manifest import AMMANN_RHOMB_KIND, AMMANN_SQUARE_KIND
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     PatchRecord,
@@ -96,13 +97,13 @@ def _merge_ammann_triangles(
     records: list[PatchRecord] = []
     triangle_pairs: dict[tuple[tuple[float, float], tuple[float, float]], list[tuple[str, tuple[Vec, ...], Vec, int]]] = defaultdict(list)
     for name, vertices, anchor, orientation in leaves:
-        if name == "rhomb":
+        if name == AMMANN_RHOMB_KIND:
             rounded_vertices = tuple(rounded_point(vertex) for vertex in vertices)
             center = rounded_point(polygon_centroid(vertices))
             records.append(
                 {
                     "id": id_from_anchor("abr", anchor, orientation * 45),
-                    "kind": "rhomb",
+                    "kind": AMMANN_RHOMB_KIND,
                     "center": center,
                     "vertices": rounded_vertices,
                 }
@@ -136,7 +137,7 @@ def _merge_ammann_triangles(
         records.append(
             {
                 "id": f"abs:{edge_key[0][0]}:{edge_key[0][1]}:{edge_key[1][0]}:{edge_key[1][1]}",
-                "kind": "square",
+                "kind": AMMANN_SQUARE_KIND,
                 "center": center,
                 "vertices": rounded_vertices,
             }

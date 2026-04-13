@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 
+from backend.simulation.aperiodic_family_manifest import TAYLOR_HALF_HEX_KIND
 from backend.simulation.aperiodic_substitution import (
     SubstitutionChild,
     SubstitutionLeafTemplate,
@@ -42,7 +43,7 @@ def _half_hex_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafT
     del node
     return (
         SubstitutionLeafTemplate(
-            kind="taylor-half-hex",
+            kind=TAYLOR_HALF_HEX_KIND,
             id_prefix="taylor",
             vertices=_HALF_HEX_BASE_VERTICES,
         ),

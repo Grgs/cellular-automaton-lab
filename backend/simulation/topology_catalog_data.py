@@ -1,5 +1,22 @@
 from __future__ import annotations
 
+from backend.simulation.aperiodic_family_manifest import (
+    AMMANN_BEENKER_GEOMETRY,
+    APERIODIC_FAMILY_MANIFEST,
+    CHAIR_GEOMETRY,
+    DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
+    HAT_MONOTILE_GEOMETRY,
+    PENROSE_GEOMETRY,
+    PENROSE_P2_GEOMETRY,
+    PENROSE_VERTEX_GEOMETRY,
+    PINWHEEL_GEOMETRY,
+    ROBINSON_TRIANGLES_GEOMETRY,
+    SHIELD_GEOMETRY,
+    SPHINX_GEOMETRY,
+    SPECTRE_GEOMETRY,
+    TAYLOR_SOCOLAR_GEOMETRY,
+    TUEBINGEN_TRIANGLE_GEOMETRY,
+)
 from backend.simulation.topology_catalog_types import SizingPolicyDefinition, TopologyVariantDefinition
 
 DEFAULT_SQUARE_RULE = "conway"
@@ -29,20 +46,6 @@ DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
 PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal"
 FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal"
 SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual"
-PENROSE_GEOMETRY = "penrose-p3-rhombs"
-PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
-PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
-AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
-SPECTRE_GEOMETRY = "spectre"
-TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
-SPHINX_GEOMETRY = "sphinx"
-HAT_MONOTILE_GEOMETRY = "hat-monotile"
-CHAIR_GEOMETRY = "chair"
-ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
-TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
-DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
-SHIELD_GEOMETRY = "shield"
-PINWHEEL_GEOMETRY = "pinwheel"
 
 PICKER_GROUP_ORDER = {
     "Classic": 0,
@@ -89,6 +92,51 @@ TOPOLOGY_SIZING_POLICIES = {
     SHIELD_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
     PINWHEEL_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
 }
+
+
+def _build_aperiodic_variant(
+    geometry_key: str,
+    *,
+    tiling_family: str | None = None,
+    adjacency_mode: str = EDGE_ADJACENCY,
+    default_rule: str | None = None,
+) -> TopologyVariantDefinition:
+    metadata = APERIODIC_FAMILY_MANIFEST[tiling_family or geometry_key]
+    return TopologyVariantDefinition(
+        geometry_key=geometry_key,
+        tiling_family=tiling_family or geometry_key,
+        adjacency_mode=adjacency_mode,
+        label=metadata.catalog_label,
+        picker_group=metadata.picker_group,
+        picker_order=metadata.picker_order,
+        default_rule=default_rule or metadata.default_rule,
+        sizing_mode="patch_depth",
+        family="aperiodic",
+        viewport_sync_mode="presentation-only",
+    )
+
+
+_APERIODIC_VARIANTS = (
+    _build_aperiodic_variant(PENROSE_GEOMETRY),
+    _build_aperiodic_variant(
+        PENROSE_VERTEX_GEOMETRY,
+        tiling_family=PENROSE_GEOMETRY,
+        adjacency_mode=VERTEX_ADJACENCY,
+        default_rule="conway",
+    ),
+    _build_aperiodic_variant(PENROSE_P2_GEOMETRY),
+    _build_aperiodic_variant(AMMANN_BEENKER_GEOMETRY),
+    _build_aperiodic_variant(SPECTRE_GEOMETRY),
+    _build_aperiodic_variant(HAT_MONOTILE_GEOMETRY),
+    _build_aperiodic_variant(TAYLOR_SOCOLAR_GEOMETRY),
+    _build_aperiodic_variant(SPHINX_GEOMETRY),
+    _build_aperiodic_variant(CHAIR_GEOMETRY),
+    _build_aperiodic_variant(ROBINSON_TRIANGLES_GEOMETRY),
+    _build_aperiodic_variant(TUEBINGEN_TRIANGLE_GEOMETRY),
+    _build_aperiodic_variant(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
+    _build_aperiodic_variant(SHIELD_GEOMETRY),
+    _build_aperiodic_variant(PINWHEEL_GEOMETRY),
+)
 
 TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
     TopologyVariantDefinition(
@@ -331,174 +379,7 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         family="mixed",
         viewport_sync_mode="backend-sync",
     ),
-    TopologyVariantDefinition(
-        geometry_key=PENROSE_GEOMETRY,
-        tiling_family=PENROSE_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Penrose P3 Rhombs",
-        picker_group="Aperiodic",
-        picker_order=220,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=PENROSE_VERTEX_GEOMETRY,
-        tiling_family=PENROSE_GEOMETRY,
-        adjacency_mode=VERTEX_ADJACENCY,
-        label="Penrose P3 Rhombs",
-        picker_group="Aperiodic",
-        picker_order=220,
-        default_rule="conway",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=PENROSE_P2_GEOMETRY,
-        tiling_family=PENROSE_P2_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Penrose P2 Kite-Dart",
-        picker_group="Aperiodic",
-        picker_order=210,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=AMMANN_BEENKER_GEOMETRY,
-        tiling_family=AMMANN_BEENKER_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Ammann-Beenker",
-        picker_group="Aperiodic",
-        picker_order=230,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=SPECTRE_GEOMETRY,
-        tiling_family=SPECTRE_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Spectre",
-        picker_group="Aperiodic",
-        picker_order=240,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=HAT_MONOTILE_GEOMETRY,
-        tiling_family=HAT_MONOTILE_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Hat",
-        picker_group="Aperiodic",
-        picker_order=250,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=TAYLOR_SOCOLAR_GEOMETRY,
-        tiling_family=TAYLOR_SOCOLAR_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Taylor-Socolar",
-        picker_group="Aperiodic",
-        picker_order=270,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=SPHINX_GEOMETRY,
-        tiling_family=SPHINX_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Sphinx",
-        picker_group="Aperiodic",
-        picker_order=280,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=CHAIR_GEOMETRY,
-        tiling_family=CHAIR_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Chair",
-        picker_group="Aperiodic",
-        picker_order=290,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=ROBINSON_TRIANGLES_GEOMETRY,
-        tiling_family=ROBINSON_TRIANGLES_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Robinson Triangles",
-        picker_group="Aperiodic",
-        picker_order=300,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=TUEBINGEN_TRIANGLE_GEOMETRY,
-        tiling_family=TUEBINGEN_TRIANGLE_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Tuebingen Triangle",
-        picker_group="Aperiodic",
-        picker_order=310,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-        tiling_family=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Dodecagonal Square-Triangle",
-        picker_group="Experimental",
-        picker_order=320,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=SHIELD_GEOMETRY,
-        tiling_family=SHIELD_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Shield",
-        picker_group="Experimental",
-        picker_order=330,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
-    TopologyVariantDefinition(
-        geometry_key=PINWHEEL_GEOMETRY,
-        tiling_family=PINWHEEL_GEOMETRY,
-        adjacency_mode=EDGE_ADJACENCY,
-        label="Pinwheel",
-        picker_group="Experimental",
-        picker_order=340,
-        default_rule="life-b2-s23",
-        sizing_mode="patch_depth",
-        family="aperiodic",
-        viewport_sync_mode="presentation-only",
-    ),
+    *_APERIODIC_VARIANTS,
 )
 
 LOW_MINIMUM_MIXED_GEOMETRIES = frozenset(

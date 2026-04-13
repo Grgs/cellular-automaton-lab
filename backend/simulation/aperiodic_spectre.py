@@ -4,6 +4,7 @@ import math
 from dataclasses import dataclass
 from functools import lru_cache
 
+from backend.simulation.aperiodic_family_manifest import SPECTRE_KIND
 from backend.simulation.aperiodic_substitution import (
     SubstitutionChild,
     SubstitutionLeafTemplate,
@@ -166,7 +167,7 @@ def _spectre_expand_children(node: SubstitutionChild, depth: int) -> tuple[Subst
 def _spectre_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:
     return tuple(
         SubstitutionLeafTemplate(
-            kind="spectre",
+            kind=SPECTRE_KIND,
             id_prefix="spectre",
             vertices=_SPECTRE_BASE_VERTICES,
             transform=child_transform,

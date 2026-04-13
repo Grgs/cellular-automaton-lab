@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 
+from backend.simulation.aperiodic_family_manifest import SPHINX_KIND
 from backend.simulation.aperiodic_substitution import (
     SubstitutionChild,
     SubstitutionLeafTemplate,
@@ -76,7 +77,7 @@ def _sphinx_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTem
     del node
     return (
         SubstitutionLeafTemplate(
-            kind="sphinx",
+            kind=SPHINX_KIND,
             id_prefix="sphinx",
             vertices=_SPHINX_BASE_VERTICES,
         ),

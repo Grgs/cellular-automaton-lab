@@ -5,6 +5,11 @@ import json
 from pathlib import Path
 from typing import Literal
 
+from backend.simulation.aperiodic_family_manifest import (
+    APERIODIC_FAMILY_MANIFEST,
+    PENROSE_GEOMETRY,
+    PENROSE_VERTEX_GEOMETRY,
+)
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 
@@ -31,31 +36,6 @@ class AperiodicImplementationContract:
     depth_semantics: str
     verification_modes: tuple[str, ...]
     promotion_blocker: str | None = None
-
-
-_IMPLEMENTATION_STATUS: dict[str, AperiodicImplementationStatus] = {
-    "penrose-p3-rhombs": "true_substitution",
-    "penrose-p3-rhombs-vertex": "true_substitution",
-    "penrose-p2-kite-dart": "true_substitution",
-    "ammann-beenker": "true_substitution",
-    "spectre": "true_substitution",
-    "hat-monotile": "true_substitution",
-    "taylor-socolar": "true_substitution",
-    "sphinx": "true_substitution",
-    "chair": "true_substitution",
-    "robinson-triangles": "true_substitution",
-    "tuebingen-triangle": "true_substitution",
-    "dodecagonal-square-triangle": "canonical_patch",
-    "shield": "known_deviation",
-    "pinwheel": "exact_affine",
-}
-
-_PROMOTION_BLOCKERS: dict[str, str] = {
-    "dodecagonal-square-triangle": "Experimental until manual visual review accepts the canonical-patch implementation.",
-    "shield": "Experimental until the known translated-cluster deviation is replaced by a marked fractal substitution.",
-    "pinwheel": "Experimental until manual visual review accepts the exact-affine implementation.",
-}
-
 
 def _load_fixture_geometries(path: Path) -> set[str]:
     if not path.exists():
@@ -92,24 +72,30 @@ def _depth_semantics(geometry: str) -> str:
     return "substitution patch depth"
 
 
+def _contract_manifest_geometry(geometry: str) -> str:
+    if geometry == PENROSE_VERTEX_GEOMETRY:
+        return PENROSE_GEOMETRY
+    return geometry
+
+
 def build_aperiodic_contract(geometry: str) -> AperiodicImplementationContract:
     spec = REFERENCE_FAMILY_SPECS[geometry]
     try:
-        implementation_status = _IMPLEMENTATION_STATUS[geometry]
+        manifest_entry = APERIODIC_FAMILY_MANIFEST[_contract_manifest_geometry(geometry)]
     except KeyError as error:
         raise ValueError(f"Missing aperiodic implementation contract for {geometry!r}.") from error
     return AperiodicImplementationContract(
         geometry=geometry,
-        implementation_status=implementation_status,
+        implementation_status=manifest_entry.implementation_status,
         source_urls=spec.source_urls,
-        public_cell_kinds=spec.allowed_public_cell_kinds,
+        public_cell_kinds=manifest_entry.public_cell_kinds,
         metadata_fields=tuple(
             (requirement.kind, requirement.fields)
             for requirement in spec.required_metadata
         ),
         depth_semantics=_depth_semantics(geometry),
         verification_modes=_verification_modes(geometry),
-        promotion_blocker=_PROMOTION_BLOCKERS.get(geometry),
+        promotion_blocker=manifest_entry.promotion_blocker,
     )
 
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from backend.simulation.aperiodic_family_manifest import HAT_KIND, HAT_TILE_FAMILY
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     AperiodicPatchCell,
@@ -422,13 +423,13 @@ def _hat_record(index: int, placed: _PlacedHat) -> PatchRecord:
     vertices = _hat_vertices(placed)
     return {
         "id": f"hat:{index}",
-        "kind": "hat",
+        "kind": HAT_KIND,
         "center": (
             round(polygon_centroid(vertices).x, 6),
             round(polygon_centroid(vertices).y, 6),
         ),
         "vertices": tuple((round(vertex.x, 9), round(vertex.y, 9)) for vertex in vertices),
-        "tile_family": "hat",
+        "tile_family": HAT_TILE_FAMILY,
         "orientation_token": _orientation_token(placed.turn),
         "chirality_token": _chirality_token(placed.flipped),
     }

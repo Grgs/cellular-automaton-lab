@@ -5,6 +5,7 @@ import itertools
 import math
 from dataclasses import dataclass
 
+from backend.simulation.aperiodic_family_manifest import TUEBINGEN_TILE_FAMILY
 from backend.simulation.aperiodic_golden_triangles import (
     TUEBINGEN_THICK_KIND,
     TUEBINGEN_THIN_KIND,
@@ -308,7 +309,7 @@ def _record_for_node(node: _TuebingenNode) -> PatchRecord:
             else TUEBINGEN_THIN_KIND
         ),
         vertices=rounded_vertices,
-        tile_family="tuebingen",
+        tile_family=TUEBINGEN_TILE_FAMILY,
         chirality_token=node.chirality,
     )
 
