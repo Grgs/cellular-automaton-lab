@@ -34,7 +34,7 @@ class AperiodicRegistryTests(unittest.TestCase):
                 self.assertTrue(contract.verification_modes)
 
     def test_experimental_aperiodics_keep_explicit_promotion_blockers(self) -> None:
-        for geometry in ("square-triangle", "shield", "pinwheel"):
+        for geometry in ("dodecagonal-square-triangle", "shield", "pinwheel"):
             with self.subTest(geometry=geometry):
                 self.assertIsNotNone(
                     APERIODIC_IMPLEMENTATION_CONTRACTS[geometry].promotion_blocker
@@ -71,7 +71,7 @@ class AperiodicRegistryTests(unittest.TestCase):
         for geometry, depth in (
             ("hat-monotile", 3),
             ("tuebingen-triangle", 3),
-            ("square-triangle", 3),
+            ("dodecagonal-square-triangle", 3),
             ("shield", 3),
             ("pinwheel", 3),
         ):

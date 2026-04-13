@@ -13,7 +13,7 @@ try:
         SHIELD_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
-        SQUARE_TRIANGLE_GEOMETRY,
+        DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         CHAIR_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
@@ -34,7 +34,7 @@ except ModuleNotFoundError:
         SHIELD_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
-        SQUARE_TRIANGLE_GEOMETRY,
+        DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         CHAIR_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
@@ -138,7 +138,7 @@ class TopologyValidationTests(unittest.TestCase):
         for geometry in (
             HAT_MONOTILE_GEOMETRY,
             TUEBINGEN_TRIANGLE_GEOMETRY,
-            SQUARE_TRIANGLE_GEOMETRY,
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
             SHIELD_GEOMETRY,
             PINWHEEL_GEOMETRY,
         ):
@@ -152,7 +152,7 @@ class TopologyValidationTests(unittest.TestCase):
             (CHAIR_GEOMETRY, 3),
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
-            (SQUARE_TRIANGLE_GEOMETRY, 3),
+            (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
         ):
             with self.subTest(geometry=geometry):
@@ -173,7 +173,7 @@ class TopologyValidationTests(unittest.TestCase):
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
-            (SQUARE_TRIANGLE_GEOMETRY, 3),
+            (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 3),
             (SHIELD_GEOMETRY, 3),
         ):
             with self.subTest(geometry=geometry):
@@ -206,7 +206,7 @@ class TopologyValidationTests(unittest.TestCase):
         for geometry, patch_depth in (
             (CHAIR_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
-            (SQUARE_TRIANGLE_GEOMETRY, 3),
+            (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 3),
             (SHIELD_GEOMETRY, 3),
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
@@ -244,7 +244,7 @@ class TopologyValidationTests(unittest.TestCase):
             CHAIR_GEOMETRY,
             HAT_MONOTILE_GEOMETRY,
             TUEBINGEN_TRIANGLE_GEOMETRY,
-            SQUARE_TRIANGLE_GEOMETRY,
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
             PINWHEEL_GEOMETRY,
         ):
             with self.subTest(geometry=geometry):

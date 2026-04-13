@@ -363,10 +363,10 @@ Browser UI
 - [backend/simulation/aperiodic_sphinx.py](../backend/simulation/aperiodic_sphinx.py)
 - [backend/simulation/aperiodic_hat.py](../backend/simulation/aperiodic_hat.py)
 - [backend/simulation/aperiodic_tuebingen_triangle.py](../backend/simulation/aperiodic_tuebingen_triangle.py)
-- [backend/simulation/aperiodic_square_triangle.py](../backend/simulation/aperiodic_square_triangle.py)
+- [backend/simulation/aperiodic_dodecagonal_square_triangle.py](../backend/simulation/aperiodic_dodecagonal_square_triangle.py)
 - [backend/simulation/aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
 - [backend/simulation/aperiodic_pinwheel.py](../backend/simulation/aperiodic_pinwheel.py)
-  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Square-Triangle, Shield, and Pinwheel. Pinwheel uses the exact-record helper path in `aperiodic_support.py`; the other rebuilt families still emit the standard polygon patch format.
+  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Dodecagonal Square-Triangle, Shield, and Pinwheel. Pinwheel uses the exact-record helper path in `aperiodic_support.py`; the other rebuilt families still emit the standard polygon patch format.
 
 ### Rules
 

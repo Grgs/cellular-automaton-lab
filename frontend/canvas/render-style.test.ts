@@ -295,7 +295,7 @@ describe("canvas/render-style", () => {
         });
     });
 
-    it("uses warm metadata-based dead-state colors for square-triangle tiles", async () => {
+    it("uses warm metadata-based dead-state colors for dodecagonal square-triangle tiles", async () => {
         const {
             buildStateColorLookup,
             resolveDeadCellColor,
@@ -307,8 +307,8 @@ describe("canvas/render-style", () => {
                 cell: {
                     id: "st:square-blue",
                     state: 0,
-                    kind: "square-triangle-square",
-                    tile_family: "square-triangle",
+                    kind: "dodecagonal-square-triangle-square",
+                    tile_family: "dodecagonal-square-triangle",
                     chirality_token: "blue",
                 },
                 expectedColor: "#f8f1e5",
@@ -317,8 +317,8 @@ describe("canvas/render-style", () => {
                 cell: {
                     id: "st:square-yellow",
                     state: 0,
-                    kind: "square-triangle-square",
-                    tile_family: "square-triangle",
+                    kind: "dodecagonal-square-triangle-square",
+                    tile_family: "dodecagonal-square-triangle",
                     chirality_token: "yellow",
                 },
                 expectedColor: "#d5bb8f",
@@ -327,8 +327,8 @@ describe("canvas/render-style", () => {
                 cell: {
                     id: "st:triangle-red",
                     state: 0,
-                    kind: "square-triangle-triangle",
-                    tile_family: "square-triangle",
+                    kind: "dodecagonal-square-triangle-triangle",
+                    tile_family: "dodecagonal-square-triangle",
                     chirality_token: "red",
                 },
                 expectedColor: "#e1cdac",
@@ -337,8 +337,8 @@ describe("canvas/render-style", () => {
                 cell: {
                     id: "st:triangle-yellow",
                     state: 0,
-                    kind: "square-triangle-triangle",
-                    tile_family: "square-triangle",
+                    kind: "dodecagonal-square-triangle-triangle",
+                    tile_family: "dodecagonal-square-triangle",
                     chirality_token: "yellow",
                 },
                 expectedColor: "#c88d4b",
@@ -346,10 +346,10 @@ describe("canvas/render-style", () => {
         ];
 
         cases.forEach(({ cell, expectedColor }) => {
-            expect(resolveDeadCellColor(0, { geometry: "square-triangle", cell })).toBe(expectedColor);
+            expect(resolveDeadCellColor(0, { geometry: "dodecagonal-square-triangle", cell })).toBe(expectedColor);
             expect(
                 resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), {
-                    geometry: "square-triangle",
+                    geometry: "dodecagonal-square-triangle",
                     cell,
                 }),
             ).toBe(expectedColor);

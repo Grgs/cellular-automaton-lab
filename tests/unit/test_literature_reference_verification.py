@@ -58,12 +58,12 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(observation.isolated_cell_count, 0)
 
     def test_reference_observation_records_surface_hole_stats(self) -> None:
-        square_triangle_observation = observe_reference_patch("square-triangle", 3)
+        dodecagonal_square_triangle_observation = observe_reference_patch("dodecagonal-square-triangle", 3)
         shield_observation = observe_reference_patch("shield", 3)
         chair_observation = observe_reference_patch("chair", 3)
         hat_observation = observe_reference_patch("hat-monotile", 3)
 
-        self.assertEqual(square_triangle_observation.hole_count, 0)
+        self.assertEqual(dodecagonal_square_triangle_observation.hole_count, 0)
         self.assertEqual(shield_observation.hole_count, 0)
         self.assertEqual(chair_observation.hole_count, 0)
         self.assertEqual(hat_observation.hole_count, 0)
@@ -92,7 +92,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["spectre"].status, "PASS")
         self.assertEqual(results["sphinx"].status, "PASS")
         self.assertEqual(results["robinson-triangles"].status, "PASS")
-        self.assertEqual(results["square-triangle"].status, "PASS")
+        self.assertEqual(results["dodecagonal-square-triangle"].status, "PASS")
         self.assertEqual(results["shield"].status, "PASS")
         self.assertEqual(results["pinwheel"].status, "PASS")
         self.assertFalse(results["chair"].waived)
@@ -101,7 +101,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertFalse(results["pinwheel"].waived)
         self.assertFalse(results["chair"].blocking)
         self.assertFalse(results["hat-monotile"].blocking)
-        self.assertFalse(results["square-triangle"].blocking)
+        self.assertFalse(results["dodecagonal-square-triangle"].blocking)
         self.assertFalse(results["shield"].blocking)
         self.assertFalse(results["pinwheel"].blocking)
 
@@ -110,7 +110,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             "chair",
             "hat-monotile",
             "pinwheel",
-            "square-triangle",
+            "dodecagonal-square-triangle",
             "shield",
             "tuebingen-triangle",
         ):
@@ -404,7 +404,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             ("hat-monotile", 2),
             ("shield", 3),
             ("pinwheel", 3),
-            ("square-triangle", 3),
+            ("dodecagonal-square-triangle", 3),
             ("chair", 3),
         ):
             with self.subTest(geometry=geometry, depth=depth):
@@ -416,11 +416,11 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
     def test_canonical_patch_payload_is_deterministic(self) -> None:
         first = _canonical_patch_payload(
-            build_topology("square-triangle", 0, 0, 3),
+            build_topology("dodecagonal-square-triangle", 0, 0, 3),
             include_id=False,
         )
         second = _canonical_patch_payload(
-            build_topology("square-triangle", 0, 0, 3),
+            build_topology("dodecagonal-square-triangle", 0, 0, 3),
             include_id=False,
         )
 
@@ -430,7 +430,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         for geometry, depth in (
             ("robinson-triangles", 3),
             ("tuebingen-triangle", 3),
-            ("square-triangle", 3),
+            ("dodecagonal-square-triangle", 3),
             ("shield", 3),
             ("pinwheel", 3),
         ):
@@ -571,8 +571,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             any(failure.code == "unexpected-orientation-token-counts" for failure in failures)
         )
 
-    def test_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(self) -> None:
-        result = verify_reference_family("square-triangle")
+    def test_dodecagonal_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(self) -> None:
+        result = verify_reference_family("dodecagonal-square-triangle")
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
@@ -584,11 +584,11 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(
             depth_three_observation.kind_counts,
             (
-                ("square-triangle-square", 140),
-                ("square-triangle-triangle", 322),
+                ("dodecagonal-square-triangle-square", 140),
+                ("dodecagonal-square-triangle-triangle", 322),
             ),
         )
-        self.assertEqual(depth_three_observation.signature, "cdf9cac072d0")
+        self.assertEqual(depth_three_observation.signature, "f66a7171fb67")
 
     def test_pinwheel_reference_verifier_tracks_expanding_support(self) -> None:
         result = verify_reference_family("pinwheel")

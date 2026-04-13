@@ -42,13 +42,13 @@ const CHAIR_DEAD_PALETTE = new Map<string, string>([
     ["3", "#dbc1b2"],
 ]);
 
-const SQUARE_TRIANGLE_DEAD_PALETTE = new Map<string, string>([
-    ["square-triangle-square:blue", "#f8f1e5"],
-    ["square-triangle-square:red", "#ead6b6"],
-    ["square-triangle-square:yellow", "#d5bb8f"],
-    ["square-triangle-triangle:blue", "#efe4d0"],
-    ["square-triangle-triangle:red", "#e1cdac"],
-    ["square-triangle-triangle:yellow", "#c88d4b"],
+const DODECAGONAL_SQUARE_TRIANGLE_DEAD_PALETTE = new Map<string, string>([
+    ["dodecagonal-square-triangle-square:blue", "#f8f1e5"],
+    ["dodecagonal-square-triangle-square:red", "#ead6b6"],
+    ["dodecagonal-square-triangle-square:yellow", "#d5bb8f"],
+    ["dodecagonal-square-triangle-triangle:blue", "#efe4d0"],
+    ["dodecagonal-square-triangle-triangle:red", "#e1cdac"],
+    ["dodecagonal-square-triangle-triangle:yellow", "#c88d4b"],
 ]);
 
 const PINWHEEL_DEAD_PALETTE = new Map<string, string>([
@@ -111,18 +111,18 @@ function resolveChairDeadColor(
     return CHAIR_DEAD_PALETTE.get(orientation) || null;
 }
 
-function resolveSquareTriangleDeadColor(
+function resolveDodecagonalSquareTriangleDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
-    if (topologyCell?.tile_family !== "square-triangle") {
+    if (topologyCell?.tile_family !== "dodecagonal-square-triangle") {
         return null;
     }
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
     const chirality = typeof topologyCell.chirality_token === "string"
         ? topologyCell.chirality_token
         : "";
-    return SQUARE_TRIANGLE_DEAD_PALETTE.get(`${kind}:${chirality}`) || null;
+    return DODECAGONAL_SQUARE_TRIANGLE_DEAD_PALETTE.get(`${kind}:${chirality}`) || null;
 }
 
 function resolvePinwheelDeadColor(
@@ -184,9 +184,9 @@ export function resolveDeadCellColor(
     if (chairDeadColor) {
         return chairDeadColor;
     }
-    const squareTriangleDeadColor = resolveSquareTriangleDeadColor(cell);
-    if (squareTriangleDeadColor) {
-        return squareTriangleDeadColor;
+    const dodecagonalSquareTriangleDeadColor = resolveDodecagonalSquareTriangleDeadColor(cell);
+    if (dodecagonalSquareTriangleDeadColor) {
+        return dodecagonalSquareTriangleDeadColor;
     }
     const pinwheelDeadColor = resolvePinwheelDeadColor(cell);
     if (pinwheelDeadColor) {

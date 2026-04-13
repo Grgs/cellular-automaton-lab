@@ -344,55 +344,55 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "The Tuebingen triangle substitution distinguishes left- and right-handed Robinson triangles.",
         ),
     ),
-    "square-triangle": ReferenceFamilySpec(
-        geometry="square-triangle",
-        display_name="Square-Triangle",
+    "dodecagonal-square-triangle": ReferenceFamilySpec(
+        geometry="dodecagonal-square-triangle",
+        display_name="Dodecagonal Square-Triangle",
         source_urls=(
             "https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",
         ),
-        canonical_root_seed_policy="12-fold square-triangle substitution patch",
+        canonical_root_seed_policy="dodecagonal square-triangle substitution patch",
         allowed_public_cell_kinds=(
-            "square-triangle-square",
-            "square-triangle-triangle",
+            "dodecagonal-square-triangle-square",
+            "dodecagonal-square-triangle-triangle",
         ),
         required_metadata=(
             MetadataRequirement(
-                kind="square-triangle-square",
+                kind="dodecagonal-square-triangle-square",
                 fields=("tile_family", "orientation_token"),
             ),
             MetadataRequirement(
-                kind="square-triangle-triangle",
+                kind="dodecagonal-square-triangle-triangle",
                 fields=("tile_family", "orientation_token", "chirality_token"),
             ),
         ),
         depth_expectations={
             1: ReferenceDepthExpectation(
                 required_kinds=(
-                    "square-triangle-square",
-                    "square-triangle-triangle",
+                    "dodecagonal-square-triangle-square",
+                    "dodecagonal-square-triangle-triangle",
                 ),
                 required_adjacency_pairs=(
-                    ("square-triangle-square", "square-triangle-triangle"),
-                    ("square-triangle-triangle", "square-triangle-triangle"),
+                    ("dodecagonal-square-triangle-square", "dodecagonal-square-triangle-triangle"),
+                    ("dodecagonal-square-triangle-triangle", "dodecagonal-square-triangle-triangle"),
                 ),
             ),
             3: ReferenceDepthExpectation(
                 exact_total_cells=462,
                 expected_kind_counts=(
-                    ("square-triangle-square", 140),
-                    ("square-triangle-triangle", 322),
+                    ("dodecagonal-square-triangle-square", 140),
+                    ("dodecagonal-square-triangle-triangle", 322),
                 ),
                 required_kinds=(
-                    "square-triangle-square",
-                    "square-triangle-triangle",
+                    "dodecagonal-square-triangle-square",
+                    "dodecagonal-square-triangle-triangle",
                 ),
                 expected_adjacency_pairs=(
-                    ("square-triangle-square", "square-triangle-triangle"),
-                    ("square-triangle-triangle", "square-triangle-triangle"),
+                    ("dodecagonal-square-triangle-square", "dodecagonal-square-triangle-triangle"),
+                    ("dodecagonal-square-triangle-triangle", "dodecagonal-square-triangle-triangle"),
                 ),
                 min_unique_orientation_tokens=12,
                 min_unique_chirality_tokens=3,
-                expected_signature="cdf9cac072d0",  # pragma: allowlist secret
+                expected_signature="f66a7171fb67",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-3",
             ),
         },

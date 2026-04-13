@@ -7,10 +7,10 @@ from pathlib import Path
 from backend.simulation.aperiodic_support import AperiodicPatch, PatchRecord, patch_from_records
 
 
-# This checked-in patch is a cleaned dense central component from the square-triangle
+# This checked-in patch is a cleaned dense central component from the dodecagonal square-triangle
 # literature patch. A few stray fringe triangles are excluded to keep the public sample
 # connected and overlap-free while still presenting a visibly bulk-filled patch.
-_DATA_PATH = Path(__file__).with_name("data") / "square_triangle_reference_patch.json"
+_DATA_PATH = Path(__file__).with_name("data") / "dodecagonal_square_triangle_reference_patch.json"
 _EXCLUDED_RECORD_IDS = frozenset(
     {
         "sqtri:ref:05726",
@@ -69,7 +69,7 @@ def _distance_threshold(patch_depth: int) -> int:
     return _PATCH_DISTANCE_THRESHOLDS[available_depths[-1]]
 
 
-def build_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
+def build_dodecagonal_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     max_distance = _distance_threshold(resolved_depth)
     record_distances = _load_record_distances()

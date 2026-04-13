@@ -37,7 +37,7 @@ try:
         SNUB_SQUARE_DUAL_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
-        SQUARE_TRIANGLE_GEOMETRY,
+        DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
@@ -81,7 +81,7 @@ except ModuleNotFoundError:
         SNUB_SQUARE_DUAL_GEOMETRY,
         SPHINX_GEOMETRY,
         SPECTRE_GEOMETRY,
-        SQUARE_TRIANGLE_GEOMETRY,
+        DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
@@ -115,7 +115,7 @@ class SimulationTopologyTests(unittest.TestCase):
             (SHIELD_GEOMETRY, 0, 0),
             (SPECTRE_GEOMETRY, 0, 0),
             (SPHINX_GEOMETRY, 0, 0),
-            (SQUARE_TRIANGLE_GEOMETRY, 0, 0),
+            (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0),
             (TAYLOR_SOCOLAR_GEOMETRY, 0, 0),
             (TUEBINGEN_TRIANGLE_GEOMETRY, 0, 0),
             (PENROSE_GEOMETRY, 0, 0),
@@ -136,7 +136,7 @@ class SimulationTopologyTests(unittest.TestCase):
                         SHIELD_GEOMETRY,
                         SPECTRE_GEOMETRY,
                         SPHINX_GEOMETRY,
-                        SQUARE_TRIANGLE_GEOMETRY,
+                        DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
                         TAYLOR_SOCOLAR_GEOMETRY,
                         TUEBINGEN_TRIANGLE_GEOMETRY,
                         PENROSE_GEOMETRY,
@@ -487,7 +487,7 @@ class SimulationTopologyTests(unittest.TestCase):
         cases = (
             (HAT_MONOTILE_GEOMETRY, {"hat"}, 2),
             (TUEBINGEN_TRIANGLE_GEOMETRY, {"tuebingen-thick", "tuebingen-thin"}, 3),
-            (SQUARE_TRIANGLE_GEOMETRY, {"square-triangle-square", "square-triangle-triangle"}, 3),
+            (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, {"dodecagonal-square-triangle-square", "dodecagonal-square-triangle-triangle"}, 3),
             (SHIELD_GEOMETRY, {"shield-shield", "shield-square", "shield-triangle"}, 3),
             (PINWHEEL_GEOMETRY, {"pinwheel-triangle"}, 3),
         )
@@ -506,10 +506,10 @@ class SimulationTopologyTests(unittest.TestCase):
                 self.assertTrue(all(cell.tile_family is not None for cell in deep.cells))
                 if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY}:
                     self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
-                if geometry == SQUARE_TRIANGLE_GEOMETRY:
+                if geometry == DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY:
                     self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
-                if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY, SQUARE_TRIANGLE_GEOMETRY}:
-                    self.assertTrue(all(cell.chirality_token is not None for cell in deep.cells if cell.kind != "square-triangle-square"))
+                if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY, DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY}:
+                    self.assertTrue(all(cell.chirality_token is not None for cell in deep.cells if cell.kind != "dodecagonal-square-triangle-square"))
                 if geometry == SHIELD_GEOMETRY:
                     self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
                     self.assertGreaterEqual(

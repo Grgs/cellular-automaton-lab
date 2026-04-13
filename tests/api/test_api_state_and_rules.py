@@ -548,7 +548,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         cases = (
             ('hat-monotile', 3, {'hat'}),
             ('tuebingen-triangle', 5, {'tuebingen-thick', 'tuebingen-thin'}),
-            ('square-triangle', 4, {'square-triangle-square', 'square-triangle-triangle'}),
+            ('dodecagonal-square-triangle', 4, {'dodecagonal-square-triangle-square', 'dodecagonal-square-triangle-triangle'}),
             ('shield', 4, {'shield-shield', 'shield-square', 'shield-triangle'}),
             ('pinwheel', 4, {'pinwheel-triangle'}),
         )
@@ -579,8 +579,8 @@ class ApiStateAndRulesTests(ApiTestCase):
                 if geometry in {'hat-monotile', 'tuebingen-triangle', 'pinwheel'}:
                     self.assertTrue(all(cell.get('orientation_token') is not None for cell in topology['cells']))
                     self.assertTrue(all(cell.get('chirality_token') is not None for cell in topology['cells']))
-                if geometry == 'square-triangle':
-                    self.assertTrue(any(cell['kind'] == 'square-triangle-square' for cell in topology['cells']))
+                if geometry == 'dodecagonal-square-triangle':
+                    self.assertTrue(any(cell['kind'] == 'dodecagonal-square-triangle-square' for cell in topology['cells']))
                     self.assertTrue(all(cell.get('orientation_token') is not None for cell in topology['cells']))
                 if geometry == 'shield':
                     self.assertTrue(any(cell['kind'] == 'shield-square' for cell in topology['cells']))

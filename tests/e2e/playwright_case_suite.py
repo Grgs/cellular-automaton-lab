@@ -49,6 +49,7 @@ class SharedUiFlowCase(Protocol):
     def assertTrue(self, expr: Any, msg: str | None = None) -> None: ...
     def assertGreater(self, first: Any, second: Any, msg: str | None = None) -> None: ...
     def assertGreaterEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
+    def assertLessEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
 
 
 class SharedUiFlowMixin:
@@ -456,10 +457,10 @@ class SharedUiFlowMixin:
         self._expect("#grid-size-text").to_contain_text("Depth")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
-    def test_square_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
-        self._select_tiling_family_and_wait_for_reset("square-triangle")
+    def test_dodecagonal_square_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
+        self._select_tiling_family_and_wait_for_reset("dodecagonal-square-triangle")
 
-        self._expect("#tiling-family-select").to_have_value("square-triangle")
+        self._expect("#tiling-family-select").to_have_value("dodecagonal-square-triangle")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=3)

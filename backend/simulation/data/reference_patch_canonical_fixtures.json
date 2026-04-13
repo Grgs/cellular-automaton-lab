@@ -29509,7 +29509,7 @@
       "include_id": false
     }
   },
-  "square-triangle": {
+  "dodecagonal-square-triangle": {
     "dense-depth-3": {
       "cells": [
         {
@@ -29519,7 +29519,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29547,7 +29547,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29575,7 +29575,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29603,7 +29603,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29631,7 +29631,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29659,7 +29659,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29687,7 +29687,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29715,7 +29715,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29743,7 +29743,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29771,7 +29771,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29799,7 +29799,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29827,7 +29827,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29855,7 +29855,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29883,7 +29883,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29911,7 +29911,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29939,7 +29939,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29967,7 +29967,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -29995,7 +29995,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30023,7 +30023,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30051,7 +30051,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30079,7 +30079,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30107,7 +30107,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30135,7 +30135,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30163,7 +30163,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30191,7 +30191,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30219,7 +30219,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30247,7 +30247,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30275,7 +30275,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30303,7 +30303,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30331,7 +30331,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "0",
           "vertices": [
             [
@@ -30359,7 +30359,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30387,7 +30387,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30415,7 +30415,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30443,7 +30443,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30471,7 +30471,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30499,7 +30499,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30527,7 +30527,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30555,7 +30555,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30583,7 +30583,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "120",
           "vertices": [
             [
@@ -30611,7 +30611,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30639,7 +30639,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30667,7 +30667,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30695,7 +30695,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30723,7 +30723,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30751,7 +30751,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30779,7 +30779,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30807,7 +30807,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30835,7 +30835,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "150",
           "vertices": [
             [
@@ -30863,7 +30863,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "180",
           "vertices": [
             [
@@ -30891,7 +30891,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "180",
           "vertices": [
             [
@@ -30919,7 +30919,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "180",
           "vertices": [
             [
@@ -30947,7 +30947,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "180",
           "vertices": [
             [
@@ -30975,7 +30975,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "180",
           "vertices": [
             [
@@ -31003,7 +31003,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "180",
           "vertices": [
             [
@@ -31031,7 +31031,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31059,7 +31059,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31087,7 +31087,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31115,7 +31115,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31143,7 +31143,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31171,7 +31171,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31199,7 +31199,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31227,7 +31227,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31255,7 +31255,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31283,7 +31283,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31311,7 +31311,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31339,7 +31339,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31367,7 +31367,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31395,7 +31395,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31423,7 +31423,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "210",
           "vertices": [
             [
@@ -31451,7 +31451,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "240",
           "vertices": [
             [
@@ -31479,7 +31479,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "240",
           "vertices": [
             [
@@ -31507,7 +31507,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "240",
           "vertices": [
             [
@@ -31535,7 +31535,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "240",
           "vertices": [
             [
@@ -31563,7 +31563,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "240",
           "vertices": [
             [
@@ -31591,7 +31591,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "240",
           "vertices": [
             [
@@ -31619,7 +31619,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "270",
           "vertices": [
             [
@@ -31647,7 +31647,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "270",
           "vertices": [
             [
@@ -31675,7 +31675,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "270",
           "vertices": [
             [
@@ -31703,7 +31703,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "270",
           "vertices": [
             [
@@ -31731,7 +31731,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "270",
           "vertices": [
             [
@@ -31759,7 +31759,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "270",
           "vertices": [
             [
@@ -31787,7 +31787,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -31815,7 +31815,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -31843,7 +31843,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -31871,7 +31871,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -31899,7 +31899,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -31927,7 +31927,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -31955,7 +31955,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -31983,7 +31983,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -32011,7 +32011,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -32039,7 +32039,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "30",
           "vertices": [
             [
@@ -32067,7 +32067,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32095,7 +32095,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32123,7 +32123,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32151,7 +32151,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32179,7 +32179,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32207,7 +32207,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32235,7 +32235,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32263,7 +32263,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32291,7 +32291,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32319,7 +32319,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "300",
           "vertices": [
             [
@@ -32347,7 +32347,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32375,7 +32375,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32403,7 +32403,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32431,7 +32431,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32459,7 +32459,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32487,7 +32487,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32515,7 +32515,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32543,7 +32543,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "330",
           "vertices": [
             [
@@ -32571,7 +32571,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32599,7 +32599,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32627,7 +32627,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32655,7 +32655,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32683,7 +32683,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32711,7 +32711,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32739,7 +32739,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32767,7 +32767,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32795,7 +32795,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32823,7 +32823,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32851,7 +32851,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32879,7 +32879,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32907,7 +32907,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32935,7 +32935,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32963,7 +32963,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -32991,7 +32991,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33019,7 +33019,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33047,7 +33047,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33075,7 +33075,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33103,7 +33103,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33131,7 +33131,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33159,7 +33159,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33187,7 +33187,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33215,7 +33215,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "60",
           "vertices": [
             [
@@ -33243,7 +33243,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "90",
           "vertices": [
             [
@@ -33271,7 +33271,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "90",
           "vertices": [
             [
@@ -33299,7 +33299,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "90",
           "vertices": [
             [
@@ -33327,7 +33327,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "90",
           "vertices": [
             [
@@ -33355,7 +33355,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "90",
           "vertices": [
             [
@@ -33383,7 +33383,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "90",
           "vertices": [
             [
@@ -33411,7 +33411,7 @@
           ],
           "chirality_token": null,
           "decoration_tokens": null,
-          "kind": "square-triangle-square",
+          "kind": "dodecagonal-square-triangle-square",
           "orientation_token": "90",
           "vertices": [
             [
@@ -33439,7 +33439,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33463,7 +33463,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33487,7 +33487,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33511,7 +33511,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33535,7 +33535,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33559,7 +33559,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33583,7 +33583,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33607,7 +33607,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33631,7 +33631,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33655,7 +33655,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33679,7 +33679,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33703,7 +33703,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33727,7 +33727,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33751,7 +33751,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33775,7 +33775,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33799,7 +33799,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33823,7 +33823,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33847,7 +33847,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33871,7 +33871,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33895,7 +33895,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33919,7 +33919,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
@@ -33943,7 +33943,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -33967,7 +33967,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -33991,7 +33991,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34015,7 +34015,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34039,7 +34039,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34063,7 +34063,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34087,7 +34087,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34111,7 +34111,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34135,7 +34135,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34159,7 +34159,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34183,7 +34183,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34207,7 +34207,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34231,7 +34231,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34255,7 +34255,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34279,7 +34279,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34303,7 +34303,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34327,7 +34327,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34351,7 +34351,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34375,7 +34375,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34399,7 +34399,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34423,7 +34423,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34447,7 +34447,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34471,7 +34471,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34495,7 +34495,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34519,7 +34519,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34543,7 +34543,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34567,7 +34567,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34591,7 +34591,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34615,7 +34615,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34639,7 +34639,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34663,7 +34663,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34687,7 +34687,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34711,7 +34711,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34735,7 +34735,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34759,7 +34759,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34783,7 +34783,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34807,7 +34807,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34831,7 +34831,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "120",
           "vertices": [
             [
@@ -34855,7 +34855,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -34879,7 +34879,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -34903,7 +34903,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -34927,7 +34927,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -34951,7 +34951,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -34975,7 +34975,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -34999,7 +34999,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35023,7 +35023,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35047,7 +35047,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35071,7 +35071,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35095,7 +35095,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35119,7 +35119,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35143,7 +35143,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35167,7 +35167,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35191,7 +35191,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35215,7 +35215,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35239,7 +35239,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35263,7 +35263,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35287,7 +35287,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35311,7 +35311,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35335,7 +35335,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35359,7 +35359,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "150",
           "vertices": [
             [
@@ -35383,7 +35383,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35407,7 +35407,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35431,7 +35431,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35455,7 +35455,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35479,7 +35479,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35503,7 +35503,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35527,7 +35527,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35551,7 +35551,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35575,7 +35575,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35599,7 +35599,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35623,7 +35623,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35647,7 +35647,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35671,7 +35671,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35695,7 +35695,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35719,7 +35719,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35743,7 +35743,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35767,7 +35767,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35791,7 +35791,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "180",
           "vertices": [
             [
@@ -35815,7 +35815,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -35839,7 +35839,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -35863,7 +35863,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -35887,7 +35887,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -35911,7 +35911,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -35935,7 +35935,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -35959,7 +35959,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -35983,7 +35983,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36007,7 +36007,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36031,7 +36031,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36055,7 +36055,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36079,7 +36079,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36103,7 +36103,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36127,7 +36127,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36151,7 +36151,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36175,7 +36175,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36199,7 +36199,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36223,7 +36223,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36247,7 +36247,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36271,7 +36271,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36295,7 +36295,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36319,7 +36319,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36343,7 +36343,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36367,7 +36367,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36391,7 +36391,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36415,7 +36415,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36439,7 +36439,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36463,7 +36463,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36487,7 +36487,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36511,7 +36511,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "210",
           "vertices": [
             [
@@ -36535,7 +36535,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36559,7 +36559,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36583,7 +36583,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36607,7 +36607,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36631,7 +36631,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36655,7 +36655,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36679,7 +36679,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36703,7 +36703,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36727,7 +36727,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36751,7 +36751,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36775,7 +36775,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36799,7 +36799,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36823,7 +36823,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36847,7 +36847,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36871,7 +36871,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36895,7 +36895,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36919,7 +36919,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36943,7 +36943,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36967,7 +36967,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -36991,7 +36991,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -37015,7 +37015,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -37039,7 +37039,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -37063,7 +37063,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -37087,7 +37087,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -37111,7 +37111,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "240",
           "vertices": [
             [
@@ -37135,7 +37135,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37159,7 +37159,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37183,7 +37183,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37207,7 +37207,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37231,7 +37231,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37255,7 +37255,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37279,7 +37279,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37303,7 +37303,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37327,7 +37327,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37351,7 +37351,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37375,7 +37375,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37399,7 +37399,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37423,7 +37423,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37447,7 +37447,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37471,7 +37471,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37495,7 +37495,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37519,7 +37519,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37543,7 +37543,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37567,7 +37567,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37591,7 +37591,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37615,7 +37615,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37639,7 +37639,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37663,7 +37663,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37687,7 +37687,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37711,7 +37711,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37735,7 +37735,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37759,7 +37759,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "270",
           "vertices": [
             [
@@ -37783,7 +37783,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37807,7 +37807,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37831,7 +37831,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37855,7 +37855,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37879,7 +37879,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37903,7 +37903,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37927,7 +37927,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37951,7 +37951,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37975,7 +37975,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -37999,7 +37999,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38023,7 +38023,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38047,7 +38047,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38071,7 +38071,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38095,7 +38095,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38119,7 +38119,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38143,7 +38143,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38167,7 +38167,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38191,7 +38191,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38215,7 +38215,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38239,7 +38239,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38263,7 +38263,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38287,7 +38287,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38311,7 +38311,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38335,7 +38335,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38359,7 +38359,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38383,7 +38383,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38407,7 +38407,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "30",
           "vertices": [
             [
@@ -38431,7 +38431,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38455,7 +38455,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38479,7 +38479,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38503,7 +38503,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38527,7 +38527,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38551,7 +38551,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38575,7 +38575,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38599,7 +38599,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38623,7 +38623,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38647,7 +38647,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38671,7 +38671,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38695,7 +38695,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38719,7 +38719,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38743,7 +38743,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38767,7 +38767,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38791,7 +38791,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38815,7 +38815,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38839,7 +38839,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38863,7 +38863,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38887,7 +38887,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38911,7 +38911,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38935,7 +38935,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38959,7 +38959,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -38983,7 +38983,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -39007,7 +39007,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -39031,7 +39031,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -39055,7 +39055,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -39079,7 +39079,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
@@ -39103,7 +39103,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39127,7 +39127,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39151,7 +39151,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39175,7 +39175,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39199,7 +39199,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39223,7 +39223,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39247,7 +39247,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39271,7 +39271,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39295,7 +39295,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39319,7 +39319,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39343,7 +39343,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39367,7 +39367,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39391,7 +39391,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39415,7 +39415,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39439,7 +39439,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39463,7 +39463,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39487,7 +39487,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39511,7 +39511,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39535,7 +39535,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39559,7 +39559,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39583,7 +39583,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39607,7 +39607,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39631,7 +39631,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39655,7 +39655,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "330",
           "vertices": [
             [
@@ -39679,7 +39679,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39703,7 +39703,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39727,7 +39727,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39751,7 +39751,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39775,7 +39775,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39799,7 +39799,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39823,7 +39823,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39847,7 +39847,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39871,7 +39871,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39895,7 +39895,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39919,7 +39919,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39943,7 +39943,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39967,7 +39967,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -39991,7 +39991,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40015,7 +40015,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40039,7 +40039,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40063,7 +40063,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40087,7 +40087,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40111,7 +40111,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40135,7 +40135,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40159,7 +40159,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40183,7 +40183,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40207,7 +40207,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40231,7 +40231,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40255,7 +40255,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40279,7 +40279,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40303,7 +40303,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40327,7 +40327,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40351,7 +40351,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40375,7 +40375,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40399,7 +40399,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40423,7 +40423,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40447,7 +40447,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40471,7 +40471,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40495,7 +40495,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40519,7 +40519,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40543,7 +40543,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40567,7 +40567,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40591,7 +40591,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40615,7 +40615,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "60",
           "vertices": [
             [
@@ -40639,7 +40639,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40663,7 +40663,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40687,7 +40687,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40711,7 +40711,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40735,7 +40735,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40759,7 +40759,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40783,7 +40783,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40807,7 +40807,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40831,7 +40831,7 @@
           ],
           "chirality_token": "blue",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40855,7 +40855,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40879,7 +40879,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40903,7 +40903,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40927,7 +40927,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40951,7 +40951,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40975,7 +40975,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -40999,7 +40999,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -41023,7 +41023,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -41047,7 +41047,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -41071,7 +41071,7 @@
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -41095,7 +41095,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -41119,7 +41119,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [
@@ -41143,7 +41143,7 @@
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
-          "kind": "square-triangle-triangle",
+          "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "90",
           "vertices": [
             [

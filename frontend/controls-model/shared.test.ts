@@ -119,8 +119,8 @@ describe("controls-model/shared", () => {
                 sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 5 },
             },
             {
-                tiling_family: "square-triangle",
-                label: "Square-Triangle",
+                tiling_family: "dodecagonal-square-triangle",
+                label: "Dodecagonal Square-Triangle",
                 picker_group: "Experimental",
                 picker_order: 320,
                 sizing_mode: "patch_depth",
@@ -130,7 +130,7 @@ describe("controls-model/shared", () => {
                 supported_adjacency_modes: ["edge"],
                 default_adjacency_mode: "edge",
                 default_rules: { edge: "life-b2-s23" },
-                geometry_keys: { edge: "square-triangle" },
+                geometry_keys: { edge: "dodecagonal-square-triangle" },
                 sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 4 },
             },
             {
@@ -207,7 +207,7 @@ describe("controls-model/shared", () => {
         };
         const squareTriangleState = createAppState();
         squareTriangleState.topologySpec = {
-            tiling_family: "square-triangle",
+            tiling_family: "dodecagonal-square-triangle",
             adjacency_mode: "edge",
             sizing_mode: "patch_depth",
             width: 0,

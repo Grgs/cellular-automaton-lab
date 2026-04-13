@@ -13,7 +13,7 @@ This is the short version of how tilings fit into the app.
 - Aperiodic substitution families
   - built through `backend/simulation/aperiodic_registry.py`
   - shared helpers live in `backend/simulation/aperiodic_substitution.py` and `backend/simulation/aperiodic_support.py`
-  - examples: Penrose, Ammann-Beenker, Spectre, Taylor-Socolar, Sphinx, Hat, Chair, Robinson, Tuebingen Triangle, Square-Triangle, Shield, Pinwheel
+  - examples: Penrose, Ammann-Beenker, Spectre, Taylor-Socolar, Sphinx, Hat, Chair, Robinson, Tuebingen Triangle, Dodecagonal Square-Triangle, Shield, Pinwheel
 
 ## Verification Layers
 

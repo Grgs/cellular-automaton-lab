@@ -24,7 +24,7 @@ class ValidateTilingsToolTests(unittest.TestCase):
         self.assertIn("robinson-triangles", targets)
         self.assertIn("hat-monotile", targets)
         self.assertIn("tuebingen-triangle", targets)
-        self.assertIn("square-triangle", targets)
+        self.assertIn("dodecagonal-square-triangle", targets)
         self.assertIn("shield", targets)
         self.assertIn("pinwheel", targets)
         self.assertIn("penrose-p3-rhombs", targets)
@@ -37,7 +37,7 @@ class ValidateTilingsToolTests(unittest.TestCase):
         self.assertEqual(targets["robinson-triangles"]["patch_depth"], 3)
         self.assertEqual(targets["hat-monotile"]["patch_depth"], 3)
         self.assertEqual(targets["tuebingen-triangle"]["patch_depth"], 3)
-        self.assertEqual(targets["square-triangle"]["patch_depth"], 3)
+        self.assertEqual(targets["dodecagonal-square-triangle"]["patch_depth"], 3)
         self.assertEqual(targets["shield"]["patch_depth"], 3)
         self.assertEqual(targets["pinwheel"]["patch_depth"], 3)
 

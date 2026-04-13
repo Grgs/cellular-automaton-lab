@@ -160,14 +160,14 @@ Primary files:
 - [aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
 - [aperiodic_substitution.py](../backend/simulation/aperiodic_substitution.py)
 - [aperiodic_support.py](../backend/simulation/aperiodic_support.py)
-- [aperiodic_square_triangle.py](../backend/simulation/aperiodic_square_triangle.py)
+- [aperiodic_dodecagonal_square_triangle.py](../backend/simulation/aperiodic_dodecagonal_square_triangle.py)
 - [aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
 - [aperiodic_pinwheel.py](../backend/simulation/aperiodic_pinwheel.py)
 - [topology_validation.py](../backend/simulation/topology_validation.py)
 
 Current issue:
 
-Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `square-triangle`, `shield`, and `pinwheel` remain experimental because manual visual review still does not justify promotion. Shield is explicitly not a defensible full marked fractal substitution.
+Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `dodecagonal-square-triangle`, `shield`, and `pinwheel` remain experimental because manual visual review still does not justify promotion. Shield is explicitly not a defensible full marked fractal substitution.
 
 Needed change:
 
@@ -195,7 +195,7 @@ The code stops treating all aperiodic builders as equally authoritative. Product
 
 Implementation status:
 
-The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `square-triangle`, `shield`, and `pinwheel` still explicitly blocked from promotion pending visual or implementation work.
+The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `dodecagonal-square-triangle`, `shield`, and `pinwheel` still explicitly blocked from promotion pending visual or implementation work.
 
 ### 5. Literature Verification And Fixtures
 
@@ -232,7 +232,7 @@ Implementation status:
 
 The first split is in place. `backend/simulation/literature_reference_specs.py` now merges grouped spec modules from `backend/simulation/reference_specs/`, and `backend/simulation/literature_reference_verification.py` is a compatibility facade over `backend/simulation/reference_verification/` modules for observation, fixtures, depth checks, periodic checks, shared types, and runner orchestration. `tools/regenerate_reference_fixtures.py` now makes local and canonical fixture regeneration explicit, deterministic, and checkable.
 The verification-strength report is now a real aggregator instead of a thin tag dump: `tools/report_tiling_verification_strength.py` combines static coverage, aperiodic implementation contracts, fixture presence, and live `verify_all_reference_families()` results into summary, detail, and deterministic JSON outputs.
-Direct canonical patch comparison now also covers `robinson-triangles` and `tuebingen-triangle` at depth `3`, extending the exact checked-in fixture layer beyond the earlier `square-triangle`, `shield`, and `pinwheel` set.
+Direct canonical patch comparison now also covers `robinson-triangles` and `tuebingen-triangle` at depth `3`, extending the exact checked-in fixture layer beyond the earlier `dodecagonal-square-triangle`, `shield`, and `pinwheel` set.
 
 ### 6. Frontend Geometry Adapter Common Path
 
@@ -340,7 +340,7 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Do Not Do Yet
 
-- Do not promote `square-triangle`, `shield`, or `pinwheel` until manual visual review and implementation status justify it.
+- Do not promote `dodecagonal-square-triangle`, `shield`, or `pinwheel` until manual visual review and implementation status justify it.
 - Do not centralize all constants into one global config file.
 - Do not rewrite the app controller stack without first extracting gesture and overlay state; those are the higher-churn seams.
 - Do not replace Playwright coverage with unit tests for flows that genuinely require DOM, canvas, browser storage, or standalone worker execution.
@@ -348,4 +348,4 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 ## Suggested Order
 
 1. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
-2. Broaden direct canonical patch comparisons beyond the current exact-depth set (`square-triangle`, `shield`, `pinwheel`, `robinson-triangles`, and `tuebingen-triangle`) where they materially strengthen correctness guarantees.
+2. Broaden direct canonical patch comparisons beyond the current exact-depth set (`dodecagonal-square-triangle`, `shield`, `pinwheel`, `robinson-triangles`, and `tuebingen-triangle`) where they materially strengthen correctness guarantees.

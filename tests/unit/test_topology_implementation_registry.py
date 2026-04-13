@@ -39,7 +39,7 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         for geometry in (
             "hat-monotile",
             "tuebingen-triangle",
-            "square-triangle",
+            "dodecagonal-square-triangle",
             "shield",
             "pinwheel",
         ):
@@ -64,7 +64,7 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertIn("robinson-triangles", geometries)
         self.assertIn("hat-monotile", geometries)
         self.assertIn("tuebingen-triangle", geometries)
-        self.assertIn("square-triangle", geometries)
+        self.assertIn("dodecagonal-square-triangle", geometries)
         self.assertIn("shield", geometries)
         self.assertIn("pinwheel", geometries)
 

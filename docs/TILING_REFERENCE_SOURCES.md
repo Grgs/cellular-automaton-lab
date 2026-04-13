@@ -84,7 +84,7 @@ The order is intentional:
   - [Robinson triangle](https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/)
 - `tuebingen-triangle`
   - [Tuebingen Triangle](https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/)
-- `square-triangle`
+- `dodecagonal-square-triangle`
   - [Square-triangle](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)

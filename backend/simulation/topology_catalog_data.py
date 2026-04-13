@@ -40,7 +40,7 @@ HAT_MONOTILE_GEOMETRY = "hat-monotile"
 CHAIR_GEOMETRY = "chair"
 ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
 TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
-SQUARE_TRIANGLE_GEOMETRY = "square-triangle"
+DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
 SHIELD_GEOMETRY = "shield"
 PINWHEEL_GEOMETRY = "pinwheel"
 
@@ -85,7 +85,7 @@ TOPOLOGY_SIZING_POLICIES = {
     CHAIR_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
     ROBINSON_TRIANGLES_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
     TUEBINGEN_TRIANGLE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
-    SQUARE_TRIANGLE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+    DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
     SHIELD_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
     PINWHEEL_GEOMETRY: SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
 }
@@ -464,10 +464,10 @@ TOPOLOGY_VARIANTS: tuple[TopologyVariantDefinition, ...] = (
         viewport_sync_mode="presentation-only",
     ),
     TopologyVariantDefinition(
-        geometry_key=SQUARE_TRIANGLE_GEOMETRY,
-        tiling_family=SQUARE_TRIANGLE_GEOMETRY,
+        geometry_key=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
+        tiling_family=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         adjacency_mode=EDGE_ADJACENCY,
-        label="Square-Triangle",
+        label="Dodecagonal Square-Triangle",
         picker_group="Experimental",
         picker_order=320,
         default_rule="life-b2-s23",

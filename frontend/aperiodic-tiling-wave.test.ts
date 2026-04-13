@@ -35,8 +35,8 @@ const NEW_TILINGS: ReadonlyArray<BootstrappedTopologyDefinition> = [
         sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 5 },
     },
     {
-        tiling_family: "square-triangle",
-        label: "Square-Triangle",
+        tiling_family: "dodecagonal-square-triangle",
+        label: "Dodecagonal Square-Triangle",
         picker_group: "Experimental",
         picker_order: 320,
         sizing_mode: "patch_depth",
@@ -46,7 +46,7 @@ const NEW_TILINGS: ReadonlyArray<BootstrappedTopologyDefinition> = [
         supported_adjacency_modes: ["edge"],
         default_adjacency_mode: "edge",
         default_rules: { edge: "life-b2-s23" },
-        geometry_keys: { edge: "square-triangle" },
+        geometry_keys: { edge: "dodecagonal-square-triangle" },
         sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 4 },
     },
     {

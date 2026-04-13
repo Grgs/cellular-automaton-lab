@@ -74,7 +74,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - rooted local-reference fixtures now check a canonical neighborhood around that `H8`-rooted sample
 - `tuebingen-triangle`
   - chirality metadata is part of the expected output
-- `square-triangle`
+- `dodecagonal-square-triangle`
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
   - the authoritative verifier sample is now a cleaned dense depth-3 central component of the literature patch, not just a shallow adjacency shell
   - that depth-3 sample must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature

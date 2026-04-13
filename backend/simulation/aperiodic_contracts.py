@@ -45,13 +45,13 @@ _IMPLEMENTATION_STATUS: dict[str, AperiodicImplementationStatus] = {
     "chair": "true_substitution",
     "robinson-triangles": "true_substitution",
     "tuebingen-triangle": "true_substitution",
-    "square-triangle": "canonical_patch",
+    "dodecagonal-square-triangle": "canonical_patch",
     "shield": "known_deviation",
     "pinwheel": "exact_affine",
 }
 
 _PROMOTION_BLOCKERS: dict[str, str] = {
-    "square-triangle": "Experimental until manual visual review accepts the canonical-patch implementation.",
+    "dodecagonal-square-triangle": "Experimental until manual visual review accepts the canonical-patch implementation.",
     "shield": "Experimental until the known translated-cluster deviation is replaced by a marked fractal substitution.",
     "pinwheel": "Experimental until manual visual review accepts the exact-affine implementation.",
 }

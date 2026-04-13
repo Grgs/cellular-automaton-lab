@@ -21,7 +21,7 @@ from backend.simulation.topology_catalog import (
     SNUB_SQUARE_DUAL_GEOMETRY,
     SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
-    SQUARE_TRIANGLE_GEOMETRY,
+    DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
@@ -196,7 +196,7 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertFalse(geometry_uses_backend_viewport_sync(SPECTRE_GEOMETRY))
 
     def test_recent_aperiodic_geometries_remain_experimental(self) -> None:
-        for geometry in (SQUARE_TRIANGLE_GEOMETRY, SHIELD_GEOMETRY, PINWHEEL_GEOMETRY):
+        for geometry in (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, SHIELD_GEOMETRY, PINWHEEL_GEOMETRY):
             with self.subTest(geometry=geometry):
                 definition = get_topology_variant_for_geometry(geometry)
                 family_definition = get_topology_definition(geometry)
@@ -264,7 +264,7 @@ class GeometryManifestTests(unittest.TestCase):
         expected = {
             HAT_MONOTILE_GEOMETRY: {"default": 2, "min": 0, "max": 3},
             TUEBINGEN_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 5},
-            SQUARE_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 4},
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 4},
             SHIELD_GEOMETRY: {"default": 3, "min": 0, "max": 4},
             PINWHEEL_GEOMETRY: {"default": 3, "min": 0, "max": 4},
         }
