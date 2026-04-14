@@ -1,103 +1,51 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { BootstrappedTopologyDefinition } from "./types/domain.js";
+import {
+    buildSingleVariantBootstrappedTopologyDefinition,
+} from "./test-helpers/topology-catalog-fixtures.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 
-const NEW_TILINGS: ReadonlyArray<BootstrappedTopologyDefinition> = [
-    {
-        tiling_family: "hat-monotile",
-        label: "Hat",
-        picker_group: "Aperiodic",
-        picker_order: 250,
-        sizing_mode: "patch_depth",
-        family: "aperiodic",
-        render_kind: "polygon_aperiodic",
-        viewport_sync_mode: "presentation-only",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: { edge: "life-b2-s23" },
-        geometry_keys: { edge: "hat-monotile" },
-        sizing_policy: { control: "patch_depth", default: 2, min: 0, max: 3 },
-    },
-    {
-        tiling_family: "tuebingen-triangle",
-        label: "Tuebingen Triangle",
-        picker_group: "Aperiodic",
-        picker_order: 310,
-        sizing_mode: "patch_depth",
-        family: "aperiodic",
-        render_kind: "polygon_aperiodic",
-        viewport_sync_mode: "presentation-only",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: { edge: "life-b2-s23" },
-        geometry_keys: { edge: "tuebingen-triangle" },
-        sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 5 },
-    },
-    {
-        tiling_family: "dodecagonal-square-triangle",
-        label: "Dodecagonal Square-Triangle",
-        picker_group: "Experimental",
-        picker_order: 320,
-        sizing_mode: "patch_depth",
-        family: "aperiodic",
-        render_kind: "polygon_aperiodic",
-        viewport_sync_mode: "presentation-only",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: { edge: "life-b2-s23" },
-        geometry_keys: { edge: "dodecagonal-square-triangle" },
-        sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 4 },
-    },
-    {
-        tiling_family: "shield",
-        label: "Shield",
-        picker_group: "Experimental",
-        picker_order: 330,
-        sizing_mode: "patch_depth",
-        family: "aperiodic",
-        render_kind: "polygon_aperiodic",
-        viewport_sync_mode: "presentation-only",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: { edge: "life-b2-s23" },
-        geometry_keys: { edge: "shield" },
-        sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 4 },
-    },
-    {
-        tiling_family: "pinwheel",
-        label: "Pinwheel",
-        picker_group: "Experimental",
-        picker_order: 340,
-        sizing_mode: "patch_depth",
-        family: "aperiodic",
-        render_kind: "polygon_aperiodic",
-        viewport_sync_mode: "presentation-only",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: { edge: "life-b2-s23" },
-        geometry_keys: { edge: "pinwheel" },
-        sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 4 },
-    },
-];
+const NEW_TILINGS = [
+    buildSingleVariantBootstrappedTopologyDefinition("hat-monotile", {
+        geometryKey: "hat-monotile",
+        renderKind: "polygon_aperiodic",
+        defaultRule: "life-b2-s23",
+        sizingPolicy: { control: "patch_depth", default: 2, min: 0, max: 3 },
+    }),
+    buildSingleVariantBootstrappedTopologyDefinition("tuebingen-triangle", {
+        geometryKey: "tuebingen-triangle",
+        renderKind: "polygon_aperiodic",
+        defaultRule: "life-b2-s23",
+        sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 5 },
+    }),
+    buildSingleVariantBootstrappedTopologyDefinition("dodecagonal-square-triangle", {
+        geometryKey: "dodecagonal-square-triangle",
+        renderKind: "polygon_aperiodic",
+        defaultRule: "life-b2-s23",
+        sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 4 },
+    }),
+    buildSingleVariantBootstrappedTopologyDefinition("shield", {
+        geometryKey: "shield",
+        renderKind: "polygon_aperiodic",
+        defaultRule: "life-b2-s23",
+        sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 4 },
+    }),
+    buildSingleVariantBootstrappedTopologyDefinition("pinwheel", {
+        geometryKey: "pinwheel",
+        renderKind: "polygon_aperiodic",
+        defaultRule: "life-b2-s23",
+        sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 4 },
+    }),
+] as const;
 
 function installGlobals(): void {
     window.APP_TOPOLOGIES = [
-        {
-            tiling_family: "square",
-            label: "Square",
-            picker_group: "Classic",
-            picker_order: 10,
-            sizing_mode: "grid",
-            family: "regular",
-            render_kind: "regular_grid",
-            viewport_sync_mode: "backend-sync",
-            supported_adjacency_modes: ["edge"],
-            default_adjacency_mode: "edge",
-            default_rules: { edge: "conway" },
-            geometry_keys: { edge: "square" },
-            sizing_policy: { control: "cell_size", default: 12, min: 8, max: 24 },
-        },
+        buildSingleVariantBootstrappedTopologyDefinition("square", {
+            geometryKey: "square",
+            renderKind: "regular_grid",
+            defaultRule: "conway",
+            sizingPolicy: { control: "cell_size", default: 12, min: 8, max: 24 },
+        }),
         ...NEW_TILINGS,
     ];
     window.APP_PERIODIC_FACE_TILINGS = [

@@ -1,5 +1,10 @@
 import unittest
 
+from backend.simulation.topology_family_manifest import (
+    GEOMETRY_MINIMUM_GRID_DIMENSIONS,
+    PICKER_GROUP_ORDER,
+    TOPOLOGY_FAMILY_MANIFEST,
+)
 from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_33336_GEOMETRY,
@@ -32,6 +37,7 @@ from backend.simulation.topology_catalog import (
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     SUPPORTED_GEOMETRIES,
+    TOPOLOGY_SIZING_POLICIES,
     TOPOLOGY_VARIANTS,
     describe_topology_variants,
     geometry_uses_backend_viewport_sync,
@@ -45,7 +51,18 @@ from backend.simulation.topology_catalog import (
 
 class GeometryManifestTests(unittest.TestCase):
     def test_supported_geometries_are_unique_and_manifest_backed(self) -> None:
-        manifest_ids = [definition.geometry_key for definition in TOPOLOGY_VARIANTS]
+        manifest_ids = [
+            variant.geometry_key
+            for family in sorted(
+                TOPOLOGY_FAMILY_MANIFEST.values(),
+                key=lambda definition: (
+                    PICKER_GROUP_ORDER.get(definition.picker_group, 99),
+                    definition.picker_order,
+                    definition.label.lower(),
+                ),
+            )
+            for variant in family.variants
+        ]
 
         self.assertEqual(SUPPORTED_GEOMETRIES, tuple(manifest_ids))
         self.assertEqual(len(manifest_ids), len(set(manifest_ids)))
@@ -53,10 +70,53 @@ class GeometryManifestTests(unittest.TestCase):
     def test_default_rule_map_derives_from_manifest(self) -> None:
         self.assertEqual(
             GEOMETRY_DEFAULT_RULES,
-            {definition.geometry_key: definition.default_rule for definition in TOPOLOGY_VARIANTS},
+            {
+                variant.geometry_key: variant.default_rule
+                for family in TOPOLOGY_FAMILY_MANIFEST.values()
+                for variant in family.variants
+            },
         )
         self.assertEqual(GEOMETRY_DEFAULT_RULES[PENROSE_GEOMETRY], "life-b2-s23")
         self.assertEqual(GEOMETRY_DEFAULT_RULES[PENROSE_VERTEX_GEOMETRY], "conway")
+
+    def test_variants_and_sizing_policies_derive_from_family_manifest(self) -> None:
+        self.assertEqual(
+            {
+                variant.geometry_key: (
+                    variant.tiling_family,
+                    variant.label,
+                    variant.picker_group,
+                    variant.picker_order,
+                    variant.family,
+                    variant.sizing_mode,
+                    variant.viewport_sync_mode,
+                )
+                for variant in TOPOLOGY_VARIANTS
+            },
+            {
+                variant.geometry_key: (
+                    family.tiling_family,
+                    family.label,
+                    family.picker_group,
+                    family.picker_order,
+                    family.family,
+                    family.sizing_mode,
+                    family.viewport_sync_mode,
+                )
+                for family in TOPOLOGY_FAMILY_MANIFEST.values()
+                for variant in family.variants
+            },
+        )
+        self.assertEqual(
+            {
+                family_id: policy.to_dict()
+                for family_id, policy in TOPOLOGY_SIZING_POLICIES.items()
+            },
+            {
+                family_id: definition.sizing_policy.to_dict()
+                for family_id, definition in TOPOLOGY_FAMILY_MANIFEST.items()
+            },
+        )
 
     def test_penrose_modes_expose_expected_capabilities(self) -> None:
         edge = get_topology_variant_for_geometry(PENROSE_GEOMETRY)
@@ -158,6 +218,7 @@ class GeometryManifestTests(unittest.TestCase):
                 self.assertEqual(definition.default_rule, default_rule)
                 self.assertEqual(GEOMETRY_DEFAULT_RULES[geometry], default_rule)
                 self.assertEqual(minimum_grid_dimension_for_geometry(geometry), 1)
+                self.assertEqual(GEOMETRY_MINIMUM_GRID_DIMENSIONS[geometry], 1)
 
         self.assertEqual(minimum_grid_dimension_for_geometry("square"), 3)
         self.assertEqual(minimum_grid_dimension_for_geometry("archimedean-4-8-8"), 3)
@@ -183,6 +244,7 @@ class GeometryManifestTests(unittest.TestCase):
                 self.assertEqual(definition.default_rule, "life-b2-s23")
                 self.assertEqual(GEOMETRY_DEFAULT_RULES[geometry], "life-b2-s23")
                 self.assertEqual(minimum_grid_dimension_for_geometry(geometry), minimum_dimension)
+                self.assertEqual(GEOMETRY_MINIMUM_GRID_DIMENSIONS[geometry], minimum_dimension)
 
     def test_spectre_geometry_uses_aperiodic_patch_depth_defaults(self) -> None:
         definition = get_topology_variant_for_geometry(SPECTRE_GEOMETRY)

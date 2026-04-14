@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from backend.payload_types import TopologyCatalogEntryPayload, TopologySpecPayload, TopologyVariantPayload
 from backend.simulation.topology_catalog_build import build_topology_catalog
+from backend.simulation.topology_family_manifest import GEOMETRY_MINIMUM_GRID_DIMENSIONS
 from backend.simulation.topology_catalog_data import (
     AMMANN_BEENKER_GEOMETRY,
     ARCHIMEDEAN_31212_GEOMETRY,
@@ -24,7 +25,6 @@ from backend.simulation.topology_catalog_data import (
     HAT_MONOTILE_GEOMETRY,
     HEX_GEOMETRY,
     KAGOME_GEOMETRY,
-    LOW_MINIMUM_MIXED_GEOMETRIES,
     PATCH_DEPTH_CONTROL,
     PENROSE_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -238,9 +238,7 @@ def is_aperiodic_geometry(geometry_key: str) -> bool:
 
 
 def minimum_grid_dimension_for_geometry(geometry_key: str) -> int:
-    if geometry_key in LOW_MINIMUM_MIXED_GEOMETRIES:
-        return 1
-    return DEFAULT_MIN_GRID_SIZE
+    return GEOMETRY_MINIMUM_GRID_DIMENSIONS.get(geometry_key, DEFAULT_MIN_GRID_SIZE)
 
 
 def default_patch_depth_for_tiling_family(tiling_family: str) -> int:

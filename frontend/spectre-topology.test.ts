@@ -1,23 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { BootstrappedTopologyDefinition } from "./types/domain.js";
+import { buildSingleVariantBootstrappedTopologyDefinition } from "./test-helpers/topology-catalog-fixtures.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 
-const SPECTRE_TOPOLOGY: BootstrappedTopologyDefinition = {
-    tiling_family: "spectre",
-    label: "Spectre",
-    picker_group: "Aperiodic",
-    picker_order: 240,
-    sizing_mode: "patch_depth",
-    family: "aperiodic",
-    render_kind: "polygon_aperiodic",
-    viewport_sync_mode: "presentation-only",
-    supported_adjacency_modes: ["edge"],
-    default_adjacency_mode: "edge",
-    default_rules: { edge: "life-b2-s23" },
-    geometry_keys: { edge: "spectre" },
-    sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 3 },
-};
+const SPECTRE_TOPOLOGY = buildSingleVariantBootstrappedTopologyDefinition("spectre", {
+    geometryKey: "spectre",
+    renderKind: "polygon_aperiodic",
+    defaultRule: "life-b2-s23",
+    sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 3 },
+});
 
 const PERIODIC_MIXED_GEOMETRIES = [
     "archimedean-4-8-8",
@@ -40,21 +31,12 @@ const PERIODIC_MIXED_GEOMETRIES = [
 
 function installSpectreGlobals(): void {
     window.APP_TOPOLOGIES = [
-        {
-            tiling_family: "square",
-            label: "Square",
-            picker_group: "Classic",
-            picker_order: 10,
-            sizing_mode: "grid",
-            family: "regular",
-            render_kind: "regular_grid",
-            viewport_sync_mode: "backend-sync",
-            supported_adjacency_modes: ["edge"],
-            default_adjacency_mode: "edge",
-            default_rules: { edge: "conway" },
-            geometry_keys: { edge: "square" },
-            sizing_policy: { control: "cell_size", default: 12, min: 8, max: 24 },
-        },
+        buildSingleVariantBootstrappedTopologyDefinition("square", {
+            geometryKey: "square",
+            renderKind: "regular_grid",
+            defaultRule: "conway",
+            sizingPolicy: { control: "cell_size", default: 12, min: 8, max: 24 },
+        }),
         SPECTRE_TOPOLOGY,
     ];
     window.APP_PERIODIC_FACE_TILINGS = PERIODIC_MIXED_GEOMETRIES.map(

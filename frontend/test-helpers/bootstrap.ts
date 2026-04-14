@@ -1,3 +1,4 @@
+import { buildBootstrappedTopologyDefinition, buildSingleVariantBootstrappedTopologyDefinition } from "./topology-catalog-fixtures.js";
 import type { BootstrappedFrontendDefaults, BootstrappedTopologyDefinition } from "../types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "../types/rendering.js";
 
@@ -37,45 +38,20 @@ const DEFAULTS: BootstrappedFrontendDefaults = {
 };
 
 const TOPOLOGIES: ReadonlyArray<BootstrappedTopologyDefinition> = Object.freeze([
-    {
-        tiling_family: "square",
-        label: "Square",
-        picker_group: "Classic",
-        picker_order: 1,
-        sizing_mode: "grid",
-        family: "regular",
-        render_kind: "regular_grid",
-        viewport_sync_mode: "backend-sync",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: geometryKeys({ edge: "conway" }),
-        geometry_keys: geometryKeys({ edge: "square" }),
-        sizing_policy: { control: "cell_size", default: 12, min: 8, max: 24 },
-    },
-    {
-        tiling_family: "hex",
-        label: "Hex",
-        picker_group: "Classic",
-        picker_order: 2,
-        sizing_mode: "grid",
-        family: "regular",
-        render_kind: "regular_grid",
-        viewport_sync_mode: "backend-sync",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: geometryKeys({ edge: "hexlife" }),
-        geometry_keys: geometryKeys({ edge: "hex" }),
-        sizing_policy: { control: "cell_size", default: 16, min: 10, max: 24 },
-    },
-    {
-        tiling_family: "penrose-p3-rhombs",
-        label: "Penrose P3 Rhombs",
-        picker_group: "Aperiodic",
-        picker_order: 30,
-        sizing_mode: "patch_depth",
-        family: "aperiodic",
+    buildSingleVariantBootstrappedTopologyDefinition("square", {
+        geometryKey: "square",
+        renderKind: "regular_grid",
+        defaultRule: "conway",
+        sizingPolicy: { control: "cell_size", default: 12, min: 8, max: 24 },
+    }),
+    buildSingleVariantBootstrappedTopologyDefinition("hex", {
+        geometryKey: "hex",
+        renderKind: "regular_grid",
+        defaultRule: "hexlife",
+        sizingPolicy: { control: "cell_size", default: 16, min: 10, max: 24 },
+    }),
+    buildBootstrappedTopologyDefinition("penrose-p3-rhombs", {
         render_kind: "polygon_aperiodic",
-        viewport_sync_mode: "presentation-only",
         supported_adjacency_modes: ["edge", "vertex"],
         default_adjacency_mode: "edge",
         default_rules: geometryKeys({
@@ -87,7 +63,7 @@ const TOPOLOGIES: ReadonlyArray<BootstrappedTopologyDefinition> = Object.freeze(
             vertex: "penrose-p3-rhombs-vertex",
         }),
         sizing_policy: { control: "patch_depth", default: 4, min: 0, max: 6 },
-    },
+    }),
 ]);
 
 const PERIODIC_FACE_TILINGS: ReadonlyArray<PeriodicFaceTilingDescriptor> = Object.freeze([

@@ -1,41 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { BootstrappedTopologyDefinition } from "./types/domain.js";
+import { buildSingleVariantBootstrappedTopologyDefinition } from "./test-helpers/topology-catalog-fixtures.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 
-const CHAIR_TOPOLOGY: BootstrappedTopologyDefinition = {
-    tiling_family: "chair",
-    label: "Chair",
-    picker_group: "Aperiodic",
-    picker_order: 290,
-    sizing_mode: "patch_depth",
-    family: "aperiodic",
-    render_kind: "polygon_aperiodic",
-    viewport_sync_mode: "presentation-only",
-    supported_adjacency_modes: ["edge"],
-    default_adjacency_mode: "edge",
-    default_rules: { edge: "life-b2-s23" },
-    geometry_keys: { edge: "chair" },
-    sizing_policy: { control: "patch_depth", default: 3, min: 0, max: 5 },
-};
+const CHAIR_TOPOLOGY = buildSingleVariantBootstrappedTopologyDefinition("chair", {
+    geometryKey: "chair",
+    renderKind: "polygon_aperiodic",
+    defaultRule: "life-b2-s23",
+    sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 5 },
+});
 
 function installChairGlobals(): void {
     window.APP_TOPOLOGIES = [
-        {
-            tiling_family: "square",
-            label: "Square",
-            picker_group: "Classic",
-            picker_order: 10,
-            sizing_mode: "grid",
-            family: "regular",
-            render_kind: "regular_grid",
-            viewport_sync_mode: "backend-sync",
-            supported_adjacency_modes: ["edge"],
-            default_adjacency_mode: "edge",
-            default_rules: { edge: "conway" },
-            geometry_keys: { edge: "square" },
-            sizing_policy: { control: "cell_size", default: 12, min: 8, max: 24 },
-        },
+        buildSingleVariantBootstrappedTopologyDefinition("square", {
+            geometryKey: "square",
+            renderKind: "regular_grid",
+            defaultRule: "conway",
+            sizingPolicy: { control: "cell_size", default: 12, min: 8, max: 24 },
+        }),
         CHAIR_TOPOLOGY,
     ];
     window.APP_PERIODIC_FACE_TILINGS = [
