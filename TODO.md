@@ -2,13 +2,13 @@
 
 ## Now
 
-- Revisit browser-visible shape and pattern correctness for `square-triangle`, `shield`, and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
+- Revisit browser-visible shape and pattern correctness for `dodecagonal-square-triangle`, `shield`, and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
-- Broaden direct canonical patch comparisons beyond the current exact-depth set (`square-triangle`, `shield`, `pinwheel`, `robinson-triangles`, and `tuebingen-triangle`) where they buy materially stronger guarantees.
-- If we revisit `square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
+- The current exact-depth canonical set now also covers `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
+- If we revisit `dodecagonal-square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 
 ## Later

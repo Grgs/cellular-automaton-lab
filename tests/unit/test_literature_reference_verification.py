@@ -428,6 +428,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
     def test_stronger_substitution_families_match_checked_in_canonical_patch_fixtures(self) -> None:
         for geometry, depth in (
+            ("spectre", 3),
+            ("taylor-socolar", 3),
+            ("sphinx", 3),
             ("robinson-triangles", 3),
             ("tuebingen-triangle", 3),
             ("dodecagonal-square-triangle", 3),

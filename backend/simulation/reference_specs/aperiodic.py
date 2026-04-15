@@ -187,7 +187,10 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 required_adjacency_pairs=((SPECTRE_KIND, SPECTRE_KIND),),
             ),
             2: ReferenceDepthExpectation(exact_total_cells=71),
-            3: ReferenceDepthExpectation(exact_total_cells=559),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=559,
+                canonical_patch_fixture_key="exact-depth-3",
+            ),
         },
     ),
     TAYLOR_SOCOLAR_GEOMETRY: ReferenceFamilySpec(
@@ -208,7 +211,10 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             ),
             1: ReferenceDepthExpectation(exact_total_cells=8),
             2: ReferenceDepthExpectation(exact_total_cells=32),
-            3: ReferenceDepthExpectation(exact_total_cells=128),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=128,
+                canonical_patch_fixture_key="exact-depth-3",
+            ),
         },
     ),
     SPHINX_GEOMETRY: ReferenceFamilySpec(
@@ -227,7 +233,10 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 required_adjacency_pairs=((SPHINX_KIND, SPHINX_KIND),),
             ),
             2: ReferenceDepthExpectation(exact_total_cells=16),
-            3: ReferenceDepthExpectation(exact_total_cells=64),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=64,
+                canonical_patch_fixture_key="exact-depth-3",
+            ),
         },
     ),
     CHAIR_GEOMETRY: ReferenceFamilySpec(

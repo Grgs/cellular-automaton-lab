@@ -5,10 +5,12 @@ import itertools
 import math
 from dataclasses import dataclass
 
-from backend.simulation.aperiodic_family_manifest import TUEBINGEN_TILE_FAMILY
-from backend.simulation.aperiodic_golden_triangles import (
+from backend.simulation.aperiodic_family_manifest import (
     TUEBINGEN_THICK_KIND,
     TUEBINGEN_THIN_KIND,
+    TUEBINGEN_TILE_FAMILY,
+)
+from backend.simulation.aperiodic_golden_triangles import (
     triangle_record,
 )
 from backend.simulation.aperiodic_support import (

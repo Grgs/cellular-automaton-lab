@@ -74,6 +74,11 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
             output,
         )
         self.assertIn(
+            "spectre\tpatch_depth\ttrue_substitution\tPASS\t"
+            "sample-exact,canonical-patch,strict-validation",
+            output,
+        )
+        self.assertIn(
             "robinson-triangles\tpatch_depth\ttrue_substitution\tPASS\t",
             output,
         )
@@ -121,6 +126,14 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertTrue(tuebingen["has_canonical_patch"])
         self.assertIn("canonical-patch", tuebingen["strength_tags"])
         self.assertIn("canonical-patch", tuebingen["verification_modes"])
+
+        for geometry in ("spectre", "sphinx", "taylor-socolar"):
+            family = next(family for family in families if family["geometry"] == geometry)
+            self.assertEqual(family["implementation_status"], "true_substitution")
+            self.assertEqual(family["verification_status"], "PASS")
+            self.assertTrue(family["has_canonical_patch"])
+            self.assertIn("canonical-patch", family["strength_tags"])
+            self.assertIn("canonical-patch", family["verification_modes"])
 
     def test_detail_output_includes_promotion_blocker_and_live_observation_data(self) -> None:
         output = render_verification_strength_report(self.rows, output_format="detail")
@@ -203,8 +216,14 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
                 self.live_results[geometry].waived,
             )
 
-    def test_canonical_patch_strength_tags_are_present_for_robinson_and_tuebingen(self) -> None:
-        for geometry in ("robinson-triangles", "tuebingen-triangle"):
+    def test_canonical_patch_strength_tags_are_present_for_exact_patch_families(self) -> None:
+        for geometry in (
+            "spectre",
+            "sphinx",
+            "taylor-socolar",
+            "robinson-triangles",
+            "tuebingen-triangle",
+        ):
             row = self.rows_by_geometry[geometry]
             self.assertTrue(row.has_canonical_patch)
             self.assertIn("canonical-patch", row.strength_tags)
