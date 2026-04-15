@@ -104,6 +104,7 @@ Use these when the open question is visual rather than topological:
 Output locations:
 
 - successful render review: `output/render-review/`
+- managed `run_browser_check.py --render-review`: `output/browser-check/<timestamp-mode-host>/`
 - direct render-review failure artifacts: `output/render-review-artifacts/`
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
 

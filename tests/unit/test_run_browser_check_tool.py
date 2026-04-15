@@ -7,9 +7,11 @@ from unittest.mock import patch
 
 from tools.run_browser_check import (
     build_run_manifest,
+    ensure_render_review_outputs,
     resolve_default_artifact_dir,
     resolve_host_kind,
 )
+from tools.render_canvas_review import parse_cli_args as parse_render_canvas_review_cli_args
 
 
 class RunBrowserCheckToolTests(unittest.TestCase):
@@ -48,3 +50,28 @@ class RunBrowserCheckToolTests(unittest.TestCase):
         self.assertEqual(manifest["mode"], "render-review")
         self.assertEqual(manifest["artifactDir"], "/tmp/browser-check")
         self.assertIn("startedAt", manifest)
+
+    def test_ensure_render_review_outputs_defaults_into_artifact_dir(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="browser-check-render-review-") as tmpdir:
+            artifact_dir = Path(tmpdir)
+            args = parse_render_canvas_review_cli_args(["--profile", "pinwheel-depth-3"])
+            resolved = ensure_render_review_outputs(args, artifact_dir=artifact_dir)
+            self.assertEqual(resolved.out, artifact_dir / "pinwheel-depth-3.png")
+            self.assertEqual(resolved.summary_out, artifact_dir / "pinwheel-depth-3.json")
+
+    def test_ensure_render_review_outputs_preserves_explicit_paths(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="browser-check-render-review-explicit-") as tmpdir:
+            artifact_dir = Path(tmpdir)
+            args = parse_render_canvas_review_cli_args(
+                [
+                    "--profile",
+                    "pinwheel-depth-3",
+                    "--out",
+                    str(artifact_dir / "custom.png"),
+                    "--summary-out",
+                    str(artifact_dir / "custom.json"),
+                ]
+            )
+            resolved = ensure_render_review_outputs(args, artifact_dir=artifact_dir)
+            self.assertEqual(resolved.out, artifact_dir / "custom.png")
+            self.assertEqual(resolved.summary_out, artifact_dir / "custom.json")

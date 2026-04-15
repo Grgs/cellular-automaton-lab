@@ -9,6 +9,7 @@
 - Documented the browser-diagnosis workflow and added CLI profile discovery so the new tools are usable without reading source.
 - Added a repo-scoped process inspection/kill helper for the known browser/server helper processes started from this repo.
 - Added a render-review consistency report that cross-checks backend topology facts, browser-state topology facts, and frontend grid-summary output in one JSON report.
+- Made managed `run_browser_check.py --render-review` runs default their PNG/JSON outputs into the run artifact directory so repeated reviews do not overwrite the shared `output/render-review/` paths.
 
 ## Now
 
@@ -17,7 +18,7 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Add an optional success-artifact bundle for managed browser checks, especially targeted `--unittest` runs, so passing diagnosis sessions can still preserve `canvas.png`, `page.png`, and `render-summary.json`.
+- Add an optional success-artifact bundle for managed browser checks, especially targeted `--unittest` runs, so passing diagnosis sessions can still preserve `canvas.png`, `page.png`, and `render-summary.json` without depending on failure-only capture paths.
 - Add a review-sweep helper that runs one render-review profile across a small matrix of depths, themes, or host kinds and emits one comparable artifact set.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The current exact-depth canonical set now also covers `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.

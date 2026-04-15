@@ -304,6 +304,7 @@ Artifact locations:
 
 - Successful direct render-review outputs default to `output/render-review/`.
 - Direct render-review failure artifacts default to `output/render-review-artifacts/`.
+- Managed runner `--render-review` runs default the PNG, JSON summary, and optional montage into `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner outputs default to `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 
@@ -316,6 +317,13 @@ Shared failure artifact bundle:
 - `render-summary.json`
 - host logs such as standalone or server stdout and stderr
 - `run-manifest.json`
+
+Managed runner manifests for successful render reviews also record:
+
+- `renderPng`
+- `renderSummary`
+- `renderMontage` when present
+- `consistencyWarnings` when the review summary surfaced any
 
 Defaults:
 

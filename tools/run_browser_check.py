@@ -25,6 +25,7 @@ from tests.e2e.support_runtime_host import (
 from tools.render_canvas_review import (
     parse_cli_args as parse_render_canvas_review_cli_args,
     render_canvas_review,
+    resolve_render_review_request,
 )
 
 EXTERNAL_RUNTIME_HOST_KIND_ENV = "E2E_EXTERNAL_RUNTIME_HOST_KIND"
@@ -108,6 +109,38 @@ def _write_host_logs(artifact_dir: Path, *, stdout_text: str, stderr_text: str, 
     (artifact_dir / f"{stem}-stderr.log").write_text(stderr_text, encoding="utf-8")
 
 
+def _render_output_stem(*, family: str, patch_depth: int | None, cell_size: int | None) -> str:
+    if patch_depth is not None:
+        return f"{family}-depth-{patch_depth}"
+    if cell_size is not None:
+        return f"{family}-size-{cell_size}"
+    return family
+
+
+def ensure_render_review_outputs(
+    review_args: Any,
+    *,
+    artifact_dir: Path,
+) -> Any:
+    if review_args.out is not None and review_args.summary_out is not None and (
+        review_args.reference is None or review_args.montage_out is not None
+    ):
+        return review_args
+    request = resolve_render_review_request(review_args)
+    stem = _render_output_stem(
+        family=request.family,
+        patch_depth=request.patch_depth,
+        cell_size=request.cell_size,
+    )
+    if review_args.out is None:
+        review_args.out = artifact_dir / f"{stem}.png"
+    if review_args.summary_out is None:
+        review_args.summary_out = artifact_dir / f"{stem}.json"
+    if review_args.reference is not None and review_args.montage_out is None:
+        review_args.montage_out = artifact_dir / f"{stem}-montage.png"
+    return review_args
+
+
 def run_unittest_with_managed_host(
     *,
     host: BrowserRuntimeHost,
@@ -173,7 +206,10 @@ def main(argv: list[str] | None = None) -> int:
         run_manifest["baseUrl"] = host.base_url
         run_manifest["port"] = _host_port(host)
         if args.render_review:
-            review_args = parse_render_canvas_review_cli_args(remaining)
+            review_args = ensure_render_review_outputs(
+                parse_render_canvas_review_cli_args(remaining),
+                artifact_dir=artifact_dir,
+            )
             result = render_canvas_review(
                 review_args,
                 host=host,
@@ -185,6 +221,8 @@ def main(argv: list[str] | None = None) -> int:
             run_manifest["renderSummary"] = str(result.summary_path)
             if result.montage_path is not None:
                 run_manifest["renderMontage"] = str(result.montage_path)
+            if result.consistency_warnings:
+                run_manifest["consistencyWarnings"] = list(result.consistency_warnings)
             exit_code = 0
         else:
             if remaining:

@@ -40,18 +40,18 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                     "chair",
                     "--patch-depth",
                     "3",
-                    "--out",
-                    str(output_dir / "chair.png"),
-                    "--summary-out",
-                    str(output_dir / "chair.json"),
                 ]
             )
             self.assertEqual(exit_code, 0)
-            self.assertTrue((output_dir / "chair.png").exists())
             manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["hostKind"], "standalone")
             self.assertEqual(manifest["mode"], "render-review")
             self.assertEqual(manifest["exitStatus"], "success")
+            self.assertEqual(manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png"))
+            self.assertEqual(manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json"))
+            self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
+            self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
+            self.assertIn("consistencyWarnings", manifest)
 
     def test_runner_delegates_server_render_review(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-") as tmpdir:
@@ -67,18 +67,17 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                     "chair",
                     "--patch-depth",
                     "3",
-                    "--out",
-                    str(output_dir / "chair.png"),
-                    "--summary-out",
-                    str(output_dir / "chair.json"),
                 ]
             )
             self.assertEqual(exit_code, 0)
-            self.assertTrue((output_dir / "chair.png").exists())
             manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["hostKind"], "server")
             self.assertEqual(manifest["mode"], "render-review")
             self.assertEqual(manifest["exitStatus"], "success")
+            self.assertEqual(manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png"))
+            self.assertEqual(manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json"))
+            self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
+            self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
 
     @unittest.skipUnless(
         _standalone_outputs_ready(),
