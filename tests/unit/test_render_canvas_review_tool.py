@@ -7,7 +7,9 @@ from contextlib import redirect_stdout
 from pathlib import Path
 
 from tools.render_canvas_review import (
+    build_consistency_report,
     main,
+    parse_grid_size_text,
     parse_cli_args,
     resolve_montage_path,
     resolve_output_paths,
@@ -134,3 +136,47 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
             )
             request = resolve_render_review_request(args)
             self.assertEqual(request.reference, reference_path)
+
+    def test_parse_grid_size_text_parses_patch_depth_summary(self) -> None:
+        parsed = parse_grid_size_text("Depth 3 • 600 tiles")
+        self.assertEqual(parsed, {"mode": "patch_depth", "depth": 3, "tileCount": 600})
+
+    def test_parse_grid_size_text_parses_grid_dimensions_summary(self) -> None:
+        parsed = parse_grid_size_text("12 x 10")
+        self.assertEqual(parsed, {"mode": "grid_dimensions", "width": 12, "height": 10})
+
+    def test_build_consistency_report_warns_on_backend_browser_dom_mismatch(self) -> None:
+        request = resolve_render_review_request(parse_cli_args(["--family", "pinwheel", "--patch-depth", "3"]))
+        report = build_consistency_report(
+            request=request,
+            host_kind="server",
+            actual_patch_depth=3,
+            actual_cell_size=None,
+            grid_size_text="Depth 3 • 600 tiles",
+            generation_text="Generation 0",
+            backend_topology={
+                "tilingFamily": "pinwheel",
+                "patchDepth": 3,
+                "width": 2,
+                "height": 1,
+                "topologyCellCount": 250,
+                "topologyRevision": "backend-rev",
+            },
+            browser_topology={
+                "tilingFamily": "pinwheel",
+                "patchDepth": 3,
+                "topologyCellCount": 250,
+                "width": 2,
+                "height": 1,
+                "topologyRevision": "browser-rev",
+            },
+        )
+        self.assertEqual(report["parsedGridSummary"], {"mode": "patch_depth", "depth": 3, "tileCount": 600})
+        self.assertIn(
+            "Grid summary tile count 600 does not match browser topology cell count 250.",
+            report["warnings"],
+        )
+        self.assertIn(
+            "Grid summary tile count 600 does not match backend topology cell count 250.",
+            report["warnings"],
+        )

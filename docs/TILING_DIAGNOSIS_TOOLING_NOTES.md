@@ -123,12 +123,12 @@ That means every serious visual review still depends on extra operator memory.
 ### High Priority
 
 1. Render-review consistency report
-   - Extend the review summary so it records:
-     - backend topology cell count
-     - backend topology width/height
-     - frontend grid summary text
-     - rendered/visible polygon count if available
-   - Fail loudly or at least warn when those layers disagree in suspicious ways.
+   - Status: landed.
+   - The render-review summary now records:
+     - backend topology cell count and dimensions when a live backend client exists
+     - browser-state topology facts from a read-only diagnostics hook
+     - frontend grid summary text and parsed expectations
+   - The tool now warns when those layers disagree in suspicious ways, but does not fail the review command by default.
 
 2. Success-path artifact bundle option
    - Add a flag to `tools/run_browser_check.py` that preserves:
@@ -181,7 +181,7 @@ The current tooling is good enough to run a diagnosis loop without stale
 processes. The remaining problem is observability quality, not command
 orchestration.
 
-For the `pinwheel` example, the next tooling investment should be the
-consistency-report layer. It would have made this pass substantially faster by
-showing whether the visible-review data was aligned with the backend topology
-state before any tiling code was touched.
+For the `pinwheel` example, the consistency-report layer is now the primary
+cross-check. The next tooling investment should be better success-path review
+artifacts and short experiment sweeps, so the operator can preserve and compare
+diagnosis runs without recreating them manually.

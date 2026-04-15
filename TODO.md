@@ -8,6 +8,7 @@
 - Unified browser/render failure artifacts so local review and browser-test failures emit the same core bundle shape.
 - Documented the browser-diagnosis workflow and added CLI profile discovery so the new tools are usable without reading source.
 - Added a repo-scoped process inspection/kill helper for the known browser/server helper processes started from this repo.
+- Added a render-review consistency report that cross-checks backend topology facts, browser-state topology facts, and frontend grid-summary output in one JSON report.
 
 ## Now
 
@@ -16,7 +17,6 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Add a render-review consistency report that cross-checks backend topology counts and bounds against frontend grid-summary and render-review output, so visual diagnosis cannot silently hide state mismatches.
 - Add an optional success-artifact bundle for managed browser checks, especially targeted `--unittest` runs, so passing diagnosis sessions can still preserve `canvas.png`, `page.png`, and `render-summary.json`.
 - Add a review-sweep helper that runs one render-review profile across a small matrix of depths, themes, or host kinds and emits one comparable artifact set.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.

@@ -60,6 +60,14 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertGreater(summary["coverageWidthRatio"], 0)
             self.assertGreater(summary["coverageHeightRatio"], 0)
             self.assertGreater(summary["renderCellSize"], 0)
+            self.assertIn("consistency", summary)
+            self.assertEqual(summary["consistency"]["requested"]["tilingFamily"], "chair")
+            self.assertEqual(summary["consistency"]["requested"]["patchDepth"], 3)
+            self.assertIsNone(summary["consistency"]["backendTopology"])
+            self.assertEqual(summary["consistency"]["browserState"]["tilingFamily"], "chair")
+            self.assertEqual(summary["consistency"]["browserState"]["patchDepth"], 3)
+            self.assertGreater(summary["consistency"]["browserState"]["topologyCellCount"], 0)
+            self.assertIn("Backend topology facts unavailable for host mode standalone.", summary["consistency"]["warnings"])
 
     def test_tool_supports_profiles_references_and_montages(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-canvas-review-profile-") as tmpdir:
@@ -94,5 +102,7 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertEqual(summary["profile"], "pinwheel-depth-3")
             self.assertEqual(summary["tiling_family"], "pinwheel")
             self.assertIn("comparison", summary)
+            self.assertIn("consistency", summary)
+            self.assertEqual(summary["consistency"]["requested"]["tilingFamily"], "pinwheel")
             self.assertEqual(summary["comparison"]["referenceImagePath"], str(reference_path))
             self.assertEqual(summary["comparison"]["montageImagePath"], str(montage_path))

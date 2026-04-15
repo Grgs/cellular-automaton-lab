@@ -16,6 +16,15 @@ class CanvasVisualSummary(TypedDict):
     gridSizeText: str
 
 
+class BrowserTopologySummary(TypedDict):
+    tilingFamily: str | None
+    patchDepth: int | None
+    topologyCellCount: int | None
+    width: int | None
+    height: int | None
+    topologyRevision: str | None
+
+
 def wait_for_page_bootstrapped(page: Page, *, timeout_ms: int = 30_000) -> None:
     page.wait_for_selector("#grid", timeout=timeout_ms)
     page.wait_for_function("() => document.readyState === 'complete'", timeout=timeout_ms)
@@ -183,6 +192,47 @@ def canvas_visual_summary(page: Page) -> CanvasVisualSummary:
         }""",
     )
     return cast(CanvasVisualSummary, summary)
+
+
+def browser_topology_summary(page: Page) -> BrowserTopologySummary | None:
+    summary = page.evaluate(
+        """() => {
+            const diagnostics = window.__appDiagnostics;
+            if (typeof diagnostics !== "function") {
+                return null;
+            }
+            const snapshot = diagnostics();
+            if (!snapshot || typeof snapshot !== "object") {
+                return null;
+            }
+            const numericOrNull = (value) => {
+                const numeric = Number(value);
+                return Number.isFinite(numeric) ? numeric : null;
+            };
+            return {
+                tilingFamily: typeof snapshot.tilingFamily === "string" ? snapshot.tilingFamily : null,
+                patchDepth: numericOrNull(snapshot.patchDepth),
+                topologyCellCount: numericOrNull(snapshot.topologyCellCount),
+                width: numericOrNull(snapshot.width),
+                height: numericOrNull(snapshot.height),
+                topologyRevision: typeof snapshot.topologyRevision === "string" ? snapshot.topologyRevision : null,
+            };
+        }""",
+    )
+    if summary is None:
+        return None
+    cast_summary = cast(dict[str, object], summary)
+    return cast(
+        BrowserTopologySummary,
+        {
+            "tilingFamily": cast_summary.get("tilingFamily"),
+            "patchDepth": cast_summary.get("patchDepth"),
+            "topologyCellCount": cast_summary.get("topologyCellCount"),
+            "width": cast_summary.get("width"),
+            "height": cast_summary.get("height"),
+            "topologyRevision": cast_summary.get("topologyRevision"),
+        },
+    )
 
 
 def viewport_gap_summary(page: Page) -> dict[str, float]:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,6 +20,7 @@ from tests.e2e.browser_support.artifacts import (
     create_artifact_dir,
 )
 from tests.e2e.browser_support.render_review import (
+    browser_topology_summary,
     canvas_visual_summary,
     select_tiling_family,
     set_cell_size,
@@ -60,6 +62,7 @@ class RenderCanvasReviewResult:
     png_path: Path
     summary_path: Path
     montage_path: Path | None
+    consistency_warnings: tuple[str, ...]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -203,6 +206,171 @@ def resolve_montage_path(
     if montage_out is not None:
         return montage_out
     return png_path.with_name(f"{png_path.stem}-montage.png")
+
+
+def parse_grid_size_text(grid_size_text: str) -> dict[str, Any] | None:
+    text = str(grid_size_text or "").strip()
+    if not text:
+        return None
+    depth_match = re.match(r"^Depth\s+(?P<depth>\d+)\s+•\s+(?P<tiles>\d+)\s+tiles$", text)
+    if depth_match:
+        return {
+            "mode": "patch_depth",
+            "depth": int(depth_match.group("depth")),
+            "tileCount": int(depth_match.group("tiles")),
+        }
+    dimensions_match = re.match(r"^(?P<width>\d+)\s*x\s*(?P<height>\d+)$", text)
+    if dimensions_match:
+        return {
+            "mode": "grid_dimensions",
+            "width": int(dimensions_match.group("width")),
+            "height": int(dimensions_match.group("height")),
+        }
+    return None
+
+
+def extract_backend_topology_facts(topology_payload: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(topology_payload, dict):
+        return None
+    topology_spec = topology_payload.get("topology_spec")
+    if not isinstance(topology_spec, dict):
+        return None
+    cells = topology_payload.get("cells")
+    return {
+        "tilingFamily": str(topology_spec.get("tiling_family") or "") or None,
+        "patchDepth": int(topology_spec["patch_depth"]) if isinstance(topology_spec.get("patch_depth"), int) else None,
+        "width": int(topology_spec["width"]) if isinstance(topology_spec.get("width"), int) else None,
+        "height": int(topology_spec["height"]) if isinstance(topology_spec.get("height"), int) else None,
+        "topologyCellCount": len(cells) if isinstance(cells, list) else None,
+        "topologyRevision": str(topology_payload.get("topology_revision") or "") or None,
+    }
+
+
+def build_consistency_report(
+    *,
+    request: ResolvedRenderReviewRequest,
+    host_kind: str,
+    actual_patch_depth: int | None,
+    actual_cell_size: int | None,
+    grid_size_text: str,
+    generation_text: str,
+    backend_topology: dict[str, Any] | None,
+    browser_topology: dict[str, Any] | None,
+) -> dict[str, Any]:
+    parsed_grid_size = parse_grid_size_text(grid_size_text)
+    warnings: list[str] = []
+
+    if backend_topology is None:
+        warnings.append(f"Backend topology facts unavailable for host mode {host_kind}.")
+    if browser_topology is None:
+        warnings.append("Browser topology diagnostics were unavailable.")
+    if grid_size_text and parsed_grid_size is None:
+        warnings.append(f"Grid summary text could not be parsed: {grid_size_text!r}.")
+
+    requested = {
+        "tilingFamily": request.family,
+        "patchDepth": request.patch_depth,
+        "cellSize": request.cell_size,
+    }
+    dom_summary = {
+        "gridSizeText": grid_size_text,
+        "generationText": generation_text,
+    }
+
+    if browser_topology is not None:
+        browser_family = browser_topology.get("tilingFamily")
+        if browser_family is not None and browser_family != request.family:
+            warnings.append(
+                f"Requested tiling family {request.family!r} does not match browser state family {browser_family!r}."
+            )
+        browser_patch_depth = browser_topology.get("patchDepth")
+        if actual_patch_depth is not None and browser_patch_depth is not None and browser_patch_depth != actual_patch_depth:
+            warnings.append(
+                f"Visible patch depth control value {actual_patch_depth} does not match browser state patch depth {browser_patch_depth}."
+            )
+
+    if backend_topology is not None:
+        backend_family = backend_topology.get("tilingFamily")
+        if backend_family is not None and backend_family != request.family:
+            warnings.append(
+                f"Requested tiling family {request.family!r} does not match backend topology family {backend_family!r}."
+            )
+        backend_patch_depth = backend_topology.get("patchDepth")
+        if actual_patch_depth is not None and backend_patch_depth is not None and backend_patch_depth != actual_patch_depth:
+            warnings.append(
+                f"Visible patch depth control value {actual_patch_depth} does not match backend topology patch depth {backend_patch_depth}."
+            )
+
+    if (
+        backend_topology is not None
+        and browser_topology is not None
+        and backend_topology.get("topologyCellCount") is not None
+        and browser_topology.get("topologyCellCount") is not None
+        and backend_topology["topologyCellCount"] != browser_topology["topologyCellCount"]
+    ):
+        warnings.append(
+            "Backend topology cell count "
+            f"{backend_topology['topologyCellCount']} does not match browser topology cell count "
+            f"{browser_topology['topologyCellCount']}."
+        )
+
+    if parsed_grid_size is not None and parsed_grid_size.get("mode") == "patch_depth":
+        parsed_depth = parsed_grid_size.get("depth")
+        parsed_tile_count = parsed_grid_size.get("tileCount")
+        if actual_patch_depth is not None and parsed_depth is not None and parsed_depth != actual_patch_depth:
+            warnings.append(
+                f"Grid summary depth {parsed_depth} does not match visible patch depth control value {actual_patch_depth}."
+            )
+        if browser_topology is not None and parsed_tile_count is not None:
+            browser_tile_count = browser_topology.get("topologyCellCount")
+            if browser_tile_count is not None and parsed_tile_count != browser_tile_count:
+                warnings.append(
+                    f"Grid summary tile count {parsed_tile_count} does not match browser topology cell count {browser_tile_count}."
+                )
+        if backend_topology is not None and parsed_tile_count is not None:
+            backend_tile_count = backend_topology.get("topologyCellCount")
+            if backend_tile_count is not None and parsed_tile_count != backend_tile_count:
+                warnings.append(
+                    f"Grid summary tile count {parsed_tile_count} does not match backend topology cell count {backend_tile_count}."
+                )
+    elif parsed_grid_size is not None and parsed_grid_size.get("mode") == "grid_dimensions":
+        parsed_width = parsed_grid_size.get("width")
+        parsed_height = parsed_grid_size.get("height")
+        if browser_topology is not None:
+            browser_width = browser_topology.get("width")
+            browser_height = browser_topology.get("height")
+            if browser_width is not None and parsed_width is not None and browser_width != parsed_width:
+                warnings.append(
+                    f"Grid summary width {parsed_width} does not match browser topology width {browser_width}."
+                )
+            if browser_height is not None and parsed_height is not None and browser_height != parsed_height:
+                warnings.append(
+                    f"Grid summary height {parsed_height} does not match browser topology height {browser_height}."
+                )
+        if backend_topology is not None:
+            backend_width = backend_topology.get("width")
+            backend_height = backend_topology.get("height")
+            if backend_width is not None and parsed_width is not None and backend_width != parsed_width:
+                warnings.append(
+                    f"Grid summary width {parsed_width} does not match backend topology width {backend_width}."
+                )
+            if backend_height is not None and parsed_height is not None and backend_height != parsed_height:
+                warnings.append(
+                    f"Grid summary height {parsed_height} does not match backend topology height {backend_height}."
+                )
+
+    return {
+        "requested": requested,
+        "actualControlValues": {
+            "patchDepth": actual_patch_depth,
+            "cellSize": actual_cell_size,
+        },
+        "backendTopology": backend_topology,
+        "browserState": browser_topology,
+        "dom": dom_summary,
+        "parsedGridSummary": parsed_grid_size,
+        "warnings": warnings,
+    }
 
 
 def _apply_theme_init_script(page: Page, theme: str) -> None:
@@ -354,6 +522,21 @@ def render_canvas_review(
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
                     page.locator("#grid").screenshot(path=str(png_path))
                     visual_summary = canvas_visual_summary(page)
+                    browser_topology = browser_topology_summary(page)
+                    backend_topology = None
+                    client = active_host.client()
+                    if client is not None:
+                        backend_topology = extract_backend_topology_facts(client.get_topology())
+                    consistency_report = build_consistency_report(
+                        request=request,
+                        host_kind=host_kind,
+                        actual_patch_depth=actual_patch_depth,
+                        actual_cell_size=actual_cell_size,
+                        grid_size_text=str(visual_summary["gridSizeText"]),
+                        generation_text=str(visual_summary["generationText"]),
+                        backend_topology=backend_topology,
+                        browser_topology=browser_topology,
+                    )
                     summary_payload: dict[str, Any] = {
                         "tiling_family": request.family,
                         "profile": request.profile_name,
@@ -374,6 +557,7 @@ def render_canvas_review(
                         "gridSizeText": str(visual_summary["gridSizeText"]),
                         "hostMode": host_kind,
                         "baseUrl": active_host.base_url,
+                        "consistency": consistency_report,
                     }
                     if request.reference is not None and montage_path is not None:
                         summary_payload["comparison"] = build_reference_montage(
@@ -389,6 +573,7 @@ def render_canvas_review(
                         png_path=png_path,
                         summary_path=summary_path,
                         montage_path=montage_path,
+                        consistency_warnings=tuple(str(warning) for warning in consistency_report["warnings"]),
                     )
                 finally:
                     context.close()
@@ -433,6 +618,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"render_summary={result.summary_path}")
     if result.montage_path is not None:
         print(f"render_montage={result.montage_path}")
+    if result.consistency_warnings:
+        print(f"consistency_warnings={len(result.consistency_warnings)}")
+        for warning in result.consistency_warnings:
+            print(f"consistency_warning={warning}")
     return 0
 
 
