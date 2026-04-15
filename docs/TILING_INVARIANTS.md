@@ -54,13 +54,16 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 ## Family-Specific Notes
 
 - `pinwheel`
+  - the canonical representative patch starts from two literature right triangles forming a rectangle
   - must use the exact-affine verification path
   - contiguity is verified from exact positive-length segment overlap, not only exact whole-edge identity
   - orientation diversity must increase with depth
   - exact-record ids must match serialized patch ids
+  - exact-record growth must follow the paired-seed substitution count `2 * 5^d`
   - representative support should expand with depth on the exact-affine inflation path
   - a rooted local-reference anchor now checks the exact-path neighborhood around a canonical depth-3 tile
   - a direct canonical depth-3 patch fixture now checks the exact serialized patch on that exact-affine path
+  - the representative sample must remain hole-free under the canonical surface checks
 - `shield`
   - the authoritative verifier sample is a dense 12-fold central field derived from the literature patch image
   - odd patch depths must apply the documented 15-degree orientation alternation

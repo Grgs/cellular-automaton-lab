@@ -261,6 +261,15 @@ class TopologyValidationTests(unittest.TestCase):
                 )
 
         self.assertEqual(
+            recommended_validation_options(PINWHEEL_GEOMETRY),
+            {
+                "check_surface": True,
+                "check_overlaps": True,
+                "check_edge_multiplicity": True,
+                "check_graph_connectivity": True,
+            },
+        )
+        self.assertEqual(
             recommended_validation_options(SHIELD_GEOMETRY),
             {
                 "check_surface": True,

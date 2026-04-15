@@ -37,12 +37,36 @@ def _builder_signal_failures(
 
 
 def _pinwheel_exact_path_failures() -> list[ReferenceCheckFailure]:
+    from backend.simulation.aperiodic_support import AperiodicPatch
     from backend.simulation.aperiodic_pinwheel import collect_pinwheel_exact_records
 
+    def _bounds_longest_span(patch: AperiodicPatch) -> float:
+        vertices = [vertex for cell in patch.cells for vertex in (cell.vertices or ())]
+        if not vertices:
+            return 0.0
+        min_x = min(vertex[0] for vertex in vertices)
+        max_x = max(vertex[0] for vertex in vertices)
+        min_y = min(vertex[1] for vertex in vertices)
+        max_y = max(vertex[1] for vertex in vertices)
+        return max(max_x - min_x, max_y - min_y)
+
     failures: list[ReferenceCheckFailure] = []
+    previous_bounds_longest_span: float | None = None
     for depth in range(4):
         patch = build_aperiodic_patch("pinwheel", depth)
         exact_records = collect_pinwheel_exact_records(depth)
+        expected_exact_count = 2 * (5**depth)
+        if len(exact_records) != expected_exact_count:
+            failures.append(
+                ReferenceCheckFailure(
+                    code="pinwheel-exact-growth-mismatch",
+                    message=(
+                        f"Depth {depth} exact record count {len(exact_records)} "
+                        f"did not match literature growth 2*5^{depth}={expected_exact_count}."
+                    ),
+                    depth=depth,
+                )
+            )
         if len(exact_records) != len(patch.cells):
             failures.append(
                 ReferenceCheckFailure(
@@ -64,6 +88,54 @@ def _pinwheel_exact_path_failures() -> list[ReferenceCheckFailure]:
                     depth=depth,
                 )
             )
+        if any(
+            not (
+                record_id.startswith("pinwheel:root0")
+                or record_id.startswith("pinwheel:root1")
+            )
+            for record_id in exact_ids
+        ):
+            failures.append(
+                ReferenceCheckFailure(
+                    code="pinwheel-exact-root-mismatch",
+                    message=(
+                        f"Depth {depth} exact-record ids were not rooted exclusively "
+                        "under pinwheel:root0 or pinwheel:root1."
+                    ),
+                    depth=depth,
+                )
+            )
+        observed_roots = {
+            record_id.split(".", 1)[0].removeprefix("pinwheel:")
+            for record_id in exact_ids
+        }
+        if observed_roots != {"root0", "root1"}:
+            failures.append(
+                ReferenceCheckFailure(
+                    code="pinwheel-exact-root-coverage-mismatch",
+                    message=(
+                        f"Depth {depth} exact-record roots {sorted(observed_roots)!r} "
+                        "did not match ['root0', 'root1']."
+                    ),
+                    depth=depth,
+                )
+            )
+        bounds_longest_span = _bounds_longest_span(patch)
+        if (
+            previous_bounds_longest_span is not None
+            and bounds_longest_span <= previous_bounds_longest_span
+        ):
+            failures.append(
+                ReferenceCheckFailure(
+                    code="pinwheel-exact-support-nonexpanding",
+                    message=(
+                        f"Depth {depth} support span {bounds_longest_span:.6f} did not grow "
+                        f"beyond the previous depth span {previous_bounds_longest_span:.6f}."
+                    ),
+                    depth=depth,
+                )
+            )
+        previous_bounds_longest_span = bounds_longest_span
     return failures
 
 

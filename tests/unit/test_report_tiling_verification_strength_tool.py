@@ -127,6 +127,15 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("canonical-patch", tuebingen["strength_tags"])
         self.assertIn("canonical-patch", tuebingen["verification_modes"])
 
+        pinwheel = next(family for family in families if family["geometry"] == "pinwheel")
+        self.assertEqual(pinwheel["implementation_status"], "exact_affine")
+        self.assertEqual(pinwheel["verification_status"], "PASS")
+        self.assertTrue(pinwheel["has_local_reference"])
+        self.assertTrue(pinwheel["has_canonical_patch"])
+        self.assertTrue(pinwheel["strict_validation"])
+        self.assertIn("exact-path", pinwheel["strength_tags"])
+        self.assertIn("canonical-patch", pinwheel["verification_modes"])
+
         for geometry in ("spectre", "sphinx", "taylor-socolar"):
             family = next(family for family in families if family["geometry"] == geometry)
             self.assertEqual(family["implementation_status"], "true_substitution")

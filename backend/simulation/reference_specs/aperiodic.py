@@ -562,6 +562,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         exact_reference_mode="pinwheel_exact",
         notes=(
             "Pinwheel verification uses the exact-affine path instead of rounded-edge reconstruction.",
+            "The representative literature patch starts from two right triangles forming a rectangle.",
         ),
     ),
 }

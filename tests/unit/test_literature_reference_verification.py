@@ -67,6 +67,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(shield_observation.hole_count, 0)
         self.assertEqual(chair_observation.hole_count, 0)
         self.assertEqual(hat_observation.hole_count, 0)
+        self.assertEqual(observe_reference_patch("pinwheel", 3).hole_count, 0)
 
     def test_reference_verifier_reports_passes_and_blocking_surface_or_connectivity_failures(self) -> None:
         results = {
@@ -362,14 +363,33 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             self.assertIsNone(_verify_periodic_face_id_roundtrip(descriptor, cell))
 
     def test_pinwheel_reference_verifier_uses_exact_path(self) -> None:
+        from backend.simulation.aperiodic_pinwheel import collect_pinwheel_exact_records
+
         result = verify_reference_family("pinwheel")
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
-        self.assertEqual(result.observations[0].total_cells, 2)
-        self.assertEqual(result.observations[1].total_cells, 10)
+        self.assertEqual(
+            [observation.total_cells for observation in result.observations],
+            [2, 10, 50, 250],
+        )
         self.assertGreater(result.observations[1].bounds_longest_span, result.observations[0].bounds_longest_span)
         self.assertEqual(result.observations[-1].connected_component_count, 1)
+        exact_ids = tuple(sorted(record["id"] for record in collect_pinwheel_exact_records(3)))
+        self.assertEqual(len(exact_ids), 250)
+        self.assertTrue(
+            any(record_id.startswith("pinwheel:root0") for record_id in exact_ids)
+        )
+        self.assertTrue(
+            any(record_id.startswith("pinwheel:root1") for record_id in exact_ids)
+        )
+        self.assertTrue(
+            all(
+                record_id.startswith("pinwheel:root0")
+                or record_id.startswith("pinwheel:root1")
+                for record_id in exact_ids
+            )
+        )
 
     def test_chair_reference_verifier_accepts_true_substitution_chair_tiles(self) -> None:
         result = verify_reference_family("chair")
