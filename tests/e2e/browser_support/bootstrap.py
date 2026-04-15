@@ -28,6 +28,7 @@ from playwright.sync_api import (
 
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tests.e2e.support_server import JsonApiClient
+from tests.e2e.browser_support.render_review import wait_for_page_bootstrapped
 
 WaitUntilState = Literal["commit", "domcontentloaded", "load", "networkidle"]
 E2E_ARTIFACTS_DIR_ENV = "E2E_ARTIFACTS_DIR"
@@ -178,26 +179,7 @@ class BrowserAppTestCase(unittest.TestCase):
         return artifact_dir
 
     def _wait_for_page_bootstrapped(self, timeout_ms: int = 30_000) -> None:
-        self.page.wait_for_selector("#grid", timeout=timeout_ms)
-        self.page.wait_for_function("() => document.readyState === 'complete'", timeout=timeout_ms)
-        self.page.wait_for_function(
-            """() => {
-                const grid = document.getElementById('grid');
-                const statusText = document.getElementById('status-text');
-                const gridSizeText = document.getElementById('grid-size-text')?.textContent?.trim() || '';
-                const renderCellSize = Number(grid?.dataset.renderCellSize || 0);
-                return Boolean(grid)
-                    && Boolean(statusText)
-                    && typeof statusText.textContent === 'string'
-                    && statusText.textContent.trim().length > 0
-                    && (
-                        window.__appReady === true
-                        || renderCellSize > 0
-                        || (gridSizeText.length > 0 && gridSizeText !== '-- x --')
-                    );
-            }""",
-            timeout=timeout_ms,
-        )
+        wait_for_page_bootstrapped(self.page, timeout_ms=timeout_ms)
 
     def _run_navigation_with_retry(
         self,

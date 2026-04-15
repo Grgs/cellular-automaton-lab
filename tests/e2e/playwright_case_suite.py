@@ -13,12 +13,24 @@ from playwright.sync_api import expect
 try:
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase, WaitUntilState
     from tests.e2e.browser_support.diagnostics import GridSummary, parse_grid_summary_text
+    from tests.e2e.browser_support.render_review import (
+        assert_canvas_centered_within_viewport,
+        canvas_visual_summary,
+        select_tiling_family,
+        wait_for_patch_render_complete,
+    )
     from tests.e2e.support_runtime_host import BrowserRuntimeHost
     from tests.e2e.support_server import JsonApiClient
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase, WaitUntilState
     from tests.e2e.browser_support.diagnostics import GridSummary, parse_grid_summary_text
+    from tests.e2e.browser_support.render_review import (
+        assert_canvas_centered_within_viewport,
+        canvas_visual_summary,
+        select_tiling_family,
+        wait_for_patch_render_complete,
+    )
     from tests.e2e.support_runtime_host import BrowserRuntimeHost
     from tests.e2e.support_server import JsonApiClient
 
@@ -105,62 +117,7 @@ class SharedUiFlowMixin:
 
     def _canvas_visual_summary(self) -> dict[str, object]:
         case = self._case()
-        summary = case.page.evaluate(
-            """() => {
-                const canvas = document.getElementById("grid");
-                if (!(canvas instanceof HTMLCanvasElement)) {
-                    throw new Error("grid canvas is missing");
-                }
-                const context = canvas.getContext("2d");
-                if (!context) {
-                    throw new Error("2d canvas context is unavailable");
-                }
-                const image = context.getImageData(0, 0, canvas.width, canvas.height);
-                const { data, width, height } = image;
-                let minX = width;
-                let minY = height;
-                let maxX = -1;
-                let maxY = -1;
-                const dominantFillColors = new Map();
-
-                for (let y = 0; y < height; y += 1) {
-                    for (let x = 0; x < width; x += 1) {
-                        const index = ((y * width) + x) * 4;
-                        const alpha = data[index + 3];
-                        if (alpha < 32) {
-                            continue;
-                        }
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-
-                        if (alpha < 250) {
-                            continue;
-                        }
-                        const r = data[index];
-                        const g = data[index + 1];
-                        const b = data[index + 2];
-                        if (r < 140 || g < 100 || b < 60) {
-                            continue;
-                        }
-                        const key = `${r},${g},${b}`;
-                        dominantFillColors.set(key, (dominantFillColors.get(key) || 0) + 1);
-                    }
-                }
-
-                return {
-                    canvasWidth: width,
-                    canvasHeight: height,
-                    coverageWidthRatio: maxX >= minX ? (maxX - minX + 1) / width : 0,
-                    coverageHeightRatio: maxY >= minY ? (maxY - minY + 1) / height : 0,
-                    dominantFillColors: Array.from(dominantFillColors.entries())
-                        .filter(([, count]) => count >= 100)
-                        .sort((left, right) => right[1] - left[1]),
-                };
-            }""",
-        )
-        return cast(dict[str, object], summary)
+        return cast(dict[str, object], canvas_visual_summary(case.page))
 
     def _assert_canvas_centered_within_viewport(
         self,
@@ -169,46 +126,15 @@ class SharedUiFlowMixin:
         maximum_horizontal_gap_delta: float = 4.0,
     ) -> None:
         case = self._case()
-        summary = case.page.evaluate(
-            """() => {
-                const viewport = document.getElementById("grid-viewport");
-                const canvas = document.getElementById("grid");
-                if (!(viewport instanceof HTMLElement) || !(canvas instanceof HTMLCanvasElement)) {
-                    throw new Error("grid viewport or canvas is missing");
-                }
-                const viewportRect = viewport.getBoundingClientRect();
-                const canvasRect = canvas.getBoundingClientRect();
-                return {
-                    topGap: canvasRect.top - viewportRect.top,
-                    bottomGap: viewportRect.bottom - canvasRect.bottom,
-                    leftGap: canvasRect.left - viewportRect.left,
-                    rightGap: viewportRect.right - canvasRect.right,
-                };
-            }""",
-        )
-        viewport_summary = cast(dict[str, float], summary)
-        case.assertLessEqual(
-            abs(viewport_summary["topGap"] - viewport_summary["bottomGap"]),
-            maximum_vertical_gap_delta,
-        )
-        case.assertLessEqual(
-            abs(viewport_summary["leftGap"] - viewport_summary["rightGap"]),
-            maximum_horizontal_gap_delta,
+        assert_canvas_centered_within_viewport(
+            case.page,
+            maximum_vertical_gap_delta=maximum_vertical_gap_delta,
+            maximum_horizontal_gap_delta=maximum_horizontal_gap_delta,
         )
 
     def _wait_for_patch_render_complete(self) -> None:
         case = self._case()
-        case.page.wait_for_function(
-            """() => {
-                const grid = document.getElementById("grid");
-                const overlay = document.getElementById("blocking-activity-overlay");
-                const renderCellSize = Number(grid?.getAttribute("data-render-cell-size") || "0");
-                const overlayHidden = overlay instanceof HTMLElement
-                    ? overlay.hidden || overlay.getAttribute("hidden") !== null
-                    : true;
-                return Number.isFinite(renderCellSize) && renderCellSize > 0 && overlayHidden;
-            }""",
-        )
+        wait_for_patch_render_complete(case.page)
 
     def _select_tiling_family_and_wait_for_reset(
         self,
@@ -217,23 +143,14 @@ class SharedUiFlowMixin:
         timeout_ms: int = 60_000,
     ) -> None:
         case = self._case()
-        if case.api is None:
-            case.page.select_option("#tiling-family-select", tiling_family)
-            case.page.wait_for_function(
-                """(nextTilingFamily) => {
-                    const select = document.getElementById("tiling-family-select");
-                    return select instanceof HTMLSelectElement && select.value === nextTilingFamily;
-                }""",
-                arg=tiling_family,
-                timeout=timeout_ms,
-            )
-            return
-        with case.page.expect_response(
-            lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
-            timeout=timeout_ms,
-        ) as response_info:
-            case.page.select_option("#tiling-family-select", tiling_family)
-        case.assertEqual(response_info.value.status, 200)
+        status_code = select_tiling_family(
+            case.page,
+            tiling_family,
+            expect_reset_request=case.api is not None,
+            timeout_ms=timeout_ms,
+        )
+        if status_code is not None:
+            case.assertEqual(status_code, 200)
 
     def _wait_for_canvas_visual_patch(
         self,
