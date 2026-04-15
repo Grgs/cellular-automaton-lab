@@ -85,6 +85,28 @@ npm run fixtures:reference:check
 
 Use this when generator or verifier changes may affect checked-in rooted local-reference or canonical patch fixtures. It reports fixture drift without rewriting the JSON files. To intentionally update fixtures, run `py -3 tools/regenerate_reference_fixtures.py --all --mode both` and review the resulting git diff.
 
+### 9. Visual review
+
+```powershell
+python tools/render_canvas_review.py --list-profiles
+python tools/render_canvas_review.py --profile pinwheel-depth-3
+python tools/render_canvas_review.py --profile pinwheel-depth-3 --reference .\docs\images\pinwheel-reference.png
+python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+```
+
+Use these when the open question is visual rather than topological:
+
+- `render_canvas_review.py` is the preferred path for producing a real canvas PNG plus JSON metrics from the browser render path.
+- `run_browser_check.py` is the preferred path when you need the same browser review or a targeted Playwright test with owned host startup, cleanup, logs, and a run manifest.
+- npm Playwright entrypoints remain the preferred full-suite path when you want broad browser regression coverage rather than one focused diagnosis.
+
+Output locations:
+
+- successful render review: `output/render-review/`
+- direct render-review failure artifacts: `output/render-review-artifacts/`
+- managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
+
 ## How To Read Failures
 
 - `validate_tilings.py` fails

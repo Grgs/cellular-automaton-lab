@@ -6,6 +6,7 @@
 - Added a managed browser-host runner that owns standalone/server startup, readiness, logs, and cleanup for local browser checks.
 - Extended the render-review tool with reference-image comparison and named review profiles for repeatable visual diagnosis.
 - Unified browser/render failure artifacts so local review and browser-test failures emit the same core bundle shape.
+- Documented the browser-diagnosis workflow and added CLI profile discovery so the new tools are usable without reading source.
 
 ## Now
 

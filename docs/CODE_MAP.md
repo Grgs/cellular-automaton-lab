@@ -405,6 +405,10 @@ Browser UI
   Builds the static standalone site.
 - [tools/run-playwright.mjs](../tools/run-playwright.mjs)
   Local Playwright runner used by npm scripts. It prepares Linux browser runtime libraries when needed, builds standalone output for standalone suites, and dispatches Python `unittest` modules.
+- [tools/render_canvas_review.py](../tools/render_canvas_review.py)
+  Focused browser-backed render-review CLI. Renders one topology through the real canvas path, supports named profiles and optional reference montages, and writes PNG plus JSON summary output.
+- [tools/run_browser_check.py](../tools/run_browser_check.py)
+  Managed browser-diagnosis runner. Owns standalone/server host startup, readiness, logging, cleanup, and run-manifest output for focused render reviews or targeted Python `unittest` browser checks.
 - [tools/run-python.mjs](../tools/run-python.mjs)
   Cross-platform Python command wrapper used by npm scripts for repo tools.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
@@ -415,6 +419,8 @@ Browser UI
   Writes the standalone wrapper into the transient build-input directory.
 - [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)
   Exports bootstrap metadata for standalone mode.
+- [tests/e2e/browser_support/artifacts.py](../tests/e2e/browser_support/artifacts.py)
+  Shared browser-failure artifact writer used by the managed runner, render-review tool, and Playwright harness so local diagnosis and failing tests emit the same core bundle shape.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
   Validates topology descriptors and generated tilings.
 - [vite.config.ts](../vite.config.ts)

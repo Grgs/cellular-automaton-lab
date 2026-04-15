@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from tools.render_canvas_review import (
+    main,
     parse_cli_args,
     resolve_montage_path,
     resolve_output_paths,
@@ -33,6 +36,18 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
     def test_parse_cli_args_rejects_montage_without_reference(self) -> None:
         with self.assertRaises(SystemExit):
             parse_cli_args(["--family", "chair", "--montage-out", "/tmp/out.png"])
+
+    def test_main_lists_available_profiles_without_requiring_family(self) -> None:
+        stdout = io.StringIO()
+        with redirect_stdout(stdout):
+            exit_code = main(["--list-profiles"])
+        self.assertEqual(exit_code, 0)
+        rendered = stdout.getvalue()
+        self.assertIn("pinwheel-depth-3: family=pinwheel, depth=3", rendered)
+        self.assertIn(
+            "dodecagonal-square-triangle-depth-3: family=dodecagonal-square-triangle, depth=3",
+            rendered,
+        )
 
     def test_resolve_render_review_request_accepts_profile_without_family(self) -> None:
         args = parse_cli_args(["--profile", "pinwheel-depth-3"])

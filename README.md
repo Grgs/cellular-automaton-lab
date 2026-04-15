@@ -125,6 +125,22 @@ py -3 -m unittest -v tests.e2e.test_playwright_all
 py -3 -m unittest -v tests.e2e.test_playwright_suite_integrity
 ```
 
+### Browser diagnosis
+
+Use the render-review tool when the question is what the current canvas output actually looks like:
+
+```powershell
+python tools/render_canvas_review.py --profile pinwheel-depth-3
+```
+
+Use the managed runner when you need owned startup, cleanup, logs, and artifacts around a focused browser check:
+
+```powershell
+python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+```
+
+The render-review tool is the preferred visual-inspection path. The managed runner is the preferred direct-debug path when host lifecycle ownership matters. Full browser suites should still go through the npm Playwright entrypoints.
+
 ## Repository Layout
 
 - `app.py`: local app entrypoint

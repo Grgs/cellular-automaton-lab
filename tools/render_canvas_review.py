@@ -27,7 +27,11 @@ from tests.e2e.browser_support.render_review import (
     wait_for_patch_render_complete,
 )
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
-from tools.render_review_profiles import resolve_render_review_profile
+from tools.render_review_profiles import (
+    describe_render_review_profile,
+    iter_render_review_profiles,
+    resolve_render_review_profile,
+)
 
 DEFAULT_VIEWPORT_WIDTH = 1200
 DEFAULT_VIEWPORT_HEIGHT = 900
@@ -64,6 +68,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--family", help="Tiling family to render.")
     parser.add_argument("--profile", help="Named render-review profile to use.")
+    parser.add_argument(
+        "--list-profiles",
+        action="store_true",
+        help="List the available named render-review profiles and exit.",
+    )
     parser.add_argument("--patch-depth", type=int, help="Patch depth for aperiodic tilings.")
     parser.add_argument("--cell-size", type=int, help="Cell size for grid-sized tilings.")
     parser.add_argument("--viewport-width", type=int, default=DEFAULT_VIEWPORT_WIDTH)
@@ -83,6 +92,8 @@ def _parser_error(parser: argparse.ArgumentParser, message: str) -> None:
 def parse_cli_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.list_profiles:
+        return args
     if args.viewport_width <= 0 or args.viewport_height <= 0:
         _parser_error(parser, "--viewport-width and --viewport-height must be positive.")
     if args.patch_depth is not None and args.cell_size is not None:
@@ -413,6 +424,10 @@ def render_canvas_review(
 
 def main(argv: list[str] | None = None) -> int:
     parsed_args = parse_cli_args(argv)
+    if parsed_args.list_profiles:
+        for profile in iter_render_review_profiles():
+            print(describe_render_review_profile(profile))
+        return 0
     result = render_canvas_review(parsed_args)
     print(f"render_png={result.png_path}")
     print(f"render_summary={result.summary_path}")

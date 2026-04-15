@@ -267,6 +267,55 @@ Browser tests are the highest-cost layer. They should validate:
 
 They should not be the first place to test logic that already fits a unit or API test.
 
+### Browser Diagnosis And Failure Investigation
+
+Use the browser-diagnosis tools when you need a focused local answer instead of a full Playwright suite run.
+
+Preferred paths:
+
+- Full suite or feature suite: use the npm Playwright entrypoints.
+- Visual inspection of one rendered topology: use `python tools/render_canvas_review.py`.
+- Host-owned local debugging with guaranteed startup and cleanup: use `python tools/run_browser_check.py`.
+
+Direct render review examples:
+
+```powershell
+python tools/render_canvas_review.py --list-profiles
+python tools/render_canvas_review.py --profile pinwheel-depth-3
+python tools/render_canvas_review.py --profile pinwheel-depth-3 --reference .\docs\images\pinwheel-reference.png
+```
+
+Managed runner examples:
+
+```powershell
+python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+```
+
+Artifact locations:
+
+- Successful direct render-review outputs default to `output/render-review/`.
+- Direct render-review failure artifacts default to `output/render-review-artifacts/`.
+- Managed runner outputs default to `output/browser-check/<timestamp-mode-host>/`.
+- Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
+
+Shared failure artifact bundle:
+
+- `canvas.png`
+- `page.png`
+- `page.html`
+- `console.txt`
+- `render-summary.json`
+- host logs such as standalone or server stdout and stderr
+- `run-manifest.json`
+
+Defaults:
+
+- `tools/render_canvas_review.py` is the preferred visual-inspection entrypoint.
+- `tools/run_browser_check.py` is the preferred direct-debug entrypoint when host lifecycle, logs, and cleanup must be owned by one command.
+- npm Playwright entrypoints remain the preferred full-suite path.
+- A repo-scoped process-kill helper is intentionally deferred until real usage shows the managed runner is not enough.
+
 ## Recommended Local Workflow
 
 For most frontend-only changes:
