@@ -409,6 +409,8 @@ Browser UI
   Focused browser-backed render-review CLI. Renders one topology through the real canvas path, supports named profiles and optional reference montages, and writes PNG plus JSON summary output.
 - [tools/run_browser_check.py](../tools/run_browser_check.py)
   Managed browser-diagnosis runner. Owns standalone/server host startup, readiness, logging, cleanup, and run-manifest output for focused render reviews or targeted Python `unittest` browser checks.
+- [tools/dev_processes.py](../tools/dev_processes.py)
+  Repo-scoped process inspection and cleanup helper for the known browser/server helper processes started from this repo.
 - [tools/run-python.mjs](../tools/run-python.mjs)
   Cross-platform Python command wrapper used by npm scripts for repo tools.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)

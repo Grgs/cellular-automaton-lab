@@ -139,7 +139,14 @@ Use the managed runner when you need owned startup, cleanup, logs, and artifacts
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
 ```
 
-The render-review tool is the preferred visual-inspection path. The managed runner is the preferred direct-debug path when host lifecycle ownership matters. Full browser suites should still go through the npm Playwright entrypoints.
+If you need to inspect or clear repo-owned browser/server helper processes directly:
+
+```powershell
+python tools/dev_processes.py list
+python tools/dev_processes.py kill --stale-browser-hosts
+```
+
+The render-review tool is the preferred visual-inspection path. The managed runner is the preferred direct-debug path when host lifecycle ownership matters. The process helper is the narrow cleanup fallback. Full browser suites should still go through the npm Playwright entrypoints.
 
 ## Repository Layout
 

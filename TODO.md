@@ -7,6 +7,7 @@
 - Extended the render-review tool with reference-image comparison and named review profiles for repeatable visual diagnosis.
 - Unified browser/render failure artifacts so local review and browser-test failures emit the same core bundle shape.
 - Documented the browser-diagnosis workflow and added CLI profile discovery so the new tools are usable without reading source.
+- Added a repo-scoped process inspection/kill helper for the known browser/server helper processes started from this repo.
 
 ## Now
 
@@ -15,7 +16,6 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Decide whether a small repo-scoped process inspection/kill helper is still needed now that the managed host runner owns normal cleanup.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The current exact-depth canonical set now also covers `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
 - If we revisit `dodecagonal-square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
@@ -23,7 +23,6 @@
 
 ## Later
 
-- Add a small repo-scoped process inspection/kill helper only if the managed host runner still leaves cleanup gaps.
 - Add `turtle-monotile` on top of the existing Hat-family support.
 - Add another verified substitution tiling family such as `socolar-12-fold`.
 - Revisit `pinwheel` verification with stronger substitution-matrix and direct local-patch invariants, now that its contiguity is derived from exact segment-overlap neighbors on the exact-affine path.

@@ -292,6 +292,14 @@ python tools/run_browser_check.py --host standalone --render-review --profile pi
 python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 ```
 
+Repo-scoped process inspection and cleanup:
+
+```powershell
+python tools/dev_processes.py list
+python tools/dev_processes.py kill --stale-browser-hosts
+python tools/dev_processes.py kill --port 5002
+```
+
 Artifact locations:
 
 - Successful direct render-review outputs default to `output/render-review/`.
@@ -314,7 +322,7 @@ Defaults:
 - `tools/render_canvas_review.py` is the preferred visual-inspection entrypoint.
 - `tools/run_browser_check.py` is the preferred direct-debug entrypoint when host lifecycle, logs, and cleanup must be owned by one command.
 - npm Playwright entrypoints remain the preferred full-suite path.
-- A repo-scoped process-kill helper is intentionally deferred until real usage shows the managed runner is not enough.
+- `tools/dev_processes.py` is the narrow cleanup fallback when you need to inspect or terminate repo-owned browser/server helper processes directly.
 
 ## Recommended Local Workflow
 
