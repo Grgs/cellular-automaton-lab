@@ -1,14 +1,20 @@
 # TODO
 
+## Done
+
+- Added a standalone-first canvas render-review harness that saves a canvas PNG plus JSON metrics from the real browser render path.
+- Added a managed browser-host runner that owns standalone/server startup, readiness, logs, and cleanup for local browser checks.
+- Extended the render-review tool with reference-image comparison and named review profiles for repeatable visual diagnosis.
+- Unified browser/render failure artifacts so local review and browser-test failures emit the same core bundle shape.
+
 ## Now
 
-- Build a standalone-first canvas render-review harness that renders a chosen topology through the real browser canvas path and saves a PNG plus JSON metrics for visual review.
 - Revisit browser-visible shape and pattern correctness for `dodecagonal-square-triangle`, `shield`, and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
 - For `pinwheel`, treat the remaining visual mismatch as a display-sampling problem; keep the two-root exact-affine runtime patch, and if we revisit the presentation use a display-only observation window rather than runtime subset selection.
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Add a managed browser-host runner that owns standalone/server startup, readiness, logs, and cleanup so local review and targeted Playwright checks do not leave stale processes behind.
+- Decide whether a small repo-scoped process inspection/kill helper is still needed now that the managed host runner owns normal cleanup.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The current exact-depth canonical set now also covers `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
 - If we revisit `dodecagonal-square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.

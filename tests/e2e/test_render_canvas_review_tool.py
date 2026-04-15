@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from PIL import Image
+
 from tools.render_canvas_review import main
 
 
@@ -58,3 +60,39 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertGreater(summary["coverageWidthRatio"], 0)
             self.assertGreater(summary["coverageHeightRatio"], 0)
             self.assertGreater(summary["renderCellSize"], 0)
+
+    def test_tool_supports_profiles_references_and_montages(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-canvas-review-profile-") as tmpdir:
+            output_dir = Path(tmpdir)
+            png_path = output_dir / "pinwheel.png"
+            summary_path = output_dir / "pinwheel.json"
+            reference_path = output_dir / "reference.png"
+            montage_path = output_dir / "montage.png"
+            Image.new("RGBA", (50, 50), (255, 255, 255, 255)).save(reference_path)
+
+            exit_code = main(
+                [
+                    "--profile",
+                    "pinwheel-depth-3",
+                    "--reference",
+                    str(reference_path),
+                    "--montage-out",
+                    str(montage_path),
+                    "--out",
+                    str(png_path),
+                    "--summary-out",
+                    str(summary_path),
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertTrue(png_path.exists())
+            self.assertTrue(summary_path.exists())
+            self.assertTrue(montage_path.exists())
+
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            self.assertEqual(summary["profile"], "pinwheel-depth-3")
+            self.assertEqual(summary["tiling_family"], "pinwheel")
+            self.assertIn("comparison", summary)
+            self.assertEqual(summary["comparison"]["referenceImagePath"], str(reference_path))
+            self.assertEqual(summary["comparison"]["montageImagePath"], str(montage_path))

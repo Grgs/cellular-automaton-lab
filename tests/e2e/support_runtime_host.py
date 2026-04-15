@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import socket
 import subprocess
 import sys
@@ -16,6 +17,10 @@ from playwright.sync_api import Page
 
 from tests.e2e.support_server import AppServer, JsonApiClient
 
+_EXTERNAL_RUNTIME_HOST_KIND_ENV = "E2E_EXTERNAL_RUNTIME_HOST_KIND"
+_EXTERNAL_RUNTIME_BASE_URL_ENV = "E2E_EXTERNAL_RUNTIME_BASE_URL"
+_EXTERNAL_RUNTIME_STDOUT_PATH_ENV = "E2E_EXTERNAL_RUNTIME_STDOUT_PATH"
+_EXTERNAL_RUNTIME_STDERR_PATH_ENV = "E2E_EXTERNAL_RUNTIME_STDERR_PATH"
 
 _STANDALONE_REQUIRED_OUTPUTS = (
     "index.html",
@@ -319,7 +324,136 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
         )
 
 
+class ExternalRuntimeHost(BrowserRuntimeHost):
+    def __init__(
+        self,
+        *,
+        kind: str,
+        base_url: str,
+        stdout_path: str | None = None,
+        stderr_path: str | None = None,
+    ) -> None:
+        super().__init__()
+        self.kind = kind
+        self._base_url = base_url.rstrip("/")
+        self.stdout_path = Path(stdout_path) if stdout_path else None
+        self.stderr_path = Path(stderr_path) if stderr_path else None
+
+    @property
+    def base_url(self) -> str:
+        return self._base_url
+
+    def client(self) -> JsonApiClient | None:
+        if self.kind == "server":
+            return JsonApiClient(self.base_url)
+        return None
+
+    def start(self) -> None:
+        return None
+
+    def stop(self) -> None:
+        return None
+
+    def before_test(self) -> None:
+        return None
+
+    def close(self) -> None:
+        return None
+
+    def _copy_log_file(self, artifact_dir: Path, source: Path | None, target_name: str) -> None:
+        if source is None or not source.exists():
+            return
+        shutil.copyfile(source, artifact_dir / target_name)
+
+    def capture_failure_artifacts(self, artifact_dir: Path, page: Page | None) -> None:
+        if self.kind == "server":
+            client = JsonApiClient(self.base_url)
+            try:
+                backend_state = client.get_state()
+                (artifact_dir / "backend-state.json").write_text(
+                    json.dumps(backend_state, indent=2),
+                    encoding="utf-8",
+                )
+            except Exception as exc:
+                (artifact_dir / "backend-state-error.txt").write_text(str(exc), encoding="utf-8")
+            try:
+                backend_topology = client.get_topology()
+                (artifact_dir / "backend-topology.json").write_text(
+                    json.dumps(backend_topology, indent=2),
+                    encoding="utf-8",
+                )
+            except Exception as exc:
+                (artifact_dir / "backend-topology-error.txt").write_text(str(exc), encoding="utf-8")
+            self._copy_log_file(artifact_dir, self.stdout_path, "server-stdout.log")
+            self._copy_log_file(artifact_dir, self.stderr_path, "server-stderr.log")
+            (artifact_dir / "server-log-paths.txt").write_text(
+                f"stdout={self.stdout_path}\nstderr={self.stderr_path}\n",
+                encoding="utf-8",
+            )
+            return
+
+        if page is not None and not page.is_closed():
+            try:
+                storage = page.evaluate(
+                    """async ({ databaseName, objectStoreName, snapshotKey, localStorageKey }) => {
+                        const localStorageValue = window.localStorage.getItem(localStorageKey);
+                        const indexedDbValue = await new Promise((resolve) => {
+                            if (typeof window.indexedDB === "undefined") {
+                                resolve(null);
+                                return;
+                            }
+                            const openRequest = window.indexedDB.open(databaseName, 1);
+                            openRequest.onerror = () => resolve({ error: String(openRequest.error) });
+                            openRequest.onsuccess = () => {
+                                const database = openRequest.result;
+                                if (!database.objectStoreNames.contains(objectStoreName)) {
+                                    resolve(null);
+                                    return;
+                                }
+                                const transaction = database.transaction(objectStoreName, "readonly");
+                                const store = transaction.objectStore(objectStoreName);
+                                const getRequest = store.get(snapshotKey);
+                                getRequest.onerror = () => resolve({ error: String(getRequest.error) });
+                                getRequest.onsuccess = () => resolve(getRequest.result ?? null);
+                            };
+                        });
+                        return {
+                            localStorageValue,
+                            indexedDbValue,
+                            appReady: window.__appReady === true,
+                        };
+                    }""",
+                    {
+                        "databaseName": "cellular-automaton-lab-standalone",
+                        "objectStoreName": "runtime",
+                        "snapshotKey": "snapshot-v5",
+                        "localStorageKey": "cellular-automaton-lab-standalone-state-v5",
+                    },
+                )
+                (artifact_dir / "standalone-storage.json").write_text(
+                    json.dumps(storage, indent=2),
+                    encoding="utf-8",
+                )
+            except Exception as exc:
+                (artifact_dir / "standalone-storage-error.txt").write_text(str(exc), encoding="utf-8")
+        self._copy_log_file(artifact_dir, self.stdout_path, "standalone-stdout.log")
+        self._copy_log_file(artifact_dir, self.stderr_path, "standalone-stderr.log")
+        (artifact_dir / "standalone-log-paths.txt").write_text(
+            f"stdout={self.stdout_path}\nstderr={self.stderr_path}\n",
+            encoding="utf-8",
+        )
+
+
 def create_runtime_host(kind: str) -> BrowserRuntimeHost:
+    external_kind = os.environ.get(_EXTERNAL_RUNTIME_HOST_KIND_ENV)
+    external_base_url = os.environ.get(_EXTERNAL_RUNTIME_BASE_URL_ENV)
+    if external_kind == kind and external_base_url:
+        return ExternalRuntimeHost(
+            kind=kind,
+            base_url=external_base_url,
+            stdout_path=os.environ.get(_EXTERNAL_RUNTIME_STDOUT_PATH_ENV),
+            stderr_path=os.environ.get(_EXTERNAL_RUNTIME_STDERR_PATH_ENV),
+        )
     if kind == "server":
         return ServerRuntimeHost()
     if kind == "standalone":

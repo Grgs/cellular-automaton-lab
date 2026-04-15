@@ -2,9 +2,6 @@ from __future__ import annotations
 
 import _thread
 import os
-import re
-import shutil
-import tempfile
 import threading
 import time
 import unittest
@@ -28,10 +25,14 @@ from playwright.sync_api import (
 
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tests.e2e.support_server import JsonApiClient
+from tests.e2e.browser_support.artifacts import (
+    E2E_ARTIFACTS_DIR_ENV,
+    capture_browser_failure_artifacts,
+    create_artifact_dir,
+)
 from tests.e2e.browser_support.render_review import wait_for_page_bootstrapped
 
 WaitUntilState = Literal["commit", "domcontentloaded", "load", "networkidle"]
-E2E_ARTIFACTS_DIR_ENV = "E2E_ARTIFACTS_DIR"
 
 
 class BrowserAppTestCase(unittest.TestCase):
@@ -143,37 +144,30 @@ class BrowserAppTestCase(unittest.TestCase):
 
     def _artifact_root(self) -> Path | None:
         configured_root = os.environ.get(E2E_ARTIFACTS_DIR_ENV)
-        if not configured_root:
-            return None
-        artifact_root = Path(configured_root)
-        artifact_root.mkdir(parents=True, exist_ok=True)
-        return artifact_root
+        return Path(configured_root) if configured_root else None
 
     def _create_artifact_dir(self) -> Path:
-        artifact_root = self._artifact_root()
-        if artifact_root is None:
-            return Path(tempfile.mkdtemp(prefix="cellular-automaton-e2e-artifacts-"))
-
-        sanitized_test_id = re.sub(r"[^A-Za-z0-9_.-]+", "-", self.id()).strip(".-")
-        artifact_dir = artifact_root / (sanitized_test_id or "unknown-test")
-        if artifact_dir.exists():
-            shutil.rmtree(artifact_dir)
-        artifact_dir.mkdir(parents=True, exist_ok=True)
-        return artifact_dir
+        return create_artifact_dir(
+            name=self.id(),
+            root=self._artifact_root(),
+            temp_prefix="cellular-automaton-e2e-artifacts-",
+        )
 
     def _capture_failure_artifacts(self) -> Path | None:
         artifact_dir = self._create_artifact_dir()
         try:
-            if not self.page.is_closed():
-                self.page.screenshot(path=str(artifact_dir / "page.png"), full_page=True)
-                (artifact_dir / "page.html").write_text(self.page.content(), encoding="utf-8")
-
-            (artifact_dir / "console.txt").write_text(
-                "\n".join(self.console_messages) if self.console_messages else "(no console messages)",
-                encoding="utf-8",
+            capture_browser_failure_artifacts(
+                artifact_dir,
+                host=self.host,
+                page=self.page,
+                console_messages=self.console_messages,
+                run_manifest={
+                    "baseUrl": self.host.base_url,
+                    "exitStatus": "test-failure",
+                    "hostKind": self.runtime_host_kind,
+                    "testId": self.id(),
+                },
             )
-
-            self.host.capture_failure_artifacts(artifact_dir, self.page)
         except Exception as exc:
             (artifact_dir / "artifact-capture-error.txt").write_text(str(exc), encoding="utf-8")
         return artifact_dir
