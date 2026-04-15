@@ -16,6 +16,9 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
+- Add a render-review consistency report that cross-checks backend topology counts and bounds against frontend grid-summary and render-review output, so visual diagnosis cannot silently hide state mismatches.
+- Add an optional success-artifact bundle for managed browser checks, especially targeted `--unittest` runs, so passing diagnosis sessions can still preserve `canvas.png`, `page.png`, and `render-summary.json`.
+- Add a review-sweep helper that runs one render-review profile across a small matrix of depths, themes, or host kinds and emits one comparable artifact set.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The current exact-depth canonical set now also covers `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
 - If we revisit `dodecagonal-square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.
