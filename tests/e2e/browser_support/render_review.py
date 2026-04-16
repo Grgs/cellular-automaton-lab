@@ -25,6 +25,15 @@ class BrowserTopologySummary(TypedDict):
     topologyRevision: str | None
 
 
+class BrowserTransformReport(TypedDict):
+    geometry: str
+    adapterGeometry: str
+    adapterFamily: str
+    topologyBounds: dict[str, float] | None
+    renderMetrics: dict[str, float | int | None]
+    sampleCells: dict[str, dict[str, object] | None]
+
+
 def wait_for_page_bootstrapped(page: Page, *, timeout_ms: int = 30_000) -> None:
     page.wait_for_selector("#grid", timeout=timeout_ms)
     page.wait_for_function("() => document.readyState === 'complete'", timeout=timeout_ms)
@@ -233,6 +242,25 @@ def browser_topology_summary(page: Page) -> BrowserTopologySummary | None:
             "topologyRevision": cast_summary.get("topologyRevision"),
         },
     )
+
+
+def browser_transform_report(page: Page) -> BrowserTransformReport | None:
+    summary = page.evaluate(
+        """() => {
+            const diagnostics = window.__appDiagnostics;
+            if (typeof diagnostics !== "function") {
+                return null;
+            }
+            const snapshot = diagnostics();
+            if (!snapshot || typeof snapshot !== "object" || !snapshot.transformReport) {
+                return null;
+            }
+            return snapshot.transformReport;
+        }""",
+    )
+    if summary is None:
+        return None
+    return cast(BrowserTransformReport, summary)
 
 
 def viewport_gap_summary(page: Page) -> dict[str, float]:

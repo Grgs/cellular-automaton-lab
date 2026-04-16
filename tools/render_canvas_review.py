@@ -21,6 +21,7 @@ from tests.e2e.browser_support.artifacts import (
 )
 from tests.e2e.browser_support.render_review import (
     browser_topology_summary,
+    browser_transform_report,
     canvas_visual_summary,
     select_tiling_family,
     set_cell_size,
@@ -83,6 +84,7 @@ class RenderCanvasReviewResult:
     summary_path: Path
     montage_path: Path | None
     consistency_warnings: tuple[str, ...]
+    provenance_warnings: tuple[str, ...]
     literature_warnings: tuple[str, ...]
     literature_reference_status: str | None
 
@@ -340,6 +342,37 @@ def build_literature_review_summary(
         ),
         "comparison": comparison,
         "warnings": list(literature_reference.warnings),
+    }
+
+
+def condense_transform_report(transform_report: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(transform_report, dict):
+        return None
+    sample_cells = transform_report.get("sampleCells")
+    condensed_sample_ids: dict[str, str | None] = {}
+    if isinstance(sample_cells, dict):
+        for role, payload in sample_cells.items():
+            condensed_sample_ids[str(role)] = (
+                str(payload.get("cellId"))
+                if isinstance(payload, dict) and payload.get("cellId") is not None
+                else None
+            )
+    render_metrics = transform_report.get("renderMetrics")
+    return {
+        "adapterGeometry": transform_report.get("adapterGeometry"),
+        "adapterFamily": transform_report.get("adapterFamily"),
+        "topologyBounds": transform_report.get("topologyBounds"),
+        "renderedBounds": (
+            {
+                "width": render_metrics.get("cssWidth"),
+                "height": render_metrics.get("cssHeight"),
+                "canvasWidth": render_metrics.get("canvasWidth"),
+                "canvasHeight": render_metrics.get("canvasHeight"),
+            }
+            if isinstance(render_metrics, dict)
+            else None
+        ),
+        "sampleCellIds": condensed_sample_ids,
     }
 
 
@@ -633,8 +666,15 @@ def render_canvas_review(
     owned_host = host is None
     active_host = host or create_runtime_host(host_kind)
     page: Page | None = None
+    runtime_provenance = None
+    provenance_warnings: tuple[str, ...] = ()
     try:
         active_host.start()
+        runtime_provenance = active_host.runtime_provenance()
+        provenance_warnings = tuple(
+            str(warning)
+            for warning in runtime_provenance.get("warnings", [])
+        ) if isinstance(runtime_provenance, dict) else ()
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             try:
@@ -700,6 +740,7 @@ def render_canvas_review(
                     page.locator("#grid").screenshot(path=str(png_path))
                     visual_summary = canvas_visual_summary(page)
                     browser_topology = browser_topology_summary(page)
+                    transform_report = browser_transform_report(page)
                     backend_topology = None
                     client = active_host.client()
                     if client is not None:
@@ -734,6 +775,9 @@ def render_canvas_review(
                         "gridSizeText": str(visual_summary["gridSizeText"]),
                         "hostMode": host_kind,
                         "baseUrl": active_host.base_url,
+                        "transformReport": transform_report,
+                        "runtimeProvenance": runtime_provenance,
+                        "provenanceWarnings": list(provenance_warnings),
                         "consistency": consistency_report,
                     }
                     comparison_payload = None
@@ -757,6 +801,7 @@ def render_canvas_review(
                         summary_path=summary_path,
                         montage_path=montage_path,
                         consistency_warnings=tuple(str(warning) for warning in consistency_report["warnings"]),
+                        provenance_warnings=provenance_warnings,
                         literature_warnings=request.literature_reference.warnings,
                         literature_reference_status=request.literature_reference.reference_status,
                     )
@@ -777,6 +822,8 @@ def render_canvas_review(
                 "failureReason": str(exc),
                 "hostKind": host_kind,
                 "tilingFamily": request.family,
+                "runtimeProvenance": runtime_provenance,
+                "provenanceWarnings": list(provenance_warnings),
             }
         )
         capture_browser_failure_artifacts(
@@ -813,6 +860,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"consistency_warnings={len(result.consistency_warnings)}")
         for warning in result.consistency_warnings:
             print(f"consistency_warning={warning}")
+    if result.provenance_warnings:
+        print(f"provenance_warnings={len(result.provenance_warnings)}")
+        for warning in result.provenance_warnings:
+            print(f"provenance_warning={warning}")
     return 0
 
 

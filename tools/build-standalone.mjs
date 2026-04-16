@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, "..");
@@ -32,6 +33,20 @@ function runCommand(command, args, options = {}) {
     }
 }
 
+function readCommandOutput(command, args, options = {}) {
+    const result = spawnSync(command, args, {
+        cwd: rootDir,
+        stdio: ["ignore", "pipe", "ignore"],
+        shell: false,
+        encoding: "utf8",
+        ...options,
+    });
+    if (result.status !== 0) {
+        return null;
+    }
+    return String(result.stdout || "").trim() || null;
+}
+
 function collectFiles(directory, predicate, bucket = []) {
     const entries = fs.readdirSync(directory, { withFileTypes: true });
     for (const entry of entries) {
@@ -45,6 +60,31 @@ function collectFiles(directory, predicate, bucket = []) {
         }
     }
     return bucket;
+}
+
+function collectSourceFingerprintPaths() {
+    const relativePaths = collectFiles(
+        path.join(rootDir, "frontend"),
+        () => true,
+    ).map((absolutePath) => path.relative(rootDir, absolutePath).replace(/\\/g, "/"));
+    for (const relativePath of ["tools/build-standalone.mjs", "package.json", "package-lock.json"]) {
+        const absolutePath = path.join(rootDir, relativePath);
+        if (fs.existsSync(absolutePath)) {
+            relativePaths.push(relativePath);
+        }
+    }
+    return [...new Set(relativePaths)].sort();
+}
+
+function computeSourceFingerprint(relativePaths) {
+    const hash = createHash("sha256");
+    for (const relativePath of relativePaths) {
+        hash.update(relativePath, "utf8");
+        hash.update("\0", "utf8");
+        hash.update(fs.readFileSync(path.join(rootDir, relativePath)));
+        hash.update("\0", "utf8");
+    }
+    return hash.digest("hex");
 }
 
 function copyFileIntoDirectory(sourcePath, targetDir, filename = path.basename(sourcePath)) {
@@ -132,6 +172,25 @@ function copyStaticAssets() {
     fs.writeFileSync(path.join(outputDir, ".nojekyll"), "", "utf8");
 }
 
+function writeBuildManifest() {
+    const sourceFiles = collectSourceFingerprintPaths();
+    const manifest = {
+        builtAt: new Date().toISOString(),
+        gitHead: readCommandOutput("git", ["rev-parse", "HEAD"]),
+        gitDirty: (() => {
+            const status = readCommandOutput("git", ["status", "--porcelain"]);
+            return status === null ? null : status.length > 0;
+        })(),
+        sourceFingerprint: computeSourceFingerprint(sourceFiles),
+        sourceFiles,
+    };
+    fs.writeFileSync(
+        path.join(outputDir, "build-manifest.json"),
+        JSON.stringify(manifest, null, 2),
+        "utf8",
+    );
+}
+
 function buildStandaloneFrontend(htmlEntryPath) {
     runCommand(
         process.execPath,
@@ -151,6 +210,7 @@ try {
     copyStaticAssets();
     exportBootstrapData();
     writePythonBundle();
+    writeBuildManifest();
 } finally {
     fs.rmSync(standaloneBuildInputDir, { recursive: true, force: true });
 }

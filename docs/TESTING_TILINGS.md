@@ -120,10 +120,16 @@ Output locations:
 - successful render review: `output/render-review/`
 - managed `run_browser_check.py --render-review`: `output/browser-check/<timestamp-mode-host>/`
 - literature reference cache: `output/literature-reference-cache/`
+- standalone build provenance: `output/standalone/build-manifest.json`
 - direct render-review failure artifacts: `output/render-review-artifacts/`
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
 - managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
 - render-review sweeps: `output/render-review-sweeps/<timestamp-profile>/`
+
+Render-review summaries and managed manifests now also expose:
+
+- `transformReport` / `transformSummary` for topology-space to render-space diagnostics
+- `runtimeProvenance` and `provenanceWarnings` for standalone/server build attribution
 
 ## How To Read Failures
 

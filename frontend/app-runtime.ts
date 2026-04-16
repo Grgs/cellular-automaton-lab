@@ -23,6 +23,7 @@ function installAppDiagnostics(controller: AppController): void {
             width: Number.isFinite(Number(topologySpec?.width)) ? Number(topologySpec?.width) : null,
             height: Number.isFinite(Number(topologySpec?.height)) ? Number(topologySpec?.height) : null,
             topologyRevision: typeof state.topologyRevision === "string" ? state.topologyRevision : null,
+            transformReport: controller.getRenderDiagnostics(),
         };
     };
 }

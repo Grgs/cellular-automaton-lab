@@ -209,6 +209,11 @@ and the frontend adapter. There is still no diagnostic report that shows, for
 one family, the topology-space polygon, backend-normalized polygon, and final
 render-space polygon side by side.
 
+Status: partially landed for the first slice. The browser diagnostics path now
+records topology-space bounds, render metrics, and stable sample-cell
+transforms from the live frontend adapter path. Deeper backend-vs-source
+transform breakdowns are still deferred.
+
 ### 2. Candidate-sample exploration is too manual
 
 Switching shield away from graph-distance cropping required trying multiple
@@ -234,6 +239,10 @@ The consistency-report tooling exposed the mismatch, but it did not identify an
 out-of-date standalone build as the likely cause. Build provenance needs to be
 visible in review manifests if those discrepancies are going to be actionable
 quickly.
+
+Status: landed for the first slice. Render-review summaries and manifests now
+carry runtime provenance, and standalone builds now emit a build manifest that
+can be compared to the current checkout.
 
 ### 4. Visual-quality metrics are too thin for centered dense fields
 

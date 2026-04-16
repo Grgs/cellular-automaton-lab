@@ -3,6 +3,7 @@ import type {
     BootstrappedTopologyDefinition,
 } from "./types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
+import type { RenderDiagnosticsSnapshot } from "./types/rendering.js";
 
 declare global {
     interface Window {
@@ -17,6 +18,7 @@ declare global {
             width: number | null;
             height: number | null;
             topologyRevision: string | null;
+            transformReport: RenderDiagnosticsSnapshot | null;
         } | null) | null);
     }
 }

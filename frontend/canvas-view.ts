@@ -33,7 +33,12 @@ import type {
     CanvasGridView,
     CanvasRenderPayload,
     GeometryCache,
+    GeometryBounds,
     GridMetrics,
+    PolygonGeometryCache,
+    RenderDiagnosticsSampleCell,
+    RenderDiagnosticsSnapshot,
+    RenderableTopologyCell,
 } from "./types/rendering.js";
 
 interface CreateCanvasGridViewOptions {
@@ -47,10 +52,223 @@ interface CreateCanvasGridViewOptions {
 type RuntimeCanvasGridView = CanvasGridView & {
     supportsTopology: true;
     getMetrics(): CanvasSurfaceMetrics;
+    getRenderDiagnostics(): RenderDiagnosticsSnapshot | null;
 };
+
+type SampleRole = "lexicographicFirst" | "centerNearest" | "boundaryFurthest";
 
 function canvasBorderRadius(gap: number): string {
     return gap === 0 ? "0px" : "18px";
+}
+
+function isFinitePoint(
+    value: { x?: number | null; y?: number | null } | null | undefined,
+): value is { x: number; y: number } {
+    return Number.isFinite(Number(value?.x)) && Number.isFinite(Number(value?.y));
+}
+
+function boundsFromVertices(vertices: Array<{ x: number; y: number }>): GeometryBounds | null {
+    if (vertices.length === 0) {
+        return null;
+    }
+    const xValues = vertices.map((vertex) => Number(vertex.x));
+    const yValues = vertices.map((vertex) => Number(vertex.y));
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    const minY = Math.min(...yValues);
+    const maxY = Math.max(...yValues);
+    return {
+        minX,
+        maxX,
+        minY,
+        maxY,
+        width: maxX - minX,
+        height: maxY - minY,
+    };
+}
+
+function boundsCenter(bounds: GeometryBounds): { x: number; y: number } {
+    return {
+        x: bounds.minX + (bounds.width / 2),
+        y: bounds.minY + (bounds.height / 2),
+    };
+}
+
+function rawGeometryForCell(cell: RenderableTopologyCell): {
+    center: { x: number; y: number };
+    bounds: GeometryBounds;
+} | null {
+    if (!Array.isArray(cell.vertices) || cell.vertices.length === 0) {
+        return null;
+    }
+    const bounds = boundsFromVertices(cell.vertices);
+    if (bounds === null) {
+        return null;
+    }
+    return {
+        center: isFinitePoint(cell.center)
+            ? { x: Number(cell.center.x), y: Number(cell.center.y) }
+            : boundsCenter(bounds),
+        bounds,
+    };
+}
+
+function renderedBoundsForCell(geometryCell: {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+}): GeometryBounds {
+    return {
+        minX: geometryCell.minX,
+        maxX: geometryCell.maxX,
+        minY: geometryCell.minY,
+        maxY: geometryCell.maxY,
+        width: geometryCell.maxX - geometryCell.minX,
+        height: geometryCell.maxY - geometryCell.minY,
+    };
+}
+
+function centerDistanceSquared(
+    center: { x: number; y: number },
+    target: { x: number; y: number },
+): number {
+    const dx = center.x - target.x;
+    const dy = center.y - target.y;
+    return (dx * dx) + (dy * dy);
+}
+
+function asPolygonGeometryCache(cache: GeometryCache | null): PolygonGeometryCache | null {
+    if (!cache || !("cellsById" in cache)) {
+        return null;
+    }
+    return cache;
+}
+
+function sampleRenderDiagnostics(
+    topology: TopologyPayload | null,
+    geometryCache: GeometryCache | null,
+    {
+        geometry,
+        adapterFamily,
+        metrics,
+        cellSize,
+    }: {
+        geometry: string;
+        adapterFamily: "regular" | "mixed" | "aperiodic";
+        metrics: CanvasSurfaceMetrics;
+        cellSize: number;
+    },
+): RenderDiagnosticsSnapshot | null {
+    if (!topology?.cells?.length) {
+        return null;
+    }
+    const polygonCache = asPolygonGeometryCache(geometryCache);
+    if (polygonCache === null) {
+        return null;
+    }
+    const topologyCells = topology.cells
+        .map((cell) => {
+            const typedCell = cell as RenderableTopologyCell;
+            const rawGeometry = rawGeometryForCell(typedCell);
+            const renderedGeometry = typedCell.id ? polygonCache.cellsById.get(typedCell.id) ?? null : null;
+            if (rawGeometry === null || renderedGeometry === null) {
+                return null;
+            }
+            return {
+                cell: typedCell,
+                rawCenter: rawGeometry.center,
+                rawBounds: rawGeometry.bounds,
+                renderedCenter: { x: renderedGeometry.centerX, y: renderedGeometry.centerY },
+                renderedBounds: renderedBoundsForCell(renderedGeometry),
+            };
+        })
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+        .sort((left, right) => left.cell.id.localeCompare(right.cell.id));
+    if (topologyCells.length === 0) {
+        return null;
+    }
+    const topologyBounds = boundsFromVertices(
+        topologyCells.flatMap((entry) => entry.cell.vertices ?? []),
+    );
+    if (topologyBounds === null) {
+        return null;
+    }
+    const topologyCenter = boundsCenter(topologyBounds);
+    const usedIds = new Set<string>();
+    const roles: SampleRole[] = [
+        "lexicographicFirst",
+        "centerNearest",
+        "boundaryFurthest",
+    ];
+    const sampleCells = {
+        lexicographicFirst: null,
+        centerNearest: null,
+        boundaryFurthest: null,
+    } as RenderDiagnosticsSnapshot["sampleCells"];
+
+    const resolveRole = (role: SampleRole): typeof topologyCells[number] | null => {
+        const candidates = topologyCells.filter((entry) => !usedIds.has(entry.cell.id));
+        if (candidates.length === 0) {
+            return null;
+        }
+        if (role === "lexicographicFirst") {
+            return candidates[0] ?? null;
+        }
+        if (role === "centerNearest") {
+            return [...candidates].sort((left, right) => {
+                const distanceDelta = centerDistanceSquared(left.rawCenter, topologyCenter)
+                    - centerDistanceSquared(right.rawCenter, topologyCenter);
+                return distanceDelta !== 0
+                    ? distanceDelta
+                    : left.cell.id.localeCompare(right.cell.id);
+            })[0] ?? null;
+        }
+        return [...candidates].sort((left, right) => {
+            const distanceDelta = centerDistanceSquared(right.rawCenter, topologyCenter)
+                - centerDistanceSquared(left.rawCenter, topologyCenter);
+            return distanceDelta !== 0
+                ? distanceDelta
+                : left.cell.id.localeCompare(right.cell.id);
+        })[0] ?? null;
+    };
+
+    for (const role of roles) {
+        const selected = resolveRole(role);
+        if (!selected) {
+            continue;
+        }
+        usedIds.add(selected.cell.id);
+        sampleCells[role] = {
+            role,
+            cellId: selected.cell.id,
+            kind: typeof selected.cell.kind === "string" ? selected.cell.kind : null,
+            rawCenter: selected.rawCenter,
+            rawBounds: selected.rawBounds,
+            renderedCenter: selected.renderedCenter,
+            renderedBounds: selected.renderedBounds,
+        } satisfies RenderDiagnosticsSampleCell;
+    }
+
+    return {
+        geometry,
+        adapterGeometry: geometry,
+        adapterFamily,
+        topologyBounds,
+        renderMetrics: {
+            cellSize,
+            renderCellSize: cellSize,
+            scale: typeof metrics.scale === "number" ? metrics.scale : null,
+            coordinateScale: typeof metrics.coordinateScale === "number" ? metrics.coordinateScale : 1,
+            xInset: metrics.xInset,
+            yInset: metrics.yInset,
+            cssWidth: metrics.cssWidth,
+            cssHeight: metrics.cssHeight,
+            canvasWidth: metrics.pixelWidth,
+            canvasHeight: metrics.pixelHeight,
+        },
+        sampleCells,
+    };
 }
 
 export {
@@ -129,6 +347,7 @@ export function createCanvasGridView({
     let canvasColors: CanvasColors = { ...DEFAULT_COLORS };
     let colorLookup = buildStateColorLookup([], canvasColors);
     let currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
+    let renderDiagnostics: RenderDiagnosticsSnapshot | null = null;
     let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
         pixelWidth: canvas.width,
@@ -284,6 +503,16 @@ export function createCanvasGridView({
         });
         geometryCacheKey = nextCache.cacheKey;
         geometryCache = nextCache.geometryCache;
+        renderDiagnostics = sampleRenderDiagnostics(
+            topology,
+            geometryCache,
+            {
+                geometry,
+                adapterFamily: adapter.family,
+                metrics,
+                cellSize,
+            },
+        );
 
         drawCommittedGrid();
         redrawTransientLayers();
@@ -364,6 +593,10 @@ export function createCanvasGridView({
         return { ...metrics };
     }
 
+    function getRenderDiagnostics(): RenderDiagnosticsSnapshot | null {
+        return renderDiagnostics ? structuredClone(renderDiagnostics) : null;
+    }
+
     return {
         supportsTopology: true,
         render,
@@ -377,5 +610,6 @@ export function createCanvasGridView({
         clearGestureOutline,
         getCellFromPointerEvent,
         getMetrics,
+        getRenderDiagnostics,
     };
 }

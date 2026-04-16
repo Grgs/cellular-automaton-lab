@@ -16,6 +16,7 @@ from tests.e2e.browser_support.artifacts import create_artifact_dir
 from tools.render_canvas_review import (
     DEFAULT_REFERENCE_CACHE_DIR,
     ResolvedRenderReviewRequest,
+    condense_transform_report,
     resolve_render_review_request,
 )
 from tools.render_review_profiles import RenderReviewProfile, resolve_render_review_profile
@@ -310,6 +311,9 @@ def build_sweep_case_record(
         "renderSummary": str(run.render_summary_path),
         "renderMontage": str(run.render_montage_path) if run.render_montage_path is not None else None,
         "consistencyWarnings": list(run.consistency_warnings),
+        "provenanceWarnings": summary_payload.get("provenanceWarnings", []),
+        "runtimeProvenance": summary_payload.get("runtimeProvenance"),
+        "transformSummary": condense_transform_report(summary_payload.get("transformReport")),
         "literatureReview": (
             {
                 "requested": literature_review.get("requested"),

@@ -40,6 +40,60 @@ function topologyPayload(): TopologyPayload {
     };
 }
 
+function polygonTopologyPayload(): TopologyPayload {
+    return {
+        cells: [
+            {
+                id: "shield:a",
+                kind: "kite",
+                neighbors: ["shield:b"],
+                center: { x: 0, y: 0 },
+                vertices: [
+                    { x: -1, y: -1 },
+                    { x: 1, y: -1 },
+                    { x: 1, y: 1 },
+                    { x: -1, y: 1 },
+                ],
+            },
+            {
+                id: "shield:b",
+                kind: "dart",
+                neighbors: ["shield:a", "shield:c"],
+                center: { x: 3, y: 0 },
+                vertices: [
+                    { x: 2, y: -1 },
+                    { x: 4, y: -1 },
+                    { x: 4, y: 1 },
+                    { x: 2, y: 1 },
+                ],
+            },
+            {
+                id: "shield:c",
+                kind: "kite",
+                neighbors: ["shield:b"],
+                center: { x: 7, y: 0 },
+                vertices: [
+                    { x: 6, y: -1 },
+                    { x: 8, y: -1 },
+                    { x: 8, y: 1 },
+                    { x: 6, y: 1 },
+                ],
+            },
+        ],
+        topology_revision: "test:shield:topology",
+        topology_spec: {
+            tiling_family: "shield",
+            adjacency_mode: "edge",
+            sizing_mode: "patch_depth",
+            width: 3,
+            height: 1,
+            patch_depth: 3,
+        },
+        width: 3,
+        height: 1,
+    };
+}
+
 describe("canvas-view", () => {
     beforeEach(() => {
         document.body.innerHTML = "";
@@ -345,5 +399,151 @@ describe("canvas-view", () => {
         );
 
         expect(canvas.style.margin).toBe("0px");
+    });
+
+    it("exposes deterministic render diagnostics for polygon topologies", async () => {
+        const topology = polygonTopologyPayload();
+        const cellsById = new Map(
+            topology.cells.map((cell, index) => [
+                cell.id,
+                {
+                    cell,
+                    vertices: [],
+                    centerX: 20 + (index * 30),
+                    centerY: 70,
+                    minX: 10 + (index * 30),
+                    maxX: 30 + (index * 30),
+                    minY: 60,
+                    maxY: 80,
+                },
+            ]),
+        );
+
+        vi.doMock("./canvas/surface.js", () => ({
+            createCanvasSurface: () => ({
+                context: {} as CanvasRenderingContext2D,
+                committedCanvas: document.createElement("canvas"),
+                committedContext: {} as CanvasRenderingContext2D,
+                resize: () => ({
+                    ...BASE_METRICS,
+                    geometry: "shield",
+                    width: 3,
+                    height: 1,
+                    cssWidth: 300,
+                    cssHeight: 140,
+                    xInset: 20,
+                    yInset: 70,
+                    pixelWidth: 300,
+                    pixelHeight: 140,
+                    scale: 10,
+                    coordinateScale: 0.35,
+                }),
+                restoreCommittedSurface: vi.fn(),
+            }),
+        }));
+        vi.doMock("./canvas/render-layers.js", () => ({
+            drawCommittedLayer: vi.fn(),
+            drawHoverLayer: vi.fn(),
+            drawSelectionLayer: vi.fn(),
+            drawPreviewLayer: vi.fn(),
+            drawGestureOutlineLayer: vi.fn(),
+        }));
+        vi.doMock("./geometry/registry.js", () => ({
+            getGeometryAdapter: () => ({
+                geometry: "shield",
+                buildMetrics: () => ({
+                    ...BASE_METRICS,
+                    geometry: "shield",
+                    width: 3,
+                    height: 1,
+                    cssWidth: 300,
+                    cssHeight: 140,
+                    xInset: 20,
+                    yInset: 70,
+                    scale: 10,
+                    coordinateScale: 0.35,
+                }),
+                family: "mixed",
+            }),
+            isSupportedGeometry: () => true,
+        }));
+        vi.doMock("./canvas/cache.js", () => ({
+            resolveGeometryCache: () => ({
+                cacheKey: "polygon-cache",
+                geometryCache: {
+                    type: "shield",
+                    strokePath: null,
+                    cells: [],
+                    cellsById,
+                },
+            }),
+        }));
+        vi.doMock("./canvas/render-style.js", () => ({
+            DEFAULT_COLORS: {
+                line: "rgba(31, 36, 48, 0.16)",
+                dead: "#f8f1e5",
+                deadAlt: "#d5bb8f",
+                lineSoft: "rgba(31, 36, 48, 0.10)",
+                lineStrong: "rgba(31, 36, 48, 0.20)",
+                lineAperiodic: "rgba(31, 36, 48, 0.24)",
+                live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
+            },
+            buildStateColorLookup: () => new Map([[0, "#f8f1e5"]]),
+            readCanvasColors: () => ({
+                line: "rgba(31, 36, 48, 0.16)",
+                dead: "#f8f1e5",
+                deadAlt: "#d5bb8f",
+                lineSoft: "rgba(31, 36, 48, 0.10)",
+                lineStrong: "rgba(31, 36, 48, 0.20)",
+                lineAperiodic: "rgba(31, 36, 48, 0.24)",
+                live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
+            }),
+            resolveCanvasRenderStyle: () => ({
+                mode: "standard",
+                geometry: "shield",
+                lineColorToken: "lineSoft",
+                triangleStrokeEnabled: false,
+                lineColor: "rgba(31, 36, 48, 0.10)",
+                aperiodicLineColor: "rgba(31, 36, 48, 0.24)",
+                hoverTintColor: "rgba(31, 36, 48, 0.20)",
+                hoverStrokeColor: "#1f2430",
+                selectionTintColor: "rgba(191, 90, 54, 0.16)",
+                selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
+            }),
+            resolveDeadCellColor: vi.fn(),
+            resolveRenderedCellColor: () => "#f8f1e5",
+            resolveRenderDetailLevel: vi.fn(),
+            resolveRenderStyle: vi.fn(),
+            resolveStateColor: vi.fn(),
+        }));
+
+        const { createCanvasGridView } = await import("./canvas-view.js");
+        const canvas = document.createElement("canvas");
+        const view = createCanvasGridView({ canvas });
+
+        view.render(
+            {
+                topology,
+                cellStates: [0, 0, 0],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "shield",
+        );
+
+        const diagnostics = view.getRenderDiagnostics();
+        expect(diagnostics?.adapterFamily).toBe("mixed");
+        expect(diagnostics?.renderMetrics.coordinateScale).toBe(0.35);
+        expect(diagnostics?.sampleCells.lexicographicFirst?.cellId).toBe("shield:a");
+        expect(diagnostics?.sampleCells.centerNearest?.cellId).toBe("shield:b");
+        expect(diagnostics?.sampleCells.boundaryFurthest?.cellId).toBe("shield:c");
+        expect(diagnostics?.topologyBounds?.width).toBe(9);
     });
 });

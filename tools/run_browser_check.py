@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import os
 import subprocess
 import sys
@@ -26,6 +27,7 @@ from tests.e2e.support_runtime_host import (
 )
 from tools.render_canvas_review import (
     ResolvedRenderReviewRequest,
+    condense_transform_report,
     parse_cli_args as parse_render_canvas_review_cli_args,
     render_canvas_review,
     resolve_render_review_request,
@@ -200,6 +202,10 @@ def run_managed_render_review(
         run_manifest["renderSummary"] = str(review_result.summary_path)
         if review_result.montage_path is not None:
             run_manifest["renderMontage"] = str(review_result.montage_path)
+        summary_payload = json.loads(review_result.summary_path.read_text(encoding="utf-8"))
+        run_manifest["runtimeProvenance"] = summary_payload.get("runtimeProvenance")
+        run_manifest["provenanceWarnings"] = summary_payload.get("provenanceWarnings", [])
+        run_manifest["transformSummary"] = condense_transform_report(summary_payload.get("transformReport"))
         if review_result.consistency_warnings:
             run_manifest["consistencyWarnings"] = list(review_result.consistency_warnings)
         if review_result.literature_reference_status is not None:
@@ -316,6 +322,9 @@ def main(argv: list[str] | None = None) -> int:
         host.start()
         run_manifest["baseUrl"] = host.base_url
         run_manifest["port"] = _host_port(host)
+        provenance = host.runtime_provenance()
+        run_manifest["runtimeProvenance"] = provenance
+        run_manifest["provenanceWarnings"] = provenance.get("warnings", [])
         if remaining:
             parser.error(f"unexpected extra arguments for --unittest: {' '.join(remaining)}")
         exit_code = run_unittest_with_managed_host(

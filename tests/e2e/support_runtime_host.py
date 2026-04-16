@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -10,8 +11,9 @@ import tempfile
 import time
 import urllib.request
 from abc import ABC, abstractmethod
+from functools import lru_cache
 from pathlib import Path
-from typing import TextIO
+from typing import Any, TextIO
 
 from playwright.sync_api import Page
 
@@ -27,6 +29,137 @@ _STANDALONE_REQUIRED_OUTPUTS = (
     "standalone-bootstrap.json",
     "standalone-python-bundle.json",
 )
+_STANDALONE_BUILD_MANIFEST_NAME = "build-manifest.json"
+_SOURCE_FINGERPRINT_DIRS = ("frontend",)
+_SOURCE_FINGERPRINT_FILES = (
+    "tools/build-standalone.mjs",
+    "package.json",
+    "package-lock.json",
+)
+
+
+def _run_git_output(root: Path, *args: str) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except Exception:
+        return None
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+
+def _iter_source_fingerprint_paths(root: Path) -> tuple[str, ...]:
+    relative_paths: list[str] = []
+    for relative_dir in _SOURCE_FINGERPRINT_DIRS:
+        absolute_dir = root / relative_dir
+        if not absolute_dir.exists():
+            continue
+        for absolute_path in sorted(path for path in absolute_dir.rglob("*") if path.is_file()):
+            relative_paths.append(absolute_path.relative_to(root).as_posix())
+    for relative_file in _SOURCE_FINGERPRINT_FILES:
+        absolute_file = root / relative_file
+        if absolute_file.exists():
+            relative_paths.append(absolute_file.relative_to(root).as_posix())
+    return tuple(sorted(dict.fromkeys(relative_paths)))
+
+
+def compute_source_fingerprint(root: Path) -> tuple[str, tuple[str, ...]]:
+    hash_object = hashlib.sha256()
+    relative_paths = _iter_source_fingerprint_paths(root)
+    for relative_path in relative_paths:
+        absolute_path = root / relative_path
+        hash_object.update(relative_path.encode("utf-8"))
+        hash_object.update(b"\0")
+        hash_object.update(absolute_path.read_bytes())
+        hash_object.update(b"\0")
+    return hash_object.hexdigest(), relative_paths
+
+
+@lru_cache(maxsize=4)
+def current_repo_provenance(root_path: str) -> dict[str, Any]:
+    root = Path(root_path)
+    source_fingerprint, source_files = compute_source_fingerprint(root)
+    git_head = _run_git_output(root, "rev-parse", "HEAD")
+    git_status = _run_git_output(root, "status", "--porcelain")
+    git_dirty = None if git_status is None else bool(git_status)
+    return {
+        "gitHead": git_head,
+        "gitDirty": git_dirty,
+        "sourceFingerprint": source_fingerprint,
+        "sourceFileCount": len(source_files),
+    }
+
+
+def load_standalone_build_manifest(output_dir: Path) -> dict[str, Any] | None:
+    manifest_path = output_dir / _STANDALONE_BUILD_MANIFEST_NAME
+    if not manifest_path.exists():
+        return None
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source_files = payload.get("sourceFiles")
+    return {
+        "manifestPath": str(manifest_path),
+        "builtAt": payload.get("builtAt"),
+        "gitHead": payload.get("gitHead"),
+        "gitDirty": payload.get("gitDirty"),
+        "sourceFingerprint": payload.get("sourceFingerprint"),
+        "sourceFileCount": len(source_files) if isinstance(source_files, list) else None,
+    }
+
+
+def build_runtime_provenance_report(
+    *,
+    host_kind: str,
+    current_repo: dict[str, Any],
+    standalone_build: dict[str, Any] | None,
+) -> dict[str, Any]:
+    warnings: list[str] = []
+    current_git_head = current_repo.get("gitHead")
+    current_source_fingerprint = current_repo.get("sourceFingerprint")
+    if current_git_head is None:
+        warnings.append("Current checkout git HEAD is unavailable.")
+    if current_repo.get("gitDirty") is None:
+        warnings.append("Current checkout dirty-state provenance is unavailable.")
+
+    comparison: dict[str, bool | None] = {
+        "gitHeadMatches": None,
+        "fingerprintMatches": None,
+    }
+    if host_kind == "standalone":
+        if standalone_build is None:
+            warnings.append("Standalone build manifest is missing.")
+        else:
+            standalone_git_head = standalone_build.get("gitHead")
+            standalone_source_fingerprint = standalone_build.get("sourceFingerprint")
+            if standalone_build.get("gitDirty") is True:
+                warnings.append("Standalone bundle was built from a dirty checkout.")
+            if standalone_git_head is None:
+                warnings.append("Standalone build git HEAD is unavailable.")
+            if standalone_source_fingerprint is None:
+                warnings.append("Standalone build source fingerprint is unavailable.")
+            if current_git_head is not None and standalone_git_head is not None:
+                comparison["gitHeadMatches"] = current_git_head == standalone_git_head
+                if comparison["gitHeadMatches"] is False:
+                    warnings.append(
+                        f"Standalone build git HEAD {standalone_git_head} does not match current checkout HEAD {current_git_head}."
+                    )
+            if current_source_fingerprint is not None and standalone_source_fingerprint is not None:
+                comparison["fingerprintMatches"] = current_source_fingerprint == standalone_source_fingerprint
+                if comparison["fingerprintMatches"] is False:
+                    warnings.append("Standalone build source fingerprint does not match the current checkout.")
+
+    return {
+        "hostKind": host_kind,
+        "currentRepo": current_repo,
+        "standaloneBuild": standalone_build,
+        "comparison": comparison,
+        "warnings": warnings,
+    }
 
 
 def _find_available_port() -> int:
@@ -84,6 +217,10 @@ class BrowserRuntimeHost(ABC):
         raise RuntimeError(f"{self.__class__.__name__} does not support restart().")
 
     @abstractmethod
+    def runtime_provenance(self) -> dict[str, Any]:
+        raise NotImplementedError
+
+    @abstractmethod
     def close(self) -> None:
         raise NotImplementedError
 
@@ -103,6 +240,13 @@ class ServerRuntimeHost(BrowserRuntimeHost):
 
     def client(self) -> JsonApiClient:
         return self.server.client
+
+    def runtime_provenance(self) -> dict[str, Any]:
+        return build_runtime_provenance_report(
+            host_kind="server",
+            current_repo=current_repo_provenance(str(self.root)),
+            standalone_build=None,
+        )
 
     def start(self) -> None:
         self.server.start()
@@ -169,6 +313,13 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
     @property
     def base_url(self) -> str:
         return self._base_url
+
+    def runtime_provenance(self) -> dict[str, Any]:
+        return build_runtime_provenance_report(
+            host_kind="standalone",
+            current_repo=current_repo_provenance(str(self.root)),
+            standalone_build=load_standalone_build_manifest(self.output_dir),
+        )
 
     def _close_log_handles(self) -> None:
         if self.stdout_handle is not None:
@@ -343,10 +494,28 @@ class ExternalRuntimeHost(BrowserRuntimeHost):
     def base_url(self) -> str:
         return self._base_url
 
+    def runtime_provenance(self) -> dict[str, Any]:
+        return build_runtime_provenance_report(
+            host_kind="standalone",
+            current_repo=current_repo_provenance(str(self.root)),
+            standalone_build=load_standalone_build_manifest(self.output_dir),
+        )
+
     def client(self) -> JsonApiClient | None:
         if self.kind == "server":
             return JsonApiClient(self.base_url)
         return None
+
+    def runtime_provenance(self) -> dict[str, Any]:
+        return build_runtime_provenance_report(
+            host_kind=self.kind,
+            current_repo=current_repo_provenance(str(self.root)),
+            standalone_build=(
+                load_standalone_build_manifest(_standalone_output_dir(self.root))
+                if self.kind == "standalone"
+                else None
+            ),
+        )
 
     def start(self) -> None:
         return None

@@ -11,6 +11,7 @@ from PIL import Image
 from tools.render_canvas_review import (
     build_reference_montage,
     build_consistency_report,
+    condense_transform_report,
     main,
     parse_grid_size_text,
     parse_cli_args,
@@ -223,6 +224,24 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
             self.assertEqual(comparison["referenceImageFittedWidth"], 50)
             self.assertEqual(comparison["referenceImageFittedHeight"], 200)
             self.assertTrue(montage_path.exists())
+
+    def test_condense_transform_report_extracts_bounds_and_sample_ids(self) -> None:
+        condensed = condense_transform_report(
+            {
+                "adapterGeometry": "shield",
+                "adapterFamily": "mixed",
+                "topologyBounds": {"minX": -1, "maxX": 8, "minY": -1, "maxY": 1, "width": 9, "height": 2},
+                "renderMetrics": {"cssWidth": 300, "cssHeight": 140, "canvasWidth": 300, "canvasHeight": 140},
+                "sampleCells": {
+                    "lexicographicFirst": {"cellId": "shield:a"},
+                    "centerNearest": {"cellId": "shield:b"},
+                    "boundaryFurthest": {"cellId": "shield:c"},
+                },
+            }
+        )
+        self.assertEqual(condensed["adapterGeometry"], "shield")
+        self.assertEqual(condensed["sampleCellIds"]["centerNearest"], "shield:b")
+        self.assertEqual(condensed["renderedBounds"]["width"], 300)
 
     def test_parse_grid_size_text_parses_patch_depth_summary(self) -> None:
         parsed = parse_grid_size_text("Depth 3 • 600 tiles")

@@ -103,6 +103,7 @@ function buildAperiodicMetrics(
         cellSize,
         gap: 0,
         scale,
+        coordinateScale,
         minRawX,
         minRawY,
         maxRawX,

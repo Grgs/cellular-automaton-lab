@@ -52,6 +52,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
             self.assertIn("consistencyWarnings", manifest)
+            self.assertIn("runtimeProvenance", manifest)
+            self.assertIn("provenanceWarnings", manifest)
+            self.assertIn("transformSummary", manifest)
 
     def test_runner_delegates_server_render_review(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-") as tmpdir:
@@ -78,6 +81,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertEqual(manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json"))
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
+            self.assertIn("runtimeProvenance", manifest)
+            self.assertIn("provenanceWarnings", manifest)
+            self.assertIn("transformSummary", manifest)
 
     @unittest.skipUnless(
         _standalone_outputs_ready(),
@@ -102,6 +108,8 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertEqual(manifest["mode"], "unittest")
             self.assertEqual(manifest["exitStatus"], "success")
             self.assertIn("unittestTargets", manifest)
+            self.assertIn("runtimeProvenance", manifest)
+            self.assertIn("provenanceWarnings", manifest)
 
     def test_runner_delegates_server_unittest(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-unittest-") as tmpdir:
@@ -121,6 +129,8 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertEqual(manifest["hostKind"], "server")
             self.assertEqual(manifest["mode"], "unittest")
             self.assertEqual(manifest["exitStatus"], "success")
+            self.assertIn("runtimeProvenance", manifest)
+            self.assertIn("provenanceWarnings", manifest)
 
     def test_runner_delegates_server_unittest_with_success_artifacts(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-unittest-success-") as tmpdir:

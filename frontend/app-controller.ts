@@ -113,6 +113,7 @@ export function createAppController({
         applyCellSize: (nextCellSize) => controlActions?.setCellSize?.(nextCellSize),
         applyPaintState: (nextPaintState) => controlActions?.setPaintState(nextPaintState),
         getState: () => state,
+        getRenderDiagnostics: () => gridView.getRenderDiagnostics?.() ?? null,
         getInteractions: () => interactions,
         getViewportController: () => viewportController,
         getConfigSyncController: () => configSyncController,

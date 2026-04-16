@@ -10,6 +10,7 @@ import type { ConfigSyncController, UiSessionController } from "./controller-syn
 import type { AppView, GridView, InteractionController, ViewportController } from "./controller-view.js";
 import type { DomElements } from "./dom.js";
 import type { SimulationSnapshot } from "./domain.js";
+import type { RenderDiagnosticsSnapshot } from "./rendering.js";
 import type { AppState } from "./state.js";
 
 export interface SimulationReconcilerDependencies {
@@ -59,6 +60,7 @@ export interface AppController {
     applyCellSize(nextCellSize: number): void;
     applyPaintState(nextPaintState: number): void;
     getState(): AppState;
+    getRenderDiagnostics(): RenderDiagnosticsSnapshot | null;
     getInteractions(): InteractionController | null;
     getViewportController(): ViewportController | null;
     getConfigSyncController(): ConfigSyncController | null;

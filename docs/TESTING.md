@@ -324,6 +324,7 @@ Artifact locations:
 - Successful direct render-review outputs default to `output/render-review/`.
 - Direct render-review failure artifacts default to `output/render-review-artifacts/`.
 - Literature reference cache defaults to `output/literature-reference-cache/`.
+- Standalone builds now emit `output/standalone/build-manifest.json`.
 - Managed runner `--render-review` runs default the PNG, JSON summary, and optional montage into `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner outputs default to `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
@@ -345,9 +346,18 @@ Managed runner manifests for successful render reviews also record:
 - `renderPng`
 - `renderSummary`
 - `renderMontage` when present
+- `runtimeProvenance`
+- `provenanceWarnings`
+- `transformSummary`
 - `literatureReferenceStatus` when literature review was requested or an explicit reference was used
 - `literatureWarnings` when the review ran without a cache hit
 - `consistencyWarnings` when the review summary surfaced any
+
+Render-review JSON summaries now also record:
+
+- `transformReport`
+- `runtimeProvenance`
+- `provenanceWarnings`
 
 Managed runner manifests for successful `--unittest --success-artifacts` runs also record:
 

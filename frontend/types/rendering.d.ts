@@ -36,6 +36,7 @@ export interface GridMetrics {
     triangleSide?: number;
     triangleHeight?: number;
     scale?: number;
+    coordinateScale?: number;
     baseMinX?: number;
     baseMinY?: number;
     unitWidth?: number;
@@ -299,4 +300,47 @@ export interface CanvasGridView {
     flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number): void;
     clearGestureOutline(): void;
     getCellFromPointerEvent(event: Event): PaintableCell | null;
+}
+
+export interface GeometryBounds {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+    width: number;
+    height: number;
+}
+
+export interface RenderDiagnosticsSampleCell {
+    role: "lexicographicFirst" | "centerNearest" | "boundaryFurthest";
+    cellId: string;
+    kind: string | null;
+    rawCenter: Point2D;
+    rawBounds: GeometryBounds;
+    renderedCenter: Point2D;
+    renderedBounds: GeometryBounds;
+}
+
+export interface RenderDiagnosticsSnapshot {
+    geometry: string;
+    adapterGeometry: string;
+    adapterFamily: "regular" | "mixed" | "aperiodic";
+    topologyBounds: GeometryBounds | null;
+    renderMetrics: {
+        cellSize: number;
+        renderCellSize: number;
+        scale: number | null;
+        coordinateScale: number;
+        xInset: number;
+        yInset: number;
+        cssWidth: number;
+        cssHeight: number;
+        canvasWidth: number;
+        canvasHeight: number;
+    };
+    sampleCells: {
+        lexicographicFirst: RenderDiagnosticsSampleCell | null;
+        centerNearest: RenderDiagnosticsSampleCell | null;
+        boundaryFurthest: RenderDiagnosticsSampleCell | null;
+    };
 }

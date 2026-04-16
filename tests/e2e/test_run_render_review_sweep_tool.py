@@ -66,6 +66,9 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
                 self.assertIn("coverageHeightRatio", case["metrics"])
                 self.assertIn("browserTopologyCellCount", case["metrics"])
                 self.assertIn("backendTopologyCellCount", case["metrics"])
+                self.assertIn("runtimeProvenance", case)
+                self.assertIn("provenanceWarnings", case)
+                self.assertIn("transformSummary", case)
 
     def test_tool_records_literature_review_status_for_cached_reference(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-review-sweep-literature-tool-") as tmpdir:
@@ -97,3 +100,4 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
                 self.assertEqual(case["literatureReview"]["referenceImageStatus"], "cached")
                 self.assertEqual(case["literatureReview"]["referenceCachePath"], str(cache_dir / "pinwheel-reference.png"))
                 self.assertTrue(Path(case["renderMontage"]).exists())
+                self.assertIn("runtimeProvenance", case)
