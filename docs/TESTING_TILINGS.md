@@ -93,6 +93,7 @@ python tools/render_canvas_review.py --profile pinwheel-depth-3
 python tools/render_canvas_review.py --profile pinwheel-depth-3 --reference .\docs\images\pinwheel-reference.png
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
 python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 ```
 
 Use these when the open question is visual rather than topological:
@@ -107,6 +108,7 @@ Output locations:
 - managed `run_browser_check.py --render-review`: `output/browser-check/<timestamp-mode-host>/`
 - direct render-review failure artifacts: `output/render-review-artifacts/`
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
+- managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
 
 ## How To Read Failures
 

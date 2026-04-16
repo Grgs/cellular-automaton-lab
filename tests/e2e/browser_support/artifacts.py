@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 
 E2E_ARTIFACTS_DIR_ENV = "E2E_ARTIFACTS_DIR"
+E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV = "E2E_CAPTURE_SUCCESS_ARTIFACTS"
 DEFAULT_BROWSER_ARTIFACTS_DIRNAME = "browser-artifacts"
 
 
@@ -63,7 +64,7 @@ def write_run_manifest(artifact_dir: Path, manifest: dict[str, Any]) -> Path:
     return path
 
 
-def capture_browser_failure_artifacts(
+def capture_browser_artifacts(
     artifact_dir: Path,
     *,
     host: BrowserRuntimeHost,
@@ -95,3 +96,20 @@ def capture_browser_failure_artifacts(
     if run_manifest is not None:
         write_run_manifest(artifact_dir, run_manifest)
     host.capture_failure_artifacts(artifact_dir, page)
+
+
+def capture_browser_failure_artifacts(
+    artifact_dir: Path,
+    *,
+    host: BrowserRuntimeHost,
+    page: Page | None,
+    console_messages: list[str] | None,
+    run_manifest: dict[str, Any] | None = None,
+) -> None:
+    capture_browser_artifacts(
+        artifact_dir,
+        host=host,
+        page=page,
+        console_messages=console_messages,
+        run_manifest=run_manifest,
+    )

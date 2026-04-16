@@ -290,6 +290,7 @@ Managed runner examples:
 ```powershell
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
 python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 ```
 
 Repo-scoped process inspection and cleanup:
@@ -307,6 +308,7 @@ Artifact locations:
 - Managed runner `--render-review` runs default the PNG, JSON summary, and optional montage into `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner outputs default to `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
+- Managed runner `--unittest --success-artifacts` runs also preserve a per-test success bundle under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 
 Shared failure artifact bundle:
 
@@ -324,6 +326,11 @@ Managed runner manifests for successful render reviews also record:
 - `renderSummary`
 - `renderMontage` when present
 - `consistencyWarnings` when the review summary surfaced any
+
+Managed runner manifests for successful `--unittest --success-artifacts` runs also record:
+
+- `successArtifactsRequested`
+- `testArtifactsDir`
 
 Defaults:
 

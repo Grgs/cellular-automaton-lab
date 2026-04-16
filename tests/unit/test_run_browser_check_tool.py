@@ -10,6 +10,7 @@ from tools.run_browser_check import (
     ensure_render_review_outputs,
     resolve_default_artifact_dir,
     resolve_host_kind,
+    build_parser,
 )
 from tools.render_canvas_review import parse_cli_args as parse_render_canvas_review_cli_args
 
@@ -75,3 +76,8 @@ class RunBrowserCheckToolTests(unittest.TestCase):
             resolved = ensure_render_review_outputs(args, artifact_dir=artifact_dir)
             self.assertEqual(resolved.out, artifact_dir / "custom.png")
             self.assertEqual(resolved.summary_out, artifact_dir / "custom.json")
+
+    def test_parser_accepts_success_artifacts_flag(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["--success-artifacts", "--unittest", "tests.example"])
+        self.assertTrue(args.success_artifacts)

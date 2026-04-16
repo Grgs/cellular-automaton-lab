@@ -26,7 +26,9 @@ from playwright.sync_api import (
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tests.e2e.support_server import JsonApiClient
 from tests.e2e.browser_support.artifacts import (
+    E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV,
     E2E_ARTIFACTS_DIR_ENV,
+    capture_browser_artifacts,
     capture_browser_failure_artifacts,
     create_artifact_dir,
 )
@@ -114,6 +116,10 @@ class BrowserAppTestCase(unittest.TestCase):
             artifact_dir = self._capture_failure_artifacts()
             if artifact_dir is not None:
                 print(f"E2E failure artifacts: {artifact_dir}")
+        elif self._should_capture_success_artifacts():
+            artifact_dir = self._capture_success_artifacts()
+            if artifact_dir is not None:
+                print(f"E2E success artifacts: {artifact_dir}")
         self.page.close()
         self.context.close()
         super().tearDown()
@@ -146,6 +152,9 @@ class BrowserAppTestCase(unittest.TestCase):
         configured_root = os.environ.get(E2E_ARTIFACTS_DIR_ENV)
         return Path(configured_root) if configured_root else None
 
+    def _should_capture_success_artifacts(self) -> bool:
+        return os.environ.get(E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV, "").strip().lower() in {"1", "true", "yes", "on"}
+
     def _create_artifact_dir(self) -> Path:
         return create_artifact_dir(
             name=self.id(),
@@ -164,6 +173,25 @@ class BrowserAppTestCase(unittest.TestCase):
                 run_manifest={
                     "baseUrl": self.host.base_url,
                     "exitStatus": "test-failure",
+                    "hostKind": self.runtime_host_kind,
+                    "testId": self.id(),
+                },
+            )
+        except Exception as exc:
+            (artifact_dir / "artifact-capture-error.txt").write_text(str(exc), encoding="utf-8")
+        return artifact_dir
+
+    def _capture_success_artifacts(self) -> Path | None:
+        artifact_dir = self._create_artifact_dir()
+        try:
+            capture_browser_artifacts(
+                artifact_dir,
+                host=self.host,
+                page=self.page,
+                console_messages=self.console_messages,
+                run_manifest={
+                    "baseUrl": self.host.base_url,
+                    "exitStatus": "test-success",
                     "hostKind": self.runtime_host_kind,
                     "testId": self.id(),
                 },

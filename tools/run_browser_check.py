@@ -14,6 +14,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from tests.e2e.browser_support.artifacts import (
+    E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV,
     capture_browser_failure_artifacts,
     create_artifact_dir,
     write_run_manifest,
@@ -49,6 +50,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--artifact-dir",
         type=Path,
         help="Optional artifact directory for logs, manifests, and delegated failure bundles.",
+    )
+    parser.add_argument(
+        "--success-artifacts",
+        action="store_true",
+        help="Preserve browser-style success artifacts for managed --unittest runs.",
     )
     mode_group = parser.add_mutually_exclusive_group(required=True)
     mode_group.add_argument(
@@ -148,6 +154,7 @@ def run_unittest_with_managed_host(
     targets: list[str],
     artifact_dir: Path,
     run_manifest: dict[str, Any],
+    success_artifacts: bool = False,
 ) -> int:
     env = os.environ.copy()
     env[EXTERNAL_RUNTIME_HOST_KIND_ENV] = host_kind
@@ -155,6 +162,8 @@ def run_unittest_with_managed_host(
     env[EXTERNAL_RUNTIME_STDOUT_PATH_ENV] = str(getattr(host, "stdout_path", ""))
     env[EXTERNAL_RUNTIME_STDERR_PATH_ENV] = str(getattr(host, "stderr_path", ""))
     env["E2E_ARTIFACTS_DIR"] = str(artifact_dir / "test-artifacts")
+    if success_artifacts:
+        env[E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV] = "1"
     process = subprocess.Popen(
         [sys.executable, "-m", "unittest", *targets],
         cwd=ROOT_DIR,
@@ -179,6 +188,9 @@ def run_unittest_with_managed_host(
         sys.stderr.write(stderr_text)
     _write_host_logs(artifact_dir, stdout_text=stdout_text or "", stderr_text=stderr_text or "", stem="unittest")
     run_manifest["unittestTargets"] = targets
+    if success_artifacts:
+        run_manifest["successArtifactsRequested"] = True
+        run_manifest["testArtifactsDir"] = str(artifact_dir / "test-artifacts")
     return int(process.returncode or 0)
 
 
@@ -233,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
                 targets=list(args.unittest),
                 artifact_dir=artifact_dir,
                 run_manifest=run_manifest,
+                success_artifacts=bool(args.success_artifacts),
             )
         exit_status = "success" if exit_code == 0 else "failure"
         return exit_code

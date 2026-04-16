@@ -121,3 +121,31 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertEqual(manifest["hostKind"], "server")
             self.assertEqual(manifest["mode"], "unittest")
             self.assertEqual(manifest["exitStatus"], "success")
+
+    def test_runner_delegates_server_unittest_with_success_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="run-browser-check-server-unittest-success-") as tmpdir:
+            output_dir = Path(tmpdir)
+            exit_code = main(
+                [
+                    "--host",
+                    "server",
+                    "--success-artifacts",
+                    "--artifact-dir",
+                    str(output_dir / "artifacts"),
+                    "--unittest",
+                    "tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_chair_topology_switch_renders_aperiodic_patch",
+                ]
+            )
+            self.assertEqual(exit_code, 0)
+            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            self.assertTrue(manifest["successArtifactsRequested"])
+            test_artifacts_dir = output_dir / "artifacts" / "test-artifacts"
+            self.assertEqual(manifest["testArtifactsDir"], str(test_artifacts_dir))
+            self.assertTrue(test_artifacts_dir.exists())
+            artifact_dirs = [path for path in test_artifacts_dir.iterdir() if path.is_dir()]
+            self.assertEqual(len(artifact_dirs), 1)
+            artifact_dir = artifact_dirs[0]
+            self.assertTrue((artifact_dir / "page.png").exists())
+            self.assertTrue((artifact_dir / "canvas.png").exists())
+            self.assertTrue((artifact_dir / "render-summary.json").exists())
+            self.assertTrue((artifact_dir / "run-manifest.json").exists())

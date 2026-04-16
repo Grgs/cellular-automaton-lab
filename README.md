@@ -137,6 +137,7 @@ Use the managed runner when you need owned startup, cleanup, logs, and artifacts
 
 ```powershell
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 ```
 
 If you need to inspect or clear repo-owned browser/server helper processes directly:
