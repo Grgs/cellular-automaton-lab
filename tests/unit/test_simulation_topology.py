@@ -528,9 +528,9 @@ class SimulationTopologyTests(unittest.TestCase):
         depth_three = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=3)
         repeated_depth_three = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=3)
 
-        self.assertEqual(depth_zero.cell_count, 36)
-        self.assertEqual(depth_one.cell_count, 80)
-        self.assertEqual(depth_three.cell_count, 444)
+        self.assertEqual(depth_zero.cell_count, 40)
+        self.assertEqual(depth_one.cell_count, 81)
+        self.assertEqual(depth_three.cell_count, 443)
         self.assertEqual(
             [cell.id for cell in depth_three.cells],
             [cell.id for cell in repeated_depth_three.cells],

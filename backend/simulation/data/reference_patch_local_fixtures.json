@@ -344,7 +344,7 @@
       "shield:ref:2007": {
         "neighbors": [
           {
-            "area": 312.303594,
+            "area": 236.483223,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -355,7 +355,7 @@
             "orientation_token": "225"
           },
           {
-            "area": 293.932811,
+            "area": 222.572462,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -366,7 +366,7 @@
             "orientation_token": "255"
           },
           {
-            "area": 312.303605,
+            "area": 236.483242,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -378,7 +378,7 @@
           }
         ],
         "root": {
-          "area": 850.305589,
+          "area": 643.870354,
           "chirality_token": null,
           "decoration_tokens": null,
           "degree": 3,
@@ -389,7 +389,7 @@
       "shield:ref:2063": {
         "neighbors": [
           {
-            "area": 850.305589,
+            "area": 643.870354,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -400,7 +400,7 @@
             "orientation_token": "105"
           },
           {
-            "area": 820.124998,
+            "area": 621.016918,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -411,7 +411,7 @@
             "orientation_token": "165"
           },
           {
-            "area": 820.125016,
+            "area": 621.016912,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -423,7 +423,7 @@
           }
         ],
         "root": {
-          "area": 312.303594,
+          "area": 236.483223,
           "chirality_token": null,
           "decoration_tokens": null,
           "degree": 3,
@@ -434,7 +434,7 @@
       "shield:ref:2081": {
         "neighbors": [
           {
-            "area": 312.303594,
+            "area": 236.483223,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -445,7 +445,7 @@
             "orientation_token": "225"
           },
           {
-            "area": 293.932798,
+            "area": 222.572462,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -456,7 +456,7 @@
             "orientation_token": "255"
           },
           {
-            "area": 293.932789,
+            "area": 222.572459,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -467,7 +467,7 @@
             "orientation_token": "285"
           },
           {
-            "area": 293.932811,
+            "area": 222.572459,
             "chirality_token": null,
             "decoration_tokens": null,
             "delta": [
@@ -479,7 +479,7 @@
           }
         ],
         "root": {
-          "area": 820.124998,
+          "area": 621.016918,
           "chirality_token": null,
           "decoration_tokens": null,
           "degree": 4,

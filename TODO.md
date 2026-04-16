@@ -22,8 +22,10 @@
 ## Next
 
 - Add richer visual-quality metrics to render-review output beyond occupancy, such as aspect-ratio, boundary-dominance, and visible orientation diversity when those metrics are available.
+- Add shield-oriented render-review metrics for visual correctness work, including radial symmetry / angular-sector occupancy, gutter / empty-space scoring, and boundary-dominance on centered dense fields.
+- Add an adapter-vs-topology transform report so diagnosis can show when frontend display normalization changes the visible shape independently of backend geometry.
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
-- Add profile-attached expectations beyond simple review notes, such as family-specific visual checkpoints or expected warning suppressions where those expectations can be stated clearly.
+- Add profile-attached expectations beyond simple review notes, such as family-specific visual checkpoints, expected warning suppressions, and short literature-review acceptance checklists where those expectations can be stated clearly.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The current exact-depth canonical set now also covers `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
 - If we revisit `dodecagonal-square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.

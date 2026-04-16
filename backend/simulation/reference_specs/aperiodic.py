@@ -459,7 +459,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         source_urls=(
             "https://tilings.math.uni-bielefeld.de/substitution/shield/",
         ),
-        canonical_root_seed_policy="dense 12-fold shield patch cropped from a literature-derived canonical reference field",
+        canonical_root_seed_policy="dense 12-fold shield patch cropped from a literature-derived canonical field with a backend-owned dodecagonal center window",
         allowed_public_cell_kinds=_public_cell_kinds(SHIELD_GEOMETRY),
         required_metadata=(
             MetadataRequirement(
@@ -477,7 +477,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         ),
         depth_expectations={
             0: ReferenceDepthExpectation(
-                exact_total_cells=36,
+                exact_total_cells=40,
                 required_kinds=(SHIELD_SHIELD_KIND, SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
                 required_adjacency_pairs=(
                     (SHIELD_SHIELD_KIND, SHIELD_TRIANGLE_KIND),
@@ -486,15 +486,15 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ),
                 min_unique_orientation_tokens=10,
                 max_bounds_aspect_ratio=1.5,
-                expected_signature="36eab8ec9a3e",  # pragma: allowlist secret
+                expected_signature="23353d5264af",  # pragma: allowlist secret
             ),
             1: ReferenceDepthExpectation(
-                exact_total_cells=80,
+                exact_total_cells=81,
                 min_unique_orientation_tokens=12,
-                expected_signature="722843e917b9",  # pragma: allowlist secret
+                expected_signature="93ab802e2615",  # pragma: allowlist secret
             ),
             3: ReferenceDepthExpectation(
-                exact_total_cells=444,
+                exact_total_cells=443,
                 required_kinds=(SHIELD_SHIELD_KIND, SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
                 required_adjacency_pairs=(
                     (SHIELD_SHIELD_KIND, SHIELD_SQUARE_KIND),
@@ -503,12 +503,13 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     (SHIELD_TRIANGLE_KIND, SHIELD_TRIANGLE_KIND),
                 ),
                 min_unique_orientation_tokens=12,
-                expected_signature="457feb3fbf5e",  # pragma: allowlist secret
+                expected_signature="0805a959a5a1",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-3",
             ),
         },
         notes=(
             "The shipped patch is a dense literature-derived central field extracted from the Bielefeld shield patch image.",
+            "Runtime depth selection uses a backend-owned dodecagonal center window instead of graph-distance thresholds.",
             "Odd patch depths apply the documented 15-degree alternation around the central dodecagonal seed.",
             "The public model preserves only public kinds plus orientation metadata; the literature matching-rule decorations are not part of the runtime payload.",
         ),

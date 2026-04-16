@@ -16,7 +16,12 @@ from backend.simulation.aperiodic_support import (
 _DATA_PATH = Path(__file__).with_name("data") / "shield_reference_patch.json"
 _ROTATION_STEP_DEGREES = 15
 _ROTATION_STEP_RADIANS = math.radians(_ROTATION_STEP_DEGREES)
-_POLYGON_SCALE = 1.62 / 1.11
+_TRACE_GAP_COMPENSATION_SCALE = 1.27
+_DODECAGON_WINDOW_ANGLES = tuple(math.radians(step * 30) for step in range(12))
+_DODECAGON_WINDOW_VECTORS = tuple(
+    (math.cos(angle), math.sin(angle))
+    for angle in _DODECAGON_WINDOW_ANGLES
+)
 
 
 class _ShieldReferenceRecord(TypedDict):
@@ -37,6 +42,7 @@ class _ShieldReferencePayload(TypedDict):
     contact_threshold: int
     rotation_step_degrees: int
     graph_distance_thresholds: dict[str, int]
+    representative_window_thresholds: dict[str, float]
     records: list[_ShieldReferenceRecord]
 
 
@@ -51,11 +57,11 @@ def _load_reference_records() -> tuple[_ShieldReferenceRecord, ...]:
 
 
 @lru_cache(maxsize=1)
-def _distance_thresholds() -> dict[int, int]:
+def _window_thresholds() -> dict[int, float]:
     payload = _load_reference_payload()
     return {
-        int(depth): int(distance)
-        for depth, distance in payload["graph_distance_thresholds"].items()
+        int(depth): float(distance)
+        for depth, distance in payload["representative_window_thresholds"].items()
     }
 
 
@@ -72,12 +78,25 @@ def _reference_pivot() -> tuple[float, float]:
     return (float(center[0]), float(center[1]))
 
 
-def _distance_threshold(patch_depth: int) -> int:
+def _window_threshold(patch_depth: int) -> float:
     resolved_depth = max(0, int(patch_depth))
-    thresholds = _distance_thresholds()
+    thresholds = _window_thresholds()
     if resolved_depth in thresholds:
         return thresholds[resolved_depth]
     return thresholds[max(thresholds)]
+
+
+def _dodecagon_window_distance(
+    point: tuple[float, float],
+    *,
+    pivot: tuple[float, float],
+) -> float:
+    translated_x = point[0] - pivot[0]
+    translated_y = point[1] - pivot[1]
+    return max(
+        abs((translated_x * axis_x) + (translated_y * axis_y))
+        for axis_x, axis_y in _DODECAGON_WINDOW_VECTORS
+    )
 
 
 def _rotate_point(
@@ -109,15 +128,44 @@ def _rotate_orientation_token(
         return token
 
 
-def _scale_vertices(
+def _largest_connected_component_ids(
+    selected_ids: set[str],
+    *,
+    record_by_id: dict[str, _ShieldReferenceRecord],
+) -> set[str]:
+    if not selected_ids:
+        return set()
+    remaining = set(selected_ids)
+    components: list[list[str]] = []
+    while remaining:
+        start_id = min(remaining)
+        pending = [start_id]
+        component: list[str] = []
+        remaining.remove(start_id)
+        while pending:
+            current_id = pending.pop()
+            component.append(current_id)
+            for neighbor_id in record_by_id[current_id]["neighbors"]:
+                if neighbor_id in remaining:
+                    remaining.remove(neighbor_id)
+                    pending.append(neighbor_id)
+        components.append(sorted(component))
+    largest_component = max(
+        components,
+        key=lambda component: (len(component), tuple(component)),
+    )
+    return set(largest_component)
+
+
+def _compensate_trace_gaps(
     vertices: tuple[tuple[float, float], ...],
     *,
     center: tuple[float, float],
 ) -> tuple[tuple[float, float], ...]:
     return tuple(
         (
-            round(center[0] + ((vertex[0] - center[0]) * _POLYGON_SCALE), 6),
-            round(center[1] + ((vertex[1] - center[1]) * _POLYGON_SCALE), 6),
+            round(center[0] + ((vertex[0] - center[0]) * _TRACE_GAP_COMPENSATION_SCALE), 6),
+            round(center[1] + ((vertex[1] - center[1]) * _TRACE_GAP_COMPENSATION_SCALE), 6),
         )
         for vertex in vertices
     )
@@ -125,16 +173,35 @@ def _scale_vertices(
 
 def build_shield_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
-    max_distance = _distance_threshold(resolved_depth)
+    pivot = _reference_pivot()
+    max_window_distance = _window_threshold(resolved_depth)
+    records = _load_reference_records()
     selected_records = tuple(
         record
-        for record in _load_reference_records()
-        if int(record["graph_distance"]) <= max_distance
+        for record in records
+        if _dodecagon_window_distance(
+            (float(record["center"][0]), float(record["center"][1])),
+            pivot=pivot,
+        ) <= max_window_distance
     )
     selected_ids = {record["id"] for record in selected_records}
+    record_by_id = {record["id"]: record for record in records}
+    selected_ids = _largest_connected_component_ids(
+        selected_ids,
+        record_by_id=record_by_id,
+    )
+    selected_records = tuple(
+        sorted(
+            (
+                record
+                for record in selected_records
+                if record["id"] in selected_ids
+            ),
+            key=lambda record: record["id"],
+        )
+    )
 
     rotate_patch = resolved_depth % 2 == 1
-    pivot = _reference_pivot()
     cells: list[AperiodicPatchCell] = []
     for record in selected_records:
         center = (float(record["center"][0]), float(record["center"][1]))
@@ -144,7 +211,7 @@ def build_shield_patch(patch_depth: int) -> AperiodicPatch:
         )
         orientation_token = record.get("orientation_token")
         decoration_tokens = record["decoration_tokens"]
-        vertices = _scale_vertices(vertices, center=center)
+        vertices = _compensate_trace_gaps(vertices, center=center)
         if rotate_patch:
             center = _rotate_point(
                 center,

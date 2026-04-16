@@ -15,7 +15,6 @@ import {
     SHIELD_RENDER_COORDINATE_SCALE,
     SHIELD_RENDER_MARGIN_MIN,
     SHIELD_RENDER_MARGIN_SCALE,
-    SHIELD_RENDER_POLYGON_SCALE,
 } from "./render-constants.js";
 import { fitRenderCellSizeWithMetrics } from "./shared.js";
 import type {
@@ -44,26 +43,6 @@ function displayCoordinateScale(geometry: string): number {
     return geometry === "shield" ? SHIELD_RENDER_COORDINATE_SCALE : 1;
 }
 
-function scaleVerticesAroundCenter(
-    vertices: { x: number; y: number }[],
-    centerX: number,
-    centerY: number,
-    scale: number,
-): { x: number; y: number }[] {
-    return vertices.map((vertex) => ({
-        x: centerX + ((vertex.x - centerX) * scale),
-        y: centerY + ((vertex.y - centerY) * scale),
-    }));
-}
-
-function shieldDisplayVertices(
-    rawVertices: readonly { x: number; y: number }[],
-    centerX: number,
-    centerY: number,
-): { x: number; y: number }[] {
-    return scaleVerticesAroundCenter([...rawVertices], centerX, centerY, SHIELD_RENDER_POLYGON_SCALE);
-}
-
 function buildAperiodicMetrics(
     geometry: string,
     topology: TopologyPayload | null,
@@ -84,20 +63,10 @@ function buildAperiodicMetrics(
             if (!Array.isArray(cell.vertices) || cell.vertices.length === 0) {
                 return [];
             }
-            const centerX = Number.isFinite(Number(cell.center?.x))
-                ? Number(cell.center?.x) * coordinateScale
-                : (cell.vertices.reduce((sum, vertex) => sum + Number(vertex.x), 0) / cell.vertices.length) * coordinateScale;
-            const centerY = Number.isFinite(Number(cell.center?.y))
-                ? Number(cell.center?.y) * coordinateScale
-                : (cell.vertices.reduce((sum, vertex) => sum + Number(vertex.y), 0) / cell.vertices.length) * coordinateScale;
-            return shieldDisplayVertices(
-                cell.vertices.map((vertex) => ({
-                    x: Number(vertex.x) * coordinateScale,
-                    y: Number(vertex.y) * coordinateScale,
-                })),
-                centerX,
-                centerY,
-            );
+            return cell.vertices.map((vertex) => ({
+                x: Number(vertex.x) * coordinateScale,
+                y: Number(vertex.y) * coordinateScale,
+            }));
         })
         : cells.flatMap((cell) => Array.isArray(cell.vertices) ? cell.vertices : []);
 
@@ -167,9 +136,6 @@ function topologyCellGeometry(
     const centerY = Number.isFinite(Number(cell.center?.y))
         ? metrics.yInset - ((Number(cell.center?.y) * coordinateScale) * metrics.scale)
         : (initialMinY + initialMaxY) / 2;
-    if (metrics.geometry === "shield") {
-        vertices = shieldDisplayVertices(vertices, centerX, centerY);
-    }
     const minX = Math.min(...vertices.map((vertex) => vertex.x));
     const maxX = Math.max(...vertices.map((vertex) => vertex.x));
     const minY = Math.min(...vertices.map((vertex) => vertex.y));
