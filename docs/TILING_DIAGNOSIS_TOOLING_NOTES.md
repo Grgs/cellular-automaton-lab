@@ -189,3 +189,94 @@ literature-review mode now makes profile-based citation and montage workflows
 repeatable without checking reference images into git. The next tooling
 investment should be richer visual-quality metrics and more structured review
 expectations, not more host/process orchestration.
+
+## Shield Pass Gaps
+
+The later `shield` pass exposed a different class of diagnosis problem: the
+tooling was good enough to preserve artifacts and compare runs, but still weak
+at explaining where the visible distortion came from or how to search for a
+better representative sample efficiently.
+
+### 1. Backend-to-frontend transform visibility is weak
+
+The shield pass had visible shape changes coming from more than one layer:
+
+- backend trace-gap compensation in the image-derived geometry
+- frontend shield-only polygon shrink and framing normalization
+
+That split had to be reconstructed by reading code in both the backend builder
+and the frontend adapter. There is still no diagnostic report that shows, for
+one family, the topology-space polygon, backend-normalized polygon, and final
+render-space polygon side by side.
+
+### 2. Candidate-sample exploration is too manual
+
+Switching shield away from graph-distance cropping required trying multiple
+center-window rules and thresholds, then checking:
+
+- selected cell count
+- connected-component count
+- hole behavior
+- visible bounds and aspect
+
+That exploration was still done with one-off probes and manual readback. There
+is no family sample workbench that can sweep candidate windows and summarize the
+structural consequences directly.
+
+### 3. Standalone build freshness is still too easy to misread
+
+During shield acceptance, server and standalone temporarily disagreed:
+
+- server reflected the rebuilt representative sample at `40 / 81 / 443`
+- standalone was still rendering the older `36 / 80 / 444` bundle
+
+The consistency-report tooling exposed the mismatch, but it did not identify an
+out-of-date standalone build as the likely cause. Build provenance needs to be
+visible in review manifests if those discrepancies are going to be actionable
+quickly.
+
+### 4. Visual-quality metrics are too thin for centered dense fields
+
+The shield review question was not just “did it render?” It was whether the
+field read like a balanced central 12-fold patch without obvious gutters or
+lopsided boundary dominance.
+
+Current review metrics still say very little about:
+
+- radial symmetry
+- angular-sector occupancy
+- empty-space or gutter intensity
+- boundary dominance around the visible field
+
+That forced the final call to stay mostly manual even after the literature
+workflow and sweep tooling were in place.
+
+### 5. Render-space overlap tooling is too binary for image-derived families
+
+Shield is still a traced, compensated family rather than an exact edge-sharing
+substitution. The existing overlap tooling is strongest when the correct answer
+is simply “no positive-area overlap anywhere.”
+
+For shield, that is not the full story. The pass required manually treating it
+as a relaxed family and interpreting overlap results in that context. The
+tooling still lacks family-specific overlap policies that explain what kind of
+contact or compensation is acceptable.
+
+### 6. Frontend representative fixture regeneration is still ad hoc
+
+Backend reference fixtures have first-class regeneration and verification paths.
+The frontend representative shield fixture did not.
+
+Updating the frontend sample still depended on an ad hoc export step rather than
+one canonical regeneration command. That is avoidable process debt for every
+family that needs browser-visible sample refreshes.
+
+### 7. Literature-review mode still lacks family-specific acceptance prompts
+
+The literature workflow now preserves citations, notes, and local-cache support,
+but if the cache image is missing the tool mostly warns and continues.
+
+That is correct behavior, but it leaves too much operator memory in the loop.
+For shield specifically, the missing tool is a short profile-owned checklist for
+what to inspect even when the local literature image is absent, such as central
+symmetry, odd-depth rotation plausibility, and visible gutter severity.

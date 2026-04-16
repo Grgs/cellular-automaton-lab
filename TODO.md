@@ -24,6 +24,9 @@
 - Add richer visual-quality metrics to render-review output beyond occupancy, such as aspect-ratio, boundary-dominance, and visible orientation diversity when those metrics are available.
 - Add shield-oriented render-review metrics for visual correctness work, including radial symmetry / angular-sector occupancy, gutter / empty-space scoring, and boundary-dominance on centered dense fields.
 - Add an adapter-vs-topology transform report so diagnosis can show when frontend display normalization changes the visible shape independently of backend geometry.
+- Add a family sample workbench for window/crop exploration so candidate shield-style representative samples can be compared by count, connectivity, bounds, and hole behavior without one-off scripts.
+- Add standalone build provenance and stale-artifact detection to browser-review manifests so standalone/server mismatches are easier to attribute to an out-of-date bundle.
+- Add a frontend representative fixture regeneration tool so browser-facing topology fixtures do not require ad hoc manual export steps.
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Add profile-attached expectations beyond simple review notes, such as family-specific visual checkpoints, expected warning suppressions, and short literature-review acceptance checklists where those expectations can be stated clearly.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
