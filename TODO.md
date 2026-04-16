@@ -12,6 +12,7 @@
 - Made managed `run_browser_check.py --render-review` runs default their PNG/JSON outputs into the run artifact directory so repeated reviews do not overwrite the shared `output/render-review/` paths.
 - Added an optional `--success-artifacts` bundle for managed `run_browser_check.py --unittest` runs so passing browser checks can preserve `page.png`, `canvas.png`, and `render-summary.json`.
 - Added a render-review sweep tool that runs one profile across a small matrix of hosts, themes, or sizes and emits one sweep manifest plus one comparable artifact tree.
+- Added profile-owned literature review metadata plus a gitignored local reference-cache workflow so render reviews and sweeps can produce normalized literature montages without storing literature images in git.
 
 ## Now
 
@@ -20,9 +21,9 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Allow render-review profiles to carry optional reference paths and short review notes so family-specific diagnosis runs are less ad hoc.
 - Add richer visual-quality metrics to render-review output beyond occupancy, such as aspect-ratio, boundary-dominance, and visible orientation diversity when those metrics are available.
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
+- Add profile-attached expectations beyond simple review notes, such as family-specific visual checkpoints or expected warning suppressions where those expectations can be stated clearly.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The current exact-depth canonical set now also covers `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
 - If we revisit `dodecagonal-square-triangle`, add marked-prototile and substitution-structure checks beyond the current cleaned dense depth-3 canonical sample, rooted local-reference anchors, and exact public canonical patch fixture.

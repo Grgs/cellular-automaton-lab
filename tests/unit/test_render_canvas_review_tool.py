@@ -6,7 +6,10 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
+from PIL import Image
+
 from tools.render_canvas_review import (
+    build_reference_montage,
     build_consistency_report,
     main,
     parse_grid_size_text,
@@ -59,6 +62,7 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         self.assertEqual(request.viewport_width, 1200)
         self.assertEqual(request.viewport_height, 900)
         self.assertEqual(request.theme, "light")
+        self.assertFalse(request.literature_review)
 
     def test_resolve_render_review_request_prefers_explicit_cli_over_profile(self) -> None:
         args = parse_cli_args(
@@ -122,6 +126,11 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         )
         self.assertEqual(montage_path, Path("/tmp/pinwheel-depth-3-montage.png"))
 
+    def test_parse_cli_args_rejects_literature_review_without_profile(self) -> None:
+        args = parse_cli_args(["--family", "chair", "--literature-review"])
+        with self.assertRaises(SystemExit):
+            resolve_render_review_request(args)
+
     def test_resolve_render_review_request_validates_reference_path(self) -> None:
         with self.assertRaises(SystemExit):
             args = parse_cli_args(["--family", "chair", "--reference", "/tmp/does-not-exist.png"])
@@ -136,6 +145,84 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
             )
             request = resolve_render_review_request(args)
             self.assertEqual(request.reference, reference_path)
+
+    def test_resolve_render_review_request_uses_profile_owned_cached_reference_for_literature_review(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-cache-") as tmpdir:
+            cache_dir = Path(tmpdir)
+            cached_reference = cache_dir / "pinwheel-reference.png"
+            cached_reference.write_bytes(b"png")
+            args = parse_cli_args(
+                [
+                    "--profile",
+                    "pinwheel-depth-3",
+                    "--literature-review",
+                    "--reference-cache-dir",
+                    str(cache_dir),
+                ]
+            )
+            request = resolve_render_review_request(args)
+            self.assertTrue(request.literature_review)
+            self.assertEqual(request.reference, cached_reference)
+            self.assertEqual(request.literature_reference.reference_status, "cached")
+            self.assertEqual(request.literature_reference.cache_path, cached_reference)
+            self.assertIn("https://annals.math.princeton.edu/1994/139-3/p05", request.literature_reference.source_urls)
+
+    def test_explicit_reference_overrides_literature_cache(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-explicit-reference-") as tmpdir:
+            cache_dir = Path(tmpdir) / "cache"
+            cache_dir.mkdir(parents=True)
+            explicit_reference = Path(tmpdir) / "explicit.png"
+            explicit_reference.write_bytes(b"png")
+            (cache_dir / "pinwheel-reference.png").write_bytes(b"png")
+            args = parse_cli_args(
+                [
+                    "--profile",
+                    "pinwheel-depth-3",
+                    "--literature-review",
+                    "--reference-cache-dir",
+                    str(cache_dir),
+                    "--reference",
+                    str(explicit_reference),
+                ]
+            )
+            request = resolve_render_review_request(args)
+            self.assertEqual(request.reference, explicit_reference)
+            self.assertEqual(request.literature_reference.reference_status, "explicit")
+
+    def test_missing_literature_cache_emits_warning_without_failing(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-missing-cache-") as tmpdir:
+            cache_dir = Path(tmpdir)
+            args = parse_cli_args(
+                [
+                    "--profile",
+                    "shield-depth-3",
+                    "--literature-review",
+                    "--reference-cache-dir",
+                    str(cache_dir),
+                ]
+            )
+            request = resolve_render_review_request(args)
+            self.assertIsNone(request.reference)
+            self.assertEqual(request.literature_reference.reference_status, "missing")
+            self.assertTrue(request.literature_reference.warnings)
+
+    def test_build_reference_montage_normalizes_images_with_contain_panels(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-montage-") as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            rendered_path = tmpdir_path / "rendered.png"
+            reference_path = tmpdir_path / "reference.png"
+            montage_path = tmpdir_path / "montage.png"
+            Image.new("RGBA", (200, 100), (255, 0, 0, 255)).save(rendered_path)
+            Image.new("RGBA", (50, 200), (0, 0, 255, 255)).save(reference_path)
+            comparison = build_reference_montage(rendered_path, reference_path, montage_path)
+            self.assertEqual(comparison["normalizationMode"], "contain")
+            self.assertEqual(comparison["panelWidth"], 200)
+            self.assertEqual(comparison["panelHeight"], 200)
+            self.assertEqual(comparison["outputImageFittedWidth"], 200)
+            self.assertEqual(comparison["outputImageFittedHeight"], 100)
+            self.assertEqual(comparison["referenceImageFittedWidth"], 50)
+            self.assertEqual(comparison["referenceImageFittedHeight"], 200)
+            self.assertTrue(montage_path.exists())
 
     def test_parse_grid_size_text_parses_patch_depth_summary(self) -> None:
         parsed = parse_grid_size_text("Depth 3 • 600 tiles")

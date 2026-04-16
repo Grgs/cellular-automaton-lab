@@ -13,7 +13,11 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from tests.e2e.browser_support.artifacts import create_artifact_dir
-from tools.render_canvas_review import ResolvedRenderReviewRequest
+from tools.render_canvas_review import (
+    DEFAULT_REFERENCE_CACHE_DIR,
+    ResolvedRenderReviewRequest,
+    resolve_render_review_request,
+)
 from tools.render_review_profiles import RenderReviewProfile, resolve_render_review_profile
 from tools.run_browser_check import ManagedRenderReviewRun, run_managed_render_review
 
@@ -29,7 +33,9 @@ class ResolvedRenderReviewSweepRequest:
     themes: tuple[str, ...]
     patch_depths: tuple[int, ...] | None
     cell_sizes: tuple[int, ...] | None
+    literature_review: bool
     reference: Path | None
+    reference_cache_dir: Path
     artifact_dir: Path
 
 
@@ -61,6 +67,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--patch-depths", help="Comma-separated patch depths for patch-depth profiles.")
     parser.add_argument("--cell-sizes", help="Comma-separated cell sizes for cell-size profiles.")
     parser.add_argument("--reference", type=Path, help="Optional reference image path to pass to every case.")
+    parser.add_argument(
+        "--literature-review",
+        action="store_true",
+        help="Resolve profile-owned literature references from the local cache when explicit --reference is not provided.",
+    )
+    parser.add_argument("--reference-cache-dir", type=Path, help="Optional literature reference cache directory.")
     parser.add_argument("--artifact-dir", type=Path, help="Optional root artifact directory for the sweep.")
     return parser
 
@@ -153,7 +165,9 @@ def resolve_sweep_request(args: argparse.Namespace) -> ResolvedRenderReviewSweep
         themes=tuple(themes),
         patch_depths=resolved_patch_depths,
         cell_sizes=resolved_cell_sizes,
+        literature_review=bool(args.literature_review),
         reference=args.reference,
+        reference_cache_dir=Path(args.reference_cache_dir) if args.reference_cache_dir is not None else DEFAULT_REFERENCE_CACHE_DIR,
         artifact_dir=resolve_default_sweep_artifact_dir(
             profile_name=profile.name,
             artifact_dir=args.artifact_dir,
@@ -224,8 +238,10 @@ def build_case_review_request(
         patch_depth=case.patch_depth,
         cell_size=case.cell_size,
     )
-    return ResolvedRenderReviewRequest(
+    args = argparse.Namespace(
         family=request.profile.family,
+        profile=request.profile.name,
+        list_profiles=False,
         patch_depth=case.patch_depth,
         cell_size=case.cell_size,
         viewport_width=request.profile.viewport_width,
@@ -234,9 +250,15 @@ def build_case_review_request(
         out=case.artifact_dir / f"{output_stem}.png",
         summary_out=case.artifact_dir / f"{output_stem}.json",
         reference=request.reference,
-        montage_out=(case.artifact_dir / f"{output_stem}-montage.png") if request.reference is not None else None,
-        profile_name=request.profile.name,
+        montage_out=(
+            case.artifact_dir / f"{output_stem}-montage.png"
+            if request.reference is not None or request.literature_review
+            else None
+        ),
+        literature_review=request.literature_review,
+        reference_cache_dir=request.reference_cache_dir,
     )
+    return resolve_render_review_request(args)
 
 
 def extract_sweep_case_metrics(summary_payload: dict[str, Any]) -> dict[str, Any]:
@@ -274,6 +296,7 @@ def build_sweep_case_record(
     run: ManagedRenderReviewRun,
 ) -> dict[str, Any]:
     summary_payload = json.loads(run.render_summary_path.read_text(encoding="utf-8"))
+    literature_review = summary_payload.get("literatureReview")
     return {
         "index": case.index,
         "name": case.name,
@@ -287,6 +310,18 @@ def build_sweep_case_record(
         "renderSummary": str(run.render_summary_path),
         "renderMontage": str(run.render_montage_path) if run.render_montage_path is not None else None,
         "consistencyWarnings": list(run.consistency_warnings),
+        "literatureReview": (
+            {
+                "requested": literature_review.get("requested"),
+                "citationLabel": literature_review.get("citationLabel"),
+                "referenceImageStatus": literature_review.get("referenceImageStatus"),
+                "referenceImagePath": literature_review.get("referenceImagePath"),
+                "referenceCachePath": literature_review.get("referenceCachePath"),
+                "warnings": literature_review.get("warnings"),
+            }
+            if isinstance(literature_review, dict)
+            else None
+        ),
         "metrics": extract_sweep_case_metrics(summary_payload),
     }
 
@@ -304,7 +339,9 @@ def run_render_review_sweep(
             "themes": list(request.themes),
             "patchDepths": list(request.patch_depths) if request.patch_depths is not None else None,
             "cellSizes": list(request.cell_sizes) if request.cell_sizes is not None else None,
+            "literatureReview": request.literature_review,
             "reference": str(request.reference) if request.reference is not None else None,
+            "referenceCacheDir": str(request.reference_cache_dir),
         },
         "startedAt": dt.datetime.now(tz=dt.timezone.utc).isoformat(),
         "cases": [],

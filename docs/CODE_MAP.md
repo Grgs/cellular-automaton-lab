@@ -406,11 +406,11 @@ Browser UI
 - [tools/run-playwright.mjs](../tools/run-playwright.mjs)
   Local Playwright runner used by npm scripts. It prepares Linux browser runtime libraries when needed, builds standalone output for standalone suites, and dispatches Python `unittest` modules.
 - [tools/render_canvas_review.py](../tools/render_canvas_review.py)
-  Focused browser-backed render-review CLI. Renders one topology through the real canvas path, supports named profiles and optional reference montages, and writes PNG plus JSON summary output.
+  Focused browser-backed render-review CLI. Renders one topology through the real canvas path, supports named profiles, profile-owned literature metadata, optional reference montages, and writes PNG plus JSON summary output.
 - [tools/run_browser_check.py](../tools/run_browser_check.py)
   Managed browser-diagnosis runner. Owns standalone/server host startup, readiness, logging, cleanup, and run-manifest output for focused render reviews or targeted Python `unittest` browser checks. Managed render-review runs default their PNG and JSON outputs into the run artifact directory.
 - [tools/run_render_review_sweep.py](../tools/run_render_review_sweep.py)
-  Small-matrix render-review orchestrator. Expands one named profile across selected hosts, themes, and sizes, reuses the managed runner for each case, and writes one top-level sweep manifest plus one comparable artifact directory per case.
+  Small-matrix render-review orchestrator. Expands one named profile across selected hosts, themes, and sizes, reuses the managed runner for each case, and writes one top-level sweep manifest plus one comparable artifact directory per case, including literature-review status when enabled.
 - [tools/dev_processes.py](../tools/dev_processes.py)
   Repo-scoped process inspection and cleanup helper for the known browser/server helper processes started from this repo.
 - [tools/run-python.mjs](../tools/run-python.mjs)

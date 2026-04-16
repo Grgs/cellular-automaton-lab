@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from PIL import Image
+from PIL import Image, ImageOps
 from playwright.sync_api import ConsoleMessage, Page, sync_playwright
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -30,9 +30,12 @@ from tests.e2e.browser_support.render_review import (
 )
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tools.render_review_profiles import (
+    LiteratureReference,
+    RenderReviewProfile,
     describe_render_review_profile,
     iter_render_review_profiles,
     resolve_render_review_profile,
+    resolve_profile_reference_cache_path,
 )
 
 DEFAULT_VIEWPORT_WIDTH = 1200
@@ -40,6 +43,7 @@ DEFAULT_VIEWPORT_HEIGHT = 900
 DEFAULT_THEME = "light"
 DEFAULT_OUTPUT_DIR = ROOT_DIR / "output" / "render-review"
 DEFAULT_ARTIFACTS_DIR = ROOT_DIR / "output" / "render-review-artifacts"
+DEFAULT_REFERENCE_CACHE_DIR = ROOT_DIR / "output" / "literature-reference-cache"
 
 
 @dataclass(frozen=True)
@@ -54,7 +58,23 @@ class ResolvedRenderReviewRequest:
     summary_out: Path | None
     reference: Path | None
     montage_out: Path | None
+    literature_review: bool
+    reference_cache_dir: Path
     profile_name: str | None
+    profile: RenderReviewProfile | None
+    literature_reference: ResolvedLiteratureReference
+
+
+@dataclass(frozen=True)
+class ResolvedLiteratureReference:
+    requested: bool
+    citation_label: str | None
+    source_urls: tuple[str, ...]
+    review_note: str | None
+    reference_status: str | None
+    reference_path: Path | None
+    cache_path: Path | None
+    warnings: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -63,6 +83,8 @@ class RenderCanvasReviewResult:
     summary_path: Path
     montage_path: Path | None
     consistency_warnings: tuple[str, ...]
+    literature_warnings: tuple[str, ...]
+    literature_reference_status: str | None
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -85,6 +107,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--summary-out", type=Path, help="JSON summary output path.")
     parser.add_argument("--reference", type=Path, help="Optional reference image path.")
     parser.add_argument("--montage-out", type=Path, help="Optional side-by-side montage output path.")
+    parser.add_argument(
+        "--literature-review",
+        action="store_true",
+        help="Resolve a profile-owned literature reference from the local cache when no explicit --reference is provided.",
+    )
+    parser.add_argument(
+        "--reference-cache-dir",
+        type=Path,
+        default=DEFAULT_REFERENCE_CACHE_DIR,
+        help="Cache directory for operator-provided literature reference images.",
+    )
     return parser
 
 
@@ -101,9 +134,73 @@ def parse_cli_args(argv: list[str] | None = None) -> argparse.Namespace:
         _parser_error(parser, "--viewport-width and --viewport-height must be positive.")
     if args.patch_depth is not None and args.cell_size is not None:
         _parser_error(parser, "--patch-depth and --cell-size are mutually exclusive.")
-    if args.montage_out is not None and args.reference is None:
-        _parser_error(parser, "--montage-out requires --reference.")
+    if args.montage_out is not None and args.reference is None and not bool(args.literature_review):
+        _parser_error(parser, "--montage-out requires --reference or --literature-review.")
     return args
+
+
+def resolve_literature_reference(
+    *,
+    profile: RenderReviewProfile | None,
+    explicit_reference: Path | None,
+    literature_review: bool,
+    reference_cache_dir: Path,
+) -> ResolvedLiteratureReference:
+    warnings: list[str] = []
+    reference_path = explicit_reference
+    cache_path: Path | None = None
+    reference_status: str | None = None
+    citation_label: str | None = None
+    review_note: str | None = None
+    source_urls: tuple[str, ...] = ()
+
+    literature_reference: LiteratureReference | None = None
+    if profile is not None:
+        literature_reference = profile.literature_reference
+    if literature_reference is not None:
+        citation_label = literature_reference.citation_label
+        source_urls = (
+            literature_reference.primary_source_url,
+            *literature_reference.secondary_source_urls,
+        )
+        review_note = literature_reference.review_note
+
+    if explicit_reference is not None:
+        reference_status = "explicit"
+    elif literature_review:
+        if literature_reference is None:
+            warnings.append(
+                f"Profile {profile.name!r} does not declare literature reference metadata."
+                if profile is not None
+                else "Literature review requested without a render-review profile."
+            )
+            reference_status = "missing"
+        else:
+            cache_path = resolve_profile_reference_cache_path(profile, cache_dir=reference_cache_dir)
+            if cache_path is not None and cache_path.exists():
+                reference_path = cache_path
+                reference_status = "cached"
+            else:
+                reference_status = "missing"
+                if cache_path is not None:
+                    warnings.append(
+                        f"Literature reference image was not found in the local cache: {cache_path}"
+                    )
+                else:
+                    warnings.append(
+                        f"Profile {profile.name!r} does not declare a default literature cache filename."
+                    )
+
+    return ResolvedLiteratureReference(
+        requested=literature_review,
+        citation_label=citation_label,
+        source_urls=source_urls,
+        review_note=review_note,
+        reference_status=reference_status,
+        reference_path=reference_path,
+        cache_path=cache_path,
+        warnings=tuple(warnings),
+    )
 
 
 def resolve_render_review_request(args: argparse.Namespace) -> ResolvedRenderReviewRequest:
@@ -114,6 +211,8 @@ def resolve_render_review_request(args: argparse.Namespace) -> ResolvedRenderRev
             profile = resolve_render_review_profile(str(args.profile))
         except ValueError as exc:
             _parser_error(parser, str(exc))
+    if args.literature_review and profile is None:
+        _parser_error(parser, "--literature-review requires --profile.")
     family = args.family or (profile.family if profile is not None else None)
     if not family:
         _parser_error(parser, "either --family or --profile is required.")
@@ -128,9 +227,15 @@ def resolve_render_review_request(args: argparse.Namespace) -> ResolvedRenderRev
     viewport_width = int(args.viewport_width if args.viewport_width is not None else profile.viewport_width)
     viewport_height = int(args.viewport_height if args.viewport_height is not None else profile.viewport_height)
     theme = str(args.theme if args.theme is not None else profile.theme)
-    reference = args.reference
-    if reference is not None and not reference.exists():
-        _parser_error(parser, f"reference image does not exist: {reference}")
+    explicit_reference = args.reference
+    if explicit_reference is not None and not explicit_reference.exists():
+        _parser_error(parser, f"reference image does not exist: {explicit_reference}")
+    literature_reference = resolve_literature_reference(
+        profile=profile,
+        explicit_reference=explicit_reference,
+        literature_review=bool(args.literature_review),
+        reference_cache_dir=Path(args.reference_cache_dir),
+    )
     return ResolvedRenderReviewRequest(
         family=str(family),
         patch_depth=patch_depth,
@@ -140,9 +245,13 @@ def resolve_render_review_request(args: argparse.Namespace) -> ResolvedRenderRev
         theme=theme,
         out=args.out,
         summary_out=args.summary_out,
-        reference=reference,
+        reference=literature_reference.reference_path,
         montage_out=args.montage_out,
+        literature_review=bool(args.literature_review),
+        reference_cache_dir=Path(args.reference_cache_dir),
         profile_name=str(args.profile) if args.profile is not None else None,
+        profile=profile,
+        literature_reference=literature_reference,
     )
 
 
@@ -206,6 +315,32 @@ def resolve_montage_path(
     if montage_out is not None:
         return montage_out
     return png_path.with_name(f"{png_path.stem}-montage.png")
+
+
+def build_literature_review_summary(
+    *,
+    literature_reference: ResolvedLiteratureReference,
+    comparison: dict[str, Any] | None,
+) -> dict[str, Any]:
+    return {
+        "requested": literature_reference.requested,
+        "citationLabel": literature_reference.citation_label,
+        "sourceUrls": list(literature_reference.source_urls),
+        "reviewNote": literature_reference.review_note,
+        "referenceImageStatus": literature_reference.reference_status,
+        "referenceImagePath": (
+            str(literature_reference.reference_path)
+            if literature_reference.reference_path is not None
+            else None
+        ),
+        "referenceCachePath": (
+            str(literature_reference.cache_path)
+            if literature_reference.cache_path is not None
+            else None
+        ),
+        "comparison": comparison,
+        "warnings": list(literature_reference.warnings),
+    }
 
 
 def parse_grid_size_text(grid_size_text: str) -> dict[str, Any] | None:
@@ -415,6 +550,25 @@ def _ensure_control_supported(
         )
 
 
+def _contain_on_panel(
+    image: Image.Image,
+    *,
+    panel_width: int,
+    panel_height: int,
+) -> tuple[Image.Image, dict[str, int]]:
+    contained = ImageOps.contain(image, (panel_width, panel_height))
+    panel = Image.new("RGBA", (panel_width, panel_height), (242, 242, 242, 255))
+    offset_x = (panel_width - contained.width) // 2
+    offset_y = (panel_height - contained.height) // 2
+    panel.paste(contained, (offset_x, offset_y))
+    return panel, {
+        "width": contained.width,
+        "height": contained.height,
+        "offsetX": offset_x,
+        "offsetY": offset_y,
+    }
+
+
 def build_reference_montage(
     rendered_path: Path,
     reference_path: Path,
@@ -424,22 +578,45 @@ def build_reference_montage(
     with Image.open(rendered_path) as rendered_image, Image.open(reference_path) as reference_image:
         rendered = rendered_image.convert("RGBA")
         reference = reference_image.convert("RGBA")
+        panel_width = max(rendered.width, reference.width)
+        panel_height = max(rendered.height, reference.height)
+        rendered_panel, rendered_fit = _contain_on_panel(
+            rendered,
+            panel_width=panel_width,
+            panel_height=panel_height,
+        )
+        reference_panel, reference_fit = _contain_on_panel(
+            reference,
+            panel_width=panel_width,
+            panel_height=panel_height,
+        )
         montage = Image.new(
             "RGBA",
-            (rendered.width + reference.width, max(rendered.height, reference.height)),
-            (255, 255, 255, 255),
+            (panel_width * 2, panel_height),
+            (230, 230, 230, 255),
         )
-        montage.paste(rendered, (0, 0))
-        montage.paste(reference, (rendered.width, 0))
+        montage.paste(rendered_panel, (0, 0))
+        montage.paste(reference_panel, (panel_width, 0))
         montage.save(montage_path)
         return {
             "montageImagePath": str(montage_path),
+            "normalizationMode": "contain",
+            "panelWidth": panel_width,
+            "panelHeight": panel_height,
             "outputImagePath": str(rendered_path),
             "outputImageWidth": rendered.width,
             "outputImageHeight": rendered.height,
+            "outputImageFittedWidth": rendered_fit["width"],
+            "outputImageFittedHeight": rendered_fit["height"],
+            "outputImageOffsetX": rendered_fit["offsetX"],
+            "outputImageOffsetY": rendered_fit["offsetY"],
             "referenceImagePath": str(reference_path),
             "referenceImageWidth": reference.width,
             "referenceImageHeight": reference.height,
+            "referenceImageFittedWidth": reference_fit["width"],
+            "referenceImageFittedHeight": reference_fit["height"],
+            "referenceImageOffsetX": reference_fit["offsetX"],
+            "referenceImageOffsetY": reference_fit["offsetY"],
         }
 
 
@@ -559,12 +736,18 @@ def render_canvas_review(
                         "baseUrl": active_host.base_url,
                         "consistency": consistency_report,
                     }
+                    comparison_payload = None
                     if request.reference is not None and montage_path is not None:
-                        summary_payload["comparison"] = build_reference_montage(
+                        comparison_payload = build_reference_montage(
                             png_path,
                             request.reference,
                             montage_path,
                         )
+                        summary_payload["comparison"] = comparison_payload
+                    summary_payload["literatureReview"] = build_literature_review_summary(
+                        literature_reference=request.literature_reference,
+                        comparison=comparison_payload,
+                    )
                     summary_path.write_text(
                         json.dumps(summary_payload, indent=2, sort_keys=True),
                         encoding="utf-8",
@@ -574,6 +757,8 @@ def render_canvas_review(
                         summary_path=summary_path,
                         montage_path=montage_path,
                         consistency_warnings=tuple(str(warning) for warning in consistency_report["warnings"]),
+                        literature_warnings=request.literature_reference.warnings,
+                        literature_reference_status=request.literature_reference.reference_status,
                     )
                 finally:
                     context.close()
@@ -618,6 +803,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"render_summary={result.summary_path}")
     if result.montage_path is not None:
         print(f"render_montage={result.montage_path}")
+    if result.literature_reference_status is not None:
+        print(f"literature_reference_status={result.literature_reference_status}")
+    if result.literature_warnings:
+        print(f"literature_warnings={len(result.literature_warnings)}")
+        for warning in result.literature_warnings:
+            print(f"literature_warning={warning}")
     if result.consistency_warnings:
         print(f"consistency_warnings={len(result.consistency_warnings)}")
         for warning in result.consistency_warnings:

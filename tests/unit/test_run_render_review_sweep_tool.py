@@ -30,6 +30,7 @@ class RenderReviewSweepToolTests(unittest.TestCase):
             self.assertEqual(request.themes, ("light",))
             self.assertEqual(request.patch_depths, (3,))
             self.assertIsNone(request.cell_sizes)
+            self.assertFalse(request.literature_review)
 
     def test_resolve_sweep_request_rejects_cell_sizes_for_patch_depth_profile(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-review-sweep-invalid-") as tmpdir:
@@ -45,6 +46,24 @@ class RenderReviewSweepToolTests(unittest.TestCase):
                     ]
                 )
                 resolve_sweep_request(request)
+
+    def test_resolve_sweep_request_preserves_literature_review_settings(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-sweep-literature-") as tmpdir:
+            cache_dir = Path(tmpdir) / "cache"
+            args = parse_cli_args(
+                [
+                    "--profile",
+                    "pinwheel-depth-3",
+                    "--literature-review",
+                    "--reference-cache-dir",
+                    str(cache_dir),
+                    "--artifact-dir",
+                    str(Path(tmpdir) / "artifacts"),
+                ]
+            )
+            request = resolve_sweep_request(args)
+            self.assertTrue(request.literature_review)
+            self.assertEqual(request.reference_cache_dir, cache_dir)
 
     def test_sweep_case_dir_name_is_deterministic(self) -> None:
         self.assertEqual(
@@ -109,3 +128,25 @@ class RenderReviewSweepToolTests(unittest.TestCase):
             self.assertEqual(review_request.out, case.artifact_dir / "shield-depth-3.png")
             self.assertEqual(review_request.summary_out, case.artifact_dir / "shield-depth-3.json")
             self.assertEqual(review_request.theme, "light")
+
+    def test_build_case_review_request_enables_literature_review_outputs(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-sweep-request-literature-") as tmpdir:
+            cache_dir = Path(tmpdir) / "cache"
+            request = resolve_sweep_request(
+                parse_cli_args(
+                    [
+                        "--profile",
+                        "pinwheel-depth-3",
+                        "--literature-review",
+                        "--reference-cache-dir",
+                        str(cache_dir),
+                        "--artifact-dir",
+                        str(Path(tmpdir) / "artifacts"),
+                    ]
+                )
+            )
+            case = expand_sweep_cases(request)[0]
+            review_request = build_case_review_request(request, case)
+            self.assertTrue(review_request.literature_review)
+            self.assertEqual(review_request.reference_cache_dir, cache_dir)
+            self.assertEqual(review_request.montage_out, case.artifact_dir / "pinwheel-depth-3-montage.png")

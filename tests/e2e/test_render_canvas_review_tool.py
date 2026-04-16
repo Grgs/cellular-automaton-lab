@@ -69,21 +69,24 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertGreater(summary["consistency"]["browserState"]["topologyCellCount"], 0)
             self.assertIn("Backend topology facts unavailable for host mode standalone.", summary["consistency"]["warnings"])
 
-    def test_tool_supports_profiles_references_and_montages(self) -> None:
+    def test_tool_supports_profiles_literature_review_and_normalized_montages(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-canvas-review-profile-") as tmpdir:
             output_dir = Path(tmpdir)
             png_path = output_dir / "pinwheel.png"
             summary_path = output_dir / "pinwheel.json"
-            reference_path = output_dir / "reference.png"
+            cache_dir = output_dir / "cache"
+            cache_dir.mkdir(parents=True)
+            reference_path = cache_dir / "pinwheel-reference.png"
             montage_path = output_dir / "montage.png"
-            Image.new("RGBA", (50, 50), (255, 255, 255, 255)).save(reference_path)
+            Image.new("RGBA", (50, 100), (255, 255, 255, 255)).save(reference_path)
 
             exit_code = main(
                 [
                     "--profile",
                     "pinwheel-depth-3",
-                    "--reference",
-                    str(reference_path),
+                    "--literature-review",
+                    "--reference-cache-dir",
+                    str(cache_dir),
                     "--montage-out",
                     str(montage_path),
                     "--out",
@@ -101,8 +104,15 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
             self.assertEqual(summary["profile"], "pinwheel-depth-3")
             self.assertEqual(summary["tiling_family"], "pinwheel")
+            self.assertIn("literatureReview", summary)
             self.assertIn("comparison", summary)
             self.assertIn("consistency", summary)
             self.assertEqual(summary["consistency"]["requested"]["tilingFamily"], "pinwheel")
+            self.assertTrue(summary["literatureReview"]["requested"])
+            self.assertEqual(summary["literatureReview"]["referenceImageStatus"], "cached")
+            self.assertEqual(summary["literatureReview"]["referenceImagePath"], str(reference_path))
+            self.assertEqual(summary["literatureReview"]["referenceCachePath"], str(reference_path))
+            self.assertIn("https://annals.math.princeton.edu/1994/139-3/p05", summary["literatureReview"]["sourceUrls"])
             self.assertEqual(summary["comparison"]["referenceImagePath"], str(reference_path))
             self.assertEqual(summary["comparison"]["montageImagePath"], str(montage_path))
+            self.assertEqual(summary["comparison"]["normalizationMode"], "contain")

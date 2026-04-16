@@ -131,12 +131,14 @@ Use the render-review tool when the question is what the current canvas output a
 
 ```powershell
 python tools/render_canvas_review.py --profile pinwheel-depth-3
+python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review
 ```
 
 Use the managed runner when you need owned startup, cleanup, logs, and artifacts around a focused browser check:
 
 ```powershell
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3 --literature-review
 python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 ```
 
@@ -144,6 +146,7 @@ Use the sweep tool when the question is comparative rather than single-run:
 
 ```powershell
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
 ```
 
 If you need to inspect or clear repo-owned browser/server helper processes directly:
@@ -154,6 +157,8 @@ python tools/dev_processes.py kill --stale-browser-hosts
 ```
 
 The render-review tool is the preferred visual-inspection path. The managed runner is the preferred direct-debug path when host lifecycle ownership matters. The sweep tool is the preferred small-matrix comparison path. The process helper is the narrow cleanup fallback. Full browser suites should still go through the npm Playwright entrypoints.
+
+Literature review is metadata-first: the repo stores citations and review notes in profiles, not literature images. If you want a literature montage, place an operator-provided image in `output/literature-reference-cache/` or pass `--reference /abs/path/to/image`.
 
 ## Repository Layout
 

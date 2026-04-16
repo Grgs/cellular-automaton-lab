@@ -90,11 +90,14 @@ Use this when generator or verifier changes may affect checked-in rooted local-r
 ```powershell
 python tools/render_canvas_review.py --list-profiles
 python tools/render_canvas_review.py --profile pinwheel-depth-3
-python tools/render_canvas_review.py --profile pinwheel-depth-3 --reference .\docs\images\pinwheel-reference.png
+python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review
+python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review --reference C:\path\to\pinwheel-reference.png
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3 --literature-review
 python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
 ```
 
 Use these when the open question is visual rather than topological:
@@ -104,10 +107,19 @@ Use these when the open question is visual rather than topological:
 - `run_render_review_sweep.py` is the preferred path when you need to compare a small matrix of hosts, themes, or depths without hand-running each case.
 - npm Playwright entrypoints remain the preferred full-suite path when you want broad browser regression coverage rather than one focused diagnosis.
 
+Literature-review boundary:
+
+- Profiles now own citation URLs, short review notes, and the default cache filename for an operator-provided reference image.
+- The repo does not check in literature images.
+- The default local cache is `output/literature-reference-cache/`.
+- `--literature-review` uses the cached image when present and still succeeds with a warning when the cache is missing.
+- Use `--reference /abs/path/to/image` when you want to override the cache for one run.
+
 Output locations:
 
 - successful render review: `output/render-review/`
 - managed `run_browser_check.py --render-review`: `output/browser-check/<timestamp-mode-host>/`
+- literature reference cache: `output/literature-reference-cache/`
 - direct render-review failure artifacts: `output/render-review-artifacts/`
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
 - managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`

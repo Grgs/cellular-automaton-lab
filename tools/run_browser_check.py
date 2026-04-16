@@ -141,7 +141,8 @@ def ensure_render_review_outputs(
     artifact_dir: Path,
 ) -> Any:
     if review_args.out is not None and review_args.summary_out is not None and (
-        review_args.reference is None or review_args.montage_out is not None
+        (review_args.reference is None and not bool(getattr(review_args, "literature_review", False)))
+        or review_args.montage_out is not None
     ):
         return review_args
     request = resolve_render_review_request(review_args)
@@ -154,7 +155,7 @@ def ensure_render_review_outputs(
         review_args.out = artifact_dir / f"{stem}.png"
     if review_args.summary_out is None:
         review_args.summary_out = artifact_dir / f"{stem}.json"
-    if review_args.reference is not None and review_args.montage_out is None:
+    if (review_args.reference is not None or bool(getattr(review_args, "literature_review", False))) and review_args.montage_out is None:
         review_args.montage_out = artifact_dir / f"{stem}-montage.png"
     return review_args
 
@@ -201,6 +202,10 @@ def run_managed_render_review(
             run_manifest["renderMontage"] = str(review_result.montage_path)
         if review_result.consistency_warnings:
             run_manifest["consistencyWarnings"] = list(review_result.consistency_warnings)
+        if review_result.literature_reference_status is not None:
+            run_manifest["literatureReferenceStatus"] = review_result.literature_reference_status
+        if review_result.literature_warnings:
+            run_manifest["literatureWarnings"] = list(review_result.literature_warnings)
         run_manifest["exitStatus"] = "success"
     except Exception as exc:
         run_manifest["failureReason"] = str(exc)

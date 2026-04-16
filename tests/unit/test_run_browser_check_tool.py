@@ -77,6 +77,21 @@ class RunBrowserCheckToolTests(unittest.TestCase):
             self.assertEqual(resolved.out, artifact_dir / "custom.png")
             self.assertEqual(resolved.summary_out, artifact_dir / "custom.json")
 
+    def test_ensure_render_review_outputs_adds_montage_for_literature_review(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="browser-check-render-review-literature-") as tmpdir:
+            artifact_dir = Path(tmpdir)
+            args = parse_render_canvas_review_cli_args(
+                [
+                    "--profile",
+                    "pinwheel-depth-3",
+                    "--literature-review",
+                ]
+            )
+            resolved = ensure_render_review_outputs(args, artifact_dir=artifact_dir)
+            self.assertEqual(resolved.out, artifact_dir / "pinwheel-depth-3.png")
+            self.assertEqual(resolved.summary_out, artifact_dir / "pinwheel-depth-3.json")
+            self.assertEqual(resolved.montage_out, artifact_dir / "pinwheel-depth-3-montage.png")
+
     def test_parser_accepts_success_artifacts_flag(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["--success-artifacts", "--unittest", "tests.example"])

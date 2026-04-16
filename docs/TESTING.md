@@ -283,13 +283,15 @@ Direct render review examples:
 ```powershell
 python tools/render_canvas_review.py --list-profiles
 python tools/render_canvas_review.py --profile pinwheel-depth-3
-python tools/render_canvas_review.py --profile pinwheel-depth-3 --reference .\docs\images\pinwheel-reference.png
+python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review
+python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review --reference C:\path\to\pinwheel-reference.png
 ```
 
 Managed runner examples:
 
 ```powershell
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3 --literature-review
 python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 ```
@@ -298,7 +300,16 @@ Sweep example:
 
 ```powershell
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
 ```
+
+Literature-review conventions:
+
+- `--literature-review` requires `--profile`.
+- Profiles store citations, source URLs, cache filenames, and review notes; the repo does not store literature images.
+- The default local cache is `output/literature-reference-cache/`.
+- Explicit `--reference` always overrides the cache.
+- If no cached image exists, the render review still succeeds and records a missing-reference warning in the JSON summary and run manifest.
 
 Repo-scoped process inspection and cleanup:
 
@@ -312,6 +323,7 @@ Artifact locations:
 
 - Successful direct render-review outputs default to `output/render-review/`.
 - Direct render-review failure artifacts default to `output/render-review-artifacts/`.
+- Literature reference cache defaults to `output/literature-reference-cache/`.
 - Managed runner `--render-review` runs default the PNG, JSON summary, and optional montage into `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner outputs default to `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
@@ -333,6 +345,8 @@ Managed runner manifests for successful render reviews also record:
 - `renderPng`
 - `renderSummary`
 - `renderMontage` when present
+- `literatureReferenceStatus` when literature review was requested or an explicit reference was used
+- `literatureWarnings` when the review ran without a cache hit
 - `consistencyWarnings` when the review summary surfaced any
 
 Managed runner manifests for successful `--unittest --success-artifacts` runs also record:

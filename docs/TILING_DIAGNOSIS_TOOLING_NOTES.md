@@ -145,10 +145,14 @@ That means every serious visual review still depends on extra operator memory.
 ### Medium Priority
 
 4. Profile-attached references and review notes
-   - Allow render-review profiles to optionally carry:
-     - a local reference image path
-     - a short note about the visual property under review
-   - This would make reference montages less ad hoc.
+   - Status: landed with a metadata-first copyright boundary.
+   - Render-review profiles now carry:
+     - citation labels
+     - source URLs
+     - short review notes
+     - a default cache filename for an operator-provided local reference image
+   - The repo does not ship literature images; the local cache under
+     `output/literature-reference-cache/` is the convenience layer.
 
 5. Visual-quality metrics beyond occupancy
    - Add metrics oriented toward diagnosis rather than smoke checking, such as:
@@ -180,6 +184,8 @@ processes. The remaining problem is observability quality, not command
 orchestration.
 
 For the `pinwheel` example, the consistency-report layer is now the primary
-cross-check and the sweep tool is now the primary comparison path. The next
-tooling investment should be richer review metadata and more discriminating
-visual-quality metrics, not more host/process orchestration.
+cross-check, the sweep tool is now the primary comparison path, and
+literature-review mode now makes profile-based citation and montage workflows
+repeatable without checking reference images into git. The next tooling
+investment should be richer visual-quality metrics and more structured review
+expectations, not more host/process orchestration.

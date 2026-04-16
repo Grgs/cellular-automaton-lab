@@ -1,6 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
+
+
+@dataclass(frozen=True)
+class LiteratureReference:
+    citation_label: str
+    primary_source_url: str
+    secondary_source_urls: tuple[str, ...] = ()
+    review_note: str | None = None
+    cache_filename: str | None = None
 
 
 @dataclass(frozen=True)
@@ -12,6 +22,7 @@ class RenderReviewProfile:
     viewport_width: int = 1200
     viewport_height: int = 900
     theme: str = "light"
+    literature_reference: LiteratureReference | None = None
 
 
 RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
@@ -19,16 +30,47 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
         name="pinwheel-depth-3",
         family="pinwheel",
         patch_depth=3,
+        literature_reference=LiteratureReference(
+            citation_label="The pinwheel tilings of the plane",
+            primary_source_url="https://annals.math.princeton.edu/1994/139-3/p05",
+            secondary_source_urls=(
+                "https://tilings.math.uni-bielefeld.de/substitution/pinwheel/",
+            ),
+            review_note=(
+                "Compare the visible field for overall isotropy and boundary dominance; "
+                "the review target is a representative interior pinwheel field rather than "
+                "a boundary-dominated construction."
+            ),
+            cache_filename="pinwheel-reference.png",
+        ),
     ),
     "shield-depth-3": RenderReviewProfile(
         name="shield-depth-3",
         family="shield",
         patch_depth=3,
+        literature_reference=LiteratureReference(
+            citation_label="Shield",
+            primary_source_url="https://tilings.math.uni-bielefeld.de/substitution/shield/",
+            review_note=(
+                "Compare the dense 12-fold central field for symmetry, density, and overall "
+                "orientation balance rather than line-style details."
+            ),
+            cache_filename="shield-reference.png",
+        ),
     ),
     "dodecagonal-square-triangle-depth-3": RenderReviewProfile(
         name="dodecagonal-square-triangle-depth-3",
         family="dodecagonal-square-triangle",
         patch_depth=3,
+        literature_reference=LiteratureReference(
+            citation_label="Square-triangle",
+            primary_source_url="https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",
+            review_note=(
+                "Compare the dense central square-triangle mix for dodecagonal structure and "
+                "the overall balance of square and triangle regions."
+            ),
+            cache_filename="dodecagonal-square-triangle-reference.png",
+        ),
     ),
 }
 
@@ -47,6 +89,17 @@ def describe_render_review_profile(profile: RenderReviewProfile) -> str:
         f"{profile.name}: family={profile.family}, {size_summary}, "
         f"viewport={profile.viewport_width}x{profile.viewport_height}, theme={profile.theme}"
     )
+
+
+def resolve_profile_reference_cache_path(
+    profile: RenderReviewProfile,
+    *,
+    cache_dir: Path,
+) -> Path | None:
+    literature_reference = profile.literature_reference
+    if literature_reference is None or literature_reference.cache_filename is None:
+        return None
+    return cache_dir / literature_reference.cache_filename
 
 
 def resolve_render_review_profile(profile_name: str) -> RenderReviewProfile:
