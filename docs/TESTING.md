@@ -276,6 +276,7 @@ Preferred paths:
 - Full suite or feature suite: use the npm Playwright entrypoints.
 - Visual inspection of one rendered topology: use `python tools/render_canvas_review.py`.
 - Host-owned local debugging with guaranteed startup and cleanup: use `python tools/run_browser_check.py`.
+- Small comparison matrix across hosts, themes, or sizes: use `python tools/run_render_review_sweep.py`.
 
 Direct render review examples:
 
@@ -291,6 +292,12 @@ Managed runner examples:
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
 python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+```
+
+Sweep example:
+
+```powershell
+python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
 ```
 
 Repo-scoped process inspection and cleanup:
@@ -309,6 +316,7 @@ Artifact locations:
 - Managed runner outputs default to `output/browser-check/<timestamp-mode-host>/`.
 - Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 - Managed runner `--unittest --success-artifacts` runs also preserve a per-test success bundle under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
+- Sweep runs default to `output/render-review-sweeps/<timestamp-profile>/`.
 
 Shared failure artifact bundle:
 
@@ -336,6 +344,7 @@ Defaults:
 
 - `tools/render_canvas_review.py` is the preferred visual-inspection entrypoint.
 - `tools/run_browser_check.py` is the preferred direct-debug entrypoint when host lifecycle, logs, and cleanup must be owned by one command.
+- `tools/run_render_review_sweep.py` is the preferred entrypoint when a diagnosis loop needs a small matrix comparison rather than one run.
 - npm Playwright entrypoints remain the preferred full-suite path.
 - `tools/dev_processes.py` is the narrow cleanup fallback when you need to inspect or terminate repo-owned browser/server helper processes directly.
 

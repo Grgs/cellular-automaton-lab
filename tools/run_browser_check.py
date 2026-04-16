@@ -5,6 +5,7 @@ import datetime as dt
 import os
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -24,6 +25,7 @@ from tests.e2e.support_runtime_host import (
     create_runtime_host,
 )
 from tools.render_canvas_review import (
+    ResolvedRenderReviewRequest,
     parse_cli_args as parse_render_canvas_review_cli_args,
     render_canvas_review,
     resolve_render_review_request,
@@ -34,6 +36,16 @@ EXTERNAL_RUNTIME_BASE_URL_ENV = "E2E_EXTERNAL_RUNTIME_BASE_URL"
 EXTERNAL_RUNTIME_STDOUT_PATH_ENV = "E2E_EXTERNAL_RUNTIME_STDOUT_PATH"
 EXTERNAL_RUNTIME_STDERR_PATH_ENV = "E2E_EXTERNAL_RUNTIME_STDERR_PATH"
 DEFAULT_BROWSER_CHECK_DIR = ROOT_DIR / "output" / "browser-check"
+
+
+@dataclass(frozen=True)
+class ManagedRenderReviewRun:
+    artifact_dir: Path
+    run_manifest_path: Path
+    render_png_path: Path
+    render_summary_path: Path
+    render_montage_path: Path | None
+    consistency_warnings: tuple[str, ...]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -147,6 +159,78 @@ def ensure_render_review_outputs(
     return review_args
 
 
+def run_managed_render_review(
+    *,
+    host_kind: str,
+    review_args: Any,
+    artifact_dir: Path | None = None,
+) -> ManagedRenderReviewRun:
+    resolved_artifact_dir = resolve_default_artifact_dir(
+        artifact_dir=artifact_dir,
+        host_kind=host_kind,
+        mode_name="render-review",
+    )
+    run_manifest = build_run_manifest(
+        host_kind=host_kind,
+        mode_name="render-review",
+        artifact_dir=resolved_artifact_dir,
+    )
+    host: BrowserRuntimeHost | None = None
+    manifest_path: Path | None = None
+    review_result = None
+    try:
+        host = create_runtime_host(host_kind)
+        host.start()
+        run_manifest["baseUrl"] = host.base_url
+        run_manifest["port"] = _host_port(host)
+        prepared_review_args = (
+            review_args
+            if isinstance(review_args, ResolvedRenderReviewRequest)
+            else ensure_render_review_outputs(review_args, artifact_dir=resolved_artifact_dir)
+        )
+        review_result = render_canvas_review(
+            prepared_review_args,
+            host=host,
+            host_kind=host_kind,
+            artifact_dir=resolved_artifact_dir,
+            run_manifest=run_manifest,
+        )
+        run_manifest["renderPng"] = str(review_result.png_path)
+        run_manifest["renderSummary"] = str(review_result.summary_path)
+        if review_result.montage_path is not None:
+            run_manifest["renderMontage"] = str(review_result.montage_path)
+        if review_result.consistency_warnings:
+            run_manifest["consistencyWarnings"] = list(review_result.consistency_warnings)
+        run_manifest["exitStatus"] = "success"
+    except Exception as exc:
+        run_manifest["failureReason"] = str(exc)
+        run_manifest["exitStatus"] = "failure"
+        if host is not None:
+            capture_browser_failure_artifacts(
+                resolved_artifact_dir,
+                host=host,
+                page=None,
+                console_messages=[],
+                run_manifest=run_manifest,
+            )
+        raise
+    finally:
+        if host is not None:
+            host.close()
+        run_manifest["stoppedAt"] = dt.datetime.now(tz=dt.timezone.utc).isoformat()
+        manifest_path = write_run_manifest(resolved_artifact_dir, run_manifest)
+    if review_result is None or manifest_path is None:
+        raise RuntimeError("Managed render review did not complete.")
+    return ManagedRenderReviewRun(
+        artifact_dir=resolved_artifact_dir,
+        run_manifest_path=manifest_path,
+        render_png_path=review_result.png_path,
+        render_summary_path=review_result.summary_path,
+        render_montage_path=review_result.montage_path,
+        consistency_warnings=review_result.consistency_warnings,
+    )
+
+
 def run_unittest_with_managed_host(
     *,
     host: BrowserRuntimeHost,
@@ -198,7 +282,17 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args, remaining = parser.parse_known_args(argv)
     host_kind = resolve_host_kind(str(args.host))
-    mode_name = "render-review" if args.render_review else "unittest"
+    if args.render_review:
+        review_args = parse_render_canvas_review_cli_args(remaining)
+        run = run_managed_render_review(
+            host_kind=host_kind,
+            review_args=review_args,
+            artifact_dir=args.artifact_dir,
+        )
+        print(f"artifact_dir={run.artifact_dir}")
+        print(f"run_manifest={run.run_manifest_path}")
+        return 0
+    mode_name = "unittest"
     artifact_dir = resolve_default_artifact_dir(
         artifact_dir=args.artifact_dir,
         host_kind=host_kind,
@@ -217,36 +311,16 @@ def main(argv: list[str] | None = None) -> int:
         host.start()
         run_manifest["baseUrl"] = host.base_url
         run_manifest["port"] = _host_port(host)
-        if args.render_review:
-            review_args = ensure_render_review_outputs(
-                parse_render_canvas_review_cli_args(remaining),
-                artifact_dir=artifact_dir,
-            )
-            result = render_canvas_review(
-                review_args,
-                host=host,
-                host_kind=host_kind,
-                artifact_dir=artifact_dir,
-                run_manifest=run_manifest,
-            )
-            run_manifest["renderPng"] = str(result.png_path)
-            run_manifest["renderSummary"] = str(result.summary_path)
-            if result.montage_path is not None:
-                run_manifest["renderMontage"] = str(result.montage_path)
-            if result.consistency_warnings:
-                run_manifest["consistencyWarnings"] = list(result.consistency_warnings)
-            exit_code = 0
-        else:
-            if remaining:
-                parser.error(f"unexpected extra arguments for --unittest: {' '.join(remaining)}")
-            exit_code = run_unittest_with_managed_host(
-                host=host,
-                host_kind=host_kind,
-                targets=list(args.unittest),
-                artifact_dir=artifact_dir,
-                run_manifest=run_manifest,
-                success_artifacts=bool(args.success_artifacts),
-            )
+        if remaining:
+            parser.error(f"unexpected extra arguments for --unittest: {' '.join(remaining)}")
+        exit_code = run_unittest_with_managed_host(
+            host=host,
+            host_kind=host_kind,
+            targets=list(args.unittest),
+            artifact_dir=artifact_dir,
+            run_manifest=run_manifest,
+            success_artifacts=bool(args.success_artifacts),
+        )
         exit_status = "success" if exit_code == 0 else "failure"
         return exit_code
     except Exception as exc:

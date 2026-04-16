@@ -42,20 +42,14 @@ The concrete loop used in this pass was:
 
 ## Findings From The Example Pass
 
-### 1. Success-path artifacts are still too thin
+### 1. Success-path artifacts are now available, but comparison loops still need orchestration
 
-The managed runner writes a useful `run-manifest.json`, but a successful
-`--unittest` run does not preserve a canvas snapshot or page screenshot by
-default. That makes it harder to correlate a passing browser test with the
-visual object that was actually reviewed.
+The managed runner now supports `--success-artifacts` for successful
+`--unittest` runs, and managed `--render-review` runs already keep their PNG and
+JSON output inside the run artifact directory.
 
-Observed example:
-
-- `output/browser-check/<timestamp>-unittest-standalone/run-manifest.json`
-- `unittest-stdout.log`
-- `unittest-stderr.log`
-
-There was no success-path `canvas.png` or `page.png`.
+That closes the earlier “passing runs are too thin” gap. The remaining friction
+is not basic preservation, but comparing several preserved runs coherently.
 
 ### 2. Render-review summaries do not yet expose enough visual-quality signals
 
@@ -131,22 +125,26 @@ That means every serious visual review still depends on extra operator memory.
    - The tool now warns when those layers disagree in suspicious ways, but does not fail the review command by default.
 
 2. Success-path artifact bundle option
-   - Add a flag to `tools/run_browser_check.py` that preserves:
+   - Status: landed.
+   - Managed `--render-review` runs now keep PNG/JSON artifacts in the run
+     directory by default.
+   - Managed `--unittest --success-artifacts` runs can now preserve:
      - `canvas.png`
      - `page.png`
      - `render-summary.json`
-   - Apply it to successful `--render-review` and `--unittest` runs.
 
 3. Review sweep tool
-   - Add a small wrapper that runs a profile across a matrix such as:
+   - Status: landed.
+   - The sweep tool now runs a profile across a small matrix such as:
      - patch depths
      - host kinds
      - themes
-   - Output one manifest plus one directory tree of comparable PNG/JSON pairs.
+   - It emits one top-level sweep manifest plus one directory tree of comparable
+     PNG/JSON pairs.
 
 ### Medium Priority
 
-4. Profile-attached references
+4. Profile-attached references and review notes
    - Allow render-review profiles to optionally carry:
      - a local reference image path
      - a short note about the visual property under review
@@ -182,6 +180,6 @@ processes. The remaining problem is observability quality, not command
 orchestration.
 
 For the `pinwheel` example, the consistency-report layer is now the primary
-cross-check. The next tooling investment should be better success-path review
-artifacts and short experiment sweeps, so the operator can preserve and compare
-diagnosis runs without recreating them manually.
+cross-check and the sweep tool is now the primary comparison path. The next
+tooling investment should be richer review metadata and more discriminating
+visual-quality metrics, not more host/process orchestration.

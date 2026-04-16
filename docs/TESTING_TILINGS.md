@@ -94,12 +94,14 @@ python tools/render_canvas_review.py --profile pinwheel-depth-3 --reference .\do
 python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
 python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
 ```
 
 Use these when the open question is visual rather than topological:
 
 - `render_canvas_review.py` is the preferred path for producing a real canvas PNG plus JSON metrics from the browser render path.
 - `run_browser_check.py` is the preferred path when you need the same browser review or a targeted Playwright test with owned host startup, cleanup, logs, and a run manifest.
+- `run_render_review_sweep.py` is the preferred path when you need to compare a small matrix of hosts, themes, or depths without hand-running each case.
 - npm Playwright entrypoints remain the preferred full-suite path when you want broad browser regression coverage rather than one focused diagnosis.
 
 Output locations:
@@ -109,6 +111,7 @@ Output locations:
 - direct render-review failure artifacts: `output/render-review-artifacts/`
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
 - managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
+- render-review sweeps: `output/render-review-sweeps/<timestamp-profile>/`
 
 ## How To Read Failures
 
