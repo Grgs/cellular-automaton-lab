@@ -3,9 +3,14 @@ from __future__ import annotations
 import unittest
 
 from tests.e2e.browser_support.render_review import (
+    boundary_dominance,
+    edge_density,
+    gutter_score,
     normalize_readiness_snapshot,
+    occupied_bounds_from_mask,
     readiness_blockers,
     readiness_tuple,
+    visible_aspect_ratio,
     wait_for_patch_render_complete,
 )
 
@@ -27,6 +32,53 @@ class _FakePage:
 
 
 class BrowserRenderReviewSupportTests(unittest.TestCase):
+    def test_occupied_bounds_and_visible_aspect_ratio(self) -> None:
+        occupied_mask = [
+            False, False, False, False, False,
+            False, True, True, True, False,
+            False, True, True, True, False,
+            False, False, False, False, False,
+        ]
+        bounds = occupied_bounds_from_mask(occupied_mask, width=5, height=4)
+        self.assertEqual(
+            bounds,
+            {
+                "minX": 1,
+                "maxX": 3,
+                "minY": 1,
+                "maxY": 2,
+                "width": 3,
+                "height": 2,
+            },
+        )
+        self.assertEqual(visible_aspect_ratio(bounds), 1.5)
+
+    def test_edge_density_and_boundary_dominance(self) -> None:
+        occupied_mask = [
+            False, False, False, False, False,
+            False, True, True, True, False,
+            False, True, True, True, False,
+            False, True, True, True, False,
+            False, False, False, False, False,
+        ]
+        bounds = occupied_bounds_from_mask(occupied_mask, width=5, height=5)
+        self.assertEqual(edge_density(occupied_mask, width=5, height=5), 8 / 9)
+        self.assertEqual(
+            boundary_dominance(occupied_mask, bounds, width=5, height=5),
+            8 / 9,
+        )
+
+    def test_gutter_score_finds_enclosed_transparent_pixels(self) -> None:
+        occupied_mask = [
+            False, False, False, False, False,
+            False, True, True, True, False,
+            False, True, False, True, False,
+            False, True, True, True, False,
+            False, False, False, False, False,
+        ]
+        bounds = occupied_bounds_from_mask(occupied_mask, width=5, height=5)
+        self.assertEqual(gutter_score(occupied_mask, bounds, width=5, height=5), 1 / 9)
+
     def test_normalize_readiness_snapshot_coerces_diagnostics_values(self) -> None:
         snapshot = normalize_readiness_snapshot(
             {
@@ -200,4 +252,3 @@ class BrowserRenderReviewSupportTests(unittest.TestCase):
                 stable_poll_count=3,
                 stable_poll_interval_ms=1,
             )
-

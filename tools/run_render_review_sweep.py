@@ -19,6 +19,7 @@ from tools.render_canvas_review import (
     condense_settle_diagnostics,
     condense_overlap_hotspots,
     condense_transform_report,
+    condense_visual_metrics,
     resolve_render_review_request,
 )
 from tools.render_review_profiles import RenderReviewProfile, resolve_render_review_profile
@@ -318,6 +319,7 @@ def build_sweep_case_record(
         "settleDiagnostics": condense_settle_diagnostics(summary_payload.get("settleDiagnostics")),
         "transformSummary": condense_transform_report(summary_payload.get("transformReport")),
         "overlapHotspots": condense_overlap_hotspots(summary_payload.get("overlapHotspots")),
+        "visualMetrics": condense_visual_metrics(summary_payload.get("visualMetrics")),
         "literatureReview": (
             {
                 "requested": literature_review.get("requested"),

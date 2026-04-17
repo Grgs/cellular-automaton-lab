@@ -18,6 +18,7 @@
 - Hardened browser render-review settle detection so captures now wait for a stable readiness tuple and record `settleDiagnostics` instead of trusting a momentarily hidden loading overlay.
 - Added overlap-hotspot diagnostics plus family-aware overlap policy metadata to render review, managed browser checks, and sweeps so image-derived families like `shield` can report overlap severity instead of only failing a binary fixture test.
 - Restored shield's representative render-space no-overlap fixture by separating topology cleanup from draw-only seam hiding: the shipped topology now uses minimal inward trace cleanup, while the canvas path handles seam bridging without mutating geometry cache vertices.
+- Added advisory visual-quality metrics to render-review output, managed browser-check manifests, and sweep case records, including visible aspect ratio, edge density, boundary dominance, gutter score, orientation diversity, 12-sector occupancy, and radial-symmetry scoring when the live render diagnostics expose the needed inputs.
 
 ## Now
 
@@ -26,8 +27,6 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Add richer visual-quality metrics to render-review output beyond occupancy, such as aspect-ratio, boundary-dominance, and visible orientation diversity when those metrics are available.
-- Add shield-oriented render-review metrics for visual correctness work, including radial symmetry / angular-sector occupancy, gutter / empty-space scoring, and boundary-dominance on centered dense fields.
 - Add a family sample workbench for window/crop exploration so candidate shield-style representative samples can be compared by count, connectivity, bounds, and hole behavior without one-off scripts.
 - Add a geometry cleanup workbench for image-derived families so small topology-space cleanup factors can be measured against overlap count, bounds drift, and visible gutter risk without ad hoc Shapely sweeps.
 - Add a frontend representative fixture regeneration tool so browser-facing topology fixtures do not require ad hoc manual export steps.

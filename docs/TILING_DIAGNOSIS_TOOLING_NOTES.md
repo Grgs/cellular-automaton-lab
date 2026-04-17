@@ -170,10 +170,17 @@ That means every serious visual review still depends on extra operator memory.
      captured `Building tiling...` even though the command completed.
 
 6. Visual-quality metrics beyond occupancy
-   - Add metrics oriented toward diagnosis rather than smoke checking, such as:
-     - orientation-token diversity for visible cells
-     - bounding-box aspect ratio of the visible field
-     - simple edge-density or boundary-dominance measures
+   - Status: landed for the first advisory slice.
+   - Render-review payloads now include:
+     - visible occupied-field aspect ratio
+     - edge density
+     - boundary dominance
+     - gutter score
+     - orientation diversity when orientation tokens are present
+     - 12-sector occupancy and radial-symmetry score when render diagnostics
+       expose aggregate center/sector inputs
+   - These metrics are advisory only; they do not yet introduce thresholds or
+     pass/fail gates.
 
 7. Trial manifest / diagnosis journal
    - When running an experiment loop, emit one summary file that records:
@@ -279,8 +286,11 @@ Current review metrics still say very little about:
 - empty-space or gutter intensity
 - boundary dominance around the visible field
 
-That forced the final call to stay mostly manual even after the literature
-workflow and sweep tooling were in place.
+Status: partially landed. Render-review now emits advisory visual metrics for
+boundary dominance, gutter score, orientation diversity, 12-sector occupancy,
+and radial symmetry. The remaining gap is not the presence of metrics, but the
+lack of family-owned thresholds, expectations, and workbench-style exploration
+for candidate representative samples.
 
 ### 5. Render-space overlap tooling is too binary for image-derived families
 

@@ -131,6 +131,7 @@ Render-review summaries and managed manifests now also expose:
 - `transformReport` / `transformSummary` for topology-space to render-space diagnostics
 - `runtimeProvenance` and `provenanceWarnings` for standalone/server build attribution
 - `settleDiagnostics` for render-readiness and final stable summary state
+- `visualMetrics` for advisory visual-quality diagnosis
 
 Render review no longer treats “loading overlay hidden” as the capture gate by
 itself. The browser harness now waits for a stable readiness tuple that
@@ -143,6 +144,11 @@ includes:
 
 The motivating failure case was a dark standalone `shield` artifact that
 captured `Building tiling...` even though the run reported success.
+
+The standard visual-metrics block now includes:
+
+- generic raster metrics: visible aspect ratio, edge density, boundary dominance, gutter score
+- geometry/metadata metrics when available: orientation diversity, 12-sector occupancy, radial symmetry score
 
 ## How To Read Failures
 

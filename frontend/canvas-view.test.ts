@@ -46,6 +46,7 @@ function polygonTopologyPayload(): TopologyPayload {
             {
                 id: "shield:a",
                 kind: "kite",
+                orientation_token: "0",
                 neighbors: ["shield:b"],
                 center: { x: 0, y: 0 },
                 vertices: [
@@ -58,6 +59,7 @@ function polygonTopologyPayload(): TopologyPayload {
             {
                 id: "shield:b",
                 kind: "dart",
+                orientation_token: "120",
                 neighbors: ["shield:a", "shield:c"],
                 center: { x: 3, y: 0 },
                 vertices: [
@@ -70,6 +72,7 @@ function polygonTopologyPayload(): TopologyPayload {
             {
                 id: "shield:c",
                 kind: "kite",
+                orientation_token: "240",
                 neighbors: ["shield:b"],
                 center: { x: 7, y: 0 },
                 vertices: [
@@ -545,6 +548,13 @@ describe("canvas-view", () => {
         expect(diagnostics?.sampleCells.centerNearest?.cellId).toBe("shield:b");
         expect(diagnostics?.sampleCells.boundaryFurthest?.cellId).toBe("shield:c");
         expect(diagnostics?.topologyBounds?.width).toBe(9);
+        expect(diagnostics?.metricInputs.renderedCellCount).toBe(3);
+        expect(diagnostics?.metricInputs.orientationTokenCounts).toEqual({
+            "0": 1,
+            "120": 1,
+            "240": 1,
+        });
+        expect(diagnostics?.metricInputs.angularSectorCounts).toEqual([2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]);
         expect(diagnostics?.overlapHotspots?.sampledOverlapCount).toBe(0);
     });
 });

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from dataclasses import dataclass
@@ -407,6 +408,21 @@ def condense_settle_diagnostics(settle_diagnostics: dict[str, Any] | None) -> di
     }
 
 
+def condense_visual_metrics(visual_metrics: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(visual_metrics, dict):
+        return None
+    return {
+        "visibleAspectRatio": visual_metrics.get("visibleAspectRatio"),
+        "edgeDensity": visual_metrics.get("edgeDensity"),
+        "boundaryDominance": visual_metrics.get("boundaryDominance"),
+        "gutterScore": visual_metrics.get("gutterScore"),
+        "orientationDiversity": visual_metrics.get("orientationDiversity"),
+        "angularSectorOccupancy": visual_metrics.get("angularSectorOccupancy"),
+        "radialSymmetryScore": visual_metrics.get("radialSymmetryScore"),
+        "warnings": list(visual_metrics.get("warnings", [])),
+    }
+
+
 def build_overlap_hotspots_summary(
     *,
     family: str,
@@ -446,6 +462,166 @@ def build_overlap_hotspots_summary(
         "expectedToReduceMaxSampledArea": policy.expected_to_reduce_max_sampled_area,
         "expectedToReduceMaxSampledCount": policy.expected_to_reduce_max_sampled_count,
         "status": status,
+        "warnings": warnings,
+    }
+
+
+def _coerce_orientation_token_counts(raw_counts: object) -> dict[str, int] | None:
+    if not isinstance(raw_counts, dict):
+        return None
+    normalized: dict[str, int] = {}
+    for key, value in raw_counts.items():
+        try:
+            count = int(value)
+        except (TypeError, ValueError):
+            continue
+        if count < 0:
+            continue
+        normalized[str(key)] = count
+    return normalized or None
+
+
+def _coerce_sector_counts(raw_counts: object) -> list[int] | None:
+    if not isinstance(raw_counts, list):
+        return None
+    normalized: list[int] = []
+    for value in raw_counts:
+        try:
+            count = int(value)
+        except (TypeError, ValueError):
+            return None
+        normalized.append(max(0, count))
+    return normalized or None
+
+
+def compute_orientation_diversity(
+    orientation_token_counts: dict[str, int] | None,
+) -> dict[str, int | float | None]:
+    if not orientation_token_counts:
+        return {
+            "uniqueOrientationTokens": None,
+            "normalizedEntropy": None,
+        }
+    counts = [count for count in orientation_token_counts.values() if count > 0]
+    unique_token_count = len(counts)
+    total = sum(counts)
+    if total <= 0 or unique_token_count <= 0:
+        return {
+            "uniqueOrientationTokens": None,
+            "normalizedEntropy": None,
+        }
+    if unique_token_count == 1:
+        normalized_entropy = 0.0
+    else:
+        entropy = 0.0
+        for count in counts:
+            probability = count / total
+            entropy -= probability * math.log(probability)
+        normalized_entropy = entropy / math.log(unique_token_count)
+    return {
+        "uniqueOrientationTokens": unique_token_count,
+        "normalizedEntropy": normalized_entropy,
+    }
+
+
+def compute_radial_symmetry_score(sector_counts: list[int] | None) -> float | None:
+    if not sector_counts:
+        return None
+    mean = sum(sector_counts) / len(sector_counts)
+    if mean <= 0:
+        return None
+    variance = sum((count - mean) ** 2 for count in sector_counts) / len(sector_counts)
+    score = 1.0 - (math.sqrt(variance) / mean)
+    return max(0.0, min(1.0, score))
+
+
+def build_visual_metrics(
+    *,
+    visual_summary: dict[str, Any],
+    transform_report: dict[str, Any] | None,
+) -> dict[str, Any]:
+    warnings: list[str] = []
+    metric_inputs = transform_report.get("metricInputs") if isinstance(transform_report, dict) else None
+
+    visible_aspect_ratio = visual_summary.get("visibleAspectRatio")
+    edge_density = visual_summary.get("edgeDensity")
+    boundary_dominance = visual_summary.get("boundaryDominance")
+    gutter_score = visual_summary.get("gutterScore")
+
+    if visible_aspect_ratio is None:
+        warnings.append("Visible aspect ratio was unavailable because the occupied canvas bounds could not be resolved.")
+    if edge_density is None:
+        warnings.append("Edge density was unavailable because the occupied canvas mask was empty.")
+    if boundary_dominance is None:
+        warnings.append("Boundary dominance was unavailable because the occupied canvas bounds could not be resolved.")
+    if gutter_score is None:
+        warnings.append("Gutter score was unavailable because the occupied canvas bounds could not be resolved.")
+
+    if not isinstance(metric_inputs, dict):
+        warnings.extend(
+            [
+                "Orientation diversity was unavailable because render diagnostics metric inputs were missing.",
+                "Angular sector occupancy was unavailable because render diagnostics metric inputs were missing.",
+                "Radial symmetry score was unavailable because render diagnostics metric inputs were missing.",
+            ]
+        )
+        return {
+            "visibleAspectRatio": visible_aspect_ratio,
+            "edgeDensity": edge_density,
+            "boundaryDominance": boundary_dominance,
+            "gutterScore": gutter_score,
+            "orientationDiversity": {
+                "uniqueOrientationTokens": None,
+                "normalizedEntropy": None,
+            },
+            "angularSectorOccupancy": {
+                "sectorCount": 12,
+                "counts": None,
+                "normalizedCounts": None,
+            },
+            "radialSymmetryScore": None,
+            "warnings": warnings,
+        }
+
+    orientation_counts = _coerce_orientation_token_counts(metric_inputs.get("orientationTokenCounts"))
+    orientation_diversity = compute_orientation_diversity(orientation_counts)
+    if orientation_diversity["uniqueOrientationTokens"] is None:
+        warnings.append("Orientation diversity was unavailable because no orientation-token counts were exposed.")
+
+    sector_counts = _coerce_sector_counts(metric_inputs.get("angularSectorCounts"))
+    if sector_counts is None:
+        warnings.append("Angular sector occupancy was unavailable because no rendered sector counts were exposed.")
+        angular_sector_occupancy = {
+            "sectorCount": 12,
+            "counts": None,
+            "normalizedCounts": None,
+        }
+    else:
+        sector_total = sum(sector_counts)
+        angular_sector_occupancy = {
+            "sectorCount": len(sector_counts),
+            "counts": sector_counts,
+            "normalizedCounts": (
+                [count / sector_total for count in sector_counts]
+                if sector_total > 0
+                else None
+            ),
+        }
+        if sector_total <= 0:
+            warnings.append("Angular sector occupancy was unavailable because the rendered sector counts summed to zero.")
+
+    radial_symmetry_score = compute_radial_symmetry_score(sector_counts)
+    if radial_symmetry_score is None:
+        warnings.append("Radial symmetry score was unavailable because the rendered sector counts were not usable.")
+
+    return {
+        "visibleAspectRatio": visible_aspect_ratio,
+        "edgeDensity": edge_density,
+        "boundaryDominance": boundary_dominance,
+        "gutterScore": gutter_score,
+        "orientationDiversity": orientation_diversity,
+        "angularSectorOccupancy": angular_sector_occupancy,
+        "radialSymmetryScore": radial_symmetry_score,
         "warnings": warnings,
     }
 
@@ -813,7 +989,7 @@ def render_canvas_review(
                     png_path.parent.mkdir(parents=True, exist_ok=True)
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
                     page.locator("#grid").screenshot(path=str(png_path))
-                    visual_summary = canvas_visual_summary(page)
+                    visual_summary = canvas_visual_summary(page, png_path=png_path)
                     browser_topology = browser_topology_summary(page)
                     transform_report = browser_transform_report(page)
                     raw_overlap_hotspots = browser_overlap_hotspots(page)
@@ -835,6 +1011,10 @@ def render_canvas_review(
                         generation_text=str(visual_summary["generationText"]),
                         backend_topology=backend_topology,
                         browser_topology=browser_topology,
+                    )
+                    visual_metrics = build_visual_metrics(
+                        visual_summary=visual_summary,
+                        transform_report=transform_report,
                     )
                     summary_payload: dict[str, Any] = {
                         "tiling_family": request.family,
@@ -862,6 +1042,7 @@ def render_canvas_review(
                         "provenanceWarnings": list(provenance_warnings),
                         "settleDiagnostics": settle_diagnostics,
                         "consistency": consistency_report,
+                        "visualMetrics": visual_metrics,
                     }
                     comparison_payload = None
                     if request.reference is not None and montage_path is not None:

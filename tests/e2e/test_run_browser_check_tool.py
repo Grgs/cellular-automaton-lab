@@ -57,6 +57,7 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("settleDiagnostics", manifest)
             self.assertIn("transformSummary", manifest)
             self.assertIn("overlapHotspots", manifest)
+            self.assertIn("visualMetrics", manifest)
             self.assertTrue(manifest["settleDiagnostics"]["settled"])
 
     def test_runner_delegates_server_render_review(self) -> None:
@@ -89,6 +90,7 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("settleDiagnostics", manifest)
             self.assertIn("transformSummary", manifest)
             self.assertIn("overlapHotspots", manifest)
+            self.assertIn("visualMetrics", manifest)
             self.assertTrue(manifest["settleDiagnostics"]["settled"])
 
     @unittest.skipUnless(

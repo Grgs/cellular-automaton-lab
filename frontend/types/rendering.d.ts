@@ -343,6 +343,13 @@ export interface RenderDiagnosticsOverlapHotspots {
     transformSampleHits: string[];
 }
 
+export interface RenderDiagnosticsMetricInputs {
+    renderedTopologyCenter: Point2D | null;
+    renderedCellCount: number;
+    orientationTokenCounts: Record<string, number> | null;
+    angularSectorCounts: number[] | null;
+}
+
 export interface RenderDiagnosticsSnapshot {
     geometry: string;
     adapterGeometry: string;
@@ -365,5 +372,6 @@ export interface RenderDiagnosticsSnapshot {
         centerNearest: RenderDiagnosticsSampleCell | null;
         boundaryFurthest: RenderDiagnosticsSampleCell | null;
     };
+    metricInputs: RenderDiagnosticsMetricInputs;
     overlapHotspots: RenderDiagnosticsOverlapHotspots | null;
 }

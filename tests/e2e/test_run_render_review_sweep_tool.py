@@ -71,6 +71,7 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
                 self.assertIn("settleDiagnostics", case)
                 self.assertIn("transformSummary", case)
                 self.assertIn("overlapHotspots", case)
+                self.assertIn("visualMetrics", case)
                 self.assertTrue(case["settleDiagnostics"]["settled"])
 
     def test_tool_records_literature_review_status_for_cached_reference(self) -> None:
@@ -106,4 +107,5 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
                 self.assertIn("runtimeProvenance", case)
                 self.assertIn("settleDiagnostics", case)
                 self.assertIn("overlapHotspots", case)
+                self.assertIn("visualMetrics", case)
                 self.assertTrue(case["settleDiagnostics"]["settled"])

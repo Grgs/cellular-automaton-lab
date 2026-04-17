@@ -9,11 +9,15 @@ from pathlib import Path
 from PIL import Image
 
 from tools.render_canvas_review import (
+    build_visual_metrics,
     build_overlap_hotspots_summary,
     build_reference_montage,
     build_consistency_report,
+    compute_orientation_diversity,
+    compute_radial_symmetry_score,
     condense_overlap_hotspots,
     condense_transform_report,
+    condense_visual_metrics,
     main,
     parse_grid_size_text,
     parse_cli_args,
@@ -279,6 +283,74 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         self.assertEqual(condensed["status"], "expected-to-reduce")
         self.assertEqual(condensed["sampledOverlapCount"], 12)
         self.assertEqual(condensed["transformSampleHits"], ["shield:ref:1378"])
+
+    def test_compute_orientation_diversity_normalizes_entropy(self) -> None:
+        diversity = compute_orientation_diversity({"0": 4, "120": 4, "240": 4})
+        self.assertEqual(diversity["uniqueOrientationTokens"], 3)
+        self.assertAlmostEqual(float(diversity["normalizedEntropy"]), 1.0)
+
+    def test_compute_radial_symmetry_score_clamps_uniform_distribution(self) -> None:
+        self.assertEqual(compute_radial_symmetry_score([2] * 12), 1.0)
+        self.assertIsNone(compute_radial_symmetry_score(None))
+
+    def test_build_visual_metrics_combines_raster_and_geometry_signals(self) -> None:
+        visual_metrics = build_visual_metrics(
+            visual_summary={
+                "visibleAspectRatio": 1.2,
+                "edgeDensity": 0.4,
+                "boundaryDominance": 0.35,
+                "gutterScore": 0.02,
+            },
+            transform_report={
+                "metricInputs": {
+                    "renderedTopologyCenter": {"x": 50, "y": 50},
+                    "renderedCellCount": 12,
+                    "orientationTokenCounts": {"0": 4, "120": 4, "240": 4},
+                    "angularSectorCounts": [1] * 12,
+                }
+            },
+        )
+        self.assertEqual(visual_metrics["visibleAspectRatio"], 1.2)
+        self.assertEqual(visual_metrics["orientationDiversity"]["uniqueOrientationTokens"], 3)
+        self.assertEqual(visual_metrics["angularSectorOccupancy"]["sectorCount"], 12)
+        self.assertEqual(visual_metrics["angularSectorOccupancy"]["counts"], [1] * 12)
+        self.assertEqual(visual_metrics["radialSymmetryScore"], 1.0)
+        self.assertEqual(visual_metrics["warnings"], [])
+
+    def test_build_visual_metrics_emits_warnings_for_unavailable_metrics(self) -> None:
+        visual_metrics = build_visual_metrics(
+            visual_summary={
+                "visibleAspectRatio": None,
+                "edgeDensity": None,
+                "boundaryDominance": None,
+                "gutterScore": None,
+            },
+            transform_report=None,
+        )
+        self.assertIsNone(visual_metrics["radialSymmetryScore"])
+        self.assertIsNone(visual_metrics["orientationDiversity"]["normalizedEntropy"])
+        self.assertTrue(visual_metrics["warnings"])
+
+    def test_condense_visual_metrics_preserves_review_fields(self) -> None:
+        condensed = condense_visual_metrics(
+            {
+                "visibleAspectRatio": 1.2,
+                "edgeDensity": 0.4,
+                "boundaryDominance": 0.35,
+                "gutterScore": 0.02,
+                "orientationDiversity": {"uniqueOrientationTokens": 3, "normalizedEntropy": 1.0},
+                "angularSectorOccupancy": {
+                    "sectorCount": 12,
+                    "counts": [1] * 12,
+                    "normalizedCounts": [1 / 12] * 12,
+                },
+                "radialSymmetryScore": 1.0,
+                "warnings": ["example warning"],
+            }
+        )
+        self.assertEqual(condensed["visibleAspectRatio"], 1.2)
+        self.assertEqual(condensed["radialSymmetryScore"], 1.0)
+        self.assertEqual(condensed["warnings"], ["example warning"])
 
     def test_parse_grid_size_text_parses_patch_depth_summary(self) -> None:
         parsed = parse_grid_size_text("Depth 3 • 600 tiles")

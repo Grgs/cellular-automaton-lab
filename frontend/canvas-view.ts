@@ -139,6 +139,64 @@ function centerDistanceSquared(
     return (dx * dx) + (dy * dy);
 }
 
+function aggregateBounds(
+    boundsList: GeometryBounds[],
+): GeometryBounds | null {
+    if (boundsList.length === 0) {
+        return null;
+    }
+    return boundsList.reduce((combined, bounds) => ({
+        minX: Math.min(combined.minX, bounds.minX),
+        maxX: Math.max(combined.maxX, bounds.maxX),
+        minY: Math.min(combined.minY, bounds.minY),
+        maxY: Math.max(combined.maxY, bounds.maxY),
+        width: Math.max(combined.maxX, bounds.maxX) - Math.min(combined.minX, bounds.minX),
+        height: Math.max(combined.maxY, bounds.maxY) - Math.min(combined.minY, bounds.minY),
+    }));
+}
+
+function orientationTokenCounts(
+    cells: RenderableTopologyCell[],
+): Record<string, number> | null {
+    const counts = new Map<string, number>();
+    for (const cell of cells) {
+        if (typeof cell.orientation_token !== "string" || cell.orientation_token.length === 0) {
+            continue;
+        }
+        counts.set(cell.orientation_token, (counts.get(cell.orientation_token) ?? 0) + 1);
+    }
+    if (counts.size === 0) {
+        return null;
+    }
+    return Object.fromEntries(
+        Array.from(counts.entries()).sort((left, right) => left[0].localeCompare(right[0])),
+    );
+}
+
+function angularSectorCounts(
+    centers: Array<{ x: number; y: number }>,
+    origin: { x: number; y: number },
+    sectorCount: number = 12,
+): number[] | null {
+    if (centers.length === 0 || sectorCount <= 0) {
+        return null;
+    }
+    const counts = Array.from({ length: sectorCount }, () => 0);
+    const sectorAngle = (Math.PI * 2) / sectorCount;
+    for (const center of centers) {
+        const dx = center.x - origin.x;
+        const dy = center.y - origin.y;
+        const angle = Math.atan2(dy, dx);
+        const normalizedAngle = angle >= 0 ? angle : angle + (Math.PI * 2);
+        const index = Math.min(
+            sectorCount - 1,
+            Math.floor(normalizedAngle / sectorAngle),
+        );
+        counts[index] = (counts[index] ?? 0) + 1;
+    }
+    return counts;
+}
+
 function asPolygonGeometryCache(cache: GeometryCache | null): PolygonGeometryCache | null {
     if (!cache || !("cellsById" in cache)) {
         return null;
@@ -196,6 +254,8 @@ function sampleRenderDiagnostics(
         return null;
     }
     const topologyCenter = boundsCenter(topologyBounds);
+    const renderedBounds = aggregateBounds(topologyCells.map((entry) => entry.renderedBounds));
+    const renderedTopologyCenter = renderedBounds ? boundsCenter(renderedBounds) : null;
     const usedIds = new Set<string>();
     const roles: SampleRole[] = [
         "lexicographicFirst",
@@ -269,6 +329,17 @@ function sampleRenderDiagnostics(
             canvasHeight: metrics.pixelHeight,
         },
         sampleCells,
+        metricInputs: {
+            renderedTopologyCenter,
+            renderedCellCount: topologyCells.length,
+            orientationTokenCounts: orientationTokenCounts(topologyCells.map((entry) => entry.cell)),
+            angularSectorCounts: renderedTopologyCenter
+                ? angularSectorCounts(
+                    topologyCells.map((entry) => entry.renderedCenter),
+                    renderedTopologyCenter,
+                )
+                : null,
+        },
         overlapHotspots: null,
     };
 }

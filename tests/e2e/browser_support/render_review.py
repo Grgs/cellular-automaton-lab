@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import datetime as dt
+import io
 import json
+import math
 import time
+from collections import Counter, deque
+from pathlib import Path
 from typing import Any, TypedDict, cast
 
 from playwright.sync_api import Page
+from PIL import Image
 
 
 class CanvasVisualSummary(TypedDict):
@@ -13,6 +18,10 @@ class CanvasVisualSummary(TypedDict):
     canvasHeight: int
     coverageWidthRatio: float
     coverageHeightRatio: float
+    visibleAspectRatio: float | None
+    edgeDensity: float | None
+    boundaryDominance: float | None
+    gutterScore: float | None
     dominantFillColors: list[list[object]]
     renderCellSize: float
     generationText: str
@@ -35,6 +44,7 @@ class BrowserTransformReport(TypedDict):
     topologyBounds: dict[str, float] | None
     renderMetrics: dict[str, float | int | None]
     sampleCells: dict[str, dict[str, object] | None]
+    metricInputs: dict[str, object] | None
     overlapHotspots: dict[str, object] | None
 
 
@@ -68,6 +78,239 @@ PLACEHOLDER_GRID_SIZE_TEXT = "-- x --"
 DEFAULT_SETTLE_TIMEOUT_MS = 30_000
 DEFAULT_SETTLE_STABLE_POLLS = 3
 DEFAULT_SETTLE_POLL_INTERVAL_MS = 150
+DEFAULT_ALPHA_OCCUPIED_THRESHOLD = 32
+DEFAULT_ALPHA_OPAQUE_THRESHOLD = 250
+DEFAULT_BOUNDARY_BAND_FRACTION = 0.15
+DEFAULT_MIN_DOMINANT_FILL_COUNT = 100
+
+
+class OccupiedBounds(TypedDict):
+    minX: int
+    maxX: int
+    minY: int
+    maxY: int
+    width: int
+    height: int
+
+
+def _mask_index(width: int, x: int, y: int) -> int:
+    return (y * width) + x
+
+
+def occupied_bounds_from_mask(
+    occupied_mask: list[bool],
+    *,
+    width: int,
+    height: int,
+) -> OccupiedBounds | None:
+    min_x = width
+    min_y = height
+    max_x = -1
+    max_y = -1
+    for y in range(height):
+        row_offset = y * width
+        for x in range(width):
+            if not occupied_mask[row_offset + x]:
+                continue
+            if x < min_x:
+                min_x = x
+            if x > max_x:
+                max_x = x
+            if y < min_y:
+                min_y = y
+            if y > max_y:
+                max_y = y
+    if max_x < min_x or max_y < min_y:
+        return None
+    return {
+        "minX": min_x,
+        "maxX": max_x,
+        "minY": min_y,
+        "maxY": max_y,
+        "width": (max_x - min_x) + 1,
+        "height": (max_y - min_y) + 1,
+    }
+
+
+def visible_aspect_ratio(bounds: OccupiedBounds | None) -> float | None:
+    if bounds is None or bounds["height"] <= 0:
+        return None
+    return bounds["width"] / bounds["height"]
+
+
+def edge_density(
+    occupied_mask: list[bool],
+    *,
+    width: int,
+    height: int,
+) -> float | None:
+    occupied_count = 0
+    edge_count = 0
+    for y in range(height):
+        row_offset = y * width
+        for x in range(width):
+            if not occupied_mask[row_offset + x]:
+                continue
+            occupied_count += 1
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nx = x + dx
+                ny = y + dy
+                if nx < 0 or nx >= width or ny < 0 or ny >= height:
+                    edge_count += 1
+                    break
+                if not occupied_mask[_mask_index(width, nx, ny)]:
+                    edge_count += 1
+                    break
+    if occupied_count <= 0:
+        return None
+    return edge_count / occupied_count
+
+
+def boundary_dominance(
+    occupied_mask: list[bool],
+    bounds: OccupiedBounds | None,
+    *,
+    width: int,
+    height: int,
+    band_fraction: float = DEFAULT_BOUNDARY_BAND_FRACTION,
+) -> float | None:
+    if bounds is None:
+        return None
+    occupied_count = 0
+    boundary_count = 0
+    horizontal_band = max(1, math.ceil(bounds["width"] * band_fraction))
+    vertical_band = max(1, math.ceil(bounds["height"] * band_fraction))
+    left_limit = bounds["minX"] + horizontal_band
+    right_limit = bounds["maxX"] - horizontal_band
+    top_limit = bounds["minY"] + vertical_band
+    bottom_limit = bounds["maxY"] - vertical_band
+    for y in range(height):
+        row_offset = y * width
+        for x in range(width):
+            if not occupied_mask[row_offset + x]:
+                continue
+            occupied_count += 1
+            if (
+                x < left_limit
+                or x > right_limit
+                or y < top_limit
+                or y > bottom_limit
+            ):
+                boundary_count += 1
+    if occupied_count <= 0:
+        return None
+    return boundary_count / occupied_count
+
+
+def gutter_score(
+    occupied_mask: list[bool],
+    bounds: OccupiedBounds | None,
+    *,
+    width: int,
+    height: int,
+) -> float | None:
+    if bounds is None:
+        return None
+    bbox_area = bounds["width"] * bounds["height"]
+    if bbox_area <= 0:
+        return None
+    queue: deque[tuple[int, int]] = deque()
+    visited: set[int] = set()
+
+    def enqueue_if_transparent(x: int, y: int) -> None:
+        index = _mask_index(width, x, y)
+        if occupied_mask[index] or index in visited:
+            return
+        visited.add(index)
+        queue.append((x, y))
+
+    for x in range(bounds["minX"], bounds["maxX"] + 1):
+        enqueue_if_transparent(x, bounds["minY"])
+        enqueue_if_transparent(x, bounds["maxY"])
+    for y in range(bounds["minY"], bounds["maxY"] + 1):
+        enqueue_if_transparent(bounds["minX"], y)
+        enqueue_if_transparent(bounds["maxX"], y)
+
+    while queue:
+        x, y = queue.popleft()
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx = x + dx
+            ny = y + dy
+            if nx < bounds["minX"] or nx > bounds["maxX"] or ny < bounds["minY"] or ny > bounds["maxY"]:
+                continue
+            enqueue_if_transparent(nx, ny)
+
+    enclosed_transparent_pixels = 0
+    for y in range(bounds["minY"], bounds["maxY"] + 1):
+        for x in range(bounds["minX"], bounds["maxX"] + 1):
+            index = _mask_index(width, x, y)
+            if occupied_mask[index] or index in visited:
+                continue
+            enclosed_transparent_pixels += 1
+    return enclosed_transparent_pixels / bbox_area
+
+
+def summarize_canvas_pixels(
+    image: Image.Image,
+    *,
+    alpha_occupied_threshold: int = DEFAULT_ALPHA_OCCUPIED_THRESHOLD,
+    alpha_opaque_threshold: int = DEFAULT_ALPHA_OPAQUE_THRESHOLD,
+) -> dict[str, Any]:
+    rgba_image = image.convert("RGBA")
+    width, height = rgba_image.size
+    rgba_pixels = rgba_image.load()
+    occupied_mask: list[bool] = []
+    dominant_fill_colors: Counter[str] = Counter()
+
+    for y in range(height):
+        for x in range(width):
+            red, green, blue, alpha = rgba_pixels[x, y]
+            occupied = alpha >= alpha_occupied_threshold
+            occupied_mask.append(occupied)
+            if (
+                alpha >= alpha_opaque_threshold
+                and red >= 140
+                and green >= 100
+                and blue >= 60
+            ):
+                dominant_fill_colors[f"{red},{green},{blue}"] += 1
+
+    bounds = occupied_bounds_from_mask(occupied_mask, width=width, height=height)
+    coverage_width_ratio = (bounds["width"] / width) if bounds is not None and width > 0 else 0.0
+    coverage_height_ratio = (bounds["height"] / height) if bounds is not None and height > 0 else 0.0
+
+    return {
+        "canvasWidth": width,
+        "canvasHeight": height,
+        "coverageWidthRatio": coverage_width_ratio,
+        "coverageHeightRatio": coverage_height_ratio,
+        "visibleAspectRatio": visible_aspect_ratio(bounds),
+        "edgeDensity": edge_density(occupied_mask, width=width, height=height),
+        "boundaryDominance": boundary_dominance(
+            occupied_mask,
+            bounds,
+            width=width,
+            height=height,
+        ),
+        "gutterScore": gutter_score(
+            occupied_mask,
+            bounds,
+            width=width,
+            height=height,
+        ),
+        "dominantFillColors": [
+            [key, count]
+            for key, count in sorted(
+                (
+                    (key, count)
+                    for key, count in dominant_fill_colors.items()
+                    if count >= DEFAULT_MIN_DOMINANT_FILL_COUNT
+                ),
+                key=lambda item: item[1],
+                reverse=True,
+            )
+        ],
+    }
 
 
 def wait_for_page_bootstrapped(page: Page, *, timeout_ms: int = 30_000) -> None:
@@ -333,66 +576,36 @@ def wait_for_patch_render_complete(
     )
 
 
-def canvas_visual_summary(page: Page) -> CanvasVisualSummary:
-    summary = page.evaluate(
+def canvas_visual_summary(page: Page, *, png_path: Path | None = None) -> CanvasVisualSummary:
+    if png_path is not None and png_path.exists():
+        with Image.open(png_path) as image:
+            pixel_summary = summarize_canvas_pixels(image)
+    else:
+        png_bytes = page.locator("#grid").screenshot(type="png")
+        with Image.open(io.BytesIO(png_bytes)) as image:
+            pixel_summary = summarize_canvas_pixels(image)
+    text_summary = page.evaluate(
         """() => {
             const canvas = document.getElementById("grid");
             if (!(canvas instanceof HTMLCanvasElement)) {
                 throw new Error("grid canvas is missing");
             }
-            const context = canvas.getContext("2d");
-            if (!context) {
-                throw new Error("2d canvas context is unavailable");
-            }
-            const image = context.getImageData(0, 0, canvas.width, canvas.height);
-            const { data, width, height } = image;
-            let minX = width;
-            let minY = height;
-            let maxX = -1;
-            let maxY = -1;
-            const dominantFillColors = new Map();
-
-            for (let y = 0; y < height; y += 1) {
-                for (let x = 0; x < width; x += 1) {
-                    const index = ((y * width) + x) * 4;
-                    const alpha = data[index + 3];
-                    if (alpha < 32) {
-                        continue;
-                    }
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-                    if (y < minY) minY = y;
-                    if (y > maxY) maxY = y;
-
-                    if (alpha < 250) {
-                        continue;
-                    }
-                    const r = data[index];
-                    const g = data[index + 1];
-                    const b = data[index + 2];
-                    if (r < 140 || g < 100 || b < 60) {
-                        continue;
-                    }
-                    const key = `${r},${g},${b}`;
-                    dominantFillColors.set(key, (dominantFillColors.get(key) || 0) + 1);
-                }
-            }
-
             return {
-                canvasWidth: width,
-                canvasHeight: height,
-                coverageWidthRatio: maxX >= minX ? (maxX - minX + 1) / width : 0,
-                coverageHeightRatio: maxY >= minY ? (maxY - minY + 1) / height : 0,
-                dominantFillColors: Array.from(dominantFillColors.entries())
-                    .filter(([, count]) => count >= 100)
-                    .sort((left, right) => right[1] - left[1]),
                 renderCellSize: Number(canvas.getAttribute("data-render-cell-size") || "0"),
                 generationText: document.getElementById("generation-text")?.textContent?.trim() || "",
                 gridSizeText: document.getElementById("grid-size-text")?.textContent?.trim() || "",
             };
         }""",
     )
-    return cast(CanvasVisualSummary, summary)
+    return cast(
+        CanvasVisualSummary,
+        {
+            **pixel_summary,
+            "renderCellSize": float(text_summary["renderCellSize"]),
+            "generationText": str(text_summary["generationText"]),
+            "gridSizeText": str(text_summary["gridSizeText"]),
+        },
+    )
 
 
 def browser_topology_summary(page: Page) -> BrowserTopologySummary | None:

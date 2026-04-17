@@ -30,6 +30,7 @@ from tools.render_canvas_review import (
     condense_settle_diagnostics,
     condense_overlap_hotspots,
     condense_transform_report,
+    condense_visual_metrics,
     parse_cli_args as parse_render_canvas_review_cli_args,
     render_canvas_review,
     resolve_render_review_request,
@@ -210,6 +211,7 @@ def run_managed_render_review(
         run_manifest["settleDiagnostics"] = condense_settle_diagnostics(summary_payload.get("settleDiagnostics"))
         run_manifest["transformSummary"] = condense_transform_report(summary_payload.get("transformReport"))
         run_manifest["overlapHotspots"] = condense_overlap_hotspots(summary_payload.get("overlapHotspots"))
+        run_manifest["visualMetrics"] = condense_visual_metrics(summary_payload.get("visualMetrics"))
         if review_result.consistency_warnings:
             run_manifest["consistencyWarnings"] = list(review_result.consistency_warnings)
         if review_result.literature_reference_status is not None:
