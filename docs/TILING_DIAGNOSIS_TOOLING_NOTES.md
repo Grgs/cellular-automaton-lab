@@ -154,13 +154,28 @@ That means every serious visual review still depends on extra operator memory.
    - The repo does not ship literature images; the local cache under
      `output/literature-reference-cache/` is the convenience layer.
 
-5. Visual-quality metrics beyond occupancy
+5. Artifact-readiness settle detection
+   - Status: landed.
+   - Render-review capture no longer treats “overlay hidden” as a sufficient
+     settle gate.
+   - The browser harness now waits for a stable readiness tuple that includes:
+     - cleared blocking activity from controller state
+     - non-placeholder `gridSizeText`
+     - non-empty `generationText`
+     - stable topology revision, cell count, and render cell size across three
+       polls
+   - Summaries and manifests now carry `settleDiagnostics` so a captured image
+     can be tied back to the final readiness snapshot.
+   - The motivating failure case was a dark standalone `shield` run that
+     captured `Building tiling...` even though the command completed.
+
+6. Visual-quality metrics beyond occupancy
    - Add metrics oriented toward diagnosis rather than smoke checking, such as:
      - orientation-token diversity for visible cells
      - bounding-box aspect ratio of the visible field
      - simple edge-density or boundary-dominance measures
 
-6. Trial manifest / diagnosis journal
+7. Trial manifest / diagnosis journal
    - When running an experiment loop, emit one summary file that records:
      - commands used
      - outputs generated
@@ -169,11 +184,11 @@ That means every serious visual review still depends on extra operator memory.
 
 ### Lower Priority
 
-7. One-command side-by-side diff review
+8. One-command side-by-side diff review
    - Build on the existing montage support so the tool can emit one HTML or image
      sheet for a set of runs rather than only one rendered image vs one reference.
 
-8. Optional browser-test success snapshots
+9. Optional browser-test success snapshots
    - Preserve a final settled screenshot for targeted browser tests when requested,
      not only on failure.
 
@@ -243,6 +258,13 @@ quickly.
 Status: landed for the first slice. Render-review summaries and manifests now
 carry runtime provenance, and standalone builds now emit a build manifest that
 can be compared to the current checkout.
+
+The same shield work also exposed a second harness problem: the old settle gate
+could still capture an intermediate loading frame after the overlay briefly
+cleared. That artifact-readiness gap is now closed. The render-review harness
+waits for a stable readiness tuple and records `settleDiagnostics` in summaries
+and manifests, so future visual diagnosis should build on that stronger gate
+rather than falling back to DOM-only heuristics.
 
 ### 4. Visual-quality metrics are too thin for centered dense fields
 

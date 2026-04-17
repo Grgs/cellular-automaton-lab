@@ -358,6 +358,20 @@ Render-review JSON summaries now also record:
 - `transformReport`
 - `runtimeProvenance`
 - `provenanceWarnings`
+- `settleDiagnostics`
+
+Render-review capture now waits for a stable readiness tuple before saving PNGs
+or JSON summaries. A hidden loading overlay is no longer sufficient on its own.
+The settle gate now requires:
+
+- `window.__appReady === true`
+- no active blocking activity message or kind
+- non-placeholder `gridSizeText`
+- non-empty `generationText`
+- stable topology/render summary state across three polls
+
+This change was motivated by a dark-mode standalone `shield` run that captured a
+transient `Building tiling...` frame even though the command itself succeeded.
 
 Managed runner manifests for successful `--unittest --success-artifacts` runs also record:
 

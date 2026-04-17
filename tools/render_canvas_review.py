@@ -393,6 +393,20 @@ def condense_overlap_hotspots(overlap_hotspots: dict[str, Any] | None) -> dict[s
     }
 
 
+def condense_settle_diagnostics(settle_diagnostics: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(settle_diagnostics, dict):
+        return None
+    return {
+        "settled": bool(settle_diagnostics.get("settled")),
+        "stablePollCountRequired": settle_diagnostics.get("stablePollCountRequired"),
+        "stablePollIntervalMs": settle_diagnostics.get("stablePollIntervalMs"),
+        "settledAt": settle_diagnostics.get("settledAt"),
+        "settleDurationMs": settle_diagnostics.get("settleDurationMs"),
+        "finalSnapshot": settle_diagnostics.get("finalSnapshot"),
+        "warnings": list(settle_diagnostics.get("warnings", [])),
+    }
+
+
 def build_overlap_hotspots_summary(
     *,
     family: str,
@@ -728,6 +742,7 @@ def render_canvas_review(
     page: Page | None = None
     runtime_provenance = None
     provenance_warnings: tuple[str, ...] = ()
+    settle_diagnostics: dict[str, Any] | None = None
     try:
         active_host.start()
         runtime_provenance = active_host.runtime_provenance()
@@ -779,7 +794,7 @@ def render_canvas_review(
                         set_patch_depth(page, int(request.patch_depth))
                     if request.cell_size is not None:
                         set_cell_size(page, int(request.cell_size))
-                    wait_for_patch_render_complete(page)
+                    settle_diagnostics = wait_for_patch_render_complete(page)
 
                     actual_patch_depth = _resolve_actual_control_value(page, "#patch-depth-input")
                     actual_cell_size = _resolve_actual_control_value(page, "#cell-size-input")
@@ -845,6 +860,7 @@ def render_canvas_review(
                         "overlapHotspots": overlap_hotspots,
                         "runtimeProvenance": runtime_provenance,
                         "provenanceWarnings": list(provenance_warnings),
+                        "settleDiagnostics": settle_diagnostics,
                         "consistency": consistency_report,
                     }
                     comparison_payload = None

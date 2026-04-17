@@ -27,6 +27,7 @@ from tests.e2e.support_runtime_host import (
 )
 from tools.render_canvas_review import (
     ResolvedRenderReviewRequest,
+    condense_settle_diagnostics,
     condense_overlap_hotspots,
     condense_transform_report,
     parse_cli_args as parse_render_canvas_review_cli_args,
@@ -206,6 +207,7 @@ def run_managed_render_review(
         summary_payload = json.loads(review_result.summary_path.read_text(encoding="utf-8"))
         run_manifest["runtimeProvenance"] = summary_payload.get("runtimeProvenance")
         run_manifest["provenanceWarnings"] = summary_payload.get("provenanceWarnings", [])
+        run_manifest["settleDiagnostics"] = condense_settle_diagnostics(summary_payload.get("settleDiagnostics"))
         run_manifest["transformSummary"] = condense_transform_report(summary_payload.get("transformReport"))
         run_manifest["overlapHotspots"] = condense_overlap_hotspots(summary_payload.get("overlapHotspots"))
         if review_result.consistency_warnings:

@@ -130,6 +130,19 @@ Render-review summaries and managed manifests now also expose:
 
 - `transformReport` / `transformSummary` for topology-space to render-space diagnostics
 - `runtimeProvenance` and `provenanceWarnings` for standalone/server build attribution
+- `settleDiagnostics` for render-readiness and final stable summary state
+
+Render review no longer treats “loading overlay hidden” as the capture gate by
+itself. The browser harness now waits for a stable readiness tuple that
+includes:
+
+- blocking activity cleared from controller state
+- non-placeholder `gridSizeText`
+- non-empty `generationText`
+- stable topology revision, cell count, and render cell size across three polls
+
+The motivating failure case was a dark standalone `shield` artifact that
+captured `Building tiling...` even though the run reported success.
 
 ## How To Read Failures
 

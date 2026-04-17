@@ -63,8 +63,10 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertIn("consistency", summary)
             self.assertIn("transformReport", summary)
             self.assertIn("overlapHotspots", summary)
+            self.assertIn("settleDiagnostics", summary)
             self.assertIn("runtimeProvenance", summary)
             self.assertIn("provenanceWarnings", summary)
+            self.assertTrue(summary["settleDiagnostics"]["settled"])
             self.assertEqual(summary["consistency"]["requested"]["tilingFamily"], "chair")
             self.assertEqual(summary["consistency"]["requested"]["patchDepth"], 3)
             self.assertIsNone(summary["consistency"]["backendTopology"])
@@ -117,8 +119,10 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertIn("consistency", summary)
             self.assertIn("transformReport", summary)
             self.assertIn("overlapHotspots", summary)
+            self.assertIn("settleDiagnostics", summary)
             self.assertIn("runtimeProvenance", summary)
             self.assertEqual(summary["consistency"]["requested"]["tilingFamily"], "pinwheel")
+            self.assertTrue(summary["settleDiagnostics"]["settled"])
             self.assertTrue(summary["literatureReview"]["requested"])
             self.assertEqual(summary["literatureReview"]["referenceImageStatus"], "cached")
             self.assertEqual(summary["literatureReview"]["referenceImagePath"], str(reference_path))
@@ -127,3 +131,29 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertEqual(summary["comparison"]["referenceImagePath"], str(reference_path))
             self.assertEqual(summary["comparison"]["montageImagePath"], str(montage_path))
             self.assertEqual(summary["comparison"]["normalizationMode"], "contain")
+
+    def test_tool_renders_dark_shield_with_settle_diagnostics(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-canvas-review-shield-dark-") as tmpdir:
+            output_dir = Path(tmpdir)
+            png_path = output_dir / "shield-dark.png"
+            summary_path = output_dir / "shield-dark.json"
+
+            exit_code = main(
+                [
+                    "--profile",
+                    "shield-depth-3",
+                    "--theme",
+                    "dark",
+                    "--out",
+                    str(png_path),
+                    "--summary-out",
+                    str(summary_path),
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            self.assertEqual(summary["theme"], "dark")
+            self.assertTrue(summary["settleDiagnostics"]["settled"])
+            self.assertEqual(summary["settleDiagnostics"]["finalSnapshot"]["blockingActivityMessage"], "")
+            self.assertEqual(summary["settleDiagnostics"]["finalSnapshot"]["gridSizeText"], "Depth 3 • 443 tiles")

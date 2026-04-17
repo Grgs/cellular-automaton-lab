@@ -54,8 +54,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("consistencyWarnings", manifest)
             self.assertIn("runtimeProvenance", manifest)
             self.assertIn("provenanceWarnings", manifest)
+            self.assertIn("settleDiagnostics", manifest)
             self.assertIn("transformSummary", manifest)
             self.assertIn("overlapHotspots", manifest)
+            self.assertTrue(manifest["settleDiagnostics"]["settled"])
 
     def test_runner_delegates_server_render_review(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-") as tmpdir:
@@ -84,8 +86,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
             self.assertIn("runtimeProvenance", manifest)
             self.assertIn("provenanceWarnings", manifest)
+            self.assertIn("settleDiagnostics", manifest)
             self.assertIn("transformSummary", manifest)
             self.assertIn("overlapHotspots", manifest)
+            self.assertTrue(manifest["settleDiagnostics"]["settled"])
 
     @unittest.skipUnless(
         _standalone_outputs_ready(),

@@ -16,6 +16,7 @@ from tests.e2e.browser_support.artifacts import create_artifact_dir
 from tools.render_canvas_review import (
     DEFAULT_REFERENCE_CACHE_DIR,
     ResolvedRenderReviewRequest,
+    condense_settle_diagnostics,
     condense_overlap_hotspots,
     condense_transform_report,
     resolve_render_review_request,
@@ -314,6 +315,7 @@ def build_sweep_case_record(
         "consistencyWarnings": list(run.consistency_warnings),
         "provenanceWarnings": summary_payload.get("provenanceWarnings", []),
         "runtimeProvenance": summary_payload.get("runtimeProvenance"),
+        "settleDiagnostics": condense_settle_diagnostics(summary_payload.get("settleDiagnostics")),
         "transformSummary": condense_transform_report(summary_payload.get("transformReport")),
         "overlapHotspots": condense_overlap_hotspots(summary_payload.get("overlapHotspots")),
         "literatureReview": (
