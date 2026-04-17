@@ -53,7 +53,7 @@ npm run test:frontend
 
 Use these when a tiling looks visually stacked or suspicious. The backend test catches topology-space polygon overlap with Shapely, and the frontend suite now includes adapter-space overlap checks using the same transformed polygons the canvas renderer fills.
 
-`recommended_validation_options(...)` now keeps overlap checks globally strict, even for the aperiodic families that still relax other shared-surface checks.
+`recommended_validation_options(...)` now keeps overlap checks strict for the families that are intended to be exact edge-sharing surfaces, while `shield` still relaxes shared-surface and overlap checks because its current image-derived geometry is only diagnostics-clean, not an exact substitution surface.
 
 The frontend adapter-space overlap helper is intentionally looser than the backend check: its current positive-area epsilon is `1e-4`, and it now compares overlap area across multiple snapped precisions so known-good exact-path families such as `pinwheel` do not fail on polygon-clipping noise.
 

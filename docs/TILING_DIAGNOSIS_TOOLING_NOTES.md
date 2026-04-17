@@ -271,6 +271,48 @@ as a relaxed family and interpreting overlap results in that context. The
 tooling still lacks family-specific overlap policies that explain what kind of
 contact or compensation is acceptable.
 
+The current overlap helper also stops short of being a diagnosis tool. In the
+latest shield pass, the existing fixture test confirmed that overlap existed,
+but did not report:
+
+- how many representative cells were involved
+- which kind pairs dominated the overlap set
+- whether the overlap areas were epsilon-scale noise or large structural
+  intrusions
+- whether the same cell ids already surfaced by the render transform report
+  were part of the overlap hotspots
+
+Using the current tooling required a temporary debug test to extract that data.
+That run showed:
+
+- at least 200 positive-area overlaps in the first capped sample over 443
+  representative cells
+- large overlap areas, including values around `2e5`, which rules out a simple
+  epsilon/tolerance story
+- the dominant overlap classes were triangle/triangle, square/triangle, and
+  shield/triangle
+- transform-report sample ids such as `shield:ref:1378` and `shield:ref:1400`
+  were already part of the overlap set, but the tooling did not connect those
+  views automatically
+
+Status: landed in a later slice. Render review, managed browser checks, and
+sweeps now emit `overlapHotspots` with pair summaries, dominant kind pairs,
+transform-sample hits, and family-aware policy labeling.
+
+The current remaining gap is narrower: overlap diagnosis is now good enough to
+show where the problem is, but geometry cleanup is still exploratory work. The
+shield overlap fix ended up needing:
+
+- a minimal topology-space inward trace cleanup to remove the remaining
+  positive-area intersections from the shipped geometry
+- a draw-only seam bridge so visual gap hiding stays out of the geometry cache
+
+That cleanup choice was still selected with an ad hoc Shapely sweep over scale
+factors rather than a first-class workbench. The missing follow-up tool is a
+geometry-cleanup workbench that can report overlap count, max overlap area,
+bounds drift, and likely gutter risk for small cleanup factors without a custom
+one-off script.
+
 ### 6. Frontend representative fixture regeneration is still ad hoc
 
 Backend reference fixtures have first-class regeneration and verification paths.

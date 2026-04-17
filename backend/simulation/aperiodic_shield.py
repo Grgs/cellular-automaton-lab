@@ -16,12 +16,15 @@ from backend.simulation.aperiodic_support import (
 _DATA_PATH = Path(__file__).with_name("data") / "shield_reference_patch.json"
 _ROTATION_STEP_DEGREES = 15
 _ROTATION_STEP_RADIANS = math.radians(_ROTATION_STEP_DEGREES)
-_TRACE_GAP_COMPENSATION_SCALE = 1.27
 _DODECAGON_WINDOW_ANGLES = tuple(math.radians(step * 30) for step in range(12))
 _DODECAGON_WINDOW_VECTORS = tuple(
     (math.cos(angle), math.sin(angle))
     for angle in _DODECAGON_WINDOW_ANGLES
 )
+# The traced literature patch still carries small positive-area overlap between
+# adjacent polygons. Clean that overlap in topology space with a minimal inward
+# normalization, then let the frontend bridge any resulting seams at draw time.
+_TRACE_GEOMETRY_CLEANUP_SCALE = 0.951
 
 
 class _ShieldReferenceRecord(TypedDict):
@@ -128,6 +131,20 @@ def _rotate_orientation_token(
         return token
 
 
+def _cleanup_traced_vertices(
+    center: tuple[float, float],
+    vertices: tuple[tuple[float, float], ...],
+) -> tuple[tuple[float, float], ...]:
+    center_x, center_y = center
+    return tuple(
+        (
+            round(center_x + ((vertex_x - center_x) * _TRACE_GEOMETRY_CLEANUP_SCALE), 6),
+            round(center_y + ((vertex_y - center_y) * _TRACE_GEOMETRY_CLEANUP_SCALE), 6),
+        )
+        for vertex_x, vertex_y in vertices
+    )
+
+
 def _largest_connected_component_ids(
     selected_ids: set[str],
     *,
@@ -155,20 +172,6 @@ def _largest_connected_component_ids(
         key=lambda component: (len(component), tuple(component)),
     )
     return set(largest_component)
-
-
-def _compensate_trace_gaps(
-    vertices: tuple[tuple[float, float], ...],
-    *,
-    center: tuple[float, float],
-) -> tuple[tuple[float, float], ...]:
-    return tuple(
-        (
-            round(center[0] + ((vertex[0] - center[0]) * _TRACE_GAP_COMPENSATION_SCALE), 6),
-            round(center[1] + ((vertex[1] - center[1]) * _TRACE_GAP_COMPENSATION_SCALE), 6),
-        )
-        for vertex in vertices
-    )
 
 
 def build_shield_patch(patch_depth: int) -> AperiodicPatch:
@@ -209,9 +212,9 @@ def build_shield_patch(patch_depth: int) -> AperiodicPatch:
             (float(vertex[0]), float(vertex[1]))
             for vertex in record["vertices"]
         )
+        vertices = _cleanup_traced_vertices(center, vertices)
         orientation_token = record.get("orientation_token")
         decoration_tokens = record["decoration_tokens"]
-        vertices = _compensate_trace_gaps(vertices, center=center)
         if rotate_patch:
             center = _rotate_point(
                 center,

@@ -9,8 +9,10 @@ from pathlib import Path
 from PIL import Image
 
 from tools.render_canvas_review import (
+    build_overlap_hotspots_summary,
     build_reference_montage,
     build_consistency_report,
+    condense_overlap_hotspots,
     condense_transform_report,
     main,
     parse_grid_size_text,
@@ -242,6 +244,41 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         self.assertEqual(condensed["adapterGeometry"], "shield")
         self.assertEqual(condensed["sampleCellIds"]["centerNearest"], "shield:b")
         self.assertEqual(condensed["renderedBounds"]["width"], 300)
+
+    def test_build_overlap_hotspots_summary_marks_large_shield_overlap_blocking(self) -> None:
+        request = resolve_render_review_request(parse_cli_args(["--profile", "shield-depth-3"]))
+        summary = build_overlap_hotspots_summary(
+            family=request.family,
+            profile=request.profile,
+            overlap_hotspots={
+                "representativeCellCount": 443,
+                "sampledOverlapCount": 200,
+                "maxSampledArea": 213254.65271002054,
+                "topOverlapPairs": [],
+                "topKindPairs": [],
+                "transformSampleHits": ["shield:ref:1378", "shield:ref:1400"],
+            },
+        )
+        assert summary is not None
+        self.assertEqual(summary["status"], "blocking")
+        self.assertEqual(summary["policyMode"], "image-derived-relaxed")
+        self.assertTrue(summary["warnings"])
+
+    def test_condense_overlap_hotspots_extracts_review_fields(self) -> None:
+        condensed = condense_overlap_hotspots(
+            {
+                "status": "expected-to-reduce",
+                "policyMode": "image-derived-relaxed",
+                "representativeCellCount": 443,
+                "sampledOverlapCount": 12,
+                "maxSampledArea": 4.25,
+                "transformSampleHits": ["shield:ref:1378"],
+                "topKindPairs": [{"kindPair": "shield-square / shield-triangle", "count": 8}],
+            }
+        )
+        self.assertEqual(condensed["status"], "expected-to-reduce")
+        self.assertEqual(condensed["sampledOverlapCount"], 12)
+        self.assertEqual(condensed["transformSampleHits"], ["shield:ref:1378"])
 
     def test_parse_grid_size_text_parses_patch_depth_summary(self) -> None:
         parsed = parse_grid_size_text("Depth 3 • 600 tiles")

@@ -20,6 +20,7 @@ from tests.e2e.browser_support.artifacts import (
     create_artifact_dir,
 )
 from tests.e2e.browser_support.render_review import (
+    browser_overlap_hotspots,
     browser_topology_summary,
     browser_transform_report,
     canvas_visual_summary,
@@ -32,9 +33,11 @@ from tests.e2e.browser_support.render_review import (
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tools.render_review_profiles import (
     LiteratureReference,
+    OverlapPolicy,
     RenderReviewProfile,
     describe_render_review_profile,
     iter_render_review_profiles,
+    resolve_overlap_policy,
     resolve_render_review_profile,
     resolve_profile_reference_cache_path,
 )
@@ -373,6 +376,63 @@ def condense_transform_report(transform_report: dict[str, Any] | None) -> dict[s
             else None
         ),
         "sampleCellIds": condensed_sample_ids,
+    }
+
+
+def condense_overlap_hotspots(overlap_hotspots: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(overlap_hotspots, dict):
+        return None
+    return {
+        "status": overlap_hotspots.get("status"),
+        "policyMode": overlap_hotspots.get("policyMode"),
+        "representativeCellCount": overlap_hotspots.get("representativeCellCount"),
+        "sampledOverlapCount": overlap_hotspots.get("sampledOverlapCount"),
+        "maxSampledArea": overlap_hotspots.get("maxSampledArea"),
+        "transformSampleHits": overlap_hotspots.get("transformSampleHits"),
+        "topKindPairs": overlap_hotspots.get("topKindPairs"),
+    }
+
+
+def build_overlap_hotspots_summary(
+    *,
+    family: str,
+    profile: RenderReviewProfile | None,
+    overlap_hotspots: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not isinstance(overlap_hotspots, dict):
+        return None
+    policy = resolve_overlap_policy(family=family, profile=profile)
+    sampled_overlap_count = int(overlap_hotspots.get("sampledOverlapCount") or 0)
+    max_sampled_area = float(overlap_hotspots.get("maxSampledArea") or 0)
+    status = "diagnostic-only"
+    warnings: list[str] = []
+    if sampled_overlap_count > 0:
+        if policy.mode == "strict":
+            status = "blocking"
+            warnings.append(
+                f"{family!r} reported {sampled_overlap_count} positive-area representative overlaps under the strict overlap policy."
+            )
+        else:
+            max_area_threshold = float(policy.expected_to_reduce_max_sampled_area or 0)
+            max_count_threshold = int(policy.expected_to_reduce_max_sampled_count or 0)
+            if sampled_overlap_count <= max_count_threshold and max_sampled_area <= max_area_threshold:
+                status = "expected-to-reduce"
+                warnings.append(
+                    f"{family!r} still reports residual positive-area overlap, but it is within the current relaxed diagnostic budget."
+                )
+            else:
+                status = "blocking"
+                warnings.append(
+                    f"{family!r} reports large structural overlap: {sampled_overlap_count} sampled pairs with max area {max_sampled_area:.3f}."
+                )
+    return {
+        **overlap_hotspots,
+        "policyMode": policy.mode,
+        "policyReviewNote": policy.review_note,
+        "expectedToReduceMaxSampledArea": policy.expected_to_reduce_max_sampled_area,
+        "expectedToReduceMaxSampledCount": policy.expected_to_reduce_max_sampled_count,
+        "status": status,
+        "warnings": warnings,
     }
 
 
@@ -741,6 +801,12 @@ def render_canvas_review(
                     visual_summary = canvas_visual_summary(page)
                     browser_topology = browser_topology_summary(page)
                     transform_report = browser_transform_report(page)
+                    raw_overlap_hotspots = browser_overlap_hotspots(page)
+                    overlap_hotspots = build_overlap_hotspots_summary(
+                        family=request.family,
+                        profile=request.profile,
+                        overlap_hotspots=raw_overlap_hotspots,
+                    )
                     backend_topology = None
                     client = active_host.client()
                     if client is not None:
@@ -776,6 +842,7 @@ def render_canvas_review(
                         "hostMode": host_kind,
                         "baseUrl": active_host.base_url,
                         "transformReport": transform_report,
+                        "overlapHotspots": overlap_hotspots,
                         "runtimeProvenance": runtime_provenance,
                         "provenanceWarnings": list(provenance_warnings),
                         "consistency": consistency_report,

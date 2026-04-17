@@ -122,6 +122,7 @@ describe("geometry/polygon-overlap", () => {
             "hat-monotile-depth-3.json",
             "robinson-triangles-depth-3.json",
             "spectre-depth-3.json",
+            "shield-depth-3.json",
             "sphinx-depth-3.json",
             "dodecagonal-square-triangle-depth-3.json",
             "taylor-socolar-depth-3.json",
@@ -132,11 +133,4 @@ describe("geometry/polygon-overlap", () => {
             expect(overlaps, filename).toEqual([]);
         }
     }, 30_000);
-
-    it("treats shield as a relaxed overlap family while keeping the representative fixture finite", async () => {
-        const overlaps = await overlapsForFixture("shield-depth-3.json", 5000);
-
-        expect(overlaps.length).toBeGreaterThan(0);
-        expect(overlaps.length).toBeLessThan(5000);
-    });
 });

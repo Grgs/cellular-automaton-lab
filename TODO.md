@@ -15,6 +15,8 @@
 - Added profile-owned literature review metadata plus a gitignored local reference-cache workflow so render reviews and sweeps can produce normalized literature montages without storing literature images in git.
 - Added render-transform diagnostics to browser-backed render review so summaries and manifests can show topology-space bounds, render-space bounds, and stable sample-cell transforms from the live frontend adapter path.
 - Added standalone build provenance and stale-bundle comparison so render-review summaries and manifests can warn when a standalone bundle no longer matches the current checkout.
+- Added overlap-hotspot diagnostics plus family-aware overlap policy metadata to render review, managed browser checks, and sweeps so image-derived families like `shield` can report overlap severity instead of only failing a binary fixture test.
+- Restored shield's representative render-space no-overlap fixture by separating topology cleanup from draw-only seam hiding: the shipped topology now uses minimal inward trace cleanup, while the canvas path handles seam bridging without mutating geometry cache vertices.
 
 ## Now
 
@@ -26,6 +28,7 @@
 - Add richer visual-quality metrics to render-review output beyond occupancy, such as aspect-ratio, boundary-dominance, and visible orientation diversity when those metrics are available.
 - Add shield-oriented render-review metrics for visual correctness work, including radial symmetry / angular-sector occupancy, gutter / empty-space scoring, and boundary-dominance on centered dense fields.
 - Add a family sample workbench for window/crop exploration so candidate shield-style representative samples can be compared by count, connectivity, bounds, and hole behavior without one-off scripts.
+- Add a geometry cleanup workbench for image-derived families so small topology-space cleanup factors can be measured against overlap count, bounds drift, and visible gutter risk without ad hoc Shapely sweeps.
 - Add a frontend representative fixture regeneration tool so browser-facing topology fixtures do not require ad hoc manual export steps.
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Add profile-attached expectations beyond simple review notes, such as family-specific visual checkpoints, expected warning suppressions, and short literature-review acceptance checklists where those expectations can be stated clearly.

@@ -55,6 +55,7 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("runtimeProvenance", manifest)
             self.assertIn("provenanceWarnings", manifest)
             self.assertIn("transformSummary", manifest)
+            self.assertIn("overlapHotspots", manifest)
 
     def test_runner_delegates_server_render_review(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-") as tmpdir:
@@ -84,6 +85,7 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("runtimeProvenance", manifest)
             self.assertIn("provenanceWarnings", manifest)
             self.assertIn("transformSummary", manifest)
+            self.assertIn("overlapHotspots", manifest)
 
     @unittest.skipUnless(
         _standalone_outputs_ready(),

@@ -321,6 +321,28 @@ export interface RenderDiagnosticsSampleCell {
     renderedBounds: GeometryBounds;
 }
 
+export interface RenderDiagnosticsOverlapPair {
+    leftId: string;
+    rightId: string;
+    area: number;
+    leftKind: string | null;
+    rightKind: string | null;
+}
+
+export interface RenderDiagnosticsOverlapKindPair {
+    kindPair: string;
+    count: number;
+}
+
+export interface RenderDiagnosticsOverlapHotspots {
+    representativeCellCount: number;
+    sampledOverlapCount: number;
+    maxSampledArea: number;
+    topOverlapPairs: RenderDiagnosticsOverlapPair[];
+    topKindPairs: RenderDiagnosticsOverlapKindPair[];
+    transformSampleHits: string[];
+}
+
 export interface RenderDiagnosticsSnapshot {
     geometry: string;
     adapterGeometry: string;
@@ -343,4 +365,5 @@ export interface RenderDiagnosticsSnapshot {
         centerNearest: RenderDiagnosticsSampleCell | null;
         boundaryFurthest: RenderDiagnosticsSampleCell | null;
     };
+    overlapHotspots: RenderDiagnosticsOverlapHotspots | null;
 }

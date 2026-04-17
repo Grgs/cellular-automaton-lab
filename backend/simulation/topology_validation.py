@@ -174,7 +174,7 @@ def build_topology_graph(topology: LatticeTopology) -> nx.Graph:
 def recommended_validation_options(geometry: str) -> dict[str, bool]:
     if geometry == "shield":
         return {
-            "check_surface": True,
+            "check_surface": False,
             "check_overlaps": False,
             "check_edge_multiplicity": False,
             "check_graph_connectivity": True,

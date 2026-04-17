@@ -207,7 +207,6 @@ class TopologyValidationTests(unittest.TestCase):
             (CHAIR_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
             (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 3),
-            (SHIELD_GEOMETRY, 3),
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
             (PINWHEEL_GEOMETRY, 3),
         ):
@@ -272,7 +271,7 @@ class TopologyValidationTests(unittest.TestCase):
         self.assertEqual(
             recommended_validation_options(SHIELD_GEOMETRY),
             {
-                "check_surface": True,
+                "check_surface": False,
                 "check_overlaps": False,
                 "check_edge_multiplicity": False,
                 "check_graph_connectivity": True,

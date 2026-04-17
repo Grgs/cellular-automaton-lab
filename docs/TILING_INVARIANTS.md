@@ -67,7 +67,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 - `shield`
   - the authoritative verifier sample is a dense 12-fold central field derived from the literature patch image
   - runtime depth selection now uses a backend-owned dodecagonal center window rather than a graph-distance shell
-  - traced shield polygons use a backend-owned gap-compensation scale so the representative field remains a continuous surface without a frontend-only shrink step
+  - traced shield polygons now use a minimal backend-owned inward cleanup to remove positive-area overlap, while any seam hiding is handled only in the canvas draw pass
   - odd patch depths must apply the documented 15-degree orientation alternation
   - orientation-token diversity must remain high in representative dense patches
   - rooted local-reference fixtures now check canonical neighborhoods inside that dense field
@@ -96,5 +96,5 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 - For periodic families, the verifier is now stronger than a plain sample-signature check, but it still targets finite family-specific open-boundary boards rather than quotient-surface or large-sample proofs.
 - Periodic dual-family checks now cover unambiguous reciprocal pairs and the current ambiguous candidate classes, but they are still finite-sample descriptor checks rather than full dual constructions.
 - The new reference layer mixes rooted neighborhoods with direct canonical patch diffs for selected families; it is not yet a full canonical patch-diff system across the whole catalog.
-- `shield` is now materially closer to the literature visually through a centered dodecagonal window and backend-owned trace-gap compensation, but the repo still does not claim a full marked substitution with fractalized boundary generation for that family.
+- `shield` is now materially closer to the literature visually through a centered dodecagonal window, topology-space overlap cleanup, and a draw-only seam bridge, but the repo still does not claim a full marked substitution with fractalized boundary generation for that family.
 - That is stronger than screenshot plausibility, but it is still not the same thing as a full symbolic proof that the generator exactly matches the literature’s substitution system at all depths.

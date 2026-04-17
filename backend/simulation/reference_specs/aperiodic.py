@@ -486,12 +486,12 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 ),
                 min_unique_orientation_tokens=10,
                 max_bounds_aspect_ratio=1.5,
-                expected_signature="23353d5264af",  # pragma: allowlist secret
+                expected_signature="37d013f30fc0",  # pragma: allowlist secret
             ),
             1: ReferenceDepthExpectation(
                 exact_total_cells=81,
                 min_unique_orientation_tokens=12,
-                expected_signature="93ab802e2615",  # pragma: allowlist secret
+                expected_signature="1d884216655b",  # pragma: allowlist secret
             ),
             3: ReferenceDepthExpectation(
                 exact_total_cells=443,
@@ -503,7 +503,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     (SHIELD_TRIANGLE_KIND, SHIELD_TRIANGLE_KIND),
                 ),
                 min_unique_orientation_tokens=12,
-                expected_signature="0805a959a5a1",  # pragma: allowlist secret
+                expected_signature="95a927bb2a20",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-3",
             ),
         },
@@ -511,6 +511,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "The shipped patch is a dense literature-derived central field extracted from the Bielefeld shield patch image.",
             "Runtime depth selection uses a backend-owned dodecagonal center window instead of graph-distance thresholds.",
             "Odd patch depths apply the documented 15-degree alternation around the central dodecagonal seed.",
+            "Runtime geometry now applies a minimal inward trace-cleanup normalization to remove positive-area overlap from the traced polygons; any seam hiding is render-only.",
             "The public model preserves only public kinds plus orientation metadata; the literature matching-rule decorations are not part of the runtime payload.",
         ),
     ),

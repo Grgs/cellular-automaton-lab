@@ -545,5 +545,6 @@ describe("canvas-view", () => {
         expect(diagnostics?.sampleCells.centerNearest?.cellId).toBe("shield:b");
         expect(diagnostics?.sampleCells.boundaryFurthest?.cellId).toBe("shield:c");
         expect(diagnostics?.topologyBounds?.width).toBe(9);
+        expect(diagnostics?.overlapHotspots?.sampledOverlapCount).toBe(0);
     });
 });

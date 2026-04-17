@@ -1,4 +1,7 @@
-import { drawPolygonCellWithTransientOverlay } from "../canvas/draw.js";
+import {
+    drawPolygonCellWithTransientOverlay,
+    resolveShieldFillBridgeStrokeWidth,
+} from "../canvas/draw.js";
 import {
     buildMixedTopologyGeometryCache,
     resolveMixedCellFromOffset,
@@ -249,6 +252,20 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
                 renderLayer,
                 renderStyle,
                 committedStrokeColor: renderStyle?.aperiodicLineColor || renderStyle?.lineColor || null,
+                fillBridgeColor: (
+                    geometry === "shield"
+                    && renderLayer !== "gesture-paint"
+                    && renderLayer !== "gesture-erase"
+                )
+                    ? color
+                    : null,
+                fillBridgeStrokeWidth: (
+                    geometry === "shield"
+                    && renderLayer !== "gesture-paint"
+                    && renderLayer !== "gesture-erase"
+                )
+                    ? resolveShieldFillBridgeStrokeWidth(renderStyle)
+                    : 0,
             });
         },
 

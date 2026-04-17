@@ -14,6 +14,14 @@ class LiteratureReference:
 
 
 @dataclass(frozen=True)
+class OverlapPolicy:
+    mode: str
+    expected_to_reduce_max_sampled_area: float | None = None
+    expected_to_reduce_max_sampled_count: int | None = None
+    review_note: str | None = None
+
+
+@dataclass(frozen=True)
 class RenderReviewProfile:
     name: str
     family: str
@@ -23,6 +31,7 @@ class RenderReviewProfile:
     viewport_height: int = 900
     theme: str = "light"
     literature_reference: LiteratureReference | None = None
+    overlap_policy: OverlapPolicy | None = None
 
 
 RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
@@ -56,6 +65,15 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
                 "orientation balance rather than line-style details."
             ),
             cache_filename="shield-reference.png",
+        ),
+        overlap_policy=OverlapPolicy(
+            mode="image-derived-relaxed",
+            expected_to_reduce_max_sampled_area=0.01,
+            expected_to_reduce_max_sampled_count=4,
+            review_note=(
+                "The current Experimental shield model should now be overlap-free at the representative review epsilon. "
+                "Only a tiny residual trace-noise budget is acceptable; anything larger is blocking."
+            ),
         ),
     ),
     "dodecagonal-square-triangle-depth-3": RenderReviewProfile(
@@ -110,3 +128,13 @@ def resolve_render_review_profile(profile_name: str) -> RenderReviewProfile:
         raise ValueError(
             f"Unknown render review profile {profile_name!r}. Available profiles: {available}"
         ) from exc
+
+
+def resolve_overlap_policy(
+    *,
+    family: str,
+    profile: RenderReviewProfile | None,
+) -> OverlapPolicy:
+    if profile is not None and profile.overlap_policy is not None:
+        return profile.overlap_policy
+    return OverlapPolicy(mode="strict")

@@ -4,6 +4,7 @@ import {
     GESTURE_OUTLINE_MIN_STROKE_WIDTH,
     HOVER_MIN_STROKE_WIDTH,
     SELECTION_MIN_STROKE_WIDTH,
+    SHIELD_FILL_BRIDGE_STROKE_WIDTH,
     STANDARD_POLYGON_STROKE_WIDTH,
 } from "./render-constants.js";
 import type {
@@ -24,6 +25,8 @@ interface DrawPolygonCellArgs {
     renderStyle: CanvasRenderStyle | undefined;
     committedStrokeColor?: string | null;
     drawPreviewStroke?: boolean;
+    fillBridgeColor?: string | null;
+    fillBridgeStrokeWidth?: number;
 }
 
 export function tracePolygonPath(context: CanvasRenderingContext2D, vertices: readonly Point2D[]): void {
@@ -100,6 +103,13 @@ export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): numbe
     return renderStyle.mode === "compact" ? COMPACT_POLYGON_STROKE_WIDTH : STANDARD_POLYGON_STROKE_WIDTH;
 }
 
+export function resolveShieldFillBridgeStrokeWidth(renderStyle: CanvasRenderStyle | undefined): number {
+    return Math.max(
+        SHIELD_FILL_BRIDGE_STROKE_WIDTH,
+        renderStyle ? resolvePolygonStrokeWidth(renderStyle) + 1.25 : SHIELD_FILL_BRIDGE_STROKE_WIDTH,
+    );
+}
+
 export function resolveTransientOverlayStyle(
     renderLayer: RenderedCellArgs["renderLayer"],
     renderStyle: CanvasRenderStyle | undefined,
@@ -150,9 +160,21 @@ export function drawPolygonCellWithTransientOverlay({
     renderStyle,
     committedStrokeColor = null,
     drawPreviewStroke = false,
+    fillBridgeColor = null,
+    fillBridgeStrokeWidth = 0,
 }: DrawPolygonCellArgs): void {
     const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
     if (!overlayStyle || overlayStyle.drawBaseFill) {
+        if (fillBridgeColor && fillBridgeStrokeWidth > 0) {
+            context.save();
+            context.strokeStyle = fillBridgeColor;
+            context.lineWidth = fillBridgeStrokeWidth;
+            context.lineJoin = "round";
+            context.lineCap = "round";
+            tracePolygonPath(context, vertices);
+            context.stroke();
+            context.restore();
+        }
         if (context.fillStyle !== fillColor) {
             context.fillStyle = fillColor;
         }

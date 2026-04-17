@@ -5,6 +5,7 @@ import {
     topologyCellCenter as resolveTopologyCellCenter,
 } from "./geometry-adapters.js";
 import { getGeometryAdapter } from "./geometry/registry.js";
+import { summarizePositiveAreaPolygonOverlaps } from "./geometry/polygon-overlap.js";
 import {
     topologyCellStatesById,
     topologyHeight,
@@ -268,6 +269,7 @@ function sampleRenderDiagnostics(
             canvasHeight: metrics.pixelHeight,
         },
         sampleCells,
+        overlapHotspots: null,
     };
 }
 
@@ -594,7 +596,25 @@ export function createCanvasGridView({
     }
 
     function getRenderDiagnostics(): RenderDiagnosticsSnapshot | null {
-        return renderDiagnostics ? structuredClone(renderDiagnostics) : null;
+        if (!renderDiagnostics) {
+            return null;
+        }
+        if (renderDiagnostics.overlapHotspots === null) {
+            const polygonCache = asPolygonGeometryCache(geometryCache);
+            const transformSampleIds = Object.values(renderDiagnostics.sampleCells)
+                .map((sample) => sample?.cellId ?? null)
+                .filter((cellId): cellId is string => typeof cellId === "string");
+            renderDiagnostics = {
+                ...renderDiagnostics,
+                overlapHotspots: polygonCache
+                    ? summarizePositiveAreaPolygonOverlaps(
+                        polygonCache.cells,
+                        { maxStoredPairs: 50, transformSampleIds },
+                    )
+                    : null,
+            };
+        }
+        return structuredClone(renderDiagnostics);
     }
 
     return {

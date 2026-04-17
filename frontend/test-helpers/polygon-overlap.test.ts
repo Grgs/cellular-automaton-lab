@@ -4,6 +4,7 @@ import {
     OVERLAP_AREA_EPSILON,
     findPositiveAreaPolygonOverlaps,
     representativePolygonCells,
+    summarizePositiveAreaPolygonOverlaps,
 } from "./polygon-overlap.js";
 import type { PolygonGeometryCell } from "../types/rendering.js";
 
@@ -96,5 +97,45 @@ describe("test-helpers/polygon-overlap", () => {
         const second = findPositiveAreaPolygonOverlaps([left, right]);
 
         expect(second).toEqual(first);
+    });
+
+    it("summarizes overlap hotspots and cross-references transform sample ids", () => {
+        const triangle = polygonCell("shield:ref:1378", [
+            [0, 0],
+            [2, 0],
+            [1, 2],
+        ]);
+        triangle.cell.kind = "shield-triangle";
+        const square = polygonCell("shield:ref:1400", [
+            [0.5, 0.25],
+            [2.5, 0.25],
+            [2.5, 2.25],
+            [0.5, 2.25],
+        ]);
+        square.cell.kind = "shield-square";
+        const distant = polygonCell("shield:ref:2007", [
+            [10, 10],
+            [12, 10],
+            [12, 12],
+            [10, 12],
+        ]);
+        distant.cell.kind = "shield-shield";
+
+        const summary = summarizePositiveAreaPolygonOverlaps(
+            [triangle, square, distant],
+            { transformSampleIds: ["shield:ref:1378", "shield:ref:2007"] },
+        );
+
+        expect(summary.representativeCellCount).toBe(3);
+        expect(summary.sampledOverlapCount).toBe(1);
+        expect(summary.maxSampledArea).toBeGreaterThan(OVERLAP_AREA_EPSILON);
+        expect(summary.topOverlapPairs).toHaveLength(1);
+        expect(summary.topKindPairs).toEqual([
+            {
+                kindPair: "shield-square / shield-triangle",
+                count: 1,
+            },
+        ]);
+        expect(summary.transformSampleHits).toEqual(["shield:ref:1378"]);
     });
 });

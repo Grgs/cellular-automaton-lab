@@ -32,6 +32,7 @@ class BrowserTransformReport(TypedDict):
     topologyBounds: dict[str, float] | None
     renderMetrics: dict[str, float | int | None]
     sampleCells: dict[str, dict[str, object] | None]
+    overlapHotspots: dict[str, object] | None
 
 
 def wait_for_page_bootstrapped(page: Page, *, timeout_ms: int = 30_000) -> None:
@@ -261,6 +262,14 @@ def browser_transform_report(page: Page) -> BrowserTransformReport | None:
     if summary is None:
         return None
     return cast(BrowserTransformReport, summary)
+
+
+def browser_overlap_hotspots(page: Page) -> dict[str, object] | None:
+    summary = browser_transform_report(page)
+    if summary is None:
+        return None
+    overlap_hotspots = summary.get("overlapHotspots")
+    return cast(dict[str, object] | None, overlap_hotspots)
 
 
 def viewport_gap_summary(page: Page) -> dict[str, float]:
