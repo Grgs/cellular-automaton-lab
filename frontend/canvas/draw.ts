@@ -106,7 +106,7 @@ export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): numbe
 export function resolveShieldFillBridgeStrokeWidth(renderStyle: CanvasRenderStyle | undefined): number {
     return Math.max(
         SHIELD_FILL_BRIDGE_STROKE_WIDTH,
-        renderStyle ? resolvePolygonStrokeWidth(renderStyle) + 1.25 : SHIELD_FILL_BRIDGE_STROKE_WIDTH,
+        renderStyle ? resolvePolygonStrokeWidth(renderStyle) * 0.8 : SHIELD_FILL_BRIDGE_STROKE_WIDTH,
     );
 }
 
