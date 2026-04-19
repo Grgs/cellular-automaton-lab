@@ -268,6 +268,9 @@ jobs:
       - backend-api-coverage
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -309,14 +312,10 @@ jobs:
             coverage-unit-api.xml
 
   e2e-playwright:
-    name: Playwright Server Subset ${{ matrix.subset_index }}
+    name: Playwright Server
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: build-frontend-artifacts
-    strategy:
-      fail-fast: false
-      matrix:
-        subset_index: [0, 1, 2, 3]
 
     steps:
       - name: Check out repository
@@ -353,19 +352,17 @@ jobs:
       - name: Install Chromium for Playwright
         run: python -m playwright install --with-deps chromium
 
-      - name: Run Playwright subset
+      - name: Run Playwright server suite
         env:
-          E2E_ARTIFACTS_DIR: ${{ github.workspace }}/e2e-artifacts/server-subset-${{ matrix.subset_index }}
-          PLAYWRIGHT_SUBSET_INDEX: ${{ matrix.subset_index }}
-          PLAYWRIGHT_SUBSET_COUNT: 4
-        run: python -m unittest -q tests.e2e.playwright_chunk_subset
+          E2E_ARTIFACTS_DIR: ${{ github.workspace }}/e2e-artifacts/server-browser
+        run: python -m unittest -q tests.e2e.test_playwright_server
 
       - name: Upload Playwright server artifacts
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: playwright-server-subset-${{ matrix.subset_index }}
-          path: ${{ github.workspace }}/e2e-artifacts/server-subset-${{ matrix.subset_index }}
+          name: playwright-server
+          path: ${{ github.workspace }}/e2e-artifacts/server-browser
           if-no-files-found: ignore
 
   e2e-playwright-standalone:

@@ -206,14 +206,10 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
                 PlaywrightSuiteDefinition(
                     name="server",
                     label="Server-host browser suites",
-                    module="tests.e2e.playwright_chunk_subset",
+                    module="tests.e2e.test_playwright_server",
                     includes_standalone=False,
                     requires_standalone_build=False,
                     shardable=False,
-                    env=(
-                        ("PLAYWRIGHT_SUBSET_INDEX", "0"),
-                        ("PLAYWRIGHT_SUBSET_COUNT", "1"),
-                    ),
                 ),
             ),
             (
@@ -288,6 +284,10 @@ def build_playwright_suite() -> unittest.TestSuite:
     for feature_name in PLAYWRIGHT_FEATURE_NAMES:
         suite.addTests(build_playwright_feature_suite(feature_name))
     return suite
+
+
+def build_server_playwright_suite() -> unittest.TestSuite:
+    return build_named_playwright_suite(iter_server_playwright_test_names())
 
 
 def iter_playwright_feature_test_names(feature_name: str) -> list[str]:

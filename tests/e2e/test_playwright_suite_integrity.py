@@ -10,6 +10,7 @@ from tests.e2e.playwright_suite_support import (
     DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
     PLAYWRIGHT_FEATURE_NAMES,
     build_playwright_suite,
+    build_server_playwright_suite,
     iter_public_playwright_suite_names,
     iter_playwright_feature_test_names,
     playwright_suite_manifest_payload,
@@ -67,6 +68,10 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
         expected = iter_playwright_test_names()
         self.assertEqual(iter_playwright_test_names(), expected)
         self.assertEqual(sorted(_iter_suite_test_names(build_playwright_suite())), expected)
+
+    def test_server_playwright_loader_covers_every_server_browser_test(self) -> None:
+        expected = iter_server_playwright_test_names()
+        self.assertEqual(sorted(_iter_suite_test_names(build_server_playwright_suite())), expected)
 
     def test_chunked_playwright_subsets_cover_every_server_browser_test_once(self) -> None:
         expected = iter_server_playwright_test_names()
