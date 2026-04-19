@@ -93,7 +93,7 @@ describe("controls-model/shared", () => {
                 geometryKey: "shield",
                 renderKind: "polygon_aperiodic",
                 defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 4 },
+                sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 5 },
             }),
             buildSingleVariantBootstrappedTopologyDefinition("pinwheel", {
                 geometryKey: "pinwheel",
@@ -194,7 +194,7 @@ describe("controls-model/shared", () => {
         expect(resolveViewportSizingState(shieldState)).toMatchObject({
             usesPatchDepth: true,
             patchDepthMin: 0,
-            patchDepthMax: 4,
+            patchDepthMax: 5,
         });
         expect(resolveViewportSizingState(pinwheelState)).toMatchObject({
             usesPatchDepth: true,

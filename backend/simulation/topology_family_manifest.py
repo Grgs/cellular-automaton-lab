@@ -404,7 +404,7 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     SHIELD_GEOMETRY: _translated_aperiodic_family(
         SHIELD_GEOMETRY,
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
     ),
     PINWHEEL_GEOMETRY: _translated_aperiodic_family(
         PINWHEEL_GEOMETRY,

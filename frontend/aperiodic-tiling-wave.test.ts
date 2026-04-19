@@ -29,7 +29,7 @@ const NEW_TILINGS = [
         geometryKey: "shield",
         renderKind: "polygon_aperiodic",
         defaultRule: "life-b2-s23",
-        sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 4 },
+        sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 5 },
     }),
     buildSingleVariantBootstrappedTopologyDefinition("pinwheel", {
         geometryKey: "pinwheel",
