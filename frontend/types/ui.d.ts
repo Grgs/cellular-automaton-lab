@@ -116,7 +116,12 @@ export interface TopBarViewModel {
     runToggle: RunToggleViewModel;
 }
 
-export interface DrawerViewModel {
+export interface DrawerShellViewModel extends DrawerToggleState, BlockingActivityViewState, PatternStatusViewState, QuickStartHintState {
+    drawerVisible: boolean;
+    backdropVisible: boolean;
+}
+
+export interface DrawerInspectorViewModel {
     inspectorTilingText: string;
     inspectorRuleText: string;
     topologyStatusVisible: boolean;
@@ -124,23 +129,41 @@ export interface DrawerViewModel {
     topologyStatusDetail: string;
     topologyStatusTone: "info" | "warning";
     selectionInspector: SelectionInspectorViewModel;
+}
+
+export interface DrawerRulePaletteViewModel {
     ruleSummaryText: string;
-    overlaysDismissed: boolean;
-    drawerVisible: boolean;
-    backdropVisible: boolean;
-    tilingFamilyOptions: TopologyOption[];
-    tilingFamilyValue: string;
-    adjacencyModeOptions: AdjacencyModeOption[];
-    adjacencyModeValue: string;
-    adjacencyModeVisible: boolean;
-    syncStatusText: string;
-    speedValue: string;
-    speedLabel: string;
     ruleSelectValue: string;
     ruleOptions: RuleSelectOption[];
     ruleDescription: string;
     paletteStates: PaintPaletteState[];
     selectedPaintState: number | null;
+}
+
+export interface DrawerTopologyViewModel {
+    tilingFamilyOptions: TopologyOption[];
+    tilingFamilyValue: string;
+    adjacencyModeOptions: AdjacencyModeOption[];
+    adjacencyModeValue: string;
+    adjacencyModeVisible: boolean;
+    speedValue: string;
+    speedLabel: string;
+    unsafeSizingEnabled: boolean;
+    cellSizeVisible: boolean;
+    cellSizeVisibleTopBar: boolean;
+    cellSizeValue: string;
+    cellSizeLabel: string;
+    cellSizeMin: string;
+    cellSizeMax: string;
+    patchDepthVisible: boolean;
+    patchDepthVisibleTopBar: boolean;
+    patchDepthValue: string;
+    patchDepthLabel: string;
+    patchDepthMin: string;
+    patchDepthMax: string;
+}
+
+export interface DrawerPatternViewModel {
     randomResetVisible: boolean;
     randomResetDisabled: boolean;
     randomResetTitle: string;
@@ -162,29 +185,14 @@ export interface DrawerViewModel {
     pastePatternLabel: string;
     pastePatternDisabled: boolean;
     pastePatternTitle: string;
-    drawerToggleLabel: string;
-    drawerToggleTitle: string;
-    quickStartHintText: string;
-    quickStartHintVisible: boolean;
-    cellSizeVisible: boolean;
-    cellSizeVisibleTopBar: boolean;
-    cellSizeValue: string;
-    cellSizeLabel: string;
-    cellSizeMin: string;
-    cellSizeMax: string;
-    unsafeSizingEnabled: boolean;
-    patchDepthVisible: boolean;
-    patchDepthVisibleTopBar: boolean;
-    patchDepthValue: string;
-    patchDepthLabel: string;
-    patchDepthMin: string;
-    patchDepthMax: string;
-    blockingActivityVisible: boolean;
-    blockingActivityMessage: string;
-    blockingActivityDetail: string;
-    patternStatusText: string;
-    patternStatusTone: string;
 }
+
+export interface DrawerViewModel extends
+    DrawerShellViewModel,
+    DrawerInspectorViewModel,
+    DrawerRulePaletteViewModel,
+    DrawerTopologyViewModel,
+    DrawerPatternViewModel {}
 
 export interface EditorViewModel {
     editorTools: readonly LabeledOption<string>[];

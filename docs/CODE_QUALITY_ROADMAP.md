@@ -151,7 +151,7 @@ Adding a drawer section should not increase coupling between unrelated controls.
 
 Implementation status:
 
-The right-click metadata builder now lives in `frontend/controls-model/selection-inspector.ts`. `drawer.ts` remains the drawer aggregator and imports that section-specific model.
+The right-click metadata builder now lives in `frontend/controls-model/selection-inspector.ts`, and the broader drawer model is now split into section-owned builders for shell state, inspector/header state, topology/sizing, rule/palette, and pattern controls. `drawer.ts` is now just the composition layer for those sections.
 
 ### 4. Aperiodic Tiling Implementations
 
