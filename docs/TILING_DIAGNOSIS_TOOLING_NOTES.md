@@ -110,7 +110,17 @@ Profiles already encode the family/depth/viewport/theme. They do not yet encode:
 - preferred host mode
 - any family-specific notes about what visual property is under review
 
-That means every serious visual review still depends on extra operator memory.
+That was the state during the original pass, and it forced serious visual
+review to depend on operator memory.
+
+Status: partially addressed in later slices. Named profiles now carry:
+
+- profile-owned literature metadata
+- short manual-review checklists
+- exact expected-warning metadata via `profileExpectations`
+
+The remaining gap is narrower: profiles still annotate review decisions rather
+than owning hard acceptance thresholds or promotion rules.
 
 ## Tooling Backlog
 
@@ -209,9 +219,11 @@ For the `pinwheel` example, the consistency-report layer is now the primary
 cross-check, the sweep tool is now the primary comparison path, the family
 sample workbench is now the primary structural candidate-exploration path, and
 literature-review mode now makes profile-based citation and montage workflows
-repeatable without checking reference images into git. The next tooling
-investment should be geometry-cleanup exploration and stronger profile-owned
-review expectations, not more host/process orchestration.
+repeatable without checking reference images into git. The geometry-cleanup
+workbench and advisory profile-owned expectations have since landed too. The
+remaining tooling gaps are lighter-weight: better family-level acceptance
+criteria and an optional diff-style review surface, not more host/process
+orchestration.
 
 ## Shield Pass Gaps
 
