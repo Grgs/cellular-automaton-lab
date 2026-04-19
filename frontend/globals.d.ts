@@ -41,6 +41,7 @@ declare global {
         __appReady?: boolean;
         __appDiagnostics?: ((() => AppDiagnosticsSnapshot | null) | null);
         __applyReviewTopology?: (((topology: TopologyPayload) => Promise<void>) | null);
+        __resolveRenderedCellCenter?: (((cellId: string) => Promise<{ x: number; y: number } | null>) | null);
     }
 }
 

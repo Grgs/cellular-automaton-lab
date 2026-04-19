@@ -54,6 +54,7 @@ type RuntimeCanvasGridView = CanvasGridView & {
     supportsTopology: true;
     getMetrics(): CanvasSurfaceMetrics;
     getRenderDiagnostics(): RenderDiagnosticsSnapshot | null;
+    getRenderedCellCenter(cellId: string): { x: number; y: number } | null;
 };
 
 type SampleRole = "lexicographicFirst" | "centerNearest" | "boundaryFurthest";
@@ -688,6 +689,18 @@ export function createCanvasGridView({
         return structuredClone(renderDiagnostics);
     }
 
+    function getRenderedCellCenter(cellId: string): { x: number; y: number } | null {
+        const polygonCache = asPolygonGeometryCache(geometryCache);
+        const renderedGeometry = polygonCache?.cellsById.get(cellId) ?? null;
+        if (!renderedGeometry) {
+            return null;
+        }
+        return {
+            x: renderedGeometry.centerX,
+            y: renderedGeometry.centerY,
+        };
+    }
+
     return {
         supportsTopology: true,
         render,
@@ -702,5 +715,6 @@ export function createCanvasGridView({
         getCellFromPointerEvent,
         getMetrics,
         getRenderDiagnostics,
+        getRenderedCellCenter,
     };
 }

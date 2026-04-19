@@ -13,7 +13,13 @@ from playwright.sync_api import expect
 try:
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase, WaitUntilState
     from tests.e2e.browser_support.diagnostics import GridSummary, parse_grid_summary_text
+    from tests.e2e.browser_support.palette_regression import (
+        PaletteFixtureCase,
+        iter_palette_fixture_cases,
+        palette_fixture_test_suffix,
+    )
     from tests.e2e.browser_support.render_review import (
+        apply_review_topology_payload,
         assert_canvas_centered_within_viewport,
         canvas_visual_summary,
         select_tiling_family,
@@ -25,7 +31,13 @@ except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase, WaitUntilState
     from tests.e2e.browser_support.diagnostics import GridSummary, parse_grid_summary_text
+    from tests.e2e.browser_support.palette_regression import (
+        PaletteFixtureCase,
+        iter_palette_fixture_cases,
+        palette_fixture_test_suffix,
+    )
     from tests.e2e.browser_support.render_review import (
+        apply_review_topology_payload,
         assert_canvas_centered_within_viewport,
         canvas_visual_summary,
         select_tiling_family,
@@ -136,6 +148,81 @@ class SharedUiFlowMixin:
         case = self._case()
         wait_for_patch_render_complete(case.page)
 
+    def _apply_review_topology(self, topology_payload: dict[str, object]) -> None:
+        case = self._case()
+        apply_review_topology_payload(case.page, topology_payload)
+        wait_for_patch_render_complete(case.page)
+
+    def _sample_canvas_pixel_rgba(self, canvas_x: float, canvas_y: float) -> tuple[int, int, int, int]:
+        case = self._case()
+        rgba = case.page.evaluate(
+            """([x, y]) => {
+                const canvas = document.getElementById("grid");
+                if (!(canvas instanceof HTMLCanvasElement)) {
+                    throw new Error("grid canvas is missing");
+                }
+                const context = canvas.getContext("2d");
+                if (!context) {
+                    throw new Error("grid context is missing");
+                }
+                const data = context.getImageData(Math.round(x), Math.round(y), 1, 1).data;
+                return Array.from(data);
+            }""",
+            [canvas_x, canvas_y],
+        )
+        return tuple(int(channel) for channel in cast(list[int], rgba))
+
+    def _click_canvas_position(self, canvas_x: float, canvas_y: float) -> None:
+        case = self._case()
+        bbox = case.page.locator("#grid").bounding_box()
+        if bbox is None:
+            raise AssertionError("grid canvas bounding box was unavailable")
+        canvas_metrics = case.page.evaluate(
+            """() => {
+                const canvas = document.getElementById("grid");
+                if (!(canvas instanceof HTMLCanvasElement)) {
+                    throw new Error("grid canvas is missing");
+                }
+                return { width: canvas.width, height: canvas.height };
+            }""",
+        )
+        if not isinstance(canvas_metrics, dict):
+            raise AssertionError("grid canvas metrics were unavailable")
+        canvas_width = float(canvas_metrics.get("width") or 0)
+        canvas_height = float(canvas_metrics.get("height") or 0)
+        if canvas_width <= 0 or canvas_height <= 0:
+            raise AssertionError(f"grid canvas metrics were invalid: {canvas_metrics!r}")
+        css_x = bbox["x"] + (canvas_x * (bbox["width"] / canvas_width))
+        css_y = bbox["y"] + (canvas_y * (bbox["height"] / canvas_height))
+        case.page.mouse.click(css_x, css_y)
+
+    def _set_paint_state(self, state_value: int) -> None:
+        case = self._case()
+        case.page.locator(f'.paint-state-button[data-state-value="{state_value}"]').click()
+
+    def _set_editor_tool(self, editor_tool: str) -> None:
+        case = self._case()
+        case.page.locator(f'[data-editor-tool="{editor_tool}"]').click()
+
+    def _resolve_rendered_cell_center(self, cell_id: str) -> tuple[float, float]:
+        case = self._case()
+        center = case.page.evaluate(
+            """async (targetCellId) => {
+                if (typeof window.__resolveRenderedCellCenter !== "function") {
+                    throw new Error("rendered cell center hook is unavailable");
+                }
+                return window.__resolveRenderedCellCenter(targetCellId);
+            }""",
+            cell_id,
+        )
+        if not isinstance(center, dict):
+            raise AssertionError(f"rendered center was unavailable for {cell_id}")
+        center_x = center.get("x")
+        center_y = center.get("y")
+        if not isinstance(center_x, (int, float)) or not isinstance(center_y, (int, float)):
+            raise AssertionError(f"rendered center was malformed for {cell_id}: {center!r}")
+        return float(center_x), float(center_y)
+
     def _select_tiling_family_and_wait_for_reset(
         self,
         tiling_family: str,
@@ -243,6 +330,93 @@ class SharedUiFlowMixin:
         case.assertGreater(coverage_width_ratio, minimum_coverage_width_ratio)
         case.assertGreater(coverage_height_ratio, minimum_coverage_height_ratio)
         case.assertGreaterEqual(len(dominant_fill_colors), minimum_fill_colors)
+
+    def _assert_fixture_dead_cells_do_not_alias_live_canvas_color(
+        self,
+        fixture_case: PaletteFixtureCase,
+    ) -> None:
+        case = self._case()
+        topology = cast(dict[str, object], fixture_case["topology"])
+        cells = cast(list[dict[str, object]], topology["cells"])
+        selector_fields = fixture_case["selector_fields"]
+
+        self._select_tiling_family_and_wait_for_reset(fixture_case["family"])
+        self._expect("#tiling-family-select").to_have_value(fixture_case["family"])
+        self._apply_review_topology(topology)
+
+        centers = [
+            (
+                float(cast(dict[str, object], cell["center"])["x"]),
+                float(cast(dict[str, object], cell["center"])["y"]),
+            )
+            for cell in cells
+            if isinstance(cell.get("center"), dict)
+        ]
+        mean_x = sum(point[0] for point in centers) / len(centers)
+        mean_y = sum(point[1] for point in centers) / len(centers)
+
+        grouped_candidates: dict[str, list[dict[str, object]]] = {}
+        for cell in cells:
+            center = cell.get("center")
+            if not isinstance(center, dict):
+                continue
+            signature_parts = []
+            for field in selector_fields:
+                value = cell.get(field)
+                signature_parts.append(str(value or "<missing>"))
+            signature = ":".join(signature_parts) if signature_parts else "__default__"
+            grouped_candidates.setdefault(signature, []).append(cell)
+
+        representative_cells: dict[str, dict[str, object]] = {}
+        rendered_centers: dict[str, tuple[float, float]] = {}
+        for signature, candidates in grouped_candidates.items():
+            candidates.sort(
+                key=lambda cell: (
+                    (float(cast(dict[str, object], cell["center"])["x"]) - mean_x) ** 2
+                    + (float(cast(dict[str, object], cell["center"])["y"]) - mean_y) ** 2
+                ),
+            )
+            for candidate in candidates:
+                try:
+                    rendered_center = self._resolve_rendered_cell_center(str(candidate["id"]))
+                except AssertionError:
+                    continue
+                representative_cells[signature] = candidate
+                rendered_centers[signature] = rendered_center
+                break
+
+        case.assertTrue(
+            representative_cells,
+            f"{fixture_case['family']} fixture did not yield any representative palette samples",
+        )
+
+        dead_samples: dict[str, tuple[int, int, int, int]] = {}
+        self._set_editor_tool("brush")
+        self._set_paint_state(1)
+        for signature, cell in representative_cells.items():
+            center_x, center_y = rendered_centers[signature]
+            dead_samples[signature] = self._sample_canvas_pixel_rgba(center_x, center_y)
+            self._click_canvas_position(center_x, center_y)
+
+        case.page.wait_for_timeout(300)
+
+        live_samples: dict[str, tuple[int, int, int, int]] = {}
+        for signature, cell in representative_cells.items():
+            center_x, center_y = rendered_centers[signature]
+            live_samples[signature] = self._sample_canvas_pixel_rgba(center_x, center_y)
+
+        canonical_live_sample = next(iter(live_samples.values()))
+        for signature in sorted(representative_cells):
+            case.assertEqual(
+                live_samples[signature],
+                canonical_live_sample,
+                f"{fixture_case['family']} sample {signature} did not paint to the canonical live canvas color",
+            )
+            case.assertNotEqual(
+                dead_samples[signature],
+                canonical_live_sample,
+                f"{fixture_case['family']} sample {signature} dead-state canvas color aliased the live canvas color",
+            )
 
     def _export_pattern_payload(self) -> dict[str, object]:
         case = self._case()
@@ -505,6 +679,21 @@ class SharedUiFlowMixin:
         self._expect("#pattern-status").to_have_text("Pasted pattern from clipboard.")
         pasted_payload = self._export_pattern_payload()
         case.assertEqual(pasted_payload["cells_by_id"], copied_payload["cells_by_id"])
+
+
+def _build_palette_alias_regression_test(fixture_case: PaletteFixtureCase):
+    def test_method(self: SharedUiFlowMixin) -> None:
+        self._assert_fixture_dead_cells_do_not_alias_live_canvas_color(fixture_case)
+
+    return test_method
+
+
+for _palette_fixture_case in iter_palette_fixture_cases():
+    setattr(
+        SharedUiFlowMixin,
+        f"test_{palette_fixture_test_suffix(_palette_fixture_case)}_dead_cells_do_not_alias_live_canvas_color",
+        _build_palette_alias_regression_test(_palette_fixture_case),
+    )
 
 
 class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):

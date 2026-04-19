@@ -56,6 +56,7 @@ function installAppDiagnostics(controller: AppController): void {
     window.__applyReviewTopology = async (topologyPayload) => {
         controller.applyReviewTopology(topologyPayload);
     };
+    window.__resolveRenderedCellCenter = async (cellId) => controller.getRenderedCellCenter(cellId);
 }
 
 export function disposeApp(): void {
@@ -63,6 +64,7 @@ export function disposeApp(): void {
     activeController = null;
     window.__appDiagnostics = null;
     window.__applyReviewTopology = null;
+    window.__resolveRenderedCellCenter = null;
     window.__appReady = false;
 }
 

@@ -134,6 +134,7 @@ export function createAppController({
         applyReviewTopology,
         getState: () => state,
         getRenderDiagnostics: () => gridView.getRenderDiagnostics?.() ?? null,
+        getRenderedCellCenter: (cellId) => gridView.getRenderedCellCenter?.(cellId) ?? null,
         getInteractions: () => interactions,
         getViewportController: () => viewportController,
         getConfigSyncController: () => configSyncController,
