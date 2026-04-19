@@ -15,7 +15,7 @@ None.
 
 - Periodic mixed families are still verified on finite open-boundary canonical samples rather than larger-sample or quotient-surface proofs. The reference layer now supports per-family periodic sample sizes, but the current audit kept the shipped catalog on `3x3`.
 - Periodic dual-family invariants now cover the unambiguous reciprocal pairs plus candidate-class signature checks for the currently ambiguous catalog groups, but they are still finite-sample descriptor checks rather than full dual-construction proofs.
-- The reference layer now mixes rooted local-reference anchors with direct canonical patch diffs for `dodecagonal-square-triangle`, `shield`, and `pinwheel`; it is not yet full canonical patch coverage for every family.
+- The reference layer now mixes rooted local-reference anchors with direct canonical patch diffs for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`; it is not yet full canonical patch coverage for every family.
 - `shield` uses relaxed topology validation (`graph connectivity`, without strict shared-surface, overlap, or edge-multiplicity checks) because the dense image-derived polygons are still not exact edge-sharing substitution polygons.
 - `shield` now keeps a no-overlap representative frontend fixture, but it still relies on a small topology-space trace cleanup plus a draw-only seam bridge rather than an exact symbolic substitution model.
 - Several aperiodic families are verified through deterministic low-depth samples, count invariants, adjacency rules, and metadata presence rather than a full symbolic substitution proof.

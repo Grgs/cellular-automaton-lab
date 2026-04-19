@@ -15,6 +15,7 @@ from backend.simulation.literature_reference_verification import (
     _depth_topology_expectation_failures,
     _canonicalize_vertex_configuration,
     _local_reference_fixture_failures,
+    _load_canonical_reference_fixtures,
     _parse_periodic_face_cell_id,
     _periodic_face_sample_size,
     _periodic_face_descriptor_failures,
@@ -468,6 +469,40 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
                     ]
                 )
 
+    def test_broadened_direct_canonical_patch_payloads_match_checked_in_fixtures(self) -> None:
+        fixtures = _load_canonical_reference_fixtures()
+
+        for geometry, depth in (
+            ("robinson-triangles", 1),
+            ("robinson-triangles", 3),
+            ("tuebingen-triangle", 1),
+            ("tuebingen-triangle", 3),
+            ("dodecagonal-square-triangle", 1),
+            ("dodecagonal-square-triangle", 3),
+            ("shield", 1),
+            ("shield", 3),
+            ("pinwheel", 1),
+            ("pinwheel", 3),
+        ):
+            with self.subTest(geometry=geometry, depth=depth):
+                expectation = REFERENCE_FAMILY_SPECS[geometry].depth_expectations[depth]
+                fixture_key = expectation.canonical_patch_fixture_key
+                if fixture_key is None:
+                    self.fail(f"{geometry} depth {depth} is missing a canonical patch fixture key.")
+                topology = build_topology(geometry, 0, 0, depth)
+                fixture = fixtures[geometry][fixture_key]
+                self.assertEqual(
+                    bool(fixture["include_id"]),
+                    expectation.canonical_patch_include_id,
+                )
+                self.assertEqual(
+                    _canonical_patch_payload(
+                        topology,
+                        include_id=expectation.canonical_patch_include_id,
+                    ),
+                    fixture["cells"],
+                )
+
     def test_canonical_patch_fixture_reports_mismatch(self) -> None:
         topology = build_topology("shield", 0, 0, 3)
         observed_cells = _canonical_patch_payload(topology, include_id=False)
@@ -500,6 +535,37 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
         self.assertTrue(
             any(failure.code == "canonical-patch-fixture-mismatch" for failure in failures)
+        )
+
+    def test_canonical_patch_fixture_reports_include_id_mismatch(self) -> None:
+        topology = build_topology("pinwheel", 0, 0, 1)
+        bad_fixtures = {
+            "pinwheel": {
+                "exact-depth-1": {
+                    "depth": 1,
+                    "include_id": False,
+                    "cells": _canonical_patch_payload(topology, include_id=False),
+                }
+            }
+        }
+
+        expectation = REFERENCE_FAMILY_SPECS["pinwheel"].depth_expectations[1]
+        with patch(
+            "backend.simulation.reference_verification.fixtures._load_canonical_reference_fixtures",
+            return_value=bad_fixtures,
+        ):
+            failures = _depth_topology_expectation_failures(
+                geometry="pinwheel",
+                depth=1,
+                topology=topology,
+                expectation=expectation,
+            )
+
+        self.assertTrue(
+            any(
+                failure.code == "canonical-patch-fixture-include-id-mismatch"
+                for failure in failures
+            )
         )
 
     def test_exact_substitution_canonical_patch_fixture_reports_mismatch(self) -> None:

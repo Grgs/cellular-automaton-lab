@@ -304,6 +304,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     (ROBINSON_THICK_KIND, ROBINSON_THIN_KIND),
                     (ROBINSON_THIN_KIND, ROBINSON_THIN_KIND),
                 ),
+                canonical_patch_fixture_key="exact-depth-1",
             ),
             2: ReferenceDepthExpectation(exact_total_cells=140),
             3: ReferenceDepthExpectation(
@@ -379,6 +380,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     (TUEBINGEN_THICK_KIND, TUEBINGEN_THIN_KIND),
                 ),
                 min_unique_chirality_tokens=2,
+                canonical_patch_fixture_key="exact-depth-1",
             ),
             3: ReferenceDepthExpectation(
                 exact_total_cells=210,
@@ -427,6 +429,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     (DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND, DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND),
                     (DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND, DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND),
                 ),
+                canonical_patch_fixture_key="dense-depth-1",
             ),
             3: ReferenceDepthExpectation(
                 exact_total_cells=462,
@@ -492,6 +495,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 exact_total_cells=81,
                 min_unique_orientation_tokens=12,
                 expected_signature="1d884216655b",  # pragma: allowlist secret
+                canonical_patch_fixture_key="dense-depth-1",
             ),
             3: ReferenceDepthExpectation(
                 exact_total_cells=443,
@@ -541,6 +545,8 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 exact_total_cells=10,
                 min_unique_orientation_tokens=4,
                 min_bounds_longest_span=3.0,
+                canonical_patch_fixture_key="exact-depth-1",
+                canonical_patch_include_id=True,
             ),
             2: ReferenceDepthExpectation(
                 exact_total_cells=50,
@@ -552,6 +558,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 min_unique_orientation_tokens=30,
                 min_bounds_longest_span=12.0,
                 canonical_patch_fixture_key="exact-depth-3",
+                canonical_patch_include_id=True,
             ),
         },
         builder_signals=(

@@ -110,23 +110,12 @@ def discover_canonical_fixture_targets(
             fixture_key = expectation.canonical_patch_fixture_key
             if fixture_key is None:
                 continue
-            fixture = fixtures.get(candidate_geometry, {}).get(fixture_key)
-            if fixture is None:
-                raise FixtureRegenerationError(
-                    f"Missing existing canonical fixture {candidate_geometry}:{fixture_key}."
-                )
-            fixture_depth = int(fixture.get("depth", candidate_depth))
-            if fixture_depth != candidate_depth:
-                raise FixtureRegenerationError(
-                    f"Canonical fixture {candidate_geometry}:{fixture_key} declares depth "
-                    f"{fixture_depth}, expected {candidate_depth}."
-                )
             targets.append(
                 CanonicalFixtureTarget(
                     geometry=candidate_geometry,
                     depth=candidate_depth,
                     fixture_key=fixture_key,
-                    include_id=bool(fixture.get("include_id", False)),
+                    include_id=expectation.canonical_patch_include_id,
                 )
             )
     return tuple(targets)

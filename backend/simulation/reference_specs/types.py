@@ -57,6 +57,7 @@ class ReferenceDepthExpectation:
     max_bounds_aspect_ratio: float | None = None
     expected_signature: str | None = None
     canonical_patch_fixture_key: str | None = None
+    canonical_patch_include_id: bool = False
 
 
 @dataclass(frozen=True)

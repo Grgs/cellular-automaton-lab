@@ -232,7 +232,7 @@ Implementation status:
 
 The first split is in place. `backend/simulation/literature_reference_specs.py` now merges grouped spec modules from `backend/simulation/reference_specs/`, and `backend/simulation/literature_reference_verification.py` is a compatibility facade over `backend/simulation/reference_verification/` modules for observation, fixtures, depth checks, periodic checks, shared types, and runner orchestration. `tools/regenerate_reference_fixtures.py` now makes local and canonical fixture regeneration explicit, deterministic, and checkable.
 The verification-strength report is now a real aggregator instead of a thin tag dump: `tools/report_tiling_verification_strength.py` combines static coverage, aperiodic implementation contracts, fixture presence, and live `verify_all_reference_families()` results into summary, detail, and deterministic JSON outputs.
-Direct canonical patch comparison now also covers `robinson-triangles` and `tuebingen-triangle` at depth `3`, extending the exact checked-in fixture layer beyond the earlier `dodecagonal-square-triangle`, `shield`, and `pinwheel` set.
+Direct canonical patch comparison now covers both shallow and representative depths for the highest-risk aperiodic families: `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel` all have checked-in direct patch fixtures at depth `1`, while their strongest representative fixtures remain checked in at depth `3`. Canonical fixture policy such as whether ids must be part of the comparison is now owned by the backend reference spec instead of by the JSON fixture file.
 
 ### 6. Frontend Geometry Adapter Common Path
 
@@ -348,4 +348,4 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 ## Suggested Order
 
 1. Split remaining drawer sections into section-owned builders once metadata and editor controls grow again.
-2. Broaden direct canonical patch comparisons beyond the current exact-depth set (`dodecagonal-square-triangle`, `shield`, `pinwheel`, `robinson-triangles`, and `tuebingen-triangle`) where they materially strengthen correctness guarantees.
+2. Expand Python lint/format guardrails beyond the current render-review/bootstrap slice once the older compatibility facades stop depending on import-for-export and `sys.path` bootstrap patterns.

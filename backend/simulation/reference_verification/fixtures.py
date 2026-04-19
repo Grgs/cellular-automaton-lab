@@ -219,8 +219,21 @@ def _canonical_patch_fixture_failures(
                 depth=depth,
             )
         ]
-    include_id = bool(fixture.get("include_id", False))
-    observed_payload = _canonical_patch_payload(topology, include_id=include_id)
+    expected_include_id = expectation.canonical_patch_include_id
+    fixture_include_id = bool(fixture.get("include_id", False))
+    if fixture_include_id != expected_include_id:
+        return [
+            ReferenceCheckFailure(
+                code="canonical-patch-fixture-include-id-mismatch",
+                message=(
+                    f"Depth {depth} expected canonical patch fixture {fixture_key!r} "
+                    f"for {geometry} to declare include_id={expected_include_id}, "
+                    f"but the checked-in fixture declared include_id={fixture_include_id}."
+                ),
+                depth=depth,
+            )
+        ]
+    observed_payload = _canonical_patch_payload(topology, include_id=expected_include_id)
     expected_payload = fixture.get("cells", [])
     if observed_payload != expected_payload:
         return [
@@ -234,4 +247,3 @@ def _canonical_patch_fixture_failures(
             )
         ]
     return []
-

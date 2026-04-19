@@ -62,7 +62,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - exact-record growth must follow the paired-seed substitution count `2 * 5^d`
   - representative support should expand with depth on the exact-affine inflation path
   - a rooted local-reference anchor now checks the exact-path neighborhood around a canonical depth-3 tile
-  - a direct canonical depth-3 patch fixture now checks the exact serialized patch on that exact-affine path
+  - direct canonical patch fixtures now check the exact serialized patch on that exact-affine path at both depth `1` and depth `3`
   - the representative sample must remain hole-free under the canonical surface checks
 - `shield`
   - the authoritative verifier sample is a dense 12-fold central field derived from the literature patch image
@@ -71,7 +71,7 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - odd patch depths must apply the documented 15-degree orientation alternation
   - orientation-token diversity must remain high in representative dense patches
   - rooted local-reference fixtures now check canonical neighborhoods inside that dense field
-  - a direct dense depth-3 canonical patch fixture now checks the normalized public serialization exactly
+  - direct dense canonical patch fixtures now check the normalized public serialization exactly at both depth `1` and depth `3`
 - `hat-monotile`
   - verification assumes an `H8`-rooted representative patch rather than a one-tile seed
   - representative patches should include opposite-chirality Hat adjacencies
@@ -79,12 +79,15 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - rooted local-reference fixtures now check a canonical neighborhood around that `H8`-rooted sample
 - `tuebingen-triangle`
   - chirality metadata is part of the expected output
+  - direct canonical patch fixtures now pin both the first handed substitution patch and the representative depth-`3` sample
 - `dodecagonal-square-triangle`
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
   - the authoritative verifier sample is now a cleaned dense depth-3 central component of the literature patch, not just a shallow adjacency shell
   - that depth-3 sample must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
   - rooted local-reference fixtures now pin a few canonical square/triangle neighborhoods inside that dense sample
-  - a direct canonical depth-3 patch fixture now checks the normalized public square/triangle serialization exactly
+  - direct dense canonical patch fixtures now check the normalized public square/triangle serialization exactly at both depth `1` and depth `3`
+- `robinson-triangles`
+  - direct canonical patch fixtures now pin both the first refined Robinson triangle patch and the representative depth-`3` sample
 - `chair`
   - representative patches should follow the true inflation-by-2 chair substitution from a single chair seed
   - low-depth samples should preserve exact substitution depth totals and orientation-token distributions

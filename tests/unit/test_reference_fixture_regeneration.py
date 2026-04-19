@@ -9,6 +9,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.regenerate_reference_fixtures import (
+    CanonicalFixtureTarget,
     FixtureRegenerationError,
     LocalFixtureTarget,
     _canonical_drift_lines,
@@ -64,6 +65,27 @@ class ReferenceFixtureRegenerationTests(unittest.TestCase):
         self.assertEqual(
             _canonical_drift_lines(regenerated, mutated, targets),
             ["canonical shield depth 3 fixture dense-depth-3"],
+        )
+
+    def test_canonical_target_discovery_uses_spec_owned_include_id_for_missing_fixture(self) -> None:
+        fixtures = _read_canonical_fixtures()
+        mutated = copy.deepcopy(fixtures)
+        mutated["pinwheel"].pop("exact-depth-1", None)
+
+        self.assertEqual(
+            discover_canonical_fixture_targets(
+                mutated,
+                geometry="pinwheel",
+                depth=1,
+            ),
+            (
+                CanonicalFixtureTarget(
+                    geometry="pinwheel",
+                    depth=1,
+                    fixture_key="exact-depth-1",
+                    include_id=True,
+                ),
+            ),
         )
 
     def test_missing_local_anchor_fails_clearly(self) -> None:
