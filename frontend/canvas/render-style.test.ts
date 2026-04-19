@@ -412,7 +412,7 @@ describe("canvas/render-style", () => {
                     kind: "shield-shield",
                     tile_family: "shield",
                 },
-                expectedColor: "#d5bb8f",
+                expectedColor: "#1f2430",
             },
             {
                 cell: {
@@ -430,7 +430,7 @@ describe("canvas/render-style", () => {
                     kind: "shield-triangle",
                     tile_family: "shield",
                 },
-                expectedColor: "#c88d4b",
+                expectedColor: "#bf5a36",
             },
         ];
 

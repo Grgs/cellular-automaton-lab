@@ -24,7 +24,8 @@
 
 ## Now
 
-- Revisit browser-visible shape and pattern correctness for `dodecagonal-square-triangle`, `shield`, and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
+- Revisit browser-visible shape and pattern correctness for `dodecagonal-square-triangle` and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
+- Run an explicit manual visible-review decision for `shield` against the cached literature reference; the current dense-field approximation is now visually close enough to revisit review, but it remains `Experimental` until that decision is recorded.
 - For `pinwheel`, treat the remaining visual mismatch as a display-sampling problem; keep the two-root exact-affine runtime patch, and if we revisit the presentation use a display-only observation window rather than runtime subset selection.
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next

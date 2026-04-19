@@ -73,9 +73,9 @@ const PINWHEEL_DEAD_PALETTE = new Map<string, string>([
 ]);
 
 const SHIELD_DEAD_PALETTE = new Map<string, string>([
-    [SHIELD_SHIELD_KIND, "#d5bb8f"],
-    [SHIELD_SQUARE_KIND, "#f8f1e5"],
-    [SHIELD_TRIANGLE_KIND, "#c88d4b"],
+    [SHIELD_SHIELD_KIND, DEFAULT_COLORS.live],
+    [SHIELD_SQUARE_KIND, DEFAULT_COLORS.dead],
+    [SHIELD_TRIANGLE_KIND, DEFAULT_COLORS.accent],
 ]);
 
 function resolveTuebingenDeadColor(

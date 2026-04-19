@@ -8,8 +8,8 @@ None.
 
 ## Current Known Deviations
 
-- `dodecagonal-square-triangle`, `shield`, and `pinwheel` still fail manual visible review even though they now pass stronger backend, canonical-patch, and browser-visible automated checks. They remain in `Experimental` until the rendered patterns look correct enough to justify promotion.
-- `shield` now uses a dense literature-derived central field selected through a backend-owned dodecagonal window rather than the old translated-cluster motif, but it is still not a full marked fractal substitution with explicit bond rules. The repo treats that as an approximation gap, not as a blocker for the current canonical-patch verifier.
+- `dodecagonal-square-triangle` and `pinwheel` still fail manual visible review even though they now pass stronger backend, canonical-patch, and browser-visible automated checks. They remain in `Experimental` until the rendered patterns look correct enough to justify promotion.
+- `shield` now uses a dense literature-derived central field selected through a backend-owned dodecagonal window, minimal topology-space trace cleanup, a draw-only seam bridge, and an app-owned dead-state palette. It is visually close enough to justify a new manual review pass, but it still remains in `Experimental` and does not claim a full marked fractal substitution with explicit bond rules.
 
 ## Known Limits That Are Not Currently Treated As Failures
 
