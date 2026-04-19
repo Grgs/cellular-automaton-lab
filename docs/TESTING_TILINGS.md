@@ -190,6 +190,13 @@ Render-review summaries and managed manifests now also expose:
 - `runtimeProvenance` and `provenanceWarnings` for standalone/server build attribution
 - `settleDiagnostics` for render-readiness and final stable summary state
 - `visualMetrics` for advisory visual-quality diagnosis
+- `profileExpectations` for profile-owned manual checklists plus expected-warning classification
+
+`profileExpectations` is advisory only. In v1 it carries:
+
+- manual checklist items owned by the named render-review profile
+- exact-message expected warnings, filtered by applicable host kind
+- `missingExpectedWarnings` and `unexpectedWarnings` so the operator can see whether a run matches the profile-owned expectation set
 
 Render review no longer treats “loading overlay hidden” as the capture gate by
 itself. The browser harness now waits for a stable readiness tuple that

@@ -22,6 +22,22 @@ class OverlapPolicy:
 
 
 @dataclass(frozen=True)
+class ReviewChecklistItem:
+    id: str
+    label: str
+    guidance: str
+
+
+@dataclass(frozen=True)
+class ExpectedWarning:
+    id: str
+    message: str
+    sources: tuple[str, ...]
+    host_kinds: tuple[str, ...] = ()
+    note: str | None = None
+
+
+@dataclass(frozen=True)
 class RenderReviewProfile:
     name: str
     family: str
@@ -32,6 +48,17 @@ class RenderReviewProfile:
     theme: str = "light"
     literature_reference: LiteratureReference | None = None
     overlap_policy: OverlapPolicy | None = None
+    review_checklist: tuple[ReviewChecklistItem, ...] = ()
+    expected_warnings: tuple[ExpectedWarning, ...] = ()
+
+
+STANDALONE_BACKEND_UNAVAILABLE_WARNING = ExpectedWarning(
+    id="standalone-backend-topology-unavailable",
+    message="Backend topology facts unavailable for host mode standalone.",
+    sources=("consistency",),
+    host_kinds=("standalone",),
+    note="Standalone render review cannot compare live backend topology facts.",
+)
 
 
 RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
@@ -52,6 +79,24 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
             ),
             cache_filename="pinwheel-reference.png",
         ),
+        review_checklist=(
+            ReviewChecklistItem(
+                id="interior-field-isotropy",
+                label="Interior field reads isotropic",
+                guidance="Check that the visible patch reads as an interior pinwheel field rather than a directional or rectangular crop.",
+            ),
+            ReviewChecklistItem(
+                id="boundary-dominance",
+                label="Boundary does not dominate",
+                guidance="Check that boundary triangles do not visually outweigh the interior texture of the sample.",
+            ),
+            ReviewChecklistItem(
+                id="orientation-mix",
+                label="Orientation mix feels balanced",
+                guidance="Check that multiple pinwheel orientations are evident in the field instead of one dominant directional band.",
+            ),
+        ),
+        expected_warnings=(STANDALONE_BACKEND_UNAVAILABLE_WARNING,),
     ),
     "shield-depth-3": RenderReviewProfile(
         name="shield-depth-3",
@@ -75,6 +120,24 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
                 "Only a tiny residual trace-noise budget is acceptable; anything larger is blocking."
             ),
         ),
+        review_checklist=(
+            ReviewChecklistItem(
+                id="central-field-symmetry",
+                label="Central field reads 12-fold",
+                guidance="Check that the dense center reads as a symmetric 12-fold shield field rather than a lopsided cluster.",
+            ),
+            ReviewChecklistItem(
+                id="density-balance",
+                label="Density stays visually even",
+                guidance="Check that the field stays dense without obvious sparse gutters or boundary-driven voids.",
+            ),
+            ReviewChecklistItem(
+                id="orientation-balance",
+                label="Orientations stay balanced",
+                guidance="Check that shield, square, and triangle orientations feel balanced in the central field instead of collapsing into a directional bias.",
+            ),
+        ),
+        expected_warnings=(STANDALONE_BACKEND_UNAVAILABLE_WARNING,),
     ),
     "dodecagonal-square-triangle-depth-3": RenderReviewProfile(
         name="dodecagonal-square-triangle-depth-3",
@@ -89,6 +152,24 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
             ),
             cache_filename="dodecagonal-square-triangle-reference.png",
         ),
+        review_checklist=(
+            ReviewChecklistItem(
+                id="dodecagonal-structure",
+                label="Dodecagonal structure is visible",
+                guidance="Check that the central field reads as a 12-fold square-triangle construction rather than an arbitrary dense polygon patch.",
+            ),
+            ReviewChecklistItem(
+                id="square-triangle-balance",
+                label="Square and triangle regions stay balanced",
+                guidance="Check that neither squares nor triangles visually swamp the other across the representative window.",
+            ),
+            ReviewChecklistItem(
+                id="central-density",
+                label="Central density stays coherent",
+                guidance="Check that the central mix stays dense and coherent without obvious missing sectors or off-center weighting.",
+            ),
+        ),
+        expected_warnings=(STANDALONE_BACKEND_UNAVAILABLE_WARNING,),
     ),
 }
 
@@ -128,6 +209,23 @@ def resolve_render_review_profile(profile_name: str) -> RenderReviewProfile:
         raise ValueError(
             f"Unknown render review profile {profile_name!r}. Available profiles: {available}"
         ) from exc
+
+
+def find_render_review_profile(
+    *,
+    family: str,
+    patch_depth: int | None = None,
+    cell_size: int | None = None,
+) -> RenderReviewProfile | None:
+    for profile in iter_render_review_profiles():
+        if profile.family != family:
+            continue
+        if profile.patch_depth != patch_depth:
+            continue
+        if profile.cell_size != cell_size:
+            continue
+        return profile
+    return None
 
 
 def resolve_overlap_policy(

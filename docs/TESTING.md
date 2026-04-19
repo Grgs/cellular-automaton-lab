@@ -449,6 +449,15 @@ such as:
 - 12-sector occupancy and derived radial-symmetry score when render diagnostics
   expose the needed aggregate inputs
 
+Named render-review profiles also now carry advisory `profileExpectations`:
+
+- short manual-review checklist items owned by the profile
+- exact expected-warning matching for known host- or family-specific warnings
+- missing vs unexpected warning classification in the JSON summary
+
+These expectations are advisory only. They do not change exit status or fail a
+review command on their own.
+
 Managed runner manifests for successful `--unittest --success-artifacts` runs also record:
 
 - `successArtifactsRequested`

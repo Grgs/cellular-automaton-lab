@@ -11,11 +11,13 @@ from PIL import Image
 from tools.render_canvas_review import (
     build_visual_metrics,
     build_overlap_hotspots_summary,
+    build_profile_expectations,
     build_reference_montage,
     build_consistency_report,
     compute_orientation_diversity,
     compute_radial_symmetry_score,
     condense_overlap_hotspots,
+    condense_profile_expectations,
     condense_transform_report,
     condense_visual_metrics,
     main,
@@ -25,6 +27,11 @@ from tools.render_canvas_review import (
     resolve_output_paths,
     resolve_render_review_request,
     with_review_topology_payload,
+)
+from tools.render_review_profiles import (
+    ExpectedWarning,
+    RenderReviewProfile,
+    ReviewChecklistItem,
 )
 
 
@@ -352,6 +359,153 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         self.assertEqual(condensed["visibleAspectRatio"], 1.2)
         self.assertEqual(condensed["radialSymmetryScore"], 1.0)
         self.assertEqual(condensed["warnings"], ["example warning"])
+
+    def test_build_profile_expectations_returns_none_without_profile(self) -> None:
+        expectations = build_profile_expectations(
+            profile=None,
+            host_kind="standalone",
+            consistency_report={"warnings": []},
+            provenance_warnings=(),
+            literature_review_summary={"warnings": []},
+            overlap_hotspots={"warnings": []},
+            settle_diagnostics={"warnings": []},
+            visual_metrics={"warnings": []},
+        )
+        self.assertIsNone(expectations)
+
+    def test_build_profile_expectations_matches_exact_warning_messages(self) -> None:
+        profile = RenderReviewProfile(
+            name="test-profile",
+            family="chair",
+            review_checklist=(
+                ReviewChecklistItem(
+                    id="manual",
+                    label="Manual review",
+                    guidance="Inspect the representative field manually.",
+                ),
+            ),
+            expected_warnings=(
+                ExpectedWarning(
+                    id="consistency-warning",
+                    message="Expected warning",
+                    sources=("consistency",),
+                ),
+            ),
+        )
+        expectations = build_profile_expectations(
+            profile=profile,
+            host_kind="server",
+            consistency_report={"warnings": ["Expected warning"]},
+            provenance_warnings=("Expected warning",),
+            literature_review_summary={"warnings": ["Unexpected literature warning"]},
+            overlap_hotspots={"warnings": []},
+            settle_diagnostics={"warnings": []},
+            visual_metrics={"warnings": []},
+        )
+        assert expectations is not None
+        self.assertEqual(expectations["profile"], "test-profile")
+        self.assertEqual(expectations["checklist"][0]["status"], "manual-review")
+        self.assertTrue(expectations["expectedWarnings"][0]["matched"])
+        self.assertEqual(
+            expectations["unexpectedWarnings"],
+            [
+                {"source": "provenanceWarnings", "message": "Expected warning"},
+                {"source": "literatureReview", "message": "Unexpected literature warning"},
+            ],
+        )
+
+    def test_build_profile_expectations_filters_host_specific_expected_warnings(self) -> None:
+        profile = RenderReviewProfile(
+            name="test-profile",
+            family="chair",
+            expected_warnings=(
+                ExpectedWarning(
+                    id="standalone-only",
+                    message="Backend topology facts unavailable for host mode standalone.",
+                    sources=("consistency",),
+                    host_kinds=("standalone",),
+                ),
+            ),
+        )
+        expectations = build_profile_expectations(
+            profile=profile,
+            host_kind="server",
+            consistency_report={"warnings": []},
+            provenance_warnings=(),
+            literature_review_summary={"warnings": []},
+            overlap_hotspots={"warnings": []},
+            settle_diagnostics={"warnings": []},
+            visual_metrics={"warnings": []},
+        )
+        assert expectations is not None
+        self.assertEqual(expectations["expectedWarnings"], [])
+        self.assertEqual(expectations["missingExpectedWarnings"], [])
+        self.assertEqual(expectations["unexpectedWarnings"], [])
+
+    def test_build_profile_expectations_classifies_missing_expected_warnings(self) -> None:
+        profile = RenderReviewProfile(
+            name="test-profile",
+            family="chair",
+            expected_warnings=(
+                ExpectedWarning(
+                    id="missing",
+                    message="Missing warning",
+                    sources=("visualMetrics",),
+                ),
+            ),
+        )
+        expectations = build_profile_expectations(
+            profile=profile,
+            host_kind="server",
+            consistency_report={"warnings": []},
+            provenance_warnings=(),
+            literature_review_summary={"warnings": []},
+            overlap_hotspots={"warnings": []},
+            settle_diagnostics={"warnings": []},
+            visual_metrics={"warnings": []},
+        )
+        assert expectations is not None
+        self.assertEqual(expectations["missingExpectedWarnings"], expectations["expectedWarnings"])
+        self.assertEqual(expectations["unexpectedWarnings"], [])
+
+    def test_condense_profile_expectations_keeps_review_headlines(self) -> None:
+        condensed = condense_profile_expectations(
+            {
+                "profile": "shield-depth-3",
+                "advisoryOnly": True,
+                "checklist": [
+                    {
+                        "id": "central-field-symmetry",
+                        "label": "Central field reads 12-fold",
+                        "guidance": "Check the center.",
+                        "status": "manual-review",
+                    }
+                ],
+                "missingExpectedWarnings": [
+                    {
+                        "id": "standalone-backend-topology-unavailable",
+                        "message": "Backend topology facts unavailable for host mode standalone.",
+                        "sources": ["consistency"],
+                        "matched": False,
+                        "note": "Standalone render review cannot compare live backend topology facts.",
+                    }
+                ],
+                "unexpectedWarnings": [
+                    {
+                        "source": "visualMetrics",
+                        "message": "Visible aspect ratio was unavailable because the occupied canvas bounds could not be resolved.",
+                    }
+                ],
+            }
+        )
+        assert condensed is not None
+        self.assertEqual(condensed["profile"], "shield-depth-3")
+        self.assertEqual(
+            condensed["checklist"],
+            [{"id": "central-field-symmetry", "label": "Central field reads 12-fold"}],
+        )
+        self.assertEqual(len(condensed["missingExpectedWarnings"]), 1)
+        self.assertEqual(len(condensed["unexpectedWarnings"]), 1)
 
     def test_parse_grid_size_text_parses_patch_depth_summary(self) -> None:
         parsed = parse_grid_size_text("Depth 3 • 600 tiles")

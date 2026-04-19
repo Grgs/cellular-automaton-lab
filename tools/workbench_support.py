@@ -14,6 +14,7 @@ if str(ROOT_DIR) not in sys.path:
 from tests.e2e.browser_support.artifacts import create_artifact_dir
 from tools.render_canvas_review import (
     DEFAULT_REFERENCE_CACHE_DIR,
+    condense_profile_expectations,
     condense_overlap_hotspots,
     condense_settle_diagnostics,
     condense_transform_report,
@@ -22,6 +23,7 @@ from tools.render_canvas_review import (
     resolve_render_review_request,
     with_review_topology_payload,
 )
+from tools.render_review_profiles import find_render_review_profile
 
 VALID_HOSTS = ("standalone", "server")
 VALID_THEMES = ("light", "dark")
@@ -59,10 +61,15 @@ def run_candidate_browser_review(
     topology_payload: dict[str, Any],
 ) -> dict[str, Any]:
     stem = f"{family}-depth-{patch_depth}"
+    matching_profile = find_render_review_profile(
+        family=family,
+        patch_depth=patch_depth,
+        cell_size=None,
+    )
     resolved = resolve_render_review_request(
         argparse.Namespace(
             family=family,
-            profile=None,
+            profile=matching_profile.name if matching_profile is not None else None,
             list_profiles=False,
             patch_depth=patch_depth,
             cell_size=None,
@@ -93,6 +100,7 @@ def run_candidate_browser_review(
         "overlapHotspots": condense_overlap_hotspots(review_payload.get("overlapHotspots")),
         "settleDiagnostics": condense_settle_diagnostics(review_payload.get("settleDiagnostics")),
         "visualMetrics": condense_visual_metrics(review_payload.get("visualMetrics")),
+        "profileExpectations": condense_profile_expectations(review_payload.get("profileExpectations")),
     }
 
 

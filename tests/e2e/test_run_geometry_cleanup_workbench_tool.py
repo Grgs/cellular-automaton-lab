@@ -92,4 +92,6 @@ class GeometryCleanupWorkbenchBrowserIntegrationTests(unittest.TestCase):
             )
             self.assertTrue(Path(render_review["summaryPath"]).exists())
             self.assertTrue(Path(render_review["pngPath"]).exists())
+            self.assertIn("profileExpectations", render_review)
+            self.assertEqual(render_review["profileExpectations"]["profile"], "shield-depth-3")
             self.assertIsNotNone(candidate_summary["cleanupDiagnostics"]["visualComparison"]["gutterScore"])

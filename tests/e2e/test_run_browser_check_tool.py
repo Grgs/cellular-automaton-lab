@@ -58,6 +58,8 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("transformSummary", manifest)
             self.assertIn("overlapHotspots", manifest)
             self.assertIn("visualMetrics", manifest)
+            self.assertIn("profileExpectations", manifest)
+            self.assertIsNone(manifest["profileExpectations"])
             self.assertTrue(manifest["settleDiagnostics"]["settled"])
 
     def test_runner_delegates_server_render_review(self) -> None:
@@ -91,7 +93,52 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("transformSummary", manifest)
             self.assertIn("overlapHotspots", manifest)
             self.assertIn("visualMetrics", manifest)
+            self.assertIn("profileExpectations", manifest)
+            self.assertIsNone(manifest["profileExpectations"])
             self.assertTrue(manifest["settleDiagnostics"]["settled"])
+
+    @unittest.skipUnless(
+        _standalone_outputs_ready(),
+        "standalone outputs are required; run `npm run build:frontend:standalone`",
+    )
+    def test_runner_copies_condensed_profile_expectations_for_standalone_profile_review(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-profile-") as tmpdir:
+            output_dir = Path(tmpdir)
+            exit_code = main(
+                [
+                    "--host",
+                    "standalone",
+                    "--artifact-dir",
+                    str(output_dir / "artifacts"),
+                    "--render-review",
+                    "--profile",
+                    "shield-depth-3",
+                ]
+            )
+            self.assertEqual(exit_code, 0)
+            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["profileExpectations"]["profile"], "shield-depth-3")
+            self.assertTrue(manifest["profileExpectations"]["advisoryOnly"])
+            self.assertEqual(manifest["profileExpectations"]["missingExpectedWarnings"], [])
+
+    def test_runner_copies_condensed_profile_expectations_for_server_profile_review(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="run-browser-check-server-profile-") as tmpdir:
+            output_dir = Path(tmpdir)
+            exit_code = main(
+                [
+                    "--host",
+                    "server",
+                    "--artifact-dir",
+                    str(output_dir / "artifacts"),
+                    "--render-review",
+                    "--profile",
+                    "shield-depth-3",
+                ]
+            )
+            self.assertEqual(exit_code, 0)
+            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["profileExpectations"]["profile"], "shield-depth-3")
+            self.assertEqual(manifest["profileExpectations"]["missingExpectedWarnings"], [])
 
     @unittest.skipUnless(
         _standalone_outputs_ready(),

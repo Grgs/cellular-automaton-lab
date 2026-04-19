@@ -66,10 +66,12 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertIn("settleDiagnostics", summary)
             self.assertIn("visualMetrics", summary)
             self.assertIn("runtimeProvenance", summary)
+            self.assertIn("profileExpectations", summary)
             self.assertIn("provenanceWarnings", summary)
             self.assertTrue(summary["settleDiagnostics"]["settled"])
             self.assertIn("visibleAspectRatio", summary["visualMetrics"])
             self.assertIn("radialSymmetryScore", summary["visualMetrics"])
+            self.assertIsNone(summary["profileExpectations"])
             self.assertEqual(summary["consistency"]["requested"]["tilingFamily"], "chair")
             self.assertEqual(summary["consistency"]["requested"]["patchDepth"], 3)
             self.assertIsNone(summary["consistency"]["backendTopology"])
@@ -125,8 +127,23 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertIn("settleDiagnostics", summary)
             self.assertIn("visualMetrics", summary)
             self.assertIn("runtimeProvenance", summary)
+            self.assertIn("profileExpectations", summary)
             self.assertEqual(summary["consistency"]["requested"]["tilingFamily"], "pinwheel")
             self.assertTrue(summary["settleDiagnostics"]["settled"])
+            self.assertEqual(summary["profileExpectations"]["profile"], "pinwheel-depth-3")
+            self.assertTrue(summary["profileExpectations"]["advisoryOnly"])
+            self.assertTrue(summary["profileExpectations"]["checklist"])
+            self.assertEqual(summary["profileExpectations"]["missingExpectedWarnings"], [])
+            self.assertIn(
+                {
+                    "id": "standalone-backend-topology-unavailable",
+                    "message": "Backend topology facts unavailable for host mode standalone.",
+                    "sources": ["consistency"],
+                    "matched": True,
+                    "note": "Standalone render review cannot compare live backend topology facts.",
+                },
+                summary["profileExpectations"]["expectedWarnings"],
+            )
             self.assertTrue(summary["literatureReview"]["requested"])
             self.assertEqual(summary["literatureReview"]["referenceImageStatus"], "cached")
             self.assertEqual(summary["literatureReview"]["referenceImagePath"], str(reference_path))
@@ -162,6 +179,7 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             self.assertEqual(summary["settleDiagnostics"]["finalSnapshot"]["blockingActivityMessage"], "")
             self.assertEqual(summary["settleDiagnostics"]["finalSnapshot"]["gridSizeText"], "Depth 3 • 443 tiles")
             self.assertIn("visualMetrics", summary)
+            self.assertIn("profileExpectations", summary)
             self.assertIsNotNone(summary["visualMetrics"]["boundaryDominance"])
             self.assertIsNotNone(summary["visualMetrics"]["gutterScore"])
             self.assertEqual(summary["visualMetrics"]["angularSectorOccupancy"]["sectorCount"], 12)

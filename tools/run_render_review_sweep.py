@@ -16,6 +16,7 @@ from tests.e2e.browser_support.artifacts import create_artifact_dir
 from tools.render_canvas_review import (
     DEFAULT_REFERENCE_CACHE_DIR,
     ResolvedRenderReviewRequest,
+    condense_profile_expectations,
     condense_settle_diagnostics,
     condense_overlap_hotspots,
     condense_transform_report,
@@ -320,6 +321,7 @@ def build_sweep_case_record(
         "transformSummary": condense_transform_report(summary_payload.get("transformReport")),
         "overlapHotspots": condense_overlap_hotspots(summary_payload.get("overlapHotspots")),
         "visualMetrics": condense_visual_metrics(summary_payload.get("visualMetrics")),
+        "profileExpectations": condense_profile_expectations(summary_payload.get("profileExpectations")),
         "literatureReview": (
             {
                 "requested": literature_review.get("requested"),

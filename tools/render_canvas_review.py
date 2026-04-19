@@ -34,6 +34,7 @@ from tests.e2e.browser_support.render_review import (
 )
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tools.render_review_profiles import (
+    ExpectedWarning,
     LiteratureReference,
     OverlapPolicy,
     RenderReviewProfile,
@@ -362,6 +363,132 @@ def build_literature_review_summary(
     }
 
 
+def _warning_observations(source: str, warnings: object) -> list[dict[str, str]]:
+    if not isinstance(warnings, list | tuple):
+        return []
+    observations: list[dict[str, str]] = []
+    for warning in warnings:
+        message = str(warning or "").strip()
+        if not message:
+            continue
+        observations.append(
+            {
+                "source": source,
+                "message": message,
+            }
+        )
+    return observations
+
+
+def _expected_warning_applies(expected_warning: ExpectedWarning, *, host_kind: str) -> bool:
+    if not expected_warning.host_kinds:
+        return True
+    return host_kind in expected_warning.host_kinds
+
+
+def build_profile_expectations(
+    *,
+    profile: RenderReviewProfile | None,
+    host_kind: str,
+    consistency_report: dict[str, Any] | None,
+    provenance_warnings: list[str] | tuple[str, ...],
+    literature_review_summary: dict[str, Any] | None,
+    overlap_hotspots: dict[str, Any] | None,
+    settle_diagnostics: dict[str, Any] | None,
+    visual_metrics: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if profile is None:
+        return None
+
+    observed_warnings: list[dict[str, str]] = []
+    observed_warnings.extend(
+        _warning_observations(
+            "consistency",
+            consistency_report.get("warnings") if isinstance(consistency_report, dict) else None,
+        )
+    )
+    observed_warnings.extend(_warning_observations("provenanceWarnings", provenance_warnings))
+    observed_warnings.extend(
+        _warning_observations(
+            "literatureReview",
+            literature_review_summary.get("warnings")
+            if isinstance(literature_review_summary, dict)
+            else None,
+        )
+    )
+    observed_warnings.extend(
+        _warning_observations(
+            "overlapHotspots",
+            overlap_hotspots.get("warnings") if isinstance(overlap_hotspots, dict) else None,
+        )
+    )
+    observed_warnings.extend(
+        _warning_observations(
+            "settleDiagnostics",
+            settle_diagnostics.get("warnings")
+            if isinstance(settle_diagnostics, dict)
+            else None,
+        )
+    )
+    observed_warnings.extend(
+        _warning_observations(
+            "visualMetrics",
+            visual_metrics.get("warnings") if isinstance(visual_metrics, dict) else None,
+        )
+    )
+
+    applicable_expected_warnings = tuple(
+        expected_warning
+        for expected_warning in profile.expected_warnings
+        if _expected_warning_applies(expected_warning, host_kind=host_kind)
+    )
+    matched_observation_indexes: set[int] = set()
+    expected_warning_payloads: list[dict[str, Any]] = []
+    missing_expected_warnings: list[dict[str, Any]] = []
+    for expected_warning in applicable_expected_warnings:
+        matched_indexes = [
+            index
+            for index, observation in enumerate(observed_warnings)
+            if observation["message"] == expected_warning.message
+            and observation["source"] in expected_warning.sources
+        ]
+        matched = bool(matched_indexes)
+        matched_observation_indexes.update(matched_indexes)
+        payload = {
+            "id": expected_warning.id,
+            "message": expected_warning.message,
+            "sources": list(expected_warning.sources),
+            "matched": matched,
+            "note": expected_warning.note,
+        }
+        expected_warning_payloads.append(payload)
+        if not matched:
+            missing_expected_warnings.append(payload)
+
+    unexpected_warnings = [
+        observation
+        for index, observation in enumerate(observed_warnings)
+        if index not in matched_observation_indexes
+    ]
+    return {
+        "profile": profile.name,
+        "advisoryOnly": True,
+        "checklist": [
+            {
+                "id": item.id,
+                "label": item.label,
+                "guidance": item.guidance,
+                "status": "manual-review",
+            }
+            for item in profile.review_checklist
+        ],
+        "expectedWarnings": expected_warning_payloads,
+        "observedWarnings": observed_warnings,
+        "missingExpectedWarnings": missing_expected_warnings,
+        "unexpectedWarnings": unexpected_warnings,
+    }
+
+
 def condense_transform_report(transform_report: dict[str, Any] | None) -> dict[str, Any] | None:
     if not isinstance(transform_report, dict):
         return None
@@ -433,6 +560,32 @@ def condense_visual_metrics(visual_metrics: dict[str, Any] | None) -> dict[str, 
         "angularSectorOccupancy": visual_metrics.get("angularSectorOccupancy"),
         "radialSymmetryScore": visual_metrics.get("radialSymmetryScore"),
         "warnings": list(visual_metrics.get("warnings", [])),
+    }
+
+
+def condense_profile_expectations(
+    profile_expectations: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not isinstance(profile_expectations, dict):
+        return None
+    checklist = profile_expectations.get("checklist")
+    condensed_checklist: list[dict[str, Any]] = []
+    if isinstance(checklist, list):
+        for item in checklist:
+            if not isinstance(item, dict):
+                continue
+            condensed_checklist.append(
+                {
+                    "id": item.get("id"),
+                    "label": item.get("label"),
+                }
+            )
+    return {
+        "profile": profile_expectations.get("profile"),
+        "advisoryOnly": bool(profile_expectations.get("advisoryOnly")),
+        "checklist": condensed_checklist,
+        "missingExpectedWarnings": profile_expectations.get("missingExpectedWarnings", []),
+        "unexpectedWarnings": profile_expectations.get("unexpectedWarnings", []),
     }
 
 
@@ -1103,6 +1256,16 @@ def render_canvas_review(
                     summary_payload["literatureReview"] = build_literature_review_summary(
                         literature_reference=request.literature_reference,
                         comparison=comparison_payload,
+                    )
+                    summary_payload["profileExpectations"] = build_profile_expectations(
+                        profile=request.profile,
+                        host_kind=host_kind,
+                        consistency_report=consistency_report,
+                        provenance_warnings=provenance_warnings,
+                        literature_review_summary=summary_payload["literatureReview"],
+                        overlap_hotspots=overlap_hotspots,
+                        settle_diagnostics=settle_diagnostics,
+                        visual_metrics=visual_metrics,
                     )
                     summary_path.write_text(
                         json.dumps(summary_payload, indent=2, sort_keys=True),

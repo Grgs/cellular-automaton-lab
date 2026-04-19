@@ -27,6 +27,7 @@ from tests.e2e.support_runtime_host import (
 )
 from tools.render_canvas_review import (
     ResolvedRenderReviewRequest,
+    condense_profile_expectations,
     condense_settle_diagnostics,
     condense_overlap_hotspots,
     condense_transform_report,
@@ -212,6 +213,9 @@ def run_managed_render_review(
         run_manifest["transformSummary"] = condense_transform_report(summary_payload.get("transformReport"))
         run_manifest["overlapHotspots"] = condense_overlap_hotspots(summary_payload.get("overlapHotspots"))
         run_manifest["visualMetrics"] = condense_visual_metrics(summary_payload.get("visualMetrics"))
+        run_manifest["profileExpectations"] = condense_profile_expectations(
+            summary_payload.get("profileExpectations")
+        )
         if review_result.consistency_warnings:
             run_manifest["consistencyWarnings"] = list(review_result.consistency_warnings)
         if review_result.literature_reference_status is not None:

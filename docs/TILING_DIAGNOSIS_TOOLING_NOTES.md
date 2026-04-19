@@ -367,8 +367,10 @@ workbench now:
   through the injected-topology review path
 
 The next missing shield-specific tooling is no longer cleanup-factor
-exploration. It is fixture regeneration and profile-owned expectations for how
-those cleanup diagnostics should be interpreted during manual review.
+exploration. Fixture regeneration has now landed, and profile-owned
+expectations now give the named review profiles a checklist plus expected
+warning classification. The remaining gap is decision quality: turning those
+advisory signals into clearer family-specific acceptance calls.
 
 ### 6. Frontend representative fixture regeneration is now manifest-driven
 
@@ -386,18 +388,23 @@ as backend reference fixtures: there is a checked manifest, a canonical
 regeneration command, and a drift-check mode for validation.
 
 The remaining gap is not regeneration anymore. It is deciding when a family's
-fixture should be refreshed and tying that to profile-owned expectations rather
-than operator memory.
+fixture should be refreshed and tying that to clearer family-level acceptance
+calls rather than operator memory.
 
-### 7. Literature-review mode still lacks family-specific acceptance prompts
+### 7. Literature-review mode now carries family-specific advisory prompts
 
 The literature workflow now preserves citations, notes, and local-cache support,
 but if the cache image is missing the tool mostly warns and continues.
 
-That is correct behavior, but it leaves too much operator memory in the loop.
-For shield specifically, the missing tool is a short profile-owned checklist for
-what to inspect even when the local literature image is absent, such as central
-symmetry, odd-depth rotation plausibility, and visible gutter severity.
+Status: addressed for the advisory slice. Named render-review profiles now own:
+
+- short manual-review checklist items
+- exact expected-warning metadata
+- condensed `profileExpectations` output in direct review, managed runs, sweeps,
+  and browser-reviewed workbench summaries
+
+That closes the “all guidance lives in operator memory” gap without turning
+review expectations into hard command failures.
 
 ### 8. Browser palette regressions now use id-based review mutation, not clicks
 
