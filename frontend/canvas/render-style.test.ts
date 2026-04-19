@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
-import type { BootstrappedTopologyDefinition } from "../types/domain.js";
-import type { PeriodicFaceTilingDescriptor } from "../types/rendering.js";
 
 const ARCHIMEDEAN_488_GEOMETRY = "archimedean-4-8-8";
 const ARCHIMEDEAN_31212_GEOMETRY = "archimedean-3-12-12";
@@ -20,58 +18,9 @@ const DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal";
 const PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal";
 const FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal";
 const SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual";
-const PERIODIC_GEOMETRIES = [
-    ARCHIMEDEAN_488_GEOMETRY,
-    ARCHIMEDEAN_31212_GEOMETRY,
-    ARCHIMEDEAN_3464_GEOMETRY,
-    ARCHIMEDEAN_4612_GEOMETRY,
-    ARCHIMEDEAN_33434_GEOMETRY,
-    ARCHIMEDEAN_33344_GEOMETRY,
-    ARCHIMEDEAN_33336_GEOMETRY,
-    KAGOME_GEOMETRY,
-    CAIRO_GEOMETRY,
-    RHOMBILLE_GEOMETRY,
-    TETRAKIS_SQUARE_GEOMETRY,
-    TRIAKIS_TRIANGULAR_GEOMETRY,
-    DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
-    PRISMATIC_PENTAGONAL_GEOMETRY,
-    FLORET_PENTAGONAL_GEOMETRY,
-    SNUB_SQUARE_DUAL_GEOMETRY,
-] as const;
 
 function installRenderStyleTestGlobals(): void {
     installFrontendGlobals();
-    const periodicTopologyEntries = PERIODIC_GEOMETRIES.map((geometry, index): BootstrappedTopologyDefinition => ({
-        tiling_family: geometry,
-        label: geometry,
-        picker_group: "Periodic Mixed",
-        picker_order: 100 + index,
-        sizing_mode: "grid",
-        family: "mixed",
-        render_kind: "polygon_periodic",
-        viewport_sync_mode: "backend-sync",
-        supported_adjacency_modes: ["edge"],
-        default_adjacency_mode: "edge",
-        default_rules: { edge: "life-b2-s23" },
-        geometry_keys: { edge: geometry },
-        sizing_policy: { control: "cell_size", default: 12, min: 8, max: 20 },
-    }));
-    window.APP_TOPOLOGIES = [...window.APP_TOPOLOGIES, ...periodicTopologyEntries];
-    window.APP_PERIODIC_FACE_TILINGS = PERIODIC_GEOMETRIES.map((geometry): PeriodicFaceTilingDescriptor => ({
-        geometry,
-        label: geometry,
-        metric_model: "pattern",
-        base_edge: 52,
-        unit_width: 100,
-        unit_height: 100,
-        min_dimension: 1,
-        min_x: 0,
-        min_y: 0,
-        max_x: 100,
-        max_y: 100,
-        cell_count_per_unit: 1,
-        row_offset_x: 0,
-    }));
 }
 
 function styleDeclaration(values: Record<string, string>): CSSStyleDeclaration {

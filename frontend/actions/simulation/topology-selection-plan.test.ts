@@ -191,7 +191,7 @@ describe("topology-selection-plan", () => {
                 ...state.topologySpec,
                 width: 80,
                 height: 55,
-                patch_depth: 0,
+                patch_depth: window.APP_DEFAULTS.simulation.topology_spec.patch_depth,
             },
             speed: 7,
             rule: "highlife",

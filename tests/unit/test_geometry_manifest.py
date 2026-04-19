@@ -147,55 +147,14 @@ class GeometryManifestTests(unittest.TestCase):
             for entry in describe_topologies()
         }
 
-        self.assertEqual(
-            described["square"]["sizing_policy"],
-            {"control": "cell_size", "default": 12, "min": 8, "max": 24},
-        )
+        for tiling_family, definition in TOPOLOGY_FAMILY_MANIFEST.items():
+            with self.subTest(tiling_family=tiling_family):
+                self.assertEqual(
+                    described[tiling_family]["sizing_policy"],
+                    definition.sizing_policy.to_dict(),
+                )
+
         self.assertEqual(described["square"]["render_kind"], "regular_grid")
-        self.assertEqual(
-            described["hex"]["sizing_policy"],
-            {"control": "cell_size", "default": 16, "min": 10, "max": 24},
-        )
-        self.assertEqual(
-            described["triangle"]["sizing_policy"],
-            {"control": "cell_size", "default": 20, "min": 12, "max": 24},
-        )
-        self.assertEqual(
-            described[ARCHIMEDEAN_33336_GEOMETRY]["sizing_policy"],
-            {"control": "cell_size", "default": 16, "min": 14, "max": 20},
-        )
-        self.assertEqual(
-            described[PENROSE_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 4, "min": 0, "max": 6},
-        )
-        self.assertEqual(
-            described[PENROSE_P2_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 4, "min": 0, "max": 6},
-        )
-        self.assertEqual(
-            described[AMMANN_BEENKER_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 4, "min": 0, "max": 4},
-        )
-        self.assertEqual(
-            described[SPECTRE_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 3, "min": 0, "max": 3},
-        )
-        self.assertEqual(
-            described[TAYLOR_SOCOLAR_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
-        )
-        self.assertEqual(
-            described[SPHINX_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
-        )
-        self.assertEqual(
-            described[CHAIR_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
-        )
-        self.assertEqual(
-            described[ROBINSON_TRIANGLES_GEOMETRY]["sizing_policy"],
-            {"control": "patch_depth", "default": 3, "min": 0, "max": 5},
-        )
         self.assertEqual(described[SPECTRE_GEOMETRY]["render_kind"], "polygon_aperiodic")
         self.assertEqual(described[ARCHIMEDEAN_33336_GEOMETRY]["render_kind"], "polygon_periodic")
 

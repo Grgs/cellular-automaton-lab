@@ -1,84 +1,30 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { buildSingleVariantBootstrappedTopologyDefinition } from "./test-helpers/topology-catalog-fixtures.js";
-import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
-
-const SPECTRE_TOPOLOGY = buildSingleVariantBootstrappedTopologyDefinition("spectre", {
-    geometryKey: "spectre",
-    renderKind: "polygon_aperiodic",
-    defaultRule: "life-b2-s23",
-    sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 3 },
-});
-
-const PERIODIC_MIXED_GEOMETRIES = [
-    "archimedean-4-8-8",
-    "archimedean-3-12-12",
-    "archimedean-3-4-6-4",
-    "archimedean-4-6-12",
-    "archimedean-3-3-4-3-4",
-    "archimedean-3-3-3-4-4",
-    "archimedean-3-3-3-3-6",
-    "trihexagonal-3-6-3-6",
-    "cairo-pentagonal",
-    "rhombille",
-    "deltoidal-trihexagonal",
-    "tetrakis-square",
-    "triakis-triangular",
-    "prismatic-pentagonal",
-    "floret-pentagonal",
-    "snub-square-dual",
-] as const;
-
-function installSpectreGlobals(): void {
-    window.APP_TOPOLOGIES = [
-        buildSingleVariantBootstrappedTopologyDefinition("square", {
-            geometryKey: "square",
-            renderKind: "regular_grid",
-            defaultRule: "conway",
-            sizingPolicy: { control: "cell_size", default: 12, min: 8, max: 24 },
-        }),
-        SPECTRE_TOPOLOGY,
-    ];
-    window.APP_PERIODIC_FACE_TILINGS = PERIODIC_MIXED_GEOMETRIES.map(
-        (geometry): PeriodicFaceTilingDescriptor => ({
-            geometry,
-            label: geometry,
-            metric_model: "pattern",
-            base_edge: 52,
-            unit_width: 100,
-            unit_height: 100,
-            min_dimension: 1,
-            min_x: -10,
-            min_y: -10,
-            max_x: 110,
-            max_y: 110,
-            cell_count_per_unit: 4,
-            row_offset_x: 0,
-        }),
-    );
-}
+import { getFixtureTopologyDefinition, installFrontendGlobals } from "./test-helpers/bootstrap.js";
 
 describe("spectre topology", () => {
     beforeEach(() => {
         document.body.innerHTML = "";
         vi.resetModules();
-        installSpectreGlobals();
+        installFrontendGlobals();
     });
 
     it("appears in topology picker metadata with a patch-depth topology variant", async () => {
         const { getTopologyDefinition, resolveTopologyVariantKey, tilingFamilyOptions, topologyUsesPatchDepth } = await import("./topology-catalog.js");
+        const spectre = getFixtureTopologyDefinition("spectre");
 
         expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("spectre");
-        expect(resolveTopologyVariantKey("spectre", "edge")).toBe("spectre");
+        expect(resolveTopologyVariantKey("spectre", "edge")).toBe(spectre.geometry_keys.edge);
         expect(getTopologyDefinition("spectre")?.picker_group).toBe("Aperiodic");
         expect(topologyUsesPatchDepth("spectre")).toBe(true);
     });
 
     it("resolves through the aperiodic geometry registry", async () => {
         const { getGeometryAdapter, isSupportedGeometry } = await import("./geometry/registry.js");
+        const geometry = getFixtureTopologyDefinition("spectre").geometry_keys.edge;
 
-        expect(isSupportedGeometry("spectre")).toBe(true);
-        expect(getGeometryAdapter("spectre").geometry).toBe("spectre");
-        expect(getGeometryAdapter("spectre").family).toBe("mixed");
+        expect(isSupportedGeometry(geometry)).toBe(true);
+        expect(getGeometryAdapter(geometry).geometry).toBe(geometry);
+        expect(getGeometryAdapter(geometry).family).toBe("mixed");
     });
 });

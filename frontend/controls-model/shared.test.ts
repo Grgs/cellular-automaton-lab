@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
-import { buildSingleVariantBootstrappedTopologyDefinition } from "../test-helpers/topology-catalog-fixtures.js";
+import {
+    getFixtureTopologyDefinition,
+    installFrontendGlobals,
+} from "../test-helpers/bootstrap.js";
 
 describe("controls-model/shared", () => {
     beforeEach(() => {
@@ -57,54 +59,15 @@ describe("controls-model/shared", () => {
     });
 
     it("uses patch-depth sizing for new aperiodic tilings and cell-size sizing for new periodic mixed tilings", async () => {
-        window.APP_TOPOLOGIES = [
-            ...window.APP_TOPOLOGIES,
-            buildSingleVariantBootstrappedTopologyDefinition("chair", {
-                geometryKey: "chair",
-                renderKind: "polygon_aperiodic",
-                defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 5 },
-            }),
-            buildSingleVariantBootstrappedTopologyDefinition("deltoidal-hexagonal", {
-                geometryKey: "deltoidal-hexagonal",
-                renderKind: "polygon_periodic",
-                defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "cell_size", default: 12, min: 8, max: 20 },
-            }),
-            buildSingleVariantBootstrappedTopologyDefinition("hat-monotile", {
-                geometryKey: "hat-monotile",
-                renderKind: "polygon_aperiodic",
-                defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "patch_depth", default: 2, min: 0, max: 3 },
-            }),
-            buildSingleVariantBootstrappedTopologyDefinition("tuebingen-triangle", {
-                geometryKey: "tuebingen-triangle",
-                renderKind: "polygon_aperiodic",
-                defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 5 },
-            }),
-            buildSingleVariantBootstrappedTopologyDefinition("dodecagonal-square-triangle", {
-                geometryKey: "dodecagonal-square-triangle",
-                renderKind: "polygon_aperiodic",
-                defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 4 },
-            }),
-            buildSingleVariantBootstrappedTopologyDefinition("shield", {
-                geometryKey: "shield",
-                renderKind: "polygon_aperiodic",
-                defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 5 },
-            }),
-            buildSingleVariantBootstrappedTopologyDefinition("pinwheel", {
-                geometryKey: "pinwheel",
-                renderKind: "polygon_aperiodic",
-                defaultRule: "life-b2-s23",
-                sizingPolicy: { control: "patch_depth", default: 3, min: 0, max: 4 },
-            }),
-        ];
-
         const { createAppState } = await import("../state/simulation-state.js");
         const { resolveViewportSizingState } = await import("./shared.js");
+        const chairPolicy = getFixtureTopologyDefinition("chair").sizing_policy;
+        const hatPolicy = getFixtureTopologyDefinition("hat-monotile").sizing_policy;
+        const tuebingenPolicy = getFixtureTopologyDefinition("tuebingen-triangle").sizing_policy;
+        const squareTrianglePolicy = getFixtureTopologyDefinition("dodecagonal-square-triangle").sizing_policy;
+        const shieldPolicy = getFixtureTopologyDefinition("shield").sizing_policy;
+        const pinwheelPolicy = getFixtureTopologyDefinition("pinwheel").sizing_policy;
+        const periodicPolicy = getFixtureTopologyDefinition("deltoidal-hexagonal").sizing_policy;
 
         const chairState = createAppState();
         chairState.topologySpec = {
@@ -173,38 +136,38 @@ describe("controls-model/shared", () => {
 
         expect(resolveViewportSizingState(chairState)).toMatchObject({
             usesPatchDepth: true,
-            patchDepthMin: 0,
-            patchDepthMax: 5,
+            patchDepthMin: chairPolicy.min,
+            patchDepthMax: chairPolicy.max,
         });
         expect(resolveViewportSizingState(hatState)).toMatchObject({
             usesPatchDepth: true,
-            patchDepthMin: 0,
-            patchDepthMax: 3,
+            patchDepthMin: hatPolicy.min,
+            patchDepthMax: hatPolicy.max,
         });
         expect(resolveViewportSizingState(tuebingenState)).toMatchObject({
             usesPatchDepth: true,
-            patchDepthMin: 0,
-            patchDepthMax: 5,
+            patchDepthMin: tuebingenPolicy.min,
+            patchDepthMax: tuebingenPolicy.max,
         });
         expect(resolveViewportSizingState(squareTriangleState)).toMatchObject({
             usesPatchDepth: true,
-            patchDepthMin: 0,
-            patchDepthMax: 4,
+            patchDepthMin: squareTrianglePolicy.min,
+            patchDepthMax: squareTrianglePolicy.max,
         });
         expect(resolveViewportSizingState(shieldState)).toMatchObject({
             usesPatchDepth: true,
-            patchDepthMin: 0,
-            patchDepthMax: 5,
+            patchDepthMin: shieldPolicy.min,
+            patchDepthMax: shieldPolicy.max,
         });
         expect(resolveViewportSizingState(pinwheelState)).toMatchObject({
             usesPatchDepth: true,
-            patchDepthMin: 0,
-            patchDepthMax: 4,
+            patchDepthMin: pinwheelPolicy.min,
+            patchDepthMax: pinwheelPolicy.max,
         });
         expect(resolveViewportSizingState(periodicState)).toMatchObject({
             usesPatchDepth: false,
-            cellSizeMin: 8,
-            cellSizeMax: 20,
+            cellSizeMin: periodicPolicy.min,
+            cellSizeMax: periodicPolicy.max,
         });
     });
 });

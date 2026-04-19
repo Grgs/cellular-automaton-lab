@@ -1,116 +1,41 @@
-import { buildBootstrappedTopologyDefinition, buildSingleVariantBootstrappedTopologyDefinition } from "./topology-catalog-fixtures.js";
+import bootstrapFixtureData from "../test-fixtures/bootstrap-data.json";
 import type {
+    AppBootstrapData,
     BootstrappedAperiodicFamilyDefinition,
-    BootstrappedFrontendDefaults,
     BootstrappedTopologyDefinition,
 } from "../types/domain.js";
-import type { PeriodicFaceTilingDescriptor } from "../types/rendering.js";
 
-function geometryKeys(keys: Record<string, string>): Record<string, string> {
-    return keys;
+function cloneBootstrapFixture(): AppBootstrapData {
+    return structuredClone(bootstrapFixtureData as AppBootstrapData);
 }
 
-const DEFAULTS: BootstrappedFrontendDefaults = {
-    simulation: {
-        topology_spec: {
-            tiling_family: "square",
-            adjacency_mode: "edge",
-            sizing_mode: "grid",
-            width: 30,
-            height: 20,
-            patch_depth: 0,
-        },
-        speed: 5,
-        rule: "conway",
-        min_grid_size: 4,
-        max_grid_size: 200,
-        min_patch_depth: 0,
-        max_patch_depth: 6,
-        min_speed: 1,
-        max_speed: 30,
-    },
-    ui: {
-        cell_size: 12,
-        min_cell_size: 8,
-        max_cell_size: 24,
-        storage_key: "cellular-automaton-lab-ui",
-    },
-    theme: {
-        default: "light",
-        storage_key: "cellular-automaton-theme",
-    },
-};
+export function getFixtureTopologyDefinition(tilingFamily: string): BootstrappedTopologyDefinition {
+    const definition = cloneBootstrapFixture().topology_catalog.find(
+        (entry) => entry.tiling_family === tilingFamily,
+    );
+    if (!definition) {
+        throw new Error(`Missing bootstrap topology fixture for "${tilingFamily}".`);
+    }
+    return definition;
+}
 
-const TOPOLOGIES: ReadonlyArray<BootstrappedTopologyDefinition> = Object.freeze([
-    buildSingleVariantBootstrappedTopologyDefinition("square", {
-        geometryKey: "square",
-        renderKind: "regular_grid",
-        defaultRule: "conway",
-        sizingPolicy: { control: "cell_size", default: 12, min: 8, max: 24 },
-    }),
-    buildSingleVariantBootstrappedTopologyDefinition("hex", {
-        geometryKey: "hex",
-        renderKind: "regular_grid",
-        defaultRule: "hexlife",
-        sizingPolicy: { control: "cell_size", default: 16, min: 10, max: 24 },
-    }),
-    buildBootstrappedTopologyDefinition("penrose-p3-rhombs", {
-        render_kind: "polygon_aperiodic",
-        supported_adjacency_modes: ["edge", "vertex"],
-        default_adjacency_mode: "edge",
-        default_rules: geometryKeys({
-            edge: "life-b2-s23",
-            vertex: "conway",
-        }),
-        geometry_keys: geometryKeys({
-            edge: "penrose-p3-rhombs",
-            vertex: "penrose-p3-rhombs-vertex",
-        }),
-        sizing_policy: { control: "patch_depth", default: 4, min: 0, max: 6 },
-    }),
-]);
-
-const PERIODIC_FACE_TILINGS: ReadonlyArray<PeriodicFaceTilingDescriptor> = Object.freeze([
-    {
-        geometry: "archimedean-4-8-8",
-        label: "Square-Octagon (4.8.8)",
-        metric_model: "pattern",
-        base_edge: 52,
-        unit_width: 100,
-        unit_height: 100,
-        min_dimension: 1,
-        min_x: 0,
-        min_y: 0,
-        max_x: 100,
-        max_y: 100,
-        cell_count_per_unit: 8,
-        row_offset_x: 0,
-    },
-]);
-
-const APERIODIC_FAMILIES: ReadonlyArray<BootstrappedAperiodicFamilyDefinition> = Object.freeze([
-    {
-        tiling_family: "penrose-p3-rhombs",
-        label: "Penrose P3 Rhombs",
-        experimental: false,
-        implementation_status: "true_substitution",
-        promotion_blocker: null,
-        public_cell_kinds: ["thick-rhomb", "thin-rhomb"],
-    },
-    {
-        tiling_family: "pinwheel",
-        label: "Pinwheel",
-        experimental: true,
-        implementation_status: "exact_affine",
-        promotion_blocker: "Experimental until manual visual review accepts the exact-affine implementation.",
-        public_cell_kinds: ["pinwheel-triangle"],
-    },
-]);
+export function getFixtureAperiodicFamilyDefinition(
+    tilingFamily: string,
+): BootstrappedAperiodicFamilyDefinition {
+    const definition = cloneBootstrapFixture().aperiodic_families.find(
+        (entry) => entry.tiling_family === tilingFamily,
+    );
+    if (!definition) {
+        throw new Error(`Missing bootstrap aperiodic fixture for "${tilingFamily}".`);
+    }
+    return definition;
+}
 
 export function installFrontendGlobals(): void {
-    window.APP_DEFAULTS = structuredClone(DEFAULTS);
-    window.APP_TOPOLOGIES = TOPOLOGIES;
-    window.APP_PERIODIC_FACE_TILINGS = PERIODIC_FACE_TILINGS;
-    window.APP_APERIODIC_FAMILIES = APERIODIC_FAMILIES;
+    const payload = cloneBootstrapFixture();
+    window.APP_DEFAULTS = payload.app_defaults;
+    window.APP_TOPOLOGIES = payload.topology_catalog;
+    window.APP_PERIODIC_FACE_TILINGS = payload.periodic_face_tilings;
+    window.APP_APERIODIC_FAMILIES = payload.aperiodic_families;
     window.__appReady = true;
 }

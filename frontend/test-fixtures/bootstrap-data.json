@@ -1,0 +1,1296 @@
+{
+  "app_defaults": {
+    "simulation": {
+      "topology_spec": {
+        "tiling_family": "square",
+        "adjacency_mode": "edge",
+        "sizing_mode": "grid",
+        "width": 30,
+        "height": 20,
+        "patch_depth": 4
+      },
+      "speed": 7.0,
+      "rule": "conway",
+      "min_grid_size": 3,
+      "max_grid_size": 250,
+      "min_patch_depth": 0,
+      "max_patch_depth": 6,
+      "min_speed": 1.0,
+      "max_speed": 30.0
+    },
+    "ui": {
+      "cell_size": 12,
+      "min_cell_size": 4,
+      "max_cell_size": 24,
+      "storage_key": "cellular-automaton-ui-session"
+    },
+    "theme": {
+      "default": "dark",
+      "storage_key": "cellular-automaton-theme"
+    }
+  },
+  "topology_catalog": [
+    {
+      "tiling_family": "square",
+      "label": "Square",
+      "picker_group": "Classic",
+      "picker_order": 10,
+      "sizing_mode": "grid",
+      "family": "regular",
+      "render_kind": "regular_grid",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "conway"
+      },
+      "geometry_keys": {
+        "edge": "square"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 24
+      }
+    },
+    {
+      "tiling_family": "hex",
+      "label": "Hexagonal",
+      "picker_group": "Classic",
+      "picker_order": 20,
+      "sizing_mode": "grid",
+      "family": "regular",
+      "render_kind": "regular_grid",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "hexlife"
+      },
+      "geometry_keys": {
+        "edge": "hex"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 16,
+        "min": 10,
+        "max": 24
+      }
+    },
+    {
+      "tiling_family": "triangle",
+      "label": "Triangular",
+      "picker_group": "Classic",
+      "picker_order": 30,
+      "sizing_mode": "grid",
+      "family": "regular",
+      "render_kind": "regular_grid",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "trilife"
+      },
+      "geometry_keys": {
+        "edge": "triangle"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 20,
+        "min": 12,
+        "max": 24
+      }
+    },
+    {
+      "tiling_family": "archimedean-4-8-8",
+      "label": "Square-Octagon (4.8.8)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 110,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "archlife488"
+      },
+      "geometry_keys": {
+        "edge": "archimedean-4-8-8"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 24
+      }
+    },
+    {
+      "tiling_family": "trihexagonal-3-6-3-6",
+      "label": "Kagome / Trihexagonal (3.6.3.6)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 120,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "kagome-life"
+      },
+      "geometry_keys": {
+        "edge": "trihexagonal-3-6-3-6"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 24
+      }
+    },
+    {
+      "tiling_family": "archimedean-3-12-12",
+      "label": "Truncated Hexagonal (3.12.12)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 130,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "archlife-3-12-12"
+      },
+      "geometry_keys": {
+        "edge": "archimedean-3-12-12"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "archimedean-3-4-6-4",
+      "label": "Rhombitrihexagonal (3.4.6.4)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 140,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "archlife-3-4-6-4"
+      },
+      "geometry_keys": {
+        "edge": "archimedean-3-4-6-4"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 14,
+        "min": 10,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "archimedean-4-6-12",
+      "label": "Truncated Trihexagonal (4.6.12)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 150,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "archlife-4-6-12"
+      },
+      "geometry_keys": {
+        "edge": "archimedean-4-6-12"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "archimedean-3-3-4-3-4",
+      "label": "Snub Square (3.3.4.3.4)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 160,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "archlife-3-3-4-3-4"
+      },
+      "geometry_keys": {
+        "edge": "archimedean-3-3-4-3-4"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 18,
+        "min": 12,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "archimedean-3-3-3-4-4",
+      "label": "Elongated Triangular (3.3.3.4.4)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 170,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "archlife-3-3-3-4-4"
+      },
+      "geometry_keys": {
+        "edge": "archimedean-3-3-3-4-4"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 18,
+        "min": 12,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "archimedean-3-3-3-3-6",
+      "label": "Snub Trihexagonal (3.3.3.3.6)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 180,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "archlife-3-3-3-3-6"
+      },
+      "geometry_keys": {
+        "edge": "archimedean-3-3-3-3-6"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 16,
+        "min": 14,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "cairo-pentagonal",
+      "label": "Cairo Pentagonal",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 190,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "cairo-pentagonal"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "rhombille",
+      "label": "Rhombille",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 200,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "rhombille"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "deltoidal-trihexagonal",
+      "label": "Deltoidal Trihexagonal",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 210,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "deltoidal-trihexagonal"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "deltoidal-hexagonal",
+      "label": "Deltoidal Hexagonal",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 215,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "deltoidal-hexagonal"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "snub-square-dual",
+      "label": "Snub Square Dual",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 220,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "snub-square-dual"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 18
+      }
+    },
+    {
+      "tiling_family": "tetrakis-square",
+      "label": "Tetrakis Square",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 230,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "tetrakis-square"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "triakis-triangular",
+      "label": "Triakis Triangular",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 240,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "triakis-triangular"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
+      "tiling_family": "prismatic-pentagonal",
+      "label": "Prismatic Pentagonal",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 250,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "prismatic-pentagonal"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 18
+      }
+    },
+    {
+      "tiling_family": "floret-pentagonal",
+      "label": "Floret Pentagonal",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 260,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "floret-pentagonal"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 18
+      }
+    },
+    {
+      "tiling_family": "penrose-p2-kite-dart",
+      "label": "Penrose P2 Kite-Dart",
+      "picker_group": "Aperiodic",
+      "picker_order": 210,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "penrose-p2-kite-dart"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 4,
+        "min": 0,
+        "max": 6
+      }
+    },
+    {
+      "tiling_family": "penrose-p3-rhombs",
+      "label": "Penrose P3 Rhombs",
+      "picker_group": "Aperiodic",
+      "picker_order": 220,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge",
+        "vertex"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23",
+        "vertex": "conway"
+      },
+      "geometry_keys": {
+        "edge": "penrose-p3-rhombs",
+        "vertex": "penrose-p3-rhombs-vertex"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 4,
+        "min": 0,
+        "max": 6
+      }
+    },
+    {
+      "tiling_family": "ammann-beenker",
+      "label": "Ammann-Beenker",
+      "picker_group": "Aperiodic",
+      "picker_order": 230,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "ammann-beenker"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 4,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
+      "tiling_family": "spectre",
+      "label": "Spectre",
+      "picker_group": "Aperiodic",
+      "picker_order": 240,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "spectre"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 3
+      }
+    },
+    {
+      "tiling_family": "hat-monotile",
+      "label": "Hat",
+      "picker_group": "Aperiodic",
+      "picker_order": 250,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "hat-monotile"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 3
+      }
+    },
+    {
+      "tiling_family": "taylor-socolar",
+      "label": "Taylor-Socolar",
+      "picker_group": "Aperiodic",
+      "picker_order": 270,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "taylor-socolar"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 5
+      }
+    },
+    {
+      "tiling_family": "sphinx",
+      "label": "Sphinx",
+      "picker_group": "Aperiodic",
+      "picker_order": 280,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "sphinx"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 5
+      }
+    },
+    {
+      "tiling_family": "chair",
+      "label": "Chair",
+      "picker_group": "Aperiodic",
+      "picker_order": 290,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "chair"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 5
+      }
+    },
+    {
+      "tiling_family": "robinson-triangles",
+      "label": "Robinson Triangles",
+      "picker_group": "Aperiodic",
+      "picker_order": 300,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "robinson-triangles"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 5
+      }
+    },
+    {
+      "tiling_family": "tuebingen-triangle",
+      "label": "Tuebingen Triangle",
+      "picker_group": "Aperiodic",
+      "picker_order": 310,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "tuebingen-triangle"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 5
+      }
+    },
+    {
+      "tiling_family": "shield",
+      "label": "Shield",
+      "picker_group": "Aperiodic",
+      "picker_order": 330,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "shield"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 5
+      }
+    },
+    {
+      "tiling_family": "dodecagonal-square-triangle",
+      "label": "Dodecagonal Square-Triangle",
+      "picker_group": "Experimental",
+      "picker_order": 320,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "dodecagonal-square-triangle"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
+      "tiling_family": "pinwheel",
+      "label": "Pinwheel",
+      "picker_group": "Experimental",
+      "picker_order": 340,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "pinwheel"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 4
+      }
+    }
+  ],
+  "periodic_face_tilings": [
+    {
+      "geometry": "archimedean-4-8-8",
+      "label": "Square-Octagon (4.8.8)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 125.53910524340094,
+      "unit_height": 125.53910524340094,
+      "min_dimension": 1,
+      "min_x": -36.76955262170047,
+      "min_y": -36.76955262170047,
+      "max_x": 125.53910524340094,
+      "max_y": 125.53910524340094,
+      "cell_count_per_unit": 2,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "archimedean-3-12-12",
+      "label": "Truncated Hexagonal (3.12.12)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 582.0,
+      "unit_height": 336.0,
+      "min_dimension": 1,
+      "min_x": -97.0,
+      "min_y": -71.0,
+      "max_x": 582.0,
+      "max_y": 336.0,
+      "cell_count_per_unit": 18,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "archimedean-3-4-6-4",
+      "label": "Rhombitrihexagonal (3.4.6.4)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 142.0,
+      "unit_height": 246.0,
+      "min_dimension": 1,
+      "min_x": -26.0,
+      "min_y": 0.0,
+      "max_x": 161.0,
+      "max_y": 272.0,
+      "cell_count_per_unit": 12,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "archimedean-4-6-12",
+      "label": "Truncated Trihexagonal (4.6.12)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 426.0,
+      "unit_height": 246.0,
+      "min_dimension": 1,
+      "min_x": -71.0,
+      "min_y": -71.0,
+      "max_x": 426.0,
+      "max_y": 246.0,
+      "cell_count_per_unit": 12,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "archimedean-3-3-4-3-4",
+      "label": "Snub Square (3.3.4.3.4)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 142.0,
+      "unit_height": 142.0,
+      "min_dimension": 1,
+      "min_x": -26.0,
+      "min_y": -26.0,
+      "max_x": 142.0,
+      "max_y": 168.0,
+      "cell_count_per_unit": 12,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "archimedean-3-3-3-4-4",
+      "label": "Elongated Triangular (3.3.3.4.4)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 104.0,
+      "unit_height": 194.0,
+      "min_dimension": 1,
+      "min_x": -26.0,
+      "min_y": 0.0,
+      "max_x": 104.0,
+      "max_y": 194.0,
+      "cell_count_per_unit": 12,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "archimedean-3-3-3-3-6",
+      "label": "Snub Trihexagonal (3.3.3.3.6)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 364.0,
+      "unit_height": 630.0,
+      "min_dimension": 1,
+      "min_x": -52.0,
+      "min_y": -45.0,
+      "max_x": 390.0,
+      "max_y": 630.0,
+      "cell_count_per_unit": 126,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "trihexagonal-3-6-3-6",
+      "label": "Kagome / Trihexagonal (3.6.3.6)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 104.0,
+      "unit_height": 90.06664199358161,
+      "min_dimension": 1,
+      "min_x": 0.0,
+      "min_y": 0.0,
+      "max_x": 130.0,
+      "max_y": 135.09996299037243,
+      "cell_count_per_unit": 3,
+      "row_offset_x": 52.0
+    },
+    {
+      "geometry": "cairo-pentagonal",
+      "label": "Cairo Pentagonal",
+      "metric_model": "pattern",
+      "base_edge": 30.0,
+      "unit_width": 142.0,
+      "unit_height": 71.0,
+      "min_dimension": 1,
+      "min_x": 0.0,
+      "min_y": 15.0,
+      "max_x": 142.0,
+      "max_y": 127.0,
+      "cell_count_per_unit": 4,
+      "row_offset_x": 71.0
+    },
+    {
+      "geometry": "rhombille",
+      "label": "Rhombille",
+      "metric_model": "pattern",
+      "base_edge": 60.044428,
+      "unit_width": 104.0,
+      "unit_height": 180.133284,
+      "min_dimension": 1,
+      "min_x": -52.0,
+      "min_y": -30.022214,
+      "max_x": 104.0,
+      "max_y": 180.133284,
+      "cell_count_per_unit": 6,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "deltoidal-hexagonal",
+      "label": "Deltoidal Hexagonal",
+      "metric_model": "pattern",
+      "base_edge": 40.993902,
+      "unit_width": 142.0,
+      "unit_height": 246.0,
+      "min_dimension": 1,
+      "min_x": -26.0,
+      "min_y": -26.0,
+      "max_x": 151.5,
+      "max_y": 220.0,
+      "cell_count_per_unit": 12,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "deltoidal-trihexagonal",
+      "label": "Deltoidal Trihexagonal",
+      "metric_model": "pattern",
+      "base_edge": 56.001488,
+      "unit_width": 142.0,
+      "unit_height": 246.0,
+      "min_dimension": 1,
+      "min_x": -26.0,
+      "min_y": -26.0,
+      "max_x": 151.5,
+      "max_y": 281.5,
+      "cell_count_per_unit": 12,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "tetrakis-square",
+      "label": "Tetrakis Square",
+      "metric_model": "pattern",
+      "base_edge": 41.846368,
+      "unit_width": 52.0,
+      "unit_height": 52.0,
+      "min_dimension": 1,
+      "min_x": 0.0,
+      "min_y": 0.0,
+      "max_x": 52.0,
+      "max_y": 52.0,
+      "cell_count_per_unit": 4,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "triakis-triangular",
+      "label": "Triakis Triangular",
+      "metric_model": "pattern",
+      "base_edge": 139.333599,
+      "unit_width": 582.0,
+      "unit_height": 336.0,
+      "min_dimension": 1,
+      "min_x": -97.0,
+      "min_y": -30.0,
+      "max_x": 582.0,
+      "max_y": 362.0,
+      "cell_count_per_unit": 36,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "prismatic-pentagonal",
+      "label": "Prismatic Pentagonal",
+      "metric_model": "pattern",
+      "base_edge": 38.806665,
+      "unit_width": 104.0,
+      "unit_height": 194.0,
+      "min_dimension": 1,
+      "min_x": -26.0,
+      "min_y": 26.0,
+      "max_x": 104.0,
+      "max_y": 220.0,
+      "cell_count_per_unit": 8,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "floret-pentagonal",
+      "label": "Floret Pentagonal",
+      "metric_model": "pattern",
+      "base_edge": 42.015551,
+      "unit_width": 364.0,
+      "unit_height": 630.0,
+      "min_dimension": 1,
+      "min_x": -52.0,
+      "min_y": -45.0,
+      "max_x": 390.0,
+      "max_y": 630.0,
+      "cell_count_per_unit": 84,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "snub-square-dual",
+      "label": "Snub Square Dual",
+      "metric_model": "pattern",
+      "base_edge": 38.795122,
+      "unit_width": 142.0,
+      "unit_height": 142.0,
+      "min_dimension": 1,
+      "min_x": -35.5,
+      "min_y": -35.5,
+      "max_x": 142.0,
+      "max_y": 142.0,
+      "cell_count_per_unit": 8,
+      "row_offset_x": 0.0
+    }
+  ],
+  "aperiodic_families": [
+    {
+      "tiling_family": "penrose-p2-kite-dart",
+      "label": "Penrose P2 Kite-Dart",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "kite",
+        "dart"
+      ]
+    },
+    {
+      "tiling_family": "penrose-p3-rhombs",
+      "label": "Penrose P3 Rhombs",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "thick-rhomb",
+        "thin-rhomb"
+      ]
+    },
+    {
+      "tiling_family": "ammann-beenker",
+      "label": "Ammann-Beenker",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "rhomb",
+        "square"
+      ]
+    },
+    {
+      "tiling_family": "spectre",
+      "label": "Spectre",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "spectre"
+      ]
+    },
+    {
+      "tiling_family": "hat-monotile",
+      "label": "Hat",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "hat"
+      ]
+    },
+    {
+      "tiling_family": "taylor-socolar",
+      "label": "Taylor-Socolar",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "taylor-half-hex"
+      ]
+    },
+    {
+      "tiling_family": "sphinx",
+      "label": "Sphinx",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "sphinx"
+      ]
+    },
+    {
+      "tiling_family": "chair",
+      "label": "Chair",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "chair"
+      ]
+    },
+    {
+      "tiling_family": "robinson-triangles",
+      "label": "Robinson Triangles",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "robinson-thick",
+        "robinson-thin"
+      ]
+    },
+    {
+      "tiling_family": "tuebingen-triangle",
+      "label": "Tuebingen Triangle",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "tuebingen-thick",
+        "tuebingen-thin"
+      ]
+    },
+    {
+      "tiling_family": "dodecagonal-square-triangle",
+      "label": "Dodecagonal Square-Triangle",
+      "experimental": true,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": "Experimental until manual visual review accepts the canonical-patch implementation.",
+      "public_cell_kinds": [
+        "dodecagonal-square-triangle-square",
+        "dodecagonal-square-triangle-triangle"
+      ]
+    },
+    {
+      "tiling_family": "shield",
+      "label": "Shield",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "shield-shield",
+        "shield-square",
+        "shield-triangle"
+      ]
+    },
+    {
+      "tiling_family": "pinwheel",
+      "label": "Pinwheel",
+      "experimental": true,
+      "implementation_status": "exact_affine",
+      "promotion_blocker": "Experimental until manual visual review accepts the exact-affine implementation.",
+      "public_cell_kinds": [
+        "pinwheel-triangle"
+      ]
+    }
+  ],
+  "server_meta": {
+    "app_name": "cellular-automaton-lab"
+  },
+  "snapshot_version": 5
+}

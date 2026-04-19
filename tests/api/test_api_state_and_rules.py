@@ -3,7 +3,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from backend.defaults import APP_DEFAULTS
 from backend.payload_types import RuleDefinitionPayload
+from backend.simulation.topology_catalog import (
+    PENROSE_GEOMETRY,
+    maximum_patch_depth_for_tiling_family,
+)
 
 try:
     from tests.api.support import ApiTestCase
@@ -138,7 +143,7 @@ class ApiStateAndRulesTests(ApiTestCase):
                 'sizing_mode': 'grid',
                 'width': 10,
                 'height': 6,
-                'patch_depth': 4,
+                'patch_depth': APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"],
             },
         )
         self.assertFalse(payload['running'])
@@ -324,7 +329,7 @@ class ApiStateAndRulesTests(ApiTestCase):
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'penrose-p3-rhombs')
         self.assertEqual(state['topology_spec']['adjacency_mode'], 'edge')
-        self.assertEqual(state['topology_spec']['patch_depth'], 6)
+        self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family(PENROSE_GEOMETRY))
         self.assertFalse(state['running'])
         self.assertEqual(state['generation'], 0)
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
@@ -408,7 +413,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertGreater(len(topology['cells']), 50)
         self.assertTrue(all(cell_state == 0 for cell_state in state['cell_states']))
 
-    def test_ammann_beenker_patch_depth_is_capped_at_four(self) -> None:
+    def test_ammann_beenker_patch_depth_uses_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'ammann-beenker',
@@ -424,12 +429,12 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'ammann-beenker')
-        self.assertEqual(state['topology_spec']['patch_depth'], 4)
+        self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family('ammann-beenker'))
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 100)
 
-    def test_spectre_patch_depth_uses_generic_rule_and_caps_at_three(self) -> None:
+    def test_spectre_patch_depth_uses_generic_rule_and_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'spectre',
@@ -445,14 +450,14 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'spectre')
-        self.assertEqual(state['topology_spec']['patch_depth'], 3)
+        self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family('spectre'))
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 500)
         self.assertTrue(all(cell['kind'] == 'spectre' for cell in topology['cells']))
 
-    def test_taylor_socolar_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
+    def test_taylor_socolar_patch_depth_uses_generic_rule_and_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'taylor-socolar',
@@ -468,14 +473,14 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'taylor-socolar')
-        self.assertEqual(state['topology_spec']['patch_depth'], 5)
+        self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family('taylor-socolar'))
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 100)
         self.assertTrue(all(cell['kind'] == 'taylor-half-hex' for cell in topology['cells']))
 
-    def test_sphinx_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
+    def test_sphinx_patch_depth_uses_generic_rule_and_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'sphinx',
@@ -491,14 +496,14 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'sphinx')
-        self.assertEqual(state['topology_spec']['patch_depth'], 5)
+        self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family('sphinx'))
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 20)
         self.assertTrue(all(cell['kind'] == 'sphinx' for cell in topology['cells']))
 
-    def test_chair_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
+    def test_chair_patch_depth_uses_generic_rule_and_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'chair',
@@ -514,14 +519,14 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'chair')
-        self.assertEqual(state['topology_spec']['patch_depth'], 5)
+        self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family('chair'))
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
         self.assertGreater(len(topology['cells']), 50)
         self.assertTrue(all(cell['kind'] == 'chair' for cell in topology['cells']))
 
-    def test_robinson_triangles_patch_depth_uses_generic_rule_and_caps_at_five(self) -> None:
+    def test_robinson_triangles_patch_depth_uses_generic_rule_and_family_cap(self) -> None:
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'robinson-triangles',
@@ -537,7 +542,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'robinson-triangles')
-        self.assertEqual(state['topology_spec']['patch_depth'], 5)
+        self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family('robinson-triangles'))
         self.assertEqual(state['rule']['name'], 'life-b2-s23')
         self.assertEqual(topology['topology_spec'], state['topology_spec'])
         self.assertEqual(len(topology['cells']), len(state['cell_states']))
@@ -546,14 +551,14 @@ class ApiStateAndRulesTests(ApiTestCase):
 
     def test_new_aperiodic_wave_tilings_reset_with_metadata_and_expected_caps(self) -> None:
         cases = (
-            ('hat-monotile', 3, {'hat'}),
-            ('tuebingen-triangle', 5, {'tuebingen-thick', 'tuebingen-thin'}),
-            ('dodecagonal-square-triangle', 4, {'dodecagonal-square-triangle-square', 'dodecagonal-square-triangle-triangle'}),
-            ('shield', 5, {'shield-shield', 'shield-square', 'shield-triangle'}),
-            ('pinwheel', 4, {'pinwheel-triangle'}),
+            ('hat-monotile', {'hat'}),
+            ('tuebingen-triangle', {'tuebingen-thick', 'tuebingen-thin'}),
+            ('dodecagonal-square-triangle', {'dodecagonal-square-triangle-square', 'dodecagonal-square-triangle-triangle'}),
+            ('shield', {'shield-shield', 'shield-square', 'shield-triangle'}),
+            ('pinwheel', {'pinwheel-triangle'}),
         )
 
-        for geometry, expected_patch_depth, expected_kinds in cases:
+        for geometry, expected_kinds in cases:
             with self.subTest(geometry=geometry):
                 reset = self.client.post('/api/control/reset', json={
                     'topology_spec': {
@@ -570,7 +575,7 @@ class ApiStateAndRulesTests(ApiTestCase):
                 topology = self.get_topology()
 
                 self.assertEqual(state['topology_spec']['tiling_family'], geometry)
-                self.assertEqual(state['topology_spec']['patch_depth'], expected_patch_depth)
+                self.assertEqual(state['topology_spec']['patch_depth'], maximum_patch_depth_for_tiling_family(geometry))
                 self.assertEqual(state['rule']['name'], 'life-b2-s23')
                 self.assertEqual(topology['topology_spec'], state['topology_spec'])
                 self.assertEqual(len(topology['cells']), len(state['cell_states']))
@@ -587,11 +592,12 @@ class ApiStateAndRulesTests(ApiTestCase):
                     self.assertTrue(all(cell.get('orientation_token') is not None for cell in topology['cells']))
 
     def test_unsafe_size_override_allows_patch_depth_above_family_cap(self) -> None:
+        override_patch_depth = maximum_patch_depth_for_tiling_family('spectre') + 1
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
                 'tiling_family': 'spectre',
                 'adjacency_mode': 'edge',
-                'patch_depth': 4,
+                'patch_depth': override_patch_depth,
                 'unsafe_size_override': True,
             },
             'speed': 6,
@@ -603,8 +609,8 @@ class ApiStateAndRulesTests(ApiTestCase):
         topology = self.get_topology()
 
         self.assertEqual(state['topology_spec']['tiling_family'], 'spectre')
-        self.assertEqual(state['topology_spec']['patch_depth'], 4)
-        self.assertEqual(topology['topology_spec']['patch_depth'], 4)
+        self.assertEqual(state['topology_spec']['patch_depth'], override_patch_depth)
+        self.assertEqual(topology['topology_spec']['patch_depth'], override_patch_depth)
         self.assertTrue(all(cell['kind'] == 'spectre' for cell in topology['cells']))
 
     def test_retired_penrose_rule_names_resolve_to_canonical_rules(self) -> None:

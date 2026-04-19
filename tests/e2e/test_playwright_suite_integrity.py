@@ -1,6 +1,10 @@
 from collections import Counter
 import unittest
 
+from backend.simulation.topology_catalog import (
+    PENROSE_GEOMETRY,
+    default_patch_depth_for_tiling_family,
+)
 
 from tests.e2e.playwright_suite_support import (
     DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
@@ -103,7 +107,8 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
 
     def test_grid_summary_parser_supports_regular_and_aperiodic_labels(self) -> None:
         regular = parse_grid_summary_text("36 x 25")
-        aperiodic = parse_grid_summary_text("Depth 4 • 271 tiles")
+        expected_patch_depth = default_patch_depth_for_tiling_family(PENROSE_GEOMETRY)
+        aperiodic = parse_grid_summary_text(f"Depth {expected_patch_depth} • 271 tiles")
 
         self.assertEqual(regular.kind, "regular")
         self.assertEqual(regular.width, 36)
@@ -113,7 +118,7 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
         self.assertEqual(aperiodic.kind, "aperiodic")
         self.assertIsNone(aperiodic.width)
         self.assertIsNone(aperiodic.height)
-        self.assertEqual(aperiodic.patch_depth, 4)
+        self.assertEqual(aperiodic.patch_depth, expected_patch_depth)
 
 
 if __name__ == "__main__":
