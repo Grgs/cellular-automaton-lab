@@ -424,11 +424,14 @@ def readiness_blockers(snapshot: BrowserReadinessSnapshot | None) -> list[str]:
 def browser_readiness_snapshot(page: Page) -> BrowserReadinessSnapshot | None:
     summary = page.evaluate(
         """() => {
-            const diagnostics = window.__appDiagnostics;
-            if (typeof diagnostics !== "function") {
-                return null;
-            }
-            const snapshot = diagnostics();
+            const reviewApi = window.__reviewApi;
+            const snapshot = reviewApi && typeof reviewApi.getDiagnostics === "function"
+                ? reviewApi.getDiagnostics()
+                : (
+                    typeof window.__appDiagnostics === "function"
+                        ? window.__appDiagnostics()
+                        : null
+                );
             if (!snapshot || typeof snapshot !== "object" || !snapshot.readiness) {
                 return null;
             }
@@ -470,6 +473,11 @@ def apply_review_topology_payload(
 ) -> None:
     page.evaluate(
         """async (payload) => {
+            const reviewApi = window.__reviewApi;
+            if (reviewApi && typeof reviewApi.applyTopology === "function") {
+                await reviewApi.applyTopology(payload);
+                return;
+            }
             const applyReviewTopology = window.__applyReviewTopology;
             if (typeof applyReviewTopology !== "function") {
                 throw new Error("Review topology injection hook is unavailable.");
@@ -478,6 +486,50 @@ def apply_review_topology_payload(
         }""",
         topology_payload,
     )
+
+
+def apply_review_cell_states(
+    page: Page,
+    review_cell_states: dict[str, int] | list[dict[str, object]],
+) -> None:
+    page.evaluate(
+        """async (nextCellStates) => {
+            const reviewApi = window.__reviewApi;
+            if (!reviewApi || typeof reviewApi.applyCellStates !== "function") {
+                throw new Error("Review cell-state injection hook is unavailable.");
+            }
+            await reviewApi.applyCellStates(nextCellStates);
+        }""",
+        review_cell_states,
+    )
+
+
+def reset_review_state(page: Page) -> None:
+    page.evaluate(
+        """async () => {
+            const reviewApi = window.__reviewApi;
+            if (!reviewApi || typeof reviewApi.resetState !== "function") {
+                throw new Error("Review state reset hook is unavailable.");
+            }
+            await reviewApi.resetState();
+        }""",
+    )
+
+
+def sample_review_cell_pixel(page: Page, cell_id: str) -> tuple[int, int, int, int] | None:
+    rgba = page.evaluate(
+        """(targetCellId) => {
+            const reviewApi = window.__reviewApi;
+            if (!reviewApi || typeof reviewApi.sampleRenderedCellPixel !== "function") {
+                throw new Error("Rendered cell pixel sampling hook is unavailable.");
+            }
+            return reviewApi.sampleRenderedCellPixel(targetCellId);
+        }""",
+        cell_id,
+    )
+    if rgba is None:
+        return None
+    return tuple(int(channel) for channel in cast(list[int], rgba))
 
 
 def set_range_value(
@@ -627,11 +679,14 @@ def canvas_visual_summary(page: Page, *, png_path: Path | None = None) -> Canvas
 def browser_topology_summary(page: Page) -> BrowserTopologySummary | None:
     summary = page.evaluate(
         """() => {
-            const diagnostics = window.__appDiagnostics;
-            if (typeof diagnostics !== "function") {
-                return null;
-            }
-            const snapshot = diagnostics();
+            const reviewApi = window.__reviewApi;
+            const snapshot = reviewApi && typeof reviewApi.getDiagnostics === "function"
+                ? reviewApi.getDiagnostics()
+                : (
+                    typeof window.__appDiagnostics === "function"
+                        ? window.__appDiagnostics()
+                        : null
+                );
             if (!snapshot || typeof snapshot !== "object") {
                 return null;
             }
@@ -668,11 +723,14 @@ def browser_topology_summary(page: Page) -> BrowserTopologySummary | None:
 def browser_transform_report(page: Page) -> BrowserTransformReport | None:
     summary = page.evaluate(
         """() => {
-            const diagnostics = window.__appDiagnostics;
-            if (typeof diagnostics !== "function") {
-                return null;
-            }
-            const snapshot = diagnostics();
+            const reviewApi = window.__reviewApi;
+            const snapshot = reviewApi && typeof reviewApi.getDiagnostics === "function"
+                ? reviewApi.getDiagnostics()
+                : (
+                    typeof window.__appDiagnostics === "function"
+                        ? window.__appDiagnostics()
+                        : null
+                );
             if (!snapshot || typeof snapshot !== "object" || !snapshot.transformReport) {
                 return null;
             }

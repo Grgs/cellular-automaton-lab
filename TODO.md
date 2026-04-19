@@ -21,6 +21,8 @@
 - Added advisory visual-quality metrics to render-review output, managed browser-check manifests, and sweep case records, including visible aspect ratio, edge density, boundary dominance, gutter score, orientation diversity, 12-sector occupancy, and radial-symmetry scoring when the live render diagnostics expose the needed inputs.
 - Added a family sample workbench for patch-depth families so candidate representative samples can be compared structurally by count, connectivity, bounds, holes, and diagnostic validation, with optional browser review against injected candidate topology payloads.
 - Added a geometry cleanup workbench for image-derived families so shield cleanup scales can be compared by overlap severity, bounds drift, and optional browser-visible gutter risk without ad hoc Shapely sweeps.
+- Replaced click-driven palette alias browser tests with a review/test API that injects topology and mutates cell state by `cell.id`, then samples rendered pixels directly from the canvas.
+- Moved custom dead-palette ownership and fixture-backed browser alias coverage onto a shared manifest/registry contract so TypeScript and Python no longer maintain separate family allowlists for this test surface.
 
 ## Now
 
@@ -30,8 +32,6 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Add a review/test-only cell-state injection hook by `cell.id` so palette and render-contract browser tests stop depending on canvas clicks when the thing under test is not hit-testing itself.
-- Move custom dead-palette ownership and browser alias-test coverage onto a shared manifest/registry contract so future tilings inherit unit invariants automatically and fixture-backed browser coverage does not drift between TypeScript and Python.
 - Add a frontend representative fixture regeneration tool so browser-facing topology fixtures do not require ad hoc manual export steps.
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Add profile-attached expectations beyond simple review notes, such as family-specific visual checkpoints, expected warning suppressions, and short literature-review acceptance checklists where those expectations can be stated clearly.

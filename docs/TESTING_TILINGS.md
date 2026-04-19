@@ -81,15 +81,19 @@ For family-specific dead palettes, there is a second browser-visible contract:
 dead cells must not alias the live fill on the rendered canvas. That coverage
 now has two layers:
 
+- a shared manifest in `frontend/canvas/family-dead-palette-manifest.json`
+  declares the family variants and any fixture-backed browser coverage
 - a frontend registry in `frontend/canvas/family-dead-palette-registry.ts`
-  owns the runtime dead-palette contract and unit-test expectations
+  reads that manifest and owns the runtime dead-palette contract plus unit-test
+  expectations
 - generated Playwright palette regressions sample rendered pixels from
-  representative topology fixtures for the palette-heavy families
+  representative topology fixtures for the palette-heavy families through the
+  review API, mutating cell state by `cell.id` rather than clicking the canvas
 
-When adding a new tiling with custom dead-state colors, update the frontend
-palette registry first. If the family also needs browser alias coverage, add a
-representative fixture and extend the browser coverage metadata rather than
-copying another one-off Playwright test.
+When adding a new tiling with custom dead-state colors, update the shared
+palette manifest first. If the family also needs browser alias coverage, add a
+representative fixture and manifest metadata rather than copying another one-off
+Playwright test.
 
 ### 8. Reference fixture drift check
 

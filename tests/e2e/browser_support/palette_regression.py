@@ -14,66 +14,52 @@ class PaletteFixtureCase(TypedDict):
     topology: dict[str, Any]
 
 
-PALETTE_ALIAS_BROWSER_FAMILIES = frozenset({
-    "chair",
-    "dodecagonal-square-triangle",
-    "hat-monotile",
-    "pinwheel",
-    "robinson-triangles",
-    "shield",
-    "tuebingen-triangle",
-})
+def palette_manifest_path() -> Path:
+    return Path(__file__).resolve().parents[3] / "frontend" / "canvas" / "family-dead-palette-manifest.json"
 
 
-def _fixture_root() -> Path:
-    return Path(__file__).resolve().parents[3] / "frontend" / "test-fixtures" / "topologies"
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
 
 
-def _unique_non_empty_values(cells: list[dict[str, Any]], field: str) -> set[str]:
-    values: set[str] = set()
-    for cell in cells:
-        value = cell.get(field)
-        if isinstance(value, str) and value:
-            values.add(value)
-    return values
-
-
-def infer_palette_selector_fields(cells: list[dict[str, Any]]) -> tuple[str, ...]:
-    selector_fields: list[str] = []
-    if len(_unique_non_empty_values(cells, "kind")) > 1:
-        selector_fields.append("kind")
-    if len(_unique_non_empty_values(cells, "chirality_token")) > 1:
-        selector_fields.append("chirality_token")
-    if not selector_fields and len(_unique_non_empty_values(cells, "orientation_token")) > 1:
-        selector_fields.append("orientation_token")
-    return tuple(selector_fields)
+def load_palette_manifest() -> dict[str, Any]:
+    return json.loads(palette_manifest_path().read_text(encoding="utf-8"))
 
 
 def iter_palette_fixture_cases() -> list[PaletteFixtureCase]:
+    manifest = load_palette_manifest()
+    families = manifest.get("families")
+    if not isinstance(families, list):
+        raise AssertionError("Palette manifest was missing a 'families' array.")
+
     cases: list[PaletteFixtureCase] = []
-    for fixture_path in sorted(_fixture_root().glob("*.json")):
+    for family_entry in families:
+        if not isinstance(family_entry, dict):
+            continue
+        browser_alias_coverage = family_entry.get("browserAliasCoverage")
+        if not isinstance(browser_alias_coverage, dict):
+            continue
+        family = family_entry.get("geometry")
+        fixture_path_value = browser_alias_coverage.get("fixturePath")
+        selector_fields_value = browser_alias_coverage.get("selectorFields")
+        if not isinstance(family, str) or not isinstance(fixture_path_value, str):
+            continue
+        selector_fields = tuple(
+            field
+            for field in selector_fields_value
+            if isinstance(field, str)
+        ) if isinstance(selector_fields_value, list) else ()
+        fixture_path = (_repo_root() / fixture_path_value).resolve()
         payload = json.loads(fixture_path.read_text(encoding="utf-8"))
         topology = payload.get("topology")
         if not isinstance(topology, dict):
-            continue
-        topology_spec = topology.get("topology_spec")
-        cells = topology.get("cells")
-        if not isinstance(topology_spec, dict) or not isinstance(cells, list):
-            continue
-        family = topology_spec.get("tiling_family")
-        if not isinstance(family, str) or not family:
-            continue
-        if family not in PALETTE_ALIAS_BROWSER_FAMILIES:
-            continue
-        typed_cells = [cell for cell in cells if isinstance(cell, dict)]
-        if not typed_cells:
             continue
         cases.append(
             {
                 "family": family,
                 "fixture_name": fixture_path.name,
                 "fixture_path": str(fixture_path),
-                "selector_fields": infer_palette_selector_fields(typed_cells),
+                "selector_fields": selector_fields,
                 "topology": topology,
             },
         )

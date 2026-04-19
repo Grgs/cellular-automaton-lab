@@ -1,0 +1,267 @@
+{
+  "families": [
+    {
+      "geometry": "tuebingen-triangle",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/tuebingen-triangle-depth-3.json",
+        "selectorFields": ["kind", "chirality_token"]
+      },
+      "variants": [
+        {
+          "label": "tuebingen-thick-left",
+          "selector": {
+            "kind": "tuebingen-thick",
+            "tile_family": "tuebingen",
+            "chirality_token": "left"
+          },
+          "color": "#f8f1e5"
+        },
+        {
+          "label": "tuebingen-thick-right",
+          "selector": {
+            "kind": "tuebingen-thick",
+            "tile_family": "tuebingen",
+            "chirality_token": "right"
+          },
+          "color": "#d5bb8f"
+        },
+        {
+          "label": "tuebingen-thin-left",
+          "selector": {
+            "kind": "tuebingen-thin",
+            "tile_family": "tuebingen",
+            "chirality_token": "left"
+          },
+          "color": "#efe4d0"
+        },
+        {
+          "label": "tuebingen-thin-right",
+          "selector": {
+            "kind": "tuebingen-thin",
+            "tile_family": "tuebingen",
+            "chirality_token": "right"
+          },
+          "color": "#e1cdac"
+        }
+      ]
+    },
+    {
+      "geometry": "robinson-triangles",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/robinson-triangles-depth-3.json",
+        "selectorFields": ["kind"]
+      },
+      "variants": [
+        {
+          "label": "robinson-thick",
+          "selector": {
+            "kind": "robinson-thick",
+            "tile_family": "robinson"
+          },
+          "color": "#f8f1e5"
+        },
+        {
+          "label": "robinson-thin",
+          "selector": {
+            "kind": "robinson-thin",
+            "tile_family": "robinson"
+          },
+          "color": "#d5bb8f"
+        }
+      ]
+    },
+    {
+      "geometry": "hat-monotile",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/hat-monotile-depth-3.json",
+        "selectorFields": ["chirality_token"]
+      },
+      "variants": [
+        {
+          "label": "hat-left",
+          "selector": {
+            "tile_family": "hat",
+            "chirality_token": "left"
+          },
+          "color": "#f8f1e5"
+        },
+        {
+          "label": "hat-right",
+          "selector": {
+            "tile_family": "hat",
+            "chirality_token": "right"
+          },
+          "color": "#c88d4b"
+        }
+      ]
+    },
+    {
+      "geometry": "chair",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/chair-depth-3.json",
+        "selectorFields": ["orientation_token"]
+      },
+      "variants": [
+        {
+          "label": "chair-0",
+          "selector": {
+            "kind": "chair",
+            "orientation_token": "0"
+          },
+          "color": "#f8f1e5"
+        },
+        {
+          "label": "chair-1",
+          "selector": {
+            "kind": "chair",
+            "orientation_token": "1"
+          },
+          "color": "#e5c089"
+        },
+        {
+          "label": "chair-2",
+          "selector": {
+            "kind": "chair",
+            "orientation_token": "2"
+          },
+          "color": "#c88d4b"
+        },
+        {
+          "label": "chair-3",
+          "selector": {
+            "kind": "chair",
+            "orientation_token": "3"
+          },
+          "color": "#dbc1b2"
+        }
+      ]
+    },
+    {
+      "geometry": "dodecagonal-square-triangle",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/dodecagonal-square-triangle-depth-3.json",
+        "selectorFields": ["kind", "chirality_token"]
+      },
+      "variants": [
+        {
+          "label": "dst-square-blue",
+          "selector": {
+            "kind": "dodecagonal-square-triangle-square",
+            "tile_family": "dodecagonal-square-triangle",
+            "chirality_token": "blue"
+          },
+          "color": "#f8f1e5"
+        },
+        {
+          "label": "dst-square-red",
+          "selector": {
+            "kind": "dodecagonal-square-triangle-square",
+            "tile_family": "dodecagonal-square-triangle",
+            "chirality_token": "red"
+          },
+          "color": "#ead6b6"
+        },
+        {
+          "label": "dst-square-yellow",
+          "selector": {
+            "kind": "dodecagonal-square-triangle-square",
+            "tile_family": "dodecagonal-square-triangle",
+            "chirality_token": "yellow"
+          },
+          "color": "#d5bb8f"
+        },
+        {
+          "label": "dst-triangle-blue",
+          "selector": {
+            "kind": "dodecagonal-square-triangle-triangle",
+            "tile_family": "dodecagonal-square-triangle",
+            "chirality_token": "blue"
+          },
+          "color": "#efe4d0"
+        },
+        {
+          "label": "dst-triangle-red",
+          "selector": {
+            "kind": "dodecagonal-square-triangle-triangle",
+            "tile_family": "dodecagonal-square-triangle",
+            "chirality_token": "red"
+          },
+          "color": "#e1cdac"
+        },
+        {
+          "label": "dst-triangle-yellow",
+          "selector": {
+            "kind": "dodecagonal-square-triangle-triangle",
+            "tile_family": "dodecagonal-square-triangle",
+            "chirality_token": "yellow"
+          },
+          "color": "#c88d4b"
+        }
+      ]
+    },
+    {
+      "geometry": "pinwheel",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/pinwheel-depth-3.json",
+        "selectorFields": ["chirality_token"]
+      },
+      "variants": [
+        {
+          "label": "pinwheel-left",
+          "selector": {
+            "tile_family": "pinwheel",
+            "chirality_token": "left"
+          },
+          "color": "#efe4d0"
+        },
+        {
+          "label": "pinwheel-right",
+          "selector": {
+            "tile_family": "pinwheel",
+            "chirality_token": "right"
+          },
+          "color": "#d5bb8f"
+        }
+      ]
+    },
+    {
+      "geometry": "shield",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/shield-depth-3.json",
+        "selectorFields": ["kind"]
+      },
+      "variants": [
+        {
+          "label": "shield-shield",
+          "selector": {
+            "kind": "shield-shield",
+            "tile_family": "shield"
+          },
+          "color": {
+            "token": "deadAlt"
+          }
+        },
+        {
+          "label": "shield-square",
+          "selector": {
+            "kind": "shield-square",
+            "tile_family": "shield"
+          },
+          "color": {
+            "token": "dead"
+          }
+        },
+        {
+          "label": "shield-triangle",
+          "selector": {
+            "kind": "shield-triangle",
+            "tile_family": "shield"
+          },
+          "color": {
+            "token": "accentStrong"
+          }
+        }
+      ]
+    }
+  ]
+}

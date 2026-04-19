@@ -389,7 +389,7 @@ For shield specifically, the missing tool is a short profile-owned checklist for
 what to inspect even when the local literature image is absent, such as central
 symmetry, odd-depth rotation plausibility, and visible gutter severity.
 
-### 8. Browser palette regressions still lean too hard on canvas clicking
+### 8. Browser palette regressions now use id-based review mutation, not clicks
 
 The new palette alias regressions proved a useful point: browser-level coverage
 is necessary because unit token-resolution tests can still miss a rendered
@@ -405,19 +405,18 @@ The concrete failure modes were:
 - false failures where the browser test was really measuring click placement,
   not palette aliasing
 
-Status: partially improved. The browser palette regressions now use rendered
-cell-center diagnostics rather than reconstructing coordinates from topology
-space. That removed the worst false failures, but it did not change the core
-problem: tests that only need state changes are still depending on clicks.
+Status: addressed for palette/render-contract coverage. The browser palette
+regressions now:
 
-The next fix should be explicit and narrow:
+- inject representative topology through the review path
+- mutate cell state by `cell.id` through the review API
+- sample rendered pixels by `cell.id` from the live canvas
 
-- add a review/test-only hook that can set cell state by `cell.id`
-- use that hook for palette and render-contract tests
-- keep click-based tests only for interaction coverage, where hit-testing is the
-  behavior under review
+That means non-interaction tests no longer rely on pointer placement. Click
+tests remain useful, but only when hit-testing or editor interaction itself is
+the behavior under review.
 
-### 9. Cross-language browser coverage ownership is still split
+### 9. Cross-language palette/browser coverage ownership is now shared
 
 The runtime dead-palette contract now lives in a frontend registry, which is
 the right direction. But the browser alias-test coverage still has a second
@@ -429,17 +428,14 @@ That split is tolerable short term, but it is still process debt:
 - TypeScript owns the runtime palette registry
 - Python currently owns the browser-family allowlist for generated palette tests
 
-Status: partially improved. The runtime contract is now centralized in the
-frontend registry, and browser regressions are generated from fixture metadata
-rather than being hand-written for `shield` only. The remaining gap is shared
-ownership of which families need browser alias coverage.
-
-The next refinement should be one small cross-language manifest that states:
+Status: addressed. The shared palette manifest now states:
 
 - family id
 - whether browser alias coverage is required
 - which representative fixture to use
 - which variant axes matter for representative sample selection
 
-That would let future tilings pick up both unit invariants and fixture-backed
-browser alias coverage without adding another hard-coded family path in Python.
+TypeScript consumes that manifest for runtime dead-palette ownership and unit
+invariants, while Python consumes the same manifest for generated browser alias
+coverage. Future tilings now add one manifest entry instead of parallel
+registry/allowlist edits.

@@ -20,8 +20,11 @@ try:
     )
     from tests.e2e.browser_support.render_review import (
         apply_review_topology_payload,
+        apply_review_cell_states,
         assert_canvas_centered_within_viewport,
         canvas_visual_summary,
+        reset_review_state,
+        sample_review_cell_pixel,
         select_tiling_family,
         wait_for_patch_render_complete,
     )
@@ -38,8 +41,11 @@ except ModuleNotFoundError:
     )
     from tests.e2e.browser_support.render_review import (
         apply_review_topology_payload,
+        apply_review_cell_states,
         assert_canvas_centered_within_viewport,
         canvas_visual_summary,
+        reset_review_state,
+        sample_review_cell_pixel,
         select_tiling_family,
         wait_for_patch_render_complete,
     )
@@ -153,6 +159,20 @@ class SharedUiFlowMixin:
         apply_review_topology_payload(case.page, topology_payload)
         wait_for_patch_render_complete(case.page)
 
+    def _apply_review_cell_states(self, review_cell_states: dict[str, int] | list[dict[str, object]]) -> None:
+        case = self._case()
+        apply_review_cell_states(case.page, review_cell_states)
+        case.page.wait_for_timeout(75)
+
+    def _reset_review_state(self) -> None:
+        case = self._case()
+        reset_review_state(case.page)
+        wait_for_patch_render_complete(case.page)
+
+    def _sample_review_cell_pixel(self, cell_id: str) -> tuple[int, int, int, int] | None:
+        case = self._case()
+        return sample_review_cell_pixel(case.page, cell_id)
+
     def _sample_canvas_pixel_rgba(self, canvas_x: float, canvas_y: float) -> tuple[int, int, int, int]:
         case = self._case()
         rgba = case.page.evaluate(
@@ -203,25 +223,6 @@ class SharedUiFlowMixin:
     def _set_editor_tool(self, editor_tool: str) -> None:
         case = self._case()
         case.page.locator(f'[data-editor-tool="{editor_tool}"]').click()
-
-    def _resolve_rendered_cell_center(self, cell_id: str) -> tuple[float, float]:
-        case = self._case()
-        center = case.page.evaluate(
-            """async (targetCellId) => {
-                if (typeof window.__resolveRenderedCellCenter !== "function") {
-                    throw new Error("rendered cell center hook is unavailable");
-                }
-                return window.__resolveRenderedCellCenter(targetCellId);
-            }""",
-            cell_id,
-        )
-        if not isinstance(center, dict):
-            raise AssertionError(f"rendered center was unavailable for {cell_id}")
-        center_x = center.get("x")
-        center_y = center.get("y")
-        if not isinstance(center_x, (int, float)) or not isinstance(center_y, (int, float)):
-            raise AssertionError(f"rendered center was malformed for {cell_id}: {center!r}")
-        return float(center_x), float(center_y)
 
     def _select_tiling_family_and_wait_for_reset(
         self,
@@ -344,79 +345,87 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value(fixture_case["family"])
         self._apply_review_topology(topology)
 
-        centers = [
-            (
-                float(cast(dict[str, object], cell["center"])["x"]),
-                float(cast(dict[str, object], cell["center"])["y"]),
-            )
-            for cell in cells
-            if isinstance(cell.get("center"), dict)
-        ]
-        mean_x = sum(point[0] for point in centers) / len(centers)
-        mean_y = sum(point[1] for point in centers) / len(centers)
+        try:
+            centers = [
+                (
+                    float(cast(dict[str, object], cell["center"])["x"]),
+                    float(cast(dict[str, object], cell["center"])["y"]),
+                )
+                for cell in cells
+                if isinstance(cell.get("center"), dict)
+            ]
+            mean_x = sum(point[0] for point in centers) / len(centers)
+            mean_y = sum(point[1] for point in centers) / len(centers)
 
-        grouped_candidates: dict[str, list[dict[str, object]]] = {}
-        for cell in cells:
-            center = cell.get("center")
-            if not isinstance(center, dict):
-                continue
-            signature_parts = []
-            for field in selector_fields:
-                value = cell.get(field)
-                signature_parts.append(str(value or "<missing>"))
-            signature = ":".join(signature_parts) if signature_parts else "__default__"
-            grouped_candidates.setdefault(signature, []).append(cell)
-
-        representative_cells: dict[str, dict[str, object]] = {}
-        rendered_centers: dict[str, tuple[float, float]] = {}
-        for signature, candidates in grouped_candidates.items():
-            candidates.sort(
-                key=lambda cell: (
-                    (float(cast(dict[str, object], cell["center"])["x"]) - mean_x) ** 2
-                    + (float(cast(dict[str, object], cell["center"])["y"]) - mean_y) ** 2
-                ),
-            )
-            for candidate in candidates:
-                try:
-                    rendered_center = self._resolve_rendered_cell_center(str(candidate["id"]))
-                except AssertionError:
+            grouped_candidates: dict[str, list[dict[str, object]]] = {}
+            for cell in cells:
+                center = cell.get("center")
+                if not isinstance(center, dict):
                     continue
-                representative_cells[signature] = candidate
-                rendered_centers[signature] = rendered_center
-                break
+                signature_parts = []
+                for field in selector_fields:
+                    value = cell.get(field)
+                    signature_parts.append(str(value or "<missing>"))
+                signature = ":".join(signature_parts) if signature_parts else "__default__"
+                grouped_candidates.setdefault(signature, []).append(cell)
 
-        case.assertTrue(
-            representative_cells,
-            f"{fixture_case['family']} fixture did not yield any representative palette samples",
-        )
+            representative_cells: dict[str, dict[str, object]] = {}
+            for signature, candidates in grouped_candidates.items():
+                candidates.sort(
+                    key=lambda cell: (
+                        (float(cast(dict[str, object], cell["center"])["x"]) - mean_x) ** 2
+                        + (float(cast(dict[str, object], cell["center"])["y"]) - mean_y) ** 2
+                    ),
+                )
+                for candidate in candidates:
+                    sampled_pixel = self._sample_review_cell_pixel(str(candidate["id"]))
+                    if sampled_pixel is None:
+                        continue
+                    representative_cells[signature] = candidate
+                    break
 
-        dead_samples: dict[str, tuple[int, int, int, int]] = {}
-        self._set_editor_tool("brush")
-        self._set_paint_state(1)
-        for signature, cell in representative_cells.items():
-            center_x, center_y = rendered_centers[signature]
-            dead_samples[signature] = self._sample_canvas_pixel_rgba(center_x, center_y)
-            self._click_canvas_position(center_x, center_y)
-
-        case.page.wait_for_timeout(300)
-
-        live_samples: dict[str, tuple[int, int, int, int]] = {}
-        for signature, cell in representative_cells.items():
-            center_x, center_y = rendered_centers[signature]
-            live_samples[signature] = self._sample_canvas_pixel_rgba(center_x, center_y)
-
-        canonical_live_sample = next(iter(live_samples.values()))
-        for signature in sorted(representative_cells):
-            case.assertEqual(
-                live_samples[signature],
-                canonical_live_sample,
-                f"{fixture_case['family']} sample {signature} did not paint to the canonical live canvas color",
+            case.assertTrue(
+                representative_cells,
+                f"{fixture_case['family']} fixture did not yield any representative palette samples",
             )
-            case.assertNotEqual(
-                dead_samples[signature],
-                canonical_live_sample,
-                f"{fixture_case['family']} sample {signature} dead-state canvas color aliased the live canvas color",
+
+            dead_samples: dict[str, tuple[int, int, int, int]] = {}
+            for signature, cell in representative_cells.items():
+                sampled_pixel = self._sample_review_cell_pixel(str(cell["id"]))
+                if sampled_pixel is None:
+                    raise AssertionError(f"{fixture_case['family']} sample {signature} did not resolve to a rendered pixel")
+                dead_samples[signature] = sampled_pixel
+
+            self._apply_review_cell_states(
+                [
+                    {"id": str(cell["id"]), "state": 1}
+                    for cell in representative_cells.values()
+                ],
             )
+
+            live_samples: dict[str, tuple[int, int, int, int]] = {}
+            for signature, cell in representative_cells.items():
+                sampled_pixel = self._sample_review_cell_pixel(str(cell["id"]))
+                if sampled_pixel is None:
+                    raise AssertionError(
+                        f"{fixture_case['family']} sample {signature} did not resolve to a rendered pixel after live-state injection",
+                    )
+                live_samples[signature] = sampled_pixel
+
+            canonical_live_sample = next(iter(live_samples.values()))
+            for signature in sorted(representative_cells):
+                case.assertEqual(
+                    live_samples[signature],
+                    canonical_live_sample,
+                    f"{fixture_case['family']} sample {signature} did not paint to the canonical live canvas color",
+                )
+                case.assertNotEqual(
+                    dead_samples[signature],
+                    canonical_live_sample,
+                    f"{fixture_case['family']} sample {signature} dead-state canvas color aliased the live canvas color",
+                )
+        finally:
+            self._reset_review_state()
 
     def _export_pattern_payload(self) -> dict[str, object]:
         case = self._case()

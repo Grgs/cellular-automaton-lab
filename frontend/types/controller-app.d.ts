@@ -9,7 +9,7 @@ import type { MutationRunner } from "./controller-runtime.js";
 import type { ConfigSyncController, UiSessionController } from "./controller-sync-session.js";
 import type { AppView, GridView, InteractionController, ViewportController } from "./controller-view.js";
 import type { DomElements } from "./dom.js";
-import type { SimulationSnapshot, TopologyPayload } from "./domain.js";
+import type { CellStateUpdate, SimulationSnapshot, TopologyPayload } from "./domain.js";
 import type { Point2D, RenderDiagnosticsSnapshot } from "./rendering.js";
 import type { AppState } from "./state.js";
 
@@ -51,6 +51,8 @@ export interface AppControllerStartupResult {
     controlActions: AppActionSet;
 }
 
+export type ReviewCellStateInput = Record<string, number> | CellStateUpdate[];
+
 export interface AppController {
     init(): Promise<void>;
     dispose(): void;
@@ -60,6 +62,8 @@ export interface AppController {
     applyCellSize(nextCellSize: number): void;
     applyPaintState(nextPaintState: number): void;
     applyReviewTopology(topology: TopologyPayload): void;
+    applyReviewCellStates(reviewCellStates: ReviewCellStateInput): void;
+    resetReviewState(): void;
     getState(): AppState;
     getRenderDiagnostics(): RenderDiagnosticsSnapshot | null;
     getRenderedCellCenter(cellId: string): Point2D | null;

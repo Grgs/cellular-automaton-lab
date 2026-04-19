@@ -217,6 +217,18 @@ The main Playwright-backed suites cover flows such as:
 - topology switching and persistence
 - fixture-backed dead/live palette alias regressions for palette-heavy tilings
 
+Non-interaction browser checks should prefer the review/test API over synthetic
+canvas clicks. In practice:
+
+- use canvas clicks when hit-testing, brush behavior, or editor interaction is
+  the thing being tested
+- use injected review topology plus cell-state mutation by `cell.id` when the
+  thing being tested is rendered appearance or palette behavior
+
+The palette alias regressions now follow that rule. They no longer click the
+canvas to paint representative cells; they inject topology, set states by
+`cell.id`, and sample the rendered pixels directly.
+
 Useful entrypoints include:
 
 ```powershell
