@@ -25,7 +25,7 @@ def _standalone_outputs_ready() -> bool:
 
 
 class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
-    def test_structural_only_shield_window_workbench_records_distinct_candidates(self) -> None:
+    def test_structural_only_shield_window_workbench_keeps_exact_output_stable(self) -> None:
         with tempfile.TemporaryDirectory(prefix="family-sample-workbench-tool-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"
             exit_code = main(
@@ -55,7 +55,8 @@ class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
             second_summary = json.loads(
                 Path(manifest["candidates"][1]["candidateSummary"]).read_text(encoding="utf-8")
             )
-            self.assertNotEqual(first_summary["total_cells"], second_summary["total_cells"])
+            self.assertEqual(first_summary["total_cells"], second_summary["total_cells"])
+            self.assertEqual(first_summary["signature"], second_summary["signature"])
             self.assertIn("validation", first_summary)
             self.assertIn("validation", second_summary)
 

@@ -65,13 +65,11 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - direct canonical patch fixtures now check the exact serialized patch on that exact-affine path at both depth `1` and depth `3`
   - the representative sample must remain hole-free under the canonical surface checks
 - `shield`
-  - the authoritative verifier sample is a dense 12-fold central field derived from the literature patch image
-  - runtime depth selection now uses a backend-owned dodecagonal center window rather than a graph-distance shell
-  - traced shield polygons now use a minimal backend-owned inward cleanup to remove positive-area overlap, while any seam hiding is handled only in the canvas draw pass
-  - odd patch depths must apply the documented 15-degree orientation alternation
-  - orientation-token diversity must remain high in representative dense patches
-  - rooted local-reference fixtures now check canonical neighborhoods inside that dense field
-  - direct dense canonical patch fixtures now check the normalized public serialization exactly at both depth `1` and depth `3`
+  - the authoritative verifier sample now comes from Gahler's marked recursive substitution rule translated from the published PostScript source
+  - runtime depth is exact substitution depth on a single right-shield seed
+  - the public runtime still collapses marked internal tiles to shield / square / triangle kinds while preserving orientation and chirality metadata
+  - rooted local-reference fixtures now check canonical neighborhoods inside the exact substitution patch
+  - direct canonical patch fixtures now check the normalized public serialization exactly at both depth `1` and depth `3`
 - `hat-monotile`
   - verification assumes an `H8`-rooted representative patch rather than a one-tile seed
   - representative patches should include opposite-chirality Hat adjacencies
@@ -99,5 +97,5 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 - For periodic families, the verifier is now stronger than a plain sample-signature check, but it still targets finite family-specific open-boundary boards rather than quotient-surface or large-sample proofs.
 - Periodic dual-family checks now cover unambiguous reciprocal pairs and the current ambiguous candidate classes, but they are still finite-sample descriptor checks rather than full dual constructions.
 - The new reference layer mixes rooted neighborhoods with direct canonical patch diffs for selected families; it is not yet a full canonical patch-diff system across the whole catalog.
-- `shield` is now materially closer to the literature visually through a centered dodecagonal window, topology-space overlap cleanup, and a draw-only seam bridge, but the repo still does not claim a full marked substitution with fractalized boundary generation for that family.
+- `shield` now comes from an exact marked substitution translated from Gahler's published PostScript rule, and it is held to the same strict shared-surface, overlap, and edge-multiplicity checks as the other exact edge-sharing substitution families.
 - That is stronger than screenshot plausibility, but it is still not the same thing as a full symbolic proof that the generator exactly matches the literature’s substitution system at all depths.

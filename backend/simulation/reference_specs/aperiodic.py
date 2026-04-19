@@ -449,62 +449,65 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     SHIELD_GEOMETRY: ReferenceFamilySpec(
         geometry=SHIELD_GEOMETRY,
         display_name=_reference_label(SHIELD_GEOMETRY),
-        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/shield/",),
-        canonical_root_seed_policy="dense 12-fold shield patch cropped from a literature-derived canonical field with a backend-owned dodecagonal center window",
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/shield/",
+            "https://www.math.uni-bielefeld.de/~gaehler/tilings/sh.ps",
+        ),
+        canonical_root_seed_policy="single right-shield seed from Gahler's marked recursive PostScript rule",
         allowed_public_cell_kinds=_public_cell_kinds(SHIELD_GEOMETRY),
         required_metadata=(
             MetadataRequirement(
                 kind=SHIELD_SHIELD_KIND,
-                fields=("tile_family", "orientation_token"),
+                fields=("tile_family", "orientation_token", "chirality_token"),
             ),
             MetadataRequirement(
                 kind=SHIELD_SQUARE_KIND,
-                fields=("tile_family", "orientation_token"),
+                fields=("tile_family", "orientation_token", "chirality_token"),
             ),
             MetadataRequirement(
                 kind=SHIELD_TRIANGLE_KIND,
-                fields=("tile_family", "orientation_token"),
+                fields=("tile_family", "orientation_token", "chirality_token"),
             ),
         ),
         depth_expectations={
             0: ReferenceDepthExpectation(
-                exact_total_cells=40,
-                required_kinds=(SHIELD_SHIELD_KIND, SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
+                exact_total_cells=1,
+                required_kinds=(SHIELD_SHIELD_KIND,),
+                min_unique_orientation_tokens=1,
+                min_unique_chirality_tokens=1,
+                max_bounds_aspect_ratio=1.1,
+                expected_signature="ced78e983b2d",  # pragma: allowlist secret
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=13,
+                required_kinds=(SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
                 required_adjacency_pairs=(
-                    (SHIELD_SHIELD_KIND, SHIELD_TRIANGLE_KIND),
                     (SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
                     (SHIELD_TRIANGLE_KIND, SHIELD_TRIANGLE_KIND),
                 ),
                 min_unique_orientation_tokens=10,
-                max_bounds_aspect_ratio=1.5,
-                expected_signature="37d013f30fc0",  # pragma: allowlist secret
-            ),
-            1: ReferenceDepthExpectation(
-                exact_total_cells=81,
-                min_unique_orientation_tokens=12,
-                expected_signature="1d884216655b",  # pragma: allowlist secret
+                min_unique_chirality_tokens=2,
+                expected_signature="e707a58ed144",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-1",
             ),
             3: ReferenceDepthExpectation(
-                exact_total_cells=443,
+                exact_total_cells=151,
                 required_kinds=(SHIELD_SHIELD_KIND, SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
                 required_adjacency_pairs=(
-                    (SHIELD_SHIELD_KIND, SHIELD_SQUARE_KIND),
                     (SHIELD_SHIELD_KIND, SHIELD_TRIANGLE_KIND),
                     (SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
                     (SHIELD_TRIANGLE_KIND, SHIELD_TRIANGLE_KIND),
                 ),
                 min_unique_orientation_tokens=12,
-                expected_signature="95a927bb2a20",  # pragma: allowlist secret
+                min_unique_chirality_tokens=2,
+                expected_signature="bf43dadeef7c",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-3",
             ),
         },
         notes=(
-            "The shipped patch is a dense literature-derived central field extracted from the Bielefeld shield patch image.",
-            "Runtime depth selection uses a backend-owned dodecagonal center window instead of graph-distance thresholds.",
-            "Odd patch depths apply the documented 15-degree alternation around the central dodecagonal seed.",
-            "Runtime geometry now applies a minimal inward trace-cleanup normalization to remove positive-area overlap from the traced polygons; any seam hiding is render-only.",
-            "The public model preserves only public kinds plus orientation metadata; the literature matching-rule decorations are not part of the runtime payload.",
+            "The backend now translates Gahler's exact marked recursive PostScript rule instead of tracing a rendered patch image.",
+            "The public runtime still collapses the marked internal prototiles to public square / triangle / shield kinds while preserving orientation and chirality metadata.",
+            "Shield now uses exact substitution patch depth with strict edge-sharing validation.",
         ),
     ),
     PINWHEEL_GEOMETRY: ReferenceFamilySpec(

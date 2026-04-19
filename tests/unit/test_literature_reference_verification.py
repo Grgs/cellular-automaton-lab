@@ -643,8 +643,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
-        self.assertGreaterEqual(result.observations[0].unique_orientation_tokens, 10)
-        self.assertGreaterEqual(result.observations[1].unique_orientation_tokens, 12)
+        self.assertGreaterEqual(result.observations[0].unique_orientation_tokens, 1)
+        self.assertGreaterEqual(result.observations[1].unique_orientation_tokens, 10)
+        self.assertGreaterEqual(result.observations[2].unique_orientation_tokens, 12)
         self.assertEqual(result.observations[-1].hole_count, 0)
 
     def test_chair_orientation_count_expectation_reports_mismatch(self) -> None:

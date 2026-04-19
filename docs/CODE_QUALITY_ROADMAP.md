@@ -167,7 +167,7 @@ Primary files:
 
 Current issue:
 
-Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `dodecagonal-square-triangle`, `shield`, and `pinwheel` remain experimental because manual visual review still does not justify promotion. Shield is explicitly not a defensible full marked fractal substitution.
+Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `dodecagonal-square-triangle`, `shield`, and `pinwheel` remain experimental because manual visual review still does not justify promotion. Shield now has an exact marked substitution implementation, so the remaining work is product-facing review and removal of compatibility-only legacy diagnostics, not replacement of the generator itself.
 
 Needed change:
 
@@ -187,7 +187,7 @@ Each contract should identify:
 - validation mode
 - promotion blocker, if any
 
-Shield should stay documented as a known weak point until a full marked substitution rule table exists or is reconstructed to a defensible standard.
+Shield should stay documented as experimental until the new exact marked substitution path has an intentional visible-review decision and the remaining compatibility-only diagnostic tooling is either removed or simplified.
 
 Target outcome:
 
@@ -195,7 +195,7 @@ The code stops treating all aperiodic builders as equally authoritative. Product
 
 Implementation status:
 
-The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `dodecagonal-square-triangle`, `shield`, and `pinwheel` still explicitly blocked from promotion pending visual or implementation work. Backend-owned `aperiodic_families` bootstrap metadata now also carries those status fields into the frontend, and the picker/drawer surface experimental status directly instead of hiding it in backend/test-only layers.
+The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `shield` promoted from `known_deviation` to `true_substitution`, while `dodecagonal-square-triangle` and `pinwheel` still remain explicitly blocked pending visual review. Backend-owned `aperiodic_families` bootstrap metadata now also carries those status fields into the frontend, and the picker/drawer surface experimental status directly instead of hiding it in backend/test-only layers.
 
 ### 5. Literature Verification And Fixtures
 

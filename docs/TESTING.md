@@ -333,8 +333,8 @@ Use the workbench when:
 Current v1 strategy support:
 
 - `baseline` for any patch-depth family
-- `shield` `representative-window` for explicit dodecagonal window-threshold sweeps
-- `shield` `trace-cleanup-scale` in the geometry cleanup workbench for fixed-sample cleanup-factor sweeps
+- `shield` `representative-window` only as a compatibility artifact path; exact symbolic shield output no longer changes with those legacy threshold values
+- `shield` `trace-cleanup-scale` only as a compatibility artifact path; exact symbolic shield output no longer changes with those legacy cleanup values
 
 Use the geometry cleanup workbench when the representative sample is already fixed and the question is instead:
 

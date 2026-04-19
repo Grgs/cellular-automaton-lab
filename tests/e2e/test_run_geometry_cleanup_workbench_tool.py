@@ -25,7 +25,7 @@ def _standalone_outputs_ready() -> bool:
 
 
 class GeometryCleanupWorkbenchToolIntegrationTests(unittest.TestCase):
-    def test_structural_cleanup_workbench_records_distinct_candidate_drift(self) -> None:
+    def test_structural_cleanup_workbench_reports_compatibility_no_drift(self) -> None:
         with tempfile.TemporaryDirectory(prefix="geometry-cleanup-workbench-tool-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"
             exit_code = main(
@@ -55,10 +55,8 @@ class GeometryCleanupWorkbenchToolIntegrationTests(unittest.TestCase):
             last_summary = json.loads(
                 Path(manifest["candidates"][-1]["candidateSummary"]).read_text(encoding="utf-8")
             )
-            self.assertNotEqual(
-                first_summary["cleanupDiagnostics"]["boundsDrift"]["widthRatio"],
-                last_summary["cleanupDiagnostics"]["boundsDrift"]["widthRatio"],
-            )
+            self.assertEqual(first_summary["cleanupDiagnostics"]["boundsDrift"]["widthRatio"], 1.0)
+            self.assertEqual(last_summary["cleanupDiagnostics"]["boundsDrift"]["widthRatio"], 1.0)
             self.assertIn("maxOverlapArea", first_summary["cleanupDiagnostics"])
 
 

@@ -35,9 +35,8 @@
 
 - Revisit browser-visible shape and pattern correctness for `dodecagonal-square-triangle` and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
-- Run an explicit manual visible-review decision for `shield` against the cached literature reference; the current dense-field approximation is now visually close enough to revisit review, but it remains `Experimental` until that decision is recorded.
+- Run an explicit manual visible-review decision for `shield` against the cached literature reference; the exact marked substitution is now in place, but it still remains `Experimental` until that review decision is recorded.
 - For `pinwheel`, treat the remaining visual mismatch as a display-sampling problem; keep the two-root exact-affine runtime patch, and if we revisit the presentation use a display-only observation window rather than runtime subset selection.
-- Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
@@ -65,6 +64,7 @@
 - Decide whether the lightweight frontend formatting check should grow into a full linter/formatter after a deliberate repo-wide mechanical style pass.
 - Extend canonical type-surface drift checks beyond the current controller-view/editor/controller-sync-session/actions slice only if more frontend barrels start restating payload shapes instead of reusing canonical request and domain types.
 - Revisit Playwright runner/build coordination only if new host types or non-standalone artifact builds need their own freshness checks; keep suite selection and standalone build reuse centralized in the npm runner path.
+- Remove or simplify the remaining compatibility-only shield workbench knobs (`representative-window`, `trace-cleanup-scale`) once no one needs artifact continuity with the old image-derived workflow.
 - Continue the code-quality roadmap by splitting the remaining drawer sections if editor controls and topology metadata keep growing together.
 - Revisit the interaction router only if idle click/context-menu behavior grows new gesture modes; pointer-session start/update/cancel/commit flow should stay in the session modules.
 - Revisit drawer composition only if new UI sections appear; section-local field growth should stay in the section builders, not return to one broad `drawer.ts`.

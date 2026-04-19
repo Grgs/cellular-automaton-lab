@@ -80,7 +80,7 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
             "tuebingen-triangle\tpatch_depth\ttrue_substitution\tPASS\t",
             output,
         )
-        self.assertIn("shield\tpatch_depth\tknown_deviation\tPASS\t", output)
+        self.assertIn("shield\tpatch_depth\ttrue_substitution\tPASS\t", output)
 
     def test_json_output_is_deterministic_and_contains_required_fields(self) -> None:
         first = render_verification_strength_report(self.rows, output_format="json")
@@ -96,14 +96,14 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         )
 
         shield = next(family for family in families if family["geometry"] == "shield")
-        self.assertEqual(shield["implementation_status"], "known_deviation")
+        self.assertEqual(shield["implementation_status"], "true_substitution")
         self.assertEqual(shield["verification_status"], "PASS")
         self.assertTrue(isinstance(shield["promotion_blocker"], str))
         self.assertEqual(shield["depths"], [0, 1, 3])
         self.assertEqual(shield["failure_codes"], [])
         self.assertTrue(shield["has_local_reference"])
         self.assertTrue(shield["has_canonical_patch"])
-        self.assertFalse(shield["strict_validation"])
+        self.assertTrue(shield["strict_validation"])
         self.assertTrue(shield["verification_modes"])
         self.assertTrue(shield["observations"])
 
@@ -144,10 +144,10 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         output = render_verification_strength_report(self.rows, output_format="detail")
 
         self.assertIn("shield (Shield)", output)
-        self.assertIn("implementation_status: known_deviation", output)
+        self.assertIn("implementation_status: true_substitution", output)
         self.assertIn("verification_status: PASS", output)
         self.assertIn(
-            "promotion_blocker: Experimental until the known translated-cluster deviation is replaced by a marked fractal substitution.",
+            "promotion_blocker: Experimental until manual visual review accepts the exact marked substitution implementation.",
             output,
         )
         self.assertIn("pinwheel (Pinwheel)", output)

@@ -67,8 +67,6 @@ def _depth_semantics(geometry: str) -> str:
         return "grid sample"
     if geometry == "pinwheel":
         return "exact affine substitution depth"
-    if geometry == "shield":
-        return "canonical patch depth over the current known-deviation implementation"
     return "substitution patch depth"
 
 

@@ -53,7 +53,7 @@ npm run test:frontend
 
 Use these when a tiling looks visually stacked or suspicious. The backend test catches topology-space polygon overlap with Shapely, and the frontend suite now includes adapter-space overlap checks using the same transformed polygons the canvas renderer fills.
 
-`recommended_validation_options(...)` now keeps overlap checks strict for the families that are intended to be exact edge-sharing surfaces, while `shield` still relaxes shared-surface and overlap checks because its current image-derived geometry is only diagnostics-clean, not an exact substitution surface.
+`recommended_validation_options(...)` now keeps overlap checks strict for the exact edge-sharing families, including `shield` after the exact marked substitution migration.
 
 The frontend adapter-space overlap helper is intentionally looser than the backend check: its current positive-area epsilon is `1e-4`, and it now compares overlap area across multiple snapped precisions so known-good exact-path families such as `pinwheel` do not fail on polygon-clipping noise.
 
@@ -157,7 +157,7 @@ python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3 -
 
 Workbench notes:
 
-- The default strategy is `representative-window` for `shield` and `baseline` for other patch-depth families.
+- The default strategy is still `representative-window` for `shield` only for compatibility artifact comparisons, but exact symbolic shield output no longer changes with those legacy threshold values.
 - The workbench always writes per-candidate `candidate-topology.json` and `candidate-summary.json`.
 - Optional browser review works by injecting the candidate topology payload into the review runtime; it does not rely on the shipped family/depth patch selection path.
 - The geometry cleanup workbench is the fixed-sample counterpart: it keeps the shipped representative sample and varies topology cleanup scale only.

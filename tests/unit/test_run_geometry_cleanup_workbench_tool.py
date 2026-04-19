@@ -66,7 +66,7 @@ class GeometryCleanupWorkbenchToolTests(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(request.values, (0.941, 0.951, 0.961))
+            self.assertEqual(request.values, (0.941, 0.961, 1.0))
 
     def test_expand_candidates_builds_deterministic_scale_names(self) -> None:
         with tempfile.TemporaryDirectory(prefix="geometry-cleanup-workbench-candidates-") as tmpdir:
@@ -87,8 +87,10 @@ class GeometryCleanupWorkbenchToolTests(unittest.TestCase):
             candidates = expand_cleanup_candidates(request)
             self.assertEqual(candidates[0].name, "001-scale-0.941000")
             self.assertEqual(candidates[1].name, "002-scale-0.951000")
+            self.assertEqual(candidates[2].name, "003-scale-1.000000")
             self.assertFalse(candidates[0].is_baseline)
-            self.assertTrue(candidates[1].is_baseline)
+            self.assertFalse(candidates[1].is_baseline)
+            self.assertTrue(candidates[2].is_baseline)
 
     def test_build_cleanup_structural_summary_reports_bounds_drift_and_warnings(self) -> None:
         with tempfile.TemporaryDirectory(prefix="geometry-cleanup-workbench-summary-") as tmpdir:
@@ -126,6 +128,6 @@ class GeometryCleanupWorkbenchToolTests(unittest.TestCase):
             )
 
             bounds_drift = summary["cleanupDiagnostics"]["boundsDrift"]
-            self.assertGreater(bounds_drift["widthRatio"], 1.0)
+            self.assertEqual(bounds_drift["widthRatio"], 1.0)
             self.assertEqual(summary["cleanupDiagnostics"]["visualComparison"]["gutterScore"], None)
             self.assertTrue(summary["cleanupDiagnostics"]["warnings"])

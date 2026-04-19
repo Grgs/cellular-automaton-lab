@@ -18,6 +18,11 @@ try:
     from backend.rules.life_b2s23 import LifeB2S23Rule
     from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
     from backend.simulation.engine import SimulationEngine
+    from backend.simulation.aperiodic_family_manifest import (
+        SHIELD_SHIELD_KIND,
+        SHIELD_SQUARE_KIND,
+        SHIELD_TRIANGLE_KIND,
+    )
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
         ARCHIMEDEAN_488_GEOMETRY,
@@ -62,6 +67,11 @@ except ModuleNotFoundError:
     from backend.rules.life_b2s23 import LifeB2S23Rule
     from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
     from backend.simulation.engine import SimulationEngine
+    from backend.simulation.aperiodic_family_manifest import (
+        SHIELD_SHIELD_KIND,
+        SHIELD_SQUARE_KIND,
+        SHIELD_TRIANGLE_KIND,
+    )
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
         ARCHIMEDEAN_488_GEOMETRY,
@@ -522,18 +532,26 @@ class SimulationTopologyTests(unittest.TestCase):
                         assert neighbor_id is not None
                         self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
-    def test_shield_topology_uses_dense_reference_patch_with_orientation_rotation_step(self) -> None:
+    def test_shield_topology_uses_exact_symbolic_substitution_depth(self) -> None:
         depth_zero = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=0)
         depth_one = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=1)
         depth_three = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=3)
         repeated_depth_three = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=3)
 
-        self.assertEqual(depth_zero.cell_count, 40)
-        self.assertEqual(depth_one.cell_count, 81)
-        self.assertEqual(depth_three.cell_count, 443)
+        self.assertEqual(depth_zero.cell_count, 1)
+        self.assertEqual(depth_one.cell_count, 13)
+        self.assertEqual(depth_three.cell_count, 151)
         self.assertEqual(
             [cell.id for cell in depth_three.cells],
             [cell.id for cell in repeated_depth_three.cells],
+        )
+        self.assertEqual(
+            {cell.kind for cell in depth_zero.cells},
+            {SHIELD_SHIELD_KIND},
+        )
+        self.assertEqual(
+            {cell.kind for cell in depth_one.cells},
+            {SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND},
         )
         self.assertGreaterEqual(
             len(
@@ -545,19 +563,16 @@ class SimulationTopologyTests(unittest.TestCase):
             ),
             12,
         )
-        rotated_pairs = []
-        by_id_even = {cell.id: cell for cell in build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=2).cells}
-        for odd_cell in depth_three.cells:
-            even_cell = by_id_even.get(odd_cell.id)
-            if even_cell is None:
-                continue
-            if even_cell.orientation_token is None or odd_cell.orientation_token is None:
-                continue
-            rotated_pairs.append(
-                ((int(odd_cell.orientation_token) - int(even_cell.orientation_token)) % 360)
-            )
-        self.assertTrue(rotated_pairs)
-        self.assertTrue(all(delta == 15 for delta in rotated_pairs))
+        self.assertGreaterEqual(
+            len(
+                {
+                    cell.chirality_token
+                    for cell in depth_three.cells
+                    if cell.chirality_token is not None
+                }
+            ),
+            2,
+        )
 
     def test_penrose_vertex_topology_is_symmetric_duplicate_free_and_larger_than_edge_neighbors(self) -> None:
         edge = build_topology(PENROSE_GEOMETRY, 0, 0, patch_depth=3)
