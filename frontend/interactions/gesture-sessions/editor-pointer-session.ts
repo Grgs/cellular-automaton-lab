@@ -1,3 +1,4 @@
+import { matchesGesturePointer } from "./helpers.js";
 import type { PointerGestureSession, EditorPointerSessionOptions } from "./types.js";
 
 export function createEditorPointerSession({
@@ -5,19 +6,26 @@ export function createEditorPointerSession({
     editorSession,
 }: EditorPointerSessionOptions): PointerGestureSession {
     return {
-        pointerId,
+        kind: "editor-pointer",
         handleMove(event, cell) {
-            if ((event.buttons & 1) === 0) {
+            if (!matchesGesturePointer(pointerId, event) || (event.buttons & 1) === 0) {
                 return;
             }
             editorSession.handlePointerMove(cell);
         },
-        handleUp() {
+        handleUp(event) {
+            if (!matchesGesturePointer(pointerId, event)) {
+                return false;
+            }
             void editorSession.handlePointerUp();
+            return true;
         },
-        cancel() {
+        cancel(event) {
+            if (!matchesGesturePointer(pointerId, event)) {
+                return false;
+            }
             void editorSession.cancelActivePreview();
+            return true;
         },
-        isActive: () => editorSession.isPointerActive(),
     };
 }

@@ -1,12 +1,21 @@
 import type { PaintableCell } from "../../types/editor.js";
 import type { InteractionEditPolicy } from "../edit-policy.js";
 
+export type PointerDownIntent =
+    | { kind: "ignore" }
+    | { kind: "right-selection" }
+    | { kind: "direct-paint" }
+    | { kind: "running-brush" }
+    | { kind: "blocked-advanced-tool" }
+    | { kind: "blocked-editing" }
+    | { kind: "fill-click" }
+    | { kind: "editor-pointer" };
+
 export interface PointerGestureSession {
-    pointerId: number | null;
+    kind: "editor-pointer" | "legacy-drag" | "right-selection";
     handleMove(event: PointerEvent, cell: PaintableCell): void;
-    handleUp(event: PointerEvent): void;
-    cancel(event: PointerEvent): void;
-    isActive(): boolean;
+    handleUp(event: PointerEvent): boolean;
+    cancel(event: PointerEvent): boolean;
 }
 
 export interface EditorGestureController {

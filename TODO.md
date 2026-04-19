@@ -28,6 +28,7 @@
 - Moved browser diagnosis and workbench implementation under `tools/render_review/` and reduced the top-level Python commands to thin CLI entrypoints.
 - Surfaced backend-owned aperiodic implementation status and promotion blockers in the topology picker and drawer UI.
 - Added incremental lint/format guardrails for the render-review/bootstrap slice plus a repo-owned frontend formatting check.
+- Tightened the interaction stack around explicit pointer-down intent resolution and session-owned pointer matching/completion, so the router no longer hardcodes per-session pointer-id policy.
 
 ## Now
 
@@ -61,3 +62,4 @@
 - Expand Python lint/format guardrails beyond the current render-review/bootstrap slice once the older compatibility facades stop depending on import-for-export and `sys.path` bootstrap patterns.
 - Decide whether the lightweight frontend formatting check should grow into a full linter/formatter after a deliberate repo-wide mechanical style pass.
 - Continue the code-quality roadmap by splitting the remaining drawer sections if editor controls and topology metadata keep growing together.
+- Revisit the interaction router only if idle click/context-menu behavior grows new gesture modes; pointer-session start/update/cancel/commit flow should stay in the session modules.

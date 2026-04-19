@@ -15,6 +15,10 @@ export function cloneSelectedCells(cells: PaintableCell[]): Map<string, Paintabl
     );
 }
 
+export function matchesGesturePointer(pointerId: number | null, event: PointerEvent): boolean {
+    return pointerId === null || event.pointerId === pointerId;
+}
+
 export function setSurfacePointerCapture(
     surfaceElement: HTMLElement | null,
     pointerId: number | null,

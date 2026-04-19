@@ -2,6 +2,7 @@ import type { PaintableCell } from "../../types/editor.js";
 import {
     cloneSelectedCells,
     identifyGestureCell,
+    matchesGesturePointer,
     releaseSurfacePointerCapture,
     setSurfacePointerCapture,
 } from "./helpers.js";
@@ -54,29 +55,30 @@ export function createRightSelectionGestureSession({
     updateSelection(initialCell);
 
     return {
-        pointerId,
+        kind: "right-selection",
         handleMove(moveEvent, cell) {
-            if (moveEvent.pointerId !== pointerId || (moveEvent.buttons & 2) === 0) {
+            if (!matchesGesturePointer(pointerId, moveEvent) || (moveEvent.buttons & 2) === 0) {
                 return;
             }
             updateSelection(cell);
         },
         handleUp(upEvent) {
-            if (upEvent.pointerId !== pointerId) {
-                return;
+            if (!matchesGesturePointer(pointerId, upEvent)) {
+                return false;
             }
             releaseSurfacePointerCapture(surfaceElement, pointerId);
             onScheduleContextMenuReset();
+            return true;
         },
         cancel(cancelEvent) {
-            if (cancelEvent.pointerId !== pointerId) {
-                return;
+            if (!matchesGesturePointer(pointerId, cancelEvent)) {
+                return false;
             }
             setSelectedCells(Array.from(initialCells.values()));
             releaseSurfacePointerCapture(surfaceElement, pointerId);
             onClearContextMenuSuppression();
             renderControlPanel();
+            return true;
         },
-        isActive: () => true,
     };
 }

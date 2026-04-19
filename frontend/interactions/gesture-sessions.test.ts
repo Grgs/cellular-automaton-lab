@@ -116,6 +116,20 @@ describe("interactions/gesture-sessions", () => {
         expect(editorSession.handlePointerUp).toHaveBeenCalledTimes(1);
     });
 
+    it("keeps left-button sessions bound to their original pointer id", () => {
+        const { router, editorSession } = createRouter({ isEditArmed: true, currentTool: "line" });
+
+        router.beginPointerDown(pointerEvent({ pointerId: 3 }), { id: "cell:a" });
+        router.handlePointerMove(pointerEvent({ pointerId: 7, buttons: 1 }), { id: "cell:b" });
+        router.handlePointerUp(pointerEvent({ pointerId: 7 }));
+        router.handlePointerMove(pointerEvent({ pointerId: 3, buttons: 1 }), { id: "cell:c" });
+        router.handlePointerUp(pointerEvent({ pointerId: 3 }));
+
+        expect(editorSession.handlePointerMove).toHaveBeenCalledTimes(1);
+        expect(editorSession.handlePointerMove).toHaveBeenCalledWith({ id: "cell:c" });
+        expect(editorSession.handlePointerUp).toHaveBeenCalledTimes(1);
+    });
+
     it("selects cells during right-drag and suppresses the follow-up context menu", () => {
         const firstCell: PaintableCell = { id: "cell:a" };
         const secondCell: PaintableCell = { id: "cell:b" };

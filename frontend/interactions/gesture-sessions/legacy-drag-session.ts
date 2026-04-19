@@ -1,3 +1,4 @@
+import { matchesGesturePointer } from "./helpers.js";
 import type { PointerGestureSession, LegacyDragGestureSessionOptions } from "./types.js";
 
 export function createLegacyDragGestureSession({
@@ -7,20 +8,27 @@ export function createLegacyDragGestureSession({
     onCancel = () => {},
 }: LegacyDragGestureSessionOptions): PointerGestureSession {
     return {
-        pointerId,
+        kind: "legacy-drag",
         handleMove(event, cell) {
-            if ((event.buttons & buttonMask) === 0) {
+            if (!matchesGesturePointer(pointerId, event) || (event.buttons & buttonMask) === 0) {
                 return;
             }
             legacyDrag.update(cell);
         },
-        handleUp() {
+        handleUp(event) {
+            if (!matchesGesturePointer(pointerId, event)) {
+                return false;
+            }
             void legacyDrag.end();
+            return true;
         },
-        cancel() {
+        cancel(event) {
+            if (!matchesGesturePointer(pointerId, event)) {
+                return false;
+            }
             onCancel();
             void legacyDrag.cancel();
+            return true;
         },
-        isActive: () => legacyDrag.isActive(),
     };
 }

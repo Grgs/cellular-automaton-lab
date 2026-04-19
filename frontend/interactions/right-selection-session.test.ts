@@ -129,8 +129,8 @@ describe("interactions/right-selection-session", () => {
         const { session, setSelectedCells } = createSubject();
 
         session.handleMove(pointerEvent({ pointerId: 8, buttons: 2 }), { id: "cell:b" });
-        session.handleUp(pointerEvent({ pointerId: 8, buttons: 0 }));
-        session.cancel(pointerEvent({ pointerId: 8, buttons: 0 }));
+        expect(session.handleUp(pointerEvent({ pointerId: 8, buttons: 0 }))).toBe(false);
+        expect(session.cancel(pointerEvent({ pointerId: 8, buttons: 0 }))).toBe(false);
 
         expect(setSelectedCells).toHaveBeenCalledTimes(1);
         expect(setSelectedCells).toHaveBeenCalledWith([{ id: "cell:a" }]);

@@ -79,7 +79,7 @@ Adding a new gesture should require adding one session implementation, not editi
 
 Implementation status:
 
-The first extraction is in place. `surface-bindings.ts` now delegates pointer lifecycle behavior to `frontend/interactions/gesture-sessions.ts`, and the gesture router now hands off concrete behavior to per-session modules for legacy drag, armed editor pointer sessions, and right-button selection gestures. The router still owns cross-session click/context-menu policy, which is acceptable for now.
+The first extraction is in place. `surface-bindings.ts` now delegates pointer lifecycle behavior to `frontend/interactions/gesture-sessions.ts`, the gesture router resolves explicit pointer-down intents before starting a session, and the per-session modules now own pointer-id matching plus up/cancel completion semantics for legacy drag, armed editor pointer sessions, and right-button selection gestures. The router still owns idle click/context-menu policy, which is acceptable unless that path grows new modes.
 
 ### 2. Canvas Transient Overlay Rendering
 

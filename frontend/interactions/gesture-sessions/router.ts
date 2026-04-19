@@ -1,7 +1,7 @@
-import { EDITOR_TOOL_FILL } from "../../editor-tools.js";
 import { FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS } from "../constants.js";
 import { cloneSelectedCells, identifyGestureCell } from "./helpers.js";
 import { createEditorPointerSession } from "./editor-pointer-session.js";
+import { resolvePointerDownIntent } from "./intent.js";
 import { createLegacyDragGestureSession } from "./legacy-drag-session.js";
 import { createRightSelectionGestureSession } from "./right-selection-session.js";
 import type { GestureRouterOptions, PointerGestureSession } from "./types.js";
@@ -64,79 +64,105 @@ export function createPointerGestureRouter({
         }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
     }
 
-    function beginPointerDown(event: PointerEvent, cell: Parameters<typeof resolveDirectGestureTargetState>[0]): void {
-        setHoveredCell(null);
-        clearGestureOutline();
-        if (event.button === 2) {
-            activeSession = createRightSelectionGestureSession({
-                event,
-                initialCell: cell,
-                surfaceElement,
-                editPolicy,
-                getSelectedCells,
-                setSelectedCells,
-                openInspectorDrawer,
-                renderControlPanel,
-                onSuppressContextMenu: () => {
-                    suppressNextContextMenu = true;
-                },
-                onScheduleContextMenuReset: scheduleContextMenuReset,
-                onClearContextMenuSuppression: () => {
-                    suppressNextContextMenu = false;
-                },
-            });
-            return;
-        }
-        if (event.button !== 0) {
-            return;
-        }
+    function beginRightSelectionSession(
+        event: PointerEvent,
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): void {
+        activeSession = createRightSelectionGestureSession({
+            event,
+            initialCell: cell,
+            surfaceElement,
+            editPolicy,
+            getSelectedCells,
+            setSelectedCells,
+            openInspectorDrawer,
+            renderControlPanel,
+            onSuppressContextMenu: () => {
+                suppressNextContextMenu = true;
+            },
+            onScheduleContextMenuReset: scheduleContextMenuReset,
+            onClearContextMenuSuppression: () => {
+                suppressNextContextMenu = false;
+            },
+        });
+    }
 
-        const editModeActive = editPolicy.supportsEditorTools() && editPolicy.isEditArmed();
-        if (!editModeActive) {
-            editPolicy.prepareDirectGridInteraction(event);
-            const targetState = resolveDirectGestureTargetState(cell);
-            rememberDirectGesture(cell, targetState);
-            legacyDrag.begin(cell, event.pointerId, targetState);
-            activeSession = createLegacyDragGestureSession({
-                pointerId: event.pointerId ?? null,
-                legacyDrag,
-                buttonMask: 1,
-                onCancel: clearPendingDirectGesture,
-            });
-            return;
-        }
+    function beginDirectPaintSession(
+        event: PointerEvent,
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): void {
+        editPolicy.prepareDirectGridInteraction(event);
+        const targetState = resolveDirectGestureTargetState(cell);
+        rememberDirectGesture(cell, targetState);
+        legacyDrag.begin(cell, event.pointerId, targetState);
+        activeSession = createLegacyDragGestureSession({
+            pointerId: event.pointerId ?? null,
+            legacyDrag,
+            buttonMask: 1,
+            onCancel: clearPendingDirectGesture,
+        });
+    }
 
+    function beginRunningBrushSession(
+        event: PointerEvent,
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): void {
         clearPendingDirectGesture();
-        if (editPolicy.runningBrushEditingEnabled()) {
-            void editPolicy.dismissEditingUi();
-            event.preventDefault();
-            legacyDrag.begin(cell, event.pointerId);
-            activeSession = createLegacyDragGestureSession({
-                pointerId: event.pointerId ?? null,
-                legacyDrag,
-                buttonMask: 1,
-            });
-            return;
-        }
-        if (editPolicy.runningAdvancedToolBlocked()) {
-            editPolicy.blockRunningAdvancedTool(event);
-            consumeNextClick = true;
-            return;
-        }
-        if (editPolicy.supportsEditorTools() && editPolicy.editingBlockedByRun()) {
-            return;
-        }
         void editPolicy.dismissEditingUi();
-        if (editPolicy.currentTool() === EDITOR_TOOL_FILL) {
-            return;
-        }
+        event.preventDefault();
+        legacyDrag.begin(cell, event.pointerId);
+        activeSession = createLegacyDragGestureSession({
+            pointerId: event.pointerId ?? null,
+            legacyDrag,
+            buttonMask: 1,
+        });
+    }
 
+    function beginEditorPointerSession(
+        event: PointerEvent,
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): void {
+        clearPendingDirectGesture();
+        void editPolicy.dismissEditingUi();
         event.preventDefault();
         void editorSession.beginPointerSession(cell, event.pointerId);
         activeSession = createEditorPointerSession({
             pointerId: event.pointerId ?? null,
             editorSession,
         });
+    }
+
+    function beginPointerDown(event: PointerEvent, cell: Parameters<typeof resolveDirectGestureTargetState>[0]): void {
+        setHoveredCell(null);
+        clearGestureOutline();
+        switch (resolvePointerDownIntent(event, editPolicy).kind) {
+            case "right-selection":
+                beginRightSelectionSession(event, cell);
+                return;
+            case "ignore":
+                return;
+            case "direct-paint":
+                beginDirectPaintSession(event, cell);
+                return;
+            case "running-brush":
+                beginRunningBrushSession(event, cell);
+                return;
+            case "blocked-advanced-tool":
+                clearPendingDirectGesture();
+                editPolicy.blockRunningAdvancedTool(event);
+                consumeNextClick = true;
+                return;
+            case "blocked-editing":
+                clearPendingDirectGesture();
+                return;
+            case "fill-click":
+                clearPendingDirectGesture();
+                void editPolicy.dismissEditingUi();
+                return;
+            case "editor-pointer":
+                beginEditorPointerSession(event, cell);
+                return;
+        }
     }
 
     function handlePointerMove(event: PointerEvent, cell: Parameters<typeof resolveDirectGestureTargetState>[0]): void {
@@ -150,11 +176,9 @@ export function createPointerGestureRouter({
             }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
         }
         if (activeSession) {
-            if (activeSession.pointerId !== null && event.pointerId !== activeSession.pointerId) {
-                return;
+            if (activeSession.handleUp(event)) {
+                clearActiveSession();
             }
-            activeSession.handleUp(event);
-            clearActiveSession();
             return;
         }
         if (!editPolicy.supportsEditorTools()) {
@@ -171,11 +195,9 @@ export function createPointerGestureRouter({
         setHoveredCell(null);
         clearGestureOutline();
         if (activeSession) {
-            if (activeSession.pointerId !== null && event.pointerId !== activeSession.pointerId) {
-                return;
+            if (activeSession.cancel(event)) {
+                clearActiveSession();
             }
-            activeSession.cancel(event);
-            clearActiveSession();
             return;
         }
         if (legacyDrag.isActive()) {
