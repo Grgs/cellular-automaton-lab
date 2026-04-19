@@ -32,7 +32,7 @@ def _compile_periodic_face_id_pattern(id_pattern: str) -> re.Pattern[str]:
     parts: list[str] = []
     position = 0
     for match in re.finditer(r"\{(prefix|slot|x|y)\}", id_pattern):
-        parts.append(re.escape(id_pattern[position:match.start()]))
+        parts.append(re.escape(id_pattern[position : match.start()]))
         parts.append(token_patterns[match.group(1)])
         position = match.end()
     parts.append(re.escape(id_pattern[position:]))
@@ -108,9 +108,8 @@ def _periodic_face_interior_vertex_configuration_occurrences(
     ) -> int | None:
         for group_id, group in enumerate(groups):
             representative = group[0]
-            if (
-                math.isclose(representative[0], point[0], abs_tol=_FLOAT_TOLERANCE)
-                and math.isclose(representative[1], point[1], abs_tol=_FLOAT_TOLERANCE)
+            if math.isclose(representative[0], point[0], abs_tol=_FLOAT_TOLERANCE) and math.isclose(
+                representative[1], point[1], abs_tol=_FLOAT_TOLERANCE
             ):
                 return group_id
         return None
@@ -158,10 +157,7 @@ def _periodic_face_interior_vertex_configuration_occurrences(
             edge_counts[edge] += 1
 
     boundary_vertex_groups = {
-        group_id
-        for edge, count in edge_counts.items()
-        if count == 1
-        for group_id in edge
+        group_id for edge, count in edge_counts.items() if count == 1 for group_id in edge
     }
 
     all_x = [point[0] for point in representative_points.values()]
@@ -193,9 +189,7 @@ def _periodic_face_interior_vertex_configuration_occurrences(
             ),
         )
         configurations.append(
-            _canonicalize_vertex_configuration(
-                tuple(cell.kind for cell in ordered_cells)
-            )
+            _canonicalize_vertex_configuration(tuple(cell.kind for cell in ordered_cells))
         )
     return tuple(sorted(configurations))
 
@@ -203,20 +197,14 @@ def _periodic_face_interior_vertex_configuration_occurrences(
 def _periodic_face_interior_vertex_configurations(
     cells: tuple[PeriodicFaceCell, ...],
 ) -> tuple[tuple[str, ...], ...]:
-    return tuple(
-        sorted(set(_periodic_face_interior_vertex_configuration_occurrences(cells)))
-    )
+    return tuple(sorted(set(_periodic_face_interior_vertex_configuration_occurrences(cells))))
 
 
 def _periodic_face_interior_vertex_configuration_frequencies(
     cells: tuple[PeriodicFaceCell, ...],
 ) -> tuple[tuple[tuple[str, ...], int], ...]:
     return tuple(
-        sorted(
-            Counter(
-                _periodic_face_interior_vertex_configuration_occurrences(cells)
-            ).items()
-        )
+        sorted(Counter(_periodic_face_interior_vertex_configuration_occurrences(cells)).items())
     )
 
 
@@ -224,10 +212,7 @@ def _periodic_face_vertex_valence_frequency_signature(
     configuration_frequencies: tuple[tuple[tuple[str, ...], int], ...],
 ) -> tuple[tuple[int, int], ...]:
     return tuple(
-        sorted(
-            (len(configuration), count)
-            for configuration, count in configuration_frequencies
-        )
+        sorted((len(configuration), count) for configuration, count in configuration_frequencies)
     )
 
 
@@ -248,7 +233,11 @@ def _periodic_face_dual_structure_failure(
     if dual_geometry is None:
         return None
     dual_spec = REFERENCE_FAMILY_SPECS.get(dual_geometry)
-    if dual_spec is None or dual_spec.periodic_descriptor is None or not is_periodic_face_tiling(dual_geometry):
+    if (
+        dual_spec is None
+        or dual_spec.periodic_descriptor is None
+        or not is_periodic_face_tiling(dual_geometry)
+    ):
         return ReferenceCheckFailure(
             code="descriptor-dual-geometry-missing",
             message=(
@@ -274,7 +263,9 @@ def _periodic_face_dual_structure_failure(
         dual_height,
     )
     observed_side_counts = _periodic_face_unique_polygon_side_counts(sample_cells)
-    observed_vertex_valences = tuple(sorted({len(configuration) for configuration in observed_vertex_configurations}))
+    observed_vertex_valences = tuple(
+        sorted({len(configuration) for configuration in observed_vertex_configurations})
+    )
     dual_side_counts = _periodic_face_unique_polygon_side_counts(dual_cells)
     dual_vertex_valences = tuple(
         sorted(
@@ -310,12 +301,16 @@ def _periodic_face_dual_candidate_failure(
         return None
 
     observed_side_counts = _periodic_face_unique_polygon_side_counts(sample_cells)
-    observed_vertex_valences = tuple(sorted({len(configuration) for configuration in observed_vertex_configurations}))
+    observed_vertex_valences = tuple(
+        sorted({len(configuration) for configuration in observed_vertex_configurations})
+    )
     candidate_geometries: list[str] = []
     for candidate_geometry, candidate_spec in sorted(REFERENCE_FAMILY_SPECS.items()):
         if candidate_geometry == geometry:
             continue
-        if candidate_spec.periodic_descriptor is None or not is_periodic_face_tiling(candidate_geometry):
+        if candidate_spec.periodic_descriptor is None or not is_periodic_face_tiling(
+            candidate_geometry
+        ):
             continue
         candidate_width, candidate_height = _periodic_face_sample_size(
             candidate_spec,
@@ -330,11 +325,16 @@ def _periodic_face_dual_candidate_failure(
             sorted(
                 {
                     len(configuration)
-                    for configuration in _periodic_face_interior_vertex_configurations(candidate_cells)
+                    for configuration in _periodic_face_interior_vertex_configurations(
+                        candidate_cells
+                    )
                 }
             )
         )
-        if observed_side_counts == candidate_vertex_valences and candidate_side_counts == observed_vertex_valences:
+        if (
+            observed_side_counts == candidate_vertex_valences
+            and candidate_side_counts == observed_vertex_valences
+        ):
             candidate_geometries.append(candidate_geometry)
     observed_candidates = tuple(candidate_geometries)
     if expected_candidates and observed_candidates != expected_candidates:
@@ -400,11 +400,9 @@ def _periodic_face_translation_failures(
 
         below = cells_by_slot_and_grid.get((slot, logical_x, logical_y + 1))
         if below is not None:
-            expected_delta_x = (
-                descriptor.row_offset_x
-                if (logical_y + 1) % 2 == 1
-                else 0.0
-            ) - (descriptor.row_offset_x if logical_y % 2 == 1 else 0.0)
+            expected_delta_x = (descriptor.row_offset_x if (logical_y + 1) % 2 == 1 else 0.0) - (
+                descriptor.row_offset_x if logical_y % 2 == 1 else 0.0
+            )
             delta_x = below.center[0] - cell.center[0]
             delta_y = below.center[1] - cell.center[1]
             if not math.isclose(delta_y, descriptor.unit_height, abs_tol=_FLOAT_TOLERANCE):
@@ -498,7 +496,9 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
                 ),
             )
         )
-    if not math.isclose(descriptor.row_offset_x, periodic_descriptor.row_offset_x, abs_tol=_FLOAT_TOLERANCE):
+    if not math.isclose(
+        descriptor.row_offset_x, periodic_descriptor.row_offset_x, abs_tol=_FLOAT_TOLERANCE
+    ):
         failures.append(
             ReferenceCheckFailure(
                 code="descriptor-row-offset-field-mismatch",
@@ -518,7 +518,9 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
         if failure is not None:
             failures.append(failure)
     observed_vertex_configurations = _periodic_face_interior_vertex_configurations(sample_cells)
-    observed_vertex_configuration_frequencies = _periodic_face_interior_vertex_configuration_frequencies(sample_cells)
+    observed_vertex_configuration_frequencies = (
+        _periodic_face_interior_vertex_configuration_frequencies(sample_cells)
+    )
     if (
         observed_vertex_configurations
         != periodic_descriptor.expected_interior_vertex_configurations
@@ -566,4 +568,3 @@ def _periodic_face_descriptor_failures(spec: ReferenceFamilySpec) -> list[Refere
         failures.append(dual_failure)
     failures.extend(_periodic_face_translation_failures(descriptor, sample_cells))
     return failures
-

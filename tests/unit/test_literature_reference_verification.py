@@ -59,7 +59,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(observation.isolated_cell_count, 0)
 
     def test_reference_observation_records_surface_hole_stats(self) -> None:
-        dodecagonal_square_triangle_observation = observe_reference_patch("dodecagonal-square-triangle", 3)
+        dodecagonal_square_triangle_observation = observe_reference_patch(
+            "dodecagonal-square-triangle", 3
+        )
         shield_observation = observe_reference_patch("shield", 3)
         chair_observation = observe_reference_patch("chair", 3)
         hat_observation = observe_reference_patch("hat-monotile", 3)
@@ -70,11 +72,10 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(hat_observation.hole_count, 0)
         self.assertEqual(observe_reference_patch("pinwheel", 3).hole_count, 0)
 
-    def test_reference_verifier_reports_passes_and_blocking_surface_or_connectivity_failures(self) -> None:
-        results = {
-            result.geometry: result
-            for result in verify_all_reference_families()
-        }
+    def test_reference_verifier_reports_passes_and_blocking_surface_or_connectivity_failures(
+        self,
+    ) -> None:
+        results = {result.geometry: result for result in verify_all_reference_families()}
 
         self.assertEqual(results["square"].status, "PASS")
         self.assertEqual(results["hex"].status, "PASS")
@@ -135,7 +136,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
         self.assertEqual(result.observations[0].signature, "e33351b2ed77")
-        self.assertEqual(result.observations[0].degree_histogram, ((2, 3), (3, 8), (4, 13), (5, 12)))
+        self.assertEqual(
+            result.observations[0].degree_histogram, ((2, 3), (3, 8), (4, 13), (5, 12))
+        )
 
     def test_periodic_face_reference_verifier_checks_zero_offset_family(self) -> None:
         result = verify_reference_family("archimedean-4-8-8")
@@ -155,7 +158,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             (("octagon", "octagon", "square"),),
         )
 
-    def test_periodic_face_interior_vertex_configuration_frequencies_match_zero_offset_family(self) -> None:
+    def test_periodic_face_interior_vertex_configuration_frequencies_match_zero_offset_family(
+        self,
+    ) -> None:
         descriptor = get_periodic_face_tiling_descriptor("archimedean-4-8-8")
 
         self.assertEqual(
@@ -171,7 +176,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             (("hexagon", "triangle-down", "hexagon", "triangle-up"),),
         )
 
-    def test_periodic_face_interior_vertex_configuration_frequencies_match_odd_row_offset_family(self) -> None:
+    def test_periodic_face_interior_vertex_configuration_frequencies_match_odd_row_offset_family(
+        self,
+    ) -> None:
         descriptor = get_periodic_face_tiling_descriptor("trihexagonal-3-6-3-6")
 
         self.assertEqual(
@@ -245,7 +252,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             )
         )
 
-    def test_periodic_face_descriptor_reports_wrong_vertex_configuration_frequency_expectation(self) -> None:
+    def test_periodic_face_descriptor_reports_wrong_vertex_configuration_frequency_expectation(
+        self,
+    ) -> None:
         spec = REFERENCE_FAMILY_SPECS["archimedean-4-8-8"]
         periodic_descriptor = spec.periodic_descriptor
         if periodic_descriptor is None:
@@ -282,7 +291,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
         self.assertTrue(
             any(
-                failure.code in {
+                failure.code
+                in {
                     "descriptor-dual-geometry-not-reciprocal",
                     "descriptor-dual-structure-mismatch",
                 }
@@ -306,13 +316,12 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         failures = _periodic_face_descriptor_failures(wrong_spec)
 
         self.assertTrue(
-            any(
-                failure.code == "descriptor-dual-candidate-class-mismatch"
-                for failure in failures
-            )
+            any(failure.code == "descriptor-dual-candidate-class-mismatch" for failure in failures)
         )
 
-    def test_periodic_face_descriptor_reports_wrong_dual_candidate_structure_expectation(self) -> None:
+    def test_periodic_face_descriptor_reports_wrong_dual_candidate_structure_expectation(
+        self,
+    ) -> None:
         spec = REFERENCE_FAMILY_SPECS["archimedean-3-3-4-3-4"]
         periodic_descriptor = spec.periodic_descriptor
         if periodic_descriptor is None:
@@ -374,20 +383,17 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             [observation.total_cells for observation in result.observations],
             [2, 10, 50, 250],
         )
-        self.assertGreater(result.observations[1].bounds_longest_span, result.observations[0].bounds_longest_span)
+        self.assertGreater(
+            result.observations[1].bounds_longest_span, result.observations[0].bounds_longest_span
+        )
         self.assertEqual(result.observations[-1].connected_component_count, 1)
         exact_ids = tuple(sorted(record["id"] for record in collect_pinwheel_exact_records(3)))
         self.assertEqual(len(exact_ids), 250)
-        self.assertTrue(
-            any(record_id.startswith("pinwheel:root0") for record_id in exact_ids)
-        )
-        self.assertTrue(
-            any(record_id.startswith("pinwheel:root1") for record_id in exact_ids)
-        )
+        self.assertTrue(any(record_id.startswith("pinwheel:root0") for record_id in exact_ids))
+        self.assertTrue(any(record_id.startswith("pinwheel:root1") for record_id in exact_ids))
         self.assertTrue(
             all(
-                record_id.startswith("pinwheel:root0")
-                or record_id.startswith("pinwheel:root1")
+                record_id.startswith("pinwheel:root0") or record_id.startswith("pinwheel:root1")
                 for record_id in exact_ids
             )
         )
@@ -660,7 +666,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             any(failure.code == "unexpected-orientation-token-counts" for failure in failures)
         )
 
-    def test_dodecagonal_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(self) -> None:
+    def test_dodecagonal_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(
+        self,
+    ) -> None:
         result = verify_reference_family("dodecagonal-square-triangle")
 
         self.assertEqual(result.status, "PASS")
@@ -685,11 +693,11 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
         spans = [observation.bounds_longest_span for observation in result.observations]
-        self.assertTrue(
-            all(left < right for left, right in zip(spans, spans[1:]))
-        )
+        self.assertTrue(all(left < right for left, right in zip(spans, spans[1:])))
 
-    def test_reference_tool_returns_failure_while_blocking_surface_or_connectivity_regressions_exist(self) -> None:
+    def test_reference_tool_returns_failure_while_blocking_surface_or_connectivity_regressions_exist(
+        self,
+    ) -> None:
         self.assertEqual(verify_reference_main(), 0)
 
 

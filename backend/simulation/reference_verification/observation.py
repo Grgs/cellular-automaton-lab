@@ -6,7 +6,10 @@ import json
 
 import networkx as nx
 
-from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS, ReferenceFamilySpec
+from backend.simulation.literature_reference_specs import (
+    REFERENCE_FAMILY_SPECS,
+    ReferenceFamilySpec,
+)
 from backend.simulation.topology import build_topology
 from backend.simulation.topology_types import LatticeCell, LatticeTopology
 from backend.simulation.topology_validation import build_topology_graph, validate_topology
@@ -48,7 +51,9 @@ def _cells_bounds(cells: tuple[LatticeCell, ...]) -> tuple[float, float]:
     return (max(all_x) - min(all_x), max(all_y) - min(all_y))
 
 
-def _topology_connectivity_stats(topology: LatticeTopology) -> tuple[int, tuple[int, ...], int, int]:
+def _topology_connectivity_stats(
+    topology: LatticeTopology,
+) -> tuple[int, tuple[int, ...], int, int]:
     graph = build_topology_graph(topology)
     if graph.number_of_nodes() == 0:
         return (0, (), 0, 0)
@@ -91,14 +96,10 @@ def _topology_signature_payload(
 ) -> dict[str, object]:
     kind_counts = Counter(cell.kind for cell in topology.cells)
     orientation_counts = Counter(
-        cell.orientation_token
-        for cell in topology.cells
-        if cell.orientation_token is not None
+        cell.orientation_token for cell in topology.cells if cell.orientation_token is not None
     )
     chirality_counts = Counter(
-        cell.chirality_token
-        for cell in topology.cells
-        if cell.chirality_token is not None
+        cell.chirality_token for cell in topology.cells if cell.chirality_token is not None
     )
     degree_histogram = Counter(
         sum(1 for neighbor_id in cell.neighbors if neighbor_id is not None)
@@ -156,7 +157,9 @@ def _polygon_area_frequencies_by_kind(
     for cell in topology.cells:
         if cell.vertices is None:
             continue
-        frequencies_by_kind.setdefault(cell.kind, Counter())[round(_polygon_area(cell.vertices), 6)] += 1
+        frequencies_by_kind.setdefault(cell.kind, Counter())[
+            round(_polygon_area(cell.vertices), 6)
+        ] += 1
     return tuple(
         sorted(
             (
@@ -168,7 +171,6 @@ def _polygon_area_frequencies_by_kind(
     )
 
 
-
 def _observe_reference_topology(
     *,
     geometry: str,
@@ -178,9 +180,7 @@ def _observe_reference_topology(
 ) -> ReferencePatchObservation:
     kind_counts = Counter(cell.kind for cell in topology.cells)
     orientation_token_counts = Counter(
-        cell.orientation_token
-        for cell in topology.cells
-        if cell.orientation_token is not None
+        cell.orientation_token for cell in topology.cells if cell.orientation_token is not None
     )
     area_classes_by_kind: dict[str, set[float]] = {}
     decoration_variants_by_kind: dict[str, set[tuple[str, ...]]] = {}
@@ -205,16 +205,12 @@ def _observe_reference_topology(
                 continue
             left = cell.chirality_token
             right = neighbor.chirality_token
-            chirality_adjacency_pairs.add(
-                (left, right) if left <= right else (right, left)
-            )
+            chirality_adjacency_pairs.add((left, right) if left <= right else (right, left))
             neighbor_chiralities.append(neighbor.chirality_token)
         if (
             cell.chirality_token is not None
             and len(neighbor_chiralities) == 3
-            and all(
-                chirality != cell.chirality_token for chirality in neighbor_chiralities
-            )
+            and all(chirality != cell.chirality_token for chirality in neighbor_chiralities)
         ):
             three_opposite_chirality_neighbor_cells += 1
     degree_histogram = Counter(
@@ -235,18 +231,10 @@ def _observe_reference_topology(
         check_graph_connectivity=False,
     )
     unique_orientation_tokens = len(
-        {
-            cell.orientation_token
-            for cell in topology.cells
-            if cell.orientation_token is not None
-        }
+        {cell.orientation_token for cell in topology.cells if cell.orientation_token is not None}
     )
     unique_chirality_tokens = len(
-        {
-            cell.chirality_token
-            for cell in topology.cells
-            if cell.chirality_token is not None
-        }
+        {cell.chirality_token for cell in topology.cells if cell.chirality_token is not None}
     )
     bounds_width, bounds_height = _cells_bounds(topology.cells)
     return ReferencePatchObservation(

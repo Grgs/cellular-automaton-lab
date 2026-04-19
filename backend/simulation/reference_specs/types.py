@@ -48,10 +48,9 @@ class ReferenceDepthExpectation:
     min_unique_chirality_tokens: int | None = None
     min_three_opposite_chirality_neighbor_cells: int | None = None
     min_unique_polygon_areas_by_kind: tuple[tuple[str, int], ...] | None = None
-    expected_polygon_area_frequencies_by_kind: tuple[
-        tuple[str, tuple[tuple[float, int], ...]],
-        ...
-    ] | None = None
+    expected_polygon_area_frequencies_by_kind: (
+        tuple[tuple[str, tuple[tuple[float, int], ...]], ...] | None
+    ) = None
     min_unique_decoration_variants_by_kind: tuple[tuple[str, int], ...] | None = None
     min_bounds_longest_span: float | None = None
     max_bounds_aspect_ratio: float | None = None

@@ -89,10 +89,7 @@ def _pinwheel_exact_path_failures() -> list[ReferenceCheckFailure]:
                 )
             )
         if any(
-            not (
-                record_id.startswith("pinwheel:root0")
-                or record_id.startswith("pinwheel:root1")
-            )
+            not (record_id.startswith("pinwheel:root0") or record_id.startswith("pinwheel:root1"))
             for record_id in exact_ids
         ):
             failures.append(
@@ -106,8 +103,7 @@ def _pinwheel_exact_path_failures() -> list[ReferenceCheckFailure]:
                 )
             )
         observed_roots = {
-            record_id.split(".", 1)[0].removeprefix("pinwheel:")
-            for record_id in exact_ids
+            record_id.split(".", 1)[0].removeprefix("pinwheel:") for record_id in exact_ids
         }
         if observed_roots != {"root0", "root1"}:
             failures.append(
@@ -141,8 +137,7 @@ def _pinwheel_exact_path_failures() -> list[ReferenceCheckFailure]:
 
 def _verify_spec(spec: ReferenceFamilySpec) -> ReferenceVerificationResult:
     observations = tuple(
-        observe_reference_patch(spec.geometry, depth)
-        for depth in sorted(spec.depth_expectations)
+        observe_reference_patch(spec.geometry, depth) for depth in sorted(spec.depth_expectations)
     )
     failures: list[ReferenceCheckFailure] = []
     deepest_topology = _build_reference_topology(spec, max(spec.depth_expectations, default=0))
@@ -204,7 +199,4 @@ def verify_reference_family(geometry: str) -> ReferenceVerificationResult:
 
 
 def verify_all_reference_families() -> tuple[ReferenceVerificationResult, ...]:
-    return tuple(
-        _verify_spec(spec)
-        for _, spec in sorted(REFERENCE_FAMILY_SPECS.items())
-    )
+    return tuple(_verify_spec(spec) for _, spec in sorted(REFERENCE_FAMILY_SPECS.items()))

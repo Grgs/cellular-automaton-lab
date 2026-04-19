@@ -55,7 +55,9 @@ def _read_local_fixtures(path: Path = _LOCAL_REFERENCE_FIXTURE_PATH) -> LocalFix
     return cast(LocalFixturePayload, json.loads(path.read_text(encoding="utf-8")))
 
 
-def _read_canonical_fixtures(path: Path = _CANONICAL_REFERENCE_FIXTURE_PATH) -> CanonicalFixturePayload:
+def _read_canonical_fixtures(
+    path: Path = _CANONICAL_REFERENCE_FIXTURE_PATH,
+) -> CanonicalFixturePayload:
     return cast(CanonicalFixturePayload, json.loads(path.read_text(encoding="utf-8")))
 
 

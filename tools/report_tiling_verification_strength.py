@@ -19,7 +19,6 @@ from backend.simulation.literature_reference_verification import verify_all_refe
 from backend.simulation.reference_verification.types import (
     ReferenceCheckFailure,
     ReferencePatchObservation,
-    ReferenceVerificationResult,
     VerificationStatus,
 )
 from backend.simulation.topology_validation import recommended_validation_options
@@ -171,10 +170,7 @@ def _failure_summary(failure: ReferenceCheckFailure) -> FailureSummary:
 
 @lru_cache(maxsize=1)
 def build_verification_strength_rows() -> tuple[VerificationStrengthRow, ...]:
-    live_results = {
-        result.geometry: result
-        for result in verify_all_reference_families()
-    }
+    live_results = {result.geometry: result for result in verify_all_reference_families()}
     rows: list[VerificationStrengthRow] = []
     for geometry in sorted(REFERENCE_FAMILY_SPECS):
         spec = REFERENCE_FAMILY_SPECS[geometry]
@@ -186,7 +182,9 @@ def build_verification_strength_rows() -> tuple[VerificationStrengthRow, ...]:
                 geometry=geometry,
                 display_name=spec.display_name,
                 sample_mode=spec.sample_mode,
-                implementation_status=contract.implementation_status if contract is not None else "",
+                implementation_status=contract.implementation_status
+                if contract is not None
+                else "",
                 verification_status=result.status,
                 waived=result.waived,
                 blocking=result.blocking,
@@ -200,7 +198,9 @@ def build_verification_strength_rows() -> tuple[VerificationStrengthRow, ...]:
                 has_canonical_patch=geometry in _load_canonical_reference_geometries(),
                 strict_validation=all(recommended_validation_options(geometry).values()),
                 failure_codes=tuple(sorted({failure.code for failure in result.failures})),
-                observations=tuple(_observation_summary(observation) for observation in result.observations),
+                observations=tuple(
+                    _observation_summary(observation) for observation in result.observations
+                ),
                 failures=failures,
             )
         )
@@ -257,7 +257,11 @@ def _detail_output(rows: tuple[VerificationStrengthRow, ...]) -> str:
         if row.failures:
             lines.append("  failures:")
             for failure in row.failures:
-                prefix = f"{failure.code}[d{failure.depth}]" if failure.depth is not None else failure.code
+                prefix = (
+                    f"{failure.code}[d{failure.depth}]"
+                    if failure.depth is not None
+                    else failure.code
+                )
                 lines.append(f"    - {prefix}: {failure.message}")
         blocks.append("\n".join(lines))
     return "\n\n".join(blocks) + "\n"

@@ -16,8 +16,12 @@ from .types import (
     ReferenceCheckFailure,
 )
 
-_LOCAL_REFERENCE_FIXTURE_PATH = Path(__file__).resolve().parents[1] / "data" / "reference_patch_local_fixtures.json"
-_CANONICAL_REFERENCE_FIXTURE_PATH = Path(__file__).resolve().parents[1] / "data" / "reference_patch_canonical_fixtures.json"
+_LOCAL_REFERENCE_FIXTURE_PATH = (
+    Path(__file__).resolve().parents[1] / "data" / "reference_patch_local_fixtures.json"
+)
+_CANONICAL_REFERENCE_FIXTURE_PATH = (
+    Path(__file__).resolve().parents[1] / "data" / "reference_patch_canonical_fixtures.json"
+)
 
 
 def _load_local_reference_fixtures() -> dict[str, dict[str, dict[str, object]]]:
@@ -34,9 +38,7 @@ def _canonical_patch_payload(
     include_id: bool,
 ) -> list[_CanonicalPatchCellPayload]:
     polygon_cells = [
-        cell
-        for cell in topology.cells
-        if cell.vertices is not None and cell.center is not None
+        cell for cell in topology.cells if cell.vertices is not None and cell.center is not None
     ]
     if not polygon_cells:
         return []
@@ -48,9 +50,7 @@ def _canonical_patch_payload(
         if cell.vertices is None or cell.center is None:
             continue
         decoration_tokens = (
-            sorted(cell.decoration_tokens)
-            if cell.decoration_tokens is not None
-            else None
+            sorted(cell.decoration_tokens) if cell.decoration_tokens is not None else None
         )
         payload: _CanonicalPatchCellPayload = {
             "kind": cell.kind,
@@ -105,12 +105,16 @@ def _cell_local_reference_payload(
             "kind": cell.kind,
             "orientation_token": cell.orientation_token,
             "chirality_token": cell.chirality_token,
-            "decoration_tokens": list(cell.decoration_tokens) if cell.decoration_tokens is not None else None,
+            "decoration_tokens": list(cell.decoration_tokens)
+            if cell.decoration_tokens is not None
+            else None,
             "area": round(_polygon_area(vertices), 6),
         }
 
     neighbors: list[_LocalReferenceNeighborPayload] = []
-    for neighbor_id in sorted(neighbor_id for neighbor_id in anchor.neighbors if neighbor_id is not None):
+    for neighbor_id in sorted(
+        neighbor_id for neighbor_id in anchor.neighbors if neighbor_id is not None
+    ):
         neighbor = cells_by_id.get(neighbor_id)
         if neighbor is None or neighbor.vertices is None or neighbor.center is None:
             continue
@@ -140,7 +144,9 @@ def _cell_local_reference_payload(
     return {
         "root": {
             **_payload(anchor),
-            "degree": len(tuple(neighbor_id for neighbor_id in anchor.neighbors if neighbor_id is not None)),
+            "degree": len(
+                tuple(neighbor_id for neighbor_id in anchor.neighbors if neighbor_id is not None)
+            ),
         },
         "neighbors": ordered_neighbors,
     }

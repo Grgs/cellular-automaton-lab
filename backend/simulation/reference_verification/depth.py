@@ -136,12 +136,11 @@ def _expectation_failures(
                 ReferenceCheckFailure(
                     code="missing-required-kind",
                     message=f"Depth {observation.depth} is missing required kind '{kind}'.",
-                depth=observation.depth,
+                    depth=observation.depth,
+                )
             )
-        )
-    if (
-        expectation.expected_adjacency_pairs is not None
-        and adjacency_pairs != set(expectation.expected_adjacency_pairs)
+    if expectation.expected_adjacency_pairs is not None and adjacency_pairs != set(
+        expectation.expected_adjacency_pairs
     ):
         failures.append(
             ReferenceCheckFailure(
@@ -162,10 +161,10 @@ def _expectation_failures(
                     message=(
                         f"Depth {observation.depth} is missing required adjacency pair "
                         f"{normalized[0]}/{normalized[1]}."
-                ),
-                depth=observation.depth,
+                    ),
+                    depth=observation.depth,
+                )
             )
-        )
     for pair in expectation.required_chirality_adjacency_pairs:
         normalized = pair if pair[0] <= pair[1] else (pair[1], pair[0])
         if normalized not in chirality_adjacency_pairs:
@@ -179,9 +178,8 @@ def _expectation_failures(
                     depth=observation.depth,
                 )
             )
-    if (
-        expectation.expected_degree_histogram is not None
-        and degree_histogram != dict(expectation.expected_degree_histogram)
+    if expectation.expected_degree_histogram is not None and degree_histogram != dict(
+        expectation.expected_degree_histogram
     ):
         failures.append(
             ReferenceCheckFailure(
@@ -349,4 +347,3 @@ def _depth_topology_expectation_failures(
     failures.extend(_local_reference_fixture_failures(geometry, depth, topology))
     failures.extend(_canonical_patch_fixture_failures(geometry, depth, topology, expectation))
     return failures
-

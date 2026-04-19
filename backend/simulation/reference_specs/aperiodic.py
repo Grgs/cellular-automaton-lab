@@ -38,11 +38,9 @@ from backend.simulation.aperiodic_family_manifest import (
     TUEBINGEN_TRIANGLE_GEOMETRY,
     get_aperiodic_family_manifest_entry,
 )
-from .helpers import REGULAR_TILING_SOURCES, _alphabetic_slots, _prefixed_slots
 from .types import (
     BuilderSignalExpectation,
     MetadataRequirement,
-    PeriodicDescriptorExpectation,
     ReferenceDepthExpectation,
     ReferenceFamilySpec,
 )
@@ -60,9 +58,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     PENROSE_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_GEOMETRY,
         display_name=_reference_label(PENROSE_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
         canonical_root_seed_policy="five thick-rhomb star seed",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
         required_metadata=(),
@@ -87,9 +83,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     PENROSE_VERTEX_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_VERTEX_GEOMETRY,
         display_name="Penrose Rhombs (Vertex Adjacency)",
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
         canonical_root_seed_policy="five thick-rhomb star seed with vertex-neighbor topology",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
         required_metadata=(),
@@ -111,16 +105,12 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             2: ReferenceDepthExpectation(exact_total_cells=24),
             3: ReferenceDepthExpectation(exact_total_cells=66),
         },
-        notes=(
-            "This is the app's vertex-adjacency topology variant of the Penrose rhomb tiling.",
-        ),
+        notes=("This is the app's vertex-adjacency topology variant of the Penrose rhomb tiling.",),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_P2_GEOMETRY,
         display_name=_reference_label(PENROSE_P2_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/",),
         canonical_root_seed_policy="five-kite star seed",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P2_GEOMETRY),
         required_metadata=(),
@@ -146,9 +136,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     AMMANN_BEENKER_GEOMETRY: ReferenceFamilySpec(
         geometry=AMMANN_BEENKER_GEOMETRY,
         display_name=_reference_label(AMMANN_BEENKER_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/ammann-beenker/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/ammann-beenker/",),
         canonical_root_seed_policy="eight-rhomb star seed",
         allowed_public_cell_kinds=_public_cell_kinds(AMMANN_BEENKER_GEOMETRY),
         required_metadata=(),
@@ -220,9 +208,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     SPHINX_GEOMETRY: ReferenceFamilySpec(
         geometry=SPHINX_GEOMETRY,
         display_name=_reference_label(SPHINX_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/sphinx/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/sphinx/",),
         canonical_root_seed_policy="single sphinx rep-tile seed",
         allowed_public_cell_kinds=_public_cell_kinds(SPHINX_GEOMETRY),
         required_metadata=(),
@@ -242,9 +228,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     CHAIR_GEOMETRY: ReferenceFamilySpec(
         geometry=CHAIR_GEOMETRY,
         display_name=_reference_label(CHAIR_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/chair/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/chair/",),
         canonical_root_seed_policy="single chair substitution seed",
         allowed_public_cell_kinds=_public_cell_kinds(CHAIR_GEOMETRY),
         required_metadata=(
@@ -284,9 +268,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     ROBINSON_TRIANGLES_GEOMETRY: ReferenceFamilySpec(
         geometry=ROBINSON_TRIANGLES_GEOMETRY,
         display_name=_reference_label(ROBINSON_TRIANGLES_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/",),
         canonical_root_seed_policy="Penrose-derived Robinson triangle refinement",
         allowed_public_cell_kinds=_public_cell_kinds(ROBINSON_TRIANGLES_GEOMETRY),
         required_metadata=(),
@@ -357,9 +339,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     TUEBINGEN_TRIANGLE_GEOMETRY: ReferenceFamilySpec(
         geometry=TUEBINGEN_TRIANGLE_GEOMETRY,
         display_name=_reference_label(TUEBINGEN_TRIANGLE_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/",),
         canonical_root_seed_policy="handed Robinson-triangle substitution patch",
         allowed_public_cell_kinds=_public_cell_kinds(TUEBINGEN_TRIANGLE_GEOMETRY),
         required_metadata=(
@@ -404,9 +384,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: ReferenceFamilySpec(
         geometry=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         display_name=_reference_label(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",),
         canonical_root_seed_policy="dodecagonal square-triangle substitution patch",
         allowed_public_cell_kinds=_public_cell_kinds(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         required_metadata=(
@@ -426,8 +404,14 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
                 ),
                 required_adjacency_pairs=(
-                    (DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND, DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND),
-                    (DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND, DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND),
+                    (
+                        DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
+                        DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
+                    ),
+                    (
+                        DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
+                        DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
+                    ),
                 ),
                 canonical_patch_fixture_key="dense-depth-1",
             ),
@@ -442,8 +426,14 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
                 ),
                 expected_adjacency_pairs=(
-                    (DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND, DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND),
-                    (DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND, DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND),
+                    (
+                        DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
+                        DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
+                    ),
+                    (
+                        DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
+                        DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
+                    ),
                 ),
                 min_unique_orientation_tokens=12,
                 min_unique_chirality_tokens=3,
@@ -459,9 +449,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     SHIELD_GEOMETRY: ReferenceFamilySpec(
         geometry=SHIELD_GEOMETRY,
         display_name=_reference_label(SHIELD_GEOMETRY),
-        source_urls=(
-            "https://tilings.math.uni-bielefeld.de/substitution/shield/",
-        ),
+        source_urls=("https://tilings.math.uni-bielefeld.de/substitution/shield/",),
         canonical_root_seed_policy="dense 12-fold shield patch cropped from a literature-derived canonical field with a backend-owned dodecagonal center window",
         allowed_public_cell_kinds=_public_cell_kinds(SHIELD_GEOMETRY),
         required_metadata=(

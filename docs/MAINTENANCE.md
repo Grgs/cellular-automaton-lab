@@ -31,6 +31,16 @@ npm run check:python
 ```
 
 These Python checks are intentionally incremental for now. They cover the backend bootstrap payload slice plus the `tools/render_review/` package and its direct tests and entrypoints. Wider `ruff` adoption is still blocked by older compatibility facades that rely on import-for-export patterns and `sys.path` bootstrap shims.
+These Python checks are still intentionally incremental, but the guarded slice is wider now. It covers:
+
+- the backend bootstrap and payload-contract files
+- `backend/simulation/reference_specs/` and `backend/simulation/reference_verification/`
+- the compatibility facades `literature_reference_specs.py` and `literature_reference_verification.py`
+- verification/reporting/reference-fixture tools such as `regenerate_reference_fixtures.py`, `report_tiling_verification_strength.py`, `validate_tilings.py`, and `verify_reference_tilings.py`
+- `tools/render_review/` plus its top-level CLI entrypoints
+- the direct unit and E2E tests for those Python-owned slices
+
+Wider `ruff` adoption is still blocked by older compatibility-heavy modules outside this slice that rely on import-for-export patterns, `sys.path` bootstrap shims, or other deliberate legacy structure.
 
 Pre-commit mirrors the same incremental Python scope plus the frontend formatting check, so local hooks and scripted runs exercise the same rules.
 

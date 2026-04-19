@@ -32,14 +32,8 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.rows = build_verification_strength_rows()
-        cls.rows_by_geometry = {
-            row.geometry: row
-            for row in cls.rows
-        }
-        cls.live_results = {
-            result.geometry: result
-            for result in verify_all_reference_families()
-        }
+        cls.rows_by_geometry = {row.geometry: row for row in cls.rows}
+        cls.live_results = {result.geometry: result for result in verify_all_reference_families()}
 
     def test_main_prints_expected_summary_columns_and_rows(self) -> None:
         stdout = io.StringIO()
@@ -120,7 +114,9 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("canonical-patch", robinson["strength_tags"])
         self.assertIn("canonical-patch", robinson["verification_modes"])
 
-        tuebingen = next(family for family in families if family["geometry"] == "tuebingen-triangle")
+        tuebingen = next(
+            family for family in families if family["geometry"] == "tuebingen-triangle"
+        )
         self.assertEqual(tuebingen["implementation_status"], "true_substitution")
         self.assertEqual(tuebingen["verification_status"], "PASS")
         self.assertTrue(tuebingen["has_canonical_patch"])
@@ -150,7 +146,10 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("shield (Shield)", output)
         self.assertIn("implementation_status: known_deviation", output)
         self.assertIn("verification_status: PASS", output)
-        self.assertIn("promotion_blocker: Experimental until the known translated-cluster deviation is replaced by a marked fractal substitution.", output)
+        self.assertIn(
+            "promotion_blocker: Experimental until the known translated-cluster deviation is replaced by a marked fractal substitution.",
+            output,
+        )
         self.assertIn("pinwheel (Pinwheel)", output)
         self.assertIn("exact_reference_mode: pinwheel_exact", output)
         self.assertIn("robinson-triangles (Robinson Triangles)", output)

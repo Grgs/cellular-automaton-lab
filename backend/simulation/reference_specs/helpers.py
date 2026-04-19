@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import string
 
-REGULAR_TILING_SOURCES = (
-    "https://en.wikipedia.org/wiki/Regular_tiling",
-)
+REGULAR_TILING_SOURCES = ("https://en.wikipedia.org/wiki/Regular_tiling",)
 
 
 def _alphabetic_slots(count: int) -> tuple[str, ...]:

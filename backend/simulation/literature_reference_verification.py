@@ -14,7 +14,6 @@ from backend.simulation.reference_verification.fixtures import (
     _local_reference_fixture_failures,
 )
 from backend.simulation.reference_verification.observation import (
-    _build_reference_topology,
     _cells_bounds,
     _cells_bounds_aspect_ratio,
     _component_size_summary,
