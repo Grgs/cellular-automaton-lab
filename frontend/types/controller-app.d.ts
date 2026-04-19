@@ -9,7 +9,7 @@ import type { MutationRunner } from "./controller-runtime.js";
 import type { ConfigSyncController, UiSessionController } from "./controller-sync-session.js";
 import type { AppView, GridView, InteractionController, ViewportController } from "./controller-view.js";
 import type { DomElements } from "./dom.js";
-import type { SimulationSnapshot } from "./domain.js";
+import type { SimulationSnapshot, TopologyPayload } from "./domain.js";
 import type { RenderDiagnosticsSnapshot } from "./rendering.js";
 import type { AppState } from "./state.js";
 
@@ -59,6 +59,7 @@ export interface AppController {
     applySimulationState(simulationState: SimulationSnapshot, options?: { source?: string }): void;
     applyCellSize(nextCellSize: number): void;
     applyPaintState(nextPaintState: number): void;
+    applyReviewTopology(topology: TopologyPayload): void;
     getState(): AppState;
     getRenderDiagnostics(): RenderDiagnosticsSnapshot | null;
     getInteractions(): InteractionController | null;

@@ -206,11 +206,12 @@ processes. The remaining problem is observability quality, not command
 orchestration.
 
 For the `pinwheel` example, the consistency-report layer is now the primary
-cross-check, the sweep tool is now the primary comparison path, and
+cross-check, the sweep tool is now the primary comparison path, the family
+sample workbench is now the primary structural candidate-exploration path, and
 literature-review mode now makes profile-based citation and montage workflows
 repeatable without checking reference images into git. The next tooling
-investment should be richer visual-quality metrics and more structured review
-expectations, not more host/process orchestration.
+investment should be geometry-cleanup exploration and stronger profile-owned
+review expectations, not more host/process orchestration.
 
 ## Shield Pass Gaps
 
@@ -249,6 +250,19 @@ center-window rules and thresholds, then checking:
 That exploration was still done with one-off probes and manual readback. There
 is no family sample workbench that can sweep candidate windows and summarize the
 structural consequences directly.
+
+Status: landed for the structural-first slice. The family sample workbench now:
+
+- builds shipped baseline candidates for any patch-depth family
+- sweeps `shield` representative-window thresholds as first-class candidates
+- emits structural summaries with count, connectivity, holes, bounds, and
+  explicit validation diagnostics
+- can optionally run browser-backed review against injected candidate topology
+  payloads rather than only the shipped family/depth sample
+
+The remaining gap is narrower. Candidate window exploration is now first-class;
+the next missing tool is a geometry-cleanup workbench for small topology-space
+cleanup factors.
 
 ### 3. Standalone build freshness is still too easy to misread
 

@@ -1,6 +1,7 @@
 import type {
     BootstrappedFrontendDefaults,
     BootstrappedTopologyDefinition,
+    TopologyPayload,
 } from "./types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 import type { RenderDiagnosticsSnapshot } from "./types/rendering.js";
@@ -39,6 +40,7 @@ declare global {
         APP_PERIODIC_FACE_TILINGS: ReadonlyArray<PeriodicFaceTilingDescriptor>;
         __appReady?: boolean;
         __appDiagnostics?: ((() => AppDiagnosticsSnapshot | null) | null);
+        __applyReviewTopology?: (((topology: TopologyPayload) => Promise<void>) | null);
     }
 }
 

@@ -174,10 +174,14 @@ def _largest_connected_component_ids(
     return set(largest_component)
 
 
-def build_shield_patch(patch_depth: int) -> AperiodicPatch:
+def build_shield_patch_for_window_threshold(
+    patch_depth: int,
+    *,
+    window_threshold: float,
+) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     pivot = _reference_pivot()
-    max_window_distance = _window_threshold(resolved_depth)
+    max_window_distance = float(window_threshold)
     records = _load_reference_records()
     selected_records = tuple(
         record
@@ -255,4 +259,12 @@ def build_shield_patch(patch_depth: int) -> AperiodicPatch:
     return patch_from_cells(
         resolved_depth,
         sorted(cells, key=lambda cell: cell.id),
+    )
+
+
+def build_shield_patch(patch_depth: int) -> AperiodicPatch:
+    resolved_depth = max(0, int(patch_depth))
+    return build_shield_patch_for_window_threshold(
+        resolved_depth,
+        window_threshold=_window_threshold(resolved_depth),
     )

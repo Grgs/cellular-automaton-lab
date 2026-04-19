@@ -282,13 +282,27 @@ def _observe_reference_topology(
     )
 
 
+def observe_topology(
+    *,
+    geometry: str,
+    sample_mode: str,
+    depth: int,
+    topology: LatticeTopology,
+) -> ReferencePatchObservation:
+    return _observe_reference_topology(
+        geometry=geometry,
+        sample_mode=sample_mode,
+        depth=depth,
+        topology=topology,
+    )
+
+
 def observe_reference_patch(geometry: str, depth: int) -> ReferencePatchObservation:
     spec = REFERENCE_FAMILY_SPECS[geometry]
     topology = _build_reference_topology(spec, depth)
-    return _observe_reference_topology(
+    return observe_topology(
         geometry=geometry,
         sample_mode=spec.sample_mode,
         depth=depth,
         topology=topology,
     )
-

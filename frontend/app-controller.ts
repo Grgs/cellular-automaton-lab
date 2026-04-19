@@ -8,6 +8,7 @@ import type { AppActionSet } from "./types/actions.js";
 import type { AppController, CreateAppControllerOptions } from "./types/controller-app.js";
 import type { ConfigSyncController, UiSessionController } from "./types/controller-sync-session.js";
 import type { InteractionController, ViewportController } from "./types/controller-view.js";
+import type { SimulationSnapshot, TopologyPayload } from "./types/domain.js";
 
 export function createAppController({
     elements,
@@ -104,6 +105,24 @@ export function createAppController({
         controllerRefs.uiSessionController = null;
     }
 
+    function applyReviewTopology(topology: TopologyPayload): void {
+        const rule = state.activeRule ?? state.rules[0] ?? null;
+        if (!rule) {
+            throw new Error("Cannot apply review topology without an active rule.");
+        }
+        const nextSnapshot: SimulationSnapshot = {
+            topology_spec: topology.topology_spec,
+            speed: Number(state.speed) || 0,
+            running: false,
+            generation: 0,
+            rule,
+            topology_revision: topology.topology_revision,
+            topology,
+            cell_states: new Array(topology.cells.length).fill(0),
+        };
+        sync.applySimulationState(nextSnapshot, { source: "review-topology" });
+    }
+
     return {
         init,
         dispose,
@@ -112,6 +131,7 @@ export function createAppController({
         applySimulationState: sync.applySimulationState,
         applyCellSize: (nextCellSize) => controlActions?.setCellSize?.(nextCellSize),
         applyPaintState: (nextPaintState) => controlActions?.setPaintState(nextPaintState),
+        applyReviewTopology,
         getState: () => state,
         getRenderDiagnostics: () => gridView.getRenderDiagnostics?.() ?? null,
         getInteractions: () => interactions,

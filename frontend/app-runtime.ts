@@ -53,12 +53,16 @@ function installAppDiagnostics(controller: AppController): void {
             },
         };
     };
+    window.__applyReviewTopology = async (topologyPayload) => {
+        controller.applyReviewTopology(topologyPayload);
+    };
 }
 
 export function disposeApp(): void {
     activeController?.dispose();
     activeController = null;
     window.__appDiagnostics = null;
+    window.__applyReviewTopology = null;
     window.__appReady = false;
 }
 

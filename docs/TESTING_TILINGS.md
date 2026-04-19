@@ -105,7 +105,23 @@ Use these when the open question is visual rather than topological:
 - `render_canvas_review.py` is the preferred path for producing a real canvas PNG plus JSON metrics from the browser render path.
 - `run_browser_check.py` is the preferred path when you need the same browser review or a targeted Playwright test with owned host startup, cleanup, logs, and a run manifest.
 - `run_render_review_sweep.py` is the preferred path when you need to compare a small matrix of hosts, themes, or depths without hand-running each case.
+- `run_family_sample_workbench.py` is the preferred path when the first question is “which candidate representative sample should we compare?” rather than “how does the shipped sample render?”
 - npm Playwright entrypoints remain the preferred full-suite path when you want broad browser regression coverage rather than one focused diagnosis.
+
+Family sample workbench examples:
+
+```powershell
+python tools/run_family_sample_workbench.py --family shield --patch-depth 3
+python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --values 193.39344,204.13752,214.8816
+python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --browser-review --host standalone
+python tools/run_family_sample_workbench.py --family pinwheel --patch-depth 3
+```
+
+Workbench notes:
+
+- The default strategy is `representative-window` for `shield` and `baseline` for other patch-depth families.
+- The workbench always writes per-candidate `candidate-topology.json` and `candidate-summary.json`.
+- Optional browser review works by injecting the candidate topology payload into the review runtime; it does not rely on the shipped family/depth patch selection path.
 
 Literature-review boundary:
 
@@ -125,6 +141,7 @@ Output locations:
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
 - managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
 - render-review sweeps: `output/render-review-sweeps/<timestamp-profile>/`
+- family sample workbench runs: `output/family-sample-workbench/<timestamp-family-depth>/`
 
 Render-review summaries and managed manifests now also expose:
 

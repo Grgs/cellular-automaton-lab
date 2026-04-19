@@ -464,6 +464,22 @@ def select_tiling_family(
     return int(response_info.value.status)
 
 
+def apply_review_topology_payload(
+    page: Page,
+    topology_payload: dict[str, Any],
+) -> None:
+    page.evaluate(
+        """async (payload) => {
+            const applyReviewTopology = window.__applyReviewTopology;
+            if (typeof applyReviewTopology !== "function") {
+                throw new Error("Review topology injection hook is unavailable.");
+            }
+            await applyReviewTopology(payload);
+        }""",
+        topology_payload,
+    )
+
+
 def set_range_value(
     page: Page,
     selector: str,

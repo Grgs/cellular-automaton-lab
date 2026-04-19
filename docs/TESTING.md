@@ -7,7 +7,8 @@ In practice, the test stack is:
 1. frontend static checks and unit tests
 2. backend type checks and Python unit/API tests
 3. topology and descriptor validation tools
-4. browser end-to-end coverage with Playwright
+4. candidate-sample and visual-diagnosis tooling
+5. browser end-to-end coverage with Playwright
 
 The repository does not rely on a single “everything is tested in the browser” approach. Most logic is validated before a real browser is involved.
 
@@ -274,9 +275,29 @@ Use the browser-diagnosis tools when you need a focused local answer instead of 
 Preferred paths:
 
 - Full suite or feature suite: use the npm Playwright entrypoints.
+- Structural-first candidate exploration for a patch-depth family: use `python tools/run_family_sample_workbench.py`.
 - Visual inspection of one rendered topology: use `python tools/render_canvas_review.py`.
 - Host-owned local debugging with guaranteed startup and cleanup: use `python tools/run_browser_check.py`.
 - Small comparison matrix across hosts, themes, or sizes: use `python tools/run_render_review_sweep.py`.
+
+Family sample workbench examples:
+
+```powershell
+python tools/run_family_sample_workbench.py --family shield --patch-depth 3
+python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --browser-review --host standalone
+python tools/run_family_sample_workbench.py --family pinwheel --patch-depth 3
+```
+
+Use the workbench when:
+
+- comparing candidate representative windows or crop rules
+- measuring count, connectivity, hole behavior, bounds drift, and overlap diagnostics across candidates
+- attaching browser review to an explicit candidate topology instead of only the shipped family/depth patch
+
+Current v1 strategy support:
+
+- `baseline` for any patch-depth family
+- `shield` `representative-window` for explicit dodecagonal window-threshold sweeps
 
 Direct render review examples:
 
@@ -330,6 +351,7 @@ Artifact locations:
 - Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 - Managed runner `--unittest --success-artifacts` runs also preserve a per-test success bundle under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 - Sweep runs default to `output/render-review-sweeps/<timestamp-profile>/`.
+- Family sample workbench runs default to `output/family-sample-workbench/<timestamp-family-depth>/`, with one `workbench-manifest.json` plus one subdirectory per candidate.
 
 Shared failure artifact bundle:
 

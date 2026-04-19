@@ -5,7 +5,7 @@ import json
 import math
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +21,7 @@ from tests.e2e.browser_support.artifacts import (
     create_artifact_dir,
 )
 from tests.e2e.browser_support.render_review import (
+    apply_review_topology_payload,
     browser_overlap_hotspots,
     browser_topology_summary,
     browser_transform_report,
@@ -68,6 +69,7 @@ class ResolvedRenderReviewRequest:
     profile_name: str | None
     profile: RenderReviewProfile | None
     literature_reference: ResolvedLiteratureReference
+    review_topology_payload: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -258,6 +260,7 @@ def resolve_render_review_request(args: argparse.Namespace) -> ResolvedRenderRev
         profile_name=str(args.profile) if args.profile is not None else None,
         profile=profile,
         literature_reference=literature_reference,
+        review_topology_payload=None,
     )
 
 
@@ -321,6 +324,16 @@ def resolve_montage_path(
     if montage_out is not None:
         return montage_out
     return png_path.with_name(f"{png_path.stem}-montage.png")
+
+
+def with_review_topology_payload(
+    request: ResolvedRenderReviewRequest,
+    topology_payload: dict[str, Any],
+) -> ResolvedRenderReviewRequest:
+    return replace(
+        request,
+        review_topology_payload=topology_payload,
+    )
 
 
 def build_literature_review_summary(
@@ -677,8 +690,10 @@ def build_consistency_report(
 ) -> dict[str, Any]:
     parsed_grid_size = parse_grid_size_text(grid_size_text)
     warnings: list[str] = []
+    review_target_topology = extract_backend_topology_facts(request.review_topology_payload)
+    review_target_mode = "injected_topology" if review_target_topology is not None else "runtime_host"
 
-    if backend_topology is None:
+    if backend_topology is None and review_target_topology is None:
         warnings.append(f"Backend topology facts unavailable for host mode {host_kind}.")
     if browser_topology is None:
         warnings.append("Browser topology diagnostics were unavailable.")
@@ -694,6 +709,8 @@ def build_consistency_report(
         "gridSizeText": grid_size_text,
         "generationText": generation_text,
     }
+    comparison_topology = review_target_topology or backend_topology
+    comparison_label = "injected topology" if review_target_topology is not None else "backend topology"
 
     if browser_topology is not None:
         browser_family = browser_topology.get("tilingFamily")
@@ -707,28 +724,32 @@ def build_consistency_report(
                 f"Visible patch depth control value {actual_patch_depth} does not match browser state patch depth {browser_patch_depth}."
             )
 
-    if backend_topology is not None:
-        backend_family = backend_topology.get("tilingFamily")
-        if backend_family is not None and backend_family != request.family:
+    if comparison_topology is not None:
+        comparison_family = comparison_topology.get("tilingFamily")
+        if comparison_family is not None and comparison_family != request.family:
             warnings.append(
-                f"Requested tiling family {request.family!r} does not match backend topology family {backend_family!r}."
+                f"Requested tiling family {request.family!r} does not match {comparison_label} family {comparison_family!r}."
             )
-        backend_patch_depth = backend_topology.get("patchDepth")
-        if actual_patch_depth is not None and backend_patch_depth is not None and backend_patch_depth != actual_patch_depth:
+        comparison_patch_depth = comparison_topology.get("patchDepth")
+        if (
+            actual_patch_depth is not None
+            and comparison_patch_depth is not None
+            and comparison_patch_depth != actual_patch_depth
+        ):
             warnings.append(
-                f"Visible patch depth control value {actual_patch_depth} does not match backend topology patch depth {backend_patch_depth}."
+                f"Visible patch depth control value {actual_patch_depth} does not match {comparison_label} patch depth {comparison_patch_depth}."
             )
 
     if (
-        backend_topology is not None
+        comparison_topology is not None
         and browser_topology is not None
-        and backend_topology.get("topologyCellCount") is not None
+        and comparison_topology.get("topologyCellCount") is not None
         and browser_topology.get("topologyCellCount") is not None
-        and backend_topology["topologyCellCount"] != browser_topology["topologyCellCount"]
+        and comparison_topology["topologyCellCount"] != browser_topology["topologyCellCount"]
     ):
         warnings.append(
-            "Backend topology cell count "
-            f"{backend_topology['topologyCellCount']} does not match browser topology cell count "
+            f"{comparison_label.capitalize()} cell count "
+            f"{comparison_topology['topologyCellCount']} does not match browser topology cell count "
             f"{browser_topology['topologyCellCount']}."
         )
 
@@ -745,11 +766,11 @@ def build_consistency_report(
                 warnings.append(
                     f"Grid summary tile count {parsed_tile_count} does not match browser topology cell count {browser_tile_count}."
                 )
-        if backend_topology is not None and parsed_tile_count is not None:
-            backend_tile_count = backend_topology.get("topologyCellCount")
-            if backend_tile_count is not None and parsed_tile_count != backend_tile_count:
+        if comparison_topology is not None and parsed_tile_count is not None:
+            comparison_tile_count = comparison_topology.get("topologyCellCount")
+            if comparison_tile_count is not None and parsed_tile_count != comparison_tile_count:
                 warnings.append(
-                    f"Grid summary tile count {parsed_tile_count} does not match backend topology cell count {backend_tile_count}."
+                    f"Grid summary tile count {parsed_tile_count} does not match {comparison_label} cell count {comparison_tile_count}."
                 )
     elif parsed_grid_size is not None and parsed_grid_size.get("mode") == "grid_dimensions":
         parsed_width = parsed_grid_size.get("width")
@@ -765,20 +786,24 @@ def build_consistency_report(
                 warnings.append(
                     f"Grid summary height {parsed_height} does not match browser topology height {browser_height}."
                 )
-        if backend_topology is not None:
-            backend_width = backend_topology.get("width")
-            backend_height = backend_topology.get("height")
-            if backend_width is not None and parsed_width is not None and backend_width != parsed_width:
+        if comparison_topology is not None:
+            comparison_width = comparison_topology.get("width")
+            comparison_height = comparison_topology.get("height")
+            if comparison_width is not None and parsed_width is not None and comparison_width != parsed_width:
                 warnings.append(
-                    f"Grid summary width {parsed_width} does not match backend topology width {backend_width}."
+                    f"Grid summary width {parsed_width} does not match {comparison_label} width {comparison_width}."
                 )
-            if backend_height is not None and parsed_height is not None and backend_height != parsed_height:
+            if comparison_height is not None and parsed_height is not None and comparison_height != parsed_height:
                 warnings.append(
-                    f"Grid summary height {parsed_height} does not match backend topology height {backend_height}."
+                    f"Grid summary height {parsed_height} does not match {comparison_label} height {comparison_height}."
                 )
 
     return {
         "requested": requested,
+        "reviewTarget": {
+            "mode": review_target_mode,
+            "topology": review_target_topology,
+        },
         "actualControlValues": {
             "patchDepth": actual_patch_depth,
             "cellSize": actual_cell_size,
@@ -912,6 +937,7 @@ def render_canvas_review(
     run_manifest: dict[str, Any] | None = None,
 ) -> RenderCanvasReviewResult:
     request = args if isinstance(args, ResolvedRenderReviewRequest) else resolve_render_review_request(args)
+    uses_injected_topology = request.review_topology_payload is not None
     console_messages: list[str] = []
     owned_host = host is None
     active_host = host or create_runtime_host(host_kind)
@@ -952,24 +978,46 @@ def render_canvas_review(
                         request.family,
                         expect_reset_request=active_host.client() is not None,
                     )
-                    _ensure_control_supported(
-                        page,
-                        selector="#patch-depth-input",
-                        requested_value=request.patch_depth,
-                        control_name="patch depth",
-                        family=request.family,
-                    )
-                    _ensure_control_supported(
-                        page,
-                        selector="#cell-size-input",
-                        requested_value=request.cell_size,
-                        control_name="cell size",
-                        family=request.family,
-                    )
-                    if request.patch_depth is not None:
-                        set_patch_depth(page, int(request.patch_depth))
-                    if request.cell_size is not None:
-                        set_cell_size(page, int(request.cell_size))
+                    if uses_injected_topology:
+                        _ensure_control_supported(
+                            page,
+                            selector="#patch-depth-input",
+                            requested_value=request.patch_depth,
+                            control_name="patch depth",
+                            family=request.family,
+                        )
+                        _ensure_control_supported(
+                            page,
+                            selector="#cell-size-input",
+                            requested_value=request.cell_size,
+                            control_name="cell size",
+                            family=request.family,
+                        )
+                        if request.patch_depth is not None:
+                            set_patch_depth(page, int(request.patch_depth))
+                        if request.cell_size is not None:
+                            set_cell_size(page, int(request.cell_size))
+                        wait_for_patch_render_complete(page)
+                        apply_review_topology_payload(page, request.review_topology_payload or {})
+                    else:
+                        _ensure_control_supported(
+                            page,
+                            selector="#patch-depth-input",
+                            requested_value=request.patch_depth,
+                            control_name="patch depth",
+                            family=request.family,
+                        )
+                        _ensure_control_supported(
+                            page,
+                            selector="#cell-size-input",
+                            requested_value=request.cell_size,
+                            control_name="cell size",
+                            family=request.family,
+                        )
+                        if request.patch_depth is not None:
+                            set_patch_depth(page, int(request.patch_depth))
+                        if request.cell_size is not None:
+                            set_cell_size(page, int(request.cell_size))
                     settle_diagnostics = wait_for_patch_render_complete(page)
 
                     actual_patch_depth = _resolve_actual_control_value(page, "#patch-depth-input")
@@ -1000,7 +1048,7 @@ def render_canvas_review(
                     )
                     backend_topology = None
                     client = active_host.client()
-                    if client is not None:
+                    if client is not None and not uses_injected_topology:
                         backend_topology = extract_backend_topology_facts(client.get_topology())
                     consistency_report = build_consistency_report(
                         request=request,

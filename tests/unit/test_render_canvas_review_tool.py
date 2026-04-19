@@ -24,6 +24,7 @@ from tools.render_canvas_review import (
     resolve_montage_path,
     resolve_output_paths,
     resolve_render_review_request,
+    with_review_topology_payload,
 )
 
 
@@ -395,3 +396,40 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
             "Grid summary tile count 600 does not match backend topology cell count 250.",
             report["warnings"],
         )
+
+    def test_build_consistency_report_uses_injected_review_target_when_present(self) -> None:
+        request = with_review_topology_payload(
+            resolve_render_review_request(parse_cli_args(["--family", "shield", "--patch-depth", "3"])),
+            {
+                "topology_spec": {
+                    "tiling_family": "shield",
+                    "adjacency_mode": "edge",
+                    "sizing_mode": "patch_depth",
+                    "width": 400,
+                    "height": 400,
+                    "patch_depth": 3,
+                },
+                "topology_revision": "candidate-rev",
+                "cells": [{"id": "shield:a", "kind": "shield-square", "neighbors": []}],
+            },
+        )
+        report = build_consistency_report(
+            request=request,
+            host_kind="standalone",
+            actual_patch_depth=3,
+            actual_cell_size=None,
+            grid_size_text="Depth 3 • 1 tiles",
+            generation_text="Generation 0",
+            backend_topology=None,
+            browser_topology={
+                "tilingFamily": "shield",
+                "patchDepth": 3,
+                "topologyCellCount": 1,
+                "width": 400,
+                "height": 400,
+                "topologyRevision": "candidate-rev",
+            },
+        )
+        self.assertEqual(report["reviewTarget"]["mode"], "injected_topology")
+        self.assertEqual(report["reviewTarget"]["topology"]["topologyCellCount"], 1)
+        self.assertEqual(report["warnings"], [])
