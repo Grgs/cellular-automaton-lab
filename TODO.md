@@ -57,6 +57,7 @@
 ## Maybe
 
 - Extend browser-visible rendering-bounds verification from geometry-level sanity into richer layout regression checks.
+- Revisit polygon/regular geometry sharing only if square, hex, and triangle adapters start duplicating overlay or hit-test policy; keep their local math unless a shared path is clearly simpler.
 
 ## Remaining After This Cleanup
 

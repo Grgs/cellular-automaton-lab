@@ -1,31 +1,31 @@
-import { drawPolygonCellWithTransientOverlay, drawPolygonGrid } from "../canvas/draw.js";
-import {
-    buildMixedTopologyGeometryCache,
-    resolveMixedCellFromOffset,
-} from "../canvas/geometry-mixed.js";
-import { asPolygonGeometryCache } from "./cache-guards.js";
 import {
     applyMixedViewportPreview,
     constrainMixedViewportDimensions,
     fitGridDimension,
     fitRenderCellSizeWithMetrics,
 } from "./shared.js";
+import {
+    buildPolygonGeometryCache,
+    buildTransformedPolygonGeometryCell,
+    drawPolygonCacheOverlay,
+    drawResolvedPolygonCell,
+    measureTopologyVertexBounds,
+    resolvePolygonCellCenter,
+    resolvePolygonCellFromOffset,
+    resolvePolygonGeometryCell,
+} from "./polygon-adapter-shared.js";
+import { asPolygonGeometryCache } from "./cache-guards.js";
 import { getPeriodicFaceTilingDescriptor } from "./periodic-face-tilings.js";
-import type { PaintableCell } from "../types/editor.js";
 import type {
     GeometryAdapter,
     GeometryBuildCacheArgs,
     GeometryBuildMetricsArgs,
     GeometryDrawOverlayArgs,
     GeometryResolveCellCenterArgs,
-    GeometryResolveCellFromOffsetArgs,
     GeometryResolveCoordinateCenterArgs,
     GeometryViewportPreviewArgs,
     GridMetrics,
     PeriodicFaceTilingDescriptor,
-    Point2D,
-    PolygonGeometryCache,
-    PolygonGeometryCell,
     RenderedCellArgs,
     RenderableTopologyCell,
 } from "../types/rendering.js";
@@ -76,20 +76,11 @@ function topologyBounds(
     width: number,
     height: number,
 ): { minX: number; minY: number; maxX: number; maxY: number } {
-    const vertices = (topology?.cells || [])
-        .flatMap((cell) => Array.isArray((cell as RenderableTopologyCell).vertices) ? (cell as RenderableTopologyCell).vertices || [] : []);
-    if (vertices.length === 0) {
+    const bounds = measureTopologyVertexBounds(topology);
+    if (!bounds) {
         return patternBounds(descriptor, width, height);
     }
-
-    const xs = vertices.map((vertex) => Number(vertex.x));
-    const ys = vertices.map((vertex) => Number(vertex.y));
-    return {
-        minX: Math.min(...xs),
-        minY: Math.min(...ys),
-        maxX: Math.max(...xs),
-        maxY: Math.max(...ys),
-    };
+    return bounds;
 }
 
 function buildPatternMetrics({
@@ -212,48 +203,23 @@ function patternViewportDimensions(
     );
 }
 
-function scaleVertices(vertices: Point2D[], metrics: PatternMetrics): Point2D[] {
-    return vertices.map((vertex) => ({
-        x: 1 + ((Number(vertex.x) - metrics.baseMinX) * metrics.scale),
-        y: 1 + ((Number(vertex.y) - metrics.baseMinY) * metrics.scale),
-    }));
-}
-
 function buildGeometryCellFromTopology(
     cell: RenderableTopologyCell,
     metrics: PatternMetrics,
-): PolygonGeometryCell | null {
-    if (!Array.isArray(cell?.vertices) || cell.vertices.length === 0) {
-        return null;
-    }
-
-    const vertices = scaleVertices(cell.vertices, metrics);
-    const minX = Math.min(...vertices.map((vertex) => vertex.x));
-    const maxX = Math.max(...vertices.map((vertex) => vertex.x));
-    const minY = Math.min(...vertices.map((vertex) => vertex.y));
-    const maxY = Math.max(...vertices.map((vertex) => vertex.y));
-    return {
+){
+    return buildTransformedPolygonGeometryCell(
         cell,
-        vertices,
-        centerX: 1 + ((Number(cell.center?.x ?? ((minX + maxX) / 2)) - metrics.baseMinX) * metrics.scale),
-        centerY: 1 + ((Number(cell.center?.y ?? ((minY + maxY) / 2)) - metrics.baseMinY) * metrics.scale),
-        minX,
-        maxX,
-        minY,
-        maxY,
-    };
-}
-
-function resolveGeometryCell(
-    geometry: string,
-    cell: RenderableTopologyCell,
-    metrics: PatternMetrics,
-    cache: PolygonGeometryCache | null,
-): PolygonGeometryCell | null {
-    if (cell?.id && cache?.cellsById?.has(cell.id)) {
-        return cache.cellsById.get(cell.id) ?? null;
-    }
-    return buildGeometryCellFromTopology(cell, metrics);
+        (vertex) => ({
+            x: 1 + ((Number(vertex.x) - metrics.baseMinX) * metrics.scale),
+            y: 1 + ((Number(vertex.y) - metrics.baseMinY) * metrics.scale),
+        }),
+        (center) => center
+            ? {
+                x: 1 + ((Number(center.x) - metrics.baseMinX) * metrics.scale),
+                y: 1 + ((Number(center.y) - metrics.baseMinY) * metrics.scale),
+            }
+            : null,
+    );
 }
 
 function createPatternViewportFit(descriptor: PeriodicFaceTilingDescriptor) {
@@ -271,17 +237,12 @@ function createMetricsBuilder(descriptor: PeriodicFaceTilingDescriptor) {
         height,
         cellSize,
         topology,
-    }: {
-        width: number;
-        height: number;
-        cellSize: number;
-        topology: TopologyPayload | null;
-    }) => buildPatternMetrics({
+    }: GeometryBuildMetricsArgs) => buildPatternMetrics({
         descriptor,
         width,
         height,
         cellSize,
-        topology,
+        topology: topology ?? null,
     });
 }
 
@@ -321,39 +282,39 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
         },
 
         buildCache({ topology, metrics }: GeometryBuildCacheArgs) {
-            return buildMixedTopologyGeometryCache(topology, (cell) => (
-                resolveGeometryCell(geometry, cell, metrics as PatternMetrics, null)
+            return buildPolygonGeometryCache(topology, (cell) => (
+                buildGeometryCellFromTopology(cell, metrics as PatternMetrics)
             ));
         },
 
         buildCellGeometry({ cell, metrics, cache }) {
-            return resolveGeometryCell(
-                geometry,
+            return resolvePolygonGeometryCell(
                 cell as RenderableTopologyCell,
-                metrics as PatternMetrics,
                 asPolygonGeometryCache(cache),
+                (uncachedCell) => buildGeometryCellFromTopology(uncachedCell, metrics as PatternMetrics),
             );
         },
 
-        resolveCellFromOffset({ offsetX, offsetY, cache }: GeometryResolveCellFromOffsetArgs) {
-            return resolveMixedCellFromOffset(
-                offsetX,
-                offsetY,
-                cache && "cellsById" in cache ? cache : null,
-            );
+        resolveCellFromOffset({ offsetX, offsetY, cache }) {
+            return resolvePolygonCellFromOffset({ offsetX, offsetY, cache });
         },
 
         resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics, cache, topology = null }: GeometryResolveCellCenterArgs) {
-            const resolvedMetrics = (metrics || buildMetrics({ width, height, cellSize, topology })) as PatternMetrics;
-            const geometryCell = resolveGeometryCell(
-                geometry,
-                cell as RenderableTopologyCell,
-                resolvedMetrics,
-                asPolygonGeometryCache(cache),
-            );
-            return geometryCell
-                ? { x: geometryCell.centerX, y: geometryCell.centerY }
-                : { x: 0, y: 0 };
+            return resolvePolygonCellCenter({
+                cell,
+                width,
+                height,
+                cellSize,
+                topology,
+                metrics,
+                cache,
+                buildMetrics,
+                buildCellGeometry: (nextCell, nextMetrics, polygonCache) => resolvePolygonGeometryCell(
+                    nextCell,
+                    polygonCache,
+                    (uncachedCell) => buildGeometryCellFromTopology(uncachedCell, nextMetrics as PatternMetrics),
+                ),
+            });
         },
 
         resolveCoordinateCenter({ x, y, cellSize, metrics }: GeometryResolveCoordinateCenterArgs) {
@@ -383,25 +344,20 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
             renderStyle,
             renderLayer,
         }: RenderedCellArgs) {
-            const geometryCell = resolveGeometryCell(
-                geometry,
+            const geometryCell = resolvePolygonGeometryCell(
                 cell as RenderableTopologyCell,
-                metrics as PatternMetrics,
                 asPolygonGeometryCache(cache),
+                (uncachedCell) => buildGeometryCellFromTopology(uncachedCell, metrics as PatternMetrics),
             );
-            const color = resolveRenderedCellColor(
+            drawResolvedPolygonCell({
+                geometry,
+                geometryCell,
+                cell,
                 stateValue,
-                colorLookup,
-                colors,
-                { geometry, cell: geometryCell?.cell || cell },
-            );
-            if (!geometryCell) {
-                return;
-            }
-            drawPolygonCellWithTransientOverlay({
                 context,
-                vertices: geometryCell.vertices,
-                fillColor: color,
+                colors,
+                colorLookup,
+                resolveRenderedCellColor,
                 renderLayer,
                 renderStyle,
                 drawPreviewStroke: true,
@@ -409,7 +365,7 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
         },
 
         drawOverlay({ context, cache, renderStyle }: GeometryDrawOverlayArgs) {
-            drawPolygonGrid(context, renderStyle, asPolygonGeometryCache(cache));
+            drawPolygonCacheOverlay({ context, cache, renderStyle });
         },
 
         applyViewportPreview(args: GeometryViewportPreviewArgs) {

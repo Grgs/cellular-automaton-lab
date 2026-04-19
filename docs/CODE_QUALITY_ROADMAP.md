@@ -268,7 +268,7 @@ Visual behavior stays consistent across tilings, and changing overlay or selecti
 
 Implementation status:
 
-The polygon overlay drawing path is now shared for the mixed periodic, Penrose, and generic aperiodic polygon adapters through `drawPolygonCellWithTransientOverlay(...)` in `frontend/canvas/draw.ts`. Regular square, hex, and triangle adapters remain local because their grid math is still clearer outside a polygon abstraction.
+The polygon adapter path is now shared more coherently. `frontend/geometry/polygon-adapter-shared.ts` owns polygon bounds measurement, transformed-cell construction, cache-backed cell resolution, rendered-center lookup, overlay/grid drawing, and polygon hit-test routing for the mixed periodic, Penrose, and generic aperiodic adapters. This also fixed the old mixed-adapter fallback-center bug where transformed bounds could be fed back through raw-coordinate center math. Regular square, hex, and triangle adapters remain local because their grid math is still clearer outside a polygon abstraction.
 
 ### 7. Frontend Type Surfaces
 

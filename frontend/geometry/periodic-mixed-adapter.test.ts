@@ -445,4 +445,45 @@ describe("geometry/periodic-mixed-adapter", () => {
         expect(context.strokeStyle).toBe("rgba(31, 36, 48, 0.24)");
         expect(context.lineWidth).toBe(2.25);
     });
+
+    it("falls back to transformed bounds when a periodic polygon omits center metadata", async () => {
+        const { createPeriodicMixedGeometryAdapter } = await import("./periodic-mixed-adapter.js");
+        const adapter = createPeriodicMixedGeometryAdapter(SNUB_SQUARE_GEOMETRY);
+        const center = adapter.resolveCellCenter({
+            cell: {
+                id: "triangle:missing-center",
+                kind: "triangle",
+                neighbors: [],
+                vertices: [
+                    { x: 45, y: 0 },
+                    { x: 71, y: 45 },
+                    { x: 97, y: 0 },
+                ],
+            },
+            width: 1,
+            height: 1,
+            cellSize: 10,
+            topology: null,
+            metrics: {
+                geometry: SNUB_SQUARE_GEOMETRY,
+                width: 1,
+                height: 1,
+                cellSize: 10,
+                gap: 0,
+                cssWidth: 10,
+                cssHeight: 10,
+                xInset: 1,
+                yInset: 1,
+                scale: 1,
+                baseMinX: 0,
+                baseMinY: 0,
+                unitWidth: 142,
+                unitHeight: 142,
+                rowOffsetX: 0,
+            },
+            cache: null,
+        });
+
+        expect(center).toEqual({ x: 72, y: 23.5 });
+    });
 });
