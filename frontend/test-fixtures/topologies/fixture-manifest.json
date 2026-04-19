@@ -1,0 +1,114 @@
+{
+  "fixtures": [
+    {
+      "name": "archimedean-4-8-8-3x3",
+      "path": "archimedean-4-8-8-3x3.json",
+      "family": "archimedean-4-8-8",
+      "width": 3,
+      "height": 3,
+      "patchDepth": null,
+      "cellSize": 12,
+      "topologyRevision": "e76c1baeebfa"
+    },
+    {
+      "name": "chair-depth-3",
+      "path": "chair-depth-3.json",
+      "family": "chair",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "chair-depth-3-v2"
+    },
+    {
+      "name": "dodecagonal-square-triangle-depth-3",
+      "path": "dodecagonal-square-triangle-depth-3.json",
+      "family": "dodecagonal-square-triangle",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-dodecagonal-dodecagonal-square-triangle-depth-3"
+    },
+    {
+      "name": "hat-monotile-depth-3",
+      "path": "hat-monotile-depth-3.json",
+      "family": "hat-monotile",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-hat-monotile-depth-3"
+    },
+    {
+      "name": "pinwheel-depth-3",
+      "path": "pinwheel-depth-3.json",
+      "family": "pinwheel",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-pinwheel-depth-3"
+    },
+    {
+      "name": "robinson-triangles-depth-3",
+      "path": "robinson-triangles-depth-3.json",
+      "family": "robinson-triangles",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-robinson-triangles-depth-3"
+    },
+    {
+      "name": "shield-depth-3",
+      "path": "shield-depth-3.json",
+      "family": "shield",
+      "width": 453,
+      "height": 452,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "a7c66a960055"
+    },
+    {
+      "name": "spectre-depth-3",
+      "path": "spectre-depth-3.json",
+      "family": "spectre",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-spectre-depth-3"
+    },
+    {
+      "name": "sphinx-depth-3",
+      "path": "sphinx-depth-3.json",
+      "family": "sphinx",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-sphinx-depth-3"
+    },
+    {
+      "name": "taylor-socolar-depth-3",
+      "path": "taylor-socolar-depth-3.json",
+      "family": "taylor-socolar",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-taylor-socolar-depth-3"
+    },
+    {
+      "name": "tuebingen-triangle-depth-3",
+      "path": "tuebingen-triangle-depth-3.json",
+      "family": "tuebingen-triangle",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12,
+      "topologyRevision": "fixture-tuebingen-triangle-depth-3"
+    }
+  ]
+}

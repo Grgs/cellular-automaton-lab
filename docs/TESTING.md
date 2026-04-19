@@ -195,6 +195,7 @@ Some correctness checks live in dedicated tooling rather than ordinary unit test
 
 ```powershell
 py -3 tools\validate_tilings.py
+py -3 tools\regenerate_frontend_topology_fixtures.py --all --check
 ```
 
 This validates geometry and tiling descriptors directly. It is part of the normal validation path because topology metadata is foundational to both backend behavior and frontend rendering.
@@ -204,6 +205,7 @@ Use this tool whenever changing:
 - topology catalog definitions
 - periodic-face descriptor data
 - geometry-related bootstrap payloads
+- representative frontend topology fixtures used by browser-visible geometry or palette tests
 
 ### 7. Browser End-To-End Tests
 

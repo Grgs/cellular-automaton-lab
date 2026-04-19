@@ -370,14 +370,24 @@ The next missing shield-specific tooling is no longer cleanup-factor
 exploration. It is fixture regeneration and profile-owned expectations for how
 those cleanup diagnostics should be interpreted during manual review.
 
-### 6. Frontend representative fixture regeneration is still ad hoc
+### 6. Frontend representative fixture regeneration is now manifest-driven
 
 Backend reference fixtures have first-class regeneration and verification paths.
 The frontend representative shield fixture did not.
 
-Updating the frontend sample still depended on an ad hoc export step rather than
-one canonical regeneration command. That is avoidable process debt for every
-family that needs browser-visible sample refreshes.
+Status: addressed. Frontend representative fixtures now have:
+
+- a shared manifest at `frontend/test-fixtures/topologies/fixture-manifest.json`
+- a deterministic regeneration/check tool at
+  `tools/regenerate_frontend_topology_fixtures.py`
+
+That means browser-facing topology fixtures now follow the same basic workflow
+as backend reference fixtures: there is a checked manifest, a canonical
+regeneration command, and a drift-check mode for validation.
+
+The remaining gap is not regeneration anymore. It is deciding when a family's
+fixture should be refreshed and tying that to profile-owned expectations rather
+than operator memory.
 
 ### 7. Literature-review mode still lacks family-specific acceptance prompts
 

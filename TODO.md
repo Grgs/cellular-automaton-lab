@@ -23,6 +23,7 @@
 - Added a geometry cleanup workbench for image-derived families so shield cleanup scales can be compared by overlap severity, bounds drift, and optional browser-visible gutter risk without ad hoc Shapely sweeps.
 - Replaced click-driven palette alias browser tests with a review/test API that injects topology and mutates cell state by `cell.id`, then samples rendered pixels directly from the canvas.
 - Moved custom dead-palette ownership and fixture-backed browser alias coverage onto a shared manifest/registry contract so TypeScript and Python no longer maintain separate family allowlists for this test surface.
+- Added a frontend representative fixture manifest plus regeneration tool so browser-facing topology fixtures can be checked and refreshed deterministically instead of relying on ad hoc manual export steps.
 
 ## Now
 
@@ -32,7 +33,6 @@
 - Replace the current literature-derived dense shield field with a defensible full marked fractal substitution if an explicit rule table becomes available or can be reconstructed to a standard the repo can defend.
 ## Next
 
-- Add a frontend representative fixture regeneration tool so browser-facing topology fixtures do not require ad hoc manual export steps.
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Add profile-attached expectations beyond simple review notes, such as family-specific visual checkpoints, expected warning suppressions, and short literature-review acceptance checklists where those expectations can be stated clearly.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.

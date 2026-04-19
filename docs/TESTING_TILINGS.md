@@ -77,6 +77,18 @@ Use these when you need a browser-side sanity pass on representative rendered fi
 
 The checked-in representative fixture set now includes `spectre`, `taylor-socolar`, and `sphinx` at depth `3`, so both render-bounds and adapter-space overlap coverage now span the full current aperiodic representative set rather than only the previously strengthened families.
 
+When these browser-facing representative fixtures need to be refreshed, use the
+checked manifest and regeneration tool instead of editing or exporting them by
+hand:
+
+```powershell
+python tools/regenerate_frontend_topology_fixtures.py --all --check
+python tools/regenerate_frontend_topology_fixtures.py --fixture shield-depth-3
+```
+
+The fixture manifest lives at
+`frontend/test-fixtures/topologies/fixture-manifest.json`.
+
 For family-specific dead palettes, there is a second browser-visible contract:
 dead cells must not alias the live fill on the rendered canvas. That coverage
 now has two layers:
