@@ -114,6 +114,12 @@ class SharedUiFlowMixin:
     def _click_canvas_center(self) -> None:
         case = self._case()
         canvas = case.page.locator("#grid")
+        case.page.wait_for_function(
+            """() => {
+                const value = Number(document.getElementById("grid")?.getAttribute("data-render-cell-size") || "0");
+                return Number.isFinite(value) && value > 0;
+            }""",
+        )
         render_cell_size_text = canvas.get_attribute("data-render-cell-size")
         if render_cell_size_text is None:
             raise AssertionError("canvas did not report a rendered cell size")

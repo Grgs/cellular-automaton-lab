@@ -279,9 +279,9 @@ class TopologyValidationTests(unittest.TestCase):
         self.assertEqual(
             recommended_validation_options(SHIELD_GEOMETRY),
             {
-                "check_surface": False,
-                "check_overlaps": False,
-                "check_edge_multiplicity": False,
+                "check_surface": True,
+                "check_overlaps": True,
+                "check_edge_multiplicity": True,
                 "check_graph_connectivity": True,
             },
         )

@@ -258,7 +258,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
     },
     "shield": {
         label: "Shield",
-        pickerGroup: "Experimental",
+        pickerGroup: "Aperiodic",
         pickerOrder: 330,
         family: "aperiodic",
         sizingMode: "patch_depth",
