@@ -163,6 +163,14 @@ Workbench notes:
 - The geometry cleanup workbench is the fixed-sample counterpart: it keeps the shipped representative sample and varies topology cleanup scale only.
 - Cleanup candidate summaries now include overlap severity, bounds drift versus the shipped baseline cleanup scale, and optional browser-visible gutter-risk metrics.
 
+Before relying on standalone provenance or comparing new visual-review outputs
+against older artifacts, rebuild the frontend outputs on the current HEAD:
+
+```powershell
+npm run build:frontend
+npm run build:frontend:standalone
+```
+
 Literature-review boundary:
 
 - Profiles now own citation URLs, short review notes, and the default cache filename for an operator-provided reference image.

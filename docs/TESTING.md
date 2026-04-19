@@ -471,6 +471,14 @@ Defaults:
 - npm Playwright entrypoints remain the preferred full-suite path.
 - `tools/dev_processes.py` is the narrow cleanup fallback when you need to inspect or terminate repo-owned browser/server helper processes directly.
 
+If a visual-review run depends on standalone provenance being current, rebuild
+the frontend outputs on the current HEAD first:
+
+```powershell
+npm run build:frontend
+npm run build:frontend:standalone
+```
+
 ## Recommended Local Workflow
 
 For most frontend-only changes:
