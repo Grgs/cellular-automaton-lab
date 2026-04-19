@@ -549,7 +549,7 @@ class ApiStateAndRulesTests(ApiTestCase):
             ('hat-monotile', 3, {'hat'}),
             ('tuebingen-triangle', 5, {'tuebingen-thick', 'tuebingen-thin'}),
             ('dodecagonal-square-triangle', 4, {'dodecagonal-square-triangle-square', 'dodecagonal-square-triangle-triangle'}),
-            ('shield', 4, {'shield-shield', 'shield-square', 'shield-triangle'}),
+            ('shield', 5, {'shield-shield', 'shield-square', 'shield-triangle'}),
             ('pinwheel', 4, {'pinwheel-triangle'}),
         )
 
