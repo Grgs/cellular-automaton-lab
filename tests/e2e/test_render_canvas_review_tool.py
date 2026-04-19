@@ -189,7 +189,7 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
                 summary["settleDiagnostics"]["finalSnapshot"]["blockingActivityMessage"], ""
             )
             self.assertEqual(
-                summary["settleDiagnostics"]["finalSnapshot"]["gridSizeText"], "Depth 3 • 443 tiles"
+                summary["settleDiagnostics"]["finalSnapshot"]["gridSizeText"], "Depth 3 • 151 tiles"
             )
             self.assertIn("visualMetrics", summary)
             self.assertIn("profileExpectations", summary)

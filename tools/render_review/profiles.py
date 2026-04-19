@@ -110,12 +110,10 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
             cache_filename="shield-reference.png",
         ),
         overlap_policy=OverlapPolicy(
-            mode="image-derived-relaxed",
-            expected_to_reduce_max_sampled_area=0.01,
-            expected_to_reduce_max_sampled_count=4,
+            mode="strict",
             review_note=(
-                "The current Experimental shield model should now be overlap-free at the representative review epsilon. "
-                "Only a tiny residual trace-noise budget is acceptable; anything larger is blocking."
+                "Shield should now be overlap-free at the representative review epsilon. "
+                "Any positive-area representative overlap is blocking."
             ),
         ),
         review_checklist=(

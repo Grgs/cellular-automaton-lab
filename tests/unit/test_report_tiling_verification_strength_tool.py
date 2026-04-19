@@ -98,7 +98,7 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         shield = next(family for family in families if family["geometry"] == "shield")
         self.assertEqual(shield["implementation_status"], "true_substitution")
         self.assertEqual(shield["verification_status"], "PASS")
-        self.assertTrue(isinstance(shield["promotion_blocker"], str))
+        self.assertIsNone(shield["promotion_blocker"])
         self.assertEqual(shield["depths"], [0, 1, 3])
         self.assertEqual(shield["failure_codes"], [])
         self.assertTrue(shield["has_local_reference"])
@@ -146,11 +146,15 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("shield (Shield)", output)
         self.assertIn("implementation_status: true_substitution", output)
         self.assertIn("verification_status: PASS", output)
-        self.assertIn(
+        self.assertNotIn(
             "promotion_blocker: Experimental until manual visual review accepts the exact marked substitution implementation.",
             output,
         )
         self.assertIn("pinwheel (Pinwheel)", output)
+        self.assertIn(
+            "promotion_blocker: Experimental until manual visual review accepts the exact-affine implementation.",
+            output,
+        )
         self.assertIn("exact_reference_mode: pinwheel_exact", output)
         self.assertIn("robinson-triangles (Robinson Triangles)", output)
         self.assertIn("tuebingen-triangle (Tuebingen Triangle)", output)

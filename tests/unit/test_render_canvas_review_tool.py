@@ -288,7 +288,7 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         )
         assert summary is not None
         self.assertEqual(summary["status"], "blocking")
-        self.assertEqual(summary["policyMode"], "image-derived-relaxed")
+        self.assertEqual(summary["policyMode"], "strict")
         self.assertTrue(summary["warnings"])
 
     def test_condense_overlap_hotspots_extracts_review_fields(self) -> None:

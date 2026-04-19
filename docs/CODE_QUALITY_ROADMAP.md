@@ -167,7 +167,7 @@ Primary files:
 
 Current issue:
 
-Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `dodecagonal-square-triangle`, `shield`, and `pinwheel` remain experimental because manual visual review still does not justify promotion. Shield now has an exact marked substitution implementation, so the remaining work is product-facing review and removal of compatibility-only legacy diagnostics, not replacement of the generator itself.
+Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `dodecagonal-square-triangle` and `pinwheel` remain experimental because manual visual review still does not justify promotion. `shield` is now on the exact marked substitution path, passed a fresh manual visible-review pass on April 19, 2026, and has been promoted into the main `Aperiodic` group. The remaining shield work is cleanup of compatibility-only legacy diagnostics, not replacement of the generator itself.
 
 Needed change:
 
@@ -340,7 +340,7 @@ These are low-risk cleanup tasks worth doing before larger refactors:
 
 ## Do Not Do Yet
 
-- Do not promote `dodecagonal-square-triangle`, `shield`, or `pinwheel` until manual visual review and implementation status justify it.
+- Do not promote `dodecagonal-square-triangle` or `pinwheel` until manual visual review and implementation status justify it.
 - Do not centralize all constants into one global config file.
 - Do not rewrite the app controller stack without first extracting gesture and overlay state; those are the higher-churn seams.
 - Do not replace Playwright coverage with unit tests for flows that genuinely require DOM, canvas, browser storage, or standalone worker execution.

@@ -209,15 +209,12 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         geometry=SHIELD_GEOMETRY,
         catalog_label="Shield",
         reference_label="Shield",
-        picker_group="Experimental",
+        picker_group="Aperiodic",
         picker_order=330,
         default_rule="life-b2-s23",
         builder_kind="substitution_recipe",
         implementation_status="true_substitution",
         public_cell_kinds=(SHIELD_SHIELD_KIND, SHIELD_SQUARE_KIND, SHIELD_TRIANGLE_KIND),
-        promotion_blocker=(
-            "Experimental until manual visual review accepts the exact marked substitution implementation."
-        ),
     ),
     PINWHEEL_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PINWHEEL_GEOMETRY,

@@ -44,11 +44,14 @@ class AperiodicRegistryTests(unittest.TestCase):
                 self.assertTrue(contract.verification_modes)
 
     def test_experimental_aperiodics_keep_explicit_promotion_blockers(self) -> None:
-        for geometry in ("dodecagonal-square-triangle", "shield", "pinwheel"):
+        for geometry in ("dodecagonal-square-triangle", "pinwheel"):
             with self.subTest(geometry=geometry):
                 self.assertIsNotNone(
                     APERIODIC_IMPLEMENTATION_CONTRACTS[geometry].promotion_blocker
                 )
+
+    def test_shield_no_longer_has_a_promotion_blocker(self) -> None:
+        self.assertIsNone(APERIODIC_IMPLEMENTATION_CONTRACTS["shield"].promotion_blocker)
 
     def test_taylor_socolar_patch_builder_matches_topology_builder_output(self) -> None:
         patch = build_aperiodic_patch("taylor-socolar", 2)
