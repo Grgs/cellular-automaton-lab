@@ -117,7 +117,7 @@ Canvas view becomes smaller and easier to reason about. Overlay behavior can be 
 
 Implementation status:
 
-The first extraction is in place. `frontend/canvas/transient-overlays.ts` owns hover, selection, preview, gesture outline, flash timing, and topology cleanup state; `canvas-view.ts` renders snapshots from that controller. Render-style ownership is also split: `theme-colors.ts` owns CSS token/color utilities, `state-colors.ts` owns cell-state and dead-state palette resolution, and `overlay-style.ts` owns transient overlay color policy.
+The next extraction is now in place. `frontend/canvas/transient-overlays.ts` owns hover, selection, preview, gesture outline, flash timing, and topology cleanup state; `frontend/canvas/overlay-renderer.ts` owns transient overlay draw order; `frontend/canvas/committed-renderer.ts` owns committed-layer lifecycle, viewport alignment, geometry cache invalidation, and pointer hit testing; and `frontend/canvas/render-diagnostics.ts` owns diagnostics sampling plus rendered-cell lookup. `canvas-view.ts` is now a thin facade that composes those subsystems. Render-style ownership is also split: `theme-colors.ts` owns CSS token/color utilities, `state-colors.ts` owns cell-state and dead-state palette resolution, and `overlay-style.ts` owns transient overlay color policy.
 
 ### 3. Drawer And Inspector View Models
 
