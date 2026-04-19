@@ -18,7 +18,10 @@ STANDALONE_REQUIRED_OUTPUTS = (
 
 
 def _standalone_outputs_ready() -> bool:
-    return all((STANDALONE_OUTPUT_DIR / relative_path).exists() for relative_path in STANDALONE_REQUIRED_OUTPUTS)
+    return all(
+        (STANDALONE_OUTPUT_DIR / relative_path).exists()
+        for relative_path in STANDALONE_REQUIRED_OUTPUTS
+    )
 
 
 class GeometryCleanupWorkbenchToolIntegrationTests(unittest.TestCase):
@@ -39,13 +42,19 @@ class GeometryCleanupWorkbenchToolIntegrationTests(unittest.TestCase):
             )
 
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["family"], "shield")
             self.assertEqual(manifest["strategy"], "trace-cleanup-scale")
             self.assertEqual(len(manifest["candidates"]), 3)
 
-            first_summary = json.loads(Path(manifest["candidates"][0]["candidateSummary"]).read_text(encoding="utf-8"))
-            last_summary = json.loads(Path(manifest["candidates"][-1]["candidateSummary"]).read_text(encoding="utf-8"))
+            first_summary = json.loads(
+                Path(manifest["candidates"][0]["candidateSummary"]).read_text(encoding="utf-8")
+            )
+            last_summary = json.loads(
+                Path(manifest["candidates"][-1]["candidateSummary"]).read_text(encoding="utf-8")
+            )
             self.assertNotEqual(
                 first_summary["cleanupDiagnostics"]["boundsDrift"]["widthRatio"],
                 last_summary["cleanupDiagnostics"]["boundsDrift"]["widthRatio"],
@@ -80,12 +89,18 @@ class GeometryCleanupWorkbenchBrowserIntegrationTests(unittest.TestCase):
             )
 
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(len(manifest["candidates"]), 2)
             candidate_record = manifest["candidates"][0]
-            candidate_summary = json.loads(Path(candidate_record["candidateSummary"]).read_text(encoding="utf-8"))
+            candidate_summary = json.loads(
+                Path(candidate_record["candidateSummary"]).read_text(encoding="utf-8")
+            )
             render_review = candidate_summary["renderReview"]
-            self.assertEqual(render_review["consistency"]["reviewTarget"]["mode"], "injected_topology")
+            self.assertEqual(
+                render_review["consistency"]["reviewTarget"]["mode"], "injected_topology"
+            )
             self.assertEqual(
                 render_review["consistency"]["browserState"]["topologyCellCount"],
                 candidate_summary["total_cells"],
@@ -94,4 +109,6 @@ class GeometryCleanupWorkbenchBrowserIntegrationTests(unittest.TestCase):
             self.assertTrue(Path(render_review["pngPath"]).exists())
             self.assertIn("profileExpectations", render_review)
             self.assertEqual(render_review["profileExpectations"]["profile"], "shield-depth-3")
-            self.assertIsNotNone(candidate_summary["cleanupDiagnostics"]["visualComparison"]["gutterScore"])
+            self.assertIsNotNone(
+                candidate_summary["cleanupDiagnostics"]["visualComparison"]["gutterScore"]
+            )

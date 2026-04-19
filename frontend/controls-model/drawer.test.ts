@@ -181,4 +181,27 @@ describe("controls-model/drawer selection inspector", () => {
             { label: "Selected Cell IDs", value: "cell:a, cell:b, cell:c" },
         ]);
     });
+
+    it("surfaces backend-owned experimental blocker text for aperiodic families", async () => {
+        const { buildControlsViewModel } = await import("../controls-model.js");
+        const state = await buildState();
+        state.topologySpec = {
+            ...state.topologySpec,
+            tiling_family: "pinwheel",
+            sizing_mode: "patch_depth",
+            patch_depth: 3,
+        };
+
+        const viewModel = buildControlsViewModel({
+            state,
+            syncState: EMPTY_SYNC_STATE,
+            theme: "light",
+            selectionInspectorSource: { selectedCells: [] },
+        });
+
+        expect(viewModel.topologyStatusVisible).toBe(true);
+        expect(viewModel.topologyStatusTone).toBe("warning");
+        expect(viewModel.topologyStatusLabel).toContain("Experimental");
+        expect(viewModel.topologyStatusDetail).toContain("manual visual review");
+    });
 });

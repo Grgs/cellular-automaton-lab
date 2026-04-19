@@ -10,7 +10,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.bootstrap_data import build_bootstrap_payload, describe_aperiodic_families
-from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_IDS, APERIODIC_FAMILY_MANIFEST
+from backend.simulation.aperiodic_family_manifest import (
+    APERIODIC_FAMILY_IDS,
+    APERIODIC_FAMILY_MANIFEST,
+)
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import PENROSE_VERTEX_GEOMETRY, TOPOLOGY_VARIANTS
 
@@ -35,9 +38,7 @@ class AperiodicFamilyContractTests(unittest.TestCase):
             if variant.family == "aperiodic" and variant.geometry_key != PENROSE_VERTEX_GEOMETRY
         }
         reference_families = {
-            geometry
-            for geometry in REFERENCE_FAMILY_SPECS
-            if geometry in APERIODIC_FAMILY_IDS
+            geometry for geometry in REFERENCE_FAMILY_SPECS if geometry in APERIODIC_FAMILY_IDS
         }
 
         self.assertEqual(catalog_families, set(APERIODIC_FAMILY_IDS))
@@ -49,6 +50,8 @@ class AperiodicFamilyContractTests(unittest.TestCase):
                 "tiling_family": geometry,
                 "label": APERIODIC_FAMILY_MANIFEST[geometry].catalog_label,
                 "experimental": APERIODIC_FAMILY_MANIFEST[geometry].experimental,
+                "implementation_status": APERIODIC_FAMILY_MANIFEST[geometry].implementation_status,
+                "promotion_blocker": APERIODIC_FAMILY_MANIFEST[geometry].promotion_blocker,
                 "public_cell_kinds": list(APERIODIC_FAMILY_MANIFEST[geometry].public_cell_kinds),
             }
             for geometry in APERIODIC_FAMILY_IDS
@@ -66,7 +69,9 @@ class AperiodicFamilyContractTests(unittest.TestCase):
             "square-triangle",
             {
                 entry["tiling_family"]
-                for entry in build_bootstrap_payload({"app_name": "cellular-automaton-lab"})["aperiodic_families"]
+                for entry in build_bootstrap_payload({"app_name": "cellular-automaton-lab"})[
+                    "aperiodic_families"
+                ]
             },
         )
 

@@ -7,12 +7,12 @@ import sys
 from pathlib import Path
 from typing import Any
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from tests.e2e.browser_support.artifacts import create_artifact_dir
-from tools.render_canvas_review import (
+from tools.render_review.review import (
     DEFAULT_REFERENCE_CACHE_DIR,
     condense_profile_expectations,
     condense_overlap_hotspots,
@@ -23,7 +23,7 @@ from tools.render_canvas_review import (
     resolve_render_review_request,
     with_review_topology_payload,
 )
-from tools.render_review_profiles import find_render_review_profile
+from tools.render_review.profiles import find_render_review_profile
 
 VALID_HOSTS = ("standalone", "server")
 VALID_THEMES = ("light", "dark")
@@ -100,7 +100,9 @@ def run_candidate_browser_review(
         "overlapHotspots": condense_overlap_hotspots(review_payload.get("overlapHotspots")),
         "settleDiagnostics": condense_settle_diagnostics(review_payload.get("settleDiagnostics")),
         "visualMetrics": condense_visual_metrics(review_payload.get("visualMetrics")),
-        "profileExpectations": condense_profile_expectations(review_payload.get("profileExpectations")),
+        "profileExpectations": condense_profile_expectations(
+            review_payload.get("profileExpectations")
+        ),
     }
 
 

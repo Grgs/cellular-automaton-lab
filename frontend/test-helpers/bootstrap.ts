@@ -93,12 +93,16 @@ const APERIODIC_FAMILIES: ReadonlyArray<BootstrappedAperiodicFamilyDefinition> =
         tiling_family: "penrose-p3-rhombs",
         label: "Penrose P3 Rhombs",
         experimental: false,
+        implementation_status: "true_substitution",
+        promotion_blocker: null,
         public_cell_kinds: ["thick-rhomb", "thin-rhomb"],
     },
     {
         tiling_family: "pinwheel",
         label: "Pinwheel",
         experimental: true,
+        implementation_status: "exact_affine",
+        promotion_blocker: "Experimental until manual visual review accepts the exact-affine implementation.",
         public_cell_kinds: ["pinwheel-triangle"],
     },
 ]);

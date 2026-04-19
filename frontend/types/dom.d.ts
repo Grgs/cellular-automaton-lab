@@ -26,6 +26,7 @@ export interface DomElements {
     gridSizePanelText: HTMLElement | null;
     inspectorTilingText: HTMLElement | null;
     inspectorRuleText: HTMLElement | null;
+    topologyStatus: HTMLElement | null;
     selectionInspectorSection: HTMLElement | null;
     selectionInspectorTitle: HTMLElement | null;
     selectionInspectorSubtitle: HTMLElement | null;

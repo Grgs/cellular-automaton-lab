@@ -99,6 +99,22 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
     if (elements.inspectorRuleText) {
         elements.inspectorRuleText.textContent = viewModel.inspectorRuleText;
     }
+    if (elements.topologyStatus) {
+        elements.topologyStatus.hidden = !viewModel.topologyStatusVisible;
+        elements.topologyStatus.dataset.tone = viewModel.topologyStatusTone;
+        elements.topologyStatus.innerHTML = "";
+        if (viewModel.topologyStatusVisible) {
+            const labelElement = document.createElement("strong");
+            labelElement.className = "topology-status-label";
+            labelElement.textContent = viewModel.topologyStatusLabel;
+
+            const detailElement = document.createElement("span");
+            detailElement.className = "topology-status-detail";
+            detailElement.textContent = viewModel.topologyStatusDetail;
+
+            elements.topologyStatus.append(labelElement, detailElement);
+        }
+    }
     if (elements.quickStartHint) {
         elements.quickStartHint.hidden = !viewModel.quickStartHintVisible;
     }

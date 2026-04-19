@@ -10,7 +10,10 @@ from backend.payload_types import (
     AppBootstrapPayload,
     ServerMetaPayload,
 )
-from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_IDS, APERIODIC_FAMILY_MANIFEST
+from backend.simulation.aperiodic_family_manifest import (
+    APERIODIC_FAMILY_IDS,
+    APERIODIC_FAMILY_MANIFEST,
+)
 from backend.simulation.periodic_face_tilings import describe_periodic_face_tilings
 from backend.simulation.topology_catalog import describe_topologies
 
@@ -40,6 +43,8 @@ def describe_aperiodic_families() -> list[AperiodicFamilyBootstrapPayload]:
             "tiling_family": geometry,
             "label": APERIODIC_FAMILY_MANIFEST[geometry].catalog_label,
             "experimental": APERIODIC_FAMILY_MANIFEST[geometry].experimental,
+            "implementation_status": APERIODIC_FAMILY_MANIFEST[geometry].implementation_status,
+            "promotion_blocker": APERIODIC_FAMILY_MANIFEST[geometry].promotion_blocker,
             "public_cell_kinds": list(APERIODIC_FAMILY_MANIFEST[geometry].public_cell_kinds),
         }
         for geometry in APERIODIC_FAMILY_IDS

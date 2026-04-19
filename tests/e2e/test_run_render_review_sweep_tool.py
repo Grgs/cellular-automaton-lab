@@ -20,7 +20,10 @@ STANDALONE_REQUIRED_OUTPUTS = (
 
 
 def _standalone_outputs_ready() -> bool:
-    return all((STANDALONE_OUTPUT_DIR / relative_path).exists() for relative_path in STANDALONE_REQUIRED_OUTPUTS)
+    return all(
+        (STANDALONE_OUTPUT_DIR / relative_path).exists()
+        for relative_path in STANDALONE_REQUIRED_OUTPUTS
+    )
 
 
 @unittest.skipUnless(
@@ -84,7 +87,9 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
             artifact_dir = Path(tmpdir) / "sweep"
             cache_dir = Path(tmpdir) / "cache"
             cache_dir.mkdir(parents=True)
-            Image.new("RGBA", (80, 120), (255, 255, 255, 255)).save(cache_dir / "pinwheel-reference.png")
+            Image.new("RGBA", (80, 120), (255, 255, 255, 255)).save(
+                cache_dir / "pinwheel-reference.png"
+            )
 
             exit_code = main(
                 [
@@ -101,13 +106,18 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
             )
 
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((artifact_dir / "sweep-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (artifact_dir / "sweep-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertTrue(manifest["requestedMatrix"]["literatureReview"])
             self.assertEqual(manifest["requestedMatrix"]["referenceCacheDir"], str(cache_dir))
             self.assertEqual(len(manifest["cases"]), 2)
             for case in manifest["cases"]:
                 self.assertEqual(case["literatureReview"]["referenceImageStatus"], "cached")
-                self.assertEqual(case["literatureReview"]["referenceCachePath"], str(cache_dir / "pinwheel-reference.png"))
+                self.assertEqual(
+                    case["literatureReview"]["referenceCachePath"],
+                    str(cache_dir / "pinwheel-reference.png"),
+                )
                 self.assertTrue(Path(case["renderMontage"]).exists())
                 self.assertIn("runtimeProvenance", case)
                 self.assertIn("settleDiagnostics", case)

@@ -65,6 +65,8 @@ describe("bootstrap-data", () => {
                     tiling_family: "penrose-p3-rhombs",
                     label: "Penrose P3 Rhombs",
                     experimental: false,
+                    implementation_status: "true_substitution",
+                    promotion_blocker: null,
                     public_cell_kinds: ["thick-rhomb", "thin-rhomb"],
                 },
             ],
@@ -101,5 +103,6 @@ describe("bootstrap-data", () => {
         expect(payload.snapshot_version).toBe(5);
         expect(payload.topology_catalog.length).toBeGreaterThan(0);
         expect(payload.aperiodic_families.length).toBeGreaterThan(0);
+        expect(payload.aperiodic_families[0]?.implementation_status).toBeTruthy();
     });
 });

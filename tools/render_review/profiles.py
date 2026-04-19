@@ -69,9 +69,7 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
         literature_reference=LiteratureReference(
             citation_label="The pinwheel tilings of the plane",
             primary_source_url="https://annals.math.princeton.edu/1994/139-3/p05",
-            secondary_source_urls=(
-                "https://tilings.math.uni-bielefeld.de/substitution/pinwheel/",
-            ),
+            secondary_source_urls=("https://tilings.math.uni-bielefeld.de/substitution/pinwheel/",),
             review_note=(
                 "Compare the visible field for overall isotropy and boundary dominance; "
                 "the review target is a representative interior pinwheel field rather than "

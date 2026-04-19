@@ -25,6 +25,9 @@
 - Moved custom dead-palette ownership and fixture-backed browser alias coverage onto a shared manifest/registry contract so TypeScript and Python no longer maintain separate family allowlists for this test surface.
 - Added a frontend representative fixture manifest plus regeneration tool so browser-facing topology fixtures can be checked and refreshed deterministically instead of relying on ad hoc manual export steps.
 - Added advisory profile-owned expectations to render review, managed browser-check manifests, sweep case records, and browser-reviewed workbench summaries so named profiles can carry manual checklists plus expected-warning classification without changing command success semantics.
+- Moved browser diagnosis and workbench implementation under `tools/render_review/` and reduced the top-level Python commands to thin CLI entrypoints.
+- Surfaced backend-owned aperiodic implementation status and promotion blockers in the topology picker and drawer UI.
+- Added incremental lint/format guardrails for the render-review/bootstrap slice plus a repo-owned frontend formatting check.
 
 ## Now
 
@@ -55,7 +58,6 @@
 
 ## Remaining After This Cleanup
 
-- Turn the render-review and workbench commands into a real tooling package instead of continuing to grow the top-level `tools/` script surface.
-- Consolidate the overlapping architecture and cleanup docs so the repo does not keep accumulating parallel sources of planning truth.
-- Surface experimental aperiodic status and promotion blockers in the product UI instead of keeping that information mostly internal to the backend/test layers.
-- Add repo-wide lint/format guardrails for Python and TypeScript to reduce style drift as the codebase keeps growing.
+- Expand Python lint/format guardrails beyond the current render-review/bootstrap slice once the older compatibility facades stop depending on import-for-export and `sys.path` bootstrap patterns.
+- Decide whether the lightweight frontend formatting check should grow into a full linter/formatter after a deliberate repo-wide mechanical style pass.
+- Continue the code-quality roadmap by splitting the remaining drawer sections if editor controls and topology metadata keep growing together.

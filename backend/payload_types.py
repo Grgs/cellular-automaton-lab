@@ -244,6 +244,8 @@ class AperiodicFamilyBootstrapPayload(TypedDict):
     tiling_family: str
     label: str
     experimental: bool
+    implementation_status: str
+    promotion_blocker: str | None
     public_cell_kinds: list[str]
 
 

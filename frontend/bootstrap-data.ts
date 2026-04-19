@@ -13,6 +13,8 @@ function cloneBootstrapData(payload: AppBootstrapData): AppBootstrapData {
         periodic_face_tilings: payload.periodic_face_tilings.map((entry) => ({ ...entry })),
         aperiodic_families: payload.aperiodic_families.map((entry) => ({
             ...entry,
+            implementation_status: entry.implementation_status,
+            promotion_blocker: entry.promotion_blocker,
             public_cell_kinds: [...entry.public_cell_kinds],
         })),
         server_meta: { ...payload.server_meta },

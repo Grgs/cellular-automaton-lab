@@ -195,7 +195,7 @@ The code stops treating all aperiodic builders as equally authoritative. Product
 
 Implementation status:
 
-The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `dodecagonal-square-triangle`, `shield`, and `pinwheel` still explicitly blocked from promotion pending visual or implementation work.
+The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `dodecagonal-square-triangle`, `shield`, and `pinwheel` still explicitly blocked from promotion pending visual or implementation work. Backend-owned `aperiodic_families` bootstrap metadata now also carries those status fields into the frontend, and the picker/drawer surface experimental status directly instead of hiding it in backend/test-only layers.
 
 ### 5. Literature Verification And Fixtures
 
@@ -330,7 +330,7 @@ Developers run the same entrypoints locally and in CI, reducing stale assumption
 
 Implementation status:
 
-The first consolidation is in place. `tests/e2e/playwright_suite_support.py` now owns the public Playwright suite manifest, `tools/run-playwright.mjs` selects suites by semantic name and can list them without running tests, and standalone-build ownership now lives in the npm runner/CI path instead of in `tests/e2e/support_runtime_host.py`. The runner also fails with explicit Linux browser-library repair guidance when Debian-style repair tooling is unavailable.
+The first consolidation is in place. `tests/e2e/playwright_suite_support.py` now owns the public Playwright suite manifest, `tools/run-playwright.mjs` selects suites by semantic name and can list them without running tests, and standalone-build ownership now lives in the npm runner/CI path instead of in `tests/e2e/support_runtime_host.py`. The runner also fails with explicit Linux browser-library repair guidance when Debian-style repair tooling is unavailable. The browser diagnosis and workbench commands now share one real package under `tools/render_review/`, with the top-level `tools/run_*.py` and `tools/render_canvas_review.py` files reduced to CLI entrypoints.
 
 ## Quick Wins
 

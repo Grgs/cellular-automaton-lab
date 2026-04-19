@@ -18,7 +18,10 @@ STANDALONE_REQUIRED_OUTPUTS = (
 
 
 def _standalone_outputs_ready() -> bool:
-    return all((STANDALONE_OUTPUT_DIR / relative_path).exists() for relative_path in STANDALONE_REQUIRED_OUTPUTS)
+    return all(
+        (STANDALONE_OUTPUT_DIR / relative_path).exists()
+        for relative_path in STANDALONE_REQUIRED_OUTPUTS
+    )
 
 
 class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
@@ -43,12 +46,18 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["hostKind"], "standalone")
             self.assertEqual(manifest["mode"], "render-review")
             self.assertEqual(manifest["exitStatus"], "success")
-            self.assertEqual(manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png"))
-            self.assertEqual(manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json"))
+            self.assertEqual(
+                manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png")
+            )
+            self.assertEqual(
+                manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json")
+            )
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
             self.assertIn("consistencyWarnings", manifest)
@@ -79,12 +88,18 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["hostKind"], "server")
             self.assertEqual(manifest["mode"], "render-review")
             self.assertEqual(manifest["exitStatus"], "success")
-            self.assertEqual(manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png"))
-            self.assertEqual(manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json"))
+            self.assertEqual(
+                manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png")
+            )
+            self.assertEqual(
+                manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json")
+            )
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
             self.assertIn("runtimeProvenance", manifest)
@@ -101,7 +116,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
         _standalone_outputs_ready(),
         "standalone outputs are required; run `npm run build:frontend:standalone`",
     )
-    def test_runner_copies_condensed_profile_expectations_for_standalone_profile_review(self) -> None:
+    def test_runner_copies_condensed_profile_expectations_for_standalone_profile_review(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-profile-") as tmpdir:
             output_dir = Path(tmpdir)
             exit_code = main(
@@ -116,7 +133,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["profileExpectations"]["profile"], "shield-depth-3")
             self.assertTrue(manifest["profileExpectations"]["advisoryOnly"])
             self.assertEqual(manifest["profileExpectations"]["missingExpectedWarnings"], [])
@@ -136,7 +155,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["profileExpectations"]["profile"], "shield-depth-3")
             self.assertEqual(manifest["profileExpectations"]["missingExpectedWarnings"], [])
 
@@ -158,7 +179,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["hostKind"], "standalone")
             self.assertEqual(manifest["mode"], "unittest")
             self.assertEqual(manifest["exitStatus"], "success")
@@ -180,7 +203,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["hostKind"], "server")
             self.assertEqual(manifest["mode"], "unittest")
             self.assertEqual(manifest["exitStatus"], "success")
@@ -188,7 +213,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIn("provenanceWarnings", manifest)
 
     def test_runner_delegates_server_unittest_with_success_artifacts(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="run-browser-check-server-unittest-success-") as tmpdir:
+        with tempfile.TemporaryDirectory(
+            prefix="run-browser-check-server-unittest-success-"
+        ) as tmpdir:
             output_dir = Path(tmpdir)
             exit_code = main(
                 [
@@ -202,7 +229,9 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output_dir / "artifacts" / "run-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertTrue(manifest["successArtifactsRequested"])
             test_artifacts_dir = output_dir / "artifacts" / "test-artifacts"
             self.assertEqual(manifest["testArtifactsDir"], str(test_artifacts_dir))

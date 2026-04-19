@@ -85,6 +85,7 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         gridSizePanelText: null,
         inspectorTilingText: null,
         inspectorRuleText: null,
+        topologyStatus: null,
         selectionInspectorSection: null,
         selectionInspectorTitle: null,
         selectionInspectorSubtitle: null,

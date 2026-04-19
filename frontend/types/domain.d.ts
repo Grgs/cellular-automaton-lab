@@ -47,10 +47,18 @@ export interface ServerMetaPayload {
     app_name: string;
 }
 
+export type AperiodicImplementationStatus =
+    | "true_substitution"
+    | "exact_affine"
+    | "canonical_patch"
+    | "known_deviation";
+
 export interface BootstrappedAperiodicFamilyDefinition {
     tiling_family: string;
     label: string;
     experimental: boolean;
+    implementation_status: AperiodicImplementationStatus;
+    promotion_blocker: string | null;
     public_cell_kinds: readonly string[];
 }
 

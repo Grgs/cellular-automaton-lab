@@ -32,3 +32,25 @@ repos:
           - detect-secrets==1.5.0
         pass_filenames: false
         stages: [pre-push, manual]
+      - id: ruff-incremental
+        name: ruff (render-review + bootstrap slice)
+        entry: python tools/run_python_style.py check
+        language: python
+        additional_dependencies:
+          - ruff==0.15.11
+        pass_filenames: false
+        stages: [pre-commit, manual]
+      - id: ruff-format-incremental
+        name: ruff format (render-review + bootstrap slice)
+        entry: python tools/run_python_style.py format-check
+        language: python
+        additional_dependencies:
+          - ruff==0.15.11
+        pass_filenames: false
+        stages: [pre-commit, manual]
+      - id: frontend-format-check
+        name: frontend format check
+        entry: node tools/check_frontend_format.mjs
+        language: system
+        pass_filenames: false
+        stages: [pre-commit, manual]

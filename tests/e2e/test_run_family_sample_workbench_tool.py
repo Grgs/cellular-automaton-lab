@@ -18,7 +18,10 @@ STANDALONE_REQUIRED_OUTPUTS = (
 
 
 def _standalone_outputs_ready() -> bool:
-    return all((STANDALONE_OUTPUT_DIR / relative_path).exists() for relative_path in STANDALONE_REQUIRED_OUTPUTS)
+    return all(
+        (STANDALONE_OUTPUT_DIR / relative_path).exists()
+        for relative_path in STANDALONE_REQUIRED_OUTPUTS
+    )
 
 
 class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
@@ -39,13 +42,19 @@ class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
             )
 
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["family"], "shield")
             self.assertEqual(manifest["strategy"], "representative-window")
             self.assertEqual(len(manifest["candidates"]), 2)
 
-            first_summary = json.loads(Path(manifest["candidates"][0]["candidateSummary"]).read_text(encoding="utf-8"))
-            second_summary = json.loads(Path(manifest["candidates"][1]["candidateSummary"]).read_text(encoding="utf-8"))
+            first_summary = json.loads(
+                Path(manifest["candidates"][0]["candidateSummary"]).read_text(encoding="utf-8")
+            )
+            second_summary = json.loads(
+                Path(manifest["candidates"][1]["candidateSummary"]).read_text(encoding="utf-8")
+            )
             self.assertNotEqual(first_summary["total_cells"], second_summary["total_cells"])
             self.assertIn("validation", first_summary)
             self.assertIn("validation", second_summary)
@@ -65,10 +74,14 @@ class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
             )
 
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["strategy"], "baseline")
             self.assertEqual(len(manifest["candidates"]), 1)
-            summary = json.loads(Path(manifest["candidates"][0]["candidateSummary"]).read_text(encoding="utf-8"))
+            summary = json.loads(
+                Path(manifest["candidates"][0]["candidateSummary"]).read_text(encoding="utf-8")
+            )
             self.assertGreater(summary["total_cells"], 0)
 
 
@@ -97,12 +110,18 @@ class FamilySampleWorkbenchBrowserIntegrationTests(unittest.TestCase):
             )
 
             self.assertEqual(exit_code, 0)
-            manifest = json.loads((artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (artifact_dir / "workbench-manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(len(manifest["candidates"]), 1)
             candidate_record = manifest["candidates"][0]
-            candidate_summary = json.loads(Path(candidate_record["candidateSummary"]).read_text(encoding="utf-8"))
+            candidate_summary = json.loads(
+                Path(candidate_record["candidateSummary"]).read_text(encoding="utf-8")
+            )
             render_review = candidate_summary["renderReview"]
-            self.assertEqual(render_review["consistency"]["reviewTarget"]["mode"], "injected_topology")
+            self.assertEqual(
+                render_review["consistency"]["reviewTarget"]["mode"], "injected_topology"
+            )
             self.assertEqual(
                 render_review["consistency"]["browserState"]["topologyCellCount"],
                 candidate_summary["total_cells"],

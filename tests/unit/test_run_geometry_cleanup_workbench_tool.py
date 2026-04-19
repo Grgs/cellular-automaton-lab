@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from backend.simulation.reference_verification.observation import observe_topology
-from tools.run_geometry_cleanup_workbench import (
+from tools.render_review.geometry_cleanup_workbench import (
     build_cleanup_structural_summary,
     default_shield_cleanup_scales,
     expand_cleanup_candidates,
@@ -107,7 +107,9 @@ class GeometryCleanupWorkbenchToolTests(unittest.TestCase):
                 )
             )
             candidates = expand_cleanup_candidates(request)
-            baseline_candidate = next(candidate for candidate in candidates if candidate.is_baseline)
+            baseline_candidate = next(
+                candidate for candidate in candidates if candidate.is_baseline
+            )
             baseline_summary = observe_topology(
                 geometry=request.family,
                 sample_mode="cleanup_workbench_baseline",
@@ -115,7 +117,9 @@ class GeometryCleanupWorkbenchToolTests(unittest.TestCase):
                 topology=baseline_candidate.topology,
             )
             summary = build_cleanup_structural_summary(
-                candidate=next(candidate for candidate in candidates if candidate.parameter_value == 0.961),
+                candidate=next(
+                    candidate for candidate in candidates if candidate.parameter_value == 0.961
+                ),
                 request=request,
                 baseline_summary=asdict(baseline_summary),
                 browser_review_summary=None,

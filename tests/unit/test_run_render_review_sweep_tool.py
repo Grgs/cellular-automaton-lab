@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.run_render_review_sweep import (
+from tools.render_review.sweep import (
     build_case_review_request,
     expand_sweep_cases,
     parse_cli_args,
@@ -130,7 +130,9 @@ class RenderReviewSweepToolTests(unittest.TestCase):
             self.assertEqual(review_request.theme, "light")
 
     def test_build_case_review_request_enables_literature_review_outputs(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="render-review-sweep-request-literature-") as tmpdir:
+        with tempfile.TemporaryDirectory(
+            prefix="render-review-sweep-request-literature-"
+        ) as tmpdir:
             cache_dir = Path(tmpdir) / "cache"
             request = resolve_sweep_request(
                 parse_cli_args(
@@ -149,4 +151,6 @@ class RenderReviewSweepToolTests(unittest.TestCase):
             review_request = build_case_review_request(request, case)
             self.assertTrue(review_request.literature_review)
             self.assertEqual(review_request.reference_cache_dir, cache_dir)
-            self.assertEqual(review_request.montage_out, case.artifact_dir / "pinwheel-depth-3-montage.png")
+            self.assertEqual(
+                review_request.montage_out, case.artifact_dir / "pinwheel-depth-3-montage.png"
+            )

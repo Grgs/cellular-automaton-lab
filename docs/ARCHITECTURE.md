@@ -40,6 +40,8 @@ Important rules:
 - Backend snapshots are authoritative for topology, rule, speed, running state, generation, and cell states.
 - Frontend edits and control changes are explicit mutations that return the next canonical snapshot.
 
+Maintenance workflows and repo-owned guardrails live in [MAINTENANCE.md](./MAINTENANCE.md).
+
 ## Current Code Quality Focus
 
 The app has usable subsystem boundaries, but the next cleanup work should focus on high-change seams rather than broad rewrites. The current priorities are documented in [CODE_QUALITY_ROADMAP.md](./CODE_QUALITY_ROADMAP.md).

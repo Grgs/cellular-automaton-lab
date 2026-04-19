@@ -36,7 +36,7 @@ Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://g
 - Regular, mixed periodic, and aperiodic boards share one rule protocol and one editing workflow.
 - Pattern files use sparse `cells_by_id` payloads instead of dense grid-only formats.
 
-Architecture details live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). A runtime-oriented source guide lives in [docs/CODE_MAP.md](docs/CODE_MAP.md).
+Architecture details live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). A runtime-oriented source guide lives in [docs/CODE_MAP.md](docs/CODE_MAP.md). Maintenance and guardrail ownership lives in [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
 
 ## Included Rules
 
@@ -82,6 +82,8 @@ The authored frontend source lives in `frontend/`. Vite builds hashed runtime as
 Common frontend commands:
 
 ```powershell
+npm run lint:frontend
+npm run format:frontend:check
 npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
@@ -105,6 +107,8 @@ py -3 -m playwright install chromium
 Frontend checks:
 
 ```powershell
+npm run lint:frontend
+npm run format:frontend:check
 npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
@@ -113,6 +117,7 @@ npm run build:frontend
 Backend and integration checks:
 
 ```powershell
+npm run check:python
 py -3 -m mypy --config-file mypy.ini
 py -3 .\tools\validate_tilings.py
 py -3 -m unittest discover -s tests -p "test_*.py"
@@ -148,6 +153,8 @@ Use the sweep tool when the question is comparative rather than single-run:
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
 ```
+
+The shared implementation for those commands lives in `tools/render_review/`. The top-level scripts remain the stable CLI entrypoints.
 
 If you need to inspect or clear repo-owned browser/server helper processes directly:
 

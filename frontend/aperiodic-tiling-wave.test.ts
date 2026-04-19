@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     buildSingleVariantBootstrappedTopologyDefinition,
 } from "./test-helpers/topology-catalog-fixtures.js";
+import type { BootstrappedAperiodicFamilyDefinition } from "./types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 
 const NEW_TILINGS = [
@@ -65,6 +66,35 @@ function installGlobals(): void {
             row_offset_x: 0,
         } satisfies PeriodicFaceTilingDescriptor,
     ];
+    window.APP_APERIODIC_FAMILIES = [
+        {
+            tiling_family: "dodecagonal-square-triangle",
+            label: "Dodecagonal Square-Triangle",
+            experimental: true,
+            implementation_status: "canonical_patch",
+            promotion_blocker: "Experimental until manual visual review accepts the canonical-patch implementation.",
+            public_cell_kinds: [
+                "dodecagonal-square-triangle-square",
+                "dodecagonal-square-triangle-triangle",
+            ],
+        },
+        {
+            tiling_family: "shield",
+            label: "Shield",
+            experimental: true,
+            implementation_status: "known_deviation",
+            promotion_blocker: "Experimental until the known translated-cluster deviation is replaced by a marked fractal substitution.",
+            public_cell_kinds: ["shield-shield", "shield-square", "shield-triangle"],
+        },
+        {
+            tiling_family: "pinwheel",
+            label: "Pinwheel",
+            experimental: true,
+            implementation_status: "exact_affine",
+            promotion_blocker: "Experimental until manual visual review accepts the exact-affine implementation.",
+            public_cell_kinds: ["pinwheel-triangle"],
+        },
+    ] satisfies ReadonlyArray<BootstrappedAperiodicFamilyDefinition>;
 }
 
 describe("next aperiodic tiling wave", () => {
@@ -84,6 +114,7 @@ describe("next aperiodic tiling wave", () => {
             expect(getTopologyDefinition(definition.tiling_family)?.render_kind).toBe("polygon_aperiodic");
             expect(topologyUsesPatchDepth(definition.tiling_family)).toBe(true);
         }
+        expect(tilingFamilyOptions().find((option) => option.value === "pinwheel")?.label).toContain("Experimental");
     });
 
     it("resolves through the render-kind geometry registry", async () => {

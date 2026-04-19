@@ -1,4 +1,5 @@
 import { adjacencyModeOptions, getTopologyDefinition, tilingFamilyOptions } from "../topology-catalog.js";
+import { describeAperiodicFamilyStatus } from "../aperiodic-family-registry.js";
 import {
     buildDrawerToggleState,
     buildOverlayVisibilityState,
@@ -47,6 +48,7 @@ export function buildDrawerViewModel({
     const sizingState = resolveViewportSizingState(state);
     const adjacencyOptions = adjacencyModeOptions(tilingFamily);
     const adjacencyModeVisible = adjacencyOptions.length > 1;
+    const topologyStatus = describeAperiodicFamilyStatus(tilingFamily);
     const presetHelperText = presetSeedAvailable
         ? "Loads a curated seed for this rule and board."
         : "No curated preset is available for this rule/topology yet.";
@@ -54,6 +56,10 @@ export function buildDrawerViewModel({
     return {
         inspectorTilingText: topologyDefinition?.label || tilingFamily,
         inspectorRuleText: activeRule?.display_name || activeRule?.label || "Choose a rule",
+        topologyStatusVisible: topologyStatus !== null,
+        topologyStatusLabel: topologyStatus?.label || "",
+        topologyStatusDetail: topologyStatus?.detail || "",
+        topologyStatusTone: topologyStatus?.tone || "info",
         selectionInspector: buildSelectionInspectorViewModel({
             selectedCells: selectionInspectorSource.selectedCells,
             topologyIndex: state.topologyIndex,

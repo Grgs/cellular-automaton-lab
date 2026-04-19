@@ -5,14 +5,14 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from tools.run_browser_check import (
+from tools.render_review.browser_check import (
     build_run_manifest,
     ensure_render_review_outputs,
     resolve_default_artifact_dir,
     resolve_host_kind,
     build_parser,
 )
-from tools.render_canvas_review import parse_cli_args as parse_render_canvas_review_cli_args
+from tools.render_review.review import parse_cli_args as parse_render_canvas_review_cli_args
 
 
 class RunBrowserCheckToolTests(unittest.TestCase):
@@ -31,7 +31,7 @@ class RunBrowserCheckToolTests(unittest.TestCase):
 
     def test_resolve_default_artifact_dir_creates_timestamped_default(self) -> None:
         with tempfile.TemporaryDirectory(prefix="browser-check-root-") as tmpdir:
-            with patch("tools.run_browser_check.DEFAULT_BROWSER_CHECK_DIR", Path(tmpdir)):
+            with patch("tools.render_review.browser_check.DEFAULT_BROWSER_CHECK_DIR", Path(tmpdir)):
                 artifact_dir = resolve_default_artifact_dir(
                     artifact_dir=None,
                     host_kind="server",
@@ -78,7 +78,9 @@ class RunBrowserCheckToolTests(unittest.TestCase):
             self.assertEqual(resolved.summary_out, artifact_dir / "custom.json")
 
     def test_ensure_render_review_outputs_adds_montage_for_literature_review(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="browser-check-render-review-literature-") as tmpdir:
+        with tempfile.TemporaryDirectory(
+            prefix="browser-check-render-review-literature-"
+        ) as tmpdir:
             artifact_dir = Path(tmpdir)
             args = parse_render_canvas_review_cli_args(
                 [

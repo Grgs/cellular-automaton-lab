@@ -7,6 +7,7 @@ import type {
     TopologyOption,
     TopologySpec,
 } from "./types/domain.js";
+import { getAperiodicFamilyMetadata } from "./aperiodic-family-registry.js";
 
 function normalizeSizingPolicy(definition: Pick<TopologyDefinition, "sizing_mode" | "sizing_policy">): Readonly<SizingPolicy> {
     const sizingMode = definition.sizing_mode;
@@ -161,12 +162,18 @@ export function tilingFamilyOptions(): TopologyOption[] {
             left.picker_order - right.picker_order
             || left.label.localeCompare(right.label)
         ))
-        .map((definition) => ({
-        value: definition.tiling_family,
-        label: definition.label,
-        group: definition.picker_group,
-        order: definition.picker_order,
-    }));
+        .map((definition) => {
+            const aperiodicMetadata = getAperiodicFamilyMetadata(definition.tiling_family);
+            const label = aperiodicMetadata?.experimental
+                ? `${definition.label} (Experimental)`
+                : definition.label;
+            return {
+                value: definition.tiling_family,
+                label,
+                group: definition.picker_group,
+                order: definition.picker_order,
+            };
+        });
 }
 
 export function adjacencyModeOptions(tilingFamily: string | null | undefined): AdjacencyModeOption[] {

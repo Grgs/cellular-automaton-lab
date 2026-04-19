@@ -7,6 +7,7 @@ This is a runtime-focused map of the app. It is meant to answer two questions qu
 
 For the higher-level architecture, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 For cleanup priorities and known structural pressure points, see [CODE_QUALITY_ROADMAP.md](./CODE_QUALITY_ROADMAP.md).
+For maintenance workflows and repo-owned guardrails, see [MAINTENANCE.md](./MAINTENANCE.md).
 
 ## Start Here
 

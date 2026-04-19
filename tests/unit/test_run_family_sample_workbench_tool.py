@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from backend.simulation.topology import build_topology
-from tools.run_family_sample_workbench import (
+from tools.render_review.family_sample_workbench import (
     DEFAULT_WORKBENCH_OUTPUT_DIR,
     build_structural_summary,
     candidate_dir_name,
@@ -111,7 +111,9 @@ class FamilySampleWorkbenchToolTests(unittest.TestCase):
             self.assertEqual(candidate_dir_name(candidates[1]), "002-threshold-214.881600")
 
     def test_expand_candidates_uses_single_baseline_for_non_shield_family(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="family-sample-workbench-baseline-candidate-") as tmpdir:
+        with tempfile.TemporaryDirectory(
+            prefix="family-sample-workbench-baseline-candidate-"
+        ) as tmpdir:
             request = resolve_workbench_request(
                 parse_cli_args(
                     [
@@ -129,7 +131,9 @@ class FamilySampleWorkbenchToolTests(unittest.TestCase):
             self.assertEqual(candidates[0].name, "001-baseline")
 
     def test_baseline_candidate_matches_shipped_topology_for_non_shield_family(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="family-sample-workbench-baseline-match-") as tmpdir:
+        with tempfile.TemporaryDirectory(
+            prefix="family-sample-workbench-baseline-match-"
+        ) as tmpdir:
             request = resolve_workbench_request(
                 parse_cli_args(
                     [

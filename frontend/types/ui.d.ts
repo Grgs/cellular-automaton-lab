@@ -119,6 +119,10 @@ export interface TopBarViewModel {
 export interface DrawerViewModel {
     inspectorTilingText: string;
     inspectorRuleText: string;
+    topologyStatusVisible: boolean;
+    topologyStatusLabel: string;
+    topologyStatusDetail: string;
+    topologyStatusTone: "info" | "warning";
     selectionInspector: SelectionInspectorViewModel;
     ruleSummaryText: string;
     overlaysDismissed: boolean;

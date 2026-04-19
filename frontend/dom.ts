@@ -32,6 +32,7 @@ export const elements: DomElements = {
     gridSizePanelText: elementById("grid-size-panel-text"),
     inspectorTilingText: elementById("inspector-tiling-text"),
     inspectorRuleText: elementById("inspector-rule-text"),
+    topologyStatus: elementById("topology-status"),
     selectionInspectorSection: elementById("selection-inspector-section"),
     selectionInspectorTitle: elementById("selection-inspector-title"),
     selectionInspectorSubtitle: elementById("selection-inspector-subtitle"),

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from tools.render_canvas_review import (
+from tools.render_review.review import (
     build_visual_metrics,
     build_overlap_hotspots_summary,
     build_profile_expectations,
@@ -28,7 +28,7 @@ from tools.render_canvas_review import (
     resolve_render_review_request,
     with_review_topology_payload,
 )
-from tools.render_review_profiles import (
+from tools.render_review.profiles import (
     ExpectedWarning,
     RenderReviewProfile,
     ReviewChecklistItem,
@@ -155,13 +155,13 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="render-review-reference-") as tmpdir:
             reference_path = Path(tmpdir) / "reference.png"
             reference_path.write_bytes(b"png")
-            args = parse_cli_args(
-                ["--family", "chair", "--reference", str(reference_path)]
-            )
+            args = parse_cli_args(["--family", "chair", "--reference", str(reference_path)])
             request = resolve_render_review_request(args)
             self.assertEqual(request.reference, reference_path)
 
-    def test_resolve_render_review_request_uses_profile_owned_cached_reference_for_literature_review(self) -> None:
+    def test_resolve_render_review_request_uses_profile_owned_cached_reference_for_literature_review(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory(prefix="render-review-cache-") as tmpdir:
             cache_dir = Path(tmpdir)
             cached_reference = cache_dir / "pinwheel-reference.png"
@@ -180,7 +180,10 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
             self.assertEqual(request.reference, cached_reference)
             self.assertEqual(request.literature_reference.reference_status, "cached")
             self.assertEqual(request.literature_reference.cache_path, cached_reference)
-            self.assertIn("https://annals.math.princeton.edu/1994/139-3/p05", request.literature_reference.source_urls)
+            self.assertIn(
+                "https://annals.math.princeton.edu/1994/139-3/p05",
+                request.literature_reference.source_urls,
+            )
 
     def test_explicit_reference_overrides_literature_cache(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-review-explicit-reference-") as tmpdir:
@@ -244,8 +247,20 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
             {
                 "adapterGeometry": "shield",
                 "adapterFamily": "mixed",
-                "topologyBounds": {"minX": -1, "maxX": 8, "minY": -1, "maxY": 1, "width": 9, "height": 2},
-                "renderMetrics": {"cssWidth": 300, "cssHeight": 140, "canvasWidth": 300, "canvasHeight": 140},
+                "topologyBounds": {
+                    "minX": -1,
+                    "maxX": 8,
+                    "minY": -1,
+                    "maxY": 1,
+                    "width": 9,
+                    "height": 2,
+                },
+                "renderMetrics": {
+                    "cssWidth": 300,
+                    "cssHeight": 140,
+                    "canvasWidth": 300,
+                    "canvasHeight": 140,
+                },
                 "sampleCells": {
                     "lexicographicFirst": {"cellId": "shield:a"},
                     "centerNearest": {"cellId": "shield:b"},
@@ -516,7 +531,9 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         self.assertEqual(parsed, {"mode": "grid_dimensions", "width": 12, "height": 10})
 
     def test_build_consistency_report_warns_on_backend_browser_dom_mismatch(self) -> None:
-        request = resolve_render_review_request(parse_cli_args(["--family", "pinwheel", "--patch-depth", "3"]))
+        request = resolve_render_review_request(
+            parse_cli_args(["--family", "pinwheel", "--patch-depth", "3"])
+        )
         report = build_consistency_report(
             request=request,
             host_kind="server",
@@ -541,7 +558,9 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
                 "topologyRevision": "browser-rev",
             },
         )
-        self.assertEqual(report["parsedGridSummary"], {"mode": "patch_depth", "depth": 3, "tileCount": 600})
+        self.assertEqual(
+            report["parsedGridSummary"], {"mode": "patch_depth", "depth": 3, "tileCount": 600}
+        )
         self.assertIn(
             "Grid summary tile count 600 does not match browser topology cell count 250.",
             report["warnings"],
@@ -553,7 +572,9 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
 
     def test_build_consistency_report_uses_injected_review_target_when_present(self) -> None:
         request = with_review_topology_payload(
-            resolve_render_review_request(parse_cli_args(["--family", "shield", "--patch-depth", "3"])),
+            resolve_render_review_request(
+                parse_cli_args(["--family", "shield", "--patch-depth", "3"])
+            ),
             {
                 "topology_spec": {
                     "tiling_family": "shield",

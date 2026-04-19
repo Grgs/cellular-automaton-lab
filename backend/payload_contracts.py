@@ -32,7 +32,14 @@ class PayloadTypeUnionContract:
 PAYLOAD_FIELD_CONTRACTS: tuple[PayloadFieldContract, ...] = (
     PayloadFieldContract(
         interface_name="BootstrappedAperiodicFamilyDefinition",
-        required_fields=("tiling_family", "label", "experimental", "public_cell_kinds"),
+        required_fields=(
+            "tiling_family",
+            "label",
+            "experimental",
+            "implementation_status",
+            "promotion_blocker",
+            "public_cell_kinds",
+        ),
     ),
     PayloadFieldContract(
         interface_name="AppBootstrapData",
