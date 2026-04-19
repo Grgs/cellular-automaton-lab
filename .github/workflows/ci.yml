@@ -209,6 +209,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: backend-coverage-unit
+          include-hidden-files: true
           path: |
             .coverage.unit
             coverage-unit.txt
@@ -255,6 +256,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: backend-coverage-api
+          include-hidden-files: true
           path: |
             .coverage.api
             coverage-api.txt
