@@ -268,6 +268,7 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
                 },
             }
         )
+        assert condensed is not None
         self.assertEqual(condensed["adapterGeometry"], "shield")
         self.assertEqual(condensed["sampleCellIds"]["centerNearest"], "shield:b")
         self.assertEqual(condensed["renderedBounds"]["width"], 300)
@@ -303,6 +304,7 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
                 "topKindPairs": [{"kindPair": "shield-square / shield-triangle", "count": 8}],
             }
         )
+        assert condensed is not None
         self.assertEqual(condensed["status"], "expected-to-reduce")
         self.assertEqual(condensed["sampledOverlapCount"], 12)
         self.assertEqual(condensed["transformSampleHits"], ["shield:ref:1378"])
@@ -310,6 +312,7 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
     def test_compute_orientation_diversity_normalizes_entropy(self) -> None:
         diversity = compute_orientation_diversity({"0": 4, "120": 4, "240": 4})
         self.assertEqual(diversity["uniqueOrientationTokens"], 3)
+        assert diversity["normalizedEntropy"] is not None
         self.assertAlmostEqual(float(diversity["normalizedEntropy"]), 1.0)
 
     def test_compute_radial_symmetry_score_clamps_uniform_distribution(self) -> None:
@@ -319,10 +322,18 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
     def test_build_visual_metrics_combines_raster_and_geometry_signals(self) -> None:
         visual_metrics = build_visual_metrics(
             visual_summary={
+                "canvasWidth": 300,
+                "canvasHeight": 140,
+                "coverageWidthRatio": 0.8,
+                "coverageHeightRatio": 0.7,
                 "visibleAspectRatio": 1.2,
                 "edgeDensity": 0.4,
                 "boundaryDominance": 0.35,
                 "gutterScore": 0.02,
+                "dominantFillColors": [],
+                "renderCellSize": 12.5,
+                "generationText": "0",
+                "gridSizeText": "Depth 3 • 443 tiles",
             },
             transform_report={
                 "metricInputs": {
@@ -343,10 +354,18 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
     def test_build_visual_metrics_emits_warnings_for_unavailable_metrics(self) -> None:
         visual_metrics = build_visual_metrics(
             visual_summary={
+                "canvasWidth": 300,
+                "canvasHeight": 140,
+                "coverageWidthRatio": 0.0,
+                "coverageHeightRatio": 0.0,
                 "visibleAspectRatio": None,
                 "edgeDensity": None,
                 "boundaryDominance": None,
                 "gutterScore": None,
+                "dominantFillColors": [],
+                "renderCellSize": 0.0,
+                "generationText": "",
+                "gridSizeText": "",
             },
             transform_report=None,
         )
@@ -371,6 +390,7 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
                 "warnings": ["example warning"],
             }
         )
+        assert condensed is not None
         self.assertEqual(condensed["visibleAspectRatio"], 1.2)
         self.assertEqual(condensed["radialSymmetryScore"], 1.0)
         self.assertEqual(condensed["warnings"], ["example warning"])

@@ -7,8 +7,9 @@ import re
 import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
+from backend.payload_types import TopologyPayload
 from PIL import Image, ImageOps
 from playwright.sync_api import Page, sync_playwright
 
@@ -21,6 +22,8 @@ from tests.e2e.browser_support.artifacts import (
     create_artifact_dir,
 )
 from tests.e2e.browser_support.render_review import (
+    BrowserTopologySummary,
+    RenderSettleDiagnostics,
     apply_review_topology_payload,
     browser_overlap_hotspots,
     browser_topology_summary,
@@ -69,7 +72,7 @@ class ResolvedRenderReviewRequest:
     profile_name: str | None
     profile: RenderReviewProfile | None
     literature_reference: ResolvedLiteratureReference
-    review_topology_payload: dict[str, Any] | None = None
+    review_topology_payload: TopologyPayload | dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -186,6 +189,7 @@ def resolve_literature_reference(
             )
             reference_status = "missing"
         else:
+            assert profile is not None
             cache_path = resolve_profile_reference_cache_path(
                 profile, cache_dir=reference_cache_dir
             )
@@ -243,12 +247,20 @@ def resolve_render_review_request(args: argparse.Namespace) -> ResolvedRenderRev
             parser, "--patch-depth and --cell-size are mutually exclusive after profile resolution."
         )
     viewport_width = int(
-        args.viewport_width if args.viewport_width is not None else profile.viewport_width
+        args.viewport_width
+        if args.viewport_width is not None
+        else (profile.viewport_width if profile is not None else DEFAULT_VIEWPORT_WIDTH)
     )
     viewport_height = int(
-        args.viewport_height if args.viewport_height is not None else profile.viewport_height
+        args.viewport_height
+        if args.viewport_height is not None
+        else (profile.viewport_height if profile is not None else DEFAULT_VIEWPORT_HEIGHT)
     )
-    theme = str(args.theme if args.theme is not None else profile.theme)
+    theme = str(
+        args.theme
+        if args.theme is not None
+        else (profile.theme if profile is not None else DEFAULT_THEME)
+    )
     explicit_reference = args.reference
     if explicit_reference is not None and not explicit_reference.exists():
         _parser_error(parser, f"reference image does not exist: {explicit_reference}")
@@ -342,7 +354,7 @@ def resolve_montage_path(
 
 def with_review_topology_payload(
     request: ResolvedRenderReviewRequest,
-    topology_payload: dict[str, Any],
+    topology_payload: TopologyPayload | dict[str, Any],
 ) -> ResolvedRenderReviewRequest:
     return replace(
         request,
@@ -407,7 +419,7 @@ def build_profile_expectations(
     provenance_warnings: list[str] | tuple[str, ...],
     literature_review_summary: dict[str, Any] | None,
     overlap_hotspots: dict[str, Any] | None,
-    settle_diagnostics: dict[str, Any] | None,
+    settle_diagnostics: RenderSettleDiagnostics | Mapping[str, object] | None,
     visual_metrics: dict[str, Any] | None,
 ) -> dict[str, Any] | None:
     if profile is None:
@@ -717,13 +729,14 @@ def compute_radial_symmetry_score(sector_counts: list[int] | None) -> float | No
 
 def build_visual_metrics(
     *,
-    visual_summary: dict[str, Any],
-    transform_report: dict[str, Any] | None,
+    visual_summary: Mapping[str, object],
+    transform_report: Mapping[str, object] | None,
 ) -> dict[str, Any]:
     warnings: list[str] = []
     metric_inputs = (
         transform_report.get("metricInputs") if isinstance(transform_report, dict) else None
     )
+    angular_sector_occupancy: dict[str, Any]
 
     visible_aspect_ratio = visual_summary.get("visibleAspectRatio")
     edge_density = visual_summary.get("edgeDensity")
@@ -844,7 +857,7 @@ def parse_grid_size_text(grid_size_text: str) -> dict[str, Any] | None:
 
 
 def extract_backend_topology_facts(
-    topology_payload: dict[str, Any] | None,
+    topology_payload: TopologyPayload | Mapping[str, object] | None,
 ) -> dict[str, Any] | None:
     if not isinstance(topology_payload, dict):
         return None
@@ -877,7 +890,7 @@ def build_consistency_report(
     grid_size_text: str,
     generation_text: str,
     backend_topology: dict[str, Any] | None,
-    browser_topology: dict[str, Any] | None,
+    browser_topology: BrowserTopologySummary | None,
 ) -> dict[str, Any]:
     parsed_grid_size = parse_grid_size_text(grid_size_text)
     warnings: list[str] = []
@@ -1165,7 +1178,7 @@ def render_canvas_review(
     page: Page | None = None
     runtime_provenance = None
     provenance_warnings: tuple[str, ...] = ()
-    settle_diagnostics: dict[str, Any] | None = None
+    settle_diagnostics: RenderSettleDiagnostics | None = None
     try:
         active_host.start()
         runtime_provenance = active_host.runtime_provenance()

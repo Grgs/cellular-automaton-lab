@@ -67,6 +67,16 @@ class WorkbenchResult:
     candidate_count: int
 
 
+__all__ = [
+    "DEFAULT_WORKBENCH_OUTPUT_DIR",
+    "ResolvedWorkbenchRequest",
+    "WorkbenchCandidate",
+    "WorkbenchResult",
+    "main",
+    "resolve_default_workbench_artifact_dir",
+]
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Explore candidate representative samples for patch-depth topology families.",

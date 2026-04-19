@@ -45,6 +45,7 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
                 encoding="utf-8",
             )
             summary = load_standalone_build_manifest(output_dir)
+            assert summary is not None
             self.assertEqual(summary["manifestPath"], str(manifest_path))
             self.assertEqual(summary["sourceFileCount"], 2)
 

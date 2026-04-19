@@ -7,8 +7,9 @@ import math
 import time
 from collections import Counter, deque
 from pathlib import Path
-from typing import Any, TypedDict, cast
+from typing import Any, Protocol, TypedDict, cast
 
+from backend.payload_types import TopologyPayload
 from playwright.sync_api import Page
 from PIL import Image
 
@@ -72,6 +73,10 @@ class RenderSettleDiagnostics(TypedDict):
     settledAt: str | None
     settleDurationMs: int
     warnings: list[str]
+
+
+class RenderReviewEvaluatePage(Protocol):
+    def evaluate(self, script: str) -> object: ...
 
 
 PLACEHOLDER_GRID_SIZE_TEXT = "-- x --"
@@ -259,12 +264,17 @@ def summarize_canvas_pixels(
     rgba_image = image.convert("RGBA")
     width, height = rgba_image.size
     rgba_pixels = rgba_image.load()
+    if rgba_pixels is None:
+        raise AssertionError("RGBA pixel access was unavailable")
     occupied_mask: list[bool] = []
     dominant_fill_colors: Counter[str] = Counter()
 
     for y in range(height):
         for x in range(width):
-            red, green, blue, alpha = rgba_pixels[x, y]
+            pixel = rgba_pixels[x, y]
+            if not isinstance(pixel, tuple) or len(pixel) != 4:
+                raise AssertionError(f"Unexpected RGBA pixel payload at {(x, y)}: {pixel!r}")
+            red, green, blue, alpha = pixel
             occupied = alpha >= alpha_occupied_threshold
             occupied_mask.append(occupied)
             if (
@@ -421,7 +431,7 @@ def readiness_blockers(snapshot: BrowserReadinessSnapshot | None) -> list[str]:
     return blockers
 
 
-def browser_readiness_snapshot(page: Page) -> BrowserReadinessSnapshot | None:
+def browser_readiness_snapshot(page: RenderReviewEvaluatePage) -> BrowserReadinessSnapshot | None:
     summary = page.evaluate(
         """() => {
             const reviewApi = window.__reviewApi;
@@ -465,7 +475,7 @@ def select_tiling_family(
 
 def apply_review_topology_payload(
     page: Page,
-    topology_payload: dict[str, Any],
+    topology_payload: TopologyPayload | dict[str, Any],
 ) -> None:
     page.evaluate(
         """async (payload) => {
@@ -520,7 +530,10 @@ def sample_review_cell_pixel(page: Page, cell_id: str) -> tuple[int, int, int, i
     )
     if rgba is None:
         return None
-    return tuple(int(channel) for channel in cast(list[int], rgba))
+    if not isinstance(rgba, list) or len(rgba) != 4:
+        raise AssertionError(f"Rendered cell pixel sampling returned an invalid RGBA payload: {rgba!r}")
+    red, green, blue, alpha = (int(channel) for channel in rgba)
+    return (red, green, blue, alpha)
 
 
 def set_range_value(
@@ -568,7 +581,7 @@ def set_cell_size(page: Page, cell_size: int, *, timeout_ms: int = 30_000) -> No
 
 
 def wait_for_patch_render_complete(
-    page: Page,
+    page: RenderReviewEvaluatePage,
     *,
     timeout_ms: int = DEFAULT_SETTLE_TIMEOUT_MS,
     stable_poll_count: int = DEFAULT_SETTLE_STABLE_POLLS,
@@ -730,7 +743,7 @@ def browser_overlap_hotspots(page: Page) -> dict[str, object] | None:
     if summary is None:
         return None
     overlap_hotspots = summary.get("overlapHotspots")
-    return cast(dict[str, object] | None, overlap_hotspots)
+    return overlap_hotspots
 
 
 def viewport_gap_summary(page: Page) -> dict[str, float]:

@@ -537,13 +537,6 @@ class ExternalRuntimeHost(BrowserRuntimeHost):
     def base_url(self) -> str:
         return self._base_url
 
-    def runtime_provenance(self) -> dict[str, Any]:
-        return build_runtime_provenance_report(
-            host_kind="standalone",
-            current_repo=current_repo_provenance(str(self.root)),
-            standalone_build=load_standalone_build_manifest(self.output_dir),
-        )
-
     def client(self) -> JsonApiClient | None:
         if self.kind == "server":
             return JsonApiClient(self.base_url)

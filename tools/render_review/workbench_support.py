@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from backend.payload_types import TopologyPayload
+
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -29,7 +31,7 @@ VALID_HOSTS = ("standalone", "server")
 VALID_THEMES = ("light", "dark")
 
 
-def write_json(path: Path, payload: dict[str, Any]) -> Path:
+def write_json(path: Path, payload: object) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f"{json.dumps(payload, indent=2, sort_keys=True)}\n", encoding="utf-8")
     return path
@@ -58,7 +60,7 @@ def run_candidate_browser_review(
     theme: str,
     host: str,
     artifact_dir: Path,
-    topology_payload: dict[str, Any],
+    topology_payload: TopologyPayload | dict[str, Any],
 ) -> dict[str, Any]:
     stem = f"{family}-depth-{patch_depth}"
     matching_profile = find_render_review_profile(

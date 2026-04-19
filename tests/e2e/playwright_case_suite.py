@@ -4,6 +4,7 @@ import json
 import sys
 import tempfile
 import unittest
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, ClassVar, Protocol, cast
 
@@ -76,6 +77,7 @@ class SharedUiFlowCase(Protocol):
 
     def addCleanup(self, function: Any, /, *args: Any, **kwargs: Any) -> None: ...
     def assertEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
+    def assertNotEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
     def assertTrue(self, expr: Any, msg: str | None = None) -> None: ...
     def assertGreater(self, first: Any, second: Any, msg: str | None = None) -> None: ...
     def assertGreaterEqual(self, first: Any, second: Any, msg: str | None = None) -> None: ...
@@ -190,7 +192,10 @@ class SharedUiFlowMixin:
             }""",
             [canvas_x, canvas_y],
         )
-        return tuple(int(channel) for channel in cast(list[int], rgba))
+        if not isinstance(rgba, list) or len(rgba) != 4:
+            raise AssertionError(f"canvas pixel sampling returned an invalid RGBA payload: {rgba!r}")
+        red, green, blue, alpha = (int(channel) for channel in rgba)
+        return (red, green, blue, alpha)
 
     def _click_canvas_position(self, canvas_x: float, canvas_y: float) -> None:
         case = self._case()
@@ -346,10 +351,16 @@ class SharedUiFlowMixin:
         self._apply_review_topology(topology)
 
         try:
+            def _coerce_center_coordinate(center: dict[str, object], axis: str) -> float:
+                value = center.get(axis)
+                if isinstance(value, (int, float)):
+                    return float(value)
+                raise AssertionError(f"cell center axis {axis!r} was not numeric: {center!r}")
+
             centers = [
                 (
-                    float(cast(dict[str, object], cell["center"])["x"]),
-                    float(cast(dict[str, object], cell["center"])["y"]),
+                    _coerce_center_coordinate(cast(dict[str, object], cell["center"]), "x"),
+                    _coerce_center_coordinate(cast(dict[str, object], cell["center"]), "y"),
                 )
                 for cell in cells
                 if isinstance(cell.get("center"), dict)
@@ -373,8 +384,14 @@ class SharedUiFlowMixin:
             for signature, candidates in grouped_candidates.items():
                 candidates.sort(
                     key=lambda cell: (
-                        (float(cast(dict[str, object], cell["center"])["x"]) - mean_x) ** 2
-                        + (float(cast(dict[str, object], cell["center"])["y"]) - mean_y) ** 2
+                        (
+                            _coerce_center_coordinate(cast(dict[str, object], cell["center"]), "x")
+                            - mean_x
+                        ) ** 2
+                        + (
+                            _coerce_center_coordinate(cast(dict[str, object], cell["center"]), "y")
+                            - mean_y
+                        ) ** 2
                     ),
                 )
                 for candidate in candidates:
@@ -690,7 +707,9 @@ class SharedUiFlowMixin:
         case.assertEqual(pasted_payload["cells_by_id"], copied_payload["cells_by_id"])
 
 
-def _build_palette_alias_regression_test(fixture_case: PaletteFixtureCase):
+def _build_palette_alias_regression_test(
+    fixture_case: PaletteFixtureCase,
+) -> Callable[[SharedUiFlowMixin], None]:
     def test_method(self: SharedUiFlowMixin) -> None:
         self._assert_fixture_dead_cells_do_not_alias_live_canvas_color(fixture_case)
 
