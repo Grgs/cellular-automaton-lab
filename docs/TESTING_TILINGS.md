@@ -77,6 +77,20 @@ Use these when you need a browser-side sanity pass on representative rendered fi
 
 The checked-in representative fixture set now includes `spectre`, `taylor-socolar`, and `sphinx` at depth `3`, so both render-bounds and adapter-space overlap coverage now span the full current aperiodic representative set rather than only the previously strengthened families.
 
+For family-specific dead palettes, there is a second browser-visible contract:
+dead cells must not alias the live fill on the rendered canvas. That coverage
+now has two layers:
+
+- a frontend registry in `frontend/canvas/family-dead-palette-registry.ts`
+  owns the runtime dead-palette contract and unit-test expectations
+- generated Playwright palette regressions sample rendered pixels from
+  representative topology fixtures for the palette-heavy families
+
+When adding a new tiling with custom dead-state colors, update the frontend
+palette registry first. If the family also needs browser alias coverage, add a
+representative fixture and extend the browser coverage metadata rather than
+copying another one-off Playwright test.
+
 ### 8. Reference fixture drift check
 
 ```powershell
@@ -107,6 +121,11 @@ Use these when the open question is visual rather than topological:
 - `run_render_review_sweep.py` is the preferred path when you need to compare a small matrix of hosts, themes, or depths without hand-running each case.
 - `run_family_sample_workbench.py` is the preferred path when the first question is “which candidate representative sample should we compare?” rather than “how does the shipped sample render?”
 - npm Playwright entrypoints remain the preferred full-suite path when you want broad browser regression coverage rather than one focused diagnosis.
+
+If the visual question is specifically dead/live distinguishability for a
+palette-heavy family, prefer the generated Playwright alias regressions over a
+manual screenshot check. Those tests sample actual canvas pixels after mutating
+representative cells and are less brittle than screenshot goldens.
 
 Family sample workbench examples:
 

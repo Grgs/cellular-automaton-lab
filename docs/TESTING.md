@@ -215,6 +215,7 @@ The main Playwright-backed suites cover flows such as:
 - pattern import/export and showcase demos
 - rules and topology picker behavior
 - topology switching and persistence
+- fixture-backed dead/live palette alias regressions for palette-heavy tilings
 
 Useful entrypoints include:
 
@@ -239,6 +240,23 @@ py -3 -m unittest -q tests.e2e.test_playwright_pattern_and_showcase
 py -3 -m unittest -q tests.e2e.test_playwright_rules_and_picker
 py -3 -m unittest -q tests.e2e.test_playwright_topology_and_persistence
 ```
+
+The palette alias coverage is generated inside the shared Playwright case suite,
+not maintained as one hand-written test per family. The current browser-backed
+dead/live alias checks cover the fixture-backed palette-heavy families:
+
+- `chair`
+- `dodecagonal-square-triangle`
+- `hat-monotile`
+- `pinwheel`
+- `robinson-triangles`
+- `shield`
+- `tuebingen-triangle`
+
+Those browser checks are intentionally narrower than the unit-level palette
+invariants. Use the browser path when the question is “does the rendered canvas
+still distinguish dead from live?”, not just “does the token resolver return
+the expected color?”
 
 For standalone specifically, direct Python entrypoints now expect prebuilt outputs under `output/standalone/`. Use:
 
