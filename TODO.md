@@ -52,3 +52,11 @@
 ## Maybe
 
 - Extend browser-visible rendering-bounds verification from geometry-level sanity into richer layout regression checks.
+
+## Remaining After This Cleanup
+
+- Split the remaining `frontend/canvas-view.ts` ownership so diagnostics, cache/render lifecycle, and transient overlays are not still concentrated in one canvas entrypoint.
+- Turn the render-review and workbench commands into a real tooling package instead of continuing to grow the top-level `tools/` script surface.
+- Consolidate the overlapping architecture and cleanup docs so the repo does not keep accumulating parallel sources of planning truth.
+- Surface experimental aperiodic status and promotion blockers in the product UI instead of keeping that information mostly internal to the backend/test layers.
+- Add repo-wide lint/format guardrails for Python and TypeScript to reduce style drift as the codebase keeps growing.

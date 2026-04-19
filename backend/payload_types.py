@@ -240,10 +240,18 @@ class AppDefaultsPayload(TypedDict):
     theme: ThemeDefaultsPayload
 
 
+class AperiodicFamilyBootstrapPayload(TypedDict):
+    tiling_family: str
+    label: str
+    experimental: bool
+    public_cell_kinds: list[str]
+
+
 class AppBootstrapPayload(TypedDict):
     app_defaults: AppDefaultsPayload
     topology_catalog: list[TopologyCatalogEntryPayload]
     periodic_face_tilings: list[PeriodicFaceTilingDescriptorPayload]
+    aperiodic_families: list[AperiodicFamilyBootstrapPayload]
     server_meta: ServerMetaPayload
     snapshot_version: int
 

@@ -83,6 +83,7 @@ const bootstrapData: AppBootstrapData = {
     },
     topology_catalog: [],
     periodic_face_tilings: [],
+    aperiodic_families: [],
     server_meta: { app_name: "cellular-automaton-lab" },
     snapshot_version: 5,
 };

@@ -60,6 +60,14 @@ describe("bootstrap-data", () => {
                 },
             ],
             periodic_face_tilings: [],
+            aperiodic_families: [
+                {
+                    tiling_family: "penrose-p3-rhombs",
+                    label: "Penrose P3 Rhombs",
+                    experimental: false,
+                    public_cell_kinds: ["thick-rhomb", "thin-rhomb"],
+                },
+            ],
             server_meta: { app_name: "cellular-automaton-lab" },
             snapshot_version: 5,
         });
@@ -67,6 +75,7 @@ describe("bootstrap-data", () => {
         expect(payload.app_defaults.simulation.rule).toBe("hexlife");
         expect(window.APP_DEFAULTS.simulation.rule).toBe("hexlife");
         expect(window.APP_TOPOLOGIES[0]?.tiling_family).toBe("hex");
+        expect(window.APP_APERIODIC_FAMILIES[0]?.tiling_family).toBe("penrose-p3-rhombs");
     });
 
     it("loads bootstrap data over fetch", async () => {
@@ -79,6 +88,7 @@ describe("bootstrap-data", () => {
                     app_defaults: window.APP_DEFAULTS,
                     topology_catalog: window.APP_TOPOLOGIES,
                     periodic_face_tilings: window.APP_PERIODIC_FACE_TILINGS,
+                    aperiodic_families: window.APP_APERIODIC_FAMILIES,
                     server_meta: { app_name: "cellular-automaton-lab" },
                     snapshot_version: 5,
                 }),
@@ -90,5 +100,6 @@ describe("bootstrap-data", () => {
         expect(payload.server_meta.app_name).toBe("cellular-automaton-lab");
         expect(payload.snapshot_version).toBe(5);
         expect(payload.topology_catalog.length).toBeGreaterThan(0);
+        expect(payload.aperiodic_families.length).toBeGreaterThan(0);
     });
 });

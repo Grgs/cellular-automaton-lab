@@ -47,10 +47,18 @@ export interface ServerMetaPayload {
     app_name: string;
 }
 
+export interface BootstrappedAperiodicFamilyDefinition {
+    tiling_family: string;
+    label: string;
+    experimental: boolean;
+    public_cell_kinds: readonly string[];
+}
+
 export interface AppBootstrapData {
     app_defaults: BootstrappedFrontendDefaults;
     topology_catalog: ReadonlyArray<BootstrappedTopologyDefinition>;
     periodic_face_tilings: ReadonlyArray<PeriodicFaceTilingDescriptor>;
+    aperiodic_families: ReadonlyArray<BootstrappedAperiodicFamilyDefinition>;
     server_meta: ServerMetaPayload;
     snapshot_version: number;
 }

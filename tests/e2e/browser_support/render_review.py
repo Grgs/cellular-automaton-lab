@@ -427,11 +427,7 @@ def browser_readiness_snapshot(page: Page) -> BrowserReadinessSnapshot | None:
             const reviewApi = window.__reviewApi;
             const snapshot = reviewApi && typeof reviewApi.getDiagnostics === "function"
                 ? reviewApi.getDiagnostics()
-                : (
-                    typeof window.__appDiagnostics === "function"
-                        ? window.__appDiagnostics()
-                        : null
-                );
+                : null;
             if (!snapshot || typeof snapshot !== "object" || !snapshot.readiness) {
                 return null;
             }
@@ -474,15 +470,10 @@ def apply_review_topology_payload(
     page.evaluate(
         """async (payload) => {
             const reviewApi = window.__reviewApi;
-            if (reviewApi && typeof reviewApi.applyTopology === "function") {
-                await reviewApi.applyTopology(payload);
-                return;
-            }
-            const applyReviewTopology = window.__applyReviewTopology;
-            if (typeof applyReviewTopology !== "function") {
+            if (!reviewApi || typeof reviewApi.applyTopology !== "function") {
                 throw new Error("Review topology injection hook is unavailable.");
             }
-            await applyReviewTopology(payload);
+            await reviewApi.applyTopology(payload);
         }""",
         topology_payload,
     )
@@ -682,11 +673,7 @@ def browser_topology_summary(page: Page) -> BrowserTopologySummary | None:
             const reviewApi = window.__reviewApi;
             const snapshot = reviewApi && typeof reviewApi.getDiagnostics === "function"
                 ? reviewApi.getDiagnostics()
-                : (
-                    typeof window.__appDiagnostics === "function"
-                        ? window.__appDiagnostics()
-                        : null
-                );
+                : null;
             if (!snapshot || typeof snapshot !== "object") {
                 return null;
             }
@@ -726,11 +713,7 @@ def browser_transform_report(page: Page) -> BrowserTransformReport | None:
             const reviewApi = window.__reviewApi;
             const snapshot = reviewApi && typeof reviewApi.getDiagnostics === "function"
                 ? reviewApi.getDiagnostics()
-                : (
-                    typeof window.__appDiagnostics === "function"
-                        ? window.__appDiagnostics()
-                        : null
-                );
+                : null;
             if (!snapshot || typeof snapshot !== "object" || !snapshot.transformReport) {
                 return null;
             }

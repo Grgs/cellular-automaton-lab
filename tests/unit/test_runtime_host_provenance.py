@@ -17,7 +17,7 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="runtime-host-provenance-") as tmpdir:
             root = Path(tmpdir)
             (root / "frontend").mkdir()
-            (root / "frontend" / "app.ts").write_text("console.log('a');\n", encoding="utf-8")
+            (root / "frontend" / "app-runtime.ts").write_text("console.log('a');\n", encoding="utf-8")
             (root / "tools").mkdir()
             (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
             (root / "package.json").write_text("{}\n", encoding="utf-8")
@@ -25,7 +25,7 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
             fingerprint_b, source_files_b = compute_source_fingerprint(root)
             self.assertEqual(fingerprint_a, fingerprint_b)
             self.assertEqual(source_files_a, source_files_b)
-            self.assertIn("frontend/app.ts", source_files_a)
+            self.assertIn("frontend/app-runtime.ts", source_files_a)
 
     def test_load_standalone_build_manifest_summarizes_manifest(self) -> None:
         with tempfile.TemporaryDirectory(prefix="runtime-host-build-manifest-") as tmpdir:
@@ -38,7 +38,7 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
                         "gitHead": "abc123",
                         "gitDirty": False,
                         "sourceFingerprint": "fingerprint",
-                        "sourceFiles": ["frontend/app.ts", "package.json"],
+                        "sourceFiles": ["frontend/app-runtime.ts", "package.json"],
                     }
                 ),
                 encoding="utf-8",

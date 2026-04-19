@@ -31,6 +31,21 @@ class PayloadTypeUnionContract:
 
 PAYLOAD_FIELD_CONTRACTS: tuple[PayloadFieldContract, ...] = (
     PayloadFieldContract(
+        interface_name="BootstrappedAperiodicFamilyDefinition",
+        required_fields=("tiling_family", "label", "experimental", "public_cell_kinds"),
+    ),
+    PayloadFieldContract(
+        interface_name="AppBootstrapData",
+        required_fields=(
+            "app_defaults",
+            "topology_catalog",
+            "periodic_face_tilings",
+            "aperiodic_families",
+            "server_meta",
+            "snapshot_version",
+        ),
+    ),
+    PayloadFieldContract(
         interface_name="TopologySpec",
         required_fields=(
             "tiling_family",

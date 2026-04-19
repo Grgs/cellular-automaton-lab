@@ -1,5 +1,6 @@
 import type {
     AppBootstrapData,
+    BootstrappedAperiodicFamilyDefinition,
     BootstrappedFrontendDefaults,
     BootstrappedTopologyDefinition,
 } from "./types/domain.js";
@@ -10,6 +11,10 @@ function cloneBootstrapData(payload: AppBootstrapData): AppBootstrapData {
         app_defaults: structuredClone(payload.app_defaults),
         topology_catalog: payload.topology_catalog.map((entry) => ({ ...entry })),
         periodic_face_tilings: payload.periodic_face_tilings.map((entry) => ({ ...entry })),
+        aperiodic_families: payload.aperiodic_families.map((entry) => ({
+            ...entry,
+            public_cell_kinds: [...entry.public_cell_kinds],
+        })),
         server_meta: { ...payload.server_meta },
         snapshot_version: Number(payload.snapshot_version),
     };
@@ -27,9 +32,16 @@ function normalizeBootstrapData(payload: unknown): AppBootstrapData {
     const defaults = root.app_defaults as BootstrappedFrontendDefaults | undefined;
     const topologies = root.topology_catalog as ReadonlyArray<BootstrappedTopologyDefinition> | undefined;
     const periodicFaceTilings = root.periodic_face_tilings as ReadonlyArray<PeriodicFaceTilingDescriptor> | undefined;
+    const aperiodicFamilies = root.aperiodic_families as ReadonlyArray<BootstrappedAperiodicFamilyDefinition> | undefined;
     const serverMeta = root.server_meta as { app_name?: string } | undefined;
     const snapshotVersion = Number(root.snapshot_version);
-    if (!defaults || !Array.isArray(topologies) || !Array.isArray(periodicFaceTilings) || !serverMeta?.app_name) {
+    if (
+        !defaults
+        || !Array.isArray(topologies)
+        || !Array.isArray(periodicFaceTilings)
+        || !Array.isArray(aperiodicFamilies)
+        || !serverMeta?.app_name
+    ) {
         throw new Error("Bootstrap payload is invalid.");
     }
     if (!Number.isFinite(snapshotVersion)) {
@@ -39,6 +51,7 @@ function normalizeBootstrapData(payload: unknown): AppBootstrapData {
         app_defaults: defaults,
         topology_catalog: topologies,
         periodic_face_tilings: periodicFaceTilings,
+        aperiodic_families: aperiodicFamilies,
         server_meta: { app_name: String(serverMeta.app_name) },
         snapshot_version: snapshotVersion,
     });
@@ -49,6 +62,7 @@ export function installBootstrapData(payload: AppBootstrapData): AppBootstrapDat
     window.APP_DEFAULTS = structuredClone(normalized.app_defaults);
     window.APP_TOPOLOGIES = normalized.topology_catalog;
     window.APP_PERIODIC_FACE_TILINGS = normalized.periodic_face_tilings;
+    window.APP_APERIODIC_FAMILIES = normalized.aperiodic_families;
     return normalized;
 }
 
@@ -57,6 +71,7 @@ export function bootstrapDataFromWindow(): AppBootstrapData {
         app_defaults: window.APP_DEFAULTS,
         topology_catalog: window.APP_TOPOLOGIES,
         periodic_face_tilings: window.APP_PERIODIC_FACE_TILINGS,
+        aperiodic_families: window.APP_APERIODIC_FAMILIES,
         server_meta: { app_name: "cellular-automaton-lab" },
         snapshot_version: 5,
     });

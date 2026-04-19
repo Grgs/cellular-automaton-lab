@@ -1,5 +1,9 @@
 import { buildBootstrappedTopologyDefinition, buildSingleVariantBootstrappedTopologyDefinition } from "./topology-catalog-fixtures.js";
-import type { BootstrappedFrontendDefaults, BootstrappedTopologyDefinition } from "../types/domain.js";
+import type {
+    BootstrappedAperiodicFamilyDefinition,
+    BootstrappedFrontendDefaults,
+    BootstrappedTopologyDefinition,
+} from "../types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "../types/rendering.js";
 
 function geometryKeys(keys: Record<string, string>): Record<string, string> {
@@ -84,9 +88,25 @@ const PERIODIC_FACE_TILINGS: ReadonlyArray<PeriodicFaceTilingDescriptor> = Objec
     },
 ]);
 
+const APERIODIC_FAMILIES: ReadonlyArray<BootstrappedAperiodicFamilyDefinition> = Object.freeze([
+    {
+        tiling_family: "penrose-p3-rhombs",
+        label: "Penrose P3 Rhombs",
+        experimental: false,
+        public_cell_kinds: ["thick-rhomb", "thin-rhomb"],
+    },
+    {
+        tiling_family: "pinwheel",
+        label: "Pinwheel",
+        experimental: true,
+        public_cell_kinds: ["pinwheel-triangle"],
+    },
+]);
+
 export function installFrontendGlobals(): void {
     window.APP_DEFAULTS = structuredClone(DEFAULTS);
     window.APP_TOPOLOGIES = TOPOLOGIES;
     window.APP_PERIODIC_FACE_TILINGS = PERIODIC_FACE_TILINGS;
+    window.APP_APERIODIC_FAMILIES = APERIODIC_FAMILIES;
     window.__appReady = true;
 }

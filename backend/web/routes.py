@@ -96,6 +96,7 @@ def index() -> str:
         ),
         topology_catalog=current_app.config["TOPOLOGY_CATALOG"],
         periodic_face_tilings=current_app.config["PERIODIC_FACE_TILINGS"],
+        aperiodic_families=current_app.config["APERIODIC_FAMILIES"],
         frontend_script=entry_assets.script_filename,
         frontend_stylesheets=entry_assets.stylesheet_filenames,
     )

@@ -3,6 +3,7 @@ from pathlib import Path
 
 from flask import Flask
 
+from backend.bootstrap_data import describe_aperiodic_families
 from backend.defaults import APP_DEFAULTS
 from backend.dev_server import APP_NAME
 from backend.frontend_assets import FrontendAssetManifest
@@ -32,6 +33,7 @@ def create_app(*, instance_path: str | None = None) -> Flask:
     app.config["APP_DEFAULTS"] = APP_DEFAULTS
     app.config["TOPOLOGY_CATALOG"] = describe_topologies()
     app.config["PERIODIC_FACE_TILINGS"] = describe_periodic_face_tilings()
+    app.config["APERIODIC_FAMILIES"] = describe_aperiodic_families()
     server_meta: ServerMetaPayload = {
         "app_name": APP_NAME,
     }

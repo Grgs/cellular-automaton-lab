@@ -10,6 +10,7 @@
             window.APP_DEFAULTS = {{ app_defaults | tojson }};
             window.APP_TOPOLOGIES = {{ topology_catalog | tojson }};
             window.APP_PERIODIC_FACE_TILINGS = {{ periodic_face_tilings | tojson }};
+            window.APP_APERIODIC_FAMILIES = {{ aperiodic_families | tojson }};
             try {
                 var themeDefaults = (window.APP_DEFAULTS && window.APP_DEFAULTS.theme) || {};
                 var storageKey = themeDefaults.storage_key || "cellular-automaton-theme";

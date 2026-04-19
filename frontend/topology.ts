@@ -3,7 +3,6 @@ import {
 } from "./topology-catalog.js";
 import {
     AMMANN_BEENKER_GEOMETRY,
-    APERIODIC_FAMILY_METADATA,
     CHAIR_KIND,
     CHAIR_GEOMETRY,
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -38,7 +37,6 @@ import {
 } from "./aperiodic-family-metadata.js";
 export {
     AMMANN_BEENKER_GEOMETRY,
-    APERIODIC_FAMILY_METADATA,
     CHAIR_KIND,
     CHAIR_GEOMETRY,
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
