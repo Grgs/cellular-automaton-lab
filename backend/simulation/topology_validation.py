@@ -30,6 +30,20 @@ class EdgeMultiplicityIssue:
 
 
 @dataclass(frozen=True)
+class OverlapAreaPair:
+    left_id: str
+    right_id: str
+    area: float
+
+
+@dataclass(frozen=True)
+class TopologyOverlapAreaDiagnostics:
+    pair_count: int
+    max_area: float
+    top_pairs: tuple[OverlapAreaPair, ...] = ()
+
+
+@dataclass(frozen=True)
 class TopologyValidationResult:
     geometry: str
     checked_cell_count: int
@@ -138,6 +152,37 @@ def topology_polygons(topology: LatticeTopology) -> dict[str, Polygon]:
             continue
         polygons[cell.id] = Polygon(cell.vertices)
     return polygons
+
+
+def analyze_topology_overlap_areas(
+    topology: LatticeTopology,
+    *,
+    top_limit: int = 10,
+) -> TopologyOverlapAreaDiagnostics:
+    polygons = topology_polygons(topology)
+    overlap_pairs: list[OverlapAreaPair] = []
+    cell_ids = tuple(sorted(polygons))
+    for left_id, right_id in combinations(cell_ids, 2):
+        left_polygon = polygons[left_id]
+        right_polygon = polygons[right_id]
+        if not _bounds_overlap(left_polygon, right_polygon):
+            continue
+        area = left_polygon.intersection(right_polygon).area
+        if area <= _AREA_TOLERANCE:
+            continue
+        overlap_pairs.append(
+            OverlapAreaPair(
+                left_id=left_id,
+                right_id=right_id,
+                area=float(area),
+            )
+        )
+    overlap_pairs.sort(key=lambda pair: (-pair.area, pair.left_id, pair.right_id))
+    return TopologyOverlapAreaDiagnostics(
+        pair_count=len(overlap_pairs),
+        max_area=(overlap_pairs[0].area if overlap_pairs else 0.0),
+        top_pairs=tuple(overlap_pairs[: max(0, int(top_limit))]),
+    )
 
 
 def _bounds_overlap(left: Polygon, right: Polygon) -> bool:

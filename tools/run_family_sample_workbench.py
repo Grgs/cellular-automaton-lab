@@ -22,22 +22,17 @@ from backend.simulation.topology_catalog import geometry_uses_patch_depth
 from backend.simulation.topology_specialized import topology_from_aperiodic_patch
 from backend.simulation.topology_types import LatticeTopology
 from backend.simulation.topology_validation import validate_topology
-from tests.e2e.browser_support.artifacts import create_artifact_dir
-from tools.render_canvas_review import (
-    DEFAULT_REFERENCE_CACHE_DIR,
-    ResolvedRenderReviewRequest,
-    condense_overlap_hotspots,
-    condense_settle_diagnostics,
-    condense_transform_report,
-    condense_visual_metrics,
-    render_canvas_review,
-    resolve_render_review_request,
-    with_review_topology_payload,
+from tools.workbench_support import (
+    VALID_HOSTS,
+    VALID_THEMES,
+    build_candidate_manifest_record,
+    format_candidate_metric_line,
+    resolve_default_workbench_artifact_dir,
+    run_candidate_browser_review,
+    write_json,
 )
 
 DEFAULT_WORKBENCH_OUTPUT_DIR = ROOT_DIR / "output" / "family-sample-workbench"
-VALID_HOSTS = ("standalone", "server")
-VALID_THEMES = ("light", "dark")
 DEFAULT_SHIELD_WINDOW_MULTIPLIERS = (0.90, 0.95, 1.00, 1.05, 1.10)
 DEFAULT_VALIDATION_OVERLAP_PREVIEW = 12
 
@@ -121,44 +116,10 @@ def _parse_float_values(raw: str | None, *, value_name: str) -> tuple[float, ...
     return tuple(parsed)
 
 
-def resolve_default_workbench_artifact_dir(
-    *,
-    family: str,
-    patch_depth: int,
-    artifact_dir: Path | None,
-) -> Path:
-    if artifact_dir is not None:
-        artifact_dir.mkdir(parents=True, exist_ok=True)
-        return artifact_dir
-    timestamp = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y%m%d-%H%M%S-%f")
-    return create_artifact_dir(
-        name=f"{timestamp}-{family}-depth-{patch_depth}",
-        default_parent=DEFAULT_WORKBENCH_OUTPUT_DIR,
-    )
-
-
 def default_shield_window_values(*, patch_depth: int) -> tuple[float, ...]:
-    request = resolve_render_review_request(
-        argparse.Namespace(
-            family="shield",
-            profile=None,
-            list_profiles=False,
-            patch_depth=patch_depth,
-            cell_size=None,
-            viewport_width=1200,
-            viewport_height=900,
-            theme="light",
-            out=None,
-            summary_out=None,
-            reference=None,
-            montage_out=None,
-            literature_review=False,
-            reference_cache_dir=DEFAULT_REFERENCE_CACHE_DIR,
-        )
-    )
     baseline_threshold = (
         json.loads((ROOT_DIR / "backend" / "simulation" / "data" / "shield_reference_patch.json").read_text(encoding="utf-8"))
-        ["representative_window_thresholds"][str(request.patch_depth)]
+        ["representative_window_thresholds"][str(max(0, int(patch_depth)))]
     )
     return tuple(round(float(baseline_threshold) * multiplier, 6) for multiplier in DEFAULT_SHIELD_WINDOW_MULTIPLIERS)
 
@@ -203,9 +164,9 @@ def resolve_workbench_request(args: argparse.Namespace) -> ResolvedWorkbenchRequ
         host=str(args.host),
         theme=str(args.theme),
         artifact_dir=resolve_default_workbench_artifact_dir(
-            family=family,
-            patch_depth=int(args.patch_depth),
             artifact_dir=args.artifact_dir,
+            default_parent=DEFAULT_WORKBENCH_OUTPUT_DIR,
+            name=f"{family}-depth-{int(args.patch_depth)}",
         ),
     )
 
@@ -367,78 +328,6 @@ def build_structural_summary(
     }
 
 
-def _write_json(path: Path, payload: dict[str, Any]) -> Path:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"{json.dumps(payload, indent=2, sort_keys=True)}\n", encoding="utf-8")
-    return path
-
-
-def _build_candidate_review_request(
-    *,
-    request: ResolvedWorkbenchRequest,
-    candidate: WorkbenchCandidate,
-) -> ResolvedRenderReviewRequest:
-    stem = f"{request.family}-depth-{request.patch_depth}"
-    resolved = resolve_render_review_request(
-        argparse.Namespace(
-            family=request.family,
-            profile=None,
-            list_profiles=False,
-            patch_depth=request.patch_depth,
-            cell_size=None,
-            viewport_width=1200,
-            viewport_height=900,
-            theme=request.theme,
-            out=candidate.artifact_dir / f"{stem}.png",
-            summary_out=candidate.artifact_dir / f"{stem}.json",
-            reference=None,
-            montage_out=None,
-            literature_review=False,
-            reference_cache_dir=DEFAULT_REFERENCE_CACHE_DIR,
-        )
-    )
-    topology_payload = candidate.topology.to_dict()
-    return with_review_topology_payload(resolved, topology_payload)
-
-
-def _build_manifest_candidate_record(
-    *,
-    candidate: WorkbenchCandidate,
-    structural_summary: dict[str, Any],
-    topology_path: Path,
-    summary_path: Path,
-    browser_review_summary: dict[str, Any] | None,
-) -> dict[str, Any]:
-    record = {
-        "index": candidate.index,
-        "name": candidate.name,
-        "strategy": candidate.strategy,
-        "parameterName": candidate.parameter_name,
-        "parameterValue": candidate.parameter_value,
-        "artifactDir": str(candidate.artifact_dir),
-        "candidateTopology": str(topology_path),
-        "candidateSummary": str(summary_path),
-        "totalCells": structural_summary["total_cells"],
-        "connectedComponentCount": structural_summary["connected_component_count"],
-        "holeCount": structural_summary["hole_count"],
-        "overlapPairCount": structural_summary["validation"]["overlapPairCount"],
-        "boundsAspectRatio": structural_summary["bounds_aspect_ratio"],
-        "signature": structural_summary["signature"],
-    }
-    if browser_review_summary is not None:
-        record["renderReview"] = {
-            "summaryPath": browser_review_summary["summaryPath"],
-            "pngPath": browser_review_summary["pngPath"],
-            "runManifestPath": browser_review_summary.get("runManifestPath"),
-            "consistency": browser_review_summary["consistency"],
-            "transformSummary": browser_review_summary["transformSummary"],
-            "overlapHotspots": browser_review_summary["overlapHotspots"],
-            "settleDiagnostics": browser_review_summary["settleDiagnostics"],
-            "visualMetrics": browser_review_summary["visualMetrics"],
-        }
-    return record
-
-
 def run_family_sample_workbench(
     request: ResolvedWorkbenchRequest,
 ) -> WorkbenchResult:
@@ -459,7 +348,7 @@ def run_family_sample_workbench(
     try:
         for candidate in candidates:
             candidate.artifact_dir.mkdir(parents=True, exist_ok=True)
-            topology_path = _write_json(
+            topology_path = write_json(
                 candidate.artifact_dir / "candidate-topology.json",
                 candidate.topology.to_dict(),
             )
@@ -467,37 +356,37 @@ def run_family_sample_workbench(
             candidate_summary_payload = dict(structural_summary)
             browser_review_summary: dict[str, Any] | None = None
             if request.browser_review:
-                review_request = _build_candidate_review_request(
-                    request=request,
-                    candidate=candidate,
-                )
-                review_result = render_canvas_review(
-                    review_request,
-                    host_kind=request.host,
+                browser_review_summary = run_candidate_browser_review(
+                    family=request.family,
+                    patch_depth=request.patch_depth,
+                    theme=request.theme,
+                    host=request.host,
                     artifact_dir=candidate.artifact_dir,
+                    topology_payload=candidate.topology.to_dict(),
                 )
-                review_payload = json.loads(review_result.summary_path.read_text(encoding="utf-8"))
-                browser_review_summary = {
-                    "summaryPath": str(review_result.summary_path),
-                    "pngPath": str(review_result.png_path),
-                    "runManifestPath": None,
-                    "consistency": review_payload.get("consistency"),
-                    "transformSummary": condense_transform_report(review_payload.get("transformReport")),
-                    "overlapHotspots": condense_overlap_hotspots(review_payload.get("overlapHotspots")),
-                    "settleDiagnostics": condense_settle_diagnostics(review_payload.get("settleDiagnostics")),
-                    "visualMetrics": condense_visual_metrics(review_payload.get("visualMetrics")),
-                }
                 candidate_summary_payload["renderReview"] = browser_review_summary
-            summary_path = _write_json(
+            summary_path = write_json(
                 candidate.artifact_dir / "candidate-summary.json",
                 candidate_summary_payload,
             )
             manifest["candidates"].append(
-                _build_manifest_candidate_record(
-                    candidate=candidate,
-                    structural_summary=structural_summary,
+                build_candidate_manifest_record(
+                    index=candidate.index,
+                    name=candidate.name,
+                    strategy=candidate.strategy,
+                    parameter_name=candidate.parameter_name,
+                    parameter_value=candidate.parameter_value,
+                    artifact_dir=candidate.artifact_dir,
                     topology_path=topology_path,
                     summary_path=summary_path,
+                    key_metrics={
+                        "totalCells": structural_summary["total_cells"],
+                        "connectedComponentCount": structural_summary["connected_component_count"],
+                        "holeCount": structural_summary["hole_count"],
+                        "overlapPairCount": structural_summary["validation"]["overlapPairCount"],
+                        "boundsAspectRatio": structural_summary["bounds_aspect_ratio"],
+                        "signature": structural_summary["signature"],
+                    },
                     browser_review_summary=browser_review_summary,
                 )
             )
@@ -513,17 +402,21 @@ def run_family_sample_workbench(
     finally:
         manifest["exitStatus"] = exit_status
         manifest["stoppedAt"] = dt.datetime.now(tz=dt.timezone.utc).isoformat()
-        _write_json(manifest_path, manifest)
+        write_json(manifest_path, manifest)
 
 
 def _print_candidate_line(candidate_record: dict[str, Any]) -> None:
     print(
-        f"{candidate_record['name']}: "
-        f"cells={candidate_record['totalCells']} "
-        f"components={candidate_record['connectedComponentCount']} "
-        f"holes={candidate_record['holeCount']} "
-        f"overlaps={candidate_record['overlapPairCount']} "
-        f"aspect={candidate_record['boundsAspectRatio']}"
+        format_candidate_metric_line(
+            candidate_record["name"],
+            metrics={
+                "cells": candidate_record["totalCells"],
+                "components": candidate_record["connectedComponentCount"],
+                "holes": candidate_record["holeCount"],
+                "overlaps": candidate_record["overlapPairCount"],
+                "aspect": candidate_record["boundsAspectRatio"],
+            },
+        )
     )
 
 

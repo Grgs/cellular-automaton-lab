@@ -134,15 +134,21 @@ def _rotate_orientation_token(
 def _cleanup_traced_vertices(
     center: tuple[float, float],
     vertices: tuple[tuple[float, float], ...],
+    *,
+    cleanup_scale: float,
 ) -> tuple[tuple[float, float], ...]:
     center_x, center_y = center
     return tuple(
         (
-            round(center_x + ((vertex_x - center_x) * _TRACE_GEOMETRY_CLEANUP_SCALE), 6),
-            round(center_y + ((vertex_y - center_y) * _TRACE_GEOMETRY_CLEANUP_SCALE), 6),
+            round(center_x + ((vertex_x - center_x) * cleanup_scale), 6),
+            round(center_y + ((vertex_y - center_y) * cleanup_scale), 6),
         )
         for vertex_x, vertex_y in vertices
     )
+
+
+def default_shield_trace_geometry_cleanup_scale() -> float:
+    return float(_TRACE_GEOMETRY_CLEANUP_SCALE)
 
 
 def _largest_connected_component_ids(
@@ -178,10 +184,16 @@ def build_shield_patch_for_window_threshold(
     patch_depth: int,
     *,
     window_threshold: float,
+    cleanup_scale: float | None = None,
 ) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     pivot = _reference_pivot()
     max_window_distance = float(window_threshold)
+    resolved_cleanup_scale = (
+        default_shield_trace_geometry_cleanup_scale()
+        if cleanup_scale is None
+        else float(cleanup_scale)
+    )
     records = _load_reference_records()
     selected_records = tuple(
         record
@@ -216,7 +228,11 @@ def build_shield_patch_for_window_threshold(
             (float(vertex[0]), float(vertex[1]))
             for vertex in record["vertices"]
         )
-        vertices = _cleanup_traced_vertices(center, vertices)
+        vertices = _cleanup_traced_vertices(
+            center,
+            vertices,
+            cleanup_scale=resolved_cleanup_scale,
+        )
         orientation_token = record.get("orientation_token")
         decoration_tokens = record["decoration_tokens"]
         if rotate_patch:
@@ -262,9 +278,23 @@ def build_shield_patch_for_window_threshold(
     )
 
 
+def build_shield_patch_for_cleanup_scale(
+    patch_depth: int,
+    *,
+    cleanup_scale: float,
+) -> AperiodicPatch:
+    resolved_depth = max(0, int(patch_depth))
+    return build_shield_patch_for_window_threshold(
+        resolved_depth,
+        window_threshold=_window_threshold(resolved_depth),
+        cleanup_scale=cleanup_scale,
+    )
+
+
 def build_shield_patch(patch_depth: int) -> AperiodicPatch:
     resolved_depth = max(0, int(patch_depth))
     return build_shield_patch_for_window_threshold(
         resolved_depth,
         window_threshold=_window_threshold(resolved_depth),
+        cleanup_scale=default_shield_trace_geometry_cleanup_scale(),
     )

@@ -260,9 +260,11 @@ Status: landed for the structural-first slice. The family sample workbench now:
 - can optionally run browser-backed review against injected candidate topology
   payloads rather than only the shipped family/depth sample
 
-The remaining gap is narrower. Candidate window exploration is now first-class;
-the next missing tool is a geometry-cleanup workbench for small topology-space
-cleanup factors.
+The remaining gap is narrower. Candidate window exploration is now first-class,
+and the geometry-cleanup workbench now covers the second shield-specific
+question too: how small topology-space cleanup factors trade off overlap
+severity, bounds drift, and optional gutter-risk metrics on the shipped
+representative sample.
 
 ### 3. Standalone build freshness is still too easy to misread
 
@@ -353,11 +355,20 @@ shield overlap fix ended up needing:
   positive-area intersections from the shipped geometry
 - a draw-only seam bridge so visual gap hiding stays out of the geometry cache
 
-That cleanup choice was still selected with an ad hoc Shapely sweep over scale
-factors rather than a first-class workbench. The missing follow-up tool is a
-geometry-cleanup workbench that can report overlap count, max overlap area,
-bounds drift, and likely gutter risk for small cleanup factors without a custom
-one-off script.
+That cleanup choice was originally selected with an ad hoc Shapely sweep over
+scale factors. Status: landed for the first slice. The geometry-cleanup
+workbench now:
+
+- varies `shield` cleanup scale while keeping the shipped representative sample
+  fixed
+- reports overlap count, max overlap area, and top overlap pairs
+- reports bounds drift versus the shipped cleanup baseline
+- can optionally attach browser-visible gutter-risk and related visual metrics
+  through the injected-topology review path
+
+The next missing shield-specific tooling is no longer cleanup-factor
+exploration. It is fixture regeneration and profile-owned expectations for how
+those cleanup diagnostics should be interpreted during manual review.
 
 ### 6. Frontend representative fixture regeneration is still ad hoc
 

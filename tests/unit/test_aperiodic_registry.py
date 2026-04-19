@@ -6,14 +6,22 @@ from pathlib import Path
 try:
     from backend.simulation.aperiodic_contracts import APERIODIC_IMPLEMENTATION_CONTRACTS
     from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
-    from backend.simulation.aperiodic_shield import build_shield_patch_for_window_threshold
+    from backend.simulation.aperiodic_shield import (
+        build_shield_patch_for_cleanup_scale,
+        build_shield_patch_for_window_threshold,
+        default_shield_trace_geometry_cleanup_scale,
+    )
     from backend.simulation.topology import build_topology
     from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.simulation.aperiodic_contracts import APERIODIC_IMPLEMENTATION_CONTRACTS
     from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
-    from backend.simulation.aperiodic_shield import build_shield_patch_for_window_threshold
+    from backend.simulation.aperiodic_shield import (
+        build_shield_patch_for_cleanup_scale,
+        build_shield_patch_for_window_threshold,
+        default_shield_trace_geometry_cleanup_scale,
+    )
     from backend.simulation.topology import build_topology
     from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 
@@ -89,6 +97,18 @@ class AperiodicRegistryTests(unittest.TestCase):
     def test_shield_explicit_threshold_builder_preserves_shipped_threshold_output(self) -> None:
         shipped_patch = build_aperiodic_patch("shield", 3)
         explicit_patch = build_shield_patch_for_window_threshold(3, window_threshold=214.8816)
+
+        self.assertEqual(shipped_patch.patch_depth, explicit_patch.patch_depth)
+        self.assertEqual(shipped_patch.width, explicit_patch.width)
+        self.assertEqual(shipped_patch.height, explicit_patch.height)
+        self.assertEqual([cell.id for cell in shipped_patch.cells], [cell.id for cell in explicit_patch.cells])
+
+    def test_shield_explicit_cleanup_builder_preserves_shipped_default_output(self) -> None:
+        shipped_patch = build_aperiodic_patch("shield", 3)
+        explicit_patch = build_shield_patch_for_cleanup_scale(
+            3,
+            cleanup_scale=default_shield_trace_geometry_cleanup_scale(),
+        )
 
         self.assertEqual(shipped_patch.patch_depth, explicit_patch.patch_depth)
         self.assertEqual(shipped_patch.width, explicit_patch.width)

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from backend.simulation.topology import build_topology
 from tools.run_family_sample_workbench import (
+    DEFAULT_WORKBENCH_OUTPUT_DIR,
     build_structural_summary,
     candidate_dir_name,
     default_shield_window_values,
@@ -170,14 +171,14 @@ class FamilySampleWorkbenchToolTests(unittest.TestCase):
 
     def test_default_artifact_dir_generation_is_unique_across_repeated_calls(self) -> None:
         first = resolve_default_workbench_artifact_dir(
-            family="shield",
-            patch_depth=3,
             artifact_dir=None,
+            default_parent=DEFAULT_WORKBENCH_OUTPUT_DIR,
+            name="shield-depth-3",
         )
         second = resolve_default_workbench_artifact_dir(
-            family="shield",
-            patch_depth=3,
             artifact_dir=None,
+            default_parent=DEFAULT_WORKBENCH_OUTPUT_DIR,
+            name="shield-depth-3",
         )
         try:
             self.assertNotEqual(first, second)

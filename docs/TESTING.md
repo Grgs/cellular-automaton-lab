@@ -286,6 +286,8 @@ Family sample workbench examples:
 python tools/run_family_sample_workbench.py --family shield --patch-depth 3
 python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --browser-review --host standalone
 python tools/run_family_sample_workbench.py --family pinwheel --patch-depth 3
+python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3
+python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3 --browser-review --host standalone --theme dark
 ```
 
 Use the workbench when:
@@ -298,6 +300,13 @@ Current v1 strategy support:
 
 - `baseline` for any patch-depth family
 - `shield` `representative-window` for explicit dodecagonal window-threshold sweeps
+- `shield` `trace-cleanup-scale` in the geometry cleanup workbench for fixed-sample cleanup-factor sweeps
+
+Use the geometry cleanup workbench when the representative sample is already fixed and the question is instead:
+
+- how much topology-space cleanup removes overlap
+- how much bounds drift that cleanup introduces
+- whether the browser-visible gutter risk stays acceptable under the current draw-only seam bridge
 
 Direct render review examples:
 
@@ -352,6 +361,7 @@ Artifact locations:
 - Managed runner `--unittest --success-artifacts` runs also preserve a per-test success bundle under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 - Sweep runs default to `output/render-review-sweeps/<timestamp-profile>/`.
 - Family sample workbench runs default to `output/family-sample-workbench/<timestamp-family-depth>/`, with one `workbench-manifest.json` plus one subdirectory per candidate.
+- Geometry cleanup workbench runs default to `output/geometry-cleanup-workbench/<timestamp-family-depth>/`, with one `workbench-manifest.json` plus one subdirectory per cleanup candidate.
 
 Shared failure artifact bundle:
 

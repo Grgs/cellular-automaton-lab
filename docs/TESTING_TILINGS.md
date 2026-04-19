@@ -115,6 +115,9 @@ python tools/run_family_sample_workbench.py --family shield --patch-depth 3
 python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --values 193.39344,204.13752,214.8816
 python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --browser-review --host standalone
 python tools/run_family_sample_workbench.py --family pinwheel --patch-depth 3
+python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3
+python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3 --values 0.941,0.951,0.961
+python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3 --browser-review --host standalone --theme dark
 ```
 
 Workbench notes:
@@ -122,6 +125,8 @@ Workbench notes:
 - The default strategy is `representative-window` for `shield` and `baseline` for other patch-depth families.
 - The workbench always writes per-candidate `candidate-topology.json` and `candidate-summary.json`.
 - Optional browser review works by injecting the candidate topology payload into the review runtime; it does not rely on the shipped family/depth patch selection path.
+- The geometry cleanup workbench is the fixed-sample counterpart: it keeps the shipped representative sample and varies topology cleanup scale only.
+- Cleanup candidate summaries now include overlap severity, bounds drift versus the shipped baseline cleanup scale, and optional browser-visible gutter-risk metrics.
 
 Literature-review boundary:
 
@@ -142,6 +147,7 @@ Output locations:
 - managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
 - render-review sweeps: `output/render-review-sweeps/<timestamp-profile>/`
 - family sample workbench runs: `output/family-sample-workbench/<timestamp-family-depth>/`
+- geometry cleanup workbench runs: `output/geometry-cleanup-workbench/<timestamp-family-depth>/`
 
 Render-review summaries and managed manifests now also expose:
 

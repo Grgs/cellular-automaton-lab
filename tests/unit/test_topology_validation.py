@@ -21,7 +21,11 @@ try:
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
-    from backend.simulation.topology_validation import recommended_validation_options, validate_topology
+    from backend.simulation.topology_validation import (
+        analyze_topology_overlap_areas,
+        recommended_validation_options,
+        validate_topology,
+    )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
@@ -42,7 +46,11 @@ except ModuleNotFoundError:
         PENROSE_VERTEX_GEOMETRY,
         build_topology,
     )
-    from backend.simulation.topology_validation import recommended_validation_options, validate_topology
+    from backend.simulation.topology_validation import (
+        analyze_topology_overlap_areas,
+        recommended_validation_options,
+        validate_topology,
+    )
 
 
 def _polygon_cell(
@@ -377,6 +385,31 @@ class TopologyValidationTests(unittest.TestCase):
 
         self.assertFalse(validation.is_valid)
         self.assertEqual(validation.overlapping_pairs, (("a", "b"),))
+
+    def test_overlap_area_diagnostics_report_max_area_and_sorted_top_pairs(self) -> None:
+        topology = _topology(
+            _polygon_cell(
+                "a",
+                ((0.0, 0.0), (1.2, 0.0), (1.2, 1.0), (0.0, 1.0)),
+            ),
+            _polygon_cell(
+                "b",
+                ((0.8, 0.0), (1.8, 0.0), (1.8, 1.0), (0.8, 1.0)),
+            ),
+            _polygon_cell(
+                "c",
+                ((1.0, 0.0), (2.0, 0.0), (2.0, 1.0), (1.0, 1.0)),
+            ),
+            revision="fixture-overlap-areas",
+        )
+
+        diagnostics = analyze_topology_overlap_areas(topology, top_limit=2)
+
+        self.assertEqual(diagnostics.pair_count, 3)
+        self.assertGreater(diagnostics.max_area, 0)
+        self.assertEqual(len(diagnostics.top_pairs), 2)
+        self.assertGreaterEqual(diagnostics.top_pairs[0].area, diagnostics.top_pairs[1].area)
+        self.assertEqual((diagnostics.top_pairs[0].left_id, diagnostics.top_pairs[0].right_id), ("b", "c"))
 
     def test_validator_flags_missing_neighbor_references(self) -> None:
         topology = _topology(
