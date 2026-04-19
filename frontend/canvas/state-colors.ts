@@ -72,12 +72,6 @@ const PINWHEEL_DEAD_PALETTE = new Map<string, string>([
     ["right", "#d5bb8f"],
 ]);
 
-const SHIELD_DEAD_PALETTE = new Map<string, string>([
-    [SHIELD_SHIELD_KIND, DEFAULT_COLORS.live],
-    [SHIELD_SQUARE_KIND, DEFAULT_COLORS.dead],
-    [SHIELD_TRIANGLE_KIND, DEFAULT_COLORS.accent],
-]);
-
 function resolveTuebingenDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
 ): string | null {
@@ -156,13 +150,23 @@ function resolvePinwheelDeadColor(
 
 function resolveShieldDeadColor(
     cell: TopologyCell | PaintableCell | null | undefined,
+    fallbackColors: CanvasColors = DEFAULT_COLORS,
 ): string | null {
     const topologyCell = cell as Partial<TopologyCell> | null | undefined;
     if (topologyCell?.tile_family !== SHIELD_TILE_FAMILY) {
         return null;
     }
     const kind = typeof topologyCell.kind === "string" ? topologyCell.kind : "";
-    return SHIELD_DEAD_PALETTE.get(kind) || null;
+    if (kind === SHIELD_SHIELD_KIND) {
+        return fallbackColors.deadAlt;
+    }
+    if (kind === SHIELD_SQUARE_KIND) {
+        return fallbackColors.dead;
+    }
+    if (kind === SHIELD_TRIANGLE_KIND) {
+        return fallbackColors.accentStrong;
+    }
+    return null;
 }
 
 export function resolveDeadCellColor(
@@ -208,7 +212,7 @@ export function resolveDeadCellColor(
     if (pinwheelDeadColor) {
         return pinwheelDeadColor;
     }
-    const shieldDeadColor = resolveShieldDeadColor(cell);
+    const shieldDeadColor = resolveShieldDeadColor(cell, fallbackColors);
     if (shieldDeadColor) {
         return shieldDeadColor;
     }

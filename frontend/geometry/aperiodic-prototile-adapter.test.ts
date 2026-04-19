@@ -156,8 +156,9 @@ describe("geometry/aperiodic-prototile-adapter", () => {
 
         expect(drawPolygonCellWithTransientOverlay).toHaveBeenCalledTimes(1);
         expect(drawPolygonCellWithTransientOverlay.mock.calls[0]?.[0]).toMatchObject({
+            committedStrokeColor: null,
             fillBridgeColor: "#f8f1e5",
-            fillBridgeStrokeWidth: 1,
+            fillBridgeStrokeWidth: 1.25,
             vertices: geometry.vertices,
         });
     });

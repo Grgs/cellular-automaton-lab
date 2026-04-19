@@ -251,7 +251,9 @@ export function createAperiodicPrototileGeometryAdapter(geometry: string): Geome
                 fillColor: color,
                 renderLayer,
                 renderStyle,
-                committedStrokeColor: renderStyle?.aperiodicLineColor || renderStyle?.lineColor || null,
+                committedStrokeColor: geometry === "shield"
+                    ? null
+                    : renderStyle?.aperiodicLineColor || renderStyle?.lineColor || null,
                 fillBridgeColor: (
                     geometry === "shield"
                     && renderLayer !== "gesture-paint"

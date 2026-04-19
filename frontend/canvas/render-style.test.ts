@@ -412,7 +412,7 @@ describe("canvas/render-style", () => {
                     kind: "shield-shield",
                     tile_family: "shield",
                 },
-                expectedColor: "#1f2430",
+                expectedColor: "#d5bb8f",
             },
             {
                 cell: {
@@ -430,7 +430,7 @@ describe("canvas/render-style", () => {
                     kind: "shield-triangle",
                     tile_family: "shield",
                 },
-                expectedColor: "#bf5a36",
+                expectedColor: "#8a3d20",
             },
         ];
 
@@ -443,6 +443,124 @@ describe("canvas/render-style", () => {
                 }),
             ).toBe(expectedColor);
         });
+    });
+
+    it("keeps representative dead-state accent colors distinct from the live-state fill", async () => {
+        const {
+            buildStateColorLookup,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colors = {
+            line: "rgba(31, 36, 48, 0.16)",
+            dead: "#fcfaf4",
+            deadAlt: "#d1b57a",
+            lineSoft: "rgba(31, 36, 48, 0.11)",
+            lineStrong: "rgba(31, 36, 48, 0.21)",
+            lineAperiodic: "rgba(31, 36, 48, 0.24)",
+            live: "#131722",
+            accent: "#bf5a36",
+            accentStrong: "#8a3d20",
+        };
+        const colorLookup = buildStateColorLookup([], colors);
+        const representativeDeadCells = [
+            {
+                geometry: "tuebingen-triangle",
+                cell: {
+                    id: "tt:right",
+                    state: 0,
+                    kind: "tuebingen-thick",
+                    tile_family: "tuebingen",
+                    chirality_token: "right",
+                },
+            },
+            {
+                geometry: "robinson-triangles",
+                cell: { id: "rob:thin", state: 0, kind: "robinson-thin", tile_family: "robinson" },
+            },
+            {
+                geometry: "hat-monotile",
+                cell: { id: "hat:right", state: 0, kind: "hat", tile_family: "hat", chirality_token: "right" },
+            },
+            {
+                geometry: "chair",
+                cell: { id: "chair:o3", state: 0, kind: "chair", orientation_token: "3" },
+            },
+            {
+                geometry: "dodecagonal-square-triangle",
+                cell: {
+                    id: "st:triangle-yellow",
+                    state: 0,
+                    kind: "dodecagonal-square-triangle-triangle",
+                    tile_family: "dodecagonal-square-triangle",
+                    chirality_token: "yellow",
+                },
+            },
+            {
+                geometry: "pinwheel",
+                cell: {
+                    id: "pin:right",
+                    state: 0,
+                    kind: "pinwheel-triangle",
+                    tile_family: "pinwheel",
+                    chirality_token: "right",
+                },
+            },
+            {
+                geometry: "shield",
+                cell: {
+                    id: "shield:hex",
+                    state: 0,
+                    kind: "shield-shield",
+                    tile_family: "shield",
+                },
+                expectedColor: colors.deadAlt,
+            },
+            {
+                geometry: "shield",
+                cell: {
+                    id: "shield:square",
+                    state: 0,
+                    kind: "shield-square",
+                    tile_family: "shield",
+                },
+                expectedColor: colors.dead,
+            },
+            {
+                geometry: "shield",
+                cell: {
+                    id: "shield:tri",
+                    state: 0,
+                    kind: "shield-triangle",
+                    tile_family: "shield",
+                },
+                expectedColor: colors.accentStrong,
+            },
+        ];
+
+        representativeDeadCells.forEach(({ geometry, cell, expectedColor }) => {
+            const deadColor = resolveRenderedCellColor(0, colorLookup, colors, { geometry, cell });
+            expect(deadColor).not.toBe(colors.live);
+            if (expectedColor) {
+                expect(deadColor).toBe(expectedColor);
+            }
+        });
+
+        expect(
+            resolveRenderedCellColor(
+                1,
+                colorLookup,
+                colors,
+                {
+                    geometry: "shield",
+                    cell: {
+                        id: "shield:live",
+                        state: 1,
+                        kind: "shield-shield",
+                        tile_family: "shield",
+                    },
+                },
+            ),
+        ).toBe(colors.live);
     });
 
     it("reads canvas line tokens and applies them to the resolved render style", async () => {
