@@ -9,6 +9,7 @@ from tests.e2e.support_runtime_host import (
     build_runtime_provenance_report,
     compute_source_fingerprint,
     load_standalone_build_manifest,
+    standalone_build_status,
 )
 
 
@@ -46,6 +47,54 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
             summary = load_standalone_build_manifest(output_dir)
             self.assertEqual(summary["manifestPath"], str(manifest_path))
             self.assertEqual(summary["sourceFileCount"], 2)
+
+    def test_standalone_build_status_reports_current_build(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="runtime-host-build-status-") as tmpdir:
+            root = Path(tmpdir)
+            (root / "frontend").mkdir()
+            (root / "frontend" / "app-runtime.ts").write_text("console.log('a');\n", encoding="utf-8")
+            (root / "tools").mkdir()
+            (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
+            (root / "package.json").write_text("{}\n", encoding="utf-8")
+            (root / "package-lock.json").write_text("{}\n", encoding="utf-8")
+            output_dir = root / "output" / "standalone"
+            output_dir.mkdir(parents=True)
+            for relative_path in ("index.html", "standalone-bootstrap.json", "standalone-python-bundle.json"):
+                (output_dir / relative_path).write_text("{}\n", encoding="utf-8")
+            fingerprint, source_files = compute_source_fingerprint(root)
+            (output_dir / "build-manifest.json").write_text(
+                json.dumps(
+                    {
+                        "builtAt": "2026-04-19T00:00:00Z",
+                        "gitHead": None,
+                        "gitDirty": False,
+                        "sourceFingerprint": fingerprint,
+                        "sourceFiles": list(source_files),
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            status = standalone_build_status(root)
+            self.assertTrue(status["buildCurrent"])
+            self.assertEqual(status["reason"], "standalone build outputs are current")
+            self.assertFalse(status["missingOutputs"])
+
+    def test_standalone_build_status_reports_missing_outputs_before_manifest_checks(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="runtime-host-build-status-missing-") as tmpdir:
+            root = Path(tmpdir)
+            (root / "frontend").mkdir()
+            (root / "frontend" / "app-runtime.ts").write_text("console.log('a');\n", encoding="utf-8")
+            (root / "tools").mkdir()
+            (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
+            (root / "package.json").write_text("{}\n", encoding="utf-8")
+            output_dir = root / "output" / "standalone"
+            output_dir.mkdir(parents=True)
+
+            status = standalone_build_status(root)
+            self.assertFalse(status["buildCurrent"])
+            self.assertEqual(status["reason"], "required outputs are missing")
+            self.assertIn("index.html", status["missingOutputs"])
 
     def test_build_runtime_provenance_report_warns_on_missing_manifest(self) -> None:
         report = build_runtime_provenance_report(

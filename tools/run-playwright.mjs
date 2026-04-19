@@ -11,9 +11,11 @@ const playwrightLibDebDir = path.join(playwrightLibRoot, "debs");
 const playwrightLibExtractRoot = path.join(playwrightLibRoot, "root");
 const defaultSuiteName = "all";
 const manifestToolPath = path.join("tools", "print_playwright_suite_manifest.py");
+const standaloneBuildStatusToolPath = path.join("tools", "print_standalone_build_status.py");
 const envOverrides = {};
 let listSuites = false;
 let skipStandaloneBuild = false;
+let forceStandaloneBuild = false;
 let suiteName = defaultSuiteName;
 
 for (let index = 2; index < process.argv.length; index += 1) {
@@ -35,6 +37,10 @@ for (let index = 2; index < process.argv.length; index += 1) {
         skipStandaloneBuild = true;
         continue;
     }
+    if (token === "--force-standalone-build") {
+        forceStandaloneBuild = true;
+        continue;
+    }
     if (token === "--env") {
         const assignment = process.argv[index + 1];
         if (!assignment || !assignment.includes("=")) {
@@ -45,7 +51,13 @@ for (let index = 2; index < process.argv.length; index += 1) {
         index += 1;
         continue;
     }
-    throw new Error(`Unknown argument '${token}'. Use --suite <name>, --list-suites, or --env KEY=VALUE.`);
+    throw new Error(
+        `Unknown argument '${token}'. Use --suite <name>, --list-suites, --skip-standalone-build, --force-standalone-build, or --env KEY=VALUE.`,
+    );
+}
+
+if (skipStandaloneBuild && forceStandaloneBuild) {
+    throw new Error("--skip-standalone-build and --force-standalone-build cannot be used together.");
 }
 
 const pythonCandidates = process.platform === "win32"
@@ -123,6 +135,8 @@ function linuxRepairError({ missingLibraries, packages = [], missingTools = [], 
     }
     lines.push("The local self-repair path currently assumes Debian/Ubuntu-style tooling (`apt`, `apt-cache`, and `dpkg-deb`).");
     lines.push("Install the required runtime libraries manually or rerun in an environment with those packaging tools available.");
+    lines.push("Preferred browser entrypoints: `npm run test:e2e:playwright`, `npm run test:e2e:playwright:server`, or `npm run test:e2e:playwright:standalone`.");
+    lines.push("Troubleshooting reference: docs/TESTING.md (Playwright troubleshooting section).");
     if (extraDetail) {
         lines.push(extraDetail.trim());
     }
@@ -209,7 +223,10 @@ function ensureLinuxPlaywrightRuntime(env) {
         throw linuxRepairError({
             missingLibraries: currentMissing,
             packages,
-            extraDetail: downloadResult.stderr || downloadResult.stdout || "The `apt download` command failed.",
+            extraDetail: (
+                "Automatic browser-library repair failed while running `apt download`.\n"
+                + (downloadResult.stderr || downloadResult.stdout || "The `apt download` command failed.")
+            ),
         });
     }
 
@@ -305,6 +322,15 @@ function loadSuiteManifest() {
     return payload;
 }
 
+function loadStandaloneBuildStatus() {
+    const result = runPythonCapture([standaloneBuildStatusToolPath]);
+    const payload = JSON.parse(result.stdout || "{}");
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+        throw new Error("Standalone build status tool did not produce a JSON object.");
+    }
+    return payload;
+}
+
 const suiteManifest = loadSuiteManifest();
 if (listSuites) {
     console.log(JSON.stringify(suiteManifest, null, 2));
@@ -324,9 +350,25 @@ const baseEnv = {
 };
 const runtimeEnv = ensureLinuxPlaywrightRuntime(baseEnv);
 if (!skipStandaloneBuild && selectedSuite.requires_standalone_build) {
-    runCommand(resolveNpmExecutable(), ["run", "build:frontend:standalone"], {
-        env: runtimeEnv,
-        stdio: "inherit",
-    });
+    const buildStatus = loadStandaloneBuildStatus();
+    if (forceStandaloneBuild || buildStatus.buildCurrent !== true) {
+        const reason = forceStandaloneBuild
+            ? "forced rebuild requested"
+            : String(buildStatus.reason || "standalone build is missing or stale");
+        console.error(`Preparing standalone build for Playwright suite '${selectedSuite.name}': ${reason}.`);
+        runCommand(resolveNpmExecutable(), ["run", "build:frontend:standalone"], {
+            env: runtimeEnv,
+            stdio: "inherit",
+        });
+    } else {
+        console.error(`Reusing current standalone build for Playwright suite '${selectedSuite.name}'.`);
+    }
+} else if (skipStandaloneBuild && selectedSuite.requires_standalone_build) {
+    const buildStatus = loadStandaloneBuildStatus();
+    if (buildStatus.buildCurrent !== true) {
+        console.error(
+            `Skipping standalone rebuild for Playwright suite '${selectedSuite.name}' even though the build is not current: ${String(buildStatus.reason || "unknown reason")}.`,
+        );
+    }
 }
 runPythonModules([selectedSuite.module], runtimeEnv);

@@ -245,7 +245,9 @@ node ./tools/run-playwright.mjs --list-suites
 
 These npm scripts are the preferred local entrypoints because they own Playwright suite selection, Linux browser-runtime repair, and standalone-build setup when a suite needs it. The suite list comes from the Python Playwright manifest in `tests/e2e/playwright_suite_support.py`.
 
-Direct Python entrypoints are still useful when debugging CI internals:
+The runner now reuses `output/standalone/` when the existing build manifest matches the current checkout fingerprint. It only rebuilds the standalone bundle when required outputs are missing, the manifest is missing, or the build fingerprint no longer matches the current source tree.
+
+Direct Python entrypoints are still useful when debugging CI internals, but they are not the preferred local path:
 
 ```powershell
 py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
@@ -515,10 +517,22 @@ Quick failure-class mapping:
 - full browser sweep: `npm run test:e2e:playwright`
 - shard debugging with `PLAYWRIGHT_SUBSET_*`: `npm run test:e2e:playwright:subset`
 
-Linux note:
+Playwright troubleshooting:
 
-- `node ./tools/run-playwright.mjs` can repair missing Playwright browser libraries only on Debian/Ubuntu-style environments with `apt`, `apt-cache`, and `dpkg-deb`.
-- If those tools are missing, the runner now fails with an explicit message listing the missing libraries and expected packaging tools.
+- missing server-host browser behavior:
+  run `npm run test:e2e:playwright:server`
+- missing standalone-only browser behavior:
+  run `npm run test:e2e:playwright:standalone`
+- stale or missing standalone bundle:
+  run `npm run build:frontend:standalone`
+- full browser regression sweep:
+  run `npm run test:e2e:playwright`
+- shard-specific server regression:
+  run `npm run test:e2e:playwright:subset`
+- Linux browser library failures:
+  `node ./tools/run-playwright.mjs` can repair missing Playwright browser libraries only on Debian/Ubuntu-style environments with `apt`, `apt-cache`, and `dpkg-deb`
+- when those packaging tools are unavailable:
+  install the listed shared libraries manually, then rerun the npm Playwright command you actually need
 
 For broad refactors or release confidence, run the full local sweep:
 

@@ -190,6 +190,53 @@ def _standalone_output_dir(root: Path) -> Path:
     return root / "output" / "standalone"
 
 
+def missing_standalone_output_files(output_dir: Path) -> list[str]:
+    return [
+        relative_path
+        for relative_path in _STANDALONE_REQUIRED_OUTPUTS
+        if not (output_dir / relative_path).exists()
+    ]
+
+
+def standalone_build_status(root: Path) -> dict[str, Any]:
+    output_dir = _standalone_output_dir(root)
+    missing_outputs = missing_standalone_output_files(output_dir)
+    standalone_build = load_standalone_build_manifest(output_dir)
+    current_repo = current_repo_provenance(str(root))
+    provenance = build_runtime_provenance_report(
+        host_kind="standalone",
+        current_repo=current_repo,
+        standalone_build=standalone_build,
+    )
+    fingerprint_matches = provenance["comparison"].get("fingerprintMatches")
+    build_current = (
+        len(missing_outputs) == 0
+        and standalone_build is not None
+        and fingerprint_matches is True
+    )
+    if missing_outputs:
+        reason = "required outputs are missing"
+    elif standalone_build is None:
+        reason = "build manifest is missing"
+    elif fingerprint_matches is False:
+        reason = "source fingerprint differs from current checkout"
+    elif fingerprint_matches is None:
+        reason = "build provenance is incomplete"
+    else:
+        reason = "standalone build outputs are current"
+    return {
+        "outputDir": str(output_dir),
+        "requiredOutputsPresent": len(missing_outputs) == 0,
+        "missingOutputs": missing_outputs,
+        "manifestPresent": standalone_build is not None,
+        "buildCurrent": build_current,
+        "reason": reason,
+        "recommendedBuildCommand": "npm run build:frontend:standalone",
+        "preferredStandaloneCommand": "npm run test:e2e:playwright:standalone",
+        "runtimeProvenance": provenance,
+    }
+
+
 class BrowserRuntimeHost(ABC):
     def __init__(self) -> None:
         self.root = Path(__file__).resolve().parents[2]
@@ -330,11 +377,7 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
             self.stderr_handle = None
 
     def _ensure_required_output_files(self) -> None:
-        missing_outputs = [
-            relative_path
-            for relative_path in _STANDALONE_REQUIRED_OUTPUTS
-            if not (self.output_dir / relative_path).exists()
-        ]
+        missing_outputs = missing_standalone_output_files(self.output_dir)
         if missing_outputs:
             formatted_outputs = "\n".join(
                 f"- output/standalone/{relative_path}"

@@ -64,6 +64,7 @@
 - Expand Python lint/format guardrails beyond the current render-review/bootstrap slice once the older compatibility facades stop depending on import-for-export and `sys.path` bootstrap patterns.
 - Decide whether the lightweight frontend formatting check should grow into a full linter/formatter after a deliberate repo-wide mechanical style pass.
 - Extend canonical type-surface drift checks beyond the current controller-view/editor/controller-sync-session/actions slice only if more frontend barrels start restating payload shapes instead of reusing canonical request and domain types.
+- Revisit Playwright runner/build coordination only if new host types or non-standalone artifact builds need their own freshness checks; keep suite selection and standalone build reuse centralized in the npm runner path.
 - Continue the code-quality roadmap by splitting the remaining drawer sections if editor controls and topology metadata keep growing together.
 - Revisit the interaction router only if idle click/context-menu behavior grows new gesture modes; pointer-session start/update/cancel/commit flow should stay in the session modules.
 - Revisit drawer composition only if new UI sections appear; section-local field growth should stay in the section builders, not return to one broad `drawer.ts`.

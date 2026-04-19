@@ -330,7 +330,7 @@ Developers run the same entrypoints locally and in CI, reducing stale assumption
 
 Implementation status:
 
-The first consolidation is in place. `tests/e2e/playwright_suite_support.py` now owns the public Playwright suite manifest, `tools/run-playwright.mjs` selects suites by semantic name and can list them without running tests, and standalone-build ownership now lives in the npm runner/CI path instead of in `tests/e2e/support_runtime_host.py`. The runner also fails with explicit Linux browser-library repair guidance when Debian-style repair tooling is unavailable. The browser diagnosis and workbench commands now share one real package under `tools/render_review/`, with the top-level `tools/run_*.py` and `tools/render_canvas_review.py` files reduced to CLI entrypoints.
+The consolidation is now stronger. `tests/e2e/playwright_suite_support.py` remains the single public suite manifest, `tools/run-playwright.mjs` still selects suites by semantic name, and the runner now consults a backend-owned standalone build-status report before rebuilding. That means local npm Playwright commands reuse `output/standalone/` when the build fingerprint still matches the current checkout instead of rebuilding blindly. `docs/TESTING.md` now also maps common Playwright failure classes to the right npm command and Linux browser-library repair path. The browser diagnosis and workbench commands continue to share one real package under `tools/render_review/`, with the top-level `tools/run_*.py` and `tools/render_canvas_review.py` files reduced to CLI entrypoints.
 
 ## Quick Wins
 
