@@ -258,6 +258,14 @@ class AppBootstrapPayload(TypedDict):
     snapshot_version: int
 
 
+class PatternPayload(TypedDict):
+    format: str
+    version: int
+    topology_spec: TopologySpecPayload
+    rule: str
+    cells_by_id: SparseCellsByIdPayload
+
+
 class ResetControlRequestPayload(TypedDict):
     topology_spec: ResetTopologySpecPayload
     speed: float

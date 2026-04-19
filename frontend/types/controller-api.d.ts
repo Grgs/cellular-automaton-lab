@@ -1,5 +1,7 @@
 import type {
     AppBootstrapData,
+    CellIdentifier,
+    CellStateUpdate,
     PersistedSimulationSnapshotV5,
     RulesResponse,
     SimulationSnapshot,
@@ -29,13 +31,9 @@ export interface ResetControlBody {
     randomize: boolean;
 }
 
-export interface CellTargetRequest {
-    id: string;
-}
+export interface CellTargetRequest extends CellIdentifier {}
 
-export interface CellUpdateRequest extends CellTargetRequest {
-    state: number;
-}
+export interface CellUpdateRequest extends CellStateUpdate {}
 
 export interface CellUpdatesRequest {
     cells: CellUpdateRequest[];

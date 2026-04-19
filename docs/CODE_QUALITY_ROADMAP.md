@@ -299,7 +299,7 @@ Payload drift becomes mechanically visible before it reaches runtime or E2E test
 
 Implementation status:
 
-The first drift guard now covers both the core domain payloads and the request-side controller and standalone worker command shapes. `backend/payload_contracts.py` emits backend-owned contract metadata for `frontend/types/domain.d.ts`, `frontend/types/controller-api.d.ts`, and the standalone request payload union in `frontend/standalone/protocol.ts`, and `tests/unit/test_payload_contracts.py` asserts that those frontend declarations stay aligned.
+The drift guard now covers substantially more of the shared schema surface. `backend/payload_contracts.py` derives frontend field contracts directly from backend `TypedDict` payload definitions in `payload_types.py`, including bootstrap metadata, rule/snapshot payloads, pattern export payloads, request bodies, and the rendering-side periodic face tiling descriptor. The same test module now also checks drift-prone canonical type references and aliases across `frontend/types/controller-view.d.ts`, `frontend/types/controller-sync-session.d.ts`, `frontend/types/editor.d.ts`, and `frontend/types/actions.d.ts`, while still asserting the standalone worker request payload union in `frontend/standalone/protocol.ts`.
 
 ### 8. E2E Tooling And Browser Runtime
 

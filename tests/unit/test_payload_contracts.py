@@ -9,12 +9,16 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.payload_contracts import payload_field_contracts, payload_type_union_contracts
+from backend.payload_contracts import (
+    frontend_property_type_contracts,
+    frontend_type_alias_contracts,
+    payload_field_contracts,
+    payload_type_union_contracts,
+)
 
 
-_INTERFACE_PATTERN = re.compile(
-    r"export interface (?P<name>[A-Za-z0-9_]+)(?: extends (?P<extends>[^{]+))? \{(?P<body>.*?)\n\}",
-    re.DOTALL,
+_INTERFACE_HEADER_PATTERN = re.compile(
+    r"export interface (?P<name>[A-Za-z0-9_]+)(?: extends (?P<extends>[^{]+))? \{"
 )
 _FIELD_PATTERN = re.compile(r"^\s*(?P<name>[A-Za-z0-9_]+)\??:", re.MULTILINE)
 _PROPERTY_TYPE_PATTERN = re.compile(r"^\s*(?P<name>[A-Za-z0-9_]+)\??:\s*(?P<type>[^;]+);", re.MULTILINE)
@@ -35,10 +39,14 @@ def _load_text(relative_path: str) -> str:
     return (ROOT / relative_path).read_text(encoding="utf-8")
 
 
+def _normalize_ts_type(type_text: str) -> str:
+    return re.sub(r"\s+", " ", type_text).strip()
+
+
 def _split_union_members(type_body: str) -> set[str]:
     return {
         member.strip()
-        for member in re.sub(r"\s+", " ", type_body).split("|")
+        for member in _normalize_ts_type(type_body).split("|")
         if member.strip()
     }
 
@@ -46,8 +54,23 @@ def _split_union_members(type_body: str) -> set[str]:
 def _parse_frontend_interfaces(relative_paths: list[str]) -> dict[str, _FrontendInterfaceDefinition]:
     definitions: dict[str, _FrontendInterfaceDefinition] = {}
     for relative_path in relative_paths:
-        for match in _INTERFACE_PATTERN.finditer(_load_text(relative_path)):
-            body = match.group("body")
+        text = _load_text(relative_path)
+        cursor = 0
+        while True:
+            match = _INTERFACE_HEADER_PATTERN.search(text, cursor)
+            if match is None:
+                break
+            body_start = match.end()
+            depth = 1
+            index = body_start
+            while index < len(text) and depth > 0:
+                char = text[index]
+                if char == "{":
+                    depth += 1
+                elif char == "}":
+                    depth -= 1
+                index += 1
+            body = text[body_start:index - 1]
             raw_extends = match.group("extends")
             extends = tuple(
                 parent.strip()
@@ -55,7 +78,7 @@ def _parse_frontend_interfaces(relative_paths: list[str]) -> dict[str, _Frontend
                 if parent.strip()
             )
             property_types = {
-                property_match.group("name"): property_match.group("type").strip()
+                property_match.group("name"): _normalize_ts_type(property_match.group("type"))
                 for property_match in _PROPERTY_TYPE_PATTERN.finditer(body)
             }
             definitions[match.group("name")] = _FrontendInterfaceDefinition(
@@ -63,6 +86,7 @@ def _parse_frontend_interfaces(relative_paths: list[str]) -> dict[str, _Frontend
                 extends=extends,
                 property_types=property_types,
             )
+            cursor = index
     return definitions
 
 
@@ -81,9 +105,25 @@ def _resolve_interface_fields(
     return resolved
 
 
+def _resolve_interface_property_types(
+    definitions: dict[str, _FrontendInterfaceDefinition],
+    interface_name: str,
+) -> dict[str, str]:
+    try:
+        definition = definitions[interface_name]
+    except KeyError as error:
+        raise AssertionError(f"Missing frontend interface {interface_name!r}.") from error
+
+    resolved: dict[str, str] = {}
+    for parent in definition.extends:
+        resolved.update(_resolve_interface_property_types(definitions, parent))
+    resolved.update(definition.property_types)
+    return resolved
+
+
 def _parse_type_aliases(relative_path: str) -> dict[str, str]:
     return {
-        match.group("name"): re.sub(r"\s+", " ", match.group("body")).strip()
+        match.group("name"): _normalize_ts_type(match.group("body"))
         for match in _TYPE_ALIAS_PATTERN.finditer(_load_text(relative_path))
     }
 
@@ -103,6 +143,32 @@ class PayloadContractTests(unittest.TestCase):
                 self.assertEqual(
                     _resolve_interface_fields(frontend_interfaces, contract.interface_name),
                     set(contract.all_fields),
+                )
+
+    def test_frontend_property_types_match_canonical_contracts(self) -> None:
+        frontend_paths = sorted({contract.frontend_path for contract in frontend_property_type_contracts()})
+        frontend_interfaces = _parse_frontend_interfaces(frontend_paths)
+
+        for contract in frontend_property_type_contracts():
+            with self.subTest(interface=contract.interface_name, property=contract.property_name):
+                property_types = _resolve_interface_property_types(frontend_interfaces, contract.interface_name)
+                self.assertEqual(
+                    property_types.get(contract.property_name),
+                    _normalize_ts_type(contract.property_type),
+                )
+
+    def test_frontend_type_aliases_match_canonical_contracts(self) -> None:
+        frontend_paths = sorted({contract.frontend_path for contract in frontend_type_alias_contracts()})
+        type_aliases_by_path = {
+            path: _parse_type_aliases(path)
+            for path in frontend_paths
+        }
+
+        for contract in frontend_type_alias_contracts():
+            with self.subTest(type_name=contract.type_name):
+                self.assertEqual(
+                    type_aliases_by_path[contract.frontend_path].get(contract.type_name),
+                    _normalize_ts_type(contract.type_body),
                 )
 
     def test_frontend_worker_request_payload_union_matches_backend_contract(self) -> None:
