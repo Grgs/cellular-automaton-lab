@@ -179,8 +179,14 @@ def _observe_reference_topology(
     topology: LatticeTopology,
 ) -> ReferencePatchObservation:
     kind_counts = Counter(cell.kind for cell in topology.cells)
+    tile_family_counts = Counter(
+        cell.tile_family for cell in topology.cells if cell.tile_family is not None
+    )
     orientation_token_counts = Counter(
         cell.orientation_token for cell in topology.cells if cell.orientation_token is not None
+    )
+    chirality_token_counts = Counter(
+        cell.chirality_token for cell in topology.cells if cell.chirality_token is not None
     )
     area_classes_by_kind: dict[str, set[float]] = {}
     decoration_variants_by_kind: dict[str, set[tuple[str, ...]]] = {}
@@ -243,7 +249,9 @@ def _observe_reference_topology(
         depth=int(depth),
         total_cells=len(topology.cells),
         kind_counts=tuple(sorted(kind_counts.items())),
+        tile_family_counts=tuple(sorted(tile_family_counts.items())),
         orientation_token_counts=tuple(sorted(orientation_token_counts.items())),
+        chirality_token_counts=tuple(sorted(chirality_token_counts.items())),
         degree_histogram=tuple(sorted(degree_histogram.items())),
         connected_component_count=connected_component_count,
         disconnected_component_sizes=disconnected_component_sizes,

@@ -116,6 +116,21 @@ def _expectation_failures(
             )
         )
     if (
+        expectation.expected_tile_family_counts is not None
+        and observation.tile_family_counts != expectation.expected_tile_family_counts
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="unexpected-tile-family-counts",
+                message=(
+                    f"Depth {observation.depth} expected tile-family counts "
+                    f"{expectation.expected_tile_family_counts!r} but saw "
+                    f"{observation.tile_family_counts!r}."
+                ),
+                depth=observation.depth,
+            )
+        )
+    if (
         expectation.expected_orientation_token_counts is not None
         and observation.orientation_token_counts != expectation.expected_orientation_token_counts
     ):
@@ -126,6 +141,21 @@ def _expectation_failures(
                     f"Depth {observation.depth} expected orientation-token counts "
                     f"{expectation.expected_orientation_token_counts!r} but saw "
                     f"{observation.orientation_token_counts!r}."
+                ),
+                depth=observation.depth,
+            )
+        )
+    if (
+        expectation.expected_chirality_token_counts is not None
+        and observation.chirality_token_counts != expectation.expected_chirality_token_counts
+    ):
+        failures.append(
+            ReferenceCheckFailure(
+                code="unexpected-chirality-token-counts",
+                message=(
+                    f"Depth {observation.depth} expected chirality-token counts "
+                    f"{expectation.expected_chirality_token_counts!r} but saw "
+                    f"{observation.chirality_token_counts!r}."
                 ),
                 depth=observation.depth,
             )

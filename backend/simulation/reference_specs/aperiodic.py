@@ -399,6 +399,31 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         ),
         depth_expectations={
             1: ReferenceDepthExpectation(
+                exact_total_cells=132,
+                expected_kind_counts=(
+                    (DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND, 37),
+                    (DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND, 95),
+                ),
+                expected_tile_family_counts=((DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 132),),
+                expected_orientation_token_counts=(
+                    ("0", 9),
+                    ("120", 12),
+                    ("150", 4),
+                    ("180", 8),
+                    ("210", 13),
+                    ("240", 7),
+                    ("270", 14),
+                    ("30", 14),
+                    ("300", 14),
+                    ("330", 4),
+                    ("60", 17),
+                    ("90", 16),
+                ),
+                expected_chirality_token_counts=(
+                    ("blue", 41),
+                    ("red", 46),
+                    ("yellow", 8),
+                ),
                 required_kinds=(
                     DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
                     DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
@@ -413,6 +438,8 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                         DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
                     ),
                 ),
+                expected_degree_histogram=((1, 19), (2, 63), (3, 45), (4, 5)),
+                expected_signature="e5925aea3c55",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-1",
             ),
             3: ReferenceDepthExpectation(
@@ -420,6 +447,26 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 expected_kind_counts=(
                     (DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND, 140),
                     (DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND, 322),
+                ),
+                expected_tile_family_counts=((DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 462),),
+                expected_orientation_token_counts=(
+                    ("0", 51),
+                    ("120", 47),
+                    ("150", 31),
+                    ("180", 24),
+                    ("210", 45),
+                    ("240", 31),
+                    ("270", 33),
+                    ("30", 37),
+                    ("300", 38),
+                    ("330", 32),
+                    ("60", 64),
+                    ("90", 29),
+                ),
+                expected_chirality_token_counts=(
+                    ("blue", 124),
+                    ("red", 160),
+                    ("yellow", 38),
                 ),
                 required_kinds=(
                     DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
@@ -435,15 +482,14 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                         DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
                     ),
                 ),
-                min_unique_orientation_tokens=12,
-                min_unique_chirality_tokens=3,
+                expected_degree_histogram=((1, 64), (2, 230), (3, 150), (4, 18)),
                 expected_signature="f66a7171fb67",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-3",
             ),
         },
         notes=(
             "The public tiling collapses marked internal prototiles to squares and triangles.",
-            "The app's canonical sample uses a cleaned dense central component of the literature patch.",
+            "The app's canonical sample uses a cleaned dense central component of the literature patch, with exact public kind counts plus exact tile-family, orientation, chirality, and degree distributions checked at representative depths.",
         ),
     ),
     SHIELD_GEOMETRY: ReferenceFamilySpec(

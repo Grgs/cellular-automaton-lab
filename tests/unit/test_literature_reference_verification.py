@@ -45,7 +45,9 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
 
         self.assertEqual(first.signature, second.signature)
         self.assertEqual(first.kind_counts, second.kind_counts)
+        self.assertEqual(first.tile_family_counts, second.tile_family_counts)
         self.assertEqual(first.adjacency_pairs, second.adjacency_pairs)
+        self.assertEqual(first.chirality_token_counts, second.chirality_token_counts)
         self.assertEqual(first.connected_component_count, second.connected_component_count)
         self.assertEqual(first.disconnected_component_sizes, second.disconnected_component_sizes)
         self.assertEqual(first.hole_count, second.hole_count)
@@ -667,6 +669,31 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             any(failure.code == "unexpected-orientation-token-counts" for failure in failures)
         )
 
+    def test_dodecagonal_square_triangle_marked_metadata_count_expectations_report_mismatch(
+        self,
+    ) -> None:
+        spec = REFERENCE_FAMILY_SPECS["dodecagonal-square-triangle"]
+        expectation = replace(
+            spec.depth_expectations[3],
+            expected_tile_family_counts=(("not-dodecagonal-square-triangle", 462),),
+            expected_chirality_token_counts=(("blue", 124), ("red", 159), ("yellow", 39)),
+        )
+        topology = build_topology("dodecagonal-square-triangle", 0, 0, 3)
+
+        failures = _depth_topology_expectation_failures(
+            geometry="dodecagonal-square-triangle",
+            depth=3,
+            topology=topology,
+            expectation=expectation,
+        )
+
+        self.assertTrue(
+            any(failure.code == "unexpected-tile-family-counts" for failure in failures)
+        )
+        self.assertTrue(
+            any(failure.code == "unexpected-chirality-token-counts" for failure in failures)
+        )
+
     def test_dodecagonal_square_triangle_reference_verifier_accepts_dense_hole_free_reference_patch(
         self,
     ) -> None:
@@ -685,6 +712,39 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
                 ("dodecagonal-square-triangle-square", 140),
                 ("dodecagonal-square-triangle-triangle", 322),
             ),
+        )
+        self.assertEqual(
+            depth_three_observation.tile_family_counts,
+            (("dodecagonal-square-triangle", 462),),
+        )
+        self.assertEqual(
+            depth_three_observation.orientation_token_counts,
+            (
+                ("0", 51),
+                ("120", 47),
+                ("150", 31),
+                ("180", 24),
+                ("210", 45),
+                ("240", 31),
+                ("270", 33),
+                ("30", 37),
+                ("300", 38),
+                ("330", 32),
+                ("60", 64),
+                ("90", 29),
+            ),
+        )
+        self.assertEqual(
+            depth_three_observation.chirality_token_counts,
+            (
+                ("blue", 124),
+                ("red", 160),
+                ("yellow", 38),
+            ),
+        )
+        self.assertEqual(
+            depth_three_observation.degree_histogram,
+            ((1, 64), (2, 230), (3, 150), (4, 18)),
         )
         self.assertEqual(depth_three_observation.signature, "f66a7171fb67")
 

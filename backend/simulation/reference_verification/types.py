@@ -20,7 +20,9 @@ class ReferencePatchObservation:
     depth: int
     total_cells: int
     kind_counts: tuple[tuple[str, int], ...]
+    tile_family_counts: tuple[tuple[str, int], ...]
     orientation_token_counts: tuple[tuple[str, int], ...]
+    chirality_token_counts: tuple[tuple[str, int], ...]
     degree_histogram: tuple[tuple[int, int], ...]
     connected_component_count: int
     disconnected_component_sizes: tuple[int, ...]
