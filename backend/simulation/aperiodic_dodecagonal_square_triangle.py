@@ -3,21 +3,16 @@ from __future__ import annotations
 from functools import lru_cache
 import json
 from pathlib import Path
+from typing import Any, cast
 
 from backend.simulation.aperiodic_support import AperiodicPatch, PatchRecord, patch_from_records
 
 
-# This checked-in patch is a cleaned dense central component from the dodecagonal square-triangle
-# literature patch. A few stray fringe triangles are excluded to keep the public sample
-# connected and overlap-free while still presenting a visibly bulk-filled patch.
+# This family currently ships as a backend-owned validated public patch sample rather than
+# as a symbolic substitution generator. The checked-in reference data is a deterministic
+# connected, hole-free subset of the literature patch, annotated with graph distance so the
+# app can expose stable patch-depth shells without re-running any cleanup logic at runtime.
 _DATA_PATH = Path(__file__).with_name("data") / "dodecagonal_square_triangle_reference_patch.json"
-_EXCLUDED_RECORD_IDS = frozenset(
-    {
-        "sqtri:ref:05726",
-        "sqtri:ref:05782",
-        "sqtri:ref:06625",
-    }
-)
 _PATCH_DISTANCE_THRESHOLDS = {
     0: 4,
     1: 16,
@@ -28,12 +23,16 @@ _PATCH_DISTANCE_THRESHOLDS = {
 
 
 @lru_cache(maxsize=1)
+def _load_payload() -> dict[str, object]:
+    return json.loads(_DATA_PATH.read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=1)
 def _load_reference_records() -> tuple[PatchRecord, ...]:
-    payload = json.loads(_DATA_PATH.read_text(encoding="utf-8"))
+    payload = _load_payload()
+    raw_records = cast(list[dict[str, Any]], payload["records"])
     records: list[PatchRecord] = []
-    for raw_record in payload["records"]:
-        if raw_record["id"] in _EXCLUDED_RECORD_IDS:
-            continue
+    for raw_record in raw_records:
         records.append(
             {
                 "id": raw_record["id"],
@@ -43,7 +42,11 @@ def _load_reference_records() -> tuple[PatchRecord, ...]:
                 "tile_family": raw_record.get("tile_family"),
                 "orientation_token": raw_record.get("orientation_token"),
                 "chirality_token": raw_record.get("chirality_token"),
-                "decoration_tokens": raw_record.get("decoration_tokens"),
+                "decoration_tokens": (
+                    tuple(raw_record["decoration_tokens"])
+                    if raw_record.get("decoration_tokens") is not None
+                    else None
+                ),
             }
         )
     return tuple(records)
@@ -51,11 +54,11 @@ def _load_reference_records() -> tuple[PatchRecord, ...]:
 
 @lru_cache(maxsize=1)
 def _load_record_distances() -> dict[str, int]:
-    payload = json.loads(_DATA_PATH.read_text(encoding="utf-8"))
+    payload = _load_payload()
+    raw_records = cast(list[dict[str, Any]], payload["records"])
     return {
         raw_record["id"]: int(raw_record["graph_distance"])
-        for raw_record in payload["records"]
-        if raw_record["id"] not in _EXCLUDED_RECORD_IDS
+        for raw_record in raw_records
     }
 
 
