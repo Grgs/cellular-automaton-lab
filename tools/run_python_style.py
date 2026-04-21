@@ -19,7 +19,6 @@ STYLE_TARGETS = (
     # Verification and reference-fixture tools.
     "tools/regenerate_reference_fixtures.py",
     "tools/report_tiling_verification_strength.py",
-    "tools/export_dodecagonal_square_triangle_contract_generator.py",
     "tools/validate_tilings.py",
     "tools/verify_reference_tilings.py",
     # Browser diagnosis and workbench tooling.
@@ -38,7 +37,6 @@ STYLE_TARGETS = (
     "tests/e2e/test_run_geometry_cleanup_workbench_tool.py",
     "tests/e2e/test_run_render_review_sweep_tool.py",
     "tests/unit/test_aperiodic_family_contracts.py",
-    "tests/unit/test_export_dodecagonal_square_triangle_contract_generator_tool.py",
     "tests/unit/test_literature_reference_verification.py",
     "tests/unit/test_reference_fixture_regeneration.py",
     "tests/unit/test_report_tiling_verification_strength_tool.py",

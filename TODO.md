@@ -41,7 +41,7 @@
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The direct canonical fixture layer now covers shallow and representative depths for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, plus depth-`3` fixtures for `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
-- If we revisit `dodecagonal-square-triangle`, add deeper marked-prototile and substitution-structure checks beyond the current cleaned dense canonical sample, rooted local-reference anchors, exact public canonical patch fixtures, and exact tile-family/orientation/chirality/degree distributions at depths `1` and `3`.
+- If we revisit `dodecagonal-square-triangle`, add deeper marked-prototile and substitution-structure checks beyond the current snapped literature-vector reconstruction, rooted local-reference anchors, exact public canonical patch fixtures, and exact tile-family/orientation/chirality/degree distributions at depths `1` and `3`.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 
 ## Later

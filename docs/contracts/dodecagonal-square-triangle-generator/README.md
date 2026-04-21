@@ -1,77 +1,38 @@
-# Dodecagonal Square-Triangle Generator Contract
+# Dodecagonal Square-Triangle Generator Bundle
 
-This directory is a standalone implementation contract for the `dodecagonal-square-triangle`
-patch generator. It is intentionally stripped of host-application concerns. Another model
-should be able to recreate the generator from this directory alone.
+This directory contains a standalone literature-derived generator for the public
+`dodecagonal-square-triangle` family plus the source assets it depends on.
 
-## Goal
+The generator is intentionally narrow and self-contained. It preserves only the
+public patch interface the application consumes and excludes unrelated host-app
+details such as routing, frontend wiring, persistence, and review tooling.
 
-Implement a function with this behavior:
+## Files
+
+- `generator.py`
+  - standalone Python implementation
+  - parses the Bielefeld vector patch PDF
+  - snaps near-identical PDF vertices into a shared point set
+  - rebuilds shared-edge adjacency from the snapped polygons
+  - emits deterministic public square/triangle patches for depths `0..7`
+- `test_generator.py`
+  - focused standalone validation for connectivity, hole-freedom, overlap-free
+    area, metadata presence, and reciprocal neighbors
+- `bielefeld-patch.pdf`
+  - primary vector source used by the generator
+- `reference-patch.json`
+  - baseline artifact for comparison against the older cleaned-patch approach
+
+## Public Interface
+
+The standalone generator exposes:
 
 ```python
 def build_dodecagonal_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
     ...
 ```
 
-The function returns a finite public square-triangle patch for the
-`dodecagonal-square-triangle` family.
-
-This contract preserves:
-
-- the callable interface
-- the output schema
-- the patch-depth semantics
-- the exact metadata vocabulary
-- the exact neighbor construction rule
-- the observable outputs for patch depths `0` through `4`
-
-This contract does **not** require any knowledge of the surrounding application.
-
-## Included Files
-
-- `README.md`: this contract
-- `contract.json`: machine-readable summary of thresholds, vocabularies, and exact depth-level counts
-- `reference-patch.json`: authoritative full reference dataset
-- `generator.py`: generated standalone implementation built from the checked-in backend contract
-- `test_generator.py`: generated standalone regression test for `generator.py`
-- `expected-patches/patch-depth-0.json`
-- `expected-patches/patch-depth-1.json`
-- `expected-patches/patch-depth-2.json`
-- `expected-patches/patch-depth-3.json`
-- `expected-patches/patch-depth-4.json`
-
-If you implement against this bundle, the `expected-patches` files are the authoritative
-acceptance oracles.
-
-## Regeneration
-
-The standalone `generator.py` and `test_generator.py` files in this directory are generated.
-Regenerate them from the repo source of truth with:
-
-```bash
-python tools/export_dodecagonal_square_triangle_contract_generator.py
-```
-
-Check that they are current with:
-
-```bash
-python tools/export_dodecagonal_square_triangle_contract_generator.py --check
-```
-
-## External Source Provenance
-
-The included `reference-patch.json` is the authoritative input dataset for this contract.
-It is a validated public patch sample derived from the square-triangle literature source:
-
-- [Square-triangle](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
-
-You do not need to re-derive the dataset from the literature source if you have this bundle.
-If you choose to re-derive it anyway, your produced `reference-patch.json` and generated
-patches must match the included artifacts exactly.
-
-## Required Output Types
-
-The generator must produce this logical shape:
+with a return shape equivalent to:
 
 ```python
 class PatchCell(TypedDict):
@@ -93,210 +54,56 @@ class AperiodicPatch(TypedDict):
     cells: tuple[PatchCell, ...]
 ```
 
-The concrete implementation language does not matter as long as the observable data is
-equivalent.
-
 ## Public Vocabulary
 
-### Family identifier
-
 - `tile_family = "dodecagonal-square-triangle"`
-
-### Public cell kinds
-
 - `dodecagonal-square-triangle-square`
 - `dodecagonal-square-triangle-triangle`
 
-### Orientation tokens
+Square cells keep `chirality_token = None`. Triangle cells collapse to the
+public triangle kind while preserving color-derived chirality tokens:
+`"red"`, `"yellow"`, and `"blue"`.
 
-Orientation tokens are strings, not integers. The allowed vocabulary is:
+## Core Reconstruction Rule
 
-- `"0"`
-- `"30"`
-- `"60"`
-- `"90"`
-- `"120"`
-- `"150"`
-- `"180"`
-- `"210"`
-- `"240"`
-- `"270"`
-- `"300"`
-- `"330"`
+The generator does not use the older checked-in connected subset as its source
+of truth. Instead it:
 
-### Chirality tokens
+1. parses filled polygons from `bielefeld-patch.pdf`
+2. classifies squares by vertex count and triangles by literature fill color
+3. snaps near-identical PDF vertices within a fixed tolerance so theoretically
+   shared points become exactly shared
+4. rebuilds adjacency from snapped full-edge matches
+5. grows the finite patch by graph distance from a fixed square seed cell
+6. normalizes the resulting patch around the seed cell and emits deterministic
+   public metadata
 
-For triangles only:
+This keeps the implementation tied to the literature vector source while
+avoiding the tiny coordinate drift that made the raw PDF extraction overlap at
+deeper depths.
 
-- `"red"`
-- `"yellow"`
-- `"blue"`
+## Invariants
 
-For squares:
+The emitted patch must remain:
 
-- `chirality_token = null`
+- deterministic for the same `patch_depth`
+- one connected component
+- hole-free
+- overlap-free
+- full-edge adjacent rather than point-touching
+- stable in ids and cell ordering
 
-### Decoration tokens
+## Local Verification
 
-For this family, `decoration_tokens` is always `null` in the included artifacts.
+Run the standalone checks from the repo root:
 
-## Reference Dataset Schema
-
-`reference-patch.json` contains:
-
-```json
-{
-  "unit_scale": 24.5,
-  "seed_id": "sqtri:ref:05016",
-  "snap_epsilon": 0.0025,
-  "selection_policy": "deterministic hole-free greedy subset ordered by (graph_distance, id)",
-  "records": [
-    {
-      "id": "sqtri:ref:05016",
-      "kind": "dodecagonal-square-triangle-square",
-      "center": [0.789106, 0.788325],
-      "vertices": [[1.000932, -0.001858], [1.579341, 1.00006], [0.5773, 1.578509], [-0.001148, 0.57659]],
-      "tile_family": "dodecagonal-square-triangle",
-      "orientation_token": "60",
-      "chirality_token": null,
-      "variant": "square-white",
-      "graph_distance": 0
-    }
-  ]
-}
+```bash
+python docs/contracts/dodecagonal-square-triangle-generator/test_generator.py
 ```
 
-Only these record fields are required to build the runtime patch:
+## Integration Note
 
-- `id`
-- `kind`
-- `center`
-- `vertices`
-- `tile_family`
-- `orientation_token`
-- `chirality_token`
-- `graph_distance`
-
-The `variant`, `unit_scale`, `seed_id`, `snap_epsilon`, and `selection_policy` fields are
-descriptive metadata. They do not affect runtime patch construction.
-
-## Generator Algorithm
-
-Implement exactly this behavior:
-
-1. Resolve the requested depth as:
-   - `resolved_depth = max(0, int(patch_depth))`
-2. Use this graph-distance threshold table:
-
-```python
-PATCH_DISTANCE_THRESHOLDS = {
-    0: 4,
-    1: 16,
-    2: 40,
-    3: 76,
-    4: 97,
-}
-```
-
-3. Convert `resolved_depth` to a record-selection threshold:
-   - if `resolved_depth` is in the table, use the matching threshold
-   - if `resolved_depth` is less than the smallest key, use the smallest-key threshold
-   - if `resolved_depth` is greater than the largest key, use the largest-key threshold
-4. Load all records from `reference-patch.json`.
-5. Keep only records with `graph_distance <= selected_threshold`.
-6. For each retained record, carry these fields through unchanged into a runtime patch record:
-   - `id`
-   - `kind`
-   - `center`
-   - `vertices`
-   - `tile_family`
-   - `orientation_token`
-   - `chirality_token`
-   - `decoration_tokens = null`
-7. Build neighbors by exact full-edge matching after rounding coordinates to 6 decimal places.
-8. Sort cells lexicographically by `id`.
-9. Sort each cell’s `neighbors` lexicographically by neighbor id.
-10. Compute:
-    - `width = max(1, ceil(max_x - min_x))`
-    - `height = max(1, ceil(max_y - min_y))`
-    where `max_x`, `min_x`, `max_y`, `min_y` are taken over all cell vertices in the
-    selected patch.
-11. Return:
-    - `patch_depth = resolved_depth`
-    - `width`
-    - `height`
-    - `cells`
-
-## Neighbor Construction Rule
-
-Neighboring is defined by shared full polygon edges only.
-
-Canonicalize an edge like this:
-
-1. Round both endpoints to 6 decimal places.
-2. Sort the two rounded endpoints lexicographically.
-3. Use the resulting ordered endpoint pair as the edge key.
-
-Cells `A` and `B` are neighbors if and only if there exists an edge key owned by exactly
-those two cell ids.
-
-Important consequences:
-
-- partial overlap is **not** enough
-- touching at a point is **not** enough
-- near-equal edges must be normalized by 6-decimal rounding first
-
-## Non-Negotiable Invariants
-
-The generated patch must satisfy all of these:
-
-- all cells have `tile_family == "dodecagonal-square-triangle"`
-- all cell kinds are in the two-kind public vocabulary
-- all triangle cells have non-null `chirality_token`
-- all square cells have null `chirality_token`
-- all cells have non-null `orientation_token`
-- cells are sorted by `id`
-- neighbors are sorted by `id`
-- the selected patch is connected
-- the selected patch is hole-free
-- the selected patch is overlap-free
-- no records are excluded beyond the graph-distance threshold rule
-- centers are copied from the dataset; do not recompute them from vertices
-
-## Exact Depth-Level Expectations
-
-These are the required depth-level outputs:
-
-| Depth | Threshold | Width | Height | Cells | Squares | Triangles |
-|---|---:|---:|---:|---:|---:|---:|
-| `0` | `4` | `8` | `6` | `20` | `6` | `14` |
-| `1` | `16` | `18` | `17` | `132` | `37` | `95` |
-| `2` | `40` | `24` | `31` | `259` | `75` | `184` |
-| `3` | `76` | `40` | `32` | `462` | `140` | `322` |
-| `4` | `97` | `52` | `32` | `565` | `174` | `391` |
-
-For exact orientation, chirality, and degree expectations, use `contract.json`.
-
-## Acceptance Rule
-
-The implementation is correct if:
-
-1. For patch depths `0` through `4`, it produces semantic JSON equality with the matching
-   files under `expected-patches/`.
-2. For any requested depth `>= 5`, it produces the same cells, width, and height as
-   `patch-depth-4.json`, while still returning `patch_depth = max(0, int(requested_depth))`.
-3. For any requested negative depth, it behaves like depth `0`.
-
-## Irrelevant Context To Ignore
-
-Do not include or depend on:
-
-- UI behavior
-- HTTP routes
-- frontend bootstrap data
-- browser review tooling
-- host application controller types
-- simulation rules
-- persistence formats outside this directory
-
-This contract is only about generating the finite dodecagonal square-triangle patch data.
+The application runtime now vendors a generated JSON snapshot of the same
+snapped literature source under `backend/simulation/data/` so both server and
+standalone hosts can use the same reconstruction without needing live PDF
+parsing. This folder remains the narrow standalone handoff copy.

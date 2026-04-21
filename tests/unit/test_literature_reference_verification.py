@@ -675,8 +675,8 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         spec = REFERENCE_FAMILY_SPECS["dodecagonal-square-triangle"]
         expectation = replace(
             spec.depth_expectations[3],
-            expected_tile_family_counts=(("not-dodecagonal-square-triangle", 462),),
-            expected_chirality_token_counts=(("blue", 124), ("red", 159), ("yellow", 39)),
+            expected_tile_family_counts=(("not-dodecagonal-square-triangle", 25),),
+            expected_chirality_token_counts=(("blue", 8), ("red", 6), ("yellow", 4)),
         )
         topology = build_topology("dodecagonal-square-triangle", 0, 0, 3)
 
@@ -703,50 +703,46 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertFalse(result.failures)
         depth_three_observation = result.observations[-1]
         self.assertEqual(depth_three_observation.depth, 3)
-        self.assertEqual(depth_three_observation.total_cells, 462)
+        self.assertEqual(depth_three_observation.total_cells, 25)
         self.assertEqual(depth_three_observation.connected_component_count, 1)
         self.assertEqual(depth_three_observation.hole_count, 0)
         self.assertEqual(
             depth_three_observation.kind_counts,
             (
-                ("dodecagonal-square-triangle-square", 140),
-                ("dodecagonal-square-triangle-triangle", 322),
+                ("dodecagonal-square-triangle-square", 7),
+                ("dodecagonal-square-triangle-triangle", 18),
             ),
         )
         self.assertEqual(
             depth_three_observation.tile_family_counts,
-            (("dodecagonal-square-triangle", 462),),
+            (("dodecagonal-square-triangle", 25),),
         )
         self.assertEqual(
             depth_three_observation.orientation_token_counts,
             (
-                ("0", 51),
-                ("120", 47),
-                ("150", 31),
-                ("180", 24),
-                ("210", 45),
-                ("240", 31),
-                ("270", 33),
-                ("30", 37),
-                ("300", 38),
-                ("330", 32),
-                ("60", 64),
-                ("90", 29),
+                ("0", 4),
+                ("120", 4),
+                ("30", 6),
+                ("60", 6),
+                ("90", 5),
             ),
         )
         self.assertEqual(
             depth_three_observation.chirality_token_counts,
             (
-                ("blue", 124),
-                ("red", 160),
-                ("yellow", 38),
+                ("blue", 8),
+                ("red", 7),
+                ("yellow", 3),
             ),
         )
         self.assertEqual(
             depth_three_observation.degree_histogram,
-            ((1, 64), (2, 230), (3, 150), (4, 18)),
+            ((1, 6), (2, 6), (3, 8), (4, 5)),
         )
-        self.assertEqual(depth_three_observation.signature, "f66a7171fb67")
+        self.assertEqual(
+            depth_three_observation.signature,
+            "903859d75c46",  # pragma: allowlist secret
+        )
 
     def test_pinwheel_reference_verifier_tracks_expanding_support(self) -> None:
         result = verify_reference_family("pinwheel")

@@ -862,7 +862,7 @@
         "control": "patch_depth",
         "default": 3,
         "min": 0,
-        "max": 4
+        "max": 7
       }
     },
     {
@@ -1259,8 +1259,8 @@
       "tiling_family": "dodecagonal-square-triangle",
       "label": "Dodecagonal Square-Triangle",
       "experimental": true,
-      "implementation_status": "canonical_patch",
-      "promotion_blocker": "Experimental until manual visual review accepts the canonical-patch implementation.",
+      "implementation_status": "exact_affine",
+      "promotion_blocker": "Experimental until manual visual review accepts the literature-derived vector implementation.",
       "public_cell_kinds": [
         "dodecagonal-square-triangle-square",
         "dodecagonal-square-triangle-triangle"
