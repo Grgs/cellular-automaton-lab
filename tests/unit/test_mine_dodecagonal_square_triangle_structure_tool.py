@@ -37,6 +37,15 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertEqual(top_group.macro_kind, "square")
         self.assertEqual(top_group.cell_count, 2)
         self.assertGreaterEqual(top_group.occurrence_count, 10)
+        self.assertTrue(summary.seeded_supertile_groups)
+        top_supertile = summary.seeded_supertile_groups[0]
+        self.assertEqual(top_supertile.seed_macro_kind, "square")
+        self.assertEqual(top_supertile.seed_cell_count, 2)
+        self.assertEqual(top_supertile.grown_cell_count, 5)
+        self.assertGreaterEqual(top_supertile.occurrence_count, 10)
+        self.assertGreaterEqual(top_supertile.selected_slot_count, 3)
+        self.assertIn(("square:-", 1), top_supertile.marked_cell_signature)
+        self.assertIn(("triangle:red", 4), top_supertile.marked_cell_signature)
 
     def test_main_json_output_contains_expected_summary_fields(self) -> None:
         stdout = io.StringIO()
@@ -58,6 +67,9 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertTrue(payload["macro_candidate_groups"])
         self.assertEqual(payload["macro_candidate_groups"][0]["macro_kind"], "square")
         self.assertEqual(payload["macro_candidate_groups"][0]["cell_count"], 2)
+        self.assertTrue(payload["seeded_supertile_groups"])
+        self.assertEqual(payload["seeded_supertile_groups"][0]["seed_macro_kind"], "square")
+        self.assertEqual(payload["seeded_supertile_groups"][0]["grown_cell_count"], 5)
 
 
 if __name__ == "__main__":

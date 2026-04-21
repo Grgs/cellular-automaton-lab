@@ -56,6 +56,24 @@ class MacroCandidateGroup:
 
 
 @dataclass(frozen=True)
+class SeededSupertileGroup:
+    seed_macro_kind: str
+    seed_cell_count: int
+    grown_macro_kind: str | None
+    grown_cell_count: int
+    occurrence_count: int
+    side_count: int
+    quantized_area_ratio: float
+    selected_slot_count: int
+    selected_slots: tuple[str, ...]
+    marked_cell_signature: tuple[tuple[str, int], ...]
+    edge_length_signature: tuple[float, ...]
+    angle_signature: tuple[int, ...]
+    example_roots: tuple[int, ...]
+    example_subsets: tuple[tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
 class MiningSummary:
     source_cell_count: int
     seed_index: int
@@ -68,10 +86,15 @@ class MiningSummary:
     beam_width: int
     local_neighborhood_classes: tuple[NeighborhoodClassSummary, ...]
     macro_candidate_groups: tuple[MacroCandidateGroup, ...]
+    seeded_supertile_groups: tuple[SeededSupertileGroup, ...]
 
 
 def _edge_angle(a: tuple[float, float], b: tuple[float, float]) -> float:
     return math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) % 360.0
+
+
+def _snap_angle(angle: float, *, increment: float = 30.0) -> int:
+    return int(round(angle / increment) * increment) % 360
 
 
 def _rotate_vertices(
@@ -88,8 +111,16 @@ def _rotate_vertices(
 def _orientation_token(vertices: tuple[tuple[float, float], ...]) -> str:
     rotated = _rotate_vertices(vertices)
     angle = _edge_angle(rotated[0], rotated[1])
-    snapped = int(round(angle / 30.0) * 30) % 360
+    snapped = _snap_angle(angle)
     return str(snapped)
+
+
+def _short_kind(kind: str) -> str:
+    return "square" if kind.endswith("square") else "triangle"
+
+
+def _short_cell_signature(cell: SourceCell) -> str:
+    return f"{_short_kind(cell.kind)}:{cell.chirality or '-'}"
 
 
 def load_source_cells() -> tuple[dict[int, SourceCell], int]:
@@ -155,8 +186,7 @@ def classify_local_neighborhoods(
                 if member_depth != depth:
                     continue
                 cell = cells[member]
-                short_kind = "square" if cell.kind.endswith("square") else "triangle"
-                shell_counter[f"{short_kind}:{cell.chirality or '-'}"] += 1
+                shell_counter[_short_cell_signature(cell)] += 1
             shell_payload = ",".join(
                 f"{label}={count}"
                 for label, count in sorted(shell_counter.items())
@@ -298,21 +328,31 @@ def _compactness(area: float, perimeter: float) -> float:
     return (4.0 * math.pi * area) / (perimeter * perimeter)
 
 
+def _merged_boundary(
+    subset: frozenset[int] | tuple[int, ...],
+    polygons: dict[int, Polygon],
+) -> tuple[Polygon, tuple[tuple[float, float], ...]] | None:
+    merged = unary_union([polygons[index] for index in subset])
+    if merged.geom_type != "Polygon":
+        return None
+    if len(merged.interiors) > 0:
+        return None
+    boundary = _compress_collinear_boundary(list(merged.exterior.coords))
+    if len(boundary) < 3:
+        return None
+    return merged, boundary
+
+
 def _evaluate_subset(
     subset: frozenset[int],
     polygons: dict[int, Polygon],
     *,
     primitive_area: float,
 ) -> tuple[tuple[Any, ...], dict[str, Any]] | None:
-    merged = unary_union([polygons[index] for index in subset])
-    if merged.geom_type != "Polygon":
+    merged_result = _merged_boundary(subset, polygons)
+    if merged_result is None:
         return None
-    if len(merged.interiors) > 0:
-        return None
-
-    boundary = _compress_collinear_boundary(list(merged.exterior.coords))
-    if len(boundary) < 3:
-        return None
+    merged, boundary = merged_result
 
     edge_lengths = _edge_lengths(boundary)
     interior_angles = _interior_angles(boundary)
@@ -345,7 +385,97 @@ def _evaluate_subset(
     return score, metrics
 
 
-def mine_macro_candidates(
+def _multi_source_ball(
+    cells: dict[int, SourceCell],
+    sources: tuple[int, ...],
+    radius: int,
+) -> tuple[int, ...]:
+    distances: dict[int, int] = {source: 0 for source in sources}
+    queue: deque[int] = deque(sources)
+    while queue:
+        current = queue.popleft()
+        if distances[current] == radius:
+            continue
+        for neighbor in cells[current].neighbors:
+            if neighbor in distances:
+                continue
+            distances[neighbor] = distances[current] + 1
+            queue.append(neighbor)
+    return tuple(sorted(distances))
+
+
+def _shape_symmetry_transforms(
+    macro_kind: str,
+    x: float,
+    y: float,
+) -> tuple[tuple[float, float], ...]:
+    transforms: set[tuple[float, float]] = set()
+    if macro_kind == "square":
+        rotation_steps = 4
+        reflection_offsets = (1.0, -1.0)
+        angle_increment = 90.0
+    else:
+        rotation_steps = 3
+        reflection_offsets = (1.0, -1.0)
+        angle_increment = 120.0
+
+    for step in range(rotation_steps):
+        angle = math.radians(step * angle_increment)
+        rotated_x = x * math.cos(angle) - y * math.sin(angle)
+        rotated_y = x * math.sin(angle) + y * math.cos(angle)
+        for reflection in reflection_offsets:
+            transforms.add((
+                round(reflection * rotated_x, 2),
+                round(rotated_y, 2),
+            ))
+    return tuple(sorted(transforms))
+
+
+def _canonical_slot_key(
+    *,
+    cell: SourceCell,
+    centroid: tuple[float, float],
+    orientation: int,
+    scale: float,
+    macro_kind: str,
+    polygon: Polygon,
+) -> tuple[float, float, str]:
+    offset_x = polygon.centroid.x - centroid[0]
+    offset_y = polygon.centroid.y - centroid[1]
+    rotation = math.radians(-orientation)
+    local_x = (
+        offset_x * math.cos(rotation) - offset_y * math.sin(rotation)
+    ) / scale
+    local_y = (
+        offset_x * math.sin(rotation) + offset_y * math.cos(rotation)
+    ) / scale
+    transforms = _shape_symmetry_transforms(macro_kind, local_x, local_y)
+    canonical_x, canonical_y = min(transforms)
+    return (canonical_x, canonical_y, _short_cell_signature(cell))
+
+
+def _format_slot_key(slot_key: tuple[float, float, str]) -> str:
+    return f"{slot_key[2]}@({slot_key[0]:.2f},{slot_key[1]:.2f})"
+
+
+def _subset_frame(
+    subset: tuple[int, ...],
+    polygons: dict[int, Polygon],
+) -> tuple[tuple[float, float], int, float] | None:
+    merged_result = _merged_boundary(subset, polygons)
+    if merged_result is None:
+        return None
+    merged, boundary = merged_result
+    rotated_boundary = _rotate_vertices(boundary)
+    orientation = _snap_angle(_edge_angle(rotated_boundary[0], rotated_boundary[1]))
+    edge_lengths = _edge_lengths(rotated_boundary)
+    scale = sum(edge_lengths) / len(edge_lengths)
+    if scale <= 1e-9:
+        return None
+    return ((merged.centroid.x, merged.centroid.y), orientation, scale)
+
+
+def collect_macro_occurrences(
     cells: dict[int, SourceCell],
     shell_distances: dict[int, int],
     local_labels: dict[int, str],
@@ -355,8 +485,10 @@ def mine_macro_candidates(
     max_candidate_size: int,
     min_candidate_size: int,
     beam_width: int,
-    top_groups: int,
-) -> tuple[MacroCandidateGroup, ...]:
+) -> dict[
+    tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+    list[tuple[tuple[int, ...], dict[str, Any]]],
+]:
     polygons = {
         index: Polygon(cell.vertices)
         for index, cell in cells.items()
@@ -439,6 +571,17 @@ def mine_macro_candidates(
         )
         grouped[group_key].append((subset_key, occurrence))
 
+    return grouped
+
+
+def summarize_macro_occurrences(
+    grouped: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    top_groups: int,
+) -> tuple[MacroCandidateGroup, ...]:
     summaries: list[MacroCandidateGroup] = []
     for (
         macro_kind,
@@ -482,6 +625,215 @@ def mine_macro_candidates(
     return tuple(summaries[:top_groups])
 
 
+def mine_macro_candidates(
+    cells: dict[int, SourceCell],
+    shell_distances: dict[int, int],
+    local_labels: dict[int, str],
+    *,
+    max_source_depth: int,
+    region_radius: int,
+    max_candidate_size: int,
+    min_candidate_size: int,
+    beam_width: int,
+    top_groups: int,
+) -> tuple[MacroCandidateGroup, ...]:
+    grouped = collect_macro_occurrences(
+        cells,
+        shell_distances,
+        local_labels,
+        max_source_depth=max_source_depth,
+        region_radius=region_radius,
+        max_candidate_size=max_candidate_size,
+        min_candidate_size=min_candidate_size,
+        beam_width=beam_width,
+    )
+    return summarize_macro_occurrences(grouped, top_groups=top_groups)
+
+
+def mine_seeded_supertile_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    top_groups: int,
+    max_seed_groups: int = 4,
+    max_seed_cell_count: int = 4,
+    growth_radius: int = 1,
+    slot_support_ratio: float = 0.65,
+) -> tuple[SeededSupertileGroup, ...]:
+    polygons = {
+        index: Polygon(cell.vertices)
+        for index, cell in cells.items()
+    }
+    primitive_area = next(
+        polygons[index].area
+        for index, cell in cells.items()
+        if cell.kind.endswith("square")
+    )
+
+    sorted_seed_groups = sorted(
+        grouped_macro_occurrences.items(),
+        key=lambda item: (
+            -len(item[1]),
+            -item[0][1],
+            item[0][0],
+            item[0][3],
+            item[0][4],
+        ),
+    )
+
+    summaries: list[SeededSupertileGroup] = []
+    candidate_group_limit = max(top_groups * 3, top_groups)
+    for group_key, members in sorted_seed_groups[:candidate_group_limit]:
+        seed_macro_kind, seed_cell_count, _, _, _ = group_key
+        if seed_macro_kind not in {"square", "triangle"}:
+            continue
+        if seed_cell_count > max_seed_cell_count:
+            continue
+        if len(members) < 3:
+            continue
+        if len(summaries) >= max_seed_groups:
+            break
+
+        slot_occurrence_counts: Counter[tuple[float, float, str]] = Counter()
+        per_occurrence_slots: list[
+            tuple[tuple[int, ...], tuple[int, ...], dict[tuple[float, float, str], list[int]]]
+        ] = []
+        for subset_key, occurrence in members:
+            frame = _subset_frame(subset_key, polygons)
+            if frame is None:
+                continue
+            centroid, orientation, scale = frame
+            region = _multi_source_ball(cells, subset_key, growth_radius)
+            slot_to_cells: dict[tuple[float, float, str], list[int]] = defaultdict(list)
+            for candidate_index in region:
+                if candidate_index in subset_key:
+                    continue
+                slot_key = _canonical_slot_key(
+                    cell=cells[candidate_index],
+                    centroid=centroid,
+                    orientation=orientation,
+                    scale=scale,
+                    macro_kind=seed_macro_kind,
+                    polygon=polygons[candidate_index],
+                )
+                slot_to_cells[slot_key].append(candidate_index)
+            per_occurrence_slots.append((
+                subset_key,
+                tuple(sorted(int(root_index) for root_index in occurrence["roots"])),
+                slot_to_cells,
+            ))
+            for slot_key in slot_to_cells:
+                slot_occurrence_counts[slot_key] += 1
+
+        if not per_occurrence_slots:
+            continue
+
+        slot_support_threshold = max(
+            2,
+            math.ceil(len(per_occurrence_slots) * slot_support_ratio),
+        )
+        selected_slots = {
+            slot_key
+            for slot_key, count in slot_occurrence_counts.items()
+            if count >= slot_support_threshold
+        }
+        if not selected_slots:
+            continue
+
+        grown_groups: dict[
+            tuple[str | None, int, int, float, tuple[tuple[str, int], ...]],
+            dict[str, Any],
+        ] = {}
+        for subset_key, occurrence_roots, slot_to_cells in per_occurrence_slots:
+            grown_subset = set(subset_key)
+            for slot_key in selected_slots:
+                slot_cells = slot_to_cells.get(slot_key)
+                if slot_cells:
+                    grown_subset.add(min(slot_cells))
+            if len(grown_subset) <= len(subset_key):
+                continue
+
+            grown_tuple = tuple(sorted(grown_subset))
+            evaluated = _evaluate_subset(
+                frozenset(grown_tuple),
+                polygons,
+                primitive_area=primitive_area,
+            )
+            if evaluated is None:
+                continue
+            _, metrics = evaluated
+            marked_signature = tuple(sorted(
+                Counter(_short_cell_signature(cells[index]) for index in grown_tuple).items()
+            ))
+            grown_group_key = (
+                metrics["macro_kind"],
+                len(grown_tuple),
+                int(metrics["side_count"]),
+                round(float(metrics["area_ratio"]), 2),
+                marked_signature,
+            )
+            grown_group = grown_groups.setdefault(
+                grown_group_key,
+                {
+                    "occurrence_count": 0,
+                    "roots": set(),
+                    "subsets": [],
+                    "side_count": metrics["side_count"],
+                    "area_ratio": metrics["area_ratio"],
+                    "edge_length_signature": metrics["edge_length_signature"],
+                    "angle_signature": metrics["angle_signature"],
+                },
+            )
+            grown_group["occurrence_count"] += 1
+            grown_group["roots"].update(occurrence_roots)
+            if len(grown_group["subsets"]) < 3:
+                grown_group["subsets"].append(grown_tuple)
+
+        if not grown_groups:
+            continue
+
+        best_group_key, best_group = max(
+            grown_groups.items(),
+            key=lambda item: (
+                int(item[1]["occurrence_count"]),
+                item[0][1],
+                item[0][0] or "",
+            ),
+        )
+        grown_macro_kind, grown_cell_count, _side_count, quantized_area_ratio, marked_signature = best_group_key
+        summaries.append(
+            SeededSupertileGroup(
+                seed_macro_kind=seed_macro_kind,
+                seed_cell_count=seed_cell_count,
+                grown_macro_kind=grown_macro_kind,
+                grown_cell_count=grown_cell_count,
+                occurrence_count=int(best_group["occurrence_count"]),
+                side_count=int(best_group["side_count"]),
+                quantized_area_ratio=float(quantized_area_ratio),
+                selected_slot_count=len(selected_slots),
+                selected_slots=tuple(sorted(_format_slot_key(slot_key) for slot_key in selected_slots)),
+                marked_cell_signature=marked_signature,
+                edge_length_signature=tuple(float(value) for value in best_group["edge_length_signature"]),
+                angle_signature=tuple(int(value) for value in best_group["angle_signature"]),
+                example_roots=tuple(sorted(int(root) for root in best_group["roots"])[:5]),
+                example_subsets=tuple(best_group["subsets"]),
+            )
+        )
+
+    summaries.sort(
+        key=lambda summary: (
+            -summary.occurrence_count,
+            -summary.grown_cell_count,
+            summary.seed_macro_kind,
+            summary.marked_cell_signature,
+        )
+    )
+    return tuple(summaries[:top_groups])
+
+
 def build_mining_summary(
     *,
     max_source_depth: int,
@@ -502,7 +854,7 @@ def build_mining_summary(
         max_source_depth=max_source_depth,
         top_groups=top_groups,
     )
-    macro_candidate_groups = mine_macro_candidates(
+    grouped_macro_occurrences = collect_macro_occurrences(
         cells,
         shell_distances,
         local_labels,
@@ -511,6 +863,14 @@ def build_mining_summary(
         max_candidate_size=max_candidate_size,
         min_candidate_size=min_candidate_size,
         beam_width=beam_width,
+    )
+    macro_candidate_groups = summarize_macro_occurrences(
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
+    seeded_supertile_groups = mine_seeded_supertile_groups(
+        cells,
+        grouped_macro_occurrences,
         top_groups=top_groups,
     )
     return MiningSummary(
@@ -529,6 +889,7 @@ def build_mining_summary(
         beam_width=beam_width,
         local_neighborhood_classes=local_neighborhood_classes,
         macro_candidate_groups=macro_candidate_groups,
+        seeded_supertile_groups=seeded_supertile_groups,
     )
 
 
@@ -545,6 +906,7 @@ def summary_to_payload(summary: MiningSummary) -> dict[str, Any]:
         "beam_width": summary.beam_width,
         "local_neighborhood_classes": [asdict(item) for item in summary.local_neighborhood_classes],
         "macro_candidate_groups": [asdict(item) for item in summary.macro_candidate_groups],
+        "seeded_supertile_groups": [asdict(item) for item in summary.seeded_supertile_groups],
     }
 
 
@@ -592,14 +954,38 @@ def render_text_report(summary: MiningSummary) -> str:
             f"    example_roots={list(macro_group.example_roots)}",
             f"    example_subsets={[list(subset) for subset in macro_group.example_subsets]}",
         ])
+
+    lines.extend(["", "Seeded Supertile Groups"])
+    if not summary.seeded_supertile_groups:
+        lines.append("  none")
+    for supertile_group in summary.seeded_supertile_groups:
+        lines.extend([
+            (
+                f"  seed_macro_kind={supertile_group.seed_macro_kind} seed_cell_count={supertile_group.seed_cell_count} "
+                f"grown_macro_kind={supertile_group.grown_macro_kind} grown_cell_count={supertile_group.grown_cell_count} "
+                f"occurrence_count={supertile_group.occurrence_count} side_count={supertile_group.side_count} "
+                f"area_ratio≈{supertile_group.quantized_area_ratio}"
+            ),
+            (
+                f"    selected_slots={list(supertile_group.selected_slots)} "
+                f"marked_cells={dict(supertile_group.marked_cell_signature)}"
+            ),
+            (
+                f"    edge_signature={list(supertile_group.edge_length_signature)} "
+                f"angle_signature={list(supertile_group.angle_signature)}"
+            ),
+            f"    example_roots={list(supertile_group.example_roots)}",
+            f"    example_subsets={[list(subset) for subset in supertile_group.example_subsets]}",
+        ])
     return "\n".join(lines)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Classify local neighborhoods and mine repeated square/triangle "
-            "macro-candidates in the literature-derived dodecagonal source patch."
+            "Classify local neighborhoods, mine repeated square/triangle "
+            "macro-candidates, and grow seeded supertile candidates in the "
+            "literature-derived dodecagonal source patch."
         )
     )
     parser.add_argument("--max-source-depth", type=int, default=8)
