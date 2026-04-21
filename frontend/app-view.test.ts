@@ -26,8 +26,16 @@ describe("app-view selection inspector integration", () => {
         const state = createAppState();
         const selectedCells = [{ id: "cell:a" }, { id: "cell:b" }];
         const gridView = {
+            render: vi.fn(),
+            setPreviewCells: vi.fn(),
+            clearPreview: vi.fn(),
+            setHoveredCell: vi.fn(),
+            setSelectedCells: vi.fn(),
             getSelectedCells: vi.fn(() => selectedCells),
-        } as unknown as Parameters<typeof createAppView>[0]["gridView"];
+            setGestureOutline: vi.fn(),
+            flashGestureOutline: vi.fn(),
+            clearGestureOutline: vi.fn(),
+        } as Parameters<typeof createAppView>[0]["gridView"];
 
         const appView = createAppView({
             state,

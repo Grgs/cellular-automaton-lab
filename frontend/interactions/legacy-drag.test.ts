@@ -2,21 +2,74 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
-import type { SimulationSnapshot } from "../types/domain.js";
+import type {
+    IndexedTopologyCell,
+    RuleDefinition,
+    SimulationSnapshot,
+    TopologySpec,
+} from "../types/domain.js";
 import type { AppState } from "../types/state.js";
 
 function createIndexedState(currentStates: number[]): AppState {
-    return {
+    const firstCell: IndexedTopologyCell = {
+        id: "c:0:0",
+        index: 0,
+        kind: "square",
+        neighbors: [],
+    };
+    const secondCell: IndexedTopologyCell = {
+        id: "c:1:0",
+        index: 1,
+        kind: "square",
+        neighbors: [],
+    };
+    const state: Partial<AppState> = {
         topologyIndex: {
             byId: new Map([
-                ["c:0:0", { id: "c:0:0", index: 0 }],
-                ["c:1:0", { id: "c:1:0", index: 1 }],
+                ["c:0:0", firstCell],
+                ["c:1:0", secondCell],
             ]),
         },
         cellStates: currentStates,
         undoStack: [],
         redoStack: [],
-    } as unknown as AppState;
+    };
+    return state as AppState;
+}
+
+function createSimulationSnapshot(): SimulationSnapshot {
+    const topologySpec: TopologySpec = {
+        tiling_family: "square",
+        adjacency_mode: "edge",
+        sizing_mode: "grid_dimensions",
+        width: 1,
+        height: 1,
+        patch_depth: 0,
+    };
+    const rule: RuleDefinition = {
+        name: "life",
+        display_name: "Life",
+        description: "",
+        default_paint_state: 1,
+        supports_randomize: true,
+        states: [],
+        rule_protocol: "totalistic",
+        supports_all_topologies: true,
+    };
+    return {
+        topology_spec: topologySpec,
+        speed: 0,
+        running: false,
+        generation: 0,
+        rule,
+        topology_revision: "test",
+        topology: {
+            topology_revision: "test",
+            topology_spec: topologySpec,
+            cells: [],
+        },
+        cell_states: [],
+    };
 }
 
 describe("interactions/legacy-drag", () => {
@@ -33,7 +86,7 @@ describe("interactions/legacy-drag", () => {
         const setGestureOutline = vi.fn();
         const flashGestureOutline = vi.fn();
         const clearGestureOutline = vi.fn();
-        const setCellsRequest = vi.fn().mockResolvedValue({ ok: true } as unknown as SimulationSnapshot);
+        const setCellsRequest = vi.fn().mockResolvedValue(createSimulationSnapshot());
         const runStateMutation = vi.fn(async (task: () => Promise<SimulationSnapshot>) => task());
         const renderControlPanel = vi.fn();
         const setPointerCapture = vi.fn();

@@ -27,7 +27,7 @@ function installPeriodicMixedTestGlobals(): void {
 }
 
 function createContextStub() {
-    return {
+    const context: Partial<CanvasRenderingContext2D> = {
         beginPath: vi.fn(),
         moveTo: vi.fn(),
         lineTo: vi.fn(),
@@ -37,7 +37,8 @@ function createContextStub() {
         fillStyle: "",
         strokeStyle: "",
         lineWidth: 0,
-    } as unknown as CanvasRenderingContext2D;
+    };
+    return context as CanvasRenderingContext2D;
 }
 
 describe("geometry/periodic-mixed-adapter", () => {

@@ -13,13 +13,14 @@ function pointerEvent({
     buttons?: number;
     pointerId?: number;
 } = {}) {
-    return {
+    const event: Partial<PointerEvent & MouseEvent> = {
         button,
         buttons,
         pointerId,
         preventDefault: vi.fn(),
         stopPropagation: vi.fn(),
-    } as unknown as PointerEvent & MouseEvent;
+    };
+    return event as PointerEvent & MouseEvent;
 }
 
 function createRouter({

@@ -3,13 +3,14 @@ import { describe, expect, it, vi } from "vitest";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 
 function createContextStub() {
-    return {
+    const context: Partial<CanvasRenderingContext2D> = {
         fillRect: vi.fn(),
         strokeRect: vi.fn(),
         fillStyle: "",
         strokeStyle: "",
         lineWidth: 0,
-    } as unknown as CanvasRenderingContext2D;
+    };
+    return context as CanvasRenderingContext2D;
 }
 
 describe("geometry/square-adapter", () => {

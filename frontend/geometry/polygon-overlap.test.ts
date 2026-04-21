@@ -54,11 +54,11 @@ function loadFixture(filename: string): TopologyFixture {
     return JSON.parse(raw) as TopologyFixture;
 }
 
-function asPolygonGeometryCache(cache: GeometryCache | null): PolygonGeometryCache {
-    if (!cache || !("cellsById" in cache) || !Array.isArray(cache.cells)) {
+function asPolygonGeometryCache(geometryState: GeometryCache | null): PolygonGeometryCache {
+    if (!geometryState || !("cellsById" in geometryState) || !Array.isArray(geometryState.cells)) {
         throw new Error("Expected polygon geometry cache.");
     }
-    return cache as PolygonGeometryCache;
+    return geometryState as PolygonGeometryCache;
 }
 
 describe("geometry/polygon-overlap", () => {

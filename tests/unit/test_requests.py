@@ -8,7 +8,6 @@ from backend.contract_validation import (
     normalize_reset_topology_spec,
     validate_persisted_snapshot_payload,
 )
-from backend.payload_types import RawJsonObject
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.web.requests import (
@@ -48,12 +47,12 @@ class RequestParsingTests(unittest.TestCase):
             self.assertEqual(get_payload(request), {})
 
     def test_parse_optional_numbers_accept_blank_values(self) -> None:
-        payload: RawJsonObject = {"width": "", "speed": None}
+        payload: dict[str, object] = {"width": "", "speed": None}
         self.assertIsNone(parse_optional_int(payload, "width"))
         self.assertIsNone(parse_optional_float(payload, "speed"))
 
     def test_parse_optional_numbers_convert_numeric_strings(self) -> None:
-        payload: RawJsonObject = {"width": "12", "speed": "7.5"}
+        payload: dict[str, object] = {"width": "12", "speed": "7.5"}
         self.assertEqual(parse_optional_int(payload, "width"), 12)
         self.assertEqual(parse_optional_float(payload, "speed"), 7.5)
 

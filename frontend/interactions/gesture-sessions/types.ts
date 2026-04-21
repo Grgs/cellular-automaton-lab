@@ -1,4 +1,5 @@
 import type { PaintableCell } from "../../types/editor.js";
+import type { SimulationSnapshot } from "../../types/domain.js";
 import type { InteractionEditPolicy } from "../edit-policy.js";
 
 export type PointerDownIntent =
@@ -22,7 +23,7 @@ export interface EditorGestureController {
     isPointerActive(): boolean;
     beginPointerSession(cell: PaintableCell, pointerId?: number | null): Promise<boolean>;
     handlePointerMove(cell: PaintableCell): void;
-    handlePointerUp(): Promise<unknown>;
+    handlePointerUp(): Promise<SimulationSnapshot | null>;
     cancelActivePreview(): Promise<void>;
     isClickSuppressed(): boolean;
     handleClick(cell: PaintableCell): Promise<{ handled: boolean }>;
@@ -32,8 +33,8 @@ export interface LegacyDragController {
     isActive(): boolean;
     begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
     update(cell: PaintableCell): void;
-    end(): Promise<unknown>;
-    cancel(): Promise<unknown>;
+    end(): Promise<SimulationSnapshot | null>;
+    cancel(): Promise<null>;
 }
 
 export interface GestureRouterOptions {

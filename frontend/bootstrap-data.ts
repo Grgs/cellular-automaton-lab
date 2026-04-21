@@ -5,6 +5,7 @@ import type {
     BootstrappedTopologyDefinition,
 } from "./types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
+import { requirePlainObject } from "./runtime-validation.js";
 
 function cloneBootstrapData(payload: AppBootstrapData): AppBootstrapData {
     return {
@@ -22,15 +23,8 @@ function cloneBootstrapData(payload: AppBootstrapData): AppBootstrapData {
     };
 }
 
-function requireObject(value: unknown, context: string): Record<string, unknown> {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-        throw new Error(`${context} is invalid.`);
-    }
-    return value as Record<string, unknown>;
-}
-
-function normalizeBootstrapData(payload: unknown): AppBootstrapData {
-    const root = requireObject(payload, "Bootstrap payload");
+function parseBootstrapData(payload: unknown): AppBootstrapData {
+    const root = requirePlainObject(payload, "Bootstrap payload is invalid.");
     const defaults = root.app_defaults as BootstrappedFrontendDefaults | undefined;
     const topologies = root.topology_catalog as ReadonlyArray<BootstrappedTopologyDefinition> | undefined;
     const periodicFaceTilings = root.periodic_face_tilings as ReadonlyArray<PeriodicFaceTilingDescriptor> | undefined;
@@ -86,5 +80,5 @@ export async function fetchBootstrapData(url: string): Promise<AppBootstrapData>
     if (!response.ok) {
         throw new Error(`Bootstrap request failed: ${response.status}`);
     }
-    return normalizeBootstrapData(await response.json());
+    return parseBootstrapData(await response.json());
 }

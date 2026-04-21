@@ -2,7 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type { PaintableCell } from "../types/editor.js";
-import type { SimulationSnapshot } from "../types/domain.js";
+import type {
+    IndexedTopologyCell,
+    RuleDefinition,
+    SimulationSnapshot,
+    TopologySpec,
+} from "../types/domain.js";
 import type { AppState } from "../types/state.js";
 
 function createMutationRuntime() {
@@ -13,16 +18,58 @@ function createMutationRuntime() {
 }
 
 function createIndexedState(currentState = 0): AppState {
-    return {
+    const indexedCell: IndexedTopologyCell = {
+        id: "cell:1",
+        index: 0,
+        kind: "square",
+        neighbors: [],
+    };
+    const state: Partial<AppState> = {
         topologyIndex: {
             byId: new Map([
-                ["cell:1", { id: "cell:1", index: 0 }],
+                ["cell:1", indexedCell],
             ]),
         },
         cellStates: [currentState],
         undoStack: [],
         redoStack: [],
-    } as unknown as AppState;
+    };
+    return state as AppState;
+}
+
+function createSimulationSnapshot(): SimulationSnapshot {
+    const topologySpec: TopologySpec = {
+        tiling_family: "square",
+        adjacency_mode: "edge",
+        sizing_mode: "grid_dimensions",
+        width: 1,
+        height: 1,
+        patch_depth: 0,
+    };
+    const rule: RuleDefinition = {
+        name: "life",
+        display_name: "Life",
+        description: "",
+        default_paint_state: 1,
+        supports_randomize: true,
+        states: [],
+        rule_protocol: "totalistic",
+        supports_all_topologies: true,
+    };
+    return {
+        topology_spec: topologySpec,
+        speed: 0,
+        running: false,
+        generation: 0,
+        rule,
+        topology_revision: "test",
+        topology: {
+            topology_revision: "test",
+            topology_spec: topologySpec,
+            cells: [],
+        },
+        cell_states: [],
+    };
 }
 
 describe("interactions/command-dispatch", () => {
@@ -89,7 +136,7 @@ describe("interactions/command-dispatch", () => {
 
     it("paints a cell through setCellRequest when a target state is supplied", async () => {
         const { createInteractionCommandDispatch } = await import("./command-dispatch.js");
-        const setCellRequest = vi.fn().mockResolvedValue({ ok: true } as unknown as SimulationSnapshot);
+        const setCellRequest = vi.fn().mockResolvedValue(createSimulationSnapshot());
         const toggleCellRequest = vi.fn().mockResolvedValue(null);
         const cell: PaintableCell = { id: "cell:1" };
         const state = createIndexedState(0);

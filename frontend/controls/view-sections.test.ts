@@ -5,7 +5,7 @@ import type { DomElements } from "../types/dom.js";
 import type { ControlsViewModel } from "../types/ui.js";
 
 function createElements(): DomElements {
-    return {
+    const elements: Partial<DomElements> = {
         selectionInspectorSection: document.createElement("section"),
         selectionInspectorTitle: document.createElement("strong"),
         selectionInspectorSubtitle: document.createElement("span"),
@@ -14,7 +14,8 @@ function createElements(): DomElements {
         selectionInspectorAdvanced: document.createElement("details"),
         selectionInspectorAdvancedSummary: document.createElement("summary"),
         selectionInspectorAdvancedRows: document.createElement("div"),
-    } as unknown as DomElements;
+    };
+    return elements as DomElements;
 }
 
 function viewModel(selectionInspector: ControlsViewModel["selectionInspector"]): ControlsViewModel {

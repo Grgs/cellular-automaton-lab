@@ -12,13 +12,14 @@ function createEventStub({
     buttons?: number;
     pointerId?: number;
 } = {}) {
-    return {
+    const event: Partial<PointerEvent & MouseEvent> = {
         preventDefault: vi.fn(),
         stopPropagation: vi.fn(),
         button,
         buttons,
         pointerId,
-    } as unknown as PointerEvent & MouseEvent;
+    };
+    return event as PointerEvent & MouseEvent;
 }
 
 interface SurfaceBindingSubjectOptions {

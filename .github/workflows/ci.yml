@@ -137,7 +137,7 @@ jobs:
             echo "raw JSON aliases must use the explicit RawJson* names"
             exit 1
           fi
-          if rg --line-number "RawJsonObject|RawJsonDocument" backend tests tools --glob "!backend/payload_types.py" --glob "!backend/frontend_assets.py" --glob "!backend/defaults.py" --glob "!backend/web/requests.py" --glob "!backend/web/routes.py" --glob "!backend/simulation/persistence.py" --glob "!backend/simulation/periodic_face_tilings.py" --glob "!tests/typed_payloads.py" --glob "!tests/e2e/support_server.py"; then
+          if rg --line-number "RawJsonObject|RawJsonDocument" backend tests tools --glob "!backend/payload_types.py" --glob "!backend/frontend_assets.py" --glob "!backend/defaults.py" --glob "!backend/contract_validation.py" --glob "!backend/web/requests.py" --glob "!backend/web/routes.py" --glob "!backend/web/state_actions.py" --glob "!backend/simulation/persistence.py" --glob "!backend/simulation/periodic_face_tilings.py" --glob "!tests/typed_payloads.py" --glob "!tests/e2e/support_server.py"; then
             echo "raw JSON aliases must stay inside dedicated ingress and validation modules"
             exit 1
           fi

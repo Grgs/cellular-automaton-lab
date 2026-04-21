@@ -1,6 +1,7 @@
 import { bindGridInteractions as bindGridInteractionsToSurface } from "./grid-bindings.js";
 import { createPointerGestureRouter } from "./gesture-sessions.js";
 import type { InteractionEditPolicy } from "./edit-policy.js";
+import type { SimulationSnapshot } from "../types/domain.js";
 import type { PaintableCell, GridInteractionBindings } from "../types/editor.js";
 
 export function createInteractionSurfaceBindings({
@@ -27,7 +28,7 @@ export function createInteractionSurfaceBindings({
         isPointerActive(): boolean;
         beginPointerSession(cell: PaintableCell, pointerId?: number | null): Promise<boolean>;
         handlePointerMove(cell: PaintableCell): void;
-        handlePointerUp(): Promise<unknown>;
+        handlePointerUp(): Promise<SimulationSnapshot | null>;
         cancelActivePreview(): Promise<void>;
         isClickSuppressed(): boolean;
         handleClick(cell: PaintableCell): Promise<{ handled: boolean }>;
@@ -36,7 +37,7 @@ export function createInteractionSurfaceBindings({
         isActive(): boolean;
         begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
         update(cell: PaintableCell): void;
-        end(): Promise<unknown>;
+        end(): Promise<SimulationSnapshot | null>;
         cancel(): Promise<null>;
     };
     setHoveredCell: (cell: PaintableCell | null) => void;

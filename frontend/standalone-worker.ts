@@ -6,6 +6,7 @@ import type {
     StandaloneWorkerIncomingMessage,
     StandaloneWorkerOutgoingMessage,
 } from "./standalone/protocol.js";
+import type { PlainObject } from "./runtime-validation.js";
 
 declare function importScripts(...urls: string[]): void;
 declare let loadPyodide: ((options: { indexURL: string }) => Promise<any>) | undefined;
@@ -26,7 +27,7 @@ let initialized = false;
 let currentSpeed = 1;
 let running = false;
 let tickTimer: number | null = null;
-let operationChain: Promise<unknown> = Promise.resolve();
+let operationChain: Promise<void> = Promise.resolve();
 
 function postMessage(message: StandaloneWorkerOutgoingMessage): void {
     runtimeScope.postMessage(message);
@@ -59,7 +60,7 @@ function scheduleTickLoop(): void {
     }, delay);
 }
 
-async function executePython(expression: string, globals: Record<string, unknown> = {}): Promise<string> {
+async function executePython(expression: string, globals: PlainObject = {}): Promise<string> {
     if (!pyodideInstance) {
         throw new Error("Pyodide runtime is unavailable.");
     }
