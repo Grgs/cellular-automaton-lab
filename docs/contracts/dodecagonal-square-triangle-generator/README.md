@@ -32,6 +32,8 @@ This contract does **not** require any knowledge of the surrounding application.
 - `README.md`: this contract
 - `contract.json`: machine-readable summary of thresholds, vocabularies, and exact depth-level counts
 - `reference-patch.json`: authoritative full reference dataset
+- `generator.py`: generated standalone implementation built from the checked-in backend contract
+- `test_generator.py`: generated standalone regression test for `generator.py`
 - `expected-patches/patch-depth-0.json`
 - `expected-patches/patch-depth-1.json`
 - `expected-patches/patch-depth-2.json`
@@ -40,6 +42,21 @@ This contract does **not** require any knowledge of the surrounding application.
 
 If you implement against this bundle, the `expected-patches` files are the authoritative
 acceptance oracles.
+
+## Regeneration
+
+The standalone `generator.py` and `test_generator.py` files in this directory are generated.
+Regenerate them from the repo source of truth with:
+
+```bash
+python tools/export_dodecagonal_square_triangle_contract_generator.py
+```
+
+Check that they are current with:
+
+```bash
+python tools/export_dodecagonal_square_triangle_contract_generator.py --check
+```
 
 ## External Source Provenance
 
