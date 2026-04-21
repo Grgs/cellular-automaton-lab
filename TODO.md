@@ -30,6 +30,7 @@
 - Added incremental lint/format guardrails for the render-review/bootstrap slice plus a repo-owned frontend formatting check.
 - Tightened the interaction stack around explicit pointer-down intent resolution and session-owned pointer matching/completion, so the router no longer hardcodes per-session pointer-id policy.
 - Split the drawer view model into section-owned builders for shell state, inspector/header state, topology/sizing, rule/palette, and pattern controls.
+- Added a first-pass dodecagonal structure miner that reports repeated local shell signatures and bounded square/triangle macro-candidate unions from the literature-derived source patch.
 
 ## Now
 
