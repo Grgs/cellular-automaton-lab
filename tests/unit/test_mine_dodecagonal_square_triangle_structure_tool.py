@@ -57,6 +57,17 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertGreater(top_inflation.inflation_estimate, 1.5)
         self.assertGreaterEqual(len(top_inflation.boundary_direction_histogram), 10)
         self.assertIn((90, 2), top_inflation.boundary_direction_histogram)
+        self.assertTrue(summary.boundary_template_groups)
+        top_template = summary.boundary_template_groups[0]
+        self.assertEqual(top_template.seed_macro_kind, "square")
+        self.assertEqual(top_template.base_cell_count, 5)
+        self.assertEqual(top_template.candidate_cell_count, 10)
+        self.assertGreaterEqual(top_template.template_match_count, 7)
+        self.assertGreaterEqual(top_template.template_variant_count, 2)
+        self.assertEqual(len(top_template.canonical_vertices), 14)
+        self.assertTrue(top_template.line_families)
+        self.assertEqual(top_template.line_families[0].axis_angle, 0)
+        self.assertIn(120, [family.axis_angle for family in top_template.line_families])
 
     def test_main_json_output_contains_expected_summary_fields(self) -> None:
         stdout = io.StringIO()
@@ -84,6 +95,9 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertTrue(payload["inflation_candidate_groups"])
         self.assertEqual(payload["inflation_candidate_groups"][0]["seed_macro_kind"], "square")
         self.assertEqual(payload["inflation_candidate_groups"][0]["grown_cell_count"], 10)
+        self.assertTrue(payload["boundary_template_groups"])
+        self.assertEqual(payload["boundary_template_groups"][0]["seed_macro_kind"], "square")
+        self.assertEqual(payload["boundary_template_groups"][0]["candidate_cell_count"], 10)
 
 
 if __name__ == "__main__":

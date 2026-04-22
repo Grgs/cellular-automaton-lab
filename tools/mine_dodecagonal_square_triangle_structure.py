@@ -97,6 +97,32 @@ class InflationCandidateGroup:
 
 
 @dataclass(frozen=True)
+class BoundaryLineFamily:
+    axis_angle: int
+    offsets: tuple[float, ...]
+    segment_count: int
+
+
+@dataclass(frozen=True)
+class BoundaryTemplateGroup:
+    seed_macro_kind: str
+    base_cell_count: int
+    candidate_cell_count: int
+    occurrence_count: int
+    template_match_count: int
+    template_variant_count: int
+    side_count: int
+    quantized_area_ratio: float
+    inflation_estimate: float
+    selected_slots: tuple[str, ...]
+    canonical_vertices: tuple[tuple[float, float], ...]
+    line_families: tuple[BoundaryLineFamily, ...]
+    marked_cell_signature: tuple[tuple[str, int], ...]
+    example_roots: tuple[int, ...]
+    example_subsets: tuple[tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
 class MiningSummary:
     source_cell_count: int
     seed_index: int
@@ -111,6 +137,7 @@ class MiningSummary:
     macro_candidate_groups: tuple[MacroCandidateGroup, ...]
     seeded_supertile_groups: tuple[SeededSupertileGroup, ...]
     inflation_candidate_groups: tuple[InflationCandidateGroup, ...]
+    boundary_template_groups: tuple[BoundaryTemplateGroup, ...]
 
 
 @dataclass(frozen=True)
@@ -126,6 +153,19 @@ class _ResolvedSeededOccurrence:
 class _ResolvedSeededSupertileGroup:
     summary: SeededSupertileGroup
     matched_occurrences: tuple[_ResolvedSeededOccurrence, ...]
+    selected_slot_keys: tuple[tuple[float, float, str], ...]
+
+
+@dataclass(frozen=True)
+class _ResolvedInflationOccurrence:
+    grown_subset: tuple[int, ...]
+    occurrence_roots: tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class _ResolvedInflationCandidateGroup:
+    summary: InflationCandidateGroup
+    matched_occurrences: tuple[_ResolvedInflationOccurrence, ...]
     selected_slot_keys: tuple[tuple[float, float, str], ...]
 
 
@@ -526,6 +566,123 @@ def _boundary_direction_histogram(
         local_angle = (_edge_angle(point, right) - orientation) % 360.0
         histogram[_snap_angle(local_angle)] += 1
     return tuple(sorted(histogram.items()))
+
+
+def _normalized_boundary(
+    boundary: tuple[tuple[float, float], ...],
+    *,
+    centroid: tuple[float, float],
+    orientation: int,
+    scale: float,
+) -> tuple[tuple[float, float], ...]:
+    rotation = math.radians(-orientation)
+    normalized_vertices: list[tuple[float, float]] = []
+    for x_value, y_value in boundary:
+        delta_x = x_value - centroid[0]
+        delta_y = y_value - centroid[1]
+        local_x = (
+            delta_x * math.cos(rotation) - delta_y * math.sin(rotation)
+        ) / scale
+        local_y = (
+            delta_x * math.sin(rotation) + delta_y * math.cos(rotation)
+        ) / scale
+        rounded_x = round(local_x, 2)
+        rounded_y = round(local_y, 2)
+        normalized_vertices.append((
+            0.0 if abs(rounded_x) == 0.0 else rounded_x,
+            0.0 if abs(rounded_y) == 0.0 else rounded_y,
+        ))
+    return tuple(normalized_vertices)
+
+
+def _transform_normalized_point(
+    point: tuple[float, float],
+    *,
+    macro_kind: str,
+    rotation_step: int,
+    reflection: bool,
+) -> tuple[float, float]:
+    angle_increment = 90.0 if macro_kind == "square" else 120.0
+    angle = math.radians(rotation_step * angle_increment)
+    rotated_x = point[0] * math.cos(angle) - point[1] * math.sin(angle)
+    rotated_y = point[0] * math.sin(angle) + point[1] * math.cos(angle)
+    if reflection:
+        rotated_x = -rotated_x
+    rounded_x = round(rotated_x, 2)
+    rounded_y = round(rotated_y, 2)
+    return (
+        0.0 if abs(rounded_x) == 0.0 else rounded_x,
+        0.0 if abs(rounded_y) == 0.0 else rounded_y,
+    )
+
+
+def _canonical_cycle(
+    points: tuple[tuple[float, float], ...],
+) -> tuple[tuple[float, float], ...]:
+    rotations = [
+        tuple(points[offset:] + points[:offset])
+        for offset in range(len(points))
+    ]
+    reversed_points = tuple(reversed(points))
+    rotations.extend(
+        tuple(reversed_points[offset:] + reversed_points[:offset])
+        for offset in range(len(reversed_points))
+    )
+    return min(rotations)
+
+
+def _canonicalize_boundary_template(
+    boundary: tuple[tuple[float, float], ...],
+    *,
+    centroid: tuple[float, float],
+    orientation: int,
+    scale: float,
+    macro_kind: str,
+) -> tuple[tuple[float, float], ...]:
+    normalized_vertices = _normalized_boundary(
+        boundary,
+        centroid=centroid,
+        orientation=orientation,
+        scale=scale,
+    )
+    rotation_steps = 4 if macro_kind == "square" else 3
+    candidates: list[tuple[tuple[float, float], ...]] = []
+    for step in range(rotation_steps):
+        for reflection in (False, True):
+            transformed = tuple(
+                _transform_normalized_point(
+                    point,
+                    macro_kind=macro_kind,
+                    rotation_step=step,
+                    reflection=reflection,
+                )
+                for point in normalized_vertices
+            )
+            candidates.append(_canonical_cycle(transformed))
+    return min(candidates)
+
+
+def _line_families_from_canonical_vertices(
+    canonical_vertices: tuple[tuple[float, float], ...],
+) -> tuple[BoundaryLineFamily, ...]:
+    offsets_by_axis: dict[int, list[float]] = defaultdict(list)
+    counts_by_axis: Counter[int] = Counter()
+    for index, point in enumerate(canonical_vertices):
+        right = canonical_vertices[(index + 1) % len(canonical_vertices)]
+        direction = _snap_angle(_edge_angle(point, right))
+        axis_angle = (direction + 90) % 180
+        theta = math.radians(axis_angle)
+        offset = round(point[0] * math.cos(theta) + point[1] * math.sin(theta), 2)
+        offsets_by_axis[axis_angle].append(offset)
+        counts_by_axis[axis_angle] += 1
+    return tuple(
+        BoundaryLineFamily(
+            axis_angle=axis_angle,
+            offsets=tuple(sorted(set(offsets_by_axis[axis_angle]))),
+            segment_count=int(counts_by_axis[axis_angle]),
+        )
+        for axis_angle in sorted(offsets_by_axis)
+    )
 
 
 def collect_macro_occurrences(
@@ -952,7 +1109,7 @@ def mine_seeded_supertile_groups(
     return tuple(group.summary for group in resolved_groups)
 
 
-def mine_inflation_candidate_groups(
+def _resolve_inflation_candidate_groups(
     cells: dict[int, SourceCell],
     grouped_macro_occurrences: dict[
         tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
@@ -963,7 +1120,7 @@ def mine_inflation_candidate_groups(
     max_combo_size: int = 5,
     growth_radius: int = 2,
     slot_support_ratio: float = 0.65,
-) -> tuple[InflationCandidateGroup, ...]:
+) -> tuple[_ResolvedInflationCandidateGroup, ...]:
     polygons = {
         index: Polygon(cell.vertices)
         for index, cell in cells.items()
@@ -980,7 +1137,7 @@ def mine_inflation_candidate_groups(
         top_groups=top_groups,
     )
 
-    inflation_candidates: list[InflationCandidateGroup] = []
+    resolved_candidate_groups: list[_ResolvedInflationCandidateGroup] = []
     for resolved_group in resolved_seed_groups:
         slot_occurrence_counts: Counter[tuple[float, float, str]] = Counter()
         per_occurrence_slots: list[
@@ -1074,7 +1231,6 @@ def mine_inflation_candidate_groups(
                         candidate_key,
                         {
                             "occurrence_count": 0,
-                            "combo": slot_combo,
                             "roots": set(),
                             "subsets": [],
                             "edge_length_signature": metrics["edge_length_signature"],
@@ -1083,12 +1239,19 @@ def mine_inflation_candidate_groups(
                                 boundary,
                                 orientation=occurrence.orientation,
                             ),
+                            "occurrences": [],
                         },
                     )
                     candidate_group["occurrence_count"] += 1
                     candidate_group["roots"].update(occurrence.occurrence_roots)
                     if len(candidate_group["subsets"]) < 3:
                         candidate_group["subsets"].append(expanded_tuple)
+                    candidate_group["occurrences"].append(
+                        _ResolvedInflationOccurrence(
+                            grown_subset=expanded_tuple,
+                            occurrence_roots=occurrence.occurrence_roots,
+                        )
+                    )
 
         if not candidate_groups:
             continue
@@ -1109,8 +1272,9 @@ def mine_inflation_candidate_groups(
             inflation_estimate = math.sqrt(
                 float(quantized_area_ratio) / resolved_group.summary.quantized_area_ratio
             )
-            inflation_candidates.append(
-                InflationCandidateGroup(
+            resolved_candidate_groups.append(
+                _ResolvedInflationCandidateGroup(
+                    summary=InflationCandidateGroup(
                     seed_macro_kind=resolved_group.summary.seed_macro_kind,
                     seed_cell_count=resolved_group.summary.seed_cell_count,
                     base_cell_count=resolved_group.summary.grown_cell_count,
@@ -1134,19 +1298,124 @@ def mine_inflation_candidate_groups(
                     ),
                     example_roots=tuple(sorted(int(root) for root in candidate_group["roots"])[:5]),
                     example_subsets=tuple(candidate_group["subsets"]),
+                    ),
+                    matched_occurrences=tuple(candidate_group["occurrences"]),
+                    selected_slot_keys=slot_combo,
                 )
             )
 
-    inflation_candidates.sort(
-        key=lambda candidate: (
-            -candidate.occurrence_count,
-            -candidate.grown_cell_count,
-            candidate.grown_macro_kind is None,
-            candidate.side_count,
-            candidate.marked_cell_signature,
+    resolved_candidate_groups.sort(
+        key=lambda group: (
+            -group.summary.occurrence_count,
+            -group.summary.grown_cell_count,
+            group.summary.grown_macro_kind is None,
+            group.summary.side_count,
+            group.summary.marked_cell_signature,
         )
     )
-    return tuple(inflation_candidates[:top_groups])
+    return tuple(resolved_candidate_groups[:top_groups])
+
+
+def mine_inflation_candidate_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    top_groups: int,
+    max_combo_size: int = 5,
+    growth_radius: int = 2,
+    slot_support_ratio: float = 0.65,
+) -> tuple[InflationCandidateGroup, ...]:
+    resolved_groups = _resolve_inflation_candidate_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+        max_combo_size=max_combo_size,
+        growth_radius=growth_radius,
+        slot_support_ratio=slot_support_ratio,
+    )
+    return tuple(group.summary for group in resolved_groups)
+
+
+def mine_boundary_template_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    top_groups: int,
+) -> tuple[BoundaryTemplateGroup, ...]:
+    polygons = {
+        index: Polygon(cell.vertices)
+        for index, cell in cells.items()
+    }
+    resolved_inflation_groups = _resolve_inflation_candidate_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
+
+    boundary_templates: list[BoundaryTemplateGroup] = []
+    for resolved_group in resolved_inflation_groups:
+        template_occurrence_counts: Counter[tuple[tuple[float, float], ...]] = Counter()
+        template_examples: dict[tuple[tuple[float, float], ...], tuple[int, ...]] = {}
+        for occurrence in resolved_group.matched_occurrences:
+            frame = _subset_frame(occurrence.grown_subset, polygons)
+            boundary_result = _merged_boundary(occurrence.grown_subset, polygons)
+            if frame is None or boundary_result is None:
+                continue
+            centroid, orientation, scale = frame
+            _merged, boundary = boundary_result
+            canonical_vertices = _canonicalize_boundary_template(
+                boundary,
+                centroid=centroid,
+                orientation=orientation,
+                scale=scale,
+                macro_kind=resolved_group.summary.seed_macro_kind,
+            )
+            template_occurrence_counts[canonical_vertices] += 1
+            template_examples.setdefault(canonical_vertices, occurrence.grown_subset)
+
+        if not template_occurrence_counts:
+            continue
+
+        dominant_template, template_match_count = max(
+            template_occurrence_counts.items(),
+            key=lambda item: (item[1], len(item[0])),
+        )
+        line_families = _line_families_from_canonical_vertices(dominant_template)
+        boundary_templates.append(
+            BoundaryTemplateGroup(
+                seed_macro_kind=resolved_group.summary.seed_macro_kind,
+                base_cell_count=resolved_group.summary.base_cell_count,
+                candidate_cell_count=resolved_group.summary.grown_cell_count,
+                occurrence_count=resolved_group.summary.occurrence_count,
+                template_match_count=int(template_match_count),
+                template_variant_count=len(template_occurrence_counts),
+                side_count=resolved_group.summary.side_count,
+                quantized_area_ratio=resolved_group.summary.quantized_area_ratio,
+                inflation_estimate=resolved_group.summary.inflation_estimate,
+                selected_slots=resolved_group.summary.selected_slots,
+                canonical_vertices=dominant_template,
+                line_families=line_families,
+                marked_cell_signature=resolved_group.summary.marked_cell_signature,
+                example_roots=resolved_group.summary.example_roots,
+                example_subsets=resolved_group.summary.example_subsets,
+            )
+        )
+
+    boundary_templates.sort(
+        key=lambda template: (
+            -template.candidate_cell_count,
+            -template.template_match_count,
+            template.seed_macro_kind,
+            template.marked_cell_signature,
+        )
+    )
+    return tuple(boundary_templates[:top_groups])
 
 
 def build_mining_summary(
@@ -1193,6 +1462,11 @@ def build_mining_summary(
         grouped_macro_occurrences,
         top_groups=top_groups,
     )
+    boundary_template_groups = mine_boundary_template_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
     return MiningSummary(
         source_cell_count=len(cells),
         seed_index=seed_index,
@@ -1211,6 +1485,7 @@ def build_mining_summary(
         macro_candidate_groups=macro_candidate_groups,
         seeded_supertile_groups=seeded_supertile_groups,
         inflation_candidate_groups=inflation_candidate_groups,
+        boundary_template_groups=boundary_template_groups,
     )
 
 
@@ -1229,6 +1504,7 @@ def summary_to_payload(summary: MiningSummary) -> dict[str, Any]:
         "macro_candidate_groups": [asdict(item) for item in summary.macro_candidate_groups],
         "seeded_supertile_groups": [asdict(item) for item in summary.seeded_supertile_groups],
         "inflation_candidate_groups": [asdict(item) for item in summary.inflation_candidate_groups],
+        "boundary_template_groups": [asdict(item) for item in summary.boundary_template_groups],
     }
 
 
@@ -1324,6 +1600,29 @@ def render_text_report(summary: MiningSummary) -> str:
             ),
             f"    example_roots={list(inflation_group.example_roots)}",
             f"    example_subsets={[list(subset) for subset in inflation_group.example_subsets]}",
+        ])
+
+    lines.extend(["", "Boundary Template Groups"])
+    if not summary.boundary_template_groups:
+        lines.append("  none")
+    for template_group in summary.boundary_template_groups:
+        lines.extend([
+            (
+                f"  seed_macro_kind={template_group.seed_macro_kind} base_cell_count={template_group.base_cell_count} "
+                f"candidate_cell_count={template_group.candidate_cell_count} occurrence_count={template_group.occurrence_count} "
+                f"template_match_count={template_group.template_match_count} template_variants={template_group.template_variant_count} "
+                f"side_count={template_group.side_count} area_ratio≈{template_group.quantized_area_ratio} "
+                f"inflation≈{template_group.inflation_estimate}"
+            ),
+            (
+                f"    selected_slots={list(template_group.selected_slots)} "
+                f"line_families="
+                f"{ {family.axis_angle: list(family.offsets) for family in template_group.line_families} } "
+                f"marked_cells={dict(template_group.marked_cell_signature)}"
+            ),
+            f"    canonical_vertices={list(template_group.canonical_vertices)}",
+            f"    example_roots={list(template_group.example_roots)}",
+            f"    example_subsets={[list(subset) for subset in template_group.example_subsets]}",
         ])
     return "\n".join(lines)
 
