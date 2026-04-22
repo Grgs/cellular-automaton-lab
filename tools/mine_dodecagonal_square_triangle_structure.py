@@ -164,6 +164,7 @@ class MacroCompositionCandidateGroup:
     base_cell_count: int
     candidate_cell_count: int
     template_match_count: int
+    canonical_vertices: tuple[tuple[float, float], ...]
     component_region_signatures: tuple[tuple[int, ...], ...]
     composition_macro_kind: str
     composed_cell_count: int
@@ -171,6 +172,34 @@ class MacroCompositionCandidateGroup:
     side_count: int
     quantized_area_ratio: float
     marked_cell_signature: tuple[tuple[str, int], ...]
+    example_roots: tuple[int, ...]
+    example_subsets: tuple[tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
+class RecoveredRuleChild:
+    component_region_signatures: tuple[tuple[int, ...], ...]
+    macro_kind: str
+    cell_count: int
+    occurrence_count: int
+    verified_occurrence_count: int
+    marked_cell_signature: tuple[tuple[str, int], ...]
+
+
+@dataclass(frozen=True)
+class RecoveredSubstitutionRule:
+    seed_macro_kind: str
+    base_cell_count: int
+    candidate_cell_count: int
+    template_match_count: int
+    canonical_vertices: tuple[tuple[float, float], ...]
+    line_equations: tuple[BoundaryLineEquation, ...]
+    child_rules: tuple[RecoveredRuleChild, ...]
+    residual_region_signatures: tuple[tuple[int, ...], ...]
+    verification_max_source_depth: int
+    verified_template_match_count: int
+    verified_child_rule_count: int
+    verified_rule_ratio: float
     example_roots: tuple[int, ...]
     example_subsets: tuple[tuple[int, ...], ...]
 
@@ -193,6 +222,7 @@ class MiningSummary:
     boundary_template_groups: tuple[BoundaryTemplateGroup, ...]
     supertile_decomposition_groups: tuple[SupertileDecompositionGroup, ...]
     macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...]
+    recovered_substitution_rules: tuple[RecoveredSubstitutionRule, ...]
 
 
 @dataclass(frozen=True)
@@ -1793,6 +1823,7 @@ def mine_macro_composition_groups(
             str,
             int,
             int,
+            tuple[tuple[float, float], ...],
             tuple[tuple[int, ...], ...],
             str,
             int,
@@ -1878,6 +1909,7 @@ def mine_macro_composition_groups(
                         resolved_template.summary.seed_macro_kind,
                         resolved_template.summary.base_cell_count,
                         resolved_template.summary.candidate_cell_count,
+                        resolved_template.summary.canonical_vertices,
                         tuple(region_combo),
                         str(metrics["macro_kind"]),
                         len(composed_subset),
@@ -1903,9 +1935,9 @@ def mine_macro_composition_groups(
         composition_groups.items(),
         key=lambda item: (
             -int(item[1]["occurrence_count"]),
-            -item[0][5],
+            -item[0][6],
+            item[0][5],
             item[0][4],
-            item[0][3],
         ),
     )
     return tuple(
@@ -1914,18 +1946,173 @@ def mine_macro_composition_groups(
             base_cell_count=group_key[1],
             candidate_cell_count=group_key[2],
             template_match_count=int(group["template_match_count"]),
-            component_region_signatures=group_key[3],
-            composition_macro_kind=group_key[4],
-            composed_cell_count=group_key[5],
+            canonical_vertices=group_key[3],
+            component_region_signatures=group_key[4],
+            composition_macro_kind=group_key[5],
+            composed_cell_count=group_key[6],
             occurrence_count=int(group["occurrence_count"]),
-            side_count=group_key[6],
-            quantized_area_ratio=float(group_key[7]),
-            marked_cell_signature=group_key[8],
+            side_count=group_key[7],
+            quantized_area_ratio=float(group_key[8]),
+            marked_cell_signature=group_key[9],
             example_roots=tuple(sorted(int(root) for root in group["roots"])[:5]),
             example_subsets=tuple(group["subsets"]),
         )
         for group_key, group in sorted_compositions[:top_groups]
     )
+
+
+def recover_substitution_rules(
+    *,
+    decomposition_groups: tuple[SupertileDecompositionGroup, ...],
+    macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...],
+    verification_boundary_templates: tuple[BoundaryTemplateGroup, ...],
+    verification_macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...],
+    verification_max_source_depth: int,
+    top_groups: int,
+) -> tuple[RecoveredSubstitutionRule, ...]:
+    composition_by_template: dict[
+        tuple[str, int, tuple[tuple[float, float], ...]],
+        list[MacroCompositionCandidateGroup],
+    ] = defaultdict(list)
+    for group in macro_composition_groups:
+        composition_by_template[(
+            group.seed_macro_kind,
+            group.candidate_cell_count,
+            group.canonical_vertices,
+        )].append(group)
+
+    verified_template_counts: dict[
+        tuple[str, int, tuple[tuple[float, float], ...]],
+        int,
+    ] = {}
+    for template in verification_boundary_templates:
+        template_key = (
+            template.seed_macro_kind,
+            template.candidate_cell_count,
+            template.canonical_vertices,
+        )
+        verified_template_counts[template_key] = max(
+            verified_template_counts.get(template_key, 0),
+            template.template_match_count,
+        )
+
+    verified_composition_counts: dict[
+        tuple[
+            tuple[str, int, tuple[tuple[float, float], ...]],
+            tuple[tuple[int, ...], ...],
+            str,
+            int,
+            tuple[tuple[str, int], ...],
+        ],
+        int,
+    ] = {}
+    for group in verification_macro_composition_groups:
+        template_key = (
+            group.seed_macro_kind,
+            group.candidate_cell_count,
+            group.canonical_vertices,
+        )
+        composition_key = (
+            template_key,
+            group.component_region_signatures,
+            group.composition_macro_kind,
+            group.composed_cell_count,
+            group.marked_cell_signature,
+        )
+        verified_composition_counts[composition_key] = max(
+            verified_composition_counts.get(composition_key, 0),
+            group.occurrence_count,
+        )
+
+    recovered_rules: list[RecoveredSubstitutionRule] = []
+    for decomposition_group in decomposition_groups:
+        template_key = (
+            decomposition_group.seed_macro_kind,
+            decomposition_group.candidate_cell_count,
+            decomposition_group.canonical_vertices,
+        )
+        candidate_children = sorted(
+            composition_by_template.get(template_key, []),
+            key=lambda group: (
+                -group.occurrence_count,
+                -group.composed_cell_count,
+                group.component_region_signatures,
+            ),
+        )
+        if not candidate_children:
+            continue
+
+        selected_children: list[RecoveredRuleChild] = []
+        covered_region_signatures: set[tuple[int, ...]] = set()
+        for child in candidate_children:
+            child_signatures = set(child.component_region_signatures)
+            if child_signatures & covered_region_signatures:
+                continue
+            covered_region_signatures.update(child_signatures)
+            verification_key = (
+                template_key,
+                child.component_region_signatures,
+                child.composition_macro_kind,
+                child.composed_cell_count,
+                child.marked_cell_signature,
+            )
+            selected_children.append(
+                RecoveredRuleChild(
+                    component_region_signatures=child.component_region_signatures,
+                    macro_kind=child.composition_macro_kind,
+                    cell_count=child.composed_cell_count,
+                    occurrence_count=child.occurrence_count,
+                    verified_occurrence_count=verified_composition_counts.get(verification_key, 0),
+                    marked_cell_signature=child.marked_cell_signature,
+                )
+            )
+
+        if not selected_children:
+            continue
+
+        residual_region_signatures = tuple(sorted(
+            component.region_signature
+            for component in decomposition_group.component_groups
+            if component.region_signature not in covered_region_signatures
+        ))
+        verified_template_match_count = verified_template_counts.get(template_key, 0)
+        verified_child_rule_count = sum(
+            1
+            for child in selected_children
+            if child.verified_occurrence_count > 0
+        )
+        verified_rule_ratio = round(
+            verified_child_rule_count / len(selected_children),
+            2,
+        )
+        recovered_rules.append(
+            RecoveredSubstitutionRule(
+                seed_macro_kind=decomposition_group.seed_macro_kind,
+                base_cell_count=decomposition_group.base_cell_count,
+                candidate_cell_count=decomposition_group.candidate_cell_count,
+                template_match_count=decomposition_group.template_match_count,
+                canonical_vertices=decomposition_group.canonical_vertices,
+                line_equations=decomposition_group.line_equations,
+                child_rules=tuple(selected_children),
+                residual_region_signatures=residual_region_signatures,
+                verification_max_source_depth=verification_max_source_depth,
+                verified_template_match_count=verified_template_match_count,
+                verified_child_rule_count=verified_child_rule_count,
+                verified_rule_ratio=verified_rule_ratio,
+                example_roots=decomposition_group.example_roots,
+                example_subsets=decomposition_group.example_subsets,
+            )
+        )
+
+    recovered_rules.sort(
+        key=lambda rule: (
+            -rule.verified_child_rule_count,
+            -rule.verified_template_match_count,
+            -len(rule.child_rules),
+            -rule.candidate_cell_count,
+        )
+    )
+    return tuple(recovered_rules[:top_groups])
 
 
 def build_mining_summary(
@@ -1940,6 +2127,7 @@ def build_mining_summary(
 ) -> MiningSummary:
     cells, seed_index = load_source_cells()
     shell_distances = compute_shell_distances(cells, seed_index)
+    max_available_depth = max(shell_distances.values())
     local_labels = classify_local_neighborhoods(cells, neighborhood_radius)
     local_neighborhood_classes = summarize_local_neighborhood_classes(
         cells,
@@ -1987,10 +2175,58 @@ def build_mining_summary(
         grouped_macro_occurrences,
         top_groups=top_groups,
     )
+    rule_recovery_top_groups = max(top_groups * 3, 10)
+    if rule_recovery_top_groups > top_groups:
+        rule_recovery_decomposition_groups = mine_supertile_decomposition_groups(
+            cells,
+            grouped_macro_occurrences,
+            top_groups=rule_recovery_top_groups,
+        )
+        rule_recovery_macro_composition_groups = mine_macro_composition_groups(
+            cells,
+            grouped_macro_occurrences,
+            top_groups=rule_recovery_top_groups,
+        )
+    else:
+        rule_recovery_decomposition_groups = supertile_decomposition_groups
+        rule_recovery_macro_composition_groups = macro_composition_groups
+    verification_max_source_depth = min(max_source_depth + 2, max_available_depth)
+    if verification_max_source_depth > max_source_depth:
+        verification_grouped_macro_occurrences = collect_macro_occurrences(
+            cells,
+            shell_distances,
+            local_labels,
+            max_source_depth=verification_max_source_depth,
+            region_radius=region_radius,
+            max_candidate_size=max_candidate_size,
+            min_candidate_size=min_candidate_size,
+            beam_width=beam_width,
+        )
+    else:
+        verification_grouped_macro_occurrences = grouped_macro_occurrences
+    verification_top_groups = max(top_groups * 3, top_groups)
+    verification_boundary_templates = mine_boundary_template_groups(
+        cells,
+        verification_grouped_macro_occurrences,
+        top_groups=verification_top_groups,
+    )
+    verification_macro_composition_groups = mine_macro_composition_groups(
+        cells,
+        verification_grouped_macro_occurrences,
+        top_groups=verification_top_groups,
+    )
+    recovered_substitution_rules = recover_substitution_rules(
+        decomposition_groups=rule_recovery_decomposition_groups,
+        macro_composition_groups=rule_recovery_macro_composition_groups,
+        verification_boundary_templates=verification_boundary_templates,
+        verification_macro_composition_groups=verification_macro_composition_groups,
+        verification_max_source_depth=verification_max_source_depth,
+        top_groups=top_groups,
+    )
     return MiningSummary(
         source_cell_count=len(cells),
         seed_index=seed_index,
-        max_available_depth=max(shell_distances.values()),
+        max_available_depth=max_available_depth,
         analyzed_root_count=sum(
             1
             for depth in shell_distances.values()
@@ -2008,6 +2244,7 @@ def build_mining_summary(
         boundary_template_groups=boundary_template_groups,
         supertile_decomposition_groups=supertile_decomposition_groups,
         macro_composition_groups=macro_composition_groups,
+        recovered_substitution_rules=recovered_substitution_rules,
     )
 
 
@@ -2029,6 +2266,7 @@ def summary_to_payload(summary: MiningSummary) -> dict[str, Any]:
         "boundary_template_groups": [asdict(item) for item in summary.boundary_template_groups],
         "supertile_decomposition_groups": [asdict(item) for item in summary.supertile_decomposition_groups],
         "macro_composition_groups": [asdict(item) for item in summary.macro_composition_groups],
+        "recovered_substitution_rules": [asdict(item) for item in summary.recovered_substitution_rules],
     }
 
 
@@ -2199,6 +2437,38 @@ def render_text_report(summary: MiningSummary) -> str:
             f"    example_roots={list(composition_group.example_roots)}",
             f"    example_subsets={[list(subset) for subset in composition_group.example_subsets]}",
         ])
+
+    lines.extend(["", "Recovered Substitution Rules"])
+    if not summary.recovered_substitution_rules:
+        lines.append("  none")
+    for rule in summary.recovered_substitution_rules:
+        lines.extend([
+            (
+                f"  seed_macro_kind={rule.seed_macro_kind} "
+                f"base_cell_count={rule.base_cell_count} "
+                f"candidate_cell_count={rule.candidate_cell_count} "
+                f"template_match_count={rule.template_match_count} "
+                f"verified_template_match_count={rule.verified_template_match_count} "
+                f"verified_child_rule_count={rule.verified_child_rule_count} "
+                f"verified_rule_ratio={rule.verified_rule_ratio}"
+            ),
+            f"    line_equations={[equation.equation for equation in rule.line_equations]}",
+            f"    residual_region_signatures={[list(signature) for signature in rule.residual_region_signatures]}",
+            f"    verification_max_source_depth={rule.verification_max_source_depth}",
+            f"    example_roots={list(rule.example_roots)}",
+            f"    example_subsets={[list(subset) for subset in rule.example_subsets]}",
+        ])
+        for child_rule in rule.child_rules:
+            lines.extend([
+                (
+                    f"    child_macro_kind={child_rule.macro_kind} "
+                    f"cell_count={child_rule.cell_count} "
+                    f"occurrence_count={child_rule.occurrence_count} "
+                    f"verified_occurrence_count={child_rule.verified_occurrence_count}"
+                ),
+                f"      component_region_signatures={[list(signature) for signature in child_rule.component_region_signatures]}",
+                f"      marked_cells={dict(child_rule.marked_cell_signature)}",
+            ])
     return "\n".join(lines)
 
 
@@ -2208,8 +2478,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "Classify local neighborhoods, mine repeated square/triangle "
             "macro-candidates, grow seeded supertile candidates, and probe "
             "inflation-style expansions, boundary templates, decomposition "
-            "components, and macro-composition candidates in the "
-            "literature-derived dodecagonal source patch."
+            "components, macro-composition candidates, and recovered "
+            "substitution-style rules in the literature-derived "
+            "dodecagonal source patch."
         )
     )
     parser.add_argument("--max-source-depth", type=int, default=8)

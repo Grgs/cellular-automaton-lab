@@ -36,6 +36,7 @@
 - Added a boundary-template inference pass for dodecagonal inflation candidates that canonicalizes repeated larger closures under seed symmetry and reports explicit normalized line-family offsets for the dominant repeated templates.
 - Added a line-equation and supertile-decomposition pass for dodecagonal boundary templates that emits explicit normalized line equations and groups repeated interval-signature decomposition components inside the dominant larger templates.
 - Added a dodecagonal macro-composition pass that unions repeated decomposition-region signatures and surfaces recurring square macro-cells inside the dominant 8-cell and 10-cell literature-derived templates.
+- Added a first recovered-rule pass for dodecagonal templates that promotes repeated macro-composition patterns into explicit substitution-style child rules and checks whether those child rules recur on a slightly deeper shell window of the literature-derived source patch.
 
 ## Now
 
@@ -47,7 +48,7 @@
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The direct canonical fixture layer now covers shallow and representative depths for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, plus depth-`3` fixtures for `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
-- If we revisit `dodecagonal-square-triangle`, continue from the new macro-composition pass with explicit substitution-rule recovery and deeper-shell verification beyond the current snapped literature-vector reconstruction, rooted local-reference anchors, exact public canonical patch fixtures, and exact tile-family/orientation/chirality/degree distributions at depths `1` and `3`.
+- If we revisit `dodecagonal-square-triangle`, continue from the recovered-rule pass by turning the newly verified single-child square rules into a full multi-child substitution decomposition for one parent template, then check that rule against deeper shells beyond the current snapped literature-vector reconstruction, rooted local-reference anchors, exact public canonical patch fixtures, and exact tile-family/orientation/chirality/degree distributions at depths `1` and `3`.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 
 ## Later

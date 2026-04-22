@@ -88,6 +88,22 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                 for group in summary.macro_composition_groups
             )
         )
+        self.assertTrue(summary.recovered_substitution_rules)
+        top_rule = summary.recovered_substitution_rules[0]
+        self.assertEqual(top_rule.seed_macro_kind, "square")
+        self.assertGreaterEqual(top_rule.verified_template_match_count, 1)
+        self.assertGreaterEqual(top_rule.verified_child_rule_count, 1)
+        self.assertTrue(
+            any(
+                any(
+                    child.macro_kind == "square"
+                    and child.cell_count == 2
+                    and child.verified_occurrence_count >= 2
+                    for child in rule.child_rules
+                )
+                for rule in summary.recovered_substitution_rules
+            )
+        )
 
     def test_main_json_output_contains_expected_summary_fields(self) -> None:
         stdout = io.StringIO()
@@ -128,6 +144,18 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                 and group["composed_cell_count"] == 2
                 and group["occurrence_count"] >= 4
                 for group in payload["macro_composition_groups"]
+            )
+        )
+        self.assertTrue(payload["recovered_substitution_rules"])
+        self.assertTrue(
+            any(
+                any(
+                    child["macro_kind"] == "square"
+                    and child["cell_count"] == 2
+                    and child["verified_occurrence_count"] >= 2
+                    for child in rule["child_rules"]
+                )
+                for rule in payload["recovered_substitution_rules"]
             )
         )
 
