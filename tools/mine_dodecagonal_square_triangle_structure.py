@@ -104,6 +104,15 @@ class BoundaryLineFamily:
 
 
 @dataclass(frozen=True)
+class BoundaryLineEquation:
+    axis_angle: int
+    normal_x: float
+    normal_y: float
+    offset: float
+    equation: str
+
+
+@dataclass(frozen=True)
 class BoundaryTemplateGroup:
     seed_macro_kind: str
     base_cell_count: int
@@ -117,6 +126,33 @@ class BoundaryTemplateGroup:
     selected_slots: tuple[str, ...]
     canonical_vertices: tuple[tuple[float, float], ...]
     line_families: tuple[BoundaryLineFamily, ...]
+    marked_cell_signature: tuple[tuple[str, int], ...]
+    example_roots: tuple[int, ...]
+    example_subsets: tuple[tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
+class DecompositionComponentGroup:
+    region_signature: tuple[int, ...]
+    component_macro_kind: str | None
+    cell_count: int
+    occurrence_count: int
+    side_count: int
+    quantized_area_ratio: float
+    marked_cell_signature: tuple[tuple[str, int], ...]
+    example_roots: tuple[int, ...]
+    example_subsets: tuple[tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
+class SupertileDecompositionGroup:
+    seed_macro_kind: str
+    base_cell_count: int
+    candidate_cell_count: int
+    template_match_count: int
+    line_equations: tuple[BoundaryLineEquation, ...]
+    component_groups: tuple[DecompositionComponentGroup, ...]
+    canonical_vertices: tuple[tuple[float, float], ...]
     marked_cell_signature: tuple[tuple[str, int], ...]
     example_roots: tuple[int, ...]
     example_subsets: tuple[tuple[int, ...], ...]
@@ -138,6 +174,7 @@ class MiningSummary:
     seeded_supertile_groups: tuple[SeededSupertileGroup, ...]
     inflation_candidate_groups: tuple[InflationCandidateGroup, ...]
     boundary_template_groups: tuple[BoundaryTemplateGroup, ...]
+    supertile_decomposition_groups: tuple[SupertileDecompositionGroup, ...]
 
 
 @dataclass(frozen=True)
@@ -167,6 +204,12 @@ class _ResolvedInflationCandidateGroup:
     summary: InflationCandidateGroup
     matched_occurrences: tuple[_ResolvedInflationOccurrence, ...]
     selected_slot_keys: tuple[tuple[float, float, str], ...]
+
+
+@dataclass(frozen=True)
+class _ResolvedBoundaryTemplateGroup:
+    summary: BoundaryTemplateGroup
+    matched_occurrences: tuple[_ResolvedInflationOccurrence, ...]
 
 
 def _edge_angle(a: tuple[float, float], b: tuple[float, float]) -> float:
@@ -595,6 +638,30 @@ def _normalized_boundary(
     return tuple(normalized_vertices)
 
 
+def _normalize_point(
+    point: tuple[float, float],
+    *,
+    centroid: tuple[float, float],
+    orientation: int,
+    scale: float,
+) -> tuple[float, float]:
+    rotation = math.radians(-orientation)
+    delta_x = point[0] - centroid[0]
+    delta_y = point[1] - centroid[1]
+    local_x = (
+        delta_x * math.cos(rotation) - delta_y * math.sin(rotation)
+    ) / scale
+    local_y = (
+        delta_x * math.sin(rotation) + delta_y * math.cos(rotation)
+    ) / scale
+    rounded_x = round(local_x, 2)
+    rounded_y = round(local_y, 2)
+    return (
+        0.0 if abs(rounded_x) == 0.0 else rounded_x,
+        0.0 if abs(rounded_y) == 0.0 else rounded_y,
+    )
+
+
 def _transform_normalized_point(
     point: tuple[float, float],
     *,
@@ -683,6 +750,27 @@ def _line_families_from_canonical_vertices(
         )
         for axis_angle in sorted(offsets_by_axis)
     )
+
+
+def _line_equations_from_line_families(
+    line_families: tuple[BoundaryLineFamily, ...],
+) -> tuple[BoundaryLineEquation, ...]:
+    equations: list[BoundaryLineEquation] = []
+    for family in line_families:
+        theta = math.radians(family.axis_angle)
+        normal_x = round(math.cos(theta), 3)
+        normal_y = round(math.sin(theta), 3)
+        for offset in family.offsets:
+            equations.append(
+                BoundaryLineEquation(
+                    axis_angle=family.axis_angle,
+                    normal_x=normal_x,
+                    normal_y=normal_y,
+                    offset=offset,
+                    equation=f"{normal_x}*x + {normal_y}*y = {offset}",
+                )
+            )
+    return tuple(equations)
 
 
 def collect_macro_occurrences(
@@ -1339,7 +1427,7 @@ def mine_inflation_candidate_groups(
     return tuple(group.summary for group in resolved_groups)
 
 
-def mine_boundary_template_groups(
+def _resolve_boundary_template_groups(
     cells: dict[int, SourceCell],
     grouped_macro_occurrences: dict[
         tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
@@ -1347,7 +1435,7 @@ def mine_boundary_template_groups(
     ],
     *,
     top_groups: int,
-) -> tuple[BoundaryTemplateGroup, ...]:
+) -> tuple[_ResolvedBoundaryTemplateGroup, ...]:
     polygons = {
         index: Polygon(cell.vertices)
         for index, cell in cells.items()
@@ -1358,10 +1446,14 @@ def mine_boundary_template_groups(
         top_groups=top_groups,
     )
 
-    boundary_templates: list[BoundaryTemplateGroup] = []
+    resolved_templates: list[_ResolvedBoundaryTemplateGroup] = []
     for resolved_group in resolved_inflation_groups:
         template_occurrence_counts: Counter[tuple[tuple[float, float], ...]] = Counter()
         template_examples: dict[tuple[tuple[float, float], ...], tuple[int, ...]] = {}
+        template_occurrences: dict[
+            tuple[tuple[float, float], ...],
+            list[_ResolvedInflationOccurrence],
+        ] = defaultdict(list)
         for occurrence in resolved_group.matched_occurrences:
             frame = _subset_frame(occurrence.grown_subset, polygons)
             boundary_result = _merged_boundary(occurrence.grown_subset, polygons)
@@ -1378,6 +1470,7 @@ def mine_boundary_template_groups(
             )
             template_occurrence_counts[canonical_vertices] += 1
             template_examples.setdefault(canonical_vertices, occurrence.grown_subset)
+            template_occurrences[canonical_vertices].append(occurrence)
 
         if not template_occurrence_counts:
             continue
@@ -1387,35 +1480,207 @@ def mine_boundary_template_groups(
             key=lambda item: (item[1], len(item[0])),
         )
         line_families = _line_families_from_canonical_vertices(dominant_template)
-        boundary_templates.append(
-            BoundaryTemplateGroup(
-                seed_macro_kind=resolved_group.summary.seed_macro_kind,
-                base_cell_count=resolved_group.summary.base_cell_count,
-                candidate_cell_count=resolved_group.summary.grown_cell_count,
-                occurrence_count=resolved_group.summary.occurrence_count,
-                template_match_count=int(template_match_count),
-                template_variant_count=len(template_occurrence_counts),
-                side_count=resolved_group.summary.side_count,
-                quantized_area_ratio=resolved_group.summary.quantized_area_ratio,
-                inflation_estimate=resolved_group.summary.inflation_estimate,
-                selected_slots=resolved_group.summary.selected_slots,
-                canonical_vertices=dominant_template,
-                line_families=line_families,
-                marked_cell_signature=resolved_group.summary.marked_cell_signature,
-                example_roots=resolved_group.summary.example_roots,
-                example_subsets=resolved_group.summary.example_subsets,
+        resolved_templates.append(
+            _ResolvedBoundaryTemplateGroup(
+                summary=BoundaryTemplateGroup(
+                    seed_macro_kind=resolved_group.summary.seed_macro_kind,
+                    base_cell_count=resolved_group.summary.base_cell_count,
+                    candidate_cell_count=resolved_group.summary.grown_cell_count,
+                    occurrence_count=resolved_group.summary.occurrence_count,
+                    template_match_count=int(template_match_count),
+                    template_variant_count=len(template_occurrence_counts),
+                    side_count=resolved_group.summary.side_count,
+                    quantized_area_ratio=resolved_group.summary.quantized_area_ratio,
+                    inflation_estimate=resolved_group.summary.inflation_estimate,
+                    selected_slots=resolved_group.summary.selected_slots,
+                    canonical_vertices=dominant_template,
+                    line_families=line_families,
+                    marked_cell_signature=resolved_group.summary.marked_cell_signature,
+                    example_roots=resolved_group.summary.example_roots,
+                    example_subsets=resolved_group.summary.example_subsets,
+                ),
+                matched_occurrences=tuple(template_occurrences[dominant_template]),
             )
         )
 
-    boundary_templates.sort(
-        key=lambda template: (
-            -template.candidate_cell_count,
-            -template.template_match_count,
-            template.seed_macro_kind,
-            template.marked_cell_signature,
+    resolved_templates.sort(
+        key=lambda group: (
+            -group.summary.candidate_cell_count,
+            -group.summary.template_match_count,
+            group.summary.seed_macro_kind,
+            group.summary.marked_cell_signature,
         )
     )
-    return tuple(boundary_templates[:top_groups])
+    return tuple(resolved_templates[:top_groups])
+
+
+def mine_boundary_template_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    top_groups: int,
+) -> tuple[BoundaryTemplateGroup, ...]:
+    resolved_templates = _resolve_boundary_template_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
+    return tuple(template.summary for template in resolved_templates)
+
+
+def mine_supertile_decomposition_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    top_groups: int,
+) -> tuple[SupertileDecompositionGroup, ...]:
+    polygons = {
+        index: Polygon(cell.vertices)
+        for index, cell in cells.items()
+    }
+    primitive_area = next(
+        polygons[index].area
+        for index, cell in cells.items()
+        if cell.kind.endswith("square")
+    )
+    resolved_templates = _resolve_boundary_template_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
+
+    decomposition_groups: list[SupertileDecompositionGroup] = []
+    for resolved_template in resolved_templates:
+        component_groups: dict[
+            tuple[tuple[int, ...], str | None, int, int, float, tuple[tuple[str, int], ...]],
+            dict[str, Any],
+        ] = {}
+        for occurrence in resolved_template.matched_occurrences:
+            frame = _subset_frame(occurrence.grown_subset, polygons)
+            if frame is None:
+                continue
+            centroid, orientation, scale = frame
+            region_members: dict[tuple[int, ...], list[int]] = defaultdict(list)
+            for cell_index in occurrence.grown_subset:
+                polygon = polygons[cell_index]
+                point = _normalize_point(
+                    (polygon.centroid.x, polygon.centroid.y),
+                    centroid=centroid,
+                    orientation=orientation,
+                    scale=scale,
+                )
+                region_signature_values: list[int] = []
+                for family in resolved_template.summary.line_families:
+                    theta = math.radians(family.axis_angle)
+                    value = point[0] * math.cos(theta) + point[1] * math.sin(theta)
+                    interval_index = 0
+                    while interval_index < len(family.offsets) and value > family.offsets[interval_index]:
+                        interval_index += 1
+                    region_signature_values.append(interval_index)
+                region_signature = tuple(region_signature_values)
+                region_members[region_signature].append(cell_index)
+
+            for region_signature, members in region_members.items():
+                remaining = set(members)
+                while remaining:
+                    root_index = remaining.pop()
+                    queue: deque[int] = deque((root_index,))
+                    component = {root_index}
+                    while queue:
+                        current = queue.popleft()
+                        for neighbor in cells[current].neighbors:
+                            if neighbor in remaining:
+                                remaining.remove(neighbor)
+                                component.add(neighbor)
+                                queue.append(neighbor)
+                    component_subset = tuple(sorted(component))
+                    evaluated = _evaluate_subset(
+                        frozenset(component_subset),
+                        polygons,
+                        primitive_area=primitive_area,
+                    )
+                    if evaluated is None:
+                        continue
+                    _, metrics = evaluated
+                    marked_signature = tuple(sorted(
+                        Counter(_short_cell_signature(cells[index]) for index in component_subset).items()
+                    ))
+                    component_key = (
+                        region_signature,
+                        metrics["macro_kind"],
+                        len(component_subset),
+                        int(metrics["side_count"]),
+                        round(float(metrics["area_ratio"]), 2),
+                        marked_signature,
+                    )
+                    component_group = component_groups.setdefault(
+                        component_key,
+                        {
+                            "occurrence_count": 0,
+                            "roots": set(),
+                            "subsets": [],
+                        },
+                    )
+                    component_group["occurrence_count"] += 1
+                    component_group["roots"].update(occurrence.occurrence_roots)
+                    if len(component_group["subsets"]) < 3:
+                        component_group["subsets"].append(component_subset)
+
+        sorted_components = sorted(
+            component_groups.items(),
+            key=lambda item: (
+                -int(item[1]["occurrence_count"]),
+                -item[0][2],
+                item[0][1] is None,
+                item[0][0],
+            ),
+        )
+        component_summaries = tuple(
+            DecompositionComponentGroup(
+                region_signature=component_key[0],
+                component_macro_kind=component_key[1],
+                cell_count=component_key[2],
+                occurrence_count=int(component_group["occurrence_count"]),
+                side_count=component_key[3],
+                quantized_area_ratio=float(component_key[4]),
+                marked_cell_signature=component_key[5],
+                example_roots=tuple(sorted(int(root) for root in component_group["roots"])[:5]),
+                example_subsets=tuple(component_group["subsets"]),
+            )
+            for component_key, component_group in sorted_components[:top_groups]
+        )
+        decomposition_groups.append(
+            SupertileDecompositionGroup(
+                seed_macro_kind=resolved_template.summary.seed_macro_kind,
+                base_cell_count=resolved_template.summary.base_cell_count,
+                candidate_cell_count=resolved_template.summary.candidate_cell_count,
+                template_match_count=resolved_template.summary.template_match_count,
+                line_equations=_line_equations_from_line_families(
+                    resolved_template.summary.line_families
+                ),
+                component_groups=component_summaries,
+                canonical_vertices=resolved_template.summary.canonical_vertices,
+                marked_cell_signature=resolved_template.summary.marked_cell_signature,
+                example_roots=resolved_template.summary.example_roots,
+                example_subsets=resolved_template.summary.example_subsets,
+            )
+        )
+
+    decomposition_groups.sort(
+        key=lambda group: (
+            -group.candidate_cell_count,
+            -group.template_match_count,
+            group.seed_macro_kind,
+            group.marked_cell_signature,
+        )
+    )
+    return tuple(decomposition_groups[:top_groups])
 
 
 def build_mining_summary(
@@ -1467,6 +1732,11 @@ def build_mining_summary(
         grouped_macro_occurrences,
         top_groups=top_groups,
     )
+    supertile_decomposition_groups = mine_supertile_decomposition_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
     return MiningSummary(
         source_cell_count=len(cells),
         seed_index=seed_index,
@@ -1486,6 +1756,7 @@ def build_mining_summary(
         seeded_supertile_groups=seeded_supertile_groups,
         inflation_candidate_groups=inflation_candidate_groups,
         boundary_template_groups=boundary_template_groups,
+        supertile_decomposition_groups=supertile_decomposition_groups,
     )
 
 
@@ -1505,6 +1776,7 @@ def summary_to_payload(summary: MiningSummary) -> dict[str, Any]:
         "seeded_supertile_groups": [asdict(item) for item in summary.seeded_supertile_groups],
         "inflation_candidate_groups": [asdict(item) for item in summary.inflation_candidate_groups],
         "boundary_template_groups": [asdict(item) for item in summary.boundary_template_groups],
+        "supertile_decomposition_groups": [asdict(item) for item in summary.supertile_decomposition_groups],
     }
 
 
@@ -1624,6 +1896,35 @@ def render_text_report(summary: MiningSummary) -> str:
             f"    example_roots={list(template_group.example_roots)}",
             f"    example_subsets={[list(subset) for subset in template_group.example_subsets]}",
         ])
+
+    lines.extend(["", "Supertile Decomposition Groups"])
+    if not summary.supertile_decomposition_groups:
+        lines.append("  none")
+    for decomposition_group in summary.supertile_decomposition_groups:
+        lines.extend([
+            (
+                f"  seed_macro_kind={decomposition_group.seed_macro_kind} "
+                f"base_cell_count={decomposition_group.base_cell_count} "
+                f"candidate_cell_count={decomposition_group.candidate_cell_count} "
+                f"template_match_count={decomposition_group.template_match_count}"
+            ),
+            f"    line_equations={[equation.equation for equation in decomposition_group.line_equations]}",
+            f"    canonical_vertices={list(decomposition_group.canonical_vertices)}",
+        ])
+        for component_group in decomposition_group.component_groups:
+            lines.extend([
+                (
+                    f"    region_signature={list(component_group.region_signature)} "
+                    f"macro_kind={component_group.component_macro_kind} "
+                    f"cell_count={component_group.cell_count} "
+                    f"occurrence_count={component_group.occurrence_count} "
+                    f"side_count={component_group.side_count} "
+                    f"area_ratio≈{component_group.quantized_area_ratio}"
+                ),
+                f"      marked_cells={dict(component_group.marked_cell_signature)}",
+                f"      example_roots={list(component_group.example_roots)}",
+                f"      example_subsets={[list(subset) for subset in component_group.example_subsets]}",
+            ])
     return "\n".join(lines)
 
 

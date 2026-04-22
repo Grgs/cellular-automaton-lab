@@ -68,6 +68,17 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertTrue(top_template.line_families)
         self.assertEqual(top_template.line_families[0].axis_angle, 0)
         self.assertIn(120, [family.axis_angle for family in top_template.line_families])
+        self.assertTrue(summary.supertile_decomposition_groups)
+        top_decomposition = summary.supertile_decomposition_groups[0]
+        self.assertEqual(top_decomposition.seed_macro_kind, "square")
+        self.assertEqual(top_decomposition.base_cell_count, 5)
+        self.assertEqual(top_decomposition.candidate_cell_count, 10)
+        self.assertGreaterEqual(top_decomposition.template_match_count, 7)
+        self.assertEqual(len(top_decomposition.line_equations), 10)
+        self.assertTrue(top_decomposition.component_groups)
+        self.assertEqual(top_decomposition.component_groups[0].component_macro_kind, "triangle")
+        self.assertEqual(top_decomposition.component_groups[0].cell_count, 1)
+        self.assertGreaterEqual(top_decomposition.component_groups[0].occurrence_count, 10)
 
     def test_main_json_output_contains_expected_summary_fields(self) -> None:
         stdout = io.StringIO()
@@ -98,6 +109,9 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertTrue(payload["boundary_template_groups"])
         self.assertEqual(payload["boundary_template_groups"][0]["seed_macro_kind"], "square")
         self.assertEqual(payload["boundary_template_groups"][0]["candidate_cell_count"], 10)
+        self.assertTrue(payload["supertile_decomposition_groups"])
+        self.assertEqual(payload["supertile_decomposition_groups"][0]["seed_macro_kind"], "square")
+        self.assertEqual(payload["supertile_decomposition_groups"][0]["candidate_cell_count"], 10)
 
 
 if __name__ == "__main__":
