@@ -104,6 +104,21 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                 for rule in summary.recovered_substitution_rules
             )
         )
+        self.assertTrue(summary.recovered_parent_decompositions)
+        self.assertTrue(
+            any(
+                decomposition.coverage_ratio == 1.0
+                and decomposition.verified_piece_count >= 2
+                and any(
+                    piece.piece_kind == "composition"
+                    and piece.macro_kind == "square"
+                    and piece.cell_count == 2
+                    and piece.verified_occurrence_count >= 1
+                    for piece in decomposition.child_pieces
+                )
+                for decomposition in summary.recovered_parent_decompositions
+            )
+        )
 
     def test_main_json_output_contains_expected_summary_fields(self) -> None:
         stdout = io.StringIO()
@@ -156,6 +171,21 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                     for child in rule["child_rules"]
                 )
                 for rule in payload["recovered_substitution_rules"]
+            )
+        )
+        self.assertTrue(payload["recovered_parent_decompositions"])
+        self.assertTrue(
+            any(
+                decomposition["coverage_ratio"] == 1.0
+                and decomposition["verified_piece_count"] >= 2
+                and any(
+                    piece["piece_kind"] == "composition"
+                    and piece["macro_kind"] == "square"
+                    and piece["cell_count"] == 2
+                    and piece["verified_occurrence_count"] >= 1
+                    for piece in decomposition["child_pieces"]
+                )
+                for decomposition in payload["recovered_parent_decompositions"]
             )
         )
 
