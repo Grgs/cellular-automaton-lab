@@ -159,6 +159,23 @@ class SupertileDecompositionGroup:
 
 
 @dataclass(frozen=True)
+class MacroCompositionCandidateGroup:
+    seed_macro_kind: str
+    base_cell_count: int
+    candidate_cell_count: int
+    template_match_count: int
+    component_region_signatures: tuple[tuple[int, ...], ...]
+    composition_macro_kind: str
+    composed_cell_count: int
+    occurrence_count: int
+    side_count: int
+    quantized_area_ratio: float
+    marked_cell_signature: tuple[tuple[str, int], ...]
+    example_roots: tuple[int, ...]
+    example_subsets: tuple[tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
 class MiningSummary:
     source_cell_count: int
     seed_index: int
@@ -175,6 +192,7 @@ class MiningSummary:
     inflation_candidate_groups: tuple[InflationCandidateGroup, ...]
     boundary_template_groups: tuple[BoundaryTemplateGroup, ...]
     supertile_decomposition_groups: tuple[SupertileDecompositionGroup, ...]
+    macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...]
 
 
 @dataclass(frozen=True)
@@ -210,6 +228,22 @@ class _ResolvedInflationCandidateGroup:
 class _ResolvedBoundaryTemplateGroup:
     summary: BoundaryTemplateGroup
     matched_occurrences: tuple[_ResolvedInflationOccurrence, ...]
+
+
+@dataclass(frozen=True)
+class _ResolvedRegionComponent:
+    region_signature: tuple[int, ...]
+    subset: tuple[int, ...]
+    macro_kind: str | None
+    side_count: int
+    quantized_area_ratio: float
+    marked_cell_signature: tuple[tuple[str, int], ...]
+
+
+@dataclass(frozen=True)
+class _ResolvedTemplateOccurrence:
+    occurrence: _ResolvedInflationOccurrence
+    components: tuple[_ResolvedRegionComponent, ...]
 
 
 def _edge_angle(a: tuple[float, float], b: tuple[float, float]) -> float:
@@ -1531,6 +1565,93 @@ def mine_boundary_template_groups(
     return tuple(template.summary for template in resolved_templates)
 
 
+def _resolve_template_occurrences(
+    cells: dict[int, SourceCell],
+    polygons: dict[int, Polygon],
+    *,
+    primitive_area: float,
+    resolved_template: _ResolvedBoundaryTemplateGroup,
+) -> tuple[_ResolvedTemplateOccurrence, ...]:
+    resolved_occurrences: list[_ResolvedTemplateOccurrence] = []
+    for occurrence in resolved_template.matched_occurrences:
+        frame = _subset_frame(occurrence.grown_subset, polygons)
+        if frame is None:
+            continue
+        centroid, orientation, scale = frame
+        region_members: dict[tuple[int, ...], list[int]] = defaultdict(list)
+        for cell_index in occurrence.grown_subset:
+            polygon = polygons[cell_index]
+            point = _normalize_point(
+                (polygon.centroid.x, polygon.centroid.y),
+                centroid=centroid,
+                orientation=orientation,
+                scale=scale,
+            )
+            region_signature_values: list[int] = []
+            for family in resolved_template.summary.line_families:
+                theta = math.radians(family.axis_angle)
+                value = point[0] * math.cos(theta) + point[1] * math.sin(theta)
+                interval_index = 0
+                while interval_index < len(family.offsets) and value > family.offsets[interval_index]:
+                    interval_index += 1
+                region_signature_values.append(interval_index)
+            region_members[tuple(region_signature_values)].append(cell_index)
+
+        components: list[_ResolvedRegionComponent] = []
+        for region_signature, members in region_members.items():
+            remaining = set(members)
+            while remaining:
+                root_index = remaining.pop()
+                queue: deque[int] = deque((root_index,))
+                component = {root_index}
+                while queue:
+                    current = queue.popleft()
+                    for neighbor in cells[current].neighbors:
+                        if neighbor in remaining:
+                            remaining.remove(neighbor)
+                            component.add(neighbor)
+                            queue.append(neighbor)
+                component_subset = tuple(sorted(component))
+                evaluated = _evaluate_subset(
+                    frozenset(component_subset),
+                    polygons,
+                    primitive_area=primitive_area,
+                )
+                if evaluated is None:
+                    continue
+                _, metrics = evaluated
+                marked_signature = tuple(sorted(
+                    Counter(
+                        _short_cell_signature(cells[index])
+                        for index in component_subset
+                    ).items()
+                ))
+                components.append(
+                    _ResolvedRegionComponent(
+                        region_signature=region_signature,
+                        subset=component_subset,
+                        macro_kind=metrics["macro_kind"],
+                        side_count=int(metrics["side_count"]),
+                        quantized_area_ratio=round(float(metrics["area_ratio"]), 2),
+                        marked_cell_signature=marked_signature,
+                    )
+                )
+        resolved_occurrences.append(
+            _ResolvedTemplateOccurrence(
+                occurrence=occurrence,
+                components=tuple(sorted(
+                    components,
+                    key=lambda component: (
+                        component.region_signature,
+                        len(component.subset),
+                        component.subset,
+                    ),
+                )),
+            )
+        )
+    return tuple(resolved_occurrences)
+
+
 def mine_supertile_decomposition_groups(
     cells: dict[int, SourceCell],
     grouped_macro_occurrences: dict[
@@ -1557,80 +1678,38 @@ def mine_supertile_decomposition_groups(
 
     decomposition_groups: list[SupertileDecompositionGroup] = []
     for resolved_template in resolved_templates:
+        resolved_occurrences = _resolve_template_occurrences(
+            cells,
+            polygons,
+            primitive_area=primitive_area,
+            resolved_template=resolved_template,
+        )
         component_groups: dict[
             tuple[tuple[int, ...], str | None, int, int, float, tuple[tuple[str, int], ...]],
             dict[str, Any],
         ] = {}
-        for occurrence in resolved_template.matched_occurrences:
-            frame = _subset_frame(occurrence.grown_subset, polygons)
-            if frame is None:
-                continue
-            centroid, orientation, scale = frame
-            region_members: dict[tuple[int, ...], list[int]] = defaultdict(list)
-            for cell_index in occurrence.grown_subset:
-                polygon = polygons[cell_index]
-                point = _normalize_point(
-                    (polygon.centroid.x, polygon.centroid.y),
-                    centroid=centroid,
-                    orientation=orientation,
-                    scale=scale,
+        for resolved_occurrence in resolved_occurrences:
+            for component in resolved_occurrence.components:
+                component_key = (
+                    component.region_signature,
+                    component.macro_kind,
+                    len(component.subset),
+                    component.side_count,
+                    component.quantized_area_ratio,
+                    component.marked_cell_signature,
                 )
-                region_signature_values: list[int] = []
-                for family in resolved_template.summary.line_families:
-                    theta = math.radians(family.axis_angle)
-                    value = point[0] * math.cos(theta) + point[1] * math.sin(theta)
-                    interval_index = 0
-                    while interval_index < len(family.offsets) and value > family.offsets[interval_index]:
-                        interval_index += 1
-                    region_signature_values.append(interval_index)
-                region_signature = tuple(region_signature_values)
-                region_members[region_signature].append(cell_index)
-
-            for region_signature, members in region_members.items():
-                remaining = set(members)
-                while remaining:
-                    root_index = remaining.pop()
-                    queue: deque[int] = deque((root_index,))
-                    component = {root_index}
-                    while queue:
-                        current = queue.popleft()
-                        for neighbor in cells[current].neighbors:
-                            if neighbor in remaining:
-                                remaining.remove(neighbor)
-                                component.add(neighbor)
-                                queue.append(neighbor)
-                    component_subset = tuple(sorted(component))
-                    evaluated = _evaluate_subset(
-                        frozenset(component_subset),
-                        polygons,
-                        primitive_area=primitive_area,
-                    )
-                    if evaluated is None:
-                        continue
-                    _, metrics = evaluated
-                    marked_signature = tuple(sorted(
-                        Counter(_short_cell_signature(cells[index]) for index in component_subset).items()
-                    ))
-                    component_key = (
-                        region_signature,
-                        metrics["macro_kind"],
-                        len(component_subset),
-                        int(metrics["side_count"]),
-                        round(float(metrics["area_ratio"]), 2),
-                        marked_signature,
-                    )
-                    component_group = component_groups.setdefault(
-                        component_key,
-                        {
-                            "occurrence_count": 0,
-                            "roots": set(),
-                            "subsets": [],
-                        },
-                    )
-                    component_group["occurrence_count"] += 1
-                    component_group["roots"].update(occurrence.occurrence_roots)
-                    if len(component_group["subsets"]) < 3:
-                        component_group["subsets"].append(component_subset)
+                component_group = component_groups.setdefault(
+                    component_key,
+                    {
+                        "occurrence_count": 0,
+                        "roots": set(),
+                        "subsets": [],
+                    },
+                )
+                component_group["occurrence_count"] += 1
+                component_group["roots"].update(resolved_occurrence.occurrence.occurrence_roots)
+                if len(component_group["subsets"]) < 3:
+                    component_group["subsets"].append(component.subset)
 
         sorted_components = sorted(
             component_groups.items(),
@@ -1681,6 +1760,172 @@ def mine_supertile_decomposition_groups(
         )
     )
     return tuple(decomposition_groups[:top_groups])
+
+
+def mine_macro_composition_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    top_groups: int,
+    max_combo_size: int = 4,
+    component_support_ratio: float = 0.6,
+) -> tuple[MacroCompositionCandidateGroup, ...]:
+    polygons = {
+        index: Polygon(cell.vertices)
+        for index, cell in cells.items()
+    }
+    primitive_area = next(
+        polygons[index].area
+        for index, cell in cells.items()
+        if cell.kind.endswith("square")
+    )
+    resolved_templates = _resolve_boundary_template_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
+
+    composition_groups: dict[
+        tuple[
+            str,
+            int,
+            int,
+            tuple[tuple[int, ...], ...],
+            str,
+            int,
+            int,
+            float,
+            tuple[tuple[str, int], ...],
+        ],
+        dict[str, Any],
+    ] = {}
+    for resolved_template in resolved_templates:
+        resolved_occurrences = _resolve_template_occurrences(
+            cells,
+            polygons,
+            primitive_area=primitive_area,
+            resolved_template=resolved_template,
+        )
+        if not resolved_occurrences:
+            continue
+
+        signature_occurrence_counts: Counter[tuple[int, ...]] = Counter()
+        occurrence_components: list[
+            tuple[_ResolvedInflationOccurrence, dict[tuple[int, ...], _ResolvedRegionComponent]]
+        ] = []
+        for resolved_occurrence in resolved_occurrences:
+            components_by_signature: dict[tuple[int, ...], list[_ResolvedRegionComponent]] = defaultdict(list)
+            for component in resolved_occurrence.components:
+                components_by_signature[component.region_signature].append(component)
+            unique_components = {
+                region_signature: signature_components[0]
+                for region_signature, signature_components in components_by_signature.items()
+                if len(signature_components) == 1
+            }
+            occurrence_components.append((resolved_occurrence.occurrence, unique_components))
+            for region_signature in unique_components:
+                signature_occurrence_counts[region_signature] += 1
+
+        support_threshold = max(
+            2,
+            math.ceil(len(occurrence_components) * component_support_ratio),
+        )
+        stable_signatures = sorted(
+            region_signature
+            for region_signature, count in signature_occurrence_counts.items()
+            if count >= support_threshold
+        )
+        if len(stable_signatures) < 2:
+            continue
+
+        max_effective_combo_size = min(max_combo_size, len(stable_signatures))
+        for combo_size in range(2, max_effective_combo_size + 1):
+            for region_combo in combinations(stable_signatures, combo_size):
+                for occurrence, unique_components in occurrence_components:
+                    if any(region_signature not in unique_components for region_signature in region_combo):
+                        continue
+                    selected_components = [
+                        unique_components[region_signature]
+                        for region_signature in region_combo
+                    ]
+                    composed_subset = tuple(sorted({
+                        cell_index
+                        for component in selected_components
+                        for cell_index in component.subset
+                    }))
+                    if len(composed_subset) <= max(len(component.subset) for component in selected_components):
+                        continue
+                    evaluated = _evaluate_subset(
+                        frozenset(composed_subset),
+                        polygons,
+                        primitive_area=primitive_area,
+                    )
+                    if evaluated is None:
+                        continue
+                    _, metrics = evaluated
+                    if metrics["macro_kind"] not in {"square", "triangle"}:
+                        continue
+                    marked_signature = tuple(sorted(
+                        Counter(
+                            _short_cell_signature(cells[index])
+                            for index in composed_subset
+                        ).items()
+                    ))
+                    group_key = (
+                        resolved_template.summary.seed_macro_kind,
+                        resolved_template.summary.base_cell_count,
+                        resolved_template.summary.candidate_cell_count,
+                        tuple(region_combo),
+                        str(metrics["macro_kind"]),
+                        len(composed_subset),
+                        int(metrics["side_count"]),
+                        round(float(metrics["area_ratio"]), 2),
+                        marked_signature,
+                    )
+                    composition_group = composition_groups.setdefault(
+                        group_key,
+                        {
+                            "template_match_count": resolved_template.summary.template_match_count,
+                            "occurrence_count": 0,
+                            "roots": set(),
+                            "subsets": [],
+                        },
+                    )
+                    composition_group["occurrence_count"] += 1
+                    composition_group["roots"].update(occurrence.occurrence_roots)
+                    if len(composition_group["subsets"]) < 3:
+                        composition_group["subsets"].append(composed_subset)
+
+    sorted_compositions = sorted(
+        composition_groups.items(),
+        key=lambda item: (
+            -int(item[1]["occurrence_count"]),
+            -item[0][5],
+            item[0][4],
+            item[0][3],
+        ),
+    )
+    return tuple(
+        MacroCompositionCandidateGroup(
+            seed_macro_kind=group_key[0],
+            base_cell_count=group_key[1],
+            candidate_cell_count=group_key[2],
+            template_match_count=int(group["template_match_count"]),
+            component_region_signatures=group_key[3],
+            composition_macro_kind=group_key[4],
+            composed_cell_count=group_key[5],
+            occurrence_count=int(group["occurrence_count"]),
+            side_count=group_key[6],
+            quantized_area_ratio=float(group_key[7]),
+            marked_cell_signature=group_key[8],
+            example_roots=tuple(sorted(int(root) for root in group["roots"])[:5]),
+            example_subsets=tuple(group["subsets"]),
+        )
+        for group_key, group in sorted_compositions[:top_groups]
+    )
 
 
 def build_mining_summary(
@@ -1737,6 +1982,11 @@ def build_mining_summary(
         grouped_macro_occurrences,
         top_groups=top_groups,
     )
+    macro_composition_groups = mine_macro_composition_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=top_groups,
+    )
     return MiningSummary(
         source_cell_count=len(cells),
         seed_index=seed_index,
@@ -1757,6 +2007,7 @@ def build_mining_summary(
         inflation_candidate_groups=inflation_candidate_groups,
         boundary_template_groups=boundary_template_groups,
         supertile_decomposition_groups=supertile_decomposition_groups,
+        macro_composition_groups=macro_composition_groups,
     )
 
 
@@ -1777,6 +2028,7 @@ def summary_to_payload(summary: MiningSummary) -> dict[str, Any]:
         "inflation_candidate_groups": [asdict(item) for item in summary.inflation_candidate_groups],
         "boundary_template_groups": [asdict(item) for item in summary.boundary_template_groups],
         "supertile_decomposition_groups": [asdict(item) for item in summary.supertile_decomposition_groups],
+        "macro_composition_groups": [asdict(item) for item in summary.macro_composition_groups],
     }
 
 
@@ -1925,6 +2177,28 @@ def render_text_report(summary: MiningSummary) -> str:
                 f"      example_roots={list(component_group.example_roots)}",
                 f"      example_subsets={[list(subset) for subset in component_group.example_subsets]}",
             ])
+
+    lines.extend(["", "Macro Composition Groups"])
+    if not summary.macro_composition_groups:
+        lines.append("  none")
+    for composition_group in summary.macro_composition_groups:
+        lines.extend([
+            (
+                f"  seed_macro_kind={composition_group.seed_macro_kind} "
+                f"base_cell_count={composition_group.base_cell_count} "
+                f"candidate_cell_count={composition_group.candidate_cell_count} "
+                f"template_match_count={composition_group.template_match_count} "
+                f"composition_macro_kind={composition_group.composition_macro_kind} "
+                f"composed_cell_count={composition_group.composed_cell_count} "
+                f"occurrence_count={composition_group.occurrence_count} "
+                f"side_count={composition_group.side_count} "
+                f"area_ratio≈{composition_group.quantized_area_ratio}"
+            ),
+            f"    component_region_signatures={[list(signature) for signature in composition_group.component_region_signatures]}",
+            f"    marked_cells={dict(composition_group.marked_cell_signature)}",
+            f"    example_roots={list(composition_group.example_roots)}",
+            f"    example_subsets={[list(subset) for subset in composition_group.example_subsets]}",
+        ])
     return "\n".join(lines)
 
 
@@ -1933,8 +2207,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         description=(
             "Classify local neighborhoods, mine repeated square/triangle "
             "macro-candidates, grow seeded supertile candidates, and probe "
-            "inflation-style expansions in the literature-derived "
-            "dodecagonal source patch."
+            "inflation-style expansions, boundary templates, decomposition "
+            "components, and macro-composition candidates in the "
+            "literature-derived dodecagonal source patch."
         )
     )
     parser.add_argument("--max-source-depth", type=int, default=8)

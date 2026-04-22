@@ -79,6 +79,15 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertEqual(top_decomposition.component_groups[0].component_macro_kind, "triangle")
         self.assertEqual(top_decomposition.component_groups[0].cell_count, 1)
         self.assertGreaterEqual(top_decomposition.component_groups[0].occurrence_count, 10)
+        self.assertTrue(summary.macro_composition_groups)
+        self.assertTrue(
+            any(
+                group.composition_macro_kind == "square"
+                and group.composed_cell_count == 2
+                and group.occurrence_count >= 4
+                for group in summary.macro_composition_groups
+            )
+        )
 
     def test_main_json_output_contains_expected_summary_fields(self) -> None:
         stdout = io.StringIO()
@@ -112,6 +121,15 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertTrue(payload["supertile_decomposition_groups"])
         self.assertEqual(payload["supertile_decomposition_groups"][0]["seed_macro_kind"], "square")
         self.assertEqual(payload["supertile_decomposition_groups"][0]["candidate_cell_count"], 10)
+        self.assertTrue(payload["macro_composition_groups"])
+        self.assertTrue(
+            any(
+                group["composition_macro_kind"] == "square"
+                and group["composed_cell_count"] == 2
+                and group["occurrence_count"] >= 4
+                for group in payload["macro_composition_groups"]
+            )
+        )
 
 
 if __name__ == "__main__":
