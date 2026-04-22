@@ -9,8 +9,28 @@ from itertools import combinations
 from pathlib import Path
 from typing import Any
 
-from shapely.geometry import Polygon
-from shapely.ops import unary_union
+from tools.tiling_template_analysis import (
+    BoundaryLineEquation,
+    BoundaryLineFamily,
+    ResolvedTemplateOccurrence as _ResolvedTemplateOccurrence,
+    TemplateRegionComponent as _ResolvedRegionComponent,
+    boundary_direction_histogram as _boundary_direction_histogram,
+    build_polygon_context as _build_polygon_context,
+    canonical_slot_key as _canonical_slot_key,
+    canonicalize_boundary_template as _canonicalize_boundary_template,
+    edge_angle as _edge_angle,
+    evaluate_subset as _evaluate_subset,
+    format_slot_key as _format_slot_key,
+    line_equations_from_line_families as _line_equations_from_line_families,
+    line_families_from_canonical_vertices as _line_families_from_canonical_vertices,
+    merged_boundary as _merged_boundary,
+    multi_source_ball as _multi_source_ball,
+    normalize_point as _normalize_point,
+    resolve_template_occurrences as _resolve_template_occurrences_shared,
+    rotate_vertices as _rotate_vertices,
+    snap_angle as _snap_angle,
+    subset_frame as _subset_frame,
+)
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -94,22 +114,6 @@ class InflationCandidateGroup:
     angle_signature: tuple[int, ...]
     example_roots: tuple[int, ...]
     example_subsets: tuple[tuple[int, ...], ...]
-
-
-@dataclass(frozen=True)
-class BoundaryLineFamily:
-    axis_angle: int
-    offsets: tuple[float, ...]
-    segment_count: int
-
-
-@dataclass(frozen=True)
-class BoundaryLineEquation:
-    axis_angle: int
-    normal_x: float
-    normal_y: float
-    offset: float
-    equation: str
 
 
 @dataclass(frozen=True)
@@ -260,41 +264,6 @@ class _ResolvedBoundaryTemplateGroup:
     matched_occurrences: tuple[_ResolvedInflationOccurrence, ...]
 
 
-@dataclass(frozen=True)
-class _ResolvedRegionComponent:
-    region_signature: tuple[int, ...]
-    subset: tuple[int, ...]
-    macro_kind: str | None
-    side_count: int
-    quantized_area_ratio: float
-    marked_cell_signature: tuple[tuple[str, int], ...]
-
-
-@dataclass(frozen=True)
-class _ResolvedTemplateOccurrence:
-    occurrence: _ResolvedInflationOccurrence
-    components: tuple[_ResolvedRegionComponent, ...]
-
-
-def _edge_angle(a: tuple[float, float], b: tuple[float, float]) -> float:
-    return math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) % 360.0
-
-
-def _snap_angle(angle: float, *, increment: float = 30.0) -> int:
-    return int(round(angle / increment) * increment) % 360
-
-
-def _rotate_vertices(
-    vertices: tuple[tuple[float, float], ...],
-) -> tuple[tuple[float, float], ...]:
-    rotations: list[tuple[float, tuple[tuple[float, float], ...]]] = []
-    for offset in range(len(vertices)):
-        rotated = vertices[offset:] + vertices[:offset]
-        angle = _edge_angle(rotated[0], rotated[1])
-        rotations.append((round(angle, 6), tuple(rotated)))
-    return min(rotations, key=lambda item: item[0])[1]
-
-
 def _orientation_token(vertices: tuple[tuple[float, float], ...]) -> str:
     rotated = _rotate_vertices(vertices)
     angle = _edge_angle(rotated[0], rotated[1])
@@ -439,404 +408,6 @@ def graph_ball(
     return tuple(sorted(distances))
 
 
-def _compress_collinear_boundary(
-    coordinates: list[tuple[float, float]],
-    *,
-    tolerance: float = 1e-6,
-) -> tuple[tuple[float, float], ...]:
-    points = list(coordinates[:-1])
-    changed = True
-    while changed and len(points) >= 3:
-        changed = False
-        reduced: list[tuple[float, float]] = []
-        for index, point in enumerate(points):
-            left = points[(index - 1) % len(points)]
-            right = points[(index + 1) % len(points)]
-            left_vector = (point[0] - left[0], point[1] - left[1])
-            right_vector = (right[0] - point[0], right[1] - point[1])
-            cross = (
-                left_vector[0] * right_vector[1]
-                - left_vector[1] * right_vector[0]
-            )
-            if abs(cross) <= tolerance:
-                changed = True
-                continue
-            reduced.append((round(point[0], 6), round(point[1], 6)))
-        points = reduced
-    return tuple(points)
-
-
-def _edge_lengths(vertices: tuple[tuple[float, float], ...]) -> tuple[float, ...]:
-    lengths: list[float] = []
-    for index, left in enumerate(vertices):
-        right = vertices[(index + 1) % len(vertices)]
-        lengths.append(math.dist(left, right))
-    return tuple(lengths)
-
-
-def _interior_angles(vertices: tuple[tuple[float, float], ...]) -> tuple[float, ...]:
-    angles: list[float] = []
-    for index, point in enumerate(vertices):
-        left = vertices[(index - 1) % len(vertices)]
-        right = vertices[(index + 1) % len(vertices)]
-        incoming = (left[0] - point[0], left[1] - point[1])
-        outgoing = (right[0] - point[0], right[1] - point[1])
-        incoming_length = math.hypot(*incoming)
-        outgoing_length = math.hypot(*outgoing)
-        if incoming_length == 0 or outgoing_length == 0:
-            angles.append(0.0)
-            continue
-        dot = incoming[0] * outgoing[0] + incoming[1] * outgoing[1]
-        cosine = max(-1.0, min(1.0, dot / (incoming_length * outgoing_length)))
-        angles.append(math.degrees(math.acos(cosine)))
-    return tuple(angles)
-
-
-def _classify_macro_kind(
-    side_count: int,
-    edge_lengths: tuple[float, ...],
-    interior_angles: tuple[float, ...],
-) -> str | None:
-    if not edge_lengths or min(edge_lengths) <= 1e-9:
-        return None
-    edge_ratio = max(edge_lengths) / min(edge_lengths)
-    if side_count == 3 and edge_ratio <= 1.35:
-        if max(abs(angle - 60.0) for angle in interior_angles) <= 30.0:
-            return "triangle"
-    if side_count == 4 and edge_ratio <= 1.35:
-        if max(abs(angle - 90.0) for angle in interior_angles) <= 30.0:
-            return "square"
-    return None
-
-
-def _compactness(area: float, perimeter: float) -> float:
-    if perimeter <= 1e-9:
-        return 0.0
-    return (4.0 * math.pi * area) / (perimeter * perimeter)
-
-
-def _merged_boundary(
-    subset: frozenset[int] | tuple[int, ...],
-    polygons: dict[int, Polygon],
-) -> tuple[Polygon, tuple[tuple[float, float], ...]] | None:
-    merged = unary_union([polygons[index] for index in subset])
-    if merged.geom_type != "Polygon":
-        return None
-    if len(merged.interiors) > 0:
-        return None
-    boundary = _compress_collinear_boundary(list(merged.exterior.coords))
-    if len(boundary) < 3:
-        return None
-    return merged, boundary
-
-
-def _evaluate_subset(
-    subset: frozenset[int],
-    polygons: dict[int, Polygon],
-    *,
-    primitive_area: float,
-) -> tuple[tuple[Any, ...], dict[str, Any]] | None:
-    merged_result = _merged_boundary(subset, polygons)
-    if merged_result is None:
-        return None
-    merged, boundary = merged_result
-
-    edge_lengths = _edge_lengths(boundary)
-    interior_angles = _interior_angles(boundary)
-    side_count = len(boundary)
-    convex_hull_area = merged.convex_hull.area
-    convexity = merged.area / convex_hull_area if convex_hull_area > 1e-9 else 1.0
-    area_ratio = merged.area / primitive_area
-    compactness = _compactness(merged.area, merged.length)
-    macro_kind = _classify_macro_kind(side_count, edge_lengths, interior_angles)
-
-    shape_penalty = min(abs(side_count - 3), abs(side_count - 4))
-    score = (
-        -shape_penalty,
-        round(convexity, 6),
-        round(compactness, 6),
-        round(area_ratio, 6),
-    )
-
-    edge_signature = tuple(sorted(round(length / sum(edge_lengths), 2) for length in edge_lengths))
-    angle_signature = tuple(sorted(int(round(angle / 5.0) * 5) for angle in interior_angles))
-
-    metrics = {
-        "macro_kind": macro_kind,
-        "side_count": side_count,
-        "area_ratio": area_ratio,
-        "compactness": compactness,
-        "edge_length_signature": edge_signature,
-        "angle_signature": angle_signature,
-    }
-    return score, metrics
-
-
-def _multi_source_ball(
-    cells: dict[int, SourceCell],
-    sources: tuple[int, ...],
-    radius: int,
-) -> tuple[int, ...]:
-    distances: dict[int, int] = {source: 0 for source in sources}
-    queue: deque[int] = deque(sources)
-    while queue:
-        current = queue.popleft()
-        if distances[current] == radius:
-            continue
-        for neighbor in cells[current].neighbors:
-            if neighbor in distances:
-                continue
-            distances[neighbor] = distances[current] + 1
-            queue.append(neighbor)
-    return tuple(sorted(distances))
-
-
-def _shape_symmetry_transforms(
-    macro_kind: str,
-    x: float,
-    y: float,
-) -> tuple[tuple[float, float], ...]:
-    transforms: set[tuple[float, float]] = set()
-    if macro_kind == "square":
-        rotation_steps = 4
-        reflection_offsets = (1.0, -1.0)
-        angle_increment = 90.0
-    else:
-        rotation_steps = 3
-        reflection_offsets = (1.0, -1.0)
-        angle_increment = 120.0
-
-    for step in range(rotation_steps):
-        angle = math.radians(step * angle_increment)
-        rotated_x = x * math.cos(angle) - y * math.sin(angle)
-        rotated_y = x * math.sin(angle) + y * math.cos(angle)
-        for reflection in reflection_offsets:
-            transforms.add((
-                round(reflection * rotated_x, 2),
-                round(rotated_y, 2),
-            ))
-    return tuple(sorted(transforms))
-
-
-def _canonical_slot_key(
-    *,
-    cell: SourceCell,
-    centroid: tuple[float, float],
-    orientation: int,
-    scale: float,
-    macro_kind: str,
-    polygon: Polygon,
-) -> tuple[float, float, str]:
-    offset_x = polygon.centroid.x - centroid[0]
-    offset_y = polygon.centroid.y - centroid[1]
-    rotation = math.radians(-orientation)
-    local_x = (
-        offset_x * math.cos(rotation) - offset_y * math.sin(rotation)
-    ) / scale
-    local_y = (
-        offset_x * math.sin(rotation) + offset_y * math.cos(rotation)
-    ) / scale
-    transforms = _shape_symmetry_transforms(macro_kind, local_x, local_y)
-    canonical_x, canonical_y = min(transforms)
-    return (canonical_x, canonical_y, _short_cell_signature(cell))
-
-
-def _format_slot_key(slot_key: tuple[float, float, str]) -> str:
-    return f"{slot_key[2]}@({slot_key[0]:.2f},{slot_key[1]:.2f})"
-
-
-def _subset_frame(
-    subset: tuple[int, ...],
-    polygons: dict[int, Polygon],
-) -> tuple[tuple[float, float], int, float] | None:
-    merged_result = _merged_boundary(subset, polygons)
-    if merged_result is None:
-        return None
-    merged, boundary = merged_result
-    rotated_boundary = _rotate_vertices(boundary)
-    orientation = _snap_angle(_edge_angle(rotated_boundary[0], rotated_boundary[1]))
-    edge_lengths = _edge_lengths(rotated_boundary)
-    scale = sum(edge_lengths) / len(edge_lengths)
-    if scale <= 1e-9:
-        return None
-    return ((merged.centroid.x, merged.centroid.y), orientation, scale)
-
-
-def _boundary_direction_histogram(
-    boundary: tuple[tuple[float, float], ...],
-    *,
-    orientation: int,
-) -> tuple[tuple[int, int], ...]:
-    histogram: Counter[int] = Counter()
-    for index, point in enumerate(boundary):
-        right = boundary[(index + 1) % len(boundary)]
-        local_angle = (_edge_angle(point, right) - orientation) % 360.0
-        histogram[_snap_angle(local_angle)] += 1
-    return tuple(sorted(histogram.items()))
-
-
-def _normalized_boundary(
-    boundary: tuple[tuple[float, float], ...],
-    *,
-    centroid: tuple[float, float],
-    orientation: int,
-    scale: float,
-) -> tuple[tuple[float, float], ...]:
-    rotation = math.radians(-orientation)
-    normalized_vertices: list[tuple[float, float]] = []
-    for x_value, y_value in boundary:
-        delta_x = x_value - centroid[0]
-        delta_y = y_value - centroid[1]
-        local_x = (
-            delta_x * math.cos(rotation) - delta_y * math.sin(rotation)
-        ) / scale
-        local_y = (
-            delta_x * math.sin(rotation) + delta_y * math.cos(rotation)
-        ) / scale
-        rounded_x = round(local_x, 2)
-        rounded_y = round(local_y, 2)
-        normalized_vertices.append((
-            0.0 if abs(rounded_x) == 0.0 else rounded_x,
-            0.0 if abs(rounded_y) == 0.0 else rounded_y,
-        ))
-    return tuple(normalized_vertices)
-
-
-def _normalize_point(
-    point: tuple[float, float],
-    *,
-    centroid: tuple[float, float],
-    orientation: int,
-    scale: float,
-) -> tuple[float, float]:
-    rotation = math.radians(-orientation)
-    delta_x = point[0] - centroid[0]
-    delta_y = point[1] - centroid[1]
-    local_x = (
-        delta_x * math.cos(rotation) - delta_y * math.sin(rotation)
-    ) / scale
-    local_y = (
-        delta_x * math.sin(rotation) + delta_y * math.cos(rotation)
-    ) / scale
-    rounded_x = round(local_x, 2)
-    rounded_y = round(local_y, 2)
-    return (
-        0.0 if abs(rounded_x) == 0.0 else rounded_x,
-        0.0 if abs(rounded_y) == 0.0 else rounded_y,
-    )
-
-
-def _transform_normalized_point(
-    point: tuple[float, float],
-    *,
-    macro_kind: str,
-    rotation_step: int,
-    reflection: bool,
-) -> tuple[float, float]:
-    angle_increment = 90.0 if macro_kind == "square" else 120.0
-    angle = math.radians(rotation_step * angle_increment)
-    rotated_x = point[0] * math.cos(angle) - point[1] * math.sin(angle)
-    rotated_y = point[0] * math.sin(angle) + point[1] * math.cos(angle)
-    if reflection:
-        rotated_x = -rotated_x
-    rounded_x = round(rotated_x, 2)
-    rounded_y = round(rotated_y, 2)
-    return (
-        0.0 if abs(rounded_x) == 0.0 else rounded_x,
-        0.0 if abs(rounded_y) == 0.0 else rounded_y,
-    )
-
-
-def _canonical_cycle(
-    points: tuple[tuple[float, float], ...],
-) -> tuple[tuple[float, float], ...]:
-    rotations = [
-        tuple(points[offset:] + points[:offset])
-        for offset in range(len(points))
-    ]
-    reversed_points = tuple(reversed(points))
-    rotations.extend(
-        tuple(reversed_points[offset:] + reversed_points[:offset])
-        for offset in range(len(reversed_points))
-    )
-    return min(rotations)
-
-
-def _canonicalize_boundary_template(
-    boundary: tuple[tuple[float, float], ...],
-    *,
-    centroid: tuple[float, float],
-    orientation: int,
-    scale: float,
-    macro_kind: str,
-) -> tuple[tuple[float, float], ...]:
-    normalized_vertices = _normalized_boundary(
-        boundary,
-        centroid=centroid,
-        orientation=orientation,
-        scale=scale,
-    )
-    rotation_steps = 4 if macro_kind == "square" else 3
-    candidates: list[tuple[tuple[float, float], ...]] = []
-    for step in range(rotation_steps):
-        for reflection in (False, True):
-            transformed = tuple(
-                _transform_normalized_point(
-                    point,
-                    macro_kind=macro_kind,
-                    rotation_step=step,
-                    reflection=reflection,
-                )
-                for point in normalized_vertices
-            )
-            candidates.append(_canonical_cycle(transformed))
-    return min(candidates)
-
-
-def _line_families_from_canonical_vertices(
-    canonical_vertices: tuple[tuple[float, float], ...],
-) -> tuple[BoundaryLineFamily, ...]:
-    offsets_by_axis: dict[int, list[float]] = defaultdict(list)
-    counts_by_axis: Counter[int] = Counter()
-    for index, point in enumerate(canonical_vertices):
-        right = canonical_vertices[(index + 1) % len(canonical_vertices)]
-        direction = _snap_angle(_edge_angle(point, right))
-        axis_angle = (direction + 90) % 180
-        theta = math.radians(axis_angle)
-        offset = round(point[0] * math.cos(theta) + point[1] * math.sin(theta), 2)
-        offsets_by_axis[axis_angle].append(offset)
-        counts_by_axis[axis_angle] += 1
-    return tuple(
-        BoundaryLineFamily(
-            axis_angle=axis_angle,
-            offsets=tuple(sorted(set(offsets_by_axis[axis_angle]))),
-            segment_count=int(counts_by_axis[axis_angle]),
-        )
-        for axis_angle in sorted(offsets_by_axis)
-    )
-
-
-def _line_equations_from_line_families(
-    line_families: tuple[BoundaryLineFamily, ...],
-) -> tuple[BoundaryLineEquation, ...]:
-    equations: list[BoundaryLineEquation] = []
-    for family in line_families:
-        theta = math.radians(family.axis_angle)
-        normal_x = round(math.cos(theta), 3)
-        normal_y = round(math.sin(theta), 3)
-        for offset in family.offsets:
-            equations.append(
-                BoundaryLineEquation(
-                    axis_angle=family.axis_angle,
-                    normal_x=normal_x,
-                    normal_y=normal_y,
-                    offset=offset,
-                    equation=f"{normal_x}*x + {normal_y}*y = {offset}",
-                )
-            )
-    return tuple(equations)
-
-
 def collect_macro_occurrences(
     cells: dict[int, SourceCell],
     shell_distances: dict[int, int],
@@ -851,15 +422,7 @@ def collect_macro_occurrences(
     tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
     list[tuple[tuple[int, ...], dict[str, Any]]],
 ]:
-    polygons = {
-        index: Polygon(cell.vertices)
-        for index, cell in cells.items()
-    }
-    primitive_area = polygons[min(cells)].area
-    for index, cell in cells.items():
-        if cell.kind.endswith("square"):
-            primitive_area = polygons[index].area
-            break
+    polygons, primitive_area = _build_polygon_context(cells)
 
     occurrences_by_subset: dict[tuple[int, ...], dict[str, Any]] = {}
 
@@ -1025,15 +588,7 @@ def _resolve_seeded_supertile_groups(
     growth_radius: int = 1,
     slot_support_ratio: float = 0.65,
 ) -> tuple[_ResolvedSeededSupertileGroup, ...]:
-    polygons = {
-        index: Polygon(cell.vertices)
-        for index, cell in cells.items()
-    }
-    primitive_area = next(
-        polygons[index].area
-        for index, cell in cells.items()
-        if cell.kind.endswith("square")
-    )
+    polygons, primitive_area = _build_polygon_context(cells)
 
     sorted_seed_groups = sorted(
         grouped_macro_occurrences.items(),
@@ -1081,12 +636,12 @@ def _resolve_seeded_supertile_groups(
                 if candidate_index in subset_key:
                     continue
                 slot_key = _canonical_slot_key(
-                    cell=cells[candidate_index],
                     centroid=centroid,
                     orientation=orientation,
                     scale=scale,
                     macro_kind=seed_macro_kind,
                     polygon=polygons[candidate_index],
+                    cell_signature=_short_cell_signature(cells[candidate_index]),
                 )
                 slot_to_cells[slot_key].append(candidate_index)
             per_occurrence_slots.append((
@@ -1273,15 +828,7 @@ def _resolve_inflation_candidate_groups(
     growth_radius: int = 2,
     slot_support_ratio: float = 0.65,
 ) -> tuple[_ResolvedInflationCandidateGroup, ...]:
-    polygons = {
-        index: Polygon(cell.vertices)
-        for index, cell in cells.items()
-    }
-    primitive_area = next(
-        polygons[index].area
-        for index, cell in cells.items()
-        if cell.kind.endswith("square")
-    )
+    polygons, primitive_area = _build_polygon_context(cells)
 
     resolved_seed_groups = _resolve_seeded_supertile_groups(
         cells,
@@ -1302,12 +849,12 @@ def _resolve_inflation_candidate_groups(
                 if candidate_index in occurrence.grown_subset:
                     continue
                 slot_key = _canonical_slot_key(
-                    cell=cells[candidate_index],
                     centroid=occurrence.centroid,
                     orientation=occurrence.orientation,
                     scale=occurrence.scale,
                     macro_kind=resolved_group.summary.seed_macro_kind,
                     polygon=polygons[candidate_index],
+                    cell_signature=_short_cell_signature(cells[candidate_index]),
                 )
                 slot_to_cells[slot_key].append(candidate_index)
             per_occurrence_slots.append((occurrence, slot_to_cells))
@@ -1500,10 +1047,7 @@ def _resolve_boundary_template_groups(
     *,
     top_groups: int,
 ) -> tuple[_ResolvedBoundaryTemplateGroup, ...]:
-    polygons = {
-        index: Polygon(cell.vertices)
-        for index, cell in cells.items()
-    }
+    polygons, _primitive_area = _build_polygon_context(cells)
     resolved_inflation_groups = _resolve_inflation_candidate_groups(
         cells,
         grouped_macro_occurrences,
@@ -1597,89 +1141,19 @@ def mine_boundary_template_groups(
 
 def _resolve_template_occurrences(
     cells: dict[int, SourceCell],
-    polygons: dict[int, Polygon],
+    polygons: dict[int, Any],
     *,
     primitive_area: float,
     resolved_template: _ResolvedBoundaryTemplateGroup,
 ) -> tuple[_ResolvedTemplateOccurrence, ...]:
-    resolved_occurrences: list[_ResolvedTemplateOccurrence] = []
-    for occurrence in resolved_template.matched_occurrences:
-        frame = _subset_frame(occurrence.grown_subset, polygons)
-        if frame is None:
-            continue
-        centroid, orientation, scale = frame
-        region_members: dict[tuple[int, ...], list[int]] = defaultdict(list)
-        for cell_index in occurrence.grown_subset:
-            polygon = polygons[cell_index]
-            point = _normalize_point(
-                (polygon.centroid.x, polygon.centroid.y),
-                centroid=centroid,
-                orientation=orientation,
-                scale=scale,
-            )
-            region_signature_values: list[int] = []
-            for family in resolved_template.summary.line_families:
-                theta = math.radians(family.axis_angle)
-                value = point[0] * math.cos(theta) + point[1] * math.sin(theta)
-                interval_index = 0
-                while interval_index < len(family.offsets) and value > family.offsets[interval_index]:
-                    interval_index += 1
-                region_signature_values.append(interval_index)
-            region_members[tuple(region_signature_values)].append(cell_index)
-
-        components: list[_ResolvedRegionComponent] = []
-        for region_signature, members in region_members.items():
-            remaining = set(members)
-            while remaining:
-                root_index = remaining.pop()
-                queue: deque[int] = deque((root_index,))
-                component = {root_index}
-                while queue:
-                    current = queue.popleft()
-                    for neighbor in cells[current].neighbors:
-                        if neighbor in remaining:
-                            remaining.remove(neighbor)
-                            component.add(neighbor)
-                            queue.append(neighbor)
-                component_subset = tuple(sorted(component))
-                evaluated = _evaluate_subset(
-                    frozenset(component_subset),
-                    polygons,
-                    primitive_area=primitive_area,
-                )
-                if evaluated is None:
-                    continue
-                _, metrics = evaluated
-                marked_signature = tuple(sorted(
-                    Counter(
-                        _short_cell_signature(cells[index])
-                        for index in component_subset
-                    ).items()
-                ))
-                components.append(
-                    _ResolvedRegionComponent(
-                        region_signature=region_signature,
-                        subset=component_subset,
-                        macro_kind=metrics["macro_kind"],
-                        side_count=int(metrics["side_count"]),
-                        quantized_area_ratio=round(float(metrics["area_ratio"]), 2),
-                        marked_cell_signature=marked_signature,
-                    )
-                )
-        resolved_occurrences.append(
-            _ResolvedTemplateOccurrence(
-                occurrence=occurrence,
-                components=tuple(sorted(
-                    components,
-                    key=lambda component: (
-                        component.region_signature,
-                        len(component.subset),
-                        component.subset,
-                    ),
-                )),
-            )
-        )
-    return tuple(resolved_occurrences)
+    return _resolve_template_occurrences_shared(
+        cells,
+        polygons,
+        primitive_area=primitive_area,
+        line_families=resolved_template.summary.line_families,
+        matched_occurrences=resolved_template.matched_occurrences,
+        describe_cell=_short_cell_signature,
+    )
 
 
 def mine_supertile_decomposition_groups(
@@ -1691,15 +1165,7 @@ def mine_supertile_decomposition_groups(
     *,
     top_groups: int,
 ) -> tuple[SupertileDecompositionGroup, ...]:
-    polygons = {
-        index: Polygon(cell.vertices)
-        for index, cell in cells.items()
-    }
-    primitive_area = next(
-        polygons[index].area
-        for index, cell in cells.items()
-        if cell.kind.endswith("square")
-    )
+    polygons, primitive_area = _build_polygon_context(cells)
     resolved_templates = _resolve_boundary_template_groups(
         cells,
         grouped_macro_occurrences,
@@ -1803,15 +1269,7 @@ def mine_macro_composition_groups(
     max_combo_size: int = 4,
     component_support_ratio: float = 0.6,
 ) -> tuple[MacroCompositionCandidateGroup, ...]:
-    polygons = {
-        index: Polygon(cell.vertices)
-        for index, cell in cells.items()
-    }
-    primitive_area = next(
-        polygons[index].area
-        for index, cell in cells.items()
-        if cell.kind.endswith("square")
-    )
+    polygons, primitive_area = _build_polygon_context(cells)
     resolved_templates = _resolve_boundary_template_groups(
         cells,
         grouped_macro_occurrences,
