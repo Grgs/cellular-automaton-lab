@@ -39,6 +39,7 @@
 - Added a first recovered-rule pass for dodecagonal templates that promotes repeated macro-composition patterns into explicit substitution-style child rules and checks whether those child rules recur on a slightly deeper shell window of the literature-derived source patch.
 - Extracted a reusable planar template-analysis module for polygon context building, subset scoring, boundary canonicalization, line-family inference, slot normalization, and template-component recovery so later tiling miners do not need to duplicate the dodecagonal geometry/template machinery.
 - Added a recovered parent-decomposition pass for dodecagonal templates that mixes verified multi-region child rules with recurring singleton square/triangle components, yielding fully covered child inventories for several parent templates and deeper-shell verification counts for each recovered piece.
+- Added a canonical parent-rule pass for dodecagonal templates that solves a compact exact cover over recovered composition pieces plus primitive square/triangle components, yielding smaller fully covered child inventories for the strongest parent templates.
 
 ## Now
 
@@ -50,7 +51,7 @@
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The direct canonical fixture layer now covers shallow and representative depths for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, plus depth-`3` fixtures for `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
-- If we revisit `dodecagonal-square-triangle`, continue from the recovered parent-decomposition pass by reducing one fully covered child inventory to a cleaner canonical substitution rule, removing duplicate/weak alternative pieces, and then checking that rule against deeper shells beyond the current snapped literature-vector reconstruction, rooted local-reference anchors, exact public canonical patch fixtures, and exact tile-family/orientation/chirality/degree distributions at depths `1` and `3`.
+- If we revisit `dodecagonal-square-triangle`, continue from the canonical parent-rule pass by taking one compact exact-cover inventory, pruning any remaining weak primitive placeholders, and checking whether the resulting child rule stabilizes as a reusable multi-child substitution across deeper shells beyond the current snapped literature-vector reconstruction, rooted local-reference anchors, exact public canonical patch fixtures, and exact tile-family/orientation/chirality/degree distributions at depths `1` and `3`.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 
 ## Later

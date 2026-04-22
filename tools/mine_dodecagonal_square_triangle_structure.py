@@ -240,6 +240,34 @@ class RecoveredParentDecomposition:
 
 
 @dataclass(frozen=True)
+class CanonicalParentRule:
+    seed_macro_kind: str
+    base_cell_count: int
+    candidate_cell_count: int
+    template_match_count: int
+    canonical_vertices: tuple[tuple[float, float], ...]
+    line_equations: tuple[BoundaryLineEquation, ...]
+    child_pieces: tuple[RecoveredParentPiece, ...]
+    covered_region_signatures: tuple[tuple[int, ...], ...]
+    uncovered_region_signatures: tuple[tuple[int, ...], ...]
+    coverage_ratio: float
+    verification_max_source_depth: int
+    verified_template_match_count: int
+    piece_count: int
+    composition_piece_count: int
+    verified_piece_count: int
+    verified_piece_ratio: float
+    example_roots: tuple[int, ...]
+    example_subsets: tuple[tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
+class _ParentPieceCandidate:
+    piece: RecoveredParentPiece
+    covered_region_signatures: frozenset[tuple[int, ...]]
+
+
+@dataclass(frozen=True)
 class MiningSummary:
     source_cell_count: int
     seed_index: int
@@ -259,6 +287,7 @@ class MiningSummary:
     macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...]
     recovered_substitution_rules: tuple[RecoveredSubstitutionRule, ...]
     recovered_parent_decompositions: tuple[RecoveredParentDecomposition, ...]
+    canonical_parent_rules: tuple[CanonicalParentRule, ...]
 
 
 @dataclass(frozen=True)
@@ -1634,22 +1663,21 @@ def _component_verification_key(
     )
 
 
-def recover_parent_decompositions(
-    *,
-    decomposition_groups: tuple[SupertileDecompositionGroup, ...],
-    recovered_rules: tuple[RecoveredSubstitutionRule, ...],
+def _build_parent_piece_verification_maps(
     verification_decomposition_groups: tuple[SupertileDecompositionGroup, ...],
-    verification_max_source_depth: int,
-    top_groups: int,
-) -> tuple[RecoveredParentDecomposition, ...]:
-    decomposition_by_template = {
-        _template_key(
-            seed_macro_kind=group.seed_macro_kind,
-            candidate_cell_count=group.candidate_cell_count,
-            canonical_vertices=group.canonical_vertices,
-        ): group
-        for group in decomposition_groups
-    }
+) -> tuple[
+    dict[tuple[str, int, tuple[tuple[float, float], ...]], int],
+    dict[
+        tuple[
+            tuple[str, int, tuple[tuple[float, float], ...]],
+            tuple[int, ...],
+            str | None,
+            int,
+            tuple[tuple[str, int], ...],
+        ],
+        int,
+    ],
+]:
     verified_template_counts: dict[
         tuple[str, int, tuple[tuple[float, float], ...]],
         int,
@@ -1683,6 +1711,246 @@ def recover_parent_decompositions(
                 verified_component_counts.get(verification_key, 0),
                 component.occurrence_count,
             )
+    return verified_template_counts, verified_component_counts
+
+
+def _build_parent_piece_candidates(
+    *,
+    rule: RecoveredSubstitutionRule,
+    decomposition_group: SupertileDecompositionGroup,
+    template_key: tuple[str, int, tuple[tuple[float, float], ...]],
+    verified_component_counts: dict[
+        tuple[
+            tuple[str, int, tuple[tuple[float, float], ...]],
+            tuple[int, ...],
+            str | None,
+            int,
+            tuple[tuple[str, int], ...],
+        ],
+        int,
+    ],
+) -> tuple[tuple[_ParentPieceCandidate, ...], tuple[tuple[int, ...], ...]]:
+    total_region_signatures = tuple(sorted({
+        component.region_signature
+        for component in decomposition_group.component_groups
+    }))
+    valid_region_signatures = set(total_region_signatures)
+    deduped_candidates: dict[
+        tuple[
+            str,
+            tuple[tuple[int, ...], ...],
+            str,
+            int,
+            tuple[tuple[str, int], ...],
+        ],
+        _ParentPieceCandidate,
+    ] = {}
+    for child_rule in rule.child_rules:
+        valid_child_signatures = tuple(
+            signature
+            for signature in child_rule.component_region_signatures
+            if signature in valid_region_signatures
+        )
+        if not valid_child_signatures:
+            continue
+        piece = RecoveredParentPiece(
+            piece_kind="composition",
+            component_region_signatures=valid_child_signatures,
+            macro_kind=child_rule.macro_kind,
+            cell_count=child_rule.cell_count,
+            occurrence_count=child_rule.occurrence_count,
+            verified_occurrence_count=child_rule.verified_occurrence_count,
+            marked_cell_signature=child_rule.marked_cell_signature,
+        )
+        candidate = _ParentPieceCandidate(
+            piece=piece,
+            covered_region_signatures=frozenset(valid_child_signatures),
+        )
+        deduped_candidates[(
+            piece.piece_kind,
+            piece.component_region_signatures,
+            piece.macro_kind,
+            piece.cell_count,
+            piece.marked_cell_signature,
+        )] = candidate
+
+    for component in decomposition_group.component_groups:
+        if component.component_macro_kind not in {"square", "triangle"}:
+            continue
+        verification_key = _component_verification_key(
+            template_key=template_key,
+            component=component,
+        )
+        piece = RecoveredParentPiece(
+            piece_kind="component",
+            component_region_signatures=(component.region_signature,),
+            macro_kind=str(component.component_macro_kind),
+            cell_count=component.cell_count,
+            occurrence_count=component.occurrence_count,
+            verified_occurrence_count=verified_component_counts.get(verification_key, 0),
+            marked_cell_signature=component.marked_cell_signature,
+        )
+        candidate = _ParentPieceCandidate(
+            piece=piece,
+            covered_region_signatures=frozenset((component.region_signature,)),
+        )
+        candidate_key = (
+            piece.piece_kind,
+            piece.component_region_signatures,
+            piece.macro_kind,
+            piece.cell_count,
+            piece.marked_cell_signature,
+        )
+        existing = deduped_candidates.get(candidate_key)
+        if existing is None or (
+            piece.verified_occurrence_count,
+            piece.occurrence_count,
+            piece.cell_count,
+        ) > (
+            existing.piece.verified_occurrence_count,
+            existing.piece.occurrence_count,
+            existing.piece.cell_count,
+        ):
+            deduped_candidates[candidate_key] = candidate
+
+    candidates = tuple(sorted(
+        deduped_candidates.values(),
+        key=lambda candidate: (
+            candidate.piece.piece_kind != "composition",
+            -len(candidate.covered_region_signatures),
+            -candidate.piece.verified_occurrence_count,
+            -candidate.piece.occurrence_count,
+            -candidate.piece.cell_count,
+            candidate.piece.macro_kind,
+            candidate.piece.component_region_signatures,
+        ),
+    ))
+    return candidates, total_region_signatures
+
+
+def _select_exact_parent_piece_cover(
+    *,
+    candidates: tuple[_ParentPieceCandidate, ...],
+    total_region_signatures: tuple[tuple[int, ...], ...],
+) -> tuple[RecoveredParentPiece, ...]:
+    if not total_region_signatures:
+        return ()
+
+    region_to_candidate_indexes: dict[tuple[int, ...], tuple[int, ...]] = {}
+    for region_signature in total_region_signatures:
+        matching_indexes = tuple(
+            index
+            for index, candidate in enumerate(candidates)
+            if region_signature in candidate.covered_region_signatures
+        )
+        if not matching_indexes:
+            return ()
+        region_to_candidate_indexes[region_signature] = matching_indexes
+
+    best_indexes: tuple[int, ...] | None = None
+    best_score: tuple[int, int, int, int, int] | None = None
+
+    def selection_score(selected_indexes: tuple[int, ...]) -> tuple[int, int, int, int, int]:
+        selected_pieces = tuple(candidates[index].piece for index in selected_indexes)
+        return (
+            -len(selected_pieces),
+            sum(
+                1
+                for piece in selected_pieces
+                if piece.piece_kind == "composition"
+            ),
+            sum(
+                1
+                for piece in selected_pieces
+                if piece.verified_occurrence_count > 0
+            ),
+            sum(piece.verified_occurrence_count for piece in selected_pieces),
+            sum(piece.cell_count for piece in selected_pieces),
+        )
+
+    def search(
+        *,
+        covered_region_signatures: frozenset[tuple[int, ...]],
+        selected_indexes: tuple[int, ...],
+    ) -> None:
+        nonlocal best_indexes, best_score
+        if best_score is not None and len(selected_indexes) >= -best_score[0]:
+            return
+        if len(covered_region_signatures) == len(total_region_signatures):
+            score = selection_score(selected_indexes)
+            if best_score is None or score > best_score:
+                best_score = score
+                best_indexes = selected_indexes
+            return
+
+        uncovered_region_signatures = [
+            region_signature
+            for region_signature in total_region_signatures
+            if region_signature not in covered_region_signatures
+        ]
+        target_signature = min(
+            uncovered_region_signatures,
+            key=lambda region_signature: len(tuple(
+                index
+                for index in region_to_candidate_indexes[region_signature]
+                if not (
+                    candidates[index].covered_region_signatures
+                    & covered_region_signatures
+                )
+            )),
+        )
+        candidate_indexes = tuple(
+            index
+            for index in region_to_candidate_indexes[target_signature]
+            if not (
+                candidates[index].covered_region_signatures
+                & covered_region_signatures
+            )
+        )
+        if not candidate_indexes:
+            return
+
+        for index in candidate_indexes:
+            search(
+                covered_region_signatures=(
+                    covered_region_signatures
+                    | candidates[index].covered_region_signatures
+                ),
+                selected_indexes=selected_indexes + (index,),
+            )
+
+    search(
+        covered_region_signatures=frozenset(),
+        selected_indexes=(),
+    )
+    if best_indexes is None:
+        return ()
+    return tuple(
+        candidates[index].piece
+        for index in best_indexes
+    )
+
+
+def recover_parent_decompositions(
+    *,
+    decomposition_groups: tuple[SupertileDecompositionGroup, ...],
+    recovered_rules: tuple[RecoveredSubstitutionRule, ...],
+    verification_decomposition_groups: tuple[SupertileDecompositionGroup, ...],
+    verification_max_source_depth: int,
+    top_groups: int,
+) -> tuple[RecoveredParentDecomposition, ...]:
+    decomposition_by_template = {
+        _template_key(
+            seed_macro_kind=group.seed_macro_kind,
+            candidate_cell_count=group.candidate_cell_count,
+            canonical_vertices=group.canonical_vertices,
+        ): group
+        for group in decomposition_groups
+    }
+    (
+        verified_template_counts,
+        verified_component_counts,
+    ) = _build_parent_piece_verification_maps(verification_decomposition_groups)
 
     recovered_decompositions: list[RecoveredParentDecomposition] = []
     for rule in recovered_rules:
@@ -1695,70 +1963,21 @@ def recover_parent_decompositions(
         if decomposition_group is None:
             continue
 
+        total_region_signatures: tuple[tuple[int, ...], ...]
+        candidates, total_region_signatures = _build_parent_piece_candidates(
+            rule=rule,
+            decomposition_group=decomposition_group,
+            template_key=template_key,
+            verified_component_counts=verified_component_counts,
+        )
         covered_region_signatures: set[tuple[int, ...]] = set()
         child_pieces: list[RecoveredParentPiece] = []
-        for child_rule in sorted(
-            rule.child_rules,
-            key=lambda child: (
-                -child.verified_occurrence_count,
-                -child.occurrence_count,
-                -child.cell_count,
-                child.component_region_signatures,
-            ),
-        ):
-            child_signatures = set(child_rule.component_region_signatures)
-            if child_signatures & covered_region_signatures:
+        for candidate in candidates:
+            if candidate.covered_region_signatures & covered_region_signatures:
                 continue
-            covered_region_signatures.update(child_signatures)
-            child_pieces.append(
-                RecoveredParentPiece(
-                    piece_kind="composition",
-                    component_region_signatures=child_rule.component_region_signatures,
-                    macro_kind=child_rule.macro_kind,
-                    cell_count=child_rule.cell_count,
-                    occurrence_count=child_rule.occurrence_count,
-                    verified_occurrence_count=child_rule.verified_occurrence_count,
-                    marked_cell_signature=child_rule.marked_cell_signature,
-                )
-            )
+            covered_region_signatures.update(candidate.covered_region_signatures)
+            child_pieces.append(candidate.piece)
 
-        singleton_candidates = sorted(
-            (
-                component
-                for component in decomposition_group.component_groups
-                if component.component_macro_kind in {"square", "triangle"}
-            ),
-            key=lambda component: (
-                -(component.occurrence_count),
-                -(component.cell_count),
-                component.component_macro_kind,
-                component.region_signature,
-            ),
-        )
-        for component in singleton_candidates:
-            if component.region_signature in covered_region_signatures:
-                continue
-            covered_region_signatures.add(component.region_signature)
-            verification_key = _component_verification_key(
-                template_key=template_key,
-                component=component,
-            )
-            child_pieces.append(
-                RecoveredParentPiece(
-                    piece_kind="component",
-                    component_region_signatures=(component.region_signature,),
-                    macro_kind=str(component.component_macro_kind),
-                    cell_count=component.cell_count,
-                    occurrence_count=component.occurrence_count,
-                    verified_occurrence_count=verified_component_counts.get(verification_key, 0),
-                    marked_cell_signature=component.marked_cell_signature,
-                )
-            )
-
-        total_region_signatures = tuple(sorted({
-            component.region_signature
-            for component in decomposition_group.component_groups
-        }))
         uncovered_region_signatures = tuple(
             region_signature
             for region_signature in total_region_signatures
@@ -1807,6 +2026,124 @@ def recover_parent_decompositions(
         )
     )
     return tuple(recovered_decompositions[:top_groups])
+
+
+def recover_canonical_parent_rules(
+    *,
+    decomposition_groups: tuple[SupertileDecompositionGroup, ...],
+    recovered_rules: tuple[RecoveredSubstitutionRule, ...],
+    verification_decomposition_groups: tuple[SupertileDecompositionGroup, ...],
+    verification_max_source_depth: int,
+    top_groups: int,
+) -> tuple[CanonicalParentRule, ...]:
+    decomposition_by_template = {
+        _template_key(
+            seed_macro_kind=group.seed_macro_kind,
+            candidate_cell_count=group.candidate_cell_count,
+            canonical_vertices=group.canonical_vertices,
+        ): group
+        for group in decomposition_groups
+    }
+    (
+        verified_template_counts,
+        verified_component_counts,
+    ) = _build_parent_piece_verification_maps(verification_decomposition_groups)
+
+    canonical_rules: list[CanonicalParentRule] = []
+    for rule in recovered_rules:
+        template_key = _template_key(
+            seed_macro_kind=rule.seed_macro_kind,
+            candidate_cell_count=rule.candidate_cell_count,
+            canonical_vertices=rule.canonical_vertices,
+        )
+        decomposition_group = decomposition_by_template.get(template_key)
+        if decomposition_group is None:
+            continue
+        candidates, total_region_signatures = _build_parent_piece_candidates(
+            rule=rule,
+            decomposition_group=decomposition_group,
+            template_key=template_key,
+            verified_component_counts=verified_component_counts,
+        )
+        child_pieces = _select_exact_parent_piece_cover(
+            candidates=candidates,
+            total_region_signatures=total_region_signatures,
+        )
+        if not child_pieces:
+            continue
+
+        covered_region_signatures = tuple(sorted({
+            region_signature
+            for piece in child_pieces
+            for region_signature in piece.component_region_signatures
+        }))
+        uncovered_region_signatures = tuple(
+            region_signature
+            for region_signature in total_region_signatures
+            if region_signature not in covered_region_signatures
+        )
+        coverage_ratio = round(
+            len(covered_region_signatures) / len(total_region_signatures),
+            2,
+        ) if total_region_signatures else 0.0
+        verified_piece_count = sum(
+            1
+            for piece in child_pieces
+            if piece.verified_occurrence_count > 0
+        )
+        composition_piece_count = sum(
+            1
+            for piece in child_pieces
+            if piece.piece_kind == "composition"
+        )
+        canonical_rules.append(
+            CanonicalParentRule(
+                seed_macro_kind=rule.seed_macro_kind,
+                base_cell_count=rule.base_cell_count,
+                candidate_cell_count=rule.candidate_cell_count,
+                template_match_count=rule.template_match_count,
+                canonical_vertices=rule.canonical_vertices,
+                line_equations=rule.line_equations,
+                child_pieces=child_pieces,
+                covered_region_signatures=covered_region_signatures,
+                uncovered_region_signatures=uncovered_region_signatures,
+                coverage_ratio=coverage_ratio,
+                verification_max_source_depth=verification_max_source_depth,
+                verified_template_match_count=verified_template_counts.get(template_key, 0),
+                piece_count=len(child_pieces),
+                composition_piece_count=composition_piece_count,
+                verified_piece_count=verified_piece_count,
+                verified_piece_ratio=round(
+                    verified_piece_count / len(child_pieces),
+                    2,
+                ) if child_pieces else 0.0,
+                example_roots=rule.example_roots,
+                example_subsets=rule.example_subsets,
+            )
+        )
+
+    verified_canonical_rules = [
+        rule
+        for rule in canonical_rules
+        if rule.verified_template_match_count > 0
+        and rule.verified_piece_count > 0
+    ]
+    ranked_rules = (
+        verified_canonical_rules
+        if verified_canonical_rules
+        else canonical_rules
+    )
+    ranked_rules.sort(
+        key=lambda rule: (
+            -rule.coverage_ratio,
+            -rule.verified_template_match_count,
+            rule.piece_count,
+            -rule.composition_piece_count,
+            -rule.verified_piece_count,
+            -rule.candidate_cell_count,
+        ),
+    )
+    return tuple(ranked_rules[:top_groups])
 
 
 def build_mining_summary(
@@ -1929,6 +2266,13 @@ def build_mining_summary(
         verification_max_source_depth=verification_max_source_depth,
         top_groups=top_groups,
     )
+    canonical_parent_rules = recover_canonical_parent_rules(
+        decomposition_groups=rule_recovery_decomposition_groups,
+        recovered_rules=recovered_substitution_rules,
+        verification_decomposition_groups=verification_decomposition_groups,
+        verification_max_source_depth=verification_max_source_depth,
+        top_groups=top_groups,
+    )
     return MiningSummary(
         source_cell_count=len(cells),
         seed_index=seed_index,
@@ -1952,6 +2296,7 @@ def build_mining_summary(
         macro_composition_groups=macro_composition_groups,
         recovered_substitution_rules=recovered_substitution_rules,
         recovered_parent_decompositions=recovered_parent_decompositions,
+        canonical_parent_rules=canonical_parent_rules,
     )
 
 
@@ -1975,6 +2320,7 @@ def summary_to_payload(summary: MiningSummary) -> dict[str, Any]:
         "macro_composition_groups": [asdict(item) for item in summary.macro_composition_groups],
         "recovered_substitution_rules": [asdict(item) for item in summary.recovered_substitution_rules],
         "recovered_parent_decompositions": [asdict(item) for item in summary.recovered_parent_decompositions],
+        "canonical_parent_rules": [asdict(item) for item in summary.canonical_parent_rules],
     }
 
 
@@ -2200,6 +2546,43 @@ def render_text_report(summary: MiningSummary) -> str:
             f"    example_subsets={[list(subset) for subset in decomposition.example_subsets]}",
         ])
         for piece in decomposition.child_pieces:
+            lines.extend([
+                (
+                    f"    piece_kind={piece.piece_kind} "
+                    f"macro_kind={piece.macro_kind} "
+                    f"cell_count={piece.cell_count} "
+                    f"occurrence_count={piece.occurrence_count} "
+                    f"verified_occurrence_count={piece.verified_occurrence_count}"
+                ),
+                f"      component_region_signatures={[list(signature) for signature in piece.component_region_signatures]}",
+                f"      marked_cells={dict(piece.marked_cell_signature)}",
+            ])
+
+    lines.extend(["", "Canonical Parent Rules"])
+    if not summary.canonical_parent_rules:
+        lines.append("  none")
+    for canonical_rule in summary.canonical_parent_rules:
+        lines.extend([
+            (
+                f"  seed_macro_kind={canonical_rule.seed_macro_kind} "
+                f"base_cell_count={canonical_rule.base_cell_count} "
+                f"candidate_cell_count={canonical_rule.candidate_cell_count} "
+                f"template_match_count={canonical_rule.template_match_count} "
+                f"verified_template_match_count={canonical_rule.verified_template_match_count} "
+                f"coverage_ratio={canonical_rule.coverage_ratio} "
+                f"piece_count={canonical_rule.piece_count} "
+                f"composition_piece_count={canonical_rule.composition_piece_count} "
+                f"verified_piece_count={canonical_rule.verified_piece_count} "
+                f"verified_piece_ratio={canonical_rule.verified_piece_ratio}"
+            ),
+            f"    line_equations={[equation.equation for equation in canonical_rule.line_equations]}",
+            f"    covered_region_signatures={[list(signature) for signature in canonical_rule.covered_region_signatures]}",
+            f"    uncovered_region_signatures={[list(signature) for signature in canonical_rule.uncovered_region_signatures]}",
+            f"    verification_max_source_depth={canonical_rule.verification_max_source_depth}",
+            f"    example_roots={list(canonical_rule.example_roots)}",
+            f"    example_subsets={[list(subset) for subset in canonical_rule.example_subsets]}",
+        ])
+        for piece in canonical_rule.child_pieces:
             lines.extend([
                 (
                     f"    piece_kind={piece.piece_kind} "
