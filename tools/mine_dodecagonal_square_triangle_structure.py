@@ -1233,8 +1233,35 @@ def mine_supertile_decomposition_groups(
         top_groups=top_groups,
     )
 
+    return _collect_supertile_decomposition_groups(
+        cells,
+        polygons,
+        primitive_area=primitive_area,
+        resolved_templates=resolved_templates,
+        top_groups=top_groups,
+        component_limit=top_groups,
+    )
+
+
+def _collect_supertile_decomposition_groups(
+    cells: dict[int, SourceCell],
+    polygons: dict[int, Any],
+    *,
+    primitive_area: float,
+    resolved_templates: tuple[_ResolvedBoundaryTemplateGroup, ...],
+    top_groups: int,
+    component_limit: int,
+    template_filter: set[tuple[str, int, tuple[tuple[float, float], ...]]] | None = None,
+) -> tuple[SupertileDecompositionGroup, ...]:
     decomposition_groups: list[SupertileDecompositionGroup] = []
     for resolved_template in resolved_templates:
+        template_key = _template_key(
+            seed_macro_kind=resolved_template.summary.seed_macro_kind,
+            candidate_cell_count=resolved_template.summary.candidate_cell_count,
+            canonical_vertices=resolved_template.summary.canonical_vertices,
+        )
+        if template_filter is not None and template_key not in template_filter:
+            continue
         resolved_occurrences = _resolve_template_occurrences(
             cells,
             polygons,
@@ -1289,7 +1316,7 @@ def mine_supertile_decomposition_groups(
                 example_roots=tuple(sorted(int(root) for root in component_group["roots"])[:5]),
                 example_subsets=tuple(component_group["subsets"]),
             )
-            for component_key, component_group in sorted_components[:top_groups]
+            for component_key, component_group in sorted_components[:component_limit]
         )
         decomposition_groups.append(
             SupertileDecompositionGroup(
@@ -1317,6 +1344,37 @@ def mine_supertile_decomposition_groups(
         )
     )
     return tuple(decomposition_groups[:top_groups])
+
+
+def mine_template_supertile_decomposition_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    template_keys: set[tuple[str, int, tuple[tuple[float, float], ...]]],
+    resolved_top_groups: int,
+    total_limit: int,
+    component_limit: int,
+) -> tuple[SupertileDecompositionGroup, ...]:
+    if not template_keys:
+        return ()
+    polygons, primitive_area = _build_polygon_context(cells)
+    resolved_templates = _resolve_boundary_template_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=resolved_top_groups,
+    )
+    return _collect_supertile_decomposition_groups(
+        cells,
+        polygons,
+        primitive_area=primitive_area,
+        resolved_templates=resolved_templates,
+        top_groups=total_limit,
+        component_limit=component_limit,
+        template_filter=template_keys,
+    )
 
 
 def mine_macro_composition_groups(
@@ -2204,7 +2262,10 @@ def recover_canonical_parent_rules(
         tuple[str, int, tuple[tuple[float, float], ...]],
         list[MacroCompositionCandidateGroup],
     ] = defaultdict(list)
-    for composition_group in template_macro_composition_groups:
+    for composition_group in (
+        template_macro_composition_groups
+        + verification_template_macro_composition_groups
+    ):
         template_compositions_by_key[_template_key(
             seed_macro_kind=composition_group.seed_macro_kind,
             candidate_cell_count=composition_group.candidate_cell_count,
@@ -2465,11 +2526,31 @@ def build_mining_summary(
         )
         for rule in recovered_substitution_rules
     }
+    canonical_decomposition_resolved_top_groups = max(rule_recovery_top_groups, 20)
+    verification_canonical_decomposition_resolved_top_groups = max(verification_top_groups, 20)
+    canonical_template_decomposition_groups = mine_template_supertile_decomposition_groups(
+        cells,
+        grouped_macro_occurrences,
+        template_keys=canonical_rule_template_keys,
+        resolved_top_groups=canonical_decomposition_resolved_top_groups,
+        total_limit=max(top_groups * 4, 16),
+        component_limit=24,
+    )
+    verification_canonical_template_decomposition_groups = mine_template_supertile_decomposition_groups(
+        cells,
+        verification_grouped_macro_occurrences,
+        template_keys=canonical_rule_template_keys,
+        resolved_top_groups=verification_canonical_decomposition_resolved_top_groups,
+        total_limit=max(top_groups * 4, 16),
+        component_limit=24,
+    )
+    canonical_composition_resolved_top_groups = max(rule_recovery_top_groups, 20)
+    verification_canonical_composition_resolved_top_groups = max(verification_top_groups, 20)
     canonical_template_macro_composition_groups = mine_template_macro_composition_groups(
         cells,
         grouped_macro_occurrences,
         template_keys=canonical_rule_template_keys,
-        resolved_top_groups=rule_recovery_top_groups,
+        resolved_top_groups=canonical_composition_resolved_top_groups,
         total_limit=max(top_groups * 8, 24),
         per_template_limit=8,
         component_support_ratio=0.3,
@@ -2478,16 +2559,16 @@ def build_mining_summary(
         cells,
         verification_grouped_macro_occurrences,
         template_keys=canonical_rule_template_keys,
-        resolved_top_groups=verification_top_groups,
+        resolved_top_groups=verification_canonical_composition_resolved_top_groups,
         total_limit=max(top_groups * 8, 24),
         per_template_limit=8,
         component_support_ratio=0.3,
     )
     canonical_parent_rules = recover_canonical_parent_rules(
-        decomposition_groups=rule_recovery_decomposition_groups,
+        decomposition_groups=canonical_template_decomposition_groups,
         recovered_rules=recovered_substitution_rules,
         template_macro_composition_groups=canonical_template_macro_composition_groups,
-        verification_decomposition_groups=verification_decomposition_groups,
+        verification_decomposition_groups=verification_canonical_template_decomposition_groups,
         verification_template_macro_composition_groups=verification_canonical_template_macro_composition_groups,
         verification_max_source_depth=verification_max_source_depth,
         top_groups=top_groups,

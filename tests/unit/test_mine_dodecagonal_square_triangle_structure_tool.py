@@ -125,7 +125,8 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                 rule.coverage_ratio == 1.0
                 and rule.candidate_cell_count == 7
                 and rule.piece_count <= 7
-                and rule.composition_piece_count >= 3
+                and rule.composition_piece_count >= 4
+                and rule.verified_template_match_count >= 12
                 and sum(
                     1
                     for piece in rule.child_pieces
@@ -133,7 +134,7 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                     and piece.macro_kind == "square"
                     and piece.cell_count == 2
                     and piece.verified_occurrence_count >= 2
-                ) >= 2
+                ) >= 3
                 for rule in summary.canonical_parent_rules
             )
         )
@@ -212,7 +213,8 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                 rule["coverage_ratio"] == 1.0
                 and rule["candidate_cell_count"] == 7
                 and rule["piece_count"] <= 7
-                and rule["composition_piece_count"] >= 3
+                and rule["composition_piece_count"] >= 4
+                and rule["verified_template_match_count"] >= 12
                 and sum(
                     1
                     for piece in rule["child_pieces"]
@@ -220,7 +222,7 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                     and piece["macro_kind"] == "square"
                     and piece["cell_count"] == 2
                     and piece["verified_occurrence_count"] >= 2
-                ) >= 2
+                ) >= 3
                 for rule in payload["canonical_parent_rules"]
             )
         )
