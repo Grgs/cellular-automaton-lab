@@ -138,6 +138,19 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                 for rule in summary.canonical_parent_rules
             )
         )
+        self.assertTrue(summary.evidence_parent_rules)
+        self.assertTrue(
+            any(
+                rule.coverage_ratio == 1.0
+                and rule.candidate_cell_count == 7
+                and rule.piece_count <= 10
+                and rule.composition_piece_count >= 2
+                and rule.weak_piece_count == 0
+                and rule.verified_piece_count == rule.piece_count
+                and rule.verified_template_match_count >= 12
+                for rule in summary.evidence_parent_rules
+            )
+        )
 
     def test_main_json_output_contains_expected_summary_fields(self) -> None:
         stdout = io.StringIO()
@@ -224,6 +237,19 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
                     and piece["verified_occurrence_count"] >= 2
                 ) >= 3
                 for rule in payload["canonical_parent_rules"]
+            )
+        )
+        self.assertTrue(payload["evidence_parent_rules"])
+        self.assertTrue(
+            any(
+                rule["coverage_ratio"] == 1.0
+                and rule["candidate_cell_count"] == 7
+                and rule["piece_count"] <= 10
+                and rule["composition_piece_count"] >= 2
+                and rule["weak_piece_count"] == 0
+                and rule["verified_piece_count"] == rule["piece_count"]
+                and rule["verified_template_match_count"] >= 12
+                for rule in payload["evidence_parent_rules"]
             )
         )
 

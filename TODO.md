@@ -42,6 +42,7 @@
 - Added a canonical parent-rule pass for dodecagonal templates that solves a compact exact cover over recovered composition pieces plus primitive square/triangle components, yielding smaller fully covered child inventories for the strongest parent templates.
 - Extended the canonical parent-rule pass with template-local composition mining at a lower support threshold, which reduces the strongest verified 7-cell square-seeded parent to a 7-piece exact cover with three square-valued multi-region children and twelve deeper-shell template matches.
 - Folded deeper-window template-local compositions back into the canonical rule candidate pool and gave canonical recovery its own wider template-local decomposition state, which strengthens the strongest verified 7-cell square-seeded parent into a full 7-piece exact cover with four square-valued multi-region children and twelve deeper-shell template matches.
+- Added an evidence-ranked parent-rule pass for dodecagonal templates that keeps exact-cover recovery from over-optimizing for compactness alone, surfacing fully verified zero-weak-piece covers for the strongest 7-cell square-seeded parent across the deeper verification window.
 
 ## Now
 
@@ -53,7 +54,7 @@
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The direct canonical fixture layer now covers shallow and representative depths for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, plus depth-`3` fixtures for `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
-- If we revisit `dodecagonal-square-triangle`, continue from the strengthened canonical parent-rule pass by eliminating the remaining lightly verified square singleton and the unverified two-region square child in the 7-piece rule, then check whether that cleaner child inventory stabilizes as a reusable multi-child substitution across deeper shells beyond the current snapped literature-vector reconstruction, rooted local-reference anchors, exact public canonical patch fixtures, and exact tile-family/orientation/chirality/degree distributions at depths `1` and `3`.
+- If we revisit `dodecagonal-square-triangle`, treat the remaining question as a marked-state question rather than a simple missing-composition question: the strongest evidence-ranked 7-cell parent now has zero weak pieces, and bounded deeper-window searches did not find valid square/triangle compositions for the last square-state signatures. The next step would be either explicit marked-state refinement or new literature guidance, not more of the same 2- to 4-region composition search.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 
 ## Later

@@ -256,6 +256,7 @@ class CanonicalParentRule:
     piece_count: int
     composition_piece_count: int
     verified_piece_count: int
+    weak_piece_count: int
     verified_piece_ratio: float
     example_roots: tuple[int, ...]
     example_subsets: tuple[tuple[int, ...], ...]
@@ -288,6 +289,7 @@ class MiningSummary:
     recovered_substitution_rules: tuple[RecoveredSubstitutionRule, ...]
     recovered_parent_decompositions: tuple[RecoveredParentDecomposition, ...]
     canonical_parent_rules: tuple[CanonicalParentRule, ...]
+    evidence_parent_rules: tuple[CanonicalParentRule, ...]
 
 
 @dataclass(frozen=True)
@@ -2038,6 +2040,7 @@ def _select_exact_parent_piece_cover(
     *,
     candidates: tuple[_ParentPieceCandidate, ...],
     total_region_signatures: tuple[tuple[int, ...], ...],
+    strategy: str = "compact",
 ) -> tuple[RecoveredParentPiece, ...]:
     if not total_region_signatures:
         return ()
@@ -2058,6 +2061,26 @@ def _select_exact_parent_piece_cover(
 
     def selection_score(selected_indexes: tuple[int, ...]) -> tuple[int, int, int, int, int]:
         selected_pieces = tuple(candidates[index].piece for index in selected_indexes)
+        if strategy == "evidence":
+            return (
+                -sum(
+                    1
+                    for piece in selected_pieces
+                    if piece.verified_occurrence_count == 0
+                ),
+                sum(
+                    1
+                    for piece in selected_pieces
+                    if piece.piece_kind == "composition"
+                ),
+                -len(selected_pieces),
+                sum(
+                    1
+                    for piece in selected_pieces
+                    if piece.verified_occurrence_count > 0
+                ),
+                sum(piece.verified_occurrence_count for piece in selected_pieces),
+            )
         return (
             -len(selected_pieces),
             sum(
@@ -2080,7 +2103,11 @@ def _select_exact_parent_piece_cover(
         selected_indexes: tuple[int, ...],
     ) -> None:
         nonlocal best_indexes, best_score
-        if best_score is not None and len(selected_indexes) >= -best_score[0]:
+        if (
+            strategy == "compact"
+            and best_score is not None
+            and len(selected_indexes) >= -best_score[0]
+        ):
             return
         if len(covered_region_signatures) == len(total_region_signatures):
             score = selection_score(selected_indexes)
@@ -2245,6 +2272,8 @@ def recover_canonical_parent_rules(
     verification_template_macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...],
     verification_max_source_depth: int,
     top_groups: int,
+    selection_strategy: str = "compact",
+    ranking_strategy: str = "compact",
 ) -> tuple[CanonicalParentRule, ...]:
     decomposition_by_template = {
         _template_key(
@@ -2320,6 +2349,7 @@ def recover_canonical_parent_rules(
         child_pieces = _select_exact_parent_piece_cover(
             candidates=candidates,
             total_region_signatures=total_region_signatures,
+            strategy=selection_strategy,
         )
         if not child_pieces:
             continue
@@ -2348,6 +2378,7 @@ def recover_canonical_parent_rules(
             for piece in child_pieces
             if piece.piece_kind == "composition"
         )
+        weak_piece_count = len(child_pieces) - verified_piece_count
         canonical_rules.append(
             CanonicalParentRule(
                 seed_macro_kind=rule.seed_macro_kind,
@@ -2365,6 +2396,7 @@ def recover_canonical_parent_rules(
                 piece_count=len(child_pieces),
                 composition_piece_count=composition_piece_count,
                 verified_piece_count=verified_piece_count,
+                weak_piece_count=weak_piece_count,
                 verified_piece_ratio=round(
                     verified_piece_count / len(child_pieces),
                     2,
@@ -2385,16 +2417,29 @@ def recover_canonical_parent_rules(
         if verified_canonical_rules
         else canonical_rules
     )
-    ranked_rules.sort(
-        key=lambda rule: (
-            -rule.coverage_ratio,
-            -rule.verified_template_match_count,
-            rule.piece_count,
-            -rule.composition_piece_count,
-            -rule.verified_piece_count,
-            -rule.candidate_cell_count,
-        ),
-    )
+    if ranking_strategy == "evidence":
+        ranked_rules.sort(
+            key=lambda rule: (
+                -rule.coverage_ratio,
+                rule.weak_piece_count,
+                -rule.verified_template_match_count,
+                -rule.composition_piece_count,
+                rule.piece_count,
+                -rule.verified_piece_count,
+                -rule.candidate_cell_count,
+            ),
+        )
+    else:
+        ranked_rules.sort(
+            key=lambda rule: (
+                -rule.coverage_ratio,
+                -rule.verified_template_match_count,
+                rule.piece_count,
+                -rule.composition_piece_count,
+                -rule.verified_piece_count,
+                -rule.candidate_cell_count,
+            ),
+        )
     return tuple(ranked_rules[:top_groups])
 
 
@@ -2572,6 +2617,19 @@ def build_mining_summary(
         verification_template_macro_composition_groups=verification_canonical_template_macro_composition_groups,
         verification_max_source_depth=verification_max_source_depth,
         top_groups=top_groups,
+        selection_strategy="compact",
+        ranking_strategy="compact",
+    )
+    evidence_parent_rules = recover_canonical_parent_rules(
+        decomposition_groups=canonical_template_decomposition_groups,
+        recovered_rules=recovered_substitution_rules,
+        template_macro_composition_groups=canonical_template_macro_composition_groups,
+        verification_decomposition_groups=verification_canonical_template_decomposition_groups,
+        verification_template_macro_composition_groups=verification_canonical_template_macro_composition_groups,
+        verification_max_source_depth=verification_max_source_depth,
+        top_groups=top_groups,
+        selection_strategy="evidence",
+        ranking_strategy="evidence",
     )
     return MiningSummary(
         source_cell_count=len(cells),
@@ -2597,6 +2655,7 @@ def build_mining_summary(
         recovered_substitution_rules=recovered_substitution_rules,
         recovered_parent_decompositions=recovered_parent_decompositions,
         canonical_parent_rules=canonical_parent_rules,
+        evidence_parent_rules=evidence_parent_rules,
     )
 
 
@@ -2621,6 +2680,7 @@ def summary_to_payload(summary: MiningSummary) -> dict[str, Any]:
         "recovered_substitution_rules": [asdict(item) for item in summary.recovered_substitution_rules],
         "recovered_parent_decompositions": [asdict(item) for item in summary.recovered_parent_decompositions],
         "canonical_parent_rules": [asdict(item) for item in summary.canonical_parent_rules],
+        "evidence_parent_rules": [asdict(item) for item in summary.evidence_parent_rules],
     }
 
 
@@ -2873,6 +2933,7 @@ def render_text_report(summary: MiningSummary) -> str:
                 f"piece_count={canonical_rule.piece_count} "
                 f"composition_piece_count={canonical_rule.composition_piece_count} "
                 f"verified_piece_count={canonical_rule.verified_piece_count} "
+                f"weak_piece_count={canonical_rule.weak_piece_count} "
                 f"verified_piece_ratio={canonical_rule.verified_piece_ratio}"
             ),
             f"    line_equations={[equation.equation for equation in canonical_rule.line_equations]}",
@@ -2883,6 +2944,44 @@ def render_text_report(summary: MiningSummary) -> str:
             f"    example_subsets={[list(subset) for subset in canonical_rule.example_subsets]}",
         ])
         for piece in canonical_rule.child_pieces:
+            lines.extend([
+                (
+                    f"    piece_kind={piece.piece_kind} "
+                    f"macro_kind={piece.macro_kind} "
+                    f"cell_count={piece.cell_count} "
+                    f"occurrence_count={piece.occurrence_count} "
+                    f"verified_occurrence_count={piece.verified_occurrence_count}"
+                ),
+                f"      component_region_signatures={[list(signature) for signature in piece.component_region_signatures]}",
+                f"      marked_cells={dict(piece.marked_cell_signature)}",
+            ])
+
+    lines.extend(["", "Evidence Parent Rules"])
+    if not summary.evidence_parent_rules:
+        lines.append("  none")
+    for evidence_rule in summary.evidence_parent_rules:
+        lines.extend([
+            (
+                f"  seed_macro_kind={evidence_rule.seed_macro_kind} "
+                f"base_cell_count={evidence_rule.base_cell_count} "
+                f"candidate_cell_count={evidence_rule.candidate_cell_count} "
+                f"template_match_count={evidence_rule.template_match_count} "
+                f"verified_template_match_count={evidence_rule.verified_template_match_count} "
+                f"coverage_ratio={evidence_rule.coverage_ratio} "
+                f"piece_count={evidence_rule.piece_count} "
+                f"composition_piece_count={evidence_rule.composition_piece_count} "
+                f"verified_piece_count={evidence_rule.verified_piece_count} "
+                f"weak_piece_count={evidence_rule.weak_piece_count} "
+                f"verified_piece_ratio={evidence_rule.verified_piece_ratio}"
+            ),
+            f"    line_equations={[equation.equation for equation in evidence_rule.line_equations]}",
+            f"    covered_region_signatures={[list(signature) for signature in evidence_rule.covered_region_signatures]}",
+            f"    uncovered_region_signatures={[list(signature) for signature in evidence_rule.uncovered_region_signatures]}",
+            f"    verification_max_source_depth={evidence_rule.verification_max_source_depth}",
+            f"    example_roots={list(evidence_rule.example_roots)}",
+            f"    example_subsets={[list(subset) for subset in evidence_rule.example_subsets]}",
+        ])
+        for piece in evidence_rule.child_pieces:
             lines.extend([
                 (
                     f"    piece_kind={piece.piece_kind} "
