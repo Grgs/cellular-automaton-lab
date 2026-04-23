@@ -1337,6 +1337,29 @@ def mine_macro_composition_groups(
         top_groups=top_groups,
     )
 
+    return _collect_macro_composition_groups(
+        cells,
+        polygons,
+        primitive_area=primitive_area,
+        resolved_templates=resolved_templates,
+        top_groups=top_groups,
+        max_combo_size=max_combo_size,
+        component_support_ratio=component_support_ratio,
+    )
+
+
+def _collect_macro_composition_groups(
+    cells: dict[int, SourceCell],
+    polygons: dict[int, Any],
+    *,
+    primitive_area: float,
+    resolved_templates: tuple[_ResolvedBoundaryTemplateGroup, ...],
+    top_groups: int,
+    max_combo_size: int = 4,
+    component_support_ratio: float = 0.6,
+    template_filter: set[tuple[str, int, tuple[tuple[float, float], ...]]] | None = None,
+    per_template_limit: int | None = None,
+) -> tuple[MacroCompositionCandidateGroup, ...]:
     composition_groups: dict[
         tuple[
             str,
@@ -1353,6 +1376,13 @@ def mine_macro_composition_groups(
         dict[str, Any],
     ] = {}
     for resolved_template in resolved_templates:
+        template_key = _template_key(
+            seed_macro_kind=resolved_template.summary.seed_macro_kind,
+            candidate_cell_count=resolved_template.summary.candidate_cell_count,
+            canonical_vertices=resolved_template.summary.canonical_vertices,
+        )
+        if template_filter is not None and template_key not in template_filter:
+            continue
         resolved_occurrences = _resolve_template_occurrences(
             cells,
             polygons,
@@ -1444,39 +1474,95 @@ def mine_macro_composition_groups(
                             "roots": set(),
                             "subsets": [],
                         },
-                    )
+                        )
                     composition_group["occurrence_count"] += 1
                     composition_group["roots"].update(occurrence.occurrence_roots)
                     if len(composition_group["subsets"]) < 3:
                         composition_group["subsets"].append(composed_subset)
-
-    sorted_compositions = sorted(
-        composition_groups.items(),
+    sorted_compositions = [
+        (
+            group_key,
+            group,
+            MacroCompositionCandidateGroup(
+                seed_macro_kind=group_key[0],
+                base_cell_count=group_key[1],
+                candidate_cell_count=group_key[2],
+                template_match_count=int(group["template_match_count"]),
+                canonical_vertices=group_key[3],
+                component_region_signatures=group_key[4],
+                composition_macro_kind=group_key[5],
+                composed_cell_count=group_key[6],
+                occurrence_count=int(group["occurrence_count"]),
+                side_count=group_key[7],
+                quantized_area_ratio=float(group_key[8]),
+                marked_cell_signature=group_key[9],
+                example_roots=tuple(sorted(int(root) for root in group["roots"])[:5]),
+                example_subsets=tuple(group["subsets"]),
+            ),
+        )
+        for group_key, group in composition_groups.items()
+    ]
+    sorted_compositions.sort(
         key=lambda item: (
-            -int(item[1]["occurrence_count"]),
-            -item[0][6],
-            item[0][5],
-            item[0][4],
+            -item[2].occurrence_count,
+            -item[2].composed_cell_count,
+            item[2].composition_macro_kind,
+            item[2].component_region_signatures,
         ),
     )
-    return tuple(
-        MacroCompositionCandidateGroup(
-            seed_macro_kind=group_key[0],
-            base_cell_count=group_key[1],
-            candidate_cell_count=group_key[2],
-            template_match_count=int(group["template_match_count"]),
-            canonical_vertices=group_key[3],
-            component_region_signatures=group_key[4],
-            composition_macro_kind=group_key[5],
-            composed_cell_count=group_key[6],
-            occurrence_count=int(group["occurrence_count"]),
-            side_count=group_key[7],
-            quantized_area_ratio=float(group_key[8]),
-            marked_cell_signature=group_key[9],
-            example_roots=tuple(sorted(int(root) for root in group["roots"])[:5]),
-            example_subsets=tuple(group["subsets"]),
+    if per_template_limit is None:
+        return tuple(
+            item[2]
+            for item in sorted_compositions[:top_groups]
         )
-        for group_key, group in sorted_compositions[:top_groups]
+
+    per_template_counts: Counter[tuple[str, int, tuple[tuple[float, float], ...]]] = Counter()
+    selected: list[MacroCompositionCandidateGroup] = []
+    for _group_key, _group, summary in sorted_compositions:
+        template_key = _template_key(
+            seed_macro_kind=summary.seed_macro_kind,
+            candidate_cell_count=summary.candidate_cell_count,
+            canonical_vertices=summary.canonical_vertices,
+        )
+        if per_template_counts[template_key] >= per_template_limit:
+            continue
+        per_template_counts[template_key] += 1
+        selected.append(summary)
+    return tuple(selected[:top_groups])
+
+
+def mine_template_macro_composition_groups(
+    cells: dict[int, SourceCell],
+    grouped_macro_occurrences: dict[
+        tuple[str, int, float, tuple[float, ...], tuple[int, ...]],
+        list[tuple[tuple[int, ...], dict[str, Any]]],
+    ],
+    *,
+    template_keys: set[tuple[str, int, tuple[tuple[float, float], ...]]],
+    resolved_top_groups: int,
+    total_limit: int,
+    per_template_limit: int = 8,
+    max_combo_size: int = 4,
+    component_support_ratio: float = 0.4,
+) -> tuple[MacroCompositionCandidateGroup, ...]:
+    if not template_keys:
+        return ()
+    polygons, primitive_area = _build_polygon_context(cells)
+    resolved_templates = _resolve_boundary_template_groups(
+        cells,
+        grouped_macro_occurrences,
+        top_groups=resolved_top_groups,
+    )
+    return _collect_macro_composition_groups(
+        cells,
+        polygons,
+        primitive_area=primitive_area,
+        resolved_templates=resolved_templates,
+        top_groups=total_limit,
+        max_combo_size=max_combo_size,
+        component_support_ratio=component_support_ratio,
+        template_filter=template_keys,
+        per_template_limit=per_template_limit,
     )
 
 
@@ -1718,12 +1804,23 @@ def _build_parent_piece_candidates(
     *,
     rule: RecoveredSubstitutionRule,
     decomposition_group: SupertileDecompositionGroup,
+    template_composition_groups: tuple[MacroCompositionCandidateGroup, ...],
     template_key: tuple[str, int, tuple[tuple[float, float], ...]],
     verified_component_counts: dict[
         tuple[
             tuple[str, int, tuple[tuple[float, float], ...]],
             tuple[int, ...],
             str | None,
+            int,
+            tuple[tuple[str, int], ...],
+        ],
+        int,
+    ],
+    verified_composition_counts: dict[
+        tuple[
+            tuple[str, int, tuple[tuple[float, float], ...]],
+            tuple[tuple[int, ...], ...],
+            str,
             int,
             tuple[tuple[str, int], ...],
         ],
@@ -1773,6 +1870,57 @@ def _build_parent_piece_candidates(
             piece.cell_count,
             piece.marked_cell_signature,
         )] = candidate
+
+    for composition_group in template_composition_groups:
+        valid_child_signatures = tuple(
+            signature
+            for signature in composition_group.component_region_signatures
+            if signature in valid_region_signatures
+        )
+        if len(valid_child_signatures) < 2:
+            continue
+        piece = RecoveredParentPiece(
+            piece_kind="composition",
+            component_region_signatures=valid_child_signatures,
+            macro_kind=composition_group.composition_macro_kind,
+            cell_count=composition_group.composed_cell_count,
+            occurrence_count=composition_group.occurrence_count,
+            verified_occurrence_count=verified_composition_counts.get(
+                (
+                    template_key,
+                    composition_group.component_region_signatures,
+                    composition_group.composition_macro_kind,
+                    composition_group.composed_cell_count,
+                    composition_group.marked_cell_signature,
+                ),
+                0,
+            ),
+            marked_cell_signature=composition_group.marked_cell_signature,
+        )
+        candidate = _ParentPieceCandidate(
+            piece=piece,
+            covered_region_signatures=frozenset(valid_child_signatures),
+        )
+        candidate_key = (
+            piece.piece_kind,
+            piece.component_region_signatures,
+            piece.macro_kind,
+            piece.cell_count,
+            piece.marked_cell_signature,
+        )
+        existing = deduped_candidates.get(candidate_key)
+        if existing is None or (
+            piece.verified_occurrence_count,
+            len(candidate.covered_region_signatures),
+            piece.occurrence_count,
+            piece.cell_count,
+        ) > (
+            existing.piece.verified_occurrence_count,
+            len(existing.covered_region_signatures),
+            existing.piece.occurrence_count,
+            existing.piece.cell_count,
+        ):
+            deduped_candidates[candidate_key] = candidate
 
     for component in decomposition_group.component_groups:
         if component.component_macro_kind not in {"square", "triangle"}:
@@ -1967,8 +2115,10 @@ def recover_parent_decompositions(
         candidates, total_region_signatures = _build_parent_piece_candidates(
             rule=rule,
             decomposition_group=decomposition_group,
+            template_composition_groups=(),
             template_key=template_key,
             verified_component_counts=verified_component_counts,
+            verified_composition_counts={},
         )
         covered_region_signatures: set[tuple[int, ...]] = set()
         child_pieces: list[RecoveredParentPiece] = []
@@ -2032,7 +2182,9 @@ def recover_canonical_parent_rules(
     *,
     decomposition_groups: tuple[SupertileDecompositionGroup, ...],
     recovered_rules: tuple[RecoveredSubstitutionRule, ...],
+    template_macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...],
     verification_decomposition_groups: tuple[SupertileDecompositionGroup, ...],
+    verification_template_macro_composition_groups: tuple[MacroCompositionCandidateGroup, ...],
     verification_max_source_depth: int,
     top_groups: int,
 ) -> tuple[CanonicalParentRule, ...]:
@@ -2048,6 +2200,43 @@ def recover_canonical_parent_rules(
         verified_template_counts,
         verified_component_counts,
     ) = _build_parent_piece_verification_maps(verification_decomposition_groups)
+    template_compositions_by_key: dict[
+        tuple[str, int, tuple[tuple[float, float], ...]],
+        list[MacroCompositionCandidateGroup],
+    ] = defaultdict(list)
+    for composition_group in template_macro_composition_groups:
+        template_compositions_by_key[_template_key(
+            seed_macro_kind=composition_group.seed_macro_kind,
+            candidate_cell_count=composition_group.candidate_cell_count,
+            canonical_vertices=composition_group.canonical_vertices,
+        )].append(composition_group)
+    verified_composition_counts: dict[
+        tuple[
+            tuple[str, int, tuple[tuple[float, float], ...]],
+            tuple[tuple[int, ...], ...],
+            str,
+            int,
+            tuple[tuple[str, int], ...],
+        ],
+        int,
+    ] = {}
+    for composition_group in verification_template_macro_composition_groups:
+        template_key = _template_key(
+            seed_macro_kind=composition_group.seed_macro_kind,
+            candidate_cell_count=composition_group.candidate_cell_count,
+            canonical_vertices=composition_group.canonical_vertices,
+        )
+        composition_key = (
+            template_key,
+            composition_group.component_region_signatures,
+            composition_group.composition_macro_kind,
+            composition_group.composed_cell_count,
+            composition_group.marked_cell_signature,
+        )
+        verified_composition_counts[composition_key] = max(
+            verified_composition_counts.get(composition_key, 0),
+            composition_group.occurrence_count,
+        )
 
     canonical_rules: list[CanonicalParentRule] = []
     for rule in recovered_rules:
@@ -2062,8 +2251,10 @@ def recover_canonical_parent_rules(
         candidates, total_region_signatures = _build_parent_piece_candidates(
             rule=rule,
             decomposition_group=decomposition_group,
+            template_composition_groups=tuple(template_compositions_by_key.get(template_key, ())),
             template_key=template_key,
             verified_component_counts=verified_component_counts,
+            verified_composition_counts=verified_composition_counts,
         )
         child_pieces = _select_exact_parent_piece_cover(
             candidates=candidates,
@@ -2266,10 +2457,38 @@ def build_mining_summary(
         verification_max_source_depth=verification_max_source_depth,
         top_groups=top_groups,
     )
+    canonical_rule_template_keys = {
+        _template_key(
+            seed_macro_kind=rule.seed_macro_kind,
+            candidate_cell_count=rule.candidate_cell_count,
+            canonical_vertices=rule.canonical_vertices,
+        )
+        for rule in recovered_substitution_rules
+    }
+    canonical_template_macro_composition_groups = mine_template_macro_composition_groups(
+        cells,
+        grouped_macro_occurrences,
+        template_keys=canonical_rule_template_keys,
+        resolved_top_groups=rule_recovery_top_groups,
+        total_limit=max(top_groups * 8, 24),
+        per_template_limit=8,
+        component_support_ratio=0.3,
+    )
+    verification_canonical_template_macro_composition_groups = mine_template_macro_composition_groups(
+        cells,
+        verification_grouped_macro_occurrences,
+        template_keys=canonical_rule_template_keys,
+        resolved_top_groups=verification_top_groups,
+        total_limit=max(top_groups * 8, 24),
+        per_template_limit=8,
+        component_support_ratio=0.3,
+    )
     canonical_parent_rules = recover_canonical_parent_rules(
         decomposition_groups=rule_recovery_decomposition_groups,
         recovered_rules=recovered_substitution_rules,
+        template_macro_composition_groups=canonical_template_macro_composition_groups,
         verification_decomposition_groups=verification_decomposition_groups,
+        verification_template_macro_composition_groups=verification_canonical_template_macro_composition_groups,
         verification_max_source_depth=verification_max_source_depth,
         top_groups=top_groups,
     )

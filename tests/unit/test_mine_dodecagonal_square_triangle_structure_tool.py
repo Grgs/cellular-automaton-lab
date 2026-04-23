@@ -123,15 +123,17 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertTrue(
             any(
                 rule.coverage_ratio == 1.0
-                and rule.piece_count <= 9
-                and rule.composition_piece_count >= 1
-                and any(
-                    piece.piece_kind == "composition"
+                and rule.candidate_cell_count == 7
+                and rule.piece_count <= 7
+                and rule.composition_piece_count >= 3
+                and sum(
+                    1
+                    for piece in rule.child_pieces
+                    if piece.piece_kind == "composition"
                     and piece.macro_kind == "square"
                     and piece.cell_count == 2
-                    and piece.verified_occurrence_count >= 1
-                    for piece in rule.child_pieces
-                )
+                    and piece.verified_occurrence_count >= 2
+                ) >= 2
                 for rule in summary.canonical_parent_rules
             )
         )
@@ -208,15 +210,17 @@ class MineDodecagonalSquareTriangleStructureToolTests(unittest.TestCase):
         self.assertTrue(
             any(
                 rule["coverage_ratio"] == 1.0
-                and rule["piece_count"] <= 9
-                and rule["composition_piece_count"] >= 1
-                and any(
-                    piece["piece_kind"] == "composition"
+                and rule["candidate_cell_count"] == 7
+                and rule["piece_count"] <= 7
+                and rule["composition_piece_count"] >= 3
+                and sum(
+                    1
+                    for piece in rule["child_pieces"]
+                    if piece["piece_kind"] == "composition"
                     and piece["macro_kind"] == "square"
                     and piece["cell_count"] == 2
-                    and piece["verified_occurrence_count"] >= 1
-                    for piece in rule["child_pieces"]
-                )
+                    and piece["verified_occurrence_count"] >= 2
+                ) >= 2
                 for rule in payload["canonical_parent_rules"]
             )
         )
