@@ -385,7 +385,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         geometry=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         display_name=_reference_label(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",),
-        canonical_root_seed_policy="Bielefeld literature vector patch with snapped shared-edge reconstruction",
+        canonical_root_seed_policy="Bielefeld rule-image substitution spec cropped by graph distance",
         allowed_public_cell_kinds=_public_cell_kinds(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         required_metadata=(
             MetadataRequirement(
@@ -427,27 +427,26 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                     ),
                 ),
                 expected_degree_histogram=((1, 4), (4, 1)),
-                expected_signature="99f3a17da472",  # pragma: allowlist secret
+                expected_signature="7bec99bc70db",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-1",
             ),
             3: ReferenceDepthExpectation(
-                exact_total_cells=25,
+                exact_total_cells=13,
                 expected_kind_counts=(
-                    (DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND, 7),
-                    (DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND, 18),
+                    (DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND, 3),
+                    (DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND, 10),
                 ),
-                expected_tile_family_counts=((DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 25),),
+                expected_tile_family_counts=((DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 13),),
                 expected_orientation_token_counts=(
                     ("0", 4),
-                    ("120", 4),
-                    ("30", 6),
-                    ("60", 6),
-                    ("90", 5),
+                    ("30", 4),
+                    ("60", 2),
+                    ("90", 3),
                 ),
                 expected_chirality_token_counts=(
-                    ("blue", 8),
-                    ("red", 7),
-                    ("yellow", 3),
+                    ("blue", 6),
+                    ("red", 3),
+                    ("yellow", 1),
                 ),
                 required_kinds=(
                     DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
@@ -463,14 +462,14 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                         DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
                     ),
                 ),
-                expected_degree_histogram=((1, 6), (2, 6), (3, 8), (4, 5)),
-                expected_signature="903859d75c46",  # pragma: allowlist secret
+                expected_degree_histogram=((1, 5), (2, 3), (3, 3), (4, 2)),
+                expected_signature="950c6e217e1a",  # pragma: allowlist secret
                 canonical_patch_fixture_key="dense-depth-3",
             ),
         },
         notes=(
-            "The public tiling collapses the literature vector source to public squares and triangles.",
-            "The app reconstructs shared-edge adjacency from snapped Bielefeld vector coordinates instead of shipping the older cleaned dense subset sample.",
+            "The public tiling collapses the Bielefeld five-state square-triangle rule to public squares and triangles.",
+            "The checked-in substitution spec is recovered from the Bielefeld rule image; the older snapped literature vector crop remains oracle tooling only.",
         ),
     ),
     SHIELD_GEOMETRY: ReferenceFamilySpec(

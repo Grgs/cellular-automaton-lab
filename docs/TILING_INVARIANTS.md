@@ -80,10 +80,11 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - direct canonical patch fixtures now pin both the first handed substitution patch and the representative depth-`3` sample
 - `dodecagonal-square-triangle`
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
-  - the authoritative verifier sample is now a cleaned dense depth-3 central component of the literature patch, not just a shallow adjacency shell
-  - that depth-3 sample must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
-  - rooted local-reference fixtures now pin a few canonical square/triangle neighborhoods inside that dense sample
-  - direct dense canonical patch fixtures now check the normalized public square/triangle serialization exactly at both depth `1` and depth `3`
+  - the runtime expands a checked-in five-state substitution spec recovered from the Bielefeld rule image, then crops a connected graph-distance patch
+  - the finite Bielefeld vector crop remains oracle tooling only, not the public runtime source
+  - representative samples must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
+  - rooted local-reference fixtures now pin canonical square/triangle neighborhoods inside the substitution-cropped sample
+  - direct canonical patch fixtures now check the normalized public square/triangle serialization exactly at both depth `1` and depth `3`
 - `robinson-triangles`
   - direct canonical patch fixtures now pin both the first refined Robinson triangle patch and the representative depth-`3` sample
 - `chair`

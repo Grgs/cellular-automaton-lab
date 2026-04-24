@@ -18,6 +18,7 @@ STYLE_TARGETS = (
     "backend/simulation/reference_verification",
     # Verification and reference-fixture tools.
     "tools/regenerate_dodecagonal_literature_source.py",
+    "tools/regenerate_dodecagonal_substitution_spec.py",
     "tools/regenerate_reference_fixtures.py",
     "tools/report_tiling_verification_strength.py",
     "tools/validate_tilings.py",
@@ -41,6 +42,7 @@ STYLE_TARGETS = (
     "tests/unit/test_literature_reference_verification.py",
     "tests/unit/test_reference_fixture_regeneration.py",
     "tests/unit/test_regenerate_dodecagonal_literature_source_tool.py",
+    "tests/unit/test_regenerate_dodecagonal_substitution_spec_tool.py",
     "tests/unit/test_report_tiling_verification_strength_tool.py",
     "tests/unit/test_render_canvas_review_tool.py",
     "tests/unit/test_validate_tilings_tool.py",

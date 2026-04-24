@@ -127,10 +127,16 @@ class SharedUiFlowMixin:
             raise AssertionError("canvas did not report a rendered cell size")
         render_cell_size = float(render_cell_size_text)
         if render_cell_size <= 0:
-            raise AssertionError(f"canvas reported an invalid rendered cell size: {render_cell_size_text!r}")
+            raise AssertionError(
+                f"canvas reported an invalid rendered cell size: {render_cell_size_text!r}"
+            )
 
         grid_summary = self._grid_summary()
-        if grid_summary.kind != "regular" or grid_summary.width is None or grid_summary.height is None:
+        if (
+            grid_summary.kind != "regular"
+            or grid_summary.width is None
+            or grid_summary.height is None
+        ):
             raise AssertionError(f"grid summary did not describe a regular board: {grid_summary!r}")
 
         gap = 0 if render_cell_size <= 6 else 1
@@ -169,7 +175,9 @@ class SharedUiFlowMixin:
         apply_review_topology_payload(case.page, topology_payload)
         wait_for_patch_render_complete(case.page)
 
-    def _apply_review_cell_states(self, review_cell_states: dict[str, int] | list[dict[str, object]]) -> None:
+    def _apply_review_cell_states(
+        self, review_cell_states: dict[str, int] | list[dict[str, object]]
+    ) -> None:
         case = self._case()
         apply_review_cell_states(case.page, review_cell_states)
         case.page.wait_for_timeout(75)
@@ -183,7 +191,9 @@ class SharedUiFlowMixin:
         case = self._case()
         return sample_review_cell_pixel(case.page, cell_id)
 
-    def _sample_canvas_pixel_rgba(self, canvas_x: float, canvas_y: float) -> tuple[int, int, int, int]:
+    def _sample_canvas_pixel_rgba(
+        self, canvas_x: float, canvas_y: float
+    ) -> tuple[int, int, int, int]:
         case = self._case()
         rgba = case.page.evaluate(
             """([x, y]) => {
@@ -201,7 +211,9 @@ class SharedUiFlowMixin:
             [canvas_x, canvas_y],
         )
         if not isinstance(rgba, list) or len(rgba) != 4:
-            raise AssertionError(f"canvas pixel sampling returned an invalid RGBA payload: {rgba!r}")
+            raise AssertionError(
+                f"canvas pixel sampling returned an invalid RGBA payload: {rgba!r}"
+            )
         red, green, blue, alpha = (int(channel) for channel in rgba)
         return (red, green, blue, alpha)
 
@@ -378,6 +390,7 @@ class SharedUiFlowMixin:
         self._apply_review_topology(topology)
 
         try:
+
             def _coerce_center_coordinate(center: dict[str, object], axis: str) -> float:
                 value = center.get(axis)
                 if isinstance(value, (int, float)):
@@ -414,11 +427,13 @@ class SharedUiFlowMixin:
                         (
                             _coerce_center_coordinate(cast(dict[str, object], cell["center"]), "x")
                             - mean_x
-                        ) ** 2
+                        )
+                        ** 2
                         + (
                             _coerce_center_coordinate(cast(dict[str, object], cell["center"]), "y")
                             - mean_y
-                        ) ** 2
+                        )
+                        ** 2
                     ),
                 )
                 for candidate in candidates:
@@ -437,14 +452,13 @@ class SharedUiFlowMixin:
             for signature, cell in representative_cells.items():
                 sampled_pixel = self._sample_review_cell_pixel(str(cell["id"]))
                 if sampled_pixel is None:
-                    raise AssertionError(f"{fixture_case['family']} sample {signature} did not resolve to a rendered pixel")
+                    raise AssertionError(
+                        f"{fixture_case['family']} sample {signature} did not resolve to a rendered pixel"
+                    )
                 dead_samples[signature] = sampled_pixel
 
             self._apply_review_cell_states(
-                [
-                    {"id": str(cell["id"]), "state": 1}
-                    for cell in representative_cells.values()
-                ],
+                [{"id": str(cell["id"]), "state": 1} for cell in representative_cells.values()],
             )
 
             live_samples: dict[str, tuple[int, int, int, int]] = {}
@@ -615,26 +629,28 @@ class SharedUiFlowMixin:
 
         self._expect("#tiling-family-select").to_have_value("dodecagonal-square-triangle")
         self._expect("#patch-depth-field").to_be_visible()
-        self._expect("#patch-depth-input").to_have_attribute("max", "20")
-        self.assertEqual(self._patch_depth_input_state()["max"], "20")
+        self._expect("#patch-depth-input").to_have_attribute("max", "60")
+        self.assertEqual(self._patch_depth_input_state()["max"], "60")
 
         if case.page.locator("#unsafe-sizing-toggle").is_visible():
             case.page.locator("#unsafe-sizing-toggle").check()
             self._expect("#unsafe-sizing-toggle").to_be_checked()
-            self._expect("#patch-depth-input").to_have_attribute("max", "20")
+            self._expect("#patch-depth-input").to_have_attribute("max", "60")
 
         if case.api is not None:
             with case.page.expect_response(
-                lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
+                lambda response: (
+                    response.request.method == "POST" and "/api/control/reset" in response.url
+                ),
                 timeout=60_000,
             ) as response_info:
-                set_patch_depth(case.page, 20, timeout_ms=60_000)
+                set_patch_depth(case.page, 60, timeout_ms=60_000)
             case.assertEqual(int(response_info.value.status), 200)
         else:
-            set_patch_depth(case.page, 20, timeout_ms=60_000)
-        self._expect("#patch-depth-input").to_have_value("20")
-        self._expect("#patch-depth-label").to_have_text("Depth 20")
-        self._expect("#grid-size-text").to_contain_text("Depth 20")
+            set_patch_depth(case.page, 60, timeout_ms=60_000)
+        self._expect("#patch-depth-input").to_have_value("60")
+        self._expect("#patch-depth-label").to_have_text("Depth 60")
+        self._expect("#grid-size-text").to_contain_text("Depth 60")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=3)
 
     def test_shield_topology_switch_renders_aperiodic_patch(self) -> None:
@@ -725,7 +741,9 @@ class SharedUiFlowMixin:
                 "c:3:1": 1,
             },
         }
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as pattern_file:
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", suffix=".json", delete=False
+        ) as pattern_file:
             pattern_file.write(json.dumps(payload))
             pattern_path = pattern_file.name
         case.addCleanup(lambda: Path(pattern_path).unlink(missing_ok=True))
@@ -820,7 +838,9 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
         self._expect("#rule-select").to_have_value("highlife")
         persisted_after_reload = self._export_pattern_payload()
-        self.assertEqual(persisted_after_reload["cells_by_id"], persisted_before_reload["cells_by_id"])
+        self.assertEqual(
+            persisted_after_reload["cells_by_id"], persisted_before_reload["cells_by_id"]
+        )
 
 
 class StandaloneRuntimeFailureTests(BrowserAppTestCase):

@@ -83,100 +83,111 @@
   },
   "dodecagonal-square-triangle": {
     "3": {
-      "dst:lit:02027": {
+      "dst:sub:14.11.22": {
         "neighbors": [
           {
-            "area": 0.999978,
-            "chirality_token": null,
+            "area": 0.433013,
+            "chirality_token": "blue",
             "decoration_tokens": null,
             "delta": [
-              0.682542,
-              -0.394096
-            ],
-            "kind": "dodecagonal-square-triangle-square",
-            "orientation_token": "60"
-          },
-          {
-            "area": 0.43225,
-            "chirality_token": "red",
-            "decoration_tokens": null,
-            "delta": [
-              -0.499535,
-              -0.288973
-            ],
-            "kind": "dodecagonal-square-triangle-triangle",
-            "orientation_token": "60"
-          },
-          {
-            "area": 0.432195,
-            "chirality_token": "red",
-            "decoration_tokens": null,
-            "delta": [
-              0.000435,
-              0.577088
-            ],
-            "kind": "dodecagonal-square-triangle-triangle",
-            "orientation_token": "60"
-          }
-        ],
-        "root": {
-          "area": 0.432266,
-          "chirality_token": "red",
-          "decoration_tokens": null,
-          "degree": 3,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "0"
-        }
-      },
-      "dst:lit:03557": {
-        "neighbors": [
-          {
-            "area": 0.432266,
-            "chirality_token": "red",
-            "decoration_tokens": null,
-            "delta": [
-              -0.682542,
-              0.394096
+              0.0,
+              0.788675
             ],
             "kind": "dodecagonal-square-triangle-triangle",
             "orientation_token": "0"
           },
           {
-            "area": 0.432211,
-            "chirality_token": "blue",
+            "area": 0.433013,
+            "chirality_token": "red",
             "decoration_tokens": null,
             "delta": [
-              0.394046,
-              0.682564
+              0.788675,
+              0.0
             ],
             "kind": "dodecagonal-square-triangle-triangle",
             "orientation_token": "30"
           },
           {
-            "area": 0.433254,
+            "area": 0.433013,
             "chirality_token": "yellow",
             "decoration_tokens": null,
             "delta": [
-              0.68316,
-              -0.394425
+              0.0,
+              -0.788675
             ],
             "kind": "dodecagonal-square-triangle-triangle",
             "orientation_token": "60"
           },
           {
-            "area": 0.433282,
+            "area": 0.433013,
             "chirality_token": "blue",
             "decoration_tokens": null,
             "delta": [
-              -0.394439,
-              -0.683174
+              -0.788675,
+              0.0
             ],
             "kind": "dodecagonal-square-triangle-triangle",
             "orientation_token": "90"
           }
         ],
         "root": {
-          "area": 0.999978,
+          "area": 1.0,
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "degree": 4,
+          "kind": "dodecagonal-square-triangle-square",
+          "orientation_token": "0"
+        }
+      },
+      "dst:sub:14.11.28": {
+        "neighbors": [
+          {
+            "area": 0.433013,
+            "chirality_token": "red",
+            "decoration_tokens": null,
+            "delta": [
+              0.683013,
+              -0.394338
+            ],
+            "kind": "dodecagonal-square-triangle-triangle",
+            "orientation_token": "0"
+          },
+          {
+            "area": 0.433013,
+            "chirality_token": "blue",
+            "decoration_tokens": null,
+            "delta": [
+              -0.394338,
+              -0.683013
+            ],
+            "kind": "dodecagonal-square-triangle-triangle",
+            "orientation_token": "30"
+          },
+          {
+            "area": 0.433013,
+            "chirality_token": "yellow",
+            "decoration_tokens": null,
+            "delta": [
+              -0.683013,
+              0.394338
+            ],
+            "kind": "dodecagonal-square-triangle-triangle",
+            "orientation_token": "60"
+          },
+          {
+            "area": 0.433013,
+            "chirality_token": "blue",
+            "decoration_tokens": null,
+            "delta": [
+              0.394338,
+              0.683013
+            ],
+            "kind": "dodecagonal-square-triangle-triangle",
+            "orientation_token": "90"
+          }
+        ],
+        "root": {
+          "area": 1.0,
           "chirality_token": null,
           "decoration_tokens": null,
           "degree": 4,

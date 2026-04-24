@@ -47,6 +47,7 @@
 ## Now
 
 - Revisit browser-visible shape and pattern correctness for `dodecagonal-square-triangle` and `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
+- For `dodecagonal-square-triangle`, the runtime now uses a checked-in Bielefeld rule-image substitution spec. The remaining correctness question is hidden marked-edge orientation fidelity and visual review, not whether runtime generation is still a finite literature crop.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
 - For `pinwheel`, treat the remaining visual mismatch as a display-sampling problem; keep the two-root exact-affine runtime patch, and if we revisit the presentation use a display-only observation window rather than runtime subset selection.
 ## Next
@@ -54,7 +55,7 @@
 - Add an optional one-command diff review on top of the existing montage/sweep outputs once there is a concrete consumer for it.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The direct canonical fixture layer now covers shallow and representative depths for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, plus depth-`3` fixtures for `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
-- If we revisit `dodecagonal-square-triangle`, treat the remaining question as a marked-state question rather than a simple missing-composition question: the strongest evidence-ranked 7-cell parent now has zero weak pieces, and bounded deeper-window searches did not find valid square/triangle compositions for the last square-state signatures. The next step would be either explicit marked-state refinement or new literature guidance, not more of the same 2- to 4-region composition search.
+- If we revisit `dodecagonal-square-triangle`, target the hidden edge-marking/reflection state carried by the Bielefeld rule image. The geometric substitution spec is now runtime-owned; the next productive step is proving or correcting marked-state propagation across supertile boundaries, not returning to finite-crop mining.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 
 ## Later

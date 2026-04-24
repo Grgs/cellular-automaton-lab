@@ -292,7 +292,7 @@ class GeometryManifestTests(unittest.TestCase):
         expected = {
             HAT_MONOTILE_GEOMETRY: {"default": 2, "min": 0, "max": 3},
             TUEBINGEN_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 5},
-            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 20},
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 60},
             SHIELD_GEOMETRY: {"default": 3, "min": 0, "max": 5},
             PINWHEEL_GEOMETRY: {"default": 3, "min": 0, "max": 4},
         }

@@ -532,26 +532,34 @@ class SimulationTopologyTests(unittest.TestCase):
                         assert neighbor_id is not None
                         self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
-    def test_dodecagonal_square_triangle_supports_depth_twenty(self) -> None:
+    def test_dodecagonal_square_triangle_supports_depth_sixty(self) -> None:
         depth_seven = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=7)
         depth_twenty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=20)
-        repeated_depth_twenty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=20)
+        depth_sixty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=60)
+        repeated_depth_sixty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=60)
 
-        self.assertEqual(depth_twenty.patch_depth, 20)
+        self.assertEqual(depth_sixty.patch_depth, 60)
         self.assertGreater(depth_twenty.cell_count, depth_seven.cell_count)
-        self.assertEqual(depth_twenty.cell_count, 811)
+        self.assertGreater(depth_sixty.cell_count, depth_twenty.cell_count)
+        self.assertEqual(depth_sixty.cell_count, 612)
         self.assertEqual(
-            [cell.id for cell in depth_twenty.cells],
-            [cell.id for cell in repeated_depth_twenty.cells],
+            [cell.id for cell in depth_sixty.cells],
+            [cell.id for cell in repeated_depth_sixty.cells],
         )
-        self.assertTrue(all(cell.orientation_token is not None for cell in depth_twenty.cells))
+        self.assertTrue(all(cell.orientation_token is not None for cell in depth_sixty.cells))
         self.assertTrue(
             all(
                 cell.chirality_token is not None
-                for cell in depth_twenty.cells
+                for cell in depth_sixty.cells
                 if cell.kind != "dodecagonal-square-triangle-square"
             )
         )
+
+    def test_dodecagonal_square_triangle_runtime_uses_substitution_spec(self) -> None:
+        topology = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertTrue(all(cell.id.startswith("dst:sub:") for cell in topology.cells))
+        self.assertFalse(any(cell.id.startswith("dst:lit:") for cell in topology.cells))
 
     def test_shield_topology_uses_exact_symbolic_substitution_depth(self) -> None:
         depth_zero = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=0)

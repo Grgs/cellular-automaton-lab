@@ -195,7 +195,7 @@ The code stops treating all aperiodic builders as equally authoritative. Product
 
 Implementation status:
 
-The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `shield` promoted from `known_deviation` to `true_substitution`, `dodecagonal-square-triangle` upgraded from `canonical_patch` to an `exact_affine` literature-vector reconstruction, and `pinwheel` still remaining explicitly blocked pending visual review. Backend-owned `aperiodic_families` bootstrap metadata now also carries those status fields into the frontend, and the picker/drawer surface experimental status directly instead of hiding it in backend/test-only layers.
+The first contract layer is in place in `backend/simulation/aperiodic_contracts.py`. It records implementation status, source links, public kinds, metadata fields, depth semantics, verification modes, and promotion blockers for every aperiodic catalog family. The verification-strength report now includes the implementation-status column, with `shield` promoted from `known_deviation` to `true_substitution`, `dodecagonal-square-triangle` moved to a checked-in rule-image substitution spec, and `pinwheel` still remaining explicitly blocked pending visual review. Backend-owned `aperiodic_families` bootstrap metadata now also carries those status fields into the frontend, and the picker/drawer surface experimental status directly instead of hiding it in backend/test-only layers.
 
 ### 5. Literature Verification And Fixtures
 
