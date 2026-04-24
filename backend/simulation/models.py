@@ -102,6 +102,10 @@ def _topology_spec_bool_value(
 
 MAX_UNSAFE_PATCH_DEPTH = 12
 
+
+def _maximum_unsafe_patch_depth_for_tiling_family(tiling_family: str) -> int:
+    return max(MAX_UNSAFE_PATCH_DEPTH, maximum_patch_depth_for_tiling_family(tiling_family))
+
 @dataclass(frozen=True)
 class TopologySpec:
     tiling_family: str = DEFAULT_TILING_FAMILY
@@ -133,7 +137,7 @@ class TopologySpec:
             normalized_patch_depth = clamp_int(
                 patch_depth,
                 MIN_PATCH_DEPTH,
-                MAX_UNSAFE_PATCH_DEPTH,
+                _maximum_unsafe_patch_depth_for_tiling_family(tiling_family_id),
             )
         else:
             normalized_patch_depth = clamp_int(

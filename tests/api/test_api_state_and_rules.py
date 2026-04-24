@@ -613,6 +613,28 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertEqual(topology['topology_spec']['patch_depth'], override_patch_depth)
         self.assertTrue(all(cell['kind'] == 'spectre' for cell in topology['cells']))
 
+    def test_unsafe_size_override_does_not_reduce_dodecagonal_validated_cap(self) -> None:
+        validated_patch_depth = maximum_patch_depth_for_tiling_family('dodecagonal-square-triangle')
+        reset = self.client.post('/api/control/reset', json={
+            'topology_spec': {
+                'tiling_family': 'dodecagonal-square-triangle',
+                'adjacency_mode': 'edge',
+                'patch_depth': validated_patch_depth,
+                'unsafe_size_override': True,
+            },
+            'speed': 6,
+            'randomize': False,
+        })
+        self.assertEqual(reset.status_code, 200)
+
+        state = reset.get_json()
+        topology = self.get_topology()
+
+        self.assertEqual(state['topology_spec']['tiling_family'], 'dodecagonal-square-triangle')
+        self.assertEqual(state['topology_spec']['patch_depth'], validated_patch_depth)
+        self.assertEqual(topology['topology_spec']['patch_depth'], validated_patch_depth)
+        self.assertEqual(len(topology['cells']), len(state['cell_states']))
+
     def test_retired_penrose_rule_names_resolve_to_canonical_rules(self) -> None:
         for requested_rule, expected_rule in (
             ('penrose-life', 'life-b2-s23'),

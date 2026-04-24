@@ -37,6 +37,13 @@ function unsafeSizingEnabled(options: { unsafe?: boolean } = {}): boolean {
     return Boolean(options.unsafe);
 }
 
+function safePatchDepthMaxForTilingFamily(tilingFamily: string | null | undefined): number {
+    const policy = sizingPolicyForTilingFamily(tilingFamily);
+    return policy.control === "patch_depth"
+        ? policy.max
+        : MAX_PATCH_DEPTH;
+}
+
 function normalizeInteger(value: number, minimum: number, maximum: number): number {
     const parsed = Number(value);
     return Math.min(maximum, Math.max(minimum, Math.round(parsed)));
@@ -107,12 +114,9 @@ export function maxPatchDepthForTilingFamily(
     options: { unsafe?: boolean } = {},
 ): number {
     if (unsafeSizingEnabled(options)) {
-        return MAX_UNSAFE_PATCH_DEPTH;
+        return Math.max(MAX_UNSAFE_PATCH_DEPTH, safePatchDepthMaxForTilingFamily(tilingFamily));
     }
-    const policy = sizingPolicyForTilingFamily(tilingFamily);
-    return policy.control === "patch_depth"
-        ? policy.max
-        : MAX_PATCH_DEPTH;
+    return safePatchDepthMaxForTilingFamily(tilingFamily);
 }
 
 export function minPatchDepthForTilingFamily(
@@ -167,7 +171,11 @@ export function setPatchDepth(
     } = {},
 ): void {
     state.patchDepth = preserveOutOfRange
-        ? normalizeInteger(patchDepth, MIN_UNSAFE_PATCH_DEPTH, MAX_UNSAFE_PATCH_DEPTH)
+        ? normalizeInteger(
+            patchDepth,
+            MIN_UNSAFE_PATCH_DEPTH,
+            maxPatchDepthForTilingFamily(tilingFamily, { unsafe: true }),
+        )
         : normalizePatchDepthForTilingFamily(tilingFamily, patchDepth, { unsafe: state.unsafeSizingEnabled });
     state.topologySpec = {
         ...state.topologySpec,

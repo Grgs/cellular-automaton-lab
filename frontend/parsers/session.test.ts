@@ -28,4 +28,21 @@ describe("session parser", () => {
         expect(session.cellSizeByTilingFamily.square).toBe(40);
         expect(session.patchDepthByTilingFamily.spectre).toBe(9);
     });
+
+    it("does not truncate validated patch-depth families when unsafe sizing is enabled", async () => {
+        const { parseUiSession } = await import("./session.js");
+
+        const session = parseUiSession({
+            unsafeSizingEnabled: true,
+            patchDepthByTilingFamily: {
+                "dodecagonal-square-triangle": 20,
+            },
+        }, {
+            disclosureIds: [],
+            defaultTilingFamily: "dodecagonal-square-triangle",
+        });
+
+        expect(session.unsafeSizingEnabled).toBe(true);
+        expect(session.patchDepthByTilingFamily["dodecagonal-square-triangle"]).toBe(20);
+    });
 });

@@ -40,6 +40,7 @@ describe("controls-model/shared", () => {
     it("widens viewport sizing ranges when unsafe sizing is enabled", async () => {
         const { createAppState } = await import("../state/simulation-state.js");
         const { resolveViewportSizingState } = await import("./shared.js");
+        const squareTrianglePolicy = getFixtureTopologyDefinition("dodecagonal-square-triangle").sizing_policy;
 
         const state = createAppState();
         state.unsafeSizingEnabled = true;
@@ -55,6 +56,22 @@ describe("controls-model/shared", () => {
         expect(resolveViewportSizingState(state)).toMatchObject({
             cellSizeMin: 1,
             cellSizeMax: 240,
+        });
+
+        const dodecagonalState = createAppState();
+        dodecagonalState.unsafeSizingEnabled = true;
+        dodecagonalState.topologySpec = {
+            tiling_family: "dodecagonal-square-triangle",
+            adjacency_mode: "edge",
+            sizing_mode: "patch_depth",
+            width: 0,
+            height: 0,
+            patch_depth: 20,
+        };
+
+        expect(resolveViewportSizingState(dodecagonalState)).toMatchObject({
+            patchDepthMin: squareTrianglePolicy.min,
+            patchDepthMax: squareTrianglePolicy.max,
         });
     });
 

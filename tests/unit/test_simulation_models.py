@@ -111,6 +111,22 @@ class SimulationModelTests(unittest.TestCase):
         self.assertEqual(updated.patch_depth, 8)
         self.assertEqual(updated.topology_spec.patch_depth, 8)
 
+    def test_unsafe_size_override_does_not_reduce_validated_dodecagonal_cap(self) -> None:
+        config = SimulationConfig.from_values(
+            topology_spec={
+                "tiling_family": "dodecagonal-square-triangle",
+                "adjacency_mode": "edge",
+                "width": 0,
+                "height": 0,
+                "patch_depth": 20,
+                "unsafe_size_override": True,
+            },
+            speed=4,
+        )
+
+        self.assertEqual(config.patch_depth, 20)
+        self.assertEqual(config.topology_spec.patch_depth, 20)
+
     def test_rule_and_snapshot_serialize(self) -> None:
         rule = ConwayLifeRule()
         snapshot = SimulationSnapshot(
