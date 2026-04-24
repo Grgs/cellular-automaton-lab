@@ -27,6 +27,7 @@ try:
         reset_review_state,
         sample_review_cell_pixel,
         select_tiling_family,
+        set_patch_depth,
         wait_for_patch_render_complete,
     )
     from tests.e2e.support_runtime_host import BrowserRuntimeHost
@@ -48,6 +49,7 @@ except ModuleNotFoundError:
         reset_review_state,
         sample_review_cell_pixel,
         select_tiling_family,
+        set_patch_depth,
         wait_for_patch_render_complete,
     )
     from tests.e2e.support_runtime_host import BrowserRuntimeHost
@@ -234,6 +236,25 @@ class SharedUiFlowMixin:
     def _set_editor_tool(self, editor_tool: str) -> None:
         case = self._case()
         case.page.locator(f'[data-editor-tool="{editor_tool}"]').click()
+
+    def _patch_depth_input_state(self) -> dict[str, str | None]:
+        case = self._case()
+        state = case.page.evaluate(
+            """() => {
+                const input = document.getElementById("patch-depth-input");
+                if (!(input instanceof HTMLInputElement)) {
+                    throw new Error("patch depth input is missing");
+                }
+                return {
+                    min: input.min,
+                    max: input.max,
+                    value: input.value,
+                };
+            }""",
+        )
+        if not isinstance(state, dict):
+            raise AssertionError(f"patch depth input state was invalid: {state!r}")
+        return cast(dict[str, str | None], state)
 
     def _select_tiling_family_and_wait_for_reset(
         self,
@@ -586,6 +607,34 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("dodecagonal-square-triangle")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
+        self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=3)
+
+    def test_dodecagonal_square_triangle_patch_depth_accepts_values_above_twelve(self) -> None:
+        case = self._case()
+        self._select_tiling_family_and_wait_for_reset("dodecagonal-square-triangle")
+
+        self._expect("#tiling-family-select").to_have_value("dodecagonal-square-triangle")
+        self._expect("#patch-depth-field").to_be_visible()
+        self._expect("#patch-depth-input").to_have_attribute("max", "20")
+        self.assertEqual(self._patch_depth_input_state()["max"], "20")
+
+        if case.page.locator("#unsafe-sizing-toggle").is_visible():
+            case.page.locator("#unsafe-sizing-toggle").check()
+            self._expect("#unsafe-sizing-toggle").to_be_checked()
+            self._expect("#patch-depth-input").to_have_attribute("max", "20")
+
+        if case.api is not None:
+            with case.page.expect_response(
+                lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
+                timeout=60_000,
+            ) as response_info:
+                set_patch_depth(case.page, 20, timeout_ms=60_000)
+            case.assertEqual(int(response_info.value.status), 200)
+        else:
+            set_patch_depth(case.page, 20, timeout_ms=60_000)
+        self._expect("#patch-depth-input").to_have_value("20")
+        self._expect("#patch-depth-label").to_have_text("Depth 20")
+        self._expect("#grid-size-text").to_contain_text("Depth 20")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=3)
 
     def test_shield_topology_switch_renders_aperiodic_patch(self) -> None:
