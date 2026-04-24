@@ -862,7 +862,7 @@
         "control": "patch_depth",
         "default": 3,
         "min": 0,
-        "max": 7
+        "max": 10
       }
     },
     {
