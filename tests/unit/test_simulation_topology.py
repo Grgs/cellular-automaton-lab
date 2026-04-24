@@ -532,20 +532,23 @@ class SimulationTopologyTests(unittest.TestCase):
                         assert neighbor_id is not None
                         self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
-    def test_dodecagonal_square_triangle_supports_depth_ten(self) -> None:
+    def test_dodecagonal_square_triangle_supports_depth_twenty(self) -> None:
         depth_seven = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=7)
-        depth_ten = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=10)
-        repeated_depth_ten = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=10)
+        depth_twenty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=20)
+        repeated_depth_twenty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=20)
 
-        self.assertEqual(depth_ten.patch_depth, 10)
-        self.assertGreater(depth_ten.cell_count, depth_seven.cell_count)
-        self.assertEqual(depth_ten.cell_count, 219)
-        self.assertEqual([cell.id for cell in depth_ten.cells], [cell.id for cell in repeated_depth_ten.cells])
-        self.assertTrue(all(cell.orientation_token is not None for cell in depth_ten.cells))
+        self.assertEqual(depth_twenty.patch_depth, 20)
+        self.assertGreater(depth_twenty.cell_count, depth_seven.cell_count)
+        self.assertEqual(depth_twenty.cell_count, 811)
+        self.assertEqual(
+            [cell.id for cell in depth_twenty.cells],
+            [cell.id for cell in repeated_depth_twenty.cells],
+        )
+        self.assertTrue(all(cell.orientation_token is not None for cell in depth_twenty.cells))
         self.assertTrue(
             all(
                 cell.chirality_token is not None
-                for cell in depth_ten.cells
+                for cell in depth_twenty.cells
                 if cell.kind != "dodecagonal-square-triangle-square"
             )
         )

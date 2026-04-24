@@ -14,7 +14,7 @@ from backend.simulation.aperiodic_support import AperiodicPatch, PatchRecord, pa
 _SOURCE_PATCH_DATA = (
     Path(__file__).with_name("data") / "dodecagonal_square_triangle_literature_source.json"
 )
-_MAX_PATCH_DEPTH = 10
+_MAX_PATCH_DEPTH = 20
 _EDGE_PRECISION = 6
 
 _TILE_FAMILY = "dodecagonal-square-triangle"
