@@ -1,22 +1,29 @@
 from __future__ import annotations
 
-from collections import defaultdict, deque
-from dataclasses import dataclass
-from functools import lru_cache
-from pathlib import Path
+import argparse
+import json
 import math
-from typing import TypedDict
+import sys
+from collections import defaultdict
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 import fitz
 
 
-SOURCE_PATCH_PDF = Path(__file__).with_name("bielefeld-patch.pdf")
-MAX_PATCH_DEPTH = 7
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_SOURCE_PDF = (
+    ROOT / "docs" / "contracts" / "dodecagonal-square-triangle-generator" / "bielefeld-patch.pdf"
+)
+DEFAULT_OUTPUT_PATH = (
+    ROOT / "backend" / "simulation" / "data" / "dodecagonal_square_triangle_literature_source.json"
+)
+
 SEED_CELL_INDEX = 3557
 VERTEX_SNAP_TOLERANCE = 0.005
 EDGE_PRECISION = 6
 
-TILE_FAMILY = "dodecagonal-square-triangle"
 SQUARE_KIND = "dodecagonal-square-triangle-square"
 TRIANGLE_KIND = "dodecagonal-square-triangle-triangle"
 
@@ -25,23 +32,8 @@ YELLOW_FILL = (1.0, 0.8, 0.4)
 BLUE_FILL = (0.42, 0.451, 0.639)
 
 
-class PatchCell(TypedDict):
-    id: str
-    kind: str
-    center: tuple[float, float]
-    vertices: tuple[tuple[float, float], ...]
-    neighbors: tuple[str, ...]
-    tile_family: str | None
-    orientation_token: str | None
-    chirality_token: str | None
-    decoration_tokens: tuple[str, ...] | None
-
-
-class AperiodicPatch(TypedDict):
-    patch_depth: int
-    width: int
-    height: int
-    cells: tuple[PatchCell, ...]
+class DodecagonalLiteratureSourceError(ValueError):
+    pass
 
 
 @dataclass(frozen=True)
@@ -83,20 +75,20 @@ def _polygon_center(vertices: tuple[tuple[float, float], ...]) -> tuple[float, f
     )
 
 
-def _extract_fill_vertices(drawing: dict) -> list[tuple[float, float]]:
+def _extract_fill_vertices(drawing: dict[str, Any]) -> list[tuple[float, float]]:
     points: list[tuple[float, float]] = []
     for item in drawing["items"]:
         if item[0] == "l":
-            points.append((item[1].x, item[1].y))
-            points.append((item[2].x, item[2].y))
+            points.append((float(item[1].x), float(item[1].y)))
+            points.append((float(item[2].x), float(item[2].y)))
         elif item[0] == "re":
             rect = item[1]
             points.extend(
                 (
-                    (rect.x0, rect.y0),
-                    (rect.x0, rect.y1),
-                    (rect.x1, rect.y1),
-                    (rect.x1, rect.y0),
+                    (float(rect.x0), float(rect.y0)),
+                    (float(rect.x0), float(rect.y1)),
+                    (float(rect.x1), float(rect.y1)),
+                    (float(rect.x1), float(rect.y0)),
                 )
             )
 
@@ -119,26 +111,7 @@ def _classify_cell(fill: tuple[float, float, float], vertex_count: int) -> tuple
         return TRIANGLE_KIND, "yellow"
     if fill == BLUE_FILL:
         return TRIANGLE_KIND, "blue"
-    raise ValueError(f"unexpected triangle fill {fill}")
-
-
-def _normalize_vertices(
-    vertices: tuple[tuple[float, float], ...],
-    *,
-    origin: tuple[float, float],
-    unit_scale: float,
-) -> tuple[tuple[float, float], ...]:
-    normalized = tuple(
-        ((x - origin[0]) / unit_scale, (origin[1] - y) / unit_scale)
-        for x, y in vertices
-    )
-    return _rotate_vertices(normalized)
-
-
-def _orientation_token(vertices: tuple[tuple[float, float], ...]) -> str:
-    angle = _edge_angle(vertices[0], vertices[1])
-    snapped = int(round(angle / 30.0) * 30) % 360
-    return str(snapped)
+    raise DodecagonalLiteratureSourceError(f"Unexpected triangle fill {fill!r}.")
 
 
 def _canonical_edge(
@@ -178,10 +151,7 @@ def _cluster_points(
         point_cluster[point] = best_cluster_index
 
     cluster_centers = tuple(_polygon_center(tuple(cluster)) for cluster in clusters)
-    return {
-        point: cluster_centers[cluster_index]
-        for point, cluster_index in point_cluster.items()
-    }
+    return {point: cluster_centers[cluster_index] for point, cluster_index in point_cluster.items()}
 
 
 def _rebuild_neighbors(
@@ -201,21 +171,19 @@ def _rebuild_neighbors(
         unique_owners = tuple(sorted(set(owners)))
         if len(unique_owners) != 2:
             continue
-        left, right = unique_owners
-        neighbor_map[left].add(right)
-        neighbor_map[right].add(left)
-    return {
-        index: tuple(sorted(neighbor_map[index]))
-        for index in cells
-    }
+        left_owner, right_owner = unique_owners
+        neighbor_map[left_owner].add(right_owner)
+        neighbor_map[right_owner].add(left_owner)
+    return {index: tuple(sorted(neighbor_map[index])) for index in cells}
 
 
-@lru_cache(maxsize=1)
-def _load_source_patch() -> tuple[dict[int, _SourceCell], tuple[float, float], float]:
-    if not SOURCE_PATCH_PDF.exists():
-        raise FileNotFoundError(f"missing literature source: {SOURCE_PATCH_PDF}")
+def regenerate_literature_source_payload(
+    source_pdf: Path = DEFAULT_SOURCE_PDF,
+) -> dict[str, object]:
+    if not source_pdf.exists():
+        raise DodecagonalLiteratureSourceError(f"Missing literature source PDF: {source_pdf}")
 
-    document = fitz.open(SOURCE_PATCH_PDF)
+    document = fitz.open(source_pdf)
     try:
         page = document[0]
         unique_cells: dict[
@@ -228,18 +196,19 @@ def _load_source_patch() -> tuple[dict[int, _SourceCell], tuple[float, float], f
             raw_vertices = _extract_fill_vertices(drawing)
             if len(raw_vertices) not in (3, 4):
                 continue
-            fill = tuple(round(channel, 3) for channel in drawing["fill"])
+            rounded_fill = tuple(round(float(channel), 3) for channel in drawing["fill"])
+            if len(rounded_fill) != 3:
+                raise DodecagonalLiteratureSourceError(
+                    f"Unexpected fill tuple {rounded_fill!r} in literature PDF."
+                )
+            fill = (rounded_fill[0], rounded_fill[1], rounded_fill[2])
             ordered = _ordered_vertices(raw_vertices)
             unique_cells.setdefault((ordered, fill), (ordered, fill))
     finally:
         document.close()
 
     snap_map = _cluster_points(
-        {
-            vertex
-            for vertices, _fill in unique_cells.values()
-            for vertex in vertices
-        }
+        {vertex for vertices, _fill in unique_cells.values() for vertex in vertices}
     )
 
     snapped_cells: dict[int, _SourceCell] = {}
@@ -254,82 +223,103 @@ def _load_source_patch() -> tuple[dict[int, _SourceCell], tuple[float, float], f
             neighbors=(),
         )
 
-    neighbors_by_index = _rebuild_neighbors(snapped_cells)
-    cells = {
-        index: _SourceCell(
-            index=index,
-            kind=cell.kind,
-            chirality=cell.chirality,
-            vertices=cell.vertices,
-            neighbors=neighbors_by_index[index],
+    if SEED_CELL_INDEX not in snapped_cells:
+        raise DodecagonalLiteratureSourceError(
+            f"Seed cell index {SEED_CELL_INDEX} was not present in the reconstructed source."
         )
-        for index, cell in snapped_cells.items()
+
+    neighbors_by_index = _rebuild_neighbors(snapped_cells)
+    cells = [
+        {
+            "index": index,
+            "kind": snapped_cells[index].kind,
+            "chirality": snapped_cells[index].chirality,
+            "vertices": [[float(x), float(y)] for x, y in snapped_cells[index].vertices],
+            "neighbors": list(neighbors_by_index[index]),
+        }
+        for index in sorted(snapped_cells)
+    ]
+    return {
+        "seed_index": SEED_CELL_INDEX,
+        "cells": cells,
     }
 
-    seed = cells[SEED_CELL_INDEX]
-    seed_center = _polygon_center(seed.vertices)
-    seed_scale = math.dist(seed.vertices[0], seed.vertices[1])
-    return cells, seed_center, seed_scale
+
+def _format_payload(payload: dict[str, object]) -> str:
+    return json.dumps(payload, indent=2) + "\n"
 
 
-def build_dodecagonal_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
-    if patch_depth < 0:
-        raise ValueError("patch_depth must be non-negative")
-    if patch_depth > MAX_PATCH_DEPTH:
-        raise ValueError(
-            f"patch_depth {patch_depth} exceeds validated literature crop depth {MAX_PATCH_DEPTH}"
-        )
+def payload_has_drift(
+    output_path: Path = DEFAULT_OUTPUT_PATH,
+    *,
+    source_pdf: Path = DEFAULT_SOURCE_PDF,
+) -> bool:
+    if not output_path.exists():
+        return True
+    current = json.loads(output_path.read_text(encoding="utf-8"))
+    regenerated = regenerate_literature_source_payload(source_pdf)
+    return current != regenerated
 
-    cells, seed_center, unit_scale = _load_source_patch()
 
-    distances: dict[int, int] = {SEED_CELL_INDEX: 0}
-    queue: deque[int] = deque([SEED_CELL_INDEX])
-    while queue:
-        current = queue.popleft()
-        if distances[current] == patch_depth:
-            continue
-        for neighbor in cells[current].neighbors:
-            if neighbor in distances:
-                continue
-            distances[neighbor] = distances[current] + 1
-            queue.append(neighbor)
-
-    selected_indexes = sorted(distances, key=lambda index: (distances[index], index))
-    selected_set = set(selected_indexes)
-
-    patch_cells: list[PatchCell] = []
-    for index in selected_indexes:
-        vertices = _normalize_vertices(
-            cells[index].vertices,
-            origin=seed_center,
-            unit_scale=unit_scale,
-        )
-        center = _polygon_center(vertices)
-        patch_cells.append(
-            PatchCell(
-                id=f"dst:lit:{index:05d}",
-                kind=cells[index].kind,
-                center=(round(center[0], 9), round(center[1], 9)),
-                vertices=tuple((round(x, 9), round(y, 9)) for x, y in vertices),
-                neighbors=tuple(
-                    f"dst:lit:{neighbor:05d}"
-                    for neighbor in cells[index].neighbors
-                    if neighbor in selected_set
-                ),
-                tile_family=TILE_FAMILY,
-                orientation_token=_orientation_token(vertices),
-                chirality_token=cells[index].chirality,
-                decoration_tokens=None,
-            )
-        )
-
-    xs = [x for cell in patch_cells for x, _ in cell["vertices"]]
-    ys = [y for cell in patch_cells for _, y in cell["vertices"]]
-    width = math.ceil(max(xs) - min(xs))
-    height = math.ceil(max(ys) - min(ys))
-    return AperiodicPatch(
-        patch_depth=patch_depth,
-        width=width,
-        height=height,
-        cells=tuple(patch_cells),
+def write_literature_source(
+    output_path: Path = DEFAULT_OUTPUT_PATH,
+    *,
+    source_pdf: Path = DEFAULT_SOURCE_PDF,
+) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        _format_payload(regenerate_literature_source_payload(source_pdf)),
+        encoding="utf-8",
     )
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Regenerate the backend-owned dodecagonal square-triangle literature source "
+            "JSON from the checked-in Bielefeld PDF."
+        )
+    )
+    parser.add_argument(
+        "--source-pdf",
+        type=Path,
+        default=DEFAULT_SOURCE_PDF,
+        help="Path to the checked-in Bielefeld PDF source.",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_OUTPUT_PATH,
+        help="Destination JSON path. Defaults to the checked-in backend source file.",
+    )
+    parser.add_argument("--check", action="store_true")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    source_pdf = Path(args.source_pdf)
+    output_path = Path(args.output)
+    try:
+        if bool(args.check):
+            if payload_has_drift(output_path, source_pdf=source_pdf):
+                print("Dodecagonal literature source drift detected:")
+                print(f"  source: {source_pdf}")
+                print(f"  output: {output_path}")
+                return 1
+            print("Dodecagonal literature source is up to date.")
+            return 0
+
+        write_literature_source(output_path, source_pdf=source_pdf)
+        print("Regenerated dodecagonal literature source:")
+        print(f"  source: {source_pdf}")
+        print(f"  output: {output_path}")
+        return 0
+    except DodecagonalLiteratureSourceError as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

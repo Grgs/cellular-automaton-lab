@@ -1,58 +1,33 @@
-# Dodecagonal Square-Triangle Generator Bundle
+# Dodecagonal Square-Triangle Source Bundle
 
-This directory contains a standalone literature-derived generator for the public
-`dodecagonal-square-triangle` family plus the source assets it depends on.
+This directory contains the literature source assets for the public
+`dodecagonal-square-triangle` family.
 
-The generator is intentionally narrow and self-contained. It preserves only the
-public patch interface the application consumes and excludes unrelated host-app
-details such as routing, frontend wiring, persistence, and review tooling.
+It is not a second executable generator. The application runtime uses the
+backend implementation in
+`backend/simulation/aperiodic_dodecagonal_square_triangle.py` together with the
+derived backend source file
+`backend/simulation/data/dodecagonal_square_triangle_literature_source.json`.
 
 ## Files
 
-- `generator.py`
-  - standalone Python implementation
-  - parses the Bielefeld vector patch PDF
-  - snaps near-identical PDF vertices into a shared point set
-  - rebuilds shared-edge adjacency from the snapped polygons
-  - emits deterministic public square/triangle patches for depths `0..7`
-- `test_generator.py`
-  - focused standalone validation for connectivity, hole-freedom, overlap-free
-    area, metadata presence, and reciprocal neighbors
 - `bielefeld-patch.pdf`
-  - primary vector source used by the generator
+  - primary vector source used to regenerate the backend-owned literature source
 - `reference-patch.json`
   - baseline artifact for comparison against the older cleaned-patch approach
+- `../../../tools/regenerate_dodecagonal_literature_source.py`
+  - regeneration tool that parses the PDF, snaps shared vertices, rebuilds
+    shared-edge adjacency, and rewrites the backend-owned JSON source
 
-## Public Interface
+## Runtime Integration
 
-The standalone generator exposes:
+The authoritative runtime path is:
 
-```python
-def build_dodecagonal_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
-    ...
-```
-
-with a return shape equivalent to:
-
-```python
-class PatchCell(TypedDict):
-    id: str
-    kind: str
-    center: tuple[float, float]
-    vertices: tuple[tuple[float, float], ...]
-    neighbors: tuple[str, ...]
-    tile_family: str | None
-    orientation_token: str | None
-    chirality_token: str | None
-    decoration_tokens: tuple[str, ...] | None
-
-
-class AperiodicPatch(TypedDict):
-    patch_depth: int
-    width: int
-    height: int
-    cells: tuple[PatchCell, ...]
-```
+1. `bielefeld-patch.pdf` is the checked-in literature vector source.
+2. `tools/regenerate_dodecagonal_literature_source.py` derives the snapped source
+   JSON from that PDF.
+3. `backend/simulation/aperiodic_dodecagonal_square_triangle.py` builds the app
+   patch from the derived JSON.
 
 ## Public Vocabulary
 
@@ -66,8 +41,8 @@ public triangle kind while preserving color-derived chirality tokens:
 
 ## Core Reconstruction Rule
 
-The generator does not use the older checked-in connected subset as its source
-of truth. Instead it:
+The runtime source does not use the older checked-in connected subset as its
+source of truth. Instead the regeneration tool:
 
 1. parses filled polygons from `bielefeld-patch.pdf`
 2. classifies squares by vertex count and triangles by literature fill color
@@ -84,7 +59,7 @@ deeper depths.
 
 ## Invariants
 
-The emitted patch must remain:
+The derived backend source and emitted runtime patch must remain:
 
 - deterministic for the same `patch_depth`
 - one connected component
@@ -93,17 +68,17 @@ The emitted patch must remain:
 - full-edge adjacent rather than point-touching
 - stable in ids and cell ordering
 
-## Local Verification
+## Regeneration And Verification
 
-Run the standalone checks from the repo root:
+Run the regeneration check from the repo root:
 
 ```bash
-python docs/contracts/dodecagonal-square-triangle-generator/test_generator.py
+python tools/regenerate_dodecagonal_literature_source.py --check
 ```
 
 ## Integration Note
 
-The application runtime now vendors a generated JSON snapshot of the same
-snapped literature source under `backend/simulation/data/` so both server and
-standalone hosts can use the same reconstruction without needing live PDF
-parsing. This folder remains the narrow standalone handoff copy.
+The application runtime vendors a generated JSON snapshot of the snapped
+literature source under `backend/simulation/data/` so the app does not need live
+PDF parsing. This folder remains the narrow source-asset bundle for regenerating
+that backend snapshot and for comparing it with the older reference patch.

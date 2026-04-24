@@ -3,6 +3,7 @@ hypothesis==6.151.9
 networkx==3.6.1
 shapely==2.1.2
 Pillow==11.2.1
+PyMuPDF==1.27.2.2
 mypy==1.19.1
 coverage==7.11.0
 pre-commit==4.5.1
