@@ -16,7 +16,7 @@ derived backend source file
     substitution spec
 - `bielefeld-patch.pdf`
   - finite vector patch used by the current public runtime and retained as the
-    validated reference crop
+    source crop
 - `reference-patch.json`
   - baseline artifact for comparison against the older cleaned-patch approach
 - `../../../tools/regenerate_dodecagonal_substitution_spec.py`
@@ -76,7 +76,8 @@ while avoiding a false recursive runtime.
 
 ## Invariants
 
-The derived backend source and emitted runtime patch must remain:
+At depths covered by strict validation, the derived backend source and emitted
+runtime patch must remain:
 
 - deterministic for the same `patch_depth`
 - one connected component
@@ -84,6 +85,9 @@ The derived backend source and emitted runtime patch must remain:
 - overlap-free
 - full-edge adjacent rather than point-touching
 - stable in ids and cell ordering
+
+The public runtime currently exposes finite-crop views up to depth `40`, while
+strict overlap-free and hole-free validation is proven through depth `11`.
 
 ## Regeneration And Verification
 

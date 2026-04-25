@@ -146,10 +146,8 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertIn("shield (Shield)", output)
         self.assertIn("implementation_status: true_substitution", output)
         self.assertIn("verification_status: PASS", output)
-        self.assertNotIn(
-            "promotion_blocker: Experimental until manual visual review accepts the exact marked substitution implementation.",
-            output,
-        )
+        shield_block = output.split("shield (Shield)", maxsplit=1)[1].split("\n\n", maxsplit=1)[0]
+        self.assertNotIn("promotion_blocker:", shield_block)
         self.assertIn("pinwheel (Pinwheel)", output)
         self.assertIn(
             "promotion_blocker: Experimental until manual visual review accepts the exact-affine implementation.",

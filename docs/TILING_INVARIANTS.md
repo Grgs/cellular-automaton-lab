@@ -82,8 +82,8 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
   - the runtime uses the finite Bielefeld vector crop and caps public depth at `40`; strict overlap-free and hole-free validation is currently proven through depth `11`
   - the checked-in rule-image spec remains diagnostic tooling only because the current five labels do not form a valid recursive tile substitution
-  - representative samples must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
-  - rooted local-reference fixtures now pin canonical square/triangle neighborhoods inside the validated literature-cropped sample
+  - representative verified samples must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
+  - rooted local-reference fixtures now pin canonical square/triangle neighborhoods inside the finite literature-cropped sample
   - direct canonical patch fixtures now check the normalized public square/triangle serialization exactly at both depth `1` and depth `3`
 - `robinson-triangles`
   - direct canonical patch fixtures now pin both the first refined Robinson triangle patch and the representative depth-`3` sample

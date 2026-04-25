@@ -287,7 +287,7 @@ npm run build:frontend:standalone
 py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
 ```
 
-The repo also supports a chunked subset runner for CI:
+The repo still supports a chunked subset runner for local or CI-style shard debugging, even though the current GitHub workflow runs the server Playwright suite as one combined job:
 
 ```powershell
 py -3 -m unittest -q tests.e2e.playwright_chunk_subset

@@ -143,8 +143,9 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
             citation_label="Square-triangle",
             primary_source_url="https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",
             review_note=(
-                "Compare the validated literature-cropped square-triangle mix for dodecagonal "
-                "structure and the overall balance of square and triangle regions."
+                "Compare the finite literature-cropped square-triangle mix for dodecagonal "
+                "structure and the overall balance of square and triangle regions; strict "
+                "topology validation is currently proven through depth 11."
             ),
             cache_filename="dodecagonal-square-triangle-reference.png",
         ),

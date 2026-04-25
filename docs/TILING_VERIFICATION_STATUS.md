@@ -28,5 +28,5 @@ Legend:
 ## Next Up
 
 - The current direct canonical fixture layer now covers `spectre`, `taylor-socolar`, `sphinx`, `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, with shallow depth-`1` fixtures added for the higher-risk aperiodic families; keep future expansions selective and only where the extra exactness buys materially stronger guarantees.
-- Recover the missing marked recursive state for `dodecagonal-square-triangle`; the public runtime is intentionally capped at the validated finite crop until that exists.
+- Recover the missing marked recursive state for `dodecagonal-square-triangle`; the public runtime is intentionally capped at finite-crop depth `40`, while strict overlap-free and hole-free validation is only proven through depth `11`.
 - Add new verified tilings such as `turtle-monotile` and another substitution family like `socolar-12-fold`.

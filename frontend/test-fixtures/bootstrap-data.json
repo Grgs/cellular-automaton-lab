@@ -1260,7 +1260,7 @@
       "label": "Dodecagonal Square-Triangle",
       "experimental": true,
       "implementation_status": "canonical_patch",
-      "promotion_blocker": "Experimental until a recursive marked substitution replaces the finite validated literature patch.",
+      "promotion_blocker": "Experimental until a recursive marked substitution replaces the finite Bielefeld crop; strict topology validation is currently proven through depth 11.",
       "public_cell_kinds": [
         "dodecagonal-square-triangle-square",
         "dodecagonal-square-triangle-triangle"

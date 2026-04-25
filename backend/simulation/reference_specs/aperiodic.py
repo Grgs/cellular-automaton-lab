@@ -385,7 +385,10 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         geometry=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         display_name=_reference_label(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",),
-        canonical_root_seed_policy="validated finite Bielefeld literature patch cropped by graph distance",
+        canonical_root_seed_policy=(
+            "finite Bielefeld literature patch cropped by graph distance; "
+            "strict validation is proven through depth 11"
+        ),
         allowed_public_cell_kinds=_public_cell_kinds(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         required_metadata=(
             MetadataRequirement(

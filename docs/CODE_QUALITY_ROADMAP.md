@@ -167,7 +167,7 @@ Primary files:
 
 Current issue:
 
-Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `dodecagonal-square-triangle` is back on a finite validated literature crop until its missing marked recursive substitution state is recovered, and `pinwheel` remains experimental because manual visual review still does not justify promotion. `shield` is now on the exact marked substitution path, passed a fresh manual visible-review pass on April 19, 2026, and has been promoted into the main `Aperiodic` group. The remaining shield work is cleanup of compatibility-only legacy diagnostics, not replacement of the generator itself.
+Most aperiodic families are now in better shape than the original generated patches, but the implementation quality is uneven. `dodecagonal-square-triangle` is back on a finite Bielefeld vector crop capped at depth `40`; strict overlap-free and hole-free validation is only proven through depth `11` until its missing marked recursive substitution state is recovered. `pinwheel` remains experimental because manual visual review still does not justify promotion. `shield` is now on the exact marked substitution path, passed a fresh manual visible-review pass on April 19, 2026, and has been promoted into the main `Aperiodic` group. The remaining shield work is cleanup of compatibility-only legacy diagnostics, not replacement of the generator itself.
 
 Needed change:
 
@@ -187,7 +187,7 @@ Each contract should identify:
 - validation mode
 - promotion blocker, if any
 
-Shield should stay documented as experimental until the new exact marked substitution path has an intentional visible-review decision and the remaining compatibility-only diagnostic tooling is either removed or simplified.
+`shield` is already promoted after manual review. `dodecagonal-square-triangle` and `pinwheel` should stay documented as experimental until their implementation and visual-review blockers are resolved.
 
 Target outcome:
 

@@ -88,6 +88,7 @@ The order is intentional:
   - [Square-triangle](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
   - Runtime finite crop regenerated from the checked-in Bielefeld patch PDF at
     `docs/contracts/dodecagonal-square-triangle-generator/bielefeld-patch.pdf`
+  - Public runtime depth is capped at `40`; strict topology validation is currently proven through depth `11`
   - Diagnostic rule-image spec regenerated from the checked-in Bielefeld rule image at
     `docs/contracts/dodecagonal-square-triangle-generator/bielefeld-rule.png`
 - `shield`

@@ -202,7 +202,8 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
             DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
         ),
         promotion_blocker=(
-            "Experimental until a recursive marked substitution replaces the finite validated literature patch."
+            "Experimental until a recursive marked substitution replaces the finite Bielefeld crop; "
+            "strict topology validation is currently proven through depth 11."
         ),
     ),
     SHIELD_GEOMETRY: AperiodicFamilyManifestEntry(
