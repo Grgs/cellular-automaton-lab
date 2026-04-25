@@ -13,7 +13,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from tests.e2e.browser_support.artifacts import create_artifact_dir
+from tools.render_review.browser_support.artifacts import create_artifact_dir
 from tools.render_review.review import (
     DEFAULT_REFERENCE_CACHE_DIR,
     condense_profile_expectations,

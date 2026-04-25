@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tests.e2e.browser_support.palette_regression import (
+from tools.render_review.browser_support.palette_regression import (
     iter_palette_fixture_cases,
     load_palette_manifest,
     palette_manifest_path,

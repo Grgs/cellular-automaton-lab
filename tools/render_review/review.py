@@ -17,11 +17,11 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from tests.e2e.browser_support.artifacts import (
+from tools.render_review.browser_support.artifacts import (
     capture_browser_failure_artifacts,
     create_artifact_dir,
 )
-from tests.e2e.browser_support.render_review import (
+from tools.render_review.browser_support.render_review import (
     BrowserTopologySummary,
     RenderSettleDiagnostics,
     apply_review_topology_payload,

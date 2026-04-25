@@ -34,7 +34,7 @@ function createRouter({
     currentTool?: EditorTool;
     selectedCells?: PaintableCell[];
 } = {}) {
-    const legacyDrag = {
+    const paintDrag = {
         isActive: vi.fn(() => false),
         begin: vi.fn(),
         update: vi.fn(),
@@ -68,7 +68,7 @@ function createRouter({
             currentTool: () => currentTool,
         },
         editorSession,
-        legacyDrag,
+        paintDrag,
         setHoveredCell,
         setSelectedCells,
         getSelectedCells,
@@ -82,7 +82,7 @@ function createRouter({
 
     return {
         router,
-        legacyDrag,
+        paintDrag,
         editorSession,
         getSelectedCells,
         setSelectedCells,
@@ -92,15 +92,15 @@ function createRouter({
 
 describe("interactions/gesture-sessions", () => {
     it("starts unarmed left gestures with a fixed first-cell target state", () => {
-        const { router, legacyDrag } = createRouter({ isEditArmed: false });
+        const { router, paintDrag } = createRouter({ isEditArmed: false });
         const firstCell: PaintableCell = { id: "cell:a", state: 0 };
         const secondCell: PaintableCell = { id: "cell:b", state: 9 };
 
         router.beginPointerDown(pointerEvent(), firstCell);
         router.handlePointerMove(pointerEvent({ buttons: 1 }), secondCell);
 
-        expect(legacyDrag.begin).toHaveBeenCalledWith(firstCell, 1, 2);
-        expect(legacyDrag.update).toHaveBeenCalledWith(secondCell);
+        expect(paintDrag.begin).toHaveBeenCalledWith(firstCell, 1, 2);
+        expect(paintDrag.update).toHaveBeenCalledWith(secondCell);
     });
 
     it("routes armed pointer sessions through the editor session controller", () => {

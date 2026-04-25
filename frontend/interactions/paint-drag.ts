@@ -1,9 +1,9 @@
 import { buildCommittedEdit, pushUndoEntry } from "../editor-history.js";
 import { createDragPaintSession } from "../drag-session.js";
 import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
-import type { LegacyDragController, LegacyDragOptions } from "../types/editor.js";
+import type { PaintDragController, PaintDragOptions } from "../types/editor.js";
 
-export function createLegacyDragController({
+export function createPaintDragController({
     state = null,
     getPaintState,
     previewPaintCells,
@@ -17,7 +17,7 @@ export function createLegacyDragController({
     setPointerCapture,
     releasePointerCapture,
     enableClickSuppression,
-}: LegacyDragOptions): LegacyDragController {
+}: PaintDragOptions): PaintDragController {
     const dragSession = createDragPaintSession();
     let activePointerId: number | null = null;
     let activeGestureTone: "paint" | "erase" | null = null;

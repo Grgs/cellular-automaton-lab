@@ -95,7 +95,7 @@ function createSubject({
             isClickSuppressed: vi.fn(() => false),
             handleClick: vi.fn().mockResolvedValue({ handled: true }),
         },
-        legacyDrag: {
+        paintDrag: {
             isActive: legacyPointerActive,
             begin: legacyBegin,
             update: vi.fn(),
@@ -318,7 +318,7 @@ describe("interactions/surface-bindings", () => {
                 isClickSuppressed: vi.fn(() => false),
                 handleClick: vi.fn().mockResolvedValue({ handled: true }),
             },
-            legacyDrag: {
+            paintDrag: {
                 isActive: legacyActive,
                 begin: vi.fn(),
                 update: vi.fn(),

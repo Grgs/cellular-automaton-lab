@@ -195,12 +195,7 @@ def boundary_dominance(
             if not occupied_mask[row_offset + x]:
                 continue
             occupied_count += 1
-            if (
-                x < left_limit
-                or x > right_limit
-                or y < top_limit
-                or y > bottom_limit
-            ):
+            if x < left_limit or x > right_limit or y < top_limit or y > bottom_limit:
                 boundary_count += 1
     if occupied_count <= 0:
         return None
@@ -241,7 +236,12 @@ def gutter_score(
         for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             nx = x + dx
             ny = y + dy
-            if nx < bounds["minX"] or nx > bounds["maxX"] or ny < bounds["minY"] or ny > bounds["maxY"]:
+            if (
+                nx < bounds["minX"]
+                or nx > bounds["maxX"]
+                or ny < bounds["minY"]
+                or ny > bounds["maxY"]
+            ):
                 continue
             enqueue_if_transparent(nx, ny)
 
@@ -277,17 +277,14 @@ def summarize_canvas_pixels(
             red, green, blue, alpha = pixel
             occupied = alpha >= alpha_occupied_threshold
             occupied_mask.append(occupied)
-            if (
-                alpha >= alpha_opaque_threshold
-                and red >= 140
-                and green >= 100
-                and blue >= 60
-            ):
+            if alpha >= alpha_opaque_threshold and red >= 140 and green >= 100 and blue >= 60:
                 dominant_fill_colors[f"{red},{green},{blue}"] += 1
 
     bounds = occupied_bounds_from_mask(occupied_mask, width=width, height=height)
     coverage_width_ratio = (bounds["width"] / width) if bounds is not None and width > 0 else 0.0
-    coverage_height_ratio = (bounds["height"] / height) if bounds is not None and height > 0 else 0.0
+    coverage_height_ratio = (
+        (bounds["height"] / height) if bounds is not None and height > 0 else 0.0
+    )
 
     return {
         "canvasWidth": width,
@@ -358,7 +355,13 @@ def normalize_readiness_snapshot(raw: object) -> BrowserReadinessSnapshot | None
         return str(value).strip() if value is not None else ""
 
     def _as_int_or_none(value: object) -> int | None:
-        numeric = int(value) if isinstance(value, bool) else int(value) if isinstance(value, int) else None
+        numeric = (
+            int(value)
+            if isinstance(value, bool)
+            else int(value)
+            if isinstance(value, int)
+            else None
+        )
         if numeric is not None:
             return numeric
         try:
@@ -415,9 +418,13 @@ def readiness_blockers(snapshot: BrowserReadinessSnapshot | None) -> list[str]:
     if snapshot["blockingActivityVisible"]:
         blockers.append("Blocking activity was still visible.")
     if snapshot["blockingActivityKind"]:
-        blockers.append(f"Blocking activity kind was still set: {snapshot['blockingActivityKind']}.")
+        blockers.append(
+            f"Blocking activity kind was still set: {snapshot['blockingActivityKind']}."
+        )
     if snapshot["blockingActivityMessage"]:
-        blockers.append(f"Blocking activity message was still set: {snapshot['blockingActivityMessage']}.")
+        blockers.append(
+            f"Blocking activity message was still set: {snapshot['blockingActivityMessage']}."
+        )
     if not snapshot["topologyRevision"]:
         blockers.append("Topology revision was missing.")
     if snapshot["topologyCellCount"] <= 0:
@@ -531,7 +538,9 @@ def sample_review_cell_pixel(page: Page, cell_id: str) -> tuple[int, int, int, i
     if rgba is None:
         return None
     if not isinstance(rgba, list) or len(rgba) != 4:
-        raise AssertionError(f"Rendered cell pixel sampling returned an invalid RGBA payload: {rgba!r}")
+        raise AssertionError(
+            f"Rendered cell pixel sampling returned an invalid RGBA payload: {rgba!r}"
+        )
     red, green, blue, alpha = (int(channel) for channel in rgba)
     return (red, green, blue, alpha)
 
@@ -627,21 +636,19 @@ def wait_for_patch_render_complete(
 
     warnings = readiness_blockers(last_snapshot)
     if last_snapshot is not None:
-        if last_snapshot["blockingActivityVisible"] or last_snapshot["blockingActivityKind"] or last_snapshot["blockingActivityMessage"]:
+        if (
+            last_snapshot["blockingActivityVisible"]
+            or last_snapshot["blockingActivityKind"]
+            or last_snapshot["blockingActivityMessage"]
+        ):
             warnings.append("Blocking activity never cleared before timeout.")
-        if not last_snapshot["gridSizeText"] or last_snapshot["gridSizeText"] == PLACEHOLDER_GRID_SIZE_TEXT:
+        if (
+            not last_snapshot["gridSizeText"]
+            or last_snapshot["gridSizeText"] == PLACEHOLDER_GRID_SIZE_TEXT
+        ):
             warnings.append("Grid summary stayed placeholder before timeout.")
     if stable_count > 0:
         warnings.append("Readiness tuple kept changing before timeout.")
-    diagnostics: RenderSettleDiagnostics = {
-        "settled": False,
-        "stablePollCountRequired": stable_poll_count,
-        "stablePollIntervalMs": stable_poll_interval_ms,
-        "finalSnapshot": last_snapshot,
-        "settledAt": None,
-        "settleDurationMs": int((time.monotonic() - started_at) * 1000),
-        "warnings": list(dict.fromkeys(warnings)),
-    }
     raise AssertionError(
         "Render did not settle within "
         f"{timeout_ms}ms. Last readiness snapshot: {json.dumps(last_snapshot, sort_keys=True)}"
@@ -776,11 +783,9 @@ def assert_canvas_centered_within_viewport(
     summary = viewport_gap_summary(page)
     if abs(summary["topGap"] - summary["bottomGap"]) > maximum_vertical_gap_delta:
         raise AssertionError(
-            "canvas vertical gaps were not balanced within the viewport: "
-            f"{summary!r}"
+            f"canvas vertical gaps were not balanced within the viewport: {summary!r}"
         )
     if abs(summary["leftGap"] - summary["rightGap"]) > maximum_horizontal_gap_delta:
         raise AssertionError(
-            "canvas horizontal gaps were not balanced within the viewport: "
-            f"{summary!r}"
+            f"canvas horizontal gaps were not balanced within the viewport: {summary!r}"
         )

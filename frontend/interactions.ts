@@ -6,7 +6,7 @@ import type { EditorTool } from "./editor-tools.js";
 import { createDragPaintSession } from "./drag-session.js";
 import { createEditorSessionController } from "./interactions/editor-session.js";
 import { createHistoryCommands } from "./interactions/history-commands.js";
-import { createLegacyDragController } from "./interactions/legacy-drag.js";
+import { createPaintDragController } from "./interactions/paint-drag.js";
 import { createSimulationMutations } from "./interactions/simulation-mutations.js";
 import {
     createInteractionCommandSurface,
@@ -47,7 +47,7 @@ export function createInteractionController({
     simulationMutations = null,
     createSimulationMutationsFn,
     createHistoryCommandsFn,
-    createLegacyDragControllerFn,
+    createPaintDragControllerFn,
     createEditorSessionControllerFn,
     bindGridInteractionsFn,
     dismissOverlays = () => false,
@@ -61,7 +61,7 @@ export function createInteractionController({
 }: InteractionControllerOptions & {
     createSimulationMutationsFn?: CreateSimulationMutationsFunction;
     createHistoryCommandsFn?: typeof createHistoryCommands;
-    createLegacyDragControllerFn?: typeof createLegacyDragController;
+    createPaintDragControllerFn?: typeof createPaintDragController;
     createEditorSessionControllerFn?: typeof createEditorSessionController;
     bindGridInteractionsFn?: (options: GridInteractionBindings) => void;
     state?: AppState | null;
@@ -101,7 +101,7 @@ export function createInteractionController({
         supportsEditorTools: editPolicy.supportsEditorTools,
         runStateMutation: mutations.runStateMutation,
         createHistoryCommandsFn,
-        createLegacyDragControllerFn,
+        createPaintDragControllerFn,
         createEditorSessionControllerFn,
     });
 
@@ -111,7 +111,7 @@ export function createInteractionController({
         state,
         editPolicy,
         editorSession: sessionRuntime.editorSession,
-        legacyDrag: sessionRuntime.legacyDrag,
+        paintDrag: sessionRuntime.paintDrag,
         mutations,
         setHoveredCell,
         setSelectedCells,

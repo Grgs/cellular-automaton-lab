@@ -1,19 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createLegacyDragGestureSession } from "./gesture-sessions/legacy-drag-session.js";
+import { createPaintDragGestureSession } from "./gesture-sessions/paint-drag-session.js";
 
-describe("interactions/legacy-drag-session", () => {
+describe("interactions/paint-drag-session", () => {
     it("updates only while the expected button remains pressed for the active pointer", () => {
-        const legacyDrag = {
+        const paintDrag = {
             isActive: vi.fn(() => true),
             begin: vi.fn(),
             update: vi.fn(),
             end: vi.fn().mockResolvedValue(null),
             cancel: vi.fn().mockResolvedValue(null),
         };
-        const session = createLegacyDragGestureSession({
+        const session = createPaintDragGestureSession({
             pointerId: 4,
-            legacyDrag,
+            paintDrag,
             buttonMask: 1,
         });
 
@@ -21,32 +21,32 @@ describe("interactions/legacy-drag-session", () => {
         session.handleMove({ buttons: 1, pointerId: 7 } as PointerEvent, { id: "cell:c" });
         session.handleMove({ buttons: 0 } as PointerEvent, { id: "cell:b" });
 
-        expect(legacyDrag.update).toHaveBeenCalledTimes(1);
-        expect(legacyDrag.update).toHaveBeenCalledWith({ id: "cell:a" });
+        expect(paintDrag.update).toHaveBeenCalledTimes(1);
+        expect(paintDrag.update).toHaveBeenCalledWith({ id: "cell:a" });
     });
 
     it("ends the drag only for the active pointer", () => {
-        const legacyDrag = {
+        const paintDrag = {
             isActive: vi.fn(() => true),
             begin: vi.fn(),
             update: vi.fn(),
             end: vi.fn().mockResolvedValue(null),
             cancel: vi.fn().mockResolvedValue(null),
         };
-        const session = createLegacyDragGestureSession({
+        const session = createPaintDragGestureSession({
             pointerId: 4,
-            legacyDrag,
+            paintDrag,
             buttonMask: 1,
         });
 
         expect(session.handleUp({ pointerId: 7 } as PointerEvent)).toBe(false);
         expect(session.handleUp({ pointerId: 4 } as PointerEvent)).toBe(true);
 
-        expect(legacyDrag.end).toHaveBeenCalledTimes(1);
+        expect(paintDrag.end).toHaveBeenCalledTimes(1);
     });
 
     it("runs the cancel hook before cancelling the drag for the active pointer", () => {
-        const legacyDrag = {
+        const paintDrag = {
             isActive: vi.fn(() => true),
             begin: vi.fn(),
             update: vi.fn(),
@@ -54,9 +54,9 @@ describe("interactions/legacy-drag-session", () => {
             cancel: vi.fn().mockResolvedValue(null),
         };
         const onCancel = vi.fn();
-        const session = createLegacyDragGestureSession({
+        const session = createPaintDragGestureSession({
             pointerId: 4,
-            legacyDrag,
+            paintDrag,
             buttonMask: 1,
             onCancel,
         });
@@ -65,6 +65,6 @@ describe("interactions/legacy-drag-session", () => {
         expect(session.cancel({ pointerId: 4 } as PointerEvent)).toBe(true);
 
         expect(onCancel).toHaveBeenCalledTimes(1);
-        expect(legacyDrag.cancel).toHaveBeenCalledTimes(1);
+        expect(paintDrag.cancel).toHaveBeenCalledTimes(1);
     });
 });

@@ -2,7 +2,7 @@ import { FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS } from "../constants.js";
 import { cloneSelectedCells, identifyGestureCell } from "./helpers.js";
 import { createEditorPointerSession } from "./editor-pointer-session.js";
 import { resolvePointerDownIntent } from "./intent.js";
-import { createLegacyDragGestureSession } from "./legacy-drag-session.js";
+import { createPaintDragGestureSession } from "./paint-drag-session.js";
 import { createRightSelectionGestureSession } from "./right-selection-session.js";
 import type { GestureRouterOptions, PointerGestureSession } from "./types.js";
 
@@ -10,7 +10,7 @@ export function createPointerGestureRouter({
     surfaceElement,
     editPolicy,
     editorSession,
-    legacyDrag,
+    paintDrag,
     setHoveredCell,
     setSelectedCells,
     getSelectedCells,
@@ -48,7 +48,7 @@ export function createPointerGestureRouter({
     }
 
     function isAnyPointerActive(): boolean {
-        return Boolean(activeSession) || editorSession.isPointerActive() || legacyDrag.isActive();
+        return Boolean(activeSession) || editorSession.isPointerActive() || paintDrag.isActive();
     }
 
     function clearActiveSession(): void {
@@ -94,10 +94,10 @@ export function createPointerGestureRouter({
         editPolicy.prepareDirectGridInteraction(event);
         const targetState = resolveDirectGestureTargetState(cell);
         rememberDirectGesture(cell, targetState);
-        legacyDrag.begin(cell, event.pointerId, targetState);
-        activeSession = createLegacyDragGestureSession({
+        paintDrag.begin(cell, event.pointerId, targetState);
+        activeSession = createPaintDragGestureSession({
             pointerId: event.pointerId ?? null,
-            legacyDrag,
+            paintDrag,
             buttonMask: 1,
             onCancel: clearPendingDirectGesture,
         });
@@ -110,10 +110,10 @@ export function createPointerGestureRouter({
         clearPendingDirectGesture();
         void editPolicy.dismissEditingUi();
         event.preventDefault();
-        legacyDrag.begin(cell, event.pointerId);
-        activeSession = createLegacyDragGestureSession({
+        paintDrag.begin(cell, event.pointerId);
+        activeSession = createPaintDragGestureSession({
             pointerId: event.pointerId ?? null,
-            legacyDrag,
+            paintDrag,
             buttonMask: 1,
         });
     }
@@ -170,7 +170,7 @@ export function createPointerGestureRouter({
     }
 
     function handlePointerUp(event: PointerEvent): void {
-        if (consumeNextClick && editPolicy.supportsEditorTools() && !editorSession.isPointerActive() && !legacyDrag.isActive()) {
+        if (consumeNextClick && editPolicy.supportsEditorTools() && !editorSession.isPointerActive() && !paintDrag.isActive()) {
             setTimeoutFn(() => {
                 consumeNextClick = false;
             }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
@@ -182,7 +182,7 @@ export function createPointerGestureRouter({
             return;
         }
         if (!editPolicy.supportsEditorTools()) {
-            void legacyDrag.end();
+            void paintDrag.end();
             return;
         }
 
@@ -200,12 +200,12 @@ export function createPointerGestureRouter({
             }
             return;
         }
-        if (legacyDrag.isActive()) {
-            void legacyDrag.cancel();
+        if (paintDrag.isActive()) {
+            void paintDrag.cancel();
             return;
         }
         if (!editPolicy.supportsEditorTools()) {
-            void legacyDrag.end();
+            void paintDrag.end();
             return;
         }
 

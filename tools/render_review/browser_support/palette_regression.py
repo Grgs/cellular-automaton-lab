@@ -15,7 +15,12 @@ class PaletteFixtureCase(TypedDict):
 
 
 def palette_manifest_path() -> Path:
-    return Path(__file__).resolve().parents[3] / "frontend" / "canvas" / "family-dead-palette-manifest.json"
+    return (
+        Path(__file__).resolve().parents[3]
+        / "frontend"
+        / "canvas"
+        / "family-dead-palette-manifest.json"
+    )
 
 
 def _repo_root() -> Path:
@@ -44,11 +49,11 @@ def iter_palette_fixture_cases() -> list[PaletteFixtureCase]:
         selector_fields_value = browser_alias_coverage.get("selectorFields")
         if not isinstance(family, str) or not isinstance(fixture_path_value, str):
             continue
-        selector_fields = tuple(
-            field
-            for field in selector_fields_value
-            if isinstance(field, str)
-        ) if isinstance(selector_fields_value, list) else ()
+        selector_fields = (
+            tuple(field for field in selector_fields_value if isinstance(field, str))
+            if isinstance(selector_fields_value, list)
+            else ()
+        )
         fixture_path = (_repo_root() / fixture_path_value).resolve()
         payload = json.loads(fixture_path.read_text(encoding="utf-8"))
         topology = payload.get("topology")

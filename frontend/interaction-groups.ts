@@ -1,6 +1,6 @@
 import { createEditorSessionController } from "./interactions/editor-session.js";
 import { createHistoryCommands } from "./interactions/history-commands.js";
-import { createLegacyDragController } from "./interactions/legacy-drag.js";
+import { createPaintDragController } from "./interactions/paint-drag.js";
 import { createInteractionCommandDispatch } from "./interactions/command-dispatch.js";
 import { createInteractionEditPolicy } from "./interactions/edit-policy.js";
 import { createInteractionSessionRuntime } from "./interactions/session-runtime.js";
@@ -45,7 +45,7 @@ interface InteractionEditorRuntimeOptions {
     supportsEditorTools: () => boolean;
     runStateMutation: NonNullable<InteractionControllerOptions["simulationMutations"]>["runStateMutation"];
     createHistoryCommandsFn?: typeof createHistoryCommands | undefined;
-    createLegacyDragControllerFn?: typeof createLegacyDragController | undefined;
+    createPaintDragControllerFn?: typeof createPaintDragController | undefined;
     createEditorSessionControllerFn?: typeof createEditorSessionController | undefined;
 }
 
@@ -55,7 +55,7 @@ interface InteractionCommandSurfaceOptions {
     state: AppState | null;
     editPolicy: ReturnType<typeof createInteractionEditPolicy>;
     editorSession: ReturnType<typeof createInteractionSessionRuntime>["editorSession"];
-    legacyDrag: ReturnType<typeof createInteractionSessionRuntime>["legacyDrag"];
+    paintDrag: ReturnType<typeof createInteractionSessionRuntime>["paintDrag"];
     mutations: NonNullable<InteractionControllerOptions["simulationMutations"]>;
     setHoveredCell: InteractionControllerOptions["setHoveredCell"];
     setSelectedCells: InteractionControllerOptions["setSelectedCells"];
@@ -134,7 +134,7 @@ export function createInteractionEditorRuntime({
     supportsEditorTools,
     runStateMutation,
     createHistoryCommandsFn,
-    createLegacyDragControllerFn,
+    createPaintDragControllerFn,
     createEditorSessionControllerFn,
 }: InteractionEditorRuntimeOptions) {
     return createInteractionSessionRuntime({
@@ -154,7 +154,7 @@ export function createInteractionEditorRuntime({
         supportsEditorTools,
         runStateMutation,
         ...(createHistoryCommandsFn === undefined ? {} : { createHistoryCommandsFn }),
-        ...(createLegacyDragControllerFn === undefined ? {} : { createLegacyDragControllerFn }),
+        ...(createPaintDragControllerFn === undefined ? {} : { createPaintDragControllerFn }),
         ...(createEditorSessionControllerFn === undefined ? {} : { createEditorSessionControllerFn }),
     });
 }
@@ -165,7 +165,7 @@ export function createInteractionCommandSurface({
     state,
     editPolicy,
     editorSession,
-    legacyDrag,
+    paintDrag,
     mutations,
     setHoveredCell,
     setSelectedCells,
@@ -197,7 +197,7 @@ export function createInteractionCommandSurface({
         resolveCellFromEvent,
         editPolicy,
         editorSession,
-        legacyDrag,
+        paintDrag,
         setHoveredCell,
         setSelectedCells,
         getSelectedCells,

@@ -72,14 +72,14 @@ function createSimulationSnapshot(): SimulationSnapshot {
     };
 }
 
-describe("interactions/legacy-drag", () => {
+describe("interactions/paint-drag", () => {
     beforeEach(() => {
         installFrontendGlobals();
         vi.resetModules();
     });
 
     it("uses an explicit gesture target state for every cell in the drag commit", async () => {
-        const { createLegacyDragController } = await import("./legacy-drag.js");
+        const { createPaintDragController } = await import("./paint-drag.js");
         const state = createIndexedState([7, 3]);
         const previewPaintCells = vi.fn();
         const clearPreview = vi.fn();
@@ -93,7 +93,7 @@ describe("interactions/legacy-drag", () => {
         const releasePointerCapture = vi.fn();
         const enableClickSuppression = vi.fn();
 
-        const legacyDrag = createLegacyDragController({
+        const paintDrag = createPaintDragController({
             state,
             getPaintState: () => 4,
             previewPaintCells,
@@ -109,9 +109,9 @@ describe("interactions/legacy-drag", () => {
             enableClickSuppression,
         });
 
-        legacyDrag.begin({ id: "c:0:0", x: 0, y: 0, state: 7 }, 11, 0);
-        legacyDrag.update({ id: "c:1:0", x: 1, y: 0, state: 3 });
-        await legacyDrag.end();
+        paintDrag.begin({ id: "c:0:0", x: 0, y: 0, state: 7 }, 11, 0);
+        paintDrag.update({ id: "c:1:0", x: 1, y: 0, state: 3 });
+        await paintDrag.end();
 
         expect(previewPaintCells).toHaveBeenCalled();
         expect(setGestureOutline).toHaveBeenCalledWith([
@@ -145,13 +145,13 @@ describe("interactions/legacy-drag", () => {
     });
 
     it("cancels without committing or flashing when the pointer is canceled", async () => {
-        const { createLegacyDragController } = await import("./legacy-drag.js");
+        const { createPaintDragController } = await import("./paint-drag.js");
         const setCellsRequest = vi.fn().mockResolvedValue(null);
         const flashGestureOutline = vi.fn();
         const clearGestureOutline = vi.fn();
         const clearPreview = vi.fn();
 
-        const legacyDrag = createLegacyDragController({
+        const paintDrag = createPaintDragController({
             getPaintState: () => 1,
             previewPaintCells: vi.fn(),
             clearPreview,
@@ -165,9 +165,9 @@ describe("interactions/legacy-drag", () => {
             enableClickSuppression: vi.fn(),
         });
 
-        legacyDrag.begin({ id: "c:0:0", x: 0, y: 0 }, 12, 1);
-        legacyDrag.update({ id: "c:1:0", x: 1, y: 0 });
-        await legacyDrag.cancel();
+        paintDrag.begin({ id: "c:0:0", x: 0, y: 0 }, 12, 1);
+        paintDrag.update({ id: "c:1:0", x: 1, y: 0 });
+        await paintDrag.cancel();
 
         expect(setCellsRequest).not.toHaveBeenCalled();
         expect(flashGestureOutline).not.toHaveBeenCalled();

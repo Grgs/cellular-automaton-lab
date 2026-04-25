@@ -4,19 +4,22 @@ import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type { SimulationSnapshot } from "../types/domain.js";
 
+let createAppStateFn: typeof import("../state/simulation-state.js").createAppState;
+
 function editorStateStub() {
-    return {
-        topology: { cells: [] },
-        topologyIndex: { byId: new Map() },
-        cellStates: [],
-        isRunning: false,
-    } as never;
+    const state = createAppStateFn();
+    state.topology = { topology_revision: "rev-test", topology_spec: state.topologySpec, cells: [] };
+    state.topologyIndex = { byId: new Map() };
+    state.cellStates = [];
+    state.isRunning = false;
+    return state;
 }
 
 describe("interactions/editor-session", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
         vi.resetModules();
         installFrontendGlobals();
+        ({ createAppState: createAppStateFn } = await import("../state/simulation-state.js"));
     });
 
     it("shows and flashes a paint outline for armed brush drags", async () => {

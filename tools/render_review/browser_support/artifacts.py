@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 
 from playwright.sync_api import Page
 
-from tests.e2e.browser_support.render_review import canvas_visual_summary
+from tools.render_review.browser_support.render_review import canvas_visual_summary
 
 if TYPE_CHECKING:
     from tests.e2e.support_runtime_host import BrowserRuntimeHost

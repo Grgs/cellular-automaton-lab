@@ -25,14 +25,14 @@ from playwright.sync_api import (
 
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tests.e2e.support_server import JsonApiClient
-from tests.e2e.browser_support.artifacts import (
+from tools.render_review.browser_support.artifacts import (
     E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV,
     E2E_ARTIFACTS_DIR_ENV,
     capture_browser_artifacts,
     capture_browser_failure_artifacts,
     create_artifact_dir,
 )
-from tests.e2e.browser_support.render_review import wait_for_page_bootstrapped
+from tools.render_review.browser_support.render_review import wait_for_page_bootstrapped
 
 WaitUntilState = Literal["commit", "domcontentloaded", "load", "networkidle"]
 

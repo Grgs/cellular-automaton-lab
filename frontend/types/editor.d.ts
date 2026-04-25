@@ -83,7 +83,7 @@ export interface EditorSessionController {
     isPointerActive(): boolean;
 }
 
-export interface LegacyDragController {
+export interface PaintDragController {
     begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
     update(cell: PaintableCell): void;
     end(): Promise<SimulationSnapshot | null>;
@@ -136,7 +136,7 @@ export interface HistoryCommandsOptions {
     ) => Promise<SimulationSnapshot>;
 }
 
-export interface LegacyDragOptions {
+export interface PaintDragOptions {
     state?: AppState | null;
     getPaintState: () => number;
     previewPaintCells: (cells: PreviewPaintCells) => void;

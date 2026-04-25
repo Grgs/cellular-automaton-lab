@@ -13,7 +13,7 @@ export type PointerDownIntent =
     | { kind: "editor-pointer" };
 
 export interface PointerGestureSession {
-    kind: "editor-pointer" | "legacy-drag" | "right-selection";
+    kind: "editor-pointer" | "paint-drag" | "right-selection";
     handleMove(event: PointerEvent, cell: PaintableCell): void;
     handleUp(event: PointerEvent): boolean;
     cancel(event: PointerEvent): boolean;
@@ -29,7 +29,7 @@ export interface EditorGestureController {
     handleClick(cell: PaintableCell): Promise<{ handled: boolean }>;
 }
 
-export interface LegacyDragController {
+export interface PaintDragController {
     isActive(): boolean;
     begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
     update(cell: PaintableCell): void;
@@ -41,7 +41,7 @@ export interface GestureRouterOptions {
     surfaceElement: HTMLElement | null;
     editPolicy: InteractionEditPolicy;
     editorSession: EditorGestureController;
-    legacyDrag: LegacyDragController;
+    paintDrag: PaintDragController;
     setHoveredCell: (cell: PaintableCell | null) => void;
     setSelectedCells: (cells: PaintableCell[]) => void;
     getSelectedCells: () => PaintableCell[];
@@ -53,9 +53,9 @@ export interface GestureRouterOptions {
     setTimeoutFn: (callback: () => void, delay: number) => number;
 }
 
-export interface LegacyDragGestureSessionOptions {
+export interface PaintDragGestureSessionOptions {
     pointerId: number | null;
-    legacyDrag: LegacyDragController;
+    paintDrag: PaintDragController;
     buttonMask: number;
     onCancel?: () => void;
 }

@@ -9,7 +9,7 @@ export function createInteractionSurfaceBindings({
     resolveCellFromEvent,
     editPolicy,
     editorSession,
-    legacyDrag,
+    paintDrag,
     setHoveredCell,
     setSelectedCells,
     getSelectedCells,
@@ -33,7 +33,7 @@ export function createInteractionSurfaceBindings({
         isClickSuppressed(): boolean;
         handleClick(cell: PaintableCell): Promise<{ handled: boolean }>;
     };
-    legacyDrag: {
+    paintDrag: {
         isActive(): boolean;
         begin(cell: PaintableCell, pointerId?: number | null, paintStateOverride?: number): void;
         update(cell: PaintableCell): void;
@@ -55,7 +55,7 @@ export function createInteractionSurfaceBindings({
         surfaceElement,
         editPolicy,
         editorSession,
-        legacyDrag,
+        paintDrag,
         setHoveredCell,
         setSelectedCells,
         getSelectedCells,

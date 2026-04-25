@@ -1,12 +1,12 @@
 import { createEditorSessionController } from "./editor-session.js";
 import { createHistoryCommands } from "./history-commands.js";
-import { createLegacyDragController } from "./legacy-drag.js";
+import { createPaintDragController } from "./paint-drag.js";
 import type { EditorTool } from "../editor-tools.js";
 import type {
     EditorHistoryCommands,
     EditorSessionController,
     GestureOutlineTone,
-    LegacyDragController,
+    PaintDragController,
     PaintableCell,
     PreviewPaintCells,
 } from "../types/editor.js";
@@ -20,7 +20,7 @@ import type { SimulationSnapshot } from "../types/domain.js";
 
 export interface InteractionSessionRuntime {
     editorSession: EditorSessionController;
-    legacyDrag: LegacyDragController;
+    paintDrag: PaintDragController;
     historyCommands: EditorHistoryCommands;
 }
 
@@ -41,7 +41,7 @@ export function createInteractionSessionRuntime({
     supportsEditorTools,
     runStateMutation,
     createHistoryCommandsFn = createHistoryCommands,
-    createLegacyDragControllerFn = createLegacyDragController,
+    createPaintDragControllerFn = createPaintDragController,
     createEditorSessionControllerFn = createEditorSessionController,
 }: {
     surfaceElement: HTMLElement | null;
@@ -67,7 +67,7 @@ export function createInteractionSessionRuntime({
         options?: MutationRunnerOptions & { recoverWithRefresh?: boolean; source?: string },
     ) => Promise<SimulationSnapshot>;
     createHistoryCommandsFn?: typeof createHistoryCommands | undefined;
-    createLegacyDragControllerFn?: typeof createLegacyDragController | undefined;
+    createPaintDragControllerFn?: typeof createPaintDragController | undefined;
     createEditorSessionControllerFn?: typeof createEditorSessionController | undefined;
 }): InteractionSessionRuntime {
     function setPointerCapture(pointerId: number | null): void {
@@ -110,7 +110,7 @@ export function createInteractionSessionRuntime({
         runStateMutation,
     });
 
-    const legacyDrag = createLegacyDragControllerFn({
+    const paintDrag = createPaintDragControllerFn({
         state,
         getPaintState,
         previewPaintCells,
@@ -136,7 +136,7 @@ export function createInteractionSessionRuntime({
 
     return {
         editorSession,
-        legacyDrag,
+        paintDrag,
         historyCommands,
     };
 }

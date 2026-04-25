@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tests.e2e.browser_support.render_review import (
+from tools.render_review.browser_support.render_review import (
     boundary_dominance,
     edge_density,
     gutter_score,

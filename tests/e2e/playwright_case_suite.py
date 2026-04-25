@@ -13,13 +13,13 @@ from playwright.sync_api import expect
 
 try:
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase, WaitUntilState
-    from tests.e2e.browser_support.diagnostics import GridSummary, parse_grid_summary_text
-    from tests.e2e.browser_support.palette_regression import (
+    from tools.render_review.browser_support.diagnostics import GridSummary, parse_grid_summary_text
+    from tools.render_review.browser_support.palette_regression import (
         PaletteFixtureCase,
         iter_palette_fixture_cases,
         palette_fixture_test_suffix,
     )
-    from tests.e2e.browser_support.render_review import (
+    from tools.render_review.browser_support.render_review import (
         apply_review_topology_payload,
         apply_review_cell_states,
         assert_canvas_centered_within_viewport,
@@ -35,13 +35,13 @@ try:
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase, WaitUntilState
-    from tests.e2e.browser_support.diagnostics import GridSummary, parse_grid_summary_text
-    from tests.e2e.browser_support.palette_regression import (
+    from tools.render_review.browser_support.diagnostics import GridSummary, parse_grid_summary_text
+    from tools.render_review.browser_support.palette_regression import (
         PaletteFixtureCase,
         iter_palette_fixture_cases,
         palette_fixture_test_suffix,
     )
-    from tests.e2e.browser_support.render_review import (
+    from tools.render_review.browser_support.render_review import (
         apply_review_topology_payload,
         apply_review_cell_states,
         assert_canvas_centered_within_viewport,
@@ -630,7 +630,7 @@ class SharedUiFlowMixin:
         self._expect("#tiling-family-select").to_have_value("dodecagonal-square-triangle")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#patch-depth-input").to_have_attribute("max", "40")
-        self.assertEqual(self._patch_depth_input_state()["max"], "40")
+        case.assertEqual(self._patch_depth_input_state()["max"], "40")
 
         if case.page.locator("#unsafe-sizing-toggle").is_visible():
             case.page.locator("#unsafe-sizing-toggle").check()

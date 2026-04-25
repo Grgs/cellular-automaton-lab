@@ -116,7 +116,7 @@ describe("interactions/command-dispatch", () => {
         expect(setCellRequest).not.toHaveBeenCalled();
     });
 
-    it("treats any other nonzero state as erase for direct gestures", async () => {
+    it("treats another nonzero state as erase for direct gestures", async () => {
         const { createInteractionCommandDispatch } = await import("./command-dispatch.js");
         const setCellRequest = vi.fn().mockResolvedValue(null);
         const cell: PaintableCell = { id: "cell:1", state: 1 };
