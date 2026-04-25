@@ -8,6 +8,7 @@ import {
 import { syncPolling } from "./state/polling.js";
 import { createSimulationReconciler } from "./simulation-reconciler.js";
 import { clearEditorHistory, shouldClearHistoryForSimulationUpdate } from "./editor-history.js";
+import { syncShareLinkUrlFromState } from "./share-link-sync.js";
 import type {
     AppControllerSync,
     AppView,
@@ -69,6 +70,13 @@ export function createAppControllerSync({
         { source = "external" }: { source?: string } = {},
     ): void {
         getSimulationReconciler().apply(simulationState, { source });
+        // Keep the URL hash in sync with the latest applied snapshot so the
+        // address bar reflects shareable state at all times.
+        try {
+            syncShareLinkUrlFromState(state);
+        } catch (error) {
+            onError(error);
+        }
     }
 
     async function refreshState(): Promise<void> {

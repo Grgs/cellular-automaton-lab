@@ -27,6 +27,9 @@ export async function hydrateAppController({
     bindControls(elements, controlActions);
     appView.renderControlsPanel();
     await sync.refreshState();
+    if (controlActions.applyShareLinkFromHash) {
+        await controlActions.applyShareLinkFromHash();
+    }
     interactions.bindGridInteractions();
     viewportController.install(elements.gridViewport);
 }

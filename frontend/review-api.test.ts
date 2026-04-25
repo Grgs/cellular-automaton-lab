@@ -129,6 +129,7 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         copyPatternBtn: null,
         exportPatternBtn: null,
         pastePatternBtn: null,
+        shareLinkBtn: null,
         patternImportInput: null,
         patternStatus: null,
         editorTools: null,

@@ -76,6 +76,7 @@ export const elements: DomElements = {
     copyPatternBtn: elementById("copy-pattern-btn"),
     exportPatternBtn: elementById("export-pattern-btn"),
     pastePatternBtn: elementById("paste-pattern-btn"),
+    shareLinkBtn: elementById("share-link-btn"),
     patternImportInput: elementById("pattern-import-input"),
     patternStatus: elementById("pattern-status"),
     editorTools: elementById("editor-tools"),

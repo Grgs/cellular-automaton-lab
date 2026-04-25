@@ -57,6 +57,11 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
             void actions.pastePattern();
         });
     }
+    if (elements.shareLinkBtn && actions.copyShareLink) {
+        elements.shareLinkBtn.addEventListener("click", () => {
+            void actions.copyShareLink();
+        });
+    }
     if (elements.patternImportInput && actions.importPatternFile) {
         const patternImportInput = elements.patternImportInput;
         patternImportInput.addEventListener("change", () => {

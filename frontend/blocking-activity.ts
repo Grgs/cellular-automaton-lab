@@ -76,3 +76,9 @@ export const BLOCKING_ACTIVITY_PASTE_PATTERN = createBlockingActivity(
     "Pasting pattern...",
     PATTERN_ACTIVITY_HINT,
 );
+
+export const BLOCKING_ACTIVITY_APPLY_SHARE_LINK = createBlockingActivity(
+    "apply-share-link",
+    "Loading shared board...",
+    PATTERN_ACTIVITY_HINT,
+);

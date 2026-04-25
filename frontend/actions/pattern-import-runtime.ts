@@ -63,6 +63,10 @@ export interface PatternImportRuntime {
         readTextTask: () => Promise<string>,
         options: PatternTextImportOptions,
     ): Promise<SimulationSnapshot | null>;
+    applyParsedPattern(
+        parsedPattern: ParsedPattern,
+        options: PatternTextImportOptions & { skipConfirm?: boolean },
+    ): Promise<SimulationSnapshot | null>;
 }
 
 export function createPatternImportRuntime({
@@ -116,22 +120,19 @@ export function createPatternImportRuntime({
         }
     }
 
-    async function importPatternText(
-        readTextTask: () => Promise<string>,
+    async function applyParsedPattern(
+        parsedPattern: ParsedPattern,
         {
-            failurePrefix,
             successMessage,
             cancelMessage,
             blockingActivity = null,
             onSuccess = () => {},
-        }: PatternTextImportOptions,
+            skipConfirm = false,
+        }: PatternTextImportOptions & { skipConfirm?: boolean },
     ): Promise<SimulationSnapshot | null> {
-        const parsedPattern = await parseImportedPattern(readTextTask, failurePrefix);
-        if (!parsedPattern) {
-            return null;
-        }
         if (
-            shouldConfirmPatternImport(state)
+            !skipConfirm
+            && shouldConfirmPatternImport(state)
             && !confirmImportFn("Importing a pattern will replace the current board. Continue?")
         ) {
             updatePatternStatus(cancelMessage, "info");
@@ -192,7 +193,19 @@ export function createPatternImportRuntime({
         }).catch(() => null);
     }
 
+    async function importPatternText(
+        readTextTask: () => Promise<string>,
+        options: PatternTextImportOptions,
+    ): Promise<SimulationSnapshot | null> {
+        const parsedPattern = await parseImportedPattern(readTextTask, options.failurePrefix);
+        if (!parsedPattern) {
+            return null;
+        }
+        return applyParsedPattern(parsedPattern, options);
+    }
+
     return {
         importPatternText,
+        applyParsedPattern,
     };
 }

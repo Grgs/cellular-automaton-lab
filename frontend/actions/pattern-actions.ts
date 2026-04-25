@@ -15,14 +15,21 @@ import {
 import {
     BLOCKING_ACTIVITY_IMPORT_PATTERN,
     BLOCKING_ACTIVITY_PASTE_PATTERN,
+    BLOCKING_ACTIVITY_APPLY_SHARE_LINK,
 } from "../blocking-activity.js";
 import { createPatternImportRuntime } from "./pattern-import-runtime.js";
+import {
+    buildShareUrl,
+    decodeShareFragment,
+    readShareBodyFromHash,
+    ShareLinkDecodeError,
+} from "../share-link.js";
 import type {
     PatternActionOptions,
     PatternActionSet,
     PatternBuildResult,
 } from "../types/actions.js";
-import type { PatternPayload, SimulationSnapshot } from "../types/domain.js";
+import type { ParsedPattern, PatternPayload, SimulationSnapshot } from "../types/domain.js";
 
 export function createPatternActions({
     state,
@@ -166,11 +173,56 @@ export function createPatternActions({
         );
     }
 
+    async function copyShareLink(): Promise<string | null> {
+        try {
+            const { pattern } = buildSerializedPattern();
+            const url = buildShareUrl(pattern, window.location.href);
+            await writeClipboardTextFn(url);
+            updatePatternStatus("Copied share link to clipboard.", "success");
+            return url;
+        } catch (error) {
+            handlePatternError("Share link copy failed", error);
+            return null;
+        }
+    }
+
+    function readShareablePatternFromHash(): ParsedPattern | null {
+        if (!readShareBodyFromHash(window.location.hash)) {
+            return null;
+        }
+        try {
+            return decodeShareFragment(window.location.hash);
+        } catch (error) {
+            const message = error instanceof ShareLinkDecodeError
+                ? error.message
+                : (error instanceof Error ? error.message : String(error));
+            updatePatternStatus(`Share link invalid: ${message}`, "error");
+            onError(error);
+            return null;
+        }
+    }
+
+    async function applyShareLinkFromHash(): Promise<SimulationSnapshot | null> {
+        const parsedPattern = readShareablePatternFromHash();
+        if (!parsedPattern) {
+            return null;
+        }
+        return importRuntime.applyParsedPattern(parsedPattern, {
+            failurePrefix: "Share link load failed",
+            successMessage: "Loaded shared board.",
+            cancelMessage: "Share link load canceled.",
+            blockingActivity: BLOCKING_ACTIVITY_APPLY_SHARE_LINK,
+            skipConfirm: true,
+        });
+    }
+
     return {
         openPatternImport,
         importPatternFile: (file) => importPatternFile(file),
         exportPattern: () => exportPattern(),
         copyPattern: () => copyPattern(),
         pastePattern: () => pastePattern(),
+        copyShareLink: () => copyShareLink(),
+        applyShareLinkFromHash: () => applyShareLinkFromHash(),
     };
 }

@@ -70,6 +70,7 @@ export interface DomElements {
     copyPatternBtn: HTMLButtonElement | null;
     exportPatternBtn: HTMLButtonElement | null;
     pastePatternBtn: HTMLButtonElement | null;
+    shareLinkBtn: HTMLButtonElement | null;
     patternImportInput: HTMLInputElement | null;
     patternStatus: HTMLElement | null;
     editorTools: HTMLElement | null;
