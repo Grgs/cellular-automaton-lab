@@ -17,7 +17,7 @@ _SOURCE_PATCH_DATA = (
 _SUBSTITUTION_SPEC_DATA = (
     Path(__file__).with_name("data") / "dodecagonal_square_triangle_substitution_spec.json"
 )
-_MAX_PATCH_DEPTH = 60
+_MAX_PATCH_DEPTH = 40
 _RUNTIME_SUBSTITUTION_LEVEL = 3
 _EDGE_PRECISION = 6
 
@@ -91,8 +91,7 @@ def _normalize_vertices(
     unit_scale: float,
 ) -> tuple[tuple[float, float], ...]:
     normalized = tuple(
-        ((x - origin[0]) / unit_scale, (origin[1] - y) / unit_scale)
-        for x, y in vertices
+        ((x - origin[0]) / unit_scale, (origin[1] - y) / unit_scale) for x, y in vertices
     )
     return _rotate_vertices(normalized)
 
@@ -152,10 +151,7 @@ def _load_source_patch() -> tuple[dict[int, _SourceCell], int, tuple[float, floa
                 (float(vertex[0]), float(vertex[1]))
                 for vertex in cast(list[list[float]], raw_cell["vertices"])
             ),
-            neighbors=tuple(
-                int(neighbor)
-                for neighbor in cast(list[int], raw_cell["neighbors"])
-            ),
+            neighbors=tuple(int(neighbor) for neighbor in cast(list[int], raw_cell["neighbors"])),
         )
         for raw_cell in cast(list[dict[str, object]], payload["cells"])
     }
@@ -177,8 +173,7 @@ def _load_substitution_spec() -> _SubstitutionSpec:
     )
     prototypes = {
         str(label): tuple(
-            (float(vertex[0]), float(vertex[1]))
-            for vertex in cast(list[list[float]], vertices)
+            (float(vertex[0]), float(vertex[1])) for vertex in cast(list[list[float]], vertices)
         )
         for label, vertices in cast(dict[str, object], payload["prototypes"]).items()
     }
@@ -346,9 +341,7 @@ def _build_substitution_patch(patch_depth: int) -> AperiodicPatch:
             f"at level {_RUNTIME_SUBSTITUTION_LEVEL}"
         )
 
-    selected_ids = {
-        cell_id for cell_id, distance in distances.items() if distance <= patch_depth
-    }
+    selected_ids = {cell_id for cell_id, distance in distances.items() if distance <= patch_depth}
     selected_records: list[PatchRecord] = []
     for cell in full_patch.cells:
         if cell.id not in selected_ids:
@@ -372,15 +365,31 @@ def _build_substitution_patch(patch_depth: int) -> AperiodicPatch:
     )
 
 
+def build_dodecagonal_square_triangle_rule_image_diagnostic_patch(
+    patch_depth: int,
+) -> AperiodicPatch:
+    """Build the experimental rule-image path for diagnostics only.
+
+    The Bielefeld rule image describes valid one-level patch rules, but the
+    current five labels are not enough to recursively substitute public tiles
+    without overlaps. Keep this callable so the extracted spec can be studied
+    without exposing it as the runtime generator.
+    """
+    resolved_depth = int(patch_depth)
+    if resolved_depth < 0:
+        raise ValueError("patch_depth must be non-negative")
+    return _build_substitution_patch(resolved_depth)
+
+
 def build_dodecagonal_square_triangle_literature_oracle_patch(
     patch_depth: int,
 ) -> AperiodicPatch:
     resolved_depth = int(patch_depth)
     if resolved_depth < 0:
         raise ValueError("patch_depth must be non-negative")
-    if resolved_depth > 20:
+    if resolved_depth > _MAX_PATCH_DEPTH:
         raise ValueError(
-            f"patch_depth {resolved_depth} exceeds validated literature crop depth 20"
+            f"patch_depth {resolved_depth} exceeds available literature crop depth {_MAX_PATCH_DEPTH}"
         )
 
     cells, seed_index, seed_center, unit_scale = _load_source_patch()
@@ -432,6 +441,6 @@ def build_dodecagonal_square_triangle_patch(patch_depth: int) -> AperiodicPatch:
         raise ValueError("patch_depth must be non-negative")
     if resolved_depth > _MAX_PATCH_DEPTH:
         raise ValueError(
-            f"patch_depth {resolved_depth} exceeds generated dodecagonal depth {_MAX_PATCH_DEPTH}"
+            f"patch_depth {resolved_depth} exceeds configured dodecagonal depth {_MAX_PATCH_DEPTH}"
         )
-    return _build_substitution_patch(resolved_depth)
+    return build_dodecagonal_square_triangle_literature_oracle_patch(resolved_depth)

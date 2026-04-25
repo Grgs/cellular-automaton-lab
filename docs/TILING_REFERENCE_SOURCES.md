@@ -86,7 +86,9 @@ The order is intentional:
   - [Tuebingen Triangle](https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/)
 - `dodecagonal-square-triangle`
   - [Square-triangle](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
-  - Runtime spec regenerated from the checked-in Bielefeld rule image at
+  - Runtime finite crop regenerated from the checked-in Bielefeld patch PDF at
+    `docs/contracts/dodecagonal-square-triangle-generator/bielefeld-patch.pdf`
+  - Diagnostic rule-image spec regenerated from the checked-in Bielefeld rule image at
     `docs/contracts/dodecagonal-square-triangle-generator/bielefeld-rule.png`
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)

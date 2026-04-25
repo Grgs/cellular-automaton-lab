@@ -12,7 +12,6 @@ from backend.simulation.topology_catalog import (
     ARCHIMEDEAN_33434_GEOMETRY,
     ARCHIMEDEAN_3464_GEOMETRY,
     ARCHIMEDEAN_4612_GEOMETRY,
-    AMMANN_BEENKER_GEOMETRY,
     CHAIR_GEOMETRY,
     DELTOIDAL_HEXAGONAL_GEOMETRY,
     DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
@@ -34,7 +33,6 @@ from backend.simulation.topology_catalog import (
     TUEBINGEN_TRIANGLE_GEOMETRY,
     describe_topologies,
     PENROSE_GEOMETRY,
-    PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     SUPPORTED_GEOMETRIES,
     TOPOLOGY_SIZING_POLICIES,
@@ -108,10 +106,7 @@ class GeometryManifestTests(unittest.TestCase):
             },
         )
         self.assertEqual(
-            {
-                family_id: policy.to_dict()
-                for family_id, policy in TOPOLOGY_SIZING_POLICIES.items()
-            },
+            {family_id: policy.to_dict() for family_id, policy in TOPOLOGY_SIZING_POLICIES.items()},
             {
                 family_id: definition.sizing_policy.to_dict()
                 for family_id, definition in TOPOLOGY_FAMILY_MANIFEST.items()
@@ -142,10 +137,7 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertFalse(geometry_uses_patch_depth("square"))
 
     def test_topology_catalog_exposes_expected_sizing_policy_by_family(self) -> None:
-        described = {
-            entry["tiling_family"]: entry
-            for entry in describe_topologies()
-        }
+        described = {entry["tiling_family"]: entry for entry in describe_topologies()}
 
         for tiling_family, definition in TOPOLOGY_FAMILY_MANIFEST.items():
             with self.subTest(tiling_family=tiling_family):
@@ -182,7 +174,9 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertEqual(minimum_grid_dimension_for_geometry("square"), 3)
         self.assertEqual(minimum_grid_dimension_for_geometry("archimedean-4-8-8"), 3)
 
-    def test_new_periodic_mixed_geometries_use_generic_defaults_and_expected_grid_minimums(self) -> None:
+    def test_new_periodic_mixed_geometries_use_generic_defaults_and_expected_grid_minimums(
+        self,
+    ) -> None:
         expected = {
             RHOMBILLE_GEOMETRY: 3,
             DELTOIDAL_HEXAGONAL_GEOMETRY: 1,
@@ -292,7 +286,7 @@ class GeometryManifestTests(unittest.TestCase):
         expected = {
             HAT_MONOTILE_GEOMETRY: {"default": 2, "min": 0, "max": 3},
             TUEBINGEN_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 5},
-            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 60},
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 40},
             SHIELD_GEOMETRY: {"default": 3, "min": 0, "max": 5},
             PINWHEEL_GEOMETRY: {"default": 3, "min": 0, "max": 4},
         }
@@ -310,18 +304,17 @@ class GeometryManifestTests(unittest.TestCase):
                 self.assertEqual(GEOMETRY_DEFAULT_RULES[geometry], "life-b2-s23")
                 self.assertTrue(geometry_uses_patch_depth(geometry))
                 self.assertFalse(geometry_uses_backend_viewport_sync(geometry))
-                self.assertEqual(described[geometry]["sizing_policy"], {"control": "patch_depth", **sizing_policy})
+                self.assertEqual(
+                    described[geometry]["sizing_policy"],
+                    {"control": "patch_depth", **sizing_policy},
+                )
                 self.assertEqual(described[geometry]["render_kind"], "polygon_aperiodic")
 
     def test_describe_geometries_returns_frontend_ready_metadata(self) -> None:
         described = describe_topology_variants()
 
         self.assertEqual([entry["id"] for entry in described], list(SUPPORTED_GEOMETRIES))
-        vertex_entry = next(
-            entry
-            for entry in described
-            if entry["id"] == PENROSE_VERTEX_GEOMETRY
-        )
+        vertex_entry = next(entry for entry in described if entry["id"] == PENROSE_VERTEX_GEOMETRY)
         self.assertEqual(
             vertex_entry,
             {

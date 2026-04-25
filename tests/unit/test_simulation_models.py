@@ -5,14 +5,24 @@ from pathlib import Path
 try:
     from backend.defaults import MAX_GRID_SIZE, MAX_SPEED, MIN_GRID_SIZE
     from backend.rules.conway import ConwayLifeRule
-    from backend.simulation.models import RuleSnapshot, SimulationConfig, SimulationSnapshot, SimulationStateData
+    from backend.simulation.models import (
+        RuleSnapshot,
+        SimulationConfig,
+        SimulationSnapshot,
+        SimulationStateData,
+    )
     from backend.simulation.topology import parse_regular_cell_id
     from tests.unit.board_test_support import board_from_grid
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.defaults import MAX_GRID_SIZE, MAX_SPEED, MIN_GRID_SIZE
     from backend.rules.conway import ConwayLifeRule
-    from backend.simulation.models import RuleSnapshot, SimulationConfig, SimulationSnapshot, SimulationStateData
+    from backend.simulation.models import (
+        RuleSnapshot,
+        SimulationConfig,
+        SimulationSnapshot,
+        SimulationStateData,
+    )
     from backend.simulation.topology import parse_regular_cell_id
     from tests.unit.board_test_support import board_from_grid
 
@@ -20,7 +30,12 @@ except ModuleNotFoundError:
 class SimulationModelTests(unittest.TestCase):
     def test_simulation_config_clamps_values(self) -> None:
         config = SimulationConfig.from_values(
-            topology_spec={"tiling_family": "triangle", "adjacency_mode": "edge", "width": 1, "height": 500},
+            topology_spec={
+                "tiling_family": "triangle",
+                "adjacency_mode": "edge",
+                "width": 1,
+                "height": 500,
+            },
             speed=99,
         )
         self.assertEqual(config.geometry, "triangle")
@@ -111,28 +126,33 @@ class SimulationModelTests(unittest.TestCase):
         self.assertEqual(updated.patch_depth, 8)
         self.assertEqual(updated.topology_spec.patch_depth, 8)
 
-    def test_unsafe_size_override_does_not_reduce_validated_dodecagonal_cap(self) -> None:
+    def test_unsafe_size_override_does_not_exceed_configured_dodecagonal_cap(self) -> None:
         config = SimulationConfig.from_values(
             topology_spec={
                 "tiling_family": "dodecagonal-square-triangle",
                 "adjacency_mode": "edge",
                 "width": 0,
                 "height": 0,
-                "patch_depth": 20,
+                "patch_depth": 50,
                 "unsafe_size_override": True,
             },
             speed=4,
         )
 
-        self.assertEqual(config.patch_depth, 20)
-        self.assertEqual(config.topology_spec.patch_depth, 20)
+        self.assertEqual(config.patch_depth, 40)
+        self.assertEqual(config.topology_spec.patch_depth, 40)
 
     def test_rule_and_snapshot_serialize(self) -> None:
         rule = ConwayLifeRule()
         snapshot = SimulationSnapshot(
             board=board_from_grid([[0, 1], [1, 0]]),
             config=SimulationConfig.from_values(
-                topology_spec={"tiling_family": "square", "adjacency_mode": "edge", "width": 2, "height": 2},
+                topology_spec={
+                    "tiling_family": "square",
+                    "adjacency_mode": "edge",
+                    "width": 2,
+                    "height": 2,
+                },
                 speed=5,
             ),
             running=True,
@@ -164,7 +184,12 @@ class SimulationModelTests(unittest.TestCase):
         snapshot = SimulationSnapshot(
             board=board_from_grid([[0, 1], [1, 0]]),
             config=SimulationConfig.from_values(
-                topology_spec={"tiling_family": "square", "adjacency_mode": "edge", "width": 2, "height": 2},
+                topology_spec={
+                    "tiling_family": "square",
+                    "adjacency_mode": "edge",
+                    "width": 2,
+                    "height": 2,
+                },
                 speed=5,
             ),
             running=False,

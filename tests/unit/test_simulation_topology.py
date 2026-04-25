@@ -138,7 +138,9 @@ class SimulationTopologyTests(unittest.TestCase):
                     geometry,
                     width,
                     height,
-                    patch_depth=3 if geometry in {
+                    patch_depth=3
+                    if geometry
+                    in {
                         CHAIR_GEOMETRY,
                         HAT_MONOTILE_GEOMETRY,
                         PINWHEEL_GEOMETRY,
@@ -151,7 +153,8 @@ class SimulationTopologyTests(unittest.TestCase):
                         TUEBINGEN_TRIANGLE_GEOMETRY,
                         PENROSE_GEOMETRY,
                         PENROSE_VERTEX_GEOMETRY,
-                    } else None,
+                    }
+                    else None,
                 )
                 for index, cell in enumerate(topology.cells):
                     expected = tuple(
@@ -164,31 +167,34 @@ class SimulationTopologyTests(unittest.TestCase):
         topology = build_topology(ARCHIMEDEAN_488_GEOMETRY, 5, 5)
 
         self.assertEqual(topology.cell_count, (5 * 5) + (6 * 6))
-        self.assertEqual([cell.id for cell in topology.cells[:5]], [
-            'o:0:0',
-            'o:1:0',
-            'o:2:0',
-            'o:3:0',
-            'o:4:0',
-        ])
-        self.assertEqual(topology.cells[24].id, 'o:4:4')
-        self.assertEqual(topology.cells[25].id, 's:0:0')
-        self.assertEqual(topology.cells[-1].id, 's:5:5')
-        self.assertTrue(topology.has_cell('o:3:2'))
-        self.assertTrue(topology.has_cell('s:4:1'))
-        self.assertEqual(topology.get_cell('o:3:2').kind, 'octagon')
-        self.assertEqual(topology.get_cell('s:4:1').kind, 'square')
+        self.assertEqual(
+            [cell.id for cell in topology.cells[:5]],
+            [
+                "o:0:0",
+                "o:1:0",
+                "o:2:0",
+                "o:3:0",
+                "o:4:0",
+            ],
+        )
+        self.assertEqual(topology.cells[24].id, "o:4:4")
+        self.assertEqual(topology.cells[25].id, "s:0:0")
+        self.assertEqual(topology.cells[-1].id, "s:5:5")
+        self.assertTrue(topology.has_cell("o:3:2"))
+        self.assertTrue(topology.has_cell("s:4:1"))
+        self.assertEqual(topology.get_cell("o:3:2").kind, "octagon")
+        self.assertEqual(topology.get_cell("s:4:1").kind, "square")
 
     def test_archimedean_topology_neighbor_degrees_match_cell_kind_and_boundary(self) -> None:
         topology = build_topology(ARCHIMEDEAN_488_GEOMETRY, 5, 5)
 
-        self.assertEqual(len(topology.get_cell('o:2:2').neighbors), 8)
-        self.assertEqual(len(topology.get_cell('o:0:0').neighbors), 6)
-        self.assertEqual(len(topology.get_cell('s:2:2').neighbors), 4)
-        self.assertEqual(len(topology.get_cell('s:0:0').neighbors), 1)
+        self.assertEqual(len(topology.get_cell("o:2:2").neighbors), 8)
+        self.assertEqual(len(topology.get_cell("o:0:0").neighbors), 6)
+        self.assertEqual(len(topology.get_cell("s:2:2").neighbors), 4)
+        self.assertEqual(len(topology.get_cell("s:0:0").neighbors), 1)
         self.assertEqual(
-            topology.get_cell('s:2:2').neighbors,
-            ('o:1:1', 'o:2:1', 'o:2:2', 'o:1:2'),
+            topology.get_cell("s:2:2").neighbors,
+            ("o:1:1", "o:2:1", "o:2:2", "o:1:2"),
         )
 
     def test_archimedean_board_steps_square_and_octagon_births(self) -> None:
@@ -196,73 +202,80 @@ class SimulationTopologyTests(unittest.TestCase):
         rule = ArchLife488Rule()
 
         square_birth_board = empty_board(ARCHIMEDEAN_488_GEOMETRY, 5, 5)
-        square_birth_board.set_state_for('o:1:1', 1)
-        square_birth_board.set_state_for('o:2:1', 1)
+        square_birth_board.set_state_for("o:1:1", 1)
+        square_birth_board.set_state_for("o:2:1", 1)
         next_square_board = engine.step_board(square_birth_board, rule)
 
-        self.assertEqual(next_square_board.state_for('s:2:2'), 1)
+        self.assertEqual(next_square_board.state_for("s:2:2"), 1)
 
         octagon_birth_board = empty_board(ARCHIMEDEAN_488_GEOMETRY, 5, 5)
-        octagon_birth_board.set_state_for('o:2:1', 1)
-        octagon_birth_board.set_state_for('o:3:2', 1)
-        octagon_birth_board.set_state_for('s:2:2', 1)
+        octagon_birth_board.set_state_for("o:2:1", 1)
+        octagon_birth_board.set_state_for("o:3:2", 1)
+        octagon_birth_board.set_state_for("s:2:2", 1)
         next_octagon_board = engine.step_board(octagon_birth_board, rule)
 
-        self.assertEqual(next_octagon_board.state_for('o:2:2'), 1)
+        self.assertEqual(next_octagon_board.state_for("o:2:2"), 1)
 
     def test_kagome_topology_has_deterministic_counts_and_order(self) -> None:
         topology = build_topology(KAGOME_GEOMETRY, 4, 3)
 
         self.assertEqual(topology.cell_count, 4 * 3 * 3)
-        self.assertEqual([cell.id for cell in topology.cells[:4]], [
-            'h:0:0',
-            'h:1:0',
-            'h:2:0',
-            'h:3:0',
-        ])
-        self.assertEqual(topology.cells[12].id, 'tu:0:0')
-        self.assertEqual(topology.cells[13].id, 'tu:1:0')
-        self.assertEqual(topology.cells[24].id, 'td:0:0')
-        self.assertEqual(topology.cells[-1].id, 'td:3:2')
-        self.assertEqual(topology.get_cell('h:2:1').kind, 'hexagon')
-        self.assertEqual(topology.get_cell('tu:2:1').kind, 'triangle-up')
-        self.assertEqual(topology.get_cell('td:2:1').kind, 'triangle-down')
+        self.assertEqual(
+            [cell.id for cell in topology.cells[:4]],
+            [
+                "h:0:0",
+                "h:1:0",
+                "h:2:0",
+                "h:3:0",
+            ],
+        )
+        self.assertEqual(topology.cells[12].id, "tu:0:0")
+        self.assertEqual(topology.cells[13].id, "tu:1:0")
+        self.assertEqual(topology.cells[24].id, "td:0:0")
+        self.assertEqual(topology.cells[-1].id, "td:3:2")
+        self.assertEqual(topology.get_cell("h:2:1").kind, "hexagon")
+        self.assertEqual(topology.get_cell("tu:2:1").kind, "triangle-up")
+        self.assertEqual(topology.get_cell("td:2:1").kind, "triangle-down")
 
     def test_kagome_topology_neighbor_degrees_match_cell_kind_and_boundary(self) -> None:
         topology = build_topology(KAGOME_GEOMETRY, 5, 5)
 
-        self.assertEqual(len(topology.get_cell('h:2:2').neighbors), 6)
-        self.assertEqual(len(topology.get_cell('h:0:0').neighbors), 3)
-        self.assertEqual(len(topology.get_cell('tu:2:2').neighbors), 3)
-        self.assertEqual(len(topology.get_cell('tu:0:0').neighbors), 1)
-        self.assertEqual(len(topology.get_cell('td:0:0').neighbors), 2)
-        self.assertTrue(all(
-            topology.get_cell(neighbor_id).kind.startswith('triangle')
-            for neighbor_id in topology.get_cell('h:2:2').neighbors
-            if neighbor_id is not None
-        ))
-        self.assertTrue(all(
-            topology.get_cell(neighbor_id).kind == 'hexagon'
-            for neighbor_id in topology.get_cell('tu:2:2').neighbors
-            if neighbor_id is not None
-        ))
+        self.assertEqual(len(topology.get_cell("h:2:2").neighbors), 6)
+        self.assertEqual(len(topology.get_cell("h:0:0").neighbors), 3)
+        self.assertEqual(len(topology.get_cell("tu:2:2").neighbors), 3)
+        self.assertEqual(len(topology.get_cell("tu:0:0").neighbors), 1)
+        self.assertEqual(len(topology.get_cell("td:0:0").neighbors), 2)
+        self.assertTrue(
+            all(
+                topology.get_cell(neighbor_id).kind.startswith("triangle")
+                for neighbor_id in topology.get_cell("h:2:2").neighbors
+                if neighbor_id is not None
+            )
+        )
+        self.assertTrue(
+            all(
+                topology.get_cell(neighbor_id).kind == "hexagon"
+                for neighbor_id in topology.get_cell("tu:2:2").neighbors
+                if neighbor_id is not None
+            )
+        )
 
     def test_kagome_board_steps_triangle_and_hexagon_births(self) -> None:
         engine = SimulationEngine()
         rule = KagomeLifeRule()
 
         triangle_birth_board = empty_board(KAGOME_GEOMETRY, 5, 5)
-        triangle_birth_board.set_state_for('h:2:1', 1)
-        triangle_birth_board.set_state_for('h:2:2', 1)
+        triangle_birth_board.set_state_for("h:2:1", 1)
+        triangle_birth_board.set_state_for("h:2:2", 1)
         next_triangle_board = engine.step_board(triangle_birth_board, rule)
-        self.assertEqual(next_triangle_board.state_for('tu:2:2'), 1)
+        self.assertEqual(next_triangle_board.state_for("tu:2:2"), 1)
 
         hexagon_birth_board = empty_board(KAGOME_GEOMETRY, 5, 5)
-        hexagon_birth_board.set_state_for('tu:2:2', 1)
-        hexagon_birth_board.set_state_for('td:2:2', 1)
-        hexagon_birth_board.set_state_for('tu:2:3', 1)
+        hexagon_birth_board.set_state_for("tu:2:2", 1)
+        hexagon_birth_board.set_state_for("td:2:2", 1)
+        hexagon_birth_board.set_state_for("tu:2:3", 1)
         next_hexagon_board = engine.step_board(hexagon_birth_board, rule)
-        self.assertEqual(next_hexagon_board.state_for('h:2:2'), 1)
+        self.assertEqual(next_hexagon_board.state_for("h:2:2"), 1)
 
     def test_new_archimedean_topologies_are_deterministic_and_slot_annotated(self) -> None:
         cases = {
@@ -280,7 +293,9 @@ class SimulationTopologyTests(unittest.TestCase):
                 right = build_topology(geometry, 1, 1)
 
                 self.assertEqual(left.cell_count, right.cell_count)
-                self.assertEqual([cell.id for cell in left.cells], [cell.id for cell in right.cells])
+                self.assertEqual(
+                    [cell.id for cell in left.cells], [cell.id for cell in right.cells]
+                )
                 self.assertEqual({cell.kind for cell in left.cells}, expected_kinds)
                 self.assertTrue(all(cell.slot for cell in left.cells))
                 self.assertTrue(all(cell.center is not None for cell in left.cells))
@@ -311,7 +326,9 @@ class SimulationTopologyTests(unittest.TestCase):
             "c:0:0",
         )
 
-    def test_new_periodic_mixed_topologies_are_deterministic_and_single_kind_annotated(self) -> None:
+    def test_new_periodic_mixed_topologies_are_deterministic_and_single_kind_annotated(
+        self,
+    ) -> None:
         cases = {
             RHOMBILLE_GEOMETRY: {"rhombus"},
             DELTOIDAL_HEXAGONAL_GEOMETRY: {"kite"},
@@ -329,7 +346,9 @@ class SimulationTopologyTests(unittest.TestCase):
                 right = build_topology(geometry, 1, 1)
 
                 self.assertEqual(left.cell_count, right.cell_count)
-                self.assertEqual([cell.id for cell in left.cells], [cell.id for cell in right.cells])
+                self.assertEqual(
+                    [cell.id for cell in left.cells], [cell.id for cell in right.cells]
+                )
                 self.assertEqual({cell.kind for cell in left.cells}, expected_kinds)
                 self.assertTrue(all(cell.slot for cell in left.cells))
                 self.assertTrue(all(cell.center is not None for cell in left.cells))
@@ -371,7 +390,11 @@ class SimulationTopologyTests(unittest.TestCase):
         for geometry, rule, kind, live_neighbor_count in cases:
             with self.subTest(geometry=geometry):
                 board = empty_board(geometry, 1, 1)
-                target = next(cell for cell in board.topology.cells if cell.kind == kind and len(cell.neighbors) >= live_neighbor_count)
+                target = next(
+                    cell
+                    for cell in board.topology.cells
+                    if cell.kind == kind and len(cell.neighbors) >= live_neighbor_count
+                )
                 for neighbor_id in target.neighbors[:live_neighbor_count]:
                     assert neighbor_id is not None
                     board.set_state_for(neighbor_id, 1)
@@ -385,9 +408,11 @@ class SimulationTopologyTests(unittest.TestCase):
 
         self.assertEqual(left.cell_count, right.cell_count)
         self.assertEqual([cell.id for cell in left.cells], [cell.id for cell in right.cells])
-        self.assertTrue(all(cell.kind in {'thick-rhomb', 'thin-rhomb'} for cell in left.cells))
+        self.assertTrue(all(cell.kind in {"thick-rhomb", "thin-rhomb"} for cell in left.cells))
         self.assertTrue(all(cell.center is not None for cell in left.cells))
-        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 4 for cell in left.cells))
+        self.assertTrue(
+            all(cell.vertices is not None and len(cell.vertices) == 4 for cell in left.cells)
+        )
         self.assertGreater(left.cell_count, 25)
 
     def test_penrose_topology_neighbors_are_symmetric_and_depth_grows_monotonically(self) -> None:
@@ -411,7 +436,9 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "spectre" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
-        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 14 for cell in deep.cells))
+        self.assertTrue(
+            all(cell.vertices is not None and len(cell.vertices) == 14 for cell in deep.cells)
+        )
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:
@@ -427,7 +454,9 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "taylor-half-hex" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
-        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 4 for cell in deep.cells))
+        self.assertTrue(
+            all(cell.vertices is not None and len(cell.vertices) == 4 for cell in deep.cells)
+        )
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:
@@ -443,7 +472,9 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "sphinx" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
-        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells))
+        self.assertTrue(
+            all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells)
+        )
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:
@@ -465,7 +496,9 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "chair" for cell in deep.cells))
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
-        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells))
+        self.assertTrue(
+            all(cell.vertices is not None and len(cell.vertices) == 8 for cell in deep.cells)
+        )
         self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
         self.assertEqual(
             Counter(cell.orientation_token for cell in deep.cells),
@@ -477,7 +510,9 @@ class SimulationTopologyTests(unittest.TestCase):
                 assert neighbor_id is not None
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
-    def test_robinson_triangles_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
+    def test_robinson_triangles_topology_is_deterministic_and_depth_grows_monotonically(
+        self,
+    ) -> None:
         shallow = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=1)
         deep = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=3)
         repeated = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=3)
@@ -486,7 +521,9 @@ class SimulationTopologyTests(unittest.TestCase):
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertEqual({cell.kind for cell in deep.cells}, {"robinson-thick", "robinson-thin"})
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
-        self.assertTrue(all(cell.vertices is not None and len(cell.vertices) == 3 for cell in deep.cells))
+        self.assertTrue(
+            all(cell.vertices is not None and len(cell.vertices) == 3 for cell in deep.cells)
+        )
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:
@@ -497,7 +534,11 @@ class SimulationTopologyTests(unittest.TestCase):
         cases = (
             (HAT_MONOTILE_GEOMETRY, {"hat"}, 2),
             (TUEBINGEN_TRIANGLE_GEOMETRY, {"tuebingen-thick", "tuebingen-thin"}, 3),
-            (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, {"dodecagonal-square-triangle-square", "dodecagonal-square-triangle-triangle"}, 3),
+            (
+                DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
+                {"dodecagonal-square-triangle-square", "dodecagonal-square-triangle-triangle"},
+                3,
+            ),
             (SHIELD_GEOMETRY, {"shield-shield", "shield-square", "shield-triangle"}, 3),
             (PINWHEEL_GEOMETRY, {"pinwheel-triangle"}, 3),
         )
@@ -508,22 +549,45 @@ class SimulationTopologyTests(unittest.TestCase):
                 deep = build_topology(geometry, 0, 0, patch_depth=depth)
                 repeated = build_topology(geometry, 0, 0, patch_depth=depth)
 
-                self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
+                self.assertEqual(
+                    [cell.id for cell in deep.cells], [cell.id for cell in repeated.cells]
+                )
                 self.assertGreater(deep.cell_count, shallow.cell_count)
                 self.assertEqual({cell.kind for cell in deep.cells}, expected_kinds)
                 self.assertTrue(all(cell.center is not None for cell in deep.cells))
                 self.assertTrue(all(cell.vertices for cell in deep.cells))
                 self.assertTrue(all(cell.tile_family is not None for cell in deep.cells))
-                if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY}:
+                if geometry in {
+                    HAT_MONOTILE_GEOMETRY,
+                    TUEBINGEN_TRIANGLE_GEOMETRY,
+                    PINWHEEL_GEOMETRY,
+                }:
                     self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
                 if geometry == DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY:
                     self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
-                if geometry in {HAT_MONOTILE_GEOMETRY, TUEBINGEN_TRIANGLE_GEOMETRY, PINWHEEL_GEOMETRY, DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY}:
-                    self.assertTrue(all(cell.chirality_token is not None for cell in deep.cells if cell.kind != "dodecagonal-square-triangle-square"))
+                if geometry in {
+                    HAT_MONOTILE_GEOMETRY,
+                    TUEBINGEN_TRIANGLE_GEOMETRY,
+                    PINWHEEL_GEOMETRY,
+                    DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
+                }:
+                    self.assertTrue(
+                        all(
+                            cell.chirality_token is not None
+                            for cell in deep.cells
+                            if cell.kind != "dodecagonal-square-triangle-square"
+                        )
+                    )
                 if geometry == SHIELD_GEOMETRY:
                     self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
                     self.assertGreaterEqual(
-                        len({cell.orientation_token for cell in deep.cells if cell.orientation_token is not None}),
+                        len(
+                            {
+                                cell.orientation_token
+                                for cell in deep.cells
+                                if cell.orientation_token is not None
+                            }
+                        ),
                         8,
                     )
                 for cell in deep.cells:
@@ -532,34 +596,53 @@ class SimulationTopologyTests(unittest.TestCase):
                         assert neighbor_id is not None
                         self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
-    def test_dodecagonal_square_triangle_supports_depth_sixty(self) -> None:
+    def test_dodecagonal_square_triangle_supports_configured_literature_patch_depths(self) -> None:
         depth_seven = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=7)
-        depth_twenty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=20)
-        depth_sixty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=60)
-        repeated_depth_sixty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=60)
-
-        self.assertEqual(depth_sixty.patch_depth, 60)
-        self.assertGreater(depth_twenty.cell_count, depth_seven.cell_count)
-        self.assertGreater(depth_sixty.cell_count, depth_twenty.cell_count)
-        self.assertEqual(depth_sixty.cell_count, 612)
-        self.assertEqual(
-            [cell.id for cell in depth_sixty.cells],
-            [cell.id for cell in repeated_depth_sixty.cells],
+        depth_eleven = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=11)
+        repeated_depth_eleven = build_topology(
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=11
         )
-        self.assertTrue(all(cell.orientation_token is not None for cell in depth_sixty.cells))
+        depth_forty = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=40)
+        repeated_depth_forty = build_topology(
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=40
+        )
+        validation = validate_topology(depth_eleven)
+
+        self.assertEqual(depth_eleven.patch_depth, 11)
+        self.assertGreater(depth_eleven.cell_count, depth_seven.cell_count)
+        self.assertEqual(depth_eleven.cell_count, 262)
+        self.assertTrue(validation.is_valid, validation.summary_lines())
+        self.assertEqual(
+            [cell.id for cell in depth_eleven.cells],
+            [cell.id for cell in repeated_depth_eleven.cells],
+        )
+        self.assertEqual(depth_forty.patch_depth, 40)
+        self.assertGreater(depth_forty.cell_count, depth_eleven.cell_count)
+        self.assertEqual(depth_forty.cell_count, 2013)
+        self.assertEqual(
+            [cell.id for cell in depth_forty.cells],
+            [cell.id for cell in repeated_depth_forty.cells],
+        )
+        self.assertTrue(all(cell.orientation_token is not None for cell in depth_eleven.cells))
         self.assertTrue(
             all(
                 cell.chirality_token is not None
-                for cell in depth_sixty.cells
+                for cell in depth_eleven.cells
                 if cell.kind != "dodecagonal-square-triangle-square"
             )
         )
 
-    def test_dodecagonal_square_triangle_runtime_uses_substitution_spec(self) -> None:
+    def test_dodecagonal_square_triangle_rejects_unconfigured_depths(self) -> None:
+        with self.assertRaisesRegex(ValueError, "exceeds configured dodecagonal depth 40"):
+            build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=41)
+
+    def test_dodecagonal_square_triangle_runtime_uses_literature_source_until_substitution_is_validated(
+        self,
+    ) -> None:
         topology = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=3)
 
-        self.assertTrue(all(cell.id.startswith("dst:sub:") for cell in topology.cells))
-        self.assertFalse(any(cell.id.startswith("dst:lit:") for cell in topology.cells))
+        self.assertTrue(all(cell.id.startswith("dst:lit:") for cell in topology.cells))
+        self.assertFalse(any(cell.id.startswith("dst:sub:") for cell in topology.cells))
 
     def test_shield_topology_uses_exact_symbolic_substitution_depth(self) -> None:
         depth_zero = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=0)
@@ -603,7 +686,9 @@ class SimulationTopologyTests(unittest.TestCase):
             2,
         )
 
-    def test_penrose_vertex_topology_is_symmetric_duplicate_free_and_larger_than_edge_neighbors(self) -> None:
+    def test_penrose_vertex_topology_is_symmetric_duplicate_free_and_larger_than_edge_neighbors(
+        self,
+    ) -> None:
         edge = build_topology(PENROSE_GEOMETRY, 0, 0, patch_depth=3)
         vertex = build_topology(PENROSE_VERTEX_GEOMETRY, 0, 0, patch_depth=3)
 
@@ -619,7 +704,9 @@ class SimulationTopologyTests(unittest.TestCase):
             for neighbor_id in vertex_cell.neighbors:
                 assert neighbor_id is not None
                 self.assertIn(vertex_cell.id, vertex.get_cell(neighbor_id).neighbors)
-            if len(edge_cell.neighbors) >= 4 and len(vertex_cell.neighbors) > len(edge_cell.neighbors):
+            if len(edge_cell.neighbors) >= 4 and len(vertex_cell.neighbors) > len(
+                edge_cell.neighbors
+            ):
                 interior_candidates.append((edge_cell, vertex_cell))
 
         self.assertTrue(interior_candidates)
@@ -642,7 +729,11 @@ class SimulationTopologyTests(unittest.TestCase):
         rule = LifeB2S23Rule()
         board = empty_board(PENROSE_GEOMETRY, 0, 0, patch_depth=2)
 
-        target = next(cell for cell in board.topology.cells if cell.kind == 'thin-rhomb' and len(cell.neighbors) >= 3)
+        target = next(
+            cell
+            for cell in board.topology.cells
+            if cell.kind == "thin-rhomb" and len(cell.neighbors) >= 3
+        )
         for neighbor_id in target.neighbors[:2]:
             assert neighbor_id is not None
             board.set_state_for(neighbor_id, 1)

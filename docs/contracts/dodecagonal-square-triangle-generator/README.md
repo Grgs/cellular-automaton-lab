@@ -12,11 +12,11 @@ derived backend source file
 ## Files
 
 - `bielefeld-rule.png`
-  - primary substitution-rule image used to regenerate the backend-owned
+  - substitution-rule image used to regenerate the backend-owned diagnostic
     substitution spec
 - `bielefeld-patch.pdf`
-  - finite vector patch retained as an oracle/reference crop during generator
-    validation
+  - finite vector patch used by the current public runtime and retained as the
+    validated reference crop
 - `reference-patch.json`
   - baseline artifact for comparison against the older cleaned-patch approach
 - `../../../tools/regenerate_dodecagonal_substitution_spec.py`
@@ -31,14 +31,17 @@ derived backend source file
 
 The authoritative runtime path is:
 
-1. `bielefeld-rule.png` is the checked-in substitution-rule source.
-2. `tools/regenerate_dodecagonal_substitution_spec.py` derives
-   `backend/simulation/data/dodecagonal_square_triangle_substitution_spec.json`.
-3. `backend/simulation/aperiodic_dodecagonal_square_triangle.py` expands that
-   spec and crops a connected graph-distance patch for the app.
+1. `bielefeld-patch.pdf` is parsed by
+   `tools/regenerate_dodecagonal_literature_source.py`.
+2. The tool derives
+   `backend/simulation/data/dodecagonal_square_triangle_literature_source.json`.
+3. `backend/simulation/aperiodic_dodecagonal_square_triangle.py` crops that
+   finite source by graph distance for the app.
 
-The older `bielefeld-patch.pdf` path is still checked in as oracle tooling, not
-as the public runtime generator.
+The checked-in `bielefeld-rule.png` path remains diagnostic tooling. It produces
+a valid one-level rule-image patch, but the current five marked labels are not
+enough to recursively substitute tiles without overlaps and fragmented
+adjacency.
 
 ## Public Vocabulary
 
@@ -52,9 +55,12 @@ public triangle kind while preserving color-derived chirality tokens:
 
 ## Core Reconstruction Rule
 
-The runtime source does not use the older checked-in connected subset or finite
-literature crop as its source of truth. Instead the substitution-spec
-regeneration tool:
+The runtime source intentionally uses the finite literature crop until the
+missing marked recursive state is recovered. The public depth cap is `40`.
+Strict overlap-free and hole-free validation is currently proven through depth
+`11`; higher depths are available as larger finite-crop views.
+
+The substitution-spec regeneration tool is still useful for diagnostics:
 
 1. parses colored tile components from `bielefeld-rule.png`
 2. classifies the five marked states: two squares and three triangles
@@ -65,8 +71,8 @@ regeneration tool:
 6. emits deterministic public metadata while collapsing marked states back to
    square/triangle public kinds
 
-This keeps the implementation tied to the literature rule image while avoiding a
-runtime dependency on live image/PDF parsing.
+That diagnostic path keeps the extracted rule image available for future work
+while avoiding a false recursive runtime.
 
 ## Invariants
 
@@ -84,13 +90,13 @@ The derived backend source and emitted runtime patch must remain:
 Run the regeneration check from the repo root:
 
 ```bash
-python tools/regenerate_dodecagonal_substitution_spec.py --check
 python tools/regenerate_dodecagonal_literature_source.py --check
+python tools/regenerate_dodecagonal_substitution_spec.py --check
 ```
 
 ## Integration Note
 
-The application runtime vendors a generated JSON substitution spec under
-`backend/simulation/data/` so the app does not need live image/PDF parsing. This
-folder remains the narrow source-asset bundle for regenerating that backend
-snapshot and for comparing it with the finite oracle/reference patch.
+The application runtime vendors generated JSON under `backend/simulation/data/`
+so the app does not need live image/PDF parsing. This folder remains the narrow
+source-asset bundle for regenerating that backend snapshot and for comparing it
+with the diagnostic rule-image spec.

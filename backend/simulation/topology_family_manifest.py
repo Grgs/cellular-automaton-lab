@@ -319,7 +319,11 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         PENROSE_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
         variants=(
-            _variant(PENROSE_GEOMETRY, EDGE_ADJACENCY, APERIODIC_FAMILY_MANIFEST[PENROSE_GEOMETRY].default_rule),
+            _variant(
+                PENROSE_GEOMETRY,
+                EDGE_ADJACENCY,
+                APERIODIC_FAMILY_MANIFEST[PENROSE_GEOMETRY].default_rule,
+            ),
             _variant(PENROSE_VERTEX_GEOMETRY, VERTEX_ADJACENCY, DEFAULT_SQUARE_RULE),
         ),
     ),
@@ -400,7 +404,7 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: _translated_aperiodic_family(
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 60),
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 40),
     ),
     SHIELD_GEOMETRY: _translated_aperiodic_family(
         SHIELD_GEOMETRY,

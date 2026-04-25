@@ -195,14 +195,14 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         picker_group="Experimental",
         picker_order=320,
         default_rule="life-b2-s23",
-        builder_kind="substitution_recipe",
-        implementation_status="true_substitution",
+        builder_kind="compatibility_patch",
+        implementation_status="canonical_patch",
         public_cell_kinds=(
             DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
             DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
         ),
         promotion_blocker=(
-            "Experimental until manual visual review accepts the Bielefeld rule-image substitution implementation."
+            "Experimental until a recursive marked substitution replaces the finite validated literature patch."
         ),
     ),
     SHIELD_GEOMETRY: AperiodicFamilyManifestEntry(

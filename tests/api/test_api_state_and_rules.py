@@ -613,7 +613,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertEqual(topology['topology_spec']['patch_depth'], override_patch_depth)
         self.assertTrue(all(cell['kind'] == 'spectre' for cell in topology['cells']))
 
-    def test_unsafe_size_override_does_not_reduce_dodecagonal_validated_cap(self) -> None:
+    def test_unsafe_size_override_does_not_reduce_dodecagonal_configured_cap(self) -> None:
         validated_patch_depth = maximum_patch_depth_for_tiling_family('dodecagonal-square-triangle')
         reset = self.client.post('/api/control/reset', json={
             'topology_spec': {
