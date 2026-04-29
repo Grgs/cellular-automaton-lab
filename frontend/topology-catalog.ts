@@ -10,20 +10,21 @@ import type {
 import { getAperiodicFamilyMetadata } from "./aperiodic-family-registry.js";
 
 function normalizeSizingPolicy(definition: Pick<TopologyDefinition, "sizing_mode" | "sizing_policy">): Readonly<SizingPolicy> {
-    const sizingMode = definition.sizing_mode;
-    const fallbackControl: SizingPolicy["control"] = sizingMode === "patch_depth"
-        ? "patch_depth"
-        : "cell_size";
     const policy = definition.sizing_policy;
     const control: SizingControl = String(policy.control) === "patch_depth"
         ? "patch_depth"
         : "cell_size";
-    return Object.freeze({
+    const normalized: SizingPolicy = {
         control,
         default: Number(policy.default),
         min: Number(policy.min),
         max: Number(policy.max),
-    });
+    };
+    const unsafeMax = Number(policy.unsafe_max);
+    if (Number.isFinite(unsafeMax)) {
+        normalized.unsafe_max = unsafeMax;
+    }
+    return Object.freeze(normalized);
 }
 
 function normalizeTopologyDefinition(definition: BootstrappedTopologyDefinition): Readonly<TopologyDefinition> {
