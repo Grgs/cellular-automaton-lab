@@ -154,6 +154,13 @@ python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depth
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
 ```
 
+Use the diff-review tool when you want one artifact that compares a sweep:
+
+```powershell
+python tools/run_render_review_diff.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python tools/run_render_review_diff.py --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
+```
+
 The shared implementation for those commands lives in `tools/render_review/`. The top-level scripts remain the stable CLI entrypoints.
 
 If you need to inspect or clear repo-owned browser/server helper processes directly:
@@ -163,7 +170,7 @@ python tools/dev_processes.py list
 python tools/dev_processes.py kill --stale-browser-hosts
 ```
 
-The render-review tool is the preferred visual-inspection path. The managed runner is the preferred direct-debug path when host lifecycle ownership matters. The sweep tool is the preferred small-matrix comparison path. The process helper is the narrow cleanup fallback. Full browser suites should still go through the npm Playwright entrypoints.
+The render-review tool is the preferred visual-inspection path. The managed runner is the preferred direct-debug path when host lifecycle ownership matters. The sweep tool is the preferred small-matrix comparison path. The diff-review tool is the preferred way to turn a sweep into one HTML/PNG comparison sheet. The process helper is the narrow cleanup fallback. Full browser suites should still go through the npm Playwright entrypoints.
 
 Literature review is metadata-first: the repo stores citations and review notes in profiles, not literature images. If you want a literature montage, place an operator-provided image in `output/literature-reference-cache/` or pass `--reference /abs/path/to/image`.
 

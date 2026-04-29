@@ -27,6 +27,7 @@ STYLE_TARGETS = (
     "tools/run_browser_check.py",
     "tools/run_family_sample_workbench.py",
     "tools/run_geometry_cleanup_workbench.py",
+    "tools/run_render_review_diff.py",
     "tools/run_render_review_sweep.py",
     "tools/run_python_style.py",
     # Direct tests for the guarded Python slices.
@@ -45,6 +46,7 @@ STYLE_TARGETS = (
     "tests/unit/test_run_browser_check_tool.py",
     "tests/unit/test_run_family_sample_workbench_tool.py",
     "tests/unit/test_run_geometry_cleanup_workbench_tool.py",
+    "tests/unit/test_run_render_review_diff_tool.py",
     "tests/unit/test_run_render_review_sweep_tool.py",
 )
 

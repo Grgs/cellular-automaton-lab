@@ -412,6 +412,8 @@ Browser UI
   Managed browser-diagnosis runner. Owns standalone/server host startup, readiness, logging, cleanup, and run-manifest output for focused render reviews or targeted Python `unittest` browser checks. Managed render-review runs default their PNG and JSON outputs into the run artifact directory.
 - [tools/run_render_review_sweep.py](../tools/run_render_review_sweep.py)
   Small-matrix render-review orchestrator. Expands one named profile across selected hosts, themes, and sizes, reuses the managed runner for each case, and writes one top-level sweep manifest plus one comparable artifact directory per case, including literature-review status when enabled.
+- [tools/run_render_review_diff.py](../tools/run_render_review_diff.py)
+  One-command render-review comparison sheet builder. It can run a new sweep or consume an existing `sweep-manifest.json`, then emits one HTML sheet plus one PNG contact sheet for side-by-side review.
 - [tools/dev_processes.py](../tools/dev_processes.py)
   Repo-scoped process inspection and cleanup helper for the known browser/server helper processes started from this repo.
 - [tools/run-python.mjs](../tools/run-python.mjs)
@@ -424,7 +426,7 @@ Browser UI
   Writes the standalone wrapper into the transient build-input directory.
 - [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)
   Exports bootstrap metadata for standalone mode.
-- [tests/e2e/browser_support/artifacts.py](../tests/e2e/browser_support/artifacts.py)
+- [tools/render_review/browser_support/artifacts.py](../tools/render_review/browser_support/artifacts.py)
   Shared browser-failure artifact writer used by the managed runner, render-review tool, and Playwright harness so local diagnosis and failing tests emit the same core bundle shape.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
   Validates topology descriptors and generated tilings.

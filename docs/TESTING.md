@@ -313,6 +313,7 @@ Preferred paths:
 - Visual inspection of one rendered topology: use `python tools/render_canvas_review.py`.
 - Host-owned local debugging with guaranteed startup and cleanup: use `python tools/run_browser_check.py`.
 - Small comparison matrix across hosts, themes, or sizes: use `python tools/run_render_review_sweep.py`.
+- One HTML/PNG comparison artifact from a sweep: use `python tools/run_render_review_diff.py`.
 
 Family sample workbench examples:
 
@@ -367,6 +368,13 @@ python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depth
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
 ```
 
+Diff-review examples:
+
+```powershell
+python tools/run_render_review_diff.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python tools/run_render_review_diff.py --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
+```
+
 Literature-review conventions:
 
 - `--literature-review` requires `--profile`.
@@ -394,6 +402,7 @@ Artifact locations:
 - Managed runner `--unittest` runs place delegated browser-test failure bundles under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 - Managed runner `--unittest --success-artifacts` runs also preserve a per-test success bundle under `output/browser-check/<timestamp-mode-host>/test-artifacts/`.
 - Sweep runs default to `output/render-review-sweeps/<timestamp-profile>/`.
+- Diff-review runs write `review-diff.html` and `review-diff.png` next to the sweep manifest, or under `output/render-review-diffs/<timestamp-profile>/` when they run a sweep themselves.
 - Family sample workbench runs default to `output/family-sample-workbench/<timestamp-family-depth>/`, with one `workbench-manifest.json` plus one subdirectory per candidate.
 - Geometry cleanup workbench runs default to `output/geometry-cleanup-workbench/<timestamp-family-depth>/`, with one `workbench-manifest.json` plus one subdirectory per cleanup candidate.
 

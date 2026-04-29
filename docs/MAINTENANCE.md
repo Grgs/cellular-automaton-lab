@@ -51,6 +51,7 @@ Browser diagnosis and workbench implementation now lives under `tools/render_rev
 - `review.py`
 - `browser_check.py`
 - `sweep.py`
+- `diff_review.py`
 - `workbench_support.py`
 - `family_sample_workbench.py`
 - `geometry_cleanup_workbench.py`
@@ -61,6 +62,7 @@ The top-level files in `tools/` are now CLI entrypoints only:
 - `tools/render_canvas_review.py`
 - `tools/run_browser_check.py`
 - `tools/run_render_review_sweep.py`
+- `tools/run_render_review_diff.py`
 - `tools/run_family_sample_workbench.py`
 - `tools/run_geometry_cleanup_workbench.py`
 

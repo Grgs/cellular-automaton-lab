@@ -128,6 +128,8 @@ python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_
 python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
 python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
+python tools/run_render_review_diff.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python tools/run_render_review_diff.py --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
 ```
 
 Use these when the open question is visual rather than topological:
@@ -135,6 +137,7 @@ Use these when the open question is visual rather than topological:
 - `render_canvas_review.py` is the preferred path for producing a real canvas PNG plus JSON metrics from the browser render path.
 - `run_browser_check.py` is the preferred path when you need the same browser review or a targeted Playwright test with owned host startup, cleanup, logs, and a run manifest.
 - `run_render_review_sweep.py` is the preferred path when you need to compare a small matrix of hosts, themes, or depths without hand-running each case.
+- `run_render_review_diff.py` is the preferred path when you need one HTML/PNG sheet from a sweep, either by running a new sweep or summarizing an existing `sweep-manifest.json`.
 - `run_family_sample_workbench.py` is the preferred path when the first question is “which candidate representative sample should we compare?” rather than “how does the shipped sample render?”
 - npm Playwright entrypoints remain the preferred full-suite path when you want broad browser regression coverage rather than one focused diagnosis.
 
@@ -189,6 +192,7 @@ Output locations:
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
 - managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
 - render-review sweeps: `output/render-review-sweeps/<timestamp-profile>/`
+- render-review diff sheets: next to the sweep manifest, or `output/render-review-diffs/<timestamp-profile>/` when the diff command runs the sweep
 - family sample workbench runs: `output/family-sample-workbench/<timestamp-family-depth>/`
 - geometry cleanup workbench runs: `output/geometry-cleanup-workbench/<timestamp-family-depth>/`
 

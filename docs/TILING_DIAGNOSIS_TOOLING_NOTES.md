@@ -202,10 +202,13 @@ than owning hard acceptance thresholds or promotion rules.
 ### Lower Priority
 
 8. One-command side-by-side diff review
-   - Build on the existing montage support so the tool can emit one HTML or image
-     sheet for a set of runs rather than only one rendered image vs one reference.
+   - Status: landed.
+   - `tools/run_render_review_diff.py` can either run a new render-review sweep
+     or consume an existing `sweep-manifest.json`, then emit one HTML sheet plus
+     one PNG contact sheet for side-by-side review.
 
 9. Optional browser-test success snapshots
+   - Status: landed.
    - Preserve a final settled screenshot for targeted browser tests when requested,
      not only on failure.
 
