@@ -29,7 +29,7 @@ describe("session parser", () => {
         expect(session.patchDepthByTilingFamily.spectre).toBe(9);
     });
 
-    it("caps unsafe dodecagonal patch depth to the configured runtime maximum", async () => {
+    it("lets unsafe dodecagonal patch depth grow past the safe cap up to the family unsafe ceiling", async () => {
         const { parseUiSession } = await import("./session.js");
 
         const session = parseUiSession({
@@ -43,6 +43,23 @@ describe("session parser", () => {
         });
 
         expect(session.unsafeSizingEnabled).toBe(true);
-        expect(session.patchDepthByTilingFamily["dodecagonal-square-triangle"]).toBe(40);
+        expect(session.patchDepthByTilingFamily["dodecagonal-square-triangle"]).toBe(50);
+    });
+
+    it("clamps unsafe dodecagonal patch depth to the family unsafe ceiling", async () => {
+        const { parseUiSession } = await import("./session.js");
+
+        const session = parseUiSession({
+            unsafeSizingEnabled: true,
+            patchDepthByTilingFamily: {
+                "dodecagonal-square-triangle": 999,
+            },
+        }, {
+            disclosureIds: [],
+            defaultTilingFamily: "dodecagonal-square-triangle",
+        });
+
+        expect(session.unsafeSizingEnabled).toBe(true);
+        expect(session.patchDepthByTilingFamily["dodecagonal-square-triangle"]).toBe(60);
     });
 });

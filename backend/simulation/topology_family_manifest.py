@@ -404,7 +404,13 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: _translated_aperiodic_family(
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 40),
+        SizingPolicyDefinition(
+            PATCH_DEPTH_CONTROL,
+            default=3,
+            minimum=0,
+            maximum=6,
+            unsafe_maximum=60,
+        ),
     ),
     SHIELD_GEOMETRY: _translated_aperiodic_family(
         SHIELD_GEOMETRY,

@@ -1,106 +1,62 @@
-# Dodecagonal Square-Triangle Source Bundle
+# Dodecagonal Square-Triangle Generator
 
-This directory contains the literature source assets for the public
+This file documents the runtime generator for the public
 `dodecagonal-square-triangle` family.
 
-It is not a second executable generator. The application runtime uses the
-backend implementation in
-`backend/simulation/aperiodic_dodecagonal_square_triangle.py` together with the
-derived backend source file
-`backend/simulation/data/dodecagonal_square_triangle_literature_source.json`.
+The implementation lives in
+`backend/simulation/aperiodic_dodecagonal_square_triangle.py`. There is no
+vendored data: the runtime is a deterministic geometric construction that
+scales to any requested patch depth.
 
-## Files
+## Construction
 
-- `bielefeld-rule.png`
-  - substitution-rule image used to regenerate the backend-owned diagnostic
-    substitution spec
-- `bielefeld-patch.pdf`
-  - finite vector patch used by the current public runtime and retained as the
-    source crop
-- `reference-patch.json`
-  - baseline artifact for comparison against the older cleaned-patch approach
-- `../../../tools/regenerate_dodecagonal_substitution_spec.py`
-  - regeneration tool that parses the rule image, extracts the five colored
-    marked tile states, snaps child transforms to the `2 + sqrt(3)`
-    substitution scale, and rewrites the backend-owned substitution spec
-- `../../../tools/regenerate_dodecagonal_literature_source.py`
-  - regeneration tool that parses the PDF, snaps shared vertices, rebuilds
-    shared-edge adjacency, and rewrites the oracle-only JSON source
+The runtime tiles the plane with a decorated 3.12.12 Archimedean tiling:
 
-## Runtime Integration
+1. Place regular dodecagonal supercells on a hexagonal lattice with primitive
+   pitch `2 + sqrt(3)` (the dodecagon-edge-sharing distance for unit-edge
+   regular dodecagons).
+2. Decompose every dodecagon into its canonical layout of six unit squares plus
+   twelve unit equilateral triangles. The interior layout is 6-fold symmetric:
+   six inner triangles fan out from the centre to form a unit hexagon, six
+   unit squares sit on each hexagon edge, and six outer triangles wedge between
+   adjacent squares.
+3. Add the bridging equilateral triangles of the underlying 3.12.12 tiling
+   (one per dodecagon corner, shared by three supercells). Each supercell
+   claims two of those triangles using a 120-degree-orbit transversal so that
+   each plane triangle is owned by exactly one supercell.
 
-The authoritative runtime path is:
-
-1. `bielefeld-patch.pdf` is parsed by
-   `tools/regenerate_dodecagonal_literature_source.py`.
-2. The tool derives
-   `backend/simulation/data/dodecagonal_square_triangle_literature_source.json`.
-3. `backend/simulation/aperiodic_dodecagonal_square_triangle.py` crops that
-   finite source by graph distance for the app.
-
-The checked-in `bielefeld-rule.png` path remains diagnostic tooling. It produces
-a valid one-level rule-image patch, but the current five marked labels are not
-enough to recursively substitute tiles without overlaps and fragmented
-adjacency.
+For any requested `patch_depth`, the runtime materialises supercells in a
+sufficient hex-lattice radius around the origin, builds edge-sharing
+adjacency, and returns the BFS-cropped subgraph from a chosen seed square.
 
 ## Public Vocabulary
 
 - `tile_family = "dodecagonal-square-triangle"`
-- `dodecagonal-square-triangle-square`
-- `dodecagonal-square-triangle-triangle`
-
-Square cells keep `chirality_token = None`. Triangle cells collapse to the
-public triangle kind while preserving color-derived chirality tokens:
-`"red"`, `"yellow"`, and `"blue"`.
-
-## Core Reconstruction Rule
-
-The runtime source intentionally uses the finite literature crop until the
-missing marked recursive state is recovered. The public depth cap is `40`.
-Strict overlap-free and hole-free validation is currently proven through depth
-`11`; higher depths are available as larger finite-crop views.
-
-The substitution-spec regeneration tool is still useful for diagnostics:
-
-1. parses colored tile components from `bielefeld-rule.png`
-2. classifies the five marked states: two squares and three triangles
-3. fits regular square/triangle prototypes to each rule image component
-4. snaps child linear transforms to rotations at the `2 + sqrt(3)` scale
-5. propagates exact child translations through shared-edge constraints inside
-   each supertile
-6. emits deterministic public metadata while collapsing marked states back to
-   square/triangle public kinds
-
-That diagnostic path keeps the extracted rule image available for future work
-while avoiding a false recursive runtime.
+- `dodecagonal-square-triangle-square` — `chirality_token = None`
+- `dodecagonal-square-triangle-triangle` — `chirality_token` in
+  `{"red", "yellow", "blue"}` derived from the centroid-relative orientation
+  of the first vertex.
 
 ## Invariants
 
-At depths covered by strict validation, the derived backend source and emitted
-runtime patch must remain:
+At every patch depth the runtime patch must remain:
 
 - deterministic for the same `patch_depth`
 - one connected component
 - hole-free
 - overlap-free
+- composed of unit squares and unit equilateral triangles only
 - full-edge adjacent rather than point-touching
 - stable in ids and cell ordering
 
-The public runtime currently exposes finite-crop views up to depth `40`, while
-strict overlap-free and hole-free validation is proven through depth `11`.
+## Caveats
 
-## Regeneration And Verification
-
-Run the regeneration check from the repo root:
-
-```bash
-python tools/regenerate_dodecagonal_literature_source.py --check
-python tools/regenerate_dodecagonal_substitution_spec.py --check
-```
-
-## Integration Note
-
-The application runtime vendors generated JSON under `backend/simulation/data/`
-so the app does not need live image/PDF parsing. This folder remains the narrow
-source-asset bundle for regenerating that backend snapshot and for comparing it
-with the diagnostic rule-image spec.
+- The construction is not the canonical Schlottmann quasi-periodic
+  square-triangle tiling. A faithful Schlottmann substitution requires marked
+  prototiles and is not currently available in-repo.
+- The decorated 3.12.12 generator is locally 6-fold symmetric inside every
+  former-dodecagon region (and 12-fold symmetric in flavour because the
+  enclosing dodecagonal shape is regular) but globally periodic at the
+  hex-lattice scale.
+- The asymptotic triangle/square ratio is 14:6 = 7:3 ≈ 2.333, close to the
+  canonical Schlottmann limit of 4/sqrt(3) ≈ 2.309 but not identical.

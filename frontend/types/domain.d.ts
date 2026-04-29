@@ -76,6 +76,7 @@ export interface SizingPolicy {
     default: number;
     min: number;
     max: number;
+    unsafe_max?: number;
 }
 
 export interface BootstrappedTopologyDefinition {

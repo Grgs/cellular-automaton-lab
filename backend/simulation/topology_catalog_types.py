@@ -48,14 +48,18 @@ class SizingPolicyDefinition:
     default: int
     minimum: int
     maximum: int
+    unsafe_maximum: int | None = None
 
     def to_dict(self) -> SizingPolicyPayload:
-        return {
+        payload: SizingPolicyPayload = {
             "control": self.control,
             "default": self.default,
             "min": self.minimum,
             "max": self.maximum,
         }
+        if self.unsafe_maximum is not None:
+            payload["unsafe_max"] = self.unsafe_maximum
+        return payload
 
 
 @dataclass(frozen=True)

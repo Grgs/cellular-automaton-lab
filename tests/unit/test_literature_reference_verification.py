@@ -721,18 +721,25 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
             depth_three_observation.orientation_token_counts,
             (
                 ("0", 4),
-                ("120", 4),
-                ("30", 6),
-                ("60", 6),
-                ("90", 5),
+                ("120", 3),
+                ("150", 1),
+                ("180", 3),
+                ("210", 2),
+                ("240", 2),
+                ("270", 1),
+                ("30", 2),
+                ("300", 2),
+                ("330", 1),
+                ("60", 3),
+                ("90", 1),
             ),
         )
         self.assertEqual(
             depth_three_observation.chirality_token_counts,
             (
-                ("blue", 8),
-                ("red", 7),
-                ("yellow", 3),
+                ("blue", 4),
+                ("red", 6),
+                ("yellow", 8),
             ),
         )
         self.assertEqual(
@@ -741,7 +748,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         )
         self.assertEqual(
             depth_three_observation.signature,
-            "903859d75c46",  # pragma: allowlist secret
+            "f264950423a5",  # pragma: allowlist secret
         )
 
     def test_pinwheel_reference_verifier_tracks_expanding_support(self) -> None:

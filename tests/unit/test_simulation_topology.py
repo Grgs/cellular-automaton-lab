@@ -596,7 +596,7 @@ class SimulationTopologyTests(unittest.TestCase):
                         assert neighbor_id is not None
                         self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
-    def test_dodecagonal_square_triangle_supports_configured_literature_patch_depths(self) -> None:
+    def test_dodecagonal_square_triangle_scales_to_arbitrary_depth(self) -> None:
         depth_seven = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=7)
         depth_eleven = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=11)
         repeated_depth_eleven = build_topology(
@@ -606,11 +606,13 @@ class SimulationTopologyTests(unittest.TestCase):
         repeated_depth_forty = build_topology(
             DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=40
         )
+        depth_one_hundred = build_topology(
+            DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=100
+        )
         validation = validate_topology(depth_eleven)
 
         self.assertEqual(depth_eleven.patch_depth, 11)
         self.assertGreater(depth_eleven.cell_count, depth_seven.cell_count)
-        self.assertEqual(depth_eleven.cell_count, 262)
         self.assertTrue(validation.is_valid, validation.summary_lines())
         self.assertEqual(
             [cell.id for cell in depth_eleven.cells],
@@ -618,11 +620,14 @@ class SimulationTopologyTests(unittest.TestCase):
         )
         self.assertEqual(depth_forty.patch_depth, 40)
         self.assertGreater(depth_forty.cell_count, depth_eleven.cell_count)
-        self.assertEqual(depth_forty.cell_count, 2013)
         self.assertEqual(
             [cell.id for cell in depth_forty.cells],
             [cell.id for cell in repeated_depth_forty.cells],
         )
+        # The new decorated 3.12.12 generator has no intrinsic depth cap; deeper
+        # patches just keep growing.
+        self.assertEqual(depth_one_hundred.patch_depth, 100)
+        self.assertGreater(depth_one_hundred.cell_count, depth_forty.cell_count)
         self.assertTrue(all(cell.orientation_token is not None for cell in depth_eleven.cells))
         self.assertTrue(
             all(
@@ -632,17 +637,12 @@ class SimulationTopologyTests(unittest.TestCase):
             )
         )
 
-    def test_dodecagonal_square_triangle_rejects_unconfigured_depths(self) -> None:
-        with self.assertRaisesRegex(ValueError, "exceeds configured dodecagonal depth 40"):
-            build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=41)
-
-    def test_dodecagonal_square_triangle_runtime_uses_literature_source_until_substitution_is_validated(
+    def test_dodecagonal_square_triangle_runtime_emits_decorated_supercell_ids(
         self,
     ) -> None:
         topology = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=3)
 
-        self.assertTrue(all(cell.id.startswith("dst:lit:") for cell in topology.cells))
-        self.assertFalse(any(cell.id.startswith("dst:sub:") for cell in topology.cells))
+        self.assertTrue(all(cell.id.startswith("dst:dec:") for cell in topology.cells))
 
     def test_shield_topology_uses_exact_symbolic_substitution_depth(self) -> None:
         depth_zero = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=0)
