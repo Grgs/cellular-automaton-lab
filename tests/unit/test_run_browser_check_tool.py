@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from tools.render_review.browser_check import (
     build_run_manifest,
+    require_current_standalone_build,
     ensure_render_review_outputs,
     resolve_default_artifact_dir,
     resolve_host_kind,
@@ -98,3 +99,31 @@ class RunBrowserCheckToolTests(unittest.TestCase):
         parser = build_parser()
         args = parser.parse_args(["--success-artifacts", "--unittest", "tests.example"])
         self.assertTrue(args.success_artifacts)
+
+    def test_parser_accepts_allow_stale_standalone_flag(self) -> None:
+        parser = build_parser()
+        args, remaining = parser.parse_known_args(
+            ["--allow-stale-standalone", "--render-review", "--profile", "pinwheel-depth-3"]
+        )
+        self.assertTrue(args.allow_stale_standalone)
+        self.assertEqual(remaining, ["--profile", "pinwheel-depth-3"])
+
+    def test_require_current_standalone_build_fails_with_actionable_message(self) -> None:
+        with patch("tools.render_review.browser_check.standalone_build_status") as status:
+            status.return_value = {
+                "buildCurrent": False,
+                "reason": "source fingerprint differs from current checkout",
+                "recommendedBuildCommand": "npm run build:frontend:standalone",
+                "runtimeProvenance": {
+                    "warnings": [
+                        "Standalone build source fingerprint does not match the current checkout."
+                    ],
+                },
+            }
+            with self.assertRaisesRegex(RuntimeError, "npm run build:frontend:standalone"):
+                require_current_standalone_build(host_kind="standalone")
+
+    def test_require_current_standalone_build_can_be_bypassed(self) -> None:
+        with patch("tools.render_review.browser_check.standalone_build_status") as status:
+            require_current_standalone_build(host_kind="standalone", allow_stale=True)
+            status.assert_not_called()

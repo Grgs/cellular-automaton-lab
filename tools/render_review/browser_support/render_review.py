@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import datetime as dt
 import io
 import json
@@ -87,6 +88,7 @@ DEFAULT_ALPHA_OCCUPIED_THRESHOLD = 32
 DEFAULT_ALPHA_OPAQUE_THRESHOLD = 250
 DEFAULT_BOUNDARY_BAND_FRACTION = 0.15
 DEFAULT_MIN_DOMINANT_FILL_COUNT = 100
+CANVAS_PNG_DATA_URL_PREFIX = "data:image/png;base64,"
 
 
 class OccupiedBounds(TypedDict):
@@ -318,6 +320,33 @@ def summarize_canvas_pixels(
             )
         ],
     }
+
+
+def decode_canvas_png_data_url(data_url: str) -> bytes:
+    if not data_url.startswith(CANVAS_PNG_DATA_URL_PREFIX):
+        raise ValueError("canvas export did not return a PNG data URL")
+    try:
+        return base64.b64decode(data_url.removeprefix(CANVAS_PNG_DATA_URL_PREFIX), validate=True)
+    except ValueError as exc:
+        raise ValueError("canvas export returned invalid PNG base64 data") from exc
+
+
+def canvas_png_bytes(page: Page) -> bytes:
+    data_url = page.locator("#grid").evaluate(
+        """(canvas) => {
+            if (!(canvas instanceof HTMLCanvasElement)) {
+                throw new Error("grid canvas is missing");
+            }
+            return canvas.toDataURL("image/png");
+        }""",
+    )
+    if not isinstance(data_url, str):
+        raise TypeError("canvas export did not return a string data URL")
+    return decode_canvas_png_data_url(data_url)
+
+
+def save_canvas_png(page: Page, path: Path) -> None:
+    path.write_bytes(canvas_png_bytes(page))
 
 
 def wait_for_page_bootstrapped(page: Page, *, timeout_ms: int = 30_000) -> None:
@@ -660,7 +689,7 @@ def canvas_visual_summary(page: Page, *, png_path: Path | None = None) -> Canvas
         with Image.open(png_path) as image:
             pixel_summary = summarize_canvas_pixels(image)
     else:
-        png_bytes = page.locator("#grid").screenshot(type="png")
+        png_bytes = canvas_png_bytes(page)
         with Image.open(io.BytesIO(png_bytes)) as image:
             pixel_summary = summarize_canvas_pixels(image)
     text_summary = page.evaluate(
@@ -743,6 +772,24 @@ def browser_transform_report(page: Page) -> BrowserTransformReport | None:
     if summary is None:
         return None
     return cast(BrowserTransformReport, summary)
+
+
+def browser_diagnostic_errors(page: Page) -> tuple[str, ...]:
+    summary = page.evaluate(
+        """() => {
+            const reviewApi = window.__reviewApi;
+            const snapshot = reviewApi && typeof reviewApi.getDiagnostics === "function"
+                ? reviewApi.getDiagnostics()
+                : null;
+            if (!snapshot || typeof snapshot !== "object" || !Array.isArray(snapshot.diagnosticErrors)) {
+                return [];
+            }
+            return snapshot.diagnosticErrors.map((message) => String(message));
+        }""",
+    )
+    if not isinstance(summary, list):
+        return ()
+    return tuple(str(message) for message in summary if str(message))
 
 
 def browser_overlap_hotspots(page: Page) -> dict[str, object] | None:

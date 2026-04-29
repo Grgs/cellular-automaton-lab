@@ -31,6 +31,7 @@ class RenderReviewSweepToolTests(unittest.TestCase):
             self.assertEqual(request.patch_depths, (3,))
             self.assertIsNone(request.cell_sizes)
             self.assertFalse(request.literature_review)
+            self.assertFalse(request.allow_stale_standalone)
 
     def test_resolve_sweep_request_rejects_cell_sizes_for_patch_depth_profile(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-review-sweep-invalid-") as tmpdir:
@@ -64,6 +65,20 @@ class RenderReviewSweepToolTests(unittest.TestCase):
             request = resolve_sweep_request(args)
             self.assertTrue(request.literature_review)
             self.assertEqual(request.reference_cache_dir, cache_dir)
+
+    def test_resolve_sweep_request_preserves_allow_stale_standalone(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-sweep-stale-") as tmpdir:
+            args = parse_cli_args(
+                [
+                    "--profile",
+                    "pinwheel-depth-3",
+                    "--allow-stale-standalone",
+                    "--artifact-dir",
+                    str(Path(tmpdir) / "artifacts"),
+                ]
+            )
+            request = resolve_sweep_request(args)
+            self.assertTrue(request.allow_stale_standalone)
 
     def test_sweep_case_dir_name_is_deterministic(self) -> None:
         self.assertEqual(

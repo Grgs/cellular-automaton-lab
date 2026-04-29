@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -109,10 +110,19 @@ class RenderReviewDiffToolTests(unittest.TestCase):
             manifest_path = Path(tmpdir) / "sweep-manifest.json"
             manifest_path.write_text('{"cases": []}', encoding="utf-8")
             request = resolve_diff_review_request(
-                parse_cli_args(["--sweep-manifest", str(manifest_path), "--columns", "2"])
+                parse_cli_args(
+                    [
+                        "--sweep-manifest",
+                        str(manifest_path),
+                        "--columns",
+                        "2",
+                        "--allow-stale-standalone",
+                    ]
+                )
             )
             self.assertEqual(request.sweep_manifest, manifest_path)
             self.assertEqual(request.columns, 2)
+            self.assertTrue(request.allow_stale_standalone)
 
     def test_resolve_diff_review_request_requires_manifest_or_profile(self) -> None:
         with self.assertRaises(SystemExit):
@@ -193,3 +203,38 @@ class RenderReviewDiffToolTests(unittest.TestCase):
             result = run_render_review_diff(request)
             self.assertEqual(result.html_path, artifact_dir / "review-diff.html")
             self.assertEqual(result.image_path, artifact_dir / "review-diff.png")
+
+    def test_repo_relative_manifest_paths_resolve_to_sheet_relative_links(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="render-review-diff-relative-paths-") as tmpdir:
+            root = Path(tmpdir)
+            sweep_dir = root / "output" / "sweep"
+            case_dir = sweep_dir / "case"
+            case_dir.mkdir(parents=True)
+            Image.new("RGBA", (80, 60), (0, 255, 0, 255)).save(case_dir / "case.png")
+            (case_dir / "case.json").write_text("{}", encoding="utf-8")
+            manifest_path = sweep_dir / "sweep-manifest.json"
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "profile": "pinwheel-depth-3",
+                        "cases": [
+                            {
+                                "index": 1,
+                                "name": "case",
+                                "renderPng": "output/sweep/case/case.png",
+                                "renderSummary": "output/sweep/case/case.json",
+                            },
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with patch("tools.render_review.diff_review.ROOT_DIR", root):
+                result = run_render_review_diff(
+                    resolve_diff_review_request(
+                        parse_cli_args(["--sweep-manifest", str(manifest_path)])
+                    )
+                )
+            html = result.html_path.read_text(encoding="utf-8")
+            self.assertIn('src="case/case.png"', html)
+            self.assertIn('href="case/case.json"', html)

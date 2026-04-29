@@ -3,6 +3,7 @@ import type { AppController } from "./types/controller-app.js";
 import type { GridView } from "./types/controller-view.js";
 import type { DomElements } from "./types/dom.js";
 import type { CellStateUpdate, RuleDefinition, SimulationSnapshot, TopologyPayload } from "./types/domain.js";
+import type { RenderDiagnosticsSnapshot } from "./types/rendering.js";
 import type { AppState } from "./types/state.js";
 
 type ReviewCellStateInput = Record<string, number> | CellStateUpdate[];
@@ -82,6 +83,10 @@ function readText(element: HTMLElement | null): string {
     return element?.textContent?.trim() || "";
 }
 
+function errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
+}
+
 function buildAppDiagnosticsSnapshot(
     controller: ReviewableAppController,
     gridView: GridView,
@@ -90,7 +95,13 @@ function buildAppDiagnosticsSnapshot(
     const state = controller.getState();
     const topologySpec = state.topologySpec || null;
     const topology = state.topology || null;
-    const renderDiagnostics = gridView.getRenderDiagnostics?.() ?? null;
+    const diagnosticErrors: string[] = [];
+    let renderDiagnostics: RenderDiagnosticsSnapshot | null = null;
+    try {
+        renderDiagnostics = gridView.getRenderDiagnostics?.() ?? null;
+    } catch (error) {
+        diagnosticErrors.push(errorMessage(error));
+    }
     return {
         tilingFamily: typeof topologySpec?.tiling_family === "string" ? topologySpec.tiling_family : null,
         patchDepth: Number.isFinite(Number(topologySpec?.patch_depth))
@@ -101,6 +112,7 @@ function buildAppDiagnosticsSnapshot(
         height: Number.isFinite(Number(topologySpec?.height)) ? Number(topologySpec?.height) : null,
         topologyRevision: typeof state.topologyRevision === "string" ? state.topologyRevision : null,
         transformReport: renderDiagnostics,
+        diagnosticErrors,
         readiness: {
             appReady: window.__appReady === true,
             blockingActivityVisible: Boolean(state.blockingActivityVisible),

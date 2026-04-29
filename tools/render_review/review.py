@@ -25,11 +25,13 @@ from tools.render_review.browser_support.render_review import (
     BrowserTopologySummary,
     RenderSettleDiagnostics,
     apply_review_topology_payload,
+    browser_diagnostic_errors,
     browser_overlap_hotspots,
     browser_topology_summary,
     browser_transform_report,
     canvas_visual_summary,
     select_tiling_family,
+    save_canvas_png,
     set_cell_size,
     set_patch_depth,
     wait_for_page_bootstrapped,
@@ -1273,10 +1275,11 @@ def render_canvas_review(
                     )
                     png_path.parent.mkdir(parents=True, exist_ok=True)
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
-                    page.locator("#grid").screenshot(path=str(png_path))
+                    save_canvas_png(page, png_path)
                     visual_summary = canvas_visual_summary(page, png_path=png_path)
                     browser_topology = browser_topology_summary(page)
                     transform_report = browser_transform_report(page)
+                    diagnostic_errors = browser_diagnostic_errors(page)
                     raw_overlap_hotspots = browser_overlap_hotspots(page)
                     overlap_hotspots = build_overlap_hotspots_summary(
                         family=request.family,
@@ -1322,6 +1325,7 @@ def render_canvas_review(
                         "hostMode": host_kind,
                         "baseUrl": active_host.base_url,
                         "transformReport": transform_report,
+                        "diagnosticErrors": list(diagnostic_errors),
                         "overlapHotspots": overlap_hotspots,
                         "runtimeProvenance": runtime_provenance,
                         "provenanceWarnings": list(provenance_warnings),

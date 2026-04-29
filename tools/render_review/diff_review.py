@@ -44,6 +44,7 @@ class ResolvedDiffReviewRequest:
     out_image: Path | None
     title: str | None
     columns: int | None
+    allow_stale_standalone: bool
     card_image_width: int
     card_image_height: int
 
@@ -64,6 +65,7 @@ class DiffReviewCase:
     visual_metrics: dict[str, Any] | None
     consistency_warnings: tuple[str, ...]
     provenance_warnings: tuple[str, ...]
+    diagnostic_errors: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -120,6 +122,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out-html", type=Path, help="HTML diff sheet output path.")
     parser.add_argument("--out-image", type=Path, help="PNG contact-sheet output path.")
     parser.add_argument("--title", help="Optional title for the generated sheets.")
+    parser.add_argument(
+        "--allow-stale-standalone",
+        action="store_true",
+        help="Skip the standalone build freshness preflight for intentional stale-bundle diagnosis.",
+    )
     parser.add_argument(
         "--columns",
         type=int,
@@ -179,6 +186,7 @@ def resolve_diff_review_request(args: argparse.Namespace) -> ResolvedDiffReviewR
         out_image=args.out_image,
         title=str(args.title) if args.title is not None else None,
         columns=args.columns,
+        allow_stale_standalone=bool(args.allow_stale_standalone),
         card_image_width=int(args.card_image_width),
         card_image_height=int(args.card_image_height),
     )
@@ -190,7 +198,13 @@ def _path_from_manifest(value: object, *, manifest_dir: Path) -> Path | None:
     path = Path(str(value))
     if path.is_absolute():
         return path
-    return manifest_dir / path
+    root_relative_path = ROOT_DIR / path
+    manifest_relative_path = manifest_dir / path
+    if root_relative_path.exists():
+        return root_relative_path
+    if manifest_relative_path.exists():
+        return manifest_relative_path
+    return root_relative_path if path.parts[:1] == ("output",) else manifest_relative_path
 
 
 def _as_optional_int(value: object) -> int | None:
@@ -265,6 +279,7 @@ def collect_diff_review_cases(
                 visual_metrics=visual_metrics if isinstance(visual_metrics, dict) else None,
                 consistency_warnings=_as_string_tuple(raw_case.get("consistencyWarnings")),
                 provenance_warnings=_as_string_tuple(raw_case.get("provenanceWarnings")),
+                diagnostic_errors=_as_string_tuple(raw_case.get("diagnosticErrors")),
             )
         )
     if not cases:
@@ -293,6 +308,7 @@ def _build_sweep_args(request: ResolvedDiffReviewRequest) -> argparse.Namespace:
         reference_cache_dir=request.reference_cache_dir,
         artifact_dir=request.artifact_dir
         or _default_diff_artifact_dir(profile_name=request.profile),
+        allow_stale_standalone=request.allow_stale_standalone,
     )
 
 
@@ -319,9 +335,9 @@ def _default_sheet_paths(
 
 def _relative_path(path: Path, *, base_dir: Path) -> str:
     try:
-        return str(path.relative_to(base_dir))
+        return str(path.resolve().relative_to(base_dir.resolve()))
     except ValueError:
-        return str(path)
+        return str(path.resolve())
 
 
 def _metric_text(metrics: dict[str, Any], key: str) -> str | None:
@@ -359,7 +375,9 @@ def build_case_metadata_lines(case: DiffReviewCase) -> tuple[str, ...]:
             lines.append(f"radial symmetry {radial}")
         if aspect:
             lines.append(f"visible aspect {aspect}")
-    warning_count = len(case.consistency_warnings) + len(case.provenance_warnings)
+    warning_count = (
+        len(case.consistency_warnings) + len(case.provenance_warnings) + len(case.diagnostic_errors)
+    )
     if warning_count:
         lines.append(f"warnings {warning_count}")
     return tuple(lines)
@@ -381,7 +399,11 @@ def build_diff_review_html(
             f"<li>{html.escape(line)}</li>" for line in build_case_metadata_lines(case)
         )
         warnings = ""
-        all_warnings = (*case.consistency_warnings, *case.provenance_warnings)
+        all_warnings = (
+            *case.consistency_warnings,
+            *case.provenance_warnings,
+            *case.diagnostic_errors,
+        )
         if all_warnings:
             warnings = (
                 '<ul class="warnings">'
@@ -619,7 +641,11 @@ def run_render_review_diff(request: ResolvedDiffReviewRequest) -> DiffReviewResu
 
 def main(argv: list[str] | None = None) -> int:
     request = resolve_diff_review_request(parse_cli_args(argv))
-    result = run_render_review_diff(request)
+    try:
+        result = run_render_review_diff(request)
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     print(f"sweep_manifest={result.sweep_manifest}")
     print(f"diff_html={result.html_path}")
     print(f"diff_image={result.image_path}")

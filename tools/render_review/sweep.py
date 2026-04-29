@@ -42,6 +42,7 @@ class ResolvedRenderReviewSweepRequest:
     reference: Path | None
     reference_cache_dir: Path
     artifact_dir: Path
+    allow_stale_standalone: bool
 
 
 @dataclass(frozen=True)
@@ -86,6 +87,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--artifact-dir", type=Path, help="Optional root artifact directory for the sweep."
+    )
+    parser.add_argument(
+        "--allow-stale-standalone",
+        action="store_true",
+        help="Skip the standalone build freshness preflight for intentional stale-bundle diagnosis.",
     )
     return parser
 
@@ -194,6 +200,7 @@ def resolve_sweep_request(args: argparse.Namespace) -> ResolvedRenderReviewSweep
             profile_name=profile.name,
             artifact_dir=args.artifact_dir,
         ),
+        allow_stale_standalone=bool(args.allow_stale_standalone),
     )
 
 
@@ -331,6 +338,7 @@ def build_sweep_case_record(
         else None,
         "consistencyWarnings": list(run.consistency_warnings),
         "provenanceWarnings": summary_payload.get("provenanceWarnings", []),
+        "diagnosticErrors": summary_payload.get("diagnosticErrors", []),
         "runtimeProvenance": summary_payload.get("runtimeProvenance"),
         "settleDiagnostics": condense_settle_diagnostics(summary_payload.get("settleDiagnostics")),
         "transformSummary": condense_transform_report(summary_payload.get("transformReport")),
@@ -371,6 +379,7 @@ def run_render_review_sweep(
             "literatureReview": request.literature_review,
             "reference": str(request.reference) if request.reference is not None else None,
             "referenceCacheDir": str(request.reference_cache_dir),
+            "allowStaleStandalone": request.allow_stale_standalone,
         },
         "startedAt": dt.datetime.now(tz=dt.timezone.utc).isoformat(),
         "cases": [],
@@ -383,6 +392,7 @@ def run_render_review_sweep(
                 host_kind=case.host,
                 review_args=case_review_request,
                 artifact_dir=case.artifact_dir,
+                allow_stale_standalone=request.allow_stale_standalone,
             )
             manifest["cases"].append(build_sweep_case_record(case=case, run=run))
         exit_status = "success"
@@ -403,7 +413,11 @@ def run_render_review_sweep(
 def main(argv: list[str] | None = None) -> int:
     parsed_args = parse_cli_args(argv)
     request = resolve_sweep_request(parsed_args)
-    result = run_render_review_sweep(request)
+    try:
+        result = run_render_review_sweep(request)
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     print(f"sweep_artifact_dir={result.artifact_dir}")
     print(f"sweep_manifest={result.manifest_path}")
     print(f"sweep_cases={result.case_count}")

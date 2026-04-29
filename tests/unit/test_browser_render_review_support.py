@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import unittest
+from base64 import b64encode
 
 from tools.render_review.browser_support.render_review import (
     boundary_dominance,
+    decode_canvas_png_data_url,
     edge_density,
     gutter_score,
     normalize_readiness_snapshot,
@@ -32,6 +34,20 @@ class _FakePage:
 
 
 class BrowserRenderReviewSupportTests(unittest.TestCase):
+    def test_decode_canvas_png_data_url_decodes_png_payload(self) -> None:
+        payload = b"\x89PNG\r\n\x1a\nfake"
+        data_url = f"data:image/png;base64,{b64encode(payload).decode('ascii')}"
+
+        self.assertEqual(decode_canvas_png_data_url(data_url), payload)
+
+    def test_decode_canvas_png_data_url_rejects_non_png_payload(self) -> None:
+        with self.assertRaisesRegex(ValueError, "PNG data URL"):
+            decode_canvas_png_data_url("data:text/plain;base64,ZmFrZQ==")
+
+    def test_decode_canvas_png_data_url_rejects_invalid_base64(self) -> None:
+        with self.assertRaisesRegex(ValueError, "invalid PNG base64"):
+            decode_canvas_png_data_url("data:image/png;base64,not valid")
+
     def test_occupied_bounds_and_visible_aspect_ratio(self) -> None:
         occupied_mask = [
             False, False, False, False, False,

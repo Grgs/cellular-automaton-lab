@@ -270,6 +270,44 @@ describe("review-api", () => {
         expect(window.__reviewApi).toBeNull();
     });
 
+    it("keeps readiness diagnostics available when render diagnostics fail", async () => {
+        const { installReviewApi } = await import("./review-api.js");
+        const topology = buildTopology();
+        const state = buildState(topology);
+        const canvas = document.createElement("canvas");
+        const elements = buildElements(canvas);
+        elements.gridSizeText!.textContent = "2 x 1";
+        elements.generationText!.textContent = "7";
+        elements.statusText!.textContent = "Paused";
+        const controller: Pick<AppController, "applySimulationState" | "getState"> = {
+            applySimulationState: vi.fn(),
+            getState: () => state,
+        };
+        const gridView: GridView = {
+            setPreviewCells: vi.fn(),
+            clearPreview: vi.fn(),
+            setHoveredCell: vi.fn(),
+            setSelectedCells: vi.fn(),
+            getSelectedCells: vi.fn(() => []),
+            setGestureOutline: vi.fn(),
+            flashGestureOutline: vi.fn(),
+            clearGestureOutline: vi.fn(),
+            getRenderDiagnostics: () => {
+                throw new Error("diagnostics failed");
+            },
+            getRenderedCellCenter: () => ({ x: 1, y: 1 }),
+        };
+
+        const dispose = installReviewApi({ controller, gridView, elements });
+        const diagnostics = window.__reviewApi?.getDiagnostics();
+
+        expect(diagnostics?.transformReport).toBeNull();
+        expect(diagnostics?.diagnosticErrors).toEqual(["diagnostics failed"]);
+        expect(diagnostics?.readiness.gridSizeText).toBe("2 x 1");
+
+        dispose();
+    });
+
     it("captures a baseline for review topology changes and resets it", async () => {
         const { installReviewApi } = await import("./review-api.js");
         const topology = buildTopology();

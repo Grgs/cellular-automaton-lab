@@ -32,6 +32,7 @@ export interface AppDiagnosticsSnapshot {
     height: number | null;
     topologyRevision: string | null;
     transformReport: RenderDiagnosticsSnapshot | null;
+    diagnosticErrors: string[];
     readiness: AppReadinessDiagnosticsSnapshot;
 }
 

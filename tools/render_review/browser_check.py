@@ -24,6 +24,7 @@ from tools.render_review.browser_support.artifacts import (
 from tests.e2e.support_runtime_host import (
     BrowserRuntimeHost,
     create_runtime_host,
+    standalone_build_status,
 )
 from tools.render_review.review import (
     ResolvedRenderReviewRequest,
@@ -54,6 +55,27 @@ class ManagedRenderReviewRun:
     consistency_warnings: tuple[str, ...]
 
 
+def require_current_standalone_build(*, host_kind: str, allow_stale: bool = False) -> None:
+    if host_kind != "standalone" or allow_stale:
+        return
+    status = standalone_build_status(ROOT_DIR)
+    if bool(status.get("buildCurrent")):
+        return
+    reason = str(status.get("reason") or "standalone build is stale")
+    build_command = str(
+        status.get("recommendedBuildCommand") or "npm run build:frontend:standalone"
+    )
+    warnings = status.get("runtimeProvenance", {}).get("warnings", [])
+    warning_text = ""
+    if isinstance(warnings, list) and warnings:
+        warning_text = " " + " ".join(str(warning) for warning in warnings)
+    raise RuntimeError(
+        f"Standalone build is not current: {reason}.{warning_text} "
+        f"Run `{build_command}` before standalone browser diagnosis, "
+        "or pass --allow-stale-standalone if you intentionally want to inspect the old bundle."
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run a managed browser-backed check with host lifecycle, artifacts, and cleanup.",
@@ -73,6 +95,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--success-artifacts",
         action="store_true",
         help="Preserve browser-style success artifacts for managed --unittest runs.",
+    )
+    parser.add_argument(
+        "--allow-stale-standalone",
+        action="store_true",
+        help="Skip the standalone build freshness preflight for intentional stale-bundle diagnosis.",
     )
     mode_group = parser.add_mutually_exclusive_group(required=True)
     mode_group.add_argument(
@@ -180,7 +207,12 @@ def run_managed_render_review(
     host_kind: str,
     review_args: Any,
     artifact_dir: Path | None = None,
+    allow_stale_standalone: bool = False,
 ) -> ManagedRenderReviewRun:
+    require_current_standalone_build(
+        host_kind=host_kind,
+        allow_stale=allow_stale_standalone,
+    )
     resolved_artifact_dir = resolve_default_artifact_dir(
         artifact_dir=artifact_dir,
         host_kind=host_kind,
@@ -235,6 +267,8 @@ def run_managed_render_review(
         )
         if review_result.consistency_warnings:
             run_manifest["consistencyWarnings"] = list(review_result.consistency_warnings)
+        if summary_payload.get("diagnosticErrors"):
+            run_manifest["diagnosticErrors"] = summary_payload.get("diagnosticErrors")
         if review_result.literature_reference_status is not None:
             run_manifest["literatureReferenceStatus"] = review_result.literature_reference_status
         if review_result.literature_warnings:
@@ -322,16 +356,21 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args, remaining = parser.parse_known_args(argv)
     host_kind = resolve_host_kind(str(args.host))
-    if args.render_review:
-        review_args = parse_render_canvas_review_cli_args(remaining)
-        run = run_managed_render_review(
-            host_kind=host_kind,
-            review_args=review_args,
-            artifact_dir=args.artifact_dir,
-        )
-        print(f"artifact_dir={run.artifact_dir}")
-        print(f"run_manifest={run.run_manifest_path}")
-        return 0
+    try:
+        if args.render_review:
+            review_args = parse_render_canvas_review_cli_args(remaining)
+            run = run_managed_render_review(
+                host_kind=host_kind,
+                review_args=review_args,
+                artifact_dir=args.artifact_dir,
+                allow_stale_standalone=bool(args.allow_stale_standalone),
+            )
+            print(f"artifact_dir={run.artifact_dir}")
+            print(f"run_manifest={run.run_manifest_path}")
+            return 0
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     mode_name = "unittest"
     artifact_dir = resolve_default_artifact_dir(
         artifact_dir=args.artifact_dir,
@@ -347,6 +386,10 @@ def main(argv: list[str] | None = None) -> int:
     exit_status = "failure"
     exit_code = 1
     try:
+        require_current_standalone_build(
+            host_kind=host_kind,
+            allow_stale=bool(args.allow_stale_standalone),
+        )
         host = create_runtime_host(host_kind)
         host.start()
         run_manifest["baseUrl"] = host.base_url
@@ -376,6 +419,9 @@ def main(argv: list[str] | None = None) -> int:
                 console_messages=[],
                 run_manifest=run_manifest,
             )
+        if isinstance(exc, RuntimeError) and host is None:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
         raise
     finally:
         if host is not None:
