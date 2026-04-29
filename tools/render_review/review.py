@@ -9,13 +9,13 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Mapping
 
-from backend.payload_types import TopologyPayload
-from PIL import Image, ImageOps
-from playwright.sync_api import Page, sync_playwright
-
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
+
+from backend.payload_types import TopologyPayload
+from PIL import Image, ImageOps
+from playwright.sync_api import Page, sync_playwright
 
 from tools.render_review.browser_support.artifacts import (
     capture_browser_failure_artifacts,
