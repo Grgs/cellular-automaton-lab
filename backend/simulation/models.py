@@ -32,6 +32,7 @@ from backend.simulation.topology_catalog import (
     minimum_patch_depth_for_tiling_family,
     normalize_adjacency_mode,
     resolve_geometry_key,
+    unsafe_maximum_patch_depth_for_tiling_family,
 )
 from backend.simulation.topology import (
     LatticeTopology,
@@ -101,13 +102,17 @@ def _topology_spec_bool_value(
 
 
 MAX_UNSAFE_PATCH_DEPTH = 12
-_PATCH_DEPTH_UNSAFE_OVERRIDE_BLOCKLIST = {"dodecagonal-square-triangle"}
 
 
 def _maximum_unsafe_patch_depth_for_tiling_family(tiling_family: str) -> int:
-    if tiling_family in _PATCH_DEPTH_UNSAFE_OVERRIDE_BLOCKLIST:
-        return maximum_patch_depth_for_tiling_family(tiling_family)
-    return max(MAX_UNSAFE_PATCH_DEPTH, maximum_patch_depth_for_tiling_family(tiling_family))
+    """Per-family unsafe ceiling falls back to the global default unless a family
+    publishes its own ``unsafe_maximum`` (typically when its generator is known
+    to scale safely well beyond the default ``MAX_UNSAFE_PATCH_DEPTH``)."""
+    family_unsafe_maximum = unsafe_maximum_patch_depth_for_tiling_family(tiling_family)
+    family_normal_maximum = maximum_patch_depth_for_tiling_family(tiling_family)
+    if family_unsafe_maximum is None:
+        return max(MAX_UNSAFE_PATCH_DEPTH, family_normal_maximum)
+    return max(family_unsafe_maximum, family_normal_maximum)
 
 
 @dataclass(frozen=True)

@@ -32,7 +32,6 @@ export const MIN_UNSAFE_CELL_SIZE = 1;
 export const MAX_UNSAFE_CELL_SIZE = Math.floor(MAX_RENDER_CELL_SIZE);
 export const MIN_UNSAFE_PATCH_DEPTH = MIN_PATCH_DEPTH;
 export const MAX_UNSAFE_PATCH_DEPTH = 12;
-const PATCH_DEPTH_UNSAFE_OVERRIDE_BLOCKLIST = new Set(["dodecagonal-square-triangle"]);
 
 function unsafeSizingEnabled(options: { unsafe?: boolean } = {}): boolean {
     return Boolean(options.unsafe);
@@ -43,6 +42,14 @@ function safePatchDepthMaxForTilingFamily(tilingFamily: string | null | undefine
     return policy.control === "patch_depth"
         ? policy.max
         : MAX_PATCH_DEPTH;
+}
+
+function familyUnsafePatchDepthMax(tilingFamily: string | null | undefined): number {
+    const policy = sizingPolicyForTilingFamily(tilingFamily);
+    if (policy.control !== "patch_depth") {
+        return MAX_PATCH_DEPTH;
+    }
+    return policy.unsafe_max ?? Math.max(MAX_UNSAFE_PATCH_DEPTH, policy.max);
 }
 
 function normalizeInteger(value: number, minimum: number, maximum: number): number {
@@ -114,11 +121,8 @@ export function maxPatchDepthForTilingFamily(
     tilingFamily: string | null | undefined,
     options: { unsafe?: boolean } = {},
 ): number {
-    if (tilingFamily && PATCH_DEPTH_UNSAFE_OVERRIDE_BLOCKLIST.has(tilingFamily)) {
-        return safePatchDepthMaxForTilingFamily(tilingFamily);
-    }
     if (unsafeSizingEnabled(options)) {
-        return Math.max(MAX_UNSAFE_PATCH_DEPTH, safePatchDepthMaxForTilingFamily(tilingFamily));
+        return familyUnsafePatchDepthMax(tilingFamily);
     }
     return safePatchDepthMaxForTilingFamily(tilingFamily);
 }

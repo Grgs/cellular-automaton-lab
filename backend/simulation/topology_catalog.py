@@ -126,6 +126,7 @@ __all__ = [
     "is_penrose_geometry",
     "is_supported_topology_family",
     "maximum_patch_depth_for_tiling_family",
+    "unsafe_maximum_patch_depth_for_tiling_family",
     "minimum_grid_dimension_for_geometry",
     "minimum_patch_depth_for_tiling_family",
     "normalize_adjacency_mode",
@@ -254,3 +255,10 @@ def minimum_patch_depth_for_tiling_family(tiling_family: str) -> int:
 def maximum_patch_depth_for_tiling_family(tiling_family: str) -> int:
     policy = get_topology_sizing_policy(tiling_family)
     return policy.maximum if policy.control == PATCH_DEPTH_CONTROL else DEFAULT_TOPOLOGY_PATCH_DEPTH
+
+
+def unsafe_maximum_patch_depth_for_tiling_family(tiling_family: str) -> int | None:
+    policy = get_topology_sizing_policy(tiling_family)
+    if policy.control != PATCH_DEPTH_CONTROL:
+        return None
+    return policy.unsafe_maximum

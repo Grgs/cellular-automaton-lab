@@ -70,8 +70,8 @@ describe("controls-model/shared", () => {
         };
 
         expect(resolveViewportSizingState(dodecagonalState)).toMatchObject({
-            patchDepthMin: squareTrianglePolicy.min,
-            patchDepthMax: squareTrianglePolicy.max,
+            patchDepthMin: 0,
+            patchDepthMax: squareTrianglePolicy.unsafe_max ?? squareTrianglePolicy.max,
         });
     });
 

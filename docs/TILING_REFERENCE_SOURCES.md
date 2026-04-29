@@ -86,11 +86,12 @@ The order is intentional:
   - [Tuebingen Triangle](https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/)
 - `dodecagonal-square-triangle`
   - [Square-triangle](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
-  - Runtime finite crop regenerated from the checked-in Bielefeld patch PDF at
-    `docs/contracts/dodecagonal-square-triangle-generator/bielefeld-patch.pdf`
-  - Public runtime depth is capped at `40`; strict topology validation is currently proven through depth `11`
-  - Diagnostic rule-image spec regenerated from the checked-in Bielefeld rule image at
-    `docs/contracts/dodecagonal-square-triangle-generator/bielefeld-rule.png`
+  - The runtime is a decorated 3.12.12 Archimedean tiling: hexagonal lattice of
+    regular dodecagonal supercells, each decomposed into the canonical six unit
+    squares plus twelve unit equilateral triangles, with two bridging triangles
+    per supercell from the underlying 3.12.12 layout. It scales without a
+    depth limit and depends on no vendored data. It is not the canonical
+    Schlottmann quasi-periodic tiling.
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)
 - `pinwheel`

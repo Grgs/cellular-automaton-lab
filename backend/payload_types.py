@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, NotRequired, TypeAlias, TypedDict
+from typing import Literal, NotRequired, Required, TypeAlias, TypedDict
 
 
 RawJsonObject: TypeAlias = dict[str, object]
@@ -28,11 +28,12 @@ class TopologySpecPayload(TypedDict):
     patch_depth: int
 
 
-class SizingPolicyPayload(TypedDict):
-    control: str
-    default: int
-    min: int
-    max: int
+class SizingPolicyPayload(TypedDict, total=False):
+    control: Required[str]
+    default: Required[int]
+    min: Required[int]
+    max: Required[int]
+    unsafe_max: int
 
 
 class TopologyVariantPayload(TypedDict):

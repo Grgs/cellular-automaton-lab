@@ -629,13 +629,13 @@ class SharedUiFlowMixin:
 
         self._expect("#tiling-family-select").to_have_value("dodecagonal-square-triangle")
         self._expect("#patch-depth-field").to_be_visible()
-        self._expect("#patch-depth-input").to_have_attribute("max", "40")
-        case.assertEqual(self._patch_depth_input_state()["max"], "40")
+        self._expect("#patch-depth-input").to_have_attribute("max", "6")
+        case.assertEqual(self._patch_depth_input_state()["max"], "6")
 
         if case.page.locator("#unsafe-sizing-toggle").is_visible():
             case.page.locator("#unsafe-sizing-toggle").check()
             self._expect("#unsafe-sizing-toggle").to_be_checked()
-            self._expect("#patch-depth-input").to_have_attribute("max", "40")
+            self._expect("#patch-depth-input").to_have_attribute("max", "60")
 
         if case.api is not None:
             with case.page.expect_response(
@@ -644,13 +644,13 @@ class SharedUiFlowMixin:
                 ),
                 timeout=60_000,
             ) as response_info:
-                set_patch_depth(case.page, 40, timeout_ms=60_000)
+                set_patch_depth(case.page, 6, timeout_ms=60_000)
             case.assertEqual(int(response_info.value.status), 200)
         else:
-            set_patch_depth(case.page, 40, timeout_ms=60_000)
-        self._expect("#patch-depth-input").to_have_value("40")
-        self._expect("#patch-depth-label").to_have_text("Depth 40")
-        self._expect("#grid-size-text").to_contain_text("Depth 40")
+            set_patch_depth(case.page, 6, timeout_ms=60_000)
+        self._expect("#patch-depth-input").to_have_value("6")
+        self._expect("#patch-depth-label").to_have_text("Depth 6")
+        self._expect("#grid-size-text").to_contain_text("Depth 6")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=3)
 
     def test_shield_topology_switch_renders_aperiodic_patch(self) -> None:
