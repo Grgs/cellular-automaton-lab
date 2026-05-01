@@ -79,7 +79,7 @@ Adding a new gesture should require adding one session implementation, not editi
 
 Implementation status:
 
-The first extraction is in place. `surface-bindings.ts` now delegates pointer lifecycle behavior to `frontend/interactions/gesture-sessions.ts`, the gesture router resolves explicit pointer-down intents before starting a session, and the per-session modules now own pointer-id matching plus up/cancel completion semantics for legacy drag, armed editor pointer sessions, and right-button selection gestures. The router still owns idle click/context-menu policy, which is acceptable unless that path grows new modes.
+Done. `surface-bindings.ts` delegates pointer lifecycle to `frontend/interactions/gesture-sessions.ts`; per-session modules own pointer-id matching and up/cancel completion. The router still owns idle click/context-menu policy, which is acceptable unless that path grows new modes.
 
 ### 2. Canvas Transient Overlay Rendering
 
@@ -117,7 +117,7 @@ Canvas view becomes smaller and easier to reason about. Overlay behavior can be 
 
 Implementation status:
 
-The next extraction is now in place. `frontend/canvas/transient-overlays.ts` owns hover, selection, preview, gesture outline, flash timing, and topology cleanup state; `frontend/canvas/overlay-renderer.ts` owns transient overlay draw order; `frontend/canvas/committed-renderer.ts` owns committed-layer lifecycle, viewport alignment, geometry cache invalidation, and pointer hit testing; and `frontend/canvas/render-diagnostics.ts` owns diagnostics sampling plus rendered-cell lookup. `canvas-view.ts` is now a thin facade that composes those subsystems. Render-style ownership is also split: `theme-colors.ts` owns CSS token/color utilities, `state-colors.ts` owns cell-state and dead-state palette resolution, and `overlay-style.ts` owns transient overlay color policy.
+Done. `canvas-view.ts` is a thin facade composing `frontend/canvas/transient-overlays.ts`, `overlay-renderer.ts`, `committed-renderer.ts`, and `render-diagnostics.ts`. Render-style is split into `theme-colors.ts`, `state-colors.ts`, and `overlay-style.ts`.
 
 ### 3. Drawer And Inspector View Models
 
@@ -151,7 +151,7 @@ Adding a drawer section should not increase coupling between unrelated controls.
 
 Implementation status:
 
-The right-click metadata builder now lives in `frontend/controls-model/selection-inspector.ts`, and the broader drawer model is now split into section-owned builders for shell state, inspector/header state, topology/sizing, rule/palette, and pattern controls. `drawer.ts` is now just the composition layer for those sections.
+Done. Right-click metadata lives in `frontend/controls-model/selection-inspector.ts`. `drawer.ts` is the composition layer for section-owned builders covering shell, inspector/header, topology/sizing, rule/palette, and pattern controls.
 
 ### 4. Aperiodic Tiling Implementations
 
@@ -230,9 +230,7 @@ The verifier remains strict without becoming a single-file policy engine. Adding
 
 Implementation status:
 
-The first split is in place. `backend/simulation/literature_reference_specs.py` now merges grouped spec modules from `backend/simulation/reference_specs/`, and `backend/simulation/literature_reference_verification.py` is a compatibility facade over `backend/simulation/reference_verification/` modules for observation, fixtures, depth checks, periodic checks, shared types, and runner orchestration. `tools/regenerate_reference_fixtures.py` now makes local and canonical fixture regeneration explicit, deterministic, and checkable.
-The verification-strength report is now a real aggregator instead of a thin tag dump: `tools/report_tiling_verification_strength.py` combines static coverage, aperiodic implementation contracts, fixture presence, and live `verify_all_reference_families()` results into summary, detail, and deterministic JSON outputs.
-Direct canonical patch comparison now covers both shallow and representative depths for the highest-risk aperiodic families: `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel` all have checked-in direct patch fixtures at depth `1`, while their strongest representative fixtures remain checked in at depth `3`. Canonical fixture policy such as whether ids must be part of the comparison is now owned by the backend reference spec instead of by the JSON fixture file.
+Done. Specs and verification are split under `backend/simulation/reference_specs/` and `backend/simulation/reference_verification/`. `tools/regenerate_reference_fixtures.py` makes fixture regeneration explicit. `tools/report_tiling_verification_strength.py` aggregates coverage, contracts, fixture presence, and live verifier output. Direct canonical patch fixtures are checked in for the highest-risk aperiodic families at shallow and representative depths.
 
 ### 6. Frontend Geometry Adapter Common Path
 
@@ -268,7 +266,7 @@ Visual behavior stays consistent across tilings, and changing overlay or selecti
 
 Implementation status:
 
-The polygon adapter path is now shared more coherently. `frontend/geometry/polygon-adapter-shared.ts` owns polygon bounds measurement, transformed-cell construction, cache-backed cell resolution, rendered-center lookup, overlay/grid drawing, and polygon hit-test routing for the mixed periodic, Penrose, and generic aperiodic adapters. This also fixed the old mixed-adapter fallback-center bug where transformed bounds could be fed back through raw-coordinate center math. Regular square, hex, and triangle adapters remain local because their grid math is still clearer outside a polygon abstraction.
+Done. `frontend/geometry/polygon-adapter-shared.ts` owns the shared polygon adapter path for mixed periodic, Penrose, and generic aperiodic adapters. Regular square/hex/triangle adapters remain local because their grid math is clearer outside a polygon abstraction.
 
 ### 7. Frontend Type Surfaces
 
@@ -299,7 +297,7 @@ Payload drift becomes mechanically visible before it reaches runtime or E2E test
 
 Implementation status:
 
-The drift guard now covers substantially more of the shared schema surface. `backend/payload_contracts.py` derives frontend field contracts directly from backend `TypedDict` payload definitions in `payload_types.py`, including bootstrap metadata, rule/snapshot payloads, pattern export payloads, request bodies, and the rendering-side periodic face tiling descriptor. The same test module now also checks drift-prone canonical type references and aliases across `frontend/types/controller-view.d.ts`, `frontend/types/controller-sync-session.d.ts`, `frontend/types/editor.d.ts`, and `frontend/types/actions.d.ts`, while still asserting the standalone worker request payload union in `frontend/standalone/protocol.ts`.
+Done. `backend/payload_contracts.py` derives frontend field contracts from backend `TypedDict` definitions and the contract test asserts canonical type references across the controller-view, controller-sync-session, editor, and actions type surfaces, plus the standalone worker request payload union.
 
 ### 8. E2E Tooling And Browser Runtime
 
@@ -330,7 +328,7 @@ Developers run the same entrypoints locally and in CI, reducing stale assumption
 
 Implementation status:
 
-The consolidation is now stronger. `tests/e2e/playwright_suite_support.py` remains the single public suite manifest, `tools/run-playwright.mjs` still selects suites by semantic name, and the runner now consults a backend-owned standalone build-status report before rebuilding. That means local npm Playwright commands reuse `output/standalone/` when the build fingerprint still matches the current checkout instead of rebuilding blindly. `docs/TESTING.md` now also maps common Playwright failure classes to the right npm command and Linux browser-library repair path. The browser diagnosis and workbench commands continue to share one real package under `tools/render_review/`, with the top-level `tools/run_*.py` and `tools/render_canvas_review.py` files reduced to CLI entrypoints.
+Done. `tests/e2e/playwright_suite_support.py` is the single public suite manifest, `tools/run-playwright.mjs` selects suites by semantic name and consults the backend-owned standalone build-status report before rebuilding, and [docs/TESTING.md](TESTING.md) maps Playwright failure classes to the right npm command. Browser diagnosis and workbench commands share one package under `tools/render_review/`.
 
 ## Quick Wins
 

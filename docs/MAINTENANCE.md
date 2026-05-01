@@ -10,6 +10,7 @@ This repo now has enough moving parts that maintenance guidance needs one home. 
 - `docs/TESTING.md`: test strategy, failure classes, and browser-support details
 - `docs/CODE_QUALITY_ROADMAP.md`: structural pressure points and refactor priorities
 - `TODO.md`: concrete remaining work after the current cleanup passes
+- `CHANGELOG.md`: curated narrative changelog of completed work
 
 If a note is only about hygiene, guardrails, or how to maintain the repo, put it here instead of growing another planning document.
 

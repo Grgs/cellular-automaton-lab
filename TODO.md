@@ -1,50 +1,6 @@
 # TODO
 
-## Done
-
-- Added a standalone-first canvas render-review harness that saves a canvas PNG plus JSON metrics from the real browser render path.
-- Added a managed browser-host runner that owns standalone/server startup, readiness, logs, and cleanup for local browser checks.
-- Extended the render-review tool with reference-image comparison and named review profiles for repeatable visual diagnosis.
-- Unified browser/render failure artifacts so local review and browser-test failures emit the same core bundle shape.
-- Documented the browser-diagnosis workflow and added CLI profile discovery so the new tools are usable without reading source.
-- Added a repo-scoped process inspection/kill helper for the known browser/server helper processes started from this repo.
-- Added a render-review consistency report that cross-checks backend topology facts, browser-state topology facts, and frontend grid-summary output in one JSON report.
-- Made managed `run_browser_check.py --render-review` runs default their PNG/JSON outputs into the run artifact directory so repeated reviews do not overwrite the shared `output/render-review/` paths.
-- Added an optional `--success-artifacts` bundle for managed `run_browser_check.py --unittest` runs so passing browser checks can preserve `page.png`, `canvas.png`, and `render-summary.json`.
-- Added a render-review sweep tool that runs one profile across a small matrix of hosts, themes, or sizes and emits one sweep manifest plus one comparable artifact tree.
-- Added profile-owned literature review metadata plus a gitignored local reference-cache workflow so render reviews and sweeps can produce normalized literature montages without storing literature images in git.
-- Added render-transform diagnostics to browser-backed render review so summaries and manifests can show topology-space bounds, render-space bounds, and stable sample-cell transforms from the live frontend adapter path.
-- Added standalone build provenance and stale-bundle comparison so render-review summaries and manifests can warn when a standalone bundle no longer matches the current checkout.
-- Hardened browser render-review settle detection so captures now wait for a stable readiness tuple and record `settleDiagnostics` instead of trusting a momentarily hidden loading overlay.
-- Added overlap-hotspot diagnostics plus family-aware overlap policy metadata to render review, managed browser checks, and sweeps so image-derived families like `shield` can report overlap severity instead of only failing a binary fixture test.
-- Restored shield's representative render-space no-overlap fixture by separating topology cleanup from draw-only seam hiding: the shipped topology now uses minimal inward trace cleanup, while the canvas path handles seam bridging without mutating geometry cache vertices.
-- Added advisory visual-quality metrics to render-review output, managed browser-check manifests, and sweep case records, including visible aspect ratio, edge density, boundary dominance, gutter score, orientation diversity, 12-sector occupancy, and radial-symmetry scoring when the live render diagnostics expose the needed inputs.
-- Added a family sample workbench for patch-depth families so candidate representative samples can be compared structurally by count, connectivity, bounds, holes, and diagnostic validation, with optional browser review against injected candidate topology payloads.
-- Added a geometry cleanup workbench for image-derived families so shield cleanup scales can be compared by overlap severity, bounds drift, and optional browser-visible gutter risk without ad hoc Shapely sweeps.
-- Replaced click-driven palette alias browser tests with a review/test API that injects topology and mutates cell state by `cell.id`, then samples rendered pixels directly from the canvas.
-- Moved custom dead-palette ownership and fixture-backed browser alias coverage onto a shared manifest/registry contract so TypeScript and Python no longer maintain separate family allowlists for this test surface.
-- Added a frontend representative fixture manifest plus regeneration tool so browser-facing topology fixtures can be checked and refreshed deterministically instead of relying on ad hoc manual export steps.
-- Added advisory profile-owned expectations to render review, managed browser-check manifests, sweep case records, and browser-reviewed workbench summaries so named profiles can carry manual checklists plus expected-warning classification without changing command success semantics.
-- Moved browser diagnosis and workbench implementation under `tools/render_review/` and reduced the top-level Python commands to thin CLI entrypoints.
-- Surfaced backend-owned aperiodic implementation status and promotion blockers in the topology picker and drawer UI.
-- Added incremental lint/format guardrails for the render-review/bootstrap slice plus a repo-owned frontend formatting check.
-- Tightened the interaction stack around explicit pointer-down intent resolution and session-owned pointer matching/completion, so the router no longer hardcodes per-session pointer-id policy.
-- Split the drawer view model into section-owned builders for shell state, inspector/header state, topology/sizing, rule/palette, and pattern controls.
-- Added a first-pass dodecagonal structure miner that reports repeated local shell signatures and bounded square/triangle macro-candidate unions from the literature-derived source patch.
-- Added a second-pass dodecagonal supertile miner that grows repeated macro seeds through symmetry-normalized neighbor-slot support, surfacing a stable five-cell square-seeded candidate pattern from the literature-derived source patch.
-- Added a third-pass dodecagonal inflation probe that extracts boundary line families from the five-cell seed, searches stable second-ring slot combinations, and surfaces a repeatable ten-cell polygonal closure with an approximate scale-up factor.
-- Added a boundary-template inference pass for dodecagonal inflation candidates that canonicalizes repeated larger closures under seed symmetry and reports explicit normalized line-family offsets for the dominant repeated templates.
-- Added a line-equation and supertile-decomposition pass for dodecagonal boundary templates that emits explicit normalized line equations and groups repeated interval-signature decomposition components inside the dominant larger templates.
-- Added a dodecagonal macro-composition pass that unions repeated decomposition-region signatures and surfaces recurring square macro-cells inside the dominant 8-cell and 10-cell literature-derived templates.
-- Added a first recovered-rule pass for dodecagonal templates that promotes repeated macro-composition patterns into explicit substitution-style child rules and checks whether those child rules recur on a slightly deeper shell window of the literature-derived source patch.
-- Extracted a reusable planar template-analysis module for polygon context building, subset scoring, boundary canonicalization, line-family inference, slot normalization, and template-component recovery so later tiling miners do not need to duplicate the dodecagonal geometry/template machinery.
-- Added a recovered parent-decomposition pass for dodecagonal templates that mixes verified multi-region child rules with recurring singleton square/triangle components, yielding fully covered child inventories for several parent templates and deeper-shell verification counts for each recovered piece.
-- Added a canonical parent-rule pass for dodecagonal templates that solves a compact exact cover over recovered composition pieces plus primitive square/triangle components, yielding smaller fully covered child inventories for the strongest parent templates.
-- Extended the canonical parent-rule pass with template-local composition mining at a lower support threshold, which reduces the strongest verified 7-cell square-seeded parent to a 7-piece exact cover with three square-valued multi-region children and twelve deeper-shell template matches.
-- Folded deeper-window template-local compositions back into the canonical rule candidate pool and gave canonical recovery its own wider template-local decomposition state, which strengthens the strongest verified 7-cell square-seeded parent into a full 7-piece exact cover with four square-valued multi-region children and twelve deeper-shell template matches.
-- Added an evidence-ranked parent-rule pass for dodecagonal templates that keeps exact-cover recovery from over-optimizing for compactness alone, surfacing fully verified zero-weak-piece covers for the strongest 7-cell square-seeded parent across the deeper verification window.
-- Replaced the `dodecagonal-square-triangle` finite-oracle runtime with a decorated 3.12.12 Archimedean generator that tiles the plane exactly, scales without a depth cap, and depends on no vendored data; deleted the literature oracle JSON, the substitution spec JSON, the regeneration tools (`regenerate_dodecagonal_literature_source.py`, `regenerate_dodecagonal_substitution_spec.py`), the structure miner (`mine_dodecagonal_square_triangle_structure.py`, `dodecagonal_structure_report.py`, `tiling_template_analysis.py`), their unit tests, and the contracts-bundle source assets (Bielefeld patch PDF and rule image).
-- Added a one-command render-review diff tool that either runs a new sweep or consumes an existing `sweep-manifest.json`, then emits one HTML sheet plus one PNG contact sheet for side-by-side review.
+Active work. Completed work lives in [CHANGELOG.md](CHANGELOG.md).
 
 ## Now
 
@@ -52,6 +8,7 @@
 - For `dodecagonal-square-triangle`, the runtime is now a decorated 3.12.12 Archimedean generator: hexagonal lattice of regular dodecagonal supercells decomposed into six unit squares plus twelve unit equilateral triangles, with two bridging triangles per supercell. It tiles the plane exactly, scales without depth limit, and uses no vendored data. It is not the canonical Schlottmann quasi-periodic tiling (which would require marked prototiles); the supercell layout is locally 6-fold symmetric and the global tiling is periodic at the supercell scale.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
 - For `pinwheel`, treat the remaining visual mismatch as a display-sampling problem; keep the two-root exact-affine runtime patch, and if we revisit the presentation use a display-only observation window rather than runtime subset selection.
+
 ## Next
 
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
