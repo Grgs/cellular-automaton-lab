@@ -42,7 +42,7 @@ This assessment is based on the current code shape, recent feature work, and the
 Primary files:
 
 - [surface-bindings.ts](../frontend/interactions/surface-bindings.ts)
-- [legacy-drag.ts](../frontend/interactions/legacy-drag.ts)
+- [paint-drag.ts](../frontend/interactions/paint-drag.ts)
 - [editor-session.ts](../frontend/interactions/editor-session.ts)
 - [command-dispatch.ts](../frontend/interactions/command-dispatch.ts)
 - [interactions.ts](../frontend/interactions.ts)

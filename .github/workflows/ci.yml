@@ -185,6 +185,9 @@ jobs:
       - name: Run Playwright suite integrity guard
         run: python -m unittest -q tests.e2e.test_playwright_suite_integrity
 
+      - name: Validate documentation links
+        run: python tools/check_doc_links.py
+
   backend-unit-coverage:
     name: Backend Unit Coverage
     runs-on: ubuntu-latest

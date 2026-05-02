@@ -54,3 +54,9 @@ repos:
         language: system
         pass_filenames: false
         stages: [pre-commit, manual]
+      - id: doc-links
+        name: documentation links
+        entry: python tools/check_doc_links.py
+        language: python
+        pass_filenames: false
+        stages: [pre-push, manual]

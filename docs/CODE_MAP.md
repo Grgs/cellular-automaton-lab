@@ -439,7 +439,7 @@ Use this list to decide where cleanup work should start. These are the files wit
 
 - Frontend gesture orchestration:
   [surface-bindings.ts](../frontend/interactions/surface-bindings.ts),
-  [legacy-drag.ts](../frontend/interactions/legacy-drag.ts),
+  [paint-drag.ts](../frontend/interactions/paint-drag.ts),
   [editor-session.ts](../frontend/interactions/editor-session.ts),
   [command-dispatch.ts](../frontend/interactions/command-dispatch.ts)
 - Canvas transient overlays:

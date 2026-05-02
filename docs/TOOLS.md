@@ -55,6 +55,16 @@ py -3 tools/run_python_style.py format-check
 py -3 tools/run_python_style.py format
 ```
 
+### `tools/check_doc_links.py`
+
+Validates internal Markdown links and heading anchors across every tracked `.md` file. Catches broken file paths, broken `#anchor` references (using GitHub heading-slug rules), and reference-style links with no matching `[label]: ...` definition. External `http(s)://` and `mailto:` links are intentionally skipped — link liveness is out of scope for this gate. Wrapped by `npm run check:doc-links`. Source: [check_doc_links.py](../tools/check_doc_links.py).
+
+```powershell
+py -3 tools/check_doc_links.py
+py -3 tools/check_doc_links.py --format json
+py -3 tools/check_doc_links.py docs/TOOLS.md README.md
+```
+
 ### `tools/check_frontend_format.mjs`
 
 Repo-owned lightweight frontend formatting check. Asserts every file under `frontend/`, `static/css/`, `templates/`, and `vite.config.ts` ends with a newline, has no trailing whitespace, and has no leading tabs. Wired into `pre-commit` via `npm run format:frontend:check`. Source: [check_frontend_format.mjs](../tools/check_frontend_format.mjs).
