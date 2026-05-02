@@ -67,7 +67,7 @@ packaging==26.2
     #   pip-requirements-parser
 pathspec==1.1.1
     # via mypy
-pillow==11.2.1
+pillow==12.2.0
     # via -r requirements-dev.in
 pip-api==0.0.34
     # via pip-audit
