@@ -36,12 +36,13 @@ const FAMILIES: TopologyOption[] = [
 ];
 
 function createElements(): DomElements {
-    return {
+    const elements: Partial<DomElements> = {
         tilingFamilySelect: document.createElement("select"),
         tilingPickerMenu: document.createElement("div"),
         tilingPickerCurrentPreview: document.createElement("span"),
         tilingPickerCurrentLabel: document.createElement("span"),
-    } as unknown as DomElements;
+    };
+    return elements as DomElements;
 }
 
 describe("controls/view-options tiling picker", () => {

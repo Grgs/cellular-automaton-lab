@@ -4,6 +4,8 @@ import { bindTilingPreviewPicker } from "./tiling-picker-bindings.js";
 import type { AppActionSet } from "../types/actions.js";
 import type { DomElements } from "../types/dom.js";
 
+type PickerActions = Pick<AppActionSet, "changeTilingFamily">;
+
 function createElements(): DomElements {
     const select = document.createElement("select");
     select.append(new Option("Square", "square"), new Option("Hexagonal", "hex"));
@@ -28,11 +30,16 @@ function createElements(): DomElements {
     toggle.setAttribute("aria-expanded", "false");
 
     document.body.replaceChildren(toggle, menu);
-    return {
+    const elements: Partial<DomElements> = {
         tilingFamilySelect: select,
         tilingPickerMenu: menu,
         tilingPickerToggle: toggle,
-    } as unknown as DomElements;
+    };
+    return elements as DomElements;
+}
+
+function createActions(changeTilingFamily: PickerActions["changeTilingFamily"]): PickerActions {
+    return { changeTilingFamily };
 }
 
 describe("controls/tiling-picker-bindings", () => {
@@ -40,7 +47,7 @@ describe("controls/tiling-picker-bindings", () => {
         const elements = createElements();
         const changeTilingFamily = vi.fn();
 
-        bindTilingPreviewPicker(elements, { changeTilingFamily } as unknown as AppActionSet);
+        bindTilingPreviewPicker(elements, createActions(changeTilingFamily));
         elements.tilingPickerToggle?.click();
 
         expect(elements.tilingPickerMenu?.hidden).toBe(false);
@@ -57,7 +64,7 @@ describe("controls/tiling-picker-bindings", () => {
     it("closes the preview picker on Escape", () => {
         const elements = createElements();
 
-        bindTilingPreviewPicker(elements, { changeTilingFamily: vi.fn() } as unknown as AppActionSet);
+        bindTilingPreviewPicker(elements, createActions(vi.fn()));
         elements.tilingPickerToggle?.click();
         elements.tilingPickerMenu?.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 
