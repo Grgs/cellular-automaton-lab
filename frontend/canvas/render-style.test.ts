@@ -37,55 +37,71 @@ describe("canvas/render-style", () => {
         installRenderStyleTestGlobals();
     });
 
-    it("uses alternate dead fills for the supported mixed tiling accent shapes", async () => {
+    it("applies tone-driven dead fills to the Archimedean prototile kinds", async () => {
+        // Each Archimedean family registers its prototile kinds in the
+        // family-dead palette manifest. Primary kinds use cream (the family
+        // base), the second kind uses tan, and three-kind families add clay
+        // for the smallest shape. Kagome stays on the legacy deadAlt fallback
+        // because its triangle-up/triangle-down kinds aren't yet in the
+        // manifest's selector vocabulary.
         const {
             buildStateColorLookup,
             resolveDeadCellColor,
             resolveRenderedCellColor,
         } = await import("./render-style.js");
         const colorLookup = buildStateColorLookup();
-        const deadAltByGeometry = [
-            { geometry: ARCHIMEDEAN_488_GEOMETRY, cell: { id: "s:0:0", state: 0, kind: "square" } },
-            { geometry: ARCHIMEDEAN_31212_GEOMETRY, cell: { id: "t:0:0", state: 0, kind: "triangle" } },
-            { geometry: ARCHIMEDEAN_4612_GEOMETRY, cell: { id: "s:0:0", state: 0, kind: "square" } },
-            { geometry: KAGOME_GEOMETRY, cell: { id: "tu:0:0", state: 0, kind: "triangle-up" } },
+        const colors = readCanvasColorsForTests();
+        const expectations = [
+            { geometry: ARCHIMEDEAN_488_GEOMETRY, kind: "octagon", expected: colors.toneCream },
+            { geometry: ARCHIMEDEAN_488_GEOMETRY, kind: "square", expected: colors.toneTan },
+            { geometry: ARCHIMEDEAN_31212_GEOMETRY, kind: "dodecagon", expected: colors.toneCream },
+            { geometry: ARCHIMEDEAN_31212_GEOMETRY, kind: "triangle", expected: colors.toneTan },
+            { geometry: ARCHIMEDEAN_3464_GEOMETRY, kind: "hexagon", expected: colors.toneCream },
+            { geometry: ARCHIMEDEAN_3464_GEOMETRY, kind: "square", expected: colors.toneTan },
+            { geometry: ARCHIMEDEAN_3464_GEOMETRY, kind: "triangle", expected: colors.toneClay },
+            { geometry: ARCHIMEDEAN_4612_GEOMETRY, kind: "dodecagon", expected: colors.toneCream },
+            { geometry: ARCHIMEDEAN_4612_GEOMETRY, kind: "hexagon", expected: colors.toneTan },
+            { geometry: ARCHIMEDEAN_4612_GEOMETRY, kind: "square", expected: colors.toneClay },
+            { geometry: ARCHIMEDEAN_33434_GEOMETRY, kind: "square", expected: colors.toneCream },
+            { geometry: ARCHIMEDEAN_33434_GEOMETRY, kind: "triangle", expected: colors.toneTan },
+            { geometry: ARCHIMEDEAN_33344_GEOMETRY, kind: "square", expected: colors.toneCream },
+            { geometry: ARCHIMEDEAN_33344_GEOMETRY, kind: "triangle", expected: colors.toneTan },
+            { geometry: ARCHIMEDEAN_33336_GEOMETRY, kind: "hexagon", expected: colors.toneCream },
+            { geometry: ARCHIMEDEAN_33336_GEOMETRY, kind: "triangle", expected: colors.toneTan },
+            { geometry: KAGOME_GEOMETRY, kind: "triangle-up", expected: "#d5bb8f" },
+            { geometry: KAGOME_GEOMETRY, kind: "triangle-down", expected: "#d5bb8f" },
         ];
 
-        deadAltByGeometry.forEach(({ geometry, cell }) => {
-            expect(resolveDeadCellColor(0, { geometry, cell })).toBe("#d5bb8f");
-            expect(resolveRenderedCellColor(0, colorLookup, readCanvasColorsForTests(), { geometry, cell })).toBe("#d5bb8f");
+        expectations.forEach(({ geometry, kind, expected }) => {
+            const cell = { id: `${kind}:0:0`, state: 0, kind };
+            expect(resolveDeadCellColor(0, { geometry, cell })).toBe(expected);
+            expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry, cell })).toBe(expected);
         });
     });
 
-    it("keeps unsupported or primary mixed tiling shapes on the default dead fill", async () => {
+    it("falls through to the default dead fill for geometries with no manifest entry", async () => {
         const { resolveDeadCellColor } = await import("./render-style.js");
-        expect(
-            resolveDeadCellColor(0, {
-                geometry: ARCHIMEDEAN_31212_GEOMETRY,
-                cell: { id: "d:0:0", state: 0, kind: "dodecagon" },
-            }),
-        ).toBe("#f8f1e5");
-
-        expect(
-            resolveDeadCellColor(0, {
-                geometry: ARCHIMEDEAN_4612_GEOMETRY,
-                cell: { id: "h:0:0", state: 0, kind: "hexagon" },
-            }),
-        ).toBe("#f8f1e5");
-
-        expect(
-            resolveDeadCellColor(0, {
-                geometry: ARCHIMEDEAN_4612_GEOMETRY,
-                cell: { id: "d:0:0", state: 0, kind: "dodecagon" },
-            }),
-        ).toBe("#f8f1e5");
-
-        expect(
-            resolveDeadCellColor(0, {
-                geometry: ARCHIMEDEAN_3464_GEOMETRY,
-                cell: { id: "t:0:0", state: 0, kind: "triangle" },
-            }),
-        ).toBe("#f8f1e5");
+        // Single-prototile lattices (square, hex, plus the regular duals like
+        // cairo-pentagonal, rhombille) have no manifest entry and should fall
+        // through to the default dead color.
+        const fallthroughGeometries = [
+            CAIRO_GEOMETRY,
+            RHOMBILLE_GEOMETRY,
+            DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+            TETRAKIS_SQUARE_GEOMETRY,
+            TRIAKIS_TRIANGULAR_GEOMETRY,
+            PRISMATIC_PENTAGONAL_GEOMETRY,
+            FLORET_PENTAGONAL_GEOMETRY,
+            SNUB_SQUARE_DUAL_GEOMETRY,
+        ];
+        fallthroughGeometries.forEach((geometry) => {
+            expect(
+                resolveDeadCellColor(0, {
+                    geometry,
+                    cell: { id: "p:0:0", state: 0, kind: "pentagon" },
+                }),
+            ).toBe("#f8f1e5");
+        });
     });
 
     it("resolves registered family dead-state palettes from the shared registry", async () => {

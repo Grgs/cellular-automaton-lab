@@ -1,10 +1,5 @@
 import { DEFAULT_GEOMETRY, normalizeGeometry } from "../layout.js";
-import {
-    ARCHIMEDEAN_31212_GEOMETRY,
-    ARCHIMEDEAN_4612_GEOMETRY,
-    ARCHIMEDEAN_488_GEOMETRY,
-    KAGOME_GEOMETRY,
-} from "../topology.js";
+import { KAGOME_GEOMETRY } from "../topology.js";
 import { triangleOrientation } from "./geometry-triangle.js";
 import { resolveRegisteredFamilyDeadColor } from "./family-dead-palette-registry.js";
 import { DEFAULT_COLORS } from "./theme-colors.js";
@@ -12,10 +7,12 @@ import type { CanvasColors } from "../types/rendering.js";
 import type { CellStateDefinition, TopologyCell } from "../types/domain.js";
 import type { PaintableCell } from "../types/editor.js";
 
+// Kagome stays here because the topology emits "triangle-up" / "triangle-down"
+// kinds (kagome's two triangle orientations) that the family-dead palette
+// manifest does not yet model; the manifest's selector vocabulary doesn't
+// include orientation tokens for kagome. The Archimedean families that
+// previously lived here (488, 31212, 4612) now have explicit manifest entries.
 const MIXED_DEAD_ALT_CELL_KINDS = new Map<string, ReadonlySet<string>>([
-    [ARCHIMEDEAN_488_GEOMETRY, new Set(["square"])],
-    [ARCHIMEDEAN_31212_GEOMETRY, new Set(["triangle"])],
-    [ARCHIMEDEAN_4612_GEOMETRY, new Set(["square"])],
     [KAGOME_GEOMETRY, new Set(["triangle-up", "triangle-down"])],
 ]);
 
@@ -38,15 +35,16 @@ export function resolveDeadCellColor(
         return null;
     }
 
+    const normalizedGeometry = normalizeGeometry(geometry);
     const registeredFamilyDeadColor = resolveRegisteredFamilyDeadColor(
         (cell as TopologyCell | null | undefined) ?? null,
         fallbackColors,
+        normalizedGeometry,
     );
     if (registeredFamilyDeadColor) {
         return registeredFamilyDeadColor;
     }
 
-    const normalizedGeometry = normalizeGeometry(geometry);
     const alternateMixedKinds = MIXED_DEAD_ALT_CELL_KINDS.get(normalizedGeometry);
     if (alternateMixedKinds && typeof cell?.kind === "string" && alternateMixedKinds.has(cell.kind)) {
         return fallbackColors.deadAlt;

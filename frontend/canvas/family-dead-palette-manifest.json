@@ -1,6 +1,181 @@
 {
   "families": [
     {
+      "geometry": "archimedean-4-8-8",
+      "variants": [
+        {
+          "label": "archimedean-4-8-8-octagon",
+          "selector": {"kind": "octagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "archimedean-4-8-8-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "archimedean-3-12-12",
+      "variants": [
+        {
+          "label": "archimedean-3-12-12-dodecagon",
+          "selector": {"kind": "dodecagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "archimedean-3-12-12-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "archimedean-3-4-6-4",
+      "variants": [
+        {
+          "label": "archimedean-3-4-6-4-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "archimedean-3-4-6-4-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "archimedean-3-4-6-4-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "archimedean-4-6-12",
+      "variants": [
+        {
+          "label": "archimedean-4-6-12-dodecagon",
+          "selector": {"kind": "dodecagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "archimedean-4-6-12-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "archimedean-4-6-12-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "archimedean-3-3-4-3-4",
+      "variants": [
+        {
+          "label": "archimedean-3-3-4-3-4-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "archimedean-3-3-4-3-4-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "archimedean-3-3-3-4-4",
+      "variants": [
+        {
+          "label": "archimedean-3-3-3-4-4-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "archimedean-3-3-3-4-4-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "archimedean-3-3-3-3-6",
+      "variants": [
+        {
+          "label": "archimedean-3-3-3-3-6-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "archimedean-3-3-3-3-6-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "penrose-p2-kite-dart",
+      "variants": [
+        {
+          "label": "penrose-p2-kite",
+          "selector": {"kind": "kite"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "penrose-p2-dart",
+          "selector": {"kind": "dart"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "penrose-p3-rhombs",
+      "variants": [
+        {
+          "label": "penrose-p3-thick-rhomb",
+          "selector": {"kind": "thick-rhomb"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "penrose-p3-thin-rhomb",
+          "selector": {"kind": "thin-rhomb"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "penrose-p3-rhombs-vertex",
+      "variants": [
+        {
+          "label": "penrose-p3-vertex-thick-rhomb",
+          "selector": {"kind": "thick-rhomb"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "penrose-p3-vertex-thin-rhomb",
+          "selector": {"kind": "thin-rhomb"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "ammann-beenker",
+      "variants": [
+        {
+          "label": "ammann-beenker-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "ammann-beenker-rhomb",
+          "selector": {"kind": "rhomb"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
       "geometry": "tuebingen-triangle",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/tuebingen-triangle-depth-3.json",

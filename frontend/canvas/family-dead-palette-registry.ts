@@ -148,8 +148,17 @@ export function matchesFamilyDeadPaletteVariant(
 export function resolveRegisteredFamilyDeadColor(
     cell: TopologyCell | null | undefined,
     fallbackColors: CanvasColors = DEFAULT_COLORS,
+    geometry: string | null = null,
 ): string | null {
     for (const variant of FAMILY_DEAD_PALETTE_VARIANTS) {
+        // Variants must be scoped by geometry; without this guard a cell with
+        // a generic kind like "triangle" would collide with the first triangle
+        // variant in any family that registers one. Pre-Archimedean entries
+        // happened to all use `tile_family` selectors that were inherently
+        // family-specific, so the bug only surfaced once the catalog grew.
+        if (geometry !== null && variant.geometry !== geometry) {
+            continue;
+        }
         if (matchesFamilyDeadPaletteVariant(cell, variant)) {
             return resolveDeadPaletteColorSpec(variant.color, fallbackColors);
         }
