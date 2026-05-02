@@ -236,6 +236,17 @@ Prints the JSON standalone build-status report (existence, manifest fingerprint,
 py -3 tools/print_standalone_build_status.py
 ```
 
+### `tools/run_coverage.py`
+
+Runs the backend `unit` suite, the `api` suite, or both under `coverage`, then combines and prints a report. Mirrors the CI workflow so contributors can reproduce the same backend coverage numbers locally. Supports `--fail-under <pct>` for a local threshold gate, `--xml <path>` for Cobertura output, and `--html <dir>` for an interactive report. Wrapped by `npm run coverage:backend`. Source: [run_coverage.py](../tools/run_coverage.py).
+
+```powershell
+py -3 tools/run_coverage.py
+py -3 tools/run_coverage.py --suite unit
+py -3 tools/run_coverage.py --fail-under 80
+py -3 tools/run_coverage.py --xml output/coverage/coverage.xml --html output/coverage/html
+```
+
 ## Supply-chain audit
 
 ### `tools/run_supply_chain_audit.py`

@@ -29,6 +29,7 @@ STYLE_TARGETS = (
     "tools/run_geometry_cleanup_workbench.py",
     "tools/run_render_review_diff.py",
     "tools/run_render_review_sweep.py",
+    "tools/run_coverage.py",
     "tools/run_python_style.py",
     "tools/run_supply_chain_audit.py",
     # Direct tests for the guarded Python slices.
@@ -45,6 +46,7 @@ STYLE_TARGETS = (
     "tests/unit/test_reference_fixture_regeneration.py",
     "tests/unit/test_report_tiling_verification_strength_tool.py",
     "tests/unit/test_render_canvas_review_tool.py",
+    "tests/unit/test_run_coverage_tool.py",
     "tests/unit/test_supply_chain_audit_tool.py",
     "tests/unit/test_validate_tilings_tool.py",
     "tests/unit/test_run_browser_check_tool.py",
