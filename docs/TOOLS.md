@@ -247,6 +247,17 @@ py -3 tools/run_coverage.py --fail-under 80
 py -3 tools/run_coverage.py --xml output/coverage/coverage.xml --html output/coverage/html
 ```
 
+### `tools/check_bundle_size.py`
+
+Walks the standalone build (`output/standalone/`), classifies each file into a category by glob, sums raw and gzipped bytes per category, and gates on the per-category and total budgets defined in [tools/standalone_bundle_budget.json](../tools/standalone_bundle_budget.json). Exits non-zero on any budget violation. Optional `--baseline <prior-manifest.json>` adds a delta-from-baseline column for change tracking, and `--output <path>` writes a machine-readable JSON manifest alongside the formatted summary so CI can publish historical bundle sizes. Wrapped by `npm run check:bundle-size`. Source: [check_bundle_size.py](../tools/check_bundle_size.py).
+
+```powershell
+py -3 tools/check_bundle_size.py
+py -3 tools/check_bundle_size.py --format json
+py -3 tools/check_bundle_size.py --output output/bundle-size.txt
+py -3 tools/check_bundle_size.py --baseline output/bundle-size.baseline.json
+```
+
 ## Supply-chain audit
 
 ### `tools/run_supply_chain_audit.py`

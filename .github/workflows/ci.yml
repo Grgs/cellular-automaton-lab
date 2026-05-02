@@ -50,6 +50,20 @@ jobs:
           npm run build:frontend
           npm run build:frontend:standalone
 
+      - name: Check standalone bundle size budget
+        run: |
+          mkdir -p output/bundle-size
+          python tools/check_bundle_size.py \
+            --output output/bundle-size/standalone-bundle-size.txt
+
+      - name: Upload bundle-size manifest
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: standalone-bundle-size
+          path: output/bundle-size
+          if-no-files-found: warn
+
       - name: Package frontend build outputs
         run: |
           tar -czf frontend-dist.tgz static/dist

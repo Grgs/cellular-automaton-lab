@@ -23,7 +23,8 @@
     "check:ci-local": "npm run check:python && npm run check:frontend && node ./tools/run-python.mjs tools/validate_tilings.py && node ./tools/run-python.mjs tools/verify_reference_tilings.py && npm run test:e2e:playwright",
     "fixtures:reference:check": "node ./tools/run-python.mjs tools/regenerate_reference_fixtures.py --all --mode both --check",
     "audit:supply-chain": "node ./tools/run-python.mjs tools/run_supply_chain_audit.py",
-    "coverage:backend": "node ./tools/run-python.mjs tools/run_coverage.py"
+    "coverage:backend": "node ./tools/run-python.mjs tools/run_coverage.py",
+    "check:bundle-size": "node ./tools/run-python.mjs tools/check_bundle_size.py"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
