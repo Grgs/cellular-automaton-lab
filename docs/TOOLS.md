@@ -247,6 +247,16 @@ py -3 tools/run_coverage.py --fail-under 80
 py -3 tools/run_coverage.py --xml output/coverage/coverage.xml --html output/coverage/html
 ```
 
+### `tools/smoke_test_standalone.py`
+
+Fast standalone-only smoke gate. Spins up `StandaloneRuntimeHost` against a prebuilt `output/standalone/` bundle, launches headless Chromium, navigates to the standalone URL, and waits for the readiness signal that says the bundled bootstrap has hydrated. Captures every console message and `pageerror` event during startup and fails the run on any error-level event (with a small allowlist for benign Pyodide notices). Reports total wall-clock time and the bootstrap-only sub-time. Cheap enough for an inner-loop check (typically a few seconds on a warm cache) where the full Playwright standalone suite would be overkill. Wrapped by `npm run smoke:standalone`. Source: [smoke_test_standalone.py](../tools/smoke_test_standalone.py).
+
+```powershell
+py -3 tools/smoke_test_standalone.py
+py -3 tools/smoke_test_standalone.py --timeout-seconds 60
+py -3 tools/smoke_test_standalone.py --format json --output output/standalone-smoke.json
+```
+
 ### `tools/check_bundle_size.py`
 
 Walks the standalone build (`output/standalone/`), classifies each file into a category by glob, sums raw and gzipped bytes per category, and gates on the per-category and total budgets defined in [tools/standalone_bundle_budget.json](../tools/standalone_bundle_budget.json). Exits non-zero on any budget violation. Optional `--baseline <prior-manifest.json>` adds a delta-from-baseline column for change tracking, and `--output <path>` writes a machine-readable JSON manifest alongside the formatted summary so CI can publish historical bundle sizes. Wrapped by `npm run check:bundle-size`. Source: [check_bundle_size.py](../tools/check_bundle_size.py).

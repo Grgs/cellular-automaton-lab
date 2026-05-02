@@ -33,6 +33,7 @@ STYLE_TARGETS = (
     "tools/run_coverage.py",
     "tools/run_python_style.py",
     "tools/run_supply_chain_audit.py",
+    "tools/smoke_test_standalone.py",
     # Direct tests for the guarded Python slices.
     "tests/api/test_api_bootstrap.py",
     "tests/e2e/test_render_canvas_review_tool.py",
@@ -49,6 +50,7 @@ STYLE_TARGETS = (
     "tests/unit/test_check_bundle_size_tool.py",
     "tests/unit/test_render_canvas_review_tool.py",
     "tests/unit/test_run_coverage_tool.py",
+    "tests/unit/test_smoke_test_standalone_tool.py",
     "tests/unit/test_supply_chain_audit_tool.py",
     "tests/unit/test_validate_tilings_tool.py",
     "tests/unit/test_run_browser_check_tool.py",

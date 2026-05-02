@@ -422,6 +422,20 @@ jobs:
       - name: Install Chromium for Playwright
         run: python -m playwright install --with-deps chromium
 
+      - name: Run standalone smoke test
+        run: |
+          mkdir -p output/standalone-smoke
+          python tools/smoke_test_standalone.py \
+            --output output/standalone-smoke/summary.txt
+
+      - name: Upload standalone smoke artifact
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: standalone-smoke
+          path: output/standalone-smoke
+          if-no-files-found: warn
+
       - name: Run standalone Playwright suite
         env:
           E2E_ARTIFACTS_DIR: ${{ github.workspace }}/e2e-artifacts/standalone-browser

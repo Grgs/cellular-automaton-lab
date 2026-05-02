@@ -24,7 +24,8 @@
     "fixtures:reference:check": "node ./tools/run-python.mjs tools/regenerate_reference_fixtures.py --all --mode both --check",
     "audit:supply-chain": "node ./tools/run-python.mjs tools/run_supply_chain_audit.py",
     "coverage:backend": "node ./tools/run-python.mjs tools/run_coverage.py",
-    "check:bundle-size": "node ./tools/run-python.mjs tools/check_bundle_size.py"
+    "check:bundle-size": "node ./tools/run-python.mjs tools/check_bundle_size.py",
+    "smoke:standalone": "node ./tools/run-python.mjs tools/smoke_test_standalone.py"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
