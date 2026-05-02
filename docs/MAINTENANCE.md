@@ -8,6 +8,7 @@ This repo now has enough moving parts that maintenance guidance needs one home. 
 - `docs/ARCHITECTURE.md`: runtime boundaries and subsystem ownership
 - `docs/CODE_MAP.md`: navigation for specific files and call paths
 - `docs/TESTING.md`: test strategy, failure classes, and browser-support details
+- `docs/TOOLS.md`: single index of every script under `tools/`
 - `docs/CODE_QUALITY_ROADMAP.md`: structural pressure points and refactor priorities
 - `TODO.md`: concrete remaining work after the current cleanup passes
 - `CHANGELOG.md`: curated narrative changelog of completed work
