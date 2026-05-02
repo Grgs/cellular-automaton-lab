@@ -638,20 +638,27 @@ button.tiling-preview-card.is-selected {
     stroke-linecap: round;
 }
 
+/*
+ * Picker thumbnails pull from the same tile-tone palette the canvas uses, so
+ * clicking a thumbnail previews the canvas colors you'll see. The 4-fill
+ * rotation deliberately stays inside the warm tone family - cream, tan,
+ * stone, clay - rather than introducing decorative accents (e.g. teal or
+ * terracotta) that the canvas never shows.
+ */
 .tiling-preview-fill-a {
-    fill: var(--cell-dead);
+    fill: var(--tone-cream);
 }
 
 .tiling-preview-fill-b {
-    fill: #e0c68f;
+    fill: var(--tone-tan);
 }
 
 .tiling-preview-fill-c {
-    fill: #86a7a0;
+    fill: var(--tone-stone);
 }
 
 .tiling-preview-fill-d {
-    fill: #c27457;
+    fill: var(--tone-clay);
 }
 
 :root[data-theme="dark"] .tiling-selected-preview,
@@ -659,22 +666,6 @@ button.tiling-preview-card.is-selected {
     background:
         linear-gradient(135deg, rgba(231, 237, 248, 0.08), rgba(231, 237, 248, 0.02)),
         var(--field-bg);
-}
-
-:root[data-theme="dark"] .tiling-preview-fill-a {
-    fill: #f8f1e5;
-}
-
-:root[data-theme="dark"] .tiling-preview-fill-b {
-    fill: #d5bb8f;
-}
-
-:root[data-theme="dark"] .tiling-preview-fill-c {
-    fill: #6ea8a0;
-}
-
-:root[data-theme="dark"] .tiling-preview-fill-d {
-    fill: #d67a4c;
 }
 
 .top-slider {
