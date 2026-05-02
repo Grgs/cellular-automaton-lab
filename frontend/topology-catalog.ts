@@ -168,11 +168,17 @@ export function tilingFamilyOptions(): TopologyOption[] {
             const label = aperiodicMetadata?.experimental
                 ? `${definition.label} (Experimental)`
                 : definition.label;
+            const previewKey = definition.geometry_keys[definition.default_adjacency_mode]
+                || Object.values(definition.geometry_keys)[0]
+                || definition.tiling_family;
             return {
                 value: definition.tiling_family,
                 label,
                 group: definition.picker_group,
                 order: definition.picker_order,
+                previewKey,
+                renderKind: definition.render_kind,
+                sizingMode: definition.sizing_mode,
             };
         });
 }

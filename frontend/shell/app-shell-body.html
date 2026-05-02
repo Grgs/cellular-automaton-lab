@@ -21,10 +21,31 @@
 
             <div class="top-bar-controls">
                 <div class="top-bar-control-group top-bar-topology-group">
-                    <label class="top-control compact-select top-bar-tiling-control">
-                        <span class="top-control-label">Tiling</span>
-                        <select id="tiling-family-select">__TILING_FAMILY_OPTIONS__</select>
-                    </label>
+                    <div class="top-control compact-select top-bar-tiling-control">
+                        <label id="tiling-family-label" class="top-control-label" for="tiling-family-select">Tiling</label>
+                        <div class="tiling-picker-control">
+                            <span id="tiling-picker-current-preview" class="tiling-selected-preview" aria-hidden="true"></span>
+                            <select id="tiling-family-select" aria-labelledby="tiling-family-label">__TILING_FAMILY_OPTIONS__</select>
+                            <button
+                                id="tiling-picker-toggle"
+                                class="soft-action tiling-picker-toggle"
+                                type="button"
+                                aria-haspopup="dialog"
+                                aria-expanded="false"
+                                aria-controls="tiling-picker-menu"
+                                title="Browse tilings"
+                            >
+                                Browse
+                            </button>
+                        </div>
+                        <div
+                            id="tiling-picker-menu"
+                            class="tiling-picker-menu"
+                            role="dialog"
+                            aria-label="Tiling preview picker"
+                            hidden
+                        ></div>
+                    </div>
                 </div>
 
                 <div class="top-bar-control-group top-bar-actions-group">

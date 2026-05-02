@@ -50,6 +50,9 @@ export interface DomElements {
     cellSizeLabel: HTMLElement | null;
     configSyncStatus: HTMLElement | null;
     tilingFamilySelect: HTMLSelectElement | null;
+    tilingPickerToggle: HTMLButtonElement | null;
+    tilingPickerMenu: HTMLElement | null;
+    tilingPickerCurrentPreview: HTMLElement | null;
     adjacencyModeField: HTMLElement | null;
     adjacencyModeSelect: HTMLSelectElement | null;
     patchDepthField: HTMLElement | null;

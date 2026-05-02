@@ -1,5 +1,6 @@
 import { bindButtonControl, bindInputControl } from "./binding-primitives.js";
 import { bindConstrainedNumericControl } from "./limit-cues.js";
+import { bindTilingPreviewPicker } from "./tiling-picker-bindings.js";
 import type { AppActionSet } from "../types/actions.js";
 import type { DomElements } from "../types/dom.js";
 import type { BrowserTimerId } from "../types/controller.js";
@@ -56,6 +57,7 @@ export function bindSimulationControls(
         () => Boolean(elements.unsafeSizingToggle?.checked),
         actions.setUnsafeSizingEnabled,
     );
+    bindTilingPreviewPicker(elements, actions);
 
     bindButtonControl(elements.runToggleBtn, actions.toggleRun);
     bindButtonControl(elements.stepBtn, actions.step);
