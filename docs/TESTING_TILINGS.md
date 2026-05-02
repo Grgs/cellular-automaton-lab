@@ -29,10 +29,10 @@ For periodic families, it also checks periodic-face descriptor semantics, exact 
 ### 3. Focused verifier unit tests
 
 ```powershell
-py -3 -m unittest -q tests.unit.test_literature_reference_verification
+py -3 -m unittest discover -s tests/unit -p "test_literature_reference_verification*.py"
 ```
 
-Use this when changing verifier behavior, specs, or signatures.
+Use this when changing verifier behavior, specs, or signatures. The verifier suite is split across `test_literature_reference_verification.py` (general/catalog/tool-level), `test_literature_reference_verification_periodic.py` (periodic-face descriptor checks), and `test_literature_reference_verification_aperiodic.py` (aperiodic family checks plus fixture-mismatch reporting).
 
 ### 4. Full backend regression sweep
 

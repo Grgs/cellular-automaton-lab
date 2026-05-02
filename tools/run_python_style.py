@@ -39,6 +39,8 @@ STYLE_TARGETS = (
     "tests/e2e/test_run_render_review_sweep_tool.py",
     "tests/unit/test_aperiodic_family_contracts.py",
     "tests/unit/test_literature_reference_verification.py",
+    "tests/unit/test_literature_reference_verification_aperiodic.py",
+    "tests/unit/test_literature_reference_verification_periodic.py",
     "tests/unit/test_reference_fixture_regeneration.py",
     "tests/unit/test_report_tiling_verification_strength_tool.py",
     "tests/unit/test_render_canvas_review_tool.py",
