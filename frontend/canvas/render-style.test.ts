@@ -131,6 +131,15 @@ describe("canvas/render-style", () => {
             live: "#131722",
             accent: "#bf5a36",
             accentStrong: "#8a3d20",
+            toneCream: "#f8f1e5",
+            toneLinen: "#ead6b6",
+            toneSand: "#efe4d0",
+            toneFlax: "#e1cdac",
+            toneTan: "#e5c089",
+            toneStone: "#d5bb8f",
+            toneRose: "#dbc1b2",
+            toneClay: "#c88d4b",
+            toneShadow: "#b89a6e",
         };
         const colorLookup = buildStateColorLookup([], colors);
 
@@ -204,6 +213,15 @@ describe("canvas/render-style", () => {
             live: "#1f2430",
             accent: "#d67a4c",
             accentStrong: "#f1a275",
+            toneCream: "#f8f1e5",
+            toneLinen: "#ead6b6",
+            toneSand: "#efe4d0",
+            toneFlax: "#e1cdac",
+            toneTan: "#e5c089",
+            toneStone: "#d5bb8f",
+            toneRose: "#dbc1b2",
+            toneClay: "#c88d4b",
+            toneShadow: "#b89a6e",
         };
         const colorLookup = buildStateColorLookup([], colors);
         const tokenBackedVariants = FAMILY_DEAD_PALETTE_VARIANTS.filter((variant) => typeof variant.color !== "string");
@@ -270,6 +288,15 @@ describe("canvas/render-style", () => {
             live: "#f2f5ff",
             accent: "#d67a4c",
             accentStrong: "#f1a275",
+            toneCream: "#f8f1e5",
+            toneLinen: "#ead6b6",
+            toneSand: "#efe4d0",
+            toneFlax: "#e1cdac",
+            toneTan: "#e5c089",
+            toneStone: "#d5bb8f",
+            toneRose: "#dbc1b2",
+            toneClay: "#c88d4b",
+            toneShadow: "#b89a6e",
         });
 
         expect(style.hoverTintColor).toBe("rgba(7, 11, 17, 0.18)");
@@ -292,5 +319,14 @@ function readCanvasColorsForTests() {
         live: "#1f2430",
         accent: "#bf5a36",
         accentStrong: "#8a3d20",
+        toneCream: "#f8f1e5",
+        toneLinen: "#ead6b6",
+        toneSand: "#efe4d0",
+        toneFlax: "#e1cdac",
+        toneTan: "#e5c089",
+        toneStone: "#d5bb8f",
+        toneRose: "#dbc1b2",
+        toneClay: "#c88d4b",
+        toneShadow: "#b89a6e",
     };
 }

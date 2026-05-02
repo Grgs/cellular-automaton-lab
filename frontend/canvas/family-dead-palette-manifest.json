@@ -14,7 +14,7 @@
             "tile_family": "tuebingen",
             "chirality_token": "left"
           },
-          "color": "#f8f1e5"
+          "color": {"token": "toneCream"}
         },
         {
           "label": "tuebingen-thick-right",
@@ -23,7 +23,7 @@
             "tile_family": "tuebingen",
             "chirality_token": "right"
           },
-          "color": "#d5bb8f"
+          "color": {"token": "toneStone"}
         },
         {
           "label": "tuebingen-thin-left",
@@ -32,7 +32,7 @@
             "tile_family": "tuebingen",
             "chirality_token": "left"
           },
-          "color": "#efe4d0"
+          "color": {"token": "toneSand"}
         },
         {
           "label": "tuebingen-thin-right",
@@ -41,7 +41,7 @@
             "tile_family": "tuebingen",
             "chirality_token": "right"
           },
-          "color": "#e1cdac"
+          "color": {"token": "toneFlax"}
         }
       ]
     },
@@ -58,7 +58,7 @@
             "kind": "robinson-thick",
             "tile_family": "robinson"
           },
-          "color": "#f8f1e5"
+          "color": {"token": "toneCream"}
         },
         {
           "label": "robinson-thin",
@@ -66,7 +66,7 @@
             "kind": "robinson-thin",
             "tile_family": "robinson"
           },
-          "color": "#d5bb8f"
+          "color": {"token": "toneStone"}
         }
       ]
     },
@@ -83,7 +83,7 @@
             "tile_family": "hat",
             "chirality_token": "left"
           },
-          "color": "#f8f1e5"
+          "color": {"token": "toneCream"}
         },
         {
           "label": "hat-right",
@@ -91,7 +91,7 @@
             "tile_family": "hat",
             "chirality_token": "right"
           },
-          "color": "#c88d4b"
+          "color": {"token": "toneClay"}
         }
       ]
     },
@@ -108,7 +108,7 @@
             "kind": "chair",
             "orientation_token": "0"
           },
-          "color": "#f8f1e5"
+          "color": {"token": "toneCream"}
         },
         {
           "label": "chair-1",
@@ -116,7 +116,7 @@
             "kind": "chair",
             "orientation_token": "1"
           },
-          "color": "#e5c089"
+          "color": {"token": "toneTan"}
         },
         {
           "label": "chair-2",
@@ -124,7 +124,7 @@
             "kind": "chair",
             "orientation_token": "2"
           },
-          "color": "#c88d4b"
+          "color": {"token": "toneClay"}
         },
         {
           "label": "chair-3",
@@ -132,7 +132,7 @@
             "kind": "chair",
             "orientation_token": "3"
           },
-          "color": "#dbc1b2"
+          "color": {"token": "toneRose"}
         }
       ]
     },
@@ -150,7 +150,7 @@
             "tile_family": "dodecagonal-square-triangle",
             "chirality_token": "blue"
           },
-          "color": "#f8f1e5"
+          "color": {"token": "toneCream"}
         },
         {
           "label": "dst-square-red",
@@ -159,7 +159,7 @@
             "tile_family": "dodecagonal-square-triangle",
             "chirality_token": "red"
           },
-          "color": "#ead6b6"
+          "color": {"token": "toneLinen"}
         },
         {
           "label": "dst-square-yellow",
@@ -168,7 +168,7 @@
             "tile_family": "dodecagonal-square-triangle",
             "chirality_token": "yellow"
           },
-          "color": "#d5bb8f"
+          "color": {"token": "toneStone"}
         },
         {
           "label": "dst-triangle-blue",
@@ -177,7 +177,7 @@
             "tile_family": "dodecagonal-square-triangle",
             "chirality_token": "blue"
           },
-          "color": "#efe4d0"
+          "color": {"token": "toneSand"}
         },
         {
           "label": "dst-triangle-red",
@@ -186,7 +186,7 @@
             "tile_family": "dodecagonal-square-triangle",
             "chirality_token": "red"
           },
-          "color": "#e1cdac"
+          "color": {"token": "toneFlax"}
         },
         {
           "label": "dst-triangle-yellow",
@@ -195,7 +195,7 @@
             "tile_family": "dodecagonal-square-triangle",
             "chirality_token": "yellow"
           },
-          "color": "#c88d4b"
+          "color": {"token": "toneClay"}
         }
       ]
     },
@@ -212,7 +212,7 @@
             "tile_family": "pinwheel",
             "chirality_token": "left"
           },
-          "color": "#efe4d0"
+          "color": {"token": "toneSand"}
         },
         {
           "label": "pinwheel-right",
@@ -220,7 +220,7 @@
             "tile_family": "pinwheel",
             "chirality_token": "right"
           },
-          "color": "#d5bb8f"
+          "color": {"token": "toneStone"}
         }
       ]
     },

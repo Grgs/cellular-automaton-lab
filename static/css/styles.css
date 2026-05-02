@@ -15,6 +15,23 @@
     --cell-line-soft: rgba(31, 36, 48, 0.10);
     --cell-line-strong: rgba(31, 36, 48, 0.20);
     --cell-line-aperiodic: rgba(31, 36, 48, 0.24);
+    /* Tile-tone palette: shared canonical tones for prototile-kind, chirality,
+       and orientation differentiation across families. Used by the canvas
+       family-dead palette and the tiling preview picker. The palette stays
+       warm in both themes: dead cells are the cream end of the canvas
+       regardless of UI chrome theme. Intermediate tones (linen, flax, rose)
+       support kind × chirality nesting in families like tuebingen and the
+       6-variant dodecagonal-square-triangle palette where 6+ distinguishable
+       tones must live in a tight visual range. */
+    --tone-cream: #f8f1e5;
+    --tone-linen: #ead6b6;
+    --tone-sand: #efe4d0;
+    --tone-flax: #e1cdac;
+    --tone-tan: #e5c089;
+    --tone-stone: #d5bb8f;
+    --tone-rose: #dbc1b2;
+    --tone-clay: #c88d4b;
+    --tone-shadow: #b89a6e;
     --shadow: 0 18px 40px rgba(47, 39, 25, 0.12);
     --page-bg:
         radial-gradient(circle at top left, rgba(191, 90, 54, 0.18), transparent 28%),
@@ -74,6 +91,18 @@
     --cell-line-soft: rgba(231, 237, 248, 0.07);
     --cell-line-strong: rgba(231, 237, 248, 0.14);
     --cell-line-aperiodic: rgba(7, 11, 17, 0.42);
+    /* Tile-tone palette intentionally matches light mode: tile interiors
+       stay warm so prototile differentiation reads consistently regardless
+       of UI chrome. */
+    --tone-cream: #f8f1e5;
+    --tone-linen: #ead6b6;
+    --tone-sand: #efe4d0;
+    --tone-flax: #e1cdac;
+    --tone-tan: #e5c089;
+    --tone-stone: #d5bb8f;
+    --tone-rose: #dbc1b2;
+    --tone-clay: #c88d4b;
+    --tone-shadow: #b89a6e;
     --shadow: 0 22px 42px rgba(0, 0, 0, 0.38);
     --page-bg:
         radial-gradient(circle at top left, rgba(214, 122, 76, 0.18), transparent 26%),

@@ -3,7 +3,20 @@ import { DEFAULT_COLORS } from "./theme-colors.js";
 import type { CanvasColors } from "../types/rendering.js";
 import type { TopologyCell } from "../types/domain.js";
 
-export type DeadPaletteColorToken = "dead" | "deadAlt" | "accent" | "accentStrong";
+export type DeadPaletteColorToken =
+    | "dead"
+    | "deadAlt"
+    | "accent"
+    | "accentStrong"
+    | "toneCream"
+    | "toneLinen"
+    | "toneSand"
+    | "toneFlax"
+    | "toneTan"
+    | "toneStone"
+    | "toneRose"
+    | "toneClay"
+    | "toneShadow";
 
 export type DeadPaletteColorSpec = string | { token: DeadPaletteColorToken };
 

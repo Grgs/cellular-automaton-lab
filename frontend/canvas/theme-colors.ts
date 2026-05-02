@@ -10,6 +10,15 @@ export const DEFAULT_COLORS: CanvasColors = {
     live: "#1f2430",
     accent: "#bf5a36",
     accentStrong: "#8a3d20",
+    toneCream: "#f8f1e5",
+    toneLinen: "#ead6b6",
+    toneSand: "#efe4d0",
+    toneFlax: "#e1cdac",
+    toneTan: "#e5c089",
+    toneStone: "#d5bb8f",
+    toneRose: "#dbc1b2",
+    toneClay: "#c88d4b",
+    toneShadow: "#b89a6e",
 };
 
 export function readCanvasColors(
@@ -43,6 +52,15 @@ export function readCanvasColors(
         accentStrong: rootStyle.getPropertyValue("--accent-dark").trim()
             || rootStyle.getPropertyValue("--accent").trim()
             || DEFAULT_COLORS.accentStrong,
+        toneCream: rootStyle.getPropertyValue("--tone-cream").trim() || DEFAULT_COLORS.toneCream,
+        toneLinen: rootStyle.getPropertyValue("--tone-linen").trim() || DEFAULT_COLORS.toneLinen,
+        toneSand: rootStyle.getPropertyValue("--tone-sand").trim() || DEFAULT_COLORS.toneSand,
+        toneFlax: rootStyle.getPropertyValue("--tone-flax").trim() || DEFAULT_COLORS.toneFlax,
+        toneTan: rootStyle.getPropertyValue("--tone-tan").trim() || DEFAULT_COLORS.toneTan,
+        toneStone: rootStyle.getPropertyValue("--tone-stone").trim() || DEFAULT_COLORS.toneStone,
+        toneRose: rootStyle.getPropertyValue("--tone-rose").trim() || DEFAULT_COLORS.toneRose,
+        toneClay: rootStyle.getPropertyValue("--tone-clay").trim() || DEFAULT_COLORS.toneClay,
+        toneShadow: rootStyle.getPropertyValue("--tone-shadow").trim() || DEFAULT_COLORS.toneShadow,
     };
 }
 

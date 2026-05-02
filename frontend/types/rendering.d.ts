@@ -54,6 +54,15 @@ export interface CanvasColors {
     live: string;
     accent: string;
     accentStrong: string;
+    toneCream: string;
+    toneLinen: string;
+    toneSand: string;
+    toneFlax: string;
+    toneTan: string;
+    toneStone: string;
+    toneRose: string;
+    toneClay: string;
+    toneShadow: string;
 }
 
 export interface RenderStyle {
