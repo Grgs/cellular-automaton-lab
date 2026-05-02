@@ -432,9 +432,8 @@ h1 {
 
 .tiling-picker-control {
     display: grid;
-    grid-template-columns: 46px minmax(150px, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     align-items: stretch;
-    gap: 6px;
 }
 
 .tiling-selected-preview,
@@ -450,12 +449,53 @@ h1 {
 }
 
 .tiling-selected-preview {
-    min-height: 36px;
+    width: 46px;
+    height: 34px;
+    min-height: 34px;
 }
 
 .tiling-picker-toggle {
-    min-width: 68px;
-    padding-inline: 9px;
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr) 14px;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 4px 10px 4px 4px;
+    border-color: var(--field-border);
+    background: var(--field-bg);
+    color: var(--field-text);
+    box-shadow: none;
+    text-align: left;
+}
+
+.tiling-picker-toggle:hover:not(:disabled),
+.tiling-picker-toggle:focus-visible,
+.tiling-picker-toggle[aria-expanded="true"] {
+    border-color: var(--accent);
+    background: var(--btn-soft-hover);
+    box-shadow: none;
+}
+
+.tiling-selected-label {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.89rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tiling-picker-caret {
+    width: 0;
+    height: 0;
+    justify-self: center;
+    border-top: 5px solid currentColor;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    opacity: 0.76;
 }
 
 .tiling-picker-menu {
@@ -1678,7 +1718,7 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .tiling-picker-control {
-        grid-template-columns: 46px minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr);
         width: 100%;
     }
 

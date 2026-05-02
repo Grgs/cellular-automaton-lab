@@ -40,6 +40,7 @@ function createElements(): DomElements {
         tilingFamilySelect: document.createElement("select"),
         tilingPickerMenu: document.createElement("div"),
         tilingPickerCurrentPreview: document.createElement("span"),
+        tilingPickerCurrentLabel: document.createElement("span"),
     } as unknown as DomElements;
 }
 
@@ -55,6 +56,7 @@ describe("controls/view-options tiling picker", () => {
         expect(elements.tilingPickerMenu?.querySelectorAll(".tiling-preview-card")).toHaveLength(3);
         expect(elements.tilingPickerMenu?.querySelector(".tiling-preview-card.is-selected")?.textContent).toContain("Hexagonal");
         expect(elements.tilingPickerCurrentPreview?.querySelector("svg")).not.toBeNull();
+        expect(elements.tilingPickerCurrentLabel?.textContent).toBe("Hexagonal");
     });
 
     it("reuses preview card DOM when only the selected tiling changes", () => {
@@ -72,6 +74,7 @@ describe("controls/view-options tiling picker", () => {
         expect(elements.tilingPickerCurrentPreview?.dataset.previewSignature).toBe(
             "penrose-p3-rhombs:penrose-p3-rhombs",
         );
+        expect(elements.tilingPickerCurrentLabel?.textContent).toBe("Penrose P3 Rhombs");
     });
 
     it("renders sampled topology geometry for polygon tiling thumbnails", () => {

@@ -22,20 +22,27 @@
             <div class="top-bar-controls">
                 <div class="top-bar-control-group top-bar-topology-group">
                     <div class="top-control compact-select top-bar-tiling-control">
-                        <label id="tiling-family-label" class="top-control-label" for="tiling-family-select">Tiling</label>
+                        <label id="tiling-family-label" class="top-control-label" for="tiling-picker-toggle">Tiling</label>
                         <div class="tiling-picker-control">
-                            <span id="tiling-picker-current-preview" class="tiling-selected-preview" aria-hidden="true"></span>
-                            <select id="tiling-family-select" aria-labelledby="tiling-family-label">__TILING_FAMILY_OPTIONS__</select>
+                            <select
+                                id="tiling-family-select"
+                                aria-hidden="true"
+                                tabindex="-1"
+                                hidden
+                            >__TILING_FAMILY_OPTIONS__</select>
                             <button
                                 id="tiling-picker-toggle"
-                                class="soft-action tiling-picker-toggle"
+                                class="tiling-picker-toggle"
                                 type="button"
                                 aria-haspopup="dialog"
                                 aria-expanded="false"
                                 aria-controls="tiling-picker-menu"
-                                title="Browse tilings"
+                                aria-labelledby="tiling-family-label tiling-picker-current-label"
+                                title="Choose tiling"
                             >
-                                Browse
+                                <span id="tiling-picker-current-preview" class="tiling-selected-preview" aria-hidden="true"></span>
+                                <span id="tiling-picker-current-label" class="tiling-selected-label">Loading...</span>
+                                <span class="tiling-picker-caret" aria-hidden="true"></span>
                             </button>
                         </div>
                         <div

@@ -169,16 +169,28 @@ function syncTilingPreviewSelection(menu: HTMLElement, selectedValue: string): v
 
 function syncSelectedTilingPreview(
     previewElement: HTMLElement | null,
+    labelElement: HTMLElement | null,
     families: readonly TopologyOption[],
     selectedValue: string,
 ): void {
-    if (!previewElement) {
+    if (!previewElement && !labelElement) {
         return;
     }
     const selectedOption = families.find((family) => family.value === selectedValue) ?? families[0] ?? null;
     if (!selectedOption) {
-        previewElement.replaceChildren();
-        previewElement.dataset.previewSignature = "";
+        previewElement?.replaceChildren();
+        if (previewElement) {
+            previewElement.dataset.previewSignature = "";
+        }
+        if (labelElement) {
+            labelElement.textContent = "";
+        }
+        return;
+    }
+    if (labelElement) {
+        labelElement.textContent = selectedOption.label;
+    }
+    if (!previewElement) {
         return;
     }
     const signature = `${selectedOption.value}:${selectedOption.previewKey}`;
@@ -196,7 +208,12 @@ function populateTilingPreviewPicker(
 ): void {
     const menu = elements.tilingPickerMenu;
     if (!menu) {
-        syncSelectedTilingPreview(elements.tilingPickerCurrentPreview, families, selectedValue);
+        syncSelectedTilingPreview(
+            elements.tilingPickerCurrentPreview,
+            elements.tilingPickerCurrentLabel,
+            families,
+            selectedValue,
+        );
         return;
     }
     const signature = tilingOptionsSignature(families);
@@ -205,7 +222,12 @@ function populateTilingPreviewPicker(
         menu.dataset.optionsSignature = signature;
     }
     syncTilingPreviewSelection(menu, selectedValue);
-    syncSelectedTilingPreview(elements.tilingPickerCurrentPreview, families, selectedValue);
+    syncSelectedTilingPreview(
+        elements.tilingPickerCurrentPreview,
+        elements.tilingPickerCurrentLabel,
+        families,
+        selectedValue,
+    );
 }
 
 export function populateAdjacencyModes(
