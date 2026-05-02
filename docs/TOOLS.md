@@ -11,8 +11,9 @@ The CLI tools group into seven purposes:
 5. [Browser diagnosis and render review](#browser-diagnosis-and-render-review)
 6. [Fixture and bootstrap regeneration](#fixture-and-bootstrap-regeneration)
 7. [Test runners and introspection](#test-runners-and-introspection)
-8. [Performance benchmarks](#performance-benchmarks)
-9. [Process cleanup](#process-cleanup)
+8. [Supply-chain audit](#supply-chain-audit)
+9. [Performance benchmarks](#performance-benchmarks)
+10. [Process cleanup](#process-cleanup)
 
 For the npm-script surface (which wraps several of these), see the `scripts` block in [package.json](../package.json).
 
@@ -233,6 +234,19 @@ Prints the JSON standalone build-status report (existence, manifest fingerprint,
 
 ```powershell
 py -3 tools/print_standalone_build_status.py
+```
+
+## Supply-chain audit
+
+### `tools/run_supply_chain_audit.py`
+
+Runs `pip-audit` against `requirements.txt` and `requirements-dev.txt` and `npm audit` against `package-lock.json`, and emits a unified findings summary. Exits non-zero when either ecosystem reports a finding at or above the configured severity threshold (default: `high`). Wired into `npm run audit:supply-chain` and a nightly cron in [.github/workflows/supply-chain-audit.yml](../.github/workflows/supply-chain-audit.yml). Source: [run_supply_chain_audit.py](../tools/run_supply_chain_audit.py).
+
+```powershell
+py -3 tools/run_supply_chain_audit.py
+py -3 tools/run_supply_chain_audit.py --ecosystem python
+py -3 tools/run_supply_chain_audit.py --severity moderate --format json
+py -3 tools/run_supply_chain_audit.py --ignore-pip-vuln PYSEC-2025-61
 ```
 
 ## Performance benchmarks

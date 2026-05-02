@@ -1,0 +1,73 @@
+name: Supply Chain Audit
+
+on:
+  schedule:
+    # Daily at 06:00 UTC. Picked to land before the typical workday so a
+    # blocking finding is visible the morning it appears.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "requirements*.in"
+      - "requirements*.txt"
+      - "package.json"
+      - "package-lock.json"
+      - "tools/run_supply_chain_audit.py"
+      - ".github/workflows/supply-chain-audit.yml"
+
+concurrency:
+  group: supply-chain-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: pip-audit + npm audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run supply-chain audit
+        run: |
+          mkdir -p output/supply-chain-audit
+          python tools/run_supply_chain_audit.py \
+            --format summary \
+            --output output/supply-chain-audit/summary.txt
+          python tools/run_supply_chain_audit.py \
+            --format json \
+            --no-fail \
+            --output output/supply-chain-audit/findings.json
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: supply-chain-audit
+          path: output/supply-chain-audit
+          if-no-files-found: error
