@@ -18,7 +18,10 @@ try:
         iter_palette_fixture_cases,
         palette_fixture_test_suffix,
     )
-    from tools.render_review.browser_support.render_review import set_patch_depth
+    from tools.render_review.browser_support.render_review import (
+        select_tiling_family,
+        set_patch_depth,
+    )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase
@@ -28,7 +31,10 @@ except ModuleNotFoundError:
         iter_palette_fixture_cases,
         palette_fixture_test_suffix,
     )
-    from tools.render_review.browser_support.render_review import set_patch_depth
+    from tools.render_review.browser_support.render_review import (
+        select_tiling_family,
+        set_patch_depth,
+    )
 
 
 class SharedUiFlowMixin(SharedUiFlowHelpers):
@@ -53,7 +59,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_penrose_topology_switch_updates_patch_depth_controls(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "penrose-p3-rhombs")
+        select_tiling_family(case.page, "penrose-p3-rhombs")
 
         self._expect("#tiling-family-select").to_have_value("penrose-p3-rhombs")
         self._expect("#patch-depth-field").to_be_visible()
@@ -62,7 +68,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_spectre_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "spectre")
+        select_tiling_family(case.page, "spectre")
 
         self._expect("#tiling-family-select").to_have_value("spectre")
         self._expect("#patch-depth-field").to_be_visible()
@@ -75,7 +81,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_taylor_socolar_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "taylor-socolar")
+        select_tiling_family(case.page, "taylor-socolar")
 
         self._expect("#tiling-family-select").to_have_value("taylor-socolar")
         self._expect("#patch-depth-field").to_be_visible()
@@ -88,7 +94,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_sphinx_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "sphinx")
+        select_tiling_family(case.page, "sphinx")
 
         self._expect("#tiling-family-select").to_have_value("sphinx")
         self._expect("#patch-depth-field").to_be_visible()
@@ -101,7 +107,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_chair_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "chair")
+        select_tiling_family(case.page, "chair")
 
         self._expect("#tiling-family-select").to_have_value("chair")
         self._expect("#patch-depth-field").to_be_visible()
@@ -110,7 +116,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_chair_topology_switch_renders_browser_visible_multicolor_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "chair")
+        select_tiling_family(case.page, "chair")
 
         self._expect("#tiling-family-select").to_have_value("chair")
         self._expect("#patch-depth-field").to_be_visible()
@@ -119,7 +125,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_robinson_triangles_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "robinson-triangles")
+        select_tiling_family(case.page, "robinson-triangles")
 
         self._expect("#tiling-family-select").to_have_value("robinson-triangles")
         self._expect("#patch-depth-field").to_be_visible()
@@ -128,7 +134,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_hat_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "hat-monotile")
+        select_tiling_family(case.page, "hat-monotile")
 
         self._expect("#tiling-family-select").to_have_value("hat-monotile")
         self._expect("#patch-depth-field").to_be_visible()
@@ -137,7 +143,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_tuebingen_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "tuebingen-triangle")
+        select_tiling_family(case.page, "tuebingen-triangle")
 
         self._expect("#tiling-family-select").to_have_value("tuebingen-triangle")
         self._expect("#patch-depth-field").to_be_visible()
@@ -201,7 +207,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_deltoidal_hexagonal_topology_switch_renders_periodic_patch(self) -> None:
         case = self._case()
-        case.page.select_option("#tiling-family-select", "deltoidal-hexagonal")
+        select_tiling_family(case.page, "deltoidal-hexagonal")
 
         self._expect("#tiling-family-select").to_have_value("deltoidal-hexagonal")
         self._expect("#patch-depth-field").not_to_be_visible()

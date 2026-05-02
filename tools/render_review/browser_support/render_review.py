@@ -490,8 +490,18 @@ def select_tiling_family(
     expect_reset_request: bool = False,
     timeout_ms: int = 60_000,
 ) -> int | None:
+    def _drive_tiling_picker() -> None:
+        # The tiling control is now a thumbnail picker; the legacy
+        # ``<select id="tiling-family-select">`` is hidden and only acts as a
+        # state mirror updated by the picker click handler. Drive the picker
+        # so we exercise the same path users do.
+        page.locator("#tiling-picker-toggle").click(timeout=timeout_ms)
+        page.locator(f".tiling-preview-card[data-tiling-family='{tiling_family}']").click(
+            timeout=timeout_ms
+        )
+
     if not expect_reset_request:
-        page.select_option("#tiling-family-select", tiling_family)
+        _drive_tiling_picker()
         page.wait_for_function(
             """(nextTilingFamily) => {
                 const select = document.getElementById("tiling-family-select");
@@ -505,7 +515,7 @@ def select_tiling_family(
         lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
         timeout=timeout_ms,
     ) as response_info:
-        page.select_option("#tiling-family-select", tiling_family)
+        _drive_tiling_picker()
     return int(response_info.value.status)
 
 
