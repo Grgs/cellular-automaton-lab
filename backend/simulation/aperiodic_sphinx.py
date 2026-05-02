@@ -14,7 +14,9 @@ from backend.simulation.aperiodic_support import (
     Affine,
     AperiodicPatch,
     Vec,
+    affine_chirality_token,
     affine_multiply,
+    affine_orientation_token,
     rotation,
     scale,
     translation,
@@ -74,12 +76,21 @@ def _sphinx_children(node: SubstitutionChild, depth: int) -> tuple[SubstitutionC
 
 
 def _sphinx_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:
-    del node
+    # Sphinx tiles are placed at integer multiples of 60° rotation, optionally
+    # reflected. Both axes carry visible structure: chirality flips the whole
+    # tile shape, and rotation places the same shape at six possible
+    # orientations. Setting both tokens from the resolved transform lets the
+    # family-dead palette express the structure when cells are dead.
     return (
         SubstitutionLeafTemplate(
             kind=SPHINX_KIND,
             id_prefix="sphinx",
             vertices=_SPHINX_BASE_VERTICES,
+            chirality_token=affine_chirality_token(node.transform),
+            orientation_token=affine_orientation_token(
+                node.transform,
+                angle_step_degrees=60.0,
+            ),
         ),
     )
 

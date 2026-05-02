@@ -176,6 +176,51 @@
       ]
     },
     {
+      "geometry": "spectre",
+      "variants": [
+        {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
+        {"label": "spectre-30", "selector": {"orientation_token": "30"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true},
+        {"label": "spectre-60", "selector": {"orientation_token": "60"}, "color": {"token": "toneSand"}},
+        {"label": "spectre-90", "selector": {"orientation_token": "90"}, "color": {"token": "toneSand"}, "allowSharedDeadColor": true},
+        {"label": "spectre-120", "selector": {"orientation_token": "120"}, "color": {"token": "toneTan"}},
+        {"label": "spectre-150", "selector": {"orientation_token": "150"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
+        {"label": "spectre-180", "selector": {"orientation_token": "180"}, "color": {"token": "toneStone"}},
+        {"label": "spectre-210", "selector": {"orientation_token": "210"}, "color": {"token": "toneStone"}, "allowSharedDeadColor": true},
+        {"label": "spectre-240", "selector": {"orientation_token": "240"}, "color": {"token": "toneClay"}},
+        {"label": "spectre-270", "selector": {"orientation_token": "270"}, "color": {"token": "toneClay"}, "allowSharedDeadColor": true},
+        {"label": "spectre-300", "selector": {"orientation_token": "300"}, "color": {"token": "toneLinen"}},
+        {"label": "spectre-330", "selector": {"orientation_token": "330"}, "color": {"token": "toneLinen"}, "allowSharedDeadColor": true}
+      ]
+    },
+    {
+      "geometry": "taylor-socolar",
+      "variants": [
+        {"label": "taylor-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
+        {"label": "taylor-60", "selector": {"orientation_token": "60"}, "color": {"token": "toneSand"}},
+        {"label": "taylor-120", "selector": {"orientation_token": "120"}, "color": {"token": "toneTan"}},
+        {"label": "taylor-180", "selector": {"orientation_token": "180"}, "color": {"token": "toneStone"}},
+        {"label": "taylor-240", "selector": {"orientation_token": "240"}, "color": {"token": "toneClay"}},
+        {"label": "taylor-300", "selector": {"orientation_token": "300"}, "color": {"token": "toneLinen"}}
+      ]
+    },
+    {
+      "geometry": "sphinx",
+      "variants": [
+        {"label": "sphinx-left-0", "selector": {"chirality_token": "left", "orientation_token": "0"}, "color": {"token": "toneCream"}},
+        {"label": "sphinx-left-60", "selector": {"chirality_token": "left", "orientation_token": "60"}, "color": {"token": "toneSand"}},
+        {"label": "sphinx-left-120", "selector": {"chirality_token": "left", "orientation_token": "120"}, "color": {"token": "toneTan"}},
+        {"label": "sphinx-left-180", "selector": {"chirality_token": "left", "orientation_token": "180"}, "color": {"token": "toneStone"}},
+        {"label": "sphinx-left-240", "selector": {"chirality_token": "left", "orientation_token": "240"}, "color": {"token": "toneClay"}},
+        {"label": "sphinx-left-300", "selector": {"chirality_token": "left", "orientation_token": "300"}, "color": {"token": "toneLinen"}},
+        {"label": "sphinx-right-0", "selector": {"chirality_token": "right", "orientation_token": "0"}, "color": {"token": "toneLinen"}, "allowSharedDeadColor": true},
+        {"label": "sphinx-right-60", "selector": {"chirality_token": "right", "orientation_token": "60"}, "color": {"token": "toneClay"}, "allowSharedDeadColor": true},
+        {"label": "sphinx-right-120", "selector": {"chirality_token": "right", "orientation_token": "120"}, "color": {"token": "toneStone"}, "allowSharedDeadColor": true},
+        {"label": "sphinx-right-180", "selector": {"chirality_token": "right", "orientation_token": "180"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
+        {"label": "sphinx-right-240", "selector": {"chirality_token": "right", "orientation_token": "240"}, "color": {"token": "toneSand"}, "allowSharedDeadColor": true},
+        {"label": "sphinx-right-300", "selector": {"chirality_token": "right", "orientation_token": "300"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true}
+      ]
+    },
+    {
       "geometry": "tuebingen-triangle",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/tuebingen-triangle-depth-3.json",

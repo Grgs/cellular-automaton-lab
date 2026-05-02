@@ -13,6 +13,7 @@ from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     Vec,
     affine_multiply,
+    affine_orientation_token,
     rotation,
     scale,
     translation,
@@ -40,12 +41,20 @@ def _half_hex_children(node: SubstitutionChild, depth: int) -> tuple[Substitutio
 
 
 def _half_hex_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:
-    del node
+    # Taylor-Socolar tiles do not carry chirality (the half-hex shape itself is
+    # reflection-symmetric), but the substitution rotates each half-hex by
+    # multiples of 60° as it descends. Setting orientation_token from the
+    # combined transform groups cells by visual rotation so the family-dead
+    # palette can colour rotationally-related half-hexes the same way.
     return (
         SubstitutionLeafTemplate(
             kind=TAYLOR_HALF_HEX_KIND,
             id_prefix="taylor",
             vertices=_HALF_HEX_BASE_VERTICES,
+            orientation_token=affine_orientation_token(
+                node.transform,
+                angle_step_degrees=60.0,
+            ),
         ),
     )
 

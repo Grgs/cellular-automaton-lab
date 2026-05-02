@@ -18,6 +18,7 @@ from backend.simulation.aperiodic_support import (
     Vec,
     affine_apply,
     affine_multiply,
+    affine_orientation_token,
     rotation,
     translation,
     translation_to,
@@ -165,12 +166,23 @@ def _spectre_expand_children(node: SubstitutionChild, depth: int) -> tuple[Subst
 
 
 def _spectre_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:
+    # Spectre tiles are placed without reflection (the einstein-vampire is
+    # achiral by design), so chirality is uniform and can't distinguish cells.
+    # Orientation is the meaningful axis: the substitution composes rotations
+    # in 30° increments through arbitrary depths, so cells fan out across the
+    # full circle. Snapping to 30° collapses floating-point drift into a
+    # bounded set of orientation tokens that the family-dead palette can
+    # colour.
     return tuple(
         SubstitutionLeafTemplate(
             kind=SPECTRE_KIND,
             id_prefix="spectre",
             vertices=_SPECTRE_BASE_VERTICES,
             transform=child_transform,
+            orientation_token=affine_orientation_token(
+                affine_multiply(node.transform, child_transform),
+                angle_step_degrees=30.0,
+            ),
         )
         for _, child_transform in _SPECTRE_BASE_TEMPLATES[node.label].children
     )

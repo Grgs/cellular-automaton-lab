@@ -285,6 +285,51 @@ def affine_apply(transform: Affine, point: Vec) -> Vec:
     )
 
 
+def affine_linear_determinant(transform: Affine) -> float:
+    return (transform[0] * transform[4]) - (transform[1] * transform[3])
+
+
+def affine_chirality_token(transform: Affine) -> str:
+    """Derive a ``left`` / ``right`` chirality token from the linear determinant.
+
+    A determinant of zero shouldn't happen for tile placements (it would mean a
+    degenerate transform), so we treat it as the canonical chirality.
+    """
+    return "right" if affine_linear_determinant(transform) < 0 else "left"
+
+
+def affine_orientation_token(
+    transform: Affine,
+    *,
+    angle_step_degrees: float = 30.0,
+) -> str:
+    """Derive a discrete orientation token (degrees mod 360) from the rotation angle.
+
+    The angle is recovered from the affine's first basis vector, then snapped to
+    the nearest multiple of ``angle_step_degrees`` so cells with the same visual
+    rotation collapse to a single token even with floating-point drift.
+    Reflections are normalised by negating the cosine sign before the angle is
+    extracted, so the token reflects ``rotation`` independently of
+    ``chirality``.
+    """
+    determinant = affine_linear_determinant(transform)
+    cosine = transform[0]
+    sine = transform[3]
+    if determinant < 0:
+        # Undo the reflection so a reflected-then-rotated transform reports the
+        # same orientation as the unreflected version. This keeps the chirality
+        # axis and orientation axis independent for downstream consumers.
+        sine = -sine
+    angle_radians = math.atan2(sine, cosine)
+    angle_degrees = math.degrees(angle_radians) % 360.0
+    if angle_step_degrees <= 0:
+        rounded = round(angle_degrees, 3)
+    else:
+        rounded = round(angle_degrees / angle_step_degrees) * angle_step_degrees
+        rounded %= 360.0
+    return str(int(rounded)) if float(rounded).is_integer() else str(rounded)
+
+
 def affine_inverse(transform: Affine) -> Affine:
     determinant = (transform[0] * transform[4]) - (transform[1] * transform[3])
     if math.isclose(determinant, 0.0):
