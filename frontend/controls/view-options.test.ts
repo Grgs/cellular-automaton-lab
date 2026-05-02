@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { populateTilingFamilies } from "./view-options.js";
+import { createTilingPreviewThumbnail } from "./tiling-preview.js";
 import type { TopologyOption } from "../types/domain.js";
 import type { DomElements } from "../types/dom.js";
 
@@ -71,5 +72,21 @@ describe("controls/view-options tiling picker", () => {
         expect(elements.tilingPickerCurrentPreview?.dataset.previewSignature).toBe(
             "penrose-p3-rhombs:penrose-p3-rhombs",
         );
+    });
+
+    it("renders sampled topology geometry for polygon tiling thumbnails", () => {
+        const thumbnail = createTilingPreviewThumbnail({
+            value: "archimedean-4-8-8",
+            label: "Square-Octagon",
+            group: "Periodic Mixed",
+            order: 110,
+            previewKey: "archimedean-4-8-8",
+            renderKind: "polygon_periodic",
+            sizingMode: "grid",
+        });
+
+        const polygons = Array.from(thumbnail.querySelectorAll("polygon"));
+        expect(polygons.length).toBeGreaterThan(10);
+        expect(polygons.every((polygon) => polygon.getAttribute("points")?.includes("NaN") === false)).toBe(true);
     });
 });
