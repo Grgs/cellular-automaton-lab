@@ -50,7 +50,7 @@ export interface PatternStatusViewState {
     patternStatusTone: string;
 }
 
-export type SelectionInspectorMode = "empty" | "single" | "multi";
+export type SelectionInspectorMode = "empty" | "single" | "multi" | "population";
 
 export interface SelectionInspectorSource {
     selectedCells: PaintableCell[];
@@ -149,6 +149,7 @@ export interface DrawerTopologyViewModel {
     speedValue: string;
     speedLabel: string;
     unsafeSizingEnabled: boolean;
+    tileColorsEnabled: boolean;
     cellSizeVisible: boolean;
     cellSizeVisibleTopBar: boolean;
     cellSizeValue: string;

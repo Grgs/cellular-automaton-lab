@@ -85,6 +85,7 @@ export function createAppState(): AppState {
         pendingPatchDepth: null,
         patchDepthByTilingFamily: {},
         unsafeSizingEnabled: false,
+        tileColorsEnabled: true,
         width: 0,
         height: 0,
         topologyRevision: null,
@@ -172,6 +173,10 @@ export function setBrushSize(state: AppState, brushSize: number): void {
 
 export function setUnsafeSizingEnabled(state: AppState, enabled: boolean): void {
     state.unsafeSizingEnabled = Boolean(enabled);
+}
+
+export function setTileColorsEnabled(state: AppState, enabled: boolean): void {
+    state.tileColorsEnabled = enabled !== false;
 }
 
 export function getSelectedPresetId(state: AppState, ruleName: string | null): string | null {

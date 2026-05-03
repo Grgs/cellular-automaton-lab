@@ -14,6 +14,7 @@ import {
     setBrushSize,
     setEditorTool,
     setSelectedPaintState,
+    setTileColorsEnabled,
     setUnsafeSizingEnabled,
 } from "./state/simulation-state.js";
 import { setDrawerOpen } from "./state/overlay-state.js";
@@ -63,6 +64,7 @@ export function createUiSessionController({
     setEditorToolFn = setEditorTool,
     setPatchDepthMemoryMapFn = setPatchDepthMemoryMap,
     setSelectedPaintStateFn = setSelectedPaintState,
+    setTileColorsEnabledFn = setTileColorsEnabled,
     setUnsafeSizingEnabledFn = setUnsafeSizingEnabled,
 }: {
     state: AppState;
@@ -79,6 +81,7 @@ export function createUiSessionController({
     setEditorToolFn?: typeof setEditorTool;
     setPatchDepthMemoryMapFn?: typeof setPatchDepthMemoryMap;
     setSelectedPaintStateFn?: typeof setSelectedPaintState;
+    setTileColorsEnabledFn?: typeof setTileColorsEnabled;
     setUnsafeSizingEnabledFn?: typeof setUnsafeSizingEnabled;
 }): UiSessionController {
     const storage = createUiSessionStorageFn();
@@ -86,6 +89,7 @@ export function createUiSessionController({
     function restoreInitialCellSize(): void {
         const activeTilingFamily = state.topologySpec.tiling_family;
         setUnsafeSizingEnabledFn(state, storage.getUnsafeSizingEnabled());
+        setTileColorsEnabledFn(state, storage.getTileColorsEnabled());
         const rememberedCellSizes = readStoredCellSizes(storage, activeTilingFamily);
         const hasRememberedCellSizes = Object.keys(rememberedCellSizes).length > 0;
         if (hasRememberedCellSizes) {
@@ -160,6 +164,10 @@ export function createUiSessionController({
         storage.setUnsafeSizingEnabled(Boolean(enabled));
     }
 
+    function persistTileColorsEnabled(enabled: boolean): void {
+        storage.setTileColorsEnabled(enabled !== false);
+    }
+
     function persistBrushSize(brushSize: number): void {
         storage.setBrushSize(brushSize);
     }
@@ -193,6 +201,7 @@ export function createUiSessionController({
         setPatchDepthMemoryMapFn(state, {});
         clearPendingPatchDepthFn(state);
         setUnsafeSizingEnabledFn(state, false);
+        setTileColorsEnabledFn(state, true);
         const activeTilingFamily = state.topologySpec.tiling_family;
         setCellSizeFn(
             state,
@@ -225,6 +234,7 @@ export function createUiSessionController({
         restorePaintStateForCurrentRule,
         persistCellSize,
         persistUnsafeSizingEnabled,
+        persistTileColorsEnabled,
         persistEditorTool,
         persistBrushSize,
         persistPaintStateForCurrentRule,

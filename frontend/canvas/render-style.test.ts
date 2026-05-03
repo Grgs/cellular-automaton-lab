@@ -192,6 +192,28 @@ describe("canvas/render-style", () => {
         });
     });
 
+    it("falls back to neutral dead fills when tile colors are disabled", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colors = readCanvasColorsForTests();
+        const colorLookup = buildStateColorLookup([], colors);
+        const cell = { id: "rhombille:s1", state: 0, kind: "rhombus", slot: "s1" };
+
+        expect(resolveDeadCellColor(0, { geometry: RHOMBILLE_GEOMETRY, cell, tileColorsEnabled: false })).toBe(
+            colors.dead,
+        );
+        expect(
+            resolveRenderedCellColor(0, colorLookup, colors, {
+                geometry: RHOMBILLE_GEOMETRY,
+                cell,
+                tileColorsEnabled: false,
+            }),
+        ).toBe(colors.dead);
+    });
+
     it("resolves registered family dead-state palettes from the shared registry", async () => {
         const {
             buildFamilyDeadPaletteTestCell,

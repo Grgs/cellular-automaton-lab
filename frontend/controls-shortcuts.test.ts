@@ -28,6 +28,7 @@ function createActions(overrides: Partial<AppActionSet> = {}): AppActionSet {
         setCellSize: vi.fn(),
         commitCellSize: vi.fn(),
         setUnsafeSizingEnabled: vi.fn(),
+        setTileColorsEnabled: vi.fn(),
         setPaintState: vi.fn(),
         setEditorTool: vi.fn(),
         setBrushSize: vi.fn(),

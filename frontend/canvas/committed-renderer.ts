@@ -21,7 +21,7 @@ import {
     sampleRenderDiagnostics,
 } from "./render-diagnostics.js";
 import { createCanvasSurface, type CanvasSurfaceMetrics } from "./surface.js";
-import type { CellStateDefinition, TopologyPayload } from "../types/domain.js";
+import type { CellStateDefinition, TopologyCell, TopologyPayload } from "../types/domain.js";
 import type { PaintableCell } from "../types/editor.js";
 import type {
     CanvasColors,
@@ -47,6 +47,18 @@ export interface CanvasCommittedRenderSnapshot {
     renderStyle: CanvasRenderStyle;
     colorLookup: Map<number, string>;
     cellStates: number[];
+    resolveRenderedCellColor: (
+        stateValue: number,
+        colorLookup: Map<number, string>,
+        colors: CanvasColors,
+        options?: {
+            geometry?: string;
+            x?: number | null;
+            y?: number | null;
+            cell?: TopologyCell | PaintableCell | null;
+            tileColorsEnabled?: boolean;
+        },
+    ) => string;
 }
 
 export interface CanvasCommittedRenderer {
@@ -84,6 +96,7 @@ export function createCanvasCommittedRenderer({
     let canvasColors: CanvasColors = { ...DEFAULT_COLORS };
     let colorLookup = buildStateColorLookup([], canvasColors);
     let currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
+    let tileColorsEnabled = true;
     let renderDiagnostics: RenderDiagnosticsSnapshot | null = null;
     let resolvedRenderDiagnostics: RenderDiagnosticsSnapshot | null = null;
     let metrics: CanvasSurfaceMetrics = {
@@ -112,6 +125,21 @@ export function createCanvasCommittedRenderer({
         canvasColors = readCanvasColors(canvas, getComputedStyleFn);
         colorLookup = buildStateColorLookup(stateDefinitions, canvasColors);
         currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
+        const resolveCellColor = (
+            stateValue: number,
+            nextColorLookup: Map<number, string>,
+            colors: CanvasColors,
+            options: {
+                geometry?: string;
+                x?: number | null;
+                y?: number | null;
+                cell?: TopologyCell | PaintableCell | null;
+                tileColorsEnabled?: boolean;
+            } = {},
+        ): string => resolveRenderedCellColor(stateValue, nextColorLookup, colors, {
+            ...options,
+            tileColorsEnabled,
+        });
         drawCommittedLayer({
             targetContext: surface.committedContext,
             geometry,
@@ -121,7 +149,7 @@ export function createCanvasCommittedRenderer({
             canvasColors,
             renderStyle: currentRenderStyle,
             colorLookup,
-            resolveRenderedCellColor,
+            resolveRenderedCellColor: resolveCellColor,
             cellStates,
             cellSize,
         });
@@ -135,6 +163,7 @@ export function createCanvasCommittedRenderer({
     ): void {
         topology = nextState.topology;
         cellStates = nextState.cellStates;
+        tileColorsEnabled = nextState.tileColorsEnabled !== false;
         cellSize = nextCellSize;
         stateDefinitions = nextStateDefinitions || [];
         geometry = normalizeGeometry(nextGeometry);
@@ -195,6 +224,15 @@ export function createCanvasCommittedRenderer({
             renderStyle: currentRenderStyle,
             colorLookup,
             cellStates,
+            resolveRenderedCellColor: (
+                stateValue,
+                nextColorLookup,
+                colors,
+                options = {},
+            ) => resolveRenderedCellColor(stateValue, nextColorLookup, colors, {
+                ...options,
+                tileColorsEnabled,
+            }),
         };
     }
 

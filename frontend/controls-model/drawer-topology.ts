@@ -33,6 +33,7 @@ export function buildDrawerTopologyViewModel({
         speedValue: String(speedValue),
         speedLabel: `${speedValue} gen/s`,
         unsafeSizingEnabled: Boolean(state.unsafeSizingEnabled),
+        tileColorsEnabled: state.tileColorsEnabled !== false,
         ...(sizingState.usesPatchDepth
             ? {
                 ...buildHiddenCellSizeViewState(),

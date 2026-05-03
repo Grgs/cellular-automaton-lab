@@ -37,6 +37,7 @@ export interface AppState {
     pendingPatchDepth: number | null;
     patchDepthByTilingFamily: Record<string, number>;
     unsafeSizingEnabled: boolean;
+    tileColorsEnabled: boolean;
     width: number;
     height: number;
     topologyRevision: string | null;
@@ -70,4 +71,5 @@ export interface TopologyRenderPayload {
     topology: TopologyPayload | null;
     cellStates: number[];
     previewCellStatesById: PreviewCellStatesById | null;
+    tileColorsEnabled: boolean;
 }

@@ -41,6 +41,55 @@ describe("controls-model/selection-inspector", () => {
         });
     });
 
+    it("falls back to a live-cell summary when no cells are selected", () => {
+        const cells: IndexedTopologyCell[] = [
+            {
+                id: "cell:a",
+                index: 0,
+                kind: "triangle",
+                neighbors: ["cell:b"],
+                tile_family: "family-a",
+                center: { x: 0, y: 1 },
+                vertices: [{ x: 0, y: 0 }, { x: 1, y: 0 }],
+            },
+            {
+                id: "cell:b",
+                index: 1,
+                kind: "square",
+                neighbors: ["cell:a", "cell:c"],
+                tile_family: "family-b",
+                center: { x: 2, y: 3 },
+                vertices: [{ x: 0, y: 0 }],
+            },
+            {
+                id: "cell:c",
+                index: 2,
+                kind: "square",
+                neighbors: ["cell:b"],
+                tile_family: "family-b",
+            },
+        ];
+
+        const inspector = buildSelectionInspectorViewModel({
+            selectedCells: [],
+            topologyIndex: topologyIndex(cells),
+            cellStates: [2, 2, 0],
+            activeRule,
+        });
+
+        expect(inspector.mode).toBe("population");
+        expect(inspector.title).toBe("Live Cells Summary");
+        expect(inspector.subtitle).toBe("Current population overview");
+        expect(inspector.summaryRows).toContainEqual({ label: "Live Cells", value: "2" });
+        expect(inspector.summaryRows).toContainEqual({ label: "State Mix", value: "Signal (2): 2" });
+        expect(inspector.summaryRows).toContainEqual({ label: "Kind Mix", value: "square: 1, triangle: 1" });
+        expect(inspector.advancedRows).toContainEqual({ label: "Neighbor Count Distribution", value: "1: 1, 2: 1" });
+        expect(inspector.advancedRows.at(-1)).toEqual({
+            label: "Live Cell IDs",
+            value: "cell:a, cell:b",
+        });
+    });
+
     it("builds detailed rows for a single selected topology cell", () => {
         const cell: IndexedTopologyCell = {
             id: "cell:a",

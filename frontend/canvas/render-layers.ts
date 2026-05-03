@@ -27,6 +27,7 @@ interface SharedRenderInputs {
             x?: number | null;
             y?: number | null;
             cell?: TopologyCell | PaintableCell | null;
+            tileColorsEnabled?: boolean;
         },
     ) => string;
 }

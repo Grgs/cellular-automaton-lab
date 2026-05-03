@@ -53,5 +53,6 @@ export function topologyRenderPayload(state: AppState): TopologyRenderPayload {
         topology,
         cellStates,
         previewCellStatesById,
+        tileColorsEnabled: state.tileColorsEnabled !== false,
     };
 }
