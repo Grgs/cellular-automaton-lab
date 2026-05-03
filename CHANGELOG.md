@@ -3,6 +3,13 @@
 This is a curated narrative changelog of completed work. Active and upcoming work
 lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
+## Public Release Prep
+
+- Framed the first public release line as a `v0.1.x` preview series: tagged GitHub source release plus GitHub Pages standalone demo, without npm or PyPI publishing.
+- Added public preview status, release-surface guidance, and explicit known-limitations framing to the README.
+- Added a release-process checklist to the maintenance guide, including freeze, validation, CI, tagging, and post-deploy Pages verification.
+- Added a draft `v0.1.0` release-notes document and explicit TODO triage for release blockers, acceptable limitations, and post-release follow-up.
+
 ## Browser Diagnosis And Render Review
 
 - Added a standalone-first canvas render-review harness that saves a canvas PNG plus JSON metrics from the real browser render path.

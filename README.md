@@ -2,6 +2,8 @@
 
 Cellular Automaton Lab is a browser-based cellular automata playground built around topology-first boards. It supports classic lattices, periodic mixed tilings, and finite aperiodic patches in one app, with a Flask backend and a Vite-built TypeScript frontend.
 
+Public release status: `v0.1.0` preview. This repo's first public release is a tagged GitHub source release plus the standalone GitHub Pages demo below. It is usable today, but it is not positioned as a long-term API or feature-stability promise yet.
+
 Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://grgs.github.io/cellular-automaton-lab/)
 
 ![Current canvas-first workspace on a Kagome mixed-tiling board](docs/images/readme-workspace-kagome.png)
@@ -37,6 +39,26 @@ Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://g
 - Pattern files use sparse `cells_by_id` payloads instead of dense grid-only formats.
 
 Architecture details live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). A runtime-oriented source guide lives in [docs/CODE_MAP.md](docs/CODE_MAP.md). Maintenance and guardrail ownership lives in [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
+
+## Release Surface
+
+The public `v0.1.0` preview ships through three surfaces:
+
+- tagged GitHub source releases
+- the GitHub Pages standalone demo
+- local source checkout for development and self-hosted use
+
+This release does not publish an npm package or a PyPI package. The repository is the install and integration surface for now.
+
+## Preview Status And Known Limitations
+
+The current preview is stable enough for public evaluation, local experimentation, and contribution, but some families and verification targets are still intentionally documented as provisional.
+
+- `pinwheel` remains labeled `Experimental` because manual visible review still does not justify promotion, even though stronger automated checks now pass.
+- `dodecagonal-square-triangle` is currently implemented as a decorated `3.12.12` Archimedean generator rather than the canonical Schlottmann quasi-periodic square-triangle tiling.
+- The standalone GitHub Pages demo targets static hosting with network access and still loads Pyodide from a CDN rather than bundling it for offline use.
+
+The canonical list of known mathematical and rendering deviations lives in [docs/TILING_KNOWN_DEVIATIONS.md](docs/TILING_KNOWN_DEVIATIONS.md). Active follow-up work lives in [TODO.md](TODO.md).
 
 ## Included Rules
 
@@ -128,6 +150,16 @@ Explicit Playwright runs:
 ```powershell
 py -3 -m unittest -v tests.e2e.test_playwright_all
 py -3 -m unittest -v tests.e2e.test_playwright_suite_integrity
+```
+
+For release confidence, also run:
+
+```powershell
+npm run build:frontend:standalone
+npm run smoke:standalone
+npm run check:doc-links
+npm run audit:supply-chain
+py -3 -m pre_commit run --hook-stage pre-push --all-files
 ```
 
 ### Browser diagnosis

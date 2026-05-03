@@ -9,6 +9,8 @@ The current standalone target is normal static hosting with network access. Pyod
 
 The public evaluator demo is published to GitHub Pages at [https://grgs.github.io/cellular-automaton-lab/](https://grgs.github.io/cellular-automaton-lab/).
 
+The first public release line is a `v0.1.x` preview series: tagged GitHub source release plus this GitHub Pages demo, without npm or PyPI packaging.
+
 ## Architecture Overview
 
 ### Server mode

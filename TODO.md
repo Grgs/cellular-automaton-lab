@@ -2,6 +2,24 @@
 
 Active work. Completed work lives in [CHANGELOG.md](CHANGELOG.md).
 
+## Public Release Triage
+
+### Release blockers
+
+- Do not cut the `v0.1.0` public preview from the current dirty `main` checkout. Resolve or explicitly exclude in-flight changes first, then cut a dedicated release branch from the intended release commit.
+- Keep `pinwheel` in `Experimental` for the public preview until manual visible review justifies promotion.
+
+### Acceptable known limitations for `v0.1.0`
+
+- `dodecagonal-square-triangle` is acceptable for the first public preview as a documented decorated `3.12.12` Archimedean generator, not a canonical Schlottmann quasi-periodic marked-prototile implementation.
+- The standalone public demo may continue loading Pyodide from a CDN for `v0.1.0`; full offline bundling is post-preview work.
+- Current finite-sample verifier boundaries and exact-path render tolerances are acceptable for `v0.1.0` as long as the existing known-deviation docs stay explicit.
+
+### Post-release follow-up
+
+- Add a manual post-deploy GitHub Pages smoke check routine to the release workflow if the preview release cadence becomes regular.
+- Revisit whether the verification-strength JSON report should become a CI artifact once there is a concrete consumer for it.
+
 ## Now
 
 - Revisit browser-visible shape and pattern correctness for `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.

@@ -46,6 +46,51 @@ Wider `ruff` adoption is still blocked by older compatibility-heavy modules outs
 
 Pre-commit mirrors the same incremental Python scope plus the frontend formatting check, so local hooks and scripted runs exercise the same rules.
 
+## Public Release Process
+
+The first clean public release line starts at `v0.1.0` and is intentionally a preview series. The public release surface is:
+
+- a tagged GitHub source release
+- the GitHub Pages standalone demo
+- the repository checkout for local use
+
+This repo does not publish npm or PyPI packages in the `v0.1.x` preview line.
+
+Before cutting a public release:
+
+1. Resolve or explicitly exclude in-flight work from the intended release commit.
+2. Ensure the release candidate lives on a dedicated release branch rather than an actively changing local checkout.
+3. Require a clean git tree before tagging. Do not tag from a dirty working tree.
+4. Rebuild `static/dist/` and `output/standalone/` from the exact release commit so standalone provenance is fresh.
+5. Run the release-confidence validation sweep on that same commit:
+
+```powershell
+npm run typecheck:frontend
+npm run build:frontend
+npm run test:frontend
+npm run build:frontend:standalone
+npm run smoke:standalone
+npm run check:doc-links
+npm run audit:supply-chain
+py -3 -m mypy --config-file mypy.ini
+py -3 -m unittest discover -s tests -p "test_*.py"
+py -3 tools\validate_tilings.py
+py -3 tools\verify_reference_tilings.py
+py -3 -m pre_commit run --hook-stage pre-push --all-files
+```
+
+6. Require GitHub Actions CI to pass on the exact release commit, including the Pages build path.
+7. Verify the deployed GitHub Pages demo manually:
+   - app loads successfully
+   - one simulation run/pause/step flow works
+   - one topology or rule switch works
+   - one pattern import/export or persistence flow works
+   - no obvious startup or console failure appears
+8. Publish concise release notes from [docs/releases/v0.1.0.md](releases/v0.1.0.md) or its successor for the target tag.
+9. Tag only after the intended commit has passed the required validation and deploy path.
+
+Public docs must keep preview status and known limitations explicit. Do not imply package-registry support or long-term API stability before the project actually offers them.
+
 ## Python Dependency Pinning
 
 Python dependencies are split into source and lockfile pairs:
