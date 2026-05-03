@@ -88,6 +88,7 @@ export const elements: DomElements = {
     unsafeSizingField: elementById("unsafe-sizing-field"),
     unsafeSizingToggle: elementById("unsafe-sizing-toggle"),
     brushSizeControls: elementById("brush-size-controls"),
+    eraseBtn: elementById("erase-btn"),
     undoBtn: elementById("undo-btn"),
     redoBtn: elementById("redo-btn"),
 };

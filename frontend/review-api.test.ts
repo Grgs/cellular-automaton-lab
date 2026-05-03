@@ -141,6 +141,7 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         unsafeSizingField: null,
         unsafeSizingToggle: null,
         brushSizeControls: null,
+        eraseBtn: null,
         undoBtn: null,
         redoBtn: null,
     };

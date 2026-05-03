@@ -20,5 +20,8 @@ describe("controls-model/editor", () => {
         expect(viewModel.canvasEditCueText).toBe(
             "Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.",
         );
+        expect(viewModel.editorShortcutHint).toBe(
+            "Shortcuts: B brush, L line, R rectangle, F fill, E erase, 1-3 brush size.",
+        );
     });
 });

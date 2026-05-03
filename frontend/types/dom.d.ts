@@ -82,6 +82,7 @@ export interface DomElements {
     unsafeSizingField: HTMLElement | null;
     unsafeSizingToggle: HTMLInputElement | null;
     brushSizeControls: HTMLElement | null;
+    eraseBtn: HTMLButtonElement | null;
     undoBtn: HTMLButtonElement | null;
     redoBtn: HTMLButtonElement | null;
 }

@@ -31,6 +31,11 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
         "[data-brush-size]",
         (button) => actions.setBrushSize(Number(button.dataset.brushSize)),
     );
+    if (elements.eraseBtn && actions.setPaintState) {
+        elements.eraseBtn.addEventListener("click", () => {
+            actions.setPaintState(0);
+        });
+    }
 
     if (elements.presetSeedBtn && actions.loadPresetSeed) {
         elements.presetSeedBtn.addEventListener("click", () => {
