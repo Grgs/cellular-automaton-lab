@@ -111,18 +111,18 @@ describe("canvas/render-style", () => {
         const colorLookup = buildStateColorLookup();
         const colors = readCanvasColorsForTests();
         const expectations = [
-            { slot: "k0", expected: colors.toneLinen },
-            { slot: "k7", expected: colors.toneLinen },
-            { slot: "k1", expected: colors.toneSand },
-            { slot: "k6", expected: colors.toneSand },
-            { slot: "k2", expected: colors.toneFlax },
-            { slot: "k9", expected: colors.toneFlax },
-            { slot: "k3", expected: colors.toneTan },
-            { slot: "k8", expected: colors.toneTan },
-            { slot: "k4", expected: colors.toneStone },
-            { slot: "k11", expected: colors.toneStone },
-            { slot: "k5", expected: colors.toneClay },
-            { slot: "k10", expected: colors.toneClay },
+            { slot: "k0", expected: colors.toneTan },
+            { slot: "k7", expected: colors.toneTan },
+            { slot: "k1", expected: colors.toneStone },
+            { slot: "k6", expected: colors.toneStone },
+            { slot: "k2", expected: colors.toneClay },
+            { slot: "k9", expected: colors.toneClay },
+            { slot: "k3", expected: colors.toneLinen },
+            { slot: "k8", expected: colors.toneLinen },
+            { slot: "k4", expected: colors.toneSand },
+            { slot: "k11", expected: colors.toneSand },
+            { slot: "k5", expected: colors.toneFlax },
+            { slot: "k10", expected: colors.toneFlax },
         ];
 
         expectations.forEach(({ slot, expected }) => {
