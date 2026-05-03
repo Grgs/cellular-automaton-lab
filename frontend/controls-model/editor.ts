@@ -25,6 +25,6 @@ export function buildEditorViewModel({ state }: { state: AppState }): EditorView
         editorShortcutHint: EDITOR_SHORTCUT_HINT,
         gridEditMode,
         canvasEditCueVisible: Boolean(state.editCueVisible && state.editArmed && !editingBlocked),
-        canvasEditCueText: "Edit mode active. Click or drag to paint. Unarmed click or drag paints or erases based on the first cell.",
+        canvasEditCueText: "Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.",
     };
 }
