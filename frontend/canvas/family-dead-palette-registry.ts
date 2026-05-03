@@ -22,6 +22,7 @@ export type DeadPaletteColorSpec = string | { token: DeadPaletteColorToken };
 
 export interface FamilyDeadPaletteVariantSelector {
     kind?: string;
+    slot?: string;
     tile_family?: string;
     chirality_token?: string;
     orientation_token?: string;
@@ -174,6 +175,7 @@ export function buildFamilyDeadPaletteTestCell(
         state: 0,
         kind: variant.selector.kind || "palette-test-cell",
         neighbors: [],
+        ...(variant.selector.slot ? { slot: variant.selector.slot } : {}),
         ...(variant.selector.tile_family ? { tile_family: variant.selector.tile_family } : {}),
         ...(variant.selector.chirality_token ? { chirality_token: variant.selector.chirality_token } : {}),
         ...(variant.selector.orientation_token ? { orientation_token: variant.selector.orientation_token } : {}),

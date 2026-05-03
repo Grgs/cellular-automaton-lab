@@ -12,6 +12,7 @@ const ARCHIMEDEAN_33336_GEOMETRY = "archimedean-3-3-3-3-6";
 const KAGOME_GEOMETRY = "trihexagonal-3-6-3-6";
 const CAIRO_GEOMETRY = "cairo-pentagonal";
 const RHOMBILLE_GEOMETRY = "rhombille";
+const DELTOIDAL_HEXAGONAL_GEOMETRY = "deltoidal-hexagonal";
 const TETRAKIS_SQUARE_GEOMETRY = "tetrakis-square";
 const TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular";
 const DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal";
@@ -81,13 +82,10 @@ describe("canvas/render-style", () => {
 
     it("falls through to the default dead fill for geometries with no manifest entry", async () => {
         const { resolveDeadCellColor } = await import("./render-style.js");
-        // Single-prototile lattices (square, hex, plus the regular duals like
-        // cairo-pentagonal, rhombille) have no manifest entry and should fall
-        // through to the default dead color.
+        // Single-prototile lattices that do not yet register family variants
+        // should fall through to the default dead color.
         const fallthroughGeometries = [
             CAIRO_GEOMETRY,
-            RHOMBILLE_GEOMETRY,
-            DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
             TETRAKIS_SQUARE_GEOMETRY,
             TRIAKIS_TRIANGULAR_GEOMETRY,
             PRISMATIC_PENTAGONAL_GEOMETRY,
@@ -101,6 +99,96 @@ describe("canvas/render-style", () => {
                     cell: { id: "p:0:0", state: 0, kind: "pentagon" },
                 }),
             ).toBe("#f8f1e5");
+        });
+    });
+
+    it("applies slot-based dead fills to Deltoidal Hexagonal kites", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const colors = readCanvasColorsForTests();
+        const expectations = [
+            { slot: "k0", expected: colors.toneLinen },
+            { slot: "k7", expected: colors.toneLinen },
+            { slot: "k1", expected: colors.toneSand },
+            { slot: "k6", expected: colors.toneSand },
+            { slot: "k2", expected: colors.toneFlax },
+            { slot: "k9", expected: colors.toneFlax },
+            { slot: "k3", expected: colors.toneTan },
+            { slot: "k8", expected: colors.toneTan },
+            { slot: "k4", expected: colors.toneStone },
+            { slot: "k11", expected: colors.toneStone },
+            { slot: "k5", expected: colors.toneClay },
+            { slot: "k10", expected: colors.toneClay },
+        ];
+
+        expectations.forEach(({ slot, expected }) => {
+            const cell = { id: `deltoidal-hexagonal:${slot}`, state: 0, kind: "kite", slot };
+            expect(resolveDeadCellColor(0, { geometry: DELTOIDAL_HEXAGONAL_GEOMETRY, cell })).toBe(expected);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, colors, { geometry: DELTOIDAL_HEXAGONAL_GEOMETRY, cell }),
+            ).toBe(expected);
+        });
+    });
+
+    it("applies slot-based dead fills to Deltoidal Trihexagonal kites", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const colors = readCanvasColorsForTests();
+        const expectations = [
+            { slot: "s5", expected: colors.toneLinen },
+            { slot: "s10", expected: colors.toneLinen },
+            { slot: "s3", expected: colors.toneSand },
+            { slot: "s8", expected: colors.toneSand },
+            { slot: "s2", expected: colors.toneFlax },
+            { slot: "s9", expected: colors.toneFlax },
+            { slot: "s4", expected: colors.toneTan },
+            { slot: "s11", expected: colors.toneTan },
+            { slot: "s0", expected: colors.toneStone },
+            { slot: "s6", expected: colors.toneStone },
+            { slot: "s1", expected: colors.toneClay },
+            { slot: "s7", expected: colors.toneClay },
+        ];
+
+        expectations.forEach(({ slot, expected }) => {
+            const cell = { id: `deltoidal-trihexagonal:${slot}`, state: 0, kind: "kite", slot };
+            expect(resolveDeadCellColor(0, { geometry: DELTOIDAL_TRIHEXAGONAL_GEOMETRY, cell })).toBe(expected);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, colors, { geometry: DELTOIDAL_TRIHEXAGONAL_GEOMETRY, cell }),
+            ).toBe(expected);
+        });
+    });
+
+    it("applies direction-based dead fills to Rhombille slots", async () => {
+        const {
+            buildStateColorLookup,
+            resolveDeadCellColor,
+            resolveRenderedCellColor,
+        } = await import("./render-style.js");
+        const colorLookup = buildStateColorLookup();
+        const colors = readCanvasColorsForTests();
+        const expectations = [
+            { slot: "s0", expected: colors.toneLinen },
+            { slot: "s3", expected: colors.toneLinen },
+            { slot: "s1", expected: colors.toneTan },
+            { slot: "s4", expected: colors.toneTan },
+            { slot: "s2", expected: colors.toneClay },
+            { slot: "s5", expected: colors.toneClay },
+        ];
+
+        expectations.forEach(({ slot, expected }) => {
+            const cell = { id: `rhombille:${slot}`, state: 0, kind: "rhombus", slot };
+            expect(resolveDeadCellColor(0, { geometry: RHOMBILLE_GEOMETRY, cell })).toBe(expected);
+            expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry: RHOMBILLE_GEOMETRY, cell })).toBe(
+                expected,
+            );
         });
     });
 
