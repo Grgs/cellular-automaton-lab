@@ -81,7 +81,10 @@ export interface DomElements {
     editorShortcutHint: HTMLElement | null;
     unsafeSizingField: HTMLElement | null;
     unsafeSizingToggle: HTMLInputElement | null;
+    tileColorsField: HTMLElement | null;
+    tileColorsToggle: HTMLInputElement | null;
     brushSizeControls: HTMLElement | null;
+    eraseBtn: HTMLButtonElement | null;
     undoBtn: HTMLButtonElement | null;
     redoBtn: HTMLButtonElement | null;
 }

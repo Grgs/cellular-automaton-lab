@@ -58,6 +58,10 @@ export function bindControlShortcuts(actions: AppActionSet, {
             actions.setEditorTool?.("fill");
             return;
         }
+        if (key === "e") {
+            actions.setPaintState?.(0);
+            return;
+        }
 
         if (key === "1" || key === "2" || key === "3") {
             actions.setBrushSize?.(Number(key));

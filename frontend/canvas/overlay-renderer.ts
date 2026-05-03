@@ -1,6 +1,5 @@
 import { drawGestureOutlineLayer, drawHoverLayer, drawPreviewLayer, drawSelectionLayer } from "./render-layers.js";
 import type { CanvasCommittedRenderSnapshot } from "./committed-renderer.js";
-import { resolveRenderedCellColor } from "./render-style.js";
 import type { TransientOverlaySnapshot } from "./transient-overlays.js";
 
 export function drawTransientOverlaySnapshot(
@@ -21,7 +20,7 @@ export function drawTransientOverlaySnapshot(
         drawHoverLayer({
             context: renderState.context,
             ...shared,
-            resolveRenderedCellColor,
+            resolveRenderedCellColor: renderState.resolveRenderedCellColor,
             hoveredCell: overlaySnapshot.hoveredCell,
             cellStates: renderState.cellStates,
         });
@@ -31,7 +30,7 @@ export function drawTransientOverlaySnapshot(
         drawSelectionLayer({
             context: renderState.context,
             ...shared,
-            resolveRenderedCellColor,
+            resolveRenderedCellColor: renderState.resolveRenderedCellColor,
             selectedCells: overlaySnapshot.selectedCells,
             cellStates: renderState.cellStates,
         });
@@ -41,7 +40,7 @@ export function drawTransientOverlaySnapshot(
         drawPreviewLayer({
             context: renderState.context,
             ...shared,
-            resolveRenderedCellColor,
+            resolveRenderedCellColor: renderState.resolveRenderedCellColor,
             previewCells: overlaySnapshot.previewCells,
         });
     }
@@ -50,7 +49,7 @@ export function drawTransientOverlaySnapshot(
         drawGestureOutlineLayer({
             context: renderState.context,
             ...shared,
-            resolveRenderedCellColor,
+            resolveRenderedCellColor: renderState.resolveRenderedCellColor,
             outlinedCells: overlaySnapshot.gestureOutlineCells,
             tone: overlaySnapshot.gestureOutlineTone,
             cellStates: renderState.cellStates,

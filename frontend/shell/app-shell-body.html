@@ -105,7 +105,7 @@
                 </div>
             </div>
             <div id="canvas-edit-cue" class="canvas-edit-cue" hidden aria-live="polite">
-                Edit mode active. Click or drag to paint. Unarmed click or drag paints or erases based on the first cell.
+                Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.
             </div>
             <div id="grid-viewport" class="grid-viewport">
                 <div
@@ -251,6 +251,7 @@
                     </div>
                     <div id="editor-tools" class="editor-tool-grid" aria-label="Editor tools"></div>
                     <div class="editor-action-row">
+                        <button id="erase-btn" class="soft-action" type="button" aria-pressed="false">Erase</button>
                         <button id="undo-btn" class="soft-action" type="button" disabled>Undo</button>
                         <button id="redo-btn" class="soft-action" type="button" disabled>Redo</button>
                     </div>
@@ -259,7 +260,7 @@
                         <div id="brush-size-controls" class="brush-size-grid" aria-label="Brush size"></div>
                     </div>
                     <p id="editor-shortcut-hint" class="hint editor-shortcut-hint">
-                        Shortcuts: B brush, L line, R rectangle, F fill, 1-3 brush size.
+                        Shortcuts: B brush, L line, R rectangle, F fill, E erase, 1-3 brush size.
                     </p>
                     <details id="reset-settings-toggle" class="rule-help-toggle reset-settings-toggle">
                         <summary>More</summary>
@@ -270,6 +271,13 @@
                                 <span class="buried-setting-copy">
                                     <strong class="buried-setting-title">Allow unsafe size values</strong>
                                     <span class="hint">Lets Cell Size and Patch Depth go past normal tiling limits. This can get slow or unstable.</span>
+                                </span>
+                            </label>
+                            <label id="tile-colors-field" class="buried-setting-toggle" for="tile-colors-toggle">
+                                <input id="tile-colors-toggle" type="checkbox">
+                                <span class="buried-setting-copy">
+                                    <strong class="buried-setting-title">Show tile colors</strong>
+                                    <span class="hint">Uses family-specific dead-state palettes for mixed and aperiodic tilings. Turn this off for neutral fills.</span>
                                 </span>
                             </label>
                             <button id="reset-all-settings-btn" class="soft-action reset-settings-btn" type="button">

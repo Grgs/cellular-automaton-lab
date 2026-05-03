@@ -6,6 +6,7 @@ export interface UiSessionState {
     cellSize: number;
     cellSizeByTilingFamily: Record<string, number>;
     unsafeSizingEnabled: boolean;
+    tileColorsEnabled: boolean;
     editorTool: EditorTool;
     brushSize: number;
     drawerOpen: boolean | null;
@@ -20,9 +21,11 @@ export interface UiSessionStorage {
     getCellSizes(): Record<string, number>;
     getCellSize(tilingFamily?: string): number;
     getUnsafeSizingEnabled(): boolean;
+    getTileColorsEnabled(): boolean;
     setDefaultCellSize(cellSize: number): UiSessionState;
     setCellSizeForTilingFamily(tilingFamily: string, cellSize: number): UiSessionState;
     setUnsafeSizingEnabled(enabled: boolean): UiSessionState;
+    setTileColorsEnabled(enabled: boolean): UiSessionState;
     getEditorTool(): EditorTool;
     setEditorTool(editorTool: EditorTool): UiSessionState;
     getBrushSize(): number;

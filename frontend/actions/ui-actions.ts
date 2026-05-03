@@ -11,6 +11,7 @@ import {
     setBrushSize,
     setEditorTool,
     setSelectedPaintState,
+    setTileColorsEnabled,
     setUnsafeSizingEnabled,
 } from "../state/simulation-state.js";
 import { setDrawerOpen } from "../state/overlay-state.js";
@@ -47,6 +48,7 @@ export function createUiActions({
     applyOverlayIntentFn = applyOverlayIntent,
     armEditModeFn = armEditMode,
     clearEditModeFn = clearEditMode,
+    setTileColorsEnabledFn = setTileColorsEnabled,
     setUnsafeSizingEnabledFn = setUnsafeSizingEnabled,
 }: UiActionOptions & {
     setSelectedPaintStateFn?: typeof setSelectedPaintState;
@@ -59,6 +61,7 @@ export function createUiActions({
     applyOverlayIntentFn?: typeof applyOverlayIntent;
     armEditModeFn?: typeof armEditMode;
     clearEditModeFn?: typeof clearEditMode;
+    setTileColorsEnabledFn?: typeof setTileColorsEnabled;
     setUnsafeSizingEnabledFn?: typeof setUnsafeSizingEnabled;
 }): UiActionSet {
     function applyPaintState(nextPaintState: number | null): void {
@@ -91,6 +94,14 @@ export function createUiActions({
         uiSessionController.persistUnsafeSizingEnabled(Boolean(state.unsafeSizingEnabled));
         renderControlPanel();
         return Promise.resolve(Boolean(state.unsafeSizingEnabled));
+    }
+
+    function applyTileColorsEnabled(enabled: boolean): Promise<boolean> {
+        setTileColorsEnabledFn(state, enabled);
+        uiSessionController.persistTileColorsEnabled(state.tileColorsEnabled !== false);
+        renderCurrentGrid();
+        renderControlPanel();
+        return Promise.resolve(state.tileColorsEnabled !== false);
     }
 
     function applyCellSize(
@@ -159,6 +170,7 @@ export function createUiActions({
         setCellSize: (nextCellSize) => applyCellSize(nextCellSize),
         commitCellSize: (nextCellSize) => applyCellSize(nextCellSize, { immediate: true }),
         setUnsafeSizingEnabled: (enabled) => applyUnsafeSizingEnabled(enabled),
+        setTileColorsEnabled: (enabled) => applyTileColorsEnabled(enabled),
         setPaintState: (nextPaintState) => applyPaintState(nextPaintState),
         setEditorTool: (nextTool) => applyEditorTool(nextTool),
         setBrushSize: (nextBrushSize) => applyBrushSize(nextBrushSize),

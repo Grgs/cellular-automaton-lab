@@ -64,7 +64,7 @@ function createSubject({
     const editorPointerActive = vi.fn(() => false);
     const legacyPointerActive = vi.fn(() => false);
     const paintCell = vi.fn().mockResolvedValue(undefined);
-    const resolveDirectGestureTargetState = vi.fn((cell: PaintableCell) => (cell.state ?? 0) === 0 ? 2 : 0);
+    const resolveDirectGestureTargetState = vi.fn(() => 2);
     const beginPointerSession = vi.fn().mockResolvedValue(true);
     const legacyBegin = vi.fn();
     const armEditingFromGrid = vi.fn(() => ({ consumeNextClick: false }));
@@ -193,7 +193,7 @@ describe("interactions/surface-bindings", () => {
         expect(armEditingFromGrid).not.toHaveBeenCalled();
     });
 
-    it("applies the first-cell target state on unarmed left click", () => {
+    it("applies the selected paint state on unarmed left click", () => {
         const { handlers, paintCell, prepareDirectGridInteraction } = createSubject({
             supportsEditorTools: true,
             isEditArmed: false,
@@ -207,7 +207,7 @@ describe("interactions/surface-bindings", () => {
         expect(paintCell).toHaveBeenCalledWith(cell, 2);
     });
 
-    it("erases from the first-cell target state on unarmed left click", () => {
+    it("applies the selected paint state on unarmed left click for live cells too", () => {
         const { handlers, paintCell } = createSubject({
             supportsEditorTools: true,
             isEditArmed: false,
@@ -217,7 +217,7 @@ describe("interactions/surface-bindings", () => {
         handlers.onPointerDown(createEventStub(), liveCell);
         handlers.onClick(createEventStub(), liveCell);
 
-        expect(paintCell).toHaveBeenCalledWith(liveCell, 0);
+        expect(paintCell).toHaveBeenCalledWith(liveCell, 2);
     });
 
     it("does not block unarmed gestures with running advanced-tool messaging", () => {
@@ -235,7 +235,7 @@ describe("interactions/surface-bindings", () => {
         expect(legacyBegin).toHaveBeenCalledWith(cell, 1, 2);
     });
 
-    it("uses the original pointer-down target state for a mixed unarmed drag gesture", () => {
+    it("uses the selected paint state for a mixed unarmed drag gesture", () => {
         const { handlers, legacyBegin, resolveDirectGestureTargetState } = createSubject({
             supportsEditorTools: true,
             isEditArmed: false,
@@ -246,7 +246,7 @@ describe("interactions/surface-bindings", () => {
         handlers.onPointerMove({ buttons: 1 } as PointerEvent, { id: "square:2:1", x: 2, y: 1, state: 0 });
 
         expect(resolveDirectGestureTargetState).toHaveBeenCalledWith(originCell);
-        expect(legacyBegin).toHaveBeenCalledWith(originCell, 1, 0);
+        expect(legacyBegin).toHaveBeenCalledWith(originCell, 1, 2);
     });
 
     it("keeps armed clicks on the editor-session path", () => {

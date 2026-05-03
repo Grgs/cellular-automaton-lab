@@ -78,7 +78,7 @@ describe("interactions/command-dispatch", () => {
         vi.resetModules();
     });
 
-    it("resolves dead cells to the selected paint state for direct gestures", async () => {
+    it("resolves direct gestures to the selected paint state for dead cells", async () => {
         const { createInteractionCommandDispatch } = await import("./command-dispatch.js");
         const setCellRequest = vi.fn().mockResolvedValue(null);
         const toggleCellRequest = vi.fn().mockResolvedValue(null);
@@ -99,7 +99,7 @@ describe("interactions/command-dispatch", () => {
         expect(toggleCellRequest).not.toHaveBeenCalled();
     });
 
-    it("resolves the selected paint state back to dead for direct gestures", async () => {
+    it("resolves direct gestures to the selected paint state for already-painted cells", async () => {
         const { createInteractionCommandDispatch } = await import("./command-dispatch.js");
         const setCellRequest = vi.fn().mockResolvedValue(null);
 
@@ -112,11 +112,11 @@ describe("interactions/command-dispatch", () => {
             getCellState: () => 2,
         });
 
-        expect(dispatch.resolveDirectGestureTargetState({ id: "cell:1" })).toBe(0);
+        expect(dispatch.resolveDirectGestureTargetState({ id: "cell:1" })).toBe(2);
         expect(setCellRequest).not.toHaveBeenCalled();
     });
 
-    it("treats another nonzero state as erase for direct gestures", async () => {
+    it("resolves direct gestures to the selected paint state for other nonzero cells", async () => {
         const { createInteractionCommandDispatch } = await import("./command-dispatch.js");
         const setCellRequest = vi.fn().mockResolvedValue(null);
         const cell: PaintableCell = { id: "cell:1", state: 1 };
@@ -130,7 +130,7 @@ describe("interactions/command-dispatch", () => {
             getCellState: (nextCell) => nextCell.state ?? 0,
         });
 
-        expect(dispatch.resolveDirectGestureTargetState(cell)).toBe(0);
+        expect(dispatch.resolveDirectGestureTargetState(cell)).toBe(3);
         expect(setCellRequest).not.toHaveBeenCalled();
     });
 

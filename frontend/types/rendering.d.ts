@@ -172,6 +172,7 @@ export interface RenderedCellArgs {
             x?: number | null;
             y?: number | null;
             cell?: TopologyCell | PaintableCell | null;
+            tileColorsEnabled?: boolean;
         },
     ) => string;
 }
@@ -291,6 +292,7 @@ export interface CanvasRenderPayload {
     topology: TopologyPayload | null;
     cellStates: number[];
     previewCellStatesById: Record<string, number> | null;
+    tileColorsEnabled?: boolean;
 }
 
 export interface CanvasGridView {

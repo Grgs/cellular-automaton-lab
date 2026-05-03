@@ -822,6 +822,13 @@ button.soft-action:hover:not(:disabled) {
     box-shadow: none;
 }
 
+button.soft-action.is-selected {
+    background-color: var(--panel-strong);
+    border-color: var(--accent);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
 button.primary-action {
     background-color: var(--btn-primary-bg);
     color: var(--btn-primary-text);
@@ -1263,8 +1270,15 @@ button.theme-toggle .theme-icon-moon {
 .drawer-action-grid,
 .editor-action-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 7px;
+}
+
+.drawer-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.editor-action-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .drawer-board-actions {

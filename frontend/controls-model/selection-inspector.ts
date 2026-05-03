@@ -58,11 +58,23 @@ function collectIndexedSelection(
         .filter((cell): cell is IndexedTopologyCell => Boolean(cell));
 }
 
-function buildSingleSelectionInspector(
+function collectAliveCells(
+    byId: Map<string, IndexedTopologyCell> | undefined,
+    cellStates: number[],
+): IndexedTopologyCell[] {
+    if (!byId) {
+        return [];
+    }
+    return Array.from(byId.values())
+        .filter((cell) => Number(cellStates[cell.index] ?? 0) !== 0)
+        .sort((left, right) => left.index - right.index || left.id.localeCompare(right.id));
+}
+
+function buildSingleSummaryRows(
     cell: IndexedTopologyCell,
     cellStates: number[],
     activeRule: RuleDefinition | null,
-): SelectionInspectorViewModel {
+): SelectionInspectorSummaryRow[] {
     const stateValue = Number(cellStates[cell.index] ?? 0);
     const summaryRows: SelectionInspectorSummaryRow[] = [
         { label: "State", value: formatStateLabel(stateValue, activeRule) },
@@ -92,7 +104,10 @@ function buildSingleSelectionInspector(
     if (cell.slot) {
         summaryRows.push({ label: "Slot", value: cell.slot });
     }
+    return summaryRows;
+}
 
+function buildSingleAdvancedRows(cell: IndexedTopologyCell): SelectionInspectorSummaryRow[] {
     const advancedRows: SelectionInspectorSummaryRow[] = [];
     const neighborIds = cell.neighbors.filter((neighborId): neighborId is string => typeof neighborId === "string" && neighborId.length > 0);
     if (neighborIds.length > 0) {
@@ -104,6 +119,17 @@ function buildSingleSelectionInspector(
             value: cell.vertices.map((vertex) => formatPoint(vertex)).join(", "),
         });
     }
+    return advancedRows;
+}
+
+function buildSingleSelectionInspector(
+    cell: IndexedTopologyCell,
+    cellStates: number[],
+    activeRule: RuleDefinition | null,
+): SelectionInspectorViewModel {
+    const stateValue = Number(cellStates[cell.index] ?? 0);
+    const summaryRows = buildSingleSummaryRows(cell, cellStates, activeRule);
+    const advancedRows = buildSingleAdvancedRows(cell);
 
     return {
         mode: "single",
@@ -117,10 +143,23 @@ function buildSingleSelectionInspector(
     };
 }
 
-function buildMultiSelectionInspector(
+function buildAggregateInspector(
     cells: IndexedTopologyCell[],
     cellStates: number[],
     activeRule: RuleDefinition | null,
+    {
+        mode,
+        title,
+        subtitle,
+        countLabel,
+        idsLabel,
+    }: {
+        mode: "multi" | "population";
+        title: string;
+        subtitle: string;
+        countLabel: string;
+        idsLabel: string;
+    },
 ): SelectionInspectorViewModel {
     const stateMix = new Map<string, number>();
     const kindMix = new Map<string, number>();
@@ -150,7 +189,7 @@ function buildMultiSelectionInspector(
     });
 
     const summaryRows: SelectionInspectorSummaryRow[] = [
-        { label: "Selected Cells", value: String(cells.length) },
+        { label: countLabel, value: String(cells.length) },
         { label: "State Mix", value: formatFrequencyMap(stateMix) },
         { label: "Kind Mix", value: formatFrequencyMap(kindMix) },
     ];
@@ -185,7 +224,7 @@ function buildMultiSelectionInspector(
         const visibleIds = selectedIds.slice(0, MAX_ADVANCED_SELECTED_CELL_IDS);
         const remainingCount = selectedIds.length - visibleIds.length;
         advancedRows.push({
-            label: "Selected Cell IDs",
+            label: idsLabel,
             value: remainingCount > 0
                 ? `${visibleIds.join(", ")}, +${remainingCount} more`
                 : visibleIds.join(", "),
@@ -193,9 +232,9 @@ function buildMultiSelectionInspector(
     }
 
     return {
-        mode: "multi",
-        title: `${cells.length} Cells Selected`,
-        subtitle: "Aggregate selection summary",
+        mode,
+        title,
+        subtitle,
         hintText: EMPTY_SELECTION_HINT,
         summaryRows,
         advancedRows,
@@ -217,6 +256,16 @@ export function buildSelectionInspectorViewModel({
 }): SelectionInspectorViewModel {
     const indexedSelection = collectIndexedSelection(selectedCells, topologyIndex?.byId);
     if (indexedSelection.length === 0) {
+        const aliveCells = collectAliveCells(topologyIndex?.byId, cellStates);
+        if (aliveCells.length > 0) {
+            return buildAggregateInspector(aliveCells, cellStates, activeRule, {
+                mode: "population",
+                title: "Live Cells Summary",
+                subtitle: "Current population overview",
+                countLabel: "Live Cells",
+                idsLabel: "Live Cell IDs",
+            });
+        }
         return {
             mode: "empty",
             title: "No Cells Selected",
@@ -231,5 +280,11 @@ export function buildSelectionInspectorViewModel({
     if (indexedSelection.length === 1) {
         return buildSingleSelectionInspector(indexedSelection[0]!, cellStates, activeRule);
     }
-    return buildMultiSelectionInspector(indexedSelection, cellStates, activeRule);
+    return buildAggregateInspector(indexedSelection, cellStates, activeRule, {
+        mode: "multi",
+        title: `${indexedSelection.length} Cells Selected`,
+        subtitle: "Aggregate selection summary",
+        countLabel: "Selected Cells",
+        idsLabel: "Selected Cell IDs",
+    });
 }

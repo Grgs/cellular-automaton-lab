@@ -51,6 +51,7 @@ export function parseUiSession(
 
     const session = createEmptyUiSession(defaultTilingFamily);
     session.unsafeSizingEnabled = Boolean(value.unsafeSizingEnabled);
+    session.tileColorsEnabled = value.tileColorsEnabled !== false;
     if (value.cellSizeByTilingFamily !== null && value.cellSizeByTilingFamily !== undefined) {
         session.cellSizeByTilingFamily = parseCellSizeByTilingFamily(value.cellSizeByTilingFamily, {
             unsafe: session.unsafeSizingEnabled,

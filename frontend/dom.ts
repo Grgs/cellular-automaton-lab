@@ -87,7 +87,10 @@ export const elements: DomElements = {
     editorShortcutHint: elementById("editor-shortcut-hint"),
     unsafeSizingField: elementById("unsafe-sizing-field"),
     unsafeSizingToggle: elementById("unsafe-sizing-toggle"),
+    tileColorsField: elementById("tile-colors-field"),
+    tileColorsToggle: elementById("tile-colors-toggle"),
     brushSizeControls: elementById("brush-size-controls"),
+    eraseBtn: elementById("erase-btn"),
     undoBtn: elementById("undo-btn"),
     redoBtn: elementById("redo-btn"),
 };

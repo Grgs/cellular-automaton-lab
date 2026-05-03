@@ -140,7 +140,10 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         editorShortcutHint: null,
         unsafeSizingField: null,
         unsafeSizingToggle: null,
+        tileColorsField: null,
+        tileColorsToggle: null,
         brushSizeControls: null,
+        eraseBtn: null,
         undoBtn: null,
         redoBtn: null,
     };
@@ -168,6 +171,7 @@ function buildState(topology: TopologyPayload, cellStates: number[] = [0, 1]): A
         pendingPatchDepth: null,
         patchDepthByTilingFamily: {},
         unsafeSizingEnabled: false,
+        tileColorsEnabled: true,
         width: 2,
         height: 1,
         topologyRevision: topology.topology_revision,

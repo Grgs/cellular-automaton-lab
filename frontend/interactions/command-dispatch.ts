@@ -80,7 +80,7 @@ export function createInteractionCommandDispatch({
         if (typeof cell !== "object" || cell === null) {
             throw new Error("Cell toggles require a resolved topology cell.");
         }
-        return getCellState(cell) === 0 ? getPaintState() : 0;
+        return getPaintState();
     }
 
     async function sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;

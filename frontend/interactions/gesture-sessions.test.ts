@@ -76,7 +76,7 @@ function createRouter({
         openInspectorDrawer: vi.fn(),
         renderControlPanel: vi.fn(),
         paintCell: vi.fn().mockResolvedValue(undefined),
-        resolveDirectGestureTargetState: vi.fn((cell: PaintableCell) => (cell.state ?? 0) === 0 ? 2 : 0),
+        resolveDirectGestureTargetState: vi.fn(() => 2),
         setTimeoutFn: vi.fn(() => 1),
     });
 
@@ -91,7 +91,7 @@ function createRouter({
 }
 
 describe("interactions/gesture-sessions", () => {
-    it("starts unarmed left gestures with a fixed first-cell target state", () => {
+    it("starts unarmed left gestures with the selected paint state", () => {
         const { router, paintDrag } = createRouter({ isEditArmed: false });
         const firstCell: PaintableCell = { id: "cell:a", state: 0 };
         const secondCell: PaintableCell = { id: "cell:b", state: 9 };

@@ -23,11 +23,13 @@ export function resolveDeadCellColor(
         x = null,
         y = null,
         cell = null,
+        tileColorsEnabled = true,
     }: {
         geometry?: string;
         x?: number | null;
         y?: number | null;
         cell?: TopologyCell | PaintableCell | null;
+        tileColorsEnabled?: boolean;
     } = {},
     fallbackColors = DEFAULT_COLORS,
 ): string | null {
@@ -36,13 +38,15 @@ export function resolveDeadCellColor(
     }
 
     const normalizedGeometry = normalizeGeometry(geometry);
-    const registeredFamilyDeadColor = resolveRegisteredFamilyDeadColor(
-        (cell as TopologyCell | null | undefined) ?? null,
-        fallbackColors,
-        normalizedGeometry,
-    );
-    if (registeredFamilyDeadColor) {
-        return registeredFamilyDeadColor;
+    if (tileColorsEnabled) {
+        const registeredFamilyDeadColor = resolveRegisteredFamilyDeadColor(
+            (cell as TopologyCell | null | undefined) ?? null,
+            fallbackColors,
+            normalizedGeometry,
+        );
+        if (registeredFamilyDeadColor) {
+            return registeredFamilyDeadColor;
+        }
     }
 
     const alternateMixedKinds = MIXED_DEAD_ALT_CELL_KINDS.get(normalizedGeometry);
@@ -100,13 +104,15 @@ export function resolveRenderedCellColor(
         x = null,
         y = null,
         cell = null,
+        tileColorsEnabled = true,
     }: {
         geometry?: string;
         x?: number | null;
         y?: number | null;
         cell?: TopologyCell | PaintableCell | null;
+        tileColorsEnabled?: boolean;
     } = {},
 ): string {
-    return resolveDeadCellColor(stateValue, { geometry, x, y, cell }, fallbackColors)
+    return resolveDeadCellColor(stateValue, { geometry, x, y, cell, tileColorsEnabled }, fallbackColors)
         || resolveStateColor(stateValue, colorLookup, fallbackColors);
 }

@@ -9,7 +9,7 @@ describe("controls-model/drawer selection inspector", () => {
         vi.resetModules();
     });
 
-    it("builds an empty-state selection inspector when no cells are selected", async () => {
+    it("falls back to a live-cell summary when no cells are selected", async () => {
         const { buildControlsViewModel } = await import("../controls-model.js");
         const state = await buildControlsModelState();
 
@@ -21,11 +21,16 @@ describe("controls-model/drawer selection inspector", () => {
         });
 
         expect(viewModel.selectionInspector).toMatchObject({
-            mode: "empty",
-            title: "No Cells Selected",
+            mode: "population",
+            title: "Live Cells Summary",
             hintText: "Right-click a cell to inspect it. Right-drag to summarize a selection.",
-            summaryRows: [],
-            advancedVisible: false,
+            subtitle: "Current population overview",
+            advancedVisible: true,
+        });
+        expect(viewModel.selectionInspector.summaryRows).toContainEqual({ label: "Live Cells", value: "2" });
+        expect(viewModel.selectionInspector.advancedRows.at(-1)).toEqual({
+            label: "Live Cell IDs",
+            value: "cell:b, cell:c",
         });
     });
 

@@ -57,6 +57,12 @@ export function bindSimulationControls(
         () => Boolean(elements.unsafeSizingToggle?.checked),
         actions.setUnsafeSizingEnabled,
     );
+    bindInputControl(
+        elements.tileColorsToggle,
+        "change",
+        () => Boolean(elements.tileColorsToggle?.checked),
+        actions.setTileColorsEnabled,
+    );
     bindTilingPreviewPicker(elements, actions);
 
     bindButtonControl(elements.runToggleBtn, actions.toggleRun);

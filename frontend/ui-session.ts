@@ -108,6 +108,9 @@ export function createUiSessionStorage({
         getUnsafeSizingEnabled() {
             return Boolean(ensureLoaded().unsafeSizingEnabled);
         },
+        getTileColorsEnabled() {
+            return ensureLoaded().tileColorsEnabled !== false;
+        },
         setDefaultCellSize(cellSize) {
             return update((session) => {
                 const normalizedSession = parseUiSession({
@@ -143,6 +146,18 @@ export function createUiSessionStorage({
                 const normalizedSession = parseUiSession({
                     ...session,
                     unsafeSizingEnabled: Boolean(enabled),
+                }, {
+                    disclosureIds: DISCLOSURE_IDS,
+                    defaultTilingFamily,
+                });
+                Object.assign(session, normalizedSession);
+            });
+        },
+        setTileColorsEnabled(enabled) {
+            return update((session) => {
+                const normalizedSession = parseUiSession({
+                    ...session,
+                    tileColorsEnabled: enabled !== false,
                 }, {
                     disclosureIds: DISCLOSURE_IDS,
                     defaultTilingFamily,

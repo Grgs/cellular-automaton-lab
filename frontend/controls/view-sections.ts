@@ -218,6 +218,12 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
     if (elements.unsafeSizingToggle) {
         elements.unsafeSizingToggle.checked = Boolean(viewModel.unsafeSizingEnabled);
     }
+    if (elements.tileColorsField) {
+        elements.tileColorsField.hidden = false;
+    }
+    if (elements.tileColorsToggle) {
+        elements.tileColorsToggle.checked = viewModel.tileColorsEnabled !== false;
+    }
     renderToggleButtons(
         elements.editorTools,
         viewModel.editorTools || [],
@@ -237,6 +243,18 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
     }
     if (elements.redoBtn) {
         elements.redoBtn.disabled = Boolean(viewModel.redoDisabled);
+    }
+    if (elements.eraseBtn) {
+        const eraseState = viewModel.paletteStates.find((state) => state.value === 0) ?? null;
+        const eraseSelected = viewModel.selectedPaintState === 0;
+        elements.eraseBtn.hidden = viewModel.selectedPaintState === null;
+        elements.eraseBtn.disabled = viewModel.selectedPaintState === null;
+        elements.eraseBtn.textContent = "Erase";
+        elements.eraseBtn.title = eraseState
+            ? `Select ${eraseState.label} for erasing.`
+            : "Select state 0 for erasing.";
+        elements.eraseBtn.setAttribute("aria-pressed", eraseSelected ? "true" : "false");
+        elements.eraseBtn.classList.toggle("is-selected", eraseSelected);
     }
     if (elements.editorShortcutHint) {
         elements.editorShortcutHint.textContent = viewModel.editorShortcutHint || "";
