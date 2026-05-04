@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+ARGS=(hook-impl --config="$ROOT_DIR/.pre-commit-config.yaml" --hook-type=pre-commit)
+HERE="$(cd "$(dirname "$0")" && pwd)"
+ARGS+=(--hook-dir "$HERE" -- "$@")
+
+run_pre_commit() {
+    exec "$@" "${ARGS[@]}"
+}
+
+windows_pre_commit=""
+if [ -n "${LOCALAPPDATA:-}" ]; then
+    windows_pre_commit="$LOCALAPPDATA/Programs/Python/Python313/Scripts/pre-commit.exe"
+elif [ -n "${USERPROFILE:-}" ]; then
+    windows_pre_commit="$USERPROFILE/AppData/Local/Programs/Python/Python313/Scripts/pre-commit.exe"
+fi
+
+if [ -x "$ROOT_DIR/.venv/bin/python" ]; then
+    run_pre_commit "$ROOT_DIR/.venv/bin/python" -m pre_commit
+fi
+
+if [ -x "$ROOT_DIR/venv/bin/python" ]; then
+    run_pre_commit "$ROOT_DIR/venv/bin/python" -m pre_commit
+fi
+
+if [ -n "$windows_pre_commit" ] && [ -x "$windows_pre_commit" ]; then
+    run_pre_commit "$windows_pre_commit"
+fi
+
+if command -v pre-commit >/dev/null 2>&1; then
+    run_pre_commit pre-commit
+fi
+
+echo '`pre-commit` not found. Install it in the repo venv or Windows Python 3.13 Scripts directory.' 1>&2
+exit 1
