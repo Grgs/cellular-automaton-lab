@@ -1671,6 +1671,11 @@ button.theme-toggle .theme-icon-moon {
     margin: 8px 0;
 }
 
+.display-theme-toggle {
+    align-items: center;
+    margin-top: 8px;
+}
+
 .rule-description,
 .hint {
     margin: 0;

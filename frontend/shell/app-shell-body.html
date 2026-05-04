@@ -154,26 +154,12 @@
         <aside id="control-drawer" class="control-drawer" aria-hidden="false" data-open="true">
             <div class="control-drawer-inner">
                 <header class="drawer-header">
-                    <div class="drawer-header-main">
-                            <div class="drawer-header-copy">
-                                <p class="drawer-eyebrow">Inspector</p>
-                                <div class="drawer-header-context">
-                                    <strong id="inspector-tiling-text" class="drawer-header-title">Loading...</strong>
-                                    <span id="inspector-rule-text" class="drawer-header-subtitle">Loading rule...</span>
-                                </div>
-                                <div id="topology-status" class="topology-status inspector-status" hidden aria-live="polite"></div>
-                            </div>
-                        <button
-                            id="theme-toggle-btn"
-                            class="theme-toggle inspector-theme-toggle"
-                            type="button"
-                            aria-label="Switch to dark mode"
-                            aria-pressed="false"
-                            title="Switch to dark mode"
-                        >
-                            <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true">☀</span>
-                            <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
-                        </button>
+                    <div class="drawer-header-copy">
+                        <div class="drawer-header-context">
+                            <strong id="inspector-tiling-text" class="drawer-header-title">Loading...</strong>
+                            <span id="inspector-rule-text" class="drawer-header-subtitle">Loading rule...</span>
+                        </div>
+                        <div id="topology-status" class="topology-status inspector-status" hidden aria-live="polite"></div>
                     </div>
                     <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
                         <span class="drawer-showcase-title">Try a starting point</span>
@@ -328,6 +314,23 @@
                             <span class="hint">Uses family-specific dead-state palettes for mixed and aperiodic tilings. Turn this off for neutral fills.</span>
                         </span>
                     </label>
+                    <div class="buried-setting-toggle display-theme-toggle">
+                        <button
+                            id="theme-toggle-btn"
+                            class="theme-toggle"
+                            type="button"
+                            aria-label="Switch to dark mode"
+                            aria-pressed="false"
+                            title="Switch to dark mode"
+                        >
+                            <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true">☀</span>
+                            <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
+                        </button>
+                        <span class="buried-setting-copy">
+                            <strong class="buried-setting-title">Theme</strong>
+                            <span class="hint">Switch between light and dark mode.</span>
+                        </span>
+                    </div>
                 </section>
 
                 <section id="advanced-section" class="panel-section drawer-section">
