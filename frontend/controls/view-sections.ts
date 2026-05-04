@@ -334,8 +334,9 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
             }
             btn.dataset.editorTool = String(tool.value);
             btn.setAttribute("aria-pressed", String(tool.value) === String(viewModel.selectedEditorTool) ? "true" : "false");
-            btn.title = tool.label;
-            btn.textContent = toolShortLabels[String(tool.value)] ?? tool.label;
+            const keyHint = toolShortLabels[String(tool.value)];
+            btn.title = keyHint ? `${tool.label} (${keyHint})` : tool.label;
+            btn.textContent = keyHint ?? tool.label;
             elements.canvasToolbarTools!.appendChild(btn);
         });
     }

@@ -1856,6 +1856,15 @@ button.theme-toggle .theme-icon-moon {
     cursor: default;
 }
 
+.canvas-toolbar-help-btn {
+    opacity: 0.55;
+    font-style: italic;
+}
+
+.canvas-toolbar-help-btn:hover {
+    opacity: 1;
+}
+
 :root[data-theme="dark"] .canvas-toolbar {
     border-color: rgba(231, 237, 248, 0.12);
     background: rgba(17, 23, 32, 0.95);
