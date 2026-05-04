@@ -5,9 +5,6 @@ export interface DomElements {
     controlDrawer: HTMLElement | null;
     drawerBackdrop: HTMLElement | null;
     drawerToggleBtn: HTMLButtonElement | null;
-    simulationSection: HTMLElement | null;
-    rulePaletteSection: HTMLElement | null;
-    editorSection: HTMLElement | null;
     "rule-notes-toggle": HTMLDetailsElement | null;
     gridPanel: HTMLElement | null;
     gridViewport: HTMLElement | null;

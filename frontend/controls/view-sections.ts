@@ -28,6 +28,9 @@ function renderSelectionInspectorRows(container: HTMLElement | null, rows: reado
 
 export function renderSelectionInspectorSection(elements: DomElements, viewModel: ControlsViewModel): void {
     const inspector = viewModel.selectionInspector;
+    if (elements.selectionInspectorSection) {
+        elements.selectionInspectorSection.hidden = inspector.mode === "empty";
+    }
     if (elements.selectionInspectorTitle) {
         elements.selectionInspectorTitle.textContent = inspector.title;
     }

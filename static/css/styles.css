@@ -1230,6 +1230,32 @@ button.theme-toggle .theme-icon-moon {
     line-height: 1.3;
 }
 
+.drawer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 2px 0 4px;
+}
+
+.drawer-nav-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 100ms, color 100ms, border-color 100ms;
+}
+
+.drawer-nav-pill:hover {
+    background: var(--btn-soft-hover);
+    color: var(--text);
+    border-color: var(--accent-border);
+}
+
 .drawer-section {
     padding: 9px 10px;
     border: 1px solid var(--line);
@@ -1247,6 +1273,10 @@ button.theme-toggle .theme-icon-moon {
     grid-template-columns: minmax(0, 1fr);
 }
 
+.drawer-topology-grid {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .drawer-control {
     min-width: 0;
 }
@@ -1258,6 +1288,10 @@ button.theme-toggle .theme-icon-moon {
 
 .drawer-rule-control {
     margin-bottom: 10px;
+}
+
+.drawer-speed-control {
+    margin-top: 10px;
 }
 
 .panel-section h2 {
@@ -1615,6 +1649,26 @@ button.theme-toggle .theme-icon-moon {
 
 .reset-settings-btn {
     justify-self: start;
+}
+
+.patterns-share-btn {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.file-io-toggle {
+    margin-top: 10px;
+}
+
+.rule-help-toggle .file-io-panel {
+    display: grid;
+    gap: 7px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 10px 12px 12px;
+}
+
+.advanced-section-hint {
+    margin: 8px 0;
 }
 
 .rule-description,
