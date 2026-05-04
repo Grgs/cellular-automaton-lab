@@ -87,4 +87,35 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
             void actions.redoEdit();
         });
     }
+
+    bindDelegatedControl(
+        elements.canvasToolbarPalette,
+        "[data-state-value]",
+        (button) => actions.setPaintState(Number(button.dataset.stateValue)),
+    );
+    bindDelegatedControl(
+        elements.canvasToolbarTools,
+        "[data-editor-tool]",
+        (button) => {
+            const editorTool = button.dataset.editorTool;
+            if (editorTool) {
+                actions.setEditorTool(parseEditorTool(editorTool));
+            }
+        },
+    );
+    bindDelegatedControl(
+        elements.canvasToolbarBrush,
+        "[data-brush-size]",
+        (button) => actions.setBrushSize(Number(button.dataset.brushSize)),
+    );
+    if (elements.canvasToolbarUndoBtn && actions.undoEdit) {
+        elements.canvasToolbarUndoBtn.addEventListener("click", () => {
+            void actions.undoEdit();
+        });
+    }
+    if (elements.canvasToolbarRedoBtn && actions.redoEdit) {
+        elements.canvasToolbarRedoBtn.addEventListener("click", () => {
+            void actions.redoEdit();
+        });
+    }
 }

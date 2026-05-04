@@ -87,4 +87,10 @@ export interface DomElements {
     eraseBtn: HTMLButtonElement | null;
     undoBtn: HTMLButtonElement | null;
     redoBtn: HTMLButtonElement | null;
+    canvasToolbar: HTMLElement | null;
+    canvasToolbarPalette: HTMLElement | null;
+    canvasToolbarTools: HTMLElement | null;
+    canvasToolbarBrush: HTMLElement | null;
+    canvasToolbarUndoBtn: HTMLButtonElement | null;
+    canvasToolbarRedoBtn: HTMLButtonElement | null;
 }

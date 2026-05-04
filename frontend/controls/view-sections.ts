@@ -286,4 +286,63 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
 
     renderPaintPalette(elements, viewModel.paletteStates, viewModel.selectedPaintState);
     renderThemeToggle(elements, viewModel.theme);
+
+    // Canvas toolbar
+    if (elements.canvasToolbar) {
+        elements.canvasToolbar.hidden = viewModel.paletteStates.length === 0 || viewModel.blockingActivityVisible;
+    }
+    if (elements.canvasToolbarPalette) {
+        elements.canvasToolbarPalette.innerHTML = "";
+        viewModel.paletteStates.forEach((state) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "canvas-toolbar-swatch-btn";
+            if (state.value === viewModel.selectedPaintState) {
+                btn.classList.add("is-selected");
+            }
+            btn.dataset.stateValue = String(state.value);
+            btn.setAttribute("aria-pressed", state.value === viewModel.selectedPaintState ? "true" : "false");
+            btn.title = state.label;
+            const swatch = document.createElement("span");
+            swatch.className = "canvas-toolbar-swatch";
+            swatch.style.backgroundColor = state.color;
+            btn.appendChild(swatch);
+            elements.canvasToolbarPalette!.appendChild(btn);
+        });
+    }
+    if (elements.canvasToolbarTools) {
+        const toolShortLabels: Record<string, string> = {
+            brush: "B",
+            line: "L",
+            rectangle: "R",
+            fill: "F",
+        };
+        elements.canvasToolbarTools.innerHTML = "";
+        (viewModel.editorTools || []).forEach((tool) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "canvas-toolbar-tool-btn";
+            if (String(tool.value) === String(viewModel.selectedEditorTool)) {
+                btn.classList.add("is-selected");
+            }
+            btn.dataset.editorTool = String(tool.value);
+            btn.setAttribute("aria-pressed", String(tool.value) === String(viewModel.selectedEditorTool) ? "true" : "false");
+            btn.title = tool.label;
+            btn.textContent = toolShortLabels[String(tool.value)] ?? tool.label;
+            elements.canvasToolbarTools!.appendChild(btn);
+        });
+    }
+    renderToggleButtons(
+        elements.canvasToolbarBrush,
+        viewModel.brushSizeOptions || [],
+        viewModel.selectedBrushSize,
+        "brushSize",
+        "canvas-toolbar-brush-btn",
+    );
+    if (elements.canvasToolbarUndoBtn) {
+        elements.canvasToolbarUndoBtn.disabled = Boolean(viewModel.undoDisabled);
+    }
+    if (elements.canvasToolbarRedoBtn) {
+        elements.canvasToolbarRedoBtn.disabled = Boolean(viewModel.redoDisabled);
+    }
 }

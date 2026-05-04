@@ -146,6 +146,12 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         eraseBtn: null,
         undoBtn: null,
         redoBtn: null,
+        canvasToolbar: null,
+        canvasToolbarPalette: null,
+        canvasToolbarTools: null,
+        canvasToolbarBrush: null,
+        canvasToolbarUndoBtn: null,
+        canvasToolbarRedoBtn: null,
     };
 }
 

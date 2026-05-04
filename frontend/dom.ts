@@ -93,4 +93,10 @@ export const elements: DomElements = {
     eraseBtn: elementById("erase-btn"),
     undoBtn: elementById("undo-btn"),
     redoBtn: elementById("redo-btn"),
+    canvasToolbar: elementById("canvas-toolbar"),
+    canvasToolbarPalette: elementById("canvas-toolbar-palette"),
+    canvasToolbarTools: elementById("canvas-toolbar-tools"),
+    canvasToolbarBrush: elementById("canvas-toolbar-brush"),
+    canvasToolbarUndoBtn: elementById("canvas-toolbar-undo-btn"),
+    canvasToolbarRedoBtn: elementById("canvas-toolbar-redo-btn"),
 };
