@@ -88,6 +88,25 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
         });
     }
 
+    if (elements.canvasToolbarHelpBtn && elements.canvasToolbarShortcuts) {
+        const helpBtn = elements.canvasToolbarHelpBtn;
+        const shortcuts = elements.canvasToolbarShortcuts;
+        helpBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const open = shortcuts.hidden;
+            shortcuts.hidden = !open;
+            helpBtn.setAttribute("aria-expanded", open ? "true" : "false");
+            helpBtn.classList.toggle("is-active", open);
+        });
+        document.addEventListener("click", () => {
+            if (!shortcuts.hidden) {
+                shortcuts.hidden = true;
+                helpBtn.setAttribute("aria-expanded", "false");
+                helpBtn.classList.remove("is-active");
+            }
+        });
+    }
+
     if (elements.canvasToolbarArmBtn && actions.enterEditMode) {
         elements.canvasToolbarArmBtn.addEventListener("click", () => {
             actions.enterEditMode();

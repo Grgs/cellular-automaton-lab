@@ -99,4 +99,6 @@ export const elements: DomElements = {
     canvasToolbarUndoBtn: elementById("canvas-toolbar-undo-btn"),
     canvasToolbarRedoBtn: elementById("canvas-toolbar-redo-btn"),
     canvasToolbarDismissBtn: elementById("canvas-toolbar-dismiss-btn"),
+    canvasToolbarHelpBtn: elementById("canvas-toolbar-help-btn"),
+    canvasToolbarShortcuts: elementById("canvas-toolbar-shortcuts"),
 };

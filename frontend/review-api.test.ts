@@ -152,6 +152,8 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         canvasToolbarUndoBtn: null,
         canvasToolbarRedoBtn: null,
         canvasToolbarDismissBtn: null,
+        canvasToolbarHelpBtn: null,
+        canvasToolbarShortcuts: null,
     };
 }
 

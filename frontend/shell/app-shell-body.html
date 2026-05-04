@@ -109,6 +109,14 @@
                 Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.
             </div>
             <div id="canvas-toolbar" class="canvas-toolbar" hidden data-edit-mode="idle" aria-label="Painting tools">
+                <div id="canvas-toolbar-shortcuts" class="canvas-toolbar-shortcuts" hidden aria-live="polite">
+                    <span class="shortcut-item"><kbd>B</kbd> Brush</span>
+                    <span class="shortcut-item"><kbd>L</kbd> Line</span>
+                    <span class="shortcut-item"><kbd>R</kbd> Rect</span>
+                    <span class="shortcut-item"><kbd>F</kbd> Fill</span>
+                    <span class="shortcut-item"><kbd>E</kbd> Erase</span>
+                    <span class="shortcut-item"><kbd>1</kbd>–<kbd>3</kbd> Brush size</span>
+                </div>
                 <button id="canvas-toolbar-arm-btn" class="canvas-toolbar-arm-btn" type="button">
                     Click to edit
                 </button>
@@ -125,11 +133,12 @@
                     <button id="canvas-toolbar-dismiss-btn" class="canvas-toolbar-act-btn" type="button" title="Exit edit mode">✕</button>
                     <div class="canvas-toolbar-sep" aria-hidden="true"></div>
                     <button
+                        id="canvas-toolbar-help-btn"
                         class="canvas-toolbar-act-btn canvas-toolbar-help-btn"
                         type="button"
-                        tabindex="-1"
                         aria-label="Keyboard shortcuts"
-                        title="Keyboard shortcuts: B brush · L line · R rectangle · F fill · E erase · 1–3 brush size"
+                        aria-expanded="false"
+                        aria-controls="canvas-toolbar-shortcuts"
                     >?</button>
                 </div>
             </div>

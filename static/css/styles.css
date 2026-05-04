@@ -1866,8 +1866,62 @@ button.theme-toggle .theme-icon-moon {
     font-style: italic;
 }
 
-.canvas-toolbar-help-btn:hover {
+.canvas-toolbar-help-btn:hover,
+.canvas-toolbar-help-btn.is-active {
     opacity: 1;
+}
+
+.canvas-toolbar-help-btn.is-active {
+    background: rgba(31, 36, 48, 0.10);
+}
+
+.canvas-toolbar-shortcuts {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 14px;
+    padding: 8px 14px;
+    background: rgba(255, 251, 245, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(15, 22, 34, 0.12);
+    white-space: nowrap;
+    font-size: 0.78rem;
+    pointer-events: none;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--ink);
+}
+
+.canvas-toolbar-shortcuts kbd {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    background: rgba(31, 36, 48, 0.08);
+    border: 1px solid rgba(31, 36, 48, 0.18);
+    border-radius: 4px;
+    line-height: 1.5;
+}
+
+:root[data-theme="dark"] .canvas-toolbar-shortcuts {
+    background: rgba(17, 23, 32, 0.97);
+    border-color: rgba(231, 237, 248, 0.12);
+}
+
+:root[data-theme="dark"] .canvas-toolbar-shortcuts kbd {
+    background: rgba(231, 237, 248, 0.10);
+    border-color: rgba(231, 237, 248, 0.20);
+}
+
+:root[data-theme="dark"] .canvas-toolbar-help-btn.is-active {
+    background: rgba(231, 237, 248, 0.10);
 }
 
 :root[data-theme="dark"] .canvas-toolbar {
