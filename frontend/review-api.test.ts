@@ -147,11 +147,14 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         undoBtn: null,
         redoBtn: null,
         canvasToolbar: null,
+        canvasToolbarArmBtn: null,
+        canvasToolbarControls: null,
         canvasToolbarPalette: null,
         canvasToolbarTools: null,
         canvasToolbarBrush: null,
         canvasToolbarUndoBtn: null,
         canvasToolbarRedoBtn: null,
+        canvasToolbarDismissBtn: null,
     };
 }
 

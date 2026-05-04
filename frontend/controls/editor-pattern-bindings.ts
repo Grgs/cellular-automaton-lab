@@ -88,6 +88,17 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
         });
     }
 
+    if (elements.canvasToolbarArmBtn && actions.enterEditMode) {
+        elements.canvasToolbarArmBtn.addEventListener("click", () => {
+            actions.enterEditMode();
+        });
+    }
+    if (elements.canvasToolbarDismissBtn && actions.exitEditMode) {
+        elements.canvasToolbarDismissBtn.addEventListener("click", () => {
+            actions.exitEditMode();
+        });
+    }
+
     bindDelegatedControl(
         elements.canvasToolbarPalette,
         "[data-state-value]",

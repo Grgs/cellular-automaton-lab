@@ -113,6 +113,8 @@ export interface UiActionSet {
     handleWorkspaceEmptyClick(): Promise<boolean>;
     setDisclosureState(id: UiDisclosureId, open: boolean): void;
     toggleTheme(): void;
+    enterEditMode(): void;
+    exitEditMode(): void;
 }
 
 export interface AppActionSet extends

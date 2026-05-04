@@ -94,9 +94,12 @@ export const elements: DomElements = {
     undoBtn: elementById("undo-btn"),
     redoBtn: elementById("redo-btn"),
     canvasToolbar: elementById("canvas-toolbar"),
+    canvasToolbarArmBtn: elementById("canvas-toolbar-arm-btn"),
+    canvasToolbarControls: elementById("canvas-toolbar-controls"),
     canvasToolbarPalette: elementById("canvas-toolbar-palette"),
     canvasToolbarTools: elementById("canvas-toolbar-tools"),
     canvasToolbarBrush: elementById("canvas-toolbar-brush"),
     canvasToolbarUndoBtn: elementById("canvas-toolbar-undo-btn"),
     canvasToolbarRedoBtn: elementById("canvas-toolbar-redo-btn"),
+    canvasToolbarDismissBtn: elementById("canvas-toolbar-dismiss-btn"),
 };

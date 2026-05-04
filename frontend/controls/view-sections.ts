@@ -289,7 +289,11 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
 
     // Canvas toolbar
     if (elements.canvasToolbar) {
-        elements.canvasToolbar.hidden = viewModel.paletteStates.length === 0 || viewModel.blockingActivityVisible;
+        const toolbarHidden = viewModel.paletteStates.length === 0
+            || viewModel.blockingActivityVisible
+            || viewModel.gridEditMode === "running";
+        elements.canvasToolbar.hidden = toolbarHidden;
+        elements.canvasToolbar.dataset.editMode = viewModel.gridEditMode;
     }
     if (elements.canvasToolbarPalette) {
         elements.canvasToolbarPalette.innerHTML = "";

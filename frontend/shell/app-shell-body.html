@@ -107,15 +107,22 @@
             <div id="canvas-edit-cue" class="canvas-edit-cue" hidden aria-live="polite">
                 Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.
             </div>
-            <div id="canvas-toolbar" class="canvas-toolbar" hidden aria-label="Painting tools">
-                <div id="canvas-toolbar-palette" class="canvas-toolbar-palette"></div>
-                <div class="canvas-toolbar-sep" aria-hidden="true"></div>
-                <div id="canvas-toolbar-tools" class="canvas-toolbar-tools"></div>
-                <div class="canvas-toolbar-sep" aria-hidden="true"></div>
-                <div id="canvas-toolbar-brush" class="canvas-toolbar-brush"></div>
-                <div class="canvas-toolbar-sep" aria-hidden="true"></div>
-                <button id="canvas-toolbar-undo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Undo">↩</button>
-                <button id="canvas-toolbar-redo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Redo">↪</button>
+            <div id="canvas-toolbar" class="canvas-toolbar" hidden data-edit-mode="idle" aria-label="Painting tools">
+                <button id="canvas-toolbar-arm-btn" class="canvas-toolbar-arm-btn" type="button">
+                    Click to edit
+                </button>
+                <div id="canvas-toolbar-controls" class="canvas-toolbar-controls">
+                    <div id="canvas-toolbar-palette" class="canvas-toolbar-palette"></div>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <div id="canvas-toolbar-tools" class="canvas-toolbar-tools"></div>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <div id="canvas-toolbar-brush" class="canvas-toolbar-brush"></div>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <button id="canvas-toolbar-undo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Undo">↩</button>
+                    <button id="canvas-toolbar-redo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Redo">↪</button>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <button id="canvas-toolbar-dismiss-btn" class="canvas-toolbar-act-btn" type="button" title="Exit edit mode">✕</button>
+                </div>
             </div>
             <div id="grid-viewport" class="grid-viewport">
                 <div

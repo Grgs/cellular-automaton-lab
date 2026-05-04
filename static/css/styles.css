@@ -1675,6 +1675,38 @@ button.theme-toggle .theme-icon-moon {
     margin: 0 3px;
 }
 
+/* Collapsed state: show only arm button */
+.canvas-toolbar-controls {
+    display: none;
+    align-items: center;
+    gap: 4px;
+}
+
+.canvas-toolbar[data-edit-mode="armed"] .canvas-toolbar-arm-btn {
+    display: none;
+}
+
+.canvas-toolbar[data-edit-mode="armed"] .canvas-toolbar-controls {
+    display: flex;
+}
+
+.canvas-toolbar-arm-btn {
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.5;
+    background: transparent;
+    border: none;
+    color: var(--ink);
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: 6px;
+}
+
+.canvas-toolbar-arm-btn:hover {
+    color: var(--accent);
+}
+
 .canvas-toolbar-palette,
 .canvas-toolbar-tools,
 .canvas-toolbar-brush {
