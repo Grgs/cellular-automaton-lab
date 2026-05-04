@@ -66,6 +66,7 @@
                     >
                         Reset Board
                     </button>
+                    <button id="random-btn" class="soft-action top-bar-action" type="button">Random Reset</button>
                 </div>
 
                 <div class="top-bar-control-group top-bar-utility-group">
@@ -293,12 +294,9 @@
                         type="button"
                         title="Copy a link that restores this exact board"
                     >Copy Share Link</button>
-                    <div class="drawer-board-actions">
-                        <div id="preset-seed-controls" class="preset-seed-controls">
-                            <select id="preset-seed-select" hidden aria-label="Preset seed pattern"></select>
-                            <button id="preset-seed-btn" class="soft-action" type="button">Preset Seed</button>
-                        </div>
-                        <button id="random-btn" class="secondary drawer-action-button" type="button">Random Reset</button>
+                    <div id="preset-seed-controls" class="preset-seed-controls">
+                        <select id="preset-seed-select" hidden aria-label="Preset seed pattern"></select>
+                        <button id="preset-seed-btn" class="soft-action" type="button">Preset Seed</button>
                     </div>
                     <p id="preset-helper-text" class="hint preset-helper-text">
                         Loads a curated seed for this rule and board.
