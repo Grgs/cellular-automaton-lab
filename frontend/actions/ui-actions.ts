@@ -167,7 +167,7 @@ export function createUiActions({
     }
 
     function applyEnterEditMode(): void {
-        if (!state.isRunning && !state.overlayRunPending) {
+        if (!state.isRunning && !state.overlayRunPending && !state.editArmed) {
             armEditModeFn(state, { showCue: false });
             renderControlPanel();
         }

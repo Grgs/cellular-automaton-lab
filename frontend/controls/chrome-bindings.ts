@@ -35,6 +35,12 @@ export function bindChromeControls(elements: DomElements, actions: AppActionSet)
         });
     }
 
+    if (elements.grid && actions.enterEditMode) {
+        elements.grid.addEventListener("pointerdown", () => {
+            actions.enterEditMode();
+        });
+    }
+
     if (elements.mainStage && actions.handleWorkspaceEmptyClick) {
         const mainStage = elements.mainStage;
         mainStage.addEventListener("click", (event) => {
