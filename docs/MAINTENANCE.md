@@ -5,6 +5,8 @@ This repo now has enough moving parts that maintenance guidance needs one home. 
 ## Doc Ownership
 
 - `README.md`: product overview, local setup, and the public command surface
+- `CONTRIBUTING.md`: contributor setup, common workflow, and contribution expectations
+- `SECURITY.md`: vulnerability-reporting expectations and security guardrail pointers
 - `docs/ADDING_RULES.md`, `docs/ADDING_TOPOLOGIES.md`, `docs/ADDING_PRESETS_AND_PATTERNS.md`, `docs/TESTING_CHANGES.md`: task guides for contributors adding app behavior
 - `docs/ARCHITECTURE.md`: runtime boundaries and subsystem ownership
 - `docs/CODE_MAP.md`: navigation for specific files and call paths
@@ -13,6 +15,7 @@ This repo now has enough moving parts that maintenance guidance needs one home. 
 - `docs/CODE_QUALITY_ROADMAP.md`: structural pressure points and refactor priorities
 - `TODO.md`: concrete remaining work after the current cleanup passes
 - `CHANGELOG.md`: curated narrative changelog of completed work
+- `.github/ISSUE_TEMPLATE/` and `.github/PULL_REQUEST_TEMPLATE.md`: lightweight public contribution forms
 
 If a note is only about hygiene, guardrails, or how to maintain the repo, put it here instead of growing another planning document.
 
@@ -33,7 +36,6 @@ npm run format:python:check
 npm run check:python
 ```
 
-These Python checks are intentionally incremental for now. They cover the backend bootstrap payload slice plus the `tools/render_review/` package and its direct tests and entrypoints. Wider `ruff` adoption is still blocked by older compatibility facades that rely on import-for-export patterns and `sys.path` bootstrap shims.
 These Python checks are still intentionally incremental, but the guarded slice is wider now. It covers:
 
 - the backend bootstrap and payload-contract files

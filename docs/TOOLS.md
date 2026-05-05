@@ -2,7 +2,7 @@
 
 Single index of every script under `tools/`. Each entry is a one-line summary, the canonical invocation, and (when relevant) a pointer to the deeper guide that already covers it.
 
-The CLI tools group into seven purposes:
+The CLI tools group into ten purposes:
 
 1. [Build and serve](#build-and-serve)
 2. [Lint and format](#lint-and-format)
