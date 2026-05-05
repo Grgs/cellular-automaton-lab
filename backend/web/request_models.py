@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from backend.payload_types import CellTargetPayload, CellUpdatePayload, CellUpdatesPayload, TopologySpecRequestPayload
+from backend.payload_types import CellTargetPayload, CellUpdatePayload, TopologySpecRequestPayload
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 
@@ -140,6 +140,7 @@ class ConfigUpdateRequestModel(BaseModel):
     @classmethod
     def normalize_optional_float(cls, value: object) -> object | None:
         return blank_to_none(value)
+
 
 class ResetRequestModel(ConfigUpdateRequestModel):
     randomize: bool = False

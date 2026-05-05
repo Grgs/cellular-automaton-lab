@@ -50,10 +50,26 @@ class BrowserRenderReviewSupportTests(unittest.TestCase):
 
     def test_occupied_bounds_and_visible_aspect_ratio(self) -> None:
         occupied_mask = [
-            False, False, False, False, False,
-            False, True, True, True, False,
-            False, True, True, True, False,
-            False, False, False, False, False,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
         ]
         bounds = occupied_bounds_from_mask(occupied_mask, width=5, height=4)
         self.assertEqual(
@@ -71,11 +87,31 @@ class BrowserRenderReviewSupportTests(unittest.TestCase):
 
     def test_edge_density_and_boundary_dominance(self) -> None:
         occupied_mask = [
-            False, False, False, False, False,
-            False, True, True, True, False,
-            False, True, True, True, False,
-            False, True, True, True, False,
-            False, False, False, False, False,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
         ]
         bounds = occupied_bounds_from_mask(occupied_mask, width=5, height=5)
         self.assertEqual(edge_density(occupied_mask, width=5, height=5), 8 / 9)
@@ -86,11 +122,31 @@ class BrowserRenderReviewSupportTests(unittest.TestCase):
 
     def test_gutter_score_finds_enclosed_transparent_pixels(self) -> None:
         occupied_mask = [
-            False, False, False, False, False,
-            False, True, True, True, False,
-            False, True, False, True, False,
-            False, True, True, True, False,
-            False, False, False, False, False,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            True,
+            False,
+            True,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
         ]
         bounds = occupied_bounds_from_mask(occupied_mask, width=5, height=5)
         self.assertEqual(gutter_score(occupied_mask, bounds, width=5, height=5), 1 / 9)

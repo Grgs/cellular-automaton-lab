@@ -9,6 +9,7 @@ class WhirlpoolRule(WhirlpoolRuleBase):
 
     A center-aware excitable vortex rule with outward propagation and clockwise swirl.
     """
+
     name = "whirlpool"
     display_name = "Excitable: Outward Whirlpool"
     description = (

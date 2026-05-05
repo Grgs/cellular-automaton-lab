@@ -10,6 +10,7 @@ from backend.simulation.aperiodic_support import (
     polygon_centroid,
     rounded_point,
 )
+
 _UNIT_CHAIR_POLYGONS: dict[int, tuple[Vec, ...]] = {
     0: (
         Vec(0.0, 0.0),
@@ -81,7 +82,9 @@ _CHAIR_SUBSTITUTION_RULES: dict[int, tuple[tuple[int, float, float], ...]] = {
 }
 
 
-def _chair_id(path: str, orientation: int, scale_factor: float, anchor_x: float, anchor_y: float) -> str:
+def _chair_id(
+    path: str, orientation: int, scale_factor: float, anchor_x: float, anchor_y: float
+) -> str:
     return (
         f"chair:{path}:o{orientation}:s{encode_float(scale_factor)}:"
         f"{encode_float(anchor_x)}:{encode_float(anchor_y)}"

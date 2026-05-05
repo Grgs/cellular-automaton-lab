@@ -18,7 +18,11 @@ class PaletteRegressionSupportTests(unittest.TestCase):
             "family-dead-palette-manifest.json",
         )
         self.assertEqual(
-            [family["geometry"] for family in manifest["families"] if "browserAliasCoverage" in family],
+            [
+                family["geometry"]
+                for family in manifest["families"]
+                if "browserAliasCoverage" in family
+            ],
             [
                 "tuebingen-triangle",
                 "robinson-triangles",

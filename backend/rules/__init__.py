@@ -90,7 +90,4 @@ class RuleRegistry:
         raise RuntimeError(f"No rule modules support geometry '{geometry}'.")
 
     def describe_rules(self) -> list[RuleDefinitionPayload]:
-        return [
-            RuleSnapshot.from_rule(rule).to_dict()
-            for rule in self._rules.values()
-        ]
+        return [RuleSnapshot.from_rule(rule).to_dict() for rule in self._rules.values()]

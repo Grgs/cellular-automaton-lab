@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-import sys
 import unittest
 from pathlib import Path
 
@@ -54,10 +53,7 @@ class PlaywrightRunnerToolTests(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        payload = {
-            entry["name"]: entry
-            for entry in json.loads(result.stdout)
-        }
+        payload = {entry["name"]: entry for entry in json.loads(result.stdout)}
 
         self.assertTrue(payload["all"]["requires_standalone_build"])
         self.assertTrue(payload["standalone"]["requires_standalone_build"])

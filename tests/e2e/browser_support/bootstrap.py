@@ -8,7 +8,7 @@ import unittest
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Callable, ClassVar, Literal
+from typing import ClassVar, Literal
 
 from playwright.sync_api import (
     Browser,
@@ -153,7 +153,12 @@ class BrowserAppTestCase(unittest.TestCase):
         return Path(configured_root) if configured_root else None
 
     def _should_capture_success_artifacts(self) -> bool:
-        return os.environ.get(E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV, "").strip().lower() in {"1", "true", "yes", "on"}
+        return os.environ.get(E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV, "").strip().lower() in {
+            "1",
+            "true",
+            "yes",
+            "on",
+        }
 
     def _create_artifact_dir(self) -> Path:
         return create_artifact_dir(

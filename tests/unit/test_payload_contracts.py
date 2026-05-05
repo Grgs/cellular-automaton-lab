@@ -21,7 +21,9 @@ _INTERFACE_HEADER_PATTERN = re.compile(
     r"export interface (?P<name>[A-Za-z0-9_]+)(?: extends (?P<extends>[^{]+))? \{"
 )
 _FIELD_PATTERN = re.compile(r"^\s*(?P<name>[A-Za-z0-9_]+)\??:", re.MULTILINE)
-_PROPERTY_TYPE_PATTERN = re.compile(r"^\s*(?P<name>[A-Za-z0-9_]+)\??:\s*(?P<type>[^;]+);", re.MULTILINE)
+_PROPERTY_TYPE_PATTERN = re.compile(
+    r"^\s*(?P<name>[A-Za-z0-9_]+)\??:\s*(?P<type>[^;]+);", re.MULTILINE
+)
 _TYPE_ALIAS_PATTERN = re.compile(
     r"export type (?P<name>[A-Za-z0-9_]+)\s*=\s*(?P<body>.*?);",
     re.DOTALL,
@@ -44,14 +46,12 @@ def _normalize_ts_type(type_text: str) -> str:
 
 
 def _split_union_members(type_body: str) -> set[str]:
-    return {
-        member.strip()
-        for member in _normalize_ts_type(type_body).split("|")
-        if member.strip()
-    }
+    return {member.strip() for member in _normalize_ts_type(type_body).split("|") if member.strip()}
 
 
-def _parse_frontend_interfaces(relative_paths: list[str]) -> dict[str, _FrontendInterfaceDefinition]:
+def _parse_frontend_interfaces(
+    relative_paths: list[str],
+) -> dict[str, _FrontendInterfaceDefinition]:
     definitions: dict[str, _FrontendInterfaceDefinition] = {}
     for relative_path in relative_paths:
         text = _load_text(relative_path)
@@ -70,12 +70,10 @@ def _parse_frontend_interfaces(relative_paths: list[str]) -> dict[str, _Frontend
                 elif char == "}":
                     depth -= 1
                 index += 1
-            body = text[body_start:index - 1]
+            body = text[body_start : index - 1]
             raw_extends = match.group("extends")
             extends = tuple(
-                parent.strip()
-                for parent in (raw_extends or "").split(",")
-                if parent.strip()
+                parent.strip() for parent in (raw_extends or "").split(",") if parent.strip()
             )
             property_types = {
                 property_match.group("name"): _normalize_ts_type(property_match.group("type"))
@@ -132,10 +130,7 @@ class PayloadContractTests(unittest.TestCase):
     def test_frontend_types_cover_backend_payload_fields(self) -> None:
         frontend_paths = sorted({contract.frontend_path for contract in payload_field_contracts()})
         frontend_interfaces = _parse_frontend_interfaces(frontend_paths)
-        interfaces_by_path = {
-            path: _parse_frontend_interfaces([path])
-            for path in frontend_paths
-        }
+        interfaces_by_path = {path: _parse_frontend_interfaces([path]) for path in frontend_paths}
 
         for contract in payload_field_contracts():
             with self.subTest(interface=contract.interface_name):
@@ -146,23 +141,26 @@ class PayloadContractTests(unittest.TestCase):
                 )
 
     def test_frontend_property_types_match_canonical_contracts(self) -> None:
-        frontend_paths = sorted({contract.frontend_path for contract in frontend_property_type_contracts()})
+        frontend_paths = sorted(
+            {contract.frontend_path for contract in frontend_property_type_contracts()}
+        )
         frontend_interfaces = _parse_frontend_interfaces(frontend_paths)
 
         for contract in frontend_property_type_contracts():
             with self.subTest(interface=contract.interface_name, property=contract.property_name):
-                property_types = _resolve_interface_property_types(frontend_interfaces, contract.interface_name)
+                property_types = _resolve_interface_property_types(
+                    frontend_interfaces, contract.interface_name
+                )
                 self.assertEqual(
                     property_types.get(contract.property_name),
                     _normalize_ts_type(contract.property_type),
                 )
 
     def test_frontend_type_aliases_match_canonical_contracts(self) -> None:
-        frontend_paths = sorted({contract.frontend_path for contract in frontend_type_alias_contracts()})
-        type_aliases_by_path = {
-            path: _parse_type_aliases(path)
-            for path in frontend_paths
-        }
+        frontend_paths = sorted(
+            {contract.frontend_path for contract in frontend_type_alias_contracts()}
+        )
+        type_aliases_by_path = {path: _parse_type_aliases(path) for path in frontend_paths}
 
         for contract in frontend_type_alias_contracts():
             with self.subTest(type_name=contract.type_name):

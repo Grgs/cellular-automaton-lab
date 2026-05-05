@@ -60,8 +60,7 @@ class TopologyValidationResult:
     @property
     def is_valid(self) -> bool:
         has_surface_issue = (
-            self.surface_component_count is not None
-            and self.surface_component_count != 1
+            self.surface_component_count is not None and self.surface_component_count != 1
         )
         return not any(
             (
@@ -78,11 +77,15 @@ class TopologyValidationResult:
         )
 
     def summary_lines(self) -> tuple[str, ...]:
-        lines = [f"{self.geometry}: {'PASS' if self.is_valid else 'FAIL'} ({self.checked_cell_count} cells)"]
+        lines = [
+            f"{self.geometry}: {'PASS' if self.is_valid else 'FAIL'} ({self.checked_cell_count} cells)"
+        ]
         if self.polygon_issues:
             lines.append(
                 "polygon issues: "
-                + ", ".join(f"{issue.cell_id} ({issue.reason})" for issue in self.polygon_issues[:5])
+                + ", ".join(
+                    f"{issue.cell_id} ({issue.reason})" for issue in self.polygon_issues[:5]
+                )
             )
         if self.overlapping_pairs:
             lines.append(
@@ -92,20 +95,23 @@ class TopologyValidationResult:
         if self.missing_neighbor_cells:
             lines.append(
                 "missing neighbor refs: "
-                + ", ".join(f"{cell}->{neighbor}" for cell, neighbor in self.missing_neighbor_cells[:5])
+                + ", ".join(
+                    f"{cell}->{neighbor}" for cell, neighbor in self.missing_neighbor_cells[:5]
+                )
             )
         if self.asymmetric_neighbor_links:
             lines.append(
                 "asymmetric links: "
-                + ", ".join(f"{left}<->{right}" for left, right in self.asymmetric_neighbor_links[:5])
+                + ", ".join(
+                    f"{left}<->{right}" for left, right in self.asymmetric_neighbor_links[:5]
+                )
             )
         if self.duplicate_neighbor_cells:
-            lines.append(
-                "duplicate neighbor ids: "
-                + ", ".join(self.duplicate_neighbor_cells[:5])
-            )
+            lines.append("duplicate neighbor ids: " + ", ".join(self.duplicate_neighbor_cells[:5]))
         if self.disconnected_components:
-            component_sizes = ", ".join(str(len(component)) for component in self.disconnected_components)
+            component_sizes = ", ".join(
+                str(len(component)) for component in self.disconnected_components
+            )
             lines.append(f"disconnected graph components: {component_sizes}")
         if self.edge_multiplicity_issues:
             lines.append(
@@ -242,7 +248,9 @@ def validate_topology(
     edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = {}
 
     for cell in topology.cells:
-        filtered_neighbors = tuple(neighbor_id for neighbor_id in cell.neighbors if neighbor_id is not None)
+        filtered_neighbors = tuple(
+            neighbor_id for neighbor_id in cell.neighbors if neighbor_id is not None
+        )
         if len(filtered_neighbors) != len(set(filtered_neighbors)):
             duplicate_neighbor_cells.append(cell.id)
 
@@ -288,15 +296,11 @@ def validate_topology(
             for unique_owners in (tuple(dict.fromkeys(owners)),)
             if len(unique_owners) not in {1, 2}
         )
-    
 
     graph = build_topology_graph(topology)
     disconnected_components: tuple[tuple[str, ...], ...] = ()
     if check_graph_connectivity and graph.number_of_nodes() > 0:
-        components = tuple(
-            tuple(sorted(component))
-            for component in nx.connected_components(graph)
-        )
+        components = tuple(tuple(sorted(component)) for component in nx.connected_components(graph))
         if len(components) > 1:
             disconnected_components = components
 

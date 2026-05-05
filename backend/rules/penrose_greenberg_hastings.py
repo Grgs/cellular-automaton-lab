@@ -12,7 +12,9 @@ class PenroseGreenbergHastingsRule(AutomatonRule):
 
     name = "penrose-greenberg-hastings"
     display_name = "Excitable: Penrose Greenberg-Hastings"
-    description = "A 4-state excitable-wave rule on Penrose P3 rhombs with edge-adjacent activation."
+    description = (
+        "A 4-state excitable-wave rule on Penrose P3 rhombs with edge-adjacent activation."
+    )
     states = (
         CellStateDefinition(RESTING, "Resting", "#f8f1e5"),
         CellStateDefinition(EXCITED, "Excited", "#2f80ed"),

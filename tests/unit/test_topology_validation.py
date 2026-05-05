@@ -120,7 +120,9 @@ class TopologyValidationTests(unittest.TestCase):
 
     def test_taylor_socolar_patch_passes_geometry_and_graph_validation(self) -> None:
         topology = build_topology(TAYLOR_SOCOLAR_GEOMETRY, 0, 0, patch_depth=3)
-        validation = validate_topology(topology, **recommended_validation_options(TAYLOR_SOCOLAR_GEOMETRY))
+        validation = validate_topology(
+            topology, **recommended_validation_options(TAYLOR_SOCOLAR_GEOMETRY)
+        )
 
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 
@@ -138,7 +140,9 @@ class TopologyValidationTests(unittest.TestCase):
 
     def test_robinson_triangles_patch_passes_geometry_and_graph_validation(self) -> None:
         topology = build_topology(ROBINSON_TRIANGLES_GEOMETRY, 0, 0, patch_depth=3)
-        validation = validate_topology(topology, **recommended_validation_options(ROBINSON_TRIANGLES_GEOMETRY))
+        validation = validate_topology(
+            topology, **recommended_validation_options(ROBINSON_TRIANGLES_GEOMETRY)
+        )
 
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 
@@ -175,7 +179,9 @@ class TopologyValidationTests(unittest.TestCase):
 
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
 
-    def test_canonical_sample_connectivity_passes_for_known_good_representative_families(self) -> None:
+    def test_canonical_sample_connectivity_passes_for_known_good_representative_families(
+        self,
+    ) -> None:
         for geometry, patch_depth in (
             (CHAIR_GEOMETRY, 3),
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
@@ -197,7 +203,9 @@ class TopologyValidationTests(unittest.TestCase):
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
                 self.assertEqual(validation.disconnected_components, ())
 
-    def test_pinwheel_canonical_sample_connectivity_passes_with_segment_overlap_neighbors(self) -> None:
+    def test_pinwheel_canonical_sample_connectivity_passes_with_segment_overlap_neighbors(
+        self,
+    ) -> None:
         topology = build_topology(PINWHEEL_GEOMETRY, 0, 0, patch_depth=3)
         validation = validate_topology(
             topology,
@@ -210,7 +218,9 @@ class TopologyValidationTests(unittest.TestCase):
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
         self.assertEqual(validation.disconnected_components, ())
 
-    def test_canonical_sample_surface_holes_pass_for_known_good_representative_families(self) -> None:
+    def test_canonical_sample_surface_holes_pass_for_known_good_representative_families(
+        self,
+    ) -> None:
         for geometry, patch_depth in (
             (CHAIR_GEOMETRY, 3),
             (HAT_MONOTILE_GEOMETRY, 3),
@@ -245,7 +255,9 @@ class TopologyValidationTests(unittest.TestCase):
         self.assertEqual(validation.hole_count, 0)
         self.assertFalse(validation.edge_multiplicity_issues)
 
-    def test_strict_validation_defaults_apply_to_periodic_and_repaired_aperiodic_families(self) -> None:
+    def test_strict_validation_defaults_apply_to_periodic_and_repaired_aperiodic_families(
+        self,
+    ) -> None:
         for geometry in (
             "trihexagonal-3-6-3-6",
             CHAIR_GEOMETRY,
@@ -366,7 +378,10 @@ class TopologyValidationTests(unittest.TestCase):
         validation = validate_topology(topology)
 
         self.assertFalse(validation.is_valid)
-        self.assertIn(("line", "non-positive area"), {(issue.cell_id, issue.reason) for issue in validation.polygon_issues})
+        self.assertIn(
+            ("line", "non-positive area"),
+            {(issue.cell_id, issue.reason) for issue in validation.polygon_issues},
+        )
 
     def test_validator_flags_overlapping_polygons(self) -> None:
         topology = _topology(
@@ -409,7 +424,9 @@ class TopologyValidationTests(unittest.TestCase):
         self.assertGreater(diagnostics.max_area, 0)
         self.assertEqual(len(diagnostics.top_pairs), 2)
         self.assertGreaterEqual(diagnostics.top_pairs[0].area, diagnostics.top_pairs[1].area)
-        self.assertEqual((diagnostics.top_pairs[0].left_id, diagnostics.top_pairs[0].right_id), ("b", "c"))
+        self.assertEqual(
+            (diagnostics.top_pairs[0].left_id, diagnostics.top_pairs[0].right_id), ("b", "c")
+        )
 
     def test_validator_flags_missing_neighbor_references(self) -> None:
         topology = _topology(

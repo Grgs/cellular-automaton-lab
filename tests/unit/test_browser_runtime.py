@@ -24,7 +24,9 @@ class BrowserRuntimeTests(unittest.TestCase):
     def test_handle_request_supports_cell_mutations_and_runtime_ticks(self) -> None:
         initialize_runtime()
 
-        set_response = json.loads(handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1})))
+        set_response = json.loads(
+            handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1}))
+        )
         self.assertTrue(set_response["ok"])
         self.assertEqual(set_response["snapshot"]["cell_states"][0], 1)
 
@@ -39,7 +41,9 @@ class BrowserRuntimeTests(unittest.TestCase):
 
     def test_initialize_runtime_restores_serialized_snapshot(self) -> None:
         initialize_runtime()
-        response = json.loads(handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1})))
+        response = json.loads(
+            handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1}))
+        )
 
         restored = json.loads(initialize_runtime(json.dumps(response["persisted_snapshot"])))
 
@@ -49,7 +53,9 @@ class BrowserRuntimeTests(unittest.TestCase):
     def test_handle_request_reports_validation_errors(self) -> None:
         initialize_runtime()
 
-        response = json.loads(handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 999})))
+        response = json.loads(
+            handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 999}))
+        )
 
         self.assertFalse(response["ok"])
         self.assertIn("supported by rule", response["error"])
@@ -57,9 +63,16 @@ class BrowserRuntimeTests(unittest.TestCase):
     def test_handle_request_matches_config_validation_contract(self) -> None:
         initialize_runtime()
 
-        response = json.loads(handle_request("/api/config", json.dumps({
-            "topology_spec": {"patch_depth": 4},
-        })))
+        response = json.loads(
+            handle_request(
+                "/api/config",
+                json.dumps(
+                    {
+                        "topology_spec": {"patch_depth": 4},
+                    }
+                ),
+            )
+        )
 
         self.assertFalse(response["ok"])
         self.assertEqual(response["error"], "'patch_depth' can only be changed through reset.")

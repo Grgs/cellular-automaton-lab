@@ -130,12 +130,18 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
                 continue
             neighbor_center = cell_records[neighbor_index][2]
             angle = atan2(-(neighbor_center[1] - center[1]), neighbor_center[0] - center[0])
-            distance = ((neighbor_center[0] - center[0]) ** 2 + (neighbor_center[1] - center[1]) ** 2) ** 0.5
+            distance = (
+                (neighbor_center[0] - center[0]) ** 2 + (neighbor_center[1] - center[1]) ** 2
+            ) ** 0.5
             unsorted_neighbors.append((clockwise_sort_key(angle), distance, neighbor_index))
 
         ordered_neighbors: list[TopologyNeighborFrame] = []
-        for clockwise_index, (_, _distance, neighbor_index) in enumerate(sorted(unsorted_neighbors)):
-            neighbor_radius = radial_distances[neighbor_index] if neighbor_index < len(radial_distances) else 0.0
+        for clockwise_index, (_, _distance, neighbor_index) in enumerate(
+            sorted(unsorted_neighbors)
+        ):
+            neighbor_radius = (
+                radial_distances[neighbor_index] if neighbor_index < len(radial_distances) else 0.0
+            )
             radial_delta = (
                 0.0
                 if max_radial_distance <= 0.0
@@ -167,7 +173,9 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
                 )
             )
 
-        radial_ratio = 0.0 if max_radial_distance <= 0.0 else radial_distances[index] / max_radial_distance
+        radial_ratio = (
+            0.0 if max_radial_distance <= 0.0 else radial_distances[index] / max_radial_distance
+        )
         frame_cells.append(
             TopologyCellFrame(
                 id=cell.id,

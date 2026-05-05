@@ -30,7 +30,9 @@ def topology_revision(
     patch_depth: int | None = None,
 ) -> str:
     digest = sha1(
-        f"{geometry}:{width}:{height}:{patch_depth if patch_depth is not None else '-'}:graph-v1".encode("utf-8")
+        f"{geometry}:{width}:{height}:{patch_depth if patch_depth is not None else '-'}:graph-v1".encode(
+            "utf-8"
+        )
     ).hexdigest()
     return digest[:12]
 
@@ -60,8 +62,7 @@ class LatticeCell:
             payload["center"] = PointPayload(x=self.center[0], y=self.center[1])
         if self.vertices is not None:
             payload["vertices"] = [
-                PointPayload(x=vertex[0], y=vertex[1])
-                for vertex in self.vertices
+                PointPayload(x=vertex[0], y=vertex[1]) for vertex in self.vertices
             ]
         if self.tile_family is not None:
             payload["tile_family"] = self.tile_family
@@ -104,7 +105,10 @@ class LatticeTopology:
             self,
             "_neighbor_indexes_by_cell",
             tuple(
-                tuple(-1 if neighbor_id is None else index_by_id[neighbor_id] for neighbor_id in cell.neighbors)
+                tuple(
+                    -1 if neighbor_id is None else index_by_id[neighbor_id]
+                    for neighbor_id in cell.neighbors
+                )
                 for cell in self.cells
             ),
         )

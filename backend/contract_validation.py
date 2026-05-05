@@ -131,10 +131,12 @@ def parse_cell_updates(
         cell_id = cell.get("id")
         if not isinstance(cell_id, str) or cell_id == "":
             _raise_validation(f"'{key}[{index}].id' must be a string.")
-        parsed_cells.append({
-            "id": cell_id,
-            "state": parse_state_value(cell, rule, "state"),
-        })
+        parsed_cells.append(
+            {
+                "id": cell_id,
+                "state": parse_state_value(cell, rule, "state"),
+            }
+        )
     return parsed_cells
 
 
@@ -210,7 +212,9 @@ def normalize_config_topology_patch(payload: RawJsonObject) -> TopologySpecPatch
     if topology_spec is None:
         return {}
     mapping = require_json_object(topology_spec, "'topology_spec' must be an object.")
-    disallowed_keys = {"tiling_family", "adjacency_mode", "sizing_mode", "patch_depth"} & set(mapping.keys())
+    disallowed_keys = {"tiling_family", "adjacency_mode", "sizing_mode", "patch_depth"} & set(
+        mapping.keys()
+    )
     if disallowed_keys:
         disallowed = ", ".join(sorted(disallowed_keys))
         _raise_validation(f"'{disallowed}' can only be changed through reset.")
@@ -245,9 +249,16 @@ def validate_persisted_snapshot_payload(payload: object) -> PersistedSimulationS
     topology_spec = TopologySpec.from_values(
         tiling_family=str(topology_spec_mapping.get("tiling_family") or ""),
         adjacency_mode=str(topology_spec_mapping.get("adjacency_mode") or ""),
-        width=_coerce_int(topology_spec_mapping.get("width"), "Persisted simulation field 'width' is invalid."),
-        height=_coerce_int(topology_spec_mapping.get("height"), "Persisted simulation field 'height' is invalid."),
-        patch_depth=_coerce_int(topology_spec_mapping.get("patch_depth"), "Persisted simulation field 'patch_depth' is invalid."),
+        width=_coerce_int(
+            topology_spec_mapping.get("width"), "Persisted simulation field 'width' is invalid."
+        ),
+        height=_coerce_int(
+            topology_spec_mapping.get("height"), "Persisted simulation field 'height' is invalid."
+        ),
+        patch_depth=_coerce_int(
+            topology_spec_mapping.get("patch_depth"),
+            "Persisted simulation field 'patch_depth' is invalid.",
+        ),
     )
 
     running = payload_mapping.get("running")

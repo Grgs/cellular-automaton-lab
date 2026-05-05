@@ -29,7 +29,9 @@ class SimulationCoordinatorRestore:
         )
         self._service.replace_state(restored_state)
 
-    def restore_state(self, load_payload: Callable[[], PersistedSimulationSnapshotV5 | None]) -> None:
+    def restore_state(
+        self, load_payload: Callable[[], PersistedSimulationSnapshotV5 | None]
+    ) -> None:
         payload = load_payload()
         if payload is None:
             return

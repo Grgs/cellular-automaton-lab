@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from backend.payload_types import TopologyCatalogEntryPayload, TopologySpecPayload, TopologyVariantPayload
+from backend.payload_types import (
+    TopologyCatalogEntryPayload,
+    TopologySpecPayload,
+    TopologyVariantPayload,
+)
 
 
 class _CatalogEntryLike(Protocol):
@@ -10,6 +14,7 @@ class _CatalogEntryLike(Protocol):
     def sizing_mode(self) -> str: ...
 
     def to_dict(self) -> TopologyCatalogEntryPayload: ...
+
 
 class _VariantLike(Protocol):
     @property
@@ -21,7 +26,9 @@ class _VariantLike(Protocol):
     def to_dict(self) -> TopologyVariantPayload: ...
 
 
-def describe_topologies(catalog: tuple[_CatalogEntryLike, ...]) -> list[TopologyCatalogEntryPayload]:
+def describe_topologies(
+    catalog: tuple[_CatalogEntryLike, ...],
+) -> list[TopologyCatalogEntryPayload]:
     return [definition.to_dict() for definition in catalog]
 
 

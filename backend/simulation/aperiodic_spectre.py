@@ -82,7 +82,9 @@ _SPECTRE_SUBSTITUTION_RULES: dict[str, tuple[str | None, ...]] = {
 }
 
 
-def _build_spectre_supertile_child_transforms(quad: tuple[Vec, Vec, Vec, Vec]) -> tuple[Affine, ...]:
+def _build_spectre_supertile_child_transforms(
+    quad: tuple[Vec, Vec, Vec, Vec],
+) -> tuple[Affine, ...]:
     transition_rules = (
         (60, 3, 1),
         (0, 2, 0),
@@ -100,19 +102,13 @@ def _build_spectre_supertile_child_transforms(quad: tuple[Vec, Vec, Vec, Vec]) -
         total_angle += angle
         if angle != 0:
             rotation_transform = rotation(math.radians(total_angle))
-            transformed_quad = [
-                affine_apply(rotation_transform, point)
-                for point in quad
-            ]
+            transformed_quad = [affine_apply(rotation_transform, point) for point in quad]
         translation_transform = translation_to(
             transformed_quad[to_index],
             affine_apply(transforms[-1], quad[from_index]),
         )
         transforms.append(affine_multiply(translation_transform, rotation_transform))
-    return tuple(
-        affine_multiply(AFFINE_REFLECT_X, transform)
-        for transform in transforms
-    )
+    return tuple(affine_multiply(AFFINE_REFLECT_X, transform) for transform in transforms)
 
 
 _SPECTRE_BASE_TEMPLATES = {

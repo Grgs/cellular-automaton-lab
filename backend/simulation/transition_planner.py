@@ -91,9 +91,13 @@ def plan_reset_transition(
     speed: float | None = None,
     randomize: bool = False,
 ) -> ResetTransitionPlan:
-    next_topology_spec = current_state.config.updated(
-        topology_spec=topology_spec,
-    ).topology_spec if topology_spec is not None else current_state.config.topology_spec
+    next_topology_spec = (
+        current_state.config.updated(
+            topology_spec=topology_spec,
+        ).topology_spec
+        if topology_spec is not None
+        else current_state.config.topology_spec
+    )
     next_geometry = next_topology_spec.geometry_key
     next_rule = _resolve_reset_rule(
         rule_registry=rule_registry,
@@ -135,12 +139,14 @@ def plan_config_transition(
 
     next_width = (
         topology_spec.get("width")
-        if topology_spec is not None and geometry_uses_backend_viewport_sync(current_state.config.geometry)
+        if topology_spec is not None
+        and geometry_uses_backend_viewport_sync(current_state.config.geometry)
         else None
     )
     next_height = (
         topology_spec.get("height")
-        if topology_spec is not None and geometry_uses_backend_viewport_sync(current_state.config.geometry)
+        if topology_spec is not None
+        and geometry_uses_backend_viewport_sync(current_state.config.geometry)
         else None
     )
     normalized_width, normalized_height = normalize_rule_dimensions(
@@ -153,12 +159,9 @@ def plan_config_transition(
         height=normalized_height,
         speed=speed,
     )
-    resize = (
-        geometry_uses_backend_viewport_sync(current_state.config.geometry)
-        and (
-            next_config.width != current_state.config.width
-            or next_config.height != current_state.config.height
-        )
+    resize = geometry_uses_backend_viewport_sync(current_state.config.geometry) and (
+        next_config.width != current_state.config.width
+        or next_config.height != current_state.config.height
     )
     return ConfigTransitionPlan(
         config=next_config,
@@ -185,7 +188,9 @@ def _resolve_restore_topology_spec(payload: PersistedSimulationSnapshotInput) ->
     )
 
 
-def _resolve_restore_rule(rule_registry: RuleRegistry, rule_name: str | None, geometry: str) -> AutomatonRule:
+def _resolve_restore_rule(
+    rule_registry: RuleRegistry, rule_name: str | None, geometry: str
+) -> AutomatonRule:
     if rule_name is not None and rule_registry.has(rule_name):
         return rule_registry.get(rule_name)
     return rule_registry.default_for_geometry(geometry)
@@ -216,11 +221,15 @@ def plan_restore_transition(
     next_rule = _resolve_restore_rule(rule_registry, _restore_rule_name(payload), next_geometry)
     next_patch_depth = _coerce_int(
         restored_topology_spec.patch_depth,
-        fallback_state.config.patch_depth if geometry_uses_patch_depth(next_geometry) else DEFAULT_PATCH_DEPTH,
+        fallback_state.config.patch_depth
+        if geometry_uses_patch_depth(next_geometry)
+        else DEFAULT_PATCH_DEPTH,
     )
     next_width = _coerce_int(restored_topology_spec.width, fallback_state.config.width)
     next_height = _coerce_int(restored_topology_spec.height, fallback_state.config.height)
-    normalized_width, normalized_height = normalize_rule_dimensions(next_rule, next_width, next_height)
+    normalized_width, normalized_height = normalize_rule_dimensions(
+        next_rule, next_width, next_height
+    )
     next_width = next_width if normalized_width is None else normalized_width
     next_height = next_height if normalized_height is None else normalized_height
     next_config = SimulationConfig.from_values(

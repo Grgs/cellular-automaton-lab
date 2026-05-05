@@ -5,7 +5,6 @@ import os
 import signal
 import socket
 import subprocess
-import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -67,7 +66,9 @@ def port_is_available(host: str, port: int) -> bool:
     return True
 
 
-def wait_for_port(host: str, port: int, *, should_be_available: bool, timeout_seconds: float = 5.0) -> bool:
+def wait_for_port(
+    host: str, port: int, *, should_be_available: bool, timeout_seconds: float = 5.0
+) -> bool:
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
         if port_is_available(host, port) == should_be_available:
@@ -109,7 +110,7 @@ def _windows_process_details(pid: int) -> ListeningProcess:
         "-NoProfile",
         "-Command",
         (
-            f"$process = Get-CimInstance Win32_Process -Filter \"ProcessId = {pid}\"; "
+            f'$process = Get-CimInstance Win32_Process -Filter "ProcessId = {pid}"; '
             "if ($null -eq $process) { exit 1 }; "
             "$payload = @{ "
             "  pid = $process.ProcessId; "
@@ -195,7 +196,9 @@ def find_listening_process(port: int) -> ListeningProcess:
     return _posix_process_details(pid) if pid is not None else ListeningProcess(pid=None)
 
 
-def fetch_server_meta(host: str, port: int, *, timeout_seconds: float = 1.0) -> ServerMetaPayload | None:
+def fetch_server_meta(
+    host: str, port: int, *, timeout_seconds: float = 1.0
+) -> ServerMetaPayload | None:
     query_host = resolve_query_host(host)
     url = f"http://{query_host}:{port}/api/meta"
     try:
@@ -280,11 +283,13 @@ def prepare_dev_server(
         )
 
     terminate_process_fn(listener.pid)
-    waiter = wait_for_port_fn or (lambda wait_host, wait_port: wait_for_port(
-        wait_host,
-        wait_port,
-        should_be_available=True,
-    ))
+    waiter = wait_for_port_fn or (
+        lambda wait_host, wait_port: wait_for_port(
+            wait_host,
+            wait_port,
+            should_be_available=True,
+        )
+    )
     if not waiter(host, port):
         raise RuntimeError(
             f"Stopped pid {listener.pid}, but port {port} did not become available in time."

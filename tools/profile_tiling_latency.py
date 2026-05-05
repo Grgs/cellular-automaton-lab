@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.payload_types import CellTargetPayload, SimulationStatePayload, TopologySpecPayload
-from backend.simulation.topology import _build_topology_cached, _build_topology_uncached, empty_board
+from backend.simulation.topology import _build_topology_cached, _build_topology_uncached
 from tests.e2e.support_server import AppServer
 from tests.typed_payloads import require_simulation_state_payload
 
@@ -147,7 +147,9 @@ def benchmark_topology_build_ms(
     return statistics.median(times)
 
 
-def default_reset_payload(geometry: str, rule: str, dimensions: dict[str, int]) -> ResetRequestPayload:
+def default_reset_payload(
+    geometry: str, rule: str, dimensions: dict[str, int]
+) -> ResetRequestPayload:
     return {
         "topology_spec": {
             "tiling_family": geometry,
@@ -196,7 +198,9 @@ def main() -> None:
                     int(dimensions["height"]),
                 )
 
-                reset_payload_response, reset_bytes, reset_ms = post_reset(server.base_url, reset_payload)
+                reset_payload_response, reset_bytes, reset_ms = post_reset(
+                    server.base_url, reset_payload
+                )
                 cells_payload = reset_payload_response["topology"]["cells"]
                 if not cells_payload:
                     raise RuntimeError("Reset response did not include topology cells.")

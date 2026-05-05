@@ -140,7 +140,16 @@ class RequestParsingTests(unittest.TestCase):
 
     def test_parse_topology_spec_accepts_known_values_and_rejects_unknown_ones(self) -> None:
         self.assertEqual(
-            parse_topology_spec({"topology_spec": {"tiling_family": "square", "adjacency_mode": "edge", "width": 10, "height": 6}}),
+            parse_topology_spec(
+                {
+                    "topology_spec": {
+                        "tiling_family": "square",
+                        "adjacency_mode": "edge",
+                        "width": 10,
+                        "height": 6,
+                    }
+                }
+            ),
             {
                 "tiling_family": "square",
                 "adjacency_mode": "edge",
@@ -151,7 +160,15 @@ class RequestParsingTests(unittest.TestCase):
             },
         )
         self.assertEqual(
-            parse_topology_spec({"topology_spec": {"tiling_family": "penrose-p3-rhombs", "adjacency_mode": "vertex", "patch_depth": 4}}),
+            parse_topology_spec(
+                {
+                    "topology_spec": {
+                        "tiling_family": "penrose-p3-rhombs",
+                        "adjacency_mode": "vertex",
+                        "patch_depth": 4,
+                    }
+                }
+            ),
             {
                 "tiling_family": "penrose-p3-rhombs",
                 "adjacency_mode": "vertex",
@@ -162,14 +179,16 @@ class RequestParsingTests(unittest.TestCase):
             },
         )
         self.assertEqual(
-            parse_topology_spec({
-                "topology_spec": {
-                    "tiling_family": "spectre",
-                    "adjacency_mode": "edge",
-                    "patch_depth": 9,
-                    "unsafe_size_override": True,
-                },
-            }),
+            parse_topology_spec(
+                {
+                    "topology_spec": {
+                        "tiling_family": "spectre",
+                        "adjacency_mode": "edge",
+                        "patch_depth": 9,
+                        "unsafe_size_override": True,
+                    },
+                }
+            ),
             {
                 "tiling_family": "spectre",
                 "adjacency_mode": "edge",
@@ -181,7 +200,9 @@ class RequestParsingTests(unittest.TestCase):
             },
         )
         self.assertEqual(
-            parse_topology_spec({"topology_spec": {"tiling_family": "square", "adjacency_mode": "vertex"}}),
+            parse_topology_spec(
+                {"topology_spec": {"tiling_family": "square", "adjacency_mode": "vertex"}}
+            ),
             {
                 "tiling_family": "square",
                 "adjacency_mode": "edge",
@@ -202,15 +223,17 @@ class RequestParsingTests(unittest.TestCase):
 
     def test_normalize_reset_and_config_contracts_match_http_rules(self) -> None:
         self.assertEqual(
-            normalize_reset_topology_spec({
-                "topology_spec": {
-                    "tiling_family": "hex",
-                    "adjacency_mode": "edge",
-                    "width": 12,
-                    "height": 8,
-                    "patch_depth": 0,
-                },
-            }),
+            normalize_reset_topology_spec(
+                {
+                    "topology_spec": {
+                        "tiling_family": "hex",
+                        "adjacency_mode": "edge",
+                        "width": 12,
+                        "height": 8,
+                        "patch_depth": 0,
+                    },
+                }
+            ),
             {
                 "tiling_family": "hex",
                 "adjacency_mode": "edge",
@@ -225,7 +248,9 @@ class RequestParsingTests(unittest.TestCase):
             {"width": 12, "height": 8},
         )
         self.assertEqual(
-            normalize_config_topology_patch({"topology_spec": {"width": 12, "unsafe_size_override": True}}),
+            normalize_config_topology_patch(
+                {"topology_spec": {"width": 12, "unsafe_size_override": True}}
+            ),
             {"width": 12, "unsafe_size_override": True},
         )
 
@@ -235,23 +260,25 @@ class RequestParsingTests(unittest.TestCase):
             normalize_config_topology_patch({"topology_spec": {"patch_depth": 4}})
 
     def test_validate_persisted_snapshot_payload_accepts_versioned_shape(self) -> None:
-        payload = validate_persisted_snapshot_payload({
-            "version": 5,
-            "topology_spec": {
-                "tiling_family": "square",
-                "adjacency_mode": "edge",
-                "width": 12,
-                "height": 8,
-                "patch_depth": 0,
-            },
-            "speed": 5,
-            "running": False,
-            "generation": 9,
-            "rule": "conway",
-            "cells_by_id": {
-                "c:1:1": 1,
-            },
-        })
+        payload = validate_persisted_snapshot_payload(
+            {
+                "version": 5,
+                "topology_spec": {
+                    "tiling_family": "square",
+                    "adjacency_mode": "edge",
+                    "width": 12,
+                    "height": 8,
+                    "patch_depth": 0,
+                },
+                "speed": 5,
+                "running": False,
+                "generation": 9,
+                "rule": "conway",
+                "cells_by_id": {
+                    "c:1:1": 1,
+                },
+            }
+        )
 
         self.assertEqual(payload["version"], 5)
         self.assertEqual(payload["topology_spec"]["width"], 12)

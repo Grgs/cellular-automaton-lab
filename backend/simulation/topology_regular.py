@@ -97,8 +97,7 @@ def build_hex_cells(width: int, height: int) -> tuple[LatticeCell, ...]:
         offsets = HEX_NEIGHBOR_OFFSETS_ODD_ROW if y % 2 == 1 else HEX_NEIGHBOR_OFFSETS_EVEN_ROW
         for x in range(width):
             neighbors = tuple(
-                _regular_neighbor_id(x + dx, y + dy, width, height)
-                for dx, dy in offsets
+                _regular_neighbor_id(x + dx, y + dy, width, height) for dx, dy in offsets
             )
             cells.append(
                 LatticeCell(
@@ -121,8 +120,7 @@ def build_triangle_cells(width: int, height: int) -> tuple[LatticeCell, ...]:
         for x in range(width):
             offsets = even_offsets if x % 2 == 0 else odd_offsets
             neighbors = tuple(
-                _regular_neighbor_id(x + dx, y + dy, width, height)
-                for dx, dy in offsets
+                _regular_neighbor_id(x + dx, y + dy, width, height) for dx, dy in offsets
             )
             cells.append(
                 LatticeCell(

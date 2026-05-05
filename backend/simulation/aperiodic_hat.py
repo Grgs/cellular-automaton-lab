@@ -187,11 +187,52 @@ def _meta_edge_reps(edge: _MetaEdge) -> tuple[_MetaEdge, ...]:
 def _substitution_children(meta: str) -> tuple[_PlacedMetatile, ...]:
     if meta == _META_H:
         return (
-            _PlacedMetatile(_META_H, 0, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
-            _PlacedMetatile(_META_H, -2, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
-            _PlacedMetatile(_META_H, 0, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("B-", 1), _meta_edge("X-", 1))),
-            _PlacedMetatile(_META_T, 0, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1), _meta_edge("X+", 0))),
-            _PlacedMetatile(_META_F, -1, (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2))),
+            _PlacedMetatile(
+                _META_H,
+                0,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("B+", 2),
+                    _meta_edge("X-", 1),
+                ),
+            ),
+            _PlacedMetatile(
+                _META_H,
+                -2,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("B+", 2),
+                    _meta_edge("X-", 1),
+                ),
+            ),
+            _PlacedMetatile(
+                _META_H,
+                0,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 0),
+                    _meta_edge("B-", 1),
+                    _meta_edge("X-", 1),
+                ),
+            ),
+            _PlacedMetatile(
+                _META_T,
+                0,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("B+", 2),
+                    _meta_edge("X-", 1),
+                    _meta_edge("X+", 0),
+                ),
+            ),
+            _PlacedMetatile(
+                _META_F,
+                -1,
+                (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2)),
+            ),
             _PlacedMetatile(
                 _META_F,
                 1,
@@ -221,8 +262,21 @@ def _substitution_children(meta: str) -> tuple[_PlacedMetatile, ...]:
                     _meta_edge("X-", 2),
                 ),
             ),
-            _PlacedMetatile(_META_P, 2, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
-            _PlacedMetatile(_META_P, 1, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
+            _PlacedMetatile(
+                _META_P,
+                2,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("B+", 2),
+                    _meta_edge("X-", 1),
+                ),
+            ),
+            _PlacedMetatile(
+                _META_P,
+                1,
+                (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0)),
+            ),
             _PlacedMetatile(
                 _META_P,
                 3,
@@ -241,15 +295,34 @@ def _substitution_children(meta: str) -> tuple[_PlacedMetatile, ...]:
             ),
         )
     if meta == _META_T:
-        return (
-            _PlacedMetatile(_META_H, -1, (_meta_edge("X-", 2),)),
-        )
+        return (_PlacedMetatile(_META_H, -1, (_meta_edge("X-", 2),)),)
     if meta == _META_P:
         return (
-            _PlacedMetatile(_META_P, 1, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
-            _PlacedMetatile(_META_H, 5, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
-            _PlacedMetatile(_META_H, 4, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
-            _PlacedMetatile(_META_F, 5, (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2))),
+            _PlacedMetatile(
+                _META_P,
+                1,
+                (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0)),
+            ),
+            _PlacedMetatile(
+                _META_H,
+                5,
+                (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0)),
+            ),
+            _PlacedMetatile(
+                _META_H,
+                4,
+                (
+                    _meta_edge("F-", 1),
+                    _meta_edge("X+", 2),
+                    _meta_edge("B+", 2),
+                    _meta_edge("X-", 1),
+                ),
+            ),
+            _PlacedMetatile(
+                _META_F,
+                5,
+                (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2)),
+            ),
             _PlacedMetatile(
                 _META_F,
                 2,
@@ -268,10 +341,26 @@ def _substitution_children(meta: str) -> tuple[_PlacedMetatile, ...]:
             ),
         )
     return (
-        _PlacedMetatile(_META_P, 1, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
-        _PlacedMetatile(_META_H, 5, (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0))),
-        _PlacedMetatile(_META_H, 4, (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1))),
-        _PlacedMetatile(_META_F, 5, (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2))),
+        _PlacedMetatile(
+            _META_P,
+            1,
+            (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0)),
+        ),
+        _PlacedMetatile(
+            _META_H,
+            5,
+            (_meta_edge("F-", 1), _meta_edge("X+", 0), _meta_edge("L", 0), _meta_edge("X-", 0)),
+        ),
+        _PlacedMetatile(
+            _META_H,
+            4,
+            (_meta_edge("F-", 1), _meta_edge("X+", 2), _meta_edge("B+", 2), _meta_edge("X-", 1)),
+        ),
+        _PlacedMetatile(
+            _META_F,
+            5,
+            (_meta_edge("F-", 3), _meta_edge("X+", 2), _meta_edge("L", 2), _meta_edge("X-", 2)),
+        ),
         _PlacedMetatile(
             _META_F,
             2,
@@ -305,11 +394,7 @@ def _substitution_children(meta: str) -> tuple[_PlacedMetatile, ...]:
 
 
 def _substitute(placed: _PlacedMetatile) -> tuple[_PlacedMetatile, ...]:
-    expanded_parent_dist = tuple(
-        child
-        for edge in placed.dist
-        for child in _meta_edge_reps(edge)
-    )
+    expanded_parent_dist = tuple(child for edge in placed.dist for child in _meta_edge_reps(edge))
     children: list[_PlacedMetatile] = []
     for child in _substitution_children(placed.meta):
         children.append(
@@ -324,11 +409,7 @@ def _substitute(placed: _PlacedMetatile) -> tuple[_PlacedMetatile, ...]:
 
 
 def _substitute_many(tiles: tuple[_PlacedMetatile, ...]) -> tuple[_PlacedMetatile, ...]:
-    return tuple(
-        child
-        for tile in tiles
-        for child in _substitute(tile)
-    )
+    return tuple(child for tile in tiles for child in _substitute(tile))
 
 
 _H8_ROOT_SEED: tuple[_PlacedMetatile, ...] = (
@@ -362,9 +443,29 @@ def _metatile_to_hats(placed: _PlacedMetatile) -> tuple[_PlacedHat, ...]:
     if meta == _META_H:
         return (
             _PlacedHat(origin, (2 * turn) - 2, False, 1),
-            _PlacedHat(origin + (_meta_edge("X+", turn), _meta_edge("B-", turn + 1)), (2 * turn) + 2, False, 12),
-            _PlacedHat(origin + (_meta_edge("X+", turn + 2), _meta_edge("A-", turn + 2)), (2 * turn) + 2, False, 7),
-            _PlacedHat(origin + (_meta_edge("X+", turn + 2), _meta_edge("L", turn + 2), _meta_edge("L", turn + 1)), (2 * turn + 4) % 12, True, 6),
+            _PlacedHat(
+                origin + (_meta_edge("X+", turn), _meta_edge("B-", turn + 1)),
+                (2 * turn) + 2,
+                False,
+                12,
+            ),
+            _PlacedHat(
+                origin + (_meta_edge("X+", turn + 2), _meta_edge("A-", turn + 2)),
+                (2 * turn) + 2,
+                False,
+                7,
+            ),
+            _PlacedHat(
+                origin
+                + (
+                    _meta_edge("X+", turn + 2),
+                    _meta_edge("L", turn + 2),
+                    _meta_edge("L", turn + 1),
+                ),
+                (2 * turn + 4) % 12,
+                True,
+                6,
+            ),
         )
     if meta == _META_T:
         return (_PlacedHat(origin, 2 * turn, False, 11),)
@@ -385,12 +486,7 @@ def _shift_edges(edges: tuple[_HatEdge, ...], shift: int) -> tuple[_HatEdge, ...
 
 
 def _meta_origin(dist: tuple[_MetaEdge, ...]) -> Vec:
-    return _vector_sum(
-        tuple(
-            _polar(_m_edge_length(edge), 60.0 * edge.turn)
-            for edge in dist
-        )
-    )
+    return _vector_sum(tuple(_polar(_m_edge_length(edge), 60.0 * edge.turn) for edge in dist))
 
 
 def _hat_vertices(placed: _PlacedHat) -> tuple[Vec, ...]:
@@ -405,10 +501,7 @@ def _hat_vertices(placed: _PlacedHat) -> tuple[Vec, ...]:
         step = _polar(_h_edge_length(edge), 30.0 * (placed.turn + edge.turn))
         current = Vec(current.x + step.x, current.y + step.y)
         points.append(current)
-    return tuple(
-        Vec(point.x * _OUTPUT_SCALE, point.y * _OUTPUT_SCALE)
-        for point in points[:-1]
-    )
+    return tuple(Vec(point.x * _OUTPUT_SCALE, point.y * _OUTPUT_SCALE) for point in points[:-1])
 
 
 def _orientation_token(turn: int) -> str:
@@ -495,14 +588,9 @@ def build_hat_patch(patch_depth: int) -> AperiodicPatch:
         metatiles = _substitute_many(metatiles)
 
     placed_hats = tuple(
-        placed_hat
-        for metatile in metatiles
-        for placed_hat in _metatile_to_hats(metatile)
+        placed_hat for metatile in metatiles for placed_hat in _metatile_to_hats(metatile)
     )
-    records = [
-        _hat_record(index, placed_hat)
-        for index, placed_hat in enumerate(placed_hats)
-    ]
+    records = [_hat_record(index, placed_hat) for index, placed_hat in enumerate(placed_hats)]
     patch = patch_from_records(resolved_depth, records, edge_precision=5)
     if resolved_depth >= 2:
         return _enforce_opposite_chirality_triplet(patch)

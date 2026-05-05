@@ -36,7 +36,9 @@ class NoopLock:
         return False
 
 
-def _response_payload(snapshot: object, persisted_snapshot: object | None = None, *, rules: object | None = None) -> str:
+def _response_payload(
+    snapshot: object, persisted_snapshot: object | None = None, *, rules: object | None = None
+) -> str:
     payload: dict[str, object] = {"ok": True}
     if snapshot is not None:
         payload["snapshot"] = snapshot
@@ -72,7 +74,9 @@ class BrowserSimulationRuntime:
 
     def get_state_response(self) -> str:
         snapshot = self.service.get_state()
-        return _response_payload(snapshot.to_dict(), SimulationStateStore.serialize_snapshot(snapshot))
+        return _response_payload(
+            snapshot.to_dict(), SimulationStateStore.serialize_snapshot(snapshot)
+        )
 
     def get_rules_response(self) -> str:
         return _response_payload(None, rules=self.rule_registry.describe_rules())
@@ -135,7 +139,9 @@ class BrowserSimulationRuntime:
             return _error_payload(str(exc))
 
         snapshot = self.service.get_state()
-        return _response_payload(snapshot.to_dict(), SimulationStateStore.serialize_snapshot(snapshot))
+        return _response_payload(
+            snapshot.to_dict(), SimulationStateStore.serialize_snapshot(snapshot)
+        )
 
 
 _RUNTIME: BrowserSimulationRuntime | None = None

@@ -43,7 +43,9 @@ class SimulationCoordinatorTests(unittest.TestCase):
         self.manager.toggle_cell_by_id("c:1:1")
         self.manager.set_cell_state_by_id("c:2:2", 1)
         self.manager.set_cells_by_id([("c:3:3", 1)])
-        self.manager.update_config(topology_spec={"width": 12, "height": 9}, speed=7, rule_name="highlife")
+        self.manager.update_config(
+            topology_spec={"width": 12, "height": 9}, speed=7, rule_name="highlife"
+        )
         state = self.manager.get_state()
         grid = regular_grid_from_board(state.board)
         assert grid is not None
@@ -112,7 +114,9 @@ class SimulationCoordinatorTests(unittest.TestCase):
         failing_store.load.return_value = None
         failing_store.save.side_effect = RuntimeError("boom")
         self.manager.stop_background_loop()
-        self.manager = SimulationCoordinator(rule_registry=self.rule_registry, state_store=failing_store)
+        self.manager = SimulationCoordinator(
+            rule_registry=self.rule_registry, state_store=failing_store
+        )
 
         with self.assertLogs("backend.simulation.coordinator", level="WARNING") as logs:
             self.manager.persist_state()

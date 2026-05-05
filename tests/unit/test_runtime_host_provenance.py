@@ -18,7 +18,9 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="runtime-host-provenance-") as tmpdir:
             root = Path(tmpdir)
             (root / "frontend").mkdir()
-            (root / "frontend" / "app-runtime.ts").write_text("console.log('a');\n", encoding="utf-8")
+            (root / "frontend" / "app-runtime.ts").write_text(
+                "console.log('a');\n", encoding="utf-8"
+            )
             (root / "tools").mkdir()
             (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
             (root / "package.json").write_text("{}\n", encoding="utf-8")
@@ -53,14 +55,20 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="runtime-host-build-status-") as tmpdir:
             root = Path(tmpdir)
             (root / "frontend").mkdir()
-            (root / "frontend" / "app-runtime.ts").write_text("console.log('a');\n", encoding="utf-8")
+            (root / "frontend" / "app-runtime.ts").write_text(
+                "console.log('a');\n", encoding="utf-8"
+            )
             (root / "tools").mkdir()
             (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
             (root / "package.json").write_text("{}\n", encoding="utf-8")
             (root / "package-lock.json").write_text("{}\n", encoding="utf-8")
             output_dir = root / "output" / "standalone"
             output_dir.mkdir(parents=True)
-            for relative_path in ("index.html", "standalone-bootstrap.json", "standalone-python-bundle.json"):
+            for relative_path in (
+                "index.html",
+                "standalone-bootstrap.json",
+                "standalone-python-bundle.json",
+            ):
                 (output_dir / relative_path).write_text("{}\n", encoding="utf-8")
             fingerprint, source_files = compute_source_fingerprint(root)
             (output_dir / "build-manifest.json").write_text(
@@ -85,7 +93,9 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="runtime-host-build-status-missing-") as tmpdir:
             root = Path(tmpdir)
             (root / "frontend").mkdir()
-            (root / "frontend" / "app-runtime.ts").write_text("console.log('a');\n", encoding="utf-8")
+            (root / "frontend" / "app-runtime.ts").write_text(
+                "console.log('a');\n", encoding="utf-8"
+            )
             (root / "tools").mkdir()
             (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
             (root / "package.json").write_text("{}\n", encoding="utf-8")
@@ -110,7 +120,9 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
         )
         self.assertIn("Standalone build manifest is missing.", report["warnings"])
 
-    def test_build_runtime_provenance_report_warns_on_git_head_and_fingerprint_mismatch(self) -> None:
+    def test_build_runtime_provenance_report_warns_on_git_head_and_fingerprint_mismatch(
+        self,
+    ) -> None:
         report = build_runtime_provenance_report(
             host_kind="standalone",
             current_repo={

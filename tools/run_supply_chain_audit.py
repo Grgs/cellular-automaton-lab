@@ -21,6 +21,7 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass, field
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Final
 
@@ -62,9 +63,7 @@ def _severity_at_or_above(severity: str, threshold: str) -> bool:
 
 def _run_pip_audit(ignore_ids: frozenset[str]) -> EcosystemResult:
     result = EcosystemResult(ecosystem="python")
-    try:
-        import pip_audit  # type: ignore[import-untyped]  # noqa: F401
-    except ImportError:
+    if find_spec("pip_audit") is None:
         result.skipped_reason = "pip-audit is not installed; add pip-audit to requirements-dev.in"
         return result
 

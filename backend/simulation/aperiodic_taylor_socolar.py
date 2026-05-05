@@ -30,14 +30,20 @@ _HALF_HEX_BASE_VERTICES = (
 _HALF_HEX_CHILD_TRANSFORMS: tuple[Affine, ...] = (
     scale(0.5),
     affine_multiply(translation(0.0, _SQRT3 / 2), affine_multiply(rotation(math.pi), scale(0.5))),
-    affine_multiply(translation(-0.75, _SQRT3 / 4), affine_multiply(rotation((4 * math.pi) / 3), scale(0.5))),
-    affine_multiply(translation(0.75, _SQRT3 / 4), affine_multiply(rotation((2 * math.pi) / 3), scale(0.5))),
+    affine_multiply(
+        translation(-0.75, _SQRT3 / 4), affine_multiply(rotation((4 * math.pi) / 3), scale(0.5))
+    ),
+    affine_multiply(
+        translation(0.75, _SQRT3 / 4), affine_multiply(rotation((2 * math.pi) / 3), scale(0.5))
+    ),
 )
 
 
 def _half_hex_children(node: SubstitutionChild, depth: int) -> tuple[SubstitutionChild, ...]:
     del node, depth
-    return tuple(SubstitutionChild("half-hex", transform) for transform in _HALF_HEX_CHILD_TRANSFORMS)
+    return tuple(
+        SubstitutionChild("half-hex", transform) for transform in _HALF_HEX_CHILD_TRANSFORMS
+    )
 
 
 def _half_hex_leaf_templates(node: SubstitutionChild) -> tuple[SubstitutionLeafTemplate, ...]:

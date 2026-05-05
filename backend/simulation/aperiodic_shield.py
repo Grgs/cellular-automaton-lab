@@ -152,7 +152,9 @@ def _centered_records(records: list[PatchRecord]) -> list[PatchRecord]:
             )
             for vertex_x, vertex_y in record["vertices"]
         )
-        centroid = polygon_centroid(tuple(Vec(vertex_x, vertex_y) for vertex_x, vertex_y in vertices))
+        centroid = polygon_centroid(
+            tuple(Vec(vertex_x, vertex_y) for vertex_x, vertex_y in vertices)
+        )
         centered.append(
             {
                 **record,
@@ -199,12 +201,8 @@ _SUBSTITUTION_RULES: dict[
     ShieldTileLabel,
     tuple[tuple[ShieldTileLabel, tuple[float, float, float, float, float, float], float], ...],
 ] = {
-    "right-black-triangle": (
-        ("right-shield", (0, 1, 1, 0, 0, 0), 225),
-    ),
-    "left-black-triangle": (
-        ("left-shield", (0, 1, 1, 0, 0, 0), 225),
-    ),
+    "right-black-triangle": (("right-shield", (0, 1, 1, 0, 0, 0), 225),),
+    "left-black-triangle": (("left-shield", (0, 1, 1, 0, 0, 0), 225),),
     "right-white-triangle": (
         ("left-white-triangle", (0, 0, 1, 0, 0, 0), -105),
         ("right-white-triangle", (1, 0, 0, 0, 0, -1), 105),
@@ -328,4 +326,3 @@ def build_shield_patch_for_cleanup_scale(
 
 def default_shield_window_threshold() -> float:
     return _DEFAULT_COMPATIBILITY_WINDOW
-

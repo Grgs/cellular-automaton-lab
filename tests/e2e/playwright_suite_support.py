@@ -39,9 +39,7 @@ PLAYWRIGHT_LOCAL_CASES = (
     StandaloneRuntimeFailureTests,
 )
 
-PLAYWRIGHT_SERVER_CASES = (
-    CellularAutomatonUITests,
-)
+PLAYWRIGHT_SERVER_CASES = (CellularAutomatonUITests,)
 
 PLAYWRIGHT_STANDALONE_CASES = (
     StandaloneCellularAutomatonUITests,
@@ -118,10 +116,7 @@ def _test_id(case_cls: type[unittest.TestCase], name: str) -> str:
 
 
 def _available_test_cases() -> dict[str, type[unittest.TestCase]]:
-    return {
-        case_cls.__name__: case_cls
-        for case_cls in PLAYWRIGHT_LOCAL_CASES
-    }
+    return {case_cls.__name__: case_cls for case_cls in PLAYWRIGHT_LOCAL_CASES}
 
 
 def _iter_case_test_names(case_classes: tuple[type[unittest.TestCase], ...]) -> list[str]:
@@ -151,8 +146,7 @@ def iter_standalone_runtime_test_names() -> list[str]:
 
 def _playwright_feature_map() -> OrderedDict[str, list[str]]:
     grouped: OrderedDict[str, list[str]] = OrderedDict(
-        (feature_name, [])
-        for feature_name in PLAYWRIGHT_FEATURE_NAMES
+        (feature_name, []) for feature_name in PLAYWRIGHT_FEATURE_NAMES
     )
 
     for test_id in iter_playwright_test_names():
@@ -260,10 +254,7 @@ def resolve_playwright_suite_definition(suite_name: str) -> PlaywrightSuiteDefin
 
 
 def playwright_suite_manifest_payload() -> list[dict[str, object]]:
-    return [
-        definition.payload()
-        for definition in _playwright_suite_definitions().values()
-    ]
+    return [definition.payload() for definition in _playwright_suite_definitions().values()]
 
 
 def playwright_suite_manifest_json() -> str:

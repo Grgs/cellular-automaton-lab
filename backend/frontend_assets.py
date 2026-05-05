@@ -28,7 +28,9 @@ class FrontendAssetManifest:
     @classmethod
     def load(cls, static_folder: str | None) -> "FrontendAssetManifest":
         if not static_folder:
-            raise RuntimeError("Frontend assets could not be resolved because Flask static_folder is not configured.")
+            raise RuntimeError(
+                "Frontend assets could not be resolved because Flask static_folder is not configured."
+            )
 
         manifest_path = Path(static_folder) / "dist" / "manifest.json"
         manifest, manifest_mtime_ns = cls._read_manifest(manifest_path)
@@ -96,9 +98,7 @@ class FrontendAssetManifest:
         css_value = record.get("css")
         if isinstance(css_value, list):
             normalized_record["css"] = [
-                stylesheet
-                for stylesheet in css_value
-                if isinstance(stylesheet, str) and stylesheet
+                stylesheet for stylesheet in css_value if isinstance(stylesheet, str) and stylesheet
             ]
 
         return normalized_record

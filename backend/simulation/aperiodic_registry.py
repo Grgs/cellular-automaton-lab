@@ -25,7 +25,9 @@ from backend.simulation.aperiodic_penrose_p2 import build_penrose_p2_patch
 from backend.simulation.aperiodic_pinwheel import build_pinwheel_patch
 from backend.simulation.aperiodic_robinson_triangles import build_robinson_triangles_patch
 from backend.simulation.aperiodic_shield import build_shield_patch
-from backend.simulation.aperiodic_dodecagonal_square_triangle import build_dodecagonal_square_triangle_patch
+from backend.simulation.aperiodic_dodecagonal_square_triangle import (
+    build_dodecagonal_square_triangle_patch,
+)
 from backend.simulation.aperiodic_sphinx import build_sphinx_patch
 from backend.simulation.aperiodic_spectre import build_spectre_patch
 from backend.simulation.aperiodic_support import AperiodicPatch

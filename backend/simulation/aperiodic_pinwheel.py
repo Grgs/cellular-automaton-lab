@@ -56,9 +56,7 @@ def _orientation_token(vertices: ExactTriangle) -> str:
         dy = end[1] - start[1]
         edges.append((dx * dx + dy * dy, start, end))
     _, start, end = max(edges, key=lambda item: item[0])
-    angle = math.degrees(
-        math.atan2(float(end[1] - start[1]), float(end[0] - start[0]))
-    )
+    angle = math.degrees(math.atan2(float(end[1] - start[1]), float(end[0] - start[0])))
     return str(int(round(angle)) % 360)
 
 

@@ -130,9 +130,10 @@ def _edges_overlap_with_positive_length(
     ) -> float:
         return (delta_x * (point[1] - origin[1])) - (delta_y * (point[0] - origin[0]))
 
-    if abs(_cross(first_left, second_left)) > tolerance or abs(
-        _cross(first_left, second_right)
-    ) > tolerance:
+    if (
+        abs(_cross(first_left, second_left)) > tolerance
+        or abs(_cross(first_left, second_right)) > tolerance
+    ):
         return False
 
     axis = 0 if abs(delta_x) >= abs(delta_y) else 1
@@ -195,20 +196,13 @@ def build_exact_neighbors(
             neighbor_left, neighbor_right = unique_owners
             neighbor_sets[neighbor_left].add(neighbor_right)
             neighbor_sets[neighbor_right].add(neighbor_left)
-        return {
-            cell_id: tuple(sorted(neighbors))
-            for cell_id, neighbors in neighbor_sets.items()
-        }
+        return {cell_id: tuple(sorted(neighbors)) for cell_id, neighbors in neighbor_sets.items()}
 
-    exact_edges: list[
-        tuple[str, tuple[Fraction, Fraction], tuple[Fraction, Fraction]]
-    ] = []
+    exact_edges: list[tuple[str, tuple[Fraction, Fraction], tuple[Fraction, Fraction]]] = []
     for record in records:
         vertices = record["vertices"]
         for index, left in enumerate(vertices):
-            exact_edges.append(
-                (record["id"], left, vertices[(index + 1) % len(vertices)])
-            )
+            exact_edges.append((record["id"], left, vertices[(index + 1) % len(vertices)]))
 
     for index, (left_id, left_start, left_end) in enumerate(exact_edges):
         for right_id, right_start, right_end in exact_edges[index + 1 :]:
@@ -224,10 +218,7 @@ def build_exact_neighbors(
             neighbor_sets[left_id].add(right_id)
             neighbor_sets[right_id].add(left_id)
 
-    return {
-        cell_id: tuple(sorted(neighbors))
-        for cell_id, neighbors in neighbor_sets.items()
-    }
+    return {cell_id: tuple(sorted(neighbors)) for cell_id, neighbors in neighbor_sets.items()}
 
 
 def compatibility_extent(values: list[float]) -> int:
@@ -396,10 +387,7 @@ def build_edge_neighbors(
                     continue
                 neighbor_sets[left_id].add(right_id)
                 neighbor_sets[right_id].add(left_id)
-        return {
-            cell_id: tuple(sorted(neighbors))
-            for cell_id, neighbors in neighbor_sets.items()
-        }
+        return {cell_id: tuple(sorted(neighbors)) for cell_id, neighbors in neighbor_sets.items()}
 
     edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = defaultdict(list)
     for record in records:
@@ -415,10 +403,7 @@ def build_edge_neighbors(
         neighbor_left, neighbor_right = unique_owners
         neighbor_sets[neighbor_left].add(neighbor_right)
         neighbor_sets[neighbor_right].add(neighbor_left)
-    return {
-        cell_id: tuple(sorted(neighbors))
-        for cell_id, neighbors in neighbor_sets.items()
-    }
+    return {cell_id: tuple(sorted(neighbors)) for cell_id, neighbors in neighbor_sets.items()}
 
 
 def patch_from_records(
@@ -486,9 +471,7 @@ def patch_from_exact_records(
                 )
                 for vertex in raw_vertices
             )
-        centroid = polygon_centroid(
-            tuple(Vec(vertex[0], vertex[1]) for vertex in float_vertices)
-        )
+        centroid = polygon_centroid(tuple(Vec(vertex[0], vertex[1]) for vertex in float_vertices))
         float_records.append(
             {
                 "id": record["id"],

@@ -90,18 +90,28 @@ def _inflate_p2_kite(
     short_length = length / PHI
     current_anchor = anchor
     current_heading = heading - 36
-    current_anchor, current_heading = _inflate_p2_dart(current_anchor, current_heading, short_length, depth - 1, tiles)
+    current_anchor, current_heading = _inflate_p2_dart(
+        current_anchor, current_heading, short_length, depth - 1, tiles
+    )
     current_anchor = _logo_forward(current_anchor, current_heading, length)
     current_heading += 144
-    current_anchor, current_heading = _inflate_p2_kite(current_anchor, current_heading, short_length, depth - 1, tiles)
+    current_anchor, current_heading = _inflate_p2_kite(
+        current_anchor, current_heading, short_length, depth - 1, tiles
+    )
     current_heading -= 18
-    current_anchor = _logo_forward(current_anchor, current_heading, length * (2 * math.cos(3 * math.pi / 10)))
+    current_anchor = _logo_forward(
+        current_anchor, current_heading, length * (2 * math.cos(3 * math.pi / 10))
+    )
     current_heading += 162
-    current_anchor, current_heading = _inflate_p2_kite(current_anchor, current_heading, short_length, depth - 1, tiles)
+    current_anchor, current_heading = _inflate_p2_kite(
+        current_anchor, current_heading, short_length, depth - 1, tiles
+    )
     current_heading -= 36
     current_anchor = _logo_forward(current_anchor, current_heading, length)
     current_heading += 180
-    current_anchor, current_heading = _inflate_p2_dart(current_anchor, current_heading, short_length, depth - 1, tiles)
+    current_anchor, current_heading = _inflate_p2_dart(
+        current_anchor, current_heading, short_length, depth - 1, tiles
+    )
     current_heading -= 36
     return current_anchor, current_heading
 
@@ -129,15 +139,23 @@ def _inflate_p2_dart(
     short_length = length / PHI
     current_anchor = anchor
     current_heading = heading
-    current_anchor, current_heading = _inflate_p2_kite(current_anchor, current_heading, short_length, depth - 1, tiles)
+    current_anchor, current_heading = _inflate_p2_kite(
+        current_anchor, current_heading, short_length, depth - 1, tiles
+    )
     current_heading -= 36
     current_anchor = _logo_forward(current_anchor, current_heading, length)
     current_heading += 180
-    current_anchor, current_heading = _inflate_p2_dart(current_anchor, current_heading, short_length, depth - 1, tiles)
+    current_anchor, current_heading = _inflate_p2_dart(
+        current_anchor, current_heading, short_length, depth - 1, tiles
+    )
     current_heading -= 54
-    current_anchor = _logo_forward(current_anchor, current_heading, length * (2 * math.cos(3 * math.pi / 10)))
+    current_anchor = _logo_forward(
+        current_anchor, current_heading, length * (2 * math.cos(3 * math.pi / 10))
+    )
     current_heading += 126
-    current_anchor, current_heading = _inflate_p2_dart(current_anchor, current_heading, short_length, depth - 1, tiles)
+    current_anchor, current_heading = _inflate_p2_dart(
+        current_anchor, current_heading, short_length, depth - 1, tiles
+    )
     current_anchor = _logo_forward(current_anchor, current_heading, length)
     current_heading += 144
     return current_anchor, current_heading
@@ -158,7 +176,9 @@ def build_penrose_p2_patch(patch_depth: int) -> AperiodicPatch:
         center = rounded_point(tile.center)
         records.append(
             {
-                "id": id_from_anchor("p2k" if tile.kind == "kite" else "p2d", tile.anchor, tile.orientation),
+                "id": id_from_anchor(
+                    "p2k" if tile.kind == "kite" else "p2d", tile.anchor, tile.orientation
+                ),
                 "kind": tile.kind,
                 "center": center,
                 "vertices": rounded_vertices,

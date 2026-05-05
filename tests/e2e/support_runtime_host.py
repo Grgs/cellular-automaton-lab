@@ -149,9 +149,13 @@ def build_runtime_provenance_report(
                         f"Standalone build git HEAD {standalone_git_head} does not match current checkout HEAD {current_git_head}."
                     )
             if current_source_fingerprint is not None and standalone_source_fingerprint is not None:
-                comparison["fingerprintMatches"] = current_source_fingerprint == standalone_source_fingerprint
+                comparison["fingerprintMatches"] = (
+                    current_source_fingerprint == standalone_source_fingerprint
+                )
                 if comparison["fingerprintMatches"] is False:
-                    warnings.append("Standalone build source fingerprint does not match the current checkout.")
+                    warnings.append(
+                        "Standalone build source fingerprint does not match the current checkout."
+                    )
 
     return {
         "hostKind": host_kind,
@@ -168,7 +172,9 @@ def _find_available_port() -> int:
         return int(sock.getsockname()[1])
 
 
-def _wait_until_ready(base_url: str, *, timeout_seconds: float = 20, process: subprocess.Popen[str] | None = None) -> None:
+def _wait_until_ready(
+    base_url: str, *, timeout_seconds: float = 20, process: subprocess.Popen[str] | None = None
+) -> None:
     deadline = time.time() + timeout_seconds
     while True:
         try:
@@ -210,9 +216,7 @@ def standalone_build_status(root: Path) -> dict[str, Any]:
     )
     fingerprint_matches = provenance["comparison"].get("fingerprintMatches")
     build_current = (
-        len(missing_outputs) == 0
-        and standalone_build is not None
-        and fingerprint_matches is True
+        len(missing_outputs) == 0 and standalone_build is not None and fingerprint_matches is True
     )
     if missing_outputs:
         reason = "required outputs are missing"
@@ -380,8 +384,7 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
         missing_outputs = missing_standalone_output_files(self.output_dir)
         if missing_outputs:
             formatted_outputs = "\n".join(
-                f"- output/standalone/{relative_path}"
-                for relative_path in missing_outputs
+                f"- output/standalone/{relative_path}" for relative_path in missing_outputs
             )
             raise RuntimeError(
                 "Standalone build outputs are missing before the static host can start.\n"
@@ -418,7 +421,8 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
             if stderr_tail:
                 details.append("stderr_tail:\n" + "\n".join(stderr_tail))
             raise RuntimeError(
-                "Standalone static host did not become ready for browser tests.\n" + "\n".join(details)
+                "Standalone static host did not become ready for browser tests.\n"
+                + "\n".join(details)
             ) from exc
 
     def start(self) -> None:
@@ -504,7 +508,9 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
                     encoding="utf-8",
                 )
             except Exception as exc:
-                (artifact_dir / "standalone-storage-error.txt").write_text(str(exc), encoding="utf-8")
+                (artifact_dir / "standalone-storage-error.txt").write_text(
+                    str(exc), encoding="utf-8"
+                )
 
         stdout_text = self.read_stdout()
         stderr_text = self.read_stderr()
@@ -640,7 +646,9 @@ class ExternalRuntimeHost(BrowserRuntimeHost):
                     encoding="utf-8",
                 )
             except Exception as exc:
-                (artifact_dir / "standalone-storage-error.txt").write_text(str(exc), encoding="utf-8")
+                (artifact_dir / "standalone-storage-error.txt").write_text(
+                    str(exc), encoding="utf-8"
+                )
         self._copy_log_file(artifact_dir, self.stdout_path, "standalone-stdout.log")
         self._copy_log_file(artifact_dir, self.stderr_path, "standalone-stderr.log")
         (artifact_dir / "standalone-log-paths.txt").write_text(

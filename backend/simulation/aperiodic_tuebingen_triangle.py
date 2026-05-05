@@ -30,7 +30,7 @@ from backend.simulation.aperiodic_support import (
 
 PHI = (1 + math.sqrt(5)) / 2
 XI = cmath.exp((2j * math.pi) / 5)
-CONTRACTION = XI + (XI ** 4)
+CONTRACTION = XI + (XI**4)
 _EDGE_LENGTH_EPSILON = 1e-12
 
 # Canonical Robinson triangle prototypes in simple local coordinates.
@@ -52,13 +52,13 @@ STANDARD_THIN = (
 # The thin triangle has the two listed vertices ξ² and ξ³; the third vertex
 # is the unique same-scale Robinson-triangle completion that closes the dual IFS.
 PAPER_THICK = (
-    1 + (XI ** 2) + (XI ** 4),
-    1 + XI + (XI ** 3),
-    1 + (XI ** 2) + (XI ** 3),
+    1 + (XI**2) + (XI**4),
+    1 + XI + (XI**3),
+    1 + (XI**2) + (XI**3),
 )
 PAPER_THIN = (
-    XI ** 2,
-    XI ** 3,
+    XI**2,
+    XI**3,
     complex(-(1 / (PHI * PHI)), 0.0),
 )
 
@@ -126,8 +126,7 @@ PAPER_AFFINES = {
 }
 
 STANDARD_FROM_PAPER = {
-    label: affine_inverse(transform)
-    for label, transform in PAPER_AFFINES.items()
+    label: affine_inverse(transform) for label, transform in PAPER_AFFINES.items()
 }
 
 STANDARD_REFLECTIONS = {
@@ -146,15 +145,15 @@ PAPER_CHILD_TRANSFORMS = {
         (
             "thin",
             _complex_affine(
-                CONTRACTION * (XI ** 3),
-                CONTRACTION * ((XI ** 3) + (XI ** 2)),
+                CONTRACTION * (XI**3),
+                CONTRACTION * ((XI**3) + (XI**2)),
             ),
         ),
         (
             "thick",
             _complex_affine(
                 CONTRACTION * XI,
-                CONTRACTION * (-XI + (XI ** 2)),
+                CONTRACTION * (-XI + (XI**2)),
             ),
         ),
     ),
@@ -162,22 +161,22 @@ PAPER_CHILD_TRANSFORMS = {
         (
             "thin",
             _complex_affine(
-                CONTRACTION * (XI ** 2),
-                CONTRACTION * (XI + (XI ** 2) + (XI ** 4)),
+                CONTRACTION * (XI**2),
+                CONTRACTION * (XI + (XI**2) + (XI**4)),
             ),
         ),
         (
             "thick",
             _complex_affine(
                 CONTRACTION * (-XI),
-                CONTRACTION * (XI + (XI ** 4)),
+                CONTRACTION * (XI + (XI**4)),
             ),
         ),
         (
             "thick",
             _complex_affine(
                 CONTRACTION,
-                CONTRACTION * (-1 + XI + (XI ** 4)),
+                CONTRACTION * (-1 + XI + (XI**4)),
             ),
         ),
     ),
@@ -208,12 +207,15 @@ def _opposite_chirality(chirality: str) -> str:
 def _canonical_short_edge_handedness(
     vertices: tuple[tuple[float, float], tuple[float, float], tuple[float, float]],
 ) -> str:
-    chosen_edge: tuple[
-        float,
-        tuple[float, float],
-        tuple[float, float],
-        tuple[float, float],
-    ] | None = None
+    chosen_edge: (
+        tuple[
+            float,
+            tuple[float, float],
+            tuple[float, float],
+            tuple[float, float],
+        ]
+        | None
+    ) = None
     for index, start in enumerate(vertices):
         end = vertices[(index + 1) % len(vertices)]
         opposite = vertices[(index + 2) % len(vertices)]
@@ -228,10 +230,9 @@ def _canonical_short_edge_handedness(
         if edge_length < chosen_length - _EDGE_LENGTH_EPSILON:
             chosen_edge = edge
             continue
-        if (
-            abs(edge_length - chosen_length) <= _EDGE_LENGTH_EPSILON
-            and tuple(sorted((edge_start, edge_end))) < tuple(sorted((chosen_start, chosen_end)))
-        ):
+        if abs(edge_length - chosen_length) <= _EDGE_LENGTH_EPSILON and tuple(
+            sorted((edge_start, edge_end))
+        ) < tuple(sorted((chosen_start, chosen_end))):
             chosen_edge = edge
     if chosen_edge is None:
         raise ValueError("Tuebingen triangles require exactly three vertices.")
@@ -305,11 +306,7 @@ def _record_for_node(node: _TuebingenNode) -> PatchRecord:
     rounded_vertices = _transformed_triangle_vertices(node.label, node.transform)
     return triangle_record(
         cell_id=id_from_transform(f"tuebingen:{node.label}", node.transform),
-        kind=(
-            TUEBINGEN_THICK_KIND
-            if node.label == "thick"
-            else TUEBINGEN_THIN_KIND
-        ),
+        kind=(TUEBINGEN_THICK_KIND if node.label == "thick" else TUEBINGEN_THIN_KIND),
         vertices=rounded_vertices,
         tile_family=TUEBINGEN_TILE_FAMILY,
         chirality_token=node.chirality,
@@ -354,7 +351,7 @@ def build_tuebingen_triangle_patch(patch_depth: int) -> AperiodicPatch:
                 remaining_depth - 1,
             )
 
-    root_scale = PHI ** resolved_depth
+    root_scale = PHI**resolved_depth
     for node in _root_star_nodes(root_scale):
         collect(node, resolved_depth)
 

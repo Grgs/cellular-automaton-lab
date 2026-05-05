@@ -51,10 +51,7 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
         )
 
     def test_standalone_build_flags_match_suite_scope(self) -> None:
-        manifest = {
-            entry["name"]: entry
-            for entry in playwright_suite_manifest_payload()
-        }
+        manifest = {entry["name"]: entry for entry in playwright_suite_manifest_payload()}
 
         self.assertTrue(manifest["all"]["requires_standalone_build"])
         self.assertTrue(manifest["standalone"]["requires_standalone_build"])
@@ -91,10 +88,12 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
         expected = iter_playwright_test_names()
         combined = list(iter_standalone_runtime_test_names())
         for subset_index in range(DEFAULT_PLAYWRIGHT_SUBSET_COUNT):
-            combined.extend(iter_playwright_subset_test_names(
-                subset_index,
-                DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
-            ))
+            combined.extend(
+                iter_playwright_subset_test_names(
+                    subset_index,
+                    DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
+                )
+            )
 
         self.assertEqual(sorted(combined), expected)
         self.assertEqual(Counter(combined), Counter(expected))

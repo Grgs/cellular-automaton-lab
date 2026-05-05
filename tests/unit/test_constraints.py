@@ -27,7 +27,10 @@ class RuleConstraintTests(unittest.TestCase):
         self.assertEqual(normalize_rule_dimensions("hexwhirlpool", 5, None), (5, None))
         self.assertEqual(normalize_rule_dimensions("whirlpool", 7, 5), (7, 5))
         self.assertEqual(normalize_rule_dimensions("whirlpool", 4, 9), (4, 9))
-        self.assertEqual(normalize_rule_dimensions(type("RuleLike", (), {"name": "wireworld"})(), 7, None), (7, None))
+        self.assertEqual(
+            normalize_rule_dimensions(type("RuleLike", (), {"name": "wireworld"})(), 7, None),
+            (7, None),
+        )
 
 
 if __name__ == "__main__":

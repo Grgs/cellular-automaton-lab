@@ -23,7 +23,11 @@ except ModuleNotFoundError:
     from backend.simulation.topology import ARCHIMEDEAN_488_GEOMETRY, SimulationBoard, empty_board
 
 from tests.unit.board_test_support import board_from_grid, regular_grid_from_board
-from tests.unit.simulation_test_fixtures import BLINKER_GRID, LiveNeighborTrackingRule, NeighborTrackingRule
+from tests.unit.simulation_test_fixtures import (
+    BLINKER_GRID,
+    LiveNeighborTrackingRule,
+    NeighborTrackingRule,
+)
 
 
 def reference_step_board(board: SimulationBoard, rule: AutomatonRule) -> SimulationBoard:
@@ -75,26 +79,40 @@ class SimulationEngineTests(unittest.TestCase):
 
         self.assertIn(3, rule.calls)
 
-    def test_engine_step_board_matches_reference_logic_for_binary_rules_across_geometries(self) -> None:
+    def test_engine_step_board_matches_reference_logic_for_binary_rules_across_geometries(
+        self,
+    ) -> None:
         cases = [
-            ("square", ConwayLifeRule(), [
-                [0, 1, 0, 0],
-                [1, 1, 0, 1],
-                [0, 0, 1, 0],
-                [1, 0, 0, 1],
-            ]),
-            ("hex", HexLifeRule(), [
-                [0, 1, 0, 1],
-                [1, 0, 1, 0],
-                [0, 1, 1, 0],
-                [1, 0, 0, 1],
-            ]),
-            ("triangle", TriLifeRule(), [
-                [0, 1, 0, 1, 0],
-                [1, 0, 1, 0, 1],
-                [0, 1, 1, 1, 0],
-                [1, 0, 1, 0, 1],
-            ]),
+            (
+                "square",
+                ConwayLifeRule(),
+                [
+                    [0, 1, 0, 0],
+                    [1, 1, 0, 1],
+                    [0, 0, 1, 0],
+                    [1, 0, 0, 1],
+                ],
+            ),
+            (
+                "hex",
+                HexLifeRule(),
+                [
+                    [0, 1, 0, 1],
+                    [1, 0, 1, 0],
+                    [0, 1, 1, 0],
+                    [1, 0, 0, 1],
+                ],
+            ),
+            (
+                "triangle",
+                TriLifeRule(),
+                [
+                    [0, 1, 0, 1, 0],
+                    [1, 0, 1, 0, 1],
+                    [0, 1, 1, 1, 0],
+                    [1, 0, 1, 0, 1],
+                ],
+            ),
         ]
 
         engine = SimulationEngine()
@@ -105,7 +123,9 @@ class SimulationEngineTests(unittest.TestCase):
                 expected = reference_step_board(board, rule.__class__())
                 self.assertEqual(optimized.cell_states, expected.cell_states)
 
-    def test_engine_step_board_matches_reference_logic_for_neighbor_state_rules_across_geometries(self) -> None:
+    def test_engine_step_board_matches_reference_logic_for_neighbor_state_rules_across_geometries(
+        self,
+    ) -> None:
         grid = [
             [0, 1, 2, 0, 3],
             [4, 0, 0, 5, 0],

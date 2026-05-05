@@ -25,7 +25,15 @@ class HypothesisTransitionPlannerTests(unittest.TestCase):
         cls.rule_registry = RuleRegistry()
 
     def create_regular_state(self, geometry: str = "square") -> SimulationStateData:
-        config = SimulationConfig.from_values(topology_spec={"tiling_family": geometry, "adjacency_mode": "edge", "width": 10, "height": 6}, speed=5)
+        config = SimulationConfig.from_values(
+            topology_spec={
+                "tiling_family": geometry,
+                "adjacency_mode": "edge",
+                "width": 10,
+                "height": 6,
+            },
+            speed=5,
+        )
         board = empty_board(geometry, config.width, config.height)
         return SimulationStateData(
             config=config,
@@ -40,7 +48,9 @@ class HypothesisTransitionPlannerTests(unittest.TestCase):
         return SimulationStateData(
             config=SimulationConfig.from_values(
                 topology_spec={
-                    "tiling_family": "penrose-p3-rhombs" if geometry == PENROSE_VERTEX_GEOMETRY else geometry,
+                    "tiling_family": "penrose-p3-rhombs"
+                    if geometry == PENROSE_VERTEX_GEOMETRY
+                    else geometry,
                     "adjacency_mode": "vertex" if geometry == PENROSE_VERTEX_GEOMETRY else "edge",
                     "width": board.topology.width,
                     "height": board.topology.height,

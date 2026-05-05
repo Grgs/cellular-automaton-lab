@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 def rule_requires_square_dimensions(rule_or_name: object) -> bool:
     _ = rule_or_name
     return False

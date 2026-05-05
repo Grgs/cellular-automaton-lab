@@ -35,4 +35,3 @@ FRONTEND_TOPOLOGY_FAMILY_CONTRACTS: tuple[TopologyFrontendFamilyContract, ...] =
 
 def topology_frontend_family_contracts() -> tuple[TopologyFrontendFamilyContract, ...]:
     return FRONTEND_TOPOLOGY_FAMILY_CONTRACTS
-

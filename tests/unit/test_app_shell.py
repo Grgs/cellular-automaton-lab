@@ -24,7 +24,10 @@ class AppShellTests(unittest.TestCase):
         self.assertIn('<option value="square" selected="selected">Square</option>', rendered)
         self.assertIn('value="12"', rendered)
         self.assertIn(">7 gen/s<", rendered)
-        self.assertIn('<select id="adjacency-mode-select"><option value="edge" selected="selected">Edge</option></select>', rendered)
+        self.assertIn(
+            '<select id="adjacency-mode-select"><option value="edge" selected="selected">Edge</option></select>',
+            rendered,
+        )
 
     def test_render_standalone_shell_script_matches_generated_output(self) -> None:
         root_dir = Path(__file__).resolve().parents[2]
@@ -48,7 +51,9 @@ class AppShellTests(unittest.TestCase):
 
         grid_viewport_index = rendered.index('<div id="grid-viewport" class="grid-viewport">')
         startup_index = rendered.index('id="standalone-startup-overlay"')
-        canvas_index = rendered.index('<canvas id="grid" class="grid-canvas" aria-label="Cellular automaton grid"></canvas>')
+        canvas_index = rendered.index(
+            '<canvas id="grid" class="grid-canvas" aria-label="Cellular automaton grid"></canvas>'
+        )
 
         self.assertLess(grid_viewport_index, startup_index)
         self.assertLess(startup_index, canvas_index)

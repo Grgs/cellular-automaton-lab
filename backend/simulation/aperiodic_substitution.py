@@ -70,20 +70,14 @@ def _leaf_record_prefix(
     tokens = [template.id_prefix]
     variant = template.variant if template.variant is not None else node.variant
     chirality_token = (
-        template.chirality_token
-        if template.chirality_token is not None
-        else node.chirality_token
+        template.chirality_token if template.chirality_token is not None else node.chirality_token
     )
     orientation_token = (
         template.orientation_token
         if template.orientation_token is not None
         else node.orientation_token
     )
-    tile_family = (
-        template.tile_family
-        if template.tile_family is not None
-        else node.tile_family
-    )
+    tile_family = template.tile_family if template.tile_family is not None else node.tile_family
     if tile_family:
         tokens.append(f"family-{tile_family}")
     if variant:
@@ -147,9 +141,7 @@ def _compose_child_node(
             else parent.orientation_token
         ),
         chirality_token=(
-            child.chirality_token
-            if child.chirality_token is not None
-            else parent.chirality_token
+            child.chirality_token if child.chirality_token is not None else parent.chirality_token
         ),
         tile_family=child.tile_family if child.tile_family is not None else parent.tile_family,
         decoration_tokens=_combined_decoration_tokens(

@@ -6,9 +6,7 @@ from backend.simulation.models import SimulationStateData
 
 def validate_state_value(rule: AutomatonRule, state: int) -> None:
     if not rule.is_valid_state(state):
-        raise ValueError(
-            f"State '{state}' is invalid for rule '{rule.name}'."
-        )
+        raise ValueError(f"State '{state}' is invalid for rule '{rule.name}'.")
 
 
 def validate_state_values(rule: AutomatonRule, states: list[int]) -> None:

@@ -97,15 +97,16 @@ def _format_number(value: int | float) -> str:
 
 def _build_option(value: str, label: str, *, selected: bool = False) -> str:
     selected_attribute = ' selected="selected"' if selected else ""
-    return f'<option value="{escape(value, quote=True)}"{selected_attribute}>{escape(label)}</option>'
+    return (
+        f'<option value="{escape(value, quote=True)}"{selected_attribute}>{escape(label)}</option>'
+    )
 
 
 def _group_topologies(
     topology_catalog: list[TopologyCatalogEntryPayload],
 ) -> list[tuple[str, list[TopologyCatalogEntryPayload]]]:
     grouped: dict[str, list[TopologyCatalogEntryPayload]] = {
-        group_name: []
-        for group_name in PICKER_GROUP_ORDER
+        group_name: [] for group_name in PICKER_GROUP_ORDER
     }
     extra_group_order: list[str] = []
 

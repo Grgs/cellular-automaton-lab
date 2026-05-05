@@ -6,8 +6,6 @@ from backend.simulation.aperiodic_family_manifest import (
     ROBINSON_THICK_KIND,
     ROBINSON_THIN_KIND,
     ROBINSON_TILE_FAMILY,
-    TUEBINGEN_THICK_KIND,
-    TUEBINGEN_THIN_KIND,
 )
 from backend.simulation.aperiodic_support import (
     PatchRecord,

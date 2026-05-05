@@ -52,7 +52,9 @@ def random_service_board(
     state_values = list(rule.randomize_weights.keys())
     state_weights = list(rule.randomize_weights.values())
     board = empty_service_board(geometry, width, height, patch_depth=patch_depth)
-    board.cell_states = list(choice_fn(state_values, weights=state_weights, k=board.topology.cell_count))
+    board.cell_states = list(
+        choice_fn(state_values, weights=state_weights, k=board.topology.cell_count)
+    )
     return board
 
 
@@ -65,8 +67,7 @@ def coerce_board_to_rule(board: SimulationBoard, rule: AutomatonRule) -> Simulat
     return SimulationBoard(
         topology=board.topology,
         cell_states=[
-            cell_state if cell_state in allowed_states else 0
-            for cell_state in board.cell_states
+            cell_state if cell_state in allowed_states else 0 for cell_state in board.cell_states
         ],
     )
 
@@ -80,8 +81,7 @@ def transfer_board(
 ) -> SimulationBoard:
     resized = empty_service_board(geometry, width, height, patch_depth=patch_depth)
     old_lookup = {
-        cell.id: board.cell_states[index]
-        for index, cell in enumerate(board.topology.cells)
+        cell.id: board.cell_states[index] for index, cell in enumerate(board.topology.cells)
     }
     for index, cell in enumerate(resized.topology.cells):
         resized.cell_states[index] = old_lookup.get(cell.id, 0)

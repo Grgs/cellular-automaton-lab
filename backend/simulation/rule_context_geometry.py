@@ -108,7 +108,9 @@ def cell_regular_coordinates(cell: LatticeCell) -> tuple[int, int] | None:
     return parse_regular_cell_id(cell.id)
 
 
-def cell_geometry(topology: LatticeTopology, cell: LatticeCell) -> tuple[str, tuple[float, float], tuple[tuple[float, float], ...] | None]:
+def cell_geometry(
+    topology: LatticeTopology, cell: LatticeCell
+) -> tuple[str, tuple[float, float], tuple[tuple[float, float], ...] | None]:
     regular_coordinates = cell_regular_coordinates(cell)
     if cell.center is not None:
         return (
@@ -121,7 +123,9 @@ def cell_geometry(topology: LatticeTopology, cell: LatticeCell) -> tuple[str, tu
             cell.vertices,
         )
     if regular_coordinates is None:
-        raise ValueError(f"Cell {cell.id!r} is missing geometry metadata and is not a regular cell id.")
+        raise ValueError(
+            f"Cell {cell.id!r} is missing geometry metadata and is not a regular cell id."
+        )
     return regular_geometry(topology.geometry, regular_coordinates[0], regular_coordinates[1])
 
 

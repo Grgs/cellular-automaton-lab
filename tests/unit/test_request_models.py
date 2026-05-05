@@ -25,18 +25,20 @@ except ModuleNotFoundError:
 
 class RequestModelTests(unittest.TestCase):
     def test_config_update_model_normalizes_blank_optional_fields(self) -> None:
-        payload = ConfigUpdateRequestModel.model_validate({
-            "speed": "",
-            "rule": "",
-            "topology_spec": {
-                "tiling_family": "",
-                "adjacency_mode": "",
-                "sizing_mode": "",
-                "width": "",
-                "height": None,
-                "patch_depth": "",
-            },
-        })
+        payload = ConfigUpdateRequestModel.model_validate(
+            {
+                "speed": "",
+                "rule": "",
+                "topology_spec": {
+                    "tiling_family": "",
+                    "adjacency_mode": "",
+                    "sizing_mode": "",
+                    "width": "",
+                    "height": None,
+                    "patch_depth": "",
+                },
+            }
+        )
 
         self.assertIsNone(payload.speed)
         self.assertIsNone(payload.rule)
@@ -49,19 +51,21 @@ class RequestModelTests(unittest.TestCase):
         self.assertIsNone(payload.topology_spec.patch_depth)
 
     def test_reset_request_model_parses_topology_spec_shape(self) -> None:
-        payload = ResetRequestModel.model_validate({
-            "topology_spec": {
-                "tiling_family": "hex",
-                "adjacency_mode": "edge",
-                "width": "12",
-                "height": 9,
-                "patch_depth": "",
-                "unsafe_size_override": "true",
-            },
-            "speed": "7.5",
-            "rule": "hexlife",
-            "randomize": True,
-        })
+        payload = ResetRequestModel.model_validate(
+            {
+                "topology_spec": {
+                    "tiling_family": "hex",
+                    "adjacency_mode": "edge",
+                    "width": "12",
+                    "height": 9,
+                    "patch_depth": "",
+                    "unsafe_size_override": "true",
+                },
+                "speed": "7.5",
+                "rule": "hexlife",
+                "randomize": True,
+            }
+        )
 
         assert payload.topology_spec is not None
         self.assertEqual(payload.topology_spec.tiling_family, "hex")
@@ -90,9 +94,11 @@ class RequestModelTests(unittest.TestCase):
         )
 
     def test_cell_updates_payload_requires_non_empty_list(self) -> None:
-        payload = CellUpdatesPayloadModel.model_validate({
-            "cells": [{"id": "c:1:1", "state": 1}],
-        })
+        payload = CellUpdatesPayloadModel.model_validate(
+            {
+                "cells": [{"id": "c:1:1", "state": 1}],
+            }
+        )
         self.assertEqual(
             [cell.to_payload() for cell in payload.cells],
             [{"id": "c:1:1", "state": 1}],

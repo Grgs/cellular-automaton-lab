@@ -44,7 +44,9 @@ class TransitionPlannerTests(unittest.TestCase):
     def create_penrose_state(self, geometry: str = "penrose-p3-rhombs") -> SimulationStateData:
         board = empty_board(geometry, 10, 6, patch_depth=4)
         topology_spec: TopologySpecPayload = {
-            "tiling_family": "penrose-p3-rhombs" if geometry == "penrose-p3-rhombs-vertex" else geometry,
+            "tiling_family": "penrose-p3-rhombs"
+            if geometry == "penrose-p3-rhombs-vertex"
+            else geometry,
             "adjacency_mode": "vertex" if geometry == "penrose-p3-rhombs-vertex" else "edge",
             "sizing_mode": "patch_depth",
             "patch_depth": 4,
@@ -66,7 +68,12 @@ class TransitionPlannerTests(unittest.TestCase):
         plan = plan_reset_transition(
             self.create_regular_state(),
             self.rule_registry,
-            topology_spec={"tiling_family": "hex", "adjacency_mode": "edge", "width": 9, "height": 7},
+            topology_spec={
+                "tiling_family": "hex",
+                "adjacency_mode": "edge",
+                "width": 9,
+                "height": 7,
+            },
             speed=6,
         )
 

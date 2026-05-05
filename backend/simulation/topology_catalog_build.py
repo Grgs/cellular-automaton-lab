@@ -23,7 +23,9 @@ def build_topology_catalog(
 
     catalog: list[TopologyDefinition] = []
     for tiling_family, family_variants in grouped.items():
-        family_variants.sort(key=lambda entry: (entry.adjacency_mode != "edge", entry.adjacency_mode))
+        family_variants.sort(
+            key=lambda entry: (entry.adjacency_mode != "edge", entry.adjacency_mode)
+        )
         first = family_variants[0]
         catalog.append(
             TopologyDefinition(
@@ -35,15 +37,15 @@ def build_topology_catalog(
                 family=first.family,
                 render_kind=str(render_kind_for_geometry(first.geometry_key)),
                 viewport_sync_mode=first.viewport_sync_mode,
-                supported_adjacency_modes=tuple(variant.adjacency_mode for variant in family_variants),
+                supported_adjacency_modes=tuple(
+                    variant.adjacency_mode for variant in family_variants
+                ),
                 default_adjacency_mode=family_variants[0].adjacency_mode,
                 default_rules={
-                    variant.adjacency_mode: variant.default_rule
-                    for variant in family_variants
+                    variant.adjacency_mode: variant.default_rule for variant in family_variants
                 },
                 geometry_keys={
-                    variant.adjacency_mode: variant.geometry_key
-                    for variant in family_variants
+                    variant.adjacency_mode: variant.geometry_key for variant in family_variants
                 },
                 sizing_policy=sizing_policies[tiling_family],
             )

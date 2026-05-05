@@ -26,10 +26,7 @@ def regular_grid_from_board(board: SimulationBoard) -> list[list[int]] | None:
     topology = board.topology
     if topology.geometry not in {"square", "hex", "triangle"}:
         return None
-    grid = [
-        [0] * topology.width
-        for _ in range(topology.height)
-    ]
+    grid = [[0] * topology.width for _ in range(topology.height)]
     for index, cell in enumerate(topology.cells):
         coords = parse_regular_cell_id(cell.id)
         if coords is None:
@@ -48,4 +45,4 @@ def board_with_states(
     normalized = list(states)
     if len(normalized) < topology.cell_count:
         normalized.extend([0] * (topology.cell_count - len(normalized)))
-    return SimulationBoard(topology=topology, cell_states=normalized[:topology.cell_count])
+    return SimulationBoard(topology=topology, cell_states=normalized[: topology.cell_count])

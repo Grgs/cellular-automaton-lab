@@ -20,19 +20,25 @@ def _tracked_files() -> list[str]:
 
 
 def _chunked(items: list[str], size: int) -> list[list[str]]:
-    return [items[index:index + size] for index in range(0, len(items), size)]
+    return [items[index : index + size] for index in range(0, len(items), size)]
 
 
 def _resolve_detect_secrets_hook() -> str:
     executable = shutil.which("detect-secrets-hook")
     if executable is None:
-        raise RuntimeError("detect-secrets-hook is not available. Install detect-secrets or run through pre-commit.")
+        raise RuntimeError(
+            "detect-secrets-hook is not available. Install detect-secrets or run through pre-commit."
+        )
     return executable
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run detect-secrets against changed or tracked files.")
-    parser.add_argument("--baseline", required=True, help="Path to the detect-secrets baseline file.")
+    parser = argparse.ArgumentParser(
+        description="Run detect-secrets against changed or tracked files."
+    )
+    parser.add_argument(
+        "--baseline", required=True, help="Path to the detect-secrets baseline file."
+    )
     parser.add_argument("--all-files", action="store_true", help="Scan all tracked files.")
     parser.add_argument("paths", nargs="*", help="File paths supplied by pre-commit.")
     args = parser.parse_args(argv)

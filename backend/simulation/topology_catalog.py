@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from backend.payload_types import TopologyCatalogEntryPayload, TopologySpecPayload, TopologyVariantPayload
+from backend.payload_types import (
+    TopologyCatalogEntryPayload,
+    TopologySpecPayload,
+    TopologyVariantPayload,
+)
 from backend.simulation.topology_catalog_build import build_topology_catalog
 from backend.simulation.topology_family_manifest import GEOMETRY_MINIMUM_GRID_DIMENSIONS
 from backend.simulation.topology_catalog_data import (
@@ -137,10 +141,7 @@ __all__ = [
 ]
 
 
-TOPOLOGY_VARIANT_BY_GEOMETRY = {
-    variant.geometry_key: variant
-    for variant in TOPOLOGY_VARIANTS
-}
+TOPOLOGY_VARIANT_BY_GEOMETRY = {variant.geometry_key: variant for variant in TOPOLOGY_VARIANTS}
 
 TOPOLOGY_CATALOG = build_topology_catalog(
     TOPOLOGY_VARIANTS,
@@ -148,22 +149,14 @@ TOPOLOGY_CATALOG = build_topology_catalog(
     PICKER_GROUP_ORDER,
     render_kind_for_geometry,
 )
-TOPOLOGY_BY_FAMILY = {
-    definition.tiling_family: definition
-    for definition in TOPOLOGY_CATALOG
-}
-SUPPORTED_TOPOLOGY_FAMILIES = tuple(
-    definition.tiling_family
-    for definition in TOPOLOGY_CATALOG
-)
+TOPOLOGY_BY_FAMILY = {definition.tiling_family: definition for definition in TOPOLOGY_CATALOG}
+SUPPORTED_TOPOLOGY_FAMILIES = tuple(definition.tiling_family for definition in TOPOLOGY_CATALOG)
 SUPPORTED_GEOMETRIES = tuple(variant.geometry_key for variant in TOPOLOGY_VARIANTS)
 GEOMETRY_DEFAULT_RULES = {
-    variant.geometry_key: variant.default_rule
-    for variant in TOPOLOGY_VARIANTS
+    variant.geometry_key: variant.default_rule for variant in TOPOLOGY_VARIANTS
 }
 TOPOLOGY_DEFAULT_RULES = {
-    definition.tiling_family: dict(definition.default_rules)
-    for definition in TOPOLOGY_CATALOG
+    definition.tiling_family: dict(definition.default_rules) for definition in TOPOLOGY_CATALOG
 }
 
 

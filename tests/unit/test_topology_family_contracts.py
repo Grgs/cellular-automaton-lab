@@ -21,7 +21,7 @@ _FRONTEND_ENTRY_PATTERN = re.compile(
     r'"(?P<tiling_family>[^"]+)": \{\s*'
     r'label: "(?P<label>[^"]+)",\s*'
     r'pickerGroup: "(?P<picker_group>[^"]+)",\s*'
-    r'pickerOrder: (?P<picker_order>\d+),\s*'
+    r"pickerOrder: (?P<picker_order>\d+),\s*"
     r'family: "(?P<family>[^"]+)",\s*'
     r'sizingMode: "(?P<sizing_mode>[^"]+)",\s*'
     r'viewportSyncMode: "(?P<viewport_sync_mode>[^"]+)",\s*'

@@ -114,8 +114,7 @@ class _PentAngle:
     _SIN = tuple(math.sin(index * 2 * math.pi / 5) for index in range(5))
     _COS = tuple(math.cos(index * 2 * math.pi / 5) for index in range(5))
     _INVERSE_SIN = tuple(
-        0 if index == 0 else 1 / math.sin(index * 2 * math.pi / 5)
-        for index in range(5)
+        0 if index == 0 else 1 / math.sin(index * 2 * math.pi / 5) for index in range(5)
     )
 
     def __init__(self, index: int) -> None:
@@ -152,13 +151,17 @@ def _det(x1: float, y1: float, x2: float, y2: float) -> float:
 
 
 def _ccw(point_a: _Vector, point_b: _Vector, point_c: _Vector) -> int:
-    value = ((point_b.x - point_a.x) * (point_c.y - point_a.y)) - ((point_c.x - point_a.x) * (point_b.y - point_a.y))
+    value = ((point_b.x - point_a.x) * (point_c.y - point_a.y)) - (
+        (point_c.x - point_a.x) * (point_b.y - point_a.y)
+    )
     if math.isclose(value, 0.0):
         return 0
     return 1 if value > 0 else -1
 
 
-def _intersection(point_a: _Vector, point_b: _Vector, point_c: _Vector, point_d: _Vector) -> _Vector:
+def _intersection(
+    point_a: _Vector, point_b: _Vector, point_c: _Vector, point_d: _Vector
+) -> _Vector:
     denominator = _det(
         point_a.x - point_b.x,
         point_a.y - point_b.y,
@@ -309,7 +312,9 @@ class _Strip:
             inserted = False
             for index in range(len(intersection_tuples) - 1, -1, -1):
                 current = intersection_tuples[index]
-                if (forward and next_tuple[2] > current[2]) or (not forward and next_tuple[2] < current[2]):
+                if (forward and next_tuple[2] > current[2]) or (
+                    not forward and next_tuple[2] < current[2]
+                ):
                     intersection_tuples.insert(index + 1, next_tuple)
                     inserted = True
                     break
@@ -347,7 +352,9 @@ class _Rhombus:
         self.lattice_coords = tuple(lattice_coords)
 
     def kind(self) -> _RhombusType:
-        difference = abs(self.strip_a.family.pent_angle.index - self.strip_b.family.pent_angle.index)
+        difference = abs(
+            self.strip_a.family.pent_angle.index - self.strip_b.family.pent_angle.index
+        )
         return _RhombusType.THICK if difference in {1, 4} else _RhombusType.THIN
 
     def vertices(self) -> list[_RhombusVertex]:
@@ -399,8 +406,7 @@ class _Rhombus:
 class _PenroseTiling:
     def __init__(self, offsets: tuple[float, ...] = PENROSE_P3_OFFSETS) -> None:
         self._families = tuple(
-            _StripFamily(self, offsets[pent_angle.index], pent_angle)
-            for pent_angle in PENT_ANGLES
+            _StripFamily(self, offsets[pent_angle.index], pent_angle) for pent_angle in PENT_ANGLES
         )
 
     def strip_family(self, pent_angle: _PentAngle) -> _StripFamily:
@@ -457,7 +463,10 @@ class _PenroseTiling:
                     continue
 
                 for rhombus in strip.rhombi(intersection_distances[0], True):
-                    if rhombus.strip_b.family.pent_angle.index > strip.family.pent_angle.index and rhombus_in_cell(rhombus):
+                    if (
+                        rhombus.strip_b.family.pent_angle.index > strip.family.pent_angle.index
+                        and rhombus_in_cell(rhombus)
+                    ):
                         yield rhombus
                     if rhombus == stop_rhombus:
                         break
@@ -475,10 +484,7 @@ def _rounded_point(vector: _Vector) -> tuple[float, float]:
 
 
 def _rounded_vertices(rhombus: _Rhombus) -> tuple[tuple[float, float], ...]:
-    return tuple(
-        _rounded_point(vertex.coordinate)
-        for vertex in rhombus.vertices()
-    )
+    return tuple(_rounded_point(vertex.coordinate) for vertex in rhombus.vertices())
 
 
 def _sector_index(center: tuple[float, float]) -> int:
@@ -510,12 +516,10 @@ def _penrose_cell_id(
     return f"{prefix}:{_sector_index(center)}:{strip_key}:{_encode_lattice_coords(lattice_coords)}"
 
 
-def _canonical_edge(point_a: tuple[float, float], point_b: tuple[float, float]) -> tuple[tuple[float, float], tuple[float, float]]:
-    return (
-        (point_a, point_b)
-        if point_a <= point_b
-        else (point_b, point_a)
-    )
+def _canonical_edge(
+    point_a: tuple[float, float], point_b: tuple[float, float]
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    return (point_a, point_b) if point_a <= point_b else (point_b, point_a)
 
 
 def _compatibility_extent(values: list[float]) -> int:
@@ -537,7 +541,7 @@ def _connect_owner_groups(
         if len(unique_owners) < 2:
             continue
         for index, left in enumerate(unique_owners):
-            for right in unique_owners[index + 1:]:
+            for right in unique_owners[index + 1 :]:
                 neighbors_by_id[left].add(right)
                 neighbors_by_id[right].add(left)
 
@@ -589,10 +593,7 @@ def build_penrose_patch(
 
     unique_x = {value: index for index, value in enumerate(sorted(set(center_x_values)))}
     unique_y = {value: index for index, value in enumerate(sorted(set(center_y_values)))}
-    neighbors_by_id: dict[str, set[str]] = {
-        record.id: set()
-        for record in provisional
-    }
+    neighbors_by_id: dict[str, set[str]] = {record.id: set() for record in provisional}
 
     if adjacency_mode == PENROSE_VERTEX_ADJACENCY:
         _connect_owner_groups(vertex_map.values(), neighbors_by_id, require_pair=False)

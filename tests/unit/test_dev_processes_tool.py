@@ -7,7 +7,6 @@ import sys
 import time
 import unittest
 from contextlib import redirect_stdout
-from pathlib import Path
 from unittest.mock import patch
 
 from tools import dev_processes
@@ -64,17 +63,27 @@ class DevProcessesToolTests(unittest.TestCase):
     def test_select_processes_filters_by_port_and_scope(self) -> None:
         processes = (
             RepoProcess(1, "server-host", "python app.py", dev_processes.ROOT_DIR, 5000),
-            RepoProcess(2, "standalone-host", "python -m http.server 8123", dev_processes.STANDALONE_OUTPUT_DIR, 8123),
-            RepoProcess(3, "managed-browser-check", "python tools/run_browser_check.py", dev_processes.ROOT_DIR, None),
+            RepoProcess(
+                2,
+                "standalone-host",
+                "python -m http.server 8123",
+                dev_processes.STANDALONE_OUTPUT_DIR,
+                8123,
+            ),
+            RepoProcess(
+                3,
+                "managed-browser-check",
+                "python tools/run_browser_check.py",
+                dev_processes.ROOT_DIR,
+                None,
+            ),
         )
         self.assertEqual(select_processes(processes, port=8123), (processes[1],))
         self.assertEqual(select_processes(processes, repo=True), processes)
         self.assertEqual(select_processes(processes, stale_browser_hosts=True), processes[:2])
 
     def test_main_list_prints_processes(self) -> None:
-        processes = (
-            RepoProcess(10, "server-host", "python app.py", dev_processes.ROOT_DIR, 5000),
-        )
+        processes = (RepoProcess(10, "server-host", "python app.py", dev_processes.ROOT_DIR, 5000),)
         stdout = io.StringIO()
         with patch("tools.dev_processes.iter_repo_processes", return_value=processes):
             with redirect_stdout(stdout):
@@ -85,18 +94,28 @@ class DevProcessesToolTests(unittest.TestCase):
     def test_main_kill_by_port_calls_terminate_process(self) -> None:
         processes = (
             RepoProcess(10, "server-host", "python app.py", dev_processes.ROOT_DIR, 5000),
-            RepoProcess(11, "standalone-host", "python -m http.server 8123", dev_processes.STANDALONE_OUTPUT_DIR, 8123),
+            RepoProcess(
+                11,
+                "standalone-host",
+                "python -m http.server 8123",
+                dev_processes.STANDALONE_OUTPUT_DIR,
+                8123,
+            ),
         )
         stdout = io.StringIO()
         with patch("tools.dev_processes.iter_repo_processes", return_value=processes):
-            with patch("tools.dev_processes.terminate_process", return_value="terminated") as terminate:
+            with patch(
+                "tools.dev_processes.terminate_process", return_value="terminated"
+            ) as terminate:
                 with redirect_stdout(stdout):
                     exit_code = main(["kill", "--port", "8123"])
         self.assertEqual(exit_code, 0)
         terminate.assert_called_once_with(processes[1], grace_seconds=2.0)
         self.assertIn("Killing the following repo-scoped processes:", stdout.getvalue())
 
-    @unittest.skipUnless(dev_processes.STANDALONE_OUTPUT_DIR.is_dir(), "standalone output directory is required")
+    @unittest.skipUnless(
+        dev_processes.STANDALONE_OUTPUT_DIR.is_dir(), "standalone output directory is required"
+    )
     def test_main_kill_by_port_terminates_standalone_http_server_process(self) -> None:
         port = _find_available_port()
         process = subprocess.Popen(

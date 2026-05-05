@@ -18,7 +18,9 @@ class ArchLife31212Rule(KindLifeRule, AutomatonRule):
 class ArchLife3464Rule(KindLifeRule, AutomatonRule):
     name = "archlife-3-4-6-4"
     display_name = "Mixed Life: Rhombitrihexagonal (3.4.6.4)"
-    description = "Rhombitrihexagonal Life rule with B2/S23 triangles and squares, and B3/S23 hexagons."
+    description = (
+        "Rhombitrihexagonal Life rule with B2/S23 triangles and squares, and B3/S23 hexagons."
+    )
     kind_thresholds = {
         "triangle": (frozenset({2}), frozenset({2, 3})),
         "square": (frozenset({2}), frozenset({2, 3})),

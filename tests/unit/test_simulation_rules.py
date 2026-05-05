@@ -24,7 +24,12 @@ try:
     from backend.rules.whirlpool import WhirlpoolRule
     from backend.rules.wireworld import WireWorldRule
     from backend.simulation.models import RuleSnapshot
-    from backend.simulation.rule_context import RuleContext, TopologyCellFrame, TopologyFrame, TopologyNeighborFrame
+    from backend.simulation.rule_context import (
+        RuleContext,
+        TopologyCellFrame,
+        TopologyFrame,
+        TopologyNeighborFrame,
+    )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.defaults import DEFAULT_RULE_NAME
@@ -47,7 +52,12 @@ except ModuleNotFoundError:
     from backend.rules.whirlpool import WhirlpoolRule
     from backend.rules.wireworld import WireWorldRule
     from backend.simulation.models import RuleSnapshot
-    from backend.simulation.rule_context import RuleContext, TopologyCellFrame, TopologyFrame, TopologyNeighborFrame
+    from backend.simulation.rule_context import (
+        RuleContext,
+        TopologyCellFrame,
+        TopologyFrame,
+        TopologyNeighborFrame,
+    )
 
 
 class NeighborSpec(TypedDict):
@@ -148,7 +158,9 @@ def build_context(
         center=(0.0, 0.0),
         cell_count=len(cells),
         bounds=(0.0, 0.0, 0.0, 0.0),
-        max_shell_rank=max([shell_rank, *[int(spec["shell_rank"]) for spec in neighbor_specs]], default=shell_rank),
+        max_shell_rank=max(
+            [shell_rank, *[int(spec["shell_rank"]) for spec in neighbor_specs]], default=shell_rank
+        ),
         max_radial_distance=1.0,
         cells=tuple(cells),
         _index_by_id={cell.id: index for index, cell in enumerate(cells)},
@@ -280,14 +292,22 @@ class SimulationRuleTests(unittest.TestCase):
 
         self.assertEqual(default_rule.name, DEFAULT_RULE_NAME)
         self.assertIs(self.rule_registry.get("missing-rule"), default_rule)
-        self.assertEqual(self.rule_registry.default_for_geometry("archimedean-4-8-8").name, "archlife488")
+        self.assertEqual(
+            self.rule_registry.default_for_geometry("archimedean-4-8-8").name, "archlife488"
+        )
         self.assertEqual(self.rule_registry.default_for_geometry("hex").name, "hexlife")
         self.assertEqual(self.rule_registry.default_for_geometry("triangle").name, "trilife")
-        self.assertEqual(self.rule_registry.default_for_geometry("penrose-p3-rhombs").name, "life-b2-s23")
-        self.assertEqual(self.rule_registry.default_for_geometry("penrose-p3-rhombs-vertex").name, "conway")
+        self.assertEqual(
+            self.rule_registry.default_for_geometry("penrose-p3-rhombs").name, "life-b2-s23"
+        )
+        self.assertEqual(
+            self.rule_registry.default_for_geometry("penrose-p3-rhombs-vertex").name, "conway"
+        )
 
     def test_rule_registry_uses_general_fallback_when_geometry_has_no_default(self) -> None:
-        self.assertEqual(self.rule_registry.default_for_geometry("missing-geometry").name, DEFAULT_RULE_NAME)
+        self.assertEqual(
+            self.rule_registry.default_for_geometry("missing-geometry").name, DEFAULT_RULE_NAME
+        )
 
     def test_rule_registry_describes_rules_in_display_name_order(self) -> None:
         descriptions = self.rule_registry.describe_rules()
@@ -338,40 +358,172 @@ class SimulationRuleTests(unittest.TestCase):
         self.assert_rule_snapshot(rule)
         self.assertEqual(rule.next_state(build_context(rule.EXCITED)), rule.TRAILING)
         self.assertEqual(rule.next_state(build_context(rule.TRAILING)), rule.REFRACTORY)
-        self.assertEqual(rule.next_state(build_context(rule.REFRACTORY, shell_rank=1, radial_ratio=0.4)), rule.RESTING)
+        self.assertEqual(
+            rule.next_state(build_context(rule.REFRACTORY, shell_rank=1, radial_ratio=0.4)),
+            rule.RESTING,
+        )
         self.assertEqual(rule.next_state(build_context(rule.SOURCE)), rule.SOURCE)
 
     def test_hexlife_rule_metadata_and_transitions(self) -> None:
         rule = HexLifeRule()
         self.assert_rule_snapshot(rule)
         self.assertTrue(rule.supports_randomize)
-        self.assertEqual(rule.next_state(build_context(0, neighbor_specs=[make_neighbor_spec(1, neighbor_id="n0"), make_neighbor_spec(1, neighbor_id="n1")])), 1)
-        self.assertEqual(rule.next_state(build_context(1, neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(3)])), 1)
-        self.assertEqual(rule.next_state(build_context(1, neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(4)])), 1)
-        self.assertEqual(rule.next_state(build_context(1, neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(2)])), 0)
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    0,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id="n0"),
+                        make_neighbor_spec(1, neighbor_id="n1"),
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    1,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(3)
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    1,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(4)
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    1,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(2)
+                    ],
+                )
+            ),
+            0,
+        )
 
     def test_trilife_rule_metadata_and_transitions(self) -> None:
         rule = TriLifeRule()
         self.assert_rule_snapshot(rule)
         self.assertTrue(rule.supports_randomize)
-        self.assertEqual(rule.next_state(build_context(0, neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(4)])), 1)
-        self.assertEqual(rule.next_state(build_context(1, neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(4)])), 1)
-        self.assertEqual(rule.next_state(build_context(1, neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(5)])), 1)
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    0,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(4)
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    1,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(4)
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    1,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(5)
+                    ],
+                )
+            ),
+            1,
+        )
 
     def test_archlife_rule_metadata_and_kind_specific_transitions(self) -> None:
         rule = ArchLife488Rule()
         self.assert_rule_snapshot(rule)
         self.assertTrue(rule.supports_randomize)
-        self.assertEqual(rule.next_state(build_context(0, kind="square", neighbor_specs=[make_neighbor_spec(1, neighbor_id="a"), make_neighbor_spec(1, neighbor_id="b")])), 1)
-        self.assertEqual(rule.next_state(build_context(1, kind="square", neighbor_specs=[make_neighbor_spec(1, neighbor_id="a"), make_neighbor_spec(1, neighbor_id="b")])), 1)
-        self.assertEqual(rule.next_state(build_context(0, kind="octagon", neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(3)])), 1)
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    0,
+                    kind="square",
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id="a"),
+                        make_neighbor_spec(1, neighbor_id="b"),
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    1,
+                    kind="square",
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id="a"),
+                        make_neighbor_spec(1, neighbor_id="b"),
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    0,
+                    kind="octagon",
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(3)
+                    ],
+                )
+            ),
+            1,
+        )
 
     def test_kagome_rule_metadata_and_kind_specific_transitions(self) -> None:
         rule = KagomeLifeRule()
         self.assert_rule_snapshot(rule)
         self.assertTrue(rule.supports_randomize)
-        self.assertEqual(rule.next_state(build_context(0, kind="triangle-up", neighbor_specs=[make_neighbor_spec(1, neighbor_id="a"), make_neighbor_spec(1, neighbor_id="b")])), 1)
-        self.assertEqual(rule.next_state(build_context(0, kind="hexagon", neighbor_specs=[make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(3)])), 1)
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    0,
+                    kind="triangle-up",
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id="a"),
+                        make_neighbor_spec(1, neighbor_id="b"),
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    0,
+                    kind="hexagon",
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(3)
+                    ],
+                )
+            ),
+            1,
+        )
 
     def test_life_b2_s23_rule_metadata_and_transitions(self) -> None:
         rule = LifeB2S23Rule()
@@ -381,17 +533,57 @@ class SimulationRuleTests(unittest.TestCase):
         self.assertEqual(rule.display_name, "Life: B2/S23")
         self.assertEqual([state.value for state in rule.state_definitions()], [0, 1])
         self.assertEqual(rule.default_paint_state, 1)
-        self.assertEqual(rule.next_state(build_context(0, neighbor_specs=[make_neighbor_spec(1, neighbor_id="a"), make_neighbor_spec(1, neighbor_id="b")])), 1)
-        self.assertEqual(rule.next_state(build_context(1, neighbor_specs=[make_neighbor_spec(1, neighbor_id="a"), make_neighbor_spec(1, neighbor_id="b")])), 1)
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    0,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id="a"),
+                        make_neighbor_spec(1, neighbor_id="b"),
+                    ],
+                )
+            ),
+            1,
+        )
+        self.assertEqual(
+            rule.next_state(
+                build_context(
+                    1,
+                    neighbor_specs=[
+                        make_neighbor_spec(1, neighbor_id="a"),
+                        make_neighbor_spec(1, neighbor_id="b"),
+                    ],
+                )
+            ),
+            1,
+        )
 
     def test_extended_archlife_rules_have_expected_kind_thresholds(self) -> None:
         cases = [
-            (ArchLife31212Rule(), [("triangle", 0, 2, 1), ("dodecagon", 0, 3, 1), ("dodecagon", 1, 1, 0)]),
-            (ArchLife3464Rule(), [("triangle", 0, 2, 1), ("square", 0, 2, 1), ("hexagon", 0, 3, 1)]),
-            (ArchLife4612Rule(), [("square", 0, 2, 1), ("hexagon", 0, 3, 1), ("dodecagon", 0, 4, 1)]),
-            (ArchLife33434Rule(), [("triangle", 0, 2, 1), ("square", 0, 3, 1), ("square", 1, 1, 0)]),
-            (ArchLife33344Rule(), [("triangle", 0, 2, 1), ("square", 0, 2, 1), ("square", 1, 3, 1)]),
-            (ArchLife33336Rule(), [("triangle", 0, 2, 1), ("hexagon", 0, 4, 1), ("hexagon", 1, 1, 0)]),
+            (
+                ArchLife31212Rule(),
+                [("triangle", 0, 2, 1), ("dodecagon", 0, 3, 1), ("dodecagon", 1, 1, 0)],
+            ),
+            (
+                ArchLife3464Rule(),
+                [("triangle", 0, 2, 1), ("square", 0, 2, 1), ("hexagon", 0, 3, 1)],
+            ),
+            (
+                ArchLife4612Rule(),
+                [("square", 0, 2, 1), ("hexagon", 0, 3, 1), ("dodecagon", 0, 4, 1)],
+            ),
+            (
+                ArchLife33434Rule(),
+                [("triangle", 0, 2, 1), ("square", 0, 3, 1), ("square", 1, 1, 0)],
+            ),
+            (
+                ArchLife33344Rule(),
+                [("triangle", 0, 2, 1), ("square", 0, 2, 1), ("square", 1, 3, 1)],
+            ),
+            (
+                ArchLife33336Rule(),
+                [("triangle", 0, 2, 1), ("hexagon", 0, 4, 1), ("hexagon", 1, 1, 0)],
+            ),
         ]
 
         for rule, transitions in cases:
@@ -399,8 +591,16 @@ class SimulationRuleTests(unittest.TestCase):
                 self.assert_rule_snapshot(rule)
                 self.assertTrue(rule.supports_randomize)
                 for kind, current_state, live_neighbors, expected in transitions:
-                    neighbor_specs = [make_neighbor_spec(1, neighbor_id=f"n{index}") for index in range(live_neighbors)]
-                    self.assertEqual(rule.next_state(build_context(current_state, kind=kind, neighbor_specs=neighbor_specs)), expected)
+                    neighbor_specs = [
+                        make_neighbor_spec(1, neighbor_id=f"n{index}")
+                        for index in range(live_neighbors)
+                    ]
+                    self.assertEqual(
+                        rule.next_state(
+                            build_context(current_state, kind=kind, neighbor_specs=neighbor_specs)
+                        ),
+                        expected,
+                    )
 
     def test_penrose_greenberg_hastings_metadata_and_state_cycle(self) -> None:
         rule = PenroseGreenbergHastingsRule()
@@ -411,11 +611,18 @@ class SimulationRuleTests(unittest.TestCase):
         self.assertEqual(rule.next_state(build_context(1)), 2)
         self.assertEqual(rule.next_state(build_context(2)), 3)
         self.assertEqual(rule.next_state(build_context(3)), 0)
-        self.assertEqual(rule.next_state(build_context(0, neighbor_specs=[make_neighbor_spec(1, neighbor_id="n0")])), 1)
+        self.assertEqual(
+            rule.next_state(
+                build_context(0, neighbor_specs=[make_neighbor_spec(1, neighbor_id="n0")])
+            ),
+            1,
+        )
 
     def test_penrose_aliases_resolve_to_canonical_life_rules(self) -> None:
         self.assertIs(self.rule_registry.get("penrose-life"), self.rule_registry.get("life-b2-s23"))
-        self.assertIs(self.rule_registry.get("penrose-vertex-life"), self.rule_registry.get("conway"))
+        self.assertIs(
+            self.rule_registry.get("penrose-vertex-life"), self.rule_registry.get("conway")
+        )
         self.assertIs(self.rule_registry.get("hexwhirlpool"), self.rule_registry.get("whirlpool"))
 
     def test_directional_counts_only_real_excited_neighbors(self) -> None:
@@ -423,8 +630,18 @@ class SimulationRuleTests(unittest.TestCase):
         ctx = build_context(
             rule.RESTING,
             neighbor_specs=[
-                make_neighbor_spec(rule.EXCITED, neighbor_id="n0", radial="outward", clockwise_index=0),
-                make_neighbor_spec(rule.SOURCE, neighbor_id="n1", radial="inward", turn="clockwise", radial_delta=-0.2, angle_delta=-0.3, clockwise_index=1),
+                make_neighbor_spec(
+                    rule.EXCITED, neighbor_id="n0", radial="outward", clockwise_index=0
+                ),
+                make_neighbor_spec(
+                    rule.SOURCE,
+                    neighbor_id="n1",
+                    radial="inward",
+                    turn="clockwise",
+                    radial_delta=-0.2,
+                    angle_delta=-0.3,
+                    clockwise_index=1,
+                ),
             ],
         )
 
@@ -438,24 +655,45 @@ class SimulationRuleTests(unittest.TestCase):
         ctx = build_context(
             0,
             neighbor_specs=[
-                make_neighbor_spec(0, neighbor_id="fallback", radial="level", turn="aligned", clockwise_index=1),
-                make_neighbor_spec(0, neighbor_id="best", radial="outward", turn="clockwise", radial_delta=0.5, angle_delta=-0.2, clockwise_index=2),
+                make_neighbor_spec(
+                    0, neighbor_id="fallback", radial="level", turn="aligned", clockwise_index=1
+                ),
+                make_neighbor_spec(
+                    0,
+                    neighbor_id="best",
+                    radial="outward",
+                    turn="clockwise",
+                    radial_delta=0.5,
+                    angle_delta=-0.2,
+                    clockwise_index=2,
+                ),
             ],
         )
 
         self.assertEqual(
             ctx.select_neighbor_id(
                 0,
-                tiers=(("outward", "clockwise"), ("outward", None), (None, "clockwise"), (None, None)),
+                tiers=(
+                    ("outward", "clockwise"),
+                    ("outward", None),
+                    (None, "clockwise"),
+                    (None, None),
+                ),
             ),
             "best",
         )
 
     def test_whirlpool_eye_cells_reignite_when_supported(self) -> None:
         rule = WhirlpoolRule()
-        specs = [make_neighbor_spec(rule.EXCITED, neighbor_id="n0", radial="outward", clockwise_index=0)]
-        resting_ctx = build_context(rule.RESTING, neighbor_specs=specs, shell_rank=0, radial_ratio=0.05)
-        refractory_ctx = build_context(rule.REFRACTORY, neighbor_specs=specs, shell_rank=0, radial_ratio=0.05)
+        specs = [
+            make_neighbor_spec(rule.EXCITED, neighbor_id="n0", radial="outward", clockwise_index=0)
+        ]
+        resting_ctx = build_context(
+            rule.RESTING, neighbor_specs=specs, shell_rank=0, radial_ratio=0.05
+        )
+        refractory_ctx = build_context(
+            rule.REFRACTORY, neighbor_specs=specs, shell_rank=0, radial_ratio=0.05
+        )
 
         self.assertEqual(rule.next_state(resting_ctx), rule.EXCITED)
         self.assertEqual(rule.next_state(refractory_ctx), rule.EXCITED)
@@ -481,16 +719,40 @@ class SimulationRuleTests(unittest.TestCase):
             rule.RESTING,
             radial_ratio=0.42,
             neighbor_specs=[
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-cw", radial="inward", turn="clockwise", clockwise_index=0),
-                make_neighbor_spec(rule.EXCITED, neighbor_id="level-ccw", radial="level", turn="counterclockwise", clockwise_index=1),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-cw",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="level-ccw",
+                    radial="level",
+                    turn="counterclockwise",
+                    clockwise_index=1,
+                ),
             ],
         )
         allowed_ctx = build_context(
             rule.RESTING,
             radial_ratio=0.42,
             neighbor_specs=[
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-cw", radial="inward", turn="clockwise", clockwise_index=0),
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-align", radial="inward", turn="aligned", clockwise_index=1),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-cw",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-align",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=1,
+                ),
             ],
         )
 
@@ -503,18 +765,54 @@ class SimulationRuleTests(unittest.TestCase):
             rule.RESTING,
             radial_ratio=0.72,
             neighbor_specs=[
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-cw", radial="inward", turn="clockwise", clockwise_index=0),
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-ccw", radial="inward", turn="counterclockwise", clockwise_index=1),
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-align", radial="inward", turn="aligned", clockwise_index=2),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-cw",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-ccw",
+                    radial="inward",
+                    turn="counterclockwise",
+                    clockwise_index=1,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-align",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=2,
+                ),
             ],
         )
         allowed_ctx = build_context(
             rule.RESTING,
             radial_ratio=0.72,
             neighbor_specs=[
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-cw-0", radial="inward", turn="clockwise", clockwise_index=0),
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-cw-1", radial="inward", turn="clockwise", clockwise_index=1),
-                make_neighbor_spec(rule.EXCITED, neighbor_id="in-align", radial="inward", turn="aligned", clockwise_index=2),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-cw-0",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-cw-1",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-align",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=2,
+                ),
             ],
         )
 

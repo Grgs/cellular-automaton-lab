@@ -47,7 +47,6 @@ The `v0.1.0` public preview has been released. Keep this section for follow-up w
 
 ## Remaining After This Cleanup
 
-- Expand Python lint/format guardrails beyond the current tooling + verification slice once the older compatibility-heavy simulation and legacy test modules stop depending on import-for-export and `sys.path` bootstrap patterns.
 - Decide whether the lightweight frontend formatting check should grow into a full linter/formatter after a deliberate repo-wide mechanical style pass.
 - Extend canonical type-surface drift checks beyond the current controller-view/editor/controller-sync-session/actions slice only if more frontend barrels start restating payload shapes instead of reusing canonical request and domain types.
 - Revisit Playwright runner/build coordination only if new host types or non-standalone artifact builds need their own freshness checks; keep suite selection and standalone build reuse centralized in the npm runner path.

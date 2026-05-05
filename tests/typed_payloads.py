@@ -53,8 +53,12 @@ def _require_float(value: object, *, context: str) -> float:
 def require_topology_spec_payload(value: object, *, context: str) -> TopologySpecPayload:
     payload = _require_json_object(value, context=context)
     return {
-        "tiling_family": _require_str(payload.get("tiling_family"), context=f"{context}.tiling_family"),
-        "adjacency_mode": _require_str(payload.get("adjacency_mode"), context=f"{context}.adjacency_mode"),
+        "tiling_family": _require_str(
+            payload.get("tiling_family"), context=f"{context}.tiling_family"
+        ),
+        "adjacency_mode": _require_str(
+            payload.get("adjacency_mode"), context=f"{context}.adjacency_mode"
+        ),
         "sizing_mode": _require_str(payload.get("sizing_mode"), context=f"{context}.sizing_mode"),
         "width": _require_int(payload.get("width"), context=f"{context}.width"),
         "height": _require_int(payload.get("height"), context=f"{context}.height"),
@@ -77,7 +81,9 @@ def require_rule_definition_payload(value: object, *, context: str) -> RuleDefin
     states = _require_json_list(payload.get("states"), context=f"{context}.states")
     return {
         "name": _require_str(payload.get("name"), context=f"{context}.name"),
-        "display_name": _require_str(payload.get("display_name"), context=f"{context}.display_name"),
+        "display_name": _require_str(
+            payload.get("display_name"), context=f"{context}.display_name"
+        ),
         "description": _require_str(payload.get("description"), context=f"{context}.description"),
         "states": [
             require_cell_state_payload(state, context=f"{context}.states[{index}]")
@@ -91,7 +97,9 @@ def require_rule_definition_payload(value: object, *, context: str) -> RuleDefin
             payload.get("supports_randomize"),
             context=f"{context}.supports_randomize",
         ),
-        "rule_protocol": _require_str(payload.get("rule_protocol"), context=f"{context}.rule_protocol"),
+        "rule_protocol": _require_str(
+            payload.get("rule_protocol"), context=f"{context}.rule_protocol"
+        ),
         "supports_all_topologies": _require_bool(
             payload.get("supports_all_topologies"),
             context=f"{context}.supports_all_topologies",
@@ -106,7 +114,9 @@ def require_topology_cell_payload(value: object, *, context: str) -> TopologyCel
         "id": _require_str(payload.get("id"), context=f"{context}.id"),
         "kind": _require_str(payload.get("kind"), context=f"{context}.kind"),
         "neighbors": [
-            None if neighbor is None else _require_str(neighbor, context=f"{context}.neighbors[{index}]")
+            None
+            if neighbor is None
+            else _require_str(neighbor, context=f"{context}.neighbors[{index}]")
             for index, neighbor in enumerate(neighbors)
         ],
     }
@@ -138,7 +148,9 @@ def require_topology_cell_payload(value: object, *, context: str) -> TopologyCel
         ]
     tile_family = payload.get("tile_family")
     if tile_family is not None:
-        normalized_payload["tile_family"] = _require_str(tile_family, context=f"{context}.tile_family")
+        normalized_payload["tile_family"] = _require_str(
+            tile_family, context=f"{context}.tile_family"
+        )
     orientation_token = payload.get("orientation_token")
     if orientation_token is not None:
         normalized_payload["orientation_token"] = _require_str(

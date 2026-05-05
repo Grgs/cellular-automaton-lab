@@ -38,11 +38,15 @@ def reference_step_board(
     return SimulationBoard(topology=topology, cell_states=next_states)
 
 
-def build_board(geometry: str, width: int, height: int, max_state: int, seed: int) -> SimulationBoard:
+def build_board(
+    geometry: str, width: int, height: int, max_state: int, seed: int
+) -> SimulationBoard:
     random = Random(seed)
     board = empty_board(geometry, width, height)
     if max_state == 1:
-        board.cell_states = [1 if random.random() >= 0.5 else 0 for _ in range(board.topology.cell_count)]
+        board.cell_states = [
+            1 if random.random() >= 0.5 else 0 for _ in range(board.topology.cell_count)
+        ]
     else:
         board.cell_states = [random.randint(0, max_state) for _ in range(board.topology.cell_count)]
     return board
@@ -74,7 +78,9 @@ def benchmark_case(name: str, rule: AutomatonRule, board: SimulationBoard) -> di
     }
 
 
-def benchmark_board_case(name: str, rule: AutomatonRule, board: SimulationBoard) -> dict[str, float]:
+def benchmark_board_case(
+    name: str, rule: AutomatonRule, board: SimulationBoard
+) -> dict[str, float]:
     optimized_engine = SimulationEngine()
     reference_engine = SimulationEngine()
     del name

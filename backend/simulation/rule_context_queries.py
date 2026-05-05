@@ -144,7 +144,9 @@ class RuleContext:
         turn: str | None = None,
         cell_id: str | None = None,
     ) -> int:
-        return self.count_neighbors(radial=radial, turn=turn, cell_id=cell_id) - self.count_neighbors(
+        return self.count_neighbors(
+            radial=radial, turn=turn, cell_id=cell_id
+        ) - self.count_neighbors(
             0,
             radial=radial,
             turn=turn,
@@ -190,7 +192,9 @@ class RuleContext:
             "outward": self.count_neighbors(*states, radial="outward", cell_id=cell_id),
             "inward": self.count_neighbors(*states, radial="inward", cell_id=cell_id),
             "clockwise": self.count_neighbors(*states, turn="clockwise", cell_id=cell_id),
-            "counterclockwise": self.count_neighbors(*states, turn="counterclockwise", cell_id=cell_id),
+            "counterclockwise": self.count_neighbors(
+                *states, turn="counterclockwise", cell_id=cell_id
+            ),
             "total": self.count_neighbors(*states, cell_id=cell_id),
         }
 
@@ -277,7 +281,4 @@ class RuleContext:
 
 def build_rule_contexts_for_board(board: SimulationBoard) -> tuple[RuleContext, ...]:
     frame = topology_frame_for(board.topology)
-    return tuple(
-        RuleContext(frame, board.cell_states, index)
-        for index in range(frame.cell_count)
-    )
+    return tuple(RuleContext(frame, board.cell_states, index) for index in range(frame.cell_count))

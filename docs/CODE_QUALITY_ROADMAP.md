@@ -44,16 +44,7 @@ Next action:
 - Split any new large drawer section into its own `frontend/controls-model/drawer-*.ts` builder instead of growing `drawer.ts`.
 - Keep section tests local to the section model when possible.
 
-### 2. Python Lint And Format Coverage
-
-Python linting is still intentionally incremental. The guarded slice covers bootstrap/payload contracts, reference verification, render-review tooling, and related tests.
-
-Next action:
-
-- Expand `tools/run_python_style.py` only after the next target modules no longer rely on compatibility-heavy import-for-export patterns or `sys.path` bootstrap shims.
-- Prefer widening the guarded slice in small, reviewable batches.
-
-### 3. Aperiodic Implementation Status
+### 2. Aperiodic Implementation Status
 
 The repo now exposes per-family implementation contracts, but some family status remains intentionally provisional.
 
@@ -63,7 +54,7 @@ Next action:
 - Keep `dodecagonal-square-triangle` documented as a decorated periodic `3.12.12` square-triangle generator unless a faithful canonical Schlottmann marked-prototile implementation replaces it.
 - Keep product status, verification status, and known-deviation docs aligned in the same change.
 
-### 4. Verification Report Consumption
+### 3. Verification Report Consumption
 
 `tools/report_tiling_verification_strength.py` can already produce detailed and JSON output, but there is no current consumer for a CI artifact.
 
@@ -72,7 +63,7 @@ Next action:
 - Publish the report as a CI artifact only when there is a reviewer, release, or dashboard workflow that uses it.
 - Until then, keep it as an on-demand maintainer diagnostic.
 
-### 5. Standalone Runtime Packaging
+### 4. Standalone Runtime Packaging
 
 The standalone demo still loads Pyodide from a CDN. That is acceptable for the preview, but it remains a public limitation.
 
@@ -93,6 +84,7 @@ The following roadmap items are considered done and should not be reopened witho
 - shared polygon adapter common path
 - backend/frontend payload contract guard
 - centralized Playwright suite manifest and npm runner path
+- full Python lint/format coverage for `app.py`, `backend/`, `tests/`, and `tools/`
 
 ## Do Not Do Yet
 

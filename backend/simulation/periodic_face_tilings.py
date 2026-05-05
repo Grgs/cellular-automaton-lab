@@ -218,10 +218,16 @@ def _require_pattern_descriptor_payload(
     normalized_payload: _JsonPatternDescriptor = {
         "geometry": _require_string(payload.get("geometry"), context=f"{geometry_key}.geometry"),
         "label": _require_string(payload.get("label"), context=f"{geometry_key}.label"),
-        "unit_width": _require_float(payload.get("unit_width"), context=f"{geometry_key}.unit_width"),
-        "unit_height": _require_float(payload.get("unit_height"), context=f"{geometry_key}.unit_height"),
+        "unit_width": _require_float(
+            payload.get("unit_width"), context=f"{geometry_key}.unit_width"
+        ),
+        "unit_height": _require_float(
+            payload.get("unit_height"), context=f"{geometry_key}.unit_height"
+        ),
         "base_edge": _require_float(payload.get("base_edge"), context=f"{geometry_key}.base_edge"),
-        "min_dimension": _require_int(payload.get("min_dimension"), context=f"{geometry_key}.min_dimension"),
+        "min_dimension": _require_int(
+            payload.get("min_dimension"), context=f"{geometry_key}.min_dimension"
+        ),
         "min_x": _require_float(payload.get("min_x"), context=f"{geometry_key}.min_x"),
         "min_y": _require_float(payload.get("min_y"), context=f"{geometry_key}.min_y"),
         "max_x": _require_float(payload.get("max_x"), context=f"{geometry_key}.max_x"),
@@ -266,7 +272,9 @@ def _load_pattern_payload() -> dict[str, _JsonPatternDescriptor]:
     return normalized_payload
 
 
-def _edge_key(left: tuple[float, float], right: tuple[float, float]) -> tuple[tuple[float, float], tuple[float, float]]:
+def _edge_key(
+    left: tuple[float, float], right: tuple[float, float]
+) -> tuple[tuple[float, float], tuple[float, float]]:
     normalized_left = (round(left[0], 6), round(left[1], 6))
     normalized_right = (round(right[0], 6), round(right[1], 6))
     return (
@@ -311,9 +319,7 @@ def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, 
             continue
         for cell_id in unique_edge_cells:
             neighbor_sets[cell_id].update(
-                other_id
-                for other_id in unique_edge_cells
-                if other_id != cell_id
+                other_id for other_id in unique_edge_cells if other_id != cell_id
             )
 
     return tuple(
@@ -367,17 +373,16 @@ def _pattern_cells(
     return _attach_neighbors(cells)
 
 
-def _pattern_descriptor_from_payload(payload: _JsonPatternDescriptor) -> PeriodicFaceTilingDescriptor:
+def _pattern_descriptor_from_payload(
+    payload: _JsonPatternDescriptor,
+) -> PeriodicFaceTilingDescriptor:
     faces = tuple(
         FaceTemplate(
             slot=face["slot"],
             kind=face["kind"],
             prefix=face["prefix"],
             center=(face["center"]["x"], face["center"]["y"]),
-            vertices=tuple(
-                (vertex["x"], vertex["y"])
-                for vertex in face["vertices"]
-            ),
+            vertices=tuple((vertex["x"], vertex["y"]) for vertex in face["vertices"]),
             repeat_x_extra=face.get("repeat_x_extra", 0),
             repeat_y_extra=face.get("repeat_y_extra", 0),
         )
@@ -460,5 +465,7 @@ def describe_periodic_face_tilings() -> list[PeriodicFaceTilingDescriptorPayload
     ]
 
 
-def build_periodic_face_cells(geometry: str, width: int, height: int) -> tuple[PeriodicFaceCell, ...]:
+def build_periodic_face_cells(
+    geometry: str, width: int, height: int
+) -> tuple[PeriodicFaceCell, ...]:
     return get_periodic_face_tiling_descriptor(geometry).build_faces(width, height)

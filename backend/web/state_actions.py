@@ -51,10 +51,7 @@ class StateActionService:
         by_id(str(target["id"]))
 
     def _dispatch_cell_updates(self, parsed_cells: list[CellUpdatePayload]) -> None:
-        id_cells = [
-            (cell["id"], cell["state"])
-            for cell in parsed_cells
-        ]
+        id_cells = [(cell["id"], cell["state"]) for cell in parsed_cells]
         if id_cells:
             self.coordinator.set_cells_by_id(id_cells)
 

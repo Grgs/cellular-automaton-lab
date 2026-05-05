@@ -31,7 +31,7 @@ def board_from_states(
     if len(normalized_states) < topology.cell_count:
         normalized_states.extend([0] * (topology.cell_count - len(normalized_states)))
     elif len(normalized_states) > topology.cell_count:
-        normalized_states = normalized_states[:topology.cell_count]
+        normalized_states = normalized_states[: topology.cell_count]
     return SimulationBoard(topology=topology, cell_states=normalized_states)
 
 

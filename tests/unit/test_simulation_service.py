@@ -42,14 +42,23 @@ class SimulationServiceTests(unittest.TestCase):
         self.assertIsInstance(state, SimulationSnapshot)
         self.assertEqual(state.config.width, DEFAULT_WIDTH)
         self.assertEqual(state.config.height, DEFAULT_HEIGHT)
-        self.assertEqual(state.config.tiling_family, APP_DEFAULTS["simulation"]["topology_spec"]["tiling_family"])
-        self.assertEqual(state.config.adjacency_mode, APP_DEFAULTS["simulation"]["topology_spec"]["adjacency_mode"])
-        self.assertEqual(state.config.patch_depth, APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"])
+        self.assertEqual(
+            state.config.tiling_family, APP_DEFAULTS["simulation"]["topology_spec"]["tiling_family"]
+        )
+        self.assertEqual(
+            state.config.adjacency_mode,
+            APP_DEFAULTS["simulation"]["topology_spec"]["adjacency_mode"],
+        )
+        self.assertEqual(
+            state.config.patch_depth, APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"]
+        )
         self.assertEqual(state.rule.name, APP_DEFAULTS["simulation"]["rule"])
 
     def test_update_config_resizes_grid_and_preserves_existing_cells(self) -> None:
         self.service.toggle_cell_by_id(self.cell_id(1, 1))
-        self.service.update_config(topology_spec={"width": 40, "height": 25}, speed=12, rule_name="highlife")
+        self.service.update_config(
+            topology_spec={"width": 40, "height": 25}, speed=12, rule_name="highlife"
+        )
         state = self.service.get_state()
         grid = self.grid(state)
         assert grid is not None
@@ -83,15 +92,22 @@ class SimulationServiceTests(unittest.TestCase):
 
     def test_switching_into_hexwhirlpool_preserves_rectangular_dimensions_and_overlap(self) -> None:
         self.service.reset(
-            topology_spec={"tiling_family": "hex", "adjacency_mode": "edge", "width": 7, "height": 5},
+            topology_spec={
+                "tiling_family": "hex",
+                "adjacency_mode": "edge",
+                "width": 7,
+                "height": 5,
+            },
             speed=6,
             randomize=False,
         )
-        self.service.set_cells_by_id([
-            (self.cell_id(1, 1), 1),
-            (self.cell_id(4, 4), 1),
-            (self.cell_id(6, 2), 1),
-        ])
+        self.service.set_cells_by_id(
+            [
+                (self.cell_id(1, 1), 1),
+                (self.cell_id(4, 4), 1),
+                (self.cell_id(6, 2), 1),
+            ]
+        )
 
         self.service.update_config(rule_name="hexwhirlpool")
         state = self.service.get_state()
@@ -109,7 +125,9 @@ class SimulationServiceTests(unittest.TestCase):
     def test_reset_randomize_false_clears_grid_and_stops_running(self) -> None:
         self.service.toggle_cell_by_id(self.cell_id(0, 0))
         self.service.start()
-        self.service.reset(topology_spec={"width": 8, "height": 6}, speed=7, rule_name="conway", randomize=False)
+        self.service.reset(
+            topology_spec={"width": 8, "height": 6}, speed=7, rule_name="conway", randomize=False
+        )
         state = self.service.get_state()
         grid = self.grid(state)
         assert grid is not None
@@ -122,7 +140,12 @@ class SimulationServiceTests(unittest.TestCase):
         self.assertEqual(state.config.speed, 7.0)
 
     def test_reset_preserves_rectangular_whirlpool_dimensions(self) -> None:
-        self.service.reset(topology_spec={"width": 12, "height": 8}, speed=7, rule_name="whirlpool", randomize=False)
+        self.service.reset(
+            topology_spec={"width": 12, "height": 8},
+            speed=7,
+            rule_name="whirlpool",
+            randomize=False,
+        )
         state = self.service.get_state()
         grid = self.grid(state)
         assert grid is not None
@@ -171,9 +194,7 @@ class SimulationServiceTests(unittest.TestCase):
                 self.assertEqual(state.rule.name, rule_name)
                 self.assertEqual(len(grid), 5)
                 self.assertEqual(len(grid[0]), 5)
-                self.assertTrue(
-                    all(cell in allowed_states for row in grid for cell in row)
-                )
+                self.assertTrue(all(cell in allowed_states for row in grid for cell in row))
                 self.assertEqual(grid, deterministic_rows)
 
     def test_set_cells_by_id_is_atomic_when_validation_fails(self) -> None:
@@ -194,11 +215,13 @@ class SimulationServiceTests(unittest.TestCase):
         self.assertEqual(after, before)
 
     def test_set_cells_by_id_ignores_missing_ids_but_applies_valid_updates(self) -> None:
-        self.service.set_cells_by_id([
-            (self.cell_id(1, 1), 1),
-            ("missing", 1),
-            (self.cell_id(2, 2), 1),
-        ])
+        self.service.set_cells_by_id(
+            [
+                (self.cell_id(1, 1), 1),
+                ("missing", 1),
+                (self.cell_id(2, 2), 1),
+            ]
+        )
         state = self.service.get_state()
         grid = self.grid(state)
         assert grid is not None
@@ -248,7 +271,12 @@ class SimulationServiceTests(unittest.TestCase):
 
     def test_reset_to_hex_geometry_selects_hex_default_rule(self) -> None:
         self.service.reset(
-            topology_spec={"tiling_family": "hex", "adjacency_mode": "edge", "width": 9, "height": 7},
+            topology_spec={
+                "tiling_family": "hex",
+                "adjacency_mode": "edge",
+                "width": 9,
+                "height": 7,
+            },
             speed=6,
         )
         state = self.service.get_state()
@@ -266,7 +294,12 @@ class SimulationServiceTests(unittest.TestCase):
 
     def test_reset_to_triangle_geometry_selects_triangle_default_rule(self) -> None:
         self.service.reset(
-            topology_spec={"tiling_family": "triangle", "adjacency_mode": "edge", "width": 11, "height": 9},
+            topology_spec={
+                "tiling_family": "triangle",
+                "adjacency_mode": "edge",
+                "width": 11,
+                "height": 9,
+            },
             speed=6,
         )
         state = self.service.get_state()

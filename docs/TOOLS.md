@@ -47,7 +47,7 @@ node ./tools/run-python.mjs path/to/script.py [args...]
 
 ### `tools/run_python_style.py`
 
-Runs `ruff check`, `ruff format --check`, or `ruff format` against the curated incremental lint slice (bootstrap, payload contracts, reference verification, render-review tooling, and their tests). The slice is intentionally narrower than the whole repo; widening it is gated on retiring older compatibility-heavy modules. Wired into `pre-commit`. Source: [run_python_style.py](../tools/run_python_style.py).
+Runs `ruff check`, `ruff format --check`, or `ruff format` against the repo-owned Python surface: `app.py`, `backend/`, `tests/`, and `tools/`. Wired into `pre-commit`. Source: [run_python_style.py](../tools/run_python_style.py).
 
 ```powershell
 py -3 tools/run_python_style.py check

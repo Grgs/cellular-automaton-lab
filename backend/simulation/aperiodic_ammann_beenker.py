@@ -18,8 +18,7 @@ from backend.simulation.aperiodic_support import (
 SILVER_RATIO = 1 + math.sqrt(2)
 
 _AB_DIRECTIONS = tuple(
-    Vec(math.cos(index * math.pi / 4), math.sin(index * math.pi / 4))
-    for index in range(8)
+    Vec(math.cos(index * math.pi / 4), math.sin(index * math.pi / 4)) for index in range(8)
 )
 _AB_RHOMB_VERTICES = ((), (1,), (1, 1), (0, 1))
 _AB_TRIANGLE_VERTICES = ((), (1,), (1, 0, 1))
@@ -92,10 +91,12 @@ def _inflate_ammann_tile(
 
 
 def _merge_ammann_triangles(
-    leaves: list[tuple[str, tuple[Vec, ...], Vec, int]]
+    leaves: list[tuple[str, tuple[Vec, ...], Vec, int]],
 ) -> list[PatchRecord]:
     records: list[PatchRecord] = []
-    triangle_pairs: dict[tuple[tuple[float, float], tuple[float, float]], list[tuple[str, tuple[Vec, ...], Vec, int]]] = defaultdict(list)
+    triangle_pairs: dict[
+        tuple[tuple[float, float], tuple[float, float]], list[tuple[str, tuple[Vec, ...], Vec, int]]
+    ] = defaultdict(list)
     for name, vertices, anchor, orientation in leaves:
         if name == AMMANN_RHOMB_KIND:
             rounded_vertices = tuple(rounded_point(vertex) for vertex in vertices)
@@ -120,9 +121,7 @@ def _merge_ammann_triangles(
         if len(pair) != 2:
             continue
         unique_vertices = {
-            rounded_point(vertex)
-            for _, vertices, _, _ in pair
-            for vertex in vertices
+            rounded_point(vertex) for _, vertices, _, _ in pair for vertex in vertices
         }
         center_x = sum(vertex[0] for vertex in unique_vertices) / len(unique_vertices)
         center_y = sum(vertex[1] for vertex in unique_vertices) / len(unique_vertices)
@@ -149,7 +148,9 @@ def build_ammann_beenker_patch(patch_depth: int) -> AperiodicPatch:
     root_length = SILVER_RATIO ** int(patch_depth)
     leaves: list[tuple[str, tuple[Vec, ...], Vec, int]] = []
     for orientation in range(8):
-        _inflate_ammann_tile("rhomb", Vec(0.0, 0.0), orientation, root_length, int(patch_depth), leaves)
+        _inflate_ammann_tile(
+            "rhomb", Vec(0.0, 0.0), orientation, root_length, int(patch_depth), leaves
+        )
     patch = patch_from_records(patch_depth, _merge_ammann_triangles(leaves))
     if any(not cell.neighbors for cell in patch.cells):
         return AperiodicPatch(

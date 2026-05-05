@@ -73,9 +73,7 @@ def _polygon_center(
 def _round_vertices(
     vertices: tuple[tuple[float, float], ...],
 ) -> tuple[tuple[float, float], ...]:
-    return tuple(
-        (_round_coord(vertex[0]), _round_coord(vertex[1])) for vertex in vertices
-    )
+    return tuple((_round_coord(vertex[0]), _round_coord(vertex[1])) for vertex in vertices)
 
 
 def _orientation_token_from_first_edge(
@@ -295,9 +293,7 @@ def _bfs_distances_via_edge_sharing(
                 round(tail[0], _COORD_DECIMALS),
                 round(tail[1], _COORD_DECIMALS),
             )
-            edge_key = (
-                (head_key, tail_key) if head_key < tail_key else (tail_key, head_key)
-            )
+            edge_key = (head_key, tail_key) if head_key < tail_key else (tail_key, head_key)
             edge_to_records[edge_key].append(record["id"])
 
     adjacency: dict[str, set[str]] = defaultdict(set)

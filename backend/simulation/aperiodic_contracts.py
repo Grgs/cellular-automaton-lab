@@ -37,6 +37,7 @@ class AperiodicImplementationContract:
     verification_modes: tuple[str, ...]
     promotion_blocker: str | None = None
 
+
 def _load_fixture_geometries(path: Path) -> set[str]:
     if not path.exists():
         return set()
@@ -88,8 +89,7 @@ def build_aperiodic_contract(geometry: str) -> AperiodicImplementationContract:
         source_urls=spec.source_urls,
         public_cell_kinds=manifest_entry.public_cell_kinds,
         metadata_fields=tuple(
-            (requirement.kind, requirement.fields)
-            for requirement in spec.required_metadata
+            (requirement.kind, requirement.fields) for requirement in spec.required_metadata
         ),
         depth_semantics=_depth_semantics(geometry),
         verification_modes=_verification_modes(geometry),

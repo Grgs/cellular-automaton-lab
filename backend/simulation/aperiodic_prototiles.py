@@ -17,7 +17,9 @@ def _build_penrose_patch_as_aperiodic(geometry: str, patch_depth: int) -> Aperio
     penrose_patch = build_penrose_patch(
         patch_depth,
         adjacency_mode=(
-            PENROSE_VERTEX_ADJACENCY if geometry == PENROSE_VERTEX_GEOMETRY else PENROSE_EDGE_ADJACENCY
+            PENROSE_VERTEX_ADJACENCY
+            if geometry == PENROSE_VERTEX_GEOMETRY
+            else PENROSE_EDGE_ADJACENCY
         ),
     )
     return AperiodicPatch(

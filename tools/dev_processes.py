@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import os
 import signal
-import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -35,7 +34,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     kill_parser = subparsers.add_parser("kill", help="Kill known repo-scoped helper processes.")
     target_group = kill_parser.add_mutually_exclusive_group(required=True)
-    target_group.add_argument("--port", type=int, help="Kill the known repo process bound to this port.")
+    target_group.add_argument(
+        "--port", type=int, help="Kill the known repo process bound to this port."
+    )
     target_group.add_argument(
         "--repo",
         action="store_true",
@@ -141,7 +142,9 @@ def read_proc_cwd(path: Path) -> Path:
 
 def iter_repo_processes() -> tuple[RepoProcess, ...]:
     if not PROC_DIR.is_dir():
-        raise RuntimeError("tools/dev_processes.py requires a procfs-backed environment such as Linux or WSL.")
+        raise RuntimeError(
+            "tools/dev_processes.py requires a procfs-backed environment such as Linux or WSL."
+        )
     processes: list[RepoProcess] = []
     current_pid = os.getpid()
     for entry in PROC_DIR.iterdir():

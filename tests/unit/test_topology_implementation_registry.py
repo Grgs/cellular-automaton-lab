@@ -8,7 +8,9 @@ from backend.simulation.topology_implementation_registry import (
 
 
 class TopologyImplementationRegistryTests(unittest.TestCase):
-    def test_regular_periodic_and_aperiodic_geometries_resolve_expected_builder_and_render_kinds(self) -> None:
+    def test_regular_periodic_and_aperiodic_geometries_resolve_expected_builder_and_render_kinds(
+        self,
+    ) -> None:
         self.assertEqual(get_topology_implementation("square").builder_kind, "regular_grid")
         self.assertEqual(get_topology_implementation("square").render_kind, "regular_grid")
         self.assertEqual(
@@ -30,11 +32,15 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertEqual(implementation.render_kind, "polygon_aperiodic")
 
     def test_registry_covers_new_periodic_and_aperiodic_geometries(self) -> None:
-        self.assertEqual(get_topology_implementation("deltoidal-hexagonal").builder_kind, "periodic_face")
+        self.assertEqual(
+            get_topology_implementation("deltoidal-hexagonal").builder_kind, "periodic_face"
+        )
         self.assertEqual(render_kind_for_geometry("deltoidal-hexagonal"), "polygon_periodic")
         self.assertEqual(get_topology_implementation("chair").builder_kind, "substitution_patch")
         self.assertEqual(render_kind_for_geometry("chair"), "polygon_aperiodic")
-        self.assertEqual(get_topology_implementation("robinson-triangles").builder_kind, "substitution_patch")
+        self.assertEqual(
+            get_topology_implementation("robinson-triangles").builder_kind, "substitution_patch"
+        )
         self.assertEqual(render_kind_for_geometry("robinson-triangles"), "polygon_aperiodic")
         for geometry in (
             "hat-monotile",
@@ -44,7 +50,9 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
             "pinwheel",
         ):
             with self.subTest(geometry=geometry):
-                self.assertEqual(get_topology_implementation(geometry).builder_kind, "substitution_patch")
+                self.assertEqual(
+                    get_topology_implementation(geometry).builder_kind, "substitution_patch"
+                )
                 self.assertEqual(render_kind_for_geometry(geometry), "polygon_aperiodic")
 
     def test_unknown_geometry_falls_back_to_square_implementation(self) -> None:

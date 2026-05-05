@@ -35,9 +35,7 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
 
     def test_regenerate_fixture_payload_matches_existing_checked_in_fixture(self) -> None:
         shield_target = next(
-            target
-            for target in load_fixture_targets()
-            if target.name == "shield-depth-3"
+            target for target in load_fixture_targets() if target.name == "shield-depth-3"
         )
         regenerated = regenerate_fixture_payload(shield_target)
         current = json.loads(shield_target.path.read_text(encoding="utf-8"))
@@ -70,7 +68,8 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
                         },
                     },
                     indent=2,
-                ) + "\n",
+                )
+                + "\n",
                 encoding="utf-8",
             )
             manifest_path = tmpdir_path / "fixture-manifest.json"
@@ -91,7 +90,8 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
                         ]
                     },
                     indent=2,
-                ) + "\n",
+                )
+                + "\n",
                 encoding="utf-8",
             )
             targets = discover_fixture_targets(

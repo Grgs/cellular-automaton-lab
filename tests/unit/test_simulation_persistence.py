@@ -109,33 +109,43 @@ class SimulationPersistenceTests(unittest.TestCase):
             self.state_store.load()
 
     def test_state_store_load_rejects_invalid_snapshot_fields(self) -> None:
-        self.state_path.write_text(json.dumps({
-            "version": SNAPSHOT_VERSION,
-            "topology_spec": "bad",
-            "speed": 5,
-            "running": False,
-            "generation": 0,
-            "rule": "conway",
-            "cells_by_id": {},
-        }), encoding="utf-8")
+        self.state_path.write_text(
+            json.dumps(
+                {
+                    "version": SNAPSHOT_VERSION,
+                    "topology_spec": "bad",
+                    "speed": 5,
+                    "running": False,
+                    "generation": 0,
+                    "rule": "conway",
+                    "cells_by_id": {},
+                }
+            ),
+            encoding="utf-8",
+        )
         with self.assertRaisesRegex(ValueError, "topology spec"):
             self.state_store.load()
 
-        self.state_path.write_text(json.dumps({
-            "version": SNAPSHOT_VERSION,
-            "topology_spec": {
-                "tiling_family": "square",
-                "adjacency_mode": "edge",
-                "width": 10,
-                "height": 6,
-                "patch_depth": 4,
-            },
-            "speed": 5,
-            "running": False,
-            "generation": 0,
-            "rule": "conway",
-            "cells_by_id": {"c:1:1": "bad"},
-        }), encoding="utf-8")
+        self.state_path.write_text(
+            json.dumps(
+                {
+                    "version": SNAPSHOT_VERSION,
+                    "topology_spec": {
+                        "tiling_family": "square",
+                        "adjacency_mode": "edge",
+                        "width": 10,
+                        "height": 6,
+                        "patch_depth": 4,
+                    },
+                    "speed": 5,
+                    "running": False,
+                    "generation": 0,
+                    "rule": "conway",
+                    "cells_by_id": {"c:1:1": "bad"},
+                }
+            ),
+            encoding="utf-8",
+        )
         with self.assertRaisesRegex(ValueError, "cells_by_id"):
             self.state_store.load()
 
@@ -148,7 +158,9 @@ class SimulationPersistenceTests(unittest.TestCase):
         assert payload is not None
 
         self.assertEqual(payload["version"], SNAPSHOT_VERSION)
-        self.assertEqual(payload["topology_spec"], manager.get_state().config.topology_spec.to_dict())
+        self.assertEqual(
+            payload["topology_spec"], manager.get_state().config.topology_spec.to_dict()
+        )
         self.assertEqual(payload["cells_by_id"], {"c:1:1": 1})
         self.assertNotIn("grid", payload)
         self.assertNotIn("cell_states", payload)
@@ -173,10 +185,15 @@ class SimulationPersistenceTests(unittest.TestCase):
     def test_state_store_persists_archimedean_cell_states_without_grid(self) -> None:
         manager = self.create_manager()
         manager.reset(
-            topology_spec={"tiling_family": "archimedean-4-8-8", "adjacency_mode": "edge", "width": 5, "height": 5},
+            topology_spec={
+                "tiling_family": "archimedean-4-8-8",
+                "adjacency_mode": "edge",
+                "width": 5,
+                "height": 5,
+            },
             randomize=False,
         )
-        manager.set_cells_by_id([('o:2:2', 1), ('s:2:2', 1)])
+        manager.set_cells_by_id([("o:2:2", 1), ("s:2:2", 1)])
         self.timer_factory.fire_latest()
 
         payload = self.state_store.load()
@@ -191,10 +208,15 @@ class SimulationPersistenceTests(unittest.TestCase):
     def test_state_store_persists_kagome_cell_states_without_grid(self) -> None:
         manager = self.create_manager()
         manager.reset(
-            topology_spec={"tiling_family": "trihexagonal-3-6-3-6", "adjacency_mode": "edge", "width": 4, "height": 4},
+            topology_spec={
+                "tiling_family": "trihexagonal-3-6-3-6",
+                "adjacency_mode": "edge",
+                "width": 4,
+                "height": 4,
+            },
             randomize=False,
         )
-        manager.set_cells_by_id([('h:1:1', 1), ('tu:1:1', 1), ('td:1:1', 1)])
+        manager.set_cells_by_id([("h:1:1", 1), ("tu:1:1", 1), ("td:1:1", 1)])
         self.timer_factory.fire_latest()
 
         payload = self.state_store.load()
@@ -210,9 +232,16 @@ class SimulationPersistenceTests(unittest.TestCase):
         manager = self.create_manager()
         state = manager.get_state()
 
-        self.assertEqual(state.config.tiling_family, APP_DEFAULTS["simulation"]["topology_spec"]["tiling_family"])
-        self.assertEqual(state.config.adjacency_mode, APP_DEFAULTS["simulation"]["topology_spec"]["adjacency_mode"])
-        self.assertEqual(state.config.patch_depth, APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"])
+        self.assertEqual(
+            state.config.tiling_family, APP_DEFAULTS["simulation"]["topology_spec"]["tiling_family"]
+        )
+        self.assertEqual(
+            state.config.adjacency_mode,
+            APP_DEFAULTS["simulation"]["topology_spec"]["adjacency_mode"],
+        )
+        self.assertEqual(
+            state.config.patch_depth, APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"]
+        )
         self.assertEqual(state.config.width, APP_DEFAULTS["simulation"]["topology_spec"]["width"])
         self.assertEqual(state.config.height, APP_DEFAULTS["simulation"]["topology_spec"]["height"])
         self.assertFalse(state.running)
@@ -226,9 +255,16 @@ class SimulationPersistenceTests(unittest.TestCase):
             manager = self.create_manager()
         state = manager.get_state()
 
-        self.assertEqual(state.config.tiling_family, APP_DEFAULTS["simulation"]["topology_spec"]["tiling_family"])
-        self.assertEqual(state.config.adjacency_mode, APP_DEFAULTS["simulation"]["topology_spec"]["adjacency_mode"])
-        self.assertEqual(state.config.patch_depth, APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"])
+        self.assertEqual(
+            state.config.tiling_family, APP_DEFAULTS["simulation"]["topology_spec"]["tiling_family"]
+        )
+        self.assertEqual(
+            state.config.adjacency_mode,
+            APP_DEFAULTS["simulation"]["topology_spec"]["adjacency_mode"],
+        )
+        self.assertEqual(
+            state.config.patch_depth, APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"]
+        )
         self.assertEqual(state.config.width, APP_DEFAULTS["simulation"]["topology_spec"]["width"])
         self.assertEqual(state.config.height, APP_DEFAULTS["simulation"]["topology_spec"]["height"])
         self.assertFalse(state.running)
@@ -236,26 +272,31 @@ class SimulationPersistenceTests(unittest.TestCase):
         self.assertEqual(state.rule.name, APP_DEFAULTS["simulation"]["rule"])
 
     def test_manager_restores_state_from_store_and_forces_paused(self) -> None:
-        self.state_path.write_text(json.dumps({
-            "version": SNAPSHOT_VERSION,
-            "topology_spec": {
-                "tiling_family": "hex",
-                "adjacency_mode": "edge",
-                "width": 7,
-                "height": 5,
-                "patch_depth": 4,
-                "sizing_mode": "grid",
-            },
-            "speed": 9,
-            "running": True,
-            "generation": 4,
-            "rule": "hexwhirlpool",
-            "cells_by_id": {
-                "c:1:1": 1,
-                "c:2:1": 2,
-                "c:3:1": 3,
-            },
-        }), encoding="utf-8")
+        self.state_path.write_text(
+            json.dumps(
+                {
+                    "version": SNAPSHOT_VERSION,
+                    "topology_spec": {
+                        "tiling_family": "hex",
+                        "adjacency_mode": "edge",
+                        "width": 7,
+                        "height": 5,
+                        "patch_depth": 4,
+                        "sizing_mode": "grid",
+                    },
+                    "speed": 9,
+                    "running": True,
+                    "generation": 4,
+                    "rule": "hexwhirlpool",
+                    "cells_by_id": {
+                        "c:1:1": 1,
+                        "c:2:1": 2,
+                        "c:3:1": 3,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
 
         manager = self.create_manager()
         restored = manager.get_state()

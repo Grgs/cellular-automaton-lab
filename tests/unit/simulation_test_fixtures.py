@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from backend.rules.base import AutomatonRule
 from backend.simulation.rule_context import RuleContext
 

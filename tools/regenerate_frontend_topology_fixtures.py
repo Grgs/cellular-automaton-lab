@@ -15,7 +15,9 @@ if str(ROOT) not in sys.path:
 from backend.simulation.topology import build_topology
 
 
-DEFAULT_FIXTURE_MANIFEST_PATH = ROOT / "frontend" / "test-fixtures" / "topologies" / "fixture-manifest.json"
+DEFAULT_FIXTURE_MANIFEST_PATH = (
+    ROOT / "frontend" / "test-fixtures" / "topologies" / "fixture-manifest.json"
+)
 
 
 @dataclass(frozen=True)
@@ -74,11 +76,15 @@ def load_fixture_targets(
         family = fixture_entry.get("family")
         topology_revision = fixture_entry.get("topologyRevision")
         if not isinstance(name, str) or not name:
-            raise FrontendFixtureRegenerationError("Fixture manifest entries must declare a non-empty name.")
+            raise FrontendFixtureRegenerationError(
+                "Fixture manifest entries must declare a non-empty name."
+            )
         if not isinstance(relative_path, str) or not relative_path:
             raise FrontendFixtureRegenerationError(f"Fixture {name!r} is missing a non-empty path.")
         if not isinstance(family, str) or not family:
-            raise FrontendFixtureRegenerationError(f"Fixture {name!r} is missing a non-empty family.")
+            raise FrontendFixtureRegenerationError(
+                f"Fixture {name!r} is missing a non-empty family."
+            )
         if not isinstance(topology_revision, str) or not topology_revision:
             raise FrontendFixtureRegenerationError(
                 f"Fixture {name!r} is missing a non-empty topologyRevision."
@@ -93,10 +99,16 @@ def load_fixture_targets(
                 name=name,
                 path=_resolve_fixture_path(manifest_path, relative_path),
                 family=family,
-                width=_require_int(fixture_entry.get("width"), field_name="width", fixture_name=name),
-                height=_require_int(fixture_entry.get("height"), field_name="height", fixture_name=name),
+                width=_require_int(
+                    fixture_entry.get("width"), field_name="width", fixture_name=name
+                ),
+                height=_require_int(
+                    fixture_entry.get("height"), field_name="height", fixture_name=name
+                ),
                 patch_depth=None if patch_depth_value is None else int(patch_depth_value),
-                cell_size=_require_int(fixture_entry.get("cellSize"), field_name="cellSize", fixture_name=name),
+                cell_size=_require_int(
+                    fixture_entry.get("cellSize"), field_name="cellSize", fixture_name=name
+                ),
                 topology_revision=topology_revision,
             )
         )

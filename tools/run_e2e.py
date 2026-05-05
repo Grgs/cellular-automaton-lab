@@ -29,7 +29,9 @@ def run_command(command: list[str], *, env: dict[str, str] | None = None) -> Non
 
 def run_frontend_unit_tests() -> None:
     run_command(["npm", "run", "test:frontend"])
-    run_command([sys.executable, "-m", "unittest", "-q", "tests.e2e.test_playwright_suite_integrity"])
+    run_command(
+        [sys.executable, "-m", "unittest", "-q", "tests.e2e.test_playwright_suite_integrity"]
+    )
 
 
 def run_playwright_subsets(subset_count: int) -> None:
@@ -45,7 +47,9 @@ def run_playwright_subsets(subset_count: int) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run frontend Vitest checks and chunked Playwright suites.")
+    parser = argparse.ArgumentParser(
+        description="Run frontend Vitest checks and chunked Playwright suites."
+    )
     parser.add_argument(
         "--frontend-only",
         action="store_true",

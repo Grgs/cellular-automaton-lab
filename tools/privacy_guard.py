@@ -26,7 +26,9 @@ TEXT_EXTENSIONS: Final[frozenset[str]] = frozenset(
         ".yml",
     }
 )
-SKIP_PATH_PARTS: Final[frozenset[str]] = frozenset({".git", "node_modules", "static", "dist", "__pycache__"})
+SKIP_PATH_PARTS: Final[frozenset[str]] = frozenset(
+    {".git", "node_modules", "static", "dist", "__pycache__"}
+)
 
 
 @dataclass(frozen=True)
@@ -133,9 +135,15 @@ def scan_paths(paths: list[str], *, all_files: bool) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Scan tracked repository files for personal information leaks.")
+    parser = argparse.ArgumentParser(
+        description="Scan tracked repository files for personal information leaks."
+    )
     parser.add_argument("paths", nargs="*", help="Optional file paths supplied by pre-commit.")
-    parser.add_argument("--all-files", action="store_true", help="Scan all tracked files instead of the provided list.")
+    parser.add_argument(
+        "--all-files",
+        action="store_true",
+        help="Scan all tracked files instead of the provided list.",
+    )
     args = parser.parse_args(argv)
 
     violations = scan_paths(args.paths, all_files=args.all_files)

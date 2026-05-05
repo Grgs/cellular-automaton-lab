@@ -36,18 +36,14 @@ npm run format:python:check
 npm run check:python
 ```
 
-These Python checks are still intentionally incremental, but the guarded slice is wider now. It covers:
+Python linting and formatting now cover the full repo-owned Python surface:
 
-- the backend bootstrap and payload-contract files
-- `backend/simulation/reference_specs/` and `backend/simulation/reference_verification/`
-- the compatibility facades `literature_reference_specs.py` and `literature_reference_verification.py`
-- verification/reporting/reference-fixture tools such as `regenerate_reference_fixtures.py`, `report_tiling_verification_strength.py`, `validate_tilings.py`, and `verify_reference_tilings.py`
-- `tools/render_review/` plus its top-level CLI entrypoints
-- the direct unit and E2E tests for those Python-owned slices
+- `app.py`
+- `backend/`
+- `tests/`
+- `tools/`
 
-Wider `ruff` adoption is still blocked by older compatibility-heavy modules outside this slice that rely on import-for-export patterns, `sys.path` bootstrap shims, or other deliberate legacy structure.
-
-Pre-commit mirrors the same incremental Python scope plus the frontend formatting check, so local hooks and scripted runs exercise the same rules.
+Pre-commit mirrors the same Python scope plus the frontend formatting check, so local hooks and scripted runs exercise the same rules.
 
 ## Public Release Process
 

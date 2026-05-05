@@ -31,8 +31,7 @@ class PrivacyGuardTests(unittest.TestCase):
             windows_path = "C:" + "/" + "Us" + "ers" + "/" + "example/Documents/project"
             consumer_email = "person@" + "gma" + "il.com"
             file_path.write_text(
-                f"Path: {windows_path}\n"
-                f"Email: {consumer_email}\n",
+                f"Path: {windows_path}\nEmail: {consumer_email}\n",
                 encoding="utf-8",
             )
 
