@@ -4,18 +4,9 @@ import { describeTopologySpec, resolveTopologyVariantKey } from "../topology-cat
 import { buildPresetSelection, resolveRequestedPresetSelection } from "../preset-selection.js";
 import { buildPresetSeed } from "../presets.js";
 import { createActionMutationAdapter } from "./shared/mutation-adapter.js";
-import {
-    clearEditMode,
-    setPatternStatus,
-    dismissFirstRunHint,
-} from "../state/overlay-state.js";
-import {
-    RULE_SELECTION_ORIGIN_DEFAULT,
-} from "../state/constants.js";
-import {
-    setRuleSelectionOrigin,
-    setSelectedPresetId,
-} from "../state/simulation-state.js";
+import { clearEditMode, setPatternStatus, dismissFirstRunHint } from "../state/overlay-state.js";
+import { RULE_SELECTION_ORIGIN_DEFAULT } from "../state/constants.js";
+import { setRuleSelectionOrigin, setSelectedPresetId } from "../state/simulation-state.js";
 import { BLOCKING_ACTIVITY_APPLY_PRESET } from "../blocking-activity.js";
 import { indexTopology, presetCellsToTopologyUpdates } from "../topology.js";
 import type {
@@ -25,7 +16,12 @@ import type {
     PresetSeedBuildRequest,
 } from "../types/actions.js";
 import type { SimulationMutations } from "../types/controller.js";
-import type { CartesianSeedCell, CellStateUpdate, ResolvedPresetSelection, SimulationSnapshot } from "../types/domain.js";
+import type {
+    CartesianSeedCell,
+    CellStateUpdate,
+    ResolvedPresetSelection,
+    SimulationSnapshot,
+} from "../types/domain.js";
 
 export function createPresetActions({
     state,
@@ -60,8 +56,8 @@ export function createPresetActions({
     applyOverlayIntentFn?: typeof applyOverlayIntent;
     clearEditModeFn?: typeof clearEditMode;
 }): PresetActionSet {
-    const mutations: ActionMutationAdapter | SimulationMutations = simulationMutations
-        || createActionMutationAdapter({ interactions, applySimulationState });
+    const mutations: ActionMutationAdapter | SimulationMutations =
+        simulationMutations || createActionMutationAdapter({ interactions, applySimulationState });
 
     function applyPresetSelection(nextPresetId: string | null | undefined): void {
         const selection = buildPresetSelectionFn(state);
@@ -75,7 +71,10 @@ export function createPresetActions({
     function loadPresetSeed(
         requestedPresetId: string | null | undefined,
     ): Promise<SimulationSnapshot | null | void> {
-        const selection: ResolvedPresetSelection = resolveRequestedPresetSelectionFn(state, requestedPresetId);
+        const selection: ResolvedPresetSelection = resolveRequestedPresetSelectionFn(
+            state,
+            requestedPresetId,
+        );
         if (!selection.rule || !selection.presetId) {
             return Promise.resolve();
         }
@@ -90,64 +89,71 @@ export function createPresetActions({
         }
 
         const nextConfig = collectConfig(elements);
-        return mutations.runSerialized(
-            async () => {
-                const resetTopologySpec = describeTopologySpec({
-                    ...state.topologySpec,
-                    width: selection.width,
-                    height: selection.height,
-                    patch_depth: state.patchDepth,
-                });
-                const resetState = await postControlFn("/api/control/reset", {
-                    topology_spec: resetTopologySpec,
-                    speed: nextConfig.speed,
-                    rule: selectedRule.name,
-                    randomize: false,
-                });
-                const resolvedResetState = await mutations.applyRemoteState(
-                    resetState,
-                    { source: "external" },
-                );
+        return mutations
+            .runSerialized(
+                async () => {
+                    const resetTopologySpec = describeTopologySpec({
+                        ...state.topologySpec,
+                        width: selection.width,
+                        height: selection.height,
+                        patch_depth: state.patchDepth,
+                    });
+                    const resetState = await postControlFn("/api/control/reset", {
+                        topology_spec: resetTopologySpec,
+                        speed: nextConfig.speed,
+                        rule: selectedRule.name,
+                        randomize: false,
+                    });
+                    const resolvedResetState = await mutations.applyRemoteState(resetState, {
+                        source: "external",
+                    });
 
-                const seededTopologySpec = describeTopologySpec(
-                    resolvedResetState.topology_spec || resetTopologySpec,
-                );
-                const seededGeometry = resolveTopologyVariantKey(
-                    seededTopologySpec.tiling_family,
-                    seededTopologySpec.adjacency_mode,
-                );
+                    const seededTopologySpec = describeTopologySpec(
+                        resolvedResetState.topology_spec || resetTopologySpec,
+                    );
+                    const seededGeometry = resolveTopologyVariantKey(
+                        seededTopologySpec.tiling_family,
+                        seededTopologySpec.adjacency_mode,
+                    );
 
-                const seedCells = buildPresetSeedFn({
-                    ruleName: selectedRule.name,
-                    geometry: seededGeometry,
-                    width: Number(seededTopologySpec.width) || selection.width,
-                    height: Number(seededTopologySpec.height) || selection.height,
-                    presetId,
-                });
-                const resetTopologyIndex = indexTopology(resolvedResetState.topology);
-                const topologyUpdates = presetCellsToTopologyUpdatesFn(resetTopologyIndex, seedCells);
-                const nextCells: CellStateUpdate[] = topologyUpdates.length > 0 ? topologyUpdates : [];
-                if (nextCells.length === 0) {
-                    return resolvedResetState;
-                }
+                    const seedCells = buildPresetSeedFn({
+                        ruleName: selectedRule.name,
+                        geometry: seededGeometry,
+                        width: Number(seededTopologySpec.width) || selection.width,
+                        height: Number(seededTopologySpec.height) || selection.height,
+                        presetId,
+                    });
+                    const resetTopologyIndex = indexTopology(resolvedResetState.topology);
+                    const topologyUpdates = presetCellsToTopologyUpdatesFn(
+                        resetTopologyIndex,
+                        seedCells,
+                    );
+                    const nextCells: CellStateUpdate[] =
+                        topologyUpdates.length > 0 ? topologyUpdates : [];
+                    if (nextCells.length === 0) {
+                        return resolvedResetState;
+                    }
 
-                const seededState = await setCellsRequestFn(nextCells);
-                await mutations.applyRemoteState(seededState, { source: "external" });
-                return seededState;
-            },
-            {
-                blockingActivity: BLOCKING_ACTIVITY_APPLY_PRESET,
-                onError,
-                onRecover: refreshState,
-            },
-        ).then((result) => {
-            const presetLabel = selection.presetOptions.find((preset) => preset.id === presetId)?.label
-                || presetId;
-            setRuleSelectionOriginFn(state, RULE_SELECTION_ORIGIN_DEFAULT);
-            setPatternStatusFn(state, `Loaded ${presetLabel} preset.`, "success");
-            renderControlPanel();
-            return result;
-        }).catch(() => null);
+                    const seededState = await setCellsRequestFn(nextCells);
+                    await mutations.applyRemoteState(seededState, { source: "external" });
+                    return seededState;
+                },
+                {
+                    blockingActivity: BLOCKING_ACTIVITY_APPLY_PRESET,
+                    onError,
+                    onRecover: refreshState,
+                },
+            )
+            .then((result) => {
+                const presetLabel =
+                    selection.presetOptions.find((preset) => preset.id === presetId)?.label ||
+                    presetId;
+                setRuleSelectionOriginFn(state, RULE_SELECTION_ORIGIN_DEFAULT);
+                setPatternStatusFn(state, `Loaded ${presetLabel} preset.`, "success");
+                renderControlPanel();
+                return result;
+            })
+            .catch(() => null);
     }
 
     return {

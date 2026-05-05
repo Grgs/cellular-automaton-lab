@@ -10,7 +10,8 @@ describe("geometry/aperiodic-prototile-adapter", () => {
     });
 
     it("renders shield polygons edge-to-edge without an extra display shrink", async () => {
-        const { createAperiodicPrototileGeometryAdapter } = await import("./aperiodic-prototile-adapter.js");
+        const { createAperiodicPrototileGeometryAdapter } =
+            await import("./aperiodic-prototile-adapter.js");
         const adapter = createAperiodicPrototileGeometryAdapter("shield");
         if (!adapter.buildCellGeometry) {
             throw new Error("Aperiodic adapter must expose buildCellGeometry for shield fixtures.");
@@ -62,14 +63,16 @@ describe("geometry/aperiodic-prototile-adapter", () => {
     it("applies shield seam hiding in draw space without mutating geometry vertices", async () => {
         const drawPolygonCellWithTransientOverlay = vi.fn();
         vi.doMock("../canvas/draw.js", async () => {
-            const actual = await vi.importActual<typeof import("../canvas/draw.js")>("../canvas/draw.js");
+            const actual =
+                await vi.importActual<typeof import("../canvas/draw.js")>("../canvas/draw.js");
             return {
                 ...actual,
                 drawPolygonCellWithTransientOverlay,
             };
         });
 
-        const { createAperiodicPrototileGeometryAdapter } = await import("./aperiodic-prototile-adapter.js");
+        const { createAperiodicPrototileGeometryAdapter } =
+            await import("./aperiodic-prototile-adapter.js");
         const adapter = createAperiodicPrototileGeometryAdapter("shield");
         const topology = {
             topology_spec: {

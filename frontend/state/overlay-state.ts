@@ -20,7 +20,10 @@ export function clearOverlaysDismissed(state: AppState): void {
     state.overlaysDismissed = false;
 }
 
-export function setInspectorTemporarilyHidden(state: AppState, inspectorTemporarilyHidden: boolean): void {
+export function setInspectorTemporarilyHidden(
+    state: AppState,
+    inspectorTemporarilyHidden: boolean,
+): void {
     state.inspectorTemporarilyHidden = inspectorTemporarilyHidden;
 }
 
@@ -40,7 +43,10 @@ export function setOverlayRunPending(state: AppState, overlayRunPending: boolean
     state.overlayRunPending = overlayRunPending;
 }
 
-export function setRunningOverlayRestoreActive(state: AppState, runningOverlayRestoreActive: boolean): void {
+export function setRunningOverlayRestoreActive(
+    state: AppState,
+    runningOverlayRestoreActive: boolean,
+): void {
     state.runningOverlayRestoreActive = runningOverlayRestoreActive;
 }
 
@@ -66,8 +72,8 @@ export function armEditMode(
 ): boolean {
     const nextEditArmed = true;
     const nextEditCueVisible = Boolean(showCue);
-    const changed = state.editArmed !== nextEditArmed
-        || state.editCueVisible !== nextEditCueVisible;
+    const changed =
+        state.editArmed !== nextEditArmed || state.editCueVisible !== nextEditCueVisible;
     state.editArmed = nextEditArmed;
     state.editCueVisible = nextEditCueVisible;
     return changed;
@@ -125,6 +131,8 @@ export function clearPatternStatus(state: AppState): void {
 }
 
 export function hasPatternCells(state: AppState): boolean {
-    return Array.isArray(state.cellStates)
-        && state.cellStates.some((cellState) => Number(cellState) !== 0);
+    return (
+        Array.isArray(state.cellStates) &&
+        state.cellStates.some((cellState) => Number(cellState) !== 0)
+    );
 }

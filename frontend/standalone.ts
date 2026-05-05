@@ -91,15 +91,21 @@ export function renderStartupError(error: unknown): void {
 }
 
 function installPageLifecycleDisposal(): void {
-    window.addEventListener("pagehide", () => {
-        disposeStandaloneApp();
-    }, { once: true });
+    window.addEventListener(
+        "pagehide",
+        () => {
+            disposeStandaloneApp();
+        },
+        { once: true },
+    );
 }
 
 export async function startStandaloneApp(): Promise<void> {
     showStartupOverlay(STARTUP_STAGE_LOADING_DATA);
     const bootstrapData = installBootstrapData(
-        await fetchBootstrapData(new URL(/* @vite-ignore */ "../standalone-bootstrap.json", import.meta.url).toString()),
+        await fetchBootstrapData(
+            new URL(/* @vite-ignore */ "../standalone-bootstrap.json", import.meta.url).toString(),
+        ),
     );
     showStartupOverlay(STARTUP_STAGE_STARTING_PYTHON);
     const environment = await createStandaloneEnvironment(bootstrapData);

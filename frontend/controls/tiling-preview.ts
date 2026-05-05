@@ -44,7 +44,16 @@ function addRect(
     height: number,
     fillIndex = 0,
 ): void {
-    addPolygon(svg, [[x, y], [x + width, y], [x + width, y + height], [x, y + height]], fillIndex);
+    addPolygon(
+        svg,
+        [
+            [x, y],
+            [x + width, y],
+            [x + width, y + height],
+            [x, y + height],
+        ],
+        fillIndex,
+    );
 }
 
 function regularPolygonPoints(
@@ -55,18 +64,15 @@ function regularPolygonPoints(
     rotation = -Math.PI / 2,
 ): Point[] {
     return Array.from({ length: sides }, (_, index) => {
-        const angle = rotation + ((Math.PI * 2 * index) / sides);
-        return [
-            centerX + (Math.cos(angle) * radius),
-            centerY + (Math.sin(angle) * radius),
-        ] as const;
+        const angle = rotation + (Math.PI * 2 * index) / sides;
+        return [centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius] as const;
     });
 }
 
 function addSquarePreview(svg: SVGSVGElement): void {
     for (let row = 0; row < 4; row += 1) {
         for (let column = 0; column < 6; column += 1) {
-            addRect(svg, 8 + (column * 18), 6 + (row * 16), 17, 15, row + column);
+            addRect(svg, 8 + column * 18, 6 + row * 16, 17, 15, row + column);
         }
     }
 }
@@ -78,8 +84,8 @@ function addHexPreview(svg: SVGSVGElement): void {
                 svg,
                 regularPolygonPoints(
                     6,
-                    20 + (column * 27) + ((row % 2) * 13.5),
-                    16 + (row * 20),
+                    20 + column * 27 + (row % 2) * 13.5,
+                    16 + row * 20,
                     12,
                     Math.PI / 6,
                 ),
@@ -94,12 +100,24 @@ function addTrianglePreview(svg: SVGSVGElement): void {
     const height = (Math.sqrt(3) * side) / 2;
     for (let row = 0; row < 4; row += 1) {
         for (let column = 0; column < 7; column += 1) {
-            const x = 2 + (column * side);
-            const y = 5 + (row * height);
-            addPolygon(svg, [[x, y + height], [x + (side / 2), y], [x + side, y + height]], row + column);
+            const x = 2 + column * side;
+            const y = 5 + row * height;
             addPolygon(
                 svg,
-                [[x + (side / 2), y], [x + side + (side / 2), y], [x + side, y + height]],
+                [
+                    [x, y + height],
+                    [x + side / 2, y],
+                    [x + side, y + height],
+                ],
+                row + column,
+            );
+            addPolygon(
+                svg,
+                [
+                    [x + side / 2, y],
+                    [x + side + side / 2, y],
+                    [x + side, y + height],
+                ],
                 row + column + 1,
             );
         }

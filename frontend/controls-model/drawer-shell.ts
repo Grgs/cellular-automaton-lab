@@ -28,7 +28,8 @@ export function buildDrawerShellViewModel({
         drawerToggleLabel,
         drawerToggleTitle,
         quickStartHintText: quickStartHint.quickStartHintText,
-        quickStartHintVisible: quickStartHint.quickStartHintVisible && patternStatus.patternStatusText === "",
+        quickStartHintVisible:
+            quickStartHint.quickStartHintVisible && patternStatus.patternStatusText === "",
         ...blockingActivity,
         ...patternStatus,
     };

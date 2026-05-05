@@ -114,18 +114,25 @@ describe("interactions/paint-drag", () => {
         await paintDrag.end();
 
         expect(previewPaintCells).toHaveBeenCalled();
-        expect(setGestureOutline).toHaveBeenCalledWith([
-            { id: "c:0:0", x: 0, y: 0, state: 0 },
-            { id: "c:1:0", x: 1, y: 0, state: 0 },
-        ], "erase");
+        expect(setGestureOutline).toHaveBeenCalledWith(
+            [
+                { id: "c:0:0", x: 0, y: 0, state: 0 },
+                { id: "c:1:0", x: 1, y: 0, state: 0 },
+            ],
+            "erase",
+        );
         expect(setCellsRequest).toHaveBeenCalledWith([
             { id: "c:0:0", x: 0, y: 0, state: 0 },
             { id: "c:1:0", x: 1, y: 0, state: 0 },
         ]);
-        expect(flashGestureOutline).toHaveBeenCalledWith([
-            { id: "c:0:0", x: 0, y: 0, state: 0 },
-            { id: "c:1:0", x: 1, y: 0, state: 0 },
-        ], "erase", DRAG_GESTURE_FLASH_DURATION_MS);
+        expect(flashGestureOutline).toHaveBeenCalledWith(
+            [
+                { id: "c:0:0", x: 0, y: 0, state: 0 },
+                { id: "c:1:0", x: 1, y: 0, state: 0 },
+            ],
+            "erase",
+            DRAG_GESTURE_FLASH_DURATION_MS,
+        );
         expect(clearGestureOutline).toHaveBeenCalledTimes(1);
         expect(enableClickSuppression).toHaveBeenCalledTimes(1);
         expect(clearPreview).toHaveBeenCalledTimes(1);

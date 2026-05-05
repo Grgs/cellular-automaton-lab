@@ -27,7 +27,10 @@ export function createPointerGestureRouter({
     let pendingDirectGestureCellId: string | null = null;
     let suppressNextContextMenu = false;
 
-    function rememberDirectGesture(cell: Parameters<typeof resolveDirectGestureTargetState>[0], targetState: number): void {
+    function rememberDirectGesture(
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+        targetState: number,
+    ): void {
         pendingDirectGestureCellId = identifyGestureCell(cell);
         pendingDirectGestureTargetState = targetState;
     }
@@ -37,10 +40,12 @@ export function createPointerGestureRouter({
         pendingDirectGestureTargetState = null;
     }
 
-    function resolvePendingDirectGestureTargetState(cell: Parameters<typeof resolveDirectGestureTargetState>[0]): number {
+    function resolvePendingDirectGestureTargetState(
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): number {
         if (
-            pendingDirectGestureTargetState !== null
-            && pendingDirectGestureCellId === identifyGestureCell(cell)
+            pendingDirectGestureTargetState !== null &&
+            pendingDirectGestureCellId === identifyGestureCell(cell)
         ) {
             return pendingDirectGestureTargetState;
         }
@@ -132,7 +137,10 @@ export function createPointerGestureRouter({
         });
     }
 
-    function beginPointerDown(event: PointerEvent, cell: Parameters<typeof resolveDirectGestureTargetState>[0]): void {
+    function beginPointerDown(
+        event: PointerEvent,
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): void {
         setHoveredCell(null);
         clearGestureOutline();
         switch (resolvePointerDownIntent(event, editPolicy).kind) {
@@ -165,12 +173,20 @@ export function createPointerGestureRouter({
         }
     }
 
-    function handlePointerMove(event: PointerEvent, cell: Parameters<typeof resolveDirectGestureTargetState>[0]): void {
+    function handlePointerMove(
+        event: PointerEvent,
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): void {
         activeSession?.handleMove(event, cell);
     }
 
     function handlePointerUp(event: PointerEvent): void {
-        if (consumeNextClick && editPolicy.supportsEditorTools() && !editorSession.isPointerActive() && !paintDrag.isActive()) {
+        if (
+            consumeNextClick &&
+            editPolicy.supportsEditorTools() &&
+            !editorSession.isPointerActive() &&
+            !paintDrag.isActive()
+        ) {
             setTimeoutFn(() => {
                 consumeNextClick = false;
             }, FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS);
@@ -244,7 +260,10 @@ export function createPointerGestureRouter({
         renderControlPanel();
     }
 
-    function handleClick(event: MouseEvent, cell: Parameters<typeof resolveDirectGestureTargetState>[0]): void {
+    function handleClick(
+        event: MouseEvent,
+        cell: Parameters<typeof resolveDirectGestureTargetState>[0],
+    ): void {
         if (editorSession.isClickSuppressed()) {
             clearPendingDirectGesture();
             event.preventDefault();

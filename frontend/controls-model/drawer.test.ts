@@ -27,7 +27,10 @@ describe("controls-model/drawer selection inspector", () => {
             subtitle: "Current population overview",
             advancedVisible: true,
         });
-        expect(viewModel.selectionInspector.summaryRows).toContainEqual({ label: "Live Cells", value: "2" });
+        expect(viewModel.selectionInspector.summaryRows).toContainEqual({
+            label: "Live Cells",
+            value: "2",
+        });
         expect(viewModel.selectionInspector.advancedRows.at(-1)).toEqual({
             label: "Live Cell IDs",
             value: "cell:b, cell:c",
@@ -62,7 +65,10 @@ describe("controls-model/drawer selection inspector", () => {
         ]);
         expect(viewModel.selectionInspector.advancedRows).toEqual([
             { label: "Neighbor IDs", value: "cell:b, cell:c" },
-            { label: "Vertices", value: "(0.000, 0.000), (1.000, 0.000), (1.000, 1.000), (0.000, 1.000)" },
+            {
+                label: "Vertices",
+                value: "(0.000, 0.000), (1.000, 0.000), (1.000, 1.000), (0.000, 1.000)",
+            },
         ]);
     });
 

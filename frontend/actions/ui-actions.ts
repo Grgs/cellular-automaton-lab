@@ -1,12 +1,5 @@
-import {
-    armEditMode,
-    clearEditMode,
-    dismissFirstRunHint,
-} from "../state/overlay-state.js";
-import {
-    rememberCellSizeForTilingFamily,
-    setCellSize,
-} from "../state/sizing-state.js";
+import { armEditMode, clearEditMode, dismissFirstRunHint } from "../state/overlay-state.js";
+import { rememberCellSizeForTilingFamily, setCellSize } from "../state/sizing-state.js";
 import {
     setBrushSize,
     setEditorTool,
@@ -29,7 +22,6 @@ import { toggleTheme } from "../theme.js";
 import type { EditorTool } from "../editor-tools.js";
 import type { UiActionOptions, UiActionSet } from "../types/actions.js";
 
-type DrawerToggleLabel = "Hide Inspector" | "Show Inspector" | "Show Overlays" | "Show HUD";
 type OverlayIntent = Parameters<typeof applyOverlayIntent>[1];
 
 export function createUiActions({
@@ -199,13 +191,18 @@ export function createUiActions({
             if (drawerToggleLabel === "Show HUD") {
                 return applyDrawerState(state.drawerOpen);
             }
-            return state.overlaysDismissed ? applyDrawerState(state.drawerOpen) : applyDrawerState(!state.drawerOpen);
+            return state.overlaysDismissed
+                ? applyDrawerState(state.drawerOpen)
+                : applyDrawerState(!state.drawerOpen);
         },
         closeDrawer: () => applyDrawerState(false),
         dismissOverlays,
-        handleTopBarEmptyClick: () => applyOverlayIntentAndRenderWithEditReset(OVERLAY_INTENT_TOP_BAR_EMPTY_CLICK),
-        handleInspectorEmptyClick: () => applyOverlayIntentAndRenderWithEditReset(OVERLAY_INTENT_INSPECTOR_EMPTY_CLICK),
-        handleWorkspaceEmptyClick: () => applyOverlayIntentAndRenderWithEditReset(OVERLAY_INTENT_WORKSPACE_EMPTY_CLICK),
+        handleTopBarEmptyClick: () =>
+            applyOverlayIntentAndRenderWithEditReset(OVERLAY_INTENT_TOP_BAR_EMPTY_CLICK),
+        handleInspectorEmptyClick: () =>
+            applyOverlayIntentAndRenderWithEditReset(OVERLAY_INTENT_INSPECTOR_EMPTY_CLICK),
+        handleWorkspaceEmptyClick: () =>
+            applyOverlayIntentAndRenderWithEditReset(OVERLAY_INTENT_WORKSPACE_EMPTY_CLICK),
         setDisclosureState: (id, open) => uiSessionController.persistDisclosureState(id, open),
         toggleTheme: () => {
             toggleThemeFn();

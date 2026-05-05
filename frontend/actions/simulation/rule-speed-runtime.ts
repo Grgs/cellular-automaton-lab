@@ -1,5 +1,9 @@
 import { RULE_SELECTION_ORIGIN_USER } from "../../state/constants.js";
-import { currentTopologyVariantKey, setEditorRule, setRuleSelectionOrigin } from "../../state/simulation-state.js";
+import {
+    currentTopologyVariantKey,
+    setEditorRule,
+    setRuleSelectionOrigin,
+} from "../../state/simulation-state.js";
 import { ruleRequiresSquareDimensions } from "../../rule-constraints.js";
 import type {
     ConfigSyncBody,
@@ -50,7 +54,11 @@ export function createRuleSpeedRuntime({
         if (ruleRequiresSquareDimensions(nextRuleName)) {
             const body: ConfigSyncBody = {
                 topology_spec: {
-                    ...getViewportDimensions(currentTopologyVariantKey(state), nextRuleName, state.cellSize),
+                    ...getViewportDimensions(
+                        currentTopologyVariantKey(state),
+                        nextRuleName,
+                        state.cellSize,
+                    ),
                     ...(state.unsafeSizingEnabled ? { unsafe_size_override: true } : {}),
                 },
             };

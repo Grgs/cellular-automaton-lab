@@ -16,7 +16,11 @@ import {
     setSpeed,
     setTopologySpec,
 } from "../state/simulation-state.js";
-import type { InteractionController, ResetControlBody, UiSessionController } from "../types/controller.js";
+import type {
+    InteractionController,
+    ResetControlBody,
+    UiSessionController,
+} from "../types/controller.js";
 import type { AppState } from "../types/state.js";
 import type { SimulationSnapshot } from "../types/domain.js";
 
@@ -83,9 +87,13 @@ export function createDefaultResetRuntime({
         renderCurrentGrid();
         applyDefaultBoardPreview();
         renderControlPanel();
-        const simulationState = await interactions.sendControl("/api/control/reset", buildDefaultResetPayload(), {
-            blockingActivity: BLOCKING_ACTIVITY_RESTORE_DEFAULTS,
-        });
+        const simulationState = await interactions.sendControl(
+            "/api/control/reset",
+            buildDefaultResetPayload(),
+            {
+                blockingActivity: BLOCKING_ACTIVITY_RESTORE_DEFAULTS,
+            },
+        );
         if (!simulationState) {
             await refreshState();
         }

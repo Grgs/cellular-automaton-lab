@@ -1,13 +1,8 @@
-import {
-    DEFAULT_BRUSH_SIZE,
-    DEFAULT_EDITOR_TOOL,
-} from "./editor-tools.js";
+import { DEFAULT_BRUSH_SIZE, DEFAULT_EDITOR_TOOL } from "./editor-tools.js";
 import type { EditorTool } from "./editor-tools.js";
-import { createDragPaintSession } from "./drag-session.js";
 import { createEditorSessionController } from "./interactions/editor-session.js";
 import { createHistoryCommands } from "./interactions/history-commands.js";
 import { createPaintDragController } from "./interactions/paint-drag.js";
-import { createSimulationMutations } from "./interactions/simulation-mutations.js";
 import {
     createInteractionCommandSurface,
     createInteractionEditorRuntime,
@@ -17,7 +12,11 @@ import type {
     CreateSimulationMutationsFunction,
     InteractionController,
 } from "./types/controller.js";
-import type { GridInteractionBindings, InteractionControllerOptions, PaintableCell } from "./types/editor.js";
+import type {
+    GridInteractionBindings,
+    InteractionControllerOptions,
+    PaintableCell,
+} from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 export { cellKey, interpolateCellPath, createDragPaintSession } from "./drag-session.js";
@@ -29,14 +28,14 @@ export function createInteractionController({
     previewPaintCells,
     clearPreview,
     setHoveredCell,
-        setSelectedCells,
-        getSelectedCells,
-        setGestureOutline,
-        flashGestureOutline,
-        clearGestureOutline,
-        openInspectorDrawer = () => {},
-        mutationRunner,
-        onError,
+    setSelectedCells,
+    getSelectedCells,
+    setGestureOutline,
+    flashGestureOutline,
+    clearGestureOutline,
+    openInspectorDrawer = () => {},
+    mutationRunner,
+    onError,
     applySimulationState,
     refreshState,
     toggleCellRequest,

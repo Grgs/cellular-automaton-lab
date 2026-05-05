@@ -13,7 +13,12 @@ import { createSurfaceCellResolver } from "./cell-resolution.js";
 import { currentPaintState } from "./state/selectors.js";
 import { createViewportControllerDependencies } from "./app-controller-bootstrap.js";
 import type { AppControllerServicePhaseResult } from "./app-controller-services.js";
-import type { PostControlFunction, SetCellRequestFunction, SetCellsRequestFunction, ToggleCellRequestFunction } from "./types/controller-api.js";
+import type {
+    PostControlFunction,
+    SetCellRequestFunction,
+    SetCellsRequestFunction,
+    ToggleCellRequestFunction,
+} from "./types/controller-api.js";
 import type { MutationRunner } from "./types/controller-runtime.js";
 import type { AppControllerSync, AppControllerStartupResult } from "./types/controller-app.js";
 import type { AppView, GridView } from "./types/controller-view.js";
@@ -58,7 +63,8 @@ export function wireAppController({
         setSelectedCells: (cells) => gridView.setSelectedCells(cells),
         getSelectedCells: () => gridView.getSelectedCells(),
         setGestureOutline: (cells, tone) => gridView.setGestureOutline(cells, tone),
-        flashGestureOutline: (cells, tone, durationMs) => gridView.flashGestureOutline(cells, tone, durationMs),
+        flashGestureOutline: (cells, tone, durationMs) =>
+            gridView.flashGestureOutline(cells, tone, durationMs),
         clearGestureOutline: () => gridView.clearGestureOutline(),
         mutationRunner,
         simulationMutations: services.getSimulationMutations(),
@@ -114,9 +120,8 @@ export function wireAppController({
         renderCurrentGrid: appView.renderGrid,
         renderControlPanel: appView.renderControlsPanel,
         applySimulationState: sync.applySimulationState,
-        getViewportDimensions: (geometry: string, ruleName: string | null, cellSize: number) => (
-            appView.viewportDimensionsFor(geometry, ruleName, cellSize)
-        ),
+        getViewportDimensions: (geometry: string, ruleName: string | null, cellSize: number) =>
+            appView.viewportDimensionsFor(geometry, ruleName, cellSize),
         postControlFn,
         setCellsRequestFn,
         onError,

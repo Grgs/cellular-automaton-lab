@@ -38,7 +38,9 @@ function editPolicy({
 
 describe("interactions/gesture-sessions/intent", () => {
     it("classifies right-button pointer down as a selection gesture", () => {
-        expect(resolvePointerDownIntent(pointerEvent(2), editPolicy({})).kind).toBe("right-selection");
+        expect(resolvePointerDownIntent(pointerEvent(2), editPolicy({})).kind).toBe(
+            "right-selection",
+        );
     });
 
     it("ignores unsupported pointer buttons", () => {
@@ -46,7 +48,9 @@ describe("interactions/gesture-sessions/intent", () => {
     });
 
     it("treats unarmed left pointer down as direct paint", () => {
-        expect(resolvePointerDownIntent(pointerEvent(0), editPolicy({ isEditArmed: false })).kind).toBe("direct-paint");
+        expect(
+            resolvePointerDownIntent(pointerEvent(0), editPolicy({ isEditArmed: false })).kind,
+        ).toBe("direct-paint");
     });
 
     it("keeps running armed brush gestures on the legacy paint path", () => {

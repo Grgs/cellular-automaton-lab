@@ -26,17 +26,23 @@ function cloneBootstrapData(payload: AppBootstrapData): AppBootstrapData {
 function parseBootstrapData(payload: unknown): AppBootstrapData {
     const root = requirePlainObject(payload, "Bootstrap payload is invalid.");
     const defaults = root.app_defaults as BootstrappedFrontendDefaults | undefined;
-    const topologies = root.topology_catalog as ReadonlyArray<BootstrappedTopologyDefinition> | undefined;
-    const periodicFaceTilings = root.periodic_face_tilings as ReadonlyArray<PeriodicFaceTilingDescriptor> | undefined;
-    const aperiodicFamilies = root.aperiodic_families as ReadonlyArray<BootstrappedAperiodicFamilyDefinition> | undefined;
+    const topologies = root.topology_catalog as
+        | ReadonlyArray<BootstrappedTopologyDefinition>
+        | undefined;
+    const periodicFaceTilings = root.periodic_face_tilings as
+        | ReadonlyArray<PeriodicFaceTilingDescriptor>
+        | undefined;
+    const aperiodicFamilies = root.aperiodic_families as
+        | ReadonlyArray<BootstrappedAperiodicFamilyDefinition>
+        | undefined;
     const serverMeta = root.server_meta as { app_name?: string } | undefined;
     const snapshotVersion = Number(root.snapshot_version);
     if (
-        !defaults
-        || !Array.isArray(topologies)
-        || !Array.isArray(periodicFaceTilings)
-        || !Array.isArray(aperiodicFamilies)
-        || !serverMeta?.app_name
+        !defaults ||
+        !Array.isArray(topologies) ||
+        !Array.isArray(periodicFaceTilings) ||
+        !Array.isArray(aperiodicFamilies) ||
+        !serverMeta?.app_name
     ) {
         throw new Error("Bootstrap payload is invalid.");
     }

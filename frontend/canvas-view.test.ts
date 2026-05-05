@@ -21,11 +21,13 @@ const BASE_METRICS = {
 
 function topologyPayload(): TopologyPayload {
     return {
-        cells: [{
-            id: "square:0:0",
-            kind: "cell",
-            neighbors: [],
-        } as TopologyPayload["cells"][number]],
+        cells: [
+            {
+                id: "square:0:0",
+                kind: "cell",
+                neighbors: [],
+            } as TopologyPayload["cells"][number],
+        ],
         topology_revision: "test:topology",
         topology_spec: {
             tiling_family: "square",
@@ -326,12 +328,15 @@ describe("canvas-view", () => {
             resolveGeometryCache: () => ({ cacheKey: "cache", geometryCache: null }),
         }));
         vi.doMock("./topology-catalog.js", async () => {
-            const actual = await vi.importActual<typeof import("./topology-catalog.js")>("./topology-catalog.js");
+            const actual =
+                await vi.importActual<typeof import("./topology-catalog.js")>(
+                    "./topology-catalog.js",
+                );
             return {
                 ...actual,
-                topologyUsesBackendViewportSync: (spec: { tiling_family?: string } | null | undefined) => (
-                    String(spec?.tiling_family) === "square"
-                ),
+                topologyUsesBackendViewportSync: (
+                    spec: { tiling_family?: string } | null | undefined,
+                ) => String(spec?.tiling_family) === "square",
             };
         });
         vi.doMock("./canvas/render-style.js", () => ({
@@ -448,10 +453,10 @@ describe("canvas-view", () => {
                 {
                     cell,
                     vertices: [],
-                    centerX: 20 + (index * 30),
+                    centerX: 20 + index * 30,
                     centerY: 70,
-                    minX: 10 + (index * 30),
-                    maxX: 30 + (index * 30),
+                    minX: 10 + index * 30,
+                    maxX: 30 + index * 30,
                     minY: 60,
                     maxY: 80,
                 },
@@ -608,7 +613,9 @@ describe("canvas-view", () => {
             "120": 1,
             "240": 1,
         });
-        expect(diagnostics?.metricInputs.angularSectorCounts).toEqual([2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]);
+        expect(diagnostics?.metricInputs.angularSectorCounts).toEqual([
+            2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+        ]);
         expect(diagnostics?.overlapHotspots?.sampledOverlapCount).toBe(0);
     });
 });

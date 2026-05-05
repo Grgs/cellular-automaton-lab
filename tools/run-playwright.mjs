@@ -57,20 +57,23 @@ for (let index = 2; index < process.argv.length; index += 1) {
 }
 
 if (skipStandaloneBuild && forceStandaloneBuild) {
-    throw new Error("--skip-standalone-build and --force-standalone-build cannot be used together.");
+    throw new Error(
+        "--skip-standalone-build and --force-standalone-build cannot be used together.",
+    );
 }
 
-const pythonCandidates = process.platform === "win32"
-    ? [
-        [process.env.PYTHON, []],
-        ["py", ["-3"]],
-        ["python", []],
-    ]
-    : [
-        [process.env.PYTHON, []],
-        ["python3", []],
-        ["python", []],
-    ];
+const pythonCandidates =
+    process.platform === "win32"
+        ? [
+              [process.env.PYTHON, []],
+              ["py", ["-3"]],
+              ["python", []],
+          ]
+        : [
+              [process.env.PYTHON, []],
+              ["python3", []],
+              ["python", []],
+          ];
 
 function runCommand(command, args, options = {}) {
     const result = spawnSync(command, args, {
@@ -105,9 +108,17 @@ function findChromiumHeadlessShell() {
     if (!fs.existsSync(playwrightCache)) {
         return null;
     }
-    const entries = fs.readdirSync(playwrightCache, { withFileTypes: true })
+    const entries = fs
+        .readdirSync(playwrightCache, { withFileTypes: true })
         .filter((entry) => entry.isDirectory() && entry.name.startsWith("chromium_headless_shell-"))
-        .map((entry) => path.join(playwrightCache, entry.name, "chrome-headless-shell-linux64", "chrome-headless-shell"))
+        .map((entry) =>
+            path.join(
+                playwrightCache,
+                entry.name,
+                "chrome-headless-shell-linux64",
+                "chrome-headless-shell",
+            ),
+        )
         .filter((candidate) => fs.existsSync(candidate))
         .sort();
     return entries.at(-1) ?? null;
@@ -122,7 +133,12 @@ function commandExists(command) {
     return result.status === 0;
 }
 
-function linuxRepairError({ missingLibraries, packages = [], missingTools = [], extraDetail = "" }) {
+function linuxRepairError({
+    missingLibraries,
+    packages = [],
+    missingTools = [],
+    extraDetail = "",
+}) {
     const lines = [
         "Playwright browser is missing shared libraries on Linux.",
         `Missing libraries: ${missingLibraries.join(", ")}`,
@@ -133,9 +149,15 @@ function linuxRepairError({ missingLibraries, packages = [], missingTools = [], 
     if (missingTools.length > 0) {
         lines.push(`Missing repair tools: ${missingTools.join(", ")}`);
     }
-    lines.push("The local self-repair path currently assumes Debian/Ubuntu-style tooling (`apt`, `apt-cache`, and `dpkg-deb`).");
-    lines.push("Install the required runtime libraries manually or rerun in an environment with those packaging tools available.");
-    lines.push("Preferred browser entrypoints: `npm run test:e2e:playwright`, `npm run test:e2e:playwright:server`, or `npm run test:e2e:playwright:standalone`.");
+    lines.push(
+        "The local self-repair path currently assumes Debian/Ubuntu-style tooling (`apt`, `apt-cache`, and `dpkg-deb`).",
+    );
+    lines.push(
+        "Install the required runtime libraries manually or rerun in an environment with those packaging tools available.",
+    );
+    lines.push(
+        "Preferred browser entrypoints: `npm run test:e2e:playwright`, `npm run test:e2e:playwright:server`, or `npm run test:e2e:playwright:standalone`.",
+    );
     lines.push("Troubleshooting reference: docs/TESTING.md (Playwright troubleshooting section).");
     if (extraDetail) {
         lines.push(extraDetail.trim());
@@ -160,7 +182,8 @@ function chooseAlsaPackage(missingLibraries) {
     throw linuxRepairError({
         missingLibraries,
         packages: preferred,
-        extraDetail: "Unable to resolve an installable ALSA runtime package with `apt-cache policy`.",
+        extraDetail:
+            "Unable to resolve an installable ALSA runtime package with `apt-cache policy`.",
     });
 }
 
@@ -203,7 +226,9 @@ function ensureLinuxPlaywrightRuntime(env) {
         return env;
     }
 
-    const missingTools = ["apt", "apt-cache", "dpkg-deb"].filter((command) => !commandExists(command));
+    const missingTools = ["apt", "apt-cache", "dpkg-deb"].filter(
+        (command) => !commandExists(command),
+    );
     if (missingTools.length > 0) {
         throw linuxRepairError({
             missingLibraries: currentMissing,
@@ -223,14 +248,16 @@ function ensureLinuxPlaywrightRuntime(env) {
         throw linuxRepairError({
             missingLibraries: currentMissing,
             packages,
-            extraDetail: (
-                "Automatic browser-library repair failed while running `apt download`.\n"
-                + (downloadResult.stderr || downloadResult.stdout || "The `apt download` command failed.")
-            ),
+            extraDetail:
+                "Automatic browser-library repair failed while running `apt download`.\n" +
+                (downloadResult.stderr ||
+                    downloadResult.stdout ||
+                    "The `apt download` command failed."),
         });
     }
 
-    const debFiles = fs.readdirSync(playwrightLibDebDir)
+    const debFiles = fs
+        .readdirSync(playwrightLibDebDir)
         .filter((filename) => filename.endsWith(".deb"))
         .map((filename) => path.join(playwrightLibDebDir, filename))
         .sort();
@@ -249,7 +276,8 @@ function ensureLinuxPlaywrightRuntime(env) {
         throw linuxRepairError({
             missingLibraries: remainingMissing,
             packages,
-            extraDetail: "Playwright browser is still missing shared libraries after the local repair attempt.",
+            extraDetail:
+                "Playwright browser is still missing shared libraries after the local repair attempt.",
         });
     }
     return nextEnv;
@@ -280,7 +308,11 @@ function runPythonCapture(args, options = {}) {
         const { command, prefixArgs, result } = commandFailure;
         const stdout = result.stdout ? `\nstdout:\n${result.stdout}` : "";
         const stderr = result.stderr ? `\nstderr:\n${result.stderr}` : "";
-        throw new Error(`Python command failed: ${command} ${prefixArgs.join(" ")} ${args.join(" ")}`.trim() + stdout + stderr);
+        throw new Error(
+            `Python command failed: ${command} ${prefixArgs.join(" ")} ${args.join(" ")}`.trim() +
+                stdout +
+                stderr,
+        );
     }
     throw new Error("Unable to find a working Python interpreter.");
 }
@@ -310,7 +342,9 @@ function runPythonModules(modules, env) {
         const { command, prefixArgs } = commandFailure;
         throw new Error(`Playwright tests failed with ${command} ${prefixArgs.join(" ")}`.trim());
     }
-    throw new Error("Unable to run Playwright tests because no working Python interpreter was found.");
+    throw new Error(
+        "Unable to run Playwright tests because no working Python interpreter was found.",
+    );
 }
 
 function loadSuiteManifest() {
@@ -340,7 +374,9 @@ if (listSuites) {
 const selectedSuite = suiteManifest.find((entry) => entry.name === suiteName);
 if (!selectedSuite) {
     const availableSuites = suiteManifest.map((entry) => entry.name).join(", ");
-    throw new Error(`Unknown Playwright suite '${suiteName}'. Available suites: ${availableSuites}`);
+    throw new Error(
+        `Unknown Playwright suite '${suiteName}'. Available suites: ${availableSuites}`,
+    );
 }
 
 const baseEnv = {
@@ -355,13 +391,17 @@ if (!skipStandaloneBuild && selectedSuite.requires_standalone_build) {
         const reason = forceStandaloneBuild
             ? "forced rebuild requested"
             : String(buildStatus.reason || "standalone build is missing or stale");
-        console.error(`Preparing standalone build for Playwright suite '${selectedSuite.name}': ${reason}.`);
+        console.error(
+            `Preparing standalone build for Playwright suite '${selectedSuite.name}': ${reason}.`,
+        );
         runCommand(resolveNpmExecutable(), ["run", "build:frontend:standalone"], {
             env: runtimeEnv,
             stdio: "inherit",
         });
     } else {
-        console.error(`Reusing current standalone build for Playwright suite '${selectedSuite.name}'.`);
+        console.error(
+            `Reusing current standalone build for Playwright suite '${selectedSuite.name}'.`,
+        );
     }
 } else if (skipStandaloneBuild && selectedSuite.requires_standalone_build) {
     const buildStatus = loadStandaloneBuildStatus();

@@ -10,11 +10,7 @@ import type { EditorViewModel } from "../types/ui.js";
 
 export function buildEditorViewModel({ state }: { state: AppState }): EditorViewModel {
     const editingBlocked = Boolean(state.isRunning || state.overlayRunPending);
-    const gridEditMode = editingBlocked
-        ? "running"
-        : state.editArmed
-            ? "armed"
-            : "idle";
+    const gridEditMode = editingBlocked ? "running" : state.editArmed ? "armed" : "idle";
     return {
         editorTools: EDITOR_TOOL_OPTIONS,
         selectedEditorTool: state.selectedEditorTool,
@@ -25,6 +21,7 @@ export function buildEditorViewModel({ state }: { state: AppState }): EditorView
         editorShortcutHint: EDITOR_SHORTCUT_HINT,
         gridEditMode,
         canvasEditCueVisible: Boolean(state.editCueVisible && state.editArmed && !editingBlocked),
-        canvasEditCueText: "Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.",
+        canvasEditCueText:
+            "Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.",
     };
 }

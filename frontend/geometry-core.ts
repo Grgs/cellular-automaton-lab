@@ -21,7 +21,9 @@ export {
 };
 
 export function normalizeGeometry(geometry: string | null | undefined): string {
-    return typeof geometry === "string" && isSupportedGeometry(geometry) ? geometry : DEFAULT_GEOMETRY;
+    return typeof geometry === "string" && isSupportedGeometry(geometry)
+        ? geometry
+        : DEFAULT_GEOMETRY;
 }
 
 export function gridMetrics(
@@ -57,9 +59,11 @@ export function computeViewportGridSize(
     }
 
     const adapter = getGeometryAdapter(geometry) as GeometryAdapter;
-    return adapter.fitViewport?.({
-        viewportWidth,
-        viewportHeight,
-        cellSize,
-    }) ?? fallback;
+    return (
+        adapter.fitViewport?.({
+            viewportWidth,
+            viewportHeight,
+            cellSize,
+        }) ?? fallback
+    );
 }

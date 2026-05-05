@@ -16,10 +16,7 @@ function mergePresetRegistries(...registries: readonly PresetRegistry[]): Preset
     );
 }
 
-const PRESET_REGISTRY = mergePresetRegistries(
-    SQUARE_PRESET_REGISTRY,
-    HEX_PRESET_REGISTRY,
-);
+const PRESET_REGISTRY = mergePresetRegistries(SQUARE_PRESET_REGISTRY, HEX_PRESET_REGISTRY);
 
 const PRESET_RULE_ALIASES = Object.freeze<Record<string, string>>({
     hexwhirlpool: "whirlpool",

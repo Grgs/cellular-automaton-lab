@@ -9,17 +9,18 @@ const rootDir = path.resolve(dirname, "..");
 const outputDir = path.join(rootDir, "output", "standalone");
 const standaloneBuildInputDir = path.join(rootDir, "output", ".standalone-build-input");
 const standaloneHtmlInputPath = path.join(standaloneBuildInputDir, "standalone.html");
-const pythonCandidates = process.platform === "win32"
-    ? [
-        [process.env.PYTHON, []],
-        ["py", ["-3"]],
-        ["python", []],
-    ]
-    : [
-        [process.env.PYTHON, []],
-        ["python3", []],
-        ["python", []],
-    ];
+const pythonCandidates =
+    process.platform === "win32"
+        ? [
+              [process.env.PYTHON, []],
+              ["py", ["-3"]],
+              ["python", []],
+          ]
+        : [
+              [process.env.PYTHON, []],
+              ["python3", []],
+              ["python", []],
+          ];
 
 function runCommand(command, args, options = {}) {
     const result = spawnSync(command, args, {
@@ -63,11 +64,14 @@ function collectFiles(directory, predicate, bucket = []) {
 }
 
 function collectSourceFingerprintPaths() {
-    const relativePaths = collectFiles(
-        path.join(rootDir, "frontend"),
-        () => true,
-    ).map((absolutePath) => path.relative(rootDir, absolutePath).replace(/\\/g, "/"));
-    for (const relativePath of ["tools/build-standalone.mjs", "package.json", "package-lock.json"]) {
+    const relativePaths = collectFiles(path.join(rootDir, "frontend"), () => true).map(
+        (absolutePath) => path.relative(rootDir, absolutePath).replace(/\\/g, "/"),
+    );
+    for (const relativePath of [
+        "tools/build-standalone.mjs",
+        "package.json",
+        "package-lock.json",
+    ]) {
         const absolutePath = path.join(rootDir, relativePath);
         if (fs.existsSync(absolutePath)) {
             relativePaths.push(relativePath);
@@ -115,7 +119,9 @@ function runPythonScript(scriptPath, args = []) {
         }
     }
 
-    throw new Error(`Unable to run ${path.basename(scriptPath)} because no working Python interpreter was found.`);
+    throw new Error(
+        `Unable to run ${path.basename(scriptPath)} because no working Python interpreter was found.`,
+    );
 }
 
 function renderStandaloneShell(outputPath) {
@@ -126,20 +132,24 @@ function prepareStandaloneBuildInput() {
     fs.rmSync(standaloneBuildInputDir, { recursive: true, force: true });
     fs.mkdirSync(standaloneBuildInputDir, { recursive: true });
     renderStandaloneShell(standaloneHtmlInputPath);
-    copyFileIntoDirectory(path.join(rootDir, "static", "css", "styles.css"), standaloneBuildInputDir);
+    copyFileIntoDirectory(
+        path.join(rootDir, "static", "css", "styles.css"),
+        standaloneBuildInputDir,
+    );
     copyFileIntoDirectory(path.join(rootDir, "static", "favicon.svg"), standaloneBuildInputDir);
     return standaloneHtmlInputPath;
 }
 
 function writePythonBundle() {
-    const sourceRoots = [
-        path.join(rootDir, "backend"),
-        path.join(rootDir, "config"),
-    ];
-    const files = sourceRoots.flatMap((sourceRoot) => collectFiles(
-        sourceRoot,
-        (absolutePath) => absolutePath.endsWith(".py") || absolutePath.endsWith(".json"),
-    )).sort();
+    const sourceRoots = [path.join(rootDir, "backend"), path.join(rootDir, "config")];
+    const files = sourceRoots
+        .flatMap((sourceRoot) =>
+            collectFiles(
+                sourceRoot,
+                (absolutePath) => absolutePath.endsWith(".py") || absolutePath.endsWith(".json"),
+            ),
+        )
+        .sort();
 
     const bundleEntries = files.map((absolutePath) => {
         const relativePath = path.relative(rootDir, absolutePath).replace(/\\/g, "/");
@@ -158,10 +168,16 @@ function writePythonBundle() {
 }
 
 function copyStaticAssets() {
-    const nestedStandaloneHtmlPath = path.join(outputDir, "output", ".standalone-build-input", "standalone.html");
+    const nestedStandaloneHtmlPath = path.join(
+        outputDir,
+        "output",
+        ".standalone-build-input",
+        "standalone.html",
+    );
     const standaloneHtmlPath = path.join(outputDir, "standalone.html");
     if (fs.existsSync(nestedStandaloneHtmlPath)) {
-        const normalizedHtml = fs.readFileSync(nestedStandaloneHtmlPath, "utf8")
+        const normalizedHtml = fs
+            .readFileSync(nestedStandaloneHtmlPath, "utf8")
             .replaceAll("../../assets/", "./assets/");
         fs.writeFileSync(standaloneHtmlPath, normalizedHtml, "utf8");
         fs.rmSync(path.join(outputDir, "output"), { recursive: true, force: true });
@@ -194,7 +210,12 @@ function writeBuildManifest() {
 function buildStandaloneFrontend(htmlEntryPath) {
     runCommand(
         process.execPath,
-        [path.join(rootDir, "node_modules", "vite", "bin", "vite.js"), "build", "--mode", "standalone"],
+        [
+            path.join(rootDir, "node_modules", "vite", "bin", "vite.js"),
+            "build",
+            "--mode",
+            "standalone",
+        ],
         {
             env: {
                 ...process.env,

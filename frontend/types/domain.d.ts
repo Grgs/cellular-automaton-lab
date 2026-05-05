@@ -247,8 +247,7 @@ export interface ApiSimulationSnapshot {
     cell_states: number[];
 }
 
-export interface SimulationSnapshot extends ApiSimulationSnapshot {
-}
+export type SimulationSnapshot = ApiSimulationSnapshot;
 
 export interface PersistedSimulationSnapshotV5 {
     version: 5;

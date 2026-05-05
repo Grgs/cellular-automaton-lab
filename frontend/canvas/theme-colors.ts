@@ -27,31 +27,40 @@ export function readCanvasColors(
 ): CanvasColors {
     const rootStyle = getComputedStyleFn(document.documentElement);
     const canvasStyle = getComputedStyleFn(canvas);
-    const dead = rootStyle.getPropertyValue("--cell-dead").trim()
-        || rootStyle.getPropertyValue("--dead").trim()
-        || DEFAULT_COLORS.dead;
+    const dead =
+        rootStyle.getPropertyValue("--cell-dead").trim() ||
+        rootStyle.getPropertyValue("--dead").trim() ||
+        DEFAULT_COLORS.dead;
     return {
-        line: rootStyle.getPropertyValue("--line").trim() || canvasStyle.backgroundColor || DEFAULT_COLORS.line,
+        line:
+            rootStyle.getPropertyValue("--line").trim() ||
+            canvasStyle.backgroundColor ||
+            DEFAULT_COLORS.line,
         dead,
-        deadAlt: rootStyle.getPropertyValue("--cell-dead-alt").trim() || dead || DEFAULT_COLORS.deadAlt,
-        lineSoft: rootStyle.getPropertyValue("--cell-line-soft").trim()
-            || rootStyle.getPropertyValue("--line").trim()
-            || canvasStyle.backgroundColor
-            || DEFAULT_COLORS.lineSoft,
-        lineStrong: rootStyle.getPropertyValue("--cell-line-strong").trim()
-            || rootStyle.getPropertyValue("--line").trim()
-            || canvasStyle.backgroundColor
-            || DEFAULT_COLORS.lineStrong,
-        lineAperiodic: rootStyle.getPropertyValue("--cell-line-aperiodic").trim()
-            || rootStyle.getPropertyValue("--cell-line-strong").trim()
-            || rootStyle.getPropertyValue("--line").trim()
-            || canvasStyle.backgroundColor
-            || DEFAULT_COLORS.lineAperiodic,
+        deadAlt:
+            rootStyle.getPropertyValue("--cell-dead-alt").trim() || dead || DEFAULT_COLORS.deadAlt,
+        lineSoft:
+            rootStyle.getPropertyValue("--cell-line-soft").trim() ||
+            rootStyle.getPropertyValue("--line").trim() ||
+            canvasStyle.backgroundColor ||
+            DEFAULT_COLORS.lineSoft,
+        lineStrong:
+            rootStyle.getPropertyValue("--cell-line-strong").trim() ||
+            rootStyle.getPropertyValue("--line").trim() ||
+            canvasStyle.backgroundColor ||
+            DEFAULT_COLORS.lineStrong,
+        lineAperiodic:
+            rootStyle.getPropertyValue("--cell-line-aperiodic").trim() ||
+            rootStyle.getPropertyValue("--cell-line-strong").trim() ||
+            rootStyle.getPropertyValue("--line").trim() ||
+            canvasStyle.backgroundColor ||
+            DEFAULT_COLORS.lineAperiodic,
         live: rootStyle.getPropertyValue("--live").trim() || DEFAULT_COLORS.live,
         accent: rootStyle.getPropertyValue("--accent").trim() || DEFAULT_COLORS.accent,
-        accentStrong: rootStyle.getPropertyValue("--accent-dark").trim()
-            || rootStyle.getPropertyValue("--accent").trim()
-            || DEFAULT_COLORS.accentStrong,
+        accentStrong:
+            rootStyle.getPropertyValue("--accent-dark").trim() ||
+            rootStyle.getPropertyValue("--accent").trim() ||
+            DEFAULT_COLORS.accentStrong,
         toneCream: rootStyle.getPropertyValue("--tone-cream").trim() || DEFAULT_COLORS.toneCream,
         toneLinen: rootStyle.getPropertyValue("--tone-linen").trim() || DEFAULT_COLORS.toneLinen,
         toneSand: rootStyle.getPropertyValue("--tone-sand").trim() || DEFAULT_COLORS.toneSand,
@@ -64,7 +73,9 @@ export function readCanvasColors(
     };
 }
 
-export function parseColorChannels(color: string): { r: number; g: number; b: number; a: number } | null {
+export function parseColorChannels(
+    color: string,
+): { r: number; g: number; b: number; a: number } | null {
     const normalized = color.trim().toLowerCase();
     const hexMatch = normalized.match(/^#([0-9a-f]{3,8})$/i);
     if (hexMatch) {
@@ -121,7 +132,7 @@ export function relativeLuminance({ r, g, b }: { r: number; g: number; b: number
         const srgb = channel / 255;
         return srgb <= 0.04045 ? srgb / 12.92 : ((srgb + 0.055) / 1.055) ** 2.4;
     };
-    return (0.2126 * toLinear(r)) + (0.7152 * toLinear(g)) + (0.0722 * toLinear(b));
+    return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 }
 
 export function withAlpha(color: string, alpha: number): string {

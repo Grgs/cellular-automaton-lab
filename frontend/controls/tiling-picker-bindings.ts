@@ -45,7 +45,10 @@ function focusEdgeTilingCard(menu: HTMLElement, edge: "first" | "last"): void {
     target?.focus();
 }
 
-export function bindTilingPreviewPicker(elements: DomElements, actions: Pick<AppActionSet, "changeTilingFamily">): void {
+export function bindTilingPreviewPicker(
+    elements: DomElements,
+    actions: Pick<AppActionSet, "changeTilingFamily">,
+): void {
     const menu = elements.tilingPickerMenu;
     const toggle = elements.tilingPickerToggle;
     if (!menu || !toggle) {
@@ -74,9 +77,10 @@ export function bindTilingPreviewPicker(elements: DomElements, actions: Pick<App
     });
 
     menu.addEventListener("click", (event) => {
-        const target = event.target instanceof Element
-            ? event.target.closest<HTMLButtonElement>(".tiling-preview-card")
-            : null;
+        const target =
+            event.target instanceof Element
+                ? event.target.closest<HTMLButtonElement>(".tiling-preview-card")
+                : null;
         const tilingFamily = target?.dataset.tilingFamily ?? "";
         if (!tilingFamily) {
             return;

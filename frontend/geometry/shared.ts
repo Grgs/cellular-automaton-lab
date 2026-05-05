@@ -49,8 +49,8 @@ export function squareGridMetrics(width: number, height: number, cellSize: numbe
         pitch,
         horizontalPitch: pitch,
         verticalPitch: pitch,
-        cssWidth: (width * pitch) + gap,
-        cssHeight: (height * pitch) + gap,
+        cssWidth: width * pitch + gap,
+        cssHeight: height * pitch + gap,
         xInset: gap,
         yInset: gap,
     };
@@ -62,9 +62,9 @@ export function hexGridMetrics(width: number, height: number, cellSize: number):
     const radius = hexHeight / 2;
     const hexWidth = Math.sqrt(3) * radius;
     const horizontalPitch = hexWidth + gap;
-    const verticalPitch = (0.75 * hexHeight) + gap;
+    const verticalPitch = 0.75 * hexHeight + gap;
     const oddRowOffset = height > 1 ? hexWidth / 2 : 0;
-    const xInset = (hexWidth / 2) + gap;
+    const xInset = hexWidth / 2 + gap;
     const yInset = radius + gap;
 
     if (width === 0 || height === 0) {
@@ -101,8 +101,8 @@ export function hexGridMetrics(width: number, height: number, cellSize: number):
         oddRowOffset,
         xInset,
         yInset,
-        cssWidth: (2 * xInset) + ((width - 1) * horizontalPitch) + oddRowOffset,
-        cssHeight: (2 * yInset) + ((height - 1) * verticalPitch),
+        cssWidth: 2 * xInset + (width - 1) * horizontalPitch + oddRowOffset,
+        cssHeight: 2 * yInset + (height - 1) * verticalPitch,
     };
 }
 
@@ -143,8 +143,8 @@ export function triangleGridMetrics(width: number, height: number, cellSize: num
         verticalPitch,
         xInset: inset,
         yInset: inset,
-        cssWidth: (2 * inset) + triangleSide + ((width - 1) * horizontalPitch),
-        cssHeight: (2 * inset) + (height * triangleHeight),
+        cssWidth: 2 * inset + triangleSide + (width - 1) * horizontalPitch,
+        cssHeight: 2 * inset + height * triangleHeight,
     };
 }
 
@@ -235,7 +235,10 @@ export function fitRenderCellSizeWithMetrics({
     let fittedLow = initialHigh;
     let candidateHigh = initialHigh;
     while (candidateHigh < MAX_RENDER_CELL_SIZE) {
-        const nextHigh = Math.min(MAX_RENDER_CELL_SIZE, Math.max(candidateHigh + 1, candidateHigh * 1.5));
+        const nextHigh = Math.min(
+            MAX_RENDER_CELL_SIZE,
+            Math.max(candidateHigh + 1, candidateHigh * 1.5),
+        );
         if (nextHigh === candidateHigh) {
             break;
         }
@@ -270,10 +273,7 @@ export function constrainMixedViewportDimensions(
     width = clampGridDimension(Math.floor(width * scale));
     height = clampGridDimension(Math.floor(height * scale));
 
-    while (
-        countCells(width, height) > maxCellCount
-        && (width > minimum || height > minimum)
-    ) {
+    while (countCells(width, height) > maxCellCount && (width > minimum || height > minimum)) {
         if (width >= height && width > minimum) {
             width -= 1;
             continue;
@@ -329,7 +329,10 @@ export function applyRegularViewportPreview({
 export function applyMixedViewportPreview({
     state,
     dimensions,
-}: Pick<GeometryViewportPreviewArgs, "state" | "dimensions">): { applied: boolean; renderGrid: boolean } {
+}: Pick<GeometryViewportPreviewArgs, "state" | "dimensions">): {
+    applied: boolean;
+    renderGrid: boolean;
+} {
     const nextState = state as AppState;
     nextState.width = dimensions.width;
     nextState.height = dimensions.height;

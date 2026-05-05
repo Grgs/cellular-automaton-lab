@@ -1,8 +1,4 @@
-import type {
-    AdjacencyModeOption,
-    PresetMetadata,
-    TopologyOption,
-} from "../types/domain.js";
+import type { AdjacencyModeOption, PresetMetadata, TopologyOption } from "../types/domain.js";
 import type { DomElements } from "../types/dom.js";
 import type { RuleSelectOption } from "../types/ui.js";
 import { createTilingPreviewThumbnail } from "./tiling-preview.js";
@@ -82,14 +78,18 @@ export function populateTilingFamilies(
 }
 
 function tilingOptionsSignature(families: readonly TopologyOption[]): string {
-    return families.map((family) => [
-        family.group,
-        family.value,
-        family.label,
-        family.previewKey,
-        family.renderKind,
-        family.sizingMode,
-    ].join(":")).join("|");
+    return families
+        .map((family) =>
+            [
+                family.group,
+                family.value,
+                family.label,
+                family.previewKey,
+                family.renderKind,
+                family.sizingMode,
+            ].join(":"),
+        )
+        .join("|");
 }
 
 function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {
@@ -120,10 +120,7 @@ function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {
     return button;
 }
 
-function populateTilingPreviewMenu(
-    menu: HTMLElement,
-    families: readonly TopologyOption[],
-): void {
+function populateTilingPreviewMenu(menu: HTMLElement, families: readonly TopologyOption[]): void {
     const groups = new Map<string, TopologyOption[]>();
     families.forEach((family) => {
         const groupName = family.group || "Other";
@@ -176,7 +173,8 @@ function syncSelectedTilingPreview(
     if (!previewElement && !labelElement) {
         return;
     }
-    const selectedOption = families.find((family) => family.value === selectedValue) ?? families[0] ?? null;
+    const selectedOption =
+        families.find((family) => family.value === selectedValue) ?? families[0] ?? null;
     if (!selectedOption) {
         previewElement?.replaceChildren();
         if (previewElement) {
@@ -197,7 +195,9 @@ function syncSelectedTilingPreview(
     if (previewElement.dataset.previewSignature === signature) {
         return;
     }
-    previewElement.replaceChildren(createTilingPreviewThumbnail(selectedOption, "tiling-selected-preview-svg"));
+    previewElement.replaceChildren(
+        createTilingPreviewThumbnail(selectedOption, "tiling-selected-preview-svg"),
+    );
     previewElement.dataset.previewSignature = signature;
 }
 

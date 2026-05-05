@@ -71,7 +71,11 @@ export function createInteractionSessionRuntime({
     createEditorSessionControllerFn?: typeof createEditorSessionController | undefined;
 }): InteractionSessionRuntime {
     function setPointerCapture(pointerId: number | null): void {
-        if (!surfaceElement || typeof surfaceElement.setPointerCapture !== "function" || pointerId === null) {
+        if (
+            !surfaceElement ||
+            typeof surfaceElement.setPointerCapture !== "function" ||
+            pointerId === null
+        ) {
             return;
         }
         try {
@@ -82,7 +86,11 @@ export function createInteractionSessionRuntime({
     }
 
     function releasePointerCapture(pointerId: number | null): void {
-        if (!surfaceElement || typeof surfaceElement.releasePointerCapture !== "function" || pointerId === null) {
+        if (
+            !surfaceElement ||
+            typeof surfaceElement.releasePointerCapture !== "function" ||
+            pointerId === null
+        ) {
             return;
         }
         try {

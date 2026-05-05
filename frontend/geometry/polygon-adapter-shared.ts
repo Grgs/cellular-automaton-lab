@@ -45,11 +45,8 @@ export function measurePolygonBounds(
         .map((point) => normalizePoint(point))
         .filter((point): point is Point2D => point !== null);
     const resolvedFallback = normalizePoint(fallbackCenter);
-    const source = normalizedPoints.length > 0
-        ? normalizedPoints
-        : resolvedFallback
-            ? [resolvedFallback]
-            : [];
+    const source =
+        normalizedPoints.length > 0 ? normalizedPoints : resolvedFallback ? [resolvedFallback] : [];
     if (source.length === 0) {
         return null;
     }
@@ -66,7 +63,8 @@ export function measurePolygonBounds(
 
 export function measureTopologyVertexBounds(
     topology: TopologyPayload | null,
-    transformVertex: (vertex: Point2D, cell: RenderableTopologyCell) => Point2D = (vertex) => vertex,
+    transformVertex: (vertex: Point2D, cell: RenderableTopologyCell) => Point2D = (vertex) =>
+        vertex,
 ): PolygonBounds | null {
     const transformedVertices: Point2D[] = [];
     for (const rawCell of topology?.cells ?? []) {
@@ -84,14 +82,18 @@ export function measureTopologyVertexBounds(
 export function buildTransformedPolygonGeometryCell(
     cell: RenderableTopologyCell,
     transformVertex: (vertex: Point2D, cell: RenderableTopologyCell) => Point2D,
-    transformCenter?: (center: Point2D | null | undefined, cell: RenderableTopologyCell) => Point2D | null,
+    transformCenter?: (
+        center: Point2D | null | undefined,
+        cell: RenderableTopologyCell,
+    ) => Point2D | null,
 ): PolygonGeometryCell | null {
     const vertices = (cell.vertices ?? [])
         .map((vertex) => normalizePoint(transformVertex(vertex, cell)))
         .filter((vertex): vertex is Point2D => vertex !== null);
-    const center = typeof transformCenter === "function"
-        ? normalizePoint(transformCenter(cell.center, cell))
-        : null;
+    const center =
+        typeof transformCenter === "function"
+            ? normalizePoint(transformCenter(cell.center, cell))
+            : null;
     const bounds = measurePolygonBounds(vertices, center);
     if (!bounds) {
         return null;
@@ -100,8 +102,8 @@ export function buildTransformedPolygonGeometryCell(
     return {
         cell,
         vertices,
-        centerX: center?.x ?? ((bounds.minX + bounds.maxX) / 2),
-        centerY: center?.y ?? ((bounds.minY + bounds.maxY) / 2),
+        centerX: center?.x ?? (bounds.minX + bounds.maxX) / 2,
+        centerY: center?.y ?? (bounds.minY + bounds.maxY) / 2,
         minX: bounds.minX,
         maxX: bounds.maxX,
         minY: bounds.minY,
@@ -173,16 +175,15 @@ export function resolvePolygonCellCenter<TMetrics extends GridMetrics>({
         }
     }
 
-    const resolvedMetrics = (metrics ?? buildMetrics({
-        width,
-        height,
-        cellSize,
-        topology,
-    })) as TMetrics;
+    const resolvedMetrics = (metrics ??
+        buildMetrics({
+            width,
+            height,
+            cellSize,
+            topology,
+        })) as TMetrics;
     const geometryCell = buildCellGeometry(renderableCell, resolvedMetrics, polygonCache);
-    return geometryCell
-        ? { x: geometryCell.centerX, y: geometryCell.centerY }
-        : { x: 0, y: 0 };
+    return geometryCell ? { x: geometryCell.centerX, y: geometryCell.centerY } : { x: 0, y: 0 };
 }
 
 export function drawResolvedPolygonCell({
@@ -222,12 +223,12 @@ export function drawResolvedPolygonCell({
         return;
     }
 
-    const color = resolvedFillColor ?? resolveRenderedCellColor(
-        stateValue,
-        colorLookup,
-        colors,
-        { geometry, cell: geometryCell.cell || cell },
-    );
+    const color =
+        resolvedFillColor ??
+        resolveRenderedCellColor(stateValue, colorLookup, colors, {
+            geometry,
+            cell: geometryCell.cell || cell,
+        });
     drawPolygonCellWithTransientOverlay({
         context,
         vertices: geometryCell.vertices,

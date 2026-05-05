@@ -1,6 +1,4 @@
-import {
-    resolveTransientOverlayStyle,
-} from "../canvas/draw.js";
+import { resolveTransientOverlayStyle } from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
     clampGridDimension,
@@ -13,7 +11,6 @@ import type { PaintableCell } from "../types/editor.js";
 import type {
     GeometryAdapter,
     GeometryBuildMetricsArgs,
-    GeometryDrawOverlayArgs,
     GeometryResolveCellCenterArgs,
     GeometryResolveCellFromOffsetArgs,
     GeometryResolveCoordinateCenterArgs,
@@ -26,7 +23,10 @@ interface SquareMetrics extends GridMetrics {
     pitch: number;
 }
 
-function resolveSquareCoordinates(cell: PaintableCell | null | undefined): { x: number; y: number } {
+function resolveSquareCoordinates(cell: PaintableCell | null | undefined): {
+    x: number;
+    y: number;
+} {
     const parsed = parseRegularCellId(cell?.id);
     return {
         x: typeof cell?.x === "number" && Number.isInteger(cell.x) ? cell.x : parsed?.x || 0,
@@ -57,7 +57,8 @@ export const squareGeometryAdapter: GeometryAdapter = {
             width,
             height,
             fallbackCellSize,
-            buildMetrics: ({ width: nextWidth, height: nextHeight, cellSize }) => squareGridMetrics(nextWidth, nextHeight, cellSize),
+            buildMetrics: ({ width: nextWidth, height: nextHeight, cellSize }) =>
+                squareGridMetrics(nextWidth, nextHeight, cellSize),
         });
     },
 
@@ -65,8 +66,16 @@ export const squareGeometryAdapter: GeometryAdapter = {
         return null;
     },
 
-    resolveCellFromOffset({ offsetX, offsetY, width, height, cellSize, metrics }: GeometryResolveCellFromOffsetArgs) {
-        const resolvedMetrics = (metrics || squareGridMetrics(width, height, cellSize)) as SquareMetrics;
+    resolveCellFromOffset({
+        offsetX,
+        offsetY,
+        width,
+        height,
+        cellSize,
+        metrics,
+    }: GeometryResolveCellFromOffsetArgs) {
+        const resolvedMetrics = (metrics ||
+            squareGridMetrics(width, height, cellSize)) as SquareMetrics;
         if (offsetX < resolvedMetrics.gap || offsetY < resolvedMetrics.gap) {
             return null;
         }
@@ -86,16 +95,23 @@ export const squareGeometryAdapter: GeometryAdapter = {
         return { id: regularCellId(x, y), kind: "cell", x, y };
     },
 
-    resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics }: GeometryResolveCellCenterArgs) {
+    resolveCellCenter({
+        cell,
+        width = 0,
+        height = 0,
+        cellSize,
+        metrics,
+    }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveSquareCoordinates(cell);
-        const resolvedMetrics = (metrics || squareGridMetrics(
-            Math.max(width, x + 1, 1),
-            Math.max(height, y + 1, 1),
-            cellSize,
-        )) as SquareMetrics;
+        const resolvedMetrics = (metrics ||
+            squareGridMetrics(
+                Math.max(width, x + 1, 1),
+                Math.max(height, y + 1, 1),
+                cellSize,
+            )) as SquareMetrics;
         return {
-            x: resolvedMetrics.gap + (x * resolvedMetrics.pitch) + (cellSize / 2),
-            y: resolvedMetrics.gap + (y * resolvedMetrics.pitch) + (cellSize / 2),
+            x: resolvedMetrics.gap + x * resolvedMetrics.pitch + cellSize / 2,
+            y: resolvedMetrics.gap + y * resolvedMetrics.pitch + cellSize / 2,
         };
     },
 
@@ -109,18 +125,27 @@ export const squareGeometryAdapter: GeometryAdapter = {
         });
     },
 
-    drawCell({ context, cell, stateValue, metrics, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
+    drawCell({
+        context,
+        cell,
+        stateValue,
+        metrics,
+        colors,
+        colorLookup,
+        resolveRenderedCellColor,
+        renderStyle,
+        renderLayer,
+    }: RenderedCellArgs) {
         const squareMetrics = metrics as SquareMetrics;
         const { x, y } = resolveSquareCoordinates(cell);
         const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-        const color = resolveRenderedCellColor(
-            stateValue,
-            colorLookup,
-            colors,
-            { geometry: this.geometry, x, y },
-        );
-        const cellLeft = squareMetrics.gap + (x * squareMetrics.pitch);
-        const cellTop = squareMetrics.gap + (y * squareMetrics.pitch);
+        const color = resolveRenderedCellColor(stateValue, colorLookup, colors, {
+            geometry: this.geometry,
+            x,
+            y,
+        });
+        const cellLeft = squareMetrics.gap + x * squareMetrics.pitch;
+        const cellTop = squareMetrics.gap + y * squareMetrics.pitch;
         if (!overlayStyle || overlayStyle.drawBaseFill) {
             if (context.fillStyle !== color) {
                 context.fillStyle = color;

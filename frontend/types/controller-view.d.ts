@@ -1,6 +1,10 @@
 import type { SimulationMutationOptions } from "./controller-runtime.js";
 import type { BlockingActivityConfig, MutationRunnerOptions } from "./controller-runtime.js";
-import type { ConfigSyncBody, EmptyControlCommandPath, ResetControlBody } from "./controller-api.js";
+import type {
+    ConfigSyncBody,
+    EmptyControlCommandPath,
+    ResetControlBody,
+} from "./controller-api.js";
 import type { CellIdentifier, CellStateDefinition, SimulationSnapshot } from "./domain.js";
 import type { GestureOutlineTone, PaintableCell, PreviewPaintCells } from "./editor.js";
 import type { Point2D, RenderDiagnosticsSnapshot } from "./rendering.js";
@@ -26,7 +30,11 @@ export interface AppView {
     renderAll(): void;
     renderGrid(): void;
     renderControlsPanel(): void;
-    viewportDimensionsFor(geometry?: string, ruleName?: string | null, cellSizeOverride?: number): ViewportDimensions;
+    viewportDimensionsFor(
+        geometry?: string,
+        ruleName?: string | null,
+        cellSizeOverride?: number,
+    ): ViewportDimensions;
     applyViewportPreview(dimensions: ViewportDimensions): void;
 }
 
@@ -34,7 +42,10 @@ export interface InteractionController {
     bindGridInteractions(): void;
     toggleCell?(cell: CellIdentifier): Promise<void>;
     clearSelection?(): void;
-    sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
+    sendControl(
+        path: EmptyControlCommandPath,
+        options?: SimulationMutationOptions,
+    ): Promise<SimulationSnapshot | null>;
     sendControl(
         path: "/api/control/reset",
         body: ResetControlBody,
@@ -76,13 +87,21 @@ export interface GridView {
     setSelectedCells(cells: PaintableCell[]): void;
     getSelectedCells(): PaintableCell[];
     setGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone): void;
-    flashGestureOutline(cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number): void;
+    flashGestureOutline(
+        cells: PaintableCell[],
+        tone: GestureOutlineTone,
+        durationMs?: number,
+    ): void;
     clearGestureOutline(): void;
 }
 
 export interface ViewportControllerDependencies {
     getCurrentDimensions(): ViewportDimensions;
-    getViewportDimensions(geometry?: string, ruleName?: string | null, cellSize?: number): ViewportDimensions;
+    getViewportDimensions(
+        geometry?: string,
+        ruleName?: string | null,
+        cellSize?: number,
+    ): ViewportDimensions;
     collectConfig(): { speed: number; rule: string };
     unsafeSizeOverrideEnabled?(): boolean;
     applyPreview(dimensions: ViewportDimensions): void;

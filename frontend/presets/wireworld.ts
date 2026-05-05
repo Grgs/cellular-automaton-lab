@@ -1,7 +1,10 @@
 import { centerPattern, clamp, inBounds } from "./core.js";
 import type { CartesianSeedCell } from "../types/domain.js";
 
-function createSquareCellWriter(width: number, height: number): {
+function createSquareCellWriter(
+    width: number,
+    height: number,
+): {
     setCell(x: number, y: number, state: number): void;
     drawHorizontal(x1: number, x2: number, y: number, state: number): void;
     drawVertical(x: number, y1: number, y2: number, state: number): void;
@@ -33,7 +36,13 @@ function createSquareCellWriter(width: number, height: number): {
         }
     }
 
-    function drawStairLine(startX: number, startY: number, endX: number, endY: number, state: number): void {
+    function drawStairLine(
+        startX: number,
+        startY: number,
+        endX: number,
+        endY: number,
+        state: number,
+    ): void {
         let currentX = startX;
         let currentY = startY;
         setCell(currentX, currentY, state);
@@ -68,8 +77,8 @@ function createSquareCellWriter(width: number, height: number): {
 
 export function buildWireworldSignalLoop(width: number, height: number): CartesianSeedCell[] {
     const margin = 2;
-    const loopWidth = clamp(Math.floor(width * 0.56), 11, Math.max(11, width - (margin * 2)));
-    const loopHeight = clamp(Math.floor(height * 0.52), 8, Math.max(8, height - (margin * 2)));
+    const loopWidth = clamp(Math.floor(width * 0.56), 11, Math.max(11, width - margin * 2));
+    const loopHeight = clamp(Math.floor(height * 0.52), 8, Math.max(8, height - margin * 2));
     const { offsetX: left, offsetY: top } = centerPattern(width, height, loopWidth, loopHeight);
     const right = left + loopWidth - 1;
     const bottom = top + loopHeight - 1;
@@ -94,9 +103,14 @@ export function buildWireworldSignalLoop(width: number, height: number): Cartesi
 
 export function buildWireworldDiodeDemo(width: number, height: number): CartesianSeedCell[] {
     const margin = 2;
-    const patternWidth = clamp(Math.floor(width * 0.64), 15, Math.max(15, width - (margin * 2)));
-    const patternHeight = clamp(Math.floor(height * 0.58), 10, Math.max(10, height - (margin * 2)));
-    const { offsetX: left, offsetY: top } = centerPattern(width, height, patternWidth, patternHeight);
+    const patternWidth = clamp(Math.floor(width * 0.64), 15, Math.max(15, width - margin * 2));
+    const patternHeight = clamp(Math.floor(height * 0.58), 10, Math.max(10, height - margin * 2));
+    const { offsetX: left, offsetY: top } = centerPattern(
+        width,
+        height,
+        patternWidth,
+        patternHeight,
+    );
     const right = left + patternWidth - 1;
     const gateCenterX = left + Math.floor(patternWidth * 0.58);
     const gateCenterY = top + Math.floor(patternHeight / 2);

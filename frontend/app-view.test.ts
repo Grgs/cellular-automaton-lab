@@ -49,9 +49,11 @@ describe("app-view selection inspector integration", () => {
 
         appView.renderControlsPanel();
 
-        expect(buildControlsViewModel).toHaveBeenCalledWith(expect.objectContaining({
-            selectionInspectorSource: { selectedCells },
-        }));
+        expect(buildControlsViewModel).toHaveBeenCalledWith(
+            expect.objectContaining({
+                selectionInspectorSource: { selectedCells },
+            }),
+        );
         expect(renderControls).toHaveBeenCalledTimes(1);
     });
 });

@@ -11,12 +11,13 @@ function createBlockingActivity(
     message: string,
     detail: string,
     {
-    delayMs = BLOCKING_ACTIVITY_DELAY_MS,
-    escalateAfterMs = BLOCKING_ACTIVITY_ESCALATE_MS,
-}: {
-    delayMs?: number;
-    escalateAfterMs?: number;
-} = {}): Readonly<Required<BlockingActivityConfig>> {
+        delayMs = BLOCKING_ACTIVITY_DELAY_MS,
+        escalateAfterMs = BLOCKING_ACTIVITY_ESCALATE_MS,
+    }: {
+        delayMs?: number;
+        escalateAfterMs?: number;
+    } = {},
+): Readonly<Required<BlockingActivityConfig>> {
     return Object.freeze({
         kind,
         message,

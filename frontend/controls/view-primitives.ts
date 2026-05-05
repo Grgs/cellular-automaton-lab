@@ -1,8 +1,5 @@
 import type { DomElements } from "../types/dom.js";
-import type {
-    LabeledOption,
-    PaintPaletteState,
-} from "../types/ui.js";
+import type { LabeledOption, PaintPaletteState } from "../types/ui.js";
 import type { ThemeName } from "../theme.js";
 
 export function renderToggleButtons<TValue extends string | number>(
@@ -25,7 +22,10 @@ export function renderToggleButtons<TValue extends string | number>(
             button.classList.add("is-selected");
         }
         button.dataset[dataAttribute] = String(option.value);
-        button.setAttribute("aria-pressed", String(option.value) === String(selectedValue) ? "true" : "false");
+        button.setAttribute(
+            "aria-pressed",
+            String(option.value) === String(selectedValue) ? "true" : "false",
+        );
         button.textContent = option.label;
         container.appendChild(button);
     });
@@ -49,7 +49,10 @@ export function renderPaintPalette(
             button.classList.add("is-selected");
         }
         button.dataset.stateValue = String(cellState.value);
-        button.setAttribute("aria-pressed", cellState.value === selectedPaintState ? "true" : "false");
+        button.setAttribute(
+            "aria-pressed",
+            cellState.value === selectedPaintState ? "true" : "false",
+        );
 
         const swatch = document.createElement("span");
         swatch.className = "paint-state-swatch";
@@ -128,9 +131,7 @@ export function renderThemeToggle(elements: DomElements, theme: ThemeName): void
     elements.themeToggleBtn.dataset.theme = theme;
     elements.themeToggleBtn.setAttribute("aria-pressed", isDark ? "true" : "false");
 
-    const label = isDark
-        ? "Switch to light mode"
-        : "Switch to dark mode";
+    const label = isDark ? "Switch to light mode" : "Switch to dark mode";
     elements.themeToggleBtn.setAttribute("aria-label", label);
     elements.themeToggleBtn.title = label;
 }

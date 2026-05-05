@@ -49,10 +49,14 @@ function pointyHexCenterOffset(
     cellSize: number,
     metrics: GridMetrics | null = null,
 ): PointyHexCenterCell {
-    const resolvedMetrics = (metrics || hexGridMetrics(Math.max(x + 1, 1), Math.max(y + 1, 1), cellSize)) as HexMetrics;
+    const resolvedMetrics = (metrics ||
+        hexGridMetrics(Math.max(x + 1, 1), Math.max(y + 1, 1), cellSize)) as HexMetrics;
     return {
-        x: resolvedMetrics.xInset + (x * resolvedMetrics.horizontalPitch) + (y % 2 === 1 ? resolvedMetrics.hexWidth / 2 : 0),
-        y: resolvedMetrics.yInset + (y * resolvedMetrics.verticalPitch),
+        x:
+            resolvedMetrics.xInset +
+            x * resolvedMetrics.horizontalPitch +
+            (y % 2 === 1 ? resolvedMetrics.hexWidth / 2 : 0),
+        y: resolvedMetrics.yInset + y * resolvedMetrics.verticalPitch,
         radius: resolvedMetrics.radius,
         hexWidth: resolvedMetrics.hexWidth,
         horizontalPitch: resolvedMetrics.horizontalPitch,
@@ -79,8 +83,14 @@ function pointInPointyHex(
     return dx <= (hexWidth * (radius - dy)) / radius;
 }
 
-function buildHexGeometryCache(width: number, height: number, metrics: HexMetrics): HexGeometryCache {
-    const cells: HexGeometryCell[][] = Array.from({ length: height }, () => Array<HexGeometryCell>(width));
+function buildHexGeometryCache(
+    width: number,
+    height: number,
+    metrics: HexMetrics,
+): HexGeometryCache {
+    const cells: HexGeometryCell[][] = Array.from({ length: height }, () =>
+        Array<HexGeometryCell>(width),
+    );
 
     for (let y = 0; y < height; y += 1) {
         const rowOffset = y % 2 === 1 ? metrics.hexWidth / 2 : 0;
@@ -89,15 +99,15 @@ function buildHexGeometryCache(width: number, height: number, metrics: HexMetric
             continue;
         }
         for (let x = 0; x < width; x += 1) {
-            const centerX = metrics.xInset + (x * metrics.horizontalPitch) + rowOffset;
-            const centerY = metrics.yInset + (y * metrics.verticalPitch);
+            const centerX = metrics.xInset + x * metrics.horizontalPitch + rowOffset;
+            const centerY = metrics.yInset + y * metrics.verticalPitch;
             row[x] = {
                 centerX,
                 centerY,
                 radius: metrics.radius,
                 hexWidth: metrics.hexWidth,
-                minX: centerX - (metrics.hexWidth / 2),
-                maxX: centerX + (metrics.hexWidth / 2),
+                minX: centerX - metrics.hexWidth / 2,
+                maxX: centerX + metrics.hexWidth / 2,
                 minY: centerY - metrics.radius,
                 maxY: centerY + metrics.radius,
             };
@@ -109,7 +119,7 @@ function buildHexGeometryCache(width: number, height: number, metrics: HexMetric
 
 function estimateViewportHeight(viewportHeight: number, cellSize: number): number {
     const metrics = hexGridMetrics(1, 1, cellSize) as HexMetrics;
-    const available = viewportHeight - (2 * metrics.yInset) - metrics.hexHeight;
+    const available = viewportHeight - 2 * metrics.yInset - metrics.hexHeight;
     if (available <= 0) {
         return 5;
     }
@@ -118,7 +128,7 @@ function estimateViewportHeight(viewportHeight: number, cellSize: number): numbe
 
 function estimateViewportWidth(viewportWidth: number, height: number, cellSize: number): number {
     const metrics = hexGridMetrics(1, Math.max(height, 2), cellSize) as HexMetrics;
-    const available = viewportWidth - (2 * metrics.xInset) - metrics.oddRowOffset - metrics.hexWidth;
+    const available = viewportWidth - 2 * metrics.xInset - metrics.oddRowOffset - metrics.hexWidth;
     if (available <= 0) {
         return 5;
     }
@@ -145,12 +155,14 @@ export const hexGeometryAdapter: GeometryAdapter = {
         const estimatedHeight = estimateViewportHeight(viewportHeight, cellSize);
         const height = fitGridDimension(
             estimatedHeight,
-            (candidateHeight) => hexGridMetrics(1, candidateHeight, cellSize).cssHeight <= viewportHeight,
+            (candidateHeight) =>
+                hexGridMetrics(1, candidateHeight, cellSize).cssHeight <= viewportHeight,
         );
         const estimatedWidth = estimateViewportWidth(viewportWidth, height, cellSize);
         const width = fitGridDimension(
             estimatedWidth,
-            (candidateWidth) => hexGridMetrics(candidateWidth, height, cellSize).cssWidth <= viewportWidth,
+            (candidateWidth) =>
+                hexGridMetrics(candidateWidth, height, cellSize).cssWidth <= viewportWidth,
         );
         return {
             width: clampGridDimension(width),
@@ -165,28 +177,41 @@ export const hexGeometryAdapter: GeometryAdapter = {
             width,
             height,
             fallbackCellSize,
-            buildMetrics: ({ width: nextWidth, height: nextHeight, cellSize }) => hexGridMetrics(nextWidth, nextHeight, cellSize),
+            buildMetrics: ({ width: nextWidth, height: nextHeight, cellSize }) =>
+                hexGridMetrics(nextWidth, nextHeight, cellSize),
         });
     },
 
     buildCache({ width, height, metrics, maxCachedCells }: GeometryBuildCacheArgs) {
-        if ((width * height) > maxCachedCells) {
+        if (width * height > maxCachedCells) {
             return null;
         }
         return buildHexGeometryCache(width, height, metrics as HexMetrics);
     },
 
-    resolveCellFromOffset({ offsetX, offsetY, width, height, cellSize, metrics, cache }: GeometryResolveCellFromOffsetArgs) {
+    resolveCellFromOffset({
+        offsetX,
+        offsetY,
+        width,
+        height,
+        cellSize,
+        metrics,
+        cache,
+    }: GeometryResolveCellFromOffsetArgs) {
         const resolvedMetrics = (metrics || hexGridMetrics(width, height, cellSize)) as HexMetrics;
         const hexCache = asHexGeometryCache(cache);
-        const approximateRow = Math.round((offsetY - resolvedMetrics.yInset) / resolvedMetrics.verticalPitch);
+        const approximateRow = Math.round(
+            (offsetY - resolvedMetrics.yInset) / resolvedMetrics.verticalPitch,
+        );
 
         for (let y = approximateRow - 1; y <= approximateRow + 1; y += 1) {
             if (y < 0 || y >= height) {
                 continue;
             }
             const rowOffset = y % 2 === 1 ? resolvedMetrics.hexWidth / 2 : 0;
-            const approximateColumn = Math.round((offsetX - resolvedMetrics.xInset - rowOffset) / resolvedMetrics.horizontalPitch);
+            const approximateColumn = Math.round(
+                (offsetX - resolvedMetrics.xInset - rowOffset) / resolvedMetrics.horizontalPitch,
+            );
 
             for (let x = approximateColumn - 1; x <= approximateColumn + 1; x += 1) {
                 if (x < 0 || x >= width) {
@@ -199,7 +224,7 @@ export const hexGeometryAdapter: GeometryAdapter = {
                 const centerY = "centerY" in cell ? cell.centerY : cell.y;
                 const radius = cell.radius;
                 const hexWidth = cell.hexWidth;
-                if (offsetX < centerX - (hexWidth / 2) || offsetX > centerX + (hexWidth / 2)) {
+                if (offsetX < centerX - hexWidth / 2 || offsetX > centerX + hexWidth / 2) {
                     continue;
                 }
                 if (offsetY < centerY - radius || offsetY > centerY + radius) {
@@ -214,18 +239,30 @@ export const hexGeometryAdapter: GeometryAdapter = {
         return null;
     },
 
-    resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics, cache }: GeometryResolveCellCenterArgs) {
+    resolveCellCenter({
+        cell,
+        width = 0,
+        height = 0,
+        cellSize,
+        metrics,
+        cache,
+    }: GeometryResolveCellCenterArgs) {
         const { x, y } = resolveHexCoordinates(cell);
         const hexCache = asHexGeometryCache(cache);
         const cachedRow = hexCache?.cells[y] ?? null;
         const cachedCell = cachedRow?.[x]
             ? cachedRow[x]
             : pointyHexCenterOffset(
-                x,
-                y,
-                cellSize,
-                metrics || hexGridMetrics(Math.max(width, x + 1, 1), Math.max(height, y + 1, 1), cellSize),
-            );
+                  x,
+                  y,
+                  cellSize,
+                  metrics ||
+                      hexGridMetrics(
+                          Math.max(width, x + 1, 1),
+                          Math.max(height, y + 1, 1),
+                          cellSize,
+                      ),
+              );
         return {
             x: "centerX" in cachedCell ? cachedCell.centerX : cachedCell.x,
             y: "centerY" in cachedCell ? cachedCell.centerY : cachedCell.y,
@@ -242,17 +279,27 @@ export const hexGeometryAdapter: GeometryAdapter = {
         });
     },
 
-    drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
+    drawCell({
+        context,
+        cell,
+        stateValue,
+        metrics,
+        cache,
+        colors,
+        colorLookup,
+        resolveRenderedCellColor,
+        renderStyle,
+        renderLayer,
+    }: RenderedCellArgs) {
         const { x, y } = resolveHexCoordinates(cell);
         const hexMetrics = metrics as HexMetrics;
         const hexCache = asHexGeometryCache(cache);
         const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-        const color = resolveRenderedCellColor(
-            stateValue,
-            colorLookup,
-            colors,
-            { geometry: this.geometry, x, y },
-        );
+        const color = resolveRenderedCellColor(stateValue, colorLookup, colors, {
+            geometry: this.geometry,
+            x,
+            y,
+        });
         const cachedRow = hexCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x]
             ? cachedRow[x]

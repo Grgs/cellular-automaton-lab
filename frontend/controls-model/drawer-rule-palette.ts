@@ -12,7 +12,9 @@ export function buildDrawerRulePaletteViewModel({
     const availableRules = Array.isArray(state.rules) ? state.rules : [];
 
     return {
-        ruleSummaryText: paletteRule?.description || "Select a rule to see its evolution notes and paint states.",
+        ruleSummaryText:
+            paletteRule?.description ||
+            "Select a rule to see its evolution notes and paint states.",
         ruleSelectValue: paletteRule ? paletteRule.name : "",
         ruleOptions: availableRules.map((rule) => ({
             name: rule.name,
@@ -21,12 +23,12 @@ export function buildDrawerRulePaletteViewModel({
         ruleDescription: paletteRule?.description ?? "",
         paletteStates: Array.isArray(paletteRule?.states)
             ? paletteRule.states
-                .filter((cellState) => cellState.paintable)
-                .map((cellState) => ({
-                    value: cellState.value,
-                    label: cellState.label ?? `State ${cellState.value}`,
-                    color: cellState.color ?? "",
-                }))
+                  .filter((cellState) => cellState.paintable)
+                  .map((cellState) => ({
+                      value: cellState.value,
+                      label: cellState.label ?? `State ${cellState.value}`,
+                      color: cellState.color ?? "",
+                  }))
             : [],
         selectedPaintState: state.selectedPaintState,
     };

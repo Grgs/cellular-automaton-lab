@@ -50,7 +50,10 @@ describe("controls-model/selection-inspector", () => {
                 neighbors: ["cell:b"],
                 tile_family: "family-a",
                 center: { x: 0, y: 1 },
-                vertices: [{ x: 0, y: 0 }, { x: 1, y: 0 }],
+                vertices: [
+                    { x: 0, y: 0 },
+                    { x: 1, y: 0 },
+                ],
             },
             {
                 id: "cell:b",
@@ -81,9 +84,18 @@ describe("controls-model/selection-inspector", () => {
         expect(inspector.title).toBe("Live Cells Summary");
         expect(inspector.subtitle).toBe("Current population overview");
         expect(inspector.summaryRows).toContainEqual({ label: "Live Cells", value: "2" });
-        expect(inspector.summaryRows).toContainEqual({ label: "State Mix", value: "Signal (2): 2" });
-        expect(inspector.summaryRows).toContainEqual({ label: "Kind Mix", value: "square: 1, triangle: 1" });
-        expect(inspector.advancedRows).toContainEqual({ label: "Neighbor Count Distribution", value: "1: 1, 2: 1" });
+        expect(inspector.summaryRows).toContainEqual({
+            label: "State Mix",
+            value: "Signal (2): 2",
+        });
+        expect(inspector.summaryRows).toContainEqual({
+            label: "Kind Mix",
+            value: "square: 1, triangle: 1",
+        });
+        expect(inspector.advancedRows).toContainEqual({
+            label: "Neighbor Count Distribution",
+            value: "1: 1, 2: 1",
+        });
         expect(inspector.advancedRows.at(-1)).toEqual({
             label: "Live Cell IDs",
             value: "cell:a, cell:b",
@@ -136,21 +148,33 @@ describe("controls-model/selection-inspector", () => {
             kind: index % 2 === 0 ? "triangle" : "square",
             neighbors: index % 3 === 0 ? ["cell:x", "cell:y"] : ["cell:x"],
             center: { x: index, y: 22 - index },
-            vertices: [{ x: 0, y: 0 }, { x: 1, y: 0 }],
+            vertices: [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+            ],
             tile_family: index % 2 === 0 ? "family-a" : "family-b",
         }));
 
         const inspector = buildSelectionInspectorViewModel({
             selectedCells: cells.map((cell) => ({ id: cell.id })),
             topologyIndex: topologyIndex(cells),
-            cellStates: cells.map((_, index) => index % 2 === 0 ? 2 : 0),
+            cellStates: cells.map((_, index) => (index % 2 === 0 ? 2 : 0)),
             activeRule,
         });
 
         expect(inspector.mode).toBe("multi");
-        expect(inspector.summaryRows).toContainEqual({ label: "State Mix", value: "Dead (0): 11, Signal (2): 11" });
-        expect(inspector.summaryRows).toContainEqual({ label: "Kind Mix", value: "square: 11, triangle: 11" });
-        expect(inspector.advancedRows).toContainEqual({ label: "Neighbor Count Distribution", value: "1: 14, 2: 8" });
+        expect(inspector.summaryRows).toContainEqual({
+            label: "State Mix",
+            value: "Dead (0): 11, Signal (2): 11",
+        });
+        expect(inspector.summaryRows).toContainEqual({
+            label: "Kind Mix",
+            value: "square: 11, triangle: 11",
+        });
+        expect(inspector.advancedRows).toContainEqual({
+            label: "Neighbor Count Distribution",
+            value: "1: 14, 2: 8",
+        });
         expect(inspector.advancedRows.at(-1)).toEqual({
             label: "Selected Cell IDs",
             value: "cell:00, cell:01, cell:02, cell:03, cell:04, cell:05, cell:06, cell:07, cell:08, cell:09, cell:10, cell:11, cell:12, cell:13, cell:14, cell:15, cell:16, cell:17, cell:18, cell:19, +2 more",

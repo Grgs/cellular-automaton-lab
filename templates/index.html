@@ -1,39 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cellular Automaton Lab</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-    <script>
-        (function () {
-            window.APP_DEFAULTS = {{ app_defaults | tojson }};
-            window.APP_TOPOLOGIES = {{ topology_catalog | tojson }};
-            window.APP_PERIODIC_FACE_TILINGS = {{ periodic_face_tilings | tojson }};
-            window.APP_APERIODIC_FAMILIES = {{ aperiodic_families | tojson }};
-            try {
-                var themeDefaults = (window.APP_DEFAULTS && window.APP_DEFAULTS.theme) || {};
-                var storageKey = themeDefaults.storage_key || "cellular-automaton-theme";
-                var defaultTheme = themeDefaults.default || "light";
-                var storedTheme = window.localStorage.getItem(storageKey);
-                if (storedTheme === "light" || storedTheme === "dark") {
-                    document.documentElement.dataset.theme = storedTheme;
-                    return;
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cellular Automaton Lab</title>
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="{{ url_for('static', filename='favicon.svg') }}"
+        />
+        <script>
+            (function () {
+                window.APP_DEFAULTS = {{ app_defaults | tojson }};
+                window.APP_TOPOLOGIES = {{ topology_catalog | tojson }};
+                window.APP_PERIODIC_FACE_TILINGS = {{ periodic_face_tilings | tojson }};
+                window.APP_APERIODIC_FAMILIES = {{ aperiodic_families | tojson }};
+                try {
+                    var themeDefaults = (window.APP_DEFAULTS && window.APP_DEFAULTS.theme) || {};
+                    var storageKey = themeDefaults.storage_key || "cellular-automaton-theme";
+                    var defaultTheme = themeDefaults.default || "light";
+                    var storedTheme = window.localStorage.getItem(storageKey);
+                    if (storedTheme === "light" || storedTheme === "dark") {
+                        document.documentElement.dataset.theme = storedTheme;
+                        return;
+                    }
+                    document.documentElement.dataset.theme = defaultTheme;
+                } catch (error) {
+                    void error;
                 }
-                document.documentElement.dataset.theme = defaultTheme;
-            } catch (error) {
-                void error;
-            }
-        }());
-    </script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    {% for stylesheet in frontend_stylesheets %}
-    <link rel="stylesheet" href="{{ url_for('static', filename=stylesheet) }}">
-    {% endfor %}
-</head>
-<body>
-    {{ app_shell }}
+            }());
+        </script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+        {% for stylesheet in frontend_stylesheets %}
+        <link rel="stylesheet" href="{{ url_for('static', filename=stylesheet) }}" />
+        {% endfor %}
+    </head>
+    <body>
+        {{ app_shell }}
 
-    <script type="module" src="{{ url_for('static', filename=frontend_script) }}"></script>
-</body>
+        <script type="module" src="{{ url_for('static', filename=frontend_script) }}"></script>
+    </body>
 </html>

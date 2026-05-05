@@ -131,14 +131,17 @@ export function applyOverlayIntent(
             const inspectorChanged = setInspectorHidden(state, false);
             const runPendingChanged = setRunPending(state, false);
             const runningRestoreChanged = setRunningRestoreActive(state, false);
-            return dismissalChanged || inspectorChanged || runPendingChanged || runningRestoreChanged;
+            return (
+                dismissalChanged || inspectorChanged || runPendingChanged || runningRestoreChanged
+            );
         }
         case OVERLAY_INTENT_MANUAL_RESTORE: {
             const dismissalChanged = setDismissed(state, false);
             const inspectorChanged = setInspectorHidden(state, false);
-            const runningRestoreChanged = (state.isRunning || state.overlayRunPending)
-                ? setRunningRestoreActive(state, true)
-                : false;
+            const runningRestoreChanged =
+                state.isRunning || state.overlayRunPending
+                    ? setRunningRestoreActive(state, true)
+                    : false;
             return dismissalChanged || inspectorChanged || runningRestoreChanged;
         }
         case OVERLAY_INTENT_MANUAL_HIDE_INSPECTOR: {

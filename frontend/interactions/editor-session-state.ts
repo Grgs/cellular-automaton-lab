@@ -1,8 +1,4 @@
-import {
-    EDITOR_TOOL_BRUSH,
-    EDITOR_TOOL_LINE,
-    EDITOR_TOOL_RECTANGLE,
-} from "../editor-tools.js";
+import { EDITOR_TOOL_BRUSH, EDITOR_TOOL_LINE, EDITOR_TOOL_RECTANGLE } from "../editor-tools.js";
 import { FOLLOWUP_CLICK_SUPPRESSION_RESET_DELAY_MS } from "./constants.js";
 import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
 
@@ -80,7 +76,10 @@ export function createEditorPointerState(): EditorPointerState {
         activePointerId = pointerId ?? null;
     }
 
-    function updateBrushSession(cell: PaintableCell, nextCells: PreviewPaintCell[]): PreviewPaintCell[] {
+    function updateBrushSession(
+        cell: PaintableCell,
+        nextCells: PreviewPaintCell[],
+    ): PreviewPaintCell[] {
         const session = activeEditorSession;
         if (!session || session.kind !== EDITOR_TOOL_BRUSH || nextCells.length === 0) {
             return [];
@@ -118,9 +117,15 @@ export function createEditorPointerState(): EditorPointerState {
         activePointerId = pointerId ?? null;
     }
 
-    function updateShapeSession(cell: PaintableCell, nextCells: PreviewPaintCell[]): PreviewPaintCell[] {
+    function updateShapeSession(
+        cell: PaintableCell,
+        nextCells: PreviewPaintCell[],
+    ): PreviewPaintCell[] {
         const session = activeEditorSession;
-        if (!session || (session.kind !== EDITOR_TOOL_LINE && session.kind !== EDITOR_TOOL_RECTANGLE)) {
+        if (
+            !session ||
+            (session.kind !== EDITOR_TOOL_LINE && session.kind !== EDITOR_TOOL_RECTANGLE)
+        ) {
             return [];
         }
         session.currentCell = cell;
@@ -130,7 +135,11 @@ export function createEditorPointerState(): EditorPointerState {
     }
 
     function endShapeSession(): ShapeEditorSession | null {
-        if (!activeEditorSession || (activeEditorSession.kind !== EDITOR_TOOL_LINE && activeEditorSession.kind !== EDITOR_TOOL_RECTANGLE)) {
+        if (
+            !activeEditorSession ||
+            (activeEditorSession.kind !== EDITOR_TOOL_LINE &&
+                activeEditorSession.kind !== EDITOR_TOOL_RECTANGLE)
+        ) {
             return null;
         }
         const session = activeEditorSession;

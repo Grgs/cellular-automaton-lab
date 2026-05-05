@@ -31,23 +31,24 @@ export function createEditorCommitRuntime({
             return true;
         }
 
-        const pausedState = await runStateMutation(
-            () => postControl("/api/control/pause"),
-            { source: "control" },
-        ).catch(() => null);
+        const pausedState = await runStateMutation(() => postControl("/api/control/pause"), {
+            source: "control",
+        }).catch(() => null);
         return Boolean(pausedState);
     }
 
-    async function commitEditorCells(cells: PreviewPaintCell[]): Promise<SimulationSnapshot | null> {
+    async function commitEditorCells(
+        cells: PreviewPaintCell[],
+    ): Promise<SimulationSnapshot | null> {
         const edit = buildCommittedEdit(state, cells);
         if (!edit) {
             return null;
         }
 
-        const simulationState = await runStateMutation(
-            () => setCellsRequest(edit.forwardCells),
-            { recoverWithRefresh: true, source: "editor" },
-        ).catch(() => null);
+        const simulationState = await runStateMutation(() => setCellsRequest(edit.forwardCells), {
+            recoverWithRefresh: true,
+            source: "editor",
+        }).catch(() => null);
         if (simulationState) {
             pushUndoEntry(state, edit);
             renderControlPanel();

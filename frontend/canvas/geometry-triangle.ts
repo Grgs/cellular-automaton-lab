@@ -34,14 +34,15 @@ export function triangleOrientation(x: number, y: number): "up" | "down" {
 }
 
 export function triangleVertices(x: number, y: number, cellSize: number): Point2D[] {
-    const { xInset, yInset, triangleSide, triangleHeight, horizontalPitch } = triangleLayout(cellSize);
-    const leftX = xInset + (x * horizontalPitch);
-    const topY = yInset + (y * triangleHeight);
+    const { xInset, yInset, triangleSide, triangleHeight, horizontalPitch } =
+        triangleLayout(cellSize);
+    const leftX = xInset + x * horizontalPitch;
+    const topY = yInset + y * triangleHeight;
 
     if (triangleOrientation(x, y) === "up") {
         return [
             { x: leftX, y: topY + triangleHeight },
-            { x: leftX + (triangleSide / 2), y: topY },
+            { x: leftX + triangleSide / 2, y: topY },
             { x: leftX + triangleSide, y: topY + triangleHeight },
         ];
     }
@@ -49,7 +50,7 @@ export function triangleVertices(x: number, y: number, cellSize: number): Point2
     return [
         { x: leftX, y: topY },
         { x: leftX + triangleSide, y: topY },
-        { x: leftX + (triangleSide / 2), y: topY + triangleHeight },
+        { x: leftX + triangleSide / 2, y: topY + triangleHeight },
     ];
 }
 
@@ -70,10 +71,8 @@ function pointInTriangle(offsetX: number, offsetY: number, vertices: readonly Po
     if (!a || !b || !c) {
         return false;
     }
-    const sign = (left: Point2D, right: Point2D, point: Point2D) => (
-        ((left.x - point.x) * (right.y - point.y))
-        - ((right.x - point.x) * (left.y - point.y))
-    );
+    const sign = (left: Point2D, right: Point2D, point: Point2D) =>
+        (left.x - point.x) * (right.y - point.y) - (right.x - point.x) * (left.y - point.y);
     const point = { x: offsetX, y: offsetY };
     const d1 = sign(point, a, b);
     const d2 = sign(point, b, c);
@@ -92,9 +91,14 @@ export function resolveTriangleCellFromOffset(
     metrics: GridMetrics | null = null,
     geometryCache: { type?: string; cells?: TriangleGeometryCell[][] } | null = null,
 ): { x: number; y: number } | null {
-    const resolvedMetrics = (metrics || triangleGridMetrics(width, height, cellSize)) as TriangleMetrics;
-    const approximateRow = Math.floor((offsetY - resolvedMetrics.yInset) / resolvedMetrics.triangleHeight);
-    const approximateColumn = Math.round((offsetX - resolvedMetrics.xInset) / resolvedMetrics.horizontalPitch);
+    const resolvedMetrics = (metrics ||
+        triangleGridMetrics(width, height, cellSize)) as TriangleMetrics;
+    const approximateRow = Math.floor(
+        (offsetY - resolvedMetrics.yInset) / resolvedMetrics.triangleHeight,
+    );
+    const approximateColumn = Math.round(
+        (offsetX - resolvedMetrics.xInset) / resolvedMetrics.horizontalPitch,
+    );
 
     for (let y = approximateRow - 1; y <= approximateRow + 1; y += 1) {
         if (y < 0 || y >= height) {
@@ -104,18 +108,24 @@ export function resolveTriangleCellFromOffset(
             if (x < 0 || x >= width) {
                 continue;
             }
-            const cachedRow = geometryCache?.type === "triangle" && Array.isArray(geometryCache.cells)
-                ? geometryCache.cells[y]
-                : null;
+            const cachedRow =
+                geometryCache?.type === "triangle" && Array.isArray(geometryCache.cells)
+                    ? geometryCache.cells[y]
+                    : null;
             const cell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
             if (
-                "minX" in cell
-                && typeof cell.minX === "number"
-                && typeof cell.maxX === "number"
-                && typeof cell.minY === "number"
-                && typeof cell.maxY === "number"
+                "minX" in cell &&
+                typeof cell.minX === "number" &&
+                typeof cell.maxX === "number" &&
+                typeof cell.minY === "number" &&
+                typeof cell.maxY === "number"
             ) {
-                if (offsetX < cell.minX || offsetX > cell.maxX || offsetY < cell.minY || offsetY > cell.maxY) {
+                if (
+                    offsetX < cell.minX ||
+                    offsetX > cell.maxX ||
+                    offsetY < cell.minY ||
+                    offsetY > cell.maxY
+                ) {
                     continue;
                 }
             }

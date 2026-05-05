@@ -3,7 +3,6 @@ import type {
     CreateSimulationMutationsOptions,
     MutationRunner,
     MutationRunnerOptions,
-    PostControlFunction,
     SimulationMutations,
 } from "../types/controller.js";
 import type { SimulationSnapshot } from "../types/domain.js";
@@ -28,15 +27,20 @@ export function createConfigSyncMutationRuntime({
     mutationRunner: MutationRunner;
     simulationMutations?: SimulationMutations | null;
     onError: (error: unknown) => void;
-    applySimulationState: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;
+    applySimulationState: (
+        simulationState: SimulationSnapshot,
+        options?: { source?: string },
+    ) => void;
     refreshState: () => Promise<void>;
 }): ConfigSyncMutationRuntime {
-    const mutations = simulationMutations || createSimulationMutations({
-        mutationRunner,
-        onError,
-        applySimulationState,
-        refreshState,
-    } satisfies CreateSimulationMutationsOptions);
+    const mutations =
+        simulationMutations ||
+        createSimulationMutations({
+            mutationRunner,
+            onError,
+            applySimulationState,
+            refreshState,
+        } satisfies CreateSimulationMutationsOptions);
 
     function normalizeConfigBody(body: ConfigSyncBody | null = null): ConfigSyncBody {
         if (!body) {
@@ -54,15 +58,12 @@ export function createConfigSyncMutationRuntime({
         { onFailure }: { onFailure?: () => void } = {},
     ): Promise<void> {
         try {
-            await mutations.runSerialized(
-                async () => mutations.applyRemoteState(await task()),
-                {
-                    onRecover: async () => {
-                        onFailure?.();
-                        await refreshState();
-                    },
-                } satisfies MutationRunnerOptions,
-            );
+            await mutations.runSerialized(async () => mutations.applyRemoteState(await task()), {
+                onRecover: async () => {
+                    onFailure?.();
+                    await refreshState();
+                },
+            } satisfies MutationRunnerOptions);
         } catch {
             // The shared mutation runner already reported and recovered.
         }

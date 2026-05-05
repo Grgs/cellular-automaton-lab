@@ -14,9 +14,15 @@ function topologyEntry(
         picker_group: "Fixture",
         picker_order: 1,
         sizing_mode: renderKind === "polygon_aperiodic" ? "patch_depth" : "grid",
-        family: renderKind === "regular_grid" ? "regular" : renderKind === "polygon_aperiodic" ? "aperiodic" : "mixed",
+        family:
+            renderKind === "regular_grid"
+                ? "regular"
+                : renderKind === "polygon_aperiodic"
+                  ? "aperiodic"
+                  : "mixed",
         render_kind: renderKind,
-        viewport_sync_mode: renderKind === "polygon_aperiodic" ? "presentation-only" : "backend-sync",
+        viewport_sync_mode:
+            renderKind === "polygon_aperiodic" ? "presentation-only" : "backend-sync",
         supported_adjacency_modes: ["edge"],
         default_adjacency_mode: "edge",
         default_rules: { edge: "life-b2-s23" },

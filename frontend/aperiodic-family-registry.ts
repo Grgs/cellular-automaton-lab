@@ -2,7 +2,10 @@ import type { BootstrappedAperiodicFamilyDefinition } from "./types/domain.js";
 
 let cachedSource: ReadonlyArray<BootstrappedAperiodicFamilyDefinition> | null = null;
 let cachedFamilies: readonly Readonly<BootstrappedAperiodicFamilyDefinition>[] | null = null;
-let cachedByTilingFamily: ReadonlyMap<string, Readonly<BootstrappedAperiodicFamilyDefinition>> | null = null;
+let cachedByTilingFamily: ReadonlyMap<
+    string,
+    Readonly<BootstrappedAperiodicFamilyDefinition>
+> | null = null;
 
 function normalizeAperiodicFamilyDefinition(
     definition: BootstrappedAperiodicFamilyDefinition,
@@ -57,7 +60,9 @@ export function isExperimentalAperiodicFamily(tilingFamily: string | null | unde
     return getAperiodicFamilyMetadata(tilingFamily)?.experimental === true;
 }
 
-function humanizeImplementationStatus(status: BootstrappedAperiodicFamilyDefinition["implementation_status"]): string {
+function humanizeImplementationStatus(
+    status: BootstrappedAperiodicFamilyDefinition["implementation_status"],
+): string {
     switch (status) {
         case "true_substitution":
             return "True substitution";
@@ -72,9 +77,7 @@ function humanizeImplementationStatus(status: BootstrappedAperiodicFamilyDefinit
     }
 }
 
-export function describeAperiodicFamilyStatus(
-    tilingFamily: string | null | undefined,
-): {
+export function describeAperiodicFamilyStatus(tilingFamily: string | null | undefined): {
     label: string;
     detail: string;
     tone: "info" | "warning";

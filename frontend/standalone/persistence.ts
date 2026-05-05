@@ -23,8 +23,10 @@ function openDatabase(): Promise<IDBDatabase> {
 function transactionDone(transaction: IDBTransaction): Promise<void> {
     return new Promise((resolve, reject) => {
         transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error ?? new Error("IndexedDB transaction failed."));
-        transaction.onabort = () => reject(transaction.error ?? new Error("IndexedDB transaction aborted."));
+        transaction.onerror = () =>
+            reject(transaction.error ?? new Error("IndexedDB transaction failed."));
+        transaction.onabort = () =>
+            reject(transaction.error ?? new Error("IndexedDB transaction aborted."));
     });
 }
 
@@ -35,10 +37,16 @@ async function createIndexedDbPersistence(): Promise<SimulationStatePersistence>
             const transaction = database.transaction(OBJECT_STORE_NAME, "readonly");
             const store = transaction.objectStore(OBJECT_STORE_NAME);
             const request = store.get(SNAPSHOT_KEY);
-            const value = await new Promise<PersistedSimulationSnapshotV5 | null>((resolve, reject) => {
-                request.onsuccess = () => resolve((request.result as PersistedSimulationSnapshotV5 | undefined) ?? null);
-                request.onerror = () => reject(request.error ?? new Error("IndexedDB read failed."));
-            });
+            const value = await new Promise<PersistedSimulationSnapshotV5 | null>(
+                (resolve, reject) => {
+                    request.onsuccess = () =>
+                        resolve(
+                            (request.result as PersistedSimulationSnapshotV5 | undefined) ?? null,
+                        );
+                    request.onerror = () =>
+                        reject(request.error ?? new Error("IndexedDB read failed."));
+                },
+            );
             await transactionDone(transaction);
             return value;
         },

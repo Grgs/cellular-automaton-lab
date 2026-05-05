@@ -44,9 +44,7 @@ describe("controls-model drawer sections", () => {
         expect(viewModel.ruleOptions).toEqual([
             { name: "signal-rule", displayName: "Signal Rule" },
         ]);
-        expect(viewModel.paletteStates).toEqual([
-            { value: 2, label: "Signal", color: "#ff0000" },
-        ]);
+        expect(viewModel.paletteStates).toEqual([{ value: 2, label: "Signal", color: "#ff0000" }]);
     });
 
     it("builds pattern controls independently from preset selection and topology availability", async () => {

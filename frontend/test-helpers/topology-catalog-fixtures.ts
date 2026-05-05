@@ -1,7 +1,6 @@
 import { getTopologyFamilyMetadata } from "../topology-family-metadata.js";
 import type { BootstrappedTopologyDefinition, SizingPolicy } from "../types/domain.js";
 
-
 type VariantFields = Pick<
     BootstrappedTopologyDefinition,
     | "render_kind"
@@ -12,7 +11,6 @@ type VariantFields = Pick<
     | "sizing_policy"
 >;
 
-
 function requireTopologyFamilyMetadata(tilingFamily: string) {
     const metadata = getTopologyFamilyMetadata(tilingFamily);
     if (!metadata) {
@@ -20,7 +18,6 @@ function requireTopologyFamilyMetadata(tilingFamily: string) {
     }
     return metadata;
 }
-
 
 export function buildBootstrappedTopologyDefinition(
     tilingFamily: string,
@@ -38,7 +35,6 @@ export function buildBootstrappedTopologyDefinition(
         ...variantFields,
     };
 }
-
 
 export function buildSingleVariantBootstrappedTopologyDefinition(
     tilingFamily: string,

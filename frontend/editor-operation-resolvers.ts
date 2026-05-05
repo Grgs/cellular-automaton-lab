@@ -3,7 +3,11 @@ import { resolveGeometryCache } from "./canvas/cache.js";
 import { gridMetrics } from "./layout.js";
 import { currentTopologyVariantKey } from "./state/simulation-state.js";
 import { findTopologyCellById, isRegularGeometry, regularCellId } from "./topology.js";
-import type { IndexedTopologyPaintableCell, PaintableCell, PreviewPaintCell } from "./types/editor.js";
+import type {
+    IndexedTopologyPaintableCell,
+    PaintableCell,
+    PreviewPaintCell,
+} from "./types/editor.js";
 import type { GeometryCache } from "./types/rendering.js";
 import type { AppState } from "./types/state.js";
 
@@ -49,7 +53,11 @@ export function resolveTopologyCell(
     if (typeof cell.id === "string" && cell.id.length > 0) {
         return findTopologyCellById(state.topologyIndex, cell.id);
     }
-    if (isRegularGeometry(currentTopologyVariantKey(state)) && Number.isFinite(cell.x) && Number.isFinite(cell.y)) {
+    if (
+        isRegularGeometry(currentTopologyVariantKey(state)) &&
+        Number.isFinite(cell.x) &&
+        Number.isFinite(cell.y)
+    ) {
         return findTopologyCellById(state.topologyIndex, regularCellId(cell.x ?? 0, cell.y ?? 0));
     }
     return null;
@@ -63,7 +71,13 @@ export function resolveSampledCell(
 ): IndexedTopologyPaintableCell | null {
     const nextRenderCellSize = renderCellSize(state);
     const topologyVariantKey = currentTopologyVariantKey(state);
-    const metrics = gridMetrics(state.width, state.height, nextRenderCellSize, topologyVariantKey, state.topology);
+    const metrics = gridMetrics(
+        state.width,
+        state.height,
+        nextRenderCellSize,
+        topologyVariantKey,
+        state.topology,
+    );
     return resolveTopologyCell(
         state,
         resolveCellFromCanvasOffset(
@@ -82,7 +96,13 @@ export function resolveSampledCell(
 export function geometryCacheForState(state: AppState): GeometryCache | null {
     const nextRenderCellSize = renderCellSize(state);
     const topologyVariantKey = currentTopologyVariantKey(state);
-    const metrics = gridMetrics(state.width, state.height, nextRenderCellSize, topologyVariantKey, state.topology);
+    const metrics = gridMetrics(
+        state.width,
+        state.height,
+        nextRenderCellSize,
+        topologyVariantKey,
+        state.topology,
+    );
     return resolveGeometryCache({
         existingKey: "",
         existingCache: null,

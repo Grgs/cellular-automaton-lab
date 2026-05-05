@@ -1,8 +1,5 @@
-import {
-    describeTopologySpec,
-    getTopologyDefinition,
-} from "./topology-catalog.js";
-import type { PatternPayload, ParsedPattern, TopologySpec } from "./types/domain.js";
+import { describeTopologySpec } from "./topology-catalog.js";
+import type { PatternPayload } from "./types/domain.js";
 import type { AppState } from "./types/state.js";
 import { PatternValidationError, parsePatternText } from "./parsers/pattern.js";
 
@@ -13,14 +10,18 @@ export function buildPatternPayload(state: AppState): PatternPayload {
     const topology = state?.topology;
     const rule = state?.activeRule;
     if (!topology || !Array.isArray(topology.cells) || !rule?.name) {
-        throw new PatternValidationError("Pattern export is only available after the simulation finishes loading.");
+        throw new PatternValidationError(
+            "Pattern export is only available after the simulation finishes loading.",
+        );
     }
     const topologySpec = describeTopologySpec(topology.topology_spec || state.topologySpec || {});
 
-    const cellsById = Object.fromEntries(topology.cells.flatMap((cell, index) => {
-        const stateValue = Number(state.cellStates?.[index] ?? 0);
-        return stateValue === 0 ? [] : [[cell.id, stateValue]];
-    }));
+    const cellsById = Object.fromEntries(
+        topology.cells.flatMap((cell, index) => {
+            const stateValue = Number(state.cellStates?.[index] ?? 0);
+            return stateValue === 0 ? [] : [[cell.id, stateValue]];
+        }),
+    );
 
     const payload = {
         format: PATTERN_FORMAT,
@@ -42,10 +43,12 @@ export function serializePatternPayload(payload: PatternPayload): string {
 }
 
 function slugSegment(value: string | number | null | undefined): string {
-    return String(value)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "") || "pattern";
+    return (
+        String(value)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "pattern"
+    );
 }
 
 export function buildPatternFilename(payload: PatternPayload): string {
@@ -61,13 +64,17 @@ export function buildPatternFilename(payload: PatternPayload): string {
     return `pattern-${rule}-${tilingFamily}-${adjacencyMode}-${width}x${height}.json`;
 }
 
-export function downloadPatternFile(content: string, filename: string, {
-    documentRef = document,
-    urlApi = window.URL,
-}: {
-    documentRef?: Document;
-    urlApi?: Pick<typeof URL, "createObjectURL" | "revokeObjectURL">;
-} = {}): void {
+export function downloadPatternFile(
+    content: string,
+    filename: string,
+    {
+        documentRef = document,
+        urlApi = window.URL,
+    }: {
+        documentRef?: Document;
+        urlApi?: Pick<typeof URL, "createObjectURL" | "revokeObjectURL">;
+    } = {},
+): void {
     const blob = new Blob([content], { type: "application/json" });
     const url = urlApi.createObjectURL(blob);
     const link = documentRef.createElement("a");
@@ -97,11 +104,14 @@ function resolveClipboardApi<TMethod extends "writeText" | "readText">(
     return clipboardRef;
 }
 
-export async function writeClipboardText(text: string, {
-    clipboardRef = typeof navigator !== "undefined" ? navigator.clipboard : null,
-}: {
-    clipboardRef?: Pick<Clipboard, "writeText"> | null;
-} = {}): Promise<void> {
+export async function writeClipboardText(
+    text: string,
+    {
+        clipboardRef = typeof navigator !== "undefined" ? navigator.clipboard : null,
+    }: {
+        clipboardRef?: Pick<Clipboard, "writeText"> | null;
+    } = {},
+): Promise<void> {
     const clipboard = resolveClipboardApi(clipboardRef, "writeText");
     await clipboard.writeText(String(text));
 }

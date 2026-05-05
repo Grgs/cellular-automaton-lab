@@ -31,9 +31,9 @@ export interface ResetControlBody {
     randomize: boolean;
 }
 
-export interface CellTargetRequest extends CellIdentifier {}
+export type CellTargetRequest = CellIdentifier;
 
-export interface CellUpdateRequest extends CellStateUpdate {}
+export type CellUpdateRequest = CellStateUpdate;
 
 export interface CellUpdatesRequest {
     cells: CellUpdateRequest[];

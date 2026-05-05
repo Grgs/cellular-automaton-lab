@@ -1,4 +1,9 @@
-import { drawGestureOutlineLayer, drawHoverLayer, drawPreviewLayer, drawSelectionLayer } from "./render-layers.js";
+import {
+    drawGestureOutlineLayer,
+    drawHoverLayer,
+    drawPreviewLayer,
+    drawSelectionLayer,
+} from "./render-layers.js";
 import type { CanvasCommittedRenderSnapshot } from "./committed-renderer.js";
 import type { TransientOverlaySnapshot } from "./transient-overlays.js";
 
@@ -45,7 +50,10 @@ export function drawTransientOverlaySnapshot(
         });
     }
 
-    if (overlaySnapshot.gestureOutlineTone !== null && overlaySnapshot.gestureOutlineCells.length > 0) {
+    if (
+        overlaySnapshot.gestureOutlineTone !== null &&
+        overlaySnapshot.gestureOutlineCells.length > 0
+    ) {
         drawGestureOutlineLayer({
             context: renderState.context,
             ...shared,

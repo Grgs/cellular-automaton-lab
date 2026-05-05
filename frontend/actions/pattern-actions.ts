@@ -8,10 +8,7 @@ import {
     serializePatternPayload,
     writeClipboardText,
 } from "../pattern-io.js";
-import {
-    clearPatternStatus,
-    setPatternStatus,
-} from "../state/overlay-state.js";
+import { clearPatternStatus, setPatternStatus } from "../state/overlay-state.js";
 import {
     BLOCKING_ACTIVITY_IMPORT_PATTERN,
     BLOCKING_ACTIVITY_PASTE_PATTERN,
@@ -113,34 +110,30 @@ export function createPatternActions({
         };
     }
 
-    async function importPatternFile(file: File | null | undefined): Promise<SimulationSnapshot | null> {
+    async function importPatternFile(
+        file: File | null | undefined,
+    ): Promise<SimulationSnapshot | null> {
         if (!file) {
             return null;
         }
 
-        return importRuntime.importPatternText(
-            () => readPatternFileFn(file),
-            {
-                failurePrefix: "Import failed",
-                successMessage: `Imported pattern from ${file.name}.`,
-                cancelMessage: "Import canceled.",
-                blockingActivity: BLOCKING_ACTIVITY_IMPORT_PATTERN,
-                onSuccess: () => {
-                    if (elements.patternImportInput) {
-                        elements.patternImportInput.value = "";
-                    }
-                },
+        return importRuntime.importPatternText(() => readPatternFileFn(file), {
+            failurePrefix: "Import failed",
+            successMessage: `Imported pattern from ${file.name}.`,
+            cancelMessage: "Import canceled.",
+            blockingActivity: BLOCKING_ACTIVITY_IMPORT_PATTERN,
+            onSuccess: () => {
+                if (elements.patternImportInput) {
+                    elements.patternImportInput.value = "";
+                }
             },
-        );
+        });
     }
 
     async function exportPattern(): Promise<PatternPayload | null> {
         try {
             const { pattern, filename, content } = buildSerializedPattern();
-            downloadPatternFileFn(
-                content,
-                filename,
-            );
+            downloadPatternFileFn(content, filename);
             updatePatternStatus(`Exported pattern to ${filename}.`, "success");
             return pattern;
         } catch (error) {
@@ -162,15 +155,12 @@ export function createPatternActions({
     }
 
     async function pastePattern(): Promise<SimulationSnapshot | null> {
-        return importRuntime.importPatternText(
-            () => readClipboardTextFn(),
-            {
-                failurePrefix: "Paste failed",
-                successMessage: "Pasted pattern from clipboard.",
-                cancelMessage: "Paste canceled.",
-                blockingActivity: BLOCKING_ACTIVITY_PASTE_PATTERN,
-            },
-        );
+        return importRuntime.importPatternText(() => readClipboardTextFn(), {
+            failurePrefix: "Paste failed",
+            successMessage: "Pasted pattern from clipboard.",
+            cancelMessage: "Paste canceled.",
+            blockingActivity: BLOCKING_ACTIVITY_PASTE_PATTERN,
+        });
     }
 
     async function copyShareLink(): Promise<string | null> {
@@ -193,9 +183,12 @@ export function createPatternActions({
         try {
             return decodeShareFragment(window.location.hash);
         } catch (error) {
-            const message = error instanceof ShareLinkDecodeError
-                ? error.message
-                : (error instanceof Error ? error.message : String(error));
+            const message =
+                error instanceof ShareLinkDecodeError
+                    ? error.message
+                    : error instanceof Error
+                      ? error.message
+                      : String(error);
             updatePatternStatus(`Share link invalid: ${message}`, "error");
             onError(error);
             return null;

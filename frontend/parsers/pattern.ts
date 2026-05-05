@@ -1,7 +1,4 @@
-import {
-    describeTopologySpec,
-    getTopologyDefinition,
-} from "../topology-catalog.js";
+import { describeTopologySpec, getTopologyDefinition } from "../topology-catalog.js";
 import { isPlainObject } from "../runtime-validation.js";
 import type { ParsedPattern, TopologySpec } from "../types/domain.js";
 
@@ -28,7 +25,9 @@ function ensurePatternObject(value: unknown): PatternPayloadCandidate {
 function parsePositiveInteger(value: unknown, fieldName: string): number {
     const parsed = Number(value);
     if (!Number.isInteger(parsed) || parsed <= 0) {
-        throw new PatternValidationError(`Pattern field '${fieldName}' must be a positive integer.`);
+        throw new PatternValidationError(
+            `Pattern field '${fieldName}' must be a positive integer.`,
+        );
     }
     return parsed;
 }
@@ -36,7 +35,9 @@ function parsePositiveInteger(value: unknown, fieldName: string): number {
 function parseNonNegativeInteger(value: unknown, fieldName: string): number {
     const parsed = Number(value);
     if (!Number.isInteger(parsed) || parsed < 0) {
-        throw new PatternValidationError(`Pattern field '${fieldName}' must be a non-negative integer.`);
+        throw new PatternValidationError(
+            `Pattern field '${fieldName}' must be a non-negative integer.`,
+        );
     }
     return parsed;
 }
@@ -54,7 +55,9 @@ function parseTopologySpec(value: unknown): TopologySpec {
     }
     const normalized = describeTopologySpec(value);
     if (!getTopologyDefinition(normalized.tiling_family)) {
-        throw new PatternValidationError("Pattern field 'topology_spec.tiling_family' is unsupported.");
+        throw new PatternValidationError(
+            "Pattern field 'topology_spec.tiling_family' is unsupported.",
+        );
     }
     return normalized;
 }
@@ -68,11 +71,15 @@ function parseCellsById(cellsById: unknown): Record<string, number> {
     Object.entries(cellsById).forEach(([id, rawState]) => {
         const normalizedId = typeof id === "string" ? id.trim() : "";
         if (!normalizedId) {
-            throw new PatternValidationError("Pattern field 'cells_by_id' must only contain non-empty string keys.");
+            throw new PatternValidationError(
+                "Pattern field 'cells_by_id' must only contain non-empty string keys.",
+            );
         }
         const state = Number(rawState);
         if (!Number.isInteger(state)) {
-            throw new PatternValidationError(`Pattern cell '${normalizedId}' must include an integer state.`);
+            throw new PatternValidationError(
+                `Pattern cell '${normalizedId}' must include an integer state.`,
+            );
         }
         if (state !== 0) {
             normalizedCellsById[normalizedId] = state;
@@ -105,7 +112,10 @@ export function parsePatternText(text: string): ParsedPattern {
             ...topologySpec,
             width: parsePositiveInteger(topologySpec.width, "topology_spec.width"),
             height: parsePositiveInteger(topologySpec.height, "topology_spec.height"),
-            patch_depth: parseNonNegativeInteger(topologySpec.patch_depth, "topology_spec.patch_depth"),
+            patch_depth: parseNonNegativeInteger(
+                topologySpec.patch_depth,
+                "topology_spec.patch_depth",
+            ),
         },
         rule: parseRuleName(pattern.rule),
         cellsById: parseCellsById(pattern.cells_by_id),

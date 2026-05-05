@@ -53,7 +53,9 @@ describe("controls/tiling-picker-bindings", () => {
         expect(elements.tilingPickerMenu?.hidden).toBe(false);
         expect(elements.tilingPickerToggle?.getAttribute("aria-expanded")).toBe("true");
 
-        elements.tilingPickerMenu?.querySelector<HTMLButtonElement>("[data-tiling-family='hex']")?.click();
+        elements.tilingPickerMenu
+            ?.querySelector<HTMLButtonElement>("[data-tiling-family='hex']")
+            ?.click();
 
         expect(elements.tilingFamilySelect?.value).toBe("hex");
         expect(elements.tilingPickerMenu?.hidden).toBe(true);
@@ -66,7 +68,9 @@ describe("controls/tiling-picker-bindings", () => {
 
         bindTilingPreviewPicker(elements, createActions(vi.fn()));
         elements.tilingPickerToggle?.click();
-        elements.tilingPickerMenu?.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        elements.tilingPickerMenu?.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+        );
 
         expect(elements.tilingPickerMenu?.hidden).toBe(true);
         expect(elements.tilingPickerToggle?.getAttribute("aria-expanded")).toBe("false");

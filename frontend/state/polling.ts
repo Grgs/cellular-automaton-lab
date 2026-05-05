@@ -24,7 +24,11 @@ export function schedulePolling(
     }, delay);
 }
 
-export function syncPolling(state: AppState, running: boolean, callback: () => Promise<void>): void {
+export function syncPolling(
+    state: AppState,
+    running: boolean,
+    callback: () => Promise<void>,
+): void {
     state.isRunning = running;
     if (running) {
         schedulePolling(state, callback);

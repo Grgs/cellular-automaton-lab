@@ -38,9 +38,11 @@ function resolvePreviewTopologyCell(
     geometryCache: GeometryCache | null,
 ): RenderableTopologyCell | null {
     const polygonCache = asPolygonGeometryCache(geometryCache);
-    return polygonCache?.cellsById.get(cell.id)?.cell
-        || topology?.cells?.find((candidate) => candidate.id === cell.id)
-        || null;
+    return (
+        polygonCache?.cellsById.get(cell.id)?.cell ||
+        topology?.cells?.find((candidate) => candidate.id === cell.id) ||
+        null
+    );
 }
 
 function resolveTransientRenderCell(
@@ -68,9 +70,10 @@ function resolveTransientStateValue(
         return 0;
     }
 
-    const topologyCellIndex = typeof cell.id === "string" && cell.id.length > 0
-        ? topology.cells.findIndex((candidate) => candidate.id === cell.id)
-        : -1;
+    const topologyCellIndex =
+        typeof cell.id === "string" && cell.id.length > 0
+            ? topology.cells.findIndex((candidate) => candidate.id === cell.id)
+            : -1;
 
     if (topologyCellIndex < 0) {
         return 0;
@@ -90,7 +93,12 @@ export function drawCommittedLayer({
 }): void {
     const adapter = getGeometryAdapter(shared.geometry);
     targetContext.setTransform(shared.metrics.dpr ?? 1, 0, 0, shared.metrics.dpr ?? 1, 0, 0);
-    targetContext.clearRect(0, 0, Math.max(shared.metrics.cssWidth, 1), Math.max(shared.metrics.cssHeight, 1));
+    targetContext.clearRect(
+        0,
+        0,
+        Math.max(shared.metrics.cssWidth, 1),
+        Math.max(shared.metrics.cssHeight, 1),
+    );
     targetContext.fillStyle = shared.renderStyle.lineColor;
     targetContext.fillRect(0, 0, shared.metrics.cssWidth, shared.metrics.cssHeight);
 
@@ -139,7 +147,11 @@ export function drawPreviewLayer({
     const adapter = getGeometryAdapter(shared.geometry);
     previewCells.forEach((cell) => {
         if (adapter.family === "mixed") {
-            const topologyCell = resolvePreviewTopologyCell(cell, shared.topology, shared.geometryCache);
+            const topologyCell = resolvePreviewTopologyCell(
+                cell,
+                shared.topology,
+                shared.geometryCache,
+            );
             if (!topologyCell) {
                 return;
             }

@@ -1,7 +1,4 @@
-import {
-    DEFAULT_BRUSH_SIZE,
-    DEFAULT_EDITOR_TOOL,
-} from "./editor-tools.js";
+import { DEFAULT_BRUSH_SIZE, DEFAULT_EDITOR_TOOL } from "./editor-tools.js";
 import { parseEditorTool } from "./parsers/editor.js";
 import {
     clearPendingPatchDepth,
@@ -30,7 +27,10 @@ import type { AppState } from "./types/state.js";
 import type { UiDisclosureId, UiSessionStorage } from "./types/session.js";
 import type { EditorTool } from "./editor-tools.js";
 
-function readStoredCellSizes(storage: UiSessionStorage, activeTilingFamily: string): Record<string, number> {
+function readStoredCellSizes(
+    storage: UiSessionStorage,
+    activeTilingFamily: string,
+): Record<string, number> {
     const rememberedCellSizes = storage.getCellSizes();
     if (Object.keys(rememberedCellSizes).length > 0) {
         return rememberedCellSizes;
@@ -136,8 +136,9 @@ export function createUiSessionController({
             return;
         }
 
-        const isValidPaintState = Array.isArray(rule.states)
-            && rule.states.some(
+        const isValidPaintState =
+            Array.isArray(rule.states) &&
+            rule.states.some(
                 (cellState) => cellState.paintable && cellState.value === Number(storedPaintState),
             );
         if (isValidPaintState) {
@@ -145,7 +146,10 @@ export function createUiSessionController({
         }
     }
 
-    function persistCellSize(tilingFamilyOrCellSize: string | number, cellSize: number | undefined = undefined): void {
+    function persistCellSize(
+        tilingFamilyOrCellSize: string | number,
+        cellSize: number | undefined = undefined,
+    ): void {
         if (cellSize === undefined) {
             storage.setCellSizeForTilingFamily(
                 state.topologySpec.tiling_family,
@@ -180,7 +184,10 @@ export function createUiSessionController({
         storage.setPaintStateForRule(rule.name, state.selectedPaintState);
     }
 
-    function persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: number): void {
+    function persistPatchDepthForTilingFamily(
+        tilingFamily: string | null | undefined,
+        patchDepth: number,
+    ): void {
         if (!tilingFamily) {
             return;
         }
@@ -214,7 +221,9 @@ export function createUiSessionController({
         if (currentRule) {
             setSelectedPaintStateFn(
                 state,
-                currentRule.default_paint_state ?? currentRule.states.find((cellState) => cellState.paintable)?.value ?? 0,
+                currentRule.default_paint_state ??
+                    currentRule.states.find((cellState) => cellState.paintable)?.value ??
+                    0,
             );
         }
         setDrawerOpenFn(state, Boolean(matchMediaFn("(min-width: 861px)")?.matches));

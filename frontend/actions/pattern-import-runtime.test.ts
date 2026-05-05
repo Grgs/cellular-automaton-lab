@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
-import type { ParsedPattern, RuleDefinition, SimulationSnapshot, TopologySpec } from "../types/domain.js";
+import type {
+    ParsedPattern,
+    RuleDefinition,
+    SimulationSnapshot,
+    TopologySpec,
+} from "../types/domain.js";
 import type { SimulationMutations } from "../types/controller.js";
 
 function makeRule(name = "conway"): RuleDefinition {
@@ -140,14 +145,11 @@ describe("pattern-import-runtime", () => {
             confirmImportFn,
         });
 
-        const result = await runtime.importPatternText(
-            async () => "pattern",
-            {
-                failurePrefix: "Import failed",
-                successMessage: "Imported pattern from demo.json.",
-                cancelMessage: "Import canceled.",
-            },
-        );
+        const result = await runtime.importPatternText(async () => "pattern", {
+            failurePrefix: "Import failed",
+            successMessage: "Imported pattern from demo.json.",
+            cancelMessage: "Import canceled.",
+        });
 
         expect(result).toBeNull();
         expect(confirmImportFn).toHaveBeenCalled();
@@ -188,14 +190,11 @@ describe("pattern-import-runtime", () => {
             parsePatternTextFn: vi.fn(() => makeParsedPattern()),
         });
 
-        const result = await runtime.importPatternText(
-            async () => "pattern",
-            {
-                failurePrefix: "Import failed",
-                successMessage: "Imported pattern from empty.json.",
-                cancelMessage: "Import canceled.",
-            },
-        );
+        const result = await runtime.importPatternText(async () => "pattern", {
+            failurePrefix: "Import failed",
+            successMessage: "Imported pattern from empty.json.",
+            cancelMessage: "Import canceled.",
+        });
 
         expect(result).toBe(resetSnapshot);
         expect(postControlFn).toHaveBeenCalledWith("/api/control/reset", {
@@ -243,21 +242,20 @@ describe("pattern-import-runtime", () => {
             onError,
             refreshState,
             simulationMutations: mutations,
-            parsePatternTextFn: vi.fn(() => makeParsedPattern({
-                cellsById: {
-                    missing: 1,
-                },
-            })),
+            parsePatternTextFn: vi.fn(() =>
+                makeParsedPattern({
+                    cellsById: {
+                        missing: 1,
+                    },
+                }),
+            ),
         });
 
-        const result = await runtime.importPatternText(
-            async () => "pattern",
-            {
-                failurePrefix: "Import failed",
-                successMessage: "Imported pattern from broken.json.",
-                cancelMessage: "Import canceled.",
-            },
-        );
+        const result = await runtime.importPatternText(async () => "pattern", {
+            failurePrefix: "Import failed",
+            successMessage: "Imported pattern from broken.json.",
+            cancelMessage: "Import canceled.",
+        });
 
         expect(result).toBeNull();
         expect(setCellsRequestFn).not.toHaveBeenCalled();
@@ -300,27 +298,24 @@ describe("pattern-import-runtime", () => {
             onError: vi.fn(),
             refreshState: vi.fn(async () => {}),
             simulationMutations: createSimulationMutationsStub(),
-            parsePatternTextFn: vi.fn(() => makeParsedPattern({
-                cellsById: {
-                    "c:0:0": 1,
-                },
-            })),
+            parsePatternTextFn: vi.fn(() =>
+                makeParsedPattern({
+                    cellsById: {
+                        "c:0:0": 1,
+                    },
+                }),
+            ),
         });
 
-        const result = await runtime.importPatternText(
-            async () => "pattern",
-            {
-                failurePrefix: "Import failed",
-                successMessage: "Pasted pattern from clipboard.",
-                cancelMessage: "Paste canceled.",
-                onSuccess,
-            },
-        );
+        const result = await runtime.importPatternText(async () => "pattern", {
+            failurePrefix: "Import failed",
+            successMessage: "Pasted pattern from clipboard.",
+            cancelMessage: "Paste canceled.",
+            onSuccess,
+        });
 
         expect(result).toBe(finalSnapshot);
-        expect(setCellsRequestFn).toHaveBeenCalledWith([
-            { id: "c:0:0", state: 1 },
-        ]);
+        expect(setCellsRequestFn).toHaveBeenCalledWith([{ id: "c:0:0", state: 1 }]);
         expect(onSuccess).toHaveBeenCalled();
         expect(viewportController.suppressAutoSync).toHaveBeenCalledTimes(2);
         expect(state.ruleSelectionOrigin).toBe("default");

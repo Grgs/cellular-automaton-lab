@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-    getFixtureTopologyDefinition,
-    installFrontendGlobals,
-} from "../test-helpers/bootstrap.js";
+import { getFixtureTopologyDefinition, installFrontendGlobals } from "../test-helpers/bootstrap.js";
 
 describe("controls-model/shared", () => {
     beforeEach(() => {
@@ -40,7 +37,9 @@ describe("controls-model/shared", () => {
     it("widens viewport sizing ranges when unsafe sizing is enabled", async () => {
         const { createAppState } = await import("../state/simulation-state.js");
         const { resolveViewportSizingState } = await import("./shared.js");
-        const squareTrianglePolicy = getFixtureTopologyDefinition("dodecagonal-square-triangle").sizing_policy;
+        const squareTrianglePolicy = getFixtureTopologyDefinition(
+            "dodecagonal-square-triangle",
+        ).sizing_policy;
 
         const state = createAppState();
         state.unsafeSizingEnabled = true;
@@ -81,7 +80,9 @@ describe("controls-model/shared", () => {
         const chairPolicy = getFixtureTopologyDefinition("chair").sizing_policy;
         const hatPolicy = getFixtureTopologyDefinition("hat-monotile").sizing_policy;
         const tuebingenPolicy = getFixtureTopologyDefinition("tuebingen-triangle").sizing_policy;
-        const squareTrianglePolicy = getFixtureTopologyDefinition("dodecagonal-square-triangle").sizing_policy;
+        const squareTrianglePolicy = getFixtureTopologyDefinition(
+            "dodecagonal-square-triangle",
+        ).sizing_policy;
         const shieldPolicy = getFixtureTopologyDefinition("shield").sizing_policy;
         const pinwheelPolicy = getFixtureTopologyDefinition("pinwheel").sizing_policy;
         const periodicPolicy = getFixtureTopologyDefinition("deltoidal-hexagonal").sizing_policy;

@@ -10,11 +10,20 @@ describe("taylor-socolar topology", () => {
     });
 
     it("appears in topology picker metadata with a patch-depth topology variant", async () => {
-        const { getTopologyDefinition, resolveTopologyVariantKey, tilingFamilyOptions, topologyUsesPatchDepth } = await import("./topology-catalog.js");
+        const {
+            getTopologyDefinition,
+            resolveTopologyVariantKey,
+            tilingFamilyOptions,
+            topologyUsesPatchDepth,
+        } = await import("./topology-catalog.js");
         const taylorSocolar = getFixtureTopologyDefinition("taylor-socolar");
 
-        expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("taylor-socolar");
-        expect(resolveTopologyVariantKey("taylor-socolar", "edge")).toBe(taylorSocolar.geometry_keys.edge);
+        expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain(
+            "taylor-socolar",
+        );
+        expect(resolveTopologyVariantKey("taylor-socolar", "edge")).toBe(
+            taylorSocolar.geometry_keys.edge,
+        );
         expect(getTopologyDefinition("taylor-socolar")?.picker_group).toBe("Aperiodic");
         expect(topologyUsesPatchDepth("taylor-socolar")).toBe(true);
     });

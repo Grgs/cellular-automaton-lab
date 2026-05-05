@@ -16,7 +16,8 @@ export function buildTopBarViewModel({
     const topologyDefinition = getTopologyDefinition(tilingFamily);
     const adjacencyModeValue = state.topologySpec?.adjacency_mode || "edge";
     const adjacencyModeVisible = (topologyDefinition?.supported_adjacency_modes?.length || 0) > 1;
-    const formatAdjacencyLabel = (mode: string): string => `${mode.charAt(0).toUpperCase()}${mode.slice(1)} adjacency`;
+    const formatAdjacencyLabel = (mode: string): string =>
+        `${mode.charAt(0).toUpperCase()}${mode.slice(1)} adjacency`;
     const overlayVisibility = buildOverlayVisibilityState(state);
     return {
         statusText: state.isRunning ? "Running" : "Paused",

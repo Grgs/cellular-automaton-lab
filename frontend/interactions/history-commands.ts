@@ -24,10 +24,10 @@ export function createHistoryCommands({
         }
 
         const cells = direction === "undo" ? entry.inverseCells : entry.forwardCells;
-        const simulationState = await runStateMutation(
-            () => setCellsRequest(cells),
-            { recoverWithRefresh: true, source: "editor" },
-        ).catch(() => null);
+        const simulationState = await runStateMutation(() => setCellsRequest(cells), {
+            recoverWithRefresh: true,
+            source: "editor",
+        }).catch(() => null);
         if (!simulationState) {
             return null;
         }

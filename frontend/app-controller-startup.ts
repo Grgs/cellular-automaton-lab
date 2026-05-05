@@ -2,7 +2,12 @@ import { hydrateAppController } from "./app-controller-hydration.js";
 import { createAppControllerServices } from "./app-controller-services.js";
 import { wireAppController } from "./app-controller-wiring.js";
 import type { AppControllerStartupResult, AppControllerSync } from "./types/controller-app.js";
-import type { PostControlFunction, SetCellRequestFunction, SetCellsRequestFunction, ToggleCellRequestFunction } from "./types/controller-api.js";
+import type {
+    PostControlFunction,
+    SetCellRequestFunction,
+    SetCellsRequestFunction,
+    ToggleCellRequestFunction,
+} from "./types/controller-api.js";
 import type { MutationRunner } from "./types/controller-runtime.js";
 import type { ConfigSyncController, UiSessionController } from "./types/controller-sync-session.js";
 import type { AppView, GridView } from "./types/controller-view.js";

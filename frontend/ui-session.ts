@@ -1,32 +1,16 @@
 import { FRONTEND_DEFAULTS } from "./defaults.js";
-import {
-    DEFAULT_BRUSH_SIZE,
-    DEFAULT_EDITOR_TOOL,
-} from "./editor-tools.js";
 import { parseBrushSize, parseEditorTool } from "./parsers/editor.js";
 import { parseUiSession } from "./parsers/session.js";
 import { parseStoredUiSession, serializeUiSession } from "./parsers/session-storage.js";
-import {
-    DEFAULT_CELL_SIZE,
-    DEFAULT_TOPOLOGY_SPEC,
-} from "./state/constants.js";
-import {
-    defaultCellSizeForTilingFamily,
-} from "./state/sizing-state.js";
+import { DEFAULT_TOPOLOGY_SPEC } from "./state/constants.js";
+import { defaultCellSizeForTilingFamily } from "./state/sizing-state.js";
 import { cloneUiSession, createEmptyUiSession } from "./ui-session-state.js";
 import type { DomElements } from "./types/dom.js";
 import type { EditorTool } from "./editor-tools.js";
-import type {
-    MatchMediaResult,
-    UiDisclosureId,
-    UiSessionState,
-    UiSessionStorage,
-} from "./types/session.js";
+import type { UiDisclosureId, UiSessionState, UiSessionStorage } from "./types/session.js";
 
 export const UI_SESSION_STORAGE_KEY = FRONTEND_DEFAULTS.ui.storage_key;
-export const DISCLOSURE_IDS: readonly UiDisclosureId[] = Object.freeze([
-    "rule-notes-toggle",
-]);
+export const DISCLOSURE_IDS: readonly UiDisclosureId[] = Object.freeze(["rule-notes-toggle"]);
 
 export function createUiSessionStorage({
     storage = window.localStorage,
@@ -63,10 +47,15 @@ export function createUiSessionStorage({
 
     function flush(): void {
         try {
-            storage.setItem(storageKey, JSON.stringify(serializeUiSession(ensureLoaded(), {
-                disclosureIds: DISCLOSURE_IDS,
-                defaultTilingFamily,
-            })));
+            storage.setItem(
+                storageKey,
+                JSON.stringify(
+                    serializeUiSession(ensureLoaded(), {
+                        disclosureIds: DISCLOSURE_IDS,
+                        defaultTilingFamily,
+                    }),
+                ),
+            );
         } catch (error) {
             void error;
         }
@@ -102,8 +91,10 @@ export function createUiSessionStorage({
             return { ...ensureLoaded().cellSizeByTilingFamily };
         },
         getCellSize(tilingFamily = DEFAULT_TOPOLOGY_SPEC.tiling_family) {
-            return ensureLoaded().cellSizeByTilingFamily[String(tilingFamily)]
-                ?? defaultCellSizeForTilingFamily(tilingFamily);
+            return (
+                ensureLoaded().cellSizeByTilingFamily[String(tilingFamily)] ??
+                defaultCellSizeForTilingFamily(tilingFamily)
+            );
         },
         getUnsafeSizingEnabled() {
             return Boolean(ensureLoaded().unsafeSizingEnabled);
@@ -113,55 +104,67 @@ export function createUiSessionStorage({
         },
         setDefaultCellSize(cellSize) {
             return update((session) => {
-                const normalizedSession = parseUiSession({
-                    ...session,
-                    cellSizeByTilingFamily: {
-                        ...session.cellSizeByTilingFamily,
-                        [DEFAULT_TOPOLOGY_SPEC.tiling_family]: cellSize,
+                const normalizedSession = parseUiSession(
+                    {
+                        ...session,
+                        cellSizeByTilingFamily: {
+                            ...session.cellSizeByTilingFamily,
+                            [DEFAULT_TOPOLOGY_SPEC.tiling_family]: cellSize,
+                        },
                     },
-                }, {
-                    disclosureIds: DISCLOSURE_IDS,
-                    defaultTilingFamily,
-                });
+                    {
+                        disclosureIds: DISCLOSURE_IDS,
+                        defaultTilingFamily,
+                    },
+                );
                 Object.assign(session, normalizedSession);
             });
         },
         setCellSizeForTilingFamily(tilingFamily, cellSize) {
             return update((session) => {
-                const normalizedSession = parseUiSession({
-                    ...session,
-                    cellSizeByTilingFamily: {
-                        ...session.cellSizeByTilingFamily,
-                        [String(tilingFamily)]: cellSize,
+                const normalizedSession = parseUiSession(
+                    {
+                        ...session,
+                        cellSizeByTilingFamily: {
+                            ...session.cellSizeByTilingFamily,
+                            [String(tilingFamily)]: cellSize,
+                        },
                     },
-                }, {
-                    disclosureIds: DISCLOSURE_IDS,
-                    defaultTilingFamily,
-                });
+                    {
+                        disclosureIds: DISCLOSURE_IDS,
+                        defaultTilingFamily,
+                    },
+                );
                 Object.assign(session, normalizedSession);
             });
         },
         setUnsafeSizingEnabled(enabled) {
             return update((session) => {
-                const normalizedSession = parseUiSession({
-                    ...session,
-                    unsafeSizingEnabled: Boolean(enabled),
-                }, {
-                    disclosureIds: DISCLOSURE_IDS,
-                    defaultTilingFamily,
-                });
+                const normalizedSession = parseUiSession(
+                    {
+                        ...session,
+                        unsafeSizingEnabled: Boolean(enabled),
+                    },
+                    {
+                        disclosureIds: DISCLOSURE_IDS,
+                        defaultTilingFamily,
+                    },
+                );
                 Object.assign(session, normalizedSession);
             });
         },
         setTileColorsEnabled(enabled) {
             return update((session) => {
-                const normalizedSession = parseUiSession({
-                    ...session,
-                    tileColorsEnabled: enabled !== false,
-                }, {
-                    disclosureIds: DISCLOSURE_IDS,
-                    defaultTilingFamily,
-                });
+                const normalizedSession = parseUiSession(
+                    {
+                        ...session,
+                        tileColorsEnabled: enabled !== false,
+                    },
+                    {
+                        disclosureIds: DISCLOSURE_IDS,
+                        defaultTilingFamily,
+                    },
+                );
                 Object.assign(session, normalizedSession);
             });
         },
@@ -211,16 +214,19 @@ export function createUiSessionStorage({
         },
         setPatchDepthForTilingFamily(tilingFamily, patchDepth) {
             return update((session) => {
-                const normalizedSession = parseUiSession({
-                    ...session,
-                    patchDepthByTilingFamily: {
-                        ...session.patchDepthByTilingFamily,
-                        [tilingFamily]: patchDepth,
+                const normalizedSession = parseUiSession(
+                    {
+                        ...session,
+                        patchDepthByTilingFamily: {
+                            ...session.patchDepthByTilingFamily,
+                            [tilingFamily]: patchDepth,
+                        },
                     },
-                }, {
-                    disclosureIds: DISCLOSURE_IDS,
-                    defaultTilingFamily,
-                });
+                    {
+                        disclosureIds: DISCLOSURE_IDS,
+                        defaultTilingFamily,
+                    },
+                );
                 Object.assign(session, normalizedSession);
             });
         },

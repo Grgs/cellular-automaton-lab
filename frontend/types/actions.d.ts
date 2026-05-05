@@ -20,7 +20,6 @@ import type {
     PresetMetadata,
     ResolvedPresetSelection,
     SimulationSnapshot,
-    TopologySpec,
 } from "./domain.js";
 import type { DomElements } from "./dom.js";
 import type { UiDisclosureId } from "./session.js";
@@ -44,10 +43,7 @@ export interface SimulationActionRuntime {
     buildResetPayload(randomize: boolean): ResetControlBody;
     applyRuleSelection(nextRuleName: string | null): void;
     applySpeedSelection(nextSpeed: number): void;
-    requestPatchDepth(
-        nextPatchDepth: number,
-        options?: { immediate?: boolean },
-    ): Promise<boolean>;
+    requestPatchDepth(nextPatchDepth: number, options?: { immediate?: boolean }): Promise<boolean>;
     changeTilingFamily(nextTilingFamily: string): Promise<SimulationSnapshot | null | void>;
     changeAdjacencyMode(nextAdjacencyMode: string): Promise<SimulationSnapshot | null | void>;
     resetRuleSelectionOrigin(): void;
@@ -117,12 +113,8 @@ export interface UiActionSet {
     exitEditMode(): void;
 }
 
-export interface AppActionSet extends
-    SimulationActionSet,
-    PatternActionSet,
-    PresetActionSet,
-    ShowcaseActionSet,
-    UiActionSet {
+export interface AppActionSet
+    extends SimulationActionSet, PatternActionSet, PresetActionSet, ShowcaseActionSet, UiActionSet {
     resetAllSettings(): Promise<SimulationSnapshot | null>;
     undoEdit(): Promise<SimulationSnapshot | null> | undefined;
     redoEdit(): Promise<SimulationSnapshot | null> | undefined;

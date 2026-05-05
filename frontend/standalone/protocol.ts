@@ -1,4 +1,8 @@
-import type { PersistedSimulationSnapshotV5, RulesResponse, SimulationSnapshot } from "../types/domain.js";
+import type {
+    PersistedSimulationSnapshotV5,
+    RulesResponse,
+    SimulationSnapshot,
+} from "../types/domain.js";
 import type {
     CellTargetRequest,
     CellUpdateRequest,

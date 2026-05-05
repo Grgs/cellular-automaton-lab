@@ -37,7 +37,10 @@ export interface UiSessionController {
     persistEditorTool(editorTool: EditorTool): void;
     persistBrushSize(brushSize: number): void;
     persistPaintStateForCurrentRule(): void;
-    persistPatchDepthForTilingFamily(tilingFamily: string | null | undefined, patchDepth: number): void;
+    persistPatchDepthForTilingFamily(
+        tilingFamily: string | null | undefined,
+        patchDepth: number,
+    ): void;
     persistDisclosureState(id: UiDisclosureId, open: boolean): void;
     persistDrawerState(drawerOpen: boolean): void;
     resetSessionPreferences(): void;

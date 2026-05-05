@@ -70,10 +70,10 @@ function buildPenroseMetrics(
         minRawY: bounds.minY,
         maxRawX: bounds.maxX,
         maxRawY: bounds.maxY,
-        xInset: margin - (bounds.minX * scale),
-        yInset: margin + (bounds.maxY * scale),
-        cssWidth: ((bounds.maxX - bounds.minX) * scale) + (margin * 2),
-        cssHeight: ((bounds.maxY - bounds.minY) * scale) + (margin * 2),
+        xInset: margin - bounds.minX * scale,
+        yInset: margin + bounds.maxY * scale,
+        cssWidth: (bounds.maxX - bounds.minX) * scale + margin * 2,
+        cssHeight: (bounds.maxY - bounds.minY) * scale + margin * 2,
     };
 }
 
@@ -90,7 +90,14 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             return fallbackDimensions ?? { width: 0, height: 0 };
         },
 
-        fitRenderCellSize({ viewportWidth, viewportHeight, width, height, topology, fallbackCellSize }) {
+        fitRenderCellSize({
+            viewportWidth,
+            viewportHeight,
+            width,
+            height,
+            topology,
+            fallbackCellSize,
+        }) {
             return fitRenderCellSizeWithMetrics({
                 viewportWidth,
                 viewportHeight,
@@ -98,14 +105,19 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
                 height,
                 topology: topology ?? null,
                 fallbackCellSize,
-                buildMetrics: ({ width: nextWidth, height: nextHeight, topology: nextTopology, cellSize }) => (
-                    buildPenroseMetrics(geometry, nextTopology, cellSize, nextWidth, nextHeight)
-                ),
+                buildMetrics: ({
+                    width: nextWidth,
+                    height: nextHeight,
+                    topology: nextTopology,
+                    cellSize,
+                }) => buildPenroseMetrics(geometry, nextTopology, cellSize, nextWidth, nextHeight),
             });
         },
 
         buildCache({ topology, metrics }: GeometryBuildCacheArgs) {
-            return buildPolygonGeometryCache(topology, (cell) => penroseCellGeometry(cell, metrics as PenroseMetrics));
+            return buildPolygonGeometryCache(topology, (cell) =>
+                penroseCellGeometry(cell, metrics as PenroseMetrics),
+            );
         },
 
         buildCellGeometry({ cell, metrics, cache }) {
@@ -120,7 +132,15 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             return resolvePolygonCellFromOffset({ offsetX, offsetY, cache });
         },
 
-        resolveCellCenter({ cell, width = 0, height = 0, cellSize, topology, metrics, cache }: GeometryResolveCellCenterArgs) {
+        resolveCellCenter({
+            cell,
+            width = 0,
+            height = 0,
+            cellSize,
+            topology,
+            metrics,
+            cache,
+        }: GeometryResolveCellCenterArgs) {
             return resolvePolygonCellCenter({
                 cell,
                 width,
@@ -129,14 +149,23 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
                 topology,
                 metrics,
                 cache,
-                buildMetrics: ({ width: nextWidth, height: nextHeight, topology: nextTopology, cellSize: nextCellSize }) => (
-                    buildPenroseMetrics(geometry, nextTopology ?? null, nextCellSize, nextWidth, nextHeight)
-                ),
-                buildCellGeometry: (nextCell, nextMetrics, polygonCache) => resolvePolygonGeometryCell(
-                    nextCell,
-                    polygonCache,
-                    (uncachedCell) => penroseCellGeometry(uncachedCell, nextMetrics as PenroseMetrics),
-                ),
+                buildMetrics: ({
+                    width: nextWidth,
+                    height: nextHeight,
+                    topology: nextTopology,
+                    cellSize: nextCellSize,
+                }) =>
+                    buildPenroseMetrics(
+                        geometry,
+                        nextTopology ?? null,
+                        nextCellSize,
+                        nextWidth,
+                        nextHeight,
+                    ),
+                buildCellGeometry: (nextCell, nextMetrics, polygonCache) =>
+                    resolvePolygonGeometryCell(nextCell, polygonCache, (uncachedCell) =>
+                        penroseCellGeometry(uncachedCell, nextMetrics as PenroseMetrics),
+                    ),
             });
         },
 
@@ -148,7 +177,18 @@ function createPenroseGeometryAdapter(geometry: string): GeometryAdapter {
             };
         },
 
-        drawCell({ context, cell, stateValue, metrics, cache, colors, colorLookup, resolveRenderedCellColor, renderStyle, renderLayer }: RenderedCellArgs) {
+        drawCell({
+            context,
+            cell,
+            stateValue,
+            metrics,
+            cache,
+            colors,
+            colorLookup,
+            resolveRenderedCellColor,
+            renderStyle,
+            renderLayer,
+        }: RenderedCellArgs) {
             const geometryCell = resolvePolygonGeometryCell(
                 cell as RenderableTopologyCell,
                 asPolygonGeometryCache(cache),

@@ -12,7 +12,10 @@ export interface ConfigSyncStateManager {
     getViewState(): ConfigSyncViewState;
     shouldAdoptBackendRule(): boolean;
     getDisplaySpeed(fallbackSpeed: number): number;
-    reconcile(simulationState: SimulationSnapshot, options?: { clearScheduledSpeedSync?: () => void }): void;
+    reconcile(
+        simulationState: SimulationSnapshot,
+        options?: { clearScheduledSpeedSync?: () => void },
+    ): void;
     markPendingRule(nextRuleName: string | null): void;
     beginRuleSync(nextRuleName: string | null): void;
     clearRuleSync(): void;
@@ -128,7 +131,9 @@ export function createConfigSyncStateManager(
         notify();
     }
 
-    function clearSpeedSync({ clearScheduledSpeedSync }: { clearScheduledSpeedSync?: () => void } = {}): void {
+    function clearSpeedSync({
+        clearScheduledSpeedSync,
+    }: { clearScheduledSpeedSync?: () => void } = {}): void {
         syncState.pendingSpeed = null;
         syncState.syncingSpeed = null;
         clearScheduledSpeedSync?.();

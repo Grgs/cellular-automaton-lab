@@ -63,9 +63,8 @@ describe("share-link", () => {
     });
 
     it("wraps pattern validation errors as ShareLinkDecodeError", async () => {
-        const { encodeShareFragment, decodeShareFragment, ShareLinkDecodeError } = await import(
-            "./share-link.js"
-        );
+        const { encodeShareFragment, decodeShareFragment, ShareLinkDecodeError } =
+            await import("./share-link.js");
         const corruptedPayload = buildPayload();
         // Encode a pattern with an unsupported rule field type, then ensure decode
         // surfaces a ShareLinkDecodeError rather than a raw PatternValidationError.

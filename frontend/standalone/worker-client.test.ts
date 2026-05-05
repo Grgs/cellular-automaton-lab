@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { AppBootstrapData, PersistedSimulationSnapshotV5, SimulationSnapshot } from "../types/domain.js";
+import type {
+    AppBootstrapData,
+    PersistedSimulationSnapshotV5,
+    SimulationSnapshot,
+} from "../types/domain.js";
 import type {
     StandaloneInitMessage,
     StandaloneRequestMessage,
@@ -11,7 +15,10 @@ import type {
 class FakeWorker {
     readonly postedMessages: StandaloneWorkerIncomingMessage[] = [];
     terminated = false;
-    private listeners = new Map<string, Set<(event: MessageEvent<StandaloneWorkerOutgoingMessage> | ErrorEvent) => void>>();
+    private listeners = new Map<
+        string,
+        Set<(event: MessageEvent<StandaloneWorkerOutgoingMessage> | ErrorEvent) => void>
+    >();
 
     addEventListener(
         type: string,
@@ -143,13 +150,16 @@ async function loadWorkerClientModule() {
         save: vi.fn<(nextSnapshot: PersistedSimulationSnapshotV5) => Promise<void>>(async () => {}),
     };
     let lastWorker: FakeWorker | null = null;
+    function rememberWorker(worker: FakeWorker): void {
+        lastWorker = worker;
+    }
 
     vi.stubGlobal(
         "Worker",
         class WorkerStub extends FakeWorker {
             constructor(_url: URL, _options: WorkerOptions) {
                 super();
-                lastWorker = this;
+                rememberWorker(this);
             }
         },
     );

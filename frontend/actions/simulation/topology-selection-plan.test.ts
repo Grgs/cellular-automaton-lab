@@ -111,7 +111,8 @@ describe("topology-selection-plan", () => {
             },
         ];
         const { createAppState } = await import("../../state/simulation-state.js");
-        const { resolveSelectedPatchDepthForTopology } = await import("./topology-selection-plan.js");
+        const { resolveSelectedPatchDepthForTopology } =
+            await import("./topology-selection-plan.js");
 
         const state = createAppState();
         state.activeRule = makeRule("conway");

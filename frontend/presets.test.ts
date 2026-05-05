@@ -9,7 +9,8 @@ describe("presets", () => {
     });
 
     it("lists source-driven whirlpool presets and builds a default seed", async () => {
-        const { buildPresetSeed, getDefaultPresetId, listAvailablePresets } = await import("./presets.js");
+        const { buildPresetSeed, getDefaultPresetId, listAvailablePresets } =
+            await import("./presets.js");
 
         const presets = listAvailablePresets("whirlpool", "square", 30, 20);
         const defaultPresetId = getDefaultPresetId("whirlpool", "square", 30, 20);

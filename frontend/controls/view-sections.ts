@@ -1,9 +1,22 @@
-import { renderThemeToggle, renderPaintPalette, renderRangeControl, renderToggleButtons } from "./view-primitives.js";
-import { populateAdjacencyModes, populatePresetSeeds, populateRules, populateTilingFamilies } from "./view-options.js";
+import {
+    renderThemeToggle,
+    renderPaintPalette,
+    renderRangeControl,
+    renderToggleButtons,
+} from "./view-primitives.js";
+import {
+    populateAdjacencyModes,
+    populatePresetSeeds,
+    populateRules,
+    populateTilingFamilies,
+} from "./view-options.js";
 import type { DomElements } from "../types/dom.js";
 import type { ControlsViewModel, SelectionInspectorSummaryRow } from "../types/ui.js";
 
-function renderSelectionInspectorRows(container: HTMLElement | null, rows: readonly SelectionInspectorSummaryRow[]): void {
+function renderSelectionInspectorRows(
+    container: HTMLElement | null,
+    rows: readonly SelectionInspectorSummaryRow[],
+): void {
     if (!container) {
         return;
     }
@@ -26,7 +39,10 @@ function renderSelectionInspectorRows(container: HTMLElement | null, rows: reado
     );
 }
 
-export function renderSelectionInspectorSection(elements: DomElements, viewModel: ControlsViewModel): void {
+export function renderSelectionInspectorSection(
+    elements: DomElements,
+    viewModel: ControlsViewModel,
+): void {
     const inspector = viewModel.selectionInspector;
     if (elements.selectionInspectorSection) {
         elements.selectionInspectorSection.hidden = inspector.mode === "empty";
@@ -87,7 +103,9 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
         elements.blockingActivityDetail.textContent = viewModel.blockingActivityDetail || "";
     }
     if (elements.gridViewport) {
-        elements.gridViewport.dataset.loading = viewModel.blockingActivityVisible ? "true" : "false";
+        elements.gridViewport.dataset.loading = viewModel.blockingActivityVisible
+            ? "true"
+            : "false";
     }
     if (elements.grid) {
         elements.grid.dataset.editMode = viewModel.gridEditMode || "idle";
@@ -132,7 +150,10 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
     }
     if (elements.controlDrawer) {
         elements.controlDrawer.dataset.open = String(Boolean(viewModel.drawerVisible));
-        elements.controlDrawer.setAttribute("aria-hidden", viewModel.drawerVisible ? "false" : "true");
+        elements.controlDrawer.setAttribute(
+            "aria-hidden",
+            viewModel.drawerVisible ? "false" : "true",
+        );
     }
     if (elements.drawerBackdrop) {
         elements.drawerBackdrop.hidden = !viewModel.backdropVisible;
@@ -140,19 +161,36 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
     if (elements.drawerToggleBtn) {
         elements.drawerToggleBtn.textContent = viewModel.drawerToggleLabel;
         elements.drawerToggleBtn.title = viewModel.drawerToggleTitle;
-        elements.drawerToggleBtn.setAttribute("aria-expanded", viewModel.drawerVisible ? "true" : "false");
-        elements.drawerToggleBtn.setAttribute("aria-pressed", viewModel.drawerVisible ? "true" : "false");
+        elements.drawerToggleBtn.setAttribute(
+            "aria-expanded",
+            viewModel.drawerVisible ? "true" : "false",
+        );
+        elements.drawerToggleBtn.setAttribute(
+            "aria-pressed",
+            viewModel.drawerVisible ? "true" : "false",
+        );
     }
 }
 
-export function renderSimulationSections(elements: DomElements, viewModel: ControlsViewModel): void {
+export function renderSimulationSections(
+    elements: DomElements,
+    viewModel: ControlsViewModel,
+): void {
     elements.speedInput!.value = viewModel.speedValue;
     elements.speedLabel!.textContent = viewModel.speedLabel;
     if (elements.tilingFamilySelect) {
-        populateTilingFamilies(elements, viewModel.tilingFamilyOptions, viewModel.tilingFamilyValue);
+        populateTilingFamilies(
+            elements,
+            viewModel.tilingFamilyOptions,
+            viewModel.tilingFamilyValue,
+        );
     }
     if (elements.adjacencyModeSelect) {
-        populateAdjacencyModes(elements, viewModel.adjacencyModeOptions, viewModel.adjacencyModeValue);
+        populateAdjacencyModes(
+            elements,
+            viewModel.adjacencyModeOptions,
+            viewModel.adjacencyModeValue,
+        );
         elements.adjacencyModeSelect.hidden = !viewModel.adjacencyModeVisible;
         elements.adjacencyModeSelect.disabled = !viewModel.adjacencyModeVisible;
     }
@@ -200,7 +238,10 @@ export function renderSimulationSections(elements: DomElements, viewModel: Contr
         elements.presetSeedSelect.disabled = !viewModel.presetSeedSelectVisible;
     }
     if (elements.presetSeedControls) {
-        elements.presetSeedControls.classList.toggle("has-picker", viewModel.presetSeedSelectVisible);
+        elements.presetSeedControls.classList.toggle(
+            "has-picker",
+            viewModel.presetSeedSelectVisible,
+        );
     }
     if (elements.runToggleBtn) {
         elements.runToggleBtn.textContent = viewModel.runToggle.label;
@@ -214,7 +255,10 @@ export function renderSimulationSections(elements: DomElements, viewModel: Contr
     }
 }
 
-export function renderEditorAndPatternSections(elements: DomElements, viewModel: ControlsViewModel): void {
+export function renderEditorAndPatternSections(
+    elements: DomElements,
+    viewModel: ControlsViewModel,
+): void {
     if (elements.unsafeSizingField) {
         elements.unsafeSizingField.hidden = false;
     }
@@ -292,9 +336,10 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
 
     // Canvas toolbar
     if (elements.canvasToolbar) {
-        const toolbarHidden = viewModel.paletteStates.length === 0
-            || viewModel.blockingActivityVisible
-            || viewModel.gridEditMode === "running";
+        const toolbarHidden =
+            viewModel.paletteStates.length === 0 ||
+            viewModel.blockingActivityVisible ||
+            viewModel.gridEditMode === "running";
         elements.canvasToolbar.hidden = toolbarHidden;
         elements.canvasToolbar.dataset.editMode = viewModel.gridEditMode;
     }
@@ -308,7 +353,10 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
                 btn.classList.add("is-selected");
             }
             btn.dataset.stateValue = String(state.value);
-            btn.setAttribute("aria-pressed", state.value === viewModel.selectedPaintState ? "true" : "false");
+            btn.setAttribute(
+                "aria-pressed",
+                state.value === viewModel.selectedPaintState ? "true" : "false",
+            );
             btn.title = state.label;
             const swatch = document.createElement("span");
             swatch.className = "canvas-toolbar-swatch";
@@ -333,7 +381,10 @@ export function renderEditorAndPatternSections(elements: DomElements, viewModel:
                 btn.classList.add("is-selected");
             }
             btn.dataset.editorTool = String(tool.value);
-            btn.setAttribute("aria-pressed", String(tool.value) === String(viewModel.selectedEditorTool) ? "true" : "false");
+            btn.setAttribute(
+                "aria-pressed",
+                String(tool.value) === String(viewModel.selectedEditorTool) ? "true" : "false",
+            );
             const keyHint = toolShortLabels[String(tool.value)];
             btn.title = keyHint ? `${tool.label} (${keyHint})` : tool.label;
             btn.textContent = keyHint ?? tool.label;

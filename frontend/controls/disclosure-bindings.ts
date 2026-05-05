@@ -4,7 +4,10 @@ import type { AppActionSet } from "../types/actions.js";
 import type { DomElements } from "../types/dom.js";
 import type { UiDisclosureId } from "../types/session.js";
 
-export function bindDisclosureAndShortcutControls(elements: DomElements, actions: AppActionSet): void {
+export function bindDisclosureAndShortcutControls(
+    elements: DomElements,
+    actions: AppActionSet,
+): void {
     if (actions.setDisclosureState) {
         DISCLOSURE_IDS.forEach((id) => {
             const disclosure = elements[id];

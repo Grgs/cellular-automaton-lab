@@ -22,14 +22,21 @@
             <div class="top-bar-controls">
                 <div class="top-bar-control-group top-bar-topology-group">
                     <div class="top-control compact-select top-bar-tiling-control">
-                        <label id="tiling-family-label" class="top-control-label" for="tiling-picker-toggle">Tiling</label>
+                        <label
+                            id="tiling-family-label"
+                            class="top-control-label"
+                            for="tiling-picker-toggle"
+                            >Tiling</label
+                        >
                         <div class="tiling-picker-control">
                             <select
                                 id="tiling-family-select"
                                 aria-hidden="true"
                                 tabindex="-1"
                                 hidden
-                            >__TILING_FAMILY_OPTIONS__</select>
+                            >
+                                __TILING_FAMILY_OPTIONS__
+                            </select>
                             <button
                                 id="tiling-picker-toggle"
                                 class="tiling-picker-toggle"
@@ -40,8 +47,14 @@
                                 aria-labelledby="tiling-family-label tiling-picker-current-label"
                                 title="Choose tiling"
                             >
-                                <span id="tiling-picker-current-preview" class="tiling-selected-preview" aria-hidden="true"></span>
-                                <span id="tiling-picker-current-label" class="tiling-selected-label">Loading...</span>
+                                <span
+                                    id="tiling-picker-current-preview"
+                                    class="tiling-selected-preview"
+                                    aria-hidden="true"
+                                ></span>
+                                <span id="tiling-picker-current-label" class="tiling-selected-label"
+                                    >Loading...</span
+                                >
                                 <span class="tiling-picker-caret" aria-hidden="true"></span>
                             </button>
                         </div>
@@ -56,8 +69,12 @@
                 </div>
 
                 <div class="top-bar-control-group top-bar-actions-group">
-                    <button id="run-toggle-btn" class="primary-action top-bar-action" type="button">Run</button>
-                    <button id="step-btn" class="soft-action top-bar-action" type="button">Step</button>
+                    <button id="run-toggle-btn" class="primary-action top-bar-action" type="button">
+                        Run
+                    </button>
+                    <button id="step-btn" class="soft-action top-bar-action" type="button">
+                        Step
+                    </button>
                     <button
                         id="reset-btn"
                         class="soft-action top-bar-action"
@@ -66,7 +83,9 @@
                     >
                         Reset Board
                     </button>
-                    <button id="random-btn" class="soft-action top-bar-action" type="button">Random Reset</button>
+                    <button id="random-btn" class="soft-action top-bar-action" type="button">
+                        Random Reset
+                    </button>
                 </div>
 
                 <div class="top-bar-control-group top-bar-utility-group">
@@ -106,10 +125,22 @@
                 </div>
             </div>
             <div id="canvas-edit-cue" class="canvas-edit-cue" hidden aria-live="polite">
-                Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.
+                Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected
+                paint state.
             </div>
-            <div id="canvas-toolbar" class="canvas-toolbar" hidden data-edit-mode="idle" aria-label="Painting tools">
-                <div id="canvas-toolbar-shortcuts" class="canvas-toolbar-shortcuts" hidden aria-live="polite">
+            <div
+                id="canvas-toolbar"
+                class="canvas-toolbar"
+                hidden
+                data-edit-mode="idle"
+                aria-label="Painting tools"
+            >
+                <div
+                    id="canvas-toolbar-shortcuts"
+                    class="canvas-toolbar-shortcuts"
+                    hidden
+                    aria-live="polite"
+                >
                     <span class="shortcut-item"><kbd>B</kbd> Brush</span>
                     <span class="shortcut-item"><kbd>L</kbd> Line</span>
                     <span class="shortcut-item"><kbd>R</kbd> Rect</span>
@@ -127,10 +158,33 @@
                     <div class="canvas-toolbar-sep" aria-hidden="true"></div>
                     <div id="canvas-toolbar-brush" class="canvas-toolbar-brush"></div>
                     <div class="canvas-toolbar-sep" aria-hidden="true"></div>
-                    <button id="canvas-toolbar-undo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Undo">↩</button>
-                    <button id="canvas-toolbar-redo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Redo">↪</button>
+                    <button
+                        id="canvas-toolbar-undo-btn"
+                        class="canvas-toolbar-act-btn"
+                        type="button"
+                        disabled
+                        title="Undo"
+                    >
+                        ↩
+                    </button>
+                    <button
+                        id="canvas-toolbar-redo-btn"
+                        class="canvas-toolbar-act-btn"
+                        type="button"
+                        disabled
+                        title="Redo"
+                    >
+                        ↪
+                    </button>
                     <div class="canvas-toolbar-sep" aria-hidden="true"></div>
-                    <button id="canvas-toolbar-dismiss-btn" class="canvas-toolbar-act-btn" type="button" title="Exit edit mode">✕</button>
+                    <button
+                        id="canvas-toolbar-dismiss-btn"
+                        class="canvas-toolbar-act-btn"
+                        type="button"
+                        title="Exit edit mode"
+                    >
+                        ✕
+                    </button>
                     <div class="canvas-toolbar-sep" aria-hidden="true"></div>
                     <button
                         id="canvas-toolbar-help-btn"
@@ -139,7 +193,9 @@
                         aria-label="Keyboard shortcuts"
                         aria-expanded="false"
                         aria-controls="canvas-toolbar-shortcuts"
-                    >?</button>
+                    >
+                        ?
+                    </button>
                 </div>
             </div>
             <div id="grid-viewport" class="grid-viewport">
@@ -152,8 +208,15 @@
                 >
                     <div class="blocking-activity-card">
                         <div class="blocking-activity-spinner" aria-hidden="true"></div>
-                        <strong id="blocking-activity-message" class="blocking-activity-message"></strong>
-                        <span id="blocking-activity-detail" class="blocking-activity-detail" hidden></span>
+                        <strong
+                            id="blocking-activity-message"
+                            class="blocking-activity-message"
+                        ></strong>
+                        <span
+                            id="blocking-activity-detail"
+                            class="blocking-activity-detail"
+                            hidden
+                        ></span>
                     </div>
                 </div>
                 <canvas id="grid" class="grid-canvas" aria-label="Cellular automaton grid"></canvas>
@@ -165,18 +228,35 @@
                 <header class="drawer-header">
                     <div class="drawer-header-copy">
                         <div class="drawer-header-context">
-                            <strong id="inspector-tiling-text" class="drawer-header-title">Loading...</strong>
-                            <span id="inspector-rule-text" class="drawer-header-subtitle">Loading rule...</span>
+                            <strong id="inspector-tiling-text" class="drawer-header-title"
+                                >Loading...</strong
+                            >
+                            <span id="inspector-rule-text" class="drawer-header-subtitle"
+                                >Loading rule...</span
+                            >
                         </div>
-                        <div id="topology-status" class="topology-status inspector-status" hidden aria-live="polite"></div>
+                        <div
+                            id="topology-status"
+                            class="topology-status inspector-status"
+                            hidden
+                            aria-live="polite"
+                        ></div>
                     </div>
                     <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
                         <span class="drawer-showcase-title">Try a starting point</span>
                         <span class="drawer-showcase-actions">
-                            <button id="showcase-whirlpool-btn" class="soft-action showcase-action-button" type="button">
+                            <button
+                                id="showcase-whirlpool-btn"
+                                class="soft-action showcase-action-button"
+                                type="button"
+                            >
                                 Whirlpool Demo
                             </button>
-                            <button id="showcase-wireworld-btn" class="soft-action showcase-action-button" type="button">
+                            <button
+                                id="showcase-wireworld-btn"
+                                class="soft-action showcase-action-button"
+                                type="button"
+                            >
                                 WireWorld Demo
                             </button>
                             <button
@@ -187,9 +267,16 @@
                                 Penrose Demo
                             </button>
                         </span>
-                        <span id="quick-start-hint-text" class="drawer-showcase-hint">Or click the grid to paint.</span>
+                        <span id="quick-start-hint-text" class="drawer-showcase-hint"
+                            >Or click the grid to paint.</span
+                        >
                     </div>
-                    <div id="pattern-status" class="pattern-status inspector-status" hidden aria-live="polite"></div>
+                    <div
+                        id="pattern-status"
+                        class="pattern-status inspector-status"
+                        hidden
+                        aria-live="polite"
+                    ></div>
                 </header>
 
                 <nav class="drawer-nav" aria-label="Jump to section">
@@ -200,19 +287,40 @@
                     <a href="#advanced-section" class="drawer-nav-pill">Advanced</a>
                 </nav>
 
-                <section id="selection-inspector-section" class="panel-section drawer-section" hidden>
+                <section
+                    id="selection-inspector-section"
+                    class="panel-section drawer-section"
+                    hidden
+                >
                     <h2>Cell Metadata</h2>
                     <div class="selection-inspector-header">
-                        <strong id="selection-inspector-title" class="selection-inspector-title">No Cells Selected</strong>
-                        <span id="selection-inspector-subtitle" class="selection-inspector-subtitle"></span>
+                        <strong id="selection-inspector-title" class="selection-inspector-title"
+                            >No Cells Selected</strong
+                        >
+                        <span
+                            id="selection-inspector-subtitle"
+                            class="selection-inspector-subtitle"
+                        ></span>
                     </div>
                     <p id="selection-inspector-hint" class="hint selection-inspector-hint">
                         Right-click a cell to inspect it. Right-drag to summarize a selection.
                     </p>
-                    <div id="selection-inspector-summary-rows" class="selection-inspector-rows"></div>
-                    <details id="selection-inspector-advanced" class="rule-help-toggle selection-inspector-advanced" hidden>
-                        <summary id="selection-inspector-advanced-summary">Advanced Details</summary>
-                        <div id="selection-inspector-advanced-rows" class="selection-inspector-rows selection-inspector-advanced-rows"></div>
+                    <div
+                        id="selection-inspector-summary-rows"
+                        class="selection-inspector-rows"
+                    ></div>
+                    <details
+                        id="selection-inspector-advanced"
+                        class="rule-help-toggle selection-inspector-advanced"
+                        hidden
+                    >
+                        <summary id="selection-inspector-advanced-summary">
+                            Advanced Details
+                        </summary>
+                        <div
+                            id="selection-inspector-advanced-rows"
+                            class="selection-inspector-rows selection-inspector-advanced-rows"
+                        ></div>
                     </details>
                 </section>
 
@@ -227,7 +335,10 @@
                         <summary>Rule Notes</summary>
                         <p id="rule-description" class="rule-description"></p>
                     </details>
-                    <label id="speed-field" class="top-control top-compact-control drawer-control speed-control drawer-speed-control">
+                    <label
+                        id="speed-field"
+                        class="top-control top-compact-control drawer-control speed-control drawer-speed-control"
+                    >
                         <span class="top-control-label">Speed</span>
                         <input
                             id="speed-input"
@@ -238,7 +349,7 @@
                             max="__SPEED_MAX__"
                             step="1"
                             value="__SPEED_VALUE__"
-                        >
+                        />
                         <span id="speed-label" class="top-slider-value">__SPEED_LABEL__</span>
                     </label>
                 </section>
@@ -246,11 +357,20 @@
                 <section id="topology-section" class="panel-section drawer-section">
                     <h2>Topology</h2>
                     <div class="drawer-control-grid drawer-topology-grid">
-                        <label id="adjacency-mode-field" class="top-control compact-select drawer-control" __ADJACENCY_FIELD_HIDDEN__>
+                        <label
+                            id="adjacency-mode-field"
+                            class="top-control compact-select drawer-control"
+                            __ADJACENCY_FIELD_HIDDEN__
+                        >
                             <span class="top-control-label">Adjacency</span>
-                            <select id="adjacency-mode-select">__ADJACENCY_MODE_OPTIONS__</select>
+                            <select id="adjacency-mode-select">
+                                __ADJACENCY_MODE_OPTIONS__
+                            </select>
                         </label>
-                        <label id="cell-size-field" class="top-control top-compact-control drawer-control">
+                        <label
+                            id="cell-size-field"
+                            class="top-control top-compact-control drawer-control"
+                        >
                             <span class="top-control-label">Cell Size</span>
                             <input
                                 id="cell-size-input"
@@ -261,10 +381,16 @@
                                 max="__CELL_SIZE_MAX__"
                                 step="1"
                                 value="__CELL_SIZE_VALUE__"
+                            />
+                            <span id="cell-size-label" class="top-slider-value"
+                                >__CELL_SIZE_LABEL__</span
                             >
-                            <span id="cell-size-label" class="top-slider-value">__CELL_SIZE_LABEL__</span>
                         </label>
-                        <label id="patch-depth-field" class="top-control top-compact-control drawer-control" hidden>
+                        <label
+                            id="patch-depth-field"
+                            class="top-control top-compact-control drawer-control"
+                            hidden
+                        >
                             <span class="top-control-label">Patch Depth</span>
                             <input
                                 id="patch-depth-input"
@@ -275,8 +401,10 @@
                                 max="__PATCH_DEPTH_MAX__"
                                 step="1"
                                 value="__PATCH_DEPTH_VALUE__"
+                            />
+                            <span id="patch-depth-label" class="top-slider-value"
+                                >__PATCH_DEPTH_LABEL__</span
                             >
-                            <span id="patch-depth-label" class="top-slider-value">__PATCH_DEPTH_LABEL__</span>
                         </label>
                     </div>
                 </section>
@@ -288,10 +416,18 @@
                         class="soft-action patterns-share-btn"
                         type="button"
                         title="Copy a link that restores this exact board"
-                    >Copy Share Link</button>
+                    >
+                        Copy Share Link
+                    </button>
                     <div id="preset-seed-controls" class="preset-seed-controls">
-                        <select id="preset-seed-select" hidden aria-label="Preset seed pattern"></select>
-                        <button id="preset-seed-btn" class="soft-action" type="button">Preset Seed</button>
+                        <select
+                            id="preset-seed-select"
+                            hidden
+                            aria-label="Preset seed pattern"
+                        ></select>
+                        <button id="preset-seed-btn" class="soft-action" type="button">
+                            Preset Seed
+                        </button>
                     </div>
                     <p id="preset-helper-text" class="hint preset-helper-text">
                         Loads a curated seed for this rule and board.
@@ -302,25 +438,40 @@
                         accept=".json,application/json"
                         hidden
                         aria-hidden="true"
-                    >
+                    />
                     <details class="file-io-toggle rule-help-toggle">
                         <summary>File I/O</summary>
                         <div class="file-io-panel drawer-action-grid">
-                            <button id="import-pattern-btn" class="soft-action" type="button">Import Pattern</button>
-                            <button id="export-pattern-btn" class="soft-action" type="button">Export Pattern</button>
-                            <button id="copy-pattern-btn" class="soft-action" type="button">Copy Pattern</button>
-                            <button id="paste-pattern-btn" class="soft-action" type="button">Paste Pattern</button>
+                            <button id="import-pattern-btn" class="soft-action" type="button">
+                                Import Pattern
+                            </button>
+                            <button id="export-pattern-btn" class="soft-action" type="button">
+                                Export Pattern
+                            </button>
+                            <button id="copy-pattern-btn" class="soft-action" type="button">
+                                Copy Pattern
+                            </button>
+                            <button id="paste-pattern-btn" class="soft-action" type="button">
+                                Paste Pattern
+                            </button>
                         </div>
                     </details>
                 </section>
 
                 <section id="display-section" class="panel-section drawer-section">
                     <h2>Display</h2>
-                    <label id="tile-colors-field" class="buried-setting-toggle" for="tile-colors-toggle">
-                        <input id="tile-colors-toggle" type="checkbox">
+                    <label
+                        id="tile-colors-field"
+                        class="buried-setting-toggle"
+                        for="tile-colors-toggle"
+                    >
+                        <input id="tile-colors-toggle" type="checkbox" />
                         <span class="buried-setting-copy">
                             <strong class="buried-setting-title">Show tile colors</strong>
-                            <span class="hint">Uses family-specific dead-state palettes for mixed and aperiodic tilings. Turn this off for neutral fills.</span>
+                            <span class="hint"
+                                >Uses family-specific dead-state palettes for mixed and aperiodic
+                                tilings. Turn this off for neutral fills.</span
+                            >
                         </span>
                     </label>
                     <div class="buried-setting-toggle display-theme-toggle">
@@ -332,8 +483,12 @@
                             aria-pressed="false"
                             title="Switch to dark mode"
                         >
-                            <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true">☀</span>
-                            <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
+                            <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true"
+                                >☀</span
+                            >
+                            <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true"
+                                >☾</span
+                            >
                         </button>
                         <span class="buried-setting-copy">
                             <strong class="buried-setting-title">Theme</strong>
@@ -344,15 +499,29 @@
 
                 <section id="advanced-section" class="panel-section drawer-section">
                     <h2>Advanced</h2>
-                    <label id="unsafe-sizing-field" class="buried-setting-toggle" for="unsafe-sizing-toggle">
-                        <input id="unsafe-sizing-toggle" type="checkbox">
+                    <label
+                        id="unsafe-sizing-field"
+                        class="buried-setting-toggle"
+                        for="unsafe-sizing-toggle"
+                    >
+                        <input id="unsafe-sizing-toggle" type="checkbox" />
                         <span class="buried-setting-copy">
                             <strong class="buried-setting-title">Allow unsafe size values</strong>
-                            <span class="hint">Lets Cell Size and Patch Depth go past normal tiling limits. This can get slow or unstable.</span>
+                            <span class="hint"
+                                >Lets Cell Size and Patch Depth go past normal tiling limits. This
+                                can get slow or unstable.</span
+                            >
                         </span>
                     </label>
-                    <p class="hint advanced-section-hint">Reset saved UI preferences and return the app to its default board, rule, and theme.</p>
-                    <button id="reset-all-settings-btn" class="soft-action reset-settings-btn" type="button">
+                    <p class="hint advanced-section-hint">
+                        Reset saved UI preferences and return the app to its default board, rule,
+                        and theme.
+                    </p>
+                    <button
+                        id="reset-all-settings-btn"
+                        class="soft-action reset-settings-btn"
+                        type="button"
+                    >
                         Reset All Settings
                     </button>
                 </section>

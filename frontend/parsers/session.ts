@@ -2,10 +2,7 @@ import { DEFAULT_TOPOLOGY_SPEC } from "../state/constants.js";
 import { isPlainObject } from "../runtime-validation.js";
 import { defaultCellSizeForTilingFamily } from "../state/sizing-state.js";
 import { parseBrushSize, parseEditorTool } from "./editor.js";
-import {
-    parseCellSizeByTilingFamily,
-    parsePatchDepthByTilingFamily,
-} from "./sizing.js";
+import { parseCellSizeByTilingFamily, parsePatchDepthByTilingFamily } from "./sizing.js";
 import { createEmptyUiSession } from "../ui-session-state.js";
 import type { UiDisclosureId, UiSessionState } from "../types/session.js";
 
@@ -30,9 +27,9 @@ function parseDisclosureStates(
         return {};
     }
 
-    return Object.fromEntries(
-        disclosureIds.map((id) => [id, Boolean(value[id])]),
-    ) as Partial<Record<UiDisclosureId, boolean>>;
+    return Object.fromEntries(disclosureIds.map((id) => [id, Boolean(value[id])])) as Partial<
+        Record<UiDisclosureId, boolean>
+    >;
 }
 
 export function parseUiSession(
@@ -58,11 +55,15 @@ export function parseUiSession(
         });
     } else if (value.cellSize !== null && value.cellSize !== undefined) {
         session.cellSizeByTilingFamily = {
-            [defaultTilingFamily]: parseCellSizeByTilingFamily({
-                [defaultTilingFamily]: value.cellSize,
-            }, {
-                unsafe: session.unsafeSizingEnabled,
-            })[defaultTilingFamily] ?? defaultCellSizeForTilingFamily(defaultTilingFamily),
+            [defaultTilingFamily]:
+                parseCellSizeByTilingFamily(
+                    {
+                        [defaultTilingFamily]: value.cellSize,
+                    },
+                    {
+                        unsafe: session.unsafeSizingEnabled,
+                    },
+                )[defaultTilingFamily] ?? defaultCellSizeForTilingFamily(defaultTilingFamily),
         };
     }
     if (value.editorTool !== null && value.editorTool !== undefined) {
@@ -75,11 +76,15 @@ export function parseUiSession(
         session.drawerOpen = Boolean(value.drawerOpen);
     }
     session.paintStatesByRule = parsePaintStatesByRule(value.paintStatesByRule);
-    session.patchDepthByTilingFamily = parsePatchDepthByTilingFamily(value.patchDepthByTilingFamily, {
-        unsafe: session.unsafeSizingEnabled,
-    });
+    session.patchDepthByTilingFamily = parsePatchDepthByTilingFamily(
+        value.patchDepthByTilingFamily,
+        {
+            unsafe: session.unsafeSizingEnabled,
+        },
+    );
     session.disclosures = parseDisclosureStates(value.disclosures, disclosureIds);
-    session.cellSize = session.cellSizeByTilingFamily[defaultTilingFamily]
-        ?? defaultCellSizeForTilingFamily(defaultTilingFamily);
+    session.cellSize =
+        session.cellSizeByTilingFamily[defaultTilingFamily] ??
+        defaultCellSizeForTilingFamily(defaultTilingFamily);
     return session;
 }

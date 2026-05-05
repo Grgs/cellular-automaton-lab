@@ -26,9 +26,7 @@ function createIndexedState(currentState = 0): AppState {
     };
     const state: Partial<AppState> = {
         topologyIndex: {
-            byId: new Map([
-                ["cell:1", indexedCell],
-            ]),
+            byId: new Map([["cell:1", indexedCell]]),
         },
         cellStates: [currentState],
         undoStack: [],

@@ -1,5 +1,4 @@
 import {
-    DEFAULT_BRUSH_SIZE,
     DEFAULT_EDITOR_TOOL,
     EDITOR_TOOL_BRUSH,
     EDITOR_TOOL_FILL,
@@ -53,39 +52,42 @@ export function createInteractionEditPolicy({
     setTimeoutFn?: (callback: () => void, delay: number) => number;
 }): InteractionEditPolicy {
     const runtimeState = state as AppState;
-    const armEditModeAction = typeof armEditMode === "function"
-        ? armEditMode
-        : () => {
-            if (!state) {
-                return false;
-            }
-            const changed = armEditModeState(runtimeState);
-            if (changed) {
-                renderControlPanel();
-            }
-            return changed;
-        };
-    const hideEditCueAction = typeof hideEditCue === "function"
-        ? hideEditCue
-        : () => {
-            if (!state) {
-                return false;
-            }
-            const changed = hideEditCueState(runtimeState);
-            if (changed) {
-                renderControlPanel();
-            }
-            return changed;
-        };
-    const setPatternStatusAction = typeof setPatternStatus === "function"
-        ? setPatternStatus
-        : (message: string, tone = "info") => {
-            if (!state) {
-                return;
-            }
-            setPatternStatusState(runtimeState, message, tone);
-            renderControlPanel();
-        };
+    const armEditModeAction =
+        typeof armEditMode === "function"
+            ? armEditMode
+            : () => {
+                  if (!state) {
+                      return false;
+                  }
+                  const changed = armEditModeState(runtimeState);
+                  if (changed) {
+                      renderControlPanel();
+                  }
+                  return changed;
+              };
+    const hideEditCueAction =
+        typeof hideEditCue === "function"
+            ? hideEditCue
+            : () => {
+                  if (!state) {
+                      return false;
+                  }
+                  const changed = hideEditCueState(runtimeState);
+                  if (changed) {
+                      renderControlPanel();
+                  }
+                  return changed;
+              };
+    const setPatternStatusAction =
+        typeof setPatternStatus === "function"
+            ? setPatternStatus
+            : (message: string, tone = "info") => {
+                  if (!state) {
+                      return;
+                  }
+                  setPatternStatusState(runtimeState, message, tone);
+                  renderControlPanel();
+              };
     let editCueToken = 0;
 
     function supportsEditorTools(): boolean {
@@ -160,7 +162,9 @@ export function createInteractionEditPolicy({
     }
 
     function runningBrushEditingEnabled(): boolean {
-        return supportsEditorTools() && editingBlockedByRun() && currentTool() === EDITOR_TOOL_BRUSH;
+        return (
+            supportsEditorTools() && editingBlockedByRun() && currentTool() === EDITOR_TOOL_BRUSH
+        );
     }
 
     function runningAdvancedToolBlocked(): boolean {
@@ -168,7 +172,9 @@ export function createInteractionEditPolicy({
             return false;
         }
         const tool = currentTool();
-        return tool === EDITOR_TOOL_LINE || tool === EDITOR_TOOL_RECTANGLE || tool === EDITOR_TOOL_FILL;
+        return (
+            tool === EDITOR_TOOL_LINE || tool === EDITOR_TOOL_RECTANGLE || tool === EDITOR_TOOL_FILL
+        );
     }
 
     function runningToolLabel(tool = currentTool()): string {

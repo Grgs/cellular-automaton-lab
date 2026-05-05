@@ -56,8 +56,11 @@ export function createEditorSessionController({
         isRunning: () => Boolean(state?.isRunning),
     });
 
-    async function beginPointerSession(cell: PaintableCell, pointerId: number | null): Promise<boolean> {
-        if (!await commitRuntime.ensurePausedForEditing()) {
+    async function beginPointerSession(
+        cell: PaintableCell,
+        pointerId: number | null,
+    ): Promise<boolean> {
+        if (!(await commitRuntime.ensurePausedForEditing())) {
             return false;
         }
 
@@ -78,7 +81,7 @@ export function createEditorSessionController({
     }
 
     async function commitBrushClick(cell: PaintableCell) {
-        if (!await commitRuntime.ensurePausedForEditing()) {
+        if (!(await commitRuntime.ensurePausedForEditing())) {
             return null;
         }
         clearGestureOutline();
@@ -88,12 +91,19 @@ export function createEditorSessionController({
     }
 
     async function commitFillClick(cell: PaintableCell) {
-        if (!await commitRuntime.ensurePausedForEditing()) {
+        if (!(await commitRuntime.ensurePausedForEditing())) {
             return null;
         }
         clearGestureOutline();
         return commitRuntime.commitEditorCells(
-            buildEditorToolCells(runtimeState, EDITOR_TOOL_FILL, cell, cell, getPaintState(), getBrushSize()),
+            buildEditorToolCells(
+                runtimeState,
+                EDITOR_TOOL_FILL,
+                cell,
+                cell,
+                getPaintState(),
+                getBrushSize(),
+            ),
         );
     }
 
@@ -101,13 +111,13 @@ export function createEditorSessionController({
         return session.previewCells.length > 0
             ? session.previewCells
             : buildEditorToolCells(
-                runtimeState,
-                session.kind,
-                session.anchorCell,
-                session.currentCell || session.anchorCell,
-                getPaintState(),
-                getBrushSize(),
-            );
+                  runtimeState,
+                  session.kind,
+                  session.anchorCell,
+                  session.currentCell || session.anchorCell,
+                  getPaintState(),
+                  getBrushSize(),
+              );
     }
 
     async function handleClick(cell: PaintableCell): Promise<{ handled: boolean }> {
@@ -185,25 +195,29 @@ export function createEditorSessionController({
                 }
                 releasePointerCapture(session.pointerId);
                 clearGestureOutline();
-                return commitRuntime.commitEditorCells(
-                    !session.moved || session.paintedCells.size === 0
-                        ? []
-                        : Array.from(session.paintedCells.values()),
-                ).then((result) => {
-                    if (session.moved && session.paintedCells.size > 0) {
-                        pointerState.enableClickSuppression();
-                    }
-                    return result;
-                }).catch(() => null).finally(() => {
-                    clearPreview();
-                    if (session.moved && session.paintedCells.size > 0) {
-                        flashGestureOutline(
-                            Array.from(session.paintedCells.values()),
-                            "paint",
-                            DRAG_GESTURE_FLASH_DURATION_MS,
-                        );
-                    }
-                });
+                return commitRuntime
+                    .commitEditorCells(
+                        !session.moved || session.paintedCells.size === 0
+                            ? []
+                            : Array.from(session.paintedCells.values()),
+                    )
+                    .then((result) => {
+                        if (session.moved && session.paintedCells.size > 0) {
+                            pointerState.enableClickSuppression();
+                        }
+                        return result;
+                    })
+                    .catch(() => null)
+                    .finally(() => {
+                        clearPreview();
+                        if (session.moved && session.paintedCells.size > 0) {
+                            flashGestureOutline(
+                                Array.from(session.paintedCells.values()),
+                                "paint",
+                                DRAG_GESTURE_FLASH_DURATION_MS,
+                            );
+                        }
+                    });
             }
 
             const session = pointerState.endShapeSession();
@@ -213,12 +227,15 @@ export function createEditorSessionController({
             releasePointerCapture(session.pointerId);
             const shapeCells = buildShapeCells(session);
             clearGestureOutline();
-            return commitRuntime.commitEditorCells(shapeCells).catch(() => null).finally(() => {
-                clearPreview();
-                if (session.moved && shapeCells.length > 0) {
-                    flashGestureOutline(shapeCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
-                }
-            });
+            return commitRuntime
+                .commitEditorCells(shapeCells)
+                .catch(() => null)
+                .finally(() => {
+                    clearPreview();
+                    if (session.moved && shapeCells.length > 0) {
+                        flashGestureOutline(shapeCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
+                    }
+                });
         },
         handleClick: (cell) => handleClick(cell),
         cancelActivePreview,

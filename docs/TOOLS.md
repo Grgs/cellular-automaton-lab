@@ -65,14 +65,6 @@ py -3 tools/check_doc_links.py --format json
 py -3 tools/check_doc_links.py docs/TOOLS.md README.md
 ```
 
-### `tools/check_frontend_format.mjs`
-
-Repo-owned lightweight frontend formatting check. Asserts every file under `frontend/`, `static/css/`, `templates/`, and `vite.config.ts` ends with a newline, has no trailing whitespace, and has no leading tabs. Wired into `pre-commit` via `npm run format:frontend:check`. Source: [check_frontend_format.mjs](../tools/check_frontend_format.mjs).
-
-```powershell
-node ./tools/check_frontend_format.mjs
-```
-
 ## Pre-commit hooks
 
 These run automatically through [.pre-commit-config.yaml](../.pre-commit-config.yaml) when you commit or push. They are listed here so you can invoke them manually for debugging.

@@ -129,9 +129,10 @@ export function buildShareUrl(payload: PatternPayload, currentUrl: string): stri
     const otherSlots = splitHashIntoSlots(existingHash).filter(
         (slot) => slot.tagWithEquals !== SHARE_HASH_PREFIX,
     );
-    const merged = otherSlots.length > 0
-        ? [newFragment, ...otherSlots.map((slot) => slot.raw)].join("&")
-        : newFragment;
+    const merged =
+        otherSlots.length > 0
+            ? [newFragment, ...otherSlots.map((slot) => slot.raw)].join("&")
+            : newFragment;
     return `${baseUrl}#${merged}`;
 }
 

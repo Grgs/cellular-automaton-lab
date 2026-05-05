@@ -155,7 +155,10 @@ describe("geometry/periodic-mixed-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: SNUB_SQUARE_GEOMETRY,
@@ -221,7 +224,10 @@ describe("geometry/periodic-mixed-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: SNUB_SQUARE_GEOMETRY,
@@ -302,7 +308,10 @@ describe("geometry/periodic-mixed-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: SNUB_SQUARE_GEOMETRY,
@@ -384,7 +393,10 @@ describe("geometry/periodic-mixed-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: SNUB_SQUARE_GEOMETRY,
@@ -467,7 +479,10 @@ describe("geometry/periodic-mixed-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: SNUB_SQUARE_GEOMETRY,

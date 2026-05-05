@@ -33,7 +33,7 @@ function keyForCell(cell: CoordinateCell): string {
 
 export function pointyHexCellCenter(x: number, y: number): { x: number; y: number } {
     return {
-        x: (x * HEX_WIDTH) + ((y % 2) * (HEX_WIDTH / 2)),
+        x: x * HEX_WIDTH + (y % 2) * (HEX_WIDTH / 2),
         y: y * HEX_ROW_PITCH,
     };
 }
@@ -43,7 +43,7 @@ export function pointyHexGridCenter(width: number, height: number): { x: number;
         return { x: 0, y: 0 };
     }
 
-    const maxCenterX = ((width - 1) * HEX_WIDTH) + (height > 1 ? HEX_WIDTH / 2 : 0);
+    const maxCenterX = (width - 1) * HEX_WIDTH + (height > 1 ? HEX_WIDTH / 2 : 0);
     const maxCenterY = (height - 1) * HEX_ROW_PITCH;
     return {
         x: maxCenterX / 2,
@@ -102,7 +102,11 @@ export function oddRNeighbors(x: number, y: number): CoordinateCell[] {
     return oddRNeighborOffsets(y).map(([dx, dy]) => ({ x: x + dx, y: y + dy }));
 }
 
-export function hexCellsAtDistance(centerX: number, centerY: number, distance: number): CoordinateCell[] {
+export function hexCellsAtDistance(
+    centerX: number,
+    centerY: number,
+    distance: number,
+): CoordinateCell[] {
     const origin = { x: centerX, y: centerY };
     let frontier: CoordinateCell[] = [origin];
     const visited = new Set([keyForCell(origin)]);

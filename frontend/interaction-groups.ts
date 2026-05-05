@@ -7,7 +7,11 @@ import { createInteractionSessionRuntime } from "./interactions/session-runtime.
 import { createInteractionSurfaceBindings } from "./interactions/surface-bindings.js";
 import { createSimulationMutations } from "./interactions/simulation-mutations.js";
 import type { CreateSimulationMutationsFunction } from "./types/controller-runtime.js";
-import type { GridInteractionBindings, InteractionControllerOptions, PaintableCell } from "./types/editor.js";
+import type {
+    GridInteractionBindings,
+    InteractionControllerOptions,
+    PaintableCell,
+} from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 interface InteractionMutationRuntimeOptions {
@@ -43,7 +47,9 @@ interface InteractionEditorRuntimeOptions {
     postControl: InteractionControllerOptions["postControl"];
     renderControlPanel: NonNullable<InteractionControllerOptions["renderControlPanel"]>;
     supportsEditorTools: () => boolean;
-    runStateMutation: NonNullable<InteractionControllerOptions["simulationMutations"]>["runStateMutation"];
+    runStateMutation: NonNullable<
+        InteractionControllerOptions["simulationMutations"]
+    >["runStateMutation"];
     createHistoryCommandsFn?: typeof createHistoryCommands | undefined;
     createPaintDragControllerFn?: typeof createPaintDragController | undefined;
     createEditorSessionControllerFn?: typeof createEditorSessionController | undefined;
@@ -92,12 +98,14 @@ export function createInteractionMutationRuntime({
     mutations: NonNullable<InteractionControllerOptions["simulationMutations"]>;
     editPolicy: ReturnType<typeof createInteractionEditPolicy>;
 } {
-    const mutations = simulationMutations || createSimulationMutationsFn({
-        mutationRunner,
-        onError,
-        applySimulationState,
-        refreshState,
-    });
+    const mutations =
+        simulationMutations ||
+        createSimulationMutationsFn({
+            mutationRunner,
+            onError,
+            applySimulationState,
+            refreshState,
+        });
 
     const editPolicy = createInteractionEditPolicy({
         state,
@@ -155,7 +163,9 @@ export function createInteractionEditorRuntime({
         runStateMutation,
         ...(createHistoryCommandsFn === undefined ? {} : { createHistoryCommandsFn }),
         ...(createPaintDragControllerFn === undefined ? {} : { createPaintDragControllerFn }),
-        ...(createEditorSessionControllerFn === undefined ? {} : { createEditorSessionControllerFn }),
+        ...(createEditorSessionControllerFn === undefined
+            ? {}
+            : { createEditorSessionControllerFn }),
     });
 }
 

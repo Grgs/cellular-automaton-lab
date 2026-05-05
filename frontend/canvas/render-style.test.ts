@@ -45,11 +45,8 @@ describe("canvas/render-style", () => {
         // for the smallest shape. Kagome stays on the legacy deadAlt fallback
         // because its triangle-up/triangle-down kinds aren't yet in the
         // manifest's selector vocabulary.
-        const {
-            buildStateColorLookup,
-            resolveDeadCellColor,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colorLookup = buildStateColorLookup();
         const colors = readCanvasColorsForTests();
         const expectations = [
@@ -76,7 +73,9 @@ describe("canvas/render-style", () => {
         expectations.forEach(({ geometry, kind, expected }) => {
             const cell = { id: `${kind}:0:0`, state: 0, kind };
             expect(resolveDeadCellColor(0, { geometry, cell })).toBe(expected);
-            expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry, cell })).toBe(expected);
+            expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry, cell })).toBe(
+                expected,
+            );
         });
     });
 
@@ -103,11 +102,8 @@ describe("canvas/render-style", () => {
     });
 
     it("applies slot-based dead fills to Deltoidal Hexagonal kites", async () => {
-        const {
-            buildStateColorLookup,
-            resolveDeadCellColor,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colorLookup = buildStateColorLookup();
         const colors = readCanvasColorsForTests();
         const expectations = [
@@ -127,19 +123,21 @@ describe("canvas/render-style", () => {
 
         expectations.forEach(({ slot, expected }) => {
             const cell = { id: `deltoidal-hexagonal:${slot}`, state: 0, kind: "kite", slot };
-            expect(resolveDeadCellColor(0, { geometry: DELTOIDAL_HEXAGONAL_GEOMETRY, cell })).toBe(expected);
+            expect(resolveDeadCellColor(0, { geometry: DELTOIDAL_HEXAGONAL_GEOMETRY, cell })).toBe(
+                expected,
+            );
             expect(
-                resolveRenderedCellColor(0, colorLookup, colors, { geometry: DELTOIDAL_HEXAGONAL_GEOMETRY, cell }),
+                resolveRenderedCellColor(0, colorLookup, colors, {
+                    geometry: DELTOIDAL_HEXAGONAL_GEOMETRY,
+                    cell,
+                }),
             ).toBe(expected);
         });
     });
 
     it("applies slot-based dead fills to Deltoidal Trihexagonal kites", async () => {
-        const {
-            buildStateColorLookup,
-            resolveDeadCellColor,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colorLookup = buildStateColorLookup();
         const colors = readCanvasColorsForTests();
         const expectations = [
@@ -159,19 +157,21 @@ describe("canvas/render-style", () => {
 
         expectations.forEach(({ slot, expected }) => {
             const cell = { id: `deltoidal-trihexagonal:${slot}`, state: 0, kind: "kite", slot };
-            expect(resolveDeadCellColor(0, { geometry: DELTOIDAL_TRIHEXAGONAL_GEOMETRY, cell })).toBe(expected);
             expect(
-                resolveRenderedCellColor(0, colorLookup, colors, { geometry: DELTOIDAL_TRIHEXAGONAL_GEOMETRY, cell }),
+                resolveDeadCellColor(0, { geometry: DELTOIDAL_TRIHEXAGONAL_GEOMETRY, cell }),
+            ).toBe(expected);
+            expect(
+                resolveRenderedCellColor(0, colorLookup, colors, {
+                    geometry: DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+                    cell,
+                }),
             ).toBe(expected);
         });
     });
 
     it("applies direction-based dead fills to Rhombille slots", async () => {
-        const {
-            buildStateColorLookup,
-            resolveDeadCellColor,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colorLookup = buildStateColorLookup();
         const colors = readCanvasColorsForTests();
         const expectations = [
@@ -186,25 +186,29 @@ describe("canvas/render-style", () => {
         expectations.forEach(({ slot, expected }) => {
             const cell = { id: `rhombille:${slot}`, state: 0, kind: "rhombus", slot };
             expect(resolveDeadCellColor(0, { geometry: RHOMBILLE_GEOMETRY, cell })).toBe(expected);
-            expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry: RHOMBILLE_GEOMETRY, cell })).toBe(
-                expected,
-            );
+            expect(
+                resolveRenderedCellColor(0, colorLookup, colors, {
+                    geometry: RHOMBILLE_GEOMETRY,
+                    cell,
+                }),
+            ).toBe(expected);
         });
     });
 
     it("falls back to neutral dead fills when tile colors are disabled", async () => {
-        const {
-            buildStateColorLookup,
-            resolveDeadCellColor,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colors = readCanvasColorsForTests();
         const colorLookup = buildStateColorLookup([], colors);
         const cell = { id: "rhombille:s1", state: 0, kind: "rhombus", slot: "s1" };
 
-        expect(resolveDeadCellColor(0, { geometry: RHOMBILLE_GEOMETRY, cell, tileColorsEnabled: false })).toBe(
-            colors.dead,
-        );
+        expect(
+            resolveDeadCellColor(0, {
+                geometry: RHOMBILLE_GEOMETRY,
+                cell,
+                tileColorsEnabled: false,
+            }),
+        ).toBe(colors.dead);
         expect(
             resolveRenderedCellColor(0, colorLookup, colors, {
                 geometry: RHOMBILLE_GEOMETRY,
@@ -220,11 +224,8 @@ describe("canvas/render-style", () => {
             FAMILY_DEAD_PALETTE_REGISTRY,
             resolveDeadPaletteColorSpec,
         } = await import("./family-dead-palette-registry.js");
-        const {
-            buildStateColorLookup,
-            resolveDeadCellColor,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colors = readCanvasColorsForTests();
         const colorLookup = buildStateColorLookup([], colors);
 
@@ -233,20 +234,18 @@ describe("canvas/render-style", () => {
                 const cell = buildFamilyDeadPaletteTestCell(variant);
                 const expectedColor = resolveDeadPaletteColorSpec(variant.color, colors);
                 expect(resolveDeadCellColor(0, { geometry, cell })).toBe(expectedColor);
-                expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry, cell })).toBe(expectedColor);
+                expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry, cell })).toBe(
+                    expectedColor,
+                );
             });
         });
     });
 
     it("keeps registered family dead-state variants distinct from the live-state fill", async () => {
-        const {
-            buildFamilyDeadPaletteTestCell,
-            FAMILY_DEAD_PALETTE_VARIANTS,
-        } = await import("./family-dead-palette-registry.js");
-        const {
-            buildStateColorLookup,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildFamilyDeadPaletteTestCell, FAMILY_DEAD_PALETTE_VARIANTS } =
+            await import("./family-dead-palette-registry.js");
+        const { buildStateColorLookup, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colors = {
             line: "rgba(31, 36, 48, 0.16)",
             dead: "#fcfaf4",
@@ -271,34 +270,30 @@ describe("canvas/render-style", () => {
 
         FAMILY_DEAD_PALETTE_VARIANTS.forEach((variant) => {
             const cell = buildFamilyDeadPaletteTestCell(variant);
-            expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry: variant.geometry, cell })).not.toBe(
-                colors.live,
-            );
+            expect(
+                resolveRenderedCellColor(0, colorLookup, colors, {
+                    geometry: variant.geometry,
+                    cell,
+                }),
+            ).not.toBe(colors.live);
         });
 
         expect(
-            resolveRenderedCellColor(
-                1,
-                colorLookup,
-                colors,
-                {
-                    geometry: "shield",
-                    cell: {
-                        id: "shield:live",
-                        state: 1,
-                        kind: "shield-shield",
-                        tile_family: "shield",
-                    },
+            resolveRenderedCellColor(1, colorLookup, colors, {
+                geometry: "shield",
+                cell: {
+                    id: "shield:live",
+                    state: 1,
+                    kind: "shield-shield",
+                    tile_family: "shield",
                 },
-            ),
+            }),
         ).toBe(colors.live);
     });
 
     it("keeps registered family dead-state variants distinct within each geometry unless explicitly shared", async () => {
-        const {
-            FAMILY_DEAD_PALETTE_REGISTRY,
-            resolveDeadPaletteColorSpec,
-        } = await import("./family-dead-palette-registry.js");
+        const { FAMILY_DEAD_PALETTE_REGISTRY, resolveDeadPaletteColorSpec } =
+            await import("./family-dead-palette-registry.js");
         const colors = readCanvasColorsForTests();
 
         FAMILY_DEAD_PALETTE_REGISTRY.forEach(({ geometry, variants }) => {
@@ -324,11 +319,8 @@ describe("canvas/render-style", () => {
             FAMILY_DEAD_PALETTE_VARIANTS,
             resolveDeadPaletteColorSpec,
         } = await import("./family-dead-palette-registry.js");
-        const {
-            buildStateColorLookup,
-            resolveDeadCellColor,
-            resolveRenderedCellColor,
-        } = await import("./render-style.js");
+        const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
+            await import("./render-style.js");
         const colors = {
             line: "rgba(31, 36, 48, 0.16)",
             dead: "#f2ead9",
@@ -350,15 +342,22 @@ describe("canvas/render-style", () => {
             toneShadow: "#b89a6e",
         };
         const colorLookup = buildStateColorLookup([], colors);
-        const tokenBackedVariants = FAMILY_DEAD_PALETTE_VARIANTS.filter((variant) => typeof variant.color !== "string");
+        const tokenBackedVariants = FAMILY_DEAD_PALETTE_VARIANTS.filter(
+            (variant) => typeof variant.color !== "string",
+        );
 
         tokenBackedVariants.forEach((variant) => {
             const cell = buildFamilyDeadPaletteTestCell(variant);
             const expectedColor = resolveDeadPaletteColorSpec(variant.color, colors);
-            expect(resolveDeadCellColor(0, { geometry: variant.geometry, cell }, colors)).toBe(expectedColor);
-            expect(resolveRenderedCellColor(0, colorLookup, colors, { geometry: variant.geometry, cell })).toBe(
+            expect(resolveDeadCellColor(0, { geometry: variant.geometry, cell }, colors)).toBe(
                 expectedColor,
             );
+            expect(
+                resolveRenderedCellColor(0, colorLookup, colors, {
+                    geometry: variant.geometry,
+                    cell,
+                }),
+            ).toBe(expectedColor);
         });
     });
 
@@ -367,19 +366,18 @@ describe("canvas/render-style", () => {
         const canvas = document.createElement("canvas");
         document.body.append(canvas);
 
-        const colors = readCanvasColors(
-            canvas,
-            (node) => node === document.documentElement
+        const colors = readCanvasColors(canvas, (node) =>
+            node === document.documentElement
                 ? styleDeclaration({
-                    "--cell-dead": "#fcfaf4",
-                    "--cell-dead-alt": "#d1b57a",
-                    "--cell-line-soft": "rgba(31, 36, 48, 0.11)",
-                    "--cell-line-strong": "rgba(31, 36, 48, 0.21)",
-                    "--cell-line-aperiodic": "rgba(31, 36, 48, 0.24)",
-                    "--live": "#131722",
-                    "--accent": "#bf5a36",
-                    "--accent-dark": "#8a3d20",
-                })
+                      "--cell-dead": "#fcfaf4",
+                      "--cell-dead-alt": "#d1b57a",
+                      "--cell-line-soft": "rgba(31, 36, 48, 0.11)",
+                      "--cell-line-strong": "rgba(31, 36, 48, 0.21)",
+                      "--cell-line-aperiodic": "rgba(31, 36, 48, 0.24)",
+                      "--live": "#131722",
+                      "--accent": "#bf5a36",
+                      "--accent-dark": "#8a3d20",
+                  })
                 : styleDeclaration({ backgroundColor: "rgba(255, 255, 255, 0.9)" }),
         );
 
@@ -387,16 +385,26 @@ describe("canvas/render-style", () => {
         expect(colors.lineStrong).toBe("rgba(31, 36, 48, 0.21)");
         expect(colors.lineAperiodic).toBe("rgba(31, 36, 48, 0.24)");
 
-        expect(resolveCanvasRenderStyle(6, "square", colors).lineColor).toBe("rgba(31, 36, 48, 0.11)");
-        expect(resolveCanvasRenderStyle(12, "square", colors).lineColor).toBe("rgba(31, 36, 48, 0.21)");
+        expect(resolveCanvasRenderStyle(6, "square", colors).lineColor).toBe(
+            "rgba(31, 36, 48, 0.11)",
+        );
+        expect(resolveCanvasRenderStyle(12, "square", colors).lineColor).toBe(
+            "rgba(31, 36, 48, 0.21)",
+        );
         expect(resolveCanvasRenderStyle(12, "penrose-p3-rhombs", colors).aperiodicLineColor).toBe(
             "rgba(31, 36, 48, 0.24)",
         );
-        expect(resolveCanvasRenderStyle(12, "square", colors).hoverTintColor).toBe("rgba(31, 36, 48, 0.21)");
+        expect(resolveCanvasRenderStyle(12, "square", colors).hoverTintColor).toBe(
+            "rgba(31, 36, 48, 0.21)",
+        );
         expect(resolveCanvasRenderStyle(12, "square", colors).hoverStrokeColor).toBe("#131722");
-        expect(resolveCanvasRenderStyle(12, "square", colors).selectionTintColor).toBe("rgba(191, 90, 54, 0.16)");
+        expect(resolveCanvasRenderStyle(12, "square", colors).selectionTintColor).toBe(
+            "rgba(191, 90, 54, 0.16)",
+        );
         expect(resolveCanvasRenderStyle(12, "square", colors).selectionStrokeColor).toBe("#8a3d20");
-        expect(resolveCanvasRenderStyle(12, "square", colors).gesturePaintStrokeColor).toBe("#8a3d20");
+        expect(resolveCanvasRenderStyle(12, "square", colors).gesturePaintStrokeColor).toBe(
+            "#8a3d20",
+        );
         expect(resolveCanvasRenderStyle(12, "square", colors).gestureEraseStrokeColor).toBe(
             "rgba(31, 36, 48, 0.24)",
         );

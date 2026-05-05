@@ -8,7 +8,7 @@ export interface TopologyFamilyMetadata {
 }
 
 export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
-    "square": {
+    square: {
         label: "Square",
         pickerGroup: "Classic",
         pickerOrder: 10,
@@ -16,7 +16,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "grid",
         viewportSyncMode: "backend-sync",
     },
-    "hex": {
+    hex: {
         label: "Hexagonal",
         pickerGroup: "Classic",
         pickerOrder: 20,
@@ -24,7 +24,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "grid",
         viewportSyncMode: "backend-sync",
     },
-    "triangle": {
+    triangle: {
         label: "Triangular",
         pickerGroup: "Classic",
         pickerOrder: 30,
@@ -104,7 +104,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "grid",
         viewportSyncMode: "backend-sync",
     },
-    "rhombille": {
+    rhombille: {
         label: "Rhombille",
         pickerGroup: "Periodic Mixed",
         pickerOrder: 200,
@@ -168,7 +168,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "grid",
         viewportSyncMode: "backend-sync",
     },
-    "spectre": {
+    spectre: {
         label: "Spectre",
         pickerGroup: "Aperiodic",
         pickerOrder: 240,
@@ -200,7 +200,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "grid",
         viewportSyncMode: "backend-sync",
     },
-    "chair": {
+    chair: {
         label: "Chair",
         pickerGroup: "Aperiodic",
         pickerOrder: 290,
@@ -224,7 +224,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "patch_depth",
         viewportSyncMode: "presentation-only",
     },
-    "sphinx": {
+    sphinx: {
         label: "Sphinx",
         pickerGroup: "Aperiodic",
         pickerOrder: 280,
@@ -256,7 +256,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "patch_depth",
         viewportSyncMode: "presentation-only",
     },
-    "shield": {
+    shield: {
         label: "Shield",
         pickerGroup: "Aperiodic",
         pickerOrder: 330,
@@ -264,7 +264,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "patch_depth",
         viewportSyncMode: "presentation-only",
     },
-    "pinwheel": {
+    pinwheel: {
         label: "Pinwheel",
         pickerGroup: "Experimental",
         pickerOrder: 340,
@@ -275,5 +275,9 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
 } satisfies Readonly<Record<string, TopologyFamilyMetadata>>);
 
 export function getTopologyFamilyMetadata(tilingFamily: string): TopologyFamilyMetadata | null {
-    return (TOPOLOGY_FAMILY_METADATA as Readonly<Record<string, TopologyFamilyMetadata>>)[tilingFamily] ?? null;
+    return (
+        (TOPOLOGY_FAMILY_METADATA as Readonly<Record<string, TopologyFamilyMetadata>>)[
+            tilingFamily
+        ] ?? null
+    );
 }

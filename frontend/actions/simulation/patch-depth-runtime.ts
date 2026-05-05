@@ -57,7 +57,9 @@ export function createPatchDepthRuntime({
     let patchDepthTimer: BrowserTimerId | null = null;
     let inflightPatchDepth: number | null = null;
 
-    function clearScheduledPatchDepthCommit({ clearPending = false }: { clearPending?: boolean } = {}): void {
+    function clearScheduledPatchDepthCommit({
+        clearPending = false,
+    }: { clearPending?: boolean } = {}): void {
         if (patchDepthTimer !== null) {
             clearTimeoutFn(patchDepthTimer);
             patchDepthTimer = null;
@@ -75,9 +77,9 @@ export function createPatchDepthRuntime({
             { unsafe: state.unsafeSizingEnabled },
         );
         if (
-            !topologyUsesPatchDepth(state.topologySpec)
-            || !Number.isFinite(targetDepth)
-            || targetDepth === Number(state.patchDepth)
+            !topologyUsesPatchDepth(state.topologySpec) ||
+            !Number.isFinite(targetDepth) ||
+            targetDepth === Number(state.patchDepth)
         ) {
             clearPendingPatchDepthFn(state);
             renderControlPanel();
@@ -94,10 +96,13 @@ export function createPatchDepthRuntime({
             const simulationState = await interactions.sendControl(
                 "/api/control/reset",
                 {
-                    topology_spec: buildTopologySpecRequest({
-                        ...state.topologySpec,
-                        patch_depth: targetDepth,
-                    }, state.unsafeSizingEnabled),
+                    topology_spec: buildTopologySpecRequest(
+                        {
+                            ...state.topologySpec,
+                            patch_depth: targetDepth,
+                        },
+                        state.unsafeSizingEnabled,
+                    ),
                     speed: state.speed,
                     rule: state.activeRule?.name ?? null,
                     randomize: false,
@@ -112,14 +117,14 @@ export function createPatchDepthRuntime({
         } finally {
             inflightPatchDepth = null;
             if (
-                Number(state.pendingPatchDepth) === targetDepth
-                && Number(state.patchDepth) === targetDepth
+                Number(state.pendingPatchDepth) === targetDepth &&
+                Number(state.patchDepth) === targetDepth
             ) {
                 clearPendingPatchDepthFn(state);
                 renderControlPanel();
             } else if (
-                Number.isFinite(state.pendingPatchDepth)
-                && Number(state.pendingPatchDepth) !== Number(state.patchDepth)
+                Number.isFinite(state.pendingPatchDepth) &&
+                Number(state.pendingPatchDepth) !== Number(state.patchDepth)
             ) {
                 queuePatchDepthCommit({ immediate: true });
             }

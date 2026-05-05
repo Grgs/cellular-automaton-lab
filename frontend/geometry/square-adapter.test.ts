@@ -56,7 +56,10 @@ describe("geometry/square-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: "square",
@@ -123,7 +126,10 @@ describe("geometry/square-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: "square",
@@ -191,7 +197,10 @@ describe("geometry/square-adapter", () => {
                 toneClay: "#c88d4b",
                 toneShadow: "#b89a6e",
             },
-            colorLookup: new Map([[0, "#f8f1e5"], [1, "#1f2430"]]),
+            colorLookup: new Map([
+                [0, "#f8f1e5"],
+                [1, "#1f2430"],
+            ]),
             renderStyle: {
                 mode: "standard",
                 geometry: "square",

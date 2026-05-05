@@ -40,7 +40,10 @@ export function createConfigRuleSyncRequester({
         );
     }
 
-    function requestRuleSync(nextRuleName: string | null, options: RuleSyncRequestOptions = {}): void {
+    function requestRuleSync(
+        nextRuleName: string | null,
+        options: RuleSyncRequestOptions = {},
+    ): void {
         stateManager.markPendingRule(nextRuleName);
         void syncRuleChange(nextRuleName, options);
     }

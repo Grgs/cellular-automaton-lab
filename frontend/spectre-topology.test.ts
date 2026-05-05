@@ -10,7 +10,12 @@ describe("spectre topology", () => {
     });
 
     it("appears in topology picker metadata with a patch-depth topology variant", async () => {
-        const { getTopologyDefinition, resolveTopologyVariantKey, tilingFamilyOptions, topologyUsesPatchDepth } = await import("./topology-catalog.js");
+        const {
+            getTopologyDefinition,
+            resolveTopologyVariantKey,
+            tilingFamilyOptions,
+            topologyUsesPatchDepth,
+        } = await import("./topology-catalog.js");
         const spectre = getFixtureTopologyDefinition("spectre");
 
         expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("spectre");

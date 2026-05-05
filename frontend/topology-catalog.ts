@@ -9,11 +9,12 @@ import type {
 } from "./types/domain.js";
 import { getAperiodicFamilyMetadata } from "./aperiodic-family-registry.js";
 
-function normalizeSizingPolicy(definition: Pick<TopologyDefinition, "sizing_mode" | "sizing_policy">): Readonly<SizingPolicy> {
+function normalizeSizingPolicy(
+    definition: Pick<TopologyDefinition, "sizing_mode" | "sizing_policy">,
+): Readonly<SizingPolicy> {
     const policy = definition.sizing_policy;
-    const control: SizingControl = String(policy.control) === "patch_depth"
-        ? "patch_depth"
-        : "cell_size";
+    const control: SizingControl =
+        String(policy.control) === "patch_depth" ? "patch_depth" : "cell_size";
     const normalized: SizingPolicy = {
         control,
         default: Number(policy.default),
@@ -27,8 +28,12 @@ function normalizeSizingPolicy(definition: Pick<TopologyDefinition, "sizing_mode
     return Object.freeze(normalized);
 }
 
-function normalizeTopologyDefinition(definition: BootstrappedTopologyDefinition): Readonly<TopologyDefinition> {
-    const supportedAdjacencyModes = definition.supported_adjacency_modes.map((value) => String(value));
+function normalizeTopologyDefinition(
+    definition: BootstrappedTopologyDefinition,
+): Readonly<TopologyDefinition> {
+    const supportedAdjacencyModes = definition.supported_adjacency_modes.map((value) =>
+        String(value),
+    );
     return Object.freeze({
         tiling_family: definition.tiling_family,
         label: definition.label,
@@ -73,11 +78,15 @@ export function listTopologyDefinitions(): readonly TopologyDefinition[] {
     return FRONTEND_TOPOLOGY_CATALOG;
 }
 
-export function getTopologyDefinition(tilingFamily: string | null | undefined): TopologyDefinition | null {
+export function getTopologyDefinition(
+    tilingFamily: string | null | undefined,
+): TopologyDefinition | null {
     return TOPOLOGY_BY_FAMILY.get(String(tilingFamily)) ?? null;
 }
 
-export function getTopologySizingPolicy(tilingFamily: string | null | undefined): Readonly<SizingPolicy> {
+export function getTopologySizingPolicy(
+    tilingFamily: string | null | undefined,
+): Readonly<SizingPolicy> {
     const definition = getTopologyDefinition(tilingFamily) ?? getTopologyDefinition("square");
     if (!definition) {
         throw new Error("Missing bootstrapped square topology definition.");
@@ -113,9 +122,11 @@ export function resolveTopologyVariantKey(
         return "square";
     }
     const resolvedAdjacencyMode = resolveAdjacencyMode(tilingFamily, adjacencyMode);
-    return definition.geometry_keys[resolvedAdjacencyMode]
-        || definition.geometry_keys[definition.default_adjacency_mode]
-        || "square";
+    return (
+        definition.geometry_keys[resolvedAdjacencyMode] ||
+        definition.geometry_keys[definition.default_adjacency_mode] ||
+        "square"
+    );
 }
 
 export function describeTopologySpec(topologySpec: Partial<TopologySpec> = {}): TopologySpec {
@@ -157,20 +168,20 @@ export function topologyVariantKeyFromSpec(topologySpec: Partial<TopologySpec> =
 }
 
 export function tilingFamilyOptions(): TopologyOption[] {
-    return FRONTEND_TOPOLOGY_CATALOG
-        .slice()
-        .sort((left, right) => (
-            left.picker_order - right.picker_order
-            || left.label.localeCompare(right.label)
-        ))
+    return FRONTEND_TOPOLOGY_CATALOG.slice()
+        .sort(
+            (left, right) =>
+                left.picker_order - right.picker_order || left.label.localeCompare(right.label),
+        )
         .map((definition) => {
             const aperiodicMetadata = getAperiodicFamilyMetadata(definition.tiling_family);
             const label = aperiodicMetadata?.experimental
                 ? `${definition.label} (Experimental)`
                 : definition.label;
-            const previewKey = definition.geometry_keys[definition.default_adjacency_mode]
-                || Object.values(definition.geometry_keys)[0]
-                || definition.tiling_family;
+            const previewKey =
+                definition.geometry_keys[definition.default_adjacency_mode] ||
+                Object.values(definition.geometry_keys)[0] ||
+                definition.tiling_family;
             return {
                 value: definition.tiling_family,
                 label,
@@ -183,7 +194,9 @@ export function tilingFamilyOptions(): TopologyOption[] {
         });
 }
 
-export function adjacencyModeOptions(tilingFamily: string | null | undefined): AdjacencyModeOption[] {
+export function adjacencyModeOptions(
+    tilingFamily: string | null | undefined,
+): AdjacencyModeOption[] {
     const definition = getTopologyDefinition(tilingFamily);
     if (!definition) {
         return [];

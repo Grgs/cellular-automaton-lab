@@ -3,10 +3,7 @@ import { getTopologyDefinition } from "../topology-catalog.js";
 import { buildSelectionInspectorViewModel } from "./selection-inspector.js";
 import type { RuleDefinition } from "../types/domain.js";
 import type { AppState } from "../types/state.js";
-import type {
-    DrawerInspectorViewModel,
-    SelectionInspectorSource,
-} from "../types/ui.js";
+import type { DrawerInspectorViewModel, SelectionInspectorSource } from "../types/ui.js";
 
 export function buildDrawerInspectorViewModel({
     state,

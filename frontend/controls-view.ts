@@ -4,7 +4,12 @@ import {
     renderSelectionInspectorSection,
     renderSimulationSections,
 } from "./controls/view-sections.js";
-import { populateAdjacencyModes, populatePresetSeeds, populateRules, populateTilingFamilies } from "./controls/view-options.js";
+import {
+    populateAdjacencyModes,
+    populatePresetSeeds,
+    populateRules,
+    populateTilingFamilies,
+} from "./controls/view-options.js";
 import { renderThemeToggle } from "./controls/view-primitives.js";
 import type { DomElements } from "./types/dom.js";
 import type { ControlsViewModel } from "./types/ui.js";

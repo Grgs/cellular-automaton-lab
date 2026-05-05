@@ -1,9 +1,5 @@
 import type { AppBootstrapData, RulesResponse, SimulationSnapshot } from "../types/domain.js";
-import type {
-    ConfigSyncBody,
-    ResetControlBody,
-    SimulationBackend,
-} from "../types/controller.js";
+import type { ConfigSyncBody, ResetControlBody, SimulationBackend } from "../types/controller.js";
 import { createSimulationStatePersistence } from "./persistence.js";
 import type {
     StandaloneCommandPath,
@@ -20,7 +16,13 @@ import type {
 const DEFAULT_PYODIDE_BASE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/";
 
 interface PendingRequest {
-    resolve: (value: StandaloneSuccessResponse | StandaloneReadyResponse | StandaloneInitErrorResponse | StandaloneErrorResponse) => void;
+    resolve: (
+        value:
+            | StandaloneSuccessResponse
+            | StandaloneReadyResponse
+            | StandaloneInitErrorResponse
+            | StandaloneErrorResponse,
+    ) => void;
     reject: (error: Error) => void;
 }
 
@@ -40,7 +42,9 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
     bootstrapData: AppBootstrapData;
 }> {
     const persistence = await createSimulationStatePersistence();
-    const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), { type: "classic" });
+    const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), {
+        type: "classic",
+    });
     const pendingRequests = new Map<string, PendingRequest>();
     let fatalError: Error | null = null;
     let disposed = false;
@@ -88,7 +92,12 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
 
     async function sendMessage(
         message: StandaloneWorkerIncomingMessage,
-    ): Promise<StandaloneSuccessResponse | StandaloneReadyResponse | StandaloneInitErrorResponse | StandaloneErrorResponse> {
+    ): Promise<
+        | StandaloneSuccessResponse
+        | StandaloneReadyResponse
+        | StandaloneInitErrorResponse
+        | StandaloneErrorResponse
+    > {
         if (disposed) {
             throw new Error("Standalone runtime was disposed.");
         }
@@ -103,13 +112,20 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
 
     const persistedSnapshot = await persistence.load();
     const initRequestId = createRequestId();
-    let initResponse: StandaloneSuccessResponse | StandaloneReadyResponse | StandaloneInitErrorResponse | StandaloneErrorResponse;
+    let initResponse:
+        | StandaloneSuccessResponse
+        | StandaloneReadyResponse
+        | StandaloneInitErrorResponse
+        | StandaloneErrorResponse;
     try {
         initResponse = await sendMessage({
             type: "init",
             requestId: initRequestId,
             persistedSnapshot,
-            pythonBundleUrl: new URL(/* @vite-ignore */ "../standalone-python-bundle.json", import.meta.url).toString(),
+            pythonBundleUrl: new URL(
+                /* @vite-ignore */ "../standalone-python-bundle.json",
+                import.meta.url,
+            ).toString(),
             pyodideBaseUrl: DEFAULT_PYODIDE_BASE_URL,
         });
     } catch (error) {
@@ -152,10 +168,25 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
 
     type ControlRequestPayload = ResetControlBody | ConfigSyncBody;
 
-    async function postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
-    async function postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
-    async function postControl(path: "/api/control/start" | "/api/control/pause" | "/api/control/resume" | "/api/control/step"): Promise<SimulationSnapshot>;
-    async function postControl(path: StandaloneCommandPath, body?: ControlRequestPayload): Promise<SimulationSnapshot> {
+    async function postControl(
+        path: "/api/control/reset",
+        body: ResetControlBody,
+    ): Promise<SimulationSnapshot>;
+    async function postControl(
+        path: "/api/config",
+        body: ConfigSyncBody,
+    ): Promise<SimulationSnapshot>;
+    async function postControl(
+        path:
+            | "/api/control/start"
+            | "/api/control/pause"
+            | "/api/control/resume"
+            | "/api/control/step",
+    ): Promise<SimulationSnapshot>;
+    async function postControl(
+        path: StandaloneCommandPath,
+        body?: ControlRequestPayload,
+    ): Promise<SimulationSnapshot> {
         const response = await request(path, body);
         return requireSnapshot(response.snapshot);
     }

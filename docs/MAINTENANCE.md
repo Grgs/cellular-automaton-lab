@@ -25,6 +25,8 @@ Frontend checks:
 
 ```powershell
 npm run lint:frontend
+npm run lint:frontend:eslint
+npm run format:frontend
 npm run format:frontend:check
 ```
 
@@ -43,7 +45,7 @@ Python linting and formatting now cover the full repo-owned Python surface:
 - `tests/`
 - `tools/`
 
-Pre-commit mirrors the same Python scope plus the frontend formatting check, so local hooks and scripted runs exercise the same rules.
+Pre-commit mirrors the same Python scope plus the frontend lint/format check, so local hooks and scripted runs exercise the same rules.
 
 ## Public Release Process
 

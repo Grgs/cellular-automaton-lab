@@ -12,7 +12,12 @@ export function uniqueCells(cells: readonly CartesianSeedCell[]): CartesianSeedC
     });
 }
 
-export function centerPattern(width: number, height: number, patternWidth: number, patternHeight: number): { offsetX: number; offsetY: number } {
+export function centerPattern(
+    width: number,
+    height: number,
+    patternWidth: number,
+    patternHeight: number,
+): { offsetX: number; offsetY: number } {
     return {
         offsetX: Math.floor((width - patternWidth) / 2),
         offsetY: Math.floor((height - patternHeight) / 2),
@@ -107,7 +112,11 @@ export function parseBinaryRle(patternRle: string): CartesianSeedCell[] {
     return cells;
 }
 
-export function buildCenteredBinaryRleSeed(width: number, height: number, patternRle: string): CartesianSeedCell[] {
+export function buildCenteredBinaryRleSeed(
+    width: number,
+    height: number,
+    patternRle: string,
+): CartesianSeedCell[] {
     const patternCells = parseBinaryRle(patternRle);
     if (patternCells.length === 0) {
         return [];

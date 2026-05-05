@@ -44,12 +44,11 @@ export function createSimulationReconciler({
         }
 
         applySimulationSnapshot(state, simulationState);
-        const topologyRebuilt = source !== "editor"
-            && !state.isRunning
-            && (
-                state.topologyRevision !== previousTopologyRevision
-                || topologySpecSignature(state.topologySpec) !== previousTopologySignature
-            );
+        const topologyRebuilt =
+            source !== "editor" &&
+            !state.isRunning &&
+            (state.topologyRevision !== previousTopologyRevision ||
+                topologySpecSignature(state.topologySpec) !== previousTopologySignature);
         if (topologyRebuilt) {
             applyOverlayIntent(state, OVERLAY_INTENT_BOARD_REBUILT);
         } else if (previousRunning !== Boolean(state.isRunning)) {

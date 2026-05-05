@@ -42,9 +42,11 @@ export function serializeUiSession(
 ): PersistedUiSessionV2 {
     return {
         version: UI_SESSION_STORAGE_VERSION,
-        session: cloneUiSession(parseUiSession(session, {
-            disclosureIds,
-            defaultTilingFamily,
-        })),
+        session: cloneUiSession(
+            parseUiSession(session, {
+                disclosureIds,
+                defaultTilingFamily,
+            }),
+        ),
     };
 }

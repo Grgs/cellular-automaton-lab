@@ -45,7 +45,10 @@ function normalizePaintableCells(cells: PaintableCell[]): Map<string, PaintableC
     return new Map(
         cells
             .map((cell) => [paintableCellKey(cell), clonePaintableCell(cell)])
-            .filter((entry): entry is [string, PaintableCell] => typeof entry[0] === "string" && entry[0].length > 0),
+            .filter(
+                (entry): entry is [string, PaintableCell] =>
+                    typeof entry[0] === "string" && entry[0].length > 0,
+            ),
     );
 }
 
@@ -53,7 +56,10 @@ function normalizePreviewCells(cells: PreviewPaintCell[]): Map<string, PreviewPa
     return new Map(
         cells
             .map((cell) => [previewKey(cell), clonePreviewCell(cell)])
-            .filter((entry): entry is [string, PreviewPaintCell] => typeof entry[0] === "string" && entry[0].length > 0),
+            .filter(
+                (entry): entry is [string, PreviewPaintCell] =>
+                    typeof entry[0] === "string" && entry[0].length > 0,
+            ),
     );
 }
 
@@ -96,7 +102,11 @@ export function createTransientOverlayController({
     }
 
     function clearGestureOutline(): void {
-        if (gestureOutlineCells.size === 0 && gestureOutlineTone === null && gestureOutlineTimerId === null) {
+        if (
+            gestureOutlineCells.size === 0 &&
+            gestureOutlineTone === null &&
+            gestureOutlineTimerId === null
+        ) {
             return;
         }
         clearGestureOutlineState();
@@ -115,7 +125,8 @@ export function createTransientOverlayController({
 
     function reconcileForRender(nextTopology: TopologyPayload | null): void {
         const nextTopologyRevision = nextTopology?.topology_revision ?? null;
-        const topologyRevisionChanged = lastTopologyRevision !== null && nextTopologyRevision !== lastTopologyRevision;
+        const topologyRevisionChanged =
+            lastTopologyRevision !== null && nextTopologyRevision !== lastTopologyRevision;
         const nextIds = topologyCellIds(nextTopology);
 
         if (topologyRevisionChanged) {
@@ -127,7 +138,9 @@ export function createTransientOverlayController({
                     selectedCells = new Map();
                 } else {
                     selectedCells = new Map(
-                        Array.from(selectedCells.entries()).filter(([cellId]) => nextIds.has(cellId)),
+                        Array.from(selectedCells.entries()).filter(([cellId]) =>
+                            nextIds.has(cellId),
+                        ),
                     );
                 }
             }
@@ -213,9 +226,12 @@ export function createTransientOverlayController({
         const hoveredKey = paintableCellKey(hoveredCell);
         return {
             previewCells: new Map(previewCells),
-            hoveredCell: hoveredKey && selectedCells.has(hoveredKey)
-                ? null
-                : hoveredCell ? clonePaintableCell(hoveredCell) : null,
+            hoveredCell:
+                hoveredKey && selectedCells.has(hoveredKey)
+                    ? null
+                    : hoveredCell
+                      ? clonePaintableCell(hoveredCell)
+                      : null,
             selectedCells: Array.from(selectedCells.values()).map(clonePaintableCell),
             gestureOutlineCells: Array.from(gestureOutlineCells.values()).map(clonePaintableCell),
             gestureOutlineTone,

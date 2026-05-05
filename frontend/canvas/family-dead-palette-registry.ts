@@ -65,9 +65,7 @@ interface FamilyDeadPaletteManifestFile {
 
 const manifest = familyDeadPaletteManifest as FamilyDeadPaletteManifestFile;
 
-function asSelectorField(
-    field: string,
-): keyof FamilyDeadPaletteVariantSelector {
+function asSelectorField(field: string): keyof FamilyDeadPaletteVariantSelector {
     return field as keyof FamilyDeadPaletteVariantSelector;
 }
 
@@ -76,23 +74,26 @@ export const FAMILY_DEAD_PALETTE_REGISTRY: readonly FamilyDeadPaletteDefinition[
         geometry: familyPalette.geometry,
         ...(familyPalette.browserAliasCoverage
             ? {
-                browserAliasCoverage: {
-                    fixturePath: familyPalette.browserAliasCoverage.fixturePath,
-                    selectorFields: Object.freeze(
-                        familyPalette.browserAliasCoverage.selectorFields.map(asSelectorField),
-                    ),
-                } satisfies PaletteBrowserAliasCoverageDefinition,
-            }
+                  browserAliasCoverage: {
+                      fixturePath: familyPalette.browserAliasCoverage.fixturePath,
+                      selectorFields: Object.freeze(
+                          familyPalette.browserAliasCoverage.selectorFields.map(asSelectorField),
+                      ),
+                  } satisfies PaletteBrowserAliasCoverageDefinition,
+              }
             : {}),
         variants: Object.freeze(
             familyPalette.variants.map((variant) => ({
                 geometry: familyPalette.geometry,
                 label: variant.label,
                 selector: { ...variant.selector },
-                color: typeof variant.color === "string"
-                    ? variant.color
-                    : { token: variant.color.token },
-                ...(variant.allowSharedDeadColor ? { allowSharedDeadColor: variant.allowSharedDeadColor } : {}),
+                color:
+                    typeof variant.color === "string"
+                        ? variant.color
+                        : { token: variant.color.token },
+                ...(variant.allowSharedDeadColor
+                    ? { allowSharedDeadColor: variant.allowSharedDeadColor }
+                    : {}),
             })),
         ),
     })),
@@ -103,20 +104,21 @@ export const PALETTE_BROWSER_ALIAS_COVERAGE: readonly {
     fixturePath: string;
     selectorFields: readonly (keyof FamilyDeadPaletteVariantSelector)[];
 }[] = Object.freeze(
-    FAMILY_DEAD_PALETTE_REGISTRY.flatMap((familyPalette) => (
+    FAMILY_DEAD_PALETTE_REGISTRY.flatMap((familyPalette) =>
         familyPalette.browserAliasCoverage
-            ? [{
-                geometry: familyPalette.geometry,
-                fixturePath: familyPalette.browserAliasCoverage.fixturePath,
-                selectorFields: familyPalette.browserAliasCoverage.selectorFields,
-            }]
-            : []
-    )),
+            ? [
+                  {
+                      geometry: familyPalette.geometry,
+                      fixturePath: familyPalette.browserAliasCoverage.fixturePath,
+                      selectorFields: familyPalette.browserAliasCoverage.selectorFields,
+                  },
+              ]
+            : [],
+    ),
 );
 
-export const FAMILY_DEAD_PALETTE_VARIANTS: readonly FamilyDeadPaletteVariantDefinition[] = Object.freeze(
-    FAMILY_DEAD_PALETTE_REGISTRY.flatMap((familyPalette) => familyPalette.variants),
-);
+export const FAMILY_DEAD_PALETTE_VARIANTS: readonly FamilyDeadPaletteVariantDefinition[] =
+    Object.freeze(FAMILY_DEAD_PALETTE_REGISTRY.flatMap((familyPalette) => familyPalette.variants));
 
 export function resolveDeadPaletteColorSpec(
     color: DeadPaletteColorSpec,
@@ -177,7 +179,11 @@ export function buildFamilyDeadPaletteTestCell(
         neighbors: [],
         ...(variant.selector.slot ? { slot: variant.selector.slot } : {}),
         ...(variant.selector.tile_family ? { tile_family: variant.selector.tile_family } : {}),
-        ...(variant.selector.chirality_token ? { chirality_token: variant.selector.chirality_token } : {}),
-        ...(variant.selector.orientation_token ? { orientation_token: variant.selector.orientation_token } : {}),
+        ...(variant.selector.chirality_token
+            ? { chirality_token: variant.selector.chirality_token }
+            : {}),
+        ...(variant.selector.orientation_token
+            ? { orientation_token: variant.selector.orientation_token }
+            : {}),
     };
 }

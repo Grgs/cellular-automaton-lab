@@ -1,19 +1,10 @@
 import { applyOverlayIntent, OVERLAY_INTENT_BOARD_REBUILT } from "../overlay-policy.js";
 import { buildPresetSeed, getDefaultPresetId } from "../presets.js";
 import { createActionMutationAdapter } from "./shared/mutation-adapter.js";
-import {
-    clearEditMode,
-    dismissFirstRunHint,
-    setPatternStatus,
-} from "../state/overlay-state.js";
-import {
-    RULE_SELECTION_ORIGIN_DEFAULT,
-} from "../state/constants.js";
+import { clearEditMode, dismissFirstRunHint, setPatternStatus } from "../state/overlay-state.js";
+import { RULE_SELECTION_ORIGIN_DEFAULT } from "../state/constants.js";
 import { rememberedCellSizeForTilingFamily } from "../state/sizing-state.js";
-import {
-    setRuleSelectionOrigin,
-    setSelectedPresetId,
-} from "../state/simulation-state.js";
+import { setRuleSelectionOrigin, setSelectedPresetId } from "../state/simulation-state.js";
 import { BLOCKING_ACTIVITY_LOAD_DEMO } from "../blocking-activity.js";
 import { describeTopologySpec, resolveTopologyVariantKey } from "../topology-catalog.js";
 import { indexTopology, presetCellsToTopologyUpdates } from "../topology.js";
@@ -25,7 +16,7 @@ import type {
     ShowcaseDefinition,
 } from "../types/actions.js";
 import type { SimulationMutations } from "../types/controller.js";
-import type { CellStateUpdate, SimulationSnapshot } from "../types/domain.js";
+import type { SimulationSnapshot } from "../types/domain.js";
 
 const SHOWCASE_PENROSE_PATCH_DEPTH = 4;
 
@@ -54,7 +45,10 @@ const SHOWCASE_DEMOS: Readonly<Record<string, Readonly<ShowcaseDefinition>>> = O
     }),
 });
 
-function resolvedSpeed(elements: ShowcaseActionOptions["elements"], state: ShowcaseActionOptions["state"]): number {
+function resolvedSpeed(
+    elements: ShowcaseActionOptions["elements"],
+    state: ShowcaseActionOptions["state"],
+): number {
     const requested = Number(elements.speedInput?.value);
     return Number.isFinite(requested) ? requested : Number(state.speed);
 }
@@ -91,8 +85,8 @@ export function createShowcaseActions({
     setPatternStatusFn?: typeof setPatternStatus;
     setSelectedPresetIdFn?: typeof setSelectedPresetId;
 }): ShowcaseActionSet {
-    const mutations: ActionMutationAdapter | SimulationMutations = simulationMutations
-        || createActionMutationAdapter({ interactions, applySimulationState });
+    const mutations: ActionMutationAdapter | SimulationMutations =
+        simulationMutations || createActionMutationAdapter({ interactions, applySimulationState });
 
     function restoreOverlayAndExitEditMode(): void {
         dismissFirstRunHintFn(state);
@@ -134,10 +128,9 @@ export function createShowcaseActions({
     async function loadPresetBackedDemo(demo: ShowcaseDefinition): Promise<SimulationSnapshot> {
         const resetRequest = resetRequestForDemo(demo);
         const resetState = await postControlFn("/api/control/reset", resetRequest);
-        const resolvedResetState = await mutations.applyRemoteState(
-            resetState,
-            { source: "external" },
-        );
+        const resolvedResetState = await mutations.applyRemoteState(resetState, {
+            source: "external",
+        });
 
         const resetTopologySpec = describeTopologySpec(
             resolvedResetState.topology_spec || resetRequest.topology_spec,
@@ -182,30 +175,36 @@ export function createShowcaseActions({
         }
 
         restoreOverlayAndExitEditMode();
-        return mutations.runSerialized(
-            async () => {
-                if (demo.randomize) {
-                    const resetState = await postControlFn("/api/control/reset", resetRequestForDemo(demo));
-                    return mutations.applyRemoteState(resetState, { source: "external" });
-                }
-                return loadPresetBackedDemo(demo);
-            },
-            {
-                blockingActivity: BLOCKING_ACTIVITY_LOAD_DEMO,
-                onError: (error) => {
-                    const message = error instanceof Error ? error.message : String(error);
-                    setShowcaseStatus(`Showcase failed: ${message}`, "error");
-                    onError(error);
+        return mutations
+            .runSerialized(
+                async () => {
+                    if (demo.randomize) {
+                        const resetState = await postControlFn(
+                            "/api/control/reset",
+                            resetRequestForDemo(demo),
+                        );
+                        return mutations.applyRemoteState(resetState, { source: "external" });
+                    }
+                    return loadPresetBackedDemo(demo);
                 },
-                onRecover: refreshState,
-            },
-        ).then((result) => {
-            if (result) {
-                setRuleSelectionOriginFn(state, RULE_SELECTION_ORIGIN_DEFAULT);
-                setShowcaseStatus(demo.successMessage, "success");
-            }
-            return result;
-        }).catch(() => null);
+                {
+                    blockingActivity: BLOCKING_ACTIVITY_LOAD_DEMO,
+                    onError: (error) => {
+                        const message = error instanceof Error ? error.message : String(error);
+                        setShowcaseStatus(`Showcase failed: ${message}`, "error");
+                        onError(error);
+                    },
+                    onRecover: refreshState,
+                },
+            )
+            .then((result) => {
+                if (result) {
+                    setRuleSelectionOriginFn(state, RULE_SELECTION_ORIGIN_DEFAULT);
+                    setShowcaseStatus(demo.successMessage, "success");
+                }
+                return result;
+            })
+            .catch(() => null);
     }
 
     return {

@@ -12,8 +12,8 @@
     --dead: #fdf8ef;
     --cell-dead: #fdf8ef;
     --cell-dead-alt: #e0c68f;
-    --cell-line-soft: rgba(31, 36, 48, 0.10);
-    --cell-line-strong: rgba(31, 36, 48, 0.20);
+    --cell-line-soft: rgba(31, 36, 48, 0.1);
+    --cell-line-strong: rgba(31, 36, 48, 0.2);
     --cell-line-aperiodic: rgba(31, 36, 48, 0.24);
     /* Tile-tone palette: shared canonical tones for prototile-kind, chirality,
        and orientation differentiation across families. Used by the canvas
@@ -35,7 +35,7 @@
     --shadow: 0 18px 40px rgba(47, 39, 25, 0.12);
     --page-bg:
         radial-gradient(circle at top left, rgba(191, 90, 54, 0.18), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(31, 36, 48, 0.10), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(31, 36, 48, 0.1), transparent 25%),
         linear-gradient(135deg, #efe7d6 0%, #f8f3ea 48%, #ece4d3 100%);
     --status-tile-bg: rgba(255, 255, 255, 0.42);
     --status-tile-line: rgba(31, 36, 48, 0.08);
@@ -112,7 +112,7 @@
     --status-tile-line: rgba(231, 237, 248, 0.08);
     --btn-disabled-bg: rgba(231, 237, 248, 0.06);
     --btn-disabled-text: #b7c3d7;
-    --btn-disabled-line: rgba(231, 237, 248, 0.10);
+    --btn-disabled-line: rgba(231, 237, 248, 0.1);
     --btn-primary-bg: #d67a4c;
     --btn-primary-hover: #e89468;
     --btn-primary-text: #fff9f5;
@@ -124,7 +124,7 @@
     --btn-secondary-bg: #4e6788;
     --btn-secondary-hover: #6280a7;
     --btn-secondary-text: #f8fbff;
-    --btn-secondary-line: rgba(231, 237, 248, 0.30);
+    --btn-secondary-line: rgba(231, 237, 248, 0.3);
     --btn-secondary-disabled-bg: rgba(231, 237, 248, 0.08);
     --btn-secondary-disabled-text: #aab7cc;
     --btn-secondary-disabled-line: rgba(231, 237, 248, 0.12);
@@ -770,7 +770,7 @@ button {
     color: var(--btn-primary-text);
     cursor: pointer;
     font-weight: 700;
-    box-shadow: 0 8px 18px rgba(15, 22, 34, 0.10);
+    box-shadow: 0 8px 18px rgba(15, 22, 34, 0.1);
     transition:
         transform 140ms ease,
         background-color 140ms ease,
@@ -876,7 +876,9 @@ button.theme-toggle .theme-toggle-icon {
     position: absolute;
     font-size: 1.15rem;
     line-height: 1;
-    transition: opacity 140ms ease, transform 140ms ease;
+    transition:
+        opacity 140ms ease,
+        transform 140ms ease;
 }
 
 button.theme-toggle .theme-icon-sun {
@@ -957,7 +959,7 @@ button.theme-toggle .theme-icon-moon {
     border: 1px solid rgba(255, 255, 255, 0.22);
     border-radius: 999px;
     background: rgba(255, 251, 245, 0.94);
-    box-shadow: 0 12px 24px rgba(15, 22, 34, 0.10);
+    box-shadow: 0 12px 24px rgba(15, 22, 34, 0.1);
     color: var(--ink);
     font-size: 0.82rem;
     font-weight: 700;
@@ -1111,7 +1113,9 @@ button.theme-toggle .theme-icon-moon {
     flex-direction: column;
     opacity: 1;
     transform: translateX(calc(100% + 14px));
-    transition: opacity 180ms ease, transform 180ms ease;
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
 }
 
 .control-drawer[data-open="false"] {
@@ -1247,7 +1251,10 @@ button.theme-toggle .theme-icon-moon {
     color: var(--muted);
     text-decoration: none;
     white-space: nowrap;
-    transition: background 100ms, color 100ms, border-color 100ms;
+    transition:
+        background 100ms,
+        color 100ms,
+        border-color 100ms;
 }
 
 .drawer-nav-pill:hover {
@@ -1688,7 +1695,7 @@ button.theme-toggle .theme-icon-moon {
     position: absolute;
     inset: 0;
     z-index: 20;
-    background: rgba(7, 11, 17, 0.20);
+    background: rgba(7, 11, 17, 0.2);
     display: none;
     pointer-events: none;
 }
@@ -1699,7 +1706,7 @@ button.theme-toggle .theme-icon-moon {
 
 :root[data-theme="dark"] .canvas-hud-row {
     border-color: rgba(231, 237, 248, 0.12);
-    background: rgba(17, 23, 32, 0.90);
+    background: rgba(17, 23, 32, 0.9);
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
 }
 
@@ -1721,7 +1728,7 @@ button.theme-toggle .theme-icon-moon {
     border: 1px solid rgba(255, 255, 255, 0.22);
     border-radius: 999px;
     background: rgba(255, 251, 245, 0.94);
-    box-shadow: 0 12px 24px rgba(15, 22, 34, 0.10);
+    box-shadow: 0 12px 24px rgba(15, 22, 34, 0.1);
     pointer-events: all;
     max-width: calc(100% - 28px);
 }
@@ -1790,7 +1797,7 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-toolbar-swatch-btn:hover:not(:disabled) {
-    border-color: rgba(31, 36, 48, 0.40);
+    border-color: rgba(31, 36, 48, 0.4);
 }
 
 .canvas-toolbar-swatch-btn.is-selected {
@@ -1833,7 +1840,7 @@ button.theme-toggle .theme-icon-moon {
 
 .canvas-toolbar-tool-btn.is-selected,
 .canvas-toolbar-brush-btn.is-selected {
-    background: rgba(31, 36, 48, 0.10);
+    background: rgba(31, 36, 48, 0.1);
     border-color: var(--accent);
 }
 
@@ -1872,7 +1879,7 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-toolbar-help-btn.is-active {
-    background: rgba(31, 36, 48, 0.10);
+    background: rgba(31, 36, 48, 0.1);
 }
 
 .canvas-toolbar-shortcuts {
@@ -1916,12 +1923,12 @@ button.theme-toggle .theme-icon-moon {
 }
 
 :root[data-theme="dark"] .canvas-toolbar-shortcuts kbd {
-    background: rgba(231, 237, 248, 0.10);
-    border-color: rgba(231, 237, 248, 0.20);
+    background: rgba(231, 237, 248, 0.1);
+    border-color: rgba(231, 237, 248, 0.2);
 }
 
 :root[data-theme="dark"] .canvas-toolbar-help-btn.is-active {
-    background: rgba(231, 237, 248, 0.10);
+    background: rgba(231, 237, 248, 0.1);
 }
 
 :root[data-theme="dark"] .canvas-toolbar {
@@ -1935,7 +1942,7 @@ button.theme-toggle .theme-icon-moon {
 }
 
 :root[data-theme="dark"] .canvas-toolbar-swatch-btn {
-    border-color: rgba(231, 237, 248, 0.20);
+    border-color: rgba(231, 237, 248, 0.2);
 }
 
 :root[data-theme="dark"] .canvas-toolbar-swatch-btn:hover:not(:disabled) {
@@ -1950,7 +1957,7 @@ button.theme-toggle .theme-icon-moon {
 
 :root[data-theme="dark"] .canvas-toolbar-tool-btn.is-selected,
 :root[data-theme="dark"] .canvas-toolbar-brush-btn.is-selected {
-    background: rgba(231, 237, 248, 0.10);
+    background: rgba(231, 237, 248, 0.1);
 }
 
 :root[data-theme="dark"] .canvas-hud-adjacency {

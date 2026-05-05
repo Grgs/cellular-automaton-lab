@@ -21,7 +21,8 @@ export const DEFAULT_BRUSH_SIZE = 1;
 export const MIN_BRUSH_SIZE = 1;
 export const MAX_BRUSH_SIZE = 3;
 export const MAX_EDITOR_HISTORY = 50;
-export const EDITOR_SHORTCUT_HINT = "Shortcuts: B brush, L line, R rectangle, F fill, E erase, 1-3 brush size.";
+export const EDITOR_SHORTCUT_HINT =
+    "Shortcuts: B brush, L line, R rectangle, F fill, E erase, 1-3 brush size.";
 
 export function isEditorTool(tool: string | null | undefined): tool is EditorTool {
     return Boolean(tool) && EDITOR_TOOLS.includes(tool as EditorTool);

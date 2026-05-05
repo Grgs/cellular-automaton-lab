@@ -1,4 +1,8 @@
-import type { BrowserClearTimeout, BrowserSetTimeout, BrowserTimerId } from "../types/controller.js";
+import type {
+    BrowserClearTimeout,
+    BrowserSetTimeout,
+    BrowserTimerId,
+} from "../types/controller.js";
 import type { AsyncControlResult } from "./binding-primitives.js";
 
 const LIMIT_CUE_DURATION_MS = 1800;
@@ -23,14 +27,10 @@ function rangeLimitMessage(input: HTMLInputElement | null): string {
     const minimum = parseNumericConstraint(input.min);
     const maximum = parseNumericConstraint(input.max);
     if (minimum !== null && value < minimum) {
-        return maximum !== null
-            ? `Allowed: ${minimum}-${maximum}.`
-            : `Minimum: ${minimum}.`;
+        return maximum !== null ? `Allowed: ${minimum}-${maximum}.` : `Minimum: ${minimum}.`;
     }
     if (maximum !== null && value > maximum) {
-        return minimum !== null
-            ? `Allowed: ${minimum}-${maximum}.`
-            : `Maximum: ${maximum}.`;
+        return minimum !== null ? `Allowed: ${minimum}-${maximum}.` : `Maximum: ${maximum}.`;
     }
     return "";
 }
@@ -53,14 +53,10 @@ function stepBoundaryLimitMessage(
     const minimum = parseNumericConstraint(input.min);
     const maximum = parseNumericConstraint(input.max);
     if (direction === "up" && maximum !== null && value >= maximum) {
-        return minimum !== null
-            ? `Allowed: ${minimum}-${maximum}.`
-            : `Maximum: ${maximum}.`;
+        return minimum !== null ? `Allowed: ${minimum}-${maximum}.` : `Maximum: ${maximum}.`;
     }
     if (direction === "down" && minimum !== null && value <= minimum) {
-        return maximum !== null
-            ? `Allowed: ${minimum}-${maximum}.`
-            : `Minimum: ${minimum}.`;
+        return maximum !== null ? `Allowed: ${minimum}-${maximum}.` : `Minimum: ${minimum}.`;
     }
     return "";
 }
@@ -185,9 +181,8 @@ export function bindConstrainedNumericControl({
         });
     }
     input.addEventListener("keydown", (event) => {
-        const direction = event.key === "ArrowUp"
-            ? "up"
-            : (event.key === "ArrowDown" ? "down" : null);
+        const direction =
+            event.key === "ArrowUp" ? "up" : event.key === "ArrowDown" ? "down" : null;
         if (!direction) {
             return;
         }

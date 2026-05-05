@@ -1,4 +1,3 @@
-import { createSimulationMutations } from "./interactions/simulation-mutations.js";
 import { createConfigSyncMutationRuntime } from "./config-sync/runtime.js";
 import { createConfigRuleSyncRequester } from "./config-sync/rule-sync.js";
 import { createConfigSpeedSyncScheduler } from "./config-sync/speed-sync.js";
@@ -16,7 +15,7 @@ import type { SimulationSnapshot } from "./types/domain.js";
 import type { AppState } from "./types/state.js";
 
 export function createConfigSyncController({
-    state,
+    state: _state,
     mutationRunner,
     simulationMutations = null,
     postControl,
@@ -34,7 +33,10 @@ export function createConfigSyncController({
     postControl: PostControlFunction;
     onError: (error: unknown) => void;
     onSyncStateChanged?: (viewState: ConfigSyncViewState) => void;
-    applySimulationState: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;
+    applySimulationState: (
+        simulationState: SimulationSnapshot,
+        options?: { source?: string },
+    ) => void;
     refreshState: () => Promise<void>;
     setTimeoutFn?: BrowserSetTimeout;
     clearTimeoutFn?: BrowserClearTimeout;

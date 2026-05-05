@@ -6,7 +6,8 @@ import type {
     SelectionInspectorViewModel,
 } from "../types/ui.js";
 
-const EMPTY_SELECTION_HINT = "Right-click a cell to inspect it. Right-drag to summarize a selection.";
+const EMPTY_SELECTION_HINT =
+    "Right-click a cell to inspect it. Right-drag to summarize a selection.";
 const MAX_ADVANCED_SELECTED_CELL_IDS = 20;
 
 function formatNumber(value: number): string {
@@ -18,7 +19,9 @@ function formatPoint(point: { x: number; y: number }): string {
 }
 
 function countNeighbors(cell: { neighbors: Array<string | null> }): number {
-    return cell.neighbors.filter((neighborId) => typeof neighborId === "string" && neighborId.length > 0).length;
+    return cell.neighbors.filter(
+        (neighborId) => typeof neighborId === "string" && neighborId.length > 0,
+    ).length;
 }
 
 function formatStateLabel(stateValue: number, activeRule: RuleDefinition | null): string {
@@ -39,7 +42,10 @@ function formatFrequencyMap(frequencies: Map<string, number>): string {
         .join(", ");
 }
 
-function addFrequencyValue(frequencies: Map<string, number>, label: string | null | undefined): void {
+function addFrequencyValue(
+    frequencies: Map<string, number>,
+    label: string | null | undefined,
+): void {
     if (typeof label !== "string" || label.length === 0) {
         return;
     }
@@ -82,7 +88,9 @@ function buildSingleSummaryRows(
         { label: "Kind", value: cell.kind },
         { label: "Neighbor Count", value: String(countNeighbors(cell)) },
     ];
-    const decorations = Array.isArray(cell.decoration_tokens) ? [...cell.decoration_tokens].sort() : [];
+    const decorations = Array.isArray(cell.decoration_tokens)
+        ? [...cell.decoration_tokens].sort()
+        : [];
     if (cell.tile_family) {
         summaryRows.push({ label: "Tile Family", value: cell.tile_family });
     }
@@ -109,7 +117,10 @@ function buildSingleSummaryRows(
 
 function buildSingleAdvancedRows(cell: IndexedTopologyCell): SelectionInspectorSummaryRow[] {
     const advancedRows: SelectionInspectorSummaryRow[] = [];
-    const neighborIds = cell.neighbors.filter((neighborId): neighborId is string => typeof neighborId === "string" && neighborId.length > 0);
+    const neighborIds = cell.neighbors.filter(
+        (neighborId): neighborId is string =>
+            typeof neighborId === "string" && neighborId.length > 0,
+    );
     if (neighborIds.length > 0) {
         advancedRows.push({ label: "Neighbor IDs", value: neighborIds.join(", ") });
     }
@@ -184,7 +195,9 @@ function buildAggregateInspector(
             addFrequencyValue(vertexCountDistribution, String(cell.vertices.length));
         }
         if (Array.isArray(cell.decoration_tokens)) {
-            [...cell.decoration_tokens].sort().forEach((token) => addFrequencyValue(decorationMix, token));
+            [...cell.decoration_tokens]
+                .sort()
+                .forEach((token) => addFrequencyValue(decorationMix, token));
         }
     });
 
@@ -207,10 +220,16 @@ function buildAggregateInspector(
     }
 
     const advancedRows: SelectionInspectorSummaryRow[] = [
-        { label: "Neighbor Count Distribution", value: formatFrequencyMap(neighborCountDistribution) },
+        {
+            label: "Neighbor Count Distribution",
+            value: formatFrequencyMap(neighborCountDistribution),
+        },
     ];
     if (vertexCountDistribution.size > 0) {
-        advancedRows.push({ label: "Vertex Count Distribution", value: formatFrequencyMap(vertexCountDistribution) });
+        advancedRows.push({
+            label: "Vertex Count Distribution",
+            value: formatFrequencyMap(vertexCountDistribution),
+        });
     }
     if (centers.length > 0) {
         const xs = centers.map((center) => center.x);
@@ -225,9 +244,10 @@ function buildAggregateInspector(
         const remainingCount = selectedIds.length - visibleIds.length;
         advancedRows.push({
             label: idsLabel,
-            value: remainingCount > 0
-                ? `${visibleIds.join(", ")}, +${remainingCount} more`
-                : visibleIds.join(", "),
+            value:
+                remainingCount > 0
+                    ? `${visibleIds.join(", ")}, +${remainingCount} more`
+                    : visibleIds.join(", "),
         });
     }
 

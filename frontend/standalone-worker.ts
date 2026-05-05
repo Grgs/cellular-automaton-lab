@@ -96,7 +96,7 @@ async function fetchPythonBundle(url: string): Promise<PythonBundle> {
     if (!response.ok) {
         throw new Error(`Standalone python bundle request failed: ${response.status}`);
     }
-    const payload = await response.json() as PythonBundle;
+    const payload = (await response.json()) as PythonBundle;
     if (!Number.isFinite(Number(payload.version)) || !Array.isArray(payload.files)) {
         throw new Error("Standalone python bundle is invalid.");
     }
@@ -156,13 +156,13 @@ function parseRuntimeJson(raw: string, context: string): PlainObject {
 
 function requireTopologySpec(value: unknown, context: string): TopologySpec {
     if (
-        !isPlainObject(value)
-        || typeof value.tiling_family !== "string"
-        || typeof value.adjacency_mode !== "string"
-        || typeof value.sizing_mode !== "string"
-        || typeof value.width !== "number"
-        || typeof value.height !== "number"
-        || typeof value.patch_depth !== "number"
+        !isPlainObject(value) ||
+        typeof value.tiling_family !== "string" ||
+        typeof value.adjacency_mode !== "string" ||
+        typeof value.sizing_mode !== "string" ||
+        typeof value.width !== "number" ||
+        typeof value.height !== "number" ||
+        typeof value.patch_depth !== "number"
     ) {
         throw new Error(`${context} returned an invalid topology spec.`);
     }
@@ -178,25 +178,25 @@ function requireTopologySpec(value: unknown, context: string): TopologySpec {
 
 function requireRuleDefinition(value: unknown, context: string): RuleDefinition {
     if (
-        !isPlainObject(value)
-        || typeof value.name !== "string"
-        || typeof value.display_name !== "string"
-        || typeof value.description !== "string"
-        || typeof value.default_paint_state !== "number"
-        || typeof value.supports_randomize !== "boolean"
-        || !Array.isArray(value.states)
-        || typeof value.rule_protocol !== "string"
-        || typeof value.supports_all_topologies !== "boolean"
+        !isPlainObject(value) ||
+        typeof value.name !== "string" ||
+        typeof value.display_name !== "string" ||
+        typeof value.description !== "string" ||
+        typeof value.default_paint_state !== "number" ||
+        typeof value.supports_randomize !== "boolean" ||
+        !Array.isArray(value.states) ||
+        typeof value.rule_protocol !== "string" ||
+        typeof value.supports_all_topologies !== "boolean"
     ) {
         throw new Error(`${context} returned an invalid rule definition.`);
     }
     const states = value.states.map((state) => {
         if (
-            !isPlainObject(state)
-            || typeof state.value !== "number"
-            || typeof state.label !== "string"
-            || typeof state.color !== "string"
-            || typeof state.paintable !== "boolean"
+            !isPlainObject(state) ||
+            typeof state.value !== "number" ||
+            typeof state.label !== "string" ||
+            typeof state.color !== "string" ||
+            typeof state.paintable !== "boolean"
         ) {
             throw new Error(`${context} returned an invalid rule state definition.`);
         }
@@ -222,9 +222,9 @@ function requireRuleDefinition(value: unknown, context: string): RuleDefinition 
 
 function requireTopologyPayload(value: unknown, context: string): TopologyPayload {
     if (
-        !isPlainObject(value)
-        || typeof value.topology_revision !== "string"
-        || !Array.isArray(value.cells)
+        !isPlainObject(value) ||
+        typeof value.topology_revision !== "string" ||
+        !Array.isArray(value.cells)
     ) {
         throw new Error(`${context} returned an invalid topology payload.`);
     }
@@ -243,11 +243,11 @@ function optionalSnapshot(value: unknown, context: string): SimulationSnapshot |
         throw new Error(`${context} returned an invalid simulation snapshot.`);
     }
     if (
-        typeof value.speed !== "number"
-        || typeof value.running !== "boolean"
-        || typeof value.generation !== "number"
-        || typeof value.topology_revision !== "string"
-        || !Array.isArray(value.cell_states)
+        typeof value.speed !== "number" ||
+        typeof value.running !== "boolean" ||
+        typeof value.generation !== "number" ||
+        typeof value.topology_revision !== "string" ||
+        !Array.isArray(value.cell_states)
     ) {
         throw new Error(`${context} returned an invalid simulation snapshot.`);
     }
@@ -263,7 +263,10 @@ function optionalSnapshot(value: unknown, context: string): SimulationSnapshot |
     };
 }
 
-function optionalPersistedSnapshot(value: unknown, context: string): PersistedSimulationSnapshotV5 | undefined {
+function optionalPersistedSnapshot(
+    value: unknown,
+    context: string,
+): PersistedSimulationSnapshotV5 | undefined {
     if (value === undefined || value === null) {
         return undefined;
     }
@@ -271,12 +274,12 @@ function optionalPersistedSnapshot(value: unknown, context: string): PersistedSi
         throw new Error(`${context} returned an invalid persisted snapshot.`);
     }
     if (
-        value.version !== 5
-        || typeof value.speed !== "number"
-        || typeof value.running !== "boolean"
-        || typeof value.generation !== "number"
-        || typeof value.rule !== "string"
-        || !isPlainObject(value.cells_by_id)
+        value.version !== 5 ||
+        typeof value.speed !== "number" ||
+        typeof value.running !== "boolean" ||
+        typeof value.generation !== "number" ||
+        typeof value.rule !== "string" ||
+        !isPlainObject(value.cells_by_id)
     ) {
         throw new Error(`${context} returned an invalid persisted snapshot.`);
     }
@@ -321,7 +324,8 @@ function parseInitResponse(raw: string): {
         snapshot?: SimulationSnapshot;
         persistedSnapshot: PersistedSimulationSnapshotV5 | null;
     } = {
-        persistedSnapshot: optionalPersistedSnapshot(payload.persisted_snapshot, "Standalone init") ?? null,
+        persistedSnapshot:
+            optionalPersistedSnapshot(payload.persisted_snapshot, "Standalone init") ?? null,
     };
     const snapshot = optionalSnapshot(payload.snapshot, "Standalone init");
     if (snapshot !== undefined) {
@@ -359,7 +363,10 @@ function parseRequestResponse(raw: string): {
     if (rules !== undefined) {
         result.rules = rules;
     }
-    const persistedSnapshot = optionalPersistedSnapshot(payload.persisted_snapshot, "Standalone request");
+    const persistedSnapshot = optionalPersistedSnapshot(
+        payload.persisted_snapshot,
+        "Standalone request",
+    );
     if (persistedSnapshot !== undefined) {
         result.persistedSnapshot = persistedSnapshot;
     }
@@ -392,7 +399,10 @@ function parseTickResponse(raw: string): {
     if (snapshot !== undefined) {
         result.snapshot = snapshot;
     }
-    const persistedSnapshot = optionalPersistedSnapshot(payload.persisted_snapshot, "Standalone tick");
+    const persistedSnapshot = optionalPersistedSnapshot(
+        payload.persisted_snapshot,
+        "Standalone tick",
+    );
     if (persistedSnapshot !== undefined) {
         result.persistedSnapshot = persistedSnapshot;
     }
@@ -447,7 +457,8 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             "browser_runtime.handle_request(request_path, payload_json)",
             {
                 request_path: request.path,
-                payload_json: request.payload === undefined ? null : JSON.stringify(request.payload),
+                payload_json:
+                    request.payload === undefined ? null : JSON.stringify(request.payload),
             },
         );
         const payload = parseRequestResponse(raw);
@@ -468,7 +479,9 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             ok: true,
             ...(payload.snapshot === undefined ? {} : { snapshot: payload.snapshot }),
             ...(payload.rules === undefined ? {} : { rules: payload.rules }),
-            ...(payload.persistedSnapshot === undefined ? {} : { persistedSnapshot: payload.persistedSnapshot }),
+            ...(payload.persistedSnapshot === undefined
+                ? {}
+                : { persistedSnapshot: payload.persistedSnapshot }),
         });
     } catch (error) {
         postMessage({

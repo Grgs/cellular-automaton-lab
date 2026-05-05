@@ -1,5 +1,5 @@
 import type { CartesianSeedCell } from "../types/domain.js";
-import type { PolarArcSpec, PolarSourceSpec, VortexSeedOptions } from "../types/presets.js";
+import type { PolarArcSpec, VortexSeedOptions } from "../types/presets.js";
 
 const DEFAULT_VORTEX_RADII = Object.freeze([0.22, 0.27, 0.33, 0.39, 0.46, 0.53]);
 const DEFAULT_VORTEX_ANGLES = Object.freeze([-0.98, -0.78, -0.52, -0.24, 0.08, 0.34, 0.63, 0.92]);
@@ -25,7 +25,12 @@ function findNearestUntakenCell(
     targetX: number,
     targetY: number,
 ): { x: number; y: number; center: { x: number; y: number }; distanceSquared: number } | null {
-    let nearestCell: { x: number; y: number; center: { x: number; y: number }; distanceSquared: number } | null = null;
+    let nearestCell: {
+        x: number;
+        y: number;
+        center: { x: number; y: number };
+        distanceSquared: number;
+    } | null = null;
 
     for (let y = 0; y < height; y += 1) {
         for (let x = 0; x < width; x += 1) {
@@ -35,7 +40,7 @@ function findNearestUntakenCell(
             }
 
             const center = getCellCenter(x, y);
-            const distanceSquared = ((center.x - targetX) ** 2) + ((center.y - targetY) ** 2);
+            const distanceSquared = (center.x - targetX) ** 2 + (center.y - targetY) ** 2;
             if (!nearestCell || distanceSquared < nearestCell.distanceSquared) {
                 nearestCell = { x, y, center, distanceSquared };
             }
@@ -45,7 +50,10 @@ function findNearestUntakenCell(
     return nearestCell;
 }
 
-function offsetIsInsideAnyRange(offset: number, ranges: ReadonlyArray<readonly [number, number]> = []): boolean {
+function offsetIsInsideAnyRange(
+    offset: number,
+    ranges: ReadonlyArray<readonly [number, number]> = [],
+): boolean {
     return ranges.some(([minOffset, maxOffset]) => offset >= minOffset && offset <= maxOffset);
 }
 
@@ -77,8 +85,8 @@ function placePolarSample({
     state: number;
 }): CartesianSeedCell | null {
     const angle = angleOrigin + angularOffset;
-    const targetX = gridCenter.x + (Math.cos(angle) * maxRadius * normalizedRadius);
-    const targetY = gridCenter.y + (Math.sin(angle) * maxRadius * normalizedRadius);
+    const targetX = gridCenter.x + Math.cos(angle) * maxRadius * normalizedRadius;
+    const targetY = gridCenter.y + Math.sin(angle) * maxRadius * normalizedRadius;
     const nearestCell = findNearestUntakenCell(
         width,
         height,
@@ -162,16 +170,17 @@ export function buildVortexSeed({
 
     arms.forEach((arm) => {
         const radialSamples = arm.normalizedRadii ?? DEFAULT_VORTEX_RADII;
-        const angularOffsets = (arm.angularOffsets ?? DEFAULT_VORTEX_ANGLES)
-            .filter((angularOffset) => !offsetIsInsideAnyRange(angularOffset, arm.gapRanges ?? []));
+        const angularOffsets = (arm.angularOffsets ?? DEFAULT_VORTEX_ANGLES).filter(
+            (angularOffset) => !offsetIsInsideAnyRange(angularOffset, arm.gapRanges ?? []),
+        );
         const angleOrigin = resolvedAngleOrigin(arm);
         const twist = arm.twist ?? 1.6;
 
         radialSamples.forEach((normalizedRadius) => {
             angularOffsets.forEach((angularOffset) => {
                 const angle = angleOrigin + angularOffset;
-                const targetX = gridCenter.x + (Math.cos(angle) * maxRadius * normalizedRadius);
-                const targetY = gridCenter.y + (Math.sin(angle) * maxRadius * normalizedRadius);
+                const targetX = gridCenter.x + Math.cos(angle) * maxRadius * normalizedRadius;
+                const targetY = gridCenter.y + Math.sin(angle) * maxRadius * normalizedRadius;
                 const nearestCell = findNearestUntakenCell(
                     width,
                     height,
@@ -192,7 +201,7 @@ export function buildVortexSeed({
                 const dy = nearestCell.center.y - gridCenter.y;
                 const actualAngle = Math.atan2(dy, dx);
                 const actualRadius = Math.hypot(dx, dy) / maxRadius;
-                const phase = wrapAngle(actualAngle - angleOrigin) + (twist * actualRadius);
+                const phase = wrapAngle(actualAngle - angleOrigin) + twist * actualRadius;
 
                 let state = 1;
                 if (phase < refractoryPhaseCutoff) {
@@ -207,15 +216,17 @@ export function buildVortexSeed({
     });
 
     arcs.forEach((arc) => {
-        cells.push(...placePolarArc({
-            width,
-            height,
-            gridCenter,
-            maxRadius,
-            getCellCenter,
-            takenCells,
-            arc,
-        }));
+        cells.push(
+            ...placePolarArc({
+                width,
+                height,
+                gridCenter,
+                maxRadius,
+                getCellCenter,
+                takenCells,
+                arc,
+            }),
+        );
     });
 
     sources.forEach((source) => {

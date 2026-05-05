@@ -4,10 +4,7 @@ import {
     clampBrushSize,
     resolveEditorTool,
 } from "../editor-tools.js";
-import {
-    describeTopologySpec,
-    resolveTopologyVariantKey,
-} from "../topology-catalog.js";
+import { describeTopologySpec, resolveTopologyVariantKey } from "../topology-catalog.js";
 import { indexTopology } from "../topology.js";
 import {
     DEFAULT_CELL_SIZE,
@@ -19,17 +16,9 @@ import {
     RULE_SELECTION_ORIGIN_DEFAULT,
     RULE_SELECTION_ORIGIN_USER,
 } from "./constants.js";
-import type {
-    RuleDefinition,
-    TopologyPayload,
-    TopologySpec,
-} from "../types/domain.js";
+import type { RuleDefinition, TopologyPayload, TopologySpec } from "../types/domain.js";
 import type { EditorTool } from "../editor-tools.js";
-import type {
-    AppState,
-    PreviewCellStatesById,
-    RuleSelectionOrigin,
-} from "../types/state.js";
+import type { AppState, PreviewCellStatesById, RuleSelectionOrigin } from "../types/state.js";
 
 function syncSelectedPaintState(
     state: AppState,
@@ -148,9 +137,10 @@ export function setRuleSelectionOrigin(
     state: AppState,
     origin: RuleSelectionOrigin = RULE_SELECTION_ORIGIN_DEFAULT,
 ): void {
-    state.ruleSelectionOrigin = origin === RULE_SELECTION_ORIGIN_USER
-        ? RULE_SELECTION_ORIGIN_USER
-        : RULE_SELECTION_ORIGIN_DEFAULT;
+    state.ruleSelectionOrigin =
+        origin === RULE_SELECTION_ORIGIN_USER
+            ? RULE_SELECTION_ORIGIN_USER
+            : RULE_SELECTION_ORIGIN_DEFAULT;
 }
 
 export function currentRuleSelectionOrigin(state: AppState): RuleSelectionOrigin {
@@ -186,7 +176,11 @@ export function getSelectedPresetId(state: AppState, ruleName: string | null): s
     return state.selectedPresetIdsByRule[ruleName] ?? null;
 }
 
-export function setSelectedPresetId(state: AppState, ruleName: string | null, presetId: string | null): void {
+export function setSelectedPresetId(
+    state: AppState,
+    ruleName: string | null,
+    presetId: string | null,
+): void {
     if (!ruleName) {
         return;
     }
@@ -205,14 +199,16 @@ export function setTopologySpec(state: AppState, topologySpec: Partial<TopologyS
     state.topologySpec = describeTopologySpec(topologySpec);
 }
 
-export function setTopology(state: AppState, topology: TopologyPayload | null, cellStates: number[] = []): void {
+export function setTopology(
+    state: AppState,
+    topology: TopologyPayload | null,
+    cellStates: number[] = [],
+): void {
     const normalizedTopology = topology
         ? {
-            ...topology,
-            topology_spec: describeTopologySpec(
-                topology.topology_spec,
-            ),
-        }
+              ...topology,
+              topology_spec: describeTopologySpec(topology.topology_spec),
+          }
         : null;
     state.topology = normalizedTopology;
     state.topologyRevision = normalizedTopology?.topology_revision ?? null;
@@ -254,8 +250,10 @@ export function clearViewportPreview(state: AppState): void {
 
 export function currentTopologyVariantKey(state: AppState): string {
     const topologySpec = describeTopologySpec(state.topologySpec || DEFAULT_TOPOLOGY_SPEC);
-    return resolveTopologyVariantKey(topologySpec.tiling_family, topologySpec.adjacency_mode)
-        || DEFAULT_TOPOLOGY_VARIANT_KEY;
+    return (
+        resolveTopologyVariantKey(topologySpec.tiling_family, topologySpec.adjacency_mode) ||
+        DEFAULT_TOPOLOGY_VARIANT_KEY
+    );
 }
 
 export {

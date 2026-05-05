@@ -18,7 +18,9 @@ import type {
 import type { SimulationSnapshot } from "./types/domain.js";
 
 export function createSimulationConfigActionSet(
-    options: AppActionOptions & { createSimulationActionsFn?: typeof createSimulationActions | undefined },
+    options: AppActionOptions & {
+        createSimulationActionsFn?: typeof createSimulationActions | undefined;
+    },
 ): SimulationActionSet {
     const { createSimulationActionsFn = createSimulationActions } = options;
     return createSimulationActionsFn({
@@ -40,7 +42,9 @@ export function createPatternPresetActionSet(
         createPatternActionsFn?: typeof createPatternActions | undefined;
         confirmImportFn?: ((message: string) => boolean) | undefined;
         buildPatternPayloadFn?: typeof import("./pattern-io.js").buildPatternPayload | undefined;
-        serializePatternPayloadFn?: typeof import("./pattern-io.js").serializePatternPayload | undefined;
+        serializePatternPayloadFn?:
+            | typeof import("./pattern-io.js").serializePatternPayload
+            | undefined;
         buildPatternFilenameFn?: typeof import("./pattern-io.js").buildPatternFilename | undefined;
         downloadPatternFileFn?: typeof import("./pattern-io.js").downloadPatternFile | undefined;
         readPatternFileFn?: typeof import("./pattern-io.js").readPatternFile | undefined;
@@ -132,10 +136,8 @@ export function createEditorUiActionSet(
     redoEdit(): Promise<SimulationSnapshot | null> | undefined;
     cancelEditorPreview(): Promise<void> | undefined;
 } {
-    const {
-        createUiActionsFn = createUiActions,
-        resetThemeToDefaultFn = resetThemeToDefault,
-    } = options;
+    const { createUiActionsFn = createUiActions, resetThemeToDefaultFn = resetThemeToDefault } =
+        options;
 
     const uiActions = createUiActionsFn({
         state: options.state,
@@ -156,7 +158,8 @@ export function createEditorUiActionSet(
 
     return {
         ...uiActions,
-        resetAllSettings: (): Promise<SimulationSnapshot | null> => defaultResetRuntime.resetAllSettings(),
+        resetAllSettings: (): Promise<SimulationSnapshot | null> =>
+            defaultResetRuntime.resetAllSettings(),
         undoEdit: () => {
             dismissFirstRunHint(options.state);
             return options.interactions.undo?.();

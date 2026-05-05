@@ -10,11 +10,20 @@ describe("robinson triangles topology", () => {
     });
 
     it("appears in topology picker metadata with patch-depth sizing", async () => {
-        const { getTopologyDefinition, resolveTopologyVariantKey, tilingFamilyOptions, topologyUsesPatchDepth } = await import("./topology-catalog.js");
+        const {
+            getTopologyDefinition,
+            resolveTopologyVariantKey,
+            tilingFamilyOptions,
+            topologyUsesPatchDepth,
+        } = await import("./topology-catalog.js");
         const robinson = getFixtureTopologyDefinition("robinson-triangles");
 
-        expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("robinson-triangles");
-        expect(resolveTopologyVariantKey("robinson-triangles", "edge")).toBe(robinson.geometry_keys.edge);
+        expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain(
+            "robinson-triangles",
+        );
+        expect(resolveTopologyVariantKey("robinson-triangles", "edge")).toBe(
+            robinson.geometry_keys.edge,
+        );
         expect(getTopologyDefinition("robinson-triangles")?.render_kind).toBe("polygon_aperiodic");
         expect(topologyUsesPatchDepth("robinson-triangles")).toBe(true);
     });

@@ -19,30 +19,33 @@ function identifyCell(cell: PaintableCell): string {
 }
 
 function interpolatedCells(fromCell: PaintableCell, toCell: PaintableCell): PaintableCell[] {
-    const canInterpolate = Number.isFinite(fromCell?.x)
-        && Number.isFinite(fromCell?.y)
-        && Number.isFinite(toCell?.x)
-        && Number.isFinite(toCell?.y)
-        && (!fromCell?.kind || fromCell.kind === "cell")
-        && (!toCell?.kind || toCell.kind === "cell");
+    const canInterpolate =
+        Number.isFinite(fromCell?.x) &&
+        Number.isFinite(fromCell?.y) &&
+        Number.isFinite(toCell?.x) &&
+        Number.isFinite(toCell?.y) &&
+        (!fromCell?.kind || fromCell.kind === "cell") &&
+        (!toCell?.kind || toCell.kind === "cell");
 
     if (!canInterpolate) {
         return [toCell];
     }
 
-    return interpolateCellPath(
-        fromCell.x ?? 0,
-        fromCell.y ?? 0,
-        toCell.x ?? 0,
-        toCell.y ?? 0,
-    ).map((cell) => ({
-        ...toCell,
-        ...cell,
-        ...(toCell?.id ? { id: `c:${cell.x}:${cell.y}` } : {}),
-    }));
+    return interpolateCellPath(fromCell.x ?? 0, fromCell.y ?? 0, toCell.x ?? 0, toCell.y ?? 0).map(
+        (cell) => ({
+            ...toCell,
+            ...cell,
+            ...(toCell?.id ? { id: `c:${cell.x}:${cell.y}` } : {}),
+        }),
+    );
 }
 
-export function interpolateCellPath(fromX: number, fromY: number, toX: number, toY: number): CoordinateCell[] {
+export function interpolateCellPath(
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number,
+): CoordinateCell[] {
     const steps = Math.max(Math.abs(toX - fromX), Math.abs(toY - fromY));
     if (steps === 0) {
         return [{ x: toX, y: toY }];

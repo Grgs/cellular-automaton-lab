@@ -62,7 +62,13 @@ function createSubject(selectedCells: PaintableCell[] = []) {
 
 describe("interactions/right-selection-session", () => {
     it("selects new cells and refreshes the drawer state", () => {
-        const { session, setSelectedCells, openInspectorDrawer, renderControlPanel, prepareDirectGridInteraction } = createSubject();
+        const {
+            session,
+            setSelectedCells,
+            openInspectorDrawer,
+            renderControlPanel,
+            prepareDirectGridInteraction,
+        } = createSubject();
 
         session.handleMove(pointerEvent({ pointerId: 7, buttons: 2 }), { id: "cell:b" });
 

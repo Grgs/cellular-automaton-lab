@@ -25,7 +25,10 @@ export function bindChromeControls(elements: DomElements, actions: AppActionSet)
     if (elements.controlDrawer && actions.handleInspectorEmptyClick) {
         const controlDrawer = elements.controlDrawer;
         controlDrawer.addEventListener("click", (event) => {
-            if (controlDrawer.dataset.open !== "true" || controlDrawer.getAttribute("aria-hidden") === "true") {
+            if (
+                controlDrawer.dataset.open !== "true" ||
+                controlDrawer.getAttribute("aria-hidden") === "true"
+            ) {
                 return;
             }
             if (isInteractiveChromeClick(event, controlDrawer)) {

@@ -50,16 +50,20 @@ export function resolveDeadCellColor(
     }
 
     const alternateMixedKinds = MIXED_DEAD_ALT_CELL_KINDS.get(normalizedGeometry);
-    if (alternateMixedKinds && typeof cell?.kind === "string" && alternateMixedKinds.has(cell.kind)) {
+    if (
+        alternateMixedKinds &&
+        typeof cell?.kind === "string" &&
+        alternateMixedKinds.has(cell.kind)
+    ) {
         return fallbackColors.deadAlt;
     }
     if (
-        normalizedGeometry === "triangle"
-        && typeof x === "number"
-        && typeof y === "number"
-        && Number.isInteger(x)
-        && Number.isInteger(y)
-        && triangleOrientation(x, y) === "down"
+        normalizedGeometry === "triangle" &&
+        typeof x === "number" &&
+        typeof y === "number" &&
+        Number.isInteger(x) &&
+        Number.isInteger(y) &&
+        triangleOrientation(x, y) === "down"
     ) {
         return fallbackColors.deadAlt;
     }
@@ -92,7 +96,10 @@ export function resolveStateColor(
     colorLookup: Map<number, string>,
     fallbackColors = DEFAULT_COLORS,
 ): string {
-    return colorLookup.get(stateValue) || (stateValue === 0 ? fallbackColors.dead : fallbackColors.live);
+    return (
+        colorLookup.get(stateValue) ||
+        (stateValue === 0 ? fallbackColors.dead : fallbackColors.live)
+    );
 }
 
 export function resolveRenderedCellColor(
@@ -113,6 +120,11 @@ export function resolveRenderedCellColor(
         tileColorsEnabled?: boolean;
     } = {},
 ): string {
-    return resolveDeadCellColor(stateValue, { geometry, x, y, cell, tileColorsEnabled }, fallbackColors)
-        || resolveStateColor(stateValue, colorLookup, fallbackColors);
+    return (
+        resolveDeadCellColor(
+            stateValue,
+            { geometry, x, y, cell, tileColorsEnabled },
+            fallbackColors,
+        ) || resolveStateColor(stateValue, colorLookup, fallbackColors)
+    );
 }

@@ -7,7 +7,12 @@ import type {
 } from "./controller-api.js";
 import type { MutationRunner } from "./controller-runtime.js";
 import type { ConfigSyncController, UiSessionController } from "./controller-sync-session.js";
-import type { AppView, GridView, InteractionController, ViewportController } from "./controller-view.js";
+import type {
+    AppView,
+    GridView,
+    InteractionController,
+    ViewportController,
+} from "./controller-view.js";
 import type { DomElements } from "./dom.js";
 import type { SimulationSnapshot } from "./domain.js";
 import type { AppState } from "./state.js";
@@ -16,7 +21,7 @@ export interface SimulationReconcilerDependencies {
     state: AppState;
     getConfigSyncController?: () => ConfigSyncController | null;
     getUiSessionController?: () => UiSessionController | null;
-    getRefreshState?: () => (() => Promise<void>);
+    getRefreshState?: () => () => Promise<void>;
     applySimulationSnapshot: (state: AppState, simulationState: SimulationSnapshot) => void;
     shouldClearHistoryForSimulationUpdate: (
         state: AppState,
@@ -39,7 +44,9 @@ export interface AppControllerSync {
     resolveSimulationState(simulationState: SimulationSnapshot): Promise<SimulationSnapshot>;
     refreshState(): Promise<void>;
     loadRules(): Promise<void>;
-    getSimulationReconciler(): { apply(simulationState: SimulationSnapshot, options?: { source?: string }): void };
+    getSimulationReconciler(): {
+        apply(simulationState: SimulationSnapshot, options?: { source?: string }): void;
+    };
 }
 
 export interface AppControllerStartupResult {

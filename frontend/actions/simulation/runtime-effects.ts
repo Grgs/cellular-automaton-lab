@@ -1,15 +1,16 @@
 import { clearEditMode } from "../../state/overlay-state.js";
 import { clearPatternStatus, dismissFirstRunHint } from "../../state/overlay-state.js";
-import { RULE_SELECTION_ORIGIN_DEFAULT, RULE_SELECTION_ORIGIN_USER } from "../../state/constants.js";
-import { currentRuleSelectionOrigin, setRuleSelectionOrigin } from "../../state/simulation-state.js";
+import {
+    RULE_SELECTION_ORIGIN_DEFAULT,
+    RULE_SELECTION_ORIGIN_USER,
+} from "../../state/constants.js";
+import {
+    currentRuleSelectionOrigin,
+    setRuleSelectionOrigin,
+} from "../../state/simulation-state.js";
 import { applyOverlayIntent } from "../../overlay-policy.js";
-import {
-    describeTopologySpec,
-    topologyUsesPatchDepth,
-} from "../../topology-catalog.js";
-import {
-    rememberPatchDepthForTilingFamily,
-} from "../../state/sizing-state.js";
+import { describeTopologySpec, topologyUsesPatchDepth } from "../../topology-catalog.js";
+import { rememberPatchDepthForTilingFamily } from "../../state/sizing-state.js";
 import type { SimulationSnapshot } from "../../types/domain.js";
 import type { AppState } from "../../types/state.js";
 import type { UiSessionController } from "../../types/controller.js";
@@ -60,7 +61,9 @@ export function createSimulationRuntimeEffects({
         clearSharedStatus();
     }
 
-    function applyOverlayIntentAndRender(intent: Parameters<typeof applyOverlayIntent>[1]): boolean {
+    function applyOverlayIntentAndRender(
+        intent: Parameters<typeof applyOverlayIntent>[1],
+    ): boolean {
         const changed = applyOverlayIntentFn(state, intent);
         const editChanged = clearEditModeFn(state);
         if (changed || editChanged) {
@@ -93,7 +96,10 @@ export function createSimulationRuntimeEffects({
         }
         const patchDepth = Number(topologySpec.patch_depth) || 0;
         rememberPatchDepthForTilingFamily(state, topologySpec.tiling_family, patchDepth);
-        uiSessionController.persistPatchDepthForTilingFamily?.(topologySpec.tiling_family, patchDepth);
+        uiSessionController.persistPatchDepthForTilingFamily?.(
+            topologySpec.tiling_family,
+            patchDepth,
+        );
     }
 
     function resetRuleSelectionOrigin(): void {

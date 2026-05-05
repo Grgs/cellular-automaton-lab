@@ -1,14 +1,7 @@
 import { DEFAULT_GEOMETRY, normalizeGeometry } from "../layout.js";
-import {
-    COMPACT_RENDER_MAX_CELL_SIZE,
-    STANDARD_RENDER_MAX_CELL_SIZE,
-} from "./render-constants.js";
+import { COMPACT_RENDER_MAX_CELL_SIZE, STANDARD_RENDER_MAX_CELL_SIZE } from "./render-constants.js";
 import { resolveCanvasOverlayStyle } from "./overlay-style.js";
-import type {
-    CanvasColors,
-    CanvasRenderStyle,
-    RenderStyle,
-} from "../types/rendering.js";
+import type { CanvasColors, CanvasRenderStyle, RenderStyle } from "../types/rendering.js";
 
 export {
     DEFAULT_COLORS,
@@ -53,13 +46,15 @@ export function resolveCanvasRenderStyle(
     const renderStyle = resolveRenderStyle(cellSize, geometry);
     return {
         ...renderStyle,
-        lineColor: renderStyle.lineColorToken === "lineStrong"
-            ? canvasColors.lineStrong
-            : canvasColors.lineSoft,
-        aperiodicLineColor: canvasColors.lineAperiodic
-            || canvasColors.lineStrong
-            || canvasColors.line
-            || canvasColors.lineSoft,
+        lineColor:
+            renderStyle.lineColorToken === "lineStrong"
+                ? canvasColors.lineStrong
+                : canvasColors.lineSoft,
+        aperiodicLineColor:
+            canvasColors.lineAperiodic ||
+            canvasColors.lineStrong ||
+            canvasColors.line ||
+            canvasColors.lineSoft,
         ...resolveCanvasOverlayStyle(canvasColors),
     };
 }

@@ -1,4 +1,9 @@
-import { drawTriangleGrid, resolvePolygonStrokeWidth, resolveTransientOverlayStyle, tracePolygonPath } from "../canvas/draw.js";
+import {
+    drawTriangleGrid,
+    resolvePolygonStrokeWidth,
+    resolveTransientOverlayStyle,
+    tracePolygonPath,
+} from "../canvas/draw.js";
 import {
     applyRegularViewportPreview,
     clampGridDimension,
@@ -35,13 +40,13 @@ function triangleVertices(x: number, y: number, cellSize: number): Point2D[] {
     const triangleSide = cellSize;
     const triangleHeight = (Math.sqrt(3) * triangleSide) / 2;
     const horizontalPitch = triangleSide / 2;
-    const leftX = 1 + (x * horizontalPitch);
-    const topY = 1 + (y * triangleHeight);
+    const leftX = 1 + x * horizontalPitch;
+    const topY = 1 + y * triangleHeight;
 
     if ((x + y) % 2 === 0) {
         return [
             { x: leftX, y: topY + triangleHeight },
-            { x: leftX + (triangleSide / 2), y: topY },
+            { x: leftX + triangleSide / 2, y: topY },
             { x: leftX + triangleSide, y: topY + triangleHeight },
         ];
     }
@@ -49,7 +54,7 @@ function triangleVertices(x: number, y: number, cellSize: number): Point2D[] {
     return [
         { x: leftX, y: topY },
         { x: leftX + triangleSide, y: topY },
-        { x: leftX + (triangleSide / 2), y: topY + triangleHeight },
+        { x: leftX + triangleSide / 2, y: topY + triangleHeight },
     ];
 }
 
@@ -61,8 +66,14 @@ function triangleVertexTriplet(vertices: readonly Point2D[]): [Point2D, Point2D,
     return [first, second, third];
 }
 
-function buildTriangleGeometryCache(width: number, height: number, cellSize: number): TriangleGeometryCache {
-    const cells: TriangleGeometryCell[][] = Array.from({ length: height }, () => Array<TriangleGeometryCell>(width));
+function buildTriangleGeometryCache(
+    width: number,
+    height: number,
+    cellSize: number,
+): TriangleGeometryCache {
+    const cells: TriangleGeometryCell[][] = Array.from({ length: height }, () =>
+        Array<TriangleGeometryCell>(width),
+    );
     const strokePath = typeof Path2D === "undefined" ? null : new Path2D();
 
     for (let y = 0; y < height; y += 1) {
@@ -111,10 +122,8 @@ function pointInTriangle(offsetX: number, offsetY: number, vertices: readonly Po
         return false;
     }
     const [a, b, c] = triplet;
-    const sign = (left: Point2D, right: Point2D, point: Point2D) => (
-        ((left.x - point.x) * (right.y - point.y))
-        - ((right.x - point.x) * (left.y - point.y))
-    );
+    const sign = (left: Point2D, right: Point2D, point: Point2D) =>
+        (left.x - point.x) * (right.y - point.y) - (right.x - point.x) * (left.y - point.y);
     const point = { x: offsetX, y: offsetY };
     const d1 = sign(point, a, b);
     const d2 = sign(point, b, c);
@@ -126,7 +135,7 @@ function pointInTriangle(offsetX: number, offsetY: number, vertices: readonly Po
 
 function estimateViewportHeight(viewportHeight: number, cellSize: number): number {
     const metrics = triangleGridMetrics(1, 1, cellSize) as TriangleMetrics;
-    const available = viewportHeight - (2 * metrics.yInset);
+    const available = viewportHeight - 2 * metrics.yInset;
     if (available <= 0) {
         return 5;
     }
@@ -135,14 +144,17 @@ function estimateViewportHeight(viewportHeight: number, cellSize: number): numbe
 
 function estimateViewportWidth(viewportWidth: number, cellSize: number): number {
     const metrics = triangleGridMetrics(1, 1, cellSize) as TriangleMetrics;
-    const available = viewportWidth - (2 * metrics.xInset) - metrics.triangleSide;
+    const available = viewportWidth - 2 * metrics.xInset - metrics.triangleSide;
     if (available <= 0) {
         return 5;
     }
     return Math.floor(available / metrics.horizontalPitch) + 1;
 }
 
-function resolveTriangleCoordinates(cell: PaintableCell | null | undefined): { x: number; y: number } {
+function resolveTriangleCoordinates(cell: PaintableCell | null | undefined): {
+    x: number;
+    y: number;
+} {
     const parsed = parseRegularCellId(cell?.id);
     return {
         x: typeof cell?.x === "number" && Number.isInteger(cell.x) ? cell.x : parsed?.x || 0,
@@ -162,12 +174,14 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         const estimatedHeight = estimateViewportHeight(viewportHeight, cellSize);
         const height = fitGridDimension(
             estimatedHeight,
-            (candidateHeight) => triangleGridMetrics(1, candidateHeight, cellSize).cssHeight <= viewportHeight,
+            (candidateHeight) =>
+                triangleGridMetrics(1, candidateHeight, cellSize).cssHeight <= viewportHeight,
         );
         const estimatedWidth = estimateViewportWidth(viewportWidth, cellSize);
         const width = fitGridDimension(
             estimatedWidth,
-            (candidateWidth) => triangleGridMetrics(candidateWidth, height, cellSize).cssWidth <= viewportWidth,
+            (candidateWidth) =>
+                triangleGridMetrics(candidateWidth, height, cellSize).cssWidth <= viewportWidth,
         );
         return {
             width: clampGridDimension(width),
@@ -182,22 +196,36 @@ export const triangleGeometryAdapter: GeometryAdapter = {
             width,
             height,
             fallbackCellSize,
-            buildMetrics: ({ width: nextWidth, height: nextHeight, cellSize }) => triangleGridMetrics(nextWidth, nextHeight, cellSize),
+            buildMetrics: ({ width: nextWidth, height: nextHeight, cellSize }) =>
+                triangleGridMetrics(nextWidth, nextHeight, cellSize),
         });
     },
 
     buildCache({ width, height, cellSize, maxCachedCells }: GeometryBuildCacheArgs) {
-        if ((width * height) > maxCachedCells) {
+        if (width * height > maxCachedCells) {
             return null;
         }
         return buildTriangleGeometryCache(width, height, cellSize);
     },
 
-    resolveCellFromOffset({ offsetX, offsetY, width, height, cellSize, metrics, cache }: GeometryResolveCellFromOffsetArgs) {
-        const resolvedMetrics = (metrics || triangleGridMetrics(width, height, cellSize)) as TriangleMetrics;
+    resolveCellFromOffset({
+        offsetX,
+        offsetY,
+        width,
+        height,
+        cellSize,
+        metrics,
+        cache,
+    }: GeometryResolveCellFromOffsetArgs) {
+        const resolvedMetrics = (metrics ||
+            triangleGridMetrics(width, height, cellSize)) as TriangleMetrics;
         const triangleCache = asTriangleGeometryCache(cache);
-        const approximateRow = Math.floor((offsetY - resolvedMetrics.yInset) / resolvedMetrics.triangleHeight);
-        const approximateColumn = Math.round((offsetX - resolvedMetrics.xInset) / resolvedMetrics.horizontalPitch);
+        const approximateRow = Math.floor(
+            (offsetY - resolvedMetrics.yInset) / resolvedMetrics.triangleHeight,
+        );
+        const approximateColumn = Math.round(
+            (offsetX - resolvedMetrics.xInset) / resolvedMetrics.horizontalPitch,
+        );
 
         for (let y = approximateRow - 1; y <= approximateRow + 1; y += 1) {
             if (y < 0 || y >= height) {
@@ -208,19 +236,19 @@ export const triangleGeometryAdapter: GeometryAdapter = {
                     continue;
                 }
                 const cachedRow = triangleCache?.cells[y] ?? null;
-                const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
+                const resolvedCell = cachedRow?.[x] ?? {
+                    vertices: triangleVertices(x, y, cellSize),
+                };
                 if (
-                    "minX" in resolvedCell
-                    && typeof resolvedCell.minX === "number"
-                    && typeof resolvedCell.maxX === "number"
-                    && typeof resolvedCell.minY === "number"
-                    && typeof resolvedCell.maxY === "number"
-                    && (
-                        offsetX < resolvedCell.minX
-                        || offsetX > resolvedCell.maxX
-                        || offsetY < resolvedCell.minY
-                        || offsetY > resolvedCell.maxY
-                    )
+                    "minX" in resolvedCell &&
+                    typeof resolvedCell.minX === "number" &&
+                    typeof resolvedCell.maxX === "number" &&
+                    typeof resolvedCell.minY === "number" &&
+                    typeof resolvedCell.maxY === "number" &&
+                    (offsetX < resolvedCell.minX ||
+                        offsetX > resolvedCell.maxX ||
+                        offsetY < resolvedCell.minY ||
+                        offsetY > resolvedCell.maxY)
                 ) {
                     continue;
                 }
@@ -239,10 +267,10 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         const cachedRow = triangleCache?.cells[y] ?? null;
         const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, cellSize) };
         if (
-            "centerX" in resolvedCell
-            && typeof resolvedCell.centerX === "number"
-            && "centerY" in resolvedCell
-            && typeof resolvedCell.centerY === "number"
+            "centerX" in resolvedCell &&
+            typeof resolvedCell.centerX === "number" &&
+            "centerY" in resolvedCell &&
+            typeof resolvedCell.centerY === "number"
         ) {
             return { x: resolvedCell.centerX, y: resolvedCell.centerY };
         }
@@ -266,18 +294,30 @@ export const triangleGeometryAdapter: GeometryAdapter = {
         });
     },
 
-    drawCell({ context, cell, stateValue, cache, colors, colorLookup, renderStyle, metrics, renderLayer, resolveRenderedCellColor }: RenderedCellArgs) {
+    drawCell({
+        context,
+        cell,
+        stateValue,
+        cache,
+        colors,
+        colorLookup,
+        renderStyle,
+        metrics,
+        renderLayer,
+        resolveRenderedCellColor,
+    }: RenderedCellArgs) {
         const { x, y } = resolveTriangleCoordinates(cell);
         const overlayStyle = resolveTransientOverlayStyle(renderLayer, renderStyle);
-        const color = resolveRenderedCellColor(
-            stateValue,
-            colorLookup,
-            colors,
-            { geometry: this.geometry, x, y },
-        );
+        const color = resolveRenderedCellColor(stateValue, colorLookup, colors, {
+            geometry: this.geometry,
+            x,
+            y,
+        });
         const triangleCache = asTriangleGeometryCache(cache);
         const cachedRow = triangleCache?.cells[y] ?? null;
-        const resolvedCell = cachedRow?.[x] ?? { vertices: triangleVertices(x, y, metrics.cellSize) };
+        const resolvedCell = cachedRow?.[x] ?? {
+            vertices: triangleVertices(x, y, metrics.cellSize),
+        };
         if (!overlayStyle || overlayStyle.drawBaseFill) {
             if (context.fillStyle !== color) {
                 context.fillStyle = color;

@@ -50,6 +50,7 @@ export function buildDrawerPatternViewModel({
             : "Download a JSON pattern file for the current board.",
         pastePatternLabel: "Paste Pattern",
         pastePatternDisabled: false,
-        pastePatternTitle: "Read a JSON pattern from the clipboard and load it into the simulation. If clipboard access fails, use Import Pattern.",
+        pastePatternTitle:
+            "Read a JSON pattern from the clipboard and load it into the simulation. If clipboard access fails, use Import Pattern.",
     };
 }

@@ -8,10 +8,7 @@ import {
 } from "./polygon-overlap.js";
 import type { PolygonGeometryCell } from "../types/rendering.js";
 
-function polygonCell(
-    id: string,
-    vertices: Array<[number, number]>,
-): PolygonGeometryCell {
+function polygonCell(id: string, vertices: Array<[number, number]>): PolygonGeometryCell {
     const xs = vertices.map(([x]) => x);
     const ys = vertices.map(([, y]) => y);
     return {
@@ -121,10 +118,9 @@ describe("test-helpers/polygon-overlap", () => {
         ]);
         distant.cell.kind = "shield-shield";
 
-        const summary = summarizePositiveAreaPolygonOverlaps(
-            [triangle, square, distant],
-            { transformSampleIds: ["shield:ref:1378", "shield:ref:2007"] },
-        );
+        const summary = summarizePositiveAreaPolygonOverlaps([triangle, square, distant], {
+            transformSampleIds: ["shield:ref:1378", "shield:ref:2007"],
+        });
 
         expect(summary.representativeCellCount).toBe(3);
         expect(summary.sampledOverlapCount).toBe(1);

@@ -1,14 +1,8 @@
 import { BLOCKING_ACTIVITY_BUILD_TILING } from "../../blocking-activity.js";
 import { OVERLAY_INTENT_BOARD_REBUILT } from "../../overlay-policy.js";
-import {
-    setCellSize,
-    setPatchDepth,
-} from "../../state/sizing-state.js";
+import { setCellSize, setPatchDepth } from "../../state/sizing-state.js";
 import { setTopologySpec } from "../../state/simulation-state.js";
-import {
-    getTopologyDefinition,
-    resolveAdjacencyMode,
-} from "../../topology-catalog.js";
+import { getTopologyDefinition, resolveAdjacencyMode } from "../../topology-catalog.js";
 import {
     buildCurrentTopologyResetPayload,
     planTopologySelection,
@@ -118,21 +112,29 @@ export function createTopologySelectionRuntime({
         }
         renderControlPanel();
 
-        return interactions.sendControl("/api/control/reset", selectionPlan.resetBody, {
-            blockingActivity: BLOCKING_ACTIVITY_BUILD_TILING,
-        }).then((simulationState) => {
-            reconcileTopologySelectionRuleOrigin(simulationState, selectionPlan.requestedRuleName);
-            return simulationState;
-        }).catch((error) => {
-            setTopologySpecFn(state, previousTopologySpec);
-            setPatchDepthFn(state, previousPatchDepth, previousTopologySpec?.tiling_family);
-            setCellSizeFn(state, previousCellSize, previousTopologySpec?.tiling_family);
-            renderControlPanel();
-            throw error;
-        });
+        return interactions
+            .sendControl("/api/control/reset", selectionPlan.resetBody, {
+                blockingActivity: BLOCKING_ACTIVITY_BUILD_TILING,
+            })
+            .then((simulationState) => {
+                reconcileTopologySelectionRuleOrigin(
+                    simulationState,
+                    selectionPlan.requestedRuleName,
+                );
+                return simulationState;
+            })
+            .catch((error) => {
+                setTopologySpecFn(state, previousTopologySpec);
+                setPatchDepthFn(state, previousPatchDepth, previousTopologySpec?.tiling_family);
+                setCellSizeFn(state, previousCellSize, previousTopologySpec?.tiling_family);
+                renderControlPanel();
+                throw error;
+            });
     }
 
-    function changeTilingFamily(nextTilingFamily: string): Promise<SimulationSnapshot | null | void> {
+    function changeTilingFamily(
+        nextTilingFamily: string,
+    ): Promise<SimulationSnapshot | null | void> {
         const definition = getTopologyDefinition(nextTilingFamily) as TopologyDefinition | null;
         const adjacencyMode = resolveAdjacencyMode(
             nextTilingFamily,
@@ -141,21 +143,26 @@ export function createTopologySelectionRuntime({
         if (!definition) {
             return Promise.resolve();
         }
-        return applyTopologySelection({
-            tiling_family: nextTilingFamily,
-            adjacency_mode: adjacencyMode,
-            width: state.width,
-            height: state.height,
-            patch_depth: resolveSelectedPatchDepthForTopology(state, {
+        return applyTopologySelection(
+            {
                 tiling_family: nextTilingFamily,
                 adjacency_mode: adjacencyMode,
-            }),
-        }, {
-            resizeNonPatchDepthToViewport: definition.sizing_mode !== "patch_depth",
-        });
+                width: state.width,
+                height: state.height,
+                patch_depth: resolveSelectedPatchDepthForTopology(state, {
+                    tiling_family: nextTilingFamily,
+                    adjacency_mode: adjacencyMode,
+                }),
+            },
+            {
+                resizeNonPatchDepthToViewport: definition.sizing_mode !== "patch_depth",
+            },
+        );
     }
 
-    function changeAdjacencyMode(nextAdjacencyMode: string): Promise<SimulationSnapshot | null | void> {
+    function changeAdjacencyMode(
+        nextAdjacencyMode: string,
+    ): Promise<SimulationSnapshot | null | void> {
         return applyTopologySelection({
             tiling_family: state.topologySpec?.tiling_family || "square",
             adjacency_mode: nextAdjacencyMode,

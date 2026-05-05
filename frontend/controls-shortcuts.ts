@@ -1,17 +1,22 @@
 import type { AppActionSet } from "./types/actions.js";
 
 function isTextInputTarget(target: EventTarget | null): boolean {
-    return target instanceof Element
-        && Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
+    return (
+        target instanceof Element &&
+        Boolean(target.closest("input, textarea, select, [contenteditable='true']"))
+    );
 }
 
-export function bindControlShortcuts(actions: AppActionSet, {
-    documentNode = document,
-    isTextInputTargetFn = isTextInputTarget,
-}: {
-    documentNode?: Document;
-    isTextInputTargetFn?: (target: EventTarget | null) => boolean;
-} = {}): void {
+export function bindControlShortcuts(
+    actions: AppActionSet,
+    {
+        documentNode = document,
+        isTextInputTargetFn = isTextInputTarget,
+    }: {
+        documentNode?: Document;
+        isTextInputTargetFn?: (target: EventTarget | null) => boolean;
+    } = {},
+): void {
     documentNode.addEventListener("keydown", (event) => {
         if (isTextInputTargetFn(event.target)) {
             return;

@@ -11,25 +11,17 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
         actions.changePresetSeedSelection,
     );
 
-    bindDelegatedControl(
-        elements.paintPalette,
-        "[data-state-value]",
-        (button) => actions.setPaintState(Number(button.dataset.stateValue)),
+    bindDelegatedControl(elements.paintPalette, "[data-state-value]", (button) =>
+        actions.setPaintState(Number(button.dataset.stateValue)),
     );
-    bindDelegatedControl(
-        elements.editorTools,
-        "[data-editor-tool]",
-        (button) => {
-            const editorTool = button.dataset.editorTool;
-            if (editorTool) {
-                actions.setEditorTool(parseEditorTool(editorTool));
-            }
-        },
-    );
-    bindDelegatedControl(
-        elements.brushSizeControls,
-        "[data-brush-size]",
-        (button) => actions.setBrushSize(Number(button.dataset.brushSize)),
+    bindDelegatedControl(elements.editorTools, "[data-editor-tool]", (button) => {
+        const editorTool = button.dataset.editorTool;
+        if (editorTool) {
+            actions.setEditorTool(parseEditorTool(editorTool));
+        }
+    });
+    bindDelegatedControl(elements.brushSizeControls, "[data-brush-size]", (button) =>
+        actions.setBrushSize(Number(button.dataset.brushSize)),
     );
     if (elements.eraseBtn && actions.setPaintState) {
         elements.eraseBtn.addEventListener("click", () => {
@@ -118,25 +110,17 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
         });
     }
 
-    bindDelegatedControl(
-        elements.canvasToolbarPalette,
-        "[data-state-value]",
-        (button) => actions.setPaintState(Number(button.dataset.stateValue)),
+    bindDelegatedControl(elements.canvasToolbarPalette, "[data-state-value]", (button) =>
+        actions.setPaintState(Number(button.dataset.stateValue)),
     );
-    bindDelegatedControl(
-        elements.canvasToolbarTools,
-        "[data-editor-tool]",
-        (button) => {
-            const editorTool = button.dataset.editorTool;
-            if (editorTool) {
-                actions.setEditorTool(parseEditorTool(editorTool));
-            }
-        },
-    );
-    bindDelegatedControl(
-        elements.canvasToolbarBrush,
-        "[data-brush-size]",
-        (button) => actions.setBrushSize(Number(button.dataset.brushSize)),
+    bindDelegatedControl(elements.canvasToolbarTools, "[data-editor-tool]", (button) => {
+        const editorTool = button.dataset.editorTool;
+        if (editorTool) {
+            actions.setEditorTool(parseEditorTool(editorTool));
+        }
+    });
+    bindDelegatedControl(elements.canvasToolbarBrush, "[data-brush-size]", (button) =>
+        actions.setBrushSize(Number(button.dataset.brushSize)),
     );
     if (elements.canvasToolbarUndoBtn && actions.undoEdit) {
         elements.canvasToolbarUndoBtn.addEventListener("click", () => {

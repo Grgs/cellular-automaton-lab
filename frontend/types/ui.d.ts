@@ -116,7 +116,12 @@ export interface TopBarViewModel {
     runToggle: RunToggleViewModel;
 }
 
-export interface DrawerShellViewModel extends DrawerToggleState, BlockingActivityViewState, PatternStatusViewState, QuickStartHintState {
+export interface DrawerShellViewModel
+    extends
+        DrawerToggleState,
+        BlockingActivityViewState,
+        PatternStatusViewState,
+        QuickStartHintState {
     drawerVisible: boolean;
     backdropVisible: boolean;
 }
@@ -188,12 +193,13 @@ export interface DrawerPatternViewModel {
     pastePatternTitle: string;
 }
 
-export interface DrawerViewModel extends
-    DrawerShellViewModel,
-    DrawerInspectorViewModel,
-    DrawerRulePaletteViewModel,
-    DrawerTopologyViewModel,
-    DrawerPatternViewModel {}
+export interface DrawerViewModel
+    extends
+        DrawerShellViewModel,
+        DrawerInspectorViewModel,
+        DrawerRulePaletteViewModel,
+        DrawerTopologyViewModel,
+        DrawerPatternViewModel {}
 
 export interface EditorViewModel {
     editorTools: readonly LabeledOption<string>[];

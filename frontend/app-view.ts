@@ -8,10 +8,7 @@ import {
     setViewportPreview,
 } from "./state/simulation-state.js";
 import { setRenderCellSize } from "./state/sizing-state.js";
-import {
-    currentDimensions,
-    topologyRenderPayload,
-} from "./state/selectors.js";
+import { currentDimensions, topologyRenderPayload } from "./state/selectors.js";
 import { topologyCellStatesById } from "./topology.js";
 import { currentTheme } from "./theme.js";
 import { DEFAULT_GRID_DIMENSIONS, computeViewportGridSize } from "./layout.js";
@@ -116,7 +113,11 @@ export function createAppView({
     function fittedRenderCellSize(geometry = currentTopologyVariantKey(state)): number {
         const adapter = getGeometryAdapter(geometry) as FitRenderCellSizeAdapter;
         const viewport = resolveViewportSize();
-        if (viewport.width === 0 || viewport.height === 0 || typeof adapter.fitRenderCellSize !== "function") {
+        if (
+            viewport.width === 0 ||
+            viewport.height === 0 ||
+            typeof adapter.fitRenderCellSize !== "function"
+        ) {
             return state.renderCellSize || state.cellSize;
         }
         const dimensions = currentDimensions(state);
@@ -182,7 +183,9 @@ export function createAppView({
     }
 
     function applyViewportPreview(dimensions: ViewportDimensions): void {
-        const adapter = getGeometryAdapter(currentTopologyVariantKey(state)) as ViewportPreviewAdapter;
+        const adapter = getGeometryAdapter(
+            currentTopologyVariantKey(state),
+        ) as ViewportPreviewAdapter;
         const previewResult = adapter.applyViewportPreview({
             state,
             dimensions,

@@ -38,7 +38,7 @@ function ringArea(vertices: readonly polygonClipping.Pair[]): number {
     for (let index = 0; index < vertices.length; index += 1) {
         const [x1, y1] = vertices[index] ?? [0, 0];
         const [x2, y2] = vertices[(index + 1) % vertices.length] ?? [0, 0];
-        area += (x1 * y2) - (x2 * y1);
+        area += x1 * y2 - x2 * y1;
     }
     return area / 2;
 }
@@ -63,18 +63,19 @@ function multiPolygonArea(multiPolygon: polygonClipping.MultiPolygon): number {
 
 function boundsOverlap(left: PolygonGeometryCell, right: PolygonGeometryCell): boolean {
     return !(
-        left.maxX < right.minX
-        || right.maxX < left.minX
-        || left.maxY < right.minY
-        || right.maxY < left.minY
+        left.maxX < right.minX ||
+        right.maxX < left.minX ||
+        left.maxY < right.minY ||
+        right.maxY < left.minY
     );
 }
 
-function pointsEqual(left: polygonClipping.Pair, right: polygonClipping.Pair, epsilon: number): boolean {
-    return (
-        Math.abs(left[0] - right[0]) <= epsilon
-        && Math.abs(left[1] - right[1]) <= epsilon
-    );
+function pointsEqual(
+    left: polygonClipping.Pair,
+    right: polygonClipping.Pair,
+    epsilon: number,
+): boolean {
+    return Math.abs(left[0] - right[0]) <= epsilon && Math.abs(left[1] - right[1]) <= epsilon;
 }
 
 function crossProduct(
@@ -83,8 +84,8 @@ function crossProduct(
     right: polygonClipping.Pair,
 ): number {
     return (
-        ((middle[0] - left[0]) * (right[1] - middle[1]))
-        - ((middle[1] - left[1]) * (right[0] - middle[0]))
+        (middle[0] - left[0]) * (right[1] - middle[1]) -
+        (middle[1] - left[1]) * (right[0] - middle[0])
     );
 }
 
@@ -102,8 +103,8 @@ function sanitizeRing(vertices: readonly Point2D[], decimals: number): polygonCl
         deduped.push(pair);
     }
     if (
-        deduped.length >= 2
-        && pointsEqual(deduped[0] ?? [0, 0], deduped[deduped.length - 1] ?? [0, 0], SANITIZE_EPSILON)
+        deduped.length >= 2 &&
+        pointsEqual(deduped[0] ?? [0, 0], deduped[deduped.length - 1] ?? [0, 0], SANITIZE_EPSILON)
     ) {
         deduped.pop();
     }
@@ -149,7 +150,10 @@ function canonicalRingSignature(ring: readonly polygonClipping.Pair[]): string {
     return candidateSignatures[0] ?? "";
 }
 
-function toPolygon(vertices: readonly Point2D[], decimals: number = SANITIZE_DECIMALS[0]): polygonClipping.Polygon | null {
+function toPolygon(
+    vertices: readonly Point2D[],
+    decimals: number = SANITIZE_DECIMALS[0],
+): polygonClipping.Polygon | null {
     const ring = sanitizeRing(vertices, decimals);
     if (ring.length < 3) {
         return null;
@@ -178,10 +182,7 @@ export function representativePolygonCells(
     return representatives;
 }
 
-function effectiveOverlapArea(
-    left: PolygonGeometryCell,
-    right: PolygonGeometryCell,
-): number {
+function effectiveOverlapArea(left: PolygonGeometryCell, right: PolygonGeometryCell): number {
     let minimumArea = Number.POSITIVE_INFINITY;
     let sawSuccessfulIntersection = false;
 
@@ -205,6 +206,7 @@ function effectiveOverlapArea(
                     `polygon-clipping failed for ${left.cell.id} vs ${right.cell.id}: ${
                         error instanceof Error ? error.message : String(error)
                     }`,
+                    { cause: error },
                 );
             }
         }
@@ -276,7 +278,11 @@ export function summarizePositiveAreaPolygonOverlaps(
         if (!left) {
             continue;
         }
-        for (let rightIndex = leftIndex + 1; rightIndex < representativeCells.length; rightIndex += 1) {
+        for (
+            let rightIndex = leftIndex + 1;
+            rightIndex < representativeCells.length;
+            rightIndex += 1
+        ) {
             const right = representativeCells[rightIndex];
             if (!right || !boundsOverlap(left, right)) {
                 continue;

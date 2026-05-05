@@ -18,7 +18,10 @@ interface InteractionCommandDispatch {
     paintCell(cell: PaintableCell, stateValue?: number): Promise<void>;
     resolveDirectGestureTargetState(cell: PaintableCell): number;
     toggleCell(cell: PaintableCell): Promise<void>;
-    sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
+    sendControl(
+        path: EmptyControlCommandPath,
+        options?: SimulationMutationOptions,
+    ): Promise<SimulationSnapshot | null>;
     sendControl(
         path: "/api/control/reset",
         body: ResetControlBody,
@@ -39,7 +42,7 @@ export function createInteractionCommandDispatch({
     setCellRequest,
     postControl,
     getPaintState,
-    getCellState,
+    getCellState: _getCellState,
     renderControlPanel = () => {},
 }: {
     state?: AppState | null;
@@ -59,10 +62,9 @@ export function createInteractionCommandDispatch({
         if (state?.topologyIndex && !edit) {
             return;
         }
-        const simulationState = await mutations.runStateMutation(
-            () => setCellRequest(cell, stateValue),
-            { source: "editor" },
-        ).catch(() => null);
+        const simulationState = await mutations
+            .runStateMutation(() => setCellRequest(cell, stateValue), { source: "editor" })
+            .catch(() => null);
         if (simulationState && edit && state) {
             pushUndoEntry(state, edit);
             renderControlPanel();
@@ -73,7 +75,9 @@ export function createInteractionCommandDispatch({
         if (typeof cell !== "object" || cell === null) {
             throw new Error("Cell toggles require a resolved topology cell.");
         }
-        await mutations.runStateMutation(() => toggleCellRequest(cell), { source: "editor" }).catch(() => null);
+        await mutations
+            .runStateMutation(() => toggleCellRequest(cell), { source: "editor" })
+            .catch(() => null);
     }
 
     function resolveDirectGestureTargetState(cell: PaintableCell): number {
@@ -83,7 +87,10 @@ export function createInteractionCommandDispatch({
         return getPaintState();
     }
 
-    async function sendControl(path: EmptyControlCommandPath, options?: SimulationMutationOptions): Promise<SimulationSnapshot | null>;
+    async function sendControl(
+        path: EmptyControlCommandPath,
+        options?: SimulationMutationOptions,
+    ): Promise<SimulationSnapshot | null>;
     async function sendControl(
         path: "/api/control/reset",
         body: ResetControlBody,
@@ -101,24 +108,27 @@ export function createInteractionCommandDispatch({
     ): Promise<SimulationSnapshot | null> {
         if (path === "/api/control/reset") {
             const body = bodyOrOptions as ResetControlBody;
-            return await mutations.runStateMutation(
-                () => postControl(path, body),
-                { source: "control", ...maybeOptions },
-            ).catch(() => null);
+            return await mutations
+                .runStateMutation(() => postControl(path, body), {
+                    source: "control",
+                    ...maybeOptions,
+                })
+                .catch(() => null);
         }
         if (path === "/api/config") {
             const body = bodyOrOptions as ConfigSyncBody;
-            return await mutations.runStateMutation(
-                () => postControl(path, body),
-                { source: "control", ...maybeOptions },
-            ).catch(() => null);
+            return await mutations
+                .runStateMutation(() => postControl(path, body), {
+                    source: "control",
+                    ...maybeOptions,
+                })
+                .catch(() => null);
         }
 
         const options = (bodyOrOptions as SimulationMutationOptions | undefined) ?? {};
-        return await mutations.runStateMutation(
-            () => postControl(path),
-            { source: "control", ...options },
-        ).catch(() => null);
+        return await mutations
+            .runStateMutation(() => postControl(path), { source: "control", ...options })
+            .catch(() => null);
     }
 
     return {

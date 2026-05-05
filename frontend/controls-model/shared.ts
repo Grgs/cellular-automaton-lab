@@ -52,11 +52,7 @@ export const BRUSH_SIZE_OPTIONS: readonly LabeledOption<number>[] = Object.freez
 ]);
 
 export function buildRunToggleState(isRunning: boolean, generation: number): RunToggleViewModel {
-    const nextAction = isRunning
-        ? "pause"
-        : generation > 0
-            ? "resume"
-            : "start";
+    const nextAction = isRunning ? "pause" : generation > 0 ? "resume" : "start";
 
     return {
         label: isRunning ? "Pause" : "Run",
@@ -85,15 +81,23 @@ export function resolvePatternStatus(state: AppState): PatternStatusViewState {
 
 export function resolveBlockingActivity(state: AppState): BlockingActivityViewState {
     return {
-        blockingActivityVisible: Boolean(state.blockingActivityVisible && state.blockingActivityMessage),
-        blockingActivityMessage: state.blockingActivityVisible ? (state.blockingActivityMessage ?? "") : "",
-        blockingActivityDetail: state.blockingActivityVisible ? (state.blockingActivityDetail ?? "") : "",
+        blockingActivityVisible: Boolean(
+            state.blockingActivityVisible && state.blockingActivityMessage,
+        ),
+        blockingActivityMessage: state.blockingActivityVisible
+            ? (state.blockingActivityMessage ?? "")
+            : "",
+        blockingActivityDetail: state.blockingActivityVisible
+            ? (state.blockingActivityDetail ?? "")
+            : "",
     };
 }
 
 function hasLiveCells(state: AppState): boolean {
-    return Array.isArray(state.cellStates)
-        && state.cellStates.some((cellState) => Number(cellState) !== 0);
+    return (
+        Array.isArray(state.cellStates) &&
+        state.cellStates.some((cellState) => Number(cellState) !== 0)
+    );
 }
 
 function matchesDefaultTopologySpec(state: AppState): boolean {
@@ -101,35 +105,30 @@ function matchesDefaultTopologySpec(state: AppState): boolean {
     const sizingMode = String(topologySpec.sizing_mode || "");
     const isPatchDepth = sizingMode === "patch_depth";
     return (
-        String(topologySpec.tiling_family || "") === DEFAULT_TOPOLOGY_SPEC.tiling_family
-        && String(topologySpec.adjacency_mode || "") === DEFAULT_TOPOLOGY_SPEC.adjacency_mode
-        && sizingMode === DEFAULT_TOPOLOGY_SPEC.sizing_mode
-        && (
-            isPatchDepth
-                ? Number(topologySpec.patch_depth) === Number(DEFAULT_TOPOLOGY_SPEC.patch_depth)
-                : Number(topologySpec.width) > 0 && Number(topologySpec.height) > 0
-        )
+        String(topologySpec.tiling_family || "") === DEFAULT_TOPOLOGY_SPEC.tiling_family &&
+        String(topologySpec.adjacency_mode || "") === DEFAULT_TOPOLOGY_SPEC.adjacency_mode &&
+        sizingMode === DEFAULT_TOPOLOGY_SPEC.sizing_mode &&
+        (isPatchDepth
+            ? Number(topologySpec.patch_depth) === Number(DEFAULT_TOPOLOGY_SPEC.patch_depth)
+            : Number(topologySpec.width) > 0 && Number(topologySpec.height) > 0)
     );
 }
 
 export function buildOverlayVisibilityState(state: AppState): OverlayVisibilityState {
     const inspectorOccludesGrid = state.inspectorOccludesGrid !== false;
     const runningOverlayRestoreActive = Boolean(state.runningOverlayRestoreActive);
-    const hudBlocked = !runningOverlayRestoreActive && Boolean(state.isRunning || state.overlayRunPending);
+    const hudBlocked =
+        !runningOverlayRestoreActive && Boolean(state.isRunning || state.overlayRunPending);
     const drawerBlocked = Boolean(
-        !runningOverlayRestoreActive
-        && (
-            state.overlayRunPending
-            || (state.isRunning && inspectorOccludesGrid)
-        )
+        !runningOverlayRestoreActive &&
+        (state.overlayRunPending || (state.isRunning && inspectorOccludesGrid)),
     );
     const hudVisible = !hudBlocked && !state.overlaysDismissed;
-    const drawerVisible = (
-        !drawerBlocked
-        && Boolean(state.drawerOpen)
-        && !Boolean(state.inspectorTemporarilyHidden)
-        && (!state.overlaysDismissed || !inspectorOccludesGrid)
-    );
+    const drawerVisible =
+        !drawerBlocked &&
+        state.drawerOpen &&
+        !state.inspectorTemporarilyHidden &&
+        (!state.overlaysDismissed || !inspectorOccludesGrid);
     const backdropVisible = drawerVisible && inspectorOccludesGrid;
 
     return {
@@ -180,19 +179,19 @@ export function buildQuickStartHintState(
     state: AppState,
     activeRule: RuleDefinition | null,
 ): QuickStartHintState {
-    const patternStatusText = state.blockingActivityVisible && state.blockingActivityMessage
-        ? state.blockingActivityMessage
-        : (state.patternStatus?.message ?? "");
-    const shouldShow = (
-        !state.firstRunHintDismissed
-        && !state.isRunning
-        && !state.overlayRunPending
-        && Number(state.generation) === 0
-        && !hasLiveCells(state)
-        && matchesDefaultTopologySpec(state)
-        && String(activeRule?.name || "") === "conway"
-        && patternStatusText === ""
-    );
+    const patternStatusText =
+        state.blockingActivityVisible && state.blockingActivityMessage
+            ? state.blockingActivityMessage
+            : (state.patternStatus?.message ?? "");
+    const shouldShow =
+        !state.firstRunHintDismissed &&
+        !state.isRunning &&
+        !state.overlayRunPending &&
+        Number(state.generation) === 0 &&
+        !hasLiveCells(state) &&
+        matchesDefaultTopologySpec(state) &&
+        String(activeRule?.name || "") === "conway" &&
+        patternStatusText === "";
 
     return {
         quickStartHintText: "Or click the grid to paint.",
@@ -218,20 +217,23 @@ export function resolveViewportSizingState(state: AppState): ViewportSizingState
     const cellSize = Number.isFinite(state.cellSize)
         ? state.cellSize
         : defaultCellSizeForTilingFamily(tilingFamily);
-    const patchDepth = typeof state.pendingPatchDepth === "number" && Number.isFinite(state.pendingPatchDepth)
-        ? state.pendingPatchDepth
-        : (Number.isFinite(state.patchDepth) ? state.patchDepth : defaultPatchDepthForTilingFamily(tilingFamily));
+    const patchDepth =
+        typeof state.pendingPatchDepth === "number" && Number.isFinite(state.pendingPatchDepth)
+            ? state.pendingPatchDepth
+            : Number.isFinite(state.patchDepth)
+              ? state.patchDepth
+              : defaultPatchDepthForTilingFamily(tilingFamily);
     const tileCount = Array.isArray(state.topology?.cells) ? state.topology.cells.length : 0;
     const previewActive = Boolean(
-        state.previewTopology
-        && state.previewTopologyRevision
-        && state.previewTopologyRevision === state.topologyRevision
+        state.previewTopology &&
+        state.previewTopologyRevision &&
+        state.previewTopologyRevision === state.topologyRevision,
     );
     const width = previewActive
-        ? (Number(state.previewTopology?.topology_spec?.width) || 0)
+        ? Number(state.previewTopology?.topology_spec?.width) || 0
         : (state.width ?? 0);
     const height = previewActive
-        ? (Number(state.previewTopology?.topology_spec?.height) || 0)
+        ? Number(state.previewTopology?.topology_spec?.height) || 0
         : (state.height ?? 0);
 
     return {

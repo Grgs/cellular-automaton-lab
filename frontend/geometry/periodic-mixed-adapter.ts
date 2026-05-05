@@ -40,7 +40,10 @@ interface PatternMetrics extends GridMetrics {
     rowOffsetX: number;
 }
 
-function descriptorScale(descriptor: PeriodicFaceTilingDescriptor | null, cellSize: number): number {
+function descriptorScale(
+    descriptor: PeriodicFaceTilingDescriptor | null,
+    cellSize: number,
+): number {
     return cellSize / (descriptor?.base_edge || 52);
 }
 
@@ -58,9 +61,10 @@ function patternBounds(
         (descriptor?.min_x || 0) + (hasShiftedRows && rowOffsetX < 0 ? rowOffsetX : 0),
     );
     const minY = descriptor?.min_y || 0;
-    const maxX = (descriptor?.max_x || 0)
-        + (Math.max(width, 1) - 1) * unitWidth
-        + (hasShiftedRows && rowOffsetX > 0 ? rowOffsetX : 0);
+    const maxX =
+        (descriptor?.max_x || 0) +
+        (Math.max(width, 1) - 1) * unitWidth +
+        (hasShiftedRows && rowOffsetX > 0 ? rowOffsetX : 0);
     const maxY = (descriptor?.max_y || 0) + (Math.max(height, 1) - 1) * unitHeight;
     return {
         minX,
@@ -118,16 +122,16 @@ function buildPatternMetrics({
 
     const scale = descriptorScale(descriptor, cellSize);
     const bounds = topologyBounds(topology, descriptor, width, height);
-    const cssWidth = 2 + ((bounds.maxX - bounds.minX) * scale);
-    const cssHeight = 2 + ((bounds.maxY - bounds.minY) * scale);
+    const cssWidth = 2 + (bounds.maxX - bounds.minX) * scale;
+    const cssHeight = 2 + (bounds.maxY - bounds.minY) * scale;
     return {
         geometry: descriptor.geometry,
         width,
         height,
         cellSize,
         gap: 0,
-        xInset: 1 - (bounds.minX * scale),
-        yInset: 1 - (bounds.minY * scale),
+        xInset: 1 - bounds.minX * scale,
+        yInset: 1 - bounds.minY * scale,
         cssWidth,
         cssHeight,
         scale,
@@ -150,9 +154,10 @@ function estimatePatternDimension(
         return descriptor.min_dimension;
     }
 
-    const span = axis === "width"
-        ? descriptor.max_x - descriptor.min_x
-        : descriptor.max_y - descriptor.min_y;
+    const span =
+        axis === "width"
+            ? descriptor.max_x - descriptor.min_x
+            : descriptor.max_y - descriptor.min_y;
     const unit = axis === "width" ? descriptor.unit_width : descriptor.unit_height;
     const availableBase = (viewportPixels - 2) / scale;
     if (availableBase <= 0) {
@@ -171,26 +176,33 @@ function patternViewportDimensions(
     viewportHeight: number,
     cellSize: number,
 ) {
-    const estimatedHeight = estimatePatternDimension(viewportHeight, descriptor, cellSize, "height");
+    const estimatedHeight = estimatePatternDimension(
+        viewportHeight,
+        descriptor,
+        cellSize,
+        "height",
+    );
     const height = fitGridDimension(
         estimatedHeight,
-        (candidateHeight) => buildPatternMetrics({
-            descriptor,
-            width: 1,
-            height: candidateHeight,
-            cellSize,
-        }).cssHeight <= viewportHeight,
+        (candidateHeight) =>
+            buildPatternMetrics({
+                descriptor,
+                width: 1,
+                height: candidateHeight,
+                cellSize,
+            }).cssHeight <= viewportHeight,
         descriptor.min_dimension,
     );
     const estimatedWidth = estimatePatternDimension(viewportWidth, descriptor, cellSize, "width");
     const width = fitGridDimension(
         estimatedWidth,
-        (candidateWidth) => buildPatternMetrics({
-            descriptor,
-            width: candidateWidth,
-            height,
-            cellSize,
-        }).cssWidth <= viewportWidth,
+        (candidateWidth) =>
+            buildPatternMetrics({
+                descriptor,
+                width: candidateWidth,
+                height,
+                cellSize,
+            }).cssWidth <= viewportWidth,
         descriptor.min_dimension,
     );
 
@@ -203,47 +215,44 @@ function patternViewportDimensions(
     );
 }
 
-function buildGeometryCellFromTopology(
-    cell: RenderableTopologyCell,
-    metrics: PatternMetrics,
-){
+function buildGeometryCellFromTopology(cell: RenderableTopologyCell, metrics: PatternMetrics) {
     return buildTransformedPolygonGeometryCell(
         cell,
         (vertex) => ({
-            x: 1 + ((Number(vertex.x) - metrics.baseMinX) * metrics.scale),
-            y: 1 + ((Number(vertex.y) - metrics.baseMinY) * metrics.scale),
+            x: 1 + (Number(vertex.x) - metrics.baseMinX) * metrics.scale,
+            y: 1 + (Number(vertex.y) - metrics.baseMinY) * metrics.scale,
         }),
-        (center) => center
-            ? {
-                x: 1 + ((Number(center.x) - metrics.baseMinX) * metrics.scale),
-                y: 1 + ((Number(center.y) - metrics.baseMinY) * metrics.scale),
-            }
-            : null,
+        (center) =>
+            center
+                ? {
+                      x: 1 + (Number(center.x) - metrics.baseMinX) * metrics.scale,
+                      y: 1 + (Number(center.y) - metrics.baseMinY) * metrics.scale,
+                  }
+                : null,
     );
 }
 
 function createPatternViewportFit(descriptor: PeriodicFaceTilingDescriptor) {
-    return ({ viewportWidth, viewportHeight, cellSize }: { viewportWidth: number; viewportHeight: number; cellSize: number }) => patternViewportDimensions(
-        descriptor,
+    return ({
         viewportWidth,
         viewportHeight,
         cellSize,
-    );
+    }: {
+        viewportWidth: number;
+        viewportHeight: number;
+        cellSize: number;
+    }) => patternViewportDimensions(descriptor, viewportWidth, viewportHeight, cellSize);
 }
 
 function createMetricsBuilder(descriptor: PeriodicFaceTilingDescriptor) {
-    return ({
-        width,
-        height,
-        cellSize,
-        topology,
-    }: GeometryBuildMetricsArgs) => buildPatternMetrics({
-        descriptor,
-        width,
-        height,
-        cellSize,
-        topology: topology ?? null,
-    });
+    return ({ width, height, cellSize, topology }: GeometryBuildMetricsArgs) =>
+        buildPatternMetrics({
+            descriptor,
+            width,
+            height,
+            cellSize,
+            topology: topology ?? null,
+        });
 }
 
 export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAdapter {
@@ -262,7 +271,14 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
 
         fitViewport,
 
-        fitRenderCellSize({ viewportWidth, viewportHeight, width, height, topology = null, fallbackCellSize }) {
+        fitRenderCellSize({
+            viewportWidth,
+            viewportHeight,
+            width,
+            height,
+            topology = null,
+            fallbackCellSize,
+        }) {
             return fitRenderCellSizeWithMetrics({
                 viewportWidth,
                 viewportHeight,
@@ -270,28 +286,33 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
                 height,
                 topology,
                 fallbackCellSize,
-                buildMetrics: ({ width: nextWidth, height: nextHeight, topology: nextTopology, cellSize }) => (
+                buildMetrics: ({
+                    width: nextWidth,
+                    height: nextHeight,
+                    topology: nextTopology,
+                    cellSize,
+                }) =>
                     buildMetrics({
                         width: nextWidth,
                         height: nextHeight,
                         topology: nextTopology,
                         cellSize,
-                    })
-                ),
+                    }),
             });
         },
 
         buildCache({ topology, metrics }: GeometryBuildCacheArgs) {
-            return buildPolygonGeometryCache(topology, (cell) => (
-                buildGeometryCellFromTopology(cell, metrics as PatternMetrics)
-            ));
+            return buildPolygonGeometryCache(topology, (cell) =>
+                buildGeometryCellFromTopology(cell, metrics as PatternMetrics),
+            );
         },
 
         buildCellGeometry({ cell, metrics, cache }) {
             return resolvePolygonGeometryCell(
                 cell as RenderableTopologyCell,
                 asPolygonGeometryCache(cache),
-                (uncachedCell) => buildGeometryCellFromTopology(uncachedCell, metrics as PatternMetrics),
+                (uncachedCell) =>
+                    buildGeometryCellFromTopology(uncachedCell, metrics as PatternMetrics),
             );
         },
 
@@ -299,7 +320,15 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
             return resolvePolygonCellFromOffset({ offsetX, offsetY, cache });
         },
 
-        resolveCellCenter({ cell, width = 0, height = 0, cellSize, metrics, cache, topology = null }: GeometryResolveCellCenterArgs) {
+        resolveCellCenter({
+            cell,
+            width = 0,
+            height = 0,
+            cellSize,
+            metrics,
+            cache,
+            topology = null,
+        }: GeometryResolveCellCenterArgs) {
             return resolvePolygonCellCenter({
                 cell,
                 width,
@@ -309,26 +338,28 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
                 metrics,
                 cache,
                 buildMetrics,
-                buildCellGeometry: (nextCell, nextMetrics, polygonCache) => resolvePolygonGeometryCell(
-                    nextCell,
-                    polygonCache,
-                    (uncachedCell) => buildGeometryCellFromTopology(uncachedCell, nextMetrics as PatternMetrics),
-                ),
+                buildCellGeometry: (nextCell, nextMetrics, polygonCache) =>
+                    resolvePolygonGeometryCell(nextCell, polygonCache, (uncachedCell) =>
+                        buildGeometryCellFromTopology(uncachedCell, nextMetrics as PatternMetrics),
+                    ),
             });
         },
 
         resolveCoordinateCenter({ x, y, cellSize, metrics }: GeometryResolveCoordinateCenterArgs) {
-            const resolvedMetrics = (metrics || buildMetrics({
-                width: Math.max(x + 1, 1),
-                height: Math.max(y + 1, 1),
-                cellSize,
-                topology: null,
-            })) as PatternMetrics;
+            const resolvedMetrics = (metrics ||
+                buildMetrics({
+                    width: Math.max(x + 1, 1),
+                    height: Math.max(y + 1, 1),
+                    cellSize,
+                    topology: null,
+                })) as PatternMetrics;
             const scale = descriptorScale(descriptor, cellSize);
-            const shiftX = y % 2 === 1 ? (descriptor.row_offset_x || 0) : 0;
+            const shiftX = y % 2 === 1 ? descriptor.row_offset_x || 0 : 0;
             return {
-                x: 1 + ((((x + 0.5) * descriptor.unit_width) + shiftX - resolvedMetrics.baseMinX) * scale),
-                y: 1 + ((((y + 0.5) * descriptor.unit_height) - resolvedMetrics.baseMinY) * scale),
+                x:
+                    1 +
+                    ((x + 0.5) * descriptor.unit_width + shiftX - resolvedMetrics.baseMinX) * scale,
+                y: 1 + ((y + 0.5) * descriptor.unit_height - resolvedMetrics.baseMinY) * scale,
             };
         },
 
@@ -347,7 +378,8 @@ export function createPeriodicMixedGeometryAdapter(geometry: string): GeometryAd
             const geometryCell = resolvePolygonGeometryCell(
                 cell as RenderableTopologyCell,
                 asPolygonGeometryCache(cache),
-                (uncachedCell) => buildGeometryCellFromTopology(uncachedCell, metrics as PatternMetrics),
+                (uncachedCell) =>
+                    buildGeometryCellFromTopology(uncachedCell, metrics as PatternMetrics),
             );
             drawResolvedPolygonCell({
                 geometry,

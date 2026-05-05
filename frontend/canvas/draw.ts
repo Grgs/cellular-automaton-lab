@@ -29,7 +29,10 @@ interface DrawPolygonCellArgs {
     fillBridgeStrokeWidth?: number;
 }
 
-export function tracePolygonPath(context: CanvasRenderingContext2D, vertices: readonly Point2D[]): void {
+export function tracePolygonPath(
+    context: CanvasRenderingContext2D,
+    vertices: readonly Point2D[],
+): void {
     const [first, ...rest] = vertices;
     if (!first) {
         return;
@@ -100,10 +103,14 @@ export function drawTriangleGrid(
 }
 
 export function resolvePolygonStrokeWidth(renderStyle: CanvasRenderStyle): number {
-    return renderStyle.mode === "compact" ? COMPACT_POLYGON_STROKE_WIDTH : STANDARD_POLYGON_STROKE_WIDTH;
+    return renderStyle.mode === "compact"
+        ? COMPACT_POLYGON_STROKE_WIDTH
+        : STANDARD_POLYGON_STROKE_WIDTH;
 }
 
-export function resolveShieldFillBridgeStrokeWidth(renderStyle: CanvasRenderStyle | undefined): number {
+export function resolveShieldFillBridgeStrokeWidth(
+    renderStyle: CanvasRenderStyle | undefined,
+): number {
     return Math.max(
         SHIELD_FILL_BRIDGE_STROKE_WIDTH,
         renderStyle ? resolvePolygonStrokeWidth(renderStyle) : SHIELD_FILL_BRIDGE_STROKE_WIDTH,
@@ -113,7 +120,12 @@ export function resolveShieldFillBridgeStrokeWidth(renderStyle: CanvasRenderStyl
 export function resolveTransientOverlayStyle(
     renderLayer: RenderedCellArgs["renderLayer"],
     renderStyle: CanvasRenderStyle | undefined,
-): { tintColor: string | null; strokeColor: string; strokeWidth: number; drawBaseFill: boolean } | null {
+): {
+    tintColor: string | null;
+    strokeColor: string;
+    strokeWidth: number;
+    drawBaseFill: boolean;
+} | null {
     if (!renderStyle) {
         return null;
     }
@@ -129,7 +141,10 @@ export function resolveTransientOverlayStyle(
         return {
             tintColor: renderStyle.selectionTintColor,
             strokeColor: renderStyle.selectionStrokeColor,
-            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, SELECTION_MIN_STROKE_WIDTH),
+            strokeWidth: Math.max(
+                resolvePolygonStrokeWidth(renderStyle) + 1,
+                SELECTION_MIN_STROKE_WIDTH,
+            ),
             drawBaseFill: true,
         };
     }
@@ -137,7 +152,10 @@ export function resolveTransientOverlayStyle(
         return {
             tintColor: null,
             strokeColor: renderStyle.gesturePaintStrokeColor,
-            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, GESTURE_OUTLINE_MIN_STROKE_WIDTH),
+            strokeWidth: Math.max(
+                resolvePolygonStrokeWidth(renderStyle) + 1,
+                GESTURE_OUTLINE_MIN_STROKE_WIDTH,
+            ),
             drawBaseFill: false,
         };
     }
@@ -145,7 +163,10 @@ export function resolveTransientOverlayStyle(
         return {
             tintColor: null,
             strokeColor: renderStyle.gestureEraseStrokeColor,
-            strokeWidth: Math.max(resolvePolygonStrokeWidth(renderStyle) + 1, GESTURE_OUTLINE_MIN_STROKE_WIDTH),
+            strokeWidth: Math.max(
+                resolvePolygonStrokeWidth(renderStyle) + 1,
+                GESTURE_OUTLINE_MIN_STROKE_WIDTH,
+            ),
             drawBaseFill: false,
         };
     }

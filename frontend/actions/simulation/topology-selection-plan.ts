@@ -33,20 +33,20 @@ interface TopologySelectionPlanOptions extends SharedTopologyPlanningOptions {
 
 export type TopologySelectionPlanResult =
     | {
-        kind: "noop";
-        resolvedTopologySpec: TopologySpec;
-        optimisticPatchDepth: number;
-        optimisticCellSize: number;
-        requestedRuleName: string | null;
-    }
+          kind: "noop";
+          resolvedTopologySpec: TopologySpec;
+          optimisticPatchDepth: number;
+          optimisticCellSize: number;
+          requestedRuleName: string | null;
+      }
     | {
-        kind: "apply";
-        resolvedTopologySpec: TopologySpec;
-        optimisticPatchDepth: number;
-        optimisticCellSize: number;
-        requestedRuleName: string | null;
-        resetBody: ResetControlBody;
-    };
+          kind: "apply";
+          resolvedTopologySpec: TopologySpec;
+          optimisticPatchDepth: number;
+          optimisticCellSize: number;
+          requestedRuleName: string | null;
+          resetBody: ResetControlBody;
+      };
 
 export function resolveSelectedPatchDepthForTopology(
     state: AppState,
@@ -88,10 +88,13 @@ export function buildCurrentTopologyResetPayload({
             { unsafe: state.unsafeSizingEnabled },
         );
         return {
-            topology_spec: buildTopologySpecRequest({
-                ...state.topologySpec,
-                patch_depth: targetPatchDepth,
-            }, state.unsafeSizingEnabled),
+            topology_spec: buildTopologySpecRequest(
+                {
+                    ...state.topologySpec,
+                    patch_depth: targetPatchDepth,
+                },
+                state.unsafeSizingEnabled,
+            ),
             speed: state.speed,
             rule: state.activeRule?.name ?? null,
             randomize,
@@ -103,12 +106,15 @@ export function buildCurrentTopologyResetPayload({
         state.cellSize,
     );
     return {
-        topology_spec: buildTopologySpecRequest({
-            ...state.topologySpec,
-            width: desiredDimensions.width,
-            height: desiredDimensions.height,
-            patch_depth: DEFAULT_PATCH_DEPTH,
-        }, state.unsafeSizingEnabled),
+        topology_spec: buildTopologySpecRequest(
+            {
+                ...state.topologySpec,
+                width: desiredDimensions.width,
+                height: desiredDimensions.height,
+                patch_depth: DEFAULT_PATCH_DEPTH,
+            },
+            state.unsafeSizingEnabled,
+        ),
         speed: state.speed,
         rule: state.activeRule?.name ?? null,
         randomize,
@@ -122,25 +128,31 @@ function buildTopologySelectionResetBody(
 ): ResetControlBody {
     if (topologyUsesPatchDepth(resolvedTopologySpec)) {
         return {
-            topology_spec: buildTopologySpecRequest({
-                ...resolvedTopologySpec,
-                patch_depth: normalizePatchDepthForTilingFamily(
-                    resolvedTopologySpec.tiling_family,
-                    resolvedTopologySpec.patch_depth,
-                    { unsafe: state.unsafeSizingEnabled },
-                ),
-            }, state.unsafeSizingEnabled),
+            topology_spec: buildTopologySpecRequest(
+                {
+                    ...resolvedTopologySpec,
+                    patch_depth: normalizePatchDepthForTilingFamily(
+                        resolvedTopologySpec.tiling_family,
+                        resolvedTopologySpec.patch_depth,
+                        { unsafe: state.unsafeSizingEnabled },
+                    ),
+                },
+                state.unsafeSizingEnabled,
+            ),
             speed: state.speed,
             rule: requestedRuleName,
             randomize: false,
         };
     }
     return {
-        topology_spec: buildTopologySpecRequest({
-            ...resolvedTopologySpec,
-            width: resolvedTopologySpec.width,
-            height: resolvedTopologySpec.height,
-        }, state.unsafeSizingEnabled),
+        topology_spec: buildTopologySpecRequest(
+            {
+                ...resolvedTopologySpec,
+                width: resolvedTopologySpec.width,
+                height: resolvedTopologySpec.height,
+            },
+            state.unsafeSizingEnabled,
+        ),
         speed: state.speed,
         rule: requestedRuleName,
         randomize: false,
@@ -157,14 +169,15 @@ function isNoopTopologySelection(
         resolvedTopologySpec.adjacency_mode,
     );
     return (
-        nextGeometry === currentTopologyVariantKey(state)
-        && Number(resolvedTopologySpec.width) === Number(state.width)
-        && Number(resolvedTopologySpec.height) === Number(state.height)
-        && Number(resolvedTopologySpec.patch_depth) === Number(
-            topologyUsesPatchDepth(state.topologySpec)
-                ? optimisticPatchDepth
-                : state.patchDepth,
-        )
+        nextGeometry === currentTopologyVariantKey(state) &&
+        Number(resolvedTopologySpec.width) === Number(state.width) &&
+        Number(resolvedTopologySpec.height) === Number(state.height) &&
+        Number(resolvedTopologySpec.patch_depth) ===
+            Number(
+                topologyUsesPatchDepth(state.topologySpec)
+                    ? optimisticPatchDepth
+                    : state.patchDepth,
+            )
     );
 }
 
@@ -185,27 +198,27 @@ export function planTopologySelection({
 
     const resolvedTopologySpec: TopologySpec = topologyUsesPatchDepth(describedTopologySpec)
         ? {
-            ...describedTopologySpec,
-            patch_depth: optimisticPatchDepth,
-        }
+              ...describedTopologySpec,
+              patch_depth: optimisticPatchDepth,
+          }
         : (() => {
-            if (!resizeNonPatchDepthToViewport) {
-                return describedTopologySpec;
-            }
-            const desiredDimensions = getViewportDimensions(
-                resolveTopologyVariantKey(
-                    describedTopologySpec.tiling_family,
-                    describedTopologySpec.adjacency_mode,
-                ),
-                viewportRuleName,
-                optimisticCellSize,
-            );
-            return {
-                ...describedTopologySpec,
-                width: desiredDimensions.width,
-                height: desiredDimensions.height,
-            };
-        })();
+              if (!resizeNonPatchDepthToViewport) {
+                  return describedTopologySpec;
+              }
+              const desiredDimensions = getViewportDimensions(
+                  resolveTopologyVariantKey(
+                      describedTopologySpec.tiling_family,
+                      describedTopologySpec.adjacency_mode,
+                  ),
+                  viewportRuleName,
+                  optimisticCellSize,
+              );
+              return {
+                  ...describedTopologySpec,
+                  width: desiredDimensions.width,
+                  height: desiredDimensions.height,
+              };
+          })();
 
     if (isNoopTopologySelection(state, resolvedTopologySpec, optimisticPatchDepth)) {
         return {

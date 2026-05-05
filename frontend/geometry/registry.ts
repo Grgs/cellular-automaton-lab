@@ -47,7 +47,9 @@ export function isSupportedGeometry(geometry: string | null | undefined): boolea
 }
 
 export function normalizeGeometryKey(geometry: string | null | undefined): string {
-    return typeof geometry === "string" && isSupportedGeometry(geometry) ? geometry : DEFAULT_GEOMETRY;
+    return typeof geometry === "string" && isSupportedGeometry(geometry)
+        ? geometry
+        : DEFAULT_GEOMETRY;
 }
 
 export function getGeometryAdapter(geometry = DEFAULT_GEOMETRY): GeometryAdapter {

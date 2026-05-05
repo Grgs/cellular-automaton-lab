@@ -1,10 +1,7 @@
 import { DEFAULT_GEOMETRY, gridMetrics, normalizeGeometry } from "../layout.js";
 import { resolveCellFromCanvasOffset as resolveGeometryCellFromOffset } from "../geometry-adapters.js";
 import { getGeometryAdapter } from "../geometry/registry.js";
-import {
-    topologyHeight,
-    topologyWidth,
-} from "../topology.js";
+import { topologyHeight, topologyWidth } from "../topology.js";
 import { topologyUsesBackendViewportSync } from "../topology-catalog.js";
 import { resolveGeometryCache } from "./cache.js";
 import { drawCommittedLayer } from "./render-layers.js";
@@ -136,10 +133,11 @@ export function createCanvasCommittedRenderer({
                 cell?: TopologyCell | PaintableCell | null;
                 tileColorsEnabled?: boolean;
             } = {},
-        ): string => resolveRenderedCellColor(stateValue, nextColorLookup, colors, {
-            ...options,
-            tileColorsEnabled,
-        });
+        ): string =>
+            resolveRenderedCellColor(stateValue, nextColorLookup, colors, {
+                ...options,
+                tileColorsEnabled,
+            });
         drawCommittedLayer({
             targetContext: surface.committedContext,
             geometry,
@@ -194,16 +192,12 @@ export function createCanvasCommittedRenderer({
         });
         geometryCacheKey = nextCache.cacheKey;
         geometryCache = nextCache.geometryCache;
-        renderDiagnostics = sampleRenderDiagnostics(
-            topology,
-            geometryCache,
-            {
-                geometry,
-                adapterFamily: adapter.family,
-                metrics,
-                cellSize,
-            },
-        );
+        renderDiagnostics = sampleRenderDiagnostics(topology, geometryCache, {
+            geometry,
+            adapterFamily: adapter.family,
+            metrics,
+            cellSize,
+        });
         resolvedRenderDiagnostics = null;
 
         drawCommittedGrid();
@@ -224,15 +218,11 @@ export function createCanvasCommittedRenderer({
             renderStyle: currentRenderStyle,
             colorLookup,
             cellStates,
-            resolveRenderedCellColor: (
-                stateValue,
-                nextColorLookup,
-                colors,
-                options = {},
-            ) => resolveRenderedCellColor(stateValue, nextColorLookup, colors, {
-                ...options,
-                tileColorsEnabled,
-            }),
+            resolveRenderedCellColor: (stateValue, nextColorLookup, colors, options = {}) =>
+                resolveRenderedCellColor(stateValue, nextColorLookup, colors, {
+                    ...options,
+                    tileColorsEnabled,
+                }),
         };
     }
 
@@ -259,7 +249,10 @@ export function createCanvasCommittedRenderer({
             return null;
         }
         if (resolvedRenderDiagnostics === null) {
-            resolvedRenderDiagnostics = resolveRenderDiagnosticsSnapshot(renderDiagnostics, geometryCache);
+            resolvedRenderDiagnostics = resolveRenderDiagnosticsSnapshot(
+                renderDiagnostics,
+                geometryCache,
+            );
         }
         return resolvedRenderDiagnostics ? structuredClone(resolvedRenderDiagnostics) : null;
     }

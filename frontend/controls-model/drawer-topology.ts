@@ -36,20 +36,20 @@ export function buildDrawerTopologyViewModel({
         tileColorsEnabled: state.tileColorsEnabled !== false,
         ...(sizingState.usesPatchDepth
             ? {
-                ...buildHiddenCellSizeViewState(),
-                ...buildPatchDepthViewState(
-                    sizingState.patchDepth,
-                    sizingState.patchDepthMax,
-                    sizingState.patchDepthMin,
-                ),
-            }
+                  ...buildHiddenCellSizeViewState(),
+                  ...buildPatchDepthViewState(
+                      sizingState.patchDepth,
+                      sizingState.patchDepthMax,
+                      sizingState.patchDepthMin,
+                  ),
+              }
             : {
-                ...buildCellSizeViewState(
-                    sizingState.cellSize,
-                    sizingState.cellSizeMin,
-                    sizingState.cellSizeMax,
-                ),
-                ...buildHiddenPatchDepthViewState(),
-            }),
+                  ...buildCellSizeViewState(
+                      sizingState.cellSize,
+                      sizingState.cellSizeMin,
+                      sizingState.cellSizeMax,
+                  ),
+                  ...buildHiddenPatchDepthViewState(),
+              }),
     };
 }

@@ -156,7 +156,8 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("suppresses hover updates while a pointer interaction is active", () => {
-        const { handlers, setHoveredCell, editorPointerActive, legacyPointerActive } = createSubject();
+        const { handlers, setHoveredCell, editorPointerActive, legacyPointerActive } =
+            createSubject();
         const cell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
 
         editorPointerActive.mockReturnValue(true);
@@ -179,7 +180,13 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("does not arm edit mode or start pointer editing on unarmed pointer down", () => {
-        const { handlers, beginPointerSession, legacyBegin, armEditingFromGrid, prepareDirectGridInteraction } = createSubject({
+        const {
+            handlers,
+            beginPointerSession,
+            legacyBegin,
+            armEditingFromGrid,
+            prepareDirectGridInteraction,
+        } = createSubject({
             supportsEditorTools: true,
             isEditArmed: false,
         });
@@ -243,7 +250,12 @@ describe("interactions/surface-bindings", () => {
         const originCell: PaintableCell = { id: "square:1:1", x: 1, y: 1, state: 5 };
 
         handlers.onPointerDown(createEventStub(), originCell);
-        handlers.onPointerMove({ buttons: 1 } as PointerEvent, { id: "square:2:1", x: 2, y: 1, state: 0 });
+        handlers.onPointerMove({ buttons: 1 } as PointerEvent, {
+            id: "square:2:1",
+            x: 2,
+            y: 1,
+            state: 0,
+        });
 
         expect(resolveDirectGestureTargetState).toHaveBeenCalledWith(originCell);
         expect(legacyBegin).toHaveBeenCalledWith(originCell, 1, 2);
@@ -345,7 +357,8 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("selects a cell on right-button pointer down", () => {
-        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } = createSubject();
+        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } =
+            createSubject();
         const cell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
 
         handlers.onPointerDown({ button: 2, pointerId: 7 } as PointerEvent, cell);
@@ -356,7 +369,8 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("adds multiple cells during a right-drag select gesture", () => {
-        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } = createSubject();
+        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } =
+            createSubject();
         const firstCell: PaintableCell = { id: "square:1:1", x: 1, y: 1 };
         const secondCell: PaintableCell = { id: "square:2:1", x: 2, y: 1 };
 
@@ -387,7 +401,8 @@ describe("interactions/surface-bindings", () => {
     });
 
     it("clears the selection on empty-space right click", () => {
-        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } = createSubject();
+        const { handlers, setSelectedCells, openInspectorDrawer, renderControlPanel } =
+            createSubject();
 
         handlers.onContextMenu(null);
 

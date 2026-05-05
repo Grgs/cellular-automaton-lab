@@ -10,10 +10,8 @@ describe("overlay-policy", () => {
 
     it("clears the running restore flag when a board rebuild is applied", async () => {
         const { createAppState } = await import("./state/simulation-state.js");
-        const {
-            applyOverlayIntent,
-            OVERLAY_INTENT_BOARD_REBUILT,
-        } = await import("./overlay-policy.js");
+        const { applyOverlayIntent, OVERLAY_INTENT_BOARD_REBUILT } =
+            await import("./overlay-policy.js");
 
         const state = createAppState();
         state.overlaysDismissed = true;

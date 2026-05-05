@@ -4,14 +4,20 @@ import type { CellStateUpdate, SimulationSnapshot } from "./types/domain.js";
 import type { EditorHistoryEntry, PreviewPaintCell, PreviewPaintCells } from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
-function normalizeCellUpdate(topologyIndex: AppState["topologyIndex"], cell: PreviewPaintCell): CellStateUpdate | null {
+function normalizeCellUpdate(
+    topologyIndex: AppState["topologyIndex"],
+    cell: PreviewPaintCell,
+): CellStateUpdate | null {
     if (typeof cell.id === "string" && cell.id.length > 0) {
         const resolved = findTopologyCellById(topologyIndex, cell.id);
         return resolved ? { id: resolved.id, state: Number(cell.state) } : null;
     }
 
     if (Number.isFinite(cell.x) && Number.isFinite(cell.y)) {
-        const resolved = findTopologyCellById(topologyIndex, regularCellId(cell.x ?? 0, cell.y ?? 0));
+        const resolved = findTopologyCellById(
+            topologyIndex,
+            regularCellId(cell.x ?? 0, cell.y ?? 0),
+        );
         return resolved ? { id: resolved.id, state: Number(cell.state) } : null;
     }
 
@@ -26,7 +32,10 @@ export function currentCellStateForId(state: AppState, cellId: string): number |
     return Number(state.cellStates?.[resolved.index] ?? 0);
 }
 
-export function buildCommittedEdit(state: AppState, cells: PreviewPaintCells): EditorHistoryEntry | null {
+export function buildCommittedEdit(
+    state: AppState,
+    cells: PreviewPaintCells,
+): EditorHistoryEntry | null {
     if (!state.topologyIndex || cells.length === 0) {
         return null;
     }
@@ -67,7 +76,11 @@ export function clearEditorHistory(state: AppState): void {
     state.redoStack = [];
 }
 
-export function pushUndoEntry(state: AppState, entry: EditorHistoryEntry | null, limit = MAX_EDITOR_HISTORY): void {
+export function pushUndoEntry(
+    state: AppState,
+    entry: EditorHistoryEntry | null,
+    limit = MAX_EDITOR_HISTORY,
+): void {
     if (!entry?.forwardCells?.length || !entry?.inverseCells?.length) {
         return;
     }
@@ -154,10 +167,14 @@ export function shouldClearHistoryForSimulationUpdate(
     }
 
     const nextTopologySpec = simulationState.topology_spec;
-    if (!sameScalar(
-        `${nextTopologySpec.tiling_family}:${nextTopologySpec.adjacency_mode || "edge"}`,
-        state.topologySpec ? `${state.topologySpec.tiling_family}:${state.topologySpec.adjacency_mode || "edge"}` : null,
-    )) {
+    if (
+        !sameScalar(
+            `${nextTopologySpec.tiling_family}:${nextTopologySpec.adjacency_mode || "edge"}`,
+            state.topologySpec
+                ? `${state.topologySpec.tiling_family}:${state.topologySpec.adjacency_mode || "edge"}`
+                : null,
+        )
+    ) {
         return true;
     }
 

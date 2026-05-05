@@ -1,17 +1,11 @@
-import {
-    createHttpSimulationBackend,
-} from "./api.js";
+import { createHttpSimulationBackend } from "./api.js";
 import { createAppControllerBootstrap } from "./app-controller-bootstrap.js";
 import { createAppControllerSync } from "./app-controller-sync.js";
 import { initializeAppController } from "./app-controller-startup.js";
 import type { AppActionSet } from "./types/actions.js";
-import type {
-    AppController,
-    CreateAppControllerOptions,
-} from "./types/controller-app.js";
+import type { AppController, CreateAppControllerOptions } from "./types/controller-app.js";
 import type { ConfigSyncController, UiSessionController } from "./types/controller-sync-session.js";
 import type { InteractionController, ViewportController } from "./types/controller-view.js";
-import type { SimulationSnapshot } from "./types/domain.js";
 
 export function createAppController({
     elements,
@@ -32,21 +26,20 @@ export function createAppController({
     const bootstrap = createAppControllerBootstrap({
         elements,
         gridView,
-        getSyncState: () => (
+        getSyncState: () =>
             controllerRefs.configSyncController
                 ? controllerRefs.configSyncController.getViewState()
                 : {
-                    pendingRuleName: null,
-                    syncingRuleName: null,
-                    pendingSpeed: null,
-                    syncingSpeed: null,
-                    isSyncing: false,
-                    hasPendingRuleSync: false,
-                    hasPendingSpeedSync: false,
-                    shouldLockRule: false,
-                    shouldLockSpeed: false,
-                }
-        ),
+                      pendingRuleName: null,
+                      syncingRuleName: null,
+                      pendingSpeed: null,
+                      syncingSpeed: null,
+                      isSyncing: false,
+                      hasPendingRuleSync: false,
+                      hasPendingSpeedSync: false,
+                      shouldLockRule: false,
+                      shouldLockSpeed: false,
+                  },
     });
     const { state, mutationRunner, appView } = bootstrap;
     const sync = createAppControllerSync({

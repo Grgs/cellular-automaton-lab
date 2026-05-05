@@ -41,8 +41,8 @@ export function resolveRequestedPresetSelection(
         };
     }
     if (
-        requestedPresetId
-        && selection.presetOptions.some((preset) => preset.id === requestedPresetId)
+        requestedPresetId &&
+        selection.presetOptions.some((preset) => preset.id === requestedPresetId)
     ) {
         return {
             ...selection,

@@ -40,8 +40,8 @@ function boundsFromVertices(vertices: Array<{ x: number; y: number }>): Geometry
 
 function boundsCenter(bounds: GeometryBounds): { x: number; y: number } {
     return {
-        x: bounds.minX + (bounds.width / 2),
-        y: bounds.minY + (bounds.height / 2),
+        x: bounds.minX + bounds.width / 2,
+        y: bounds.minY + bounds.height / 2,
     };
 }
 
@@ -86,7 +86,7 @@ function centerDistanceSquared(
 ): number {
     const dx = center.x - target.x;
     const dy = center.y - target.y;
-    return (dx * dx) + (dy * dy);
+    return dx * dx + dy * dy;
 }
 
 function aggregateBounds(boundsList: GeometryBounds[]): GeometryBounds | null {
@@ -103,9 +103,7 @@ function aggregateBounds(boundsList: GeometryBounds[]): GeometryBounds | null {
     }));
 }
 
-function orientationTokenCounts(
-    cells: RenderableTopologyCell[],
-): Record<string, number> | null {
+function orientationTokenCounts(cells: RenderableTopologyCell[]): Record<string, number> | null {
     const counts = new Map<string, number>();
     for (const cell of cells) {
         if (typeof cell.orientation_token !== "string" || cell.orientation_token.length === 0) {
@@ -135,11 +133,8 @@ function angularSectorCounts(
         const dx = center.x - origin.x;
         const dy = center.y - origin.y;
         const angle = Math.atan2(dy, dx);
-        const normalizedAngle = angle >= 0 ? angle : angle + (Math.PI * 2);
-        const index = Math.min(
-            sectorCount - 1,
-            Math.floor(normalizedAngle / sectorAngle),
-        );
+        const normalizedAngle = angle >= 0 ? angle : angle + Math.PI * 2;
+        const index = Math.min(sectorCount - 1, Math.floor(normalizedAngle / sectorAngle));
         counts[index] = (counts[index] ?? 0) + 1;
     }
     return counts;
@@ -171,7 +166,9 @@ export function sampleRenderDiagnostics(
         .map((cell) => {
             const typedCell = cell as RenderableTopologyCell;
             const rawGeometry = rawGeometryForCell(typedCell);
-            const renderedGeometry = typedCell.id ? polygonCache.cellsById.get(typedCell.id) ?? null : null;
+            const renderedGeometry = typedCell.id
+                ? (polygonCache.cellsById.get(typedCell.id) ?? null)
+                : null;
             if (rawGeometry === null || renderedGeometry === null) {
                 return null;
             }
@@ -198,18 +195,14 @@ export function sampleRenderDiagnostics(
     const renderedBounds = aggregateBounds(topologyCells.map((entry) => entry.renderedBounds));
     const renderedTopologyCenter = renderedBounds ? boundsCenter(renderedBounds) : null;
     const usedIds = new Set<string>();
-    const roles: SampleRole[] = [
-        "lexicographicFirst",
-        "centerNearest",
-        "boundaryFurthest",
-    ];
+    const roles: SampleRole[] = ["lexicographicFirst", "centerNearest", "boundaryFurthest"];
     const sampleCells = {
         lexicographicFirst: null,
         centerNearest: null,
         boundaryFurthest: null,
     } as RenderDiagnosticsSnapshot["sampleCells"];
 
-    const resolveRole = (role: SampleRole): typeof topologyCells[number] | null => {
+    const resolveRole = (role: SampleRole): (typeof topologyCells)[number] | null => {
         const candidates = topologyCells.filter((entry) => !usedIds.has(entry.cell.id));
         if (candidates.length === 0) {
             return null;
@@ -218,21 +211,27 @@ export function sampleRenderDiagnostics(
             return candidates[0] ?? null;
         }
         if (role === "centerNearest") {
-            return [...candidates].sort((left, right) => {
-                const distanceDelta = centerDistanceSquared(left.rawCenter, topologyCenter)
-                    - centerDistanceSquared(right.rawCenter, topologyCenter);
+            return (
+                [...candidates].sort((left, right) => {
+                    const distanceDelta =
+                        centerDistanceSquared(left.rawCenter, topologyCenter) -
+                        centerDistanceSquared(right.rawCenter, topologyCenter);
+                    return distanceDelta !== 0
+                        ? distanceDelta
+                        : left.cell.id.localeCompare(right.cell.id);
+                })[0] ?? null
+            );
+        }
+        return (
+            [...candidates].sort((left, right) => {
+                const distanceDelta =
+                    centerDistanceSquared(right.rawCenter, topologyCenter) -
+                    centerDistanceSquared(left.rawCenter, topologyCenter);
                 return distanceDelta !== 0
                     ? distanceDelta
                     : left.cell.id.localeCompare(right.cell.id);
-            })[0] ?? null;
-        }
-        return [...candidates].sort((left, right) => {
-            const distanceDelta = centerDistanceSquared(right.rawCenter, topologyCenter)
-                - centerDistanceSquared(left.rawCenter, topologyCenter);
-            return distanceDelta !== 0
-                ? distanceDelta
-                : left.cell.id.localeCompare(right.cell.id);
-        })[0] ?? null;
+            })[0] ?? null
+        );
     };
 
     for (const role of roles) {
@@ -261,7 +260,8 @@ export function sampleRenderDiagnostics(
             cellSize,
             renderCellSize: cellSize,
             scale: typeof metrics.scale === "number" ? metrics.scale : null,
-            coordinateScale: typeof metrics.coordinateScale === "number" ? metrics.coordinateScale : 1,
+            coordinateScale:
+                typeof metrics.coordinateScale === "number" ? metrics.coordinateScale : 1,
             xInset: metrics.xInset,
             yInset: metrics.yInset,
             cssWidth: metrics.cssWidth,
@@ -273,12 +273,14 @@ export function sampleRenderDiagnostics(
         metricInputs: {
             renderedTopologyCenter,
             renderedCellCount: topologyCells.length,
-            orientationTokenCounts: orientationTokenCounts(topologyCells.map((entry) => entry.cell)),
+            orientationTokenCounts: orientationTokenCounts(
+                topologyCells.map((entry) => entry.cell),
+            ),
             angularSectorCounts: renderedTopologyCenter
                 ? angularSectorCounts(
-                    topologyCells.map((entry) => entry.renderedCenter),
-                    renderedTopologyCenter,
-                )
+                      topologyCells.map((entry) => entry.renderedCenter),
+                      renderedTopologyCenter,
+                  )
                 : null,
         },
         overlapHotspots: null,
@@ -302,10 +304,10 @@ export function resolveRenderDiagnosticsSnapshot(
     return structuredClone({
         ...renderDiagnostics,
         overlapHotspots: polygonCache
-            ? summarizePositiveAreaPolygonOverlaps(
-                polygonCache.cells,
-                { maxStoredPairs: 50, transformSampleIds },
-            )
+            ? summarizePositiveAreaPolygonOverlaps(polygonCache.cells, {
+                  maxStoredPairs: 50,
+                  transformSampleIds,
+              })
             : null,
     });
 }

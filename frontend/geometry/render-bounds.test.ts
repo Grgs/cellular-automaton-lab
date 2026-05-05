@@ -38,7 +38,8 @@ function topologyEntry(
         sizing_mode: renderKind === "polygon_aperiodic" ? "patch_depth" : "grid",
         family: renderKind === "polygon_aperiodic" ? "aperiodic" : "mixed",
         render_kind: renderKind,
-        viewport_sync_mode: renderKind === "polygon_aperiodic" ? "presentation-only" : "backend-sync",
+        viewport_sync_mode:
+            renderKind === "polygon_aperiodic" ? "presentation-only" : "backend-sync",
         supported_adjacency_modes: ["edge"],
         default_adjacency_mode: "edge",
         default_rules: { edge: "life-b2-s23" },
@@ -218,7 +219,9 @@ describe("geometry/render-bounds", () => {
         ]) {
             const rendered = await renderedMetricsAndBoundsForFixture(filename);
             expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(0.8);
-            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(0.8);
+            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(
+                0.8,
+            );
         }
     });
 
@@ -229,8 +232,12 @@ describe("geometry/render-bounds", () => {
             ["sphinx-depth-3.json", 0.9, 0.9],
         ] as const) {
             const rendered = await renderedMetricsAndBoundsForFixture(filename);
-            expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(widthThreshold);
-            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(heightThreshold);
+            expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(
+                widthThreshold,
+            );
+            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(
+                heightThreshold,
+            );
         }
     });
 
@@ -241,8 +248,12 @@ describe("geometry/render-bounds", () => {
             "pinwheel-depth-3.json",
         ]) {
             const rendered = await renderedMetricsAndBoundsForFixture(filename);
-            expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(0.75);
-            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(0.75);
+            expect(boundsWidth(rendered.bounds) / rendered.cssWidth, filename).toBeGreaterThan(
+                0.75,
+            );
+            expect(boundsHeight(rendered.bounds) / rendered.cssHeight, filename).toBeGreaterThan(
+                0.75,
+            );
         }
     });
 });

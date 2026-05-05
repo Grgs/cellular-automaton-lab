@@ -85,7 +85,11 @@ export function createPaintDragController({
         } finally {
             clearPreview();
             if (dragState.moved && dragState.paintedCells.length > 0 && gestureTone) {
-                flashGestureOutline(dragState.paintedCells, gestureTone, DRAG_GESTURE_FLASH_DURATION_MS);
+                flashGestureOutline(
+                    dragState.paintedCells,
+                    gestureTone,
+                    DRAG_GESTURE_FLASH_DURATION_MS,
+                );
             }
         }
     }

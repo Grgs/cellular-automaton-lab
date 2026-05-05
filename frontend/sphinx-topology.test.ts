@@ -10,7 +10,12 @@ describe("sphinx topology", () => {
     });
 
     it("appears in topology picker metadata with patch-depth sizing", async () => {
-        const { getTopologyDefinition, resolveTopologyVariantKey, tilingFamilyOptions, topologyUsesPatchDepth } = await import("./topology-catalog.js");
+        const {
+            getTopologyDefinition,
+            resolveTopologyVariantKey,
+            tilingFamilyOptions,
+            topologyUsesPatchDepth,
+        } = await import("./topology-catalog.js");
         const sphinx = getFixtureTopologyDefinition("sphinx");
 
         expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("sphinx");

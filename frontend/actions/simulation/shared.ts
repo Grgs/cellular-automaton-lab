@@ -15,10 +15,7 @@ import {
     setTopologySpec,
 } from "../../state/simulation-state.js";
 import { applyOverlayIntent } from "../../overlay-policy.js";
-import type {
-    BrowserClearTimeout,
-    BrowserSetTimeout,
-} from "../../types/controller.js";
+import type { BrowserClearTimeout, BrowserSetTimeout } from "../../types/controller.js";
 import type { SimulationActionRuntime } from "../../types/actions.js";
 import type { AppState } from "../../types/state.js";
 import { createPatchDepthRuntime } from "./patch-depth-runtime.js";

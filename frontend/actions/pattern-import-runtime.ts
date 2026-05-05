@@ -90,8 +90,8 @@ export function createPatternImportRuntime({
     setPatternStatusFn = setPatternStatus,
     clearPatternStatusFn = clearPatternStatus,
 }: CreatePatternImportRuntimeOptions): PatternImportRuntime {
-    const mutations: ActionMutationAdapter | SimulationMutations = simulationMutations
-        || createActionMutationAdapter({ interactions, applySimulationState });
+    const mutations: ActionMutationAdapter | SimulationMutations =
+        simulationMutations || createActionMutationAdapter({ interactions, applySimulationState });
 
     function updatePatternStatus(message = "", tone = "info"): void {
         if (!message) {
@@ -131,9 +131,9 @@ export function createPatternImportRuntime({
         }: PatternTextImportOptions & { skipConfirm?: boolean },
     ): Promise<SimulationSnapshot | null> {
         if (
-            !skipConfirm
-            && shouldConfirmPatternImport(state)
-            && !confirmImportFn("Importing a pattern will replace the current board. Continue?")
+            !skipConfirm &&
+            shouldConfirmPatternImport(state) &&
+            !confirmImportFn("Importing a pattern will replace the current board. Continue?")
         ) {
             updatePatternStatus(cancelMessage, "info");
             return null;
@@ -143,54 +143,62 @@ export function createPatternImportRuntime({
         const speed = Number.isFinite(requestedSpeed) ? requestedSpeed : Number(state.speed);
         viewportController.suppressAutoSync?.();
 
-        return mutations.runSerialized(
-            async () => {
-                const resetState = await postControlFn(
-                    "/api/control/reset",
-                    buildPatternImportResetRequest(parsedPattern, speed),
-                );
-                const resolvedResetState = await mutations.applyRemoteState(
-                    resetState,
-                    { source: "external" },
-                );
+        return mutations
+            .runSerialized(
+                async () => {
+                    const resetState = await postControlFn(
+                        "/api/control/reset",
+                        buildPatternImportResetRequest(parsedPattern, speed),
+                    );
+                    const resolvedResetState = await mutations.applyRemoteState(resetState, {
+                        source: "external",
+                    });
 
-                const importedCells = normalizeImportedCellUpdates(parsedPattern);
-                if (importedCells.length === 0) {
-                    return resolvedResetState;
-                }
+                    const importedCells = normalizeImportedCellUpdates(parsedPattern);
+                    if (importedCells.length === 0) {
+                        return resolvedResetState;
+                    }
 
-                const availableCellIds = new Set(resolvedResetState.topology.cells.map((cell) => cell.id));
-                const unknownCellId = importedCells.find((cell) => !availableCellIds.has(cell.id))?.id;
-                if (unknownCellId) {
-                    throw new Error(`Pattern references an unknown cell id '${unknownCellId}'.`);
-                }
+                    const availableCellIds = new Set(
+                        resolvedResetState.topology.cells.map((cell) => cell.id),
+                    );
+                    const unknownCellId = importedCells.find(
+                        (cell) => !availableCellIds.has(cell.id),
+                    )?.id;
+                    if (unknownCellId) {
+                        throw new Error(
+                            `Pattern references an unknown cell id '${unknownCellId}'.`,
+                        );
+                    }
 
-                const importedState = await setCellsRequestFn(importedCells);
-                await mutations.applyRemoteState(importedState, { source: "external" });
-                return importedState;
-            },
-            {
-                blockingActivity,
-                onError: (error) => {
-                    const message = error instanceof Error ? error.message : String(error);
-                    updatePatternStatus(`Import failed: ${message}`, "error");
-                    onError(error);
+                    const importedState = await setCellsRequestFn(importedCells);
+                    await mutations.applyRemoteState(importedState, { source: "external" });
+                    return importedState;
                 },
-                onRecover: refreshState,
-            },
-        ).then(async (result) => {
-            viewportController.suppressAutoSync?.();
-            dismissFirstRunHintFn(state);
-            setRuleSelectionOriginFn(state, RULE_SELECTION_ORIGIN_DEFAULT);
-            const overlaysRestored = applyOverlayIntentFn(state, OVERLAY_INTENT_BOARD_REBUILT);
-            const editChanged = clearEditModeFn(state);
-            if (overlaysRestored || editChanged) {
-                renderControlPanel();
-            }
-            await onSuccess();
-            updatePatternStatus(successMessage, "success");
-            return result;
-        }).catch(() => null);
+                {
+                    blockingActivity,
+                    onError: (error) => {
+                        const message = error instanceof Error ? error.message : String(error);
+                        updatePatternStatus(`Import failed: ${message}`, "error");
+                        onError(error);
+                    },
+                    onRecover: refreshState,
+                },
+            )
+            .then(async (result) => {
+                viewportController.suppressAutoSync?.();
+                dismissFirstRunHintFn(state);
+                setRuleSelectionOriginFn(state, RULE_SELECTION_ORIGIN_DEFAULT);
+                const overlaysRestored = applyOverlayIntentFn(state, OVERLAY_INTENT_BOARD_REBUILT);
+                const editChanged = clearEditModeFn(state);
+                if (overlaysRestored || editChanged) {
+                    renderControlPanel();
+                }
+                await onSuccess();
+                updatePatternStatus(successMessage, "success");
+                return result;
+            })
+            .catch(() => null);
     }
 
     async function importPatternText(

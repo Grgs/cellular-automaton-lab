@@ -43,7 +43,10 @@ function buildTopology(topologyRevision: string = "rev-1"): TopologyPayload {
     };
 }
 
-function buildSnapshot(topology: TopologyPayload, cellStates: number[] = [0, 1]): SimulationSnapshot {
+function buildSnapshot(
+    topology: TopologyPayload,
+    cellStates: number[] = [0, 1],
+): SimulationSnapshot {
     return {
         topology_spec: topology.topology_spec,
         speed: 5,
@@ -361,7 +364,9 @@ describe("review-api", () => {
             }),
             { source: "review-topology" },
         );
-        expect(applySimulationState).toHaveBeenNthCalledWith(2, baselineSnapshot, { source: "review-reset" });
+        expect(applySimulationState).toHaveBeenNthCalledWith(2, baselineSnapshot, {
+            source: "review-reset",
+        });
 
         dispose();
     });
@@ -394,7 +399,8 @@ describe("review-api", () => {
             window.__reviewApi?.applyCellStates({ "c:9:9": 1 }) ?? Promise.resolve(),
         ).rejects.toThrow("unknown cell id");
         await expect(
-            window.__reviewApi?.applyCellStates([{ id: "c:0:0", state: Number.NaN }]) ?? Promise.resolve(),
+            window.__reviewApi?.applyCellStates([{ id: "c:0:0", state: Number.NaN }]) ??
+                Promise.resolve(),
         ).rejects.toThrow("non-finite state value");
     });
 });

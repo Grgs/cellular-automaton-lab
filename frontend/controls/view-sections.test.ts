@@ -26,16 +26,19 @@ describe("controls/view-sections selection inspector", () => {
     it("renders the empty-state hint and hides advanced details", () => {
         const elements = createElements();
 
-        renderSelectionInspectorSection(elements, viewModel({
-            mode: "empty",
-            title: "No Cells Selected",
-            subtitle: "",
-            hintText: "Right-click a cell to inspect it. Right-drag to summarize a selection.",
-            summaryRows: [],
-            advancedRows: [],
-            advancedVisible: false,
-            advancedSummaryText: "Advanced Details",
-        }));
+        renderSelectionInspectorSection(
+            elements,
+            viewModel({
+                mode: "empty",
+                title: "No Cells Selected",
+                subtitle: "",
+                hintText: "Right-click a cell to inspect it. Right-drag to summarize a selection.",
+                summaryRows: [],
+                advancedRows: [],
+                advancedVisible: false,
+                advancedSummaryText: "Advanced Details",
+            }),
+        );
 
         expect(elements.selectionInspectorTitle?.textContent).toBe("No Cells Selected");
         expect(elements.selectionInspectorSubtitle?.hidden).toBe(true);
@@ -47,21 +50,22 @@ describe("controls/view-sections selection inspector", () => {
     it("renders summary and advanced rows for a populated inspector", () => {
         const elements = createElements();
 
-        renderSelectionInspectorSection(elements, viewModel({
-            mode: "single",
-            title: "1 Cell Selected",
-            subtitle: "square | Dead (0)",
-            hintText: "ignored",
-            summaryRows: [
-                { label: "State", value: "Dead (0)" },
-                { label: "Kind", value: "square" },
-            ],
-            advancedRows: [
-                { label: "Neighbor IDs", value: "cell:b, cell:c" },
-            ],
-            advancedVisible: true,
-            advancedSummaryText: "Advanced Details",
-        }));
+        renderSelectionInspectorSection(
+            elements,
+            viewModel({
+                mode: "single",
+                title: "1 Cell Selected",
+                subtitle: "square | Dead (0)",
+                hintText: "ignored",
+                summaryRows: [
+                    { label: "State", value: "Dead (0)" },
+                    { label: "Kind", value: "square" },
+                ],
+                advancedRows: [{ label: "Neighbor IDs", value: "cell:b, cell:c" }],
+                advancedVisible: true,
+                advancedSummaryText: "Advanced Details",
+            }),
+        );
 
         expect(elements.selectionInspectorTitle?.textContent).toBe("1 Cell Selected");
         expect(elements.selectionInspectorSubtitle?.textContent).toBe("square | Dead (0)");

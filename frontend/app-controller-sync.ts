@@ -1,10 +1,5 @@
-import {
-    applySimulationSnapshot,
-} from "./state/snapshot-reducer.js";
-import {
-    setEditorRule,
-    setRules,
-} from "./state/simulation-state.js";
+import { applySimulationSnapshot } from "./state/snapshot-reducer.js";
+import { setEditorRule, setRules } from "./state/simulation-state.js";
 import { syncPolling } from "./state/polling.js";
 import { createSimulationReconciler } from "./simulation-reconciler.js";
 import { clearEditorHistory, shouldClearHistoryForSimulationUpdate } from "./editor-history.js";
@@ -38,7 +33,7 @@ export function createAppControllerSync({
     fetchStateFn: FetchStateFunction;
     getConfigSyncController: () => ConfigSyncController | null;
     getUiSessionController: () => UiSessionController | null;
-    getRefreshState: () => (() => Promise<void>);
+    getRefreshState: () => () => Promise<void>;
     createSimulationReconcilerFn?: typeof createSimulationReconciler;
 }): AppControllerSync {
     let simulationReconciler: ReturnType<typeof createSimulationReconciler> | null = null;
@@ -61,7 +56,9 @@ export function createAppControllerSync({
         return simulationReconciler;
     }
 
-    async function resolveSimulationState(simulationState: SimulationSnapshot): Promise<SimulationSnapshot> {
+    async function resolveSimulationState(
+        simulationState: SimulationSnapshot,
+    ): Promise<SimulationSnapshot> {
         return simulationState;
     }
 

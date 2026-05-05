@@ -50,11 +50,11 @@ export default defineConfig(({ mode }) => {
             rollupOptions: {
                 input: isStandalone
                     ? {
-                        standalone: standaloneHtmlEntry,
-                    }
+                          standalone: standaloneHtmlEntry,
+                      }
                     : {
-                        app: path.resolve(dirname, "frontend/server-entry.ts"),
-                    },
+                          app: path.resolve(dirname, "frontend/server-entry.ts"),
+                      },
             },
         },
         test: {

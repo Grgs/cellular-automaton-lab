@@ -1,7 +1,4 @@
-import type {
-    BootstrappedFrontendDefaults,
-    FrontendDefaults,
-} from "./types/domain.js";
+import type { BootstrappedFrontendDefaults, FrontendDefaults } from "./types/domain.js";
 
 const FALLBACK_DEFAULTS: FrontendDefaults = Object.freeze({
     simulation: Object.freeze({

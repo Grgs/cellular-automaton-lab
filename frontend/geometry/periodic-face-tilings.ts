@@ -1,6 +1,8 @@
 import type { PeriodicFaceTilingDescriptor } from "../types/rendering.js";
 
-function normalizeDescriptor(descriptor: PeriodicFaceTilingDescriptor): PeriodicFaceTilingDescriptor {
+function normalizeDescriptor(
+    descriptor: PeriodicFaceTilingDescriptor,
+): PeriodicFaceTilingDescriptor {
     return Object.freeze({
         geometry: descriptor.geometry,
         label: descriptor.label,
@@ -33,7 +35,9 @@ const PERIODIC_FACE_TILING_BY_GEOMETRY = new Map(
     PERIODIC_FACE_TILINGS.map((descriptor) => [descriptor.geometry, descriptor]),
 );
 
-export function getPeriodicFaceTilingDescriptor(geometry: string): PeriodicFaceTilingDescriptor | null {
+export function getPeriodicFaceTilingDescriptor(
+    geometry: string,
+): PeriodicFaceTilingDescriptor | null {
     return PERIODIC_FACE_TILING_BY_GEOMETRY.get(geometry) ?? null;
 }
 

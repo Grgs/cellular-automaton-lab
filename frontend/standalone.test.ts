@@ -136,7 +136,10 @@ describe("standalone startup", () => {
         installStandaloneShell();
 
         const bootstrapDeferred = deferred<typeof bootstrapData>();
-        const environmentDeferred = deferred<{ backend: object; bootstrapData: typeof bootstrapData }>();
+        const environmentDeferred = deferred<{
+            backend: object;
+            bootstrapData: typeof bootstrapData;
+        }>();
         const initDeferred = deferred<void>();
 
         vi.doMock("./bootstrap-data.js", () => ({
@@ -157,7 +160,9 @@ describe("standalone startup", () => {
         expect(startupOverlay().hidden).toBe(false);
         expect(startupOverlay().getAttribute("aria-hidden")).toBe("false");
         expect(startupMessage().textContent).toBe("Loading app data");
-        expect(startupDetail().textContent?.trim()).toBe("Reading bundled defaults and topology catalog.");
+        expect(startupDetail().textContent?.trim()).toBe(
+            "Reading bundled defaults and topology catalog.",
+        );
         expect(startupOverlay().parentElement).toBe(gridViewport());
         expect(appFrame().classList.contains("standalone-startup-pending")).toBe(true);
         expect(appFrame().getAttribute("aria-busy")).toBe("true");
@@ -167,12 +172,16 @@ describe("standalone startup", () => {
         await flushAsyncStartup();
 
         expect(startupMessage().textContent).toBe("Starting Python runtime");
-        expect(startupDetail().textContent?.trim()).toBe("Loading Pyodide, bundled Python sources, and the first board.");
+        expect(startupDetail().textContent?.trim()).toBe(
+            "Loading Pyodide, bundled Python sources, and the first board.",
+        );
 
         environmentDeferred.resolve({ backend: {}, bootstrapData });
         await flushAsyncStartup();
         expect(startupMessage().textContent).toBe("Starting Python runtime");
-        expect(startupDetail().textContent?.trim()).toBe("Loading Pyodide, bundled Python sources, and the first board.");
+        expect(startupDetail().textContent?.trim()).toBe(
+            "Loading Pyodide, bundled Python sources, and the first board.",
+        );
 
         initDeferred.resolve();
         await flushAsyncStartup();

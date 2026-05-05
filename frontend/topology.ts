@@ -1,6 +1,4 @@
-import {
-    resolveTopologyVariantKey,
-} from "./topology-catalog.js";
+import { resolveTopologyVariantKey } from "./topology-catalog.js";
 import {
     AMMANN_BEENKER_GEOMETRY,
     CHAIR_KIND,
@@ -143,7 +141,9 @@ export function regularCellId(x: number, y: number): string {
     return `c:${x}:${y}`;
 }
 
-export function parseRegularCellId(cellId: string | null | undefined): { x: number; y: number } | null {
+export function parseRegularCellId(
+    cellId: string | null | undefined,
+): { x: number; y: number } | null {
     const match = /^c:(-?\d+):(-?\d+)$/.exec(String(cellId || ""));
     if (!match) {
         return null;
@@ -200,7 +200,12 @@ export function presetCellsToTopologyUpdates(
         if ("id" in cell && typeof cell.id === "string") {
             return [{ id: cell.id, state: cell.state }];
         }
-        if (!("x" in cell) || !("y" in cell) || !Number.isFinite(cell.x) || !Number.isFinite(cell.y)) {
+        if (
+            !("x" in cell) ||
+            !("y" in cell) ||
+            !Number.isFinite(cell.x) ||
+            !Number.isFinite(cell.y)
+        ) {
             return [];
         }
         const resolved = findTopologyCellById(topologyIndex, regularCellId(cell.x, cell.y));

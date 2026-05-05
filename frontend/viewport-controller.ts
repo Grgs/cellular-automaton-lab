@@ -58,22 +58,22 @@ export function createViewportController({
         };
         return includeConfig
             ? {
-                ...collectConfig(),
-                ...body,
-                topology_spec: {
-                    ...topologySpec,
-                    ...(unsafeSizeOverrideEnabled() ? { unsafe_size_override: true } : {}),
-                    ...(body.topology_spec ?? {}),
-                },
-            }
+                  ...collectConfig(),
+                  ...body,
+                  topology_spec: {
+                      ...topologySpec,
+                      ...(unsafeSizeOverrideEnabled() ? { unsafe_size_override: true } : {}),
+                      ...(body.topology_spec ?? {}),
+                  },
+              }
             : {
-                ...body,
-                topology_spec: {
-                    ...topologySpec,
-                    ...(unsafeSizeOverrideEnabled() ? { unsafe_size_override: true } : {}),
-                    ...(body.topology_spec ?? {}),
-                },
-            };
+                  ...body,
+                  topology_spec: {
+                      ...topologySpec,
+                      ...(unsafeSizeOverrideEnabled() ? { unsafe_size_override: true } : {}),
+                      ...(body.topology_spec ?? {}),
+                  },
+              };
     }
 
     async function syncDesiredDimensions(
@@ -84,23 +84,26 @@ export function createViewportController({
             return false;
         }
 
-        if (pendingViewportDimensions && sameDimensions(desiredDimensions, pendingViewportDimensions)) {
+        if (
+            pendingViewportDimensions &&
+            sameDimensions(desiredDimensions, pendingViewportDimensions)
+        ) {
             return false;
         }
 
-        if (!options.force && !options.previewApplied && sameDimensions(desiredDimensions, getCurrentDimensions())) {
+        if (
+            !options.force &&
+            !options.previewApplied &&
+            sameDimensions(desiredDimensions, getCurrentDimensions())
+        ) {
             return false;
         }
 
         pendingViewportDimensions = desiredDimensions;
         try {
-            await sendControl(
-                "/api/config",
-                buildRequestBody(options, desiredDimensions),
-                {
-                    blockingActivity: options.blockingActivity ?? BLOCKING_ACTIVITY_RESIZE_BOARD,
-                },
-            );
+            await sendControl("/api/config", buildRequestBody(options, desiredDimensions), {
+                blockingActivity: options.blockingActivity ?? BLOCKING_ACTIVITY_RESIZE_BOARD,
+            });
             return true;
         } finally {
             pendingViewportDimensions = null;
@@ -117,7 +120,10 @@ export function createViewportController({
         }
 
         const desiredDimensions = options.desiredDimensions ?? getViewportDimensions();
-        if (pendingViewportDimensions && sameDimensions(desiredDimensions, pendingViewportDimensions)) {
+        if (
+            pendingViewportDimensions &&
+            sameDimensions(desiredDimensions, pendingViewportDimensions)
+        ) {
             return false;
         }
         if (!options.force && sameDimensions(desiredDimensions, getCurrentDimensions())) {
@@ -136,7 +142,7 @@ export function createViewportController({
             viewportSyncTimer = null;
             void syncDesiredDimensions(
                 desiredDimensions,
-                options.preview === false ? options : { ...options, previewApplied: true }
+                options.preview === false ? options : { ...options, previewApplied: true },
             );
         }, options.delay ?? 120);
         return true;
@@ -176,8 +182,8 @@ export function createViewportController({
         const onResize = () => {
             const desiredDimensions = getViewportDimensions();
             if (
-                lastObservedViewportDimensions
-                && sameDimensions(desiredDimensions, lastObservedViewportDimensions)
+                lastObservedViewportDimensions &&
+                sameDimensions(desiredDimensions, lastObservedViewportDimensions)
             ) {
                 return;
             }

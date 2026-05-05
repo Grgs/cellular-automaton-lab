@@ -1,5 +1,9 @@
-import { brushRadiusForSize, EDITOR_TOOL_FILL, EDITOR_TOOL_LINE, EDITOR_TOOL_RECTANGLE } from "./editor-tools.js";
-import { currentTopologyVariantKey } from "./state/simulation-state.js";
+import {
+    brushRadiusForSize,
+    EDITOR_TOOL_FILL,
+    EDITOR_TOOL_LINE,
+    EDITOR_TOOL_RECTANGLE,
+} from "./editor-tools.js";
 import { findTopologyCellById } from "./topology.js";
 import {
     cellCenter,
@@ -9,7 +13,11 @@ import {
     resolveSampledCell,
     resolveTopologyCell,
 } from "./editor-operation-resolvers.js";
-import type { IndexedTopologyPaintableCell, PaintableCell, PreviewPaintCell } from "./types/editor.js";
+import type {
+    IndexedTopologyPaintableCell,
+    PaintableCell,
+    PreviewPaintCell,
+} from "./types/editor.js";
 import type { AppState } from "./types/state.js";
 
 function expandBrushStamp(
@@ -24,7 +32,9 @@ function expandBrushStamp(
     }
 
     const maxDepth = brushRadiusForSize(brushSize);
-    const queue: Array<{ cell: IndexedTopologyPaintableCell; depth: number }> = [{ cell: start, depth: 0 }];
+    const queue: Array<{ cell: IndexedTopologyPaintableCell; depth: number }> = [
+        { cell: start, depth: 0 },
+    ];
     const visited = new Map<string, PreviewPaintCell>([
         [start.id, previewCellFromTopologyCell(start, paintState)],
     ]);
@@ -93,8 +103,8 @@ export function buildLineCells(
 
     for (let step = 0; step <= steps; step += 1) {
         const progress = steps === 0 ? 1 : step / steps;
-        const offsetX = startCenter.x + ((endCenter.x - startCenter.x) * progress);
-        const offsetY = startCenter.y + ((endCenter.y - startCenter.y) * progress);
+        const offsetX = startCenter.x + (endCenter.x - startCenter.x) * progress;
+        const offsetY = startCenter.y + (endCenter.y - startCenter.y) * progress;
         const resolved = resolveSampledCell(state, offsetX, offsetY, geometryCache);
         if (!resolved) {
             continue;
@@ -139,8 +149,10 @@ export function buildRectangleCells(
             return;
         }
 
-        const nearVerticalBorder = Math.abs(center.x - left) <= borderBand || Math.abs(center.x - right) <= borderBand;
-        const nearHorizontalBorder = Math.abs(center.y - top) <= borderBand || Math.abs(center.y - bottom) <= borderBand;
+        const nearVerticalBorder =
+            Math.abs(center.x - left) <= borderBand || Math.abs(center.x - right) <= borderBand;
+        const nearHorizontalBorder =
+            Math.abs(center.y - top) <= borderBand || Math.abs(center.y - bottom) <= borderBand;
         if (!nearVerticalBorder && !nearHorizontalBorder) {
             return;
         }

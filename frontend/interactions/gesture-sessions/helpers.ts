@@ -11,7 +11,10 @@ export function cloneSelectedCells(cells: PaintableCell[]): Map<string, Paintabl
     return new Map(
         cells
             .map((cell) => [identifyGestureCell(cell), { ...cell }])
-            .filter((entry): entry is [string, PaintableCell] => typeof entry[0] === "string" && entry[0].length > 0),
+            .filter(
+                (entry): entry is [string, PaintableCell] =>
+                    typeof entry[0] === "string" && entry[0].length > 0,
+            ),
     );
 }
 
@@ -23,7 +26,11 @@ export function setSurfacePointerCapture(
     surfaceElement: HTMLElement | null,
     pointerId: number | null,
 ): void {
-    if (!surfaceElement || typeof surfaceElement.setPointerCapture !== "function" || pointerId === null) {
+    if (
+        !surfaceElement ||
+        typeof surfaceElement.setPointerCapture !== "function" ||
+        pointerId === null
+    ) {
         return;
     }
     try {
@@ -37,7 +44,11 @@ export function releaseSurfacePointerCapture(
     surfaceElement: HTMLElement | null,
     pointerId: number | null,
 ): void {
-    if (!surfaceElement || typeof surfaceElement.releasePointerCapture !== "function" || pointerId === null) {
+    if (
+        !surfaceElement ||
+        typeof surfaceElement.releasePointerCapture !== "function" ||
+        pointerId === null
+    ) {
         return;
     }
     try {

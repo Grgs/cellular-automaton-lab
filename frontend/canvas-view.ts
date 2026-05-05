@@ -12,7 +12,10 @@ import {
     resolveStateColor,
 } from "./canvas/render-style.js";
 import { drawTransientOverlaySnapshot } from "./canvas/overlay-renderer.js";
-import { createCanvasCommittedRenderer, type CanvasCommittedRenderer } from "./canvas/committed-renderer.js";
+import {
+    createCanvasCommittedRenderer,
+    type CanvasCommittedRenderer,
+} from "./canvas/committed-renderer.js";
 import { createTransientOverlayController } from "./canvas/transient-overlays.js";
 import type { GeometryCache, GridMetrics } from "./types/rendering.js";
 import type { TopologyPayload } from "./types/domain.js";
@@ -85,7 +88,16 @@ export function topologyCellCenter(
     geometryCache: GeometryCache | null = null,
     topology: TopologyPayload | null = null,
 ): { x: number; y: number } {
-    return resolveTopologyCellCenter(cell, cellSize, geometry, width, height, metrics, geometryCache, topology);
+    return resolveTopologyCellCenter(
+        cell,
+        cellSize,
+        geometry,
+        width,
+        height,
+        metrics,
+        geometryCache,
+        topology,
+    );
 }
 
 export function createCanvasGridView({
@@ -108,10 +120,7 @@ export function createCanvasGridView({
 
     function redrawTransientLayers(): void {
         committedRenderer.restoreCommittedSurface();
-        drawTransientOverlaySnapshot(
-            committedRenderer.snapshot(),
-            transientOverlays.snapshot(),
-        );
+        drawTransientOverlaySnapshot(committedRenderer.snapshot(), transientOverlays.snapshot());
     }
 
     function render(
@@ -121,12 +130,7 @@ export function createCanvasGridView({
         nextGeometry?: string,
     ): void {
         transientOverlays.reconcileForRender(nextState.topology);
-        committedRenderer.render(
-            nextState,
-            nextCellSize,
-            nextStateDefinitions,
-            nextGeometry,
-        );
+        committedRenderer.render(nextState, nextCellSize, nextStateDefinitions, nextGeometry);
         redrawTransientLayers();
     }
 

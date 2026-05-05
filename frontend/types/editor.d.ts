@@ -7,7 +7,12 @@ import type {
     SetCellsRequestFunction as SetCellsFn,
     ToggleCellRequestFunction,
 } from "./controller.js";
-import type { CellIdentifier, CellStateUpdate, SimulationSnapshot, TopologyCell } from "./domain.js";
+import type {
+    CellIdentifier,
+    CellStateUpdate,
+    SimulationSnapshot,
+    TopologyCell,
+} from "./domain.js";
 import type { AppState } from "./state.js";
 import type { EditorTool } from "../editor-tools.js";
 
@@ -112,7 +117,11 @@ export interface EditorSessionOptions {
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
     setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
-    flashGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number) => void;
+    flashGestureOutline: (
+        cells: PaintableCell[],
+        tone: GestureOutlineTone,
+        durationMs?: number,
+    ) => void;
     clearGestureOutline: () => void;
     setCellsRequest: SetCellsRequestFunction;
     postControl: PostControlFunction;
@@ -142,7 +151,11 @@ export interface PaintDragOptions {
     previewPaintCells: (cells: PreviewPaintCells) => void;
     clearPreview: () => void;
     setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
-    flashGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number) => void;
+    flashGestureOutline: (
+        cells: PaintableCell[],
+        tone: GestureOutlineTone,
+        durationMs?: number,
+    ) => void;
     clearGestureOutline: () => void;
     setCellsRequest: SetCellsRequestFunction;
     runStateMutation: (
@@ -165,12 +178,19 @@ export interface InteractionControllerOptions {
     setSelectedCells: (cells: PaintableCell[]) => void;
     getSelectedCells: () => PaintableCell[];
     setGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone) => void;
-    flashGestureOutline: (cells: PaintableCell[], tone: GestureOutlineTone, durationMs?: number) => void;
+    flashGestureOutline: (
+        cells: PaintableCell[],
+        tone: GestureOutlineTone,
+        durationMs?: number,
+    ) => void;
     clearGestureOutline: () => void;
     openInspectorDrawer?: () => void;
     mutationRunner: MutationRunner;
     onError: (error: unknown) => void;
-    applySimulationState: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;
+    applySimulationState: (
+        simulationState: SimulationSnapshot,
+        options?: { source?: string },
+    ) => void;
     refreshState: () => Promise<void>;
     toggleCellRequest: ToggleCellRequestFunction;
     setCellRequest: SetCellRequestFunction;

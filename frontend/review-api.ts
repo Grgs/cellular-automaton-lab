@@ -2,7 +2,12 @@ import { indexTopology } from "./topology.js";
 import type { AppController } from "./types/controller-app.js";
 import type { GridView } from "./types/controller-view.js";
 import type { DomElements } from "./types/dom.js";
-import type { CellStateUpdate, RuleDefinition, SimulationSnapshot, TopologyPayload } from "./types/domain.js";
+import type {
+    CellStateUpdate,
+    RuleDefinition,
+    SimulationSnapshot,
+    TopologyPayload,
+} from "./types/domain.js";
 import type { RenderDiagnosticsSnapshot } from "./types/rendering.js";
 import type { AppState } from "./types/state.js";
 
@@ -62,7 +67,9 @@ function normalizeReviewCellStateInput(reviewCellStates: ReviewCellStateInput): 
             }
             const nextState = Number(cellState.state);
             if (!Number.isFinite(nextState)) {
-                throw new Error(`Review cell-state update for ${cellState.id} had a non-finite state value.`);
+                throw new Error(
+                    `Review cell-state update for ${cellState.id} had a non-finite state value.`,
+                );
             }
             return { id: cellState.id, state: nextState };
         });
@@ -103,14 +110,16 @@ function buildAppDiagnosticsSnapshot(
         diagnosticErrors.push(errorMessage(error));
     }
     return {
-        tilingFamily: typeof topologySpec?.tiling_family === "string" ? topologySpec.tiling_family : null,
+        tilingFamily:
+            typeof topologySpec?.tiling_family === "string" ? topologySpec.tiling_family : null,
         patchDepth: Number.isFinite(Number(topologySpec?.patch_depth))
             ? Number(topologySpec?.patch_depth)
             : null,
         topologyCellCount: Array.isArray(topology?.cells) ? topology.cells.length : 0,
         width: Number.isFinite(Number(topologySpec?.width)) ? Number(topologySpec?.width) : null,
         height: Number.isFinite(Number(topologySpec?.height)) ? Number(topologySpec?.height) : null,
-        topologyRevision: typeof state.topologyRevision === "string" ? state.topologyRevision : null,
+        topologyRevision:
+            typeof state.topologyRevision === "string" ? state.topologyRevision : null,
         transformReport: renderDiagnostics,
         diagnosticErrors,
         readiness: {
@@ -122,18 +131,17 @@ function buildAppDiagnosticsSnapshot(
             blockingActivityStartedAt: Number.isFinite(Number(state.blockingActivityStartedAt))
                 ? Number(state.blockingActivityStartedAt)
                 : null,
-            topologyRevision: typeof state.topologyRevision === "string" ? state.topologyRevision : null,
+            topologyRevision:
+                typeof state.topologyRevision === "string" ? state.topologyRevision : null,
             topologyCellCount: Array.isArray(topology?.cells) ? topology.cells.length : 0,
             patchDepth: Number.isFinite(Number(topologySpec?.patch_depth))
                 ? Number(topologySpec?.patch_depth)
                 : null,
             renderCellSize: Number.isFinite(Number(renderDiagnostics?.renderMetrics.renderCellSize))
                 ? Number(renderDiagnostics?.renderMetrics.renderCellSize)
-                : (
-                    Number.isFinite(Number(state.renderCellSize))
-                        ? Number(state.renderCellSize)
-                        : null
-                ),
+                : Number.isFinite(Number(state.renderCellSize))
+                  ? Number(state.renderCellSize)
+                  : null,
             gridSizeText: readText(elements.gridSizeText),
             generationText: readText(elements.generationText),
             statusText: readText(elements.statusText),
@@ -229,15 +237,10 @@ export function installReviewApi({
                 nextCellStates[resolvedCell.index] = nextState;
             });
             controller.applySimulationState(
-                buildSimulationSnapshotFromState(
-                    state,
-                    topology,
-                    nextCellStates,
-                    {
-                        running: false,
-                        topology_revision: topology.topology_revision,
-                    },
-                ),
+                buildSimulationSnapshotFromState(state, topology, nextCellStates, {
+                    running: false,
+                    topology_revision: topology.topology_revision,
+                }),
                 { source: "review-cell-states" },
             );
         },
@@ -245,10 +248,9 @@ export function installReviewApi({
             if (reviewBaselineSnapshot === null) {
                 return;
             }
-            controller.applySimulationState(
-                cloneSimulationSnapshot(reviewBaselineSnapshot),
-                { source: "review-reset" },
-            );
+            controller.applySimulationState(cloneSimulationSnapshot(reviewBaselineSnapshot), {
+                source: "review-reset",
+            });
             reviewBaselineSnapshot = null;
         },
         sampleRenderedCellPixel: (cellId) => sampleRenderedCellPixel(gridView, elements, cellId),

@@ -85,6 +85,7 @@ The following roadmap items are considered done and should not be reopened witho
 - backend/frontend payload contract guard
 - centralized Playwright suite manifest and npm runner path
 - full Python lint/format coverage for `app.py`, `backend/`, `tests/`, and `tools/`
+- full frontend ESLint/Prettier coverage for authored frontend sources and frontend build scripts
 
 ## Do Not Do Yet
 

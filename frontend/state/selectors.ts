@@ -4,9 +4,9 @@ import type { AppState, TopologyRenderPayload } from "../types/state.js";
 
 function hasTopologyPreview(state: AppState): boolean {
     return Boolean(
-        state.previewTopology
-        && state.previewTopologyRevision
-        && state.previewTopologyRevision === state.topologyRevision
+        state.previewTopology &&
+        state.previewTopologyRevision &&
+        state.previewTopologyRevision === state.topologyRevision,
     );
 }
 
@@ -45,10 +45,11 @@ export function currentPaintState(state: AppState): number {
 export function topologyRenderPayload(state: AppState): TopologyRenderPayload {
     const previewActive = hasTopologyPreview(state);
     const topology = previewActive ? state.previewTopology : state.topology;
-    const previewCellStatesById = previewActive ? (state.previewCellStatesById || {}) : null;
-    const cellStates = previewActive && Array.isArray(topology?.cells)
-        ? topology.cells.map((cell) => Number(previewCellStatesById?.[cell.id] ?? 0))
-        : state.cellStates;
+    const previewCellStatesById = previewActive ? state.previewCellStatesById || {} : null;
+    const cellStates =
+        previewActive && Array.isArray(topology?.cells)
+            ? topology.cells.map((cell) => Number(previewCellStatesById?.[cell.id] ?? 0))
+            : state.cellStates;
     return {
         topology,
         cellStates,

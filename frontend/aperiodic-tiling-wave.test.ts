@@ -33,14 +33,18 @@ describe("next aperiodic tiling wave", () => {
         for (const tilingFamily of NEW_TILING_IDS) {
             const definition = getFixtureTopologyDefinition(tilingFamily);
             expect(optionValues).toContain(tilingFamily);
-            expect(resolveTopologyVariantKey(tilingFamily, "edge")).toBe(definition.geometry_keys.edge);
+            expect(resolveTopologyVariantKey(tilingFamily, "edge")).toBe(
+                definition.geometry_keys.edge,
+            );
             expect(getTopologyDefinition(tilingFamily)?.render_kind).toBe("polygon_aperiodic");
             expect(topologyUsesPatchDepth(tilingFamily)).toBe(true);
         }
 
         const pinwheelMetadata = getFixtureAperiodicFamilyDefinition("pinwheel");
         if (pinwheelMetadata.experimental) {
-            expect(tilingFamilyOptions().find((option) => option.value === "pinwheel")?.label).toContain("Experimental");
+            expect(
+                tilingFamilyOptions().find((option) => option.value === "pinwheel")?.label,
+            ).toContain("Experimental");
         }
     });
 

@@ -16,7 +16,12 @@ export function bindSimulationControls(
 ): void {
     const cueTimeouts = new WeakMap<HTMLInputElement, BrowserTimerId>();
 
-    bindInputControl(elements.speedInput, "input", () => Number(elements.speedInput!.value), actions.changeSpeed);
+    bindInputControl(
+        elements.speedInput,
+        "input",
+        () => Number(elements.speedInput!.value),
+        actions.changeSpeed,
+    );
     bindInputControl(
         elements.tilingFamilySelect,
         "change",
@@ -29,7 +34,12 @@ export function bindSimulationControls(
         () => elements.adjacencyModeSelect!.value,
         actions.changeAdjacencyMode,
     );
-    bindInputControl(elements.ruleSelect, "change", () => elements.ruleSelect!.value, actions.changeRule);
+    bindInputControl(
+        elements.ruleSelect,
+        "change",
+        () => elements.ruleSelect!.value,
+        actions.changeRule,
+    );
 
     bindConstrainedNumericControl({
         input: elements.cellSizeInput,

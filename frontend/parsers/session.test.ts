@@ -11,18 +11,21 @@ describe("session parser", () => {
     it("preserves unsafe sizing session values when the toggle is enabled", async () => {
         const { parseUiSession } = await import("./session.js");
 
-        const session = parseUiSession({
-            unsafeSizingEnabled: true,
-            cellSizeByTilingFamily: {
-                square: 40,
+        const session = parseUiSession(
+            {
+                unsafeSizingEnabled: true,
+                cellSizeByTilingFamily: {
+                    square: 40,
+                },
+                patchDepthByTilingFamily: {
+                    spectre: 9,
+                },
             },
-            patchDepthByTilingFamily: {
-                spectre: 9,
+            {
+                disclosureIds: [],
+                defaultTilingFamily: "square",
             },
-        }, {
-            disclosureIds: [],
-            defaultTilingFamily: "square",
-        });
+        );
 
         expect(session.unsafeSizingEnabled).toBe(true);
         expect(session.cellSizeByTilingFamily.square).toBe(40);
@@ -32,15 +35,18 @@ describe("session parser", () => {
     it("lets unsafe dodecagonal patch depth grow past the safe cap up to the family unsafe ceiling", async () => {
         const { parseUiSession } = await import("./session.js");
 
-        const session = parseUiSession({
-            unsafeSizingEnabled: true,
-            patchDepthByTilingFamily: {
-                "dodecagonal-square-triangle": 50,
+        const session = parseUiSession(
+            {
+                unsafeSizingEnabled: true,
+                patchDepthByTilingFamily: {
+                    "dodecagonal-square-triangle": 50,
+                },
             },
-        }, {
-            disclosureIds: [],
-            defaultTilingFamily: "dodecagonal-square-triangle",
-        });
+            {
+                disclosureIds: [],
+                defaultTilingFamily: "dodecagonal-square-triangle",
+            },
+        );
 
         expect(session.unsafeSizingEnabled).toBe(true);
         expect(session.patchDepthByTilingFamily["dodecagonal-square-triangle"]).toBe(50);
@@ -49,15 +55,18 @@ describe("session parser", () => {
     it("clamps unsafe dodecagonal patch depth to the family unsafe ceiling", async () => {
         const { parseUiSession } = await import("./session.js");
 
-        const session = parseUiSession({
-            unsafeSizingEnabled: true,
-            patchDepthByTilingFamily: {
-                "dodecagonal-square-triangle": 999,
+        const session = parseUiSession(
+            {
+                unsafeSizingEnabled: true,
+                patchDepthByTilingFamily: {
+                    "dodecagonal-square-triangle": 999,
+                },
             },
-        }, {
-            disclosureIds: [],
-            defaultTilingFamily: "dodecagonal-square-triangle",
-        });
+            {
+                disclosureIds: [],
+                defaultTilingFamily: "dodecagonal-square-triangle",
+            },
+        );
 
         expect(session.unsafeSizingEnabled).toBe(true);
         expect(session.patchDepthByTilingFamily["dodecagonal-square-triangle"]).toBe(60);

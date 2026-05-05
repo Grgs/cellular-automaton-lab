@@ -1,9 +1,4 @@
-import type {
-    RuleDefinition,
-    TopologyIndex,
-    TopologyPayload,
-    TopologySpec,
-} from "./domain.js";
+import type { RuleDefinition, TopologyIndex, TopologyPayload, TopologySpec } from "./domain.js";
 import type { BrowserTimerId } from "./controller.js";
 import type { EditorTool } from "../editor-tools.js";
 import type { EditorHistoryEntry } from "./editor.js";

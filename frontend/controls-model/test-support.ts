@@ -11,7 +11,8 @@ export const EMPTY_SYNC_STATE = {
 } as const;
 
 export async function buildControlsModelState() {
-    const { createAppState, setRules, setActiveRule, setTopology } = await import("../state/simulation-state.js");
+    const { createAppState, setRules, setActiveRule, setTopology } =
+        await import("../state/simulation-state.js");
     const state = createAppState();
     const rule = {
         name: "signal-rule",
@@ -28,62 +29,66 @@ export async function buildControlsModelState() {
     };
     setRules(state, [rule]);
     setActiveRule(state, rule);
-    setTopology(state, {
-        topology_revision: "rev-1",
-        topology_spec: {
-            tiling_family: "square",
-            adjacency_mode: "edge",
-            sizing_mode: "grid",
-            width: 2,
-            height: 2,
-            patch_depth: 0,
+    setTopology(
+        state,
+        {
+            topology_revision: "rev-1",
+            topology_spec: {
+                tiling_family: "square",
+                adjacency_mode: "edge",
+                sizing_mode: "grid",
+                width: 2,
+                height: 2,
+                patch_depth: 0,
+            },
+            cells: [
+                {
+                    id: "cell:a",
+                    kind: "square",
+                    neighbors: ["cell:b", "cell:c", null, null],
+                    slot: "alpha",
+                    center: { x: 0, y: 0 },
+                    vertices: [
+                        { x: 0, y: 0 },
+                        { x: 1, y: 0 },
+                        { x: 1, y: 1 },
+                        { x: 0, y: 1 },
+                    ],
+                    tile_family: "family-a",
+                    orientation_token: "north",
+                    chirality_token: "left",
+                    decoration_tokens: ["stripe", "dot"],
+                },
+                {
+                    id: "cell:b",
+                    kind: "triangle",
+                    neighbors: ["cell:a", null, null],
+                    center: { x: 1.1, y: 2.2 },
+                    vertices: [
+                        { x: 0, y: 0 },
+                        { x: 1, y: 0 },
+                        { x: 0.5, y: 1 },
+                    ],
+                    tile_family: "family-a",
+                    orientation_token: "south",
+                    decoration_tokens: ["dot"],
+                },
+                {
+                    id: "cell:c",
+                    kind: "triangle",
+                    neighbors: ["cell:a", "cell:b", null],
+                    center: { x: 2, y: 3 },
+                    vertices: [
+                        { x: 0, y: 0 },
+                        { x: 1, y: 0 },
+                        { x: 0.5, y: 1 },
+                    ],
+                    tile_family: "family-b",
+                    chirality_token: "right",
+                },
+            ],
         },
-        cells: [
-            {
-                id: "cell:a",
-                kind: "square",
-                neighbors: ["cell:b", "cell:c", null, null],
-                slot: "alpha",
-                center: { x: 0, y: 0 },
-                vertices: [
-                    { x: 0, y: 0 },
-                    { x: 1, y: 0 },
-                    { x: 1, y: 1 },
-                    { x: 0, y: 1 },
-                ],
-                tile_family: "family-a",
-                orientation_token: "north",
-                chirality_token: "left",
-                decoration_tokens: ["stripe", "dot"],
-            },
-            {
-                id: "cell:b",
-                kind: "triangle",
-                neighbors: ["cell:a", null, null],
-                center: { x: 1.1, y: 2.2 },
-                vertices: [
-                    { x: 0, y: 0 },
-                    { x: 1, y: 0 },
-                    { x: 0.5, y: 1 },
-                ],
-                tile_family: "family-a",
-                orientation_token: "south",
-                decoration_tokens: ["dot"],
-            },
-            {
-                id: "cell:c",
-                kind: "triangle",
-                neighbors: ["cell:a", "cell:b", null],
-                center: { x: 2, y: 3 },
-                vertices: [
-                    { x: 0, y: 0 },
-                    { x: 1, y: 0 },
-                    { x: 0.5, y: 1 },
-                ],
-                tile_family: "family-b",
-                chirality_token: "right",
-            },
-        ],
-    }, [0, 2, 2]);
+        [0, 2, 2],
+    );
     return state;
 }

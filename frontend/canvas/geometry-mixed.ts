@@ -1,29 +1,30 @@
 import { appendPolygonPath } from "./draw.js";
 import { asPolygonGeometryCache } from "../geometry/cache-guards.js";
-import type {
-    Point2D,
-    PolygonGeometryCell,
-    RenderableTopologyCell,
-} from "../types/rendering.js";
+import type { Point2D, PolygonGeometryCell, RenderableTopologyCell } from "../types/rendering.js";
 import type { PaintableCell } from "../types/editor.js";
 import type { TopologyPayload } from "../types/domain.js";
 import type { PolygonGeometryCache } from "../types/rendering.js";
 
-export function pointInPolygon(offsetX: number, offsetY: number, vertices: readonly Point2D[]): boolean {
+export function pointInPolygon(
+    offsetX: number,
+    offsetY: number,
+    vertices: readonly Point2D[],
+): boolean {
     let inside = false;
-    for (let index = 0, previous = vertices.length - 1; index < vertices.length; previous = index, index += 1) {
+    for (
+        let index = 0, previous = vertices.length - 1;
+        index < vertices.length;
+        previous = index, index += 1
+    ) {
         const left = vertices[index];
         const right = vertices[previous];
         if (!left || !right) {
             continue;
         }
-        const intersects = (
-            ((left.y > offsetY) !== (right.y > offsetY))
-            && (
-                offsetX
-                < ((right.x - left.x) * (offsetY - left.y)) / ((right.y - left.y) || 1e-9) + left.x
-            )
-        );
+        const intersects =
+            left.y > offsetY !== right.y > offsetY &&
+            offsetX <
+                ((right.x - left.x) * (offsetY - left.y)) / (right.y - left.y || 1e-9) + left.x;
         if (intersects) {
             inside = !inside;
         }
@@ -62,10 +63,10 @@ export function resolveMixedCellFromOffset(
     const cachedCells = geometryCache?.cells ?? [];
     for (const cachedCell of cachedCells) {
         if (
-            offsetX < cachedCell.minX
-            || offsetX > cachedCell.maxX
-            || offsetY < cachedCell.minY
-            || offsetY > cachedCell.maxY
+            offsetX < cachedCell.minX ||
+            offsetX > cachedCell.maxX ||
+            offsetY < cachedCell.minY ||
+            offsetY > cachedCell.maxY
         ) {
             continue;
         }

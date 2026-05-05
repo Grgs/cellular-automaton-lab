@@ -1,6 +1,4 @@
-import {
-    BLOCKING_ACTIVITY_RESET_BOARD,
-} from "../../blocking-activity.js";
+import { BLOCKING_ACTIVITY_RESET_BOARD } from "../../blocking-activity.js";
 import {
     OVERLAY_INTENT_BOARD_RESET,
     OVERLAY_INTENT_RUN_STARTED,
@@ -8,10 +6,9 @@ import {
 } from "../../overlay-policy.js";
 import type { SimulationActionRuntime, SimulationActionSet } from "../../types/actions.js";
 
-export function createRunActions(runtime: SimulationActionRuntime): Pick<
-    SimulationActionSet,
-    "toggleRun" | "step" | "reset" | "randomReset" | "changeSpeed"
-> {
+export function createRunActions(
+    runtime: SimulationActionRuntime,
+): Pick<SimulationActionSet, "toggleRun" | "step" | "reset" | "randomReset" | "changeSpeed"> {
     const {
         state,
         interactions,
@@ -29,9 +26,7 @@ export function createRunActions(runtime: SimulationActionRuntime): Pick<
                 return interactions.sendControl("/api/control/pause");
             }
 
-            const path = state.generation > 0
-                ? "/api/control/resume"
-                : "/api/control/start";
+            const path = state.generation > 0 ? "/api/control/resume" : "/api/control/start";
             applyOverlayIntentAndRender(OVERLAY_INTENT_RUN_STARTED);
             return interactions.sendControl(path).catch((error) => {
                 applyOverlayIntentAndRender(OVERLAY_INTENT_RUN_STATE_SYNCED);
@@ -48,24 +43,28 @@ export function createRunActions(runtime: SimulationActionRuntime): Pick<
             dismissHintsAndStatus();
             interactions.clearSelection?.();
             applyOverlayIntentAndRender(OVERLAY_INTENT_BOARD_RESET);
-            return interactions.sendControl("/api/control/reset", buildResetPayload(false), {
-                blockingActivity: BLOCKING_ACTIVITY_RESET_BOARD,
-            }).then((simulationState) => {
-                resetRuleSelectionOrigin();
-                return simulationState;
-            });
+            return interactions
+                .sendControl("/api/control/reset", buildResetPayload(false), {
+                    blockingActivity: BLOCKING_ACTIVITY_RESET_BOARD,
+                })
+                .then((simulationState) => {
+                    resetRuleSelectionOrigin();
+                    return simulationState;
+                });
         },
 
         randomReset() {
             dismissHintsAndStatus();
             interactions.clearSelection?.();
             applyOverlayIntentAndRender(OVERLAY_INTENT_BOARD_RESET);
-            return interactions.sendControl("/api/control/reset", buildResetPayload(true), {
-                blockingActivity: BLOCKING_ACTIVITY_RESET_BOARD,
-            }).then((simulationState) => {
-                resetRuleSelectionOrigin();
-                return simulationState;
-            });
+            return interactions
+                .sendControl("/api/control/reset", buildResetPayload(true), {
+                    blockingActivity: BLOCKING_ACTIVITY_RESET_BOARD,
+                })
+                .then((simulationState) => {
+                    resetRuleSelectionOrigin();
+                    return simulationState;
+                });
         },
 
         changeSpeed(nextSpeed) {

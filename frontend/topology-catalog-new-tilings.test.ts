@@ -5,13 +5,43 @@ import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 
 const NEW_PERIODIC_TILINGS = [
     { geometry: "rhombille", label: "Rhombille", defaultCellSize: 12, maxCellSize: 20 },
-    { geometry: "deltoidal-hexagonal", label: "Deltoidal Hexagonal", defaultCellSize: 12, maxCellSize: 20 },
+    {
+        geometry: "deltoidal-hexagonal",
+        label: "Deltoidal Hexagonal",
+        defaultCellSize: 12,
+        maxCellSize: 20,
+    },
     { geometry: "tetrakis-square", label: "Tetrakis Square", defaultCellSize: 12, maxCellSize: 20 },
-    { geometry: "triakis-triangular", label: "Triakis Triangular", defaultCellSize: 12, maxCellSize: 20 },
-    { geometry: "deltoidal-trihexagonal", label: "Deltoidal Trihexagonal", defaultCellSize: 12, maxCellSize: 20 },
-    { geometry: "prismatic-pentagonal", label: "Prismatic Pentagonal", defaultCellSize: 10, maxCellSize: 18 },
-    { geometry: "floret-pentagonal", label: "Floret Pentagonal", defaultCellSize: 10, maxCellSize: 18 },
-    { geometry: "snub-square-dual", label: "Snub Square Dual", defaultCellSize: 10, maxCellSize: 18 },
+    {
+        geometry: "triakis-triangular",
+        label: "Triakis Triangular",
+        defaultCellSize: 12,
+        maxCellSize: 20,
+    },
+    {
+        geometry: "deltoidal-trihexagonal",
+        label: "Deltoidal Trihexagonal",
+        defaultCellSize: 12,
+        maxCellSize: 20,
+    },
+    {
+        geometry: "prismatic-pentagonal",
+        label: "Prismatic Pentagonal",
+        defaultCellSize: 10,
+        maxCellSize: 18,
+    },
+    {
+        geometry: "floret-pentagonal",
+        label: "Floret Pentagonal",
+        defaultCellSize: 10,
+        maxCellSize: 18,
+    },
+    {
+        geometry: "snub-square-dual",
+        label: "Snub Square Dual",
+        defaultCellSize: 10,
+        maxCellSize: 18,
+    },
 ] as const;
 
 const EXISTING_PERIODIC_TILINGS = [
@@ -43,21 +73,28 @@ function installPeriodicMixedGlobals(): void {
             geometry_keys: { edge: "square" },
             sizing_policy: { control: "cell_size", default: 12, min: 8, max: 24 },
         },
-        ...NEW_PERIODIC_TILINGS.map((entry, index): BootstrappedTopologyDefinition => ({
-            tiling_family: entry.geometry,
-            label: entry.label,
-            picker_group: "Periodic Mixed",
-            picker_order: 200 + (index * 10),
-            sizing_mode: "grid",
-            family: "mixed",
-            render_kind: "polygon_periodic",
-            viewport_sync_mode: "backend-sync",
-            supported_adjacency_modes: ["edge"],
-            default_adjacency_mode: "edge",
-            default_rules: { edge: "life-b2-s23" },
-            geometry_keys: { edge: entry.geometry },
-            sizing_policy: { control: "cell_size", default: entry.defaultCellSize, min: 8, max: entry.maxCellSize },
-        })),
+        ...NEW_PERIODIC_TILINGS.map(
+            (entry, index): BootstrappedTopologyDefinition => ({
+                tiling_family: entry.geometry,
+                label: entry.label,
+                picker_group: "Periodic Mixed",
+                picker_order: 200 + index * 10,
+                sizing_mode: "grid",
+                family: "mixed",
+                render_kind: "polygon_periodic",
+                viewport_sync_mode: "backend-sync",
+                supported_adjacency_modes: ["edge"],
+                default_adjacency_mode: "edge",
+                default_rules: { edge: "life-b2-s23" },
+                geometry_keys: { edge: entry.geometry },
+                sizing_policy: {
+                    control: "cell_size",
+                    default: entry.defaultCellSize,
+                    min: 8,
+                    max: entry.maxCellSize,
+                },
+            }),
+        ),
     ];
     window.APP_PERIODIC_FACE_TILINGS = [...EXISTING_PERIODIC_TILINGS, ...NEW_PERIODIC_TILINGS].map(
         (entry): PeriodicFaceTilingDescriptor => ({
@@ -86,7 +123,8 @@ describe("new periodic mixed tilings", () => {
     });
 
     it("appear in topology picker metadata with their geometry keys", async () => {
-        const { tilingFamilyOptions, resolveTopologyVariantKey } = await import("./topology-catalog.js");
+        const { tilingFamilyOptions, resolveTopologyVariantKey } =
+            await import("./topology-catalog.js");
 
         const optionValues = new Set(tilingFamilyOptions().map((option) => option.value));
         for (const entry of NEW_PERIODIC_TILINGS) {

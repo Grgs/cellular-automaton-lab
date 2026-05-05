@@ -8,7 +8,11 @@ let createAppStateFn: typeof import("../state/simulation-state.js").createAppSta
 
 function editorStateStub() {
     const state = createAppStateFn();
-    state.topology = { topology_revision: "rev-test", topology_spec: state.topologySpec, cells: [] };
+    state.topology = {
+        topology_revision: "rev-test",
+        topology_spec: state.topologySpec,
+        cells: [],
+    };
     state.topologyIndex = { byId: new Map() };
     state.cellStates = [];
     state.isRunning = false;
@@ -71,7 +75,11 @@ describe("interactions/editor-session", () => {
         expect(previewPaintCells).toHaveBeenCalledWith(previewCells);
         expect(setGestureOutline).toHaveBeenCalledWith(previewCells, "paint");
         expect(commitEditorCells).toHaveBeenCalledWith(previewCells);
-        expect(flashGestureOutline).toHaveBeenCalledWith(previewCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
+        expect(flashGestureOutline).toHaveBeenCalledWith(
+            previewCells,
+            "paint",
+            DRAG_GESTURE_FLASH_DURATION_MS,
+        );
         expect(clearGestureOutline).toHaveBeenCalled();
     });
 
@@ -125,7 +133,11 @@ describe("interactions/editor-session", () => {
         expect(previewPaintCells).toHaveBeenCalledWith(previewCells);
         expect(setGestureOutline).toHaveBeenCalledWith(previewCells, "paint");
         expect(commitEditorCells).toHaveBeenCalledWith(previewCells);
-        expect(flashGestureOutline).toHaveBeenCalledWith(previewCells, "paint", DRAG_GESTURE_FLASH_DURATION_MS);
+        expect(flashGestureOutline).toHaveBeenCalledWith(
+            previewCells,
+            "paint",
+            DRAG_GESTURE_FLASH_DURATION_MS,
+        );
         expect(clearGestureOutline).toHaveBeenCalled();
     });
 

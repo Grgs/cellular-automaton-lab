@@ -19,12 +19,17 @@ function normalizeSizingRecord(
     return Object.fromEntries(
         Object.entries(value)
             .filter(([tilingFamily]) => typeof tilingFamily === "string" && tilingFamily.length > 0)
-            .map(([tilingFamily, rawValue]) => [tilingFamily, normalizeEntry(tilingFamily, rawValue)])
+            .map(([tilingFamily, rawValue]) => [
+                tilingFamily,
+                normalizeEntry(tilingFamily, rawValue),
+            ])
             .filter(([, normalizedValue]) => Number.isInteger(normalizedValue)),
     );
 }
 
-export function sizingPolicyForTilingFamily(tilingFamily: string | null | undefined): Readonly<SizingPolicy> {
+export function sizingPolicyForTilingFamily(
+    tilingFamily: string | null | undefined,
+): Readonly<SizingPolicy> {
     return getTopologySizingPolicy(tilingFamily);
 }
 
@@ -39,9 +44,7 @@ function unsafeSizingEnabled(options: { unsafe?: boolean } = {}): boolean {
 
 function safePatchDepthMaxForTilingFamily(tilingFamily: string | null | undefined): number {
     const policy = sizingPolicyForTilingFamily(tilingFamily);
-    return policy.control === "patch_depth"
-        ? policy.max
-        : MAX_PATCH_DEPTH;
+    return policy.control === "patch_depth" ? policy.max : MAX_PATCH_DEPTH;
 }
 
 function familyUnsafePatchDepthMax(tilingFamily: string | null | undefined): number {
@@ -59,9 +62,7 @@ function normalizeInteger(value: number, minimum: number, maximum: number): numb
 
 export function defaultCellSizeForTilingFamily(tilingFamily: string | null | undefined): number {
     const policy = sizingPolicyForTilingFamily(tilingFamily);
-    return policy.control === "cell_size"
-        ? policy.default
-        : DEFAULT_CELL_SIZE;
+    return policy.control === "cell_size" ? policy.default : DEFAULT_CELL_SIZE;
 }
 
 export function minCellSizeForTilingFamily(
@@ -72,9 +73,7 @@ export function minCellSizeForTilingFamily(
         return MIN_UNSAFE_CELL_SIZE;
     }
     const policy = sizingPolicyForTilingFamily(tilingFamily);
-    return policy.control === "cell_size"
-        ? policy.min
-        : MIN_CELL_SIZE;
+    return policy.control === "cell_size" ? policy.min : MIN_CELL_SIZE;
 }
 
 export function maxCellSizeForTilingFamily(
@@ -85,9 +84,7 @@ export function maxCellSizeForTilingFamily(
         return MAX_UNSAFE_CELL_SIZE;
     }
     const policy = sizingPolicyForTilingFamily(tilingFamily);
-    return policy.control === "cell_size"
-        ? policy.max
-        : MAX_CELL_SIZE;
+    return policy.control === "cell_size" ? policy.max : MAX_CELL_SIZE;
 }
 
 export function normalizeCellSize(value: number): number {
@@ -135,16 +132,12 @@ export function minPatchDepthForTilingFamily(
         return MIN_UNSAFE_PATCH_DEPTH;
     }
     const policy = sizingPolicyForTilingFamily(tilingFamily);
-    return policy.control === "patch_depth"
-        ? policy.min
-        : MIN_PATCH_DEPTH;
+    return policy.control === "patch_depth" ? policy.min : MIN_PATCH_DEPTH;
 }
 
 export function defaultPatchDepthForTilingFamily(tilingFamily: string | null | undefined): number {
     const policy = sizingPolicyForTilingFamily(tilingFamily);
-    return policy.control === "patch_depth"
-        ? policy.default
-        : DEFAULT_PATCH_DEPTH;
+    return policy.control === "patch_depth" ? policy.default : DEFAULT_PATCH_DEPTH;
 }
 
 export function normalizePatchDepthForTilingFamily(
@@ -163,9 +156,7 @@ export function buildTopologySpecRequest<TTopologySpec extends object>(
     topologySpec: TTopologySpec,
     unsafe = false,
 ): TTopologySpec & { unsafe_size_override?: boolean } {
-    return unsafe
-        ? { ...topologySpec, unsafe_size_override: true }
-        : { ...topologySpec };
+    return unsafe ? { ...topologySpec, unsafe_size_override: true } : { ...topologySpec };
 }
 
 export function setPatchDepth(
@@ -180,11 +171,13 @@ export function setPatchDepth(
 ): void {
     state.patchDepth = preserveOutOfRange
         ? normalizeInteger(
-            patchDepth,
-            MIN_UNSAFE_PATCH_DEPTH,
-            maxPatchDepthForTilingFamily(tilingFamily, { unsafe: true }),
-        )
-        : normalizePatchDepthForTilingFamily(tilingFamily, patchDepth, { unsafe: state.unsafeSizingEnabled });
+              patchDepth,
+              MIN_UNSAFE_PATCH_DEPTH,
+              maxPatchDepthForTilingFamily(tilingFamily, { unsafe: true }),
+          )
+        : normalizePatchDepthForTilingFamily(tilingFamily, patchDepth, {
+              unsafe: state.unsafeSizingEnabled,
+          });
     state.topologySpec = {
         ...state.topologySpec,
         patch_depth: state.patchDepth,
@@ -207,25 +200,29 @@ export function clearPendingPatchDepth(state: AppState): void {
     state.pendingPatchDepth = null;
 }
 
-export function setPatchDepthMemoryMap(state: AppState, patchDepthByTilingFamily: Record<string, number>): void {
+export function setPatchDepthMemoryMap(
+    state: AppState,
+    patchDepthByTilingFamily: Record<string, number>,
+): void {
     state.patchDepthByTilingFamily = normalizeSizingRecord(
         patchDepthByTilingFamily,
-        (tilingFamily, rawValue) => normalizePatchDepthForTilingFamily(
-            tilingFamily,
-            rawValue,
-            { unsafe: state.unsafeSizingEnabled },
-        ),
+        (tilingFamily, rawValue) =>
+            normalizePatchDepthForTilingFamily(tilingFamily, rawValue, {
+                unsafe: state.unsafeSizingEnabled,
+            }),
     );
 }
 
-export function setCellSizeMemoryMap(state: AppState, cellSizeByTilingFamily: Record<string, number>): void {
+export function setCellSizeMemoryMap(
+    state: AppState,
+    cellSizeByTilingFamily: Record<string, number>,
+): void {
     state.cellSizeByTilingFamily = normalizeSizingRecord(
         cellSizeByTilingFamily,
-        (tilingFamily, rawValue) => normalizeCellSizeForTilingFamily(
-            tilingFamily,
-            rawValue,
-            { unsafe: state.unsafeSizingEnabled },
-        ),
+        (tilingFamily, rawValue) =>
+            normalizeCellSizeForTilingFamily(tilingFamily, rawValue, {
+                unsafe: state.unsafeSizingEnabled,
+            }),
     );
 }
 
@@ -238,19 +235,14 @@ export function rememberCellSizeForTilingFamily(
         return;
     }
     state.cellSizeByTilingFamily = {
-        ...normalizeSizingRecord(
-            state.cellSizeByTilingFamily,
-            (candidateTilingFamily, rawValue) => normalizeCellSizeForTilingFamily(
-                candidateTilingFamily,
-                rawValue,
-                { unsafe: state.unsafeSizingEnabled },
-            ),
+        ...normalizeSizingRecord(state.cellSizeByTilingFamily, (candidateTilingFamily, rawValue) =>
+            normalizeCellSizeForTilingFamily(candidateTilingFamily, rawValue, {
+                unsafe: state.unsafeSizingEnabled,
+            }),
         ),
-        [String(tilingFamily)]: normalizeCellSizeForTilingFamily(
-            tilingFamily,
-            cellSize,
-            { unsafe: state.unsafeSizingEnabled },
-        ),
+        [String(tilingFamily)]: normalizeCellSizeForTilingFamily(tilingFamily, cellSize, {
+            unsafe: state.unsafeSizingEnabled,
+        }),
     };
 }
 
@@ -263,7 +255,8 @@ export function rememberedCellSizeForTilingFamily(
     }
     return normalizeCellSizeForTilingFamily(
         tilingFamily,
-        state.cellSizeByTilingFamily[String(tilingFamily)] ?? defaultCellSizeForTilingFamily(tilingFamily),
+        state.cellSizeByTilingFamily[String(tilingFamily)] ??
+            defaultCellSizeForTilingFamily(tilingFamily),
         { unsafe: state.unsafeSizingEnabled },
     );
 }
@@ -279,17 +272,14 @@ export function rememberPatchDepthForTilingFamily(
     state.patchDepthByTilingFamily = {
         ...normalizeSizingRecord(
             state.patchDepthByTilingFamily,
-            (candidateTilingFamily, rawValue) => normalizePatchDepthForTilingFamily(
-                candidateTilingFamily,
-                rawValue,
-                { unsafe: state.unsafeSizingEnabled },
-            ),
+            (candidateTilingFamily, rawValue) =>
+                normalizePatchDepthForTilingFamily(candidateTilingFamily, rawValue, {
+                    unsafe: state.unsafeSizingEnabled,
+                }),
         ),
-        [String(tilingFamily)]: normalizePatchDepthForTilingFamily(
-            tilingFamily,
-            patchDepth,
-            { unsafe: state.unsafeSizingEnabled },
-        ),
+        [String(tilingFamily)]: normalizePatchDepthForTilingFamily(tilingFamily, patchDepth, {
+            unsafe: state.unsafeSizingEnabled,
+        }),
     };
 }
 
@@ -302,7 +292,8 @@ export function rememberedPatchDepthForTilingFamily(
     }
     return normalizePatchDepthForTilingFamily(
         tilingFamily,
-        state.patchDepthByTilingFamily[String(tilingFamily)] ?? defaultPatchDepthForTilingFamily(tilingFamily),
+        state.patchDepthByTilingFamily[String(tilingFamily)] ??
+            defaultPatchDepthForTilingFamily(tilingFamily),
         { unsafe: state.unsafeSizingEnabled },
     );
 }
@@ -312,11 +303,9 @@ export function setCellSize(
     cellSize: number,
     tilingFamily: string | null | undefined = state.topologySpec.tiling_family,
 ): void {
-    state.cellSize = normalizeCellSizeForTilingFamily(
-        tilingFamily,
-        cellSize,
-        { unsafe: state.unsafeSizingEnabled },
-    );
+    state.cellSize = normalizeCellSizeForTilingFamily(tilingFamily, cellSize, {
+        unsafe: state.unsafeSizingEnabled,
+    });
 }
 
 export function setRenderCellSize(state: AppState, cellSize: number): void {

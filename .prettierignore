@@ -1,0 +1,11 @@
+node_modules/
+output/
+static/dist/
+frontend/canvas/family-dead-palette-manifest.json
+frontend/test-fixtures/
+instance/
+playwright-report/
+test-results/
+htmlcov/
+.mypy_cache/
+.pytest_cache/

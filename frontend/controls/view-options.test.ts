@@ -53,9 +53,14 @@ describe("controls/view-options tiling picker", () => {
 
         expect(elements.tilingFamilySelect?.querySelectorAll("optgroup")).toHaveLength(2);
         expect(elements.tilingFamilySelect?.value).toBe("hex");
-        expect(elements.tilingPickerMenu?.querySelectorAll(".tiling-preview-group")).toHaveLength(2);
+        expect(elements.tilingPickerMenu?.querySelectorAll(".tiling-preview-group")).toHaveLength(
+            2,
+        );
         expect(elements.tilingPickerMenu?.querySelectorAll(".tiling-preview-card")).toHaveLength(3);
-        expect(elements.tilingPickerMenu?.querySelector(".tiling-preview-card.is-selected")?.textContent).toContain("Hexagonal");
+        expect(
+            elements.tilingPickerMenu?.querySelector(".tiling-preview-card.is-selected")
+                ?.textContent,
+        ).toContain("Hexagonal");
         expect(elements.tilingPickerCurrentPreview?.querySelector("svg")).not.toBeNull();
         expect(elements.tilingPickerCurrentLabel?.textContent).toBe("Hexagonal");
     });
@@ -69,9 +74,10 @@ describe("controls/view-options tiling picker", () => {
         populateTilingFamilies(elements, FAMILIES, "penrose-p3-rhombs");
 
         expect(elements.tilingPickerMenu?.firstElementChild).toBe(firstRenderedGroup);
-        expect(elements.tilingPickerMenu?.querySelector(".tiling-preview-card.is-selected")?.textContent).toContain(
-            "Penrose P3 Rhombs",
-        );
+        expect(
+            elements.tilingPickerMenu?.querySelector(".tiling-preview-card.is-selected")
+                ?.textContent,
+        ).toContain("Penrose P3 Rhombs");
         expect(elements.tilingPickerCurrentPreview?.dataset.previewSignature).toBe(
             "penrose-p3-rhombs:penrose-p3-rhombs",
         );
@@ -91,6 +97,8 @@ describe("controls/view-options tiling picker", () => {
 
         const polygons = Array.from(thumbnail.querySelectorAll("polygon"));
         expect(polygons.length).toBeGreaterThan(10);
-        expect(polygons.every((polygon) => polygon.getAttribute("points")?.includes("NaN") === false)).toBe(true);
+        expect(
+            polygons.every((polygon) => polygon.getAttribute("points")?.includes("NaN") === false),
+        ).toBe(true);
     });
 });

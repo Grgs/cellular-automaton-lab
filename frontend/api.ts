@@ -1,9 +1,4 @@
-import type {
-    CellIdentifier,
-    RuleDefinition,
-    RulesResponse,
-    SimulationSnapshot,
-} from "./types/domain.js";
+import type { CellIdentifier, RulesResponse, SimulationSnapshot } from "./types/domain.js";
 import type {
     ConfigSyncBody,
     EmptyControlCommandPath,
@@ -37,7 +32,12 @@ export function fetchRules(): Promise<RulesResponse> {
 }
 
 function normalizeCellPayload(cell: CellIdentifier): CellIdentifier {
-    if (typeof cell === "object" && cell !== null && typeof cell.id === "string" && cell.id.length > 0) {
+    if (
+        typeof cell === "object" &&
+        cell !== null &&
+        typeof cell.id === "string" &&
+        cell.id.length > 0
+    ) {
         return { id: cell.id };
     }
     throw new Error("Cell mutations require a topology cell id.");
@@ -66,7 +66,10 @@ export function setCellsRequest(cells: CellMutation[]): Promise<SimulationSnapsh
 }
 
 export function postControl(path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
-export function postControl(path: "/api/control/reset", body: ResetControlBody): Promise<SimulationSnapshot>;
+export function postControl(
+    path: "/api/control/reset",
+    body: ResetControlBody,
+): Promise<SimulationSnapshot>;
 export function postControl(path: "/api/config", body: ConfigSyncBody): Promise<SimulationSnapshot>;
 export function postControl(
     path: EmptyControlCommandPath | "/api/control/reset" | "/api/config",

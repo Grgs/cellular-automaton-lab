@@ -34,7 +34,10 @@ export interface CreateSimulationMutationsOptions {
     state?: AppState | null;
     mutationRunner: MutationRunner;
     onError?: (error: unknown) => void;
-    applySimulationState?: (simulationState: SimulationSnapshot, options?: { source?: string }) => void;
+    applySimulationState?: (
+        simulationState: SimulationSnapshot,
+        options?: { source?: string },
+    ) => void;
     resolveSimulationState?: (simulationState: SimulationSnapshot) => Promise<SimulationSnapshot>;
     refreshState?: () => Promise<void>;
     renderControlPanel?: () => void;
@@ -43,13 +46,16 @@ export interface CreateSimulationMutationsOptions {
 }
 
 export interface SimulationMutations {
-    applyState(simulationState: SimulationSnapshot, options?: { source?: string }): SimulationSnapshot;
+    applyState(
+        simulationState: SimulationSnapshot,
+        options?: { source?: string },
+    ): SimulationSnapshot;
     applyRemoteState(
         simulationState: SimulationSnapshot,
         options?: { source?: string },
     ): Promise<SimulationSnapshot>;
     runSerialized<T>(task: () => Promise<T>, options?: SimulationMutationOptions): Promise<T>;
-    runStateMutation<T>(
+    runStateMutation(
         task: () => Promise<SimulationSnapshot>,
         options?: SimulationMutationOptions,
     ): Promise<SimulationSnapshot>;

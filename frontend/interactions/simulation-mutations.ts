@@ -1,7 +1,4 @@
-import {
-    clearBlockingActivity,
-    setBlockingActivity,
-} from "../state/overlay-state.js";
+import { clearBlockingActivity, setBlockingActivity } from "../state/overlay-state.js";
 import type {
     BlockingActivityConfig,
     BrowserClearTimeout,
@@ -22,9 +19,7 @@ interface CreateSimulationMutationsOptions {
         simulationState: SimulationSnapshot,
         options?: { source?: string },
     ) => void;
-    resolveSimulationState?: (
-        simulationState: SimulationSnapshot,
-    ) => Promise<SimulationSnapshot>;
+    resolveSimulationState?: (simulationState: SimulationSnapshot) => Promise<SimulationSnapshot>;
     refreshState?: () => Promise<void>;
     renderControlPanel?: () => void;
     setTimeoutFn?: BrowserSetTimeout;
@@ -137,12 +132,12 @@ export function createSimulationMutations({
         const recoverHandler = resolveRecoverHandler(options);
         const runnerOptions = recoverHandler
             ? {
-                onError: options.onError ?? onError,
-                onRecover: recoverHandler,
-            }
+                  onError: options.onError ?? onError,
+                  onRecover: recoverHandler,
+              }
             : {
-                onError: options.onError ?? onError,
-            };
+                  onError: options.onError ?? onError,
+              };
         return mutationRunner.run(async () => {
             const finishBlockingActivity = startBlockingActivity(options.blockingActivity);
             try {
@@ -157,10 +152,7 @@ export function createSimulationMutations({
         task: () => Promise<SimulationSnapshot>,
         { source = "external", ...options }: SimulationMutationOptions = {},
     ): Promise<SimulationSnapshot> {
-        return runSerialized(
-            async () => applyRemoteState(await task(), { source }),
-            options,
-        );
+        return runSerialized(async () => applyRemoteState(await task(), { source }), options);
     }
 
     return {

@@ -28,13 +28,13 @@ export function pointyHexCenterOffset(x: number, y: number, cellSize: number): P
     const radius = cellSize / 2;
     const hexWidth = Math.sqrt(3) * radius;
     const horizontalPitch = hexWidth + gap;
-    const verticalPitch = (0.75 * cellSize) + gap;
-    const xInset = (hexWidth / 2) + gap;
+    const verticalPitch = 0.75 * cellSize + gap;
+    const xInset = hexWidth / 2 + gap;
     const yInset = radius + gap;
 
     return {
-        x: xInset + (x * horizontalPitch) + (y % 2 === 1 ? hexWidth / 2 : 0),
-        y: yInset + (y * verticalPitch),
+        x: xInset + x * horizontalPitch + (y % 2 === 1 ? hexWidth / 2 : 0),
+        y: yInset + y * verticalPitch,
         radius,
         hexWidth,
         horizontalPitch,
@@ -42,12 +42,16 @@ export function pointyHexCenterOffset(x: number, y: number, cellSize: number): P
     };
 }
 
-export function squareCenterOffset(x: number, y: number, cellSize: number): { x: number; y: number } {
+export function squareCenterOffset(
+    x: number,
+    y: number,
+    cellSize: number,
+): { x: number; y: number } {
     const gap = getCellGap(cellSize);
     const pitch = cellSize + gap;
     return {
-        x: gap + (x * pitch) + (cellSize / 2),
-        y: gap + (y * pitch) + (cellSize / 2),
+        x: gap + x * pitch + cellSize / 2,
+        y: gap + y * pitch + cellSize / 2,
     };
 }
 
@@ -59,7 +63,8 @@ export function resolveSquareCellFromOffset(
     cellSize: number,
     metrics: GridMetrics | null = null,
 ): { x: number; y: number } | null {
-    const resolvedMetrics = (metrics || squareGridMetrics(width, height, cellSize)) as SquareMetrics;
+    const resolvedMetrics = (metrics ||
+        squareGridMetrics(width, height, cellSize)) as SquareMetrics;
     if (offsetX < resolvedMetrics.gap || offsetY < resolvedMetrics.gap) {
         return null;
     }
@@ -108,29 +113,34 @@ export function resolveHexCellFromOffset(
     geometryCache: { type?: string; cells?: HexGeometryCell[][] } | null = null,
 ): { x: number; y: number } | null {
     const resolvedMetrics = (metrics || hexGridMetrics(width, height, cellSize)) as HexMetrics;
-    const approximateRow = Math.round((offsetY - resolvedMetrics.yInset) / resolvedMetrics.verticalPitch);
+    const approximateRow = Math.round(
+        (offsetY - resolvedMetrics.yInset) / resolvedMetrics.verticalPitch,
+    );
 
     for (let y = approximateRow - 1; y <= approximateRow + 1; y += 1) {
         if (y < 0 || y >= height) {
             continue;
         }
         const rowOffset = y % 2 === 1 ? resolvedMetrics.hexWidth / 2 : 0;
-        const approximateColumn = Math.round((offsetX - resolvedMetrics.xInset - rowOffset) / resolvedMetrics.horizontalPitch);
+        const approximateColumn = Math.round(
+            (offsetX - resolvedMetrics.xInset - rowOffset) / resolvedMetrics.horizontalPitch,
+        );
 
         for (let x = approximateColumn - 1; x <= approximateColumn + 1; x += 1) {
             if (x < 0 || x >= width) {
                 continue;
             }
-            const cachedRow = geometryCache?.type === "hex" && Array.isArray(geometryCache.cells)
-                ? geometryCache.cells[y]
-                : null;
+            const cachedRow =
+                geometryCache?.type === "hex" && Array.isArray(geometryCache.cells)
+                    ? geometryCache.cells[y]
+                    : null;
             const cachedCell = cachedRow?.[x];
             const cell = cachedCell ?? pointyHexCenterOffset(x, y, cellSize);
             const centerX = "centerX" in cell ? cell.centerX : cell.x;
             const centerY = "centerY" in cell ? cell.centerY : cell.y;
             const radius = cell.radius;
             const hexWidth = cell.hexWidth;
-            if (offsetX < centerX - (hexWidth / 2) || offsetX > centerX + (hexWidth / 2)) {
+            if (offsetX < centerX - hexWidth / 2 || offsetX > centerX + hexWidth / 2) {
                 continue;
             }
             if (offsetY < centerY - radius || offsetY > centerY + radius) {

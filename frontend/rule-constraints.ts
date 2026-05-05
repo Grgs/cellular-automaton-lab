@@ -1,7 +1,9 @@
 import type { ViewportDimensions } from "./types/controller.js";
 import type { RuleDefinition } from "./types/domain.js";
 
-export function ruleRequiresSquareDimensions(ruleOrName: RuleDefinition | string | null | undefined): boolean {
+export function ruleRequiresSquareDimensions(
+    ruleOrName: RuleDefinition | string | null | undefined,
+): boolean {
     void ruleOrName;
     return false;
 }

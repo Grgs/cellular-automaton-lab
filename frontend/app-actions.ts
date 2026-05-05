@@ -19,11 +19,7 @@ import {
     createSimulationConfigActionSet,
 } from "./app-action-groups.js";
 import { resetThemeToDefault } from "./theme.js";
-import type {
-    ActionMutationAdapter,
-    AppActionOptions,
-    AppActionSet,
-} from "./types/actions.js";
+import type { ActionMutationAdapter, AppActionOptions, AppActionSet } from "./types/actions.js";
 import type { SimulationMutations } from "./types/controller.js";
 
 export function createAppActions({
@@ -74,7 +70,8 @@ export function createAppActions({
     confirmImportFn?: (message: string) => boolean;
     resetThemeToDefaultFn?: typeof resetThemeToDefault;
 }): AppActionSet {
-    const sharedSimulationMutations: ActionMutationAdapter | SimulationMutations | null = simulationMutations;
+    const sharedSimulationMutations: ActionMutationAdapter | SimulationMutations | null =
+        simulationMutations;
 
     const simulationActions = createSimulationConfigActionSet({
         state,
