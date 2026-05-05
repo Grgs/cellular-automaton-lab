@@ -18,7 +18,7 @@ from backend.topology_family_contracts import (
 
 
 _FRONTEND_ENTRY_PATTERN = re.compile(
-    r'"(?P<tiling_family>[^"]+)": \{\s*'
+    r'(?:"(?P<quoted_tiling_family>[^"]+)"|(?P<bare_tiling_family>[A-Za-z_$][A-Za-z0-9_$]*)): \{\s*'
     r'label: "(?P<label>[^"]+)",\s*'
     r'pickerGroup: "(?P<picker_group>[^"]+)",\s*'
     r"pickerOrder: (?P<picker_order>\d+),\s*"
@@ -34,7 +34,8 @@ def _load_frontend_topology_family_metadata() -> dict[str, dict[str, object]]:
     text = (ROOT / FRONTEND_TOPOLOGY_FAMILY_METADATA_PATH).read_text(encoding="utf-8")
     parsed: dict[str, dict[str, object]] = {}
     for match in _FRONTEND_ENTRY_PATTERN.finditer(text):
-        parsed[match.group("tiling_family")] = {
+        tiling_family = match.group("quoted_tiling_family") or match.group("bare_tiling_family")
+        parsed[tiling_family] = {
             "label": match.group("label"),
             "picker_group": match.group("picker_group"),
             "picker_order": int(match.group("picker_order")),

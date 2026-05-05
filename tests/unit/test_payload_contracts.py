@@ -90,16 +90,19 @@ def _parse_frontend_interfaces(
 
 def _resolve_interface_fields(
     definitions: dict[str, _FrontendInterfaceDefinition],
+    type_aliases: dict[str, str],
     interface_name: str,
 ) -> set[str]:
-    try:
-        definition = definitions[interface_name]
-    except KeyError as error:
-        raise AssertionError(f"Missing frontend interface {interface_name!r}.") from error
+    definition = definitions.get(interface_name)
+    if definition is None:
+        aliased_type = type_aliases.get(interface_name)
+        if aliased_type is not None:
+            return _resolve_interface_fields(definitions, type_aliases, aliased_type)
+        raise AssertionError(f"Missing frontend interface or type alias {interface_name!r}.")
 
     resolved = set(definition.fields)
     for parent in definition.extends:
-        resolved.update(_resolve_interface_fields(definitions, parent))
+        resolved.update(_resolve_interface_fields(definitions, type_aliases, parent))
     return resolved
 
 
@@ -130,13 +133,26 @@ class PayloadContractTests(unittest.TestCase):
     def test_frontend_types_cover_backend_payload_fields(self) -> None:
         frontend_paths = sorted({contract.frontend_path for contract in payload_field_contracts()})
         frontend_interfaces = _parse_frontend_interfaces(frontend_paths)
+        frontend_type_aliases = {
+            type_name: type_body
+            for path in frontend_paths
+            for type_name, type_body in _parse_type_aliases(path).items()
+        }
         interfaces_by_path = {path: _parse_frontend_interfaces([path]) for path in frontend_paths}
+        type_aliases_by_path = {path: _parse_type_aliases(path) for path in frontend_paths}
 
         for contract in payload_field_contracts():
             with self.subTest(interface=contract.interface_name):
-                self.assertIn(contract.interface_name, interfaces_by_path[contract.frontend_path])
+                self.assertTrue(
+                    contract.interface_name in interfaces_by_path[contract.frontend_path]
+                    or contract.interface_name in type_aliases_by_path[contract.frontend_path]
+                )
                 self.assertEqual(
-                    _resolve_interface_fields(frontend_interfaces, contract.interface_name),
+                    _resolve_interface_fields(
+                        frontend_interfaces,
+                        frontend_type_aliases,
+                        contract.interface_name,
+                    ),
                     set(contract.all_fields),
                 )
 

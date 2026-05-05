@@ -30,6 +30,13 @@ PIP_REQUIREMENTS: Final[tuple[str, ...]] = ("requirements.txt", "requirements-de
 SEVERITY_ORDER: Final[tuple[str, ...]] = ("info", "low", "moderate", "high", "critical")
 
 
+def _is_module_available(module_name: str) -> bool:
+    try:
+        return find_spec(module_name) is not None
+    except ValueError:
+        return sys.modules.get(module_name) is not None
+
+
 @dataclass(frozen=True)
 class Finding:
     ecosystem: str
@@ -63,7 +70,7 @@ def _severity_at_or_above(severity: str, threshold: str) -> bool:
 
 def _run_pip_audit(ignore_ids: frozenset[str]) -> EcosystemResult:
     result = EcosystemResult(ecosystem="python")
-    if find_spec("pip_audit") is None:
+    if not _is_module_available("pip_audit"):
         result.skipped_reason = "pip-audit is not installed; add pip-audit to requirements-dev.in"
         return result
 
