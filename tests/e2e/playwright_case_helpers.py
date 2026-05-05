@@ -133,7 +133,7 @@ class SharedUiFlowHelpers:
 
     def _paint_canvas_center(self) -> None:
         self._click_canvas_center()
-        self._expect("#undo-btn").to_be_enabled()
+        self._expect("#canvas-toolbar-undo-btn").to_be_enabled()
 
     def _canvas_visual_summary(self) -> dict[str, object]:
         case = self._case()
