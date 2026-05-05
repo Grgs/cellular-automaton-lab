@@ -64,7 +64,7 @@ This performs five steps:
 4. exports `standalone-bootstrap.json` from the Python topology/defaults metadata
 5. writes `standalone-python-bundle.json`, which contains the standalone Python source/config payload as one bundled JSON file
 
-The standalone output includes both `standalone.html` and `index.html` for easier static hosting.
+The standalone output publishes `index.html` as the static-host entry file.
 The packager also writes `.nojekyll` so the published artifact is safe for GitHub Pages project-site hosting.
 
 ## Worker Message Contract

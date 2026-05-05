@@ -174,16 +174,14 @@ function copyStaticAssets() {
         ".standalone-build-input",
         "standalone.html",
     );
-    const standaloneHtmlPath = path.join(outputDir, "standalone.html");
+    const indexHtmlPath = path.join(outputDir, "index.html");
+    fs.rmSync(path.join(outputDir, "standalone.html"), { force: true });
     if (fs.existsSync(nestedStandaloneHtmlPath)) {
         const normalizedHtml = fs
             .readFileSync(nestedStandaloneHtmlPath, "utf8")
             .replaceAll("../../assets/", "./assets/");
-        fs.writeFileSync(standaloneHtmlPath, normalizedHtml, "utf8");
+        fs.writeFileSync(indexHtmlPath, normalizedHtml, "utf8");
         fs.rmSync(path.join(outputDir, "output"), { recursive: true, force: true });
-    }
-    if (fs.existsSync(standaloneHtmlPath)) {
-        fs.copyFileSync(standaloneHtmlPath, path.join(outputDir, "index.html"));
     }
     fs.writeFileSync(path.join(outputDir, ".nojekyll"), "", "utf8");
 }
