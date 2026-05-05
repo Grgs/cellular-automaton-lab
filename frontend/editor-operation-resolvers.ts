@@ -8,8 +8,15 @@ import type {
     PaintableCell,
     PreviewPaintCell,
 } from "./types/editor.js";
-import type { GeometryCache } from "./types/rendering.js";
+import type { GeometryCache, GridMetrics } from "./types/rendering.js";
 import type { AppState } from "./types/state.js";
+
+export interface EditorGeometryContext {
+    topologyVariantKey: string;
+    renderCellSize: number;
+    metrics: GridMetrics;
+    geometryCache: GeometryCache | null;
+}
 
 export function renderCellSize(state: AppState): number {
     return Number(state?.renderCellSize) || Number(state?.cellSize) || 1;
@@ -29,16 +36,17 @@ export function previewCellFromTopologyCell(
 export function cellCenter(
     state: AppState,
     cell: IndexedTopologyPaintableCell,
+    context: EditorGeometryContext | null = null,
 ): { x: number; y: number } {
-    const topologyVariantKey = currentTopologyVariantKey(state);
+    const topologyVariantKey = context?.topologyVariantKey ?? currentTopologyVariantKey(state);
     return topologyCellCenter(
         cell,
-        renderCellSize(state),
+        context?.renderCellSize ?? renderCellSize(state),
         topologyVariantKey,
         state.width,
         state.height,
-        null,
-        null,
+        context?.metrics ?? null,
+        context?.geometryCache ?? null,
         state.topology,
     );
 }
@@ -113,4 +121,32 @@ export function geometryCacheForState(state: AppState): GeometryCache | null {
         metrics,
         topology: state.topology,
     }).geometryCache;
+}
+
+export function geometryContextForState(state: AppState): EditorGeometryContext {
+    const nextRenderCellSize = renderCellSize(state);
+    const topologyVariantKey = currentTopologyVariantKey(state);
+    const metrics = gridMetrics(
+        state.width,
+        state.height,
+        nextRenderCellSize,
+        topologyVariantKey,
+        state.topology,
+    );
+    const geometryCache = resolveGeometryCache({
+        existingKey: "",
+        existingCache: null,
+        width: state.width,
+        height: state.height,
+        cellSize: nextRenderCellSize,
+        geometry: topologyVariantKey,
+        metrics,
+        topology: state.topology,
+    }).geometryCache;
+    return {
+        topologyVariantKey,
+        renderCellSize: nextRenderCellSize,
+        metrics,
+        geometryCache,
+    };
 }

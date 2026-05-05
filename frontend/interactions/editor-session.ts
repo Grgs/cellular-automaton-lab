@@ -18,6 +18,19 @@ import { createEditorPointerState } from "./editor-session-state.js";
 import { DRAG_GESTURE_FLASH_DURATION_MS } from "./constants.js";
 import type { ShapeEditorSession } from "./editor-session-state.js";
 
+function cellKey(cell: PaintableCell | null | undefined): string | null {
+    if (!cell) {
+        return null;
+    }
+    if (typeof cell.id === "string" && cell.id.length > 0) {
+        return cell.id;
+    }
+    if (typeof cell.x === "number" && typeof cell.y === "number") {
+        return `${cell.x}:${cell.y}`;
+    }
+    return null;
+}
+
 export function createEditorSessionController({
     state = null,
     getPaintState,
@@ -167,6 +180,12 @@ export function createEditorSessionController({
                 }
                 return;
             }
+            if (
+                activeSession.previewCells.length > 0 &&
+                cellKey(activeSession.currentCell) === cellKey(cell)
+            ) {
+                return;
+            }
             const previewCells = pointerState.updateShapeSession(
                 cell,
                 buildEditorToolCells(
@@ -179,9 +198,6 @@ export function createEditorSessionController({
                 ),
             );
             previewPaintCells(previewCells);
-            if (previewCells.length > 0) {
-                setGestureOutline(previewCells, "paint");
-            }
         },
         handlePointerUp() {
             const activeSession = pointerState.activeSession();

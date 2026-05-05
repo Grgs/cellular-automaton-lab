@@ -4,15 +4,20 @@ import {
     EDITOR_TOOL_LINE,
     EDITOR_TOOL_RECTANGLE,
 } from "./editor-tools.js";
-import { findTopologyCellById } from "./topology.js";
 import {
     cellCenter,
-    geometryCacheForState,
+    geometryContextForState,
     previewCellFromTopologyCell,
     renderCellSize,
     resolveSampledCell,
     resolveTopologyCell,
 } from "./editor-operation-resolvers.js";
+import {
+    findTopologyCellById,
+    isRegularGeometry,
+    parseRegularCellId,
+    regularCellId,
+} from "./topology.js";
 import type {
     IndexedTopologyPaintableCell,
     PaintableCell,
@@ -93,12 +98,13 @@ export function buildLineCells(
         return [];
     }
 
-    const startCenter = cellCenter(state, start);
-    const endCenter = cellCenter(state, end);
+    const geometryContext = geometryContextForState(state);
+    const startCenter = cellCenter(state, start, geometryContext);
+    const endCenter = cellCenter(state, end, geometryContext);
     const distance = Math.hypot(endCenter.x - startCenter.x, endCenter.y - startCenter.y);
     const stepLength = Math.max(1, renderCellSize(state) / 3);
     const steps = Math.max(1, Math.ceil(distance / stepLength));
-    const geometryCache = geometryCacheForState(state);
+    const geometryCache = geometryContext.geometryCache;
     const stamped = new Map<string, PreviewPaintCell>();
 
     for (let step = 0; step <= steps; step += 1) {
@@ -115,6 +121,49 @@ export function buildLineCells(
     return Array.from(stamped.values());
 }
 
+function regularCoordinates(cell: PaintableCell): { x: number; y: number } | null {
+    const parsed = parseRegularCellId(cell.id);
+    const x = typeof cell.x === "number" && Number.isInteger(cell.x) ? cell.x : parsed?.x;
+    const y = typeof cell.y === "number" && Number.isInteger(cell.y) ? cell.y : parsed?.y;
+    return typeof x === "number" && typeof y === "number" ? { x, y } : null;
+}
+
+function collectRegularRectangleCandidates(
+    state: AppState,
+    start: IndexedTopologyPaintableCell,
+    end: IndexedTopologyPaintableCell,
+    brushSize: number,
+): IndexedTopologyPaintableCell[] | null {
+    const startCoords = regularCoordinates(start);
+    const endCoords = regularCoordinates(end);
+    if (!startCoords || !endCoords) {
+        return null;
+    }
+
+    const padding = brushRadiusForSize(brushSize) + 4;
+    const minX = Math.max(0, Math.min(startCoords.x, endCoords.x) - padding);
+    const maxX = Math.min(state.width - 1, Math.max(startCoords.x, endCoords.x) + padding);
+    const minY = Math.max(0, Math.min(startCoords.y, endCoords.y) - padding);
+    const maxY = Math.min(state.height - 1, Math.max(startCoords.y, endCoords.y) + padding);
+    const candidates: IndexedTopologyPaintableCell[] = [];
+
+    for (let y = minY; y <= maxY; y += 1) {
+        for (let x = minX; x <= maxX; x += 1) {
+            const cell = findTopologyCellById(state.topologyIndex, regularCellId(x, y));
+            if (cell) {
+                candidates.push(cell);
+            }
+        }
+    }
+    return candidates;
+}
+
+function isIndexedTopologyPaintableCell(
+    cell: IndexedTopologyPaintableCell | PaintableCell,
+): cell is IndexedTopologyPaintableCell {
+    return typeof (cell as IndexedTopologyPaintableCell).index === "number";
+}
+
 export function buildRectangleCells(
     state: AppState,
     startCell: PaintableCell,
@@ -128,8 +177,9 @@ export function buildRectangleCells(
         return [];
     }
 
-    const startCenter = cellCenter(state, start);
-    const endCenter = cellCenter(state, end);
+    const geometryContext = geometryContextForState(state);
+    const startCenter = cellCenter(state, start, geometryContext);
+    const endCenter = cellCenter(state, end, geometryContext);
     const left = Math.min(startCenter.x, endCenter.x);
     const right = Math.max(startCenter.x, endCenter.x);
     const top = Math.min(startCenter.y, endCenter.y);
@@ -137,12 +187,19 @@ export function buildRectangleCells(
     const borderBand = Math.max(1, renderCellSize(state) / 2);
     const outlineAnchors = new Map<string, IndexedTopologyPaintableCell>();
 
-    state.topology.cells.forEach((cell) => {
-        const resolvedCell = findTopologyCellById(state.topologyIndex, cell.id);
+    const candidateCells = isRegularGeometry(geometryContext.topologyVariantKey)
+        ? collectRegularRectangleCandidates(state, start, end, brushSize)
+        : null;
+    const scanCells = candidateCells ?? state.topology.cells;
+
+    scanCells.forEach((cell) => {
+        const resolvedCell = isIndexedTopologyPaintableCell(cell)
+            ? cell
+            : findTopologyCellById(state.topologyIndex, cell.id);
         if (!resolvedCell) {
             return;
         }
-        const center = cellCenter(state, resolvedCell);
+        const center = cellCenter(state, resolvedCell, geometryContext);
         const insideHorizontal = center.x >= left - borderBand && center.x <= right + borderBand;
         const insideVertical = center.y >= top - borderBand && center.y <= bottom + borderBand;
         if (!insideHorizontal || !insideVertical) {
