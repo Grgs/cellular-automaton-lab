@@ -1,9 +1,9 @@
-"""Run backend unit and/or API tests under coverage and emit a report.
+"""Run backend unit and/or API tests under pytest-cov and emit a report.
 
 Mirrors the CI workflow locally so contributors can reproduce the same
 backend coverage numbers without pushing a branch. Coverage configuration
-lives in `.coveragerc`; this tool only orchestrates the standard
-``coverage erase / run / combine / report`` lifecycle.
+lives in `.coveragerc`; this tool only orchestrates pytest-cov suite runs and
+the coverage combine/report lifecycle needed when multiple suites are selected.
 
 Examples:
 
@@ -18,6 +18,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -45,31 +46,35 @@ def _run(cmd: list[str]) -> int:
     return completed.returncode
 
 
+def _run_with_coverage_file(cmd: list[str], data_file: str) -> int:
+    env = os.environ.copy()
+    env["COVERAGE_FILE"] = data_file
+    completed = subprocess.run(cmd, cwd=ROOT_DIR, check=False, env=env)
+    return completed.returncode
+
+
 def _coverage(*args: str) -> list[str]:
     return [sys.executable, "-m", "coverage", *args]
 
 
-def _erase(data_file: str) -> int:
-    return _run(_coverage("erase", "--data-file", data_file))
+def _pytest_cov(suite: SuiteSpec) -> list[str]:
+    return [
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "-s",
+        suite.discover_path,
+        "--cov=backend",
+        "--cov=tools",
+        "--cov-config=.coveragerc",
+        "--cov-report=",
+    ]
 
 
 def _run_suite(suite: SuiteSpec) -> int:
-    print(f"\n=== Running coverage for {suite.name} suite ===", flush=True)
-    if (rc := _erase(suite.data_file)) != 0:
-        return rc
-    return _run(
-        _coverage(
-            "run",
-            f"--data-file={suite.data_file}",
-            "-m",
-            "unittest",
-            "discover",
-            "-s",
-            suite.discover_path,
-            "-p",
-            "test_*.py",
-        )
-    )
+    print(f"\n=== Running pytest-cov for {suite.name} suite ===", flush=True)
+    return _run_with_coverage_file(_pytest_cov(suite), suite.data_file)
 
 
 def _report(data_file: str, fail_under: float | None) -> int:
@@ -96,9 +101,11 @@ def _emit_html(data_file: str, output: Path) -> int:
     return _run(_coverage("html", f"--data-file={data_file}", "-d", str(output)))
 
 
-def _coverage_module_available() -> bool:
+def _coverage_modules_available() -> bool:
     try:
         import coverage  # noqa: F401
+        import pytest  # noqa: F401
+        import pytest_cov  # noqa: F401
     except ImportError:
         return False
     return True
@@ -145,9 +152,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    if not _coverage_module_available():
+    if not _coverage_modules_available():
         print(
-            "coverage is not installed; install requirements-dev.txt before running this tool.",
+            "pytest, pytest-cov, or coverage is not installed; "
+            "install requirements-dev.txt before running this tool.",
             file=sys.stderr,
         )
         return 2
@@ -163,7 +171,8 @@ def main(argv: list[str] | None = None) -> int:
         if rc != 0:
             return rc
 
-    has_combined = len(suites_to_run) > 1 and not args.no_combine
+    has_multiple_suites = len(suites_to_run) > 1
+    has_combined = has_multiple_suites and not args.no_combine
     report_data_file = args.combined_data_file if has_combined else suites_to_run[0].data_file
 
     if has_combined:
@@ -171,6 +180,16 @@ def main(argv: list[str] | None = None) -> int:
         rc = _combine([s.data_file for s in suites_to_run], args.combined_data_file)
         if rc != 0:
             return rc
+
+    if has_multiple_suites and args.no_combine:
+        final_rc = 0
+        for suite in suites_to_run:
+            print(f"\n=== Coverage report ({suite.data_file}) ===", flush=True)
+            rc = _report(suite.data_file, args.fail_under)
+            if rc != 0 and args.fail_under is None:
+                return rc
+            final_rc = max(final_rc, rc)
+        return final_rc
 
     print(f"\n=== Coverage report ({report_data_file}) ===", flush=True)
     rc = _report(report_data_file, args.fail_under)

@@ -37,17 +37,17 @@ class MainOrchestrationTests(unittest.TestCase):
         buffer = self._silence_stdout()
         err_buffer = io.StringIO()
         with (
-            mock.patch("tools.run_coverage._coverage_module_available", return_value=False),
+            mock.patch("tools.run_coverage._coverage_modules_available", return_value=False),
             redirect_stdout(buffer),
             redirect_stderr(err_buffer),
         ):
             self.assertEqual(main(["--suite", "unit"]), 2)
-        self.assertIn("coverage is not installed", err_buffer.getvalue())
+        self.assertIn("pytest, pytest-cov, or coverage is not installed", err_buffer.getvalue())
 
     def test_unit_only_skips_combine_and_xml_html(self) -> None:
         buffer = self._silence_stdout()
         with (
-            mock.patch("tools.run_coverage._coverage_module_available", return_value=True),
+            mock.patch("tools.run_coverage._coverage_modules_available", return_value=True),
             mock.patch("tools.run_coverage._run_suite", return_value=0) as run_suite,
             mock.patch("tools.run_coverage._combine") as combine,
             mock.patch("tools.run_coverage._report", return_value=0) as report,
@@ -67,7 +67,7 @@ class MainOrchestrationTests(unittest.TestCase):
     def test_default_runs_both_suites_then_combines_and_reports(self) -> None:
         buffer = self._silence_stdout()
         with (
-            mock.patch("tools.run_coverage._coverage_module_available", return_value=True),
+            mock.patch("tools.run_coverage._coverage_modules_available", return_value=True),
             mock.patch("tools.run_coverage._run_suite", return_value=0) as run_suite,
             mock.patch("tools.run_coverage._combine", return_value=0) as combine,
             mock.patch("tools.run_coverage._report", return_value=0) as report,
@@ -84,7 +84,7 @@ class MainOrchestrationTests(unittest.TestCase):
     def test_no_combine_skips_combined_report_when_running_both_suites(self) -> None:
         buffer = self._silence_stdout()
         with (
-            mock.patch("tools.run_coverage._coverage_module_available", return_value=True),
+            mock.patch("tools.run_coverage._coverage_modules_available", return_value=True),
             mock.patch("tools.run_coverage._run_suite", return_value=0),
             mock.patch("tools.run_coverage._combine") as combine,
             mock.patch("tools.run_coverage._report", return_value=0) as report,
@@ -93,14 +93,14 @@ class MainOrchestrationTests(unittest.TestCase):
             rc = main(["--no-combine"])
         self.assertEqual(rc, 0)
         combine.assert_not_called()
-        report.assert_called_once()
-        # Falls back to the first suite's data file when combine is suppressed.
-        self.assertEqual(report.call_args.args[0], ".coverage.unit")
+        self.assertEqual(
+            [call.args[0] for call in report.call_args_list], [".coverage.unit", ".coverage.api"]
+        )
 
     def test_fail_under_threshold_propagates_to_report(self) -> None:
         buffer = self._silence_stdout()
         with (
-            mock.patch("tools.run_coverage._coverage_module_available", return_value=True),
+            mock.patch("tools.run_coverage._coverage_modules_available", return_value=True),
             mock.patch("tools.run_coverage._run_suite", return_value=0),
             mock.patch("tools.run_coverage._combine", return_value=0),
             mock.patch("tools.run_coverage._report", return_value=0) as report,
@@ -112,7 +112,7 @@ class MainOrchestrationTests(unittest.TestCase):
     def test_run_suite_failure_short_circuits(self) -> None:
         buffer = self._silence_stdout()
         with (
-            mock.patch("tools.run_coverage._coverage_module_available", return_value=True),
+            mock.patch("tools.run_coverage._coverage_modules_available", return_value=True),
             mock.patch("tools.run_coverage._run_suite", return_value=4) as run_suite,
             mock.patch("tools.run_coverage._combine") as combine,
             mock.patch("tools.run_coverage._report") as report,
@@ -128,7 +128,7 @@ class MainOrchestrationTests(unittest.TestCase):
     def test_xml_and_html_emit_after_report(self) -> None:
         buffer = self._silence_stdout()
         with (
-            mock.patch("tools.run_coverage._coverage_module_available", return_value=True),
+            mock.patch("tools.run_coverage._coverage_modules_available", return_value=True),
             mock.patch("tools.run_coverage._run_suite", return_value=0),
             mock.patch("tools.run_coverage._combine", return_value=0),
             mock.patch("tools.run_coverage._report", return_value=0),

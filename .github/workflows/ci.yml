@@ -218,9 +218,8 @@ jobs:
 
       - name: Run unit tests with coverage
         run: |
-          python -m coverage erase
-          python -m coverage run --data-file=.coverage.unit -m unittest discover -s tests/unit -p "test_*.py"
-          python -m coverage report --data-file=.coverage.unit -m | tee coverage-unit.txt
+          set -o pipefail
+          COVERAGE_FILE=.coverage.unit python -m pytest -q -s tests/unit --cov=backend --cov=tools --cov-config=.coveragerc --cov-report=term-missing | tee coverage-unit.txt
 
       - name: Upload backend unit coverage data
         uses: actions/upload-artifact@v6
@@ -265,9 +264,8 @@ jobs:
 
       - name: Run API tests with coverage
         run: |
-          python -m coverage erase
-          python -m coverage run --data-file=.coverage.api -m unittest discover -s tests/api -p "test_*.py"
-          python -m coverage report --data-file=.coverage.api -m | tee coverage-api.txt
+          set -o pipefail
+          COVERAGE_FILE=.coverage.api python -m pytest -q -s tests/api --cov=backend --cov=tools --cov-config=.coveragerc --cov-report=term-missing | tee coverage-api.txt
 
       - name: Upload backend API coverage data
         uses: actions/upload-artifact@v6

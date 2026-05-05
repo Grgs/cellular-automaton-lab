@@ -238,7 +238,7 @@ py -3 tools/print_standalone_build_status.py
 
 ### `tools/run_coverage.py`
 
-Runs the backend `unit` suite, the `api` suite, or both under `coverage`, then combines and prints a report. Mirrors the CI workflow so contributors can reproduce the same backend coverage numbers locally. Supports `--fail-under <pct>` for a local threshold gate, `--xml <path>` for Cobertura output, and `--html <dir>` for an interactive report. Wrapped by `npm run coverage:backend`. Source: [run_coverage.py](../tools/run_coverage.py).
+Runs the backend `unit` suite, the `api` suite, or both under `pytest-cov`, then combines split suite data with `coverage` and prints a report. Mirrors the CI workflow so contributors can reproduce the same backend coverage numbers locally. Supports `--fail-under <pct>` for a local threshold gate, `--xml <path>` for Cobertura output, and `--html <dir>` for an interactive report. Wrapped by `npm run coverage:backend`. Source: [run_coverage.py](../tools/run_coverage.py).
 
 ```powershell
 py -3 tools/run_coverage.py
