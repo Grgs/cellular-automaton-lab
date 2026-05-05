@@ -18,6 +18,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import os
 import subprocess
 import sys
@@ -102,13 +103,10 @@ def _emit_html(data_file: str, output: Path) -> int:
 
 
 def _coverage_modules_available() -> bool:
-    try:
-        import coverage  # noqa: F401
-        import pytest  # noqa: F401
-        import pytest_cov  # noqa: F401
-    except ImportError:
-        return False
-    return True
+    return all(
+        importlib.util.find_spec(module_name) is not None
+        for module_name in ("coverage", "pytest", "pytest_cov")
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
