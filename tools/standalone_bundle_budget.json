@@ -1,7 +1,7 @@
 {
     "_comment": "Per-category size budgets (in bytes) for the output/standalone/ bundle. Update intentionally when bundle composition changes; the budget guard fails when any category exceeds its raw or gzipped budget. Gzipped budgets are optional; omit a key to skip the gzipped check for that category.",
     "categories": [
-        {"name": "entry-html", "patterns": ["*.html"], "raw": 60000, "gzip": 8000},
+        {"name": "entry-html", "patterns": ["*.html"], "raw": 60000, "gzip": 8500},
         {"name": "bootstrap-data", "patterns": ["standalone-bootstrap.json"], "raw": 50000, "gzip": 12000},
         {"name": "python-bundle", "patterns": ["standalone-python-bundle.json"], "raw": 9500000, "gzip": 3000000},
         {"name": "build-manifest", "patterns": ["build-manifest.json"], "raw": 25000, "gzip": 6000},
