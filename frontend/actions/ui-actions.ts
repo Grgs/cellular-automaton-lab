@@ -166,6 +166,18 @@ export function createUiActions({
         return Promise.resolve(false);
     }
 
+    function applyEnterEditMode(): void {
+        if (!state.isRunning && !state.overlayRunPending && !state.editArmed) {
+            armEditModeFn(state, { showCue: false });
+            renderControlPanel();
+        }
+    }
+
+    function applyExitEditMode(): void {
+        clearEditModeFn(state);
+        renderControlPanel();
+    }
+
     return {
         setCellSize: (nextCellSize) => applyCellSize(nextCellSize),
         commitCellSize: (nextCellSize) => applyCellSize(nextCellSize, { immediate: true }),
@@ -174,6 +186,8 @@ export function createUiActions({
         setPaintState: (nextPaintState) => applyPaintState(nextPaintState),
         setEditorTool: (nextTool) => applyEditorTool(nextTool),
         setBrushSize: (nextBrushSize) => applyBrushSize(nextBrushSize),
+        enterEditMode: applyEnterEditMode,
+        exitEditMode: applyExitEditMode,
         toggleDrawer: () => {
             const { drawerToggleLabel } = buildDrawerToggleState(state);
             if (drawerToggleLabel === "Hide Inspector") {

@@ -5,9 +5,6 @@ export interface DomElements {
     controlDrawer: HTMLElement | null;
     drawerBackdrop: HTMLElement | null;
     drawerToggleBtn: HTMLButtonElement | null;
-    simulationSection: HTMLElement | null;
-    rulePaletteSection: HTMLElement | null;
-    editorSection: HTMLElement | null;
     "rule-notes-toggle": HTMLDetailsElement | null;
     gridPanel: HTMLElement | null;
     gridViewport: HTMLElement | null;
@@ -87,4 +84,15 @@ export interface DomElements {
     eraseBtn: HTMLButtonElement | null;
     undoBtn: HTMLButtonElement | null;
     redoBtn: HTMLButtonElement | null;
+    canvasToolbar: HTMLElement | null;
+    canvasToolbarArmBtn: HTMLButtonElement | null;
+    canvasToolbarControls: HTMLElement | null;
+    canvasToolbarPalette: HTMLElement | null;
+    canvasToolbarTools: HTMLElement | null;
+    canvasToolbarBrush: HTMLElement | null;
+    canvasToolbarUndoBtn: HTMLButtonElement | null;
+    canvasToolbarRedoBtn: HTMLButtonElement | null;
+    canvasToolbarDismissBtn: HTMLButtonElement | null;
+    canvasToolbarHelpBtn: HTMLButtonElement | null;
+    canvasToolbarShortcuts: HTMLElement | null;
 }

@@ -44,6 +44,8 @@ function createActions(overrides: Partial<AppActionSet> = {}): AppActionSet {
         undoEdit: vi.fn(),
         redoEdit: vi.fn(),
         cancelEditorPreview: vi.fn(),
+        enterEditMode: vi.fn(),
+        exitEditMode: vi.fn(),
         ...overrides,
     };
 }

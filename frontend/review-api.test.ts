@@ -64,9 +64,6 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         controlDrawer: null,
         drawerBackdrop: null,
         drawerToggleBtn: null,
-        simulationSection: null,
-        rulePaletteSection: null,
-        editorSection: null,
         "rule-notes-toggle": null,
         gridPanel: null,
         gridViewport: null,
@@ -146,6 +143,17 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         eraseBtn: null,
         undoBtn: null,
         redoBtn: null,
+        canvasToolbar: null,
+        canvasToolbarArmBtn: null,
+        canvasToolbarControls: null,
+        canvasToolbarPalette: null,
+        canvasToolbarTools: null,
+        canvasToolbarBrush: null,
+        canvasToolbarUndoBtn: null,
+        canvasToolbarRedoBtn: null,
+        canvasToolbarDismissBtn: null,
+        canvasToolbarHelpBtn: null,
+        canvasToolbarShortcuts: null,
     };
 }
 

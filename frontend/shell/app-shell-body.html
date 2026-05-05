@@ -66,6 +66,7 @@
                     >
                         Reset Board
                     </button>
+                    <button id="random-btn" class="soft-action top-bar-action" type="button">Random Reset</button>
                 </div>
 
                 <div class="top-bar-control-group top-bar-utility-group">
@@ -107,6 +108,40 @@
             <div id="canvas-edit-cue" class="canvas-edit-cue" hidden aria-live="polite">
                 Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected paint state.
             </div>
+            <div id="canvas-toolbar" class="canvas-toolbar" hidden data-edit-mode="idle" aria-label="Painting tools">
+                <div id="canvas-toolbar-shortcuts" class="canvas-toolbar-shortcuts" hidden aria-live="polite">
+                    <span class="shortcut-item"><kbd>B</kbd> Brush</span>
+                    <span class="shortcut-item"><kbd>L</kbd> Line</span>
+                    <span class="shortcut-item"><kbd>R</kbd> Rect</span>
+                    <span class="shortcut-item"><kbd>F</kbd> Fill</span>
+                    <span class="shortcut-item"><kbd>E</kbd> Erase</span>
+                    <span class="shortcut-item"><kbd>1</kbd>–<kbd>3</kbd> Brush size</span>
+                </div>
+                <button id="canvas-toolbar-arm-btn" class="canvas-toolbar-arm-btn" type="button">
+                    Click to edit
+                </button>
+                <div id="canvas-toolbar-controls" class="canvas-toolbar-controls">
+                    <div id="canvas-toolbar-palette" class="canvas-toolbar-palette"></div>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <div id="canvas-toolbar-tools" class="canvas-toolbar-tools"></div>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <div id="canvas-toolbar-brush" class="canvas-toolbar-brush"></div>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <button id="canvas-toolbar-undo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Undo">↩</button>
+                    <button id="canvas-toolbar-redo-btn" class="canvas-toolbar-act-btn" type="button" disabled title="Redo">↪</button>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <button id="canvas-toolbar-dismiss-btn" class="canvas-toolbar-act-btn" type="button" title="Exit edit mode">✕</button>
+                    <div class="canvas-toolbar-sep" aria-hidden="true"></div>
+                    <button
+                        id="canvas-toolbar-help-btn"
+                        class="canvas-toolbar-act-btn canvas-toolbar-help-btn"
+                        type="button"
+                        aria-label="Keyboard shortcuts"
+                        aria-expanded="false"
+                        aria-controls="canvas-toolbar-shortcuts"
+                    >?</button>
+                </div>
+            </div>
             <div id="grid-viewport" class="grid-viewport">
                 <div
                     id="blocking-activity-overlay"
@@ -128,26 +163,12 @@
         <aside id="control-drawer" class="control-drawer" aria-hidden="false" data-open="true">
             <div class="control-drawer-inner">
                 <header class="drawer-header">
-                    <div class="drawer-header-main">
-                            <div class="drawer-header-copy">
-                                <p class="drawer-eyebrow">Inspector</p>
-                                <div class="drawer-header-context">
-                                    <strong id="inspector-tiling-text" class="drawer-header-title">Loading...</strong>
-                                    <span id="inspector-rule-text" class="drawer-header-subtitle">Loading rule...</span>
-                                </div>
-                                <div id="topology-status" class="topology-status inspector-status" hidden aria-live="polite"></div>
-                            </div>
-                        <button
-                            id="theme-toggle-btn"
-                            class="theme-toggle inspector-theme-toggle"
-                            type="button"
-                            aria-label="Switch to dark mode"
-                            aria-pressed="false"
-                            title="Switch to dark mode"
-                        >
-                            <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true">☀</span>
-                            <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
-                        </button>
+                    <div class="drawer-header-copy">
+                        <div class="drawer-header-context">
+                            <strong id="inspector-tiling-text" class="drawer-header-title">Loading...</strong>
+                            <span id="inspector-rule-text" class="drawer-header-subtitle">Loading rule...</span>
+                        </div>
+                        <div id="topology-status" class="topology-status inspector-status" hidden aria-live="polite"></div>
                     </div>
                     <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
                         <span class="drawer-showcase-title">Try a starting point</span>
@@ -171,7 +192,15 @@
                     <div id="pattern-status" class="pattern-status inspector-status" hidden aria-live="polite"></div>
                 </header>
 
-                <section id="selection-inspector-section" class="panel-section drawer-section">
+                <nav class="drawer-nav" aria-label="Jump to section">
+                    <a href="#sim-section" class="drawer-nav-pill">Simulation</a>
+                    <a href="#topology-section" class="drawer-nav-pill">Topology</a>
+                    <a href="#patterns-section" class="drawer-nav-pill">Patterns</a>
+                    <a href="#display-section" class="drawer-nav-pill">Display</a>
+                    <a href="#advanced-section" class="drawer-nav-pill">Advanced</a>
+                </nav>
+
+                <section id="selection-inspector-section" class="panel-section drawer-section" hidden>
                     <h2>Cell Metadata</h2>
                     <div class="selection-inspector-header">
                         <strong id="selection-inspector-title" class="selection-inspector-title">No Cells Selected</strong>
@@ -187,23 +216,40 @@
                     </details>
                 </section>
 
-                <section id="rule-palette-section" class="panel-section drawer-section">
-                    <h2>Rule &amp; Palette</h2>
+                <section id="sim-section" class="panel-section drawer-section">
+                    <h2>Simulation</h2>
                     <label class="top-control compact-select drawer-control drawer-rule-control">
                         <span class="top-control-label">Rule</span>
                         <select id="rule-select"></select>
                     </label>
                     <p id="rule-summary-text" class="rule-summary"></p>
-                    <div id="paint-palette" class="paint-palette"></div>
                     <details id="rule-notes-toggle" class="rule-help-toggle">
                         <summary>Rule Notes</summary>
                         <p id="rule-description" class="rule-description"></p>
                     </details>
+                    <label id="speed-field" class="top-control top-compact-control drawer-control speed-control drawer-speed-control">
+                        <span class="top-control-label">Speed</span>
+                        <input
+                            id="speed-input"
+                            class="top-manual-input"
+                            type="number"
+                            inputmode="numeric"
+                            min="__SPEED_MIN__"
+                            max="__SPEED_MAX__"
+                            step="1"
+                            value="__SPEED_VALUE__"
+                        >
+                        <span id="speed-label" class="top-slider-value">__SPEED_LABEL__</span>
+                    </label>
                 </section>
 
-                <section id="editor-section" class="panel-section drawer-section">
-                    <h2>Editor</h2>
-                    <div class="drawer-control-grid drawer-tuning-grid">
+                <section id="topology-section" class="panel-section drawer-section">
+                    <h2>Topology</h2>
+                    <div class="drawer-control-grid drawer-topology-grid">
+                        <label id="adjacency-mode-field" class="top-control compact-select drawer-control" __ADJACENCY_FIELD_HIDDEN__>
+                            <span class="top-control-label">Adjacency</span>
+                            <select id="adjacency-mode-select">__ADJACENCY_MODE_OPTIONS__</select>
+                        </label>
                         <label id="cell-size-field" class="top-control top-compact-control drawer-control">
                             <span class="top-control-label">Cell Size</span>
                             <input
@@ -218,7 +264,6 @@
                             >
                             <span id="cell-size-label" class="top-slider-value">__CELL_SIZE_LABEL__</span>
                         </label>
-
                         <label id="patch-depth-field" class="top-control top-compact-control drawer-control" hidden>
                             <span class="top-control-label">Patch Depth</span>
                             <input
@@ -233,74 +278,20 @@
                             >
                             <span id="patch-depth-label" class="top-slider-value">__PATCH_DEPTH_LABEL__</span>
                         </label>
-
-                        <label id="speed-field" class="top-control top-compact-control drawer-control speed-control">
-                            <span class="top-control-label">Speed</span>
-                            <input
-                                id="speed-input"
-                                class="top-manual-input"
-                                type="number"
-                                inputmode="numeric"
-                                min="__SPEED_MIN__"
-                                max="__SPEED_MAX__"
-                                step="1"
-                                value="__SPEED_VALUE__"
-                            >
-                            <span id="speed-label" class="top-slider-value">__SPEED_LABEL__</span>
-                        </label>
                     </div>
-                    <div id="editor-tools" class="editor-tool-grid" aria-label="Editor tools"></div>
-                    <div class="editor-action-row">
-                        <button id="erase-btn" class="soft-action" type="button" aria-pressed="false">Erase</button>
-                        <button id="undo-btn" class="soft-action" type="button" disabled>Undo</button>
-                        <button id="redo-btn" class="soft-action" type="button" disabled>Redo</button>
-                    </div>
-                    <div class="editor-brush-block">
-                        <span class="editor-subtitle">Brush Size</span>
-                        <div id="brush-size-controls" class="brush-size-grid" aria-label="Brush size"></div>
-                    </div>
-                    <p id="editor-shortcut-hint" class="hint editor-shortcut-hint">
-                        Shortcuts: B brush, L line, R rectangle, F fill, E erase, 1-3 brush size.
-                    </p>
-                    <details id="reset-settings-toggle" class="rule-help-toggle reset-settings-toggle">
-                        <summary>More</summary>
-                        <div class="reset-settings-panel">
-                            <p class="hint">Reset saved UI preferences and return the app to its default board, rule, and theme.</p>
-                            <label id="unsafe-sizing-field" class="buried-setting-toggle" for="unsafe-sizing-toggle">
-                                <input id="unsafe-sizing-toggle" type="checkbox">
-                                <span class="buried-setting-copy">
-                                    <strong class="buried-setting-title">Allow unsafe size values</strong>
-                                    <span class="hint">Lets Cell Size and Patch Depth go past normal tiling limits. This can get slow or unstable.</span>
-                                </span>
-                            </label>
-                            <label id="tile-colors-field" class="buried-setting-toggle" for="tile-colors-toggle">
-                                <input id="tile-colors-toggle" type="checkbox">
-                                <span class="buried-setting-copy">
-                                    <strong class="buried-setting-title">Show tile colors</strong>
-                                    <span class="hint">Uses family-specific dead-state palettes for mixed and aperiodic tilings. Turn this off for neutral fills.</span>
-                                </span>
-                            </label>
-                            <button id="reset-all-settings-btn" class="soft-action reset-settings-btn" type="button">
-                                Reset All Settings
-                            </button>
-                        </div>
-                    </details>
                 </section>
 
-                <section id="simulation-section" class="panel-section drawer-section">
-                    <h2>Board &amp; Patterns</h2>
-                    <div class="drawer-control-grid drawer-board-grid">
-                        <label id="adjacency-mode-field" class="top-control compact-select drawer-control" __ADJACENCY_FIELD_HIDDEN__>
-                            <span class="top-control-label">Adjacency</span>
-                            <select id="adjacency-mode-select">__ADJACENCY_MODE_OPTIONS__</select>
-                        </label>
-                    </div>
-                    <div class="drawer-board-actions">
-                        <div id="preset-seed-controls" class="preset-seed-controls">
-                            <select id="preset-seed-select" hidden aria-label="Preset seed pattern"></select>
-                            <button id="preset-seed-btn" class="soft-action" type="button">Preset Seed</button>
-                        </div>
-                        <button id="random-btn" class="secondary drawer-action-button" type="button">Random Reset</button>
+                <section id="patterns-section" class="panel-section drawer-section">
+                    <h2>Patterns</h2>
+                    <button
+                        id="share-link-btn"
+                        class="soft-action patterns-share-btn"
+                        type="button"
+                        title="Copy a link that restores this exact board"
+                    >Copy Share Link</button>
+                    <div id="preset-seed-controls" class="preset-seed-controls">
+                        <select id="preset-seed-select" hidden aria-label="Preset seed pattern"></select>
+                        <button id="preset-seed-btn" class="soft-action" type="button">Preset Seed</button>
                     </div>
                     <p id="preset-helper-text" class="hint preset-helper-text">
                         Loads a curated seed for this rule and board.
@@ -312,18 +303,58 @@
                         hidden
                         aria-hidden="true"
                     >
-                    <div class="drawer-action-grid">
-                        <button id="import-pattern-btn" class="soft-action" type="button">Import Pattern</button>
-                        <button id="copy-pattern-btn" class="soft-action" type="button">Copy Pattern</button>
-                        <button id="export-pattern-btn" class="soft-action" type="button">Export Pattern</button>
-                        <button id="paste-pattern-btn" class="soft-action" type="button">Paste Pattern</button>
+                    <details class="file-io-toggle rule-help-toggle">
+                        <summary>File I/O</summary>
+                        <div class="file-io-panel drawer-action-grid">
+                            <button id="import-pattern-btn" class="soft-action" type="button">Import Pattern</button>
+                            <button id="export-pattern-btn" class="soft-action" type="button">Export Pattern</button>
+                            <button id="copy-pattern-btn" class="soft-action" type="button">Copy Pattern</button>
+                            <button id="paste-pattern-btn" class="soft-action" type="button">Paste Pattern</button>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="display-section" class="panel-section drawer-section">
+                    <h2>Display</h2>
+                    <label id="tile-colors-field" class="buried-setting-toggle" for="tile-colors-toggle">
+                        <input id="tile-colors-toggle" type="checkbox">
+                        <span class="buried-setting-copy">
+                            <strong class="buried-setting-title">Show tile colors</strong>
+                            <span class="hint">Uses family-specific dead-state palettes for mixed and aperiodic tilings. Turn this off for neutral fills.</span>
+                        </span>
+                    </label>
+                    <div class="buried-setting-toggle display-theme-toggle">
                         <button
-                            id="share-link-btn"
-                            class="soft-action"
+                            id="theme-toggle-btn"
+                            class="theme-toggle"
                             type="button"
-                            title="Copy a link that restores this exact board"
-                        >Copy Share Link</button>
+                            aria-label="Switch to dark mode"
+                            aria-pressed="false"
+                            title="Switch to dark mode"
+                        >
+                            <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true">☀</span>
+                            <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
+                        </button>
+                        <span class="buried-setting-copy">
+                            <strong class="buried-setting-title">Theme</strong>
+                            <span class="hint">Switch between light and dark mode.</span>
+                        </span>
                     </div>
+                </section>
+
+                <section id="advanced-section" class="panel-section drawer-section">
+                    <h2>Advanced</h2>
+                    <label id="unsafe-sizing-field" class="buried-setting-toggle" for="unsafe-sizing-toggle">
+                        <input id="unsafe-sizing-toggle" type="checkbox">
+                        <span class="buried-setting-copy">
+                            <strong class="buried-setting-title">Allow unsafe size values</strong>
+                            <span class="hint">Lets Cell Size and Patch Depth go past normal tiling limits. This can get slow or unstable.</span>
+                        </span>
+                    </label>
+                    <p class="hint advanced-section-hint">Reset saved UI preferences and return the app to its default board, rule, and theme.</p>
+                    <button id="reset-all-settings-btn" class="soft-action reset-settings-btn" type="button">
+                        Reset All Settings
+                    </button>
                 </section>
             </div>
         </aside>
