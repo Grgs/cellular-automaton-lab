@@ -28,7 +28,7 @@
         "coverage:backend": "node ./tools/run-python.mjs tools/run_coverage.py",
         "check:bundle-size": "node ./tools/run-python.mjs tools/check_bundle_size.py",
         "smoke:standalone": "node ./tools/run-python.mjs tools/smoke_test_standalone.py",
-        "check:doc-links": "node ./tools/run-python.mjs tools/check_doc_links.py"
+        "check:doc-links": "linkinator \"*.md\" \".github/**/*.md\" \"docs/**/*.md\""
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -36,6 +36,7 @@
         "eslint": "^10.3.0",
         "eslint-config-prettier": "^10.1.8",
         "jsdom": "^29.0.1",
+        "linkinator": "7.6.1",
         "polygon-clipping": "^0.15.7",
         "prettier": "^3.8.3",
         "typescript": "^5.8.0",

@@ -56,7 +56,7 @@ repos:
         stages: [pre-commit, manual]
       - id: doc-links
         name: documentation links
-        entry: python tools/check_doc_links.py
-        language: python
+        entry: npm run check:doc-links
+        language: system
         pass_filenames: false
         stages: [pre-push, manual]

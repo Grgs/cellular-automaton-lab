@@ -1,0 +1,10 @@
+{
+    "checkFragments": true,
+    "directoryListing": true,
+    "markdown": true,
+    "skip": [
+        "^http://127\\.0\\.0\\.1:5000/?$",
+        "^https?://(?!(localhost|127\\.0\\.0\\.1):)",
+        "^mailto:"
+    ]
+}

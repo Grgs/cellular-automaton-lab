@@ -55,14 +55,12 @@ py -3 tools/run_python_style.py format-check
 py -3 tools/run_python_style.py format
 ```
 
-### `tools/check_doc_links.py`
+### Documentation link checks
 
-Validates internal Markdown links and heading anchors across every tracked `.md` file. Catches broken file paths, broken `#anchor` references (using GitHub heading-slug rules), and reference-style links with no matching `[label]: ...` definition. External `http(s)://` and `mailto:` links are intentionally skipped — link liveness is out of scope for this gate. Wrapped by `npm run check:doc-links`. Source: [check_doc_links.py](../tools/check_doc_links.py).
+Validates Markdown links and heading anchors across repo documentation using Linkinator. Catches broken file paths, directory links, and `#anchor` references. External `https://`, `mailto:`, and local development server links are intentionally skipped because external link liveness is out of scope for this gate. Wrapped by `npm run check:doc-links`; options live in [linkinator.config.json](../linkinator.config.json).
 
 ```powershell
-py -3 tools/check_doc_links.py
-py -3 tools/check_doc_links.py --format json
-py -3 tools/check_doc_links.py docs/TOOLS.md README.md
+npm run check:doc-links
 ```
 
 ## Pre-commit hooks
