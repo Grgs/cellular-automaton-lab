@@ -5,6 +5,7 @@ This repo now has enough moving parts that maintenance guidance needs one home. 
 ## Doc Ownership
 
 - `README.md`: product overview, local setup, and the public command surface
+- `docs/ADDING_RULES.md`, `docs/ADDING_TOPOLOGIES.md`, `docs/ADDING_PRESETS_AND_PATTERNS.md`, `docs/TESTING_CHANGES.md`: task guides for contributors adding app behavior
 - `docs/ARCHITECTURE.md`: runtime boundaries and subsystem ownership
 - `docs/CODE_MAP.md`: navigation for specific files and call paths
 - `docs/TESTING.md`: test strategy, failure classes, and browser-support details

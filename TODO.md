@@ -2,20 +2,18 @@
 
 Active work. Completed work lives in [CHANGELOG.md](CHANGELOG.md).
 
-## Public Release Triage
+## Public Release Follow-up
 
-### Release blockers
+The `v0.1.0` public preview has been released. Keep this section for follow-up work that affects future preview releases or the published standalone demo.
 
-- Do not cut the `v0.1.0` public preview from the current dirty `main` checkout. Resolve or explicitly exclude in-flight changes first, then cut a dedicated release branch from the intended release commit.
-- Keep `pinwheel` in `Experimental` for the public preview until manual visible review justifies promotion.
+### Current preview limitations
 
-### Acceptable known limitations for `v0.1.0`
+- Keep `pinwheel` in `Experimental` until manual visible review justifies promotion.
+- Keep `dodecagonal-square-triangle` documented as a decorated `3.12.12` Archimedean generator, not a canonical Schlottmann quasi-periodic marked-prototile implementation.
+- Keep the standalone public demo's Pyodide CDN dependency documented until full offline bundling is implemented.
+- Keep finite-sample verifier boundaries and exact-path render tolerances documented in the known-deviation notes until stronger verification replaces them.
 
-- `dodecagonal-square-triangle` is acceptable for the first public preview as a documented decorated `3.12.12` Archimedean generator, not a canonical Schlottmann quasi-periodic marked-prototile implementation.
-- The standalone public demo may continue loading Pyodide from a CDN for `v0.1.0`; full offline bundling is post-preview work.
-- Current finite-sample verifier boundaries and exact-path render tolerances are acceptable for `v0.1.0` as long as the existing known-deviation docs stay explicit.
-
-### Post-release follow-up
+### Future release follow-up
 
 - Add a manual post-deploy GitHub Pages smoke check routine to the release workflow if the preview release cadence becomes regular.
 - Revisit whether the verification-strength JSON report should become a CI artifact once there is a concrete consumer for it.

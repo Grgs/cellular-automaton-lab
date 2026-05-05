@@ -57,6 +57,13 @@ It is intended for comparing how familiar automata behave on different local nei
 
 Architecture details live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). A runtime-oriented source guide lives in [docs/CODE_MAP.md](docs/CODE_MAP.md). Maintenance and guardrail ownership lives in [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
 
+## Developer Guides
+
+- [Adding rules](docs/ADDING_RULES.md)
+- [Adding topologies](docs/ADDING_TOPOLOGIES.md)
+- [Adding presets and patterns](docs/ADDING_PRESETS_AND_PATTERNS.md)
+- [Choosing tests for changes](docs/TESTING_CHANGES.md)
+
 ## Useful Files To Inspect
 
 - [backend/simulation/engine.py](backend/simulation/engine.py): pure stepping loop that applies the active rule to each topology cell.
