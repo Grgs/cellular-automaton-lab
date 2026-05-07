@@ -55,6 +55,10 @@ class ManagedRenderReviewRun:
     consistency_warnings: tuple[str, ...]
 
 
+def _serialize_path(path: Path) -> str:
+    return path.as_posix()
+
+
 def require_current_standalone_build(*, host_kind: str, allow_stale: bool = False) -> None:
     if host_kind != "standalone" or allow_stale:
         return
@@ -143,7 +147,7 @@ def build_run_manifest(
     artifact_dir: Path,
 ) -> dict[str, Any]:
     return {
-        "artifactDir": str(artifact_dir),
+        "artifactDir": _serialize_path(artifact_dir),
         "hostKind": host_kind,
         "mode": mode_name,
         "startedAt": dt.datetime.now(tz=dt.timezone.utc).isoformat(),
@@ -243,10 +247,10 @@ def run_managed_render_review(
             artifact_dir=resolved_artifact_dir,
             run_manifest=run_manifest,
         )
-        run_manifest["renderPng"] = str(review_result.png_path)
-        run_manifest["renderSummary"] = str(review_result.summary_path)
+        run_manifest["renderPng"] = _serialize_path(review_result.png_path)
+        run_manifest["renderSummary"] = _serialize_path(review_result.summary_path)
         if review_result.montage_path is not None:
-            run_manifest["renderMontage"] = str(review_result.montage_path)
+            run_manifest["renderMontage"] = _serialize_path(review_result.montage_path)
         summary_payload = json.loads(review_result.summary_path.read_text(encoding="utf-8"))
         run_manifest["runtimeProvenance"] = summary_payload.get("runtimeProvenance")
         run_manifest["provenanceWarnings"] = summary_payload.get("provenanceWarnings", [])
@@ -348,7 +352,7 @@ def run_unittest_with_managed_host(
     run_manifest["unittestTargets"] = targets
     if success_artifacts:
         run_manifest["successArtifactsRequested"] = True
-        run_manifest["testArtifactsDir"] = str(artifact_dir / "test-artifacts")
+        run_manifest["testArtifactsDir"] = _serialize_path(artifact_dir / "test-artifacts")
     return int(process.returncode or 0)
 
 

@@ -22,6 +22,23 @@ class PollingProcess(Protocol):
     def poll(self) -> int | None: ...
 
 
+def cleanup_temporary_directory(
+    tempdir: tempfile.TemporaryDirectory[str], *, retries: int = 20, delay_seconds: float = 0.1
+) -> None:
+    last_error: PermissionError | None = None
+    for attempt in range(retries):
+        try:
+            tempdir.cleanup()
+            return
+        except PermissionError as exc:
+            last_error = exc
+            if attempt == retries - 1:
+                raise
+            time.sleep(delay_seconds)
+    if last_error is not None:
+        raise last_error
+
+
 class JsonApiClient:
     def __init__(self, base_url: str) -> None:
         self.base_url = base_url.rstrip("/")
@@ -155,8 +172,8 @@ class AppServer:
 
     def close(self) -> None:
         self.stop()
-        self.instance_dir.cleanup()
-        self.log_dir.cleanup()
+        cleanup_temporary_directory(self.instance_dir)
+        cleanup_temporary_directory(self.log_dir)
 
     def _close_log_handles(self) -> None:
         if self.stdout_handle is not None:

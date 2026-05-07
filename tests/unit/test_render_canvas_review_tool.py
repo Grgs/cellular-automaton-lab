@@ -9,6 +9,7 @@ from pathlib import Path
 from PIL import Image
 
 from tools.render_review.review import (
+    DEFAULT_OUTPUT_DIR,
     build_visual_metrics,
     build_overlap_hotspots_summary,
     build_profile_expectations,
@@ -108,8 +109,8 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
             out=None,
             summary_out=None,
         )
-        self.assertTrue(str(png_path).endswith("output/render-review/pinwheel-depth-3.png"))
-        self.assertTrue(str(summary_path).endswith("output/render-review/pinwheel-depth-3.json"))
+        self.assertEqual(png_path, DEFAULT_OUTPUT_DIR / "pinwheel-depth-3.png")
+        self.assertEqual(summary_path, DEFAULT_OUTPUT_DIR / "pinwheel-depth-3.json")
 
     def test_resolve_output_paths_derives_summary_path_from_png_output(self) -> None:
         png_path, summary_path = resolve_output_paths(

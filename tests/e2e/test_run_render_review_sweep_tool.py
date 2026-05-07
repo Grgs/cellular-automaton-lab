@@ -110,13 +110,13 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
                 (artifact_dir / "sweep-manifest.json").read_text(encoding="utf-8")
             )
             self.assertTrue(manifest["requestedMatrix"]["literatureReview"])
-            self.assertEqual(manifest["requestedMatrix"]["referenceCacheDir"], str(cache_dir))
+            self.assertEqual(Path(manifest["requestedMatrix"]["referenceCacheDir"]), cache_dir)
             self.assertEqual(len(manifest["cases"]), 2)
             for case in manifest["cases"]:
                 self.assertEqual(case["literatureReview"]["referenceImageStatus"], "cached")
                 self.assertEqual(
-                    case["literatureReview"]["referenceCachePath"],
-                    str(cache_dir / "pinwheel-reference.png"),
+                    Path(case["literatureReview"]["referenceCachePath"]),
+                    cache_dir / "pinwheel-reference.png",
                 )
                 self.assertTrue(Path(case["renderMontage"]).exists())
                 self.assertIn("runtimeProvenance", case)

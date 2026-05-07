@@ -136,6 +136,14 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "grid",
         viewportSyncMode: "backend-sync",
     },
+    kisrhombille: {
+        label: "Kisrhombille",
+        pickerGroup: "Periodic Mixed",
+        pickerOrder: 225,
+        family: "mixed",
+        sizingMode: "grid",
+        viewportSyncMode: "backend-sync",
+    },
     "penrose-p2-kite-dart": {
         label: "Penrose P2 Kite-Dart",
         pickerGroup: "Aperiodic",

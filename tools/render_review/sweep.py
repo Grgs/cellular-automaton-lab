@@ -315,6 +315,10 @@ def write_sweep_manifest(path: Path, payload: dict[str, Any]) -> Path:
     return path
 
 
+def _serialize_path(path: Path) -> str:
+    return path.as_posix()
+
+
 def build_sweep_case_record(
     *,
     case: RenderReviewSweepCase,
@@ -329,11 +333,11 @@ def build_sweep_case_record(
         "theme": case.theme,
         "patchDepth": case.patch_depth,
         "cellSize": case.cell_size,
-        "artifactDir": str(case.artifact_dir),
-        "runManifest": str(run.run_manifest_path),
-        "renderPng": str(run.render_png_path),
-        "renderSummary": str(run.render_summary_path),
-        "renderMontage": str(run.render_montage_path)
+        "artifactDir": _serialize_path(case.artifact_dir),
+        "runManifest": _serialize_path(run.run_manifest_path),
+        "renderPng": _serialize_path(run.render_png_path),
+        "renderSummary": _serialize_path(run.render_summary_path),
+        "renderMontage": _serialize_path(run.render_montage_path)
         if run.render_montage_path is not None
         else None,
         "consistencyWarnings": list(run.consistency_warnings),
@@ -377,8 +381,10 @@ def run_render_review_sweep(
             "patchDepths": list(request.patch_depths) if request.patch_depths is not None else None,
             "cellSizes": list(request.cell_sizes) if request.cell_sizes is not None else None,
             "literatureReview": request.literature_review,
-            "reference": str(request.reference) if request.reference is not None else None,
-            "referenceCacheDir": str(request.reference_cache_dir),
+            "reference": _serialize_path(request.reference)
+            if request.reference is not None
+            else None,
+            "referenceCacheDir": _serialize_path(request.reference_cache_dir),
             "allowStaleStandalone": request.allow_stale_standalone,
         },
         "startedAt": dt.datetime.now(tz=dt.timezone.utc).isoformat(),

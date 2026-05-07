@@ -335,9 +335,9 @@ def _default_sheet_paths(
 
 def _relative_path(path: Path, *, base_dir: Path) -> str:
     try:
-        return str(path.resolve().relative_to(base_dir.resolve()))
+        return path.resolve().relative_to(base_dir.resolve()).as_posix()
     except ValueError:
-        return str(path.resolve())
+        return path.resolve().as_posix()
 
 
 def _metric_text(metrics: dict[str, Any], key: str) -> str | None:

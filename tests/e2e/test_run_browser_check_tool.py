@@ -53,10 +53,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertEqual(manifest["mode"], "render-review")
             self.assertEqual(manifest["exitStatus"], "success")
             self.assertEqual(
-                manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png")
+                Path(manifest["renderPng"]), output_dir / "artifacts" / "chair-depth-3.png"
             )
             self.assertEqual(
-                manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json")
+                Path(manifest["renderSummary"]), output_dir / "artifacts" / "chair-depth-3.json"
             )
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
@@ -95,10 +95,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertEqual(manifest["mode"], "render-review")
             self.assertEqual(manifest["exitStatus"], "success")
             self.assertEqual(
-                manifest["renderPng"], str(output_dir / "artifacts" / "chair-depth-3.png")
+                Path(manifest["renderPng"]), output_dir / "artifacts" / "chair-depth-3.png"
             )
             self.assertEqual(
-                manifest["renderSummary"], str(output_dir / "artifacts" / "chair-depth-3.json")
+                Path(manifest["renderSummary"]), output_dir / "artifacts" / "chair-depth-3.json"
             )
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.png").exists())
             self.assertTrue((output_dir / "artifacts" / "chair-depth-3.json").exists())
@@ -234,7 +234,7 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             )
             self.assertTrue(manifest["successArtifactsRequested"])
             test_artifacts_dir = output_dir / "artifacts" / "test-artifacts"
-            self.assertEqual(manifest["testArtifactsDir"], str(test_artifacts_dir))
+            self.assertEqual(Path(manifest["testArtifactsDir"]), test_artifacts_dir)
             self.assertTrue(test_artifacts_dir.exists())
             artifact_dirs = [path for path in test_artifacts_dir.iterdir() if path.is_dir()]
             self.assertEqual(len(artifact_dirs), 1)

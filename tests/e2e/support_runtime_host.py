@@ -17,7 +17,7 @@ from typing import Any, TextIO
 
 from playwright.sync_api import Page
 
-from tests.e2e.support_server import AppServer, JsonApiClient
+from tests.e2e.support_server import AppServer, JsonApiClient, cleanup_temporary_directory
 
 _EXTERNAL_RUNTIME_HOST_KIND_ENV = "E2E_EXTERNAL_RUNTIME_HOST_KIND"
 _EXTERNAL_RUNTIME_BASE_URL_ENV = "E2E_EXTERNAL_RUNTIME_BASE_URL"
@@ -452,7 +452,7 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
 
     def close(self) -> None:
         self.stop()
-        self.log_dir.cleanup()
+        cleanup_temporary_directory(self.log_dir)
 
     def read_stdout(self) -> str:
         if not self.stdout_path.exists():

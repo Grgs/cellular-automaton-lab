@@ -114,7 +114,8 @@ class DevProcessesToolTests(unittest.TestCase):
         self.assertIn("Killing the following repo-scoped processes:", stdout.getvalue())
 
     @unittest.skipUnless(
-        dev_processes.STANDALONE_OUTPUT_DIR.is_dir(), "standalone output directory is required"
+        dev_processes.STANDALONE_OUTPUT_DIR.is_dir() and dev_processes.PROC_DIR.is_dir(),
+        "standalone output directory and procfs-backed environment are required",
     )
     def test_main_kill_by_port_terminates_standalone_http_server_process(self) -> None:
         port = _find_available_port()
