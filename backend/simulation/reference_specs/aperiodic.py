@@ -79,6 +79,14 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             2: ReferenceDepthExpectation(exact_total_cells=24),
             3: ReferenceDepthExpectation(exact_total_cells=66),
         },
+        notes=(
+            "Implementation uses a non-canonical full-tile substitution rule rather than the "
+            "canonical phi-scale Conway/de Bruijn deflation. The cell counts (5, 10, 24, 66) "
+            "match the in-house rule, not the canonical sequence (5, 15, 40, 105) you would "
+            "expect from the Bielefeld substitution at https://tilings.math.uni-bielefeld.de/"
+            "substitution/penrose-rhomb/. See docs/TILING_KNOWN_DEVIATIONS.md and "
+            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md.",
+        ),
     ),
     PENROSE_VERTEX_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_VERTEX_GEOMETRY,
@@ -105,7 +113,11 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             2: ReferenceDepthExpectation(exact_total_cells=24),
             3: ReferenceDepthExpectation(exact_total_cells=66),
         },
-        notes=("This is the app's vertex-adjacency topology variant of the Penrose rhomb tiling.",),
+        notes=(
+            "Vertex-adjacency topology variant of the Penrose rhomb tiling. Inherits the same "
+            "non-canonical substitution as penrose-p3-rhombs; see that family's reference spec "
+            "and docs/TILING_KNOWN_DEVIATIONS.md for the deviation and the planned fix.",
+        ),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_P2_GEOMETRY,
@@ -132,6 +144,16 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             2: ReferenceDepthExpectation(exact_total_cells=70),
             3: ReferenceDepthExpectation(exact_total_cells=240),
         },
+        notes=(
+            "Implementation uses a non-canonical full-tile substitution K -> 2K + 2D, "
+            "D -> 1K + 2D (eigenvalue 2 + sqrt(2) ~ 3.414). The canonical Conway/de Bruijn "
+            "deflation at https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/ "
+            "uses K -> 2K + 1D, D -> 1K + 1D (eigenvalue phi^2 ~ 2.618), which would give "
+            "depth-3 = 105 cells from the same five-kite seed. The in-house rule trades the "
+            "canonical eigenvalue for the property that every parent emits only full kites/"
+            "darts (no boundary half-tiles). See docs/TILING_KNOWN_DEVIATIONS.md and "
+            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md.",
+        ),
     ),
     AMMANN_BEENKER_GEOMETRY: ReferenceFamilySpec(
         geometry=AMMANN_BEENKER_GEOMETRY,
@@ -298,6 +320,14 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 canonical_patch_fixture_key="exact-depth-3",
             ),
         },
+        notes=(
+            "Implementation derives Robinson triangles by splitting penrose-p2-kite-dart cells "
+            "in half, so it inherits P2's non-canonical depth-to-cell-count growth. The cell "
+            "counts (10, 40, 140, 480) are exactly 2x the in-house P2 counts, not the canonical "
+            "Robinson sequence (10, 30, 80, 210) you would expect from the deflation at "
+            "https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/. See "
+            "docs/TILING_KNOWN_DEVIATIONS.md and docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md.",
+        ),
     ),
     HAT_MONOTILE_GEOMETRY: ReferenceFamilySpec(
         geometry=HAT_MONOTILE_GEOMETRY,

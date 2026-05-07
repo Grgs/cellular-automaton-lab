@@ -73,7 +73,7 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
             output,
         )
         self.assertIn(
-            "robinson-triangles\tpatch_depth\ttrue_substitution\tPASS\t",
+            "robinson-triangles\tpatch_depth\tknown_deviation\tPASS\t",
             output,
         )
         self.assertIn(
@@ -108,8 +108,9 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertTrue(shield["observations"])
 
         robinson = next(family for family in families if family["geometry"] == "robinson-triangles")
-        self.assertEqual(robinson["implementation_status"], "true_substitution")
+        self.assertEqual(robinson["implementation_status"], "known_deviation")
         self.assertEqual(robinson["verification_status"], "PASS")
+        self.assertIsNotNone(robinson["promotion_blocker"])
         self.assertTrue(robinson["has_canonical_patch"])
         self.assertIn("canonical-patch", robinson["strength_tags"])
         self.assertIn("canonical-patch", robinson["verification_modes"])

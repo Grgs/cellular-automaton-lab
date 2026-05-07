@@ -447,6 +447,32 @@
       }
     },
     {
+      "tiling_family": "kisrhombille",
+      "label": "Kisrhombille",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 225,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "kisrhombille"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
       "tiling_family": "tetrakis-square",
       "label": "Tetrakis Square",
       "picker_group": "Periodic Mixed",
@@ -1105,6 +1131,21 @@
       "row_offset_x": 0.0
     },
     {
+      "geometry": "kisrhombille",
+      "label": "Kisrhombille",
+      "metric_model": "pattern",
+      "base_edge": 142.0,
+      "unit_width": 426.0,
+      "unit_height": 246.0,
+      "min_dimension": 1,
+      "min_x": -45.0,
+      "min_y": -35.5,
+      "max_x": 452.0,
+      "max_y": 272.0,
+      "cell_count_per_unit": 24,
+      "row_offset_x": 0.0
+    },
+    {
       "geometry": "prismatic-pentagonal",
       "label": "Prismatic Pentagonal",
       "metric_model": "pattern",
@@ -1155,8 +1196,8 @@
       "tiling_family": "penrose-p2-kite-dart",
       "label": "Penrose P2 Kite-Dart",
       "experimental": false,
-      "implementation_status": "true_substitution",
-      "promotion_blocker": null,
+      "implementation_status": "known_deviation",
+      "promotion_blocker": "Generates a valid Penrose kite-dart tiling but with a non-canonical full-tile substitution (eigenvalue 2+sqrt(2) ~ 3.414 vs canonical phi^2 ~ 2.618). The in-house rule avoids the boundary unpaired-half-tile problem of the canonical Conway/de Bruijn deflation. Tracked in TILING_KNOWN_DEVIATIONS.md; see docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix.",
       "public_cell_kinds": [
         "kite",
         "dart"
@@ -1166,8 +1207,8 @@
       "tiling_family": "penrose-p3-rhombs",
       "label": "Penrose P3 Rhombs",
       "experimental": false,
-      "implementation_status": "true_substitution",
-      "promotion_blocker": null,
+      "implementation_status": "known_deviation",
+      "promotion_blocker": "Generates a valid Penrose rhomb tiling but with a non-canonical full-tile substitution rule, so depth-to-cell-count growth does not match the canonical phi^2 eigenvalue. Tracked in TILING_KNOWN_DEVIATIONS.md; see docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix.",
       "public_cell_kinds": [
         "thick-rhomb",
         "thin-rhomb"
@@ -1238,8 +1279,8 @@
       "tiling_family": "robinson-triangles",
       "label": "Robinson Triangles",
       "experimental": false,
-      "implementation_status": "true_substitution",
-      "promotion_blocker": null,
+      "implementation_status": "known_deviation",
+      "promotion_blocker": "Derived by splitting Penrose P2 cells, so it inherits P2's non-canonical depth-to-cell-count growth. Tracked in TILING_KNOWN_DEVIATIONS.md; see docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix.",
       "public_cell_kinds": [
         "robinson-thick",
         "robinson-thin"
