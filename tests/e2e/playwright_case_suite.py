@@ -368,6 +368,18 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
         self._paint_canvas_center()
         persisted_before_reload = self._export_pattern_payload()
+        expected_cells_by_id = persisted_before_reload["cells_by_id"]
+        if not isinstance(expected_cells_by_id, dict):
+            raise AssertionError(
+                f"exported standalone cells_by_id payload was invalid: {expected_cells_by_id!r}"
+            )
+        self._wait_for_standalone_persisted_snapshot(
+            expected_rule="highlife",
+            expected_cells_by_id={
+                str(cell_id): int(cell_state)
+                for cell_id, cell_state in expected_cells_by_id.items()
+            },
+        )
 
         self.reload_page(wait_until="load")
 

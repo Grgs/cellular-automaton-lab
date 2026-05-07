@@ -21,6 +21,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import TypedDict
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -35,13 +36,32 @@ _VIEWBOX_H = 72
 _INLINE_RENDER_KEYS = frozenset({"square", "hex", "triangle"})
 
 
+class PreviewVertex(TypedDict):
+    x: float
+    y: float
+
+
+class PreviewFace(TypedDict):
+    kind: str
+    vertices: list[PreviewVertex]
+
+
+class PreviewDescriptor(TypedDict, total=False):
+    label: str
+    cell_count_per_unit: int
+    row_offset_x: float
+    faces: list[PreviewFace]
+    unit_width: float
+    unit_height: float
+
+
 # ---------------------------------------------------------------------------
 # Geometry helpers
 # ---------------------------------------------------------------------------
 
 
 def _tiled_vertices(
-    faces: list[dict],
+    faces: list[PreviewFace],
     *,
     unit_width: float,
     unit_height: float,
@@ -59,7 +79,7 @@ def _tiled_vertices(
 
 
 def _vertex_degree_map(
-    faces: list[dict],
+    faces: list[PreviewFace],
     *,
     unit_width: float,
     unit_height: float,
@@ -79,7 +99,7 @@ def _vertex_degree_map(
 
 
 def _best_center(
-    faces: list[dict],
+    faces: list[PreviewFace],
     *,
     unit_width: float,
     unit_height: float,
@@ -115,7 +135,7 @@ def _best_center(
 
 
 def _generate_polygon_data(
-    descriptor: dict,
+    descriptor: PreviewDescriptor,
     *,
     fill_count: int = 1,
 ) -> str:
@@ -127,7 +147,7 @@ def _generate_polygon_data(
             Use 1 for uniform Laves tilings; use the number of distinct
             cell kinds for Archimedean tilings.
     """
-    faces: list[dict] = descriptor["faces"]
+    faces = descriptor["faces"]
     unit_w: float = descriptor["unit_width"]
     unit_h: float = descriptor["unit_height"]
     row_offset_x: float = descriptor.get("row_offset_x", 0.0)
@@ -176,17 +196,17 @@ def _generate_polygon_data(
 # ---------------------------------------------------------------------------
 
 
-def _load_descriptors() -> dict[str, dict]:
+def _load_descriptors() -> dict[str, PreviewDescriptor]:
     return json.loads(_DATA_PATH.read_text(encoding="utf-8"))
 
 
-def _list_geometries(descriptors: dict[str, dict]) -> None:
+def _list_geometries(descriptors: dict[str, PreviewDescriptor]) -> None:
     print("Available geometries in periodic_face_patterns.json:")
     for key in sorted(descriptors):
         print(f"  {key}")
 
 
-def _suggest_fill_count(descriptor: dict) -> int:
+def _suggest_fill_count(descriptor: PreviewDescriptor) -> int:
     """Guess the right fill_count from the face kinds in the descriptor.
 
     For tilings with a single face kind, 1 fill is appropriate. For tilings

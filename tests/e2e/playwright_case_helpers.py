@@ -135,6 +135,73 @@ class SharedUiFlowHelpers:
         self._click_canvas_center()
         self._expect("#canvas-toolbar-undo-btn").to_be_enabled()
 
+    def _wait_for_standalone_persisted_snapshot(
+        self,
+        *,
+        expected_rule: str,
+        expected_cells_by_id: dict[str, int],
+    ) -> None:
+        case = self._case()
+        case.page.wait_for_function(
+            """async ({ expectedRule, expectedCellsById, databaseName, objectStoreName, snapshotKey, localStorageKey }) => {
+                const matchesSnapshot = (value) => {
+                    if (!value || typeof value !== "object") {
+                        return false;
+                    }
+                    const cellsById = value.cells_by_id;
+                    if (!cellsById || typeof cellsById !== "object") {
+                        return false;
+                    }
+                    return (
+                        value.rule === expectedRule &&
+                        JSON.stringify(cellsById) === JSON.stringify(expectedCellsById)
+                    );
+                };
+
+                const localStorageRaw = window.localStorage.getItem(localStorageKey);
+                if (localStorageRaw) {
+                    try {
+                        if (matchesSnapshot(JSON.parse(localStorageRaw))) {
+                            return true;
+                        }
+                    } catch {
+                        // Ignore malformed localStorage payloads while waiting for persistence.
+                    }
+                }
+
+                if (typeof window.indexedDB === "undefined") {
+                    return false;
+                }
+
+                const indexedDbValue = await new Promise((resolve) => {
+                    const openRequest = window.indexedDB.open(databaseName, 1);
+                    openRequest.onerror = () => resolve(null);
+                    openRequest.onsuccess = () => {
+                        const database = openRequest.result;
+                        if (!database.objectStoreNames.contains(objectStoreName)) {
+                            resolve(null);
+                            return;
+                        }
+                        const transaction = database.transaction(objectStoreName, "readonly");
+                        const store = transaction.objectStore(objectStoreName);
+                        const getRequest = store.get(snapshotKey);
+                        getRequest.onerror = () => resolve(null);
+                        getRequest.onsuccess = () => resolve(getRequest.result ?? null);
+                    };
+                });
+
+                return matchesSnapshot(indexedDbValue);
+            }""",
+            arg={
+                "expectedRule": expected_rule,
+                "expectedCellsById": expected_cells_by_id,
+                "databaseName": "cellular-automaton-lab-standalone",
+                "objectStoreName": "runtime",
+                "snapshotKey": "snapshot-v5",
+                "localStorageKey": "cellular-automaton-lab-standalone-state-v5",
+            },
+        )
+
     def _canvas_visual_summary(self) -> dict[str, object]:
         case = self._case()
         return cast(dict[str, object], canvas_visual_summary(case.page))
