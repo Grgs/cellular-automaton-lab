@@ -40,32 +40,75 @@ _INLINE_RENDER_KEYS = frozenset({"square", "hex", "triangle"})
 # ---------------------------------------------------------------------------
 
 
+def _tiled_vertices(
+    faces: list[dict],
+    *,
+    unit_width: float,
+    unit_height: float,
+    row_offset_x: float,
+) -> list[tuple[float, float]]:
+    vertices: list[tuple[float, float]] = []
+    for ix in range(-1, 3):
+        for iy in range(-1, 2):
+            dx = (ix * unit_width) + (row_offset_x if iy % 2 != 0 else 0.0)
+            dy = iy * unit_height
+            for face in faces:
+                for vertex in face["vertices"]:
+                    vertices.append((vertex["x"] + dx, vertex["y"] + dy))
+    return vertices
+
+
 def _vertex_degree_map(
     faces: list[dict],
+    *,
+    unit_width: float,
+    unit_height: float,
+    row_offset_x: float,
 ) -> dict[tuple[float, float], int]:
-    """Count how many faces in the template share each vertex."""
+    """Count how many tiled faces share each vertex."""
     counts: dict[tuple[float, float], int] = {}
-    for face in faces:
-        for v in face["vertices"]:
-            key = (v["x"], v["y"])
-            counts[key] = counts.get(key, 0) + 1
+    for ix in range(-1, 3):
+        for iy in range(-1, 2):
+            dx = (ix * unit_width) + (row_offset_x if iy % 2 != 0 else 0.0)
+            dy = iy * unit_height
+            for face in faces:
+                for vertex in face["vertices"]:
+                    key = (vertex["x"] + dx, vertex["y"] + dy)
+                    counts[key] = counts.get(key, 0) + 1
     return counts
 
 
-def _best_center(faces: list[dict]) -> tuple[float, float]:
+def _best_center(
+    faces: list[dict],
+    *,
+    unit_width: float,
+    unit_height: float,
+    row_offset_x: float,
+) -> tuple[float, float]:
     """Return the vertex with the highest template share count.
 
     Ties are broken by choosing the vertex closest to the bounding-box
     centre of all template vertices, favouring interior points over edges.
     """
-    degree = _vertex_degree_map(faces)
+    degree = _vertex_degree_map(
+        faces,
+        unit_width=unit_width,
+        unit_height=unit_height,
+        row_offset_x=row_offset_x,
+    )
     max_degree = max(degree.values())
     candidates = [v for v, d in degree.items() if d == max_degree]
     if len(candidates) == 1:
         return candidates[0]
-    # Tie-break: pick the candidate nearest the centroid of all vertices
-    all_x = [v[0] for v in degree]
-    all_y = [v[1] for v in degree]
+    # Tie-break: pick the candidate nearest the centroid of the tiled sample.
+    tiled_vertices = _tiled_vertices(
+        faces,
+        unit_width=unit_width,
+        unit_height=unit_height,
+        row_offset_x=row_offset_x,
+    )
+    all_x = [vertex[0] for vertex in tiled_vertices]
+    all_y = [vertex[1] for vertex in tiled_vertices]
     cx = sum(all_x) / len(all_x)
     cy = sum(all_y) / len(all_y)
     return min(candidates, key=lambda v: (v[0] - cx) ** 2 + (v[1] - cy) ** 2)
@@ -87,12 +130,18 @@ def _generate_polygon_data(
     faces: list[dict] = descriptor["faces"]
     unit_w: float = descriptor["unit_width"]
     unit_h: float = descriptor["unit_height"]
+    row_offset_x: float = descriptor.get("row_offset_x", 0.0)
 
     # Scale: fit the unit cell height exactly into the viewbox.
     scale = _VIEWBOX_H / unit_h
 
-    # Center the viewbox on the highest-degree vertex.
-    cx_orig, cy_orig = _best_center(faces)
+    # Center the viewbox on the most connected interior vertex in a tiled sample.
+    cx_orig, cy_orig = _best_center(
+        faces,
+        unit_width=unit_w,
+        unit_height=unit_h,
+        row_offset_x=row_offset_x,
+    )
     offset_x = _VIEWBOX_W / 2 - cx_orig * scale
     offset_y = _VIEWBOX_H / 2 - cy_orig * scale
 
@@ -104,7 +153,7 @@ def _generate_polygon_data(
     polygons: list[tuple[int, list[tuple[int, int]]]] = []
     for ix in range(-1, 3):
         for iy in range(-1, 2):
-            dx = ix * unit_w
+            dx = (ix * unit_w) + (row_offset_x if iy % 2 != 0 else 0.0)
             dy = iy * unit_h
             for slot_index, face in enumerate(faces):
                 vpts = [tx(v["x"] + dx, v["y"] + dy) for v in face["vertices"]]

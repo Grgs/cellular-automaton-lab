@@ -7,30 +7,19 @@ from pathlib import Path
 
 from PIL import Image
 
+from tests.e2e.support_runtime_host import ensure_current_standalone_build
 from tools.render_canvas_review import main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
-STANDALONE_OUTPUT_DIR = ROOT_DIR / "output" / "standalone"
-STANDALONE_REQUIRED_OUTPUTS = (
-    "index.html",
-    "standalone-bootstrap.json",
-    "standalone-python-bundle.json",
-)
 
 
-def _standalone_outputs_ready() -> bool:
-    return all(
-        (STANDALONE_OUTPUT_DIR / relative_path).exists()
-        for relative_path in STANDALONE_REQUIRED_OUTPUTS
-    )
-
-
-@unittest.skipUnless(
-    _standalone_outputs_ready(),
-    "standalone outputs are required; run `npm run build:frontend:standalone`",
-)
 class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        ensure_current_standalone_build(str(ROOT_DIR))
+
     def test_tool_renders_chair_png_and_summary(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-canvas-review-") as tmpdir:
             output_dir = Path(tmpdir)

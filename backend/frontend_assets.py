@@ -20,10 +20,12 @@ class FrontendAssetManifest:
         manifest: FrontendManifestPayload,
         *,
         manifest_mtime_ns: int,
+        manifest_content: str,
     ) -> None:
         self._manifest_path = manifest_path
         self._manifest = manifest
         self._manifest_mtime_ns = manifest_mtime_ns
+        self._manifest_content = manifest_content
 
     @classmethod
     def load(cls, static_folder: str | None) -> "FrontendAssetManifest":
@@ -33,22 +35,24 @@ class FrontendAssetManifest:
             )
 
         manifest_path = Path(static_folder) / "dist" / "manifest.json"
-        manifest, manifest_mtime_ns = cls._read_manifest(manifest_path)
+        manifest, manifest_mtime_ns, manifest_content = cls._read_manifest(manifest_path)
         return cls(
             manifest_path=manifest_path,
             manifest=manifest,
             manifest_mtime_ns=manifest_mtime_ns,
+            manifest_content=manifest_content,
         )
 
     @classmethod
-    def _read_manifest(cls, manifest_path: Path) -> tuple[FrontendManifestPayload, int]:
+    def _read_manifest(cls, manifest_path: Path) -> tuple[FrontendManifestPayload, int, str]:
         if not manifest_path.exists():
             raise RuntimeError(
                 "Frontend build manifest is missing at "
                 f"{manifest_path}. Run 'npm run build:frontend' before starting the app."
             )
 
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest_content = manifest_path.read_text(encoding="utf-8")
+        manifest = json.loads(manifest_content)
         if not isinstance(manifest, dict):
             raise RuntimeError(f"Frontend build manifest at {manifest_path} is invalid.")
 
@@ -58,7 +62,7 @@ class FrontendAssetManifest:
                 raise RuntimeError(f"Frontend build manifest at {manifest_path} is invalid.")
             normalized_manifest[entry_name] = cls._normalize_record(record)
 
-        return normalized_manifest, manifest_path.stat().st_mtime_ns
+        return normalized_manifest, manifest_path.stat().st_mtime_ns, manifest_content
 
     def entry_assets(self, entry_name: str) -> FrontendEntryAssets:
         self._refresh_if_stale()
@@ -106,10 +110,13 @@ class FrontendAssetManifest:
     def _refresh_if_stale(self) -> None:
         current_mtime_ns = self._manifest_path.stat().st_mtime_ns
         if current_mtime_ns == self._manifest_mtime_ns:
-            return
-        manifest, manifest_mtime_ns = self._read_manifest(self._manifest_path)
+            current_content = self._manifest_path.read_text(encoding="utf-8")
+            if current_content == self._manifest_content:
+                return
+        manifest, manifest_mtime_ns, manifest_content = self._read_manifest(self._manifest_path)
         self._manifest = manifest
         self._manifest_mtime_ns = manifest_mtime_ns
+        self._manifest_content = manifest_content
 
     def _resolve_record(self, entry_name: str) -> FrontendManifestRecord:
         if entry_name in self._manifest:

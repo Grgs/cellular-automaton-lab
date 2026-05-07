@@ -5,31 +5,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from tests.e2e.support_runtime_host import ensure_current_standalone_build
 from tools.run_browser_check import main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
-STANDALONE_OUTPUT_DIR = ROOT_DIR / "output" / "standalone"
-STANDALONE_REQUIRED_OUTPUTS = (
-    "index.html",
-    "standalone-bootstrap.json",
-    "standalone-python-bundle.json",
-)
-
-
-def _standalone_outputs_ready() -> bool:
-    return all(
-        (STANDALONE_OUTPUT_DIR / relative_path).exists()
-        for relative_path in STANDALONE_REQUIRED_OUTPUTS
-    )
 
 
 class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
-    @unittest.skipUnless(
-        _standalone_outputs_ready(),
-        "standalone outputs are required; run `npm run build:frontend:standalone`",
-    )
     def test_runner_delegates_standalone_render_review(self) -> None:
+        ensure_current_standalone_build(str(ROOT_DIR))
         with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-") as tmpdir:
             output_dir = Path(tmpdir)
             exit_code = main(
@@ -112,13 +97,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertIsNone(manifest["profileExpectations"])
             self.assertTrue(manifest["settleDiagnostics"]["settled"])
 
-    @unittest.skipUnless(
-        _standalone_outputs_ready(),
-        "standalone outputs are required; run `npm run build:frontend:standalone`",
-    )
     def test_runner_copies_condensed_profile_expectations_for_standalone_profile_review(
         self,
     ) -> None:
+        ensure_current_standalone_build(str(ROOT_DIR))
         with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-profile-") as tmpdir:
             output_dir = Path(tmpdir)
             exit_code = main(
@@ -161,11 +143,8 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             self.assertEqual(manifest["profileExpectations"]["profile"], "shield-depth-3")
             self.assertEqual(manifest["profileExpectations"]["missingExpectedWarnings"], [])
 
-    @unittest.skipUnless(
-        _standalone_outputs_ready(),
-        "standalone outputs are required; run `npm run build:frontend:standalone`",
-    )
     def test_runner_delegates_standalone_unittest(self) -> None:
+        ensure_current_standalone_build(str(ROOT_DIR))
         with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-unittest-") as tmpdir:
             output_dir = Path(tmpdir)
             exit_code = main(

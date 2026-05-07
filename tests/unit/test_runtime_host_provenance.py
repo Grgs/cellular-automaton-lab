@@ -1,19 +1,25 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from tests.e2e.support_runtime_host import (
     build_runtime_provenance_report,
     compute_source_fingerprint,
+    ensure_current_standalone_build,
     load_standalone_build_manifest,
     standalone_build_status,
 )
 
 
 class RuntimeHostProvenanceTests(unittest.TestCase):
+    def tearDown(self) -> None:
+        ensure_current_standalone_build.cache_clear()
+
     def test_compute_source_fingerprint_is_stable_for_unchanged_inputs(self) -> None:
         with tempfile.TemporaryDirectory(prefix="runtime-host-provenance-") as tmpdir:
             root = Path(tmpdir)
@@ -169,3 +175,109 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
             },
         )
         self.assertIn("Standalone bundle was built from a dirty checkout.", report["warnings"])
+
+    def test_ensure_current_standalone_build_skips_rebuild_when_current(self) -> None:
+        with patch("tests.e2e.support_runtime_host.standalone_build_status") as status:
+            status.return_value = {"buildCurrent": True}
+            with patch("tests.e2e.support_runtime_host.subprocess.run") as run:
+                ensure_current_standalone_build("/tmp/repo")
+        run.assert_not_called()
+
+    def test_ensure_current_standalone_build_rebuilds_when_stale(self) -> None:
+        stale_status = {
+            "buildCurrent": False,
+            "reason": "source fingerprint differs from current checkout",
+            "runtimeProvenance": {"warnings": []},
+        }
+        current_status = {
+            "buildCurrent": True,
+            "reason": "standalone build outputs are current",
+            "runtimeProvenance": {"warnings": []},
+        }
+        with patch(
+            "tests.e2e.support_runtime_host.standalone_build_status",
+            side_effect=[stale_status, current_status],
+        ) as status:
+            with patch(
+                "tests.e2e.support_runtime_host._resolve_npm_executable", return_value="npm"
+            ):
+                with patch(
+                    "tests.e2e.support_runtime_host.subprocess.run",
+                    return_value=subprocess.CompletedProcess(
+                        ["npm", "run", "build:frontend:standalone"],
+                        0,
+                        stdout="ok",
+                        stderr="",
+                    ),
+                ) as run:
+                    ensure_current_standalone_build("/tmp/repo")
+        self.assertEqual(status.call_count, 2)
+        run.assert_called_once_with(
+            ["npm", "run", "build:frontend:standalone"],
+            cwd=Path("/tmp/repo"),
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+    def test_ensure_current_standalone_build_surfaces_build_failure(self) -> None:
+        stale_status = {
+            "buildCurrent": False,
+            "reason": "required outputs are missing",
+            "runtimeProvenance": {"warnings": []},
+        }
+        with patch(
+            "tests.e2e.support_runtime_host.standalone_build_status",
+            return_value=stale_status,
+        ):
+            with patch(
+                "tests.e2e.support_runtime_host._resolve_npm_executable", return_value="npm"
+            ):
+                with patch(
+                    "tests.e2e.support_runtime_host.subprocess.run",
+                    return_value=subprocess.CompletedProcess(
+                        ["npm", "run", "build:frontend:standalone"],
+                        1,
+                        stdout="stdout text",
+                        stderr="stderr text",
+                    ),
+                ):
+                    with self.assertRaises(RuntimeError) as context:
+                        ensure_current_standalone_build("/tmp/repo")
+        self.assertIn("Standalone build refresh failed", str(context.exception))
+        self.assertIn("stdout text", str(context.exception))
+        self.assertIn("stderr text", str(context.exception))
+
+    def test_ensure_current_standalone_build_fails_when_bundle_remains_stale(self) -> None:
+        stale_status = {
+            "buildCurrent": False,
+            "reason": "source fingerprint differs from current checkout",
+            "runtimeProvenance": {
+                "warnings": [
+                    "Standalone build source fingerprint does not match the current checkout."
+                ]
+            },
+        }
+        with patch(
+            "tests.e2e.support_runtime_host.standalone_build_status",
+            side_effect=[stale_status, stale_status],
+        ):
+            with patch(
+                "tests.e2e.support_runtime_host._resolve_npm_executable", return_value="npm"
+            ):
+                with patch(
+                    "tests.e2e.support_runtime_host.subprocess.run",
+                    return_value=subprocess.CompletedProcess(
+                        ["npm", "run", "build:frontend:standalone"],
+                        0,
+                        stdout="ok",
+                        stderr="",
+                    ),
+                ):
+                    with self.assertRaises(RuntimeError) as context:
+                        ensure_current_standalone_build("/tmp/repo")
+        self.assertIn("bundle is still not current", str(context.exception))
+        self.assertIn(
+            "source fingerprint differs from current checkout",
+            str(context.exception),
+        )

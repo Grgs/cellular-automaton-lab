@@ -5,23 +5,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from tests.e2e.support_runtime_host import ensure_current_standalone_build
 from tools.run_family_sample_workbench import main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
-STANDALONE_OUTPUT_DIR = ROOT_DIR / "output" / "standalone"
-STANDALONE_REQUIRED_OUTPUTS = (
-    "index.html",
-    "standalone-bootstrap.json",
-    "standalone-python-bundle.json",
-)
-
-
-def _standalone_outputs_ready() -> bool:
-    return all(
-        (STANDALONE_OUTPUT_DIR / relative_path).exists()
-        for relative_path in STANDALONE_REQUIRED_OUTPUTS
-    )
 
 
 class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
@@ -86,11 +74,12 @@ class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
             self.assertGreater(summary["total_cells"], 0)
 
 
-@unittest.skipUnless(
-    _standalone_outputs_ready(),
-    "standalone outputs are required; run `npm run build:frontend:standalone`",
-)
 class FamilySampleWorkbenchBrowserIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        ensure_current_standalone_build(str(ROOT_DIR))
+
     def test_browser_review_renders_injected_candidate_topology(self) -> None:
         with tempfile.TemporaryDirectory(prefix="family-sample-workbench-browser-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"

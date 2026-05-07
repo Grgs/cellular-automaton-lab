@@ -36,6 +36,7 @@ _SOURCE_FINGERPRINT_FILES = (
     "package.json",
     "package-lock.json",
 )
+_STANDALONE_BUILD_COMMAND = ("run", "build:frontend:standalone")
 
 
 def _run_git_output(root: Path, *args: str) -> str | None:
@@ -239,6 +240,49 @@ def standalone_build_status(root: Path) -> dict[str, Any]:
         "preferredStandaloneCommand": "npm run test:e2e:playwright:standalone",
         "runtimeProvenance": provenance,
     }
+
+
+def _resolve_npm_executable() -> str:
+    if sys.platform == "win32":
+        return shutil.which("npm.cmd") or shutil.which("npm") or "npm.cmd"
+    return shutil.which("npm") or "npm"
+
+
+@lru_cache(maxsize=4)
+def ensure_current_standalone_build(root_path: str) -> None:
+    root = Path(root_path)
+    status = standalone_build_status(root)
+    if bool(status.get("buildCurrent")):
+        return
+    command = [_resolve_npm_executable(), *_STANDALONE_BUILD_COMMAND]
+    result = subprocess.run(
+        command,
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        stdout = f"\nstdout:\n{result.stdout}" if result.stdout else ""
+        stderr = f"\nstderr:\n{result.stderr}" if result.stderr else ""
+        raise RuntimeError(
+            "Standalone build refresh failed while preparing standalone-backed Python tests. "
+            "Run `npm run build:frontend:standalone` manually and fix the build error if it "
+            f"persists.{stdout}{stderr}"
+        )
+    refreshed_status = standalone_build_status(root)
+    if bool(refreshed_status.get("buildCurrent")):
+        return
+    reason = str(refreshed_status.get("reason") or "standalone build is stale")
+    warnings = refreshed_status.get("runtimeProvenance", {}).get("warnings", [])
+    warning_text = ""
+    if isinstance(warnings, list) and warnings:
+        warning_text = " " + " ".join(str(warning) for warning in warnings)
+    raise RuntimeError(
+        "Standalone build refresh completed, but the bundle is still not current: "
+        f"{reason}.{warning_text} Run `npm run build:frontend:standalone` manually and inspect "
+        "the generated output/standalone/build-manifest.json."
+    )
 
 
 class BrowserRuntimeHost(ABC):
