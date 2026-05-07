@@ -3,6 +3,31 @@ import unittest
 from unittest import mock
 
 from backend.simulation import periodic_face_tilings
+from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
+
+
+class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
+    """Verify that PERIODIC_FACE_TILING_GEOMETRIES and periodic_face_patterns.json
+    are kept in sync — every registered geometry must have a descriptor entry and
+    every descriptor entry must be registered."""
+
+    def test_registered_geometries_all_have_json_descriptors(self) -> None:
+        descriptors = periodic_face_tilings._loaded_pattern_descriptors()
+        missing = sorted(set(PERIODIC_FACE_TILING_GEOMETRIES) - set(descriptors))
+        self.assertFalse(
+            missing,
+            f"Geometries registered in PERIODIC_FACE_TILING_GEOMETRIES but missing "
+            f"from periodic_face_patterns.json: {missing}",
+        )
+
+    def test_json_descriptors_all_have_registered_geometries(self) -> None:
+        descriptors = periodic_face_tilings._loaded_pattern_descriptors()
+        orphaned = sorted(set(descriptors) - set(PERIODIC_FACE_TILING_GEOMETRIES))
+        self.assertFalse(
+            orphaned,
+            f"Entries in periodic_face_patterns.json not registered in "
+            f"PERIODIC_FACE_TILING_GEOMETRIES: {orphaned}",
+        )
 
 
 class PeriodicFaceTilingPayloadTests(unittest.TestCase):

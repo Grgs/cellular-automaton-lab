@@ -55,9 +55,9 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
    - Reuse an existing `render_kind` when possible.
    - Add a new geometry adapter only when the existing regular, periodic polygon, or aperiodic polygon adapters cannot represent the family.
 7. Add a picker thumbnail.
-   - Add an entry to [frontend/controls/tiling-preview-data.ts](../frontend/controls/tiling-preview-data.ts) using the format `"geometry-key": "fillIndex:x1,y1 x2,y2 ...;fillIndex:..."`.
-   - The SVG viewbox is `0 0 120 72`. Derive polygon coordinates by scaling face template vertices from `periodic_face_patterns.json` to fit this space, tiling enough unit cells to fill the viewbox.
-   - Fill indices 0–3 map to the four picker swatch colors; use a single index (0) for uniform Laves tilings and multiple indices to distinguish face kinds for Archimedean tilings.
+   - Run `py -3 tools/generate_tiling_preview.py --geometry <key>` to generate a ready-to-paste entry for [frontend/controls/tiling-preview-data.ts](../frontend/controls/tiling-preview-data.ts). The tool centers the viewbox on the highest-degree vertex, tiles enough unit cells to fill the `0 0 120 72` viewbox, and auto-detects the number of fill indices from the face kinds.
+   - Paste the output after the entry for the topologically nearest tiling (same family class, similar picker order).
+   - Fill indices 0–3 map to the four picker swatch colors; use `--fill-count 1` to override the auto-detection for tilings where a single color is preferred regardless of face kind count.
    - Without this entry the picker shows a generic square fallback.
 8. Add reference, invariant, and known-deviation documentation as needed.
    - Add a `ReferenceFamilySpec` to the appropriate file under [backend/simulation/reference_specs/](../backend/simulation/reference_specs/) (`regular.py`, `periodic.py`, or `aperiodic.py`). Include cell counts, degree histograms, adjacency pairs, and an SHA-prefix signature derived from `verify_reference_tilings.py`.
@@ -115,11 +115,17 @@ If a topology cannot be represented by an existing builder kind and `render_kind
 Useful commands:
 
 ```powershell
+# Generate a picker thumbnail for a new periodic face tiling
+py -3 tools\generate_tiling_preview.py --geometry <key>
+py -3 tools\generate_tiling_preview.py --list
+
 py -3 tools\validate_tilings.py
 py -3 tools\verify_reference_tilings.py
 npm run fixtures:reference:check
 npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geometry/render-bounds.test.ts
 py -3 -m unittest -q tests.unit.test_topology_validation
+py -3 -m unittest -q tests.unit.test_periodic_face_tilings
+py -3 -m unittest -q tests.unit.test_tiling_preview_coverage
 py -3 -m unittest -q tests.api.test_api_state_and_rules
 npm run test:e2e:playwright:server
 ```
