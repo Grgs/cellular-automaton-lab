@@ -18,11 +18,15 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
 
 - [backend/simulation/topology_family_manifest.py](../backend/simulation/topology_family_manifest.py): family ids, picker metadata, default rules, sizing policy, and variants.
 - [backend/simulation/topology_catalog_data.py](../backend/simulation/topology_catalog_data.py): catalog projections and exported constants consumed by runtime code.
+- [backend/simulation/topology_catalog.py](../backend/simulation/topology_catalog.py): public re-export surface; add any new geometry constant to both `__all__` and the import list here.
 - [backend/simulation/topology_implementation_registry.py](../backend/simulation/topology_implementation_registry.py): builder kind and render kind dispatch.
 - [backend/simulation/topology_regular.py](../backend/simulation/topology_regular.py): regular grid cell builders.
-- [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py): periodic mixed-tiling descriptors.
+- [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py): registers which geometry keys are handled by the periodic face builder.
+- [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json): face template descriptor data (vertices, unit cell dimensions, slot vocabulary) for every `periodic_face` tiling.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py): aperiodic family dispatch.
 - [backend/simulation/aperiodic_support.py](../backend/simulation/aperiodic_support.py): shared affine, polygon, and patch helpers.
+- [backend/simulation/reference_specs/](../backend/simulation/reference_specs/): reference family specs split by family class (`regular.py`, `periodic.py`, `aperiodic.py`). Add a `ReferenceFamilySpec` entry here for any tiling with a literature-verifiable cell count, degree histogram, or adjacency signature.
+- [frontend/controls/tiling-preview-data.ts](../frontend/controls/tiling-preview-data.ts): pre-computed polygon thumbnail data for the tiling picker. Without an entry here the tiling falls back to a generic square preview.
 - [frontend/geometry/registry.ts](../frontend/geometry/registry.ts): render adapter lookup by `render_kind`.
 - [frontend/geometry/periodic-mixed-adapter.ts](../frontend/geometry/periodic-mixed-adapter.ts) and [frontend/geometry/aperiodic-prototile-adapter.ts](../frontend/geometry/aperiodic-prototile-adapter.ts): main polygon render paths.
 
@@ -40,7 +44,7 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
    - Add the geometry to the matching implementation group or provide a focused builder wrapper.
 4. Implement the backend builder.
    - Regular grids belong near [backend/simulation/topology_regular.py](../backend/simulation/topology_regular.py).
-   - Periodic mixed tilings usually need descriptor data in [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py).
+   - Periodic mixed tilings: add an entry to [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json) with the face template vertices, unit cell dimensions (`unit_width`, `unit_height`), slot vocabulary, and bounding extents. Then add the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` in [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py).
    - Aperiodic families usually get a focused `backend/simulation/aperiodic_*.py` module plus registry wiring.
 5. Preserve topology contracts.
    - Cell ids must be deterministic and stable for the same topology spec.
@@ -50,7 +54,14 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
 6. Confirm frontend rendering.
    - Reuse an existing `render_kind` when possible.
    - Add a new geometry adapter only when the existing regular, periodic polygon, or aperiodic polygon adapters cannot represent the family.
-7. Add reference, invariant, and known-deviation documentation as needed.
+7. Add a picker thumbnail.
+   - Add an entry to [frontend/controls/tiling-preview-data.ts](../frontend/controls/tiling-preview-data.ts) using the format `"geometry-key": "fillIndex:x1,y1 x2,y2 ...;fillIndex:..."`.
+   - The SVG viewbox is `0 0 120 72`. Derive polygon coordinates by scaling face template vertices from `periodic_face_patterns.json` to fit this space, tiling enough unit cells to fill the viewbox.
+   - Fill indices 0–3 map to the four picker swatch colors; use a single index (0) for uniform Laves tilings and multiple indices to distinguish face kinds for Archimedean tilings.
+   - Without this entry the picker shows a generic square fallback.
+8. Add reference, invariant, and known-deviation documentation as needed.
+   - Add a `ReferenceFamilySpec` to the appropriate file under [backend/simulation/reference_specs/](../backend/simulation/reference_specs/) (`regular.py`, `periodic.py`, or `aperiodic.py`). Include cell counts, degree histograms, adjacency pairs, and an SHA-prefix signature derived from `verify_reference_tilings.py`.
+   - If the tiling is the dual of an existing one, add `expected_dual_geometry` to both the primal and dual `PeriodicDescriptorExpectation` entries to keep the duality relationship machine-checked.
 
 ## Small Example
 
@@ -86,7 +97,11 @@ _PERIODIC_FACE_GEOMETRIES = (
 )
 ```
 
-Also export the new constant through [backend/simulation/topology_catalog_data.py](../backend/simulation/topology_catalog_data.py) if runtime modules need to import it from the catalog surface. The actual descriptor belongs with the existing periodic descriptors, and should include enough geometry for deterministic cell ids, neighbors, and polygon rendering. If a topology cannot be represented by an existing builder kind and `render_kind`, add the smallest new builder or adapter path that preserves the same payload contracts.
+Also export the new constant through [backend/simulation/topology_catalog_data.py](../backend/simulation/topology_catalog_data.py) and [backend/simulation/topology_catalog.py](../backend/simulation/topology_catalog.py) (both `__all__` and the import list) if runtime modules need to import it from the catalog surface.
+
+The actual face template descriptor belongs in [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json) — not in `periodic_face_tilings.py`. That file only lists which geometry keys are dispatched through the periodic face builder. The JSON entry should include enough geometry (vertex coordinates, `unit_width`, `unit_height`, slot vocabulary) for deterministic cell ids, neighbors, and polygon rendering.
+
+If a topology cannot be represented by an existing builder kind and `render_kind`, add the smallest new builder or adapter path that preserves the same payload contracts.
 
 ## Tests To Add Or Update
 
@@ -115,11 +130,19 @@ npm run test:e2e:playwright:server
 - Do not add a backend builder that emits unstable cell ids; sparse persistence and pattern import depend on ids.
 - Do not silently accept mathematical shortcuts. If a family is finite-sample, approximate, or decorated rather than canonical, document that boundary.
 - Do not refresh generated fixtures by hand. Use the repo-owned regeneration tools and review the resulting diff.
+- Do not forget the picker thumbnail. Without an entry in `tiling-preview-data.ts` the tiling silently falls back to a generic square preview in the picker menu.
+- For periodic face tilings, the face template data belongs in `periodic_face_patterns.json`, not in `periodic_face_tilings.py`. Adding only the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` without a JSON entry will produce an empty or broken topology at runtime.
+- For Laves (dual) tilings, cross-link the primal tiling's reference spec with `expected_dual_geometry` so the duality relationship is verified automatically.
+- Python files must pass `ruff format` or the pre-commit hook will reject the commit. Run `py -3 -m ruff format <file>` before staging if you write or generate Python with non-standard formatting.
 
 ## Checklist
 
 - Topology id is stable, lowercase, and treated as persisted data once released.
 - Catalog metadata, implementation registry wiring, backend builder, and frontend render path agree on the same `geometry_key` and `render_kind`.
+- New geometry constant is exported from both `topology_catalog_data.py` and `topology_catalog.py`.
 - Generated cells have deterministic ids, valid neighbor ids, and documented adjacency behavior.
 - Patch-depth or sizing limits are explicit and covered by tests.
+- Picker thumbnail entry added to `tiling-preview-data.ts` and verified visually.
+- Reference spec added to `backend/simulation/reference_specs/` with cell counts, degree histogram, and signature.
+- Dual relationship cross-linked via `expected_dual_geometry` if applicable.
 - Reference docs, known deviations, and fixtures are updated through repo-owned tools when they apply.
