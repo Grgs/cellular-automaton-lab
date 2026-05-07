@@ -59,6 +59,7 @@ DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
 PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal"
 FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal"
 SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual"
+KISRHOMBILLE_GEOMETRY = "kisrhombille"
 
 
 @dataclass(frozen=True)
@@ -311,6 +312,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
+    KISRHOMBILLE_GEOMETRY: _single_variant_family(
+        tiling_family=KISRHOMBILLE_GEOMETRY,
+        label="Kisrhombille",
+        picker_group="Periodic Mixed",
+        picker_order=225,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
     PENROSE_P2_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P2_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
@@ -452,6 +464,7 @@ __all__ = [
     "HAT_MONOTILE_GEOMETRY",
     "HEX_GEOMETRY",
     "KAGOME_GEOMETRY",
+    "KISRHOMBILLE_GEOMETRY",
     "PATCH_DEPTH_CONTROL",
     "PENROSE_GEOMETRY",
     "PENROSE_P2_GEOMETRY",

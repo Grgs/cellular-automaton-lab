@@ -151,6 +151,7 @@ PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             expected_interior_vertex_configuration_frequencies=(
                 (("dodecagon", "hexagon", "square"), 170),
             ),
+            expected_dual_geometry="kisrhombille",
         ),
     ),
     "archimedean-3-3-4-3-4": ReferenceFamilySpec(
@@ -657,6 +658,70 @@ PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 "archimedean-3-3-4-3-4",
             ),
             expected_dual_structure_signature=((3, 55), (4, 25)),
+        ),
+    ),
+    "kisrhombille": ReferenceFamilySpec(
+        geometry="kisrhombille",
+        display_name="Kisrhombille",
+        source_urls=("https://en.wikipedia.org/wiki/Truncated_trihexagonal_tiling",),
+        canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
+        allowed_public_cell_kinds=("triangle",),
+        required_metadata=(),
+        sample_mode="grid",
+        depth_expectations={
+            3: ReferenceDepthExpectation(
+                exact_total_cells=216,
+                expected_kind_counts=(("triangle", 216),),
+                expected_adjacency_pairs=(("triangle", "triangle"),),
+                expected_degree_histogram=((1, 9), (2, 30), (3, 177)),
+                expected_signature="8744608a6fc6",  # pragma: allowlist secret
+            ),
+        },
+        periodic_descriptor=PeriodicDescriptorExpectation(
+            face_template_count=24,
+            slot_vocabulary=_prefixed_slots("s", 24),
+            id_pattern="{prefix}:{slot}:{x}:{y}",
+            row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("triangle", "triangle", "triangle", "triangle"),
+                ("triangle", "triangle", "triangle", "triangle", "triangle", "triangle"),
+                (
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                    "triangle",
+                ),
+            ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("triangle", "triangle", "triangle", "triangle"), 45),
+                (("triangle", "triangle", "triangle", "triangle", "triangle", "triangle"), 28),
+                (
+                    (
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                        "triangle",
+                    ),
+                    12,
+                ),
+            ),
+            expected_dual_geometry="archimedean-4-6-12",
         ),
     ),
 }
