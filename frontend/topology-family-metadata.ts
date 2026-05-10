@@ -224,6 +224,14 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "grid",
         viewportSyncMode: "backend-sync",
     },
+    "type-7-pentagonal": {
+        label: "Type 7 Pentagonal",
+        pickerGroup: "Periodic Mixed",
+        pickerOrder: 265,
+        family: "mixed",
+        sizingMode: "grid",
+        viewportSyncMode: "backend-sync",
+    },
     "taylor-socolar": {
         label: "Taylor-Socolar",
         pickerGroup: "Aperiodic",

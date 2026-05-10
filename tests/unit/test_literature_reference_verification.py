@@ -71,6 +71,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["cairo-pentagonal"].status, "PASS")
         self.assertEqual(results["deltoidal-hexagonal"].status, "PASS")
         self.assertEqual(results["snub-square-dual"].status, "PASS")
+        self.assertEqual(results["type-7-pentagonal"].status, "PASS")
         self.assertEqual(results["ammann-beenker"].status, "PASS")
         self.assertEqual(results["chair"].status, "PASS")
         self.assertEqual(results["hat-monotile"].status, "PASS")

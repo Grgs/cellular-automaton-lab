@@ -58,6 +58,7 @@ TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular"
 DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
 PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal"
 FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal"
+TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal"
 SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual"
 KISRHOMBILLE_GEOMETRY = "kisrhombille"
 
@@ -398,6 +399,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
+    TYPE_7_PENTAGONAL_GEOMETRY: _single_variant_family(
+        tiling_family=TYPE_7_PENTAGONAL_GEOMETRY,
+        label="Type 7 Pentagonal",
+        picker_group="Periodic Mixed",
+        picker_order=265,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
     TAYLOR_SOCOLAR_GEOMETRY: _translated_aperiodic_family(
         TAYLOR_SOCOLAR_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
@@ -485,6 +497,7 @@ __all__ = [
     "TOPOLOGY_FAMILY_MANIFEST",
     "TopologyFamilyManifestEntry",
     "TopologyFamilyVariantManifestEntry",
+    "TYPE_7_PENTAGONAL_GEOMETRY",
     "TRIAKIS_TRIANGULAR_GEOMETRY",
     "TRIANGLE_GEOMETRY",
     "TUEBINGEN_TRIANGLE_GEOMETRY",

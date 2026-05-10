@@ -92,6 +92,7 @@ export const DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal";
 export const PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal";
 export const FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal";
 export const SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual";
+export const TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal";
 export const PENROSE_GEOMETRIES = Object.freeze([PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY]);
 export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     ARCHIMEDEAN_488_GEOMETRY,
@@ -111,6 +112,7 @@ export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
     PRISMATIC_PENTAGONAL_GEOMETRY,
     FLORET_PENTAGONAL_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
+    TYPE_7_PENTAGONAL_GEOMETRY,
 ]);
 
 export function topologyVariantKey(topology: TopologyPayload | null | undefined): string {
