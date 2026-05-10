@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from pathlib import Path
 from typing import Any, ClassVar, Protocol, cast
 
@@ -547,6 +548,42 @@ class SharedUiFlowHelpers:
         if download_path is None:
             raise AssertionError("pattern export did not produce a readable download")
         return json.loads(Path(download_path).read_text(encoding="utf-8"))
+
+    def _wait_for_exported_pattern_payload(
+        self,
+        *,
+        expected_rule: str,
+        expected_cells_by_id: dict[str, int],
+        timeout_ms: int = 10_000,
+        poll_interval_ms: int = 250,
+    ) -> dict[str, object]:
+        case = self._case()
+        deadline = time.monotonic() + (timeout_ms / 1000)
+        last_payload: dict[str, object] | None = None
+        normalized_expected_cells_by_id = {
+            str(cell_id): int(cell_state) for cell_id, cell_state in expected_cells_by_id.items()
+        }
+        while True:
+            payload = self._export_pattern_payload()
+            last_payload = payload
+            cells_by_id = payload.get("cells_by_id")
+            if isinstance(cells_by_id, dict):
+                normalized_cells_by_id = {
+                    str(cell_id): int(cell_state)
+                    for cell_id, cell_state in cells_by_id.items()
+                    if isinstance(cell_state, int | float | bool)
+                }
+                if (
+                    payload.get("rule") == expected_rule
+                    and normalized_cells_by_id == normalized_expected_cells_by_id
+                ):
+                    return payload
+            if time.monotonic() >= deadline:
+                raise AssertionError(
+                    "exported pattern payload did not match the expected restored standalone state "
+                    f"within {timeout_ms}ms; last payload was {last_payload!r}"
+                )
+            case.page.wait_for_timeout(poll_interval_ms)
 
     def _write_clipboard_text(self, text: str) -> None:
         case = self._case()

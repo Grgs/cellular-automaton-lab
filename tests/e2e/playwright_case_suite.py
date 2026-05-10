@@ -384,7 +384,13 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self.reload_page(wait_until="load")
 
         self._expect("#rule-select").to_have_value("highlife")
-        persisted_after_reload = self._export_pattern_payload()
+        persisted_after_reload = self._wait_for_exported_pattern_payload(
+            expected_rule="highlife",
+            expected_cells_by_id={
+                str(cell_id): int(cell_state)
+                for cell_id, cell_state in expected_cells_by_id.items()
+            },
+        )
         self.assertEqual(
             persisted_after_reload["cells_by_id"], persisted_before_reload["cells_by_id"]
         )
