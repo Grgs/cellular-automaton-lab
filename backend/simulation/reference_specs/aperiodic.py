@@ -6,6 +6,7 @@ from backend.simulation.aperiodic_family_manifest import (
     AMMANN_SQUARE_KIND,
     CHAIR_GEOMETRY,
     CHAIR_KIND,
+    DART_HALF_OBTUSE_KIND,
     DART_KIND,
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
@@ -123,36 +124,51 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         geometry=PENROSE_P2_GEOMETRY,
         display_name=_reference_label(PENROSE_P2_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/",),
-        canonical_root_seed_policy="five-kite star seed",
+        canonical_root_seed_policy="five-kite sun seed",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P2_GEOMETRY),
         required_metadata=(),
         depth_expectations={
             0: ReferenceDepthExpectation(
                 exact_total_cells=5,
+                expected_kind_counts=((KITE_KIND, 5),),
                 required_kinds=(KITE_KIND,),
                 required_adjacency_pairs=((KITE_KIND, KITE_KIND),),
             ),
             1: ReferenceDepthExpectation(
-                exact_total_cells=20,
+                exact_total_cells=15,
+                expected_kind_counts=((DART_KIND, 5), (KITE_KIND, 10)),
                 required_kinds=(KITE_KIND, DART_KIND),
                 required_adjacency_pairs=(
-                    (DART_KIND, DART_KIND),
                     (DART_KIND, KITE_KIND),
                     (KITE_KIND, KITE_KIND),
                 ),
             ),
-            2: ReferenceDepthExpectation(exact_total_cells=70),
-            3: ReferenceDepthExpectation(exact_total_cells=240),
+            2: ReferenceDepthExpectation(
+                exact_total_cells=45,
+                expected_kind_counts=(
+                    (DART_KIND, 10),
+                    (DART_HALF_OBTUSE_KIND, 10),
+                    (KITE_KIND, 25),
+                ),
+            ),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=115,
+                expected_kind_counts=(
+                    (DART_KIND, 30),
+                    (DART_HALF_OBTUSE_KIND, 20),
+                    (KITE_KIND, 65),
+                ),
+            ),
         },
         notes=(
-            "Implementation uses a non-canonical full-tile substitution K -> 2K + 2D, "
-            "D -> 1K + 2D (eigenvalue 2 + sqrt(2) ~ 3.414). The canonical Conway/de Bruijn "
-            "deflation at https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/ "
-            "uses K -> 2K + 1D, D -> 1K + 1D (eigenvalue phi^2 ~ 2.618), which would give "
-            "depth-3 = 105 cells from the same five-kite seed. The in-house rule trades the "
-            "canonical eigenvalue for the property that every parent emits only full kites/"
-            "darts (no boundary half-tiles). See docs/TILING_KNOWN_DEVIATIONS.md and "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md.",
+            "Built from the canonical Robinson half-tile substitution (matrix [[2,1],[1,1]], "
+            "leading eigenvalue phi^2 ~ 2.618) seeded with the 5-kite sun. After substitution, "
+            "acute halves pair into kites along long edges and obtuse halves pair into darts "
+            "along short edges (Conway / de Bruijn convention). Half-tiles whose pairing "
+            "partner sits on the patch perimeter are emitted as ``kite-half-acute`` or "
+            "``dart-half-obtuse`` cells (Option 2 from "
+            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md), so depth >= 2 patches include "
+            "visibly halved tiles around the sun's outer boundary.",
         ),
     ),
     AMMANN_BEENKER_GEOMETRY: ReferenceFamilySpec(
@@ -291,42 +307,51 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         geometry=ROBINSON_TRIANGLES_GEOMETRY,
         display_name=_reference_label(ROBINSON_TRIANGLES_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/",),
-        canonical_root_seed_policy="Penrose-derived Robinson triangle refinement",
+        canonical_root_seed_policy="five-kite sun seed (10 acute Robinson halves)",
         allowed_public_cell_kinds=_public_cell_kinds(ROBINSON_TRIANGLES_GEOMETRY),
         required_metadata=(),
         depth_expectations={
             0: ReferenceDepthExpectation(
                 exact_total_cells=10,
+                expected_kind_counts=((ROBINSON_THICK_KIND, 10),),
                 required_kinds=(ROBINSON_THICK_KIND,),
                 required_adjacency_pairs=((ROBINSON_THICK_KIND, ROBINSON_THICK_KIND),),
             ),
             1: ReferenceDepthExpectation(
-                exact_total_cells=40,
+                exact_total_cells=30,
+                expected_kind_counts=(
+                    (ROBINSON_THICK_KIND, 20),
+                    (ROBINSON_THIN_KIND, 10),
+                ),
                 required_kinds=(ROBINSON_THICK_KIND, ROBINSON_THIN_KIND),
                 required_adjacency_pairs=(
                     (ROBINSON_THICK_KIND, ROBINSON_THICK_KIND),
                     (ROBINSON_THICK_KIND, ROBINSON_THIN_KIND),
-                    (ROBINSON_THIN_KIND, ROBINSON_THIN_KIND),
                 ),
                 canonical_patch_fixture_key="exact-depth-1",
             ),
-            2: ReferenceDepthExpectation(exact_total_cells=140),
-            3: ReferenceDepthExpectation(
-                exact_total_cells=480,
+            2: ReferenceDepthExpectation(
+                exact_total_cells=80,
                 expected_kind_counts=(
-                    (ROBINSON_THICK_KIND, 200),
-                    (ROBINSON_THIN_KIND, 280),
+                    (ROBINSON_THICK_KIND, 50),
+                    (ROBINSON_THIN_KIND, 30),
+                ),
+            ),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=210,
+                expected_kind_counts=(
+                    (ROBINSON_THICK_KIND, 130),
+                    (ROBINSON_THIN_KIND, 80),
                 ),
                 canonical_patch_fixture_key="exact-depth-3",
             ),
         },
         notes=(
-            "Implementation derives Robinson triangles by splitting penrose-p2-kite-dart cells "
-            "in half, so it inherits P2's non-canonical depth-to-cell-count growth. The cell "
-            "counts (10, 40, 140, 480) are exactly 2x the in-house P2 counts, not the canonical "
-            "Robinson sequence (10, 30, 80, 210) you would expect from the deflation at "
-            "https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/. See "
-            "docs/TILING_KNOWN_DEVIATIONS.md and docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md.",
+            "Built from the canonical Robinson half-tile substitution (matrix [[2,1],[1,1]], "
+            "leading eigenvalue phi^2 ~ 2.618) seeded with the 5-kite sun (10 acute halves). "
+            "All half-tiles are emitted directly without pairing into full kites/darts; the "
+            "depth-d cell counts (10, 30, 80, 210, ...) follow the Bielefeld substitution at "
+            "https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/.",
         ),
     ),
     HAT_MONOTILE_GEOMETRY: ReferenceFamilySpec(

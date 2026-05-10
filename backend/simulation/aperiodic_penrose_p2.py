@@ -1,187 +1,89 @@
+"""Penrose P2 (kite-dart) tiling.
+
+Built from the canonical Robinson half-tile substitution
+(``aperiodic_penrose_canonical``) starting from the 5-kite sun seed. After
+substitution we pair half-tiles into full Penrose tiles using the standard
+convention:
+
+* Two acute halves glued along a long edge form a kite.
+* Two obtuse halves glued along a short edge form a dart.
+
+Half-tiles whose pairing partner lies outside the patch (because the matching
+edge sits on the patch perimeter) are emitted as half-tile cells under
+``KITE_HALF_ACUTE_KIND`` / ``DART_HALF_OBTUSE_KIND``. This is the "Option 2"
+boundary-half-tile treatment from
+``docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md`` and matches the canonical
+Conway / de Bruijn deflation; the trade-off is that depth-d patches now have
+visibly halved kites/darts at the sun perimeter.
+"""
+
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass
-
-from backend.simulation.aperiodic_family_manifest import DART_KIND, KITE_KIND
+from backend.simulation.aperiodic_family_manifest import (
+    DART_HALF_OBTUSE_KIND,
+    DART_KIND,
+    KITE_HALF_ACUTE_KIND,
+    KITE_KIND,
+)
+from backend.simulation.aperiodic_penrose_canonical import (
+    PHI,
+    acute_polygon,
+    build_p2_sun_seed,
+    dart_polygon,
+    kite_polygon,
+    obtuse_polygon,
+    pair_halves_into_kites_and_darts,
+    substitute_all,
+)
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     PatchRecord,
     Vec,
-    id_from_anchor,
+    encode_float,
     patch_from_records,
     polygon_centroid,
     rounded_point,
 )
 
 
-PHI = (1 + math.sqrt(5)) / 2
+def _cell_id(prefix: str, vertices: tuple[tuple[float, float], ...]) -> str:
+    centroid = polygon_centroid(tuple(Vec(v[0], v[1]) for v in vertices))
+    return f"{prefix}:{encode_float(centroid.x)}:{encode_float(centroid.y)}"
 
 
-@dataclass(frozen=True)
-class _LeafTile:
-    kind: str
-    vertices: tuple[Vec, ...]
-    center: Vec
-    anchor: Vec
-    orientation: int
-
-
-def _logo_forward(point: Vec, heading_degrees: float, distance: float) -> Vec:
-    radians = math.radians(heading_degrees)
-    return Vec(
-        point.x + (distance * math.sin(radians)),
-        point.y + (distance * math.cos(radians)),
-    )
-
-
-def _kite_vertices(anchor: Vec, heading: float, length: float) -> tuple[Vec, ...]:
-    short_length = length / PHI
-    vertices = [anchor]
-    current = anchor
-    current_heading = heading - 36
-    current = _logo_forward(current, current_heading, length)
-    vertices.append(current)
-    current_heading += 108
-    current = _logo_forward(current, current_heading, short_length)
-    vertices.append(current)
-    current_heading += 36
-    current = _logo_forward(current, current_heading, short_length)
-    vertices.append(current)
-    return tuple(vertices)
-
-
-def _dart_vertices(anchor: Vec, heading: float, length: float) -> tuple[Vec, ...]:
-    short_length = length / PHI
-    vertices = [anchor]
-    current = anchor
-    current_heading = heading - 36
-    current = _logo_forward(current, current_heading, length)
-    vertices.append(current)
-    current_heading += 144
-    current = _logo_forward(current, current_heading, short_length)
-    vertices.append(current)
-    current_heading -= 36
-    current = _logo_forward(current, current_heading, short_length)
-    vertices.append(current)
-    return tuple(vertices)
-
-
-def _inflate_p2_kite(
-    anchor: Vec,
-    heading: float,
-    length: float,
-    depth: int,
-    tiles: list[_LeafTile],
-) -> tuple[Vec, float]:
-    if depth == 0:
-        vertices = _kite_vertices(anchor, heading, length)
-        tiles.append(
-            _LeafTile(
-                kind=KITE_KIND,
-                vertices=vertices,
-                center=polygon_centroid(vertices),
-                anchor=anchor,
-                orientation=int(round(heading)),
-            )
-        )
-        return anchor, heading
-
-    short_length = length / PHI
-    current_anchor = anchor
-    current_heading = heading - 36
-    current_anchor, current_heading = _inflate_p2_dart(
-        current_anchor, current_heading, short_length, depth - 1, tiles
-    )
-    current_anchor = _logo_forward(current_anchor, current_heading, length)
-    current_heading += 144
-    current_anchor, current_heading = _inflate_p2_kite(
-        current_anchor, current_heading, short_length, depth - 1, tiles
-    )
-    current_heading -= 18
-    current_anchor = _logo_forward(
-        current_anchor, current_heading, length * (2 * math.cos(3 * math.pi / 10))
-    )
-    current_heading += 162
-    current_anchor, current_heading = _inflate_p2_kite(
-        current_anchor, current_heading, short_length, depth - 1, tiles
-    )
-    current_heading -= 36
-    current_anchor = _logo_forward(current_anchor, current_heading, length)
-    current_heading += 180
-    current_anchor, current_heading = _inflate_p2_dart(
-        current_anchor, current_heading, short_length, depth - 1, tiles
-    )
-    current_heading -= 36
-    return current_anchor, current_heading
-
-
-def _inflate_p2_dart(
-    anchor: Vec,
-    heading: float,
-    length: float,
-    depth: int,
-    tiles: list[_LeafTile],
-) -> tuple[Vec, float]:
-    if depth == 0:
-        vertices = _dart_vertices(anchor, heading, length)
-        tiles.append(
-            _LeafTile(
-                kind=DART_KIND,
-                vertices=vertices,
-                center=polygon_centroid(vertices),
-                anchor=anchor,
-                orientation=int(round(heading)),
-            )
-        )
-        return anchor, heading
-
-    short_length = length / PHI
-    current_anchor = anchor
-    current_heading = heading
-    current_anchor, current_heading = _inflate_p2_kite(
-        current_anchor, current_heading, short_length, depth - 1, tiles
-    )
-    current_heading -= 36
-    current_anchor = _logo_forward(current_anchor, current_heading, length)
-    current_heading += 180
-    current_anchor, current_heading = _inflate_p2_dart(
-        current_anchor, current_heading, short_length, depth - 1, tiles
-    )
-    current_heading -= 54
-    current_anchor = _logo_forward(
-        current_anchor, current_heading, length * (2 * math.cos(3 * math.pi / 10))
-    )
-    current_heading += 126
-    current_anchor, current_heading = _inflate_p2_dart(
-        current_anchor, current_heading, short_length, depth - 1, tiles
-    )
-    current_anchor = _logo_forward(current_anchor, current_heading, length)
-    current_heading += 144
-    return current_anchor, current_heading
+def _record_for_full_tile(
+    prefix: str,
+    kind: str,
+    vertices: tuple[tuple[float, float], ...],
+) -> PatchRecord:
+    rounded = tuple(rounded_point(v) for v in vertices)
+    centroid = polygon_centroid(tuple(Vec(v[0], v[1]) for v in rounded))
+    return {
+        "id": _cell_id(prefix, rounded),
+        "kind": kind,
+        "center": rounded_point(centroid),
+        "vertices": rounded,
+    }
 
 
 def build_penrose_p2_patch(patch_depth: int) -> AperiodicPatch:
-    root_length = PHI ** int(patch_depth)
-    tiles: list[_LeafTile] = []
-    anchor = Vec(0.0, 0.0)
-    heading = 0.0
-    for _ in range(5):
-        anchor, heading = _inflate_p2_kite(anchor, heading, root_length, int(patch_depth), tiles)
-        heading -= 72
+    resolved_depth = max(0, int(patch_depth))
+    seed = build_p2_sun_seed(PHI**resolved_depth)
+    halves = substitute_all(seed, resolved_depth)
+    pairing = pair_halves_into_kites_and_darts(halves)
 
     records: list[PatchRecord] = []
-    for tile in tiles:
-        rounded_vertices = tuple(rounded_point(vertex) for vertex in tile.vertices)
-        center = rounded_point(tile.center)
-        records.append(
-            {
-                "id": id_from_anchor(
-                    "p2k" if tile.kind == "kite" else "p2d", tile.anchor, tile.orientation
-                ),
-                "kind": tile.kind,
-                "center": center,
-                "vertices": rounded_vertices,
-            }
-        )
-    return patch_from_records(patch_depth, records)
+    for left_index, right_index in pairing.kite_pairs:
+        kite_vertices = kite_polygon(halves[left_index], halves[right_index])
+        records.append(_record_for_full_tile("p2k", KITE_KIND, kite_vertices))
+    for left_index, right_index in pairing.dart_pairs:
+        dart_vertices = dart_polygon(halves[left_index], halves[right_index])
+        records.append(_record_for_full_tile("p2d", DART_KIND, dart_vertices))
+    for index in pairing.unpaired_acute:
+        half_vertices = acute_polygon(halves[index])
+        records.append(_record_for_full_tile("p2ka", KITE_HALF_ACUTE_KIND, half_vertices))
+    for index in pairing.unpaired_obtuse:
+        half_vertices = obtuse_polygon(halves[index])
+        records.append(_record_for_full_tile("p2do", DART_HALF_OBTUSE_KIND, half_vertices))
+
+    return patch_from_records(resolved_depth, records, neighbor_mode="segment_overlap")

@@ -58,7 +58,7 @@
       "height": 0,
       "patchDepth": 3,
       "cellSize": 12,
-      "topologyRevision": "fixture-robinson-triangles-depth-3"
+      "topologyRevision": "fixture-robinson-triangles-depth-3-v2"
     },
     {
       "name": "shield-depth-3",

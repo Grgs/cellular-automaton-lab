@@ -1196,11 +1196,13 @@
       "tiling_family": "penrose-p2-kite-dart",
       "label": "Penrose P2 Kite-Dart",
       "experimental": false,
-      "implementation_status": "known_deviation",
-      "promotion_blocker": "Generates a valid Penrose kite-dart tiling but with a non-canonical full-tile substitution (eigenvalue 2+sqrt(2) ~ 3.414 vs canonical phi^2 ~ 2.618). The in-house rule avoids the boundary unpaired-half-tile problem of the canonical Conway/de Bruijn deflation. Tracked in TILING_KNOWN_DEVIATIONS.md; see docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix.",
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
       "public_cell_kinds": [
         "kite",
-        "dart"
+        "dart",
+        "kite-half-acute",
+        "dart-half-obtuse"
       ]
     },
     {
@@ -1279,8 +1281,8 @@
       "tiling_family": "robinson-triangles",
       "label": "Robinson Triangles",
       "experimental": false,
-      "implementation_status": "known_deviation",
-      "promotion_blocker": "Derived by splitting Penrose P2 cells, so it inherits P2's non-canonical depth-to-cell-count growth. Tracked in TILING_KNOWN_DEVIATIONS.md; see docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix.",
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
       "public_cell_kinds": [
         "robinson-thick",
         "robinson-thin"

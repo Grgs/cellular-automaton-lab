@@ -33,6 +33,8 @@ THICK_RHOMB_KIND = "thick-rhomb"
 THIN_RHOMB_KIND = "thin-rhomb"
 KITE_KIND = "kite"
 DART_KIND = "dart"
+KITE_HALF_ACUTE_KIND = "kite-half-acute"
+DART_HALF_OBTUSE_KIND = "dart-half-obtuse"
 AMMANN_RHOMB_KIND = "rhomb"
 AMMANN_SQUARE_KIND = "square"
 SPECTRE_KIND = "spectre"
@@ -102,16 +104,9 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         picker_group="Aperiodic",
         picker_order=210,
         default_rule="life-b2-s23",
-        builder_kind="compatibility_patch",
-        implementation_status="known_deviation",
-        public_cell_kinds=(KITE_KIND, DART_KIND),
-        promotion_blocker=(
-            "Generates a valid Penrose kite-dart tiling but with a non-canonical full-tile "
-            "substitution (eigenvalue 2+sqrt(2) ~ 3.414 vs canonical phi^2 ~ 2.618). The "
-            "in-house rule avoids the boundary unpaired-half-tile problem of the canonical "
-            "Conway/de Bruijn deflation. Tracked in TILING_KNOWN_DEVIATIONS.md; see "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix."
-        ),
+        builder_kind="substitution_recipe",
+        implementation_status="true_substitution",
+        public_cell_kinds=(KITE_KIND, DART_KIND, KITE_HALF_ACUTE_KIND, DART_HALF_OBTUSE_KIND),
     ),
     AMMANN_BEENKER_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=AMMANN_BEENKER_GEOMETRY,
@@ -187,13 +182,8 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         picker_order=300,
         default_rule="life-b2-s23",
         builder_kind="substitution_recipe",
-        implementation_status="known_deviation",
+        implementation_status="true_substitution",
         public_cell_kinds=(ROBINSON_THICK_KIND, ROBINSON_THIN_KIND),
-        promotion_blocker=(
-            "Derived by splitting Penrose P2 cells, so it inherits P2's non-canonical "
-            "depth-to-cell-count growth. Tracked in TILING_KNOWN_DEVIATIONS.md; see "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix."
-        ),
     ),
     TUEBINGEN_TRIANGLE_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=TUEBINGEN_TRIANGLE_GEOMETRY,
@@ -280,6 +270,7 @@ __all__ = [
     "APERIODIC_FAMILY_MANIFEST",
     "CHAIR_GEOMETRY",
     "CHAIR_KIND",
+    "DART_HALF_OBTUSE_KIND",
     "DART_KIND",
     "DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY",
     "DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND",
@@ -289,6 +280,7 @@ __all__ = [
     "HAT_KIND",
     "HAT_MONOTILE_GEOMETRY",
     "HAT_TILE_FAMILY",
+    "KITE_HALF_ACUTE_KIND",
     "KITE_KIND",
     "PENROSE_GEOMETRY",
     "PENROSE_P2_GEOMETRY",
