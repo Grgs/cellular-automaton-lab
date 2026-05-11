@@ -9,12 +9,18 @@ convention:
 * Two obtuse halves glued along a short edge form a dart.
 
 Half-tiles whose pairing partner lies outside the patch (because the matching
-edge sits on the patch perimeter) are emitted as half-tile cells under
-``KITE_HALF_ACUTE_KIND`` / ``DART_HALF_OBTUSE_KIND``. This is the "Option 2"
-boundary-half-tile treatment from
+edge sits on the patch perimeter) are emitted as half-tile cells. This is the
+"Option 2" boundary-half-tile treatment from
 ``docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md`` and matches the canonical
 Conway / de Bruijn deflation; the trade-off is that depth-d patches now have
-visibly halved kites/darts at the sun perimeter.
+visibly halved tiles at the sun perimeter.
+
+For the 5-kite sun seed the boundary structure is asymmetric: every acute half
+finds a long-edge kite partner at every depth, but obtuse halves on the
+perimeter can be left without a short-edge partner. In practice only
+``DART_HALF_OBTUSE_KIND`` cells are produced for this family; the
+``KITE_HALF_ACUTE_KIND`` branch is kept as a defensive emit path that would
+correctly handle any future seed that does expose unpaired acutes.
 """
 
 from __future__ import annotations

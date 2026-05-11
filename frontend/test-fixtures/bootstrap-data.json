@@ -1242,7 +1242,6 @@
       "public_cell_kinds": [
         "kite",
         "dart",
-        "kite-half-acute",
         "dart-half-obtuse"
       ]
     },

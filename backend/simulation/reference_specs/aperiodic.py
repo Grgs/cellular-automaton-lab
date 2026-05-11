@@ -164,11 +164,12 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "Built from the canonical Robinson half-tile substitution (matrix [[2,1],[1,1]], "
             "leading eigenvalue phi^2 ~ 2.618) seeded with the 5-kite sun. After substitution, "
             "acute halves pair into kites along long edges and obtuse halves pair into darts "
-            "along short edges (Conway / de Bruijn convention). Half-tiles whose pairing "
-            "partner sits on the patch perimeter are emitted as ``kite-half-acute`` or "
-            "``dart-half-obtuse`` cells (Option 2 from "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md), so depth >= 2 patches include "
-            "visibly halved tiles around the sun's outer boundary.",
+            "along short edges (Conway / de Bruijn convention). The 5-kite sun seed is "
+            "geometrically asymmetric under this substitution: at every depth every acute "
+            "finds a kite partner, while perimeter obtuses can be left unpaired and emitted "
+            "as ``dart-half-obtuse`` cells (Option 2 from "
+            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md). Depth >= 2 patches therefore "
+            "show visibly halved darts around the sun's outer boundary, but no halved kites.",
         ),
     ),
     AMMANN_BEENKER_GEOMETRY: ReferenceFamilySpec(

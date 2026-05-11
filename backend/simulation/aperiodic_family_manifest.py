@@ -106,7 +106,14 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         builder_kind="substitution_recipe",
         implementation_status="true_substitution",
-        public_cell_kinds=(KITE_KIND, DART_KIND, KITE_HALF_ACUTE_KIND, DART_HALF_OBTUSE_KIND),
+        # The 5-kite sun seed is geometrically asymmetric under the canonical
+        # Robinson substitution: every acute half always finds a long-edge kite
+        # partner, but obtuse halves on the patch perimeter can be left without
+        # a short-edge partner and are emitted as ``dart-half-obtuse`` cells.
+        # Acute halves are therefore never exposed as ``kite-half-acute`` from
+        # this seed; the kind is declared on the half-tile constants but is
+        # not part of P2's reachable surface.
+        public_cell_kinds=(KITE_KIND, DART_KIND, DART_HALF_OBTUSE_KIND),
     ),
     AMMANN_BEENKER_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=AMMANN_BEENKER_GEOMETRY,
