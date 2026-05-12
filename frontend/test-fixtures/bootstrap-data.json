@@ -1249,8 +1249,8 @@
       "tiling_family": "penrose-p3-rhombs",
       "label": "Penrose P3 Rhombs",
       "experimental": false,
-      "implementation_status": "known_deviation",
-      "promotion_blocker": "Generates a valid Penrose rhomb tiling but with a non-canonical full-tile substitution rule, so depth-to-cell-count growth does not match the canonical phi^2 eigenvalue. Tracked in TILING_KNOWN_DEVIATIONS.md; see docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix.",
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
       "public_cell_kinds": [
         "thick-rhomb",
         "thin-rhomb"

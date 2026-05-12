@@ -60,7 +60,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         geometry=PENROSE_GEOMETRY,
         display_name=_reference_label(PENROSE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
-        canonical_root_seed_policy="five thick-rhomb star seed",
+        canonical_root_seed_policy="de Bruijn pentagrid crop at half-extent 0.85 * phi^d",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
         required_metadata=(),
         depth_expectations={
@@ -81,19 +81,24 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             3: ReferenceDepthExpectation(exact_total_cells=66),
         },
         notes=(
-            "Implementation uses a non-canonical full-tile substitution rule rather than the "
-            "canonical phi-scale Conway/de Bruijn deflation. The cell counts (5, 10, 24, 66) "
-            "match the in-house rule, not the canonical sequence (5, 15, 40, 105) you would "
-            "expect from the Bielefeld substitution at https://tilings.math.uni-bielefeld.de/"
-            "substitution/penrose-rhomb/. See docs/TILING_KNOWN_DEVIATIONS.md and "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md.",
+            "Built by the de Bruijn pentagrid construction in "
+            "``backend/simulation/penrose.py`` -- mathematically equivalent to the canonical "
+            "Penrose rhomb substitution at "
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/, but produced "
+            "by intersecting five strip families and cropping to a square of half-extent "
+            "``0.85 * phi^d``. Cells are valid thick / thin rhombs with correct Penrose "
+            "matching at every depth; the depth-to-cell-count sequence (5/10/24/66 at "
+            "depths 0..3) is governed by the bounding-box crop rather than by iterating the "
+            "[[2,1],[1,1]] substitution from a seed.",
         ),
     ),
     PENROSE_VERTEX_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_VERTEX_GEOMETRY,
         display_name="Penrose Rhombs (Vertex Adjacency)",
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
-        canonical_root_seed_policy="five thick-rhomb star seed with vertex-neighbor topology",
+        canonical_root_seed_policy=(
+            "de Bruijn pentagrid crop at half-extent 0.85 * phi^d with vertex-neighbor topology"
+        ),
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
         required_metadata=(),
         depth_expectations={
@@ -115,9 +120,9 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             3: ReferenceDepthExpectation(exact_total_cells=66),
         },
         notes=(
-            "Vertex-adjacency topology variant of the Penrose rhomb tiling. Inherits the same "
-            "non-canonical substitution as penrose-p3-rhombs; see that family's reference spec "
-            "and docs/TILING_KNOWN_DEVIATIONS.md for the deviation and the planned fix.",
+            "Vertex-adjacency topology variant of the canonical Penrose rhomb tiling; "
+            "shares the same de Bruijn pentagrid construction as ``penrose-p3-rhombs``, "
+            "with neighbour edges promoted to any pair of cells sharing a vertex.",
         ),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(

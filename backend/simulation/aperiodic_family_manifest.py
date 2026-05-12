@@ -88,14 +88,16 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         picker_order=220,
         default_rule="life-b2-s23",
         builder_kind="compatibility_patch",
-        implementation_status="known_deviation",
+        # Built by the de Bruijn pentagrid construction in
+        # ``backend/simulation/penrose.py`` -- mathematically equivalent to the
+        # canonical Penrose substitution but produced by a bounding-box crop
+        # over five intersecting strip families rather than by iterating
+        # ``[[2,1],[1,1]]`` from a seed. Cells are valid Penrose thick / thin
+        # rhombs with correct adjacency; the depth-to-cell-count sequence
+        # (5/10/24/66 at depths 0..3) is governed by the half-extent
+        # ``0.85 * phi^d`` rather than the substitution eigenvalue.
+        implementation_status="canonical_patch",
         public_cell_kinds=(THICK_RHOMB_KIND, THIN_RHOMB_KIND),
-        promotion_blocker=(
-            "Generates a valid Penrose rhomb tiling but with a non-canonical full-tile "
-            "substitution rule, so depth-to-cell-count growth does not match the canonical "
-            "phi^2 eigenvalue. Tracked in TILING_KNOWN_DEVIATIONS.md; see "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix."
-        ),
     ),
     PENROSE_P2_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P2_GEOMETRY,
