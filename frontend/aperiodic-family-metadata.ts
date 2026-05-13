@@ -1,6 +1,7 @@
 export const PENROSE_GEOMETRY = "penrose-p3-rhombs";
 export const PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex";
 export const PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart";
+export const PENROSE_P1_GEOMETRY = "penrose-p1-pentagon-diamond";
 export const AMMANN_BEENKER_GEOMETRY = "ammann-beenker";
 export const SPECTRE_GEOMETRY = "spectre";
 export const TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar";
@@ -17,6 +18,9 @@ export const THICK_RHOMB_KIND = "thick-rhomb";
 export const THIN_RHOMB_KIND = "thin-rhomb";
 export const KITE_KIND = "kite";
 export const DART_KIND = "dart";
+export const P1_PENTAGON_KIND = "p1-pentagon";
+export const P1_DIAMOND_KIND = "p1-diamond";
+export const PENROSE_P1_TILE_FAMILY = "penrose-p1";
 export const AMMANN_RHOMB_KIND = "rhomb";
 export const AMMANN_SQUARE_KIND = "square";
 export const SPECTRE_KIND = "spectre";

@@ -603,6 +603,32 @@
       }
     },
     {
+      "tiling_family": "penrose-p1-pentagon-diamond",
+      "label": "Penrose P1 Pentagon-Diamond",
+      "picker_group": "Aperiodic",
+      "picker_order": 205,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "penrose-p1-pentagon-diamond"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 4,
+        "min": 0,
+        "max": 6
+      }
+    },
+    {
       "tiling_family": "penrose-p2-kite-dart",
       "label": "Penrose P2 Kite-Dart",
       "picker_group": "Aperiodic",
@@ -1233,6 +1259,17 @@
     }
   ],
   "aperiodic_families": [
+    {
+      "tiling_family": "penrose-p1-pentagon-diamond",
+      "label": "Penrose P1 Pentagon-Diamond",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "p1-pentagon",
+        "p1-diamond"
+      ]
+    },
     {
       "tiling_family": "penrose-p2-kite-dart",
       "label": "Penrose P2 Kite-Dart",

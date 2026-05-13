@@ -116,6 +116,21 @@
       ]
     },
     {
+      "geometry": "penrose-p1-pentagon-diamond",
+      "variants": [
+        {
+          "label": "penrose-p1-pentagon",
+          "selector": {"kind": "p1-pentagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "penrose-p1-diamond",
+          "selector": {"kind": "p1-diamond"},
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
       "geometry": "penrose-p2-kite-dart",
       "variants": [
         {

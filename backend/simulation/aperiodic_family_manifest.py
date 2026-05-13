@@ -17,6 +17,7 @@ AperiodicPickerGroup = Literal["Aperiodic", "Experimental"]
 PENROSE_GEOMETRY = "penrose-p3-rhombs"
 PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
 PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
+PENROSE_P1_GEOMETRY = "penrose-p1-pentagon-diamond"
 AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
@@ -35,6 +36,8 @@ KITE_KIND = "kite"
 DART_KIND = "dart"
 KITE_HALF_ACUTE_KIND = "kite-half-acute"
 DART_HALF_OBTUSE_KIND = "dart-half-obtuse"
+P1_PENTAGON_KIND = "p1-pentagon"
+P1_DIAMOND_KIND = "p1-diamond"
 AMMANN_RHOMB_KIND = "rhomb"
 AMMANN_SQUARE_KIND = "square"
 SPECTRE_KIND = "spectre"
@@ -53,6 +56,7 @@ SHIELD_SQUARE_KIND = "shield-square"
 SHIELD_TRIANGLE_KIND = "shield-triangle"
 PINWHEEL_TRIANGLE_KIND = "pinwheel-triangle"
 
+PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
 TUEBINGEN_TILE_FAMILY = "tuebingen"
 HAT_TILE_FAMILY = "hat"
@@ -98,6 +102,24 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # ``0.85 * phi^d`` rather than the substitution eigenvalue.
         implementation_status="canonical_patch",
         public_cell_kinds=(THICK_RHOMB_KIND, THIN_RHOMB_KIND),
+    ),
+    PENROSE_P1_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=PENROSE_P1_GEOMETRY,
+        catalog_label="Penrose P1 Pentagon-Diamond",
+        reference_label="Penrose Pentagon-Diamond",
+        picker_group="Aperiodic",
+        picker_order=205,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
+        # Built on top of the de Bruijn pentagrid construction shared with P3
+        # (``backend/simulation/penrose.py``) and relabelled into the P1
+        # rhomb-dual prototile set: thin rhombs become geometrically exact P1
+        # diamonds, thick rhombs become P1 pentagons (the rhomb-region MLD
+        # representative of Penrose's published pentagonal prototile). The
+        # depth-to-cell-count sequence (5/10/24/66 at depths 0..3) is governed
+        # by the same bounding-box crop at ``0.85 * phi^d`` as P3.
+        implementation_status="canonical_patch",
+        public_cell_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND),
     ),
     PENROSE_P2_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P2_GEOMETRY,
@@ -291,7 +313,11 @@ __all__ = [
     "HAT_TILE_FAMILY",
     "KITE_HALF_ACUTE_KIND",
     "KITE_KIND",
+    "P1_DIAMOND_KIND",
+    "P1_PENTAGON_KIND",
     "PENROSE_GEOMETRY",
+    "PENROSE_P1_GEOMETRY",
+    "PENROSE_P1_TILE_FAMILY",
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
     "PINWHEEL_GEOMETRY",

@@ -9,6 +9,7 @@ from backend.simulation.aperiodic_family_manifest import (
     CHAIR_GEOMETRY,
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
@@ -21,6 +22,7 @@ from backend.simulation.aperiodic_family_manifest import (
 from backend.simulation.aperiodic_ammann_beenker import build_ammann_beenker_patch
 from backend.simulation.aperiodic_chair import build_chair_patch
 from backend.simulation.aperiodic_hat import build_hat_patch
+from backend.simulation.aperiodic_penrose_p1 import build_penrose_p1_patch
 from backend.simulation.aperiodic_penrose_p2 import build_penrose_p2_patch
 from backend.simulation.aperiodic_pinwheel import build_pinwheel_patch
 from backend.simulation.aperiodic_robinson_triangles import build_robinson_triangles_patch
@@ -46,6 +48,7 @@ class AperiodicFamilyDefinition:
 
 
 _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
+    PENROSE_P1_GEOMETRY: build_penrose_p1_patch,
     PENROSE_P2_GEOMETRY: build_penrose_p2_patch,
     AMMANN_BEENKER_GEOMETRY: build_ammann_beenker_patch,
     SPECTRE_GEOMETRY: build_spectre_patch,

@@ -14,7 +14,10 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_KIND,
     HAT_MONOTILE_GEOMETRY,
     KITE_KIND,
+    P1_DIAMOND_KIND,
+    P1_PENTAGON_KIND,
     PENROSE_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     PINWHEEL_GEOMETRY,
@@ -123,6 +126,67 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "Vertex-adjacency topology variant of the canonical Penrose rhomb tiling; "
             "shares the same de Bruijn pentagrid construction as ``penrose-p3-rhombs``, "
             "with neighbour edges promoted to any pair of cells sharing a vertex.",
+        ),
+    ),
+    PENROSE_P1_GEOMETRY: ReferenceFamilySpec(
+        geometry=PENROSE_P1_GEOMETRY,
+        display_name=_reference_label(PENROSE_P1_GEOMETRY),
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",
+            "https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1)",
+        ),
+        canonical_root_seed_policy=(
+            "de Bruijn pentagrid crop at half-extent 0.85 * phi^d, with thick rhombs "
+            "rendered as inscribed regular pentagons and thin rhombs rendered as "
+            "diamonds (the thin Penrose rhomb IS the P1 diamond prototile)"
+        ),
+        allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_GEOMETRY),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=5,
+                expected_kind_counts=((P1_PENTAGON_KIND, 5),),
+                required_kinds=(P1_PENTAGON_KIND,),
+                # P1 thick-rhomb cells are rendered as inscribed regular pentagons,
+                # which leave thin lens-shaped gaps between adjacent pentagons.
+                # The topology graph still tracks rhomb-edge adjacency from the
+                # underlying pentagrid; only the rendered surface has gaps.
+                require_hole_free_surface=False,
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=10,
+                expected_kind_counts=(
+                    (P1_DIAMOND_KIND, 5),
+                    (P1_PENTAGON_KIND, 5),
+                ),
+                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND),
+                required_adjacency_pairs=((P1_DIAMOND_KIND, P1_PENTAGON_KIND),),
+                require_hole_free_surface=False,
+            ),
+            2: ReferenceDepthExpectation(
+                exact_total_cells=24,
+                require_hole_free_surface=False,
+            ),
+            3: ReferenceDepthExpectation(
+                exact_total_cells=66,
+                require_hole_free_surface=False,
+            ),
+        },
+        notes=(
+            "Penrose P1 (pentagon / diamond) ships in a hybrid representation: the "
+            "topology and adjacency graph mirror the canonical Penrose pentagrid in "
+            "``backend/simulation/penrose.py`` exactly (one cell per pentagrid rhomb, "
+            "same neighbour edges, same depth-to-cell-count sequence 5/10/24/66 as "
+            "``penrose-p3-rhombs``), but the rendered cell geometry is rewritten so "
+            "the patch visually presents Penrose's published P1 prototile shapes. "
+            "Thin rhombs render as diamonds verbatim because the thin Penrose rhomb "
+            "IS Penrose's 1974 P1 diamond. Thick rhombs render as regular pentagons "
+            "inscribed inside the rhomb (one pentagon vertex along the rhomb's long "
+            "diagonal, sized to fit the short axis), producing visible thin "
+            "lens-shaped gaps along each thick-rhomb perimeter that read as the "
+            "characteristic P1 pentagonal pattern. A full 4-prototile P1 substitution "
+            "with literal pentagon / star / boat / diamond cells remains a "
+            "future-work item; see ``docs/TILING_KNOWN_DEVIATIONS.md``.",
         ),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(

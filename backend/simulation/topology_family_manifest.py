@@ -9,6 +9,7 @@ from backend.simulation.aperiodic_family_manifest import (
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
     PENROSE_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     PINWHEEL_GEOMETRY,
@@ -324,6 +325,10 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
+    PENROSE_P1_GEOMETRY: _translated_aperiodic_family(
+        PENROSE_P1_GEOMETRY,
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
+    ),
     PENROSE_P2_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P2_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
@@ -479,6 +484,7 @@ __all__ = [
     "KISRHOMBILLE_GEOMETRY",
     "PATCH_DEPTH_CONTROL",
     "PENROSE_GEOMETRY",
+    "PENROSE_P1_GEOMETRY",
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
     "PICKER_GROUP_ORDER",
