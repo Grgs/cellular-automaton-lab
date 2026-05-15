@@ -20,6 +20,7 @@ export const KITE_KIND = "kite";
 export const DART_KIND = "dart";
 export const P1_PENTAGON_KIND = "p1-pentagon";
 export const P1_DIAMOND_KIND = "p1-diamond";
+export const P1_DIAMOND_HALF_KIND = "p1-diamond-half";
 export const PENROSE_P1_TILE_FAMILY = "penrose-p1";
 export const AMMANN_RHOMB_KIND = "rhomb";
 export const AMMANN_SQUARE_KIND = "square";

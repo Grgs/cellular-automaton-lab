@@ -38,6 +38,7 @@ KITE_HALF_ACUTE_KIND = "kite-half-acute"
 DART_HALF_OBTUSE_KIND = "dart-half-obtuse"
 P1_PENTAGON_KIND = "p1-pentagon"
 P1_DIAMOND_KIND = "p1-diamond"
+P1_DIAMOND_HALF_KIND = "p1-diamond-half"
 AMMANN_RHOMB_KIND = "rhomb"
 AMMANN_SQUARE_KIND = "square"
 SPECTRE_KIND = "spectre"
@@ -110,16 +111,18 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         picker_group="Aperiodic",
         picker_order=205,
         default_rule="life-b2-s23",
-        builder_kind="compatibility_patch",
-        # Built on top of the de Bruijn pentagrid construction shared with P3
-        # (``backend/simulation/penrose.py``) and relabelled into the P1
-        # rhomb-dual prototile set: thin rhombs become geometrically exact P1
-        # diamonds, thick rhombs become P1 pentagons (the rhomb-region MLD
-        # representative of Penrose's published pentagonal prototile). The
-        # depth-to-cell-count sequence (5/10/24/66 at depths 0..3) is governed
-        # by the same bounding-box crop at ``0.85 * phi^d`` as P3.
-        implementation_status="canonical_patch",
-        public_cell_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND),
+        builder_kind="substitution_recipe",
+        # Built by Penrose's 1974 pentagonal substitution: each pentagon at
+        # scale s deflates to 1 inverted central pentagon (side s/phi^2) +
+        # 5 outer upright pentagons (side s/phi^2, one per parent vertex) +
+        # 5 acute Robinson half-tiles at parent edges. Boundary halves pair
+        # across parent edges into thin rhombs (the canonical P1 diamond);
+        # halves on the outermost patch boundary surface as ``p1-diamond-half``
+        # cells (Option-2 boundary treatment). Depth-to-cell-count sequence
+        # 1/11/66/386 follows from the 1 -> 6 pentagon expansion plus
+        # accumulated boundary halves at each level.
+        implementation_status="true_substitution",
+        public_cell_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND, P1_DIAMOND_HALF_KIND),
     ),
     PENROSE_P2_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P2_GEOMETRY,
@@ -313,6 +316,7 @@ __all__ = [
     "HAT_TILE_FAMILY",
     "KITE_HALF_ACUTE_KIND",
     "KITE_KIND",
+    "P1_DIAMOND_HALF_KIND",
     "P1_DIAMOND_KIND",
     "P1_PENTAGON_KIND",
     "PENROSE_GEOMETRY",

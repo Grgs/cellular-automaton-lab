@@ -623,9 +623,9 @@
       },
       "sizing_policy": {
         "control": "patch_depth",
-        "default": 4,
+        "default": 2,
         "min": 0,
-        "max": 6
+        "max": 3
       }
     },
     {
@@ -1263,11 +1263,12 @@
       "tiling_family": "penrose-p1-pentagon-diamond",
       "label": "Penrose P1 Pentagon-Diamond",
       "experimental": false,
-      "implementation_status": "canonical_patch",
+      "implementation_status": "true_substitution",
       "promotion_blocker": null,
       "public_cell_kinds": [
         "p1-pentagon",
-        "p1-diamond"
+        "p1-diamond",
+        "p1-diamond-half"
       ]
     },
     {

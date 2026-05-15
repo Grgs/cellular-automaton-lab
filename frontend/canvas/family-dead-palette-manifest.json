@@ -127,6 +127,12 @@
           "label": "penrose-p1-diamond",
           "selector": {"kind": "p1-diamond"},
           "color": {"token": "toneTan"}
+        },
+        {
+          "label": "penrose-p1-diamond-half",
+          "selector": {"kind": "p1-diamond-half"},
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
         }
       ]
     },
