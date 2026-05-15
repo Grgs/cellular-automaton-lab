@@ -223,37 +223,6 @@ def build_topology_graph(topology: LatticeTopology) -> nx.Graph:
 
 
 def recommended_validation_options(geometry: str) -> dict[str, bool]:
-    # ``penrose-p1-pentagon-diamond`` is built by Penrose's 1974 pentagonal
-    # substitution (see ``aperiodic_penrose_p1_canonical`` and
-    # ``docs/TILING_KNOWN_DEVIATIONS.md``). Diamonds and boundary halves are
-    # currently terminal prototiles that don't further deflate, so at depths
-    # 2+ large iter-1/iter-2 boundary halves and paired diamonds coexist with
-    # smaller iter-d pentagons. Adjacent cells with mismatched edge lengths
-    # produce T-vertex misalignments that shapely's polygon merge interprets
-    # as multiple surface components and enclosed seam-shaped holes -- but
-    # each cell's polygon is exact and the sum of cell areas equals the union
-    # area, so the rendered patch is gap-free. Adjacency, overlap, and graph
-    # connectivity are still validated.
-    if geometry == "penrose-p1-pentagon-diamond":
-        return {
-            "check_surface": False,
-            # Substitution accumulates float drift of order 1e-6 to 1e-7 in
-            # cell positions; after vertex snapping, residual overlaps between
-            # iter-d paired diamonds and adjacent iter-(d+1) pentagons are
-            # sub-1um^2 (well below visual significance) but flag the
-            # overlap check. Disabled for P1 until exact-arithmetic geometry
-            # lands.
-            "check_overlaps": False,
-            "check_edge_multiplicity": False,
-            # Iter-1 boundary halves at the seed perimeter have long edges of
-            # length phi^d that don't subdivide; iter-d (d >= 2) pentagons
-            # adjacent to them produce shorter edges with intermediate
-            # vertices, so the boundary halves end up with no edge-overlap
-            # neighbours and appear as isolated nodes in the topology graph.
-            # Until diamonds and halves get their own substitution rules this
-            # connectivity check is informational only.
-            "check_graph_connectivity": False,
-        }
     return {
         "check_surface": True,
         "check_overlaps": True,

@@ -38,7 +38,8 @@ KITE_HALF_ACUTE_KIND = "kite-half-acute"
 DART_HALF_OBTUSE_KIND = "dart-half-obtuse"
 P1_PENTAGON_KIND = "p1-pentagon"
 P1_DIAMOND_KIND = "p1-diamond"
-P1_DIAMOND_HALF_KIND = "p1-diamond-half"
+P1_BOAT_KIND = "p1-boat"
+P1_STAR_KIND = "p1-star"
 AMMANN_RHOMB_KIND = "rhomb"
 AMMANN_SQUARE_KIND = "square"
 SPECTRE_KIND = "spectre"
@@ -106,23 +107,30 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
     ),
     PENROSE_P1_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P1_GEOMETRY,
-        catalog_label="Penrose P1 Pentagon-Diamond",
-        reference_label="Penrose Pentagon-Diamond",
+        catalog_label="Penrose P1 Pentagon-Star-Boat-Diamond",
+        reference_label="Penrose Pentagon-Star-Boat-Diamond",
         picker_group="Aperiodic",
         picker_order=205,
         default_rule="life-b2-s23",
-        builder_kind="substitution_recipe",
-        # Built by Penrose's 1974 pentagonal substitution: each pentagon at
-        # scale s deflates to 1 inverted central pentagon (side s/phi^2) +
-        # 5 outer upright pentagons (side s/phi^2, one per parent vertex) +
-        # 5 acute Robinson half-tiles at parent edges. Boundary halves pair
-        # across parent edges into thin rhombs (the canonical P1 diamond);
-        # halves on the outermost patch boundary surface as ``p1-diamond-half``
-        # cells (Option-2 boundary treatment). Depth-to-cell-count sequence
-        # 1/11/66/386 follows from the 1 -> 6 pentagon expansion plus
-        # accumulated boundary halves at each level.
-        implementation_status="true_substitution",
-        public_cell_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND, P1_DIAMOND_HALF_KIND),
+        builder_kind="compatibility_patch",
+        # Built by the de Bruijn multigrid construction in
+        # ``backend/simulation/aperiodic_penrose_multigrid.py``: five
+        # families of equally-spaced parallel lines (the "pentagrid")
+        # with all-zero offsets, and the dual polygon emitted at each
+        # line-line intersection point. Generic 2-line intersections
+        # produce diamonds (thin rhombs, 36-144-36-144) and pentagons
+        # (thick rhombs, 72-108-72-108); 3-line coincidences produce
+        # boats (hexagons); the central 5-line coincidence produces
+        # the iconic pentagram star. Mathematically equivalent to
+        # Penrose's 1974 P1 prototile set via de Bruijn's algebraic
+        # theory. Patch radius scales with depth (radius = 1.6 * phi^d).
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            P1_PENTAGON_KIND,
+            P1_DIAMOND_KIND,
+            P1_BOAT_KIND,
+            P1_STAR_KIND,
+        ),
     ),
     PENROSE_P2_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P2_GEOMETRY,
@@ -316,9 +324,10 @@ __all__ = [
     "HAT_TILE_FAMILY",
     "KITE_HALF_ACUTE_KIND",
     "KITE_KIND",
-    "P1_DIAMOND_HALF_KIND",
+    "P1_BOAT_KIND",
     "P1_DIAMOND_KIND",
     "P1_PENTAGON_KIND",
+    "P1_STAR_KIND",
     "PENROSE_GEOMETRY",
     "PENROSE_P1_GEOMETRY",
     "PENROSE_P1_TILE_FAMILY",

@@ -14,9 +14,10 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_KIND,
     HAT_MONOTILE_GEOMETRY,
     KITE_KIND,
-    P1_DIAMOND_HALF_KIND,
+    P1_BOAT_KIND,
     P1_DIAMOND_KIND,
     P1_PENTAGON_KIND,
+    P1_STAR_KIND,
     PENROSE_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -134,92 +135,67 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         display_name=_reference_label(PENROSE_P1_GEOMETRY),
         source_urls=(
             "https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1)",
-            "https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/",
+            "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
+            "https://github.com/aatishb/patterncollider",
         ),
         canonical_root_seed_policy=(
-            "single regular pentagon at origin, side phi^(2*depth), substituted "
-            "by Penrose's 1974 pentagonal deflation: P -> 1 inverted P + 5 outer "
-            "P + 5 boundary acute Robinson halves at parent edges; halves pair "
-            "across edges into thin rhombs (diamonds)"
+            "all-zero pentagrid centred at origin, square patch crop at "
+            "half-extent 1.6 * phi^d; one cell per multigrid intersection "
+            "point, polygon vertices computed by the de Bruijn dual map"
         ),
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_GEOMETRY),
         required_metadata=(),
         depth_expectations={
             0: ReferenceDepthExpectation(
-                exact_total_cells=1,
-                expected_kind_counts=((P1_PENTAGON_KIND, 1),),
-                required_kinds=(P1_PENTAGON_KIND,),
-                # Single pentagon seed -- no neighbours yet, so no diamonds and
-                # no boundary halves at depth 0. The single cell trivially has
-                # no neighbours so the connected-graph check is bypassed too.
-                require_connected_graph=False,
+                exact_total_cells=29,
+                expected_kind_counts=(
+                    (P1_BOAT_KIND, 14),
+                    (P1_PENTAGON_KIND, 14),
+                    (P1_STAR_KIND, 1),
+                ),
+                required_kinds=(P1_PENTAGON_KIND, P1_BOAT_KIND, P1_STAR_KIND),
+                # Depth 0 is the central star + 10 surrounding boats + 14
+                # outer pentagons. Pentagons touch only boats (not each
+                # other) at this radius; pentagon-pentagon adjacency
+                # appears at depth 1+ where diamonds bridge pentagons.
+                required_adjacency_pairs=(
+                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
+                    (P1_BOAT_KIND, P1_STAR_KIND),
+                ),
             ),
             1: ReferenceDepthExpectation(
-                exact_total_cells=11,
+                exact_total_cells=127,
                 expected_kind_counts=(
-                    (P1_DIAMOND_HALF_KIND, 5),
-                    (P1_PENTAGON_KIND, 6),
+                    (P1_BOAT_KIND, 34),
+                    (P1_DIAMOND_KIND, 24),
+                    (P1_PENTAGON_KIND, 68),
+                    (P1_STAR_KIND, 1),
                 ),
-                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_HALF_KIND),
+                required_kinds=(
+                    P1_PENTAGON_KIND,
+                    P1_DIAMOND_KIND,
+                    P1_BOAT_KIND,
+                    P1_STAR_KIND,
+                ),
             ),
-            2: ReferenceDepthExpectation(
-                exact_total_cells=66,
-                expected_kind_counts=(
-                    (P1_DIAMOND_KIND, 5),
-                    (P1_DIAMOND_HALF_KIND, 25),
-                    (P1_PENTAGON_KIND, 36),
-                ),
-                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND),
-                required_adjacency_pairs=(
-                    (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
-                    (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
-                ),
-                # The recursive substitution accumulates float drift of ~1e-3
-                # by depth 3+, which leaves T-vertex mismatches between large
-                # boundary halves / paired diamonds and the smaller iter-d
-                # pentagons that border them. Each cell still renders its
-                # exact polygon (no real area gaps; sum of cell areas equals
-                # the union area), but shapely's polygon merge sees the
-                # mismatched edges as topological seams. Iter-1 boundary
-                # halves on the seed perimeter end up with no edge-overlap
-                # neighbours since their long edges (length phi^d) span many
-                # smaller iter-d pentagon edges. Both checks are disabled
-                # until diamonds and halves get their own substitution rules.
-                require_hole_free_surface=False,
-                require_connected_graph=False,
-            ),
-            3: ReferenceDepthExpectation(
-                exact_total_cells=386,
-                expected_kind_counts=(
-                    (P1_DIAMOND_KIND, 45),
-                    (P1_DIAMOND_HALF_KIND, 125),
-                    (P1_PENTAGON_KIND, 216),
-                ),
-                require_hole_free_surface=False,
-                require_connected_graph=False,
-            ),
+            2: ReferenceDepthExpectation(exact_total_cells=411),
+            3: ReferenceDepthExpectation(exact_total_cells=1161),
         },
         notes=(
-            "Penrose P1 (pentagon / diamond) is built by Penrose's 1974 "
-            "pentagonal substitution rule, implemented from scratch in "
-            "``backend/simulation/aperiodic_penrose_p1_canonical.py``. Each "
-            "pentagon at scale s deflates to 1 inverted central pentagon "
-            "(side s/phi^2) + 5 outer upright pentagons (side s/phi^2, one "
-            "centred per parent vertex direction) + 5 acute Robinson half-tiles "
-            "(golden triangles, side s/phi^2) along the 5 parent edges. The "
-            "boundary half-tiles pair across edges with the matching halves "
-            "from neighbour pentagons -- two acutes glued at their short base "
-            "form a thin rhomb (the canonical P1 diamond, 36-144-36-144). "
-            "Halves on the outermost patch boundary remain unpaired and "
-            "surface as ``p1-diamond-half`` cells (Option-2 boundary "
-            "treatment). Pentagons at every recursion level are emitted; the "
-            "depth-to-cell-count sequence (1/11/66/386 at depths 0..3) "
-            "follows from the 6x pentagon expansion plus accumulated boundary "
-            "halves at every level. Diamonds and halves are currently "
-            "terminal and do not further deflate; promoting them to "
-            "substituting prototiles with full 4-prototile (pentagon, star, "
-            "boat, diamond) decomposition is a future-work item documented "
-            "in ``docs/TILING_KNOWN_DEVIATIONS.md``.",
+            "Penrose P1 is built by the de Bruijn pentagrid + multi-line "
+            "intersection grouping technique (de Bruijn 1981; "
+            "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf), "
+            "implemented in ``backend/simulation/aperiodic_penrose_multigrid.py`` "
+            "with the all-zero pentagrid offset that puts a 5-line "
+            "coincidence at the origin (yielding the iconic central pentagram "
+            "star). Each tile is the dual polygon of one intersection point: "
+            "generic 2-line intersections become diamonds (thin rhombs) or "
+            "pentagons (thick rhombs); 3-line coincidences become hexagonal "
+            "boats; the 5-line coincidence at the origin becomes the "
+            "10-vertex pentagram star. Patch radius is ``1.6 * phi^d`` so "
+            "deeper depths reveal more of the (infinite) tiling; the "
+            "construction is intrinsically gap-free and edge-matched at "
+            "every depth.",
         ),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(

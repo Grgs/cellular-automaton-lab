@@ -327,14 +327,12 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     PENROSE_P1_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P1_GEOMETRY,
-        # The canonical Penrose 1974 substitution emits 6 pentagons per
-        # parent per round, so cell counts grow roughly 6x per depth: 1 / 11
-        # / 66 / 386 / 2286 at depths 0..4. Build time is dominated by the
-        # neighbour computation and snap pass, both quadratic-ish in cell
-        # count. Depth 3 is interactive (~0.5s); depth 4 takes ~25s; depth
-        # 5+ runs into minutes. Cap maximum at 3 until the builder is
-        # optimised; default 2 keeps the picker slider in a snappy range.
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 3),
+        # The de Bruijn pentagrid construction is approximately linear in
+        # cell count: 29 / 127 / 411 / 1161 / 3247 / 8995 / 24277 cells at
+        # depths 0..6, with build times of <0.01s through ~1s respectively.
+        # Same depth range as P3 since both use a pentagrid bounded by
+        # ``half_extent = base * phi^d``.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
     ),
     PENROSE_P2_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P2_GEOMETRY,

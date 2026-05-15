@@ -129,10 +129,14 @@
           "color": {"token": "toneTan"}
         },
         {
-          "label": "penrose-p1-diamond-half",
-          "selector": {"kind": "p1-diamond-half"},
-          "color": {"token": "toneTan"},
-          "allowSharedDeadColor": true
+          "label": "penrose-p1-boat",
+          "selector": {"kind": "p1-boat"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "penrose-p1-star",
+          "selector": {"kind": "p1-star"},
+          "color": {"token": "toneClay"}
         }
       ]
     },
