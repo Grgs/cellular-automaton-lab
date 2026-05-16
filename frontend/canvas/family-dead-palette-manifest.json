@@ -124,9 +124,19 @@
           "color": {"token": "toneCream"}
         },
         {
+          "label": "penrose-p1-distributed-pentagon-cluster",
+          "selector": {"kind": "p1-pentagon-cluster"},
+          "color": {"token": "toneLinen"}
+        },
+        {
           "label": "penrose-p1-distributed-diamond",
           "selector": {"kind": "p1-diamond"},
           "color": {"token": "toneTan"}
+        },
+        {
+          "label": "penrose-p1-distributed-boat",
+          "selector": {"kind": "p1-boat"},
+          "color": {"token": "toneStone"}
         },
         {
           "label": "penrose-p1-distributed-star",

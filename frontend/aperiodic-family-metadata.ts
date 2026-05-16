@@ -20,6 +20,7 @@ export const THIN_RHOMB_KIND = "thin-rhomb";
 export const KITE_KIND = "kite";
 export const DART_KIND = "dart";
 export const P1_PENTAGON_KIND = "p1-pentagon";
+export const P1_PENTAGON_CLUSTER_KIND = "p1-pentagon-cluster";
 export const P1_DIAMOND_KIND = "p1-diamond";
 export const P1_BOAT_KIND = "p1-boat";
 export const P1_STAR_KIND = "p1-star";

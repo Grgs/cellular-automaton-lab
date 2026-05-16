@@ -23,6 +23,7 @@ import math
 from backend.simulation.aperiodic_family_manifest import (
     P1_BOAT_KIND,
     P1_DIAMOND_KIND,
+    P1_PENTAGON_CLUSTER_KIND,
     P1_PENTAGON_KIND,
     P1_STAR_KIND,
     PENROSE_P1_TILE_FAMILY,
@@ -31,6 +32,7 @@ from backend.simulation.aperiodic_penrose_multigrid import (
     P1_BOAT,
     P1_DIAMOND,
     P1_PENTAGON,
+    P1_PENTAGON_CLUSTER,
     P1_STAR,
     PENROSE_P1_OFFSETS,
     PHI,
@@ -59,6 +61,7 @@ PENROSE_P1_BASE_HALF_EXTENT = 1.6
 
 _MULTIGRID_KIND_TO_CELL_KIND = {
     P1_PENTAGON: P1_PENTAGON_KIND,
+    P1_PENTAGON_CLUSTER: P1_PENTAGON_CLUSTER_KIND,
     P1_DIAMOND: P1_DIAMOND_KIND,
     P1_BOAT: P1_BOAT_KIND,
     P1_STAR: P1_STAR_KIND,
@@ -76,6 +79,7 @@ def _cell_id(prefix: str, vertices: tuple[tuple[float, float], ...]) -> str:
 
 _CELL_ID_PREFIX_BY_KIND = {
     P1_PENTAGON_KIND: "pp",
+    P1_PENTAGON_CLUSTER_KIND: "ppc",
     P1_DIAMOND_KIND: "pd",
     P1_BOAT_KIND: "pb",
     P1_STAR_KIND: "ps",

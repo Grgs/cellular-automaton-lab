@@ -334,6 +334,7 @@ def build_multigrid_cells(
 # vertices in unusual offset configurations).
 P1_DIAMOND = "p1-diamond"
 P1_PENTAGON = "p1-pentagon"
+P1_PENTAGON_CLUSTER = "p1-pentagon-cluster"
 P1_BOAT = "p1-boat"
 P1_STAR = "p1-star"
 P1_OTHER = "p1-other"
@@ -451,8 +452,12 @@ def _signature(attendees: list[tuple[int, float, str]]) -> tuple[tuple[str, int]
 # that should replace the cluster. See the docstring on
 # ``apply_p1_vertex_merge`` for the geometric interpretation of each rule.
 _VERTEX_MERGE_RULES: tuple[tuple[tuple[tuple[str, int], ...], str], ...] = (
-    # Sun vertex: 5 thick rhombs sharing a 72-degree apex -> P1 pentagon.
-    ((((P1_PENTAGON, 72),) * 5), P1_PENTAGON),
+    # Sun vertex: 5 thick rhombs sharing a 72-degree apex -> P1 pentagon
+    # cluster (10-vertex decagonal cell at the canonical P1 pentagon
+    # position). Distinct from unmerged thick rhombs (``p1-pentagon``,
+    # 4-vertex) so renderers and rules can target the cluster shapes
+    # specifically.
+    ((((P1_PENTAGON, 72),) * 5), P1_PENTAGON_CLUSTER),
     # Star vertex: 10 thin rhombs sharing a 36-degree apex -> P1 star
     # (canonical Penrose pentagram). 10 thin rhombs because each thin
     # rhomb's apex angle is 36 degrees and 10 of them sum to 360 around
@@ -536,7 +541,8 @@ def apply_p1_vertex_merge(
 
     * **Sun vertex** -- 5 thick rhombs (p1-pentagon-shape) sharing a
       72-degree apex (5 * 72 = 360). Merged into one 10-vertex decagonal
-      cluster labelled ``p1-pentagon``.
+      cluster labelled ``p1-pentagon-cluster`` (distinct from unmerged
+      thick rhombs which keep the ``p1-pentagon`` label).
     * **Star vertex** -- 10 thin rhombs (p1-diamond-shape) sharing a
       36-degree apex (10 * 36 = 360). Merged into one 20-vertex pentagram
       cluster labelled ``p1-star``.
@@ -633,6 +639,7 @@ __all__ = [
     "P1_DIAMOND",
     "P1_OTHER",
     "P1_PENTAGON",
+    "P1_PENTAGON_CLUSTER",
     "P1_STAR",
     "PENROSE_P1_OFFSETS",
     "PENROSE_PENTAGRID_OFFSETS",

@@ -1293,6 +1293,7 @@
       "promotion_blocker": null,
       "public_cell_kinds": [
         "p1-pentagon",
+        "p1-pentagon-cluster",
         "p1-diamond",
         "p1-boat",
         "p1-star"

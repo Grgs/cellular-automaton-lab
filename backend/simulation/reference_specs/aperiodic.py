@@ -16,6 +16,7 @@ from backend.simulation.aperiodic_family_manifest import (
     KITE_KIND,
     P1_BOAT_KIND,
     P1_DIAMOND_KIND,
+    P1_PENTAGON_CLUSTER_KIND,
     P1_PENTAGON_KIND,
     P1_STAR_KIND,
     PENROSE_GEOMETRY,
@@ -154,14 +155,21 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 expected_kind_counts=(
                     (P1_BOAT_KIND, 11),
                     (P1_DIAMOND_KIND, 13),
-                    (P1_PENTAGON_KIND, 18),
+                    (P1_PENTAGON_KIND, 15),
+                    (P1_PENTAGON_CLUSTER_KIND, 3),
                 ),
-                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND, P1_BOAT_KIND),
+                required_kinds=(
+                    P1_PENTAGON_KIND,
+                    P1_PENTAGON_CLUSTER_KIND,
+                    P1_DIAMOND_KIND,
+                    P1_BOAT_KIND,
+                ),
                 required_adjacency_pairs=(
                     (P1_BOAT_KIND, P1_DIAMOND_KIND),
                     (P1_BOAT_KIND, P1_PENTAGON_KIND),
                     (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
                     (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_CLUSTER_KIND, P1_PENTAGON_KIND),
                 ),
             ),
             1: ReferenceDepthExpectation(
@@ -169,11 +177,13 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 expected_kind_counts=(
                     (P1_BOAT_KIND, 24),
                     (P1_DIAMOND_KIND, 29),
-                    (P1_PENTAGON_KIND, 53),
+                    (P1_PENTAGON_KIND, 43),
+                    (P1_PENTAGON_CLUSTER_KIND, 10),
                     (P1_STAR_KIND, 1),
                 ),
                 required_kinds=(
                     P1_PENTAGON_KIND,
+                    P1_PENTAGON_CLUSTER_KIND,
                     P1_DIAMOND_KIND,
                     P1_BOAT_KIND,
                     P1_STAR_KIND,
@@ -181,9 +191,13 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 required_adjacency_pairs=(
                     (P1_BOAT_KIND, P1_DIAMOND_KIND),
                     (P1_BOAT_KIND, P1_PENTAGON_KIND),
+                    (P1_BOAT_KIND, P1_PENTAGON_CLUSTER_KIND),
                     (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
+                    (P1_DIAMOND_KIND, P1_PENTAGON_CLUSTER_KIND),
                     (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_PENTAGON_CLUSTER_KIND),
                     (P1_PENTAGON_KIND, P1_STAR_KIND),
+                    (P1_PENTAGON_CLUSTER_KIND, P1_STAR_KIND),
                 ),
             ),
             2: ReferenceDepthExpectation(exact_total_cells=272),
@@ -201,8 +215,12 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "and two 3-rhomb boat configurations (one thin + two thick at "
             "144/108/108 degrees, or two thin + one thick at 144/144/72 "
             "degrees). Each cluster collapses into the corresponding P1 "
-            "prototile cell (pentagon, pentagram star, hexagonal boat). "
-            "Pentagons, boats, and stars are distributed throughout the "
+            "prototile cell (sun -> 10-vertex ``p1-pentagon-cluster``, "
+            "star -> 20-vertex ``p1-star``, boat -> 6-vertex ``p1-boat``). "
+            "Unmerged thick rhombs that don't participate in any cluster "
+            "keep the ``p1-pentagon`` label (rhomb-region MLD "
+            "representative of the pentagonal P1 prototile). Pentagon "
+            "clusters, boats, and stars are distributed throughout the "
             "patch rather than concentrated at a single special centre; "
             "every cell renders as a complete polygon and the tiling is "
             "hole-free, edge-matched, and connected at every depth.",
