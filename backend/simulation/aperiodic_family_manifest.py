@@ -117,13 +117,17 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # Built by the de Bruijn multigrid construction in
         # ``backend/simulation/aperiodic_penrose_multigrid.py`` followed by a
         # P3 -> P1 vertex-merge pass over a non-singular pentagrid with
-        # offsets ``(0.3, 0.4, 0.5, 0.6, 0.7)``. The resulting patch distributes
-        # pentagon/star regions across the crop without the centered singular
-        # boat ring present in the all-zero pentagrid manifestation.
+        # offsets ``(0.3, 0.4, 0.5, 0.6, 0.7)``. The vertex-merge pass detects
+        # canonical Penrose vertex configurations (sun, star, two boat
+        # variants) and collapses each into the corresponding P1 prototile,
+        # giving a patch that distributes pentagons, diamonds, boats, and
+        # stars across the crop without the centered singular ring present
+        # in the all-zero pentagrid manifestation.
         implementation_status="canonical_patch",
         public_cell_kinds=(
             P1_PENTAGON_KIND,
             P1_DIAMOND_KIND,
+            P1_BOAT_KIND,
             P1_STAR_KIND,
         ),
     ),

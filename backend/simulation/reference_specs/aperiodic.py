@@ -141,47 +141,53 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         ),
         canonical_root_seed_policy=(
             "non-uniform pentagrid offsets (0.3, 0.4, 0.5, 0.6, 0.7) with "
-            "vertex-merge post-pass: scattered sun and star vertices in the "
-            "underlying P3 rhomb tiling are collapsed into Penrose's P1 "
-            "pentagon and pentagram star prototiles, producing a tiling with "
-            "no concentrated central singularity"
+            "vertex-merge post-pass: scattered sun, star, and boat vertices "
+            "in the underlying P3 rhomb tiling are collapsed into Penrose's "
+            "P1 pentagon, pentagram star, and hexagonal boat prototiles, "
+            "producing a tiling with no concentrated central singularity"
         ),
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_GEOMETRY),
         required_metadata=(),
         depth_expectations={
             0: ReferenceDepthExpectation(
-                exact_total_cells=64,
+                exact_total_cells=42,
                 expected_kind_counts=(
-                    (P1_DIAMOND_KIND, 30),
-                    (P1_PENTAGON_KIND, 34),
+                    (P1_BOAT_KIND, 11),
+                    (P1_DIAMOND_KIND, 13),
+                    (P1_PENTAGON_KIND, 18),
                 ),
-                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND),
+                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND, P1_BOAT_KIND),
                 required_adjacency_pairs=(
+                    (P1_BOAT_KIND, P1_DIAMOND_KIND),
+                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
                     (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
                     (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
                 ),
             ),
             1: ReferenceDepthExpectation(
-                exact_total_cells=156,
+                exact_total_cells=107,
                 expected_kind_counts=(
-                    (P1_DIAMOND_KIND, 66),
-                    (P1_PENTAGON_KIND, 88),
-                    (P1_STAR_KIND, 2),
+                    (P1_BOAT_KIND, 24),
+                    (P1_DIAMOND_KIND, 29),
+                    (P1_PENTAGON_KIND, 53),
+                    (P1_STAR_KIND, 1),
                 ),
                 required_kinds=(
                     P1_PENTAGON_KIND,
                     P1_DIAMOND_KIND,
+                    P1_BOAT_KIND,
                     P1_STAR_KIND,
                 ),
                 required_adjacency_pairs=(
-                    (P1_DIAMOND_KIND, P1_DIAMOND_KIND),
+                    (P1_BOAT_KIND, P1_DIAMOND_KIND),
+                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
                     (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
                     (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
                     (P1_PENTAGON_KIND, P1_STAR_KIND),
                 ),
             ),
-            2: ReferenceDepthExpectation(exact_total_cells=416),
-            3: ReferenceDepthExpectation(exact_total_cells=1136),
+            2: ReferenceDepthExpectation(exact_total_cells=272),
+            3: ReferenceDepthExpectation(exact_total_cells=723),
         },
         notes=(
             "Penrose P1 is built in two stages. Stage 1 runs the de Bruijn "
@@ -189,16 +195,17 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "Aatish Bhatia) with non-uniform offsets ``(0.3, 0.4, 0.5, 0.6, "
             "0.7)`` that produce a regular P3 rhomb tiling without a "
             "concentrated central singularity. Stage 2 (``apply_p1_vertex_"
-            "merge``) walks every rhomb-vertex and identifies the two "
-            "canonical 5-rhomb configurations -- sun vertices (5 thick "
-            "rhombs sharing a 72-degree apex) and star vertices (5 thin "
-            "rhombs sharing a 36-degree apex) -- collapsing each into a "
-            "single P1 prototile cell (pentagon and pentagram star "
-            "respectively). The result is a Penrose P1 tiling with the "
-            "pentagons and stars distributed throughout the patch rather "
-            "than concentrated at a single special centre; every cell "
-            "renders as a complete polygon and the tiling is hole-free, "
-            "edge-matched, and connected at every depth.",
+            "merge``) walks every rhomb-vertex and identifies the four "
+            "canonical Penrose vertex configurations: sun (5 thick rhombs "
+            "at 72-degree apex), star (10 thin rhombs at 36-degree apex), "
+            "and two 3-rhomb boat configurations (one thin + two thick at "
+            "144/108/108 degrees, or two thin + one thick at 144/144/72 "
+            "degrees). Each cluster collapses into the corresponding P1 "
+            "prototile cell (pentagon, pentagram star, hexagonal boat). "
+            "Pentagons, boats, and stars are distributed throughout the "
+            "patch rather than concentrated at a single special centre; "
+            "every cell renders as a complete polygon and the tiling is "
+            "hole-free, edge-matched, and connected at every depth.",
         ),
     ),
     PENROSE_P1_PBS_GEOMETRY: ReferenceFamilySpec(
