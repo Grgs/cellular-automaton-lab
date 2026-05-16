@@ -604,7 +604,7 @@
     },
     {
       "tiling_family": "penrose-p1-pentagon-diamond",
-      "label": "Penrose P1 Pentagon-Diamond",
+      "label": "Penrose P1 Pentagon-Diamond (Distributed)",
       "picker_group": "Aperiodic",
       "picker_order": 205,
       "sizing_mode": "patch_depth",
@@ -1287,14 +1287,13 @@
   "aperiodic_families": [
     {
       "tiling_family": "penrose-p1-pentagon-diamond",
-      "label": "Penrose P1 Pentagon-Diamond",
+      "label": "Penrose P1 Pentagon-Diamond (Distributed)",
       "experimental": false,
       "implementation_status": "canonical_patch",
       "promotion_blocker": null,
       "public_cell_kinds": [
         "p1-pentagon",
         "p1-diamond",
-        "p1-boat",
         "p1-star"
       ]
     },

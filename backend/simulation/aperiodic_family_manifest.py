@@ -108,28 +108,22 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
     ),
     PENROSE_P1_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P1_GEOMETRY,
-        catalog_label="Penrose P1 Pentagon-Diamond",
-        reference_label="Penrose Pentagon-Diamond",
+        catalog_label="Penrose P1 Pentagon-Diamond (Distributed)",
+        reference_label="Penrose Pentagon-Diamond (Distributed)",
         picker_group="Aperiodic",
         picker_order=205,
         default_rule="life-b2-s23",
         builder_kind="compatibility_patch",
         # Built by the de Bruijn multigrid construction in
-        # ``backend/simulation/aperiodic_penrose_multigrid.py``: five
-        # families of equally-spaced parallel lines (the "pentagrid")
-        # with all-zero offsets, and the dual polygon emitted at each
-        # line-line intersection point. Generic 2-line intersections
-        # produce diamonds (thin rhombs, 36-144-36-144) and pentagons
-        # (thick rhombs, 72-108-72-108); 3-line coincidences produce
-        # boats (hexagons); the central 5-line coincidence produces
-        # the iconic pentagram star. Mathematically equivalent to
-        # Penrose's 1974 P1 prototile set via de Bruijn's algebraic
-        # theory. Patch radius scales with depth (radius = 1.6 * phi^d).
+        # ``backend/simulation/aperiodic_penrose_multigrid.py`` followed by a
+        # P3 -> P1 vertex-merge pass over a non-singular pentagrid with
+        # offsets ``(0.3, 0.4, 0.5, 0.6, 0.7)``. The resulting patch distributes
+        # pentagon/star regions across the crop without the centered singular
+        # boat ring present in the all-zero pentagrid manifestation.
         implementation_status="canonical_patch",
         public_cell_kinds=(
             P1_PENTAGON_KIND,
             P1_DIAMOND_KIND,
-            P1_BOAT_KIND,
             P1_STAR_KIND,
         ),
     ),

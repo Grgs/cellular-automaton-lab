@@ -45,10 +45,6 @@ class AperiodicFamilyContractTests(unittest.TestCase):
                     "penrose-p1-pentagon-diamond",
                     "penrose-p1-pentagon-boat-star",
                 ),
-                "p1-boat": (
-                    "penrose-p1-pentagon-diamond",
-                    "penrose-p1-pentagon-boat-star",
-                ),
                 "p1-star": (
                     "penrose-p1-pentagon-diamond",
                     "penrose-p1-pentagon-boat-star",

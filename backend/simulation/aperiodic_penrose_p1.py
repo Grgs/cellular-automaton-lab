@@ -1,25 +1,19 @@
-"""Penrose P1 (pentagon / star / boat / diamond) tiling.
+"""Distributed Penrose P1 pentagon-diamond patch.
 
-Built by the de Bruijn multigrid construction in
-``aperiodic_penrose_multigrid``. Each P1 cell is the dual polygon of one
-intersection point in a 5-fold pentagrid:
+This family starts from a non-singular de Bruijn pentagrid / P3 rhomb patch with
+offsets ``(0.3, 0.4, 0.5, 0.6, 0.7)`` and then applies a deterministic
+vertex-merge post-pass:
 
-* Generic 2-line intersections -> 4-vertex rhomb. Classified into
-  ``p1-diamond`` (thin rhomb, 36-144-36-144) or ``p1-pentagon`` (thick
-  rhomb, 72-108-72-108) by interior-angle measurement.
-* 3-line coincidences -> 6-vertex hexagonal ``p1-boat``.
-* The central 5-line coincidence in the all-zero pentagrid -> 10-vertex
-  pentagram ``p1-star``.
+* 5 thick rhombs meeting at a sun vertex collapse into one ``p1-pentagon``.
+* 5 thin rhombs meeting at a star vertex collapse into one ``p1-star``.
+* Unmerged thick rhombs remain ``p1-pentagon`` MLD representatives.
+* Unmerged thin rhombs remain exact ``p1-diamond`` cells.
 
-The pentagrid construction is intrinsically gap-free at every patch radius
-and naturally produces all four canonical P1 prototiles, so the previous
-substitution-based draft (with its visible boundary half-tiles, T-vertex
-artefacts, and missing star / boat prototiles) is fully superseded.
-
-The patch is a square of half-extent ``1.6 * phi^d`` at depth ``d``. The
-half-extent at depth 0 is chosen to capture the central pentagram star
-plus its immediate surrounding ring of pentagons + boats; subsequent
-depths inflate the patch to expose more of the (infinite) tiling.
+The result is a gap-free, edge-matched Penrose P1-style patch whose pentagon and
+star regions are distributed across the crop rather than concentrated around the
+centered singular pentagram. This builder does not emit canonical P1 boats; the
+literal centered ``pentagon-boat-star`` manifestation is implemented separately in
+``aperiodic_penrose_p1_pbs``.
 """
 
 from __future__ import annotations
@@ -55,11 +49,10 @@ from backend.simulation.aperiodic_support import (
 )
 
 
-# Depth-0 half-extent: large enough to capture the central pentagram star
-# plus the first ring of surrounding pentagons + boats, but small enough
-# that depth 0 isn't an enormous patch. Subsequent depths scale by phi
-# per round (so depth 4 covers the same area as depth 0 at four levels of
-# zoom-out, matching the natural quasiperiodic scale hierarchy).
+# Depth-0 half-extent: large enough to capture multiple distributed sun/star
+# configurations without immediately inflating to an oversized crop. Subsequent
+# depths scale by phi per round, matching the quasiperiodic scale hierarchy of
+# the underlying P3 pentagrid patch.
 PENROSE_P1_BASE_HALF_EXTENT = 1.6
 
 

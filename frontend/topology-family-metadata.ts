@@ -145,7 +145,7 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         viewportSyncMode: "backend-sync",
     },
     "penrose-p1-pentagon-diamond": {
-        label: "Penrose P1 Pentagon-Diamond",
+        label: "Penrose P1 Pentagon-Diamond (Distributed)",
         pickerGroup: "Aperiodic",
         pickerOrder: 205,
         family: "aperiodic",
