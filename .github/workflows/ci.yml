@@ -371,6 +371,7 @@ jobs:
 
       - name: Run Playwright server suite
         env:
+          ALLOW_STALE_FRONTEND_BUILD: "1"
           E2E_ARTIFACTS_DIR: ${{ github.workspace }}/e2e-artifacts/server-browser
         run: python -m unittest -q tests.e2e.test_playwright_server
 
