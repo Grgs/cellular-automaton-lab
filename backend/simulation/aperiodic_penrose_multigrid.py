@@ -439,6 +439,88 @@ def _polygon_centroid(
     )
 
 
+def _signature(attendees: list[tuple[int, float, str]]) -> tuple[tuple[str, int], ...]:
+    """Canonical sorted (kind, rounded-angle) signature for a vertex's
+    attendees. Lets us match observed vertex configurations against the
+    canonical Penrose vertex rule table by simple tuple equality."""
+    return tuple(sorted((kind, int(round(angle))) for _, angle, kind in attendees))
+
+
+# Canonical Penrose vertex configurations (each tuple is sorted (kind, angle)
+# pairs that sum to 360 degrees at the vertex) mapped to the P1 prototile
+# that should replace the cluster. See the docstring on
+# ``apply_p1_vertex_merge`` for the geometric interpretation of each rule.
+_VERTEX_MERGE_RULES: tuple[tuple[tuple[tuple[str, int], ...], str], ...] = (
+    # Sun vertex: 5 thick rhombs sharing a 72-degree apex -> P1 pentagon.
+    ((((P1_PENTAGON, 72),) * 5), P1_PENTAGON),
+    # Star vertex: 10 thin rhombs sharing a 36-degree apex -> P1 star
+    # (canonical Penrose pentagram). 10 thin rhombs because each thin
+    # rhomb's apex angle is 36 degrees and 10 of them sum to 360 around
+    # the shared apex.
+    ((((P1_DIAMOND, 36),) * 10), P1_STAR),
+    # Two 3-rhomb configurations that sum to 360 and merge into 6-vertex
+    # hexagonal cells -- the boat prototile in our shipped P1 vocabulary.
+    # See ``aperiodic_penrose_p1_pbs.py`` for the geometrically related
+    # 3-line-coincidence boats from the all-zero pentagrid; these
+    # vertex-merge boats are the distributed-pentagrid analogue.
+    (
+        (
+            (P1_DIAMOND, 144),
+            (P1_PENTAGON, 108),
+            (P1_PENTAGON, 108),
+        ),
+        P1_BOAT,
+    ),
+    (
+        (
+            (P1_DIAMOND, 144),
+            (P1_DIAMOND, 144),
+            (P1_PENTAGON, 72),
+        ),
+        P1_BOAT,
+    ),
+)
+
+
+def _merge_polygon_outer_boundary(
+    apex: tuple[float, float],
+    cells: list[MultigridCell],
+    indices: list[int],
+) -> tuple[tuple[float, float], ...]:
+    """Compute the outer boundary of a cluster of rhombs sharing one apex.
+
+    For ``k`` rhombs sharing one apex, the outer boundary is a polygon
+    with ``2k`` vertices alternating rhomb-outer and shared-with-neighbour
+    vertices. Returned vertices are CCW around the apex (and thus around
+    the merged polygon's centroid, since the apex is on the merged
+    polygon's interior for any complete ring).
+    """
+    apex_x, apex_y = apex
+    outer_vertices: list[tuple[float, float]] = []
+    for cell_index in indices:
+        for vertex in cells[cell_index].vertices:
+            if abs(vertex[0] - apex_x) < 1e-5 and abs(vertex[1] - apex_y) < 1e-5:
+                continue
+            outer_vertices.append(vertex)
+    outer_vertices.sort(key=lambda v: math.atan2(v[1] - apex_y, v[0] - apex_x))
+    deduplicated: list[tuple[float, float]] = []
+    for vertex in outer_vertices:
+        if deduplicated:
+            dx = vertex[0] - deduplicated[-1][0]
+            dy = vertex[1] - deduplicated[-1][1]
+            if dx * dx + dy * dy < 1e-10:
+                continue
+        deduplicated.append(vertex)
+    if (
+        len(deduplicated) > 1
+        and (deduplicated[0][0] - deduplicated[-1][0]) ** 2
+        + (deduplicated[0][1] - deduplicated[-1][1]) ** 2
+        < 1e-10
+    ):
+        deduplicated.pop()
+    return tuple(deduplicated)
+
+
 def apply_p1_vertex_merge(
     cells: list[MultigridCell],
     *,
@@ -448,26 +530,32 @@ def apply_p1_vertex_merge(
     """Replace canonical Penrose vertex configurations in a rhomb tiling with
     Penrose's P1 prototiles.
 
-    Walks every rhomb-vertex in the input tiling and identifies the two
-    canonical 5-rhomb configurations:
+    Walks every rhomb-vertex in the input tiling and merges clusters that
+    match the canonical Penrose vertex configurations in
+    ``_VERTEX_MERGE_RULES``:
 
-    * **Sun vertex** -- 5 thick rhombs (p1-pentagon-shape) sharing a 72-degree
-      apex at one point. Replace the 5 rhombs with one regular-decagon cell
-      labelled ``p1-star`` ... no, ``p1-pentagon``. Wait: in canonical P1, the
-      sun configuration becomes a pentagon (centered at the sun vertex,
-      surrounded by other prototiles). We emit a 10-vertex shape (the convex
-      hull of all 10 outer rhomb vertices) and let the polygon classifier
-      label it ``p1-star``; the rendered shape is a regular decagon which
-      reads visually as the pentagon-cluster centre in P1.
+    * **Sun vertex** -- 5 thick rhombs (p1-pentagon-shape) sharing a
+      72-degree apex (5 * 72 = 360). Merged into one 10-vertex decagonal
+      cluster labelled ``p1-pentagon``.
+    * **Star vertex** -- 10 thin rhombs (p1-diamond-shape) sharing a
+      36-degree apex (10 * 36 = 360). Merged into one 20-vertex pentagram
+      cluster labelled ``p1-star``.
+    * **Boat (variant 1)** -- 3 rhombs (1 thin + 2 thick) summing to
+      360 = 144 + 108 + 108. Merged into one 6-vertex hexagonal cell
+      labelled ``p1-boat``.
+    * **Boat (variant 2)** -- 3 rhombs (2 thin + 1 thick) summing to
+      360 = 144 + 144 + 72. Merged into one 6-vertex hexagonal cell
+      labelled ``p1-boat``.
 
-    * **Star vertex** -- 5 thin rhombs (p1-diamond-shape) sharing a 36-degree
-      apex. Replace the 5 rhombs with one 10-vertex cell labelled
-      ``p1-star``; geometrically this is the Penrose pentagram star.
+    Larger configurations take precedence: if a rhomb already participates
+    in a sun or star merge, it is excluded from any boat merge. The
+    iteration order processes longer rules first so the precedence is
+    inherent rather than depending on apex coordinate ordering.
 
-    Rhombs that don't participate in either configuration are emitted
+    Rhombs that don't participate in any of the rules are emitted
     unchanged. The merge is purely topological: no rhomb area is added or
-    lost, and the polygon's outer boundary is the union of the 5 merged
-    rhomb perimeters.
+    lost, and each merged polygon's outer boundary is the union of the
+    merged rhomb perimeters.
     """
     # Group rhombs by shared vertex, recording each rhomb's interior angle
     # contribution at the shared vertex.
@@ -486,80 +574,47 @@ def apply_p1_vertex_merge(
             )
             vertex_rhombs[key].append((cell_index, angles[vertex_index], kind))
 
+    # Process rules in order of decreasing cluster size so larger merges
+    # claim their rhombs before smaller (boat) merges. This also matches
+    # the canonical Penrose interpretation: a sun or star configuration is
+    # never reinterpreted as overlapping boats.
+    rules_by_size = sorted(_VERTEX_MERGE_RULES, key=lambda r: -len(r[0]))
+
     merged_rhomb_indices: set[int] = set()
     merged_cells: list[MultigridCell] = []
 
-    # Sort vertices for deterministic output.
-    for key in sorted(vertex_rhombs):
-        attendees = vertex_rhombs[key]
-        if len(attendees) != 5:
-            continue
-        kinds = {kind for _, _, kind in attendees}
-        if len(kinds) != 1:
-            continue
-        kind = kinds.pop()
-        target_angle = 72.0 if kind == P1_PENTAGON else 36.0
-        if not all(
-            abs(angle - target_angle) <= angle_tolerance_degrees for _, angle, _ in attendees
-        ):
-            continue
-        indices = [idx for idx, _, _ in attendees]
-        if any(idx in merged_rhomb_indices for idx in indices):
-            continue
-        # Collect the 5 rhombs and form a merged polygon = ordered outer
-        # boundary of their union. Since all 5 share the apex vertex and
-        # are arranged with 5-fold rotational symmetry around it, the
-        # outer boundary is a 10-vertex polygon visiting alternating rhomb
-        # apex and side vertices in CCW order around the apex.
-        apex_x = key[0] / (10**vertex_snap)
-        apex_y = key[1] / (10**vertex_snap)
-        outer_vertices: list[tuple[float, float]] = []
-        for cell_index in indices:
-            for vertex in cells[cell_index].vertices:
-                if abs(vertex[0] - apex_x) < 1e-5 and abs(vertex[1] - apex_y) < 1e-5:
-                    continue
-                outer_vertices.append(vertex)
-        # Sort outer vertices CCW around the apex.
-        outer_vertices.sort(
-            key=lambda v: math.atan2(v[1] - apex_y, v[0] - apex_x),
-        )
-        # Deduplicate vertices that two adjacent rhombs share (4-vertex
-        # rhombs share 2 vertices with each neighbour around the apex, but
-        # only one of those is on the OUTER boundary; the other is the
-        # apex itself which we already excluded).
-        deduplicated: list[tuple[float, float]] = []
-        for vertex in outer_vertices:
-            if deduplicated:
-                dx = vertex[0] - deduplicated[-1][0]
-                dy = vertex[1] - deduplicated[-1][1]
-                if dx * dx + dy * dy < 1e-10:
-                    continue
-            deduplicated.append(vertex)
-        # Handle wrap-around duplicate.
-        if (
-            len(deduplicated) > 1
-            and (deduplicated[0][0] - deduplicated[-1][0]) ** 2
-            + (deduplicated[0][1] - deduplicated[-1][1]) ** 2
-            < 1e-10
-        ):
-            deduplicated.pop()
-        if len(deduplicated) < 5:
-            continue
-        # Sun vertex (5 thick rhombs at 72-degree apex) -> pentagon (a
-        # convex 10-vertex decagonal cluster, the rhomb-region MLD
-        # representative of the pentagonal P1 prototile).
-        # Star vertex (5 thin rhombs at 36-degree apex) -> pentagram star
-        # (the canonical 10-vertex P1 star).
-        classification_hint = P1_PENTAGON if kind == P1_PENTAGON else P1_STAR
-        merged_cells.append(
-            MultigridCell(
-                intersection_point=(apex_x, apex_y),
-                line_count=5,
-                vertices=tuple(deduplicated),
-                classification_hint=classification_hint,
+    for signature, classification_hint in rules_by_size:
+        expected_size = len(signature)
+        # Snap angle tolerance into the integer signature: build the
+        # observed signature with rounded angles and compare for equality.
+        for key in sorted(vertex_rhombs):
+            attendees = vertex_rhombs[key]
+            if len(attendees) != expected_size:
+                continue
+            observed = _signature(attendees)
+            if observed != signature:
+                continue
+            indices = [idx for idx, _, _ in attendees]
+            if any(idx in merged_rhomb_indices for idx in indices):
+                continue
+            apex_x = key[0] / (10**vertex_snap)
+            apex_y = key[1] / (10**vertex_snap)
+            deduplicated = _merge_polygon_outer_boundary((apex_x, apex_y), cells, indices)
+            # Minimum vertex counts: sun=10, star=20, boat=6. If the
+            # outer boundary collapses below the expected count there is
+            # a vertex-snap issue with the input; skip rather than emit a
+            # degenerate polygon.
+            if len(deduplicated) < expected_size + 1:
+                continue
+            merged_cells.append(
+                MultigridCell(
+                    intersection_point=(apex_x, apex_y),
+                    line_count=expected_size,
+                    vertices=deduplicated,
+                    classification_hint=classification_hint,
+                )
             )
-        )
-        merged_rhomb_indices.update(indices)
+            merged_rhomb_indices.update(indices)
 
     # Emit the remaining unmerged cells.
     output: list[MultigridCell] = []
