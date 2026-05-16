@@ -9,6 +9,8 @@ from backend.simulation.aperiodic_family_manifest import (
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
     PENROSE_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     PINWHEEL_GEOMETRY,
@@ -58,6 +60,7 @@ TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular"
 DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
 PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal"
 FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal"
+TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal"
 SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual"
 KISRHOMBILLE_GEOMETRY = "kisrhombille"
 
@@ -323,6 +326,19 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
+    PENROSE_P1_GEOMETRY: _translated_aperiodic_family(
+        PENROSE_P1_GEOMETRY,
+        # The de Bruijn pentagrid construction is approximately linear in
+        # cell count: 29 / 127 / 411 / 1161 / 3247 / 8995 / 24277 cells at
+        # depths 0..6, with build times of <0.01s through ~1s respectively.
+        # Same depth range as P3 since both use a pentagrid bounded by
+        # ``half_extent = base * phi^d``.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
+    ),
+    PENROSE_P1_PBS_GEOMETRY: _translated_aperiodic_family(
+        PENROSE_P1_PBS_GEOMETRY,
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
+    ),
     PENROSE_P2_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P2_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
@@ -398,6 +414,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
+    TYPE_7_PENTAGONAL_GEOMETRY: _single_variant_family(
+        tiling_family=TYPE_7_PENTAGONAL_GEOMETRY,
+        label="Type 7 Pentagonal",
+        picker_group="Periodic Mixed",
+        picker_order=265,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
     TAYLOR_SOCOLAR_GEOMETRY: _translated_aperiodic_family(
         TAYLOR_SOCOLAR_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
@@ -467,6 +494,8 @@ __all__ = [
     "KISRHOMBILLE_GEOMETRY",
     "PATCH_DEPTH_CONTROL",
     "PENROSE_GEOMETRY",
+    "PENROSE_P1_GEOMETRY",
+    "PENROSE_P1_PBS_GEOMETRY",
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
     "PICKER_GROUP_ORDER",
@@ -485,6 +514,7 @@ __all__ = [
     "TOPOLOGY_FAMILY_MANIFEST",
     "TopologyFamilyManifestEntry",
     "TopologyFamilyVariantManifestEntry",
+    "TYPE_7_PENTAGONAL_GEOMETRY",
     "TRIAKIS_TRIANGULAR_GEOMETRY",
     "TRIANGLE_GEOMETRY",
     "TUEBINGEN_TRIANGLE_GEOMETRY",

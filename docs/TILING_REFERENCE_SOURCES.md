@@ -53,9 +53,14 @@ The order is intentional:
   - [Prismatic pentagonal tiling](https://en.wikipedia.org/wiki/Prismatic_pentagonal_tiling)
 - `floret-pentagonal`
   - [Floret pentagonal tiling](https://en.wikipedia.org/wiki/Floret_pentagonal_tiling)
+- `type-7-pentagonal`
+  - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
+  - [Type 7 pentagonal tiling](https://www.mathartroom.com/wallpaper/pentagon_tiling/type07/)
 - `snub-square-dual`
   - [Snub square tiling](https://en.wikipedia.org/wiki/Snub_square_tiling)
   - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
+- `kisrhombille`
+  - [Truncated trihexagonal tiling](https://en.wikipedia.org/wiki/Truncated_trihexagonal_tiling)
 
 ## Aperiodic / Substitution Families
 
@@ -63,6 +68,13 @@ The order is intentional:
   - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
 - `penrose-p3-rhombs-vertex`
   - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
+- `penrose-p1-pentagon-diamond`
+  - [Penrose tiling: original pentagonal tiling (P1)](https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1))
+  - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+  - [Pattern Collider](https://github.com/aatishb/patterncollider)
+- `penrose-p1-pentagon-boat-star`
+  - [Penrose Pentagon Boat Star](https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/)
+  - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
 - `penrose-p2-kite-dart`
   - [Penrose kite-dart](https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/)
 - `ammann-beenker`

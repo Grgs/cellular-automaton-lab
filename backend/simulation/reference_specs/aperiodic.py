@@ -14,7 +14,13 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_KIND,
     HAT_MONOTILE_GEOMETRY,
     KITE_KIND,
+    P1_BOAT_KIND,
+    P1_DIAMOND_KIND,
+    P1_PENTAGON_KIND,
+    P1_STAR_KIND,
     PENROSE_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     PINWHEEL_GEOMETRY,
@@ -60,7 +66,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
         geometry=PENROSE_GEOMETRY,
         display_name=_reference_label(PENROSE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
-        canonical_root_seed_policy="five thick-rhomb star seed",
+        canonical_root_seed_policy="de Bruijn pentagrid crop at half-extent 0.85 * phi^d",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
         required_metadata=(),
         depth_expectations={
@@ -81,19 +87,24 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             3: ReferenceDepthExpectation(exact_total_cells=66),
         },
         notes=(
-            "Implementation uses a non-canonical full-tile substitution rule rather than the "
-            "canonical phi-scale Conway/de Bruijn deflation. The cell counts (5, 10, 24, 66) "
-            "match the in-house rule, not the canonical sequence (5, 15, 40, 105) you would "
-            "expect from the Bielefeld substitution at https://tilings.math.uni-bielefeld.de/"
-            "substitution/penrose-rhomb/. See docs/TILING_KNOWN_DEVIATIONS.md and "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md.",
+            "Built by the de Bruijn pentagrid construction in "
+            "``backend/simulation/penrose.py`` -- mathematically equivalent to the canonical "
+            "Penrose rhomb substitution at "
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/, but produced "
+            "by intersecting five strip families and cropping to a square of half-extent "
+            "``0.85 * phi^d``. Cells are valid thick / thin rhombs with correct Penrose "
+            "matching at every depth; the depth-to-cell-count sequence (5/10/24/66 at "
+            "depths 0..3) is governed by the bounding-box crop rather than by iterating the "
+            "[[2,1],[1,1]] substitution from a seed.",
         ),
     ),
     PENROSE_VERTEX_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_VERTEX_GEOMETRY,
         display_name="Penrose Rhombs (Vertex Adjacency)",
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
-        canonical_root_seed_policy="five thick-rhomb star seed with vertex-neighbor topology",
+        canonical_root_seed_policy=(
+            "de Bruijn pentagrid crop at half-extent 0.85 * phi^d with vertex-neighbor topology"
+        ),
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
         required_metadata=(),
         depth_expectations={
@@ -115,9 +126,143 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             3: ReferenceDepthExpectation(exact_total_cells=66),
         },
         notes=(
-            "Vertex-adjacency topology variant of the Penrose rhomb tiling. Inherits the same "
-            "non-canonical substitution as penrose-p3-rhombs; see that family's reference spec "
-            "and docs/TILING_KNOWN_DEVIATIONS.md for the deviation and the planned fix.",
+            "Vertex-adjacency topology variant of the canonical Penrose rhomb tiling; "
+            "shares the same de Bruijn pentagrid construction as ``penrose-p3-rhombs``, "
+            "with neighbour edges promoted to any pair of cells sharing a vertex.",
+        ),
+    ),
+    PENROSE_P1_GEOMETRY: ReferenceFamilySpec(
+        geometry=PENROSE_P1_GEOMETRY,
+        display_name=_reference_label(PENROSE_P1_GEOMETRY),
+        source_urls=(
+            "https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1)",
+            "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
+            "https://github.com/aatishb/patterncollider",
+        ),
+        canonical_root_seed_policy=(
+            "non-uniform pentagrid offsets (0.3, 0.4, 0.5, 0.6, 0.7) with "
+            "vertex-merge post-pass: scattered sun and star vertices in the "
+            "underlying P3 rhomb tiling are collapsed into Penrose's P1 "
+            "pentagon and pentagram star prototiles, producing a tiling with "
+            "no concentrated central singularity"
+        ),
+        allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_GEOMETRY),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=64,
+                expected_kind_counts=(
+                    (P1_DIAMOND_KIND, 30),
+                    (P1_PENTAGON_KIND, 34),
+                ),
+                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND),
+                required_adjacency_pairs=(
+                    (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
+                ),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=156,
+                expected_kind_counts=(
+                    (P1_DIAMOND_KIND, 66),
+                    (P1_PENTAGON_KIND, 88),
+                    (P1_STAR_KIND, 2),
+                ),
+                required_kinds=(
+                    P1_PENTAGON_KIND,
+                    P1_DIAMOND_KIND,
+                    P1_STAR_KIND,
+                ),
+                required_adjacency_pairs=(
+                    (P1_DIAMOND_KIND, P1_DIAMOND_KIND),
+                    (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_STAR_KIND),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=416),
+            3: ReferenceDepthExpectation(exact_total_cells=1136),
+        },
+        notes=(
+            "Penrose P1 is built in two stages. Stage 1 runs the de Bruijn "
+            "pentagrid construction (de Bruijn 1981; Pattern Collider by "
+            "Aatish Bhatia) with non-uniform offsets ``(0.3, 0.4, 0.5, 0.6, "
+            "0.7)`` that produce a regular P3 rhomb tiling without a "
+            "concentrated central singularity. Stage 2 (``apply_p1_vertex_"
+            "merge``) walks every rhomb-vertex and identifies the two "
+            "canonical 5-rhomb configurations -- sun vertices (5 thick "
+            "rhombs sharing a 72-degree apex) and star vertices (5 thin "
+            "rhombs sharing a 36-degree apex) -- collapsing each into a "
+            "single P1 prototile cell (pentagon and pentagram star "
+            "respectively). The result is a Penrose P1 tiling with the "
+            "pentagons and stars distributed throughout the patch rather "
+            "than concentrated at a single special centre; every cell "
+            "renders as a complete polygon and the tiling is hole-free, "
+            "edge-matched, and connected at every depth.",
+        ),
+    ),
+    PENROSE_P1_PBS_GEOMETRY: ReferenceFamilySpec(
+        geometry=PENROSE_P1_PBS_GEOMETRY,
+        display_name=_reference_label(PENROSE_P1_PBS_GEOMETRY),
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/",
+            "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
+        ),
+        canonical_root_seed_policy=(
+            "singular pentagrid crop with all-zero offsets and half-extent 1.6 * phi^d"
+        ),
+        allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_PBS_GEOMETRY),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=29,
+                expected_kind_counts=(
+                    (P1_BOAT_KIND, 14),
+                    (P1_PENTAGON_KIND, 14),
+                    (P1_STAR_KIND, 1),
+                ),
+                required_kinds=(P1_BOAT_KIND, P1_PENTAGON_KIND, P1_STAR_KIND),
+                required_adjacency_pairs=(
+                    (P1_BOAT_KIND, P1_BOAT_KIND),
+                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
+                    (P1_BOAT_KIND, P1_STAR_KIND),
+                ),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=127,
+                expected_kind_counts=(
+                    (P1_BOAT_KIND, 34),
+                    (P1_DIAMOND_KIND, 24),
+                    (P1_PENTAGON_KIND, 68),
+                    (P1_STAR_KIND, 1),
+                ),
+                required_kinds=(
+                    P1_BOAT_KIND,
+                    P1_DIAMOND_KIND,
+                    P1_PENTAGON_KIND,
+                    P1_STAR_KIND,
+                ),
+                required_adjacency_pairs=(
+                    (P1_BOAT_KIND, P1_BOAT_KIND),
+                    (P1_BOAT_KIND, P1_DIAMOND_KIND),
+                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
+                    (P1_BOAT_KIND, P1_STAR_KIND),
+                    (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=411),
+            3: ReferenceDepthExpectation(exact_total_cells=1161),
+        },
+        notes=(
+            "This family uses the singular de Bruijn pentagrid dual directly: "
+            "all five line-family offsets are zero, so the patch is centered "
+            "on one 5-line coincidence whose dual polygon becomes the central "
+            "P1 star. Three-line coincidences emit boats directly, while "
+            "generic 2-line cells yield the diamond and pentagon "
+            "representatives. The result is a deterministic, hole-free, "
+            "connected canonical patch with the full P1 cell vocabulary "
+            "present from depth 1 onward.",
         ),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(
@@ -164,11 +309,12 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "Built from the canonical Robinson half-tile substitution (matrix [[2,1],[1,1]], "
             "leading eigenvalue phi^2 ~ 2.618) seeded with the 5-kite sun. After substitution, "
             "acute halves pair into kites along long edges and obtuse halves pair into darts "
-            "along short edges (Conway / de Bruijn convention). Half-tiles whose pairing "
-            "partner sits on the patch perimeter are emitted as ``kite-half-acute`` or "
-            "``dart-half-obtuse`` cells (Option 2 from "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md), so depth >= 2 patches include "
-            "visibly halved tiles around the sun's outer boundary.",
+            "along short edges (Conway / de Bruijn convention). The 5-kite sun seed is "
+            "geometrically asymmetric under this substitution: at every depth every acute "
+            "finds a kite partner, while perimeter obtuses can be left unpaired and emitted "
+            "as ``dart-half-obtuse`` cells (Option 2 from "
+            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md). Depth >= 2 patches therefore "
+            "show visibly halved darts around the sun's outer boundary, but no halved kites.",
         ),
     ),
     AMMANN_BEENKER_GEOMETRY: ReferenceFamilySpec(

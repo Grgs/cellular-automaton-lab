@@ -43,6 +43,7 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         )
         self.assertEqual(render_kind_for_geometry("robinson-triangles"), "polygon_aperiodic")
         for geometry in (
+            "penrose-p1-pentagon-boat-star",
             "hat-monotile",
             "tuebingen-triangle",
             "dodecagonal-square-triangle",
@@ -70,6 +71,7 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertIn("deltoidal-hexagonal", geometries)
         self.assertIn("chair", geometries)
         self.assertIn("robinson-triangles", geometries)
+        self.assertIn("penrose-p1-pentagon-boat-star", geometries)
         self.assertIn("hat-monotile", geometries)
         self.assertIn("tuebingen-triangle", geometries)
         self.assertIn("dodecagonal-square-triangle", geometries)

@@ -17,6 +17,8 @@ AperiodicPickerGroup = Literal["Aperiodic", "Experimental"]
 PENROSE_GEOMETRY = "penrose-p3-rhombs"
 PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
 PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
+PENROSE_P1_GEOMETRY = "penrose-p1-pentagon-diamond"
+PENROSE_P1_PBS_GEOMETRY = "penrose-p1-pentagon-boat-star"
 AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
@@ -35,6 +37,10 @@ KITE_KIND = "kite"
 DART_KIND = "dart"
 KITE_HALF_ACUTE_KIND = "kite-half-acute"
 DART_HALF_OBTUSE_KIND = "dart-half-obtuse"
+P1_PENTAGON_KIND = "p1-pentagon"
+P1_DIAMOND_KIND = "p1-diamond"
+P1_BOAT_KIND = "p1-boat"
+P1_STAR_KIND = "p1-star"
 AMMANN_RHOMB_KIND = "rhomb"
 AMMANN_SQUARE_KIND = "square"
 SPECTRE_KIND = "spectre"
@@ -53,6 +59,7 @@ SHIELD_SQUARE_KIND = "shield-square"
 SHIELD_TRIANGLE_KIND = "shield-triangle"
 PINWHEEL_TRIANGLE_KIND = "pinwheel-triangle"
 
+PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
 TUEBINGEN_TILE_FAMILY = "tuebingen"
 HAT_TILE_FAMILY = "hat"
@@ -88,13 +95,52 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         picker_order=220,
         default_rule="life-b2-s23",
         builder_kind="compatibility_patch",
-        implementation_status="known_deviation",
+        # Built by the de Bruijn pentagrid construction in
+        # ``backend/simulation/penrose.py`` -- mathematically equivalent to the
+        # canonical Penrose substitution but produced by a bounding-box crop
+        # over five intersecting strip families rather than by iterating
+        # ``[[2,1],[1,1]]`` from a seed. Cells are valid Penrose thick / thin
+        # rhombs with correct adjacency; the depth-to-cell-count sequence
+        # (5/10/24/66 at depths 0..3) is governed by the half-extent
+        # ``0.85 * phi^d`` rather than the substitution eigenvalue.
+        implementation_status="canonical_patch",
         public_cell_kinds=(THICK_RHOMB_KIND, THIN_RHOMB_KIND),
-        promotion_blocker=(
-            "Generates a valid Penrose rhomb tiling but with a non-canonical full-tile "
-            "substitution rule, so depth-to-cell-count growth does not match the canonical "
-            "phi^2 eigenvalue. Tracked in TILING_KNOWN_DEVIATIONS.md; see "
-            "docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix."
+    ),
+    PENROSE_P1_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=PENROSE_P1_GEOMETRY,
+        catalog_label="Penrose P1 Pentagon-Diamond (Distributed)",
+        reference_label="Penrose Pentagon-Diamond (Distributed)",
+        picker_group="Aperiodic",
+        picker_order=205,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
+        # Built by the de Bruijn multigrid construction in
+        # ``backend/simulation/aperiodic_penrose_multigrid.py`` followed by a
+        # P3 -> P1 vertex-merge pass over a non-singular pentagrid with
+        # offsets ``(0.3, 0.4, 0.5, 0.6, 0.7)``. The resulting patch distributes
+        # pentagon/star regions across the crop without the centered singular
+        # boat ring present in the all-zero pentagrid manifestation.
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            P1_PENTAGON_KIND,
+            P1_DIAMOND_KIND,
+            P1_STAR_KIND,
+        ),
+    ),
+    PENROSE_P1_PBS_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=PENROSE_P1_PBS_GEOMETRY,
+        catalog_label="Penrose P1 Pentagon-Boat-Star",
+        reference_label="Penrose Pentagon Boat Star",
+        picker_group="Aperiodic",
+        picker_order=207,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            P1_PENTAGON_KIND,
+            P1_DIAMOND_KIND,
+            P1_BOAT_KIND,
+            P1_STAR_KIND,
         ),
     ),
     PENROSE_P2_GEOMETRY: AperiodicFamilyManifestEntry(
@@ -106,7 +152,14 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         builder_kind="substitution_recipe",
         implementation_status="true_substitution",
-        public_cell_kinds=(KITE_KIND, DART_KIND, KITE_HALF_ACUTE_KIND, DART_HALF_OBTUSE_KIND),
+        # The 5-kite sun seed is geometrically asymmetric under the canonical
+        # Robinson substitution: every acute half always finds a long-edge kite
+        # partner, but obtuse halves on the patch perimeter can be left without
+        # a short-edge partner and are emitted as ``dart-half-obtuse`` cells.
+        # Acute halves are therefore never exposed as ``kite-half-acute`` from
+        # this seed; the kind is declared on the half-tile constants but is
+        # not part of P2's reachable surface.
+        public_cell_kinds=(KITE_KIND, DART_KIND, DART_HALF_OBTUSE_KIND),
     ),
     AMMANN_BEENKER_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=AMMANN_BEENKER_GEOMETRY,
@@ -282,7 +335,14 @@ __all__ = [
     "HAT_TILE_FAMILY",
     "KITE_HALF_ACUTE_KIND",
     "KITE_KIND",
+    "P1_BOAT_KIND",
+    "P1_DIAMOND_KIND",
+    "P1_PENTAGON_KIND",
+    "P1_STAR_KIND",
     "PENROSE_GEOMETRY",
+    "PENROSE_P1_GEOMETRY",
+    "PENROSE_P1_PBS_GEOMETRY",
+    "PENROSE_P1_TILE_FAMILY",
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
     "PINWHEEL_GEOMETRY",

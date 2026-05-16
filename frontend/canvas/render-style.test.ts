@@ -19,6 +19,7 @@ const DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal";
 const PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal";
 const FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal";
 const SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual";
+const TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal";
 
 function installRenderStyleTestGlobals(): void {
     installFrontendGlobals();
@@ -90,6 +91,7 @@ describe("canvas/render-style", () => {
             PRISMATIC_PENTAGONAL_GEOMETRY,
             FLORET_PENTAGONAL_GEOMETRY,
             SNUB_SQUARE_DUAL_GEOMETRY,
+            TYPE_7_PENTAGONAL_GEOMETRY,
         ];
         fallthroughGeometries.forEach((geometry) => {
             expect(

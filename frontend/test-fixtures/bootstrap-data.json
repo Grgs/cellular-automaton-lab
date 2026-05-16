@@ -577,6 +577,84 @@
       }
     },
     {
+      "tiling_family": "type-7-pentagonal",
+      "label": "Type 7 Pentagonal",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 265,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "type-7-pentagonal"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 18
+      }
+    },
+    {
+      "tiling_family": "penrose-p1-pentagon-diamond",
+      "label": "Penrose P1 Pentagon-Diamond (Distributed)",
+      "picker_group": "Aperiodic",
+      "picker_order": 205,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "penrose-p1-pentagon-diamond"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 4,
+        "min": 0,
+        "max": 6
+      }
+    },
+    {
+      "tiling_family": "penrose-p1-pentagon-boat-star",
+      "label": "Penrose P1 Pentagon-Boat-Star",
+      "picker_group": "Aperiodic",
+      "picker_order": 207,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "penrose-p1-pentagon-boat-star"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 4,
+        "min": 0,
+        "max": 6
+      }
+    },
+    {
       "tiling_family": "penrose-p2-kite-dart",
       "label": "Penrose P2 Kite-Dart",
       "picker_group": "Aperiodic",
@@ -1189,9 +1267,49 @@
       "max_y": 142.0,
       "cell_count_per_unit": 8,
       "row_offset_x": 0.0
+    },
+    {
+      "geometry": "type-7-pentagonal",
+      "label": "Type 7 Pentagonal",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 161.32410786652946,
+      "unit_height": 243.40791333561546,
+      "min_dimension": 1,
+      "min_x": 0.0,
+      "min_y": 0.0,
+      "max_x": 210.79743643080397,
+      "max_y": 290.7733189895667,
+      "cell_count_per_unit": 8,
+      "row_offset_x": 0.0
     }
   ],
   "aperiodic_families": [
+    {
+      "tiling_family": "penrose-p1-pentagon-diamond",
+      "label": "Penrose P1 Pentagon-Diamond (Distributed)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "p1-pentagon",
+        "p1-diamond",
+        "p1-star"
+      ]
+    },
+    {
+      "tiling_family": "penrose-p1-pentagon-boat-star",
+      "label": "Penrose P1 Pentagon-Boat-Star",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "p1-pentagon",
+        "p1-diamond",
+        "p1-boat",
+        "p1-star"
+      ]
+    },
     {
       "tiling_family": "penrose-p2-kite-dart",
       "label": "Penrose P2 Kite-Dart",
@@ -1201,7 +1319,6 @@
       "public_cell_kinds": [
         "kite",
         "dart",
-        "kite-half-acute",
         "dart-half-obtuse"
       ]
     },
@@ -1209,8 +1326,8 @@
       "tiling_family": "penrose-p3-rhombs",
       "label": "Penrose P3 Rhombs",
       "experimental": false,
-      "implementation_status": "known_deviation",
-      "promotion_blocker": "Generates a valid Penrose rhomb tiling but with a non-canonical full-tile substitution rule, so depth-to-cell-count growth does not match the canonical phi^2 eigenvalue. Tracked in TILING_KNOWN_DEVIATIONS.md; see docs/PENROSE_CANONICAL_SUBSTITUTION_PLAN.md for the planned fix.",
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
       "public_cell_kinds": [
         "thick-rhomb",
         "thin-rhomb"

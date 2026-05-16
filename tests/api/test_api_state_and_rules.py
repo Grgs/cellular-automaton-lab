@@ -258,6 +258,7 @@ class ApiStateAndRulesTests(ApiTestCase):
             ("prismatic-pentagonal", {"pentagon"}, 1),
             ("floret-pentagonal", {"pentagon"}, 1),
             ("snub-square-dual", {"pentagon"}, 1),
+            ("type-7-pentagonal", {"pentagon"}, 1),
         ]
 
         for geometry, expected_kinds, expected_dimension in cases:

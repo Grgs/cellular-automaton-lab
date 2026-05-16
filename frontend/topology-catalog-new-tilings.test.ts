@@ -37,6 +37,12 @@ const NEW_PERIODIC_TILINGS = [
         maxCellSize: 18,
     },
     {
+        geometry: "type-7-pentagonal",
+        label: "Type 7 Pentagonal",
+        defaultCellSize: 10,
+        maxCellSize: 18,
+    },
+    {
         geometry: "snub-square-dual",
         label: "Snub Square Dual",
         defaultCellSize: 10,

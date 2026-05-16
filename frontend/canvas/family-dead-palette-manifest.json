@@ -116,6 +116,51 @@
       ]
     },
     {
+      "geometry": "penrose-p1-pentagon-diamond",
+      "variants": [
+        {
+          "label": "penrose-p1-distributed-pentagon",
+          "selector": {"kind": "p1-pentagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "penrose-p1-distributed-diamond",
+          "selector": {"kind": "p1-diamond"},
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "penrose-p1-distributed-star",
+          "selector": {"kind": "p1-star"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "penrose-p1-pentagon-boat-star",
+      "variants": [
+        {
+          "label": "penrose-p1-pbs-pentagon",
+          "selector": {"kind": "p1-pentagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "penrose-p1-pbs-diamond",
+          "selector": {"kind": "p1-diamond"},
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "penrose-p1-pbs-boat",
+          "selector": {"kind": "p1-boat"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "penrose-p1-pbs-star",
+          "selector": {"kind": "p1-star"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
       "geometry": "penrose-p2-kite-dart",
       "variants": [
         {

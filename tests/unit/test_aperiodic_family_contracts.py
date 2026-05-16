@@ -24,12 +24,33 @@ class AperiodicFamilyContractTests(unittest.TestCase):
         self.assertEqual(len(APERIODIC_FAMILY_IDS), len(set(APERIODIC_FAMILY_IDS)))
 
     def test_public_cell_kind_names_are_unique_across_aperiodic_families(self) -> None:
-        public_kinds = [
-            kind
-            for geometry in APERIODIC_FAMILY_IDS
-            for kind in APERIODIC_FAMILY_MANIFEST[geometry].public_cell_kinds
-        ]
-        self.assertEqual(len(public_kinds), len(set(public_kinds)))
+        kind_to_geometries: dict[str, list[str]] = {}
+        for geometry in APERIODIC_FAMILY_IDS:
+            for kind in APERIODIC_FAMILY_MANIFEST[geometry].public_cell_kinds:
+                kind_to_geometries.setdefault(kind, []).append(geometry)
+
+        duplicate_kinds = {
+            kind: tuple(geometries)
+            for kind, geometries in kind_to_geometries.items()
+            if len(geometries) > 1
+        }
+        self.assertEqual(
+            duplicate_kinds,
+            {
+                "p1-pentagon": (
+                    "penrose-p1-pentagon-diamond",
+                    "penrose-p1-pentagon-boat-star",
+                ),
+                "p1-diamond": (
+                    "penrose-p1-pentagon-diamond",
+                    "penrose-p1-pentagon-boat-star",
+                ),
+                "p1-star": (
+                    "penrose-p1-pentagon-diamond",
+                    "penrose-p1-pentagon-boat-star",
+                ),
+            },
+        )
 
     def test_manifest_aligns_with_catalog_contracts_and_reference_specs(self) -> None:
         catalog_families = {

@@ -3,6 +3,14 @@
 This is a curated narrative changelog of completed work. Active and upcoming work
 lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
+## `v0.3.x` Preview Release Candidate
+
+- Added `type-7-pentagonal` as a new periodic convex pentagonal family through the existing `periodic_face` descriptor architecture, with backend catalog wiring, picker preview data, and periodic reference validation.
+- Added `penrose-p1-pentagon-boat-star` as a separate centered singular-pentagrid Penrose P1 family that emits the full `pentagon` / `diamond` / `boat` / `star` vocabulary instead of overloading the older distributed P1 manifestation.
+- Clarified the older non-singular P1 family as `Penrose P1 Pentagon-Diamond (Distributed)`, trimmed its public metadata to the prototiles it actually emits, and aligned docs, fixtures, and release-facing labels with that split.
+- Added a startup-time frontend freshness guard so `python app.py` fails fast when `static/dist/` is stale relative to the authored frontend source.
+- Refreshed the release-facing documentation set for the current catalog, including README overview text, tiling source references, verification-status summaries, and the `v0.3.0` release-notes draft.
+
 ## Public Release Prep
 
 - Framed the first public release line as a `v0.1.x` preview series: tagged GitHub source release plus GitHub Pages standalone demo, without npm or PyPI publishing.
