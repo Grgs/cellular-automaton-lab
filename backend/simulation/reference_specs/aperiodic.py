@@ -14,7 +14,6 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_KIND,
     HAT_MONOTILE_GEOMETRY,
     KITE_KIND,
-    P1_BOAT_KIND,
     P1_DIAMOND_KIND,
     P1_PENTAGON_KIND,
     P1_STAR_KIND,
@@ -139,63 +138,65 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "https://github.com/aatishb/patterncollider",
         ),
         canonical_root_seed_policy=(
-            "all-zero pentagrid centred at origin, square patch crop at "
-            "half-extent 1.6 * phi^d; one cell per multigrid intersection "
-            "point, polygon vertices computed by the de Bruijn dual map"
+            "non-uniform pentagrid offsets (0.3, 0.4, 0.5, 0.6, 0.7) with "
+            "vertex-merge post-pass: scattered sun and star vertices in the "
+            "underlying P3 rhomb tiling are collapsed into Penrose's P1 "
+            "pentagon and pentagram star prototiles, producing a tiling with "
+            "no concentrated central singularity"
         ),
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_GEOMETRY),
         required_metadata=(),
         depth_expectations={
             0: ReferenceDepthExpectation(
-                exact_total_cells=29,
+                exact_total_cells=64,
                 expected_kind_counts=(
-                    (P1_BOAT_KIND, 14),
-                    (P1_PENTAGON_KIND, 14),
-                    (P1_STAR_KIND, 1),
+                    (P1_DIAMOND_KIND, 30),
+                    (P1_PENTAGON_KIND, 34),
                 ),
-                required_kinds=(P1_PENTAGON_KIND, P1_BOAT_KIND, P1_STAR_KIND),
-                # Depth 0 is the central star + 10 surrounding boats + 14
-                # outer pentagons. Pentagons touch only boats (not each
-                # other) at this radius; pentagon-pentagon adjacency
-                # appears at depth 1+ where diamonds bridge pentagons.
+                required_kinds=(P1_PENTAGON_KIND, P1_DIAMOND_KIND),
                 required_adjacency_pairs=(
-                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
-                    (P1_BOAT_KIND, P1_STAR_KIND),
+                    (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
                 ),
             ),
             1: ReferenceDepthExpectation(
-                exact_total_cells=127,
+                exact_total_cells=156,
                 expected_kind_counts=(
-                    (P1_BOAT_KIND, 34),
-                    (P1_DIAMOND_KIND, 24),
-                    (P1_PENTAGON_KIND, 68),
-                    (P1_STAR_KIND, 1),
+                    (P1_DIAMOND_KIND, 66),
+                    (P1_PENTAGON_KIND, 88),
+                    (P1_STAR_KIND, 2),
                 ),
                 required_kinds=(
                     P1_PENTAGON_KIND,
                     P1_DIAMOND_KIND,
-                    P1_BOAT_KIND,
                     P1_STAR_KIND,
                 ),
+                required_adjacency_pairs=(
+                    (P1_DIAMOND_KIND, P1_DIAMOND_KIND),
+                    (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_STAR_KIND),
+                ),
             ),
-            2: ReferenceDepthExpectation(exact_total_cells=411),
-            3: ReferenceDepthExpectation(exact_total_cells=1161),
+            2: ReferenceDepthExpectation(exact_total_cells=416),
+            3: ReferenceDepthExpectation(exact_total_cells=1136),
         },
         notes=(
-            "Penrose P1 is built by the de Bruijn pentagrid + multi-line "
-            "intersection grouping technique (de Bruijn 1981; "
-            "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf), "
-            "implemented in ``backend/simulation/aperiodic_penrose_multigrid.py`` "
-            "with the all-zero pentagrid offset that puts a 5-line "
-            "coincidence at the origin (yielding the iconic central pentagram "
-            "star). Each tile is the dual polygon of one intersection point: "
-            "generic 2-line intersections become diamonds (thin rhombs) or "
-            "pentagons (thick rhombs); 3-line coincidences become hexagonal "
-            "boats; the 5-line coincidence at the origin becomes the "
-            "10-vertex pentagram star. Patch radius is ``1.6 * phi^d`` so "
-            "deeper depths reveal more of the (infinite) tiling; the "
-            "construction is intrinsically gap-free and edge-matched at "
-            "every depth.",
+            "Penrose P1 is built in two stages. Stage 1 runs the de Bruijn "
+            "pentagrid construction (de Bruijn 1981; Pattern Collider by "
+            "Aatish Bhatia) with non-uniform offsets ``(0.3, 0.4, 0.5, 0.6, "
+            "0.7)`` that produce a regular P3 rhomb tiling without a "
+            "concentrated central singularity. Stage 2 (``apply_p1_vertex_"
+            "merge``) walks every rhomb-vertex and identifies the two "
+            "canonical 5-rhomb configurations -- sun vertices (5 thick "
+            "rhombs sharing a 72-degree apex) and star vertices (5 thin "
+            "rhombs sharing a 36-degree apex) -- collapsing each into a "
+            "single P1 prototile cell (pentagon and pentagram star "
+            "respectively). The result is a Penrose P1 tiling with the "
+            "pentagons and stars distributed throughout the patch rather "
+            "than concentrated at a single special centre; every cell "
+            "renders as a complete polygon and the tiling is hole-free, "
+            "edge-matched, and connected at every depth.",
         ),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(

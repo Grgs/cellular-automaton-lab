@@ -38,8 +38,9 @@ from backend.simulation.aperiodic_penrose_multigrid import (
     P1_DIAMOND,
     P1_PENTAGON,
     P1_STAR,
-    PENROSE_PENTAGRID_OFFSETS_ALL_ZERO,
+    PENROSE_P1_OFFSETS,
     PHI,
+    apply_p1_vertex_merge,
     build_multigrid_cells,
     classify_p1_prototile,
 )
@@ -90,10 +91,14 @@ _CELL_ID_PREFIX_BY_KIND = {
 def build_penrose_p1_patch(patch_depth: int) -> AperiodicPatch:
     depth = max(0, int(patch_depth))
     half_extent = penrose_p1_half_extent(depth)
-    cells = build_multigrid_cells(
-        half_extent,
-        offsets=PENROSE_PENTAGRID_OFFSETS_ALL_ZERO,
-    )
+    raw_cells = build_multigrid_cells(half_extent, offsets=PENROSE_P1_OFFSETS)
+    # Promote 5-rhomb sun and star vertex configurations to canonical P1
+    # pentagon and pentagram cells. With ``PENROSE_P1_OFFSETS`` the raw
+    # multigrid output is a regular Penrose P3 rhomb tiling (no central
+    # singularity, with sun and star vertices scattered throughout); the
+    # vertex-merge pass collapses each of those vertex configurations into
+    # a single P1 prototile cell.
+    cells = apply_p1_vertex_merge(raw_cells)
 
     records: list[dict] = []
     for cell in cells:

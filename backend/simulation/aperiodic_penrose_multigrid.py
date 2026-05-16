@@ -67,6 +67,23 @@ PENROSE_PENTAGRID_OFFSETS_ALL_ZERO: tuple[float, float, float, float, float] = (
     0.0,
 )
 
+# Non-uniform pentagrid offsets used for the P1 family. Designed to (a) make
+# the multigrid "regular" (no multi-line coincidences and so no concentrated
+# central decagon), and (b) place a generic rhomb tiling underneath whose
+# vertex statistics include scattered sun and star vertices (where 5 thick or
+# 5 thin rhombs meet at one point). The vertex-merge pass in
+# ``apply_p1_vertex_merge`` then collapses those vertices into Penrose's
+# pentagon and star prototiles, giving a P1 patch that reads as a normal
+# Penrose tessellation rather than a 5-fold rotationally symmetric structure
+# centred on the origin.
+PENROSE_P1_OFFSETS: tuple[float, float, float, float, float] = (
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+)
+
 # Coincidence detection precision: intersections within this distance of
 # each other are treated as the same point (i.e. 3+ lines meeting at one
 # spot are grouped into one multigrid cell rather than emitted as several
@@ -83,11 +100,19 @@ class MultigridCell:
     meeting at that point (always >= 2; a generic regular intersection has
     line_count == 2 and a 4-vertex rhomb polygon). ``vertices`` lists the
     polygon's vertices in counter-clockwise order around its centroid.
+
+    ``classification_hint`` lets vertex-merge passes (e.g.
+    ``apply_p1_vertex_merge``) record the P1 prototile that produced the
+    cell when the polygon's geometry alone is ambiguous (a 10-vertex
+    decagonal cluster from 5 merged thick rhombs and a 10-vertex pentagram
+    from 5 merged thin rhombs would otherwise both be classified as
+    ``p1-star``).
     """
 
     intersection_point: tuple[float, float]
     line_count: int
     vertices: tuple[tuple[float, float], ...]
+    classification_hint: str | None = None
 
 
 def _line_normal(symmetry: int, family_index: int) -> tuple[float, float]:
@@ -359,7 +384,10 @@ def classify_p1_prototile(
 ) -> str:
     """Map a multigrid cell to a Penrose P1 prototile name.
 
-    Classification by vertex count and interior-angle signature:
+    A vertex-merge pass can set ``cell.classification_hint`` to record the
+    merge origin (``p1-pentagon`` for a sun-vertex merge, ``p1-star`` for a
+    star-vertex merge) directly; otherwise the polygon's vertex count and
+    interior-angle signature decide:
 
     * 4 vertices with angles 36-144-36-144 -> ``p1-diamond``.
     * 4 vertices with angles 72-108-72-108 -> ``p1-pentagon``
@@ -377,6 +405,8 @@ def classify_p1_prototile(
     floating-point accumulation in the dual construction without
     misclassifying genuinely distinct polygons.
     """
+    if cell.classification_hint is not None:
+        return cell.classification_hint
     n = len(cell.vertices)
     if n == 4:
         angles = _polygon_interior_angles_degrees(cell.vertices)
@@ -395,6 +425,153 @@ def classify_p1_prototile(
     return P1_OTHER
 
 
+def _polygon_centroid(
+    vertices: tuple[tuple[float, float], ...],
+) -> tuple[float, float]:
+    # Simple arithmetic mean of vertex coordinates. Sufficient for the
+    # vertex-merge bookkeeping below; we don't need the geometric (area-
+    # weighted) centroid because the polygons here are always convex
+    # rhombs.
+    n = len(vertices)
+    return (
+        sum(v[0] for v in vertices) / n,
+        sum(v[1] for v in vertices) / n,
+    )
+
+
+def apply_p1_vertex_merge(
+    cells: list[MultigridCell],
+    *,
+    vertex_snap: int = 6,
+    angle_tolerance_degrees: float = 5.0,
+) -> list[MultigridCell]:
+    """Replace canonical Penrose vertex configurations in a rhomb tiling with
+    Penrose's P1 prototiles.
+
+    Walks every rhomb-vertex in the input tiling and identifies the two
+    canonical 5-rhomb configurations:
+
+    * **Sun vertex** -- 5 thick rhombs (p1-pentagon-shape) sharing a 72-degree
+      apex at one point. Replace the 5 rhombs with one regular-decagon cell
+      labelled ``p1-star`` ... no, ``p1-pentagon``. Wait: in canonical P1, the
+      sun configuration becomes a pentagon (centered at the sun vertex,
+      surrounded by other prototiles). We emit a 10-vertex shape (the convex
+      hull of all 10 outer rhomb vertices) and let the polygon classifier
+      label it ``p1-star``; the rendered shape is a regular decagon which
+      reads visually as the pentagon-cluster centre in P1.
+
+    * **Star vertex** -- 5 thin rhombs (p1-diamond-shape) sharing a 36-degree
+      apex. Replace the 5 rhombs with one 10-vertex cell labelled
+      ``p1-star``; geometrically this is the Penrose pentagram star.
+
+    Rhombs that don't participate in either configuration are emitted
+    unchanged. The merge is purely topological: no rhomb area is added or
+    lost, and the polygon's outer boundary is the union of the 5 merged
+    rhomb perimeters.
+    """
+    # Group rhombs by shared vertex, recording each rhomb's interior angle
+    # contribution at the shared vertex.
+    vertex_rhombs: dict[tuple[int, int], list[tuple[int, float, str]]] = defaultdict(list)
+    for cell_index, cell in enumerate(cells):
+        if cell.line_count != 2 or len(cell.vertices) != 4:
+            continue
+        kind = classify_p1_prototile(cell, angle_tolerance_degrees=angle_tolerance_degrees)
+        if kind not in (P1_PENTAGON, P1_DIAMOND):
+            continue
+        angles = _polygon_interior_angles_degrees(cell.vertices)
+        for vertex_index, vertex in enumerate(cell.vertices):
+            key = (
+                round(vertex[0] * (10**vertex_snap)),
+                round(vertex[1] * (10**vertex_snap)),
+            )
+            vertex_rhombs[key].append((cell_index, angles[vertex_index], kind))
+
+    merged_rhomb_indices: set[int] = set()
+    merged_cells: list[MultigridCell] = []
+
+    # Sort vertices for deterministic output.
+    for key in sorted(vertex_rhombs):
+        attendees = vertex_rhombs[key]
+        if len(attendees) != 5:
+            continue
+        kinds = {kind for _, _, kind in attendees}
+        if len(kinds) != 1:
+            continue
+        kind = kinds.pop()
+        target_angle = 72.0 if kind == P1_PENTAGON else 36.0
+        if not all(
+            abs(angle - target_angle) <= angle_tolerance_degrees for _, angle, _ in attendees
+        ):
+            continue
+        indices = [idx for idx, _, _ in attendees]
+        if any(idx in merged_rhomb_indices for idx in indices):
+            continue
+        # Collect the 5 rhombs and form a merged polygon = ordered outer
+        # boundary of their union. Since all 5 share the apex vertex and
+        # are arranged with 5-fold rotational symmetry around it, the
+        # outer boundary is a 10-vertex polygon visiting alternating rhomb
+        # apex and side vertices in CCW order around the apex.
+        apex_x = key[0] / (10**vertex_snap)
+        apex_y = key[1] / (10**vertex_snap)
+        outer_vertices: list[tuple[float, float]] = []
+        for cell_index in indices:
+            for vertex in cells[cell_index].vertices:
+                if abs(vertex[0] - apex_x) < 1e-5 and abs(vertex[1] - apex_y) < 1e-5:
+                    continue
+                outer_vertices.append(vertex)
+        # Sort outer vertices CCW around the apex.
+        outer_vertices.sort(
+            key=lambda v: math.atan2(v[1] - apex_y, v[0] - apex_x),
+        )
+        # Deduplicate vertices that two adjacent rhombs share (4-vertex
+        # rhombs share 2 vertices with each neighbour around the apex, but
+        # only one of those is on the OUTER boundary; the other is the
+        # apex itself which we already excluded).
+        deduplicated: list[tuple[float, float]] = []
+        for vertex in outer_vertices:
+            if deduplicated:
+                dx = vertex[0] - deduplicated[-1][0]
+                dy = vertex[1] - deduplicated[-1][1]
+                if dx * dx + dy * dy < 1e-10:
+                    continue
+            deduplicated.append(vertex)
+        # Handle wrap-around duplicate.
+        if (
+            len(deduplicated) > 1
+            and (deduplicated[0][0] - deduplicated[-1][0]) ** 2
+            + (deduplicated[0][1] - deduplicated[-1][1]) ** 2
+            < 1e-10
+        ):
+            deduplicated.pop()
+        if len(deduplicated) < 5:
+            continue
+        # Sun vertex (5 thick rhombs at 72-degree apex) -> pentagon (a
+        # convex 10-vertex decagonal cluster, the rhomb-region MLD
+        # representative of the pentagonal P1 prototile).
+        # Star vertex (5 thin rhombs at 36-degree apex) -> pentagram star
+        # (the canonical 10-vertex P1 star).
+        classification_hint = P1_PENTAGON if kind == P1_PENTAGON else P1_STAR
+        merged_cells.append(
+            MultigridCell(
+                intersection_point=(apex_x, apex_y),
+                line_count=5,
+                vertices=tuple(deduplicated),
+                classification_hint=classification_hint,
+            )
+        )
+        merged_rhomb_indices.update(indices)
+
+    # Emit the remaining unmerged cells.
+    output: list[MultigridCell] = []
+    for index, cell in enumerate(cells):
+        if index in merged_rhomb_indices:
+            continue
+        output.append(cell)
+    output.extend(merged_cells)
+    output.sort(key=lambda c: (c.intersection_point[0], c.intersection_point[1]))
+    return output
+
+
 __all__ = [
     "MultigridCell",
     "P1_BOAT",
@@ -402,9 +579,11 @@ __all__ = [
     "P1_OTHER",
     "P1_PENTAGON",
     "P1_STAR",
+    "PENROSE_P1_OFFSETS",
     "PENROSE_PENTAGRID_OFFSETS",
     "PENROSE_PENTAGRID_OFFSETS_ALL_ZERO",
     "PHI",
+    "apply_p1_vertex_merge",
     "build_multigrid_cells",
     "classify_p1_prototile",
 ]
