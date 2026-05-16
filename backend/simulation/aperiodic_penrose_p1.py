@@ -41,6 +41,7 @@ from backend.simulation.aperiodic_penrose_multigrid import (
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     AperiodicPatchCell,
+    PatchRecord,
     Vec,
     build_edge_neighbors,
     encode_float,
@@ -93,7 +94,7 @@ def build_penrose_p1_patch(patch_depth: int) -> AperiodicPatch:
     # a single P1 prototile cell.
     cells = apply_p1_vertex_merge(raw_cells)
 
-    records: list[dict] = []
+    records: list[PatchRecord] = []
     for cell in cells:
         kind_token = classify_p1_prototile(cell)
         cell_kind = _MULTIGRID_KIND_TO_CELL_KIND.get(kind_token)

@@ -43,6 +43,7 @@ from backend.simulation.aperiodic_penrose_multigrid import (
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     AperiodicPatchCell,
+    PatchRecord,
     Vec,
     build_edge_neighbors,
     encode_float,
@@ -85,7 +86,7 @@ def build_penrose_p1_pbs_patch(patch_depth: int) -> AperiodicPatch:
         offsets=PENROSE_PENTAGRID_OFFSETS_ALL_ZERO,
     )
 
-    records: list[dict[str, object]] = []
+    records: list[PatchRecord] = []
     for cell in raw_cells:
         kind_token = classify_p1_prototile(cell)
         if kind_token == P1_OTHER:
