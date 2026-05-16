@@ -76,6 +76,17 @@ class AperiodicRegistryTests(unittest.TestCase):
         self.assertEqual(patch.height, topology.height)
         self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
 
+    def test_penrose_p1_pentagon_boat_star_patch_builder_matches_topology_builder_output(
+        self,
+    ) -> None:
+        patch = build_aperiodic_patch("penrose-p1-pentagon-boat-star", 3)
+        topology = build_topology("penrose-p1-pentagon-boat-star", 0, 0, patch_depth=3)
+
+        self.assertEqual(patch.patch_depth, topology.patch_depth)
+        self.assertEqual(patch.width, topology.width)
+        self.assertEqual(patch.height, topology.height)
+        self.assertEqual([cell.id for cell in patch.cells], [cell.id for cell in topology.cells])
+
     def test_new_tiling_patch_builders_match_topology_builder_output(self) -> None:
         for geometry, depth in (
             ("hat-monotile", 3),
@@ -126,6 +137,7 @@ class AperiodicRegistryTests(unittest.TestCase):
         tuebingen_patch = build_aperiodic_patch("tuebingen-triangle", 2)
         shield_patch = build_aperiodic_patch("shield", 2)
         pinwheel_patch = build_aperiodic_patch("pinwheel", 2)
+        penrose_p1_pbs_patch = build_aperiodic_patch("penrose-p1-pentagon-boat-star", 2)
 
         self.assertTrue(all(cell.orientation_token is not None for cell in chair_patch.cells))
 
@@ -143,6 +155,12 @@ class AperiodicRegistryTests(unittest.TestCase):
 
         self.assertTrue(all(cell.tile_family == "pinwheel" for cell in pinwheel_patch.cells))
         self.assertTrue(all(cell.orientation_token is not None for cell in pinwheel_patch.cells))
+
+        self.assertTrue(
+            all(cell.tile_family == "penrose-p1" for cell in penrose_p1_pbs_patch.cells)
+        )
+        self.assertTrue(any(cell.kind == "p1-boat" for cell in penrose_p1_pbs_patch.cells))
+        self.assertTrue(any(cell.kind == "p1-star" for cell in penrose_p1_pbs_patch.cells))
 
     def test_pinwheel_patch_uses_segment_overlap_neighbors_to_stay_connected(self) -> None:
         patch = build_aperiodic_patch("pinwheel", 3)

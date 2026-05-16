@@ -9,6 +9,7 @@ try:
         LatticeTopology,
         HAT_MONOTILE_GEOMETRY,
         PENROSE_GEOMETRY,
+        PENROSE_P1_PBS_GEOMETRY,
         PINWHEEL_GEOMETRY,
         SHIELD_GEOMETRY,
         SPHINX_GEOMETRY,
@@ -34,6 +35,7 @@ except ModuleNotFoundError:
         LatticeTopology,
         HAT_MONOTILE_GEOMETRY,
         PENROSE_GEOMETRY,
+        PENROSE_P1_PBS_GEOMETRY,
         PINWHEEL_GEOMETRY,
         SHIELD_GEOMETRY,
         SPHINX_GEOMETRY,
@@ -149,6 +151,7 @@ class TopologyValidationTests(unittest.TestCase):
     def test_new_aperiodic_wave_patches_pass_geometry_and_graph_validation(self) -> None:
         for geometry in (
             HAT_MONOTILE_GEOMETRY,
+            PENROSE_P1_PBS_GEOMETRY,
             TUEBINGEN_TRIANGLE_GEOMETRY,
             DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
             SHIELD_GEOMETRY,

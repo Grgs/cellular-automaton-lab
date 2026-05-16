@@ -2,6 +2,7 @@ export const PENROSE_GEOMETRY = "penrose-p3-rhombs";
 export const PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex";
 export const PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart";
 export const PENROSE_P1_GEOMETRY = "penrose-p1-pentagon-diamond";
+export const PENROSE_P1_PBS_GEOMETRY = "penrose-p1-pentagon-boat-star";
 export const AMMANN_BEENKER_GEOMETRY = "ammann-beenker";
 export const SPECTRE_GEOMETRY = "spectre";
 export const TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar";

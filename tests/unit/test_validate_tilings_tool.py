@@ -27,6 +27,7 @@ class ValidateTilingsToolTests(unittest.TestCase):
         self.assertIn("dodecagonal-square-triangle", targets)
         self.assertIn("shield", targets)
         self.assertIn("pinwheel", targets)
+        self.assertIn("penrose-p1-pentagon-boat-star", targets)
         self.assertIn("penrose-p3-rhombs", targets)
         self.assertIn("penrose-p3-rhombs-vertex", targets)
         self.assertEqual(targets["archimedean-4-8-8"]["width"], 3)
@@ -40,6 +41,7 @@ class ValidateTilingsToolTests(unittest.TestCase):
         self.assertEqual(targets["dodecagonal-square-triangle"]["patch_depth"], 3)
         self.assertEqual(targets["shield"]["patch_depth"], 3)
         self.assertEqual(targets["pinwheel"]["patch_depth"], 3)
+        self.assertEqual(targets["penrose-p1-pentagon-boat-star"]["patch_depth"], 3)
 
     def test_validate_manifest_tilings_returns_valid_results(self) -> None:
         results = validate_manifest_tilings()

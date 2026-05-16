@@ -75,6 +75,7 @@ class LiteratureReferenceVerificationTests(unittest.TestCase):
         self.assertEqual(results["ammann-beenker"].status, "PASS")
         self.assertEqual(results["chair"].status, "PASS")
         self.assertEqual(results["hat-monotile"].status, "PASS")
+        self.assertEqual(results["penrose-p1-pentagon-boat-star"].status, "PASS")
         self.assertEqual(results["penrose-p2-kite-dart"].status, "PASS")
         self.assertEqual(results["penrose-p3-rhombs"].status, "PASS")
         self.assertEqual(results["penrose-p3-rhombs-vertex"].status, "PASS")

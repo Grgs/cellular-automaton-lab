@@ -18,6 +18,7 @@ PENROSE_GEOMETRY = "penrose-p3-rhombs"
 PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
 PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
 PENROSE_P1_GEOMETRY = "penrose-p1-pentagon-diamond"
+PENROSE_P1_PBS_GEOMETRY = "penrose-p1-pentagon-boat-star"
 AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
@@ -107,8 +108,8 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
     ),
     PENROSE_P1_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P1_GEOMETRY,
-        catalog_label="Penrose P1 Pentagon-Star-Boat-Diamond",
-        reference_label="Penrose Pentagon-Star-Boat-Diamond",
+        catalog_label="Penrose P1 Pentagon-Diamond",
+        reference_label="Penrose Pentagon-Diamond",
         picker_group="Aperiodic",
         picker_order=205,
         default_rule="life-b2-s23",
@@ -124,6 +125,22 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # the iconic pentagram star. Mathematically equivalent to
         # Penrose's 1974 P1 prototile set via de Bruijn's algebraic
         # theory. Patch radius scales with depth (radius = 1.6 * phi^d).
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            P1_PENTAGON_KIND,
+            P1_DIAMOND_KIND,
+            P1_BOAT_KIND,
+            P1_STAR_KIND,
+        ),
+    ),
+    PENROSE_P1_PBS_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=PENROSE_P1_PBS_GEOMETRY,
+        catalog_label="Penrose P1 Pentagon-Boat-Star",
+        reference_label="Penrose Pentagon Boat Star",
+        picker_group="Aperiodic",
+        picker_order=207,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
         implementation_status="canonical_patch",
         public_cell_kinds=(
             P1_PENTAGON_KIND,
@@ -330,6 +347,7 @@ __all__ = [
     "P1_STAR_KIND",
     "PENROSE_GEOMETRY",
     "PENROSE_P1_GEOMETRY",
+    "PENROSE_P1_PBS_GEOMETRY",
     "PENROSE_P1_TILE_FAMILY",
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",

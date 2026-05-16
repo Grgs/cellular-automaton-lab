@@ -14,11 +14,13 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_KIND,
     HAT_MONOTILE_GEOMETRY,
     KITE_KIND,
+    P1_BOAT_KIND,
     P1_DIAMOND_KIND,
     P1_PENTAGON_KIND,
     P1_STAR_KIND,
     PENROSE_GEOMETRY,
     PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     PINWHEEL_GEOMETRY,
@@ -197,6 +199,70 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
             "than concentrated at a single special centre; every cell "
             "renders as a complete polygon and the tiling is hole-free, "
             "edge-matched, and connected at every depth.",
+        ),
+    ),
+    PENROSE_P1_PBS_GEOMETRY: ReferenceFamilySpec(
+        geometry=PENROSE_P1_PBS_GEOMETRY,
+        display_name=_reference_label(PENROSE_P1_PBS_GEOMETRY),
+        source_urls=(
+            "https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/",
+            "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
+        ),
+        canonical_root_seed_policy=(
+            "singular pentagrid crop with all-zero offsets and half-extent 1.6 * phi^d"
+        ),
+        allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_PBS_GEOMETRY),
+        required_metadata=(),
+        depth_expectations={
+            0: ReferenceDepthExpectation(
+                exact_total_cells=29,
+                expected_kind_counts=(
+                    (P1_BOAT_KIND, 14),
+                    (P1_PENTAGON_KIND, 14),
+                    (P1_STAR_KIND, 1),
+                ),
+                required_kinds=(P1_BOAT_KIND, P1_PENTAGON_KIND, P1_STAR_KIND),
+                required_adjacency_pairs=(
+                    (P1_BOAT_KIND, P1_BOAT_KIND),
+                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
+                    (P1_BOAT_KIND, P1_STAR_KIND),
+                ),
+            ),
+            1: ReferenceDepthExpectation(
+                exact_total_cells=127,
+                expected_kind_counts=(
+                    (P1_BOAT_KIND, 34),
+                    (P1_DIAMOND_KIND, 24),
+                    (P1_PENTAGON_KIND, 68),
+                    (P1_STAR_KIND, 1),
+                ),
+                required_kinds=(
+                    P1_BOAT_KIND,
+                    P1_DIAMOND_KIND,
+                    P1_PENTAGON_KIND,
+                    P1_STAR_KIND,
+                ),
+                required_adjacency_pairs=(
+                    (P1_BOAT_KIND, P1_BOAT_KIND),
+                    (P1_BOAT_KIND, P1_DIAMOND_KIND),
+                    (P1_BOAT_KIND, P1_PENTAGON_KIND),
+                    (P1_BOAT_KIND, P1_STAR_KIND),
+                    (P1_DIAMOND_KIND, P1_PENTAGON_KIND),
+                    (P1_PENTAGON_KIND, P1_PENTAGON_KIND),
+                ),
+            ),
+            2: ReferenceDepthExpectation(exact_total_cells=411),
+            3: ReferenceDepthExpectation(exact_total_cells=1161),
+        },
+        notes=(
+            "This family uses the singular de Bruijn pentagrid dual directly: "
+            "all five line-family offsets are zero, so the patch is centered "
+            "on one 5-line coincidence whose dual polygon becomes the central "
+            "P1 star. Three-line coincidences emit boats directly, while "
+            "generic 2-line cells yield the diamond and pentagon "
+            "representatives. The result is a deterministic, hole-free, "
+            "connected canonical patch with the full P1 cell vocabulary "
+            "present from depth 1 onward.",
         ),
     ),
     PENROSE_P2_GEOMETRY: ReferenceFamilySpec(

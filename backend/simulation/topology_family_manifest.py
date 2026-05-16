@@ -10,6 +10,7 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_MONOTILE_GEOMETRY,
     PENROSE_GEOMETRY,
     PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     PINWHEEL_GEOMETRY,
@@ -334,6 +335,10 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         # ``half_extent = base * phi^d``.
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
     ),
+    PENROSE_P1_PBS_GEOMETRY: _translated_aperiodic_family(
+        PENROSE_P1_PBS_GEOMETRY,
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
+    ),
     PENROSE_P2_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P2_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
@@ -490,6 +495,7 @@ __all__ = [
     "PATCH_DEPTH_CONTROL",
     "PENROSE_GEOMETRY",
     "PENROSE_P1_GEOMETRY",
+    "PENROSE_P1_PBS_GEOMETRY",
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
     "PICKER_GROUP_ORDER",

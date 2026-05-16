@@ -19,6 +19,7 @@ try:
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         HAT_MONOTILE_GEOMETRY,
         PENROSE_GEOMETRY,
+        PENROSE_P1_PBS_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         PINWHEEL_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
@@ -48,6 +49,7 @@ except ModuleNotFoundError:
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         HAT_MONOTILE_GEOMETRY,
         PENROSE_GEOMETRY,
+        PENROSE_P1_PBS_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         PINWHEEL_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
@@ -84,6 +86,29 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             self.assertLessEqual(len(cell.neighbors), 4)
+            for neighbor_id in cell.neighbors:
+                assert neighbor_id is not None
+                self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
+
+    def test_penrose_p1_pentagon_boat_star_topology_is_deterministic_and_contains_all_kinds(
+        self,
+    ) -> None:
+        shallow = build_topology(PENROSE_P1_PBS_GEOMETRY, 0, 0, patch_depth=0)
+        deep = build_topology(PENROSE_P1_PBS_GEOMETRY, 0, 0, patch_depth=3)
+        repeated = build_topology(PENROSE_P1_PBS_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
+        self.assertGreater(deep.cell_count, shallow.cell_count)
+        self.assertEqual(
+            {cell.kind for cell in deep.cells},
+            {"p1-pentagon", "p1-diamond", "p1-boat", "p1-star"},
+        )
+        self.assertTrue(all(cell.center is not None for cell in deep.cells))
+        self.assertTrue(all(cell.vertices for cell in deep.cells))
+        self.assertTrue(all(cell.tile_family == "penrose-p1" for cell in deep.cells))
+        self.assertEqual(sum(1 for cell in deep.cells if cell.kind == "p1-star"), 1)
+        for cell in deep.cells:
+            self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))
             for neighbor_id in cell.neighbors:
                 assert neighbor_id is not None
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
