@@ -2,7 +2,7 @@
 
 Cellular Automaton Lab is a browser-based cellular automata playground built around topology-first boards. It supports classic lattices, periodic mixed tilings, and finite aperiodic patches in one app, with a Flask backend and a Vite-built TypeScript frontend.
 
-Public release status: `v0.1.0` preview. The preview is usable for public evaluation, local experimentation, and contribution, but it is not a long-term API or feature-stability promise.
+Public release status: `v0.2.0` preview. The preview is usable for public evaluation, local experimentation, and contribution, but it is not a long-term API or feature-stability promise.
 
 Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://grgs.github.io/cellular-automaton-lab/)
 
@@ -16,7 +16,7 @@ It is intended for comparing how familiar automata behave on different local nei
 
 ## Highlights
 
-- 15 tiling families across square, hex, triangle, Archimedean, Cairo, Penrose, and Ammann-Beenker boards
+- 37 shipped tiling families across classic grids, periodic mixed tilings, Penrose variants, monotiles, and other aperiodic patches
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
@@ -42,6 +42,8 @@ It is intended for comparing how familiar automata behave on different local nei
 - Start with Square + Conway, paint a few cells, use step/run, then export or copy the pattern to see the sparse `cells_by_id` format.
 - Switch to Kagome or `4.8.8`, choose the matching mixed-tiling Life rule, and open the inspector while painting to see the same editor workflow on non-square neighborhoods.
 - Switch to Penrose P3 Rhombs, Spectre, or Taylor-Socolar, adjust patch depth, and watch how a finite aperiodic patch remains editable and persistent.
+- Compare `Penrose P1 Pentagon-Diamond (Distributed)` with `Penrose P1 Pentagon-Boat-Star` to see the difference between the distributed vertex-merge manifestation and the centered singular pentagrid patch.
+- Try the convex pentagonal periodic catalog with Cairo, Prismatic, Floret, and Type 7 to compare how the same rule family behaves on distinct pentagon adjacencies.
 - Try Whirlpool or HexWhirlpool from the preset/showcase controls for a quick multi-state animation that exercises more than binary Life-like states.
 - Reload the standalone GitHub Pages demo after changing topology or state to check browser persistence without the Flask server.
 
@@ -134,7 +136,7 @@ For choosing narrower checks by change type, see [Testing changes](docs/TESTING_
 
 ## Release Surface
 
-The public `v0.1.0` preview ships through three surfaces:
+The public `v0.2.0` preview ships through three surfaces:
 
 - tagged GitHub source releases
 - the GitHub Pages standalone demo
