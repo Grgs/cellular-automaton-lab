@@ -139,11 +139,11 @@
             "chirality_token": "right",
             "decoration_tokens": null,
             "delta": [
-              -3.72678,
-              1.86339
+              1.013684,
+              2.742911
             ],
             "kind": "pinwheel-triangle",
-            "orientation_token": "11"
+            "orientation_token": "0"
           },
           {
             "area": 1.0,

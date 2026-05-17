@@ -38,10 +38,19 @@ _PINWHEEL_CHILDREN: tuple[ExactTriangle, ...] = (
 )
 _ROOT_TRIANGLES: tuple[ExactTriangle, ...] = (
     _BASE_TRIANGLE,
+    # The second root is the upper-left half of the 2x1 seed rectangle. To
+    # keep ``_map_local`` a similarity transform (which is what the pinwheel
+    # subdivision rule requires for shape-preserving children), the vertices
+    # must follow the same (small-angle, right-angle, large-angle) ordering
+    # as ``_BASE_TRIANGLE`` -- ``(2,1)`` is the small-angle (~26 deg) corner,
+    # ``(0,1)`` is the right-angle corner, and ``(0,0)`` is the large-angle
+    # (~63 deg) corner. The naive ordering ``((0,0), (0,1), (2,1))`` reversed
+    # the small/large endpoints and produced non-similarity children that
+    # were not Pinwheel triangles.
     (
-        (_ZERO, _ZERO),
-        (_ZERO, _ONE),
         (_TWO, _ONE),
+        (_ZERO, _ONE),
+        (_ZERO, _ZERO),
     ),
 )
 REFERENCE_ROOT_SEED_POLICY = "paired-right-triangle-rectangle"

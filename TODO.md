@@ -20,10 +20,9 @@ The `v0.1.0` public preview has been released. Keep this section for follow-up w
 
 ## Now
 
-- Revisit browser-visible shape and pattern correctness for `pinwheel`; the stronger automated gates are useful, but manual visual review still does not justify promotion out of `Experimental`.
+- Decide whether to promote `pinwheel` out of `Experimental` now that the second-root vertex-ordering bug is fixed and the rendered pattern matches Conway-Radin's published substitution; a fresh manual visual review is still the gate.
 - For `dodecagonal-square-triangle`, the runtime is now a decorated 3.12.12 Archimedean generator: hexagonal lattice of regular dodecagonal supercells decomposed into six unit squares plus twelve unit equilateral triangles, with two bridging triangles per supercell. It tiles the plane exactly, scales without depth limit, and uses no vendored data. It is not the canonical Schlottmann quasi-periodic tiling (which would require marked prototiles); the supercell layout is locally 6-fold symmetric and the global tiling is periodic at the supercell scale.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
-- For `pinwheel`, treat the remaining visual mismatch as a display-sampling problem; keep the two-root exact-affine runtime patch, and if we revisit the presentation use a display-only observation window rather than runtime subset selection.
 
 ## Next
 
