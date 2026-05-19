@@ -66,7 +66,7 @@ def _depth_semantics(geometry: str) -> str:
     spec = REFERENCE_FAMILY_SPECS[geometry]
     if spec.sample_mode == "grid":
         return "grid sample"
-    if geometry == "pinwheel":
+    if geometry in ("pinwheel", "pinwheel-2-1"):
         return "exact affine substitution depth"
     return "substitution patch depth"
 

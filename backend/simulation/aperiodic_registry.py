@@ -12,6 +12,7 @@ from backend.simulation.aperiodic_family_manifest import (
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
+    PINWHEEL_2_1_GEOMETRY,
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
@@ -27,6 +28,7 @@ from backend.simulation.aperiodic_penrose_p1 import build_penrose_p1_patch
 from backend.simulation.aperiodic_penrose_p1_pbs import build_penrose_p1_pbs_patch
 from backend.simulation.aperiodic_penrose_p2 import build_penrose_p2_patch
 from backend.simulation.aperiodic_pinwheel import build_pinwheel_patch
+from backend.simulation.aperiodic_pinwheel_2_1 import build_pinwheel_2_1_patch
 from backend.simulation.aperiodic_robinson_triangles import build_robinson_triangles_patch
 from backend.simulation.aperiodic_shield import build_shield_patch
 from backend.simulation.aperiodic_dodecagonal_square_triangle import (
@@ -64,6 +66,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: build_dodecagonal_square_triangle_patch,
     SHIELD_GEOMETRY: build_shield_patch,
     PINWHEEL_GEOMETRY: build_pinwheel_patch,
+    PINWHEEL_2_1_GEOMETRY: build_pinwheel_2_1_patch,
 }
 
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {

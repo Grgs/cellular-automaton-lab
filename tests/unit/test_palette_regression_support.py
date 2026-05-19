@@ -30,6 +30,7 @@ class PaletteRegressionSupportTests(unittest.TestCase):
                 "chair",
                 "dodecagonal-square-triangle",
                 "pinwheel",
+                "pinwheel-2-1",
                 "shield",
             ],
         )

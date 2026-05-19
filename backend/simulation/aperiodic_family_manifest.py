@@ -30,6 +30,7 @@ TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
 DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
 SHIELD_GEOMETRY = "shield"
 PINWHEEL_GEOMETRY = "pinwheel"
+PINWHEEL_2_1_GEOMETRY = "pinwheel-2-1"
 
 THICK_RHOMB_KIND = "thick-rhomb"
 THIN_RHOMB_KIND = "thin-rhomb"
@@ -58,6 +59,8 @@ SHIELD_SHIELD_KIND = "shield-shield"
 SHIELD_SQUARE_KIND = "shield-square"
 SHIELD_TRIANGLE_KIND = "shield-triangle"
 PINWHEEL_TRIANGLE_KIND = "pinwheel-triangle"
+PINWHEEL_2_1_SMALL_KIND = "pinwheel-2-1-small-triangle"
+PINWHEEL_2_1_LARGE_KIND = "pinwheel-2-1-large-triangle"
 
 PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
@@ -66,6 +69,7 @@ HAT_TILE_FAMILY = "hat"
 DODECAGONAL_SQUARE_TRIANGLE_TILE_FAMILY = DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY
 SHIELD_TILE_FAMILY = "shield"
 PINWHEEL_TILE_FAMILY = "pinwheel"
+PINWHEEL_2_1_TILE_FAMILY = "pinwheel-2-1"
 
 
 @dataclass(frozen=True)
@@ -296,6 +300,26 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
             "Experimental until manual visual review accepts the exact-affine implementation."
         ),
     ),
+    PINWHEEL_2_1_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=PINWHEEL_2_1_GEOMETRY,
+        catalog_label="Pinwheel 2-1",
+        reference_label="Pinwheel 2-1",
+        picker_group="Experimental",
+        picker_order=345,
+        default_rule="life-b2-s23",
+        builder_kind="substitution_recipe",
+        # Two-prototile pinwheel variant from the Bielefeld Tilings
+        # Encyclopedia (``pinwheel-2-1``): 1:4:sqrt(17) right triangle
+        # subdividing into one small child (scale 1/sqrt(17)) at the
+        # right-angle corner plus four large children (scale 2/sqrt(17))
+        # filling the rest. Construction is exact in Fractions
+        # (foot-of-altitude + midpoints all yield rational coordinates).
+        implementation_status="exact_affine",
+        public_cell_kinds=(PINWHEEL_2_1_SMALL_KIND, PINWHEEL_2_1_LARGE_KIND),
+        promotion_blocker=(
+            "Experimental until manual visual review accepts the exact-affine implementation."
+        ),
+    ),
 }
 
 APERIODIC_FAMILY_IDS: tuple[str, ...] = tuple(
@@ -349,6 +373,10 @@ __all__ = [
     "PENROSE_P1_TILE_FAMILY",
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
+    "PINWHEEL_2_1_GEOMETRY",
+    "PINWHEEL_2_1_LARGE_KIND",
+    "PINWHEEL_2_1_SMALL_KIND",
+    "PINWHEEL_2_1_TILE_FAMILY",
     "PINWHEEL_GEOMETRY",
     "PINWHEEL_TILE_FAMILY",
     "PINWHEEL_TRIANGLE_KIND",

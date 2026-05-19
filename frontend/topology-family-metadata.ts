@@ -304,6 +304,14 @@ export const TOPOLOGY_FAMILY_METADATA = Object.freeze({
         sizingMode: "patch_depth",
         viewportSyncMode: "presentation-only",
     },
+    "pinwheel-2-1": {
+        label: "Pinwheel 2-1",
+        pickerGroup: "Experimental",
+        pickerOrder: 345,
+        family: "aperiodic",
+        sizingMode: "patch_depth",
+        viewportSyncMode: "presentation-only",
+    },
 } satisfies Readonly<Record<string, TopologyFamilyMetadata>>);
 
 export function getTopologyFamilyMetadata(tilingFamily: string): TopologyFamilyMetadata | null {

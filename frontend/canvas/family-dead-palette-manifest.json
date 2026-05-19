@@ -670,6 +670,31 @@
       ]
     },
     {
+      "geometry": "pinwheel-2-1",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/pinwheel-2-1-depth-3.json",
+        "selectorFields": ["kind"]
+      },
+      "variants": [
+        {
+          "label": "pinwheel-2-1-small",
+          "selector": {
+            "tile_family": "pinwheel-2-1",
+            "kind": "pinwheel-2-1-small-triangle"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "pinwheel-2-1-large",
+          "selector": {
+            "tile_family": "pinwheel-2-1",
+            "kind": "pinwheel-2-1-large-triangle"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
       "geometry": "shield",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/shield-depth-3.json",
