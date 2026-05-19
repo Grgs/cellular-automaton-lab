@@ -138,8 +138,10 @@ typing-extensions==4.15.0
     # via
     #   mypy
     #   pyee
-urllib3==2.6.3
-    # via requests
+urllib3==2.7.0
+    # via
+    #   -r requirements-dev.in
+    #   requests
 virtualenv==21.3.0
     # via pre-commit
 
