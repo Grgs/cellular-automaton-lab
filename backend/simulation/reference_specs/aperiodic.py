@@ -756,7 +756,13 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
                 exact_total_cells=2,
                 required_kinds=(PINWHEEL_TRIANGLE_KIND,),
                 required_adjacency_pairs=((PINWHEEL_TRIANGLE_KIND, PINWHEEL_TRIANGLE_KIND),),
-                min_unique_chirality_tokens=2,
+                # Both root triangles are listed in (small-angle, right-angle,
+                # large-angle) order so the subdivision is a similarity
+                # transform; this makes both seed triangles ``left`` chirality.
+                # Chirality variety emerges at depth 1+ where the pinwheel
+                # subdivision rule produces 3 right + 2 left children per
+                # left parent.
+                min_unique_chirality_tokens=1,
             ),
             1: ReferenceDepthExpectation(
                 exact_total_cells=10,

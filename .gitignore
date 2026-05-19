@@ -26,3 +26,4 @@ instance/
 
 .DS_Store
 Thumbs.db
+.playwright-cli/

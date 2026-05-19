@@ -48,7 +48,7 @@
       "height": 0,
       "patchDepth": 3,
       "cellSize": 12,
-      "topologyRevision": "fixture-pinwheel-depth-3"
+      "topologyRevision": "fixture-pinwheel-depth-3-v2"
     },
     {
       "name": "robinson-triangles-depth-3",

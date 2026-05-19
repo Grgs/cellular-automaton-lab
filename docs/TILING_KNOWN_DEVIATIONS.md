@@ -9,7 +9,7 @@ None.
 ## Current Known Deviations
 
 - `dodecagonal-square-triangle` runs a decorated 3.12.12 Archimedean generator (each regular dodecagonal supercell decomposed into six unit squares plus twelve unit equilateral triangles, plus two bridging triangles per supercell). It tiles the plane exactly, has no depth cap, and uses no vendored data, but it is not the canonical Schlottmann quasi-periodic square-triangle tiling: the supercell layout is locally 6-fold symmetric and the global tiling is periodic at the supercell scale.
-- `pinwheel` still fails manual visible review even though it now passes stronger backend, canonical-patch, and browser-visible automated checks. It remains in `Experimental` until the rendered pattern looks correct enough to justify promotion.
+- `pinwheel` now renders as a clean two-root substitution patch (the previous chaotic look came from a vertex-ordering bug in the second root that made `_map_local` a non-similarity transform — fixed by listing the second root's vertices in the canonical `(small-angle, right-angle, large-angle)` order so the subdivision rule maps to similar children). The patch keeps both roots as `left` chirality at depth 0; the substitution rule (3 right + 2 left children per left parent) introduces full chirality variety from depth 1 onward. The visual is now consistent with Conway-Radin's pinwheel pattern; promotion out of `Experimental` is gated on a fresh manual review.
 
 ## Known Limits That Are Not Currently Treated As Failures
 
