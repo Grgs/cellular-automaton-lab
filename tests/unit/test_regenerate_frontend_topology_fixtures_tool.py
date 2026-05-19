@@ -23,7 +23,7 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
         self.assertEqual(DEFAULT_FIXTURE_MANIFEST_PATH.name, "fixture-manifest.json")
         self.assertEqual(targets[0].name, "archimedean-4-8-8-3x3")
         self.assertEqual(targets[-1].name, "tuebingen-triangle-depth-3")
-        self.assertEqual(len(targets), 11)
+        self.assertEqual(len(targets), 12)
 
     def test_discover_fixture_targets_rejects_missing_selection(self) -> None:
         with self.assertRaises(ValueError):

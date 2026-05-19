@@ -13,6 +13,7 @@ from backend.simulation.aperiodic_family_manifest import (
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    PINWHEEL_2_1_GEOMETRY,
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
@@ -459,6 +460,13 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         PINWHEEL_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
     ),
+    PINWHEEL_2_1_GEOMETRY: _translated_aperiodic_family(
+        PINWHEEL_2_1_GEOMETRY,
+        # Pinwheel 2-1 produces 5^d cells per root (vs Conway-Radin's
+        # 2 * 5^d). Depth 4 = 625 cells; same effective ceiling as the
+        # original pinwheel.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+    ),
 }
 
 GEOMETRY_MINIMUM_GRID_DIMENSIONS = {
@@ -499,6 +507,7 @@ __all__ = [
     "PENROSE_P2_GEOMETRY",
     "PENROSE_VERTEX_GEOMETRY",
     "PICKER_GROUP_ORDER",
+    "PINWHEEL_2_1_GEOMETRY",
     "PINWHEEL_GEOMETRY",
     "PRISMATIC_PENTAGONAL_GEOMETRY",
     "RHOMBILLE_GEOMETRY",

@@ -14,6 +14,7 @@ export const TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle";
 export const DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle";
 export const SHIELD_GEOMETRY = "shield";
 export const PINWHEEL_GEOMETRY = "pinwheel";
+export const PINWHEEL_2_1_GEOMETRY = "pinwheel-2-1";
 
 export const THICK_RHOMB_KIND = "thick-rhomb";
 export const THIN_RHOMB_KIND = "thin-rhomb";
@@ -47,3 +48,6 @@ export const SHIELD_TRIANGLE_KIND = "shield-triangle";
 export const SHIELD_TILE_FAMILY = "shield";
 export const PINWHEEL_TRIANGLE_KIND = "pinwheel-triangle";
 export const PINWHEEL_TILE_FAMILY = "pinwheel";
+export const PINWHEEL_2_1_SMALL_KIND = "pinwheel-2-1-small-triangle";
+export const PINWHEEL_2_1_LARGE_KIND = "pinwheel-2-1-large-triangle";
+export const PINWHEEL_2_1_TILE_FAMILY = "pinwheel-2-1";
