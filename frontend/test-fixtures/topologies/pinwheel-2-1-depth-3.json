@@ -11,11 +11,12 @@
           "y": 8.579698
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.0.0",
+        "id": "pinwheel-2-1:root0.0.0.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.0.2",
-          "pinwheel-2-1:root.0.0.3"
+          "pinwheel-2-1:root0.0.0.2",
+          "pinwheel-2-1:root0.0.0.3",
+          "pinwheel-2-1:root1.1.1.1"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -40,11 +41,12 @@
           "y": 8.327056
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.0.1",
+        "id": "pinwheel-2-1:root0.0.0.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.0.4",
-          "pinwheel-2-1:root.0.2.0"
+          "pinwheel-2-1:root0.0.0.4",
+          "pinwheel-2-1:root0.0.2.0",
+          "pinwheel-2-1:root1.1.1.1"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -69,12 +71,12 @@
           "y": 8.327056
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.0.2",
+        "id": "pinwheel-2-1:root0.0.0.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.0.0",
-          "pinwheel-2-1:root.0.0.3",
-          "pinwheel-2-1:root.0.3.0"
+          "pinwheel-2-1:root0.0.0.0",
+          "pinwheel-2-1:root0.0.0.3",
+          "pinwheel-2-1:root0.0.3.0"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -99,12 +101,12 @@
           "y": 8.488747
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.0.3",
+        "id": "pinwheel-2-1:root0.0.0.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.0.0",
-          "pinwheel-2-1:root.0.0.2",
-          "pinwheel-2-1:root.0.0.4"
+          "pinwheel-2-1:root0.0.0.0",
+          "pinwheel-2-1:root0.0.0.2",
+          "pinwheel-2-1:root0.0.0.4"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -129,11 +131,12 @@
           "y": 8.488747
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.0.4",
+        "id": "pinwheel-2-1:root0.0.0.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.0.1",
-          "pinwheel-2-1:root.0.0.3"
+          "pinwheel-2-1:root0.0.0.1",
+          "pinwheel-2-1:root0.0.0.3",
+          "pinwheel-2-1:root1.1.1.1"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -158,13 +161,13 @@
           "y": 4.04226
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.1.0",
+        "id": "pinwheel-2-1:root0.0.1.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.2",
-          "pinwheel-2-1:root.0.1.3",
-          "pinwheel-2-1:root.0.4.0",
-          "pinwheel-2-1:root.2.0.1"
+          "pinwheel-2-1:root0.0.1.2",
+          "pinwheel-2-1:root0.0.1.3",
+          "pinwheel-2-1:root0.0.4.0",
+          "pinwheel-2-1:root0.2.0.1"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -189,12 +192,12 @@
           "y": 1.333946
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.1.1",
+        "id": "pinwheel-2-1:root0.0.1.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.4",
-          "pinwheel-2-1:root.2.0.0",
-          "pinwheel-2-1:root.2.0.4"
+          "pinwheel-2-1:root0.0.1.4",
+          "pinwheel-2-1:root0.2.0.0",
+          "pinwheel-2-1:root0.2.0.4"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -219,11 +222,11 @@
           "y": 3.395499
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.1.2",
+        "id": "pinwheel-2-1:root0.0.1.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.0",
-          "pinwheel-2-1:root.0.1.3"
+          "pinwheel-2-1:root0.0.1.0",
+          "pinwheel-2-1:root0.0.1.3"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -248,12 +251,12 @@
           "y": 3.314654
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.1.3",
+        "id": "pinwheel-2-1:root0.0.1.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.0",
-          "pinwheel-2-1:root.0.1.2",
-          "pinwheel-2-1:root.0.1.4"
+          "pinwheel-2-1:root0.0.1.0",
+          "pinwheel-2-1:root0.0.1.2",
+          "pinwheel-2-1:root0.0.1.4"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -278,13 +281,13 @@
           "y": 2.627469
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.1.4",
+        "id": "pinwheel-2-1:root0.0.1.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.1",
-          "pinwheel-2-1:root.0.1.3",
-          "pinwheel-2-1:root.2.0.1",
-          "pinwheel-2-1:root.2.0.4"
+          "pinwheel-2-1:root0.0.1.1",
+          "pinwheel-2-1:root0.0.1.3",
+          "pinwheel-2-1:root0.2.0.1",
+          "pinwheel-2-1:root0.2.0.4"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -309,13 +312,13 @@
           "y": 8.165366
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.2.0",
+        "id": "pinwheel-2-1:root0.0.2.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.0.1",
-          "pinwheel-2-1:root.0.2.2",
-          "pinwheel-2-1:root.0.2.3",
-          "pinwheel-2-1:root.3.0.0"
+          "pinwheel-2-1:root0.0.0.1",
+          "pinwheel-2-1:root0.0.2.2",
+          "pinwheel-2-1:root0.0.2.3",
+          "pinwheel-2-1:root0.3.0.0"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -340,12 +343,12 @@
           "y": 5.457052
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.2.1",
+        "id": "pinwheel-2-1:root0.0.2.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.4",
-          "pinwheel-2-1:root.0.3.1",
-          "pinwheel-2-1:root.3.0.1"
+          "pinwheel-2-1:root0.0.2.4",
+          "pinwheel-2-1:root0.0.3.1",
+          "pinwheel-2-1:root0.3.0.1"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -370,12 +373,12 @@
           "y": 7.518604
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.2.2",
+        "id": "pinwheel-2-1:root0.0.2.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.0",
-          "pinwheel-2-1:root.0.2.3",
-          "pinwheel-2-1:root.0.3.2"
+          "pinwheel-2-1:root0.0.2.0",
+          "pinwheel-2-1:root0.0.2.3",
+          "pinwheel-2-1:root0.0.3.2"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -400,12 +403,12 @@
           "y": 7.437759
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.2.3",
+        "id": "pinwheel-2-1:root0.0.2.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.0",
-          "pinwheel-2-1:root.0.2.2",
-          "pinwheel-2-1:root.0.2.4"
+          "pinwheel-2-1:root0.0.2.0",
+          "pinwheel-2-1:root0.0.2.2",
+          "pinwheel-2-1:root0.0.2.4"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -430,12 +433,12 @@
           "y": 6.750575
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.2.4",
+        "id": "pinwheel-2-1:root0.0.2.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.1",
-          "pinwheel-2-1:root.0.2.3",
-          "pinwheel-2-1:root.3.0.4"
+          "pinwheel-2-1:root0.0.2.1",
+          "pinwheel-2-1:root0.0.2.3",
+          "pinwheel-2-1:root0.3.0.4"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -460,13 +463,13 @@
           "y": 8.165366
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.3.0",
+        "id": "pinwheel-2-1:root0.0.3.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.0.2",
-          "pinwheel-2-1:root.0.3.2",
-          "pinwheel-2-1:root.0.3.3",
-          "pinwheel-2-1:root.0.4.1"
+          "pinwheel-2-1:root0.0.0.2",
+          "pinwheel-2-1:root0.0.3.2",
+          "pinwheel-2-1:root0.0.3.3",
+          "pinwheel-2-1:root0.0.4.1"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -491,13 +494,13 @@
           "y": 5.457052
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.3.1",
+        "id": "pinwheel-2-1:root0.0.3.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.1",
-          "pinwheel-2-1:root.0.3.4",
-          "pinwheel-2-1:root.0.4.0",
-          "pinwheel-2-1:root.0.4.4"
+          "pinwheel-2-1:root0.0.2.1",
+          "pinwheel-2-1:root0.0.3.4",
+          "pinwheel-2-1:root0.0.4.0",
+          "pinwheel-2-1:root0.0.4.4"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -522,12 +525,12 @@
           "y": 7.518604
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.3.2",
+        "id": "pinwheel-2-1:root0.0.3.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.2",
-          "pinwheel-2-1:root.0.3.0",
-          "pinwheel-2-1:root.0.3.3"
+          "pinwheel-2-1:root0.0.2.2",
+          "pinwheel-2-1:root0.0.3.0",
+          "pinwheel-2-1:root0.0.3.3"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -552,12 +555,12 @@
           "y": 7.437759
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.3.3",
+        "id": "pinwheel-2-1:root0.0.3.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.3.0",
-          "pinwheel-2-1:root.0.3.2",
-          "pinwheel-2-1:root.0.3.4"
+          "pinwheel-2-1:root0.0.3.0",
+          "pinwheel-2-1:root0.0.3.2",
+          "pinwheel-2-1:root0.0.3.4"
         ],
         "orientation_token": "242",
         "tile_family": "pinwheel-2-1",
@@ -582,13 +585,13 @@
           "y": 6.750575
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.3.4",
+        "id": "pinwheel-2-1:root0.0.3.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.3.1",
-          "pinwheel-2-1:root.0.3.3",
-          "pinwheel-2-1:root.0.4.1",
-          "pinwheel-2-1:root.0.4.4"
+          "pinwheel-2-1:root0.0.3.1",
+          "pinwheel-2-1:root0.0.3.3",
+          "pinwheel-2-1:root0.0.4.1",
+          "pinwheel-2-1:root0.0.4.4"
         ],
         "orientation_token": "62",
         "tile_family": "pinwheel-2-1",
@@ -613,13 +616,13 @@
           "y": 4.203951
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.4.0",
+        "id": "pinwheel-2-1:root0.0.4.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.0",
-          "pinwheel-2-1:root.0.3.1",
-          "pinwheel-2-1:root.0.4.2",
-          "pinwheel-2-1:root.0.4.3"
+          "pinwheel-2-1:root0.0.1.0",
+          "pinwheel-2-1:root0.0.3.1",
+          "pinwheel-2-1:root0.0.4.2",
+          "pinwheel-2-1:root0.0.4.3"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -644,12 +647,12 @@
           "y": 6.912265
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.4.1",
+        "id": "pinwheel-2-1:root0.0.4.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.3.0",
-          "pinwheel-2-1:root.0.3.4",
-          "pinwheel-2-1:root.0.4.4"
+          "pinwheel-2-1:root0.0.3.0",
+          "pinwheel-2-1:root0.0.3.4",
+          "pinwheel-2-1:root0.0.4.4"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -674,11 +677,11 @@
           "y": 4.850713
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.0.4.2",
+        "id": "pinwheel-2-1:root0.0.4.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.4.0",
-          "pinwheel-2-1:root.0.4.3"
+          "pinwheel-2-1:root0.0.4.0",
+          "pinwheel-2-1:root0.0.4.3"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -703,12 +706,12 @@
           "y": 4.931558
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.4.3",
+        "id": "pinwheel-2-1:root0.0.4.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.4.0",
-          "pinwheel-2-1:root.0.4.2",
-          "pinwheel-2-1:root.0.4.4"
+          "pinwheel-2-1:root0.0.4.0",
+          "pinwheel-2-1:root0.0.4.2",
+          "pinwheel-2-1:root0.0.4.4"
         ],
         "orientation_token": "62",
         "tile_family": "pinwheel-2-1",
@@ -733,13 +736,13 @@
           "y": 5.618742
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.0.4.4",
+        "id": "pinwheel-2-1:root0.0.4.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.3.1",
-          "pinwheel-2-1:root.0.3.4",
-          "pinwheel-2-1:root.0.4.1",
-          "pinwheel-2-1:root.0.4.3"
+          "pinwheel-2-1:root0.0.3.1",
+          "pinwheel-2-1:root0.0.3.4",
+          "pinwheel-2-1:root0.0.4.1",
+          "pinwheel-2-1:root0.0.4.3"
         ],
         "orientation_token": "242",
         "tile_family": "pinwheel-2-1",
@@ -764,12 +767,12 @@
           "y": 0.080845
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.0.0",
+        "id": "pinwheel-2-1:root0.1.0.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.2",
-          "pinwheel-2-1:root.1.0.3",
-          "pinwheel-2-1:root.4.0.0"
+          "pinwheel-2-1:root0.1.0.2",
+          "pinwheel-2-1:root0.1.0.3",
+          "pinwheel-2-1:root0.4.0.0"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -794,12 +797,12 @@
           "y": 2.78916
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.0.1",
+        "id": "pinwheel-2-1:root0.1.0.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.4",
-          "pinwheel-2-1:root.1.2.0",
-          "pinwheel-2-1:root.4.0.1"
+          "pinwheel-2-1:root0.1.0.4",
+          "pinwheel-2-1:root0.1.2.0",
+          "pinwheel-2-1:root0.4.0.1"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -824,12 +827,12 @@
           "y": 0.727607
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.0.2",
+        "id": "pinwheel-2-1:root0.1.0.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.0",
-          "pinwheel-2-1:root.1.0.3",
-          "pinwheel-2-1:root.1.3.0"
+          "pinwheel-2-1:root0.1.0.0",
+          "pinwheel-2-1:root0.1.0.3",
+          "pinwheel-2-1:root0.1.3.0"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -854,12 +857,12 @@
           "y": 0.808452
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.0.3",
+        "id": "pinwheel-2-1:root0.1.0.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.0",
-          "pinwheel-2-1:root.1.0.2",
-          "pinwheel-2-1:root.1.0.4"
+          "pinwheel-2-1:root0.1.0.0",
+          "pinwheel-2-1:root0.1.0.2",
+          "pinwheel-2-1:root0.1.0.4"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -884,12 +887,12 @@
           "y": 1.495636
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.0.4",
+        "id": "pinwheel-2-1:root0.1.0.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.1",
-          "pinwheel-2-1:root.1.0.3",
-          "pinwheel-2-1:root.4.0.4"
+          "pinwheel-2-1:root0.1.0.1",
+          "pinwheel-2-1:root0.1.0.3",
+          "pinwheel-2-1:root0.4.0.4"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -914,12 +917,13 @@
           "y": 1.333946
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.1.0",
+        "id": "pinwheel-2-1:root0.1.1.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.1.2",
-          "pinwheel-2-1:root.1.1.3",
-          "pinwheel-2-1:root.1.4.0"
+          "pinwheel-2-1:root0.1.1.2",
+          "pinwheel-2-1:root0.1.1.3",
+          "pinwheel-2-1:root0.1.4.0",
+          "pinwheel-2-1:root1.4.1.4"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -944,10 +948,14 @@
           "y": 0.323381
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.1.1",
+        "id": "pinwheel-2-1:root0.1.1.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.1.4"
+          "pinwheel-2-1:root0.1.1.4",
+          "pinwheel-2-1:root1.0.0.0",
+          "pinwheel-2-1:root1.0.0.1",
+          "pinwheel-2-1:root1.0.0.4",
+          "pinwheel-2-1:root1.4.1.1"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -972,11 +980,11 @@
           "y": 0.323381
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.1.2",
+        "id": "pinwheel-2-1:root0.1.1.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.1.0",
-          "pinwheel-2-1:root.1.1.3"
+          "pinwheel-2-1:root0.1.1.0",
+          "pinwheel-2-1:root0.1.1.3"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1001,12 +1009,12 @@
           "y": 0.970143
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.1.3",
+        "id": "pinwheel-2-1:root0.1.1.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.1.0",
-          "pinwheel-2-1:root.1.1.2",
-          "pinwheel-2-1:root.1.1.4"
+          "pinwheel-2-1:root0.1.1.0",
+          "pinwheel-2-1:root0.1.1.2",
+          "pinwheel-2-1:root0.1.1.4"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -1031,11 +1039,13 @@
           "y": 0.970143
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.1.4",
+        "id": "pinwheel-2-1:root0.1.1.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.1.1",
-          "pinwheel-2-1:root.1.1.3"
+          "pinwheel-2-1:root0.1.1.1",
+          "pinwheel-2-1:root0.1.1.3",
+          "pinwheel-2-1:root1.4.1.1",
+          "pinwheel-2-1:root1.4.1.4"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -1060,12 +1070,13 @@
           "y": 3.395499
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.2.0",
+        "id": "pinwheel-2-1:root0.1.2.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.1",
-          "pinwheel-2-1:root.1.2.2",
-          "pinwheel-2-1:root.1.2.3"
+          "pinwheel-2-1:root0.1.0.1",
+          "pinwheel-2-1:root0.1.2.2",
+          "pinwheel-2-1:root0.1.2.3",
+          "pinwheel-2-1:root1.4.2.4"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -1090,11 +1101,14 @@
           "y": 2.384934
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.2.1",
+        "id": "pinwheel-2-1:root0.1.2.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.2.4",
-          "pinwheel-2-1:root.1.3.1"
+          "pinwheel-2-1:root0.1.2.4",
+          "pinwheel-2-1:root0.1.3.1",
+          "pinwheel-2-1:root1.4.1.0",
+          "pinwheel-2-1:root1.4.1.4",
+          "pinwheel-2-1:root1.4.2.1"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1119,12 +1133,12 @@
           "y": 2.384934
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.2.2",
+        "id": "pinwheel-2-1:root0.1.2.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.2.0",
-          "pinwheel-2-1:root.1.2.3",
-          "pinwheel-2-1:root.1.3.2"
+          "pinwheel-2-1:root0.1.2.0",
+          "pinwheel-2-1:root0.1.2.3",
+          "pinwheel-2-1:root0.1.3.2"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1149,12 +1163,12 @@
           "y": 3.031695
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.2.3",
+        "id": "pinwheel-2-1:root0.1.2.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.2.0",
-          "pinwheel-2-1:root.1.2.2",
-          "pinwheel-2-1:root.1.2.4"
+          "pinwheel-2-1:root0.1.2.0",
+          "pinwheel-2-1:root0.1.2.2",
+          "pinwheel-2-1:root0.1.2.4"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -1179,11 +1193,13 @@
           "y": 3.031695
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.2.4",
+        "id": "pinwheel-2-1:root0.1.2.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.2.1",
-          "pinwheel-2-1:root.1.2.3"
+          "pinwheel-2-1:root0.1.2.1",
+          "pinwheel-2-1:root0.1.2.3",
+          "pinwheel-2-1:root1.4.2.1",
+          "pinwheel-2-1:root1.4.2.4"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -1208,13 +1224,13 @@
           "y": 0.727607
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.3.0",
+        "id": "pinwheel-2-1:root0.1.3.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.2",
-          "pinwheel-2-1:root.1.3.2",
-          "pinwheel-2-1:root.1.3.3",
-          "pinwheel-2-1:root.1.4.1"
+          "pinwheel-2-1:root0.1.0.2",
+          "pinwheel-2-1:root0.1.3.2",
+          "pinwheel-2-1:root0.1.3.3",
+          "pinwheel-2-1:root0.1.4.1"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -1239,13 +1255,13 @@
           "y": 1.738172
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.3.1",
+        "id": "pinwheel-2-1:root0.1.3.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.2.1",
-          "pinwheel-2-1:root.1.3.4",
-          "pinwheel-2-1:root.1.4.0",
-          "pinwheel-2-1:root.1.4.4"
+          "pinwheel-2-1:root0.1.2.1",
+          "pinwheel-2-1:root0.1.3.4",
+          "pinwheel-2-1:root0.1.4.0",
+          "pinwheel-2-1:root0.1.4.4"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1270,12 +1286,12 @@
           "y": 1.738172
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.3.2",
+        "id": "pinwheel-2-1:root0.1.3.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.2.2",
-          "pinwheel-2-1:root.1.3.0",
-          "pinwheel-2-1:root.1.3.3"
+          "pinwheel-2-1:root0.1.2.2",
+          "pinwheel-2-1:root0.1.3.0",
+          "pinwheel-2-1:root0.1.3.3"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1300,12 +1316,12 @@
           "y": 1.09141
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.3.3",
+        "id": "pinwheel-2-1:root0.1.3.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.3.0",
-          "pinwheel-2-1:root.1.3.2",
-          "pinwheel-2-1:root.1.3.4"
+          "pinwheel-2-1:root0.1.3.0",
+          "pinwheel-2-1:root0.1.3.2",
+          "pinwheel-2-1:root0.1.3.4"
         ],
         "orientation_token": "152",
         "tile_family": "pinwheel-2-1",
@@ -1330,13 +1346,13 @@
           "y": 1.09141
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.3.4",
+        "id": "pinwheel-2-1:root0.1.3.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.3.1",
-          "pinwheel-2-1:root.1.3.3",
-          "pinwheel-2-1:root.1.4.1",
-          "pinwheel-2-1:root.1.4.4"
+          "pinwheel-2-1:root0.1.3.1",
+          "pinwheel-2-1:root0.1.3.3",
+          "pinwheel-2-1:root0.1.4.1",
+          "pinwheel-2-1:root0.1.4.4"
         ],
         "orientation_token": "332",
         "tile_family": "pinwheel-2-1",
@@ -1361,13 +1377,13 @@
           "y": 1.333946
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.4.0",
+        "id": "pinwheel-2-1:root0.1.4.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.1.0",
-          "pinwheel-2-1:root.1.3.1",
-          "pinwheel-2-1:root.1.4.2",
-          "pinwheel-2-1:root.1.4.3"
+          "pinwheel-2-1:root0.1.1.0",
+          "pinwheel-2-1:root0.1.3.1",
+          "pinwheel-2-1:root0.1.4.2",
+          "pinwheel-2-1:root0.1.4.3"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -1392,12 +1408,12 @@
           "y": 0.323381
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.4.1",
+        "id": "pinwheel-2-1:root0.1.4.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.3.0",
-          "pinwheel-2-1:root.1.3.4",
-          "pinwheel-2-1:root.1.4.4"
+          "pinwheel-2-1:root0.1.3.0",
+          "pinwheel-2-1:root0.1.3.4",
+          "pinwheel-2-1:root0.1.4.4"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -1422,11 +1438,11 @@
           "y": 0.323381
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.1.4.2",
+        "id": "pinwheel-2-1:root0.1.4.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.4.0",
-          "pinwheel-2-1:root.1.4.3"
+          "pinwheel-2-1:root0.1.4.0",
+          "pinwheel-2-1:root0.1.4.3"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -1451,12 +1467,12 @@
           "y": 0.970143
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.4.3",
+        "id": "pinwheel-2-1:root0.1.4.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.4.0",
-          "pinwheel-2-1:root.1.4.2",
-          "pinwheel-2-1:root.1.4.4"
+          "pinwheel-2-1:root0.1.4.0",
+          "pinwheel-2-1:root0.1.4.2",
+          "pinwheel-2-1:root0.1.4.4"
         ],
         "orientation_token": "332",
         "tile_family": "pinwheel-2-1",
@@ -1481,13 +1497,13 @@
           "y": 0.970143
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.1.4.4",
+        "id": "pinwheel-2-1:root0.1.4.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.3.1",
-          "pinwheel-2-1:root.1.3.4",
-          "pinwheel-2-1:root.1.4.1",
-          "pinwheel-2-1:root.1.4.3"
+          "pinwheel-2-1:root0.1.3.1",
+          "pinwheel-2-1:root0.1.3.4",
+          "pinwheel-2-1:root0.1.4.1",
+          "pinwheel-2-1:root0.1.4.3"
         ],
         "orientation_token": "152",
         "tile_family": "pinwheel-2-1",
@@ -1512,12 +1528,12 @@
           "y": 0.080845
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.0.0",
+        "id": "pinwheel-2-1:root0.2.0.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.1",
-          "pinwheel-2-1:root.2.0.2",
-          "pinwheel-2-1:root.2.0.3"
+          "pinwheel-2-1:root0.0.1.1",
+          "pinwheel-2-1:root0.2.0.2",
+          "pinwheel-2-1:root0.2.0.3"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1542,13 +1558,13 @@
           "y": 2.78916
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.0.1",
+        "id": "pinwheel-2-1:root0.2.0.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.0",
-          "pinwheel-2-1:root.0.1.4",
-          "pinwheel-2-1:root.2.0.4",
-          "pinwheel-2-1:root.2.2.0"
+          "pinwheel-2-1:root0.0.1.0",
+          "pinwheel-2-1:root0.0.1.4",
+          "pinwheel-2-1:root0.2.0.4",
+          "pinwheel-2-1:root0.2.2.0"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -1573,12 +1589,12 @@
           "y": 0.727607
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.0.2",
+        "id": "pinwheel-2-1:root0.2.0.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.0.0",
-          "pinwheel-2-1:root.2.0.3",
-          "pinwheel-2-1:root.2.3.0"
+          "pinwheel-2-1:root0.2.0.0",
+          "pinwheel-2-1:root0.2.0.3",
+          "pinwheel-2-1:root0.2.3.0"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -1603,12 +1619,12 @@
           "y": 0.808452
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.0.3",
+        "id": "pinwheel-2-1:root0.2.0.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.0.0",
-          "pinwheel-2-1:root.2.0.2",
-          "pinwheel-2-1:root.2.0.4"
+          "pinwheel-2-1:root0.2.0.0",
+          "pinwheel-2-1:root0.2.0.2",
+          "pinwheel-2-1:root0.2.0.4"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -1633,13 +1649,13 @@
           "y": 1.495636
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.0.4",
+        "id": "pinwheel-2-1:root0.2.0.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.1.1",
-          "pinwheel-2-1:root.0.1.4",
-          "pinwheel-2-1:root.2.0.1",
-          "pinwheel-2-1:root.2.0.3"
+          "pinwheel-2-1:root0.0.1.1",
+          "pinwheel-2-1:root0.0.1.4",
+          "pinwheel-2-1:root0.2.0.1",
+          "pinwheel-2-1:root0.2.0.3"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -1664,13 +1680,13 @@
           "y": 1.333946
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.1.0",
+        "id": "pinwheel-2-1:root0.2.1.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.2",
-          "pinwheel-2-1:root.2.1.3",
-          "pinwheel-2-1:root.2.4.0",
-          "pinwheel-2-1:root.3.1.0"
+          "pinwheel-2-1:root0.2.1.2",
+          "pinwheel-2-1:root0.2.1.3",
+          "pinwheel-2-1:root0.2.4.0",
+          "pinwheel-2-1:root0.3.1.0"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -1695,11 +1711,11 @@
           "y": 0.323381
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.1.1",
+        "id": "pinwheel-2-1:root0.2.1.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.4",
-          "pinwheel-2-1:root.3.1.1"
+          "pinwheel-2-1:root0.2.1.4",
+          "pinwheel-2-1:root0.3.1.1"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1724,11 +1740,11 @@
           "y": 0.323381
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.1.2",
+        "id": "pinwheel-2-1:root0.2.1.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.0",
-          "pinwheel-2-1:root.2.1.3"
+          "pinwheel-2-1:root0.2.1.0",
+          "pinwheel-2-1:root0.2.1.3"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1753,12 +1769,12 @@
           "y": 0.970143
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.1.3",
+        "id": "pinwheel-2-1:root0.2.1.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.0",
-          "pinwheel-2-1:root.2.1.2",
-          "pinwheel-2-1:root.2.1.4"
+          "pinwheel-2-1:root0.2.1.0",
+          "pinwheel-2-1:root0.2.1.2",
+          "pinwheel-2-1:root0.2.1.4"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -1783,12 +1799,12 @@
           "y": 0.970143
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.1.4",
+        "id": "pinwheel-2-1:root0.2.1.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.1",
-          "pinwheel-2-1:root.2.1.3",
-          "pinwheel-2-1:root.3.1.4"
+          "pinwheel-2-1:root0.2.1.1",
+          "pinwheel-2-1:root0.2.1.3",
+          "pinwheel-2-1:root0.3.1.4"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -1813,13 +1829,13 @@
           "y": 3.395499
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.2.0",
+        "id": "pinwheel-2-1:root0.2.2.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.0.1",
-          "pinwheel-2-1:root.2.2.2",
-          "pinwheel-2-1:root.2.2.3",
-          "pinwheel-2-1:root.3.2.0"
+          "pinwheel-2-1:root0.2.0.1",
+          "pinwheel-2-1:root0.2.2.2",
+          "pinwheel-2-1:root0.2.2.3",
+          "pinwheel-2-1:root0.3.2.0"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -1844,12 +1860,12 @@
           "y": 2.384934
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.2.1",
+        "id": "pinwheel-2-1:root0.2.2.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.4",
-          "pinwheel-2-1:root.2.3.1",
-          "pinwheel-2-1:root.3.2.1"
+          "pinwheel-2-1:root0.2.2.4",
+          "pinwheel-2-1:root0.2.3.1",
+          "pinwheel-2-1:root0.3.2.1"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1874,12 +1890,12 @@
           "y": 2.384934
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.2.2",
+        "id": "pinwheel-2-1:root0.2.2.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.0",
-          "pinwheel-2-1:root.2.2.3",
-          "pinwheel-2-1:root.2.3.2"
+          "pinwheel-2-1:root0.2.2.0",
+          "pinwheel-2-1:root0.2.2.3",
+          "pinwheel-2-1:root0.2.3.2"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -1904,12 +1920,12 @@
           "y": 3.031695
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.2.3",
+        "id": "pinwheel-2-1:root0.2.2.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.0",
-          "pinwheel-2-1:root.2.2.2",
-          "pinwheel-2-1:root.2.2.4"
+          "pinwheel-2-1:root0.2.2.0",
+          "pinwheel-2-1:root0.2.2.2",
+          "pinwheel-2-1:root0.2.2.4"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -1934,12 +1950,12 @@
           "y": 3.031695
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.2.4",
+        "id": "pinwheel-2-1:root0.2.2.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.1",
-          "pinwheel-2-1:root.2.2.3",
-          "pinwheel-2-1:root.3.2.4"
+          "pinwheel-2-1:root0.2.2.1",
+          "pinwheel-2-1:root0.2.2.3",
+          "pinwheel-2-1:root0.3.2.4"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -1964,13 +1980,13 @@
           "y": 0.727607
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.3.0",
+        "id": "pinwheel-2-1:root0.2.3.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.0.2",
-          "pinwheel-2-1:root.2.3.2",
-          "pinwheel-2-1:root.2.3.3",
-          "pinwheel-2-1:root.2.4.1"
+          "pinwheel-2-1:root0.2.0.2",
+          "pinwheel-2-1:root0.2.3.2",
+          "pinwheel-2-1:root0.2.3.3",
+          "pinwheel-2-1:root0.2.4.1"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -1995,13 +2011,13 @@
           "y": 1.738172
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.3.1",
+        "id": "pinwheel-2-1:root0.2.3.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.1",
-          "pinwheel-2-1:root.2.3.4",
-          "pinwheel-2-1:root.2.4.0",
-          "pinwheel-2-1:root.2.4.4"
+          "pinwheel-2-1:root0.2.2.1",
+          "pinwheel-2-1:root0.2.3.4",
+          "pinwheel-2-1:root0.2.4.0",
+          "pinwheel-2-1:root0.2.4.4"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -2026,12 +2042,12 @@
           "y": 1.738172
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.3.2",
+        "id": "pinwheel-2-1:root0.2.3.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.2",
-          "pinwheel-2-1:root.2.3.0",
-          "pinwheel-2-1:root.2.3.3"
+          "pinwheel-2-1:root0.2.2.2",
+          "pinwheel-2-1:root0.2.3.0",
+          "pinwheel-2-1:root0.2.3.3"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -2056,12 +2072,12 @@
           "y": 1.09141
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.3.3",
+        "id": "pinwheel-2-1:root0.2.3.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.3.0",
-          "pinwheel-2-1:root.2.3.2",
-          "pinwheel-2-1:root.2.3.4"
+          "pinwheel-2-1:root0.2.3.0",
+          "pinwheel-2-1:root0.2.3.2",
+          "pinwheel-2-1:root0.2.3.4"
         ],
         "orientation_token": "152",
         "tile_family": "pinwheel-2-1",
@@ -2086,13 +2102,13 @@
           "y": 1.09141
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.3.4",
+        "id": "pinwheel-2-1:root0.2.3.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.3.1",
-          "pinwheel-2-1:root.2.3.3",
-          "pinwheel-2-1:root.2.4.1",
-          "pinwheel-2-1:root.2.4.4"
+          "pinwheel-2-1:root0.2.3.1",
+          "pinwheel-2-1:root0.2.3.3",
+          "pinwheel-2-1:root0.2.4.1",
+          "pinwheel-2-1:root0.2.4.4"
         ],
         "orientation_token": "332",
         "tile_family": "pinwheel-2-1",
@@ -2117,13 +2133,13 @@
           "y": 1.333946
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.4.0",
+        "id": "pinwheel-2-1:root0.2.4.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.0",
-          "pinwheel-2-1:root.2.3.1",
-          "pinwheel-2-1:root.2.4.2",
-          "pinwheel-2-1:root.2.4.3"
+          "pinwheel-2-1:root0.2.1.0",
+          "pinwheel-2-1:root0.2.3.1",
+          "pinwheel-2-1:root0.2.4.2",
+          "pinwheel-2-1:root0.2.4.3"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -2148,12 +2164,12 @@
           "y": 0.323381
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.4.1",
+        "id": "pinwheel-2-1:root0.2.4.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.3.0",
-          "pinwheel-2-1:root.2.3.4",
-          "pinwheel-2-1:root.2.4.4"
+          "pinwheel-2-1:root0.2.3.0",
+          "pinwheel-2-1:root0.2.3.4",
+          "pinwheel-2-1:root0.2.4.4"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -2178,11 +2194,11 @@
           "y": 0.323381
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.2.4.2",
+        "id": "pinwheel-2-1:root0.2.4.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.4.0",
-          "pinwheel-2-1:root.2.4.3"
+          "pinwheel-2-1:root0.2.4.0",
+          "pinwheel-2-1:root0.2.4.3"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -2207,12 +2223,12 @@
           "y": 0.970143
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.4.3",
+        "id": "pinwheel-2-1:root0.2.4.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.4.0",
-          "pinwheel-2-1:root.2.4.2",
-          "pinwheel-2-1:root.2.4.4"
+          "pinwheel-2-1:root0.2.4.0",
+          "pinwheel-2-1:root0.2.4.2",
+          "pinwheel-2-1:root0.2.4.4"
         ],
         "orientation_token": "332",
         "tile_family": "pinwheel-2-1",
@@ -2237,13 +2253,13 @@
           "y": 0.970143
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.2.4.4",
+        "id": "pinwheel-2-1:root0.2.4.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.3.1",
-          "pinwheel-2-1:root.2.3.4",
-          "pinwheel-2-1:root.2.4.1",
-          "pinwheel-2-1:root.2.4.3"
+          "pinwheel-2-1:root0.2.3.1",
+          "pinwheel-2-1:root0.2.3.4",
+          "pinwheel-2-1:root0.2.4.1",
+          "pinwheel-2-1:root0.2.4.3"
         ],
         "orientation_token": "152",
         "tile_family": "pinwheel-2-1",
@@ -2268,13 +2284,13 @@
           "y": 8.003676
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.0.0",
+        "id": "pinwheel-2-1:root0.3.0.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.0",
-          "pinwheel-2-1:root.3.0.2",
-          "pinwheel-2-1:root.3.0.3",
-          "pinwheel-2-1:root.4.1.1"
+          "pinwheel-2-1:root0.0.2.0",
+          "pinwheel-2-1:root0.3.0.2",
+          "pinwheel-2-1:root0.3.0.3",
+          "pinwheel-2-1:root0.4.1.1"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -2299,12 +2315,12 @@
           "y": 5.376206
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.0.1",
+        "id": "pinwheel-2-1:root0.3.0.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.1",
-          "pinwheel-2-1:root.3.0.4",
-          "pinwheel-2-1:root.3.2.0"
+          "pinwheel-2-1:root0.0.2.1",
+          "pinwheel-2-1:root0.3.0.4",
+          "pinwheel-2-1:root0.3.2.0"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -2329,12 +2345,12 @@
           "y": 7.195224
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.0.2",
+        "id": "pinwheel-2-1:root0.3.0.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.0.0",
-          "pinwheel-2-1:root.3.0.3",
-          "pinwheel-2-1:root.3.3.0"
+          "pinwheel-2-1:root0.3.0.0",
+          "pinwheel-2-1:root0.3.0.3",
+          "pinwheel-2-1:root0.3.3.0"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -2359,12 +2375,12 @@
           "y": 7.276069
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.0.3",
+        "id": "pinwheel-2-1:root0.3.0.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.0.0",
-          "pinwheel-2-1:root.3.0.2",
-          "pinwheel-2-1:root.3.0.4"
+          "pinwheel-2-1:root0.3.0.0",
+          "pinwheel-2-1:root0.3.0.2",
+          "pinwheel-2-1:root0.3.0.4"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -2389,12 +2405,12 @@
           "y": 6.66973
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.0.4",
+        "id": "pinwheel-2-1:root0.3.0.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.0.2.4",
-          "pinwheel-2-1:root.3.0.1",
-          "pinwheel-2-1:root.3.0.3"
+          "pinwheel-2-1:root0.0.2.4",
+          "pinwheel-2-1:root0.3.0.1",
+          "pinwheel-2-1:root0.3.0.3"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -2419,13 +2435,13 @@
           "y": 2.627469
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.1.0",
+        "id": "pinwheel-2-1:root0.3.1.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.0",
-          "pinwheel-2-1:root.3.1.2",
-          "pinwheel-2-1:root.3.1.3",
-          "pinwheel-2-1:root.3.4.0"
+          "pinwheel-2-1:root0.2.1.0",
+          "pinwheel-2-1:root0.3.1.2",
+          "pinwheel-2-1:root0.3.1.3",
+          "pinwheel-2-1:root0.3.4.0"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -2450,13 +2466,13 @@
           "y": 0.970143
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.1.1",
+        "id": "pinwheel-2-1:root0.3.1.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.1",
-          "pinwheel-2-1:root.3.1.4",
-          "pinwheel-2-1:root.4.0.0",
-          "pinwheel-2-1:root.4.4.1"
+          "pinwheel-2-1:root0.2.1.1",
+          "pinwheel-2-1:root0.3.1.4",
+          "pinwheel-2-1:root0.4.0.0",
+          "pinwheel-2-1:root0.4.4.1"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -2481,13 +2497,13 @@
           "y": 2.910428
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.1.2",
+        "id": "pinwheel-2-1:root0.3.1.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.1.0",
-          "pinwheel-2-1:root.3.1.3",
-          "pinwheel-2-1:root.4.4.1",
-          "pinwheel-2-1:root.4.4.2"
+          "pinwheel-2-1:root0.3.1.0",
+          "pinwheel-2-1:root0.3.1.3",
+          "pinwheel-2-1:root0.4.4.1",
+          "pinwheel-2-1:root0.4.4.2"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -2512,12 +2528,12 @@
           "y": 2.263666
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.1.3",
+        "id": "pinwheel-2-1:root0.3.1.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.1.0",
-          "pinwheel-2-1:root.3.1.2",
-          "pinwheel-2-1:root.3.1.4"
+          "pinwheel-2-1:root0.3.1.0",
+          "pinwheel-2-1:root0.3.1.2",
+          "pinwheel-2-1:root0.3.1.4"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -2542,12 +2558,12 @@
           "y": 1.616904
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.1.4",
+        "id": "pinwheel-2-1:root0.3.1.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.1.4",
-          "pinwheel-2-1:root.3.1.1",
-          "pinwheel-2-1:root.3.1.3"
+          "pinwheel-2-1:root0.2.1.4",
+          "pinwheel-2-1:root0.3.1.1",
+          "pinwheel-2-1:root0.3.1.3"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -2572,13 +2588,13 @@
           "y": 4.689022
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.2.0",
+        "id": "pinwheel-2-1:root0.3.2.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.0",
-          "pinwheel-2-1:root.3.0.1",
-          "pinwheel-2-1:root.3.2.2",
-          "pinwheel-2-1:root.3.2.3"
+          "pinwheel-2-1:root0.2.2.0",
+          "pinwheel-2-1:root0.3.0.1",
+          "pinwheel-2-1:root0.3.2.2",
+          "pinwheel-2-1:root0.3.2.3"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -2603,12 +2619,12 @@
           "y": 3.031695
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.2.1",
+        "id": "pinwheel-2-1:root0.3.2.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.1",
-          "pinwheel-2-1:root.3.2.4",
-          "pinwheel-2-1:root.3.3.1"
+          "pinwheel-2-1:root0.2.2.1",
+          "pinwheel-2-1:root0.3.2.4",
+          "pinwheel-2-1:root0.3.3.1"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -2633,12 +2649,12 @@
           "y": 4.97198
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.2.2",
+        "id": "pinwheel-2-1:root0.3.2.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.2.0",
-          "pinwheel-2-1:root.3.2.3",
-          "pinwheel-2-1:root.3.3.2"
+          "pinwheel-2-1:root0.3.2.0",
+          "pinwheel-2-1:root0.3.2.3",
+          "pinwheel-2-1:root0.3.3.2"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -2663,12 +2679,12 @@
           "y": 4.325219
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.2.3",
+        "id": "pinwheel-2-1:root0.3.2.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.2.0",
-          "pinwheel-2-1:root.3.2.2",
-          "pinwheel-2-1:root.3.2.4"
+          "pinwheel-2-1:root0.3.2.0",
+          "pinwheel-2-1:root0.3.2.2",
+          "pinwheel-2-1:root0.3.2.4"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -2693,12 +2709,12 @@
           "y": 3.678457
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.2.4",
+        "id": "pinwheel-2-1:root0.3.2.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.2.2.4",
-          "pinwheel-2-1:root.3.2.1",
-          "pinwheel-2-1:root.3.2.3"
+          "pinwheel-2-1:root0.2.2.4",
+          "pinwheel-2-1:root0.3.2.1",
+          "pinwheel-2-1:root0.3.2.3"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -2723,13 +2739,13 @@
           "y": 7.043044
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.3.0",
+        "id": "pinwheel-2-1:root0.3.3.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.0.2",
-          "pinwheel-2-1:root.3.3.2",
-          "pinwheel-2-1:root.3.3.3",
-          "pinwheel-2-1:root.3.4.1"
+          "pinwheel-2-1:root0.3.0.2",
+          "pinwheel-2-1:root0.3.3.2",
+          "pinwheel-2-1:root0.3.3.3",
+          "pinwheel-2-1:root0.3.4.1"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -2754,13 +2770,13 @@
           "y": 3.602367
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.3.1",
+        "id": "pinwheel-2-1:root0.3.3.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.2.1",
-          "pinwheel-2-1:root.3.3.4",
-          "pinwheel-2-1:root.3.4.0",
-          "pinwheel-2-1:root.3.4.4"
+          "pinwheel-2-1:root0.3.2.1",
+          "pinwheel-2-1:root0.3.3.4",
+          "pinwheel-2-1:root0.3.4.0",
+          "pinwheel-2-1:root0.3.4.4"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -2785,12 +2801,12 @@
           "y": 5.542652
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.3.2",
+        "id": "pinwheel-2-1:root0.3.3.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.2.2",
-          "pinwheel-2-1:root.3.3.0",
-          "pinwheel-2-1:root.3.3.3"
+          "pinwheel-2-1:root0.3.2.2",
+          "pinwheel-2-1:root0.3.3.0",
+          "pinwheel-2-1:root0.3.3.3"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -2815,12 +2831,12 @@
           "y": 6.037235
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.3.3",
+        "id": "pinwheel-2-1:root0.3.3.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.3.0",
-          "pinwheel-2-1:root.3.3.2",
-          "pinwheel-2-1:root.3.3.4"
+          "pinwheel-2-1:root0.3.3.0",
+          "pinwheel-2-1:root0.3.3.2",
+          "pinwheel-2-1:root0.3.3.4"
         ],
         "orientation_token": "236",
         "tile_family": "pinwheel-2-1",
@@ -2845,13 +2861,13 @@
           "y": 5.390473
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.3.4",
+        "id": "pinwheel-2-1:root0.3.3.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.3.1",
-          "pinwheel-2-1:root.3.3.3",
-          "pinwheel-2-1:root.3.4.1",
-          "pinwheel-2-1:root.3.4.4"
+          "pinwheel-2-1:root0.3.3.1",
+          "pinwheel-2-1:root0.3.3.3",
+          "pinwheel-2-1:root0.3.4.1",
+          "pinwheel-2-1:root0.3.4.4"
         ],
         "orientation_token": "56",
         "tile_family": "pinwheel-2-1",
@@ -2876,13 +2892,13 @@
           "y": 2.779648
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.4.0",
+        "id": "pinwheel-2-1:root0.3.4.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.1.0",
-          "pinwheel-2-1:root.3.3.1",
-          "pinwheel-2-1:root.3.4.2",
-          "pinwheel-2-1:root.3.4.3"
+          "pinwheel-2-1:root0.3.1.0",
+          "pinwheel-2-1:root0.3.3.1",
+          "pinwheel-2-1:root0.3.4.2",
+          "pinwheel-2-1:root0.3.4.3"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -2907,14 +2923,14 @@
           "y": 6.220325
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.4.1",
+        "id": "pinwheel-2-1:root0.3.4.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.3.0",
-          "pinwheel-2-1:root.3.3.4",
-          "pinwheel-2-1:root.3.4.4",
-          "pinwheel-2-1:root.4.1.1",
-          "pinwheel-2-1:root.4.1.2"
+          "pinwheel-2-1:root0.3.3.0",
+          "pinwheel-2-1:root0.3.3.4",
+          "pinwheel-2-1:root0.3.4.4",
+          "pinwheel-2-1:root0.4.1.1",
+          "pinwheel-2-1:root0.4.1.2"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -2939,13 +2955,13 @@
           "y": 4.28004
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.3.4.2",
+        "id": "pinwheel-2-1:root0.3.4.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.4.0",
-          "pinwheel-2-1:root.3.4.3",
-          "pinwheel-2-1:root.4.1.2",
-          "pinwheel-2-1:root.4.4.2"
+          "pinwheel-2-1:root0.3.4.0",
+          "pinwheel-2-1:root0.3.4.3",
+          "pinwheel-2-1:root0.4.1.2",
+          "pinwheel-2-1:root0.4.4.2"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -2970,12 +2986,12 @@
           "y": 3.785458
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.4.3",
+        "id": "pinwheel-2-1:root0.3.4.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.4.0",
-          "pinwheel-2-1:root.3.4.2",
-          "pinwheel-2-1:root.3.4.4"
+          "pinwheel-2-1:root0.3.4.0",
+          "pinwheel-2-1:root0.3.4.2",
+          "pinwheel-2-1:root0.3.4.4"
         ],
         "orientation_token": "56",
         "tile_family": "pinwheel-2-1",
@@ -3000,13 +3016,13 @@
           "y": 4.43222
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.3.4.4",
+        "id": "pinwheel-2-1:root0.3.4.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.3.1",
-          "pinwheel-2-1:root.3.3.4",
-          "pinwheel-2-1:root.3.4.1",
-          "pinwheel-2-1:root.3.4.3"
+          "pinwheel-2-1:root0.3.3.1",
+          "pinwheel-2-1:root0.3.3.4",
+          "pinwheel-2-1:root0.3.4.1",
+          "pinwheel-2-1:root0.3.4.3"
         ],
         "orientation_token": "236",
         "tile_family": "pinwheel-2-1",
@@ -3031,13 +3047,13 @@
           "y": 0.242536
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.0.0",
+        "id": "pinwheel-2-1:root0.4.0.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.0",
-          "pinwheel-2-1:root.3.1.1",
-          "pinwheel-2-1:root.4.0.2",
-          "pinwheel-2-1:root.4.0.3"
+          "pinwheel-2-1:root0.1.0.0",
+          "pinwheel-2-1:root0.3.1.1",
+          "pinwheel-2-1:root0.4.0.2",
+          "pinwheel-2-1:root0.4.0.3"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -3062,12 +3078,12 @@
           "y": 2.870005
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.0.1",
+        "id": "pinwheel-2-1:root0.4.0.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.1",
-          "pinwheel-2-1:root.4.0.4",
-          "pinwheel-2-1:root.4.2.0"
+          "pinwheel-2-1:root0.1.0.1",
+          "pinwheel-2-1:root0.4.0.4",
+          "pinwheel-2-1:root0.4.2.0"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -3092,12 +3108,12 @@
           "y": 1.050988
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.0.2",
+        "id": "pinwheel-2-1:root0.4.0.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.0.0",
-          "pinwheel-2-1:root.4.0.3",
-          "pinwheel-2-1:root.4.3.0"
+          "pinwheel-2-1:root0.4.0.0",
+          "pinwheel-2-1:root0.4.0.3",
+          "pinwheel-2-1:root0.4.3.0"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -3122,12 +3138,12 @@
           "y": 0.970143
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.0.3",
+        "id": "pinwheel-2-1:root0.4.0.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.0.0",
-          "pinwheel-2-1:root.4.0.2",
-          "pinwheel-2-1:root.4.0.4"
+          "pinwheel-2-1:root0.4.0.0",
+          "pinwheel-2-1:root0.4.0.2",
+          "pinwheel-2-1:root0.4.0.4"
         ],
         "orientation_token": "90",
         "tile_family": "pinwheel-2-1",
@@ -3152,12 +3168,12 @@
           "y": 1.576482
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.0.4",
+        "id": "pinwheel-2-1:root0.4.0.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.1.0.4",
-          "pinwheel-2-1:root.4.0.1",
-          "pinwheel-2-1:root.4.0.3"
+          "pinwheel-2-1:root0.1.0.4",
+          "pinwheel-2-1:root0.4.0.1",
+          "pinwheel-2-1:root0.4.0.3"
         ],
         "orientation_token": "270",
         "tile_family": "pinwheel-2-1",
@@ -3182,12 +3198,13 @@
           "y": 5.618742
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.1.0",
+        "id": "pinwheel-2-1:root0.4.1.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.1.2",
-          "pinwheel-2-1:root.4.1.3",
-          "pinwheel-2-1:root.4.4.0"
+          "pinwheel-2-1:root0.4.1.2",
+          "pinwheel-2-1:root0.4.1.3",
+          "pinwheel-2-1:root0.4.4.0",
+          "pinwheel-2-1:root1.1.2.1"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -3212,12 +3229,14 @@
           "y": 7.276069
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.1.1",
+        "id": "pinwheel-2-1:root0.4.1.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.0.0",
-          "pinwheel-2-1:root.3.4.1",
-          "pinwheel-2-1:root.4.1.4"
+          "pinwheel-2-1:root0.3.0.0",
+          "pinwheel-2-1:root0.3.4.1",
+          "pinwheel-2-1:root0.4.1.4",
+          "pinwheel-2-1:root1.1.1.1",
+          "pinwheel-2-1:root1.1.1.4"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -3242,13 +3261,13 @@
           "y": 5.335784
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.1.2",
+        "id": "pinwheel-2-1:root0.4.1.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.4.1",
-          "pinwheel-2-1:root.3.4.2",
-          "pinwheel-2-1:root.4.1.0",
-          "pinwheel-2-1:root.4.1.3"
+          "pinwheel-2-1:root0.3.4.1",
+          "pinwheel-2-1:root0.3.4.2",
+          "pinwheel-2-1:root0.4.1.0",
+          "pinwheel-2-1:root0.4.1.3"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -3273,12 +3292,12 @@
           "y": 5.982545
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.1.3",
+        "id": "pinwheel-2-1:root0.4.1.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.1.0",
-          "pinwheel-2-1:root.4.1.2",
-          "pinwheel-2-1:root.4.1.4"
+          "pinwheel-2-1:root0.4.1.0",
+          "pinwheel-2-1:root0.4.1.2",
+          "pinwheel-2-1:root0.4.1.4"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -3303,11 +3322,14 @@
           "y": 6.629307
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.1.4",
+        "id": "pinwheel-2-1:root0.4.1.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.1.1",
-          "pinwheel-2-1:root.4.1.3"
+          "pinwheel-2-1:root0.4.1.1",
+          "pinwheel-2-1:root0.4.1.3",
+          "pinwheel-2-1:root1.1.1.0",
+          "pinwheel-2-1:root1.1.1.4",
+          "pinwheel-2-1:root1.1.2.1"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -3332,12 +3354,13 @@
           "y": 3.557189
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.2.0",
+        "id": "pinwheel-2-1:root0.4.2.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.0.1",
-          "pinwheel-2-1:root.4.2.2",
-          "pinwheel-2-1:root.4.2.3"
+          "pinwheel-2-1:root0.4.0.1",
+          "pinwheel-2-1:root0.4.2.2",
+          "pinwheel-2-1:root0.4.2.3",
+          "pinwheel-2-1:root1.4.2.4"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -3362,11 +3385,13 @@
           "y": 5.214516
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.2.1",
+        "id": "pinwheel-2-1:root0.4.2.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.2.4",
-          "pinwheel-2-1:root.4.3.1"
+          "pinwheel-2-1:root0.4.2.4",
+          "pinwheel-2-1:root0.4.3.1",
+          "pinwheel-2-1:root1.1.2.1",
+          "pinwheel-2-1:root1.1.2.4"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -3391,12 +3416,12 @@
           "y": 3.274231
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.2.2",
+        "id": "pinwheel-2-1:root0.4.2.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.2.0",
-          "pinwheel-2-1:root.4.2.3",
-          "pinwheel-2-1:root.4.3.2"
+          "pinwheel-2-1:root0.4.2.0",
+          "pinwheel-2-1:root0.4.2.3",
+          "pinwheel-2-1:root0.4.3.2"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -3421,12 +3446,12 @@
           "y": 3.920993
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.2.3",
+        "id": "pinwheel-2-1:root0.4.2.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.2.0",
-          "pinwheel-2-1:root.4.2.2",
-          "pinwheel-2-1:root.4.2.4"
+          "pinwheel-2-1:root0.4.2.0",
+          "pinwheel-2-1:root0.4.2.2",
+          "pinwheel-2-1:root0.4.2.4"
         ],
         "orientation_token": "0",
         "tile_family": "pinwheel-2-1",
@@ -3451,11 +3476,15 @@
           "y": 4.567754
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.2.4",
+        "id": "pinwheel-2-1:root0.4.2.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.2.1",
-          "pinwheel-2-1:root.4.2.3"
+          "pinwheel-2-1:root0.4.2.1",
+          "pinwheel-2-1:root0.4.2.3",
+          "pinwheel-2-1:root1.1.2.0",
+          "pinwheel-2-1:root1.1.2.4",
+          "pinwheel-2-1:root1.4.2.0",
+          "pinwheel-2-1:root1.4.2.4"
         ],
         "orientation_token": "180",
         "tile_family": "pinwheel-2-1",
@@ -3480,13 +3509,13 @@
           "y": 1.203167
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.3.0",
+        "id": "pinwheel-2-1:root0.4.3.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.0.2",
-          "pinwheel-2-1:root.4.3.2",
-          "pinwheel-2-1:root.4.3.3",
-          "pinwheel-2-1:root.4.4.1"
+          "pinwheel-2-1:root0.4.0.2",
+          "pinwheel-2-1:root0.4.3.2",
+          "pinwheel-2-1:root0.4.3.3",
+          "pinwheel-2-1:root0.4.4.1"
         ],
         "orientation_token": "118",
         "tile_family": "pinwheel-2-1",
@@ -3511,13 +3540,13 @@
           "y": 4.643844
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.3.1",
+        "id": "pinwheel-2-1:root0.4.3.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.2.1",
-          "pinwheel-2-1:root.4.3.4",
-          "pinwheel-2-1:root.4.4.0",
-          "pinwheel-2-1:root.4.4.4"
+          "pinwheel-2-1:root0.4.2.1",
+          "pinwheel-2-1:root0.4.3.4",
+          "pinwheel-2-1:root0.4.4.0",
+          "pinwheel-2-1:root0.4.4.4"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -3542,12 +3571,12 @@
           "y": 2.703559
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.3.2",
+        "id": "pinwheel-2-1:root0.4.3.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.2.2",
-          "pinwheel-2-1:root.4.3.0",
-          "pinwheel-2-1:root.4.3.3"
+          "pinwheel-2-1:root0.4.2.2",
+          "pinwheel-2-1:root0.4.3.0",
+          "pinwheel-2-1:root0.4.3.3"
         ],
         "orientation_token": "28",
         "tile_family": "pinwheel-2-1",
@@ -3572,12 +3601,12 @@
           "y": 2.208976
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.3.3",
+        "id": "pinwheel-2-1:root0.4.3.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.3.0",
-          "pinwheel-2-1:root.4.3.2",
-          "pinwheel-2-1:root.4.3.4"
+          "pinwheel-2-1:root0.4.3.0",
+          "pinwheel-2-1:root0.4.3.2",
+          "pinwheel-2-1:root0.4.3.4"
         ],
         "orientation_token": "56",
         "tile_family": "pinwheel-2-1",
@@ -3602,13 +3631,13 @@
           "y": 2.855738
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.3.4",
+        "id": "pinwheel-2-1:root0.4.3.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.3.1",
-          "pinwheel-2-1:root.4.3.3",
-          "pinwheel-2-1:root.4.4.1",
-          "pinwheel-2-1:root.4.4.4"
+          "pinwheel-2-1:root0.4.3.1",
+          "pinwheel-2-1:root0.4.3.3",
+          "pinwheel-2-1:root0.4.4.1",
+          "pinwheel-2-1:root0.4.4.4"
         ],
         "orientation_token": "236",
         "tile_family": "pinwheel-2-1",
@@ -3633,13 +3662,13 @@
           "y": 5.466563
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.4.0",
+        "id": "pinwheel-2-1:root0.4.4.0",
         "kind": "pinwheel-2-1-small-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.1.0",
-          "pinwheel-2-1:root.4.3.1",
-          "pinwheel-2-1:root.4.4.2",
-          "pinwheel-2-1:root.4.4.3"
+          "pinwheel-2-1:root0.4.1.0",
+          "pinwheel-2-1:root0.4.3.1",
+          "pinwheel-2-1:root0.4.4.2",
+          "pinwheel-2-1:root0.4.4.3"
         ],
         "orientation_token": "298",
         "tile_family": "pinwheel-2-1",
@@ -3664,14 +3693,14 @@
           "y": 2.025886
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.4.1",
+        "id": "pinwheel-2-1:root0.4.4.1",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.1.1",
-          "pinwheel-2-1:root.3.1.2",
-          "pinwheel-2-1:root.4.3.0",
-          "pinwheel-2-1:root.4.3.4",
-          "pinwheel-2-1:root.4.4.4"
+          "pinwheel-2-1:root0.3.1.1",
+          "pinwheel-2-1:root0.3.1.2",
+          "pinwheel-2-1:root0.4.3.0",
+          "pinwheel-2-1:root0.4.3.4",
+          "pinwheel-2-1:root0.4.4.4"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -3696,13 +3725,13 @@
           "y": 3.966171
         },
         "chirality_token": "right",
-        "id": "pinwheel-2-1:root.4.4.2",
+        "id": "pinwheel-2-1:root0.4.4.2",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.3.1.2",
-          "pinwheel-2-1:root.3.4.2",
-          "pinwheel-2-1:root.4.4.0",
-          "pinwheel-2-1:root.4.4.3"
+          "pinwheel-2-1:root0.3.1.2",
+          "pinwheel-2-1:root0.3.4.2",
+          "pinwheel-2-1:root0.4.4.0",
+          "pinwheel-2-1:root0.4.4.3"
         ],
         "orientation_token": "208",
         "tile_family": "pinwheel-2-1",
@@ -3727,12 +3756,12 @@
           "y": 4.460753
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.4.3",
+        "id": "pinwheel-2-1:root0.4.4.3",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.4.0",
-          "pinwheel-2-1:root.4.4.2",
-          "pinwheel-2-1:root.4.4.4"
+          "pinwheel-2-1:root0.4.4.0",
+          "pinwheel-2-1:root0.4.4.2",
+          "pinwheel-2-1:root0.4.4.4"
         ],
         "orientation_token": "236",
         "tile_family": "pinwheel-2-1",
@@ -3757,13 +3786,13 @@
           "y": 3.813992
         },
         "chirality_token": "left",
-        "id": "pinwheel-2-1:root.4.4.4",
+        "id": "pinwheel-2-1:root0.4.4.4",
         "kind": "pinwheel-2-1-large-triangle",
         "neighbors": [
-          "pinwheel-2-1:root.4.3.1",
-          "pinwheel-2-1:root.4.3.4",
-          "pinwheel-2-1:root.4.4.1",
-          "pinwheel-2-1:root.4.4.3"
+          "pinwheel-2-1:root0.4.3.1",
+          "pinwheel-2-1:root0.4.3.4",
+          "pinwheel-2-1:root0.4.4.1",
+          "pinwheel-2-1:root0.4.4.3"
         ],
         "orientation_token": "56",
         "tile_family": "pinwheel-2-1",
@@ -3781,9 +3810,3815 @@
             "y": 2.4253562503633304
           }
         ]
+      },
+      {
+        "center": {
+          "x": 0.040423,
+          "y": 0.181902
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.0.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.1.1",
+          "pinwheel-2-1:root1.0.0.2",
+          "pinwheel-2-1:root1.0.0.3"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 0.1212678125181665,
+            "y": 0.030316953129541625
+          },
+          {
+            "x": 0.0,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.39458,
+          "y": 0.434543
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.0.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.1.1",
+          "pinwheel-2-1:root1.0.0.4",
+          "pinwheel-2-1:root1.0.2.0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0615528128088303,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 1.0914103126634984,
+            "y": 0.2728525781658746
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.363803,
+          "y": 0.434543
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.0.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.0.0",
+          "pinwheel-2-1:root1.0.0.3",
+          "pinwheel-2-1:root1.0.3.0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 0.06063390625908325,
+            "y": 0.2728525781658746
+          },
+          {
+            "x": 0.0,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.404226,
+          "y": 0.272853
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.0.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.0.0",
+          "pinwheel-2-1:root1.0.0.2",
+          "pinwheel-2-1:root1.0.0.4"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 0.06063390625908325,
+            "y": 0.2728525781658746
+          },
+          {
+            "x": 0.1212678125181665,
+            "y": 0.030316953129541625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.747818,
+          "y": 0.272853
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.0.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.1.1",
+          "pinwheel-2-1:root1.0.0.1",
+          "pinwheel-2-1:root1.0.0.3"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.1212678125181665,
+            "y": 0.030316953129541625
+          },
+          {
+            "x": 1.0914103126634984,
+            "y": 0.2728525781658746
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.666973,
+          "y": 4.719339
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.1.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.2",
+          "pinwheel-2-1:root1.0.1.3",
+          "pinwheel-2-1:root1.0.4.0",
+          "pinwheel-2-1:root1.2.0.1"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 0.970142500145332,
+            "y": 4.881029453856201
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.16169,
+          "y": 7.427654
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.1.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.4",
+          "pinwheel-2-1:root1.2.0.0",
+          "pinwheel-2-1:root1.2.0.4"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 0.0,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.16169,
+          "y": 5.366101
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.1.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.0",
+          "pinwheel-2-1:root1.0.1.3"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 0.0,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.485071,
+          "y": 5.446946
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.1.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.0",
+          "pinwheel-2-1:root1.0.1.2",
+          "pinwheel-2-1:root1.0.1.4"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 0.970142500145332,
+            "y": 4.881029453856201
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.485071,
+          "y": 6.13413
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.1.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.1",
+          "pinwheel-2-1:root1.0.1.3",
+          "pinwheel-2-1:root1.2.0.1",
+          "pinwheel-2-1:root1.2.0.4"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.970142500145332,
+            "y": 4.881029453856201
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 0.0,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.697749,
+          "y": 0.596233
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.2.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.0.1",
+          "pinwheel-2-1:root1.0.2.2",
+          "pinwheel-2-1:root1.0.2.3",
+          "pinwheel-2-1:root1.3.0.0"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 0.7579238282385405
+          },
+          {
+            "x": 2.0615528128088303,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.192467,
+          "y": 3.304548
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.2.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.4",
+          "pinwheel-2-1:root1.0.3.1",
+          "pinwheel-2-1:root1.3.0.1"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 2.6982088285292045
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.192467,
+          "y": 1.242995
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.2.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.0",
+          "pinwheel-2-1:root1.0.2.3",
+          "pinwheel-2-1:root1.0.3.2"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 0.6366560157203741
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.515848,
+          "y": 1.32384
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.2.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.0",
+          "pinwheel-2-1:root1.0.2.2",
+          "pinwheel-2-1:root1.0.2.4"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 0.6366560157203741
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 0.7579238282385405
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.515848,
+          "y": 2.011025
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.2.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.1",
+          "pinwheel-2-1:root1.0.2.3",
+          "pinwheel-2-1:root1.3.0.4"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0009189065497472,
+            "y": 0.7579238282385405
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 2.6982088285292045
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.363803,
+          "y": 0.596233
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.3.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.0.2",
+          "pinwheel-2-1:root1.0.3.2",
+          "pinwheel-2-1:root1.0.3.3",
+          "pinwheel-2-1:root1.0.4.1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 0.06063390625908325,
+            "y": 0.7579238282385405
+          },
+          {
+            "x": 0.0,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.869086,
+          "y": 3.304548
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.3.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.1",
+          "pinwheel-2-1:root1.0.3.4",
+          "pinwheel-2-1:root1.0.4.0",
+          "pinwheel-2-1:root1.0.4.4"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 2.6982088285292045
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.869086,
+          "y": 1.242995
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.3.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.2",
+          "pinwheel-2-1:root1.0.3.0",
+          "pinwheel-2-1:root1.0.3.3"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 0.6366560157203741
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.545705,
+          "y": 1.32384
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.3.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.3.0",
+          "pinwheel-2-1:root1.0.3.2",
+          "pinwheel-2-1:root1.0.3.4"
+        ],
+        "orientation_token": "62",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 0.6366560157203741
+          },
+          {
+            "x": 0.06063390625908325,
+            "y": 0.7579238282385405
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.545705,
+          "y": 2.011025
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.3.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.3.1",
+          "pinwheel-2-1:root1.0.3.3",
+          "pinwheel-2-1:root1.0.4.1",
+          "pinwheel-2-1:root1.0.4.4"
+        ],
+        "orientation_token": "242",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.06063390625908325,
+            "y": 0.7579238282385405
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 2.6982088285292045
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.666973,
+          "y": 4.557649
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.4.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.0",
+          "pinwheel-2-1:root1.0.3.1",
+          "pinwheel-2-1:root1.0.4.2",
+          "pinwheel-2-1:root1.0.4.3"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 0.970142500145332,
+            "y": 4.395958203783536
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.16169,
+          "y": 1.849334
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.4.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.3.0",
+          "pinwheel-2-1:root1.0.3.4",
+          "pinwheel-2-1:root1.0.4.4"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 2.455673203492872
+          },
+          {
+            "x": 0.0,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.16169,
+          "y": 3.910887
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.0.4.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.4.0",
+          "pinwheel-2-1:root1.0.4.3"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 0.0,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.485071,
+          "y": 3.830042
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.4.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.4.0",
+          "pinwheel-2-1:root1.0.4.2",
+          "pinwheel-2-1:root1.0.4.4"
+        ],
+        "orientation_token": "242",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 0.970142500145332,
+            "y": 4.395958203783536
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.485071,
+          "y": 3.142857
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.0.4.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.3.1",
+          "pinwheel-2-1:root1.0.3.4",
+          "pinwheel-2-1:root1.0.4.1",
+          "pinwheel-2-1:root1.0.4.3"
+        ],
+        "orientation_token": "62",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.970142500145332,
+            "y": 4.395958203783536
+          },
+          {
+            "x": 0.485071250072666,
+            "y": 2.455673203492872
+          },
+          {
+            "x": 0.0,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 17.887002,
+          "y": 8.680754
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.0.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.2",
+          "pinwheel-2-1:root1.1.0.3",
+          "pinwheel-2-1:root1.4.0.0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 8.519063829401198
+          },
+          {
+            "x": 17.52319890887506,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.392285,
+          "y": 5.97244
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.0.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.4",
+          "pinwheel-2-1:root1.1.2.0",
+          "pinwheel-2-1:root1.4.0.1"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 6.578778829110532
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.392285,
+          "y": 8.033993
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.0.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.0",
+          "pinwheel-2-1:root1.1.0.3",
+          "pinwheel-2-1:root1.1.3.0"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.068904,
+          "y": 7.953147
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.0.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.0",
+          "pinwheel-2-1:root1.1.0.2",
+          "pinwheel-2-1:root1.1.0.4"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 8.519063829401198
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.068904,
+          "y": 7.265963
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.0.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.1",
+          "pinwheel-2-1:root1.1.0.3",
+          "pinwheel-2-1:root1.4.0.4"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.583832815134144,
+            "y": 8.519063829401198
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 6.578778829110532
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 26.961877,
+          "y": 7.427654
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.1.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.4.1.4",
+          "pinwheel-2-1:root1.1.1.2",
+          "pinwheel-2-1:root1.1.1.3",
+          "pinwheel-2-1:root1.1.4.0"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 26.800186566514796,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 27.285257816587464,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 26.800186566514796,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 32.378506,
+          "y": 8.438219
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.1.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.0.0.0",
+          "pinwheel-2-1:root0.0.0.1",
+          "pinwheel-2-1:root0.0.0.4",
+          "pinwheel-2-1:root0.4.1.1",
+          "pinwheel-2-1:root1.1.1.4"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 35.04639781775012,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 31.16582781716879,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 30.923292192132458,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 28.2554,
+          "y": 8.438219
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.1.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.1.0",
+          "pinwheel-2-1:root1.1.1.3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 30.923292192132458,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 27.04272219155113,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 26.800186566514796,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 28.417091,
+          "y": 7.791457
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.1.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.1.0",
+          "pinwheel-2-1:root1.1.1.2",
+          "pinwheel-2-1:root1.1.1.4"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 30.923292192132458,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 27.04272219155113,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 27.285257816587464,
+            "y": 6.821314454146866
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 29.791459,
+          "y": 7.791457
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.1.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.4.1.1",
+          "pinwheel-2-1:root0.4.1.4",
+          "pinwheel-2-1:root1.1.1.1",
+          "pinwheel-2-1:root1.1.1.3"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 27.285257816587464,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 31.16582781716879,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 30.923292192132458,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.715666,
+          "y": 5.366101
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.2.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.4.2.4",
+          "pinwheel-2-1:root1.1.0.1",
+          "pinwheel-2-1:root1.1.2.2",
+          "pinwheel-2-1:root1.1.2.3"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 19.03904656535214,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 24.132295,
+          "y": 6.376666
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.2.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.4.1.0",
+          "pinwheel-2-1:root0.4.1.4",
+          "pinwheel-2-1:root0.4.2.1",
+          "pinwheel-2-1:root1.1.2.4",
+          "pinwheel-2-1:root1.1.3.1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 26.800186566514796,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 22.91961656593347,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 20.009189,
+          "y": 6.376666
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.2.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.2.0",
+          "pinwheel-2-1:root1.1.2.3",
+          "pinwheel-2-1:root1.1.3.2"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 18.79651094031581,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 20.170879,
+          "y": 5.729904
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.2.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.2.0",
+          "pinwheel-2-1:root1.1.2.2",
+          "pinwheel-2-1:root1.1.2.4"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 18.79651094031581,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 19.03904656535214,
+            "y": 4.759761641338035
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 21.545248,
+          "y": 5.729904
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.2.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.4.2.1",
+          "pinwheel-2-1:root0.4.2.4",
+          "pinwheel-2-1:root1.1.2.1",
+          "pinwheel-2-1:root1.1.2.3"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 19.03904656535214,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 22.91961656593347,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.715666,
+          "y": 8.033993
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.3.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.2",
+          "pinwheel-2-1:root1.1.3.2",
+          "pinwheel-2-1:root1.1.3.3",
+          "pinwheel-2-1:root1.1.4.1"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 19.03904656535214,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 24.132295,
+          "y": 7.023427
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.3.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.2.1",
+          "pinwheel-2-1:root1.1.3.4",
+          "pinwheel-2-1:root1.1.4.0",
+          "pinwheel-2-1:root1.1.4.4"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 26.800186566514796,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 22.91961656593347,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 20.009189,
+          "y": 7.023427
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.3.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.2.2",
+          "pinwheel-2-1:root1.1.3.0",
+          "pinwheel-2-1:root1.1.3.3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 18.79651094031581,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 20.170879,
+          "y": 7.670189
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.3.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.3.0",
+          "pinwheel-2-1:root1.1.3.2",
+          "pinwheel-2-1:root1.1.3.4"
+        ],
+        "orientation_token": "332",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 18.79651094031581,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 19.03904656535214,
+            "y": 8.640331641919364
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 21.545248,
+          "y": 7.670189
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.3.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.3.1",
+          "pinwheel-2-1:root1.1.3.3",
+          "pinwheel-2-1:root1.1.4.1",
+          "pinwheel-2-1:root1.1.4.4"
+        ],
+        "orientation_token": "152",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 19.03904656535214,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 22.91961656593347,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 22.677080940897138,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 26.638496,
+          "y": 7.427654
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.4.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.1.0",
+          "pinwheel-2-1:root1.1.3.1",
+          "pinwheel-2-1:root1.1.4.2",
+          "pinwheel-2-1:root1.1.4.3"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 26.800186566514796,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 26.315115316442128,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 26.800186566514796,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 21.221867,
+          "y": 8.438219
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.4.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.3.0",
+          "pinwheel-2-1:root1.1.3.4",
+          "pinwheel-2-1:root1.1.4.4"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 22.434545315860802,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 22.677080940897138,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 25.344973,
+          "y": 8.438219
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.1.4.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.4.0",
+          "pinwheel-2-1:root1.1.4.3"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 22.677080940897138,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 26.557650941478464,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 26.800186566514796,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 25.183282,
+          "y": 7.791457
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.4.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.4.0",
+          "pinwheel-2-1:root1.1.4.2",
+          "pinwheel-2-1:root1.1.4.4"
+        ],
+        "orientation_token": "152",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 22.677080940897138,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 26.557650941478464,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 26.315115316442128,
+            "y": 6.821314454146866
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 23.808914,
+          "y": 7.791457
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.1.4.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.3.1",
+          "pinwheel-2-1:root1.1.3.4",
+          "pinwheel-2-1:root1.1.4.1",
+          "pinwheel-2-1:root1.1.4.3"
+        ],
+        "orientation_token": "332",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 26.315115316442128,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 22.434545315860802,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 22.677080940897138,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.363803,
+          "y": 8.680754
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.0.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.1",
+          "pinwheel-2-1:root1.2.0.2",
+          "pinwheel-2-1:root1.2.0.3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 0.06063390625908325,
+            "y": 8.519063829401198
+          },
+          {
+            "x": 0.0,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.869086,
+          "y": 5.97244
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.0.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.0",
+          "pinwheel-2-1:root1.0.1.4",
+          "pinwheel-2-1:root1.2.0.4",
+          "pinwheel-2-1:root1.2.2.0"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 6.578778829110532
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.869086,
+          "y": 8.033993
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.0.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.0.0",
+          "pinwheel-2-1:root1.2.0.3",
+          "pinwheel-2-1:root1.2.3.0"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.545705,
+          "y": 7.953147
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.0.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.0.0",
+          "pinwheel-2-1:root1.2.0.2",
+          "pinwheel-2-1:root1.2.0.4"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 0.06063390625908325,
+            "y": 8.519063829401198
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.545705,
+          "y": 7.265963
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.0.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.1.1",
+          "pinwheel-2-1:root1.0.1.4",
+          "pinwheel-2-1:root1.2.0.1",
+          "pinwheel-2-1:root1.2.0.3"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 0.06063390625908325,
+            "y": 8.519063829401198
+          },
+          {
+            "x": 0.5457051563317492,
+            "y": 6.578778829110532
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 9.438678,
+          "y": 7.427654
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.1.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.2",
+          "pinwheel-2-1:root1.2.1.3",
+          "pinwheel-2-1:root1.2.4.0",
+          "pinwheel-2-1:root1.3.1.0"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.276987657639738,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 9.762058907712403,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 14.855307,
+          "y": 8.438219
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.1.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.4",
+          "pinwheel-2-1:root1.3.1.1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.52319890887506,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 13.642628908293732,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 13.400093283257398,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 10.732201,
+          "y": 8.438219
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.1.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.0",
+          "pinwheel-2-1:root1.2.1.3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.400093283257398,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 9.51952328267607,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 9.276987657639738,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 10.893892,
+          "y": 7.791457
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.1.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.0",
+          "pinwheel-2-1:root1.2.1.2",
+          "pinwheel-2-1:root1.2.1.4"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.400093283257398,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 9.51952328267607,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 9.762058907712403,
+            "y": 6.821314454146866
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 12.26826,
+          "y": 7.791457
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.1.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.1",
+          "pinwheel-2-1:root1.2.1.3",
+          "pinwheel-2-1:root1.3.1.4"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.762058907712403,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 13.642628908293732,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 13.400093283257398,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.192467,
+          "y": 5.366101
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.2.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.0.1",
+          "pinwheel-2-1:root1.2.2.2",
+          "pinwheel-2-1:root1.2.2.3",
+          "pinwheel-2-1:root1.3.2.0"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.609096,
+          "y": 6.376666
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.2.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.4",
+          "pinwheel-2-1:root1.2.3.1",
+          "pinwheel-2-1:root1.3.2.1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 5.396417657058409,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.48599,
+          "y": 6.376666
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.2.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.0",
+          "pinwheel-2-1:root1.2.2.3",
+          "pinwheel-2-1:root1.2.3.2"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 1.2733120314407482,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.647681,
+          "y": 5.729904
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.2.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.0",
+          "pinwheel-2-1:root1.2.2.2",
+          "pinwheel-2-1:root1.2.2.4"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 1.2733120314407482,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 4.759761641338035
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.022049,
+          "y": 5.729904
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.2.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.1",
+          "pinwheel-2-1:root1.2.2.3",
+          "pinwheel-2-1:root1.3.2.4"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.515847656477081,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 5.396417657058409,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.192467,
+          "y": 8.033993
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.3.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.0.2",
+          "pinwheel-2-1:root1.2.3.2",
+          "pinwheel-2-1:root1.2.3.3",
+          "pinwheel-2-1:root1.2.4.1"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.609096,
+          "y": 7.023427
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.3.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.1",
+          "pinwheel-2-1:root1.2.3.4",
+          "pinwheel-2-1:root1.2.4.0",
+          "pinwheel-2-1:root1.2.4.4"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 5.396417657058409,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.48599,
+          "y": 7.023427
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.3.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.2",
+          "pinwheel-2-1:root1.2.3.0",
+          "pinwheel-2-1:root1.2.3.3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 1.2733120314407482,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.647681,
+          "y": 7.670189
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.3.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.3.0",
+          "pinwheel-2-1:root1.2.3.2",
+          "pinwheel-2-1:root1.2.3.4"
+        ],
+        "orientation_token": "332",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 1.2733120314407482,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 8.640331641919364
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.022049,
+          "y": 7.670189
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.3.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.3.1",
+          "pinwheel-2-1:root1.2.3.3",
+          "pinwheel-2-1:root1.2.4.1",
+          "pinwheel-2-1:root1.2.4.4"
+        ],
+        "orientation_token": "152",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.515847656477081,
+            "y": 8.640331641919364
+          },
+          {
+            "x": 5.396417657058409,
+            "y": 7.670189141774031
+          },
+          {
+            "x": 5.153882032022077,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 9.115297,
+          "y": 7.427654
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.4.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.0",
+          "pinwheel-2-1:root1.2.3.1",
+          "pinwheel-2-1:root1.2.4.2",
+          "pinwheel-2-1:root1.2.4.3"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.276987657639738,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 8.791916407567072,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.698668,
+          "y": 8.438219
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.4.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.3.0",
+          "pinwheel-2-1:root1.2.3.4",
+          "pinwheel-2-1:root1.2.4.4"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 4.911346406985744,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 5.153882032022077,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 7.821774,
+          "y": 8.438219
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.2.4.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.4.0",
+          "pinwheel-2-1:root1.2.4.3"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.153882032022077,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 9.034452032603404,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 9.276987657639738,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 7.660083,
+          "y": 7.791457
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.4.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.4.0",
+          "pinwheel-2-1:root1.2.4.2",
+          "pinwheel-2-1:root1.2.4.4"
+        ],
+        "orientation_token": "152",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.153882032022077,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 9.034452032603404,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 8.791916407567072,
+            "y": 6.821314454146866
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.285715,
+          "y": 7.791457
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.2.4.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.3.1",
+          "pinwheel-2-1:root1.2.3.4",
+          "pinwheel-2-1:root1.2.4.1",
+          "pinwheel-2-1:root1.2.4.3"
+        ],
+        "orientation_token": "332",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 8.791916407567072,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 4.911346406985744,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 5.153882032022077,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.344511,
+          "y": 0.757924
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.0.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.0",
+          "pinwheel-2-1:root1.3.0.2",
+          "pinwheel-2-1:root1.3.0.3",
+          "pinwheel-2-1:root1.4.1.1"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.971061406695079,
+            "y": 1.0004594532748736
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 0.7579238282385405
+          },
+          {
+            "x": 2.0615528128088303,
+            "y": 0.5153882032022076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.515848,
+          "y": 3.385393
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.0.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.1",
+          "pinwheel-2-1:root1.3.0.4",
+          "pinwheel-2-1:root1.3.2.0"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 2.6982088285292045
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.48599,
+          "y": 1.566376
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.0.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.0.0",
+          "pinwheel-2-1:root1.3.0.3",
+          "pinwheel-2-1:root1.3.3.0"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          },
+          {
+            "x": 2.4859901566224134,
+            "y": 0.8791916407567071
+          },
+          {
+            "x": 2.971061406695079,
+            "y": 1.0004594532748736
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.162609,
+          "y": 1.485531
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.0.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.0.0",
+          "pinwheel-2-1:root1.3.0.2",
+          "pinwheel-2-1:root1.3.0.4"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          },
+          {
+            "x": 2.4859901566224134,
+            "y": 0.8791916407567071
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 0.7579238282385405
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.839228,
+          "y": 2.09187
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.0.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.0.2.4",
+          "pinwheel-2-1:root1.3.0.1",
+          "pinwheel-2-1:root1.3.0.3"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0009189065497472,
+            "y": 0.7579238282385405
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 2.6982088285292045
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 9.762059,
+          "y": 6.13413
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.1.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.0",
+          "pinwheel-2-1:root1.3.1.2",
+          "pinwheel-2-1:root1.3.1.3",
+          "pinwheel-2-1:root1.3.4.0"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 10.247130157785069,
+            "y": 4.881029453856201
+          },
+          {
+            "x": 9.762058907712403,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 15.016997,
+          "y": 7.791457
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.1.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.1",
+          "pinwheel-2-1:root1.3.1.4",
+          "pinwheel-2-1:root1.4.0.0",
+          "pinwheel-2-1:root1.4.4.1"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.52319890887506,
+            "y": 8.76159945443753
+          },
+          {
+            "x": 13.642628908293732,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 13.885164533330066,
+            "y": 6.821314454146866
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 11.378963,
+          "y": 5.851172
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.1.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.1.0",
+          "pinwheel-2-1:root1.3.1.3",
+          "pinwheel-2-1:root1.4.4.1",
+          "pinwheel-2-1:root1.4.4.2"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.885164533330066,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 10.004594532748737,
+            "y": 5.851171954001534
+          },
+          {
+            "x": 10.247130157785069,
+            "y": 4.881029453856201
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 11.217273,
+          "y": 6.497934
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.1.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.1.0",
+          "pinwheel-2-1:root1.3.1.2",
+          "pinwheel-2-1:root1.3.1.4"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.885164533330066,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 10.004594532748737,
+            "y": 5.851171954001534
+          },
+          {
+            "x": 9.762058907712403,
+            "y": 6.821314454146866
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 12.429951,
+          "y": 7.144695
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.1.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.1.4",
+          "pinwheel-2-1:root1.3.1.1",
+          "pinwheel-2-1:root1.3.1.3"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.762058907712403,
+            "y": 6.821314454146866
+          },
+          {
+            "x": 13.642628908293732,
+            "y": 7.791456954292197
+          },
+          {
+            "x": 13.885164533330066,
+            "y": 6.821314454146866
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.515848,
+          "y": 4.072577
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.2.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.0",
+          "pinwheel-2-1:root1.3.0.1",
+          "pinwheel-2-1:root1.3.2.2",
+          "pinwheel-2-1:root1.3.2.3"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 1.0307764064044151,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.770786,
+          "y": 5.729904
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.2.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.1",
+          "pinwheel-2-1:root1.3.2.4",
+          "pinwheel-2-1:root1.3.3.1"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 5.396417657058409,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.132752,
+          "y": 3.789619
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.2.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.2.0",
+          "pinwheel-2-1:root1.3.2.3",
+          "pinwheel-2-1:root1.3.3.2"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 1.7583832815134142,
+            "y": 3.7896191411927034
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.971061,
+          "y": 4.436381
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.2.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.2.0",
+          "pinwheel-2-1:root1.3.2.2",
+          "pinwheel-2-1:root1.3.2.4"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 1.7583832815134142,
+            "y": 3.7896191411927034
+          },
+          {
+            "x": 1.515847656477081,
+            "y": 4.759761641338035
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.18374,
+          "y": 5.083142
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.2.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.2.2.4",
+          "pinwheel-2-1:root1.3.2.1",
+          "pinwheel-2-1:root1.3.2.3"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 1.515847656477081,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 5.396417657058409,
+            "y": 5.729904141483368
+          },
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.771326,
+          "y": 1.718555
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.3.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.0.2",
+          "pinwheel-2-1:root1.3.3.2",
+          "pinwheel-2-1:root1.3.3.3",
+          "pinwheel-2-1:root1.3.4.1"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          },
+          {
+            "x": 3.3419982449859416,
+            "y": 1.3357292878839222
+          },
+          {
+            "x": 2.971061406695079,
+            "y": 1.0004594532748736
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 7.075145,
+          "y": 5.159232
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.3.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.2.1",
+          "pinwheel-2-1:root1.3.3.4",
+          "pinwheel-2-1:root1.3.4.0",
+          "pinwheel-2-1:root1.3.4.4"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          },
+          {
+            "x": 6.30949295131284,
+            "y": 4.01788796475631
+          },
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.43711,
+          "y": 3.218947
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.3.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.2.2",
+          "pinwheel-2-1:root1.3.3.0",
+          "pinwheel-2-1:root1.3.3.3"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 2.6714585757678444,
+            "y": 2.0776029644656466
+          },
+          {
+            "x": 2.0009189065497472,
+            "y": 2.819476641047371
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.884137,
+          "y": 2.724365
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.3.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.3.0",
+          "pinwheel-2-1:root1.3.3.2",
+          "pinwheel-2-1:root1.3.3.4"
+        ],
+        "orientation_token": "56",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          },
+          {
+            "x": 2.6714585757678444,
+            "y": 2.0776029644656466
+          },
+          {
+            "x": 3.3419982449859416,
+            "y": 1.3357292878839222
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.096815,
+          "y": 3.371126
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.3.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.3.1",
+          "pinwheel-2-1:root1.3.3.3",
+          "pinwheel-2-1:root1.3.4.1",
+          "pinwheel-2-1:root1.3.4.4"
+        ],
+        "orientation_token": "236",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 3.3419982449859416,
+            "y": 1.3357292878839222
+          },
+          {
+            "x": 6.30949295131284,
+            "y": 4.01788796475631
+          },
+          {
+            "x": 5.638953282094742,
+            "y": 4.759761641338035
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 9.476723,
+          "y": 5.981951
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.4.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.1.0",
+          "pinwheel-2-1:root1.3.3.1",
+          "pinwheel-2-1:root1.3.4.2",
+          "pinwheel-2-1:root1.3.4.3"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 10.247130157785069,
+            "y": 4.881029453856201
+          },
+          {
+            "x": 8.906050819348875,
+            "y": 6.364776807019651
+          },
+          {
+            "x": 9.276987657639738,
+            "y": 6.700046641628699
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.172904,
+          "y": 2.541274
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.4.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.3.0",
+          "pinwheel-2-1:root1.3.3.4",
+          "pinwheel-2-1:root1.3.4.4",
+          "pinwheel-2-1:root1.4.1.1",
+          "pinwheel-2-1:root1.4.1.2"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.971061406695079,
+            "y": 1.0004594532748736
+          },
+          {
+            "x": 5.938556113021978,
+            "y": 3.682618130147262
+          },
+          {
+            "x": 6.609095782240074,
+            "y": 2.9407444535655376
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 8.810939,
+          "y": 4.481559
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.3.4.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.4.0",
+          "pinwheel-2-1:root1.3.4.3",
+          "pinwheel-2-1:root1.4.1.2",
+          "pinwheel-2-1:root1.4.4.2"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 6.609095782240074,
+            "y": 2.9407444535655376
+          },
+          {
+            "x": 9.576590488566973,
+            "y": 5.622903130437926
+          },
+          {
+            "x": 10.247130157785069,
+            "y": 4.881029453856201
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 8.363912,
+          "y": 4.976141
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.4.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.4.0",
+          "pinwheel-2-1:root1.3.4.2",
+          "pinwheel-2-1:root1.3.4.4"
+        ],
+        "orientation_token": "236",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 6.609095782240074,
+            "y": 2.9407444535655376
+          },
+          {
+            "x": 9.576590488566973,
+            "y": 5.622903130437926
+          },
+          {
+            "x": 8.906050819348875,
+            "y": 6.364776807019651
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 7.151234,
+          "y": 4.32938
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.3.4.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.3.1",
+          "pinwheel-2-1:root1.3.3.4",
+          "pinwheel-2-1:root1.3.4.1",
+          "pinwheel-2-1:root1.3.4.3"
+        ],
+        "orientation_token": "56",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 8.906050819348875,
+            "y": 6.364776807019651
+          },
+          {
+            "x": 5.938556113021978,
+            "y": 3.682618130147262
+          },
+          {
+            "x": 6.609095782240074,
+            "y": 2.9407444535655376
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 17.240241,
+          "y": 8.519064
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.0.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.0",
+          "pinwheel-2-1:root1.3.1.1",
+          "pinwheel-2-1:root1.4.0.2",
+          "pinwheel-2-1:root1.4.0.3"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 16.613690314988812,
+            "y": 8.276528204364864
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 8.519063829401198
+          },
+          {
+            "x": 17.52319890887506,
+            "y": 8.76159945443753
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.068904,
+          "y": 5.891595
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.0.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.1",
+          "pinwheel-2-1:root1.4.0.4",
+          "pinwheel-2-1:root1.4.2.0"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.553975315279477,
+            "y": 4.638493828819869
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 6.578778829110532
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 17.098762,
+          "y": 7.710612
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.0.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.0.0",
+          "pinwheel-2-1:root1.4.0.3",
+          "pinwheel-2-1:root1.4.3.0"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          },
+          {
+            "x": 17.098761565061476,
+            "y": 8.39779601688303
+          },
+          {
+            "x": 16.613690314988812,
+            "y": 8.276528204364864
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 17.422142,
+          "y": 7.791457
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.0.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.0.0",
+          "pinwheel-2-1:root1.4.0.2",
+          "pinwheel-2-1:root1.4.0.4"
+        ],
+        "orientation_token": "270",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          },
+          {
+            "x": 17.098761565061476,
+            "y": 8.39779601688303
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 8.519063829401198
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 17.745523,
+          "y": 7.185118
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.0.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.1.0.4",
+          "pinwheel-2-1:root1.4.0.1",
+          "pinwheel-2-1:root1.4.0.3"
+        ],
+        "orientation_token": "90",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.583832815134144,
+            "y": 8.519063829401198
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 6.578778829110532
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 9.822693,
+          "y": 3.142857
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.1.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.2.1",
+          "pinwheel-2-1:root1.4.1.2",
+          "pinwheel-2-1:root1.4.1.3",
+          "pinwheel-2-1:root1.4.4.0"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.33762156389882,
+            "y": 4.395958203783536
+          },
+          {
+            "x": 9.822692813971488,
+            "y": 2.455673203492872
+          },
+          {
+            "x": 10.307764064044154,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.567754,
+          "y": 1.485531
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.1.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.1.1",
+          "pinwheel-2-1:root0.1.1.4",
+          "pinwheel-2-1:root1.3.0.0",
+          "pinwheel-2-1:root1.3.4.1",
+          "pinwheel-2-1:root1.4.1.4"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 2.0615528128088303,
+            "y": 0.5153882032022076
+          },
+          {
+            "x": 5.942122813390158,
+            "y": 1.4855307033475396
+          },
+          {
+            "x": 5.699587188353825,
+            "y": 2.455673203492872
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 8.205789,
+          "y": 3.425816
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.1.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.4.1",
+          "pinwheel-2-1:root1.3.4.2",
+          "pinwheel-2-1:root1.4.1.0",
+          "pinwheel-2-1:root1.4.1.3"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.699587188353825,
+            "y": 2.455673203492872
+          },
+          {
+            "x": 9.580157188935155,
+            "y": 3.4258157036382038
+          },
+          {
+            "x": 9.33762156389882,
+            "y": 4.395958203783536
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 8.367479,
+          "y": 2.779054
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.1.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.1.0",
+          "pinwheel-2-1:root1.4.1.2",
+          "pinwheel-2-1:root1.4.1.4"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 5.699587188353825,
+            "y": 2.455673203492872
+          },
+          {
+            "x": 9.580157188935155,
+            "y": 3.4258157036382038
+          },
+          {
+            "x": 9.822692813971488,
+            "y": 2.455673203492872
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 7.154801,
+          "y": 2.132292
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.1.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.1.0",
+          "pinwheel-2-1:root0.1.1.4",
+          "pinwheel-2-1:root0.1.2.1",
+          "pinwheel-2-1:root1.4.1.1",
+          "pinwheel-2-1:root1.4.1.3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.822692813971488,
+            "y": 2.455673203492872
+          },
+          {
+            "x": 5.942122813390158,
+            "y": 1.4855307033475396
+          },
+          {
+            "x": 5.699587188353825,
+            "y": 2.455673203492872
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 18.068904,
+          "y": 5.20441
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.2.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.4.2.4",
+          "pinwheel-2-1:root1.4.0.1",
+          "pinwheel-2-1:root1.4.2.2",
+          "pinwheel-2-1:root1.4.2.3"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 18.553975315279477,
+            "y": 4.638493828819869
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 12.813966,
+          "y": 3.547084
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.2.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.2.1",
+          "pinwheel-2-1:root0.1.2.4",
+          "pinwheel-2-1:root1.4.2.4",
+          "pinwheel-2-1:root1.4.3.1"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 10.307764064044154,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 14.18833406462548,
+            "y": 3.54708351615637
+          },
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 16.452,
+          "y": 5.487369
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.2.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.2.0",
+          "pinwheel-2-1:root1.4.2.3",
+          "pinwheel-2-1:root1.4.3.2"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 17.826368440170477,
+            "y": 5.4873685164470345
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 16.61369,
+          "y": 4.840607
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.2.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.2.0",
+          "pinwheel-2-1:root1.4.2.2",
+          "pinwheel-2-1:root1.4.2.4"
+        ],
+        "orientation_token": "180",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 17.826368440170477,
+            "y": 5.4873685164470345
+          },
+          {
+            "x": 18.06890406520681,
+            "y": 4.517226016301702
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 15.401012,
+          "y": 4.193845
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.2.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root0.1.2.0",
+          "pinwheel-2-1:root0.1.2.4",
+          "pinwheel-2-1:root0.4.2.0",
+          "pinwheel-2-1:root0.4.2.4",
+          "pinwheel-2-1:root1.4.2.1",
+          "pinwheel-2-1:root1.4.2.3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 18.06890406520681,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 14.18833406462548,
+            "y": 3.54708351615637
+          },
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 16.813426,
+          "y": 7.558433
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.3.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.0.2",
+          "pinwheel-2-1:root1.4.3.2",
+          "pinwheel-2-1:root1.4.3.3",
+          "pinwheel-2-1:root1.4.4.1"
+        ],
+        "orientation_token": "298",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          },
+          {
+            "x": 16.24275347669795,
+            "y": 7.941258369755815
+          },
+          {
+            "x": 16.613690314988812,
+            "y": 8.276528204364864
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 12.509607,
+          "y": 4.117756
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.3.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.2.1",
+          "pinwheel-2-1:root1.4.3.4",
+          "pinwheel-2-1:root1.4.4.0",
+          "pinwheel-2-1:root1.4.4.4"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 10.307764064044154,
+            "y": 2.5769410160110384
+          },
+          {
+            "x": 13.275258770371051,
+            "y": 5.259099692883427
+          },
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 16.147641,
+          "y": 6.058041
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.3.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.2.2",
+          "pinwheel-2-1:root1.4.3.0",
+          "pinwheel-2-1:root1.4.3.3"
+        ],
+        "orientation_token": "208",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 16.913293145916047,
+            "y": 7.199384693174091
+          },
+          {
+            "x": 17.583832815134144,
+            "y": 6.457511016592366
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 15.700615,
+          "y": 6.552623
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.3.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.3.0",
+          "pinwheel-2-1:root1.4.3.2",
+          "pinwheel-2-1:root1.4.3.4"
+        ],
+        "orientation_token": "236",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          },
+          {
+            "x": 16.913293145916047,
+            "y": 7.199384693174091
+          },
+          {
+            "x": 16.24275347669795,
+            "y": 7.941258369755815
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 14.487937,
+          "y": 5.905861
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.3.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.3.1",
+          "pinwheel-2-1:root1.4.3.3",
+          "pinwheel-2-1:root1.4.4.1",
+          "pinwheel-2-1:root1.4.4.4"
+        ],
+        "orientation_token": "56",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 16.24275347669795,
+            "y": 7.941258369755815
+          },
+          {
+            "x": 13.275258770371051,
+            "y": 5.259099692883427
+          },
+          {
+            "x": 13.945798439589147,
+            "y": 4.517226016301702
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 10.108029,
+          "y": 3.295037
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.4.0",
+        "kind": "pinwheel-2-1-small-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.1.0",
+          "pinwheel-2-1:root1.4.3.1",
+          "pinwheel-2-1:root1.4.4.2",
+          "pinwheel-2-1:root1.4.4.3"
+        ],
+        "orientation_token": "118",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 9.33762156389882,
+            "y": 4.395958203783536
+          },
+          {
+            "x": 10.678700902335015,
+            "y": 2.9122108506200868
+          },
+          {
+            "x": 10.307764064044154,
+            "y": 2.5769410160110384
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 14.411847,
+          "y": 6.735714
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.4.1",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.1.1",
+          "pinwheel-2-1:root1.3.1.2",
+          "pinwheel-2-1:root1.4.3.0",
+          "pinwheel-2-1:root1.4.3.4",
+          "pinwheel-2-1:root1.4.4.4"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 16.613690314988812,
+            "y": 8.276528204364864
+          },
+          {
+            "x": 13.646195608661913,
+            "y": 5.594369527492475
+          },
+          {
+            "x": 12.975655939443817,
+            "y": 6.3362432040742
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 10.773813,
+          "y": 4.795429
+        },
+        "chirality_token": "right",
+        "id": "pinwheel-2-1:root1.4.4.2",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.3.1.2",
+          "pinwheel-2-1:root1.3.4.2",
+          "pinwheel-2-1:root1.4.4.0",
+          "pinwheel-2-1:root1.4.4.3"
+        ],
+        "orientation_token": "28",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 12.975655939443817,
+            "y": 6.3362432040742
+          },
+          {
+            "x": 10.008161233116917,
+            "y": 3.654084527201811
+          },
+          {
+            "x": 9.33762156389882,
+            "y": 4.395958203783536
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 11.220839,
+          "y": 4.300846
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.4.3",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.4.0",
+          "pinwheel-2-1:root1.4.4.2",
+          "pinwheel-2-1:root1.4.4.4"
+        ],
+        "orientation_token": "56",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 12.975655939443817,
+            "y": 6.3362432040742
+          },
+          {
+            "x": 10.008161233116917,
+            "y": 3.654084527201811
+          },
+          {
+            "x": 10.678700902335015,
+            "y": 2.9122108506200868
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 12.433517,
+          "y": 4.947608
+        },
+        "chirality_token": "left",
+        "id": "pinwheel-2-1:root1.4.4.4",
+        "kind": "pinwheel-2-1-large-triangle",
+        "neighbors": [
+          "pinwheel-2-1:root1.4.3.1",
+          "pinwheel-2-1:root1.4.3.4",
+          "pinwheel-2-1:root1.4.4.1",
+          "pinwheel-2-1:root1.4.4.3"
+        ],
+        "orientation_token": "236",
+        "tile_family": "pinwheel-2-1",
+        "vertices": [
+          {
+            "x": 10.678700902335015,
+            "y": 2.9122108506200868
+          },
+          {
+            "x": 13.646195608661913,
+            "y": 5.594369527492475
+          },
+          {
+            "x": 12.975655939443817,
+            "y": 6.3362432040742
+          }
+        ]
       }
     ],
-    "topology_revision": "fixture-pinwheel-2-1-depth-3",
+    "topology_revision": "fixture-pinwheel-2-1-depth-3-v2",
     "topology_spec": {
       "adjacency_mode": "edge",
       "height": 9,

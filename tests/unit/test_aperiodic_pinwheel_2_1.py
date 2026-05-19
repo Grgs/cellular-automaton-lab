@@ -111,24 +111,28 @@ class PinwheelTwoOneGeometryTests(unittest.TestCase):
 
 
 class PinwheelTwoOneRecordTests(unittest.TestCase):
-    def test_depth_zero_yields_single_large_record(self) -> None:
+    def test_depth_zero_yields_two_large_records_for_paired_roots(self) -> None:
+        # Two roots forming a 4:1 rectangle, both labeled as the large
+        # prototile at depth 0.
         records = collect_pinwheel_2_1_exact_records(0)
-        self.assertEqual(len(records), 1)
-        self.assertEqual(records[0]["kind"], KIND_LARGE)
-        self.assertEqual(records[0]["tile_family"], TILE_FAMILY)
+        self.assertEqual(len(records), 2)
+        self.assertEqual({r["kind"] for r in records}, {KIND_LARGE})
+        for record in records:
+            self.assertEqual(record["tile_family"], TILE_FAMILY)
 
-    def test_depth_one_yields_five_records_in_canonical_split(self) -> None:
+    def test_depth_one_yields_ten_records_in_canonical_split(self) -> None:
+        # One small + four large per root × two roots = 10 cells.
         records = collect_pinwheel_2_1_exact_records(1)
-        self.assertEqual(len(records), 5)
+        self.assertEqual(len(records), 10)
         kinds = [record["kind"] for record in records]
-        self.assertEqual(kinds.count(KIND_SMALL), 1)
-        self.assertEqual(kinds.count(KIND_LARGE), 4)
+        self.assertEqual(kinds.count(KIND_SMALL), 2)
+        self.assertEqual(kinds.count(KIND_LARGE), 8)
 
-    def test_record_counts_grow_as_five_to_the_depth(self) -> None:
+    def test_record_counts_grow_as_two_times_five_to_the_depth(self) -> None:
         for depth in range(4):
             with self.subTest(depth=depth):
                 records = collect_pinwheel_2_1_exact_records(depth)
-                self.assertEqual(len(records), 5**depth)
+                self.assertEqual(len(records), 2 * 5**depth)
 
     def test_record_ids_are_unique(self) -> None:
         records = collect_pinwheel_2_1_exact_records(3)
@@ -150,12 +154,12 @@ class PinwheelTwoOnePatchTests(unittest.TestCase):
         for depth in range(3):
             with self.subTest(depth=depth):
                 patch = build_pinwheel_2_1_patch(depth)
-                self.assertEqual(len(patch.cells), 5**depth)
+                self.assertEqual(len(patch.cells), 2 * 5**depth)
                 self.assertEqual(patch.patch_depth, depth)
 
     def test_build_patch_assigns_neighbors_at_depth_two(self) -> None:
         patch = build_pinwheel_2_1_patch(2)
-        # In a 25-triangle patch every cell should have at least one
+        # In a 50-triangle patch every cell should have at least one
         # segment-overlap neighbor (the patch is connected).
         for cell in patch.cells:
             with self.subTest(cell_id=cell.id):

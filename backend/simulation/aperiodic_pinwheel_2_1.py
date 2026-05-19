@@ -97,6 +97,23 @@ _ALL_CHILDREN: tuple[tuple[str, ExactTriangle], ...] = (
     *((KIND_LARGE, child) for child in _LARGE_CHILDREN),
 )
 
+# The seed patch pairs ``_BASE_TRIANGLE`` (lower-right half) with its
+# mirror in the same 4x1 bounding rectangle (upper-left half), so the
+# depth-0 patch is a 4:1 rectangle instead of a thin wedge. Both roots
+# are listed in canonical (small-angle, right-angle, large-angle) order
+# so ``_map_local`` is a similarity transform on each root and the
+# substitution rule produces shape-preserving children at every depth.
+# This mirrors the paired-rectangle seed used by the original
+# Conway-Radin pinwheel in ``aperiodic_pinwheel.py``.
+_ROOT_TRIANGLES: tuple[ExactTriangle, ...] = (
+    _BASE_TRIANGLE,
+    (
+        (_FOUR, _ONE),
+        (_ZERO, _ONE),
+        (_ZERO, _ZERO),
+    ),
+)
+REFERENCE_ROOT_SEED_POLICY = "paired-right-triangle-rectangle"
 INFLATION_FACTOR = math.sqrt(17) / 2
 USES_EXACT_REFERENCE_PATH = True
 
@@ -181,17 +198,16 @@ def _collect_records(
 def collect_pinwheel_2_1_exact_records(patch_depth: int) -> tuple[ExactPatchRecord, ...]:
     resolved_depth = max(0, int(patch_depth))
     records: list[ExactPatchRecord] = []
-    _collect_records(KIND_LARGE, _BASE_TRIANGLE, resolved_depth, "root", records)
+    for index, root in enumerate(_ROOT_TRIANGLES):
+        _collect_records(KIND_LARGE, root, resolved_depth, f"root{index}", records)
     return tuple(records)
 
 
 def build_pinwheel_2_1_patch(patch_depth: int) -> AperiodicPatch:
     """Build an AperiodicPatch for the pinwheel-2-1 substitution.
 
-    Note: the resulting patch is not registered with the topology catalog
-    or any family manifest. It uses ``segment_overlap`` neighbor mode
-    because, like the Conway-Radin pinwheel, the subdivision is not
-    edge-to-edge.
+    Uses ``segment_overlap`` neighbor mode because, like the Conway-Radin
+    pinwheel, the subdivision is not edge-to-edge.
     """
     resolved_depth = max(0, int(patch_depth))
     inflation_scale = INFLATION_FACTOR**resolved_depth
