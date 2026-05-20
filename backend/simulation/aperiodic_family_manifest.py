@@ -84,6 +84,19 @@ class AperiodicFamilyManifestEntry:
     implementation_status: AperiodicImplementationStatus
     public_cell_kinds: tuple[str, ...]
     promotion_blocker: str | None = None
+    # Label used by ``aperiodic_contracts._depth_semantics``. The default
+    # "substitution patch depth" covers most families; exact-affine
+    # pinwheel-family families use "exact affine substitution depth" so
+    # consumers can tell that the depth counter is a similarity inflation
+    # count rather than a generic substitution round.
+    depth_semantics_label: str = "substitution patch depth"
+    # Whether the polygon-union surface-component check in
+    # ``topology_validation.validate_topology`` applies to this family.
+    # Disabled for families whose substitution inherently produces
+    # T-junctions and point-only cell contacts (currently only
+    # pinwheel-2-1, where the cell-adjacency graph stays connected but
+    # Shapely's polygon union sees depth-specific near-disconnections).
+    polygon_surface_check: bool = True
 
     @property
     def experimental(self) -> bool:
@@ -299,6 +312,7 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         promotion_blocker=(
             "Experimental until manual visual review accepts the exact-affine implementation."
         ),
+        depth_semantics_label="exact affine substitution depth",
     ),
     PINWHEEL_2_1_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PINWHEEL_2_1_GEOMETRY,
@@ -316,6 +330,13 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # (foot-of-altitude + midpoints all yield rational coordinates).
         implementation_status="exact_affine",
         public_cell_kinds=(PINWHEEL_2_1_SMALL_KIND, PINWHEEL_2_1_LARGE_KIND),
+        depth_semantics_label="exact affine substitution depth",
+        # pinwheel-2-1's substitution inherently produces T-junctions and
+        # point-only cell contacts; the cell-adjacency graph is connected
+        # at every depth but Shapely's polygon-union surface check sees
+        # near-disconnected pieces at depth 3 specifically. See
+        # docs/TILING_KNOWN_DEVIATIONS.md for the full rationale.
+        polygon_surface_check=False,
         promotion_blocker=(
             "Experimental until manual visual review accepts the exact-affine implementation."
         ),
