@@ -1,0 +1,49 @@
+from __future__ import annotations
+
+from backend.simulation.reference_specs.types import (
+    PeriodicDescriptorExpectation,
+    ReferenceDepthExpectation,
+    ReferenceFamilySpec,
+)
+from backend.simulation.reference_specs.helpers import (
+    _prefixed_slots,
+)
+
+SPECS = {
+    "deltoidal-hexagonal": ReferenceFamilySpec(
+        geometry="deltoidal-hexagonal",
+        display_name="Deltoidal Hexagonal",
+        source_urls=("https://en.wikipedia.org/wiki/Deltoidal_hexagonal_tiling",),
+        canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
+        allowed_public_cell_kinds=("kite",),
+        required_metadata=(),
+        sample_mode="grid",
+        depth_expectations={
+            3: ReferenceDepthExpectation(
+                exact_total_cells=108,
+                expected_kind_counts=(("kite", 108),),
+                expected_adjacency_pairs=(("kite", "kite"),),
+                expected_degree_histogram=((1, 2), (2, 12), (3, 18), (4, 76)),
+                expected_signature="b5d904bfe95c",  # pragma: allowlist secret
+            ),
+        },
+        periodic_descriptor=PeriodicDescriptorExpectation(
+            face_template_count=12,
+            slot_vocabulary=tuple(sorted(_prefixed_slots("k", 12))),
+            id_pattern="{prefix}:{slot}:{x}:{y}",
+            row_offset_x=0.0,
+            expected_interior_vertex_configurations=(
+                ("kite", "kite", "kite"),
+                ("kite", "kite", "kite", "kite"),
+                ("kite", "kite", "kite", "kite", "kite", "kite"),
+            ),
+            expected_interior_vertex_configuration_frequencies=(
+                (("kite", "kite", "kite"), 30),
+                (("kite", "kite", "kite", "kite"), 43),
+                (("kite", "kite", "kite", "kite", "kite", "kite"), 12),
+            ),
+            expected_dual_candidate_geometries=("archimedean-3-4-6-4",),
+            expected_dual_structure_signature=((3, 30), (4, 43), (6, 12)),
+        ),
+    ),
+}
