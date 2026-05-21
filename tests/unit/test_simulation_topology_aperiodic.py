@@ -15,6 +15,10 @@ try:
     )
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
+        build_topology,
+        empty_board,
+    )
+    from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         HAT_MONOTILE_GEOMETRY,
@@ -28,8 +32,6 @@ try:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
-        build_topology,
-        empty_board,
     )
     from backend.simulation.topology_validation import validate_topology
 except ModuleNotFoundError:
@@ -45,6 +47,10 @@ except ModuleNotFoundError:
     )
     from backend.simulation.penrose import build_penrose_patch
     from backend.simulation.topology import (
+        build_topology,
+        empty_board,
+    )
+    from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         HAT_MONOTILE_GEOMETRY,
@@ -58,8 +64,6 @@ except ModuleNotFoundError:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
-        build_topology,
-        empty_board,
     )
     from backend.simulation.topology_validation import validate_topology
 

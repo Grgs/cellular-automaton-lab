@@ -5,10 +5,8 @@ from unittest.mock import patch
 
 from backend.defaults import APP_DEFAULTS
 from backend.payload_types import RuleDefinitionPayload
-from backend.simulation.topology_catalog import (
-    PENROSE_GEOMETRY,
-    maximum_patch_depth_for_tiling_family,
-)
+from backend.simulation.topology_catalog import maximum_patch_depth_for_tiling_family
+from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
 
 try:
     from tests.api.support import ApiTestCase

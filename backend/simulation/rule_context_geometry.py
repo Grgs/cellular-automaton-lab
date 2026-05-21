@@ -4,7 +4,8 @@ from math import pi, sqrt
 from collections.abc import Iterable
 
 from backend.simulation.topology import LatticeCell, LatticeTopology, parse_regular_cell_id
-from backend.simulation.topology_catalog import EDGE_ADJACENCY, get_topology_variant_for_geometry
+from backend.simulation.topology_catalog import get_topology_variant_for_geometry
+from backend.simulation.topology_family_manifest import EDGE_ADJACENCY
 
 _CLOCKWISE_START = pi / 2
 

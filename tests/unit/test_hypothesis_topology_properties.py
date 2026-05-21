@@ -6,15 +6,18 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 try:
-    from backend.simulation.topology_catalog import ARCHIMEDEAN_488_GEOMETRY, KAGOME_GEOMETRY
+    from backend.simulation.aperiodic_family_manifest import (
+        PENROSE_GEOMETRY,
+        PENROSE_VERTEX_GEOMETRY,
+    )
     from backend.simulation.periodic_face_tilings import (
         PERIODIC_FACE_TILING_GEOMETRIES,
         get_periodic_face_tiling_descriptor,
     )
-    from backend.simulation.topology import (
-        PENROSE_GEOMETRY,
-        PENROSE_VERTEX_GEOMETRY,
-        build_topology,
+    from backend.simulation.topology import build_topology
+    from backend.simulation.topology_family_manifest import (
+        ARCHIMEDEAN_488_GEOMETRY,
+        KAGOME_GEOMETRY,
     )
     from backend.simulation.topology_validation import (
         recommended_validation_options,
@@ -22,15 +25,18 @@ try:
     )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from backend.simulation.topology_catalog import ARCHIMEDEAN_488_GEOMETRY, KAGOME_GEOMETRY
+    from backend.simulation.aperiodic_family_manifest import (
+        PENROSE_GEOMETRY,
+        PENROSE_VERTEX_GEOMETRY,
+    )
     from backend.simulation.periodic_face_tilings import (
         PERIODIC_FACE_TILING_GEOMETRIES,
         get_periodic_face_tiling_descriptor,
     )
-    from backend.simulation.topology import (
-        PENROSE_GEOMETRY,
-        PENROSE_VERTEX_GEOMETRY,
-        build_topology,
+    from backend.simulation.topology import build_topology
+    from backend.simulation.topology_family_manifest import (
+        ARCHIMEDEAN_488_GEOMETRY,
+        KAGOME_GEOMETRY,
     )
     from backend.simulation.topology_validation import (
         recommended_validation_options,

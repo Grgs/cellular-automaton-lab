@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Callable, NotRequired, TypedDict
 
 from backend.payload_types import PeriodicFaceTilingDescriptorPayload, RawJsonObject
-from backend.simulation.topology_catalog import (
+from backend.simulation.topology_family_manifest import (
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_33336_GEOMETRY,
     ARCHIMEDEAN_33344_GEOMETRY,
@@ -26,8 +26,8 @@ from backend.simulation.topology_catalog import (
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
-    TYPE_7_PENTAGONAL_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
+    TYPE_7_PENTAGONAL_GEOMETRY,
 )
 
 PERIODIC_FACE_TILING_GEOMETRIES = (

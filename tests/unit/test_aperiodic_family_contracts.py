@@ -15,7 +15,8 @@ from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_MANIFEST,
 )
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
-from backend.simulation.topology_catalog import PENROSE_VERTEX_GEOMETRY, TOPOLOGY_VARIANTS
+from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
+from backend.simulation.aperiodic_family_manifest import PENROSE_VERTEX_GEOMETRY
 
 
 class AperiodicFamilyContractTests(unittest.TestCase):

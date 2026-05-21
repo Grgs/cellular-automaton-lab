@@ -24,16 +24,16 @@ from backend.payload_types import (
     TopologySpecPayload,
 )
 from backend.simulation.topology_catalog import (
-    minimum_grid_dimension_for_geometry,
-    EDGE_ADJACENCY,
     get_topology_definition,
     get_topology_variant_for_geometry,
     maximum_patch_depth_for_tiling_family,
+    minimum_grid_dimension_for_geometry,
     minimum_patch_depth_for_tiling_family,
     normalize_adjacency_mode,
     resolve_geometry_key,
     unsafe_maximum_patch_depth_for_tiling_family,
 )
+from backend.simulation.topology_family_manifest import EDGE_ADJACENCY
 from backend.simulation.topology import (
     LatticeTopology,
     SimulationBoard,

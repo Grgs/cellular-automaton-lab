@@ -16,6 +16,10 @@ try:
     from backend.rules.kagome_life import KagomeLifeRule
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.topology import (
+        build_topology,
+        empty_board,
+    )
+    from backend.simulation.topology_family_manifest import (
         ARCHIMEDEAN_488_GEOMETRY,
         DELTOIDAL_HEXAGONAL_GEOMETRY,
         DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
@@ -26,8 +30,6 @@ try:
         SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
-        build_topology,
-        empty_board,
     )
     from backend.simulation.topology_validation import validate_topology
 except ModuleNotFoundError:
@@ -44,6 +46,10 @@ except ModuleNotFoundError:
     from backend.rules.kagome_life import KagomeLifeRule
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.topology import (
+        build_topology,
+        empty_board,
+    )
+    from backend.simulation.topology_family_manifest import (
         ARCHIMEDEAN_488_GEOMETRY,
         DELTOIDAL_HEXAGONAL_GEOMETRY,
         DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
@@ -54,8 +60,6 @@ except ModuleNotFoundError:
         SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
-        build_topology,
-        empty_board,
     )
     from backend.simulation.topology_validation import validate_topology
 
