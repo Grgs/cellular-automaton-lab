@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Literal
 
 from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_IDS
-from backend.simulation.topology_catalog_data import (
+from backend.simulation.aperiodic_family_manifest import PENROSE_VERTEX_GEOMETRY
+from backend.simulation.topology_family_manifest import (
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_33336_GEOMETRY,
     ARCHIMEDEAN_33344_GEOMETRY,
@@ -19,15 +20,14 @@ from backend.simulation.topology_catalog_data import (
     HEX_GEOMETRY,
     KAGOME_GEOMETRY,
     KISRHOMBILLE_GEOMETRY,
-    PENROSE_VERTEX_GEOMETRY,
     PRISMATIC_PENTAGONAL_GEOMETRY,
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     SQUARE_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
-    TYPE_7_PENTAGONAL_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
     TRIANGLE_GEOMETRY,
+    TYPE_7_PENTAGONAL_GEOMETRY,
 )
 
 if TYPE_CHECKING:

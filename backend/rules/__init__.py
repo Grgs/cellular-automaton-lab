@@ -21,10 +21,8 @@ from backend.rules.trilife import TriLifeRule
 from backend.rules.whirlpool import WhirlpoolRule
 from backend.rules.wireworld import WireWorldRule
 from backend.simulation.models import RuleSnapshot
-from backend.simulation.topology_catalog import (
-    GEOMETRY_DEFAULT_RULES,
-    SQUARE_GEOMETRY,
-)
+from backend.simulation.topology_catalog import GEOMETRY_DEFAULT_RULES
+from backend.simulation.topology_family_manifest import SQUARE_GEOMETRY
 
 RULE_TYPES: tuple[type[AutomatonRule], ...] = (
     ArchLife31212Rule,

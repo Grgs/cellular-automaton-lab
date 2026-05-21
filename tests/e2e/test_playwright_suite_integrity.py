@@ -1,10 +1,8 @@
 from collections import Counter
 import unittest
 
-from backend.simulation.topology_catalog import (
-    PENROSE_GEOMETRY,
-    default_patch_depth_for_tiling_family,
-)
+from backend.simulation.topology_catalog import default_patch_depth_for_tiling_family
+from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
 
 from tests.e2e.playwright_suite_support import (
     DEFAULT_PLAYWRIGHT_SUBSET_COUNT,

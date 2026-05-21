@@ -20,7 +20,11 @@ from backend.rules.trilife import TriLifeRule
 from backend.rules.whirlpool import WhirlpoolRule
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.rule_context import build_rule_contexts_for_board
-from backend.simulation.topology import ARCHIMEDEAN_488_GEOMETRY, SimulationBoard, empty_board
+from backend.simulation.topology import (
+    SimulationBoard,
+    empty_board,
+)
+from backend.simulation.topology_family_manifest import ARCHIMEDEAN_488_GEOMETRY
 
 TRunnerResult = TypeVar("TRunnerResult")
 

@@ -10,7 +10,11 @@ try:
     from backend.rules.trilife import TriLifeRule
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.rule_context import build_rule_contexts_for_board
-    from backend.simulation.topology import ARCHIMEDEAN_488_GEOMETRY, SimulationBoard, empty_board
+    from backend.simulation.topology import (
+        SimulationBoard,
+        empty_board,
+    )
+    from backend.simulation.topology_family_manifest import ARCHIMEDEAN_488_GEOMETRY
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.rules.base import AutomatonRule
@@ -20,7 +24,11 @@ except ModuleNotFoundError:
     from backend.rules.trilife import TriLifeRule
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.rule_context import build_rule_contexts_for_board
-    from backend.simulation.topology import ARCHIMEDEAN_488_GEOMETRY, SimulationBoard, empty_board
+    from backend.simulation.topology import (
+        SimulationBoard,
+        empty_board,
+    )
+    from backend.simulation.topology_family_manifest import ARCHIMEDEAN_488_GEOMETRY
 
 from tests.unit.board_test_support import board_from_grid, regular_grid_from_board
 from tests.unit.simulation_test_fixtures import (

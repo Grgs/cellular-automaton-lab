@@ -4,58 +4,66 @@ from pathlib import Path
 
 try:
     from backend.simulation.topology import (
-        ARCHIMEDEAN_488_GEOMETRY,
+        build_topology,
+        empty_board,
+    )
+    from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
-        DELTOIDAL_HEXAGONAL_GEOMETRY,
-        DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-        FLORET_PENTAGONAL_GEOMETRY,
         HAT_MONOTILE_GEOMETRY,
-        KAGOME_GEOMETRY,
         PENROSE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         PINWHEEL_GEOMETRY,
-        PRISMATIC_PENTAGONAL_GEOMETRY,
-        RHOMBILLE_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
         SHIELD_GEOMETRY,
-        SNUB_SQUARE_DUAL_GEOMETRY,
         SPECTRE_GEOMETRY,
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
+        TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.topology_family_manifest import (
+        ARCHIMEDEAN_488_GEOMETRY,
+        DELTOIDAL_HEXAGONAL_GEOMETRY,
+        DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+        FLORET_PENTAGONAL_GEOMETRY,
+        KAGOME_GEOMETRY,
+        PRISMATIC_PENTAGONAL_GEOMETRY,
+        RHOMBILLE_GEOMETRY,
+        SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
-        TUEBINGEN_TRIANGLE_GEOMETRY,
-        build_topology,
-        empty_board,
     )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.simulation.topology import (
-        ARCHIMEDEAN_488_GEOMETRY,
+        build_topology,
+        empty_board,
+    )
+    from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
-        DELTOIDAL_HEXAGONAL_GEOMETRY,
-        DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-        FLORET_PENTAGONAL_GEOMETRY,
         HAT_MONOTILE_GEOMETRY,
-        KAGOME_GEOMETRY,
         PENROSE_GEOMETRY,
         PENROSE_VERTEX_GEOMETRY,
         PINWHEEL_GEOMETRY,
-        PRISMATIC_PENTAGONAL_GEOMETRY,
-        RHOMBILLE_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
         SHIELD_GEOMETRY,
-        SNUB_SQUARE_DUAL_GEOMETRY,
         SPECTRE_GEOMETRY,
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
+        TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.topology_family_manifest import (
+        ARCHIMEDEAN_488_GEOMETRY,
+        DELTOIDAL_HEXAGONAL_GEOMETRY,
+        DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
+        FLORET_PENTAGONAL_GEOMETRY,
+        KAGOME_GEOMETRY,
+        PRISMATIC_PENTAGONAL_GEOMETRY,
+        RHOMBILLE_GEOMETRY,
+        SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
-        TUEBINGEN_TRIANGLE_GEOMETRY,
-        build_topology,
-        empty_board,
     )
 
 

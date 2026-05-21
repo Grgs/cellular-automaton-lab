@@ -7,7 +7,7 @@ from backend.simulation.penrose import (
     PENROSE_VERTEX_ADJACENCY,
     build_penrose_patch,
 )
-from backend.simulation.topology_catalog import (
+from backend.simulation.aperiodic_family_manifest import (
     PENROSE_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
 )

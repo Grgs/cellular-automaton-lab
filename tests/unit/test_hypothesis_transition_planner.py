@@ -5,12 +5,14 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from backend.rules import RuleRegistry
-from backend.simulation.topology_catalog import (
-    HEX_GEOMETRY,
+from backend.simulation.topology_catalog import minimum_grid_dimension_for_geometry
+from backend.simulation.aperiodic_family_manifest import (
     PENROSE_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+)
+from backend.simulation.topology_family_manifest import (
+    HEX_GEOMETRY,
     SQUARE_GEOMETRY,
-    minimum_grid_dimension_for_geometry,
 )
 from backend.simulation.models import SimulationConfig, SimulationStateData
 from backend.simulation.topology import empty_board
