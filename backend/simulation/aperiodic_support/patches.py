@@ -6,9 +6,10 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from .geometry import COORDINATE_PRECISION, compatibility_extent, polygon_centroid, rounded_point
+from .geometry import compatibility_extent, polygon_centroid, rounded_point
 from .neighbors import build_edge_neighbors, build_exact_neighbors
 from .types import (
+    COORDINATE_PRECISION,
     AperiodicPatch,
     AperiodicPatchCell,
     ExactNeighborMode,

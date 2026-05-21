@@ -10,8 +10,14 @@ import math
 from collections import defaultdict
 from fractions import Fraction
 
-from .geometry import COORDINATE_PRECISION, canonical_edge, exact_canonical_edge
-from .types import ExactNeighborMode, ExactPatchRecord, NeighborMode, PatchRecord
+from .geometry import canonical_edge, exact_canonical_edge
+from .types import (
+    COORDINATE_PRECISION,
+    ExactNeighborMode,
+    ExactPatchRecord,
+    NeighborMode,
+    PatchRecord,
+)
 
 
 def _edges_overlap_with_positive_length(
