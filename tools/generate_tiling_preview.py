@@ -1,18 +1,24 @@
 """Generate POLYGON_PREVIEW_DATA entries for tiling-preview-data.ts.
 
-For each periodic face tiling, reads the face template vertices from
-periodic_face_patterns.json, scales them to fit the 120x72 SVG viewbox used
-by the tiling picker, and prints a ready-to-paste polygon data string.
+Periodic-face mode (default): reads face template vertices from
+periodic_face_patterns.json, scales them to fit the 120x72 SVG viewbox,
+and prints a ready-to-paste polygon data string. The viewbox is centered
+on the highest-degree vertex; a 3x3 grid of unit cells is tiled and
+clipped to the viewbox.
 
-The viewbox is centered on the highest-degree vertex — typically the most
-visually striking point (e.g. the 12-fold rosette center in kisrhombille, the
-hexagonal star in floret-pentagonal). A 3x3 grid of unit cells is tiled and
-clipped to the viewbox so edges are filled without blank margins.
+Aperiodic mode (``--aperiodic``): builds the actual depth-N patch via
+``build_registered_aperiodic_patch``, scales it to the 120x72 viewbox,
+and emits color-coded polygon data using the family's ``selectorFields``
+from ``frontend/canvas/family-dead-palette-manifest.json`` to assign
+color indices (e.g. by ``chirality_token`` for pinwheel, by ``kind`` for
+pinwheel-2-1). Replaces hand-coded entries with deterministic geometry.
 
 Usage:
     py -3 tools/generate_tiling_preview.py --geometry kisrhombille
     py -3 tools/generate_tiling_preview.py --geometry kisrhombille --fill-count 1
     py -3 tools/generate_tiling_preview.py --list
+    py -3 tools/generate_tiling_preview.py --aperiodic --geometry pinwheel --depth 1
+    py -3 tools/generate_tiling_preview.py --aperiodic --list
 """
 
 from __future__ import annotations
@@ -21,19 +27,46 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
+
+if TYPE_CHECKING:
+    from backend.simulation.topology import LatticeCell
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 _DATA_PATH = ROOT / "backend" / "simulation" / "data" / "periodic_face_patterns.json"
+_PALETTE_MANIFEST_PATH = ROOT / "frontend" / "canvas" / "family-dead-palette-manifest.json"
 _VIEWBOX_W = 120
 _VIEWBOX_H = 72
+_VIEWBOX_MARGIN = 4
 
 # The three regular tilings render via dedicated code in tiling-preview.ts
 # and never need a POLYGON_PREVIEW_DATA entry.
 _INLINE_RENDER_KEYS = frozenset({"square", "hex", "triangle"})
+
+# Per-family depth suggestions for aperiodic thumbnails: pick the lowest
+# depth that produces a visually-informative patch (typically 10-50 cells).
+# Used when ``--depth`` is not passed explicitly.
+_APERIODIC_DEFAULT_DEPTHS: dict[str, int] = {
+    "pinwheel": 1,
+    "pinwheel-2-1": 1,
+    "sphinx": 2,
+    "chair": 2,
+    "robinson-triangles": 1,
+    "tuebingen-triangle": 1,
+    "hat-monotile": 1,
+    "shield": 1,
+    "spectre": 1,
+    "taylor-socolar": 1,
+    "ammann-beenker": 1,
+    "dodecagonal-square-triangle": 0,
+    "penrose-p3-rhombs": 1,
+    "penrose-p2-kite-dart": 1,
+    "penrose-p1-pentagon-diamond": 0,
+    "penrose-p1-pentagon-boat-star": 0,
+}
 
 
 class PreviewVertex(TypedDict):
@@ -216,6 +249,94 @@ def _suggest_fill_count(descriptor: PreviewDescriptor) -> int:
     return len(kinds)
 
 
+# ---------------------------------------------------------------------------
+# Aperiodic mode
+# ---------------------------------------------------------------------------
+
+
+def _load_palette_selector_fields(geometry: str) -> tuple[str, ...]:
+    """Return the palette manifest's ``selectorFields`` for an aperiodic family.
+
+    Empty tuple means the family is rendered uniformly in the picker.
+    """
+    manifest = json.loads(_PALETTE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    for entry in manifest["families"]:
+        if entry["geometry"] != geometry:
+            continue
+        browser_coverage = entry.get("browserAliasCoverage", {})
+        return tuple(browser_coverage.get("selectorFields", ()))
+    return ()
+
+
+def _color_index_for_cell(
+    cell: LatticeCell,
+    selector_fields: tuple[str, ...],
+    value_to_index: dict[tuple[str, ...], int],
+) -> int:
+    """Assign a stable color index to a cell based on its selector-field values."""
+    if not selector_fields:
+        return 0
+    key = tuple(str(getattr(cell, field, "") or "") for field in selector_fields)
+    if key not in value_to_index:
+        value_to_index[key] = len(value_to_index)
+    return value_to_index[key]
+
+
+def _aperiodic_polygon_data(geometry: str, depth: int) -> tuple[str, int, int]:
+    """Build polygon data + cell count + assigned color count for an aperiodic family.
+
+    Uses ``build_topology`` (which dispatches to both the aperiodic registry
+    and the Penrose multigrid path) so every aperiodic geometry is covered.
+    """
+    from backend.simulation.topology import build_topology
+
+    patch = build_topology(geometry, 0, 0, depth)
+    selector_fields = _load_palette_selector_fields(geometry)
+
+    # Aperiodic cells always carry vertex polygons; narrow the optional type
+    # so mypy stops complaining about ``None`` iteration on the bbox walk.
+    cells = [cell for cell in patch.cells if cell.vertices]
+    if not cells:
+        raise ValueError(f"Patch for {geometry!r} at depth {depth} has no polygon cells.")
+    all_x = [v[0] for c in cells for v in c.vertices or ()]
+    all_y = [v[1] for c in cells for v in c.vertices or ()]
+    if not all_x:
+        raise ValueError(f"Patch for {geometry!r} at depth {depth} has no cells.")
+    bbox_w = max(all_x) - min(all_x)
+    bbox_h = max(all_y) - min(all_y)
+
+    # Fit the patch into the viewbox with a small margin; preserve aspect.
+    available_w = _VIEWBOX_W - 2 * _VIEWBOX_MARGIN
+    available_h = _VIEWBOX_H - 2 * _VIEWBOX_MARGIN
+    if bbox_w <= 0 or bbox_h <= 0:
+        scale = 1.0
+    else:
+        scale = min(available_w / bbox_w, available_h / bbox_h)
+    rendered_w = bbox_w * scale
+    rendered_h = bbox_h * scale
+    origin_x = (_VIEWBOX_W - rendered_w) / 2 - min(all_x) * scale
+    origin_y = (_VIEWBOX_H - rendered_h) / 2 - min(all_y) * scale
+
+    def tx(x: float, y: float) -> tuple[int, int]:
+        return round(x * scale + origin_x), round(y * scale + origin_y)
+
+    # Stable selector -> color index mapping in cell traversal order.
+    value_to_index: dict[tuple[str, ...], int] = {}
+    parts: list[str] = []
+    for cell in cells:
+        color_index = _color_index_for_cell(cell, selector_fields, value_to_index)
+        coords = " ".join(f"{x},{y}" for x, y in (tx(v[0], v[1]) for v in cell.vertices or ()))
+        parts.append(f"{color_index}:{coords}")
+
+    return ";".join(parts), len(cells), max(1, len(value_to_index))
+
+
+def _list_aperiodic_geometries() -> None:
+    print("Available aperiodic geometries (default depth shown in parens):")
+    for geometry in sorted(_APERIODIC_DEFAULT_DEPTHS):
+        print(f"  {geometry} ({_APERIODIC_DEFAULT_DEPTHS[geometry]})")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -230,7 +351,8 @@ def main(argv: list[str] | None = None) -> int:
         metavar="N",
         help=(
             "Number of distinct fill indices to cycle through (default: auto-detected "
-            "from face kinds — 1 for uniform Laves tilings, N for N distinct cell kinds)"
+            "from face kinds — 1 for uniform Laves tilings, N for N distinct cell kinds). "
+            "Periodic mode only."
         ),
     )
     parser.add_argument(
@@ -238,8 +360,45 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="List all available geometry keys and exit",
     )
+    parser.add_argument(
+        "--aperiodic",
+        action="store_true",
+        help=(
+            "Build the polygon data from a real depth-N aperiodic patch instead of "
+            "reading from periodic_face_patterns.json."
+        ),
+    )
+    parser.add_argument(
+        "--depth",
+        type=int,
+        default=None,
+        metavar="N",
+        help=(
+            "Aperiodic patch depth (default: per-family value in "
+            "_APERIODIC_DEFAULT_DEPTHS). Aperiodic mode only."
+        ),
+    )
 
     args = parser.parse_args(argv)
+
+    if args.aperiodic:
+        if args.list:
+            _list_aperiodic_geometries()
+            return 0
+        if not args.geometry:
+            parser.error("--geometry is required with --aperiodic (or use --list).")
+        depth = (
+            args.depth
+            if args.depth is not None
+            else _APERIODIC_DEFAULT_DEPTHS.get(args.geometry, 1)
+        )
+        polygon_data, cell_count, color_count = _aperiodic_polygon_data(args.geometry, depth)
+        print(f"// {args.geometry} depth {depth} -- {cell_count} cells, {color_count} color(s)")
+        quoted = f'"{args.geometry}"' if "-" in args.geometry else args.geometry
+        print(f"    {quoted}:")
+        print(f'        "{polygon_data}",')
+        return 0
+
     descriptors = _load_descriptors()
 
     if args.list:

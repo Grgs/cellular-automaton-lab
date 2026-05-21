@@ -8,6 +8,7 @@ from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from shapely.validation import explain_validity
 
+from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_MANIFEST
 from backend.simulation.topology import LatticeTopology
 
 
@@ -223,25 +224,18 @@ def build_topology_graph(topology: LatticeTopology) -> nx.Graph:
 
 
 def recommended_validation_options(geometry: str) -> dict[str, bool]:
-    # The pinwheel-2-1 canonical substitution mixes a small child (scale
-    # 1/sqrt(17)) with four large children (scale 2/sqrt(17)) per parent,
-    # which inherently produces T-junctions and point-only cell contacts.
-    # The cell-adjacency graph is connected at every depth (verified by
-    # ``check_graph_connectivity``), and overlap / edge-multiplicity
-    # checks remain meaningful, but Shapely's polygon-union surface
-    # component count can see depth-specific disconnections at points
-    # where cells touch only at vertices rather than along segments.
-    # Disable just the polygon surface check for this family; the other
-    # validation modes still apply.
-    if geometry == "pinwheel-2-1":
-        return {
-            "check_surface": False,
-            "check_overlaps": True,
-            "check_edge_multiplicity": True,
-            "check_graph_connectivity": True,
-        }
+    # ``check_surface`` is driven by the aperiodic family manifest's
+    # ``polygon_surface_check`` field: families whose substitution
+    # inherently produces T-junctions and point-only cell contacts (e.g.
+    # pinwheel-2-1) disable it because Shapely's polygon-union surface
+    # check sees depth-specific disconnections even though the
+    # cell-adjacency graph is connected. The other validation modes apply
+    # to every geometry; see docs/TILING_KNOWN_DEVIATIONS.md for the
+    # full rationale for any family that turns it off.
+    manifest_entry = APERIODIC_FAMILY_MANIFEST.get(geometry)
+    check_surface = manifest_entry.polygon_surface_check if manifest_entry is not None else True
     return {
-        "check_surface": True,
+        "check_surface": check_surface,
         "check_overlaps": True,
         "check_edge_multiplicity": True,
         "check_graph_connectivity": True,

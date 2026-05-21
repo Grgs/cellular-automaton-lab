@@ -66,8 +66,10 @@ def _depth_semantics(geometry: str) -> str:
     spec = REFERENCE_FAMILY_SPECS[geometry]
     if spec.sample_mode == "grid":
         return "grid sample"
-    if geometry in ("pinwheel", "pinwheel-2-1"):
-        return "exact affine substitution depth"
+    manifest_geometry = _contract_manifest_geometry(geometry)
+    manifest_entry = APERIODIC_FAMILY_MANIFEST.get(manifest_geometry)
+    if manifest_entry is not None:
+        return manifest_entry.depth_semantics_label
     return "substitution patch depth"
 
 
