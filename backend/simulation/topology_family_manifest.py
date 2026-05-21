@@ -476,56 +476,20 @@ GEOMETRY_MINIMUM_GRID_DIMENSIONS = {
 }
 
 
-__all__ = [
-    "AMMANN_BEENKER_GEOMETRY",
-    "ARCHIMEDEAN_31212_GEOMETRY",
-    "ARCHIMEDEAN_33336_GEOMETRY",
-    "ARCHIMEDEAN_33344_GEOMETRY",
-    "ARCHIMEDEAN_33434_GEOMETRY",
-    "ARCHIMEDEAN_3464_GEOMETRY",
-    "ARCHIMEDEAN_4612_GEOMETRY",
-    "ARCHIMEDEAN_488_GEOMETRY",
-    "CAIRO_GEOMETRY",
-    "CELL_SIZE_CONTROL",
-    "CHAIR_GEOMETRY",
-    "DEFAULT_MIN_GRID_SIZE",
-    "DEFAULT_SQUARE_RULE",
-    "DEFAULT_TOPOLOGY_PATCH_DEPTH",
-    "DELTOIDAL_HEXAGONAL_GEOMETRY",
-    "DELTOIDAL_TRIHEXAGONAL_GEOMETRY",
-    "EDGE_ADJACENCY",
-    "FLORET_PENTAGONAL_GEOMETRY",
-    "GEOMETRY_MINIMUM_GRID_DIMENSIONS",
-    "HAT_MONOTILE_GEOMETRY",
-    "HEX_GEOMETRY",
-    "KAGOME_GEOMETRY",
-    "KISRHOMBILLE_GEOMETRY",
-    "PATCH_DEPTH_CONTROL",
-    "PENROSE_GEOMETRY",
-    "PENROSE_P1_GEOMETRY",
-    "PENROSE_P1_PBS_GEOMETRY",
-    "PENROSE_P2_GEOMETRY",
-    "PENROSE_VERTEX_GEOMETRY",
-    "PICKER_GROUP_ORDER",
-    "PINWHEEL_2_1_GEOMETRY",
-    "PINWHEEL_GEOMETRY",
-    "PRISMATIC_PENTAGONAL_GEOMETRY",
-    "RHOMBILLE_GEOMETRY",
-    "ROBINSON_TRIANGLES_GEOMETRY",
-    "SHIELD_GEOMETRY",
-    "SNUB_SQUARE_DUAL_GEOMETRY",
-    "SPHINX_GEOMETRY",
-    "SPECTRE_GEOMETRY",
-    "DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY",
-    "SQUARE_GEOMETRY",
-    "TAYLOR_SOCOLAR_GEOMETRY",
-    "TETRAKIS_SQUARE_GEOMETRY",
-    "TOPOLOGY_FAMILY_MANIFEST",
-    "TopologyFamilyManifestEntry",
-    "TopologyFamilyVariantManifestEntry",
-    "TYPE_7_PENTAGONAL_GEOMETRY",
-    "TRIAKIS_TRIANGULAR_GEOMETRY",
-    "TRIANGLE_GEOMETRY",
-    "TUEBINGEN_TRIANGLE_GEOMETRY",
-    "VERTEX_ADJACENCY",
-]
+def _is_module_export(name: str, value: object) -> bool:
+    if name.startswith("_"):
+        return False
+    value_module = getattr(value, "__module__", None)
+    if value_module is None:
+        return True
+    if value_module == __name__:
+        return True
+    if type(value).__module__ in {"typing", "typing_extensions"}:
+        return True
+    return False
+
+
+# Auto-derive __all__ so adding a new geometry constant or family entry
+# doesn't require touching a hand-maintained list. See the matching
+# helper in aperiodic_family_manifest.py.
+__all__ = sorted(name for name, value in globals().items() if _is_module_export(name, value))

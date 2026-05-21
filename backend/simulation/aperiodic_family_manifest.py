@@ -364,67 +364,24 @@ def get_aperiodic_family_manifest_entry(geometry: str) -> AperiodicFamilyManifes
         raise ValueError(f"Unsupported aperiodic family {geometry!r}.") from error
 
 
-__all__ = [
-    "AMMANN_BEENKER_GEOMETRY",
-    "AMMANN_RHOMB_KIND",
-    "AMMANN_SQUARE_KIND",
-    "APERIODIC_FAMILY_IDS",
-    "APERIODIC_FAMILY_MANIFEST",
-    "CHAIR_GEOMETRY",
-    "CHAIR_KIND",
-    "DART_HALF_OBTUSE_KIND",
-    "DART_KIND",
-    "DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY",
-    "DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND",
-    "DODECAGONAL_SQUARE_TRIANGLE_TILE_FAMILY",
-    "DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND",
-    "EXPERIMENTAL_APERIODIC_FAMILY_IDS",
-    "HAT_KIND",
-    "HAT_MONOTILE_GEOMETRY",
-    "HAT_TILE_FAMILY",
-    "KITE_HALF_ACUTE_KIND",
-    "KITE_KIND",
-    "P1_BOAT_KIND",
-    "P1_DIAMOND_KIND",
-    "P1_PENTAGON_KIND",
-    "P1_STAR_KIND",
-    "PENROSE_GEOMETRY",
-    "PENROSE_P1_GEOMETRY",
-    "PENROSE_P1_PBS_GEOMETRY",
-    "PENROSE_P1_TILE_FAMILY",
-    "PENROSE_P2_GEOMETRY",
-    "PENROSE_VERTEX_GEOMETRY",
-    "PINWHEEL_2_1_GEOMETRY",
-    "PINWHEEL_2_1_LARGE_KIND",
-    "PINWHEEL_2_1_SMALL_KIND",
-    "PINWHEEL_2_1_TILE_FAMILY",
-    "PINWHEEL_GEOMETRY",
-    "PINWHEEL_TILE_FAMILY",
-    "PINWHEEL_TRIANGLE_KIND",
-    "ROBINSON_THICK_KIND",
-    "ROBINSON_THIN_KIND",
-    "ROBINSON_TILE_FAMILY",
-    "ROBINSON_TRIANGLES_GEOMETRY",
-    "SHIELD_GEOMETRY",
-    "SHIELD_SHIELD_KIND",
-    "SHIELD_SQUARE_KIND",
-    "SHIELD_TILE_FAMILY",
-    "SHIELD_TRIANGLE_KIND",
-    "SPECTRE_GEOMETRY",
-    "SPECTRE_KIND",
-    "SPHINX_GEOMETRY",
-    "SPHINX_KIND",
-    "TAYLOR_HALF_HEX_KIND",
-    "TAYLOR_SOCOLAR_GEOMETRY",
-    "THICK_RHOMB_KIND",
-    "THIN_RHOMB_KIND",
-    "TUEBINGEN_THICK_KIND",
-    "TUEBINGEN_THIN_KIND",
-    "TUEBINGEN_TILE_FAMILY",
-    "TUEBINGEN_TRIANGLE_GEOMETRY",
-    "AperiodicBuilderKind",
-    "AperiodicFamilyManifestEntry",
-    "AperiodicImplementationStatus",
-    "AperiodicPickerGroup",
-    "get_aperiodic_family_manifest_entry",
-]
+def _is_module_export(name: str, value: object) -> bool:
+    if name.startswith("_"):
+        return False
+    # Re-exported imports like ``Literal`` carry their original ``__module__``;
+    # exclude them while still admitting locally-defined classes / functions
+    # and ``Literal[...]`` type aliases (whose value's *type* lives in typing).
+    value_module = getattr(value, "__module__", None)
+    if value_module is None:
+        return True  # plain constants (strings, dicts, tuples, ...)
+    if value_module == __name__:
+        return True
+    if type(value).__module__ in {"typing", "typing_extensions"}:
+        return True
+    return False
+
+
+# Auto-derive __all__ so adding a new GEOMETRY / KIND / TILE_FAMILY
+# constant or manifest entry doesn't require touching a hand-maintained
+# list (which has accidentally been the source of "forgot to export"
+# CI failures more than once).
+__all__ = sorted(name for name, value in globals().items() if _is_module_export(name, value))
