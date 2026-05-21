@@ -27,7 +27,10 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
+
+if TYPE_CHECKING:
+    from backend.simulation.topology import LatticeCell
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -60,7 +63,6 @@ _APERIODIC_DEFAULT_DEPTHS: dict[str, int] = {
     "ammann-beenker": 1,
     "dodecagonal-square-triangle": 0,
     "penrose-p3-rhombs": 1,
-    "penrose-p3-rhombs-vertex": 1,
     "penrose-p2-kite-dart": 1,
     "penrose-p1-pentagon-diamond": 0,
     "penrose-p1-pentagon-boat-star": 0,
@@ -267,7 +269,9 @@ def _load_palette_selector_fields(geometry: str) -> tuple[str, ...]:
 
 
 def _color_index_for_cell(
-    cell, selector_fields: tuple[str, ...], value_to_index: dict[tuple[str, ...], int]
+    cell: LatticeCell,
+    selector_fields: tuple[str, ...],
+    value_to_index: dict[tuple[str, ...], int],
 ) -> int:
     """Assign a stable color index to a cell based on its selector-field values."""
     if not selector_fields:
@@ -289,9 +293,13 @@ def _aperiodic_polygon_data(geometry: str, depth: int) -> tuple[str, int, int]:
     patch = build_topology(geometry, 0, 0, depth)
     selector_fields = _load_palette_selector_fields(geometry)
 
-    cells = patch.cells
-    all_x = [v[0] for c in cells for v in c.vertices]
-    all_y = [v[1] for c in cells for v in c.vertices]
+    # Aperiodic cells always carry vertex polygons; narrow the optional type
+    # so mypy stops complaining about ``None`` iteration on the bbox walk.
+    cells = [cell for cell in patch.cells if cell.vertices]
+    if not cells:
+        raise ValueError(f"Patch for {geometry!r} at depth {depth} has no polygon cells.")
+    all_x = [v[0] for c in cells for v in c.vertices or ()]
+    all_y = [v[1] for c in cells for v in c.vertices or ()]
     if not all_x:
         raise ValueError(f"Patch for {geometry!r} at depth {depth} has no cells.")
     bbox_w = max(all_x) - min(all_x)
@@ -317,7 +325,7 @@ def _aperiodic_polygon_data(geometry: str, depth: int) -> tuple[str, int, int]:
     parts: list[str] = []
     for cell in cells:
         color_index = _color_index_for_cell(cell, selector_fields, value_to_index)
-        coords = " ".join(f"{x},{y}" for x, y in (tx(v[0], v[1]) for v in cell.vertices))
+        coords = " ".join(f"{x},{y}" for x, y in (tx(v[0], v[1]) for v in cell.vertices or ()))
         parts.append(f"{color_index}:{coords}")
 
     return ";".join(parts), len(cells), max(1, len(value_to_index))
