@@ -2,7 +2,7 @@
 
 Cellular Automaton Lab is a browser-based cellular automata playground built around topology-first boards. It supports classic lattices, periodic mixed tilings, and finite aperiodic patches in one app, with a Flask backend and a Vite-built TypeScript frontend.
 
-Public release status: `v0.2.0` preview. The preview is usable for public evaluation, local experimentation, and contribution, but it is not a long-term API or feature-stability promise.
+Public release status: `v0.3.0` preview. The preview is usable for public evaluation, local experimentation, and contribution, but it is not a long-term API or feature-stability promise.
 
 Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://grgs.github.io/cellular-automaton-lab/)
 
@@ -18,7 +18,7 @@ It is intended for comparing how familiar automata behave on different local nei
 
 ## Highlights
 
-- 37 shipped tiling families across classic grids, periodic mixed tilings, Penrose variants, monotiles, and other aperiodic patches
+- 39 shipped tiling families (3 regular grids, 19 periodic mixed tilings, 17 aperiodic patches including Penrose variants and monotiles)
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
@@ -96,36 +96,15 @@ The server respects `HOST`, `PORT`, and `APP_INSTANCE_PATH`. If `static/dist/man
 
 ## Common Checks
 
-For ordinary frontend work:
+The canonical "what to run" list lives in [`docs/ONBOARDING.md`](docs/ONBOARDING.md#run-tests). At a glance:
 
 ```powershell
-npm run check:frontend
+npm run check:frontend     # frontend lint + build + vitest
+npm run check:python       # ruff lint + ruff format check + mypy
+npm run check:ci-local     # the broad local-CI sweep
 ```
 
-For Python lint, formatting, and type-check guardrails (runs ruff lint + ruff format check + mypy):
-
-```powershell
-npm run check:python
-```
-
-For local CI-style confidence:
-
-```powershell
-npm run check:ci-local
-```
-
-For release confidence, also run:
-
-```powershell
-npm run build:frontend:standalone
-npm run smoke:standalone
-npm run check:doc-links
-npm run audit:supply-chain
-py -3 -m unittest discover -s tests -p "test_*.py"
-py -3 -m pre_commit run --hook-stage pre-push --all-files
-```
-
-For choosing narrower checks by change type, see [Testing changes](docs/TESTING_CHANGES.md). For the full strategy and browser diagnostics, see [Testing strategy](docs/TESTING.md).
+For choosing narrower checks by change type, see [Testing changes](docs/TESTING_CHANGES.md). For the full strategy, browser diagnostics, and the release-confidence sweep, see [Testing strategy](docs/TESTING.md) and [Maintenance](docs/MAINTENANCE.md#public-release-process).
 
 ## Developer Guides
 
@@ -137,7 +116,7 @@ For choosing narrower checks by change type, see [Testing changes](docs/TESTING_
 
 ## Release Surface
 
-The public `v0.2.0` preview ships through three surfaces:
+The public `v0.3.0` preview ships through three surfaces:
 
 - tagged GitHub source releases
 - the GitHub Pages standalone demo

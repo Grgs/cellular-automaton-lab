@@ -1,5 +1,12 @@
 # Plan: Canonical Penrose Substitution Rewrite
 
+> **Status: historical investigation, kept for context. Not current state.**
+> The half-tile substitution rewrite explored here did not converge; the
+> shipped Penrose families continue to use the de Bruijn pentagrid path.
+> See [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md) for the
+> currently-documented status, and [`backend/simulation/penrose.py`](../backend/simulation/penrose.py)
+> for the implementation actually in use.
+
 This document scopes the future fix for the non-canonical Penrose substitution
 shared by `penrose-p2-kite-dart`, `penrose-p3-rhombs`, `penrose-p3-rhombs-vertex`,
 and `robinson-triangles`. Background on the deviation is in

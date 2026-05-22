@@ -1,5 +1,12 @@
 # Tiling Diagnosis Tooling Notes
 
+> **Status: internal process notes from one focused session, not user-facing
+> reference.** Some of the gaps named here have since been addressed
+> (auto-thumbnail tool, manifest-driven branches, shared substitution
+> helper). Read for context on *how* tiling diagnosis happens, not as a
+> menu of currently-recommended steps. For current testing guidance see
+> [TESTING_TILINGS.md](TESTING_TILINGS.md).
+
 This note captures process findings from one focused tiling-fix attempt where the
 goal was not to land a tiling change, but to learn which tools are still missing
 for efficient diagnosis.

@@ -112,7 +112,8 @@ and `backend/rules/hexlife.py` are the closest reference.
 | Frontend unit tests | `npm run test:frontend` |
 | Frontend lint suite | `npm run lint:frontend` |
 | Linkinator + doc links | `npm run check:doc-links` |
-| Mypy | `python -m mypy --config-file mypy.ini` |
+| Mypy | `npm run typecheck:python` |
+| Python lint + format + mypy (one shot) | `npm run check:python` |
 | Full reference verification | `python tools/verify_reference_tilings.py` |
 | Tiling validation | `python tools/validate_tilings.py` |
 | Playwright (browser) | `npm run test:e2e:playwright` |

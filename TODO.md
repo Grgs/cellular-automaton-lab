@@ -4,7 +4,7 @@ Active work. Completed work lives in [CHANGELOG.md](CHANGELOG.md).
 
 ## Public Release Follow-up
 
-The `v0.1.0` public preview has been released. Keep this section for follow-up work that affects future preview releases or the published standalone demo.
+The `v0.3.0` public preview has been released (after `v0.1.0` and `v0.2.0`). Keep this section for follow-up work that affects future preview releases or the published standalone demo.
 
 ### Current preview limitations
 
