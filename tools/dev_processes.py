@@ -217,8 +217,15 @@ def terminate_process(process: RepoProcess, *, grace_seconds: float) -> str:
             return "terminated"
         time.sleep(0.1)
 
+    # ``signal.SIGKILL`` only exists on POSIX; this whole module is Linux-only
+    # at runtime (pid_is_running above reads /proc/{pid}/stat) but mypy on
+    # Windows still type-checks the source. Resolve dynamically so the
+    # cross-platform type-check passes; the fallback only matters if someone
+    # ever calls this on Windows, where SIGTERM is already a hard kill via
+    # TerminateProcess().
+    hard_kill_signal = getattr(signal, "SIGKILL", signal.SIGTERM)
     try:
-        os.kill(process.pid, signal.SIGKILL)
+        os.kill(process.pid, hard_kill_signal)
     except ProcessLookupError:
         return "terminated"
     except PermissionError:

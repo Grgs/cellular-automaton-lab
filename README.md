@@ -102,7 +102,7 @@ For ordinary frontend work:
 npm run check:frontend
 ```
 
-For Python lint and formatting guardrails:
+For Python lint, formatting, and type-check guardrails (runs ruff lint + ruff format check + mypy):
 
 ```powershell
 npm run check:python
@@ -121,7 +121,6 @@ npm run build:frontend:standalone
 npm run smoke:standalone
 npm run check:doc-links
 npm run audit:supply-chain
-py -3 -m mypy --config-file mypy.ini
 py -3 -m unittest discover -s tests -p "test_*.py"
 py -3 -m pre_commit run --hook-stage pre-push --all-files
 ```

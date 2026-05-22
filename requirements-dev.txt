@@ -39,7 +39,7 @@ hypothesis==6.151.9
     # via -r requirements-dev.in
 identify==2.6.19
     # via pre-commit
-idna==3.13
+idna==3.16
     # via requests
 iniconfig==2.3.0
     # via pytest
@@ -138,7 +138,7 @@ typing-extensions==4.15.0
     # via
     #   mypy
     #   pyee
-urllib3==2.6.3
+urllib3==2.7.0
     # via requests
 virtualenv==21.3.0
     # via pre-commit
