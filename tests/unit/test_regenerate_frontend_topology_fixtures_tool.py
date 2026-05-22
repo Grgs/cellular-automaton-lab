@@ -6,7 +6,9 @@ import unittest
 from pathlib import Path
 
 from tools.regenerate_frontend_topology_fixtures import (
+    CONTENT_REVISION_HASH_LENGTH,
     DEFAULT_FIXTURE_MANIFEST_PATH,
+    compute_content_revision,
     discover_fixture_targets,
     fixture_drift_lines,
     load_fixture_targets,
@@ -85,7 +87,6 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
                                 "height": 0,
                                 "patchDepth": 3,
                                 "cellSize": 12,
-                                "topologyRevision": "fixture-pinwheel-depth-3",
                             }
                         ]
                     },
@@ -103,6 +104,33 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
             self.assertEqual(fixture_drift_lines(targets), ["pinwheel-depth-3"])
             write_regenerated_fixtures(targets)
             self.assertEqual(fixture_drift_lines(targets), [])
+
+    def test_compute_content_revision_is_stable_and_ignores_existing_revision(self) -> None:
+        base_payload = {
+            "topology_spec": {"tiling_family": "demo"},
+            "cells": [{"id": "c:0:0", "kind": "cell", "neighbors": []}],
+            "topology_revision": "anything",
+        }
+        first_hash = compute_content_revision(base_payload)
+        # Same content with a different placeholder revision must hash identically.
+        second_payload = dict(base_payload, topology_revision="different")
+        self.assertEqual(first_hash, compute_content_revision(second_payload))
+        self.assertEqual(len(first_hash), CONTENT_REVISION_HASH_LENGTH)
+        # Changing actual content must change the hash.
+        mutated_payload = dict(
+            base_payload,
+            cells=[{"id": "c:0:0", "kind": "cell", "neighbors": ["c:1:0"]}],
+        )
+        self.assertNotEqual(first_hash, compute_content_revision(mutated_payload))
+
+    def test_regenerated_payload_revision_matches_computed_content_hash(self) -> None:
+        shield_target = next(
+            target for target in load_fixture_targets() if target.name == "shield-depth-3"
+        )
+        regenerated = regenerate_fixture_payload(shield_target)
+        topology = regenerated["topology"]
+        embedded_revision = topology["topology_revision"]
+        self.assertEqual(embedded_revision, compute_content_revision(topology))
 
     def test_main_check_all_passes_for_checked_in_manifest(self) -> None:
         self.assertEqual(main(["--all", "--check"]), 0)

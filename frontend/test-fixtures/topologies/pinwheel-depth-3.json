@@ -7646,7 +7646,7 @@
         ]
       }
     ],
-    "topology_revision": "fixture-pinwheel-depth-3-v2",
+    "topology_revision": "9c53bff7",
     "topology_spec": {
       "adjacency_mode": "edge",
       "height": 12,

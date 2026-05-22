@@ -3188,7 +3188,7 @@
         ]
       }
     ],
-    "topology_revision": "fixture-sphinx-depth-3",
+    "topology_revision": "4c240e0a",
     "topology_spec": {
       "adjacency_mode": "edge",
       "height": 14,

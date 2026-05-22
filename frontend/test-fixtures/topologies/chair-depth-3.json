@@ -1,21 +1,15 @@
 {
+  "cellSize": 12,
   "geometry": "chair",
-  "width": 0,
   "height": 0,
   "patchDepth": 3,
-  "cellSize": 12,
   "topology": {
-    "topology_spec": {
-      "tiling_family": "chair",
-      "adjacency_mode": "edge",
-      "sizing_mode": "patch_depth",
-      "width": 2,
-      "height": 2,
-      "patch_depth": 3
-    },
-    "topology_revision": "chair-depth-3-v2",
     "cells": [
       {
+        "center": {
+          "x": 0.104167,
+          "y": 0.104167
+        },
         "id": "chair:root.child0.child0.child0:o0:sp125000:0:0",
         "kind": "chair",
         "neighbors": [
@@ -23,10 +17,7 @@
           "chair:root.child0.child0.child2:o1:sp125000:p250000:0",
           "chair:root.child0.child0.child3:o3:sp125000:0:p250000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 0.104167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.0,
@@ -60,10 +51,13 @@
             "x": 0.125,
             "y": 0.0
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.229167,
+          "y": 0.229167
+        },
         "id": "chair:root.child0.child0.child1:o0:sp125000:p125000:p125000",
         "kind": "chair",
         "neighbors": [
@@ -72,10 +66,7 @@
           "chair:root.child0.child0.child3:o3:sp125000:0:p250000",
           "chair:root.child0.child1.child0:o0:sp125000:p250000:p250000"
         ],
-        "center": {
-          "x": 0.229167,
-          "y": 0.229167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.125,
@@ -109,10 +100,13 @@
             "x": 0.25,
             "y": 0.125
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.395833,
+          "y": 0.104167
+        },
         "id": "chair:root.child0.child0.child2:o1:sp125000:p250000:0",
         "kind": "chair",
         "neighbors": [
@@ -121,10 +115,7 @@
           "chair:root.child0.child1.child0:o0:sp125000:p250000:p250000",
           "chair:root.child0.child2.child0:o0:sp125000:p500000:0"
         ],
-        "center": {
-          "x": 0.395833,
-          "y": 0.104167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 0.25,
@@ -158,10 +149,13 @@
             "x": 0.375,
             "y": 0.0
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.104167,
+          "y": 0.395833
+        },
         "id": "chair:root.child0.child0.child3:o3:sp125000:0:p250000",
         "kind": "chair",
         "neighbors": [
@@ -170,10 +164,7 @@
           "chair:root.child0.child1.child0:o0:sp125000:p250000:p250000",
           "chair:root.child0.child3.child0:o0:sp125000:0:p500000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 0.395833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.125,
@@ -207,10 +198,13 @@
             "x": 0.125,
             "y": 0.375
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.354167,
+          "y": 0.354167
+        },
         "id": "chair:root.child0.child1.child0:o0:sp125000:p250000:p250000",
         "kind": "chair",
         "neighbors": [
@@ -221,10 +215,7 @@
           "chair:root.child0.child1.child2:o1:sp125000:p500000:p250000",
           "chair:root.child0.child1.child3:o3:sp125000:p250000:p500000"
         ],
-        "center": {
-          "x": 0.354167,
-          "y": 0.354167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.25,
@@ -258,10 +249,13 @@
             "x": 0.375,
             "y": 0.25
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.479167,
+          "y": 0.479167
+        },
         "id": "chair:root.child0.child1.child1:o0:sp125000:p375000:p375000",
         "kind": "chair",
         "neighbors": [
@@ -270,10 +264,7 @@
           "chair:root.child0.child1.child3:o3:sp125000:p250000:p500000",
           "chair:root.child1.child0.child0:o0:sp125000:p500000:p500000"
         ],
-        "center": {
-          "x": 0.479167,
-          "y": 0.479167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.375,
@@ -307,10 +298,13 @@
             "x": 0.5,
             "y": 0.375
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.645833,
+          "y": 0.354167
+        },
         "id": "chair:root.child0.child1.child2:o1:sp125000:p500000:p250000",
         "kind": "chair",
         "neighbors": [
@@ -321,10 +315,7 @@
           "chair:root.child0.child2.child3:o2:sp125000:p750000:p250000",
           "chair:root.child1.child0.child0:o0:sp125000:p500000:p500000"
         ],
-        "center": {
-          "x": 0.645833,
-          "y": 0.354167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 0.5,
@@ -358,10 +349,13 @@
             "x": 0.625,
             "y": 0.25
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.354167,
+          "y": 0.645833
+        },
         "id": "chair:root.child0.child1.child3:o3:sp125000:p250000:p500000",
         "kind": "chair",
         "neighbors": [
@@ -372,10 +366,7 @@
           "chair:root.child0.child3.child3:o3:sp125000:p125000:p625000",
           "chair:root.child1.child0.child0:o0:sp125000:p500000:p500000"
         ],
-        "center": {
-          "x": 0.354167,
-          "y": 0.645833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.375,
@@ -409,10 +400,13 @@
             "x": 0.375,
             "y": 0.625
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.604167,
+          "y": 0.104167
+        },
         "id": "chair:root.child0.child2.child0:o0:sp125000:p500000:0",
         "kind": "chair",
         "neighbors": [
@@ -421,10 +415,7 @@
           "chair:root.child0.child2.child1:o1:sp125000:p625000:p125000",
           "chair:root.child0.child2.child2:o1:sp125000:p750000:0"
         ],
-        "center": {
-          "x": 0.604167,
-          "y": 0.104167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.5,
@@ -458,10 +449,13 @@
             "x": 0.625,
             "y": 0.0
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.770833,
+          "y": 0.229167
+        },
         "id": "chair:root.child0.child2.child1:o1:sp125000:p625000:p125000",
         "kind": "chair",
         "neighbors": [
@@ -470,10 +464,7 @@
           "chair:root.child0.child2.child2:o1:sp125000:p750000:0",
           "chair:root.child0.child2.child3:o2:sp125000:p750000:p250000"
         ],
-        "center": {
-          "x": 0.770833,
-          "y": 0.229167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 0.625,
@@ -507,10 +498,13 @@
             "x": 0.75,
             "y": 0.125
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.895833,
+          "y": 0.104167
+        },
         "id": "chair:root.child0.child2.child2:o1:sp125000:p750000:0",
         "kind": "chair",
         "neighbors": [
@@ -519,10 +513,7 @@
           "chair:root.child0.child2.child3:o2:sp125000:p750000:p250000",
           "chair:root.child2.child0.child0:o0:sp125000:p1000000:0"
         ],
-        "center": {
-          "x": 0.895833,
-          "y": 0.104167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 0.75,
@@ -556,10 +547,13 @@
             "x": 0.875,
             "y": 0.0
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.895833,
+          "y": 0.395833
+        },
         "id": "chair:root.child0.child2.child3:o2:sp125000:p750000:p250000",
         "kind": "chair",
         "neighbors": [
@@ -569,10 +563,7 @@
           "chair:root.child1.child0.child2:o1:sp125000:p750000:p500000",
           "chair:root.child2.child0.child3:o3:sp125000:p1000000:p250000"
         ],
-        "center": {
-          "x": 0.895833,
-          "y": 0.395833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 1.0,
@@ -606,10 +597,13 @@
             "x": 1.0,
             "y": 0.375
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.104167,
+          "y": 0.604167
+        },
         "id": "chair:root.child0.child3.child0:o0:sp125000:0:p500000",
         "kind": "chair",
         "neighbors": [
@@ -618,10 +612,7 @@
           "chair:root.child0.child3.child2:o3:sp125000:0:p750000",
           "chair:root.child0.child3.child3:o3:sp125000:p125000:p625000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 0.604167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.0,
@@ -655,10 +646,13 @@
             "x": 0.125,
             "y": 0.5
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.395833,
+          "y": 0.895833
+        },
         "id": "chair:root.child0.child3.child1:o2:sp125000:p250000:p750000",
         "kind": "chair",
         "neighbors": [
@@ -668,10 +662,7 @@
           "chair:root.child1.child0.child3:o3:sp125000:p500000:p750000",
           "chair:root.child3.child0.child2:o1:sp125000:p250000:p1000000"
         ],
-        "center": {
-          "x": 0.395833,
-          "y": 0.895833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 0.5,
@@ -705,10 +696,13 @@
             "x": 0.5,
             "y": 0.875
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.104167,
+          "y": 0.895833
+        },
         "id": "chair:root.child0.child3.child2:o3:sp125000:0:p750000",
         "kind": "chair",
         "neighbors": [
@@ -717,10 +711,7 @@
           "chair:root.child0.child3.child3:o3:sp125000:p125000:p625000",
           "chair:root.child3.child0.child0:o0:sp125000:0:p1000000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 0.895833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.125,
@@ -754,10 +745,13 @@
             "x": 0.125,
             "y": 0.875
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.229167,
+          "y": 0.770833
+        },
         "id": "chair:root.child0.child3.child3:o3:sp125000:p125000:p625000",
         "kind": "chair",
         "neighbors": [
@@ -766,10 +760,7 @@
           "chair:root.child0.child3.child1:o2:sp125000:p250000:p750000",
           "chair:root.child0.child3.child2:o3:sp125000:0:p750000"
         ],
-        "center": {
-          "x": 0.229167,
-          "y": 0.770833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.25,
@@ -803,10 +794,13 @@
             "x": 0.25,
             "y": 0.75
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.604167,
+          "y": 0.604167
+        },
         "id": "chair:root.child1.child0.child0:o0:sp125000:p500000:p500000",
         "kind": "chair",
         "neighbors": [
@@ -817,10 +811,7 @@
           "chair:root.child1.child0.child2:o1:sp125000:p750000:p500000",
           "chair:root.child1.child0.child3:o3:sp125000:p500000:p750000"
         ],
-        "center": {
-          "x": 0.604167,
-          "y": 0.604167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.5,
@@ -854,10 +845,13 @@
             "x": 0.625,
             "y": 0.5
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.729167,
+          "y": 0.729167
+        },
         "id": "chair:root.child1.child0.child1:o0:sp125000:p625000:p625000",
         "kind": "chair",
         "neighbors": [
@@ -866,10 +860,7 @@
           "chair:root.child1.child0.child3:o3:sp125000:p500000:p750000",
           "chair:root.child1.child1.child0:o0:sp125000:p750000:p750000"
         ],
-        "center": {
-          "x": 0.729167,
-          "y": 0.729167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.625,
@@ -903,10 +894,13 @@
             "x": 0.75,
             "y": 0.625
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.895833,
+          "y": 0.604167
+        },
         "id": "chair:root.child1.child0.child2:o1:sp125000:p750000:p500000",
         "kind": "chair",
         "neighbors": [
@@ -916,10 +910,7 @@
           "chair:root.child1.child1.child0:o0:sp125000:p750000:p750000",
           "chair:root.child1.child2.child0:o0:sp125000:p1000000:p500000"
         ],
-        "center": {
-          "x": 0.895833,
-          "y": 0.604167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 0.75,
@@ -953,10 +944,13 @@
             "x": 0.875,
             "y": 0.5
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.604167,
+          "y": 0.895833
+        },
         "id": "chair:root.child1.child0.child3:o3:sp125000:p500000:p750000",
         "kind": "chair",
         "neighbors": [
@@ -966,10 +960,7 @@
           "chair:root.child1.child1.child0:o0:sp125000:p750000:p750000",
           "chair:root.child1.child3.child0:o0:sp125000:p500000:p1000000"
         ],
-        "center": {
-          "x": 0.604167,
-          "y": 0.895833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.625,
@@ -1003,10 +994,13 @@
             "x": 0.625,
             "y": 0.875
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.854167,
+          "y": 0.854167
+        },
         "id": "chair:root.child1.child1.child0:o0:sp125000:p750000:p750000",
         "kind": "chair",
         "neighbors": [
@@ -1017,10 +1011,7 @@
           "chair:root.child1.child1.child2:o1:sp125000:p1000000:p750000",
           "chair:root.child1.child1.child3:o3:sp125000:p750000:p1000000"
         ],
-        "center": {
-          "x": 0.854167,
-          "y": 0.854167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.75,
@@ -1054,10 +1045,13 @@
             "x": 0.875,
             "y": 0.75
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.979167,
+          "y": 0.979167
+        },
         "id": "chair:root.child1.child1.child1:o0:sp125000:p875000:p875000",
         "kind": "chair",
         "neighbors": [
@@ -1065,10 +1059,7 @@
           "chair:root.child1.child1.child2:o1:sp125000:p1000000:p750000",
           "chair:root.child1.child1.child3:o3:sp125000:p750000:p1000000"
         ],
-        "center": {
-          "x": 0.979167,
-          "y": 0.979167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.875,
@@ -1102,10 +1093,13 @@
             "x": 1.0,
             "y": 0.875
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 1.145833,
+          "y": 0.854167
+        },
         "id": "chair:root.child1.child1.child2:o1:sp125000:p1000000:p750000",
         "kind": "chair",
         "neighbors": [
@@ -1115,10 +1109,7 @@
           "chair:root.child1.child2.child1:o1:sp125000:p1125000:p625000",
           "chair:root.child1.child2.child3:o2:sp125000:p1250000:p750000"
         ],
-        "center": {
-          "x": 1.145833,
-          "y": 0.854167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.0,
@@ -1152,10 +1143,13 @@
             "x": 1.125,
             "y": 0.75
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.854167,
+          "y": 1.145833
+        },
         "id": "chair:root.child1.child1.child3:o3:sp125000:p750000:p1000000",
         "kind": "chair",
         "neighbors": [
@@ -1165,10 +1159,7 @@
           "chair:root.child1.child3.child1:o2:sp125000:p750000:p1250000",
           "chair:root.child1.child3.child3:o3:sp125000:p625000:p1125000"
         ],
-        "center": {
-          "x": 0.854167,
-          "y": 1.145833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.875,
@@ -1202,10 +1193,13 @@
             "x": 0.875,
             "y": 1.125
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 1.104167,
+          "y": 0.604167
+        },
         "id": "chair:root.child1.child2.child0:o0:sp125000:p1000000:p500000",
         "kind": "chair",
         "neighbors": [
@@ -1215,10 +1209,7 @@
           "chair:root.child1.child2.child2:o1:sp125000:p1250000:p500000",
           "chair:root.child2.child0.child3:o3:sp125000:p1000000:p250000"
         ],
-        "center": {
-          "x": 1.104167,
-          "y": 0.604167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 1.0,
@@ -1252,10 +1243,13 @@
             "x": 1.125,
             "y": 0.5
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 1.270833,
+          "y": 0.729167
+        },
         "id": "chair:root.child1.child2.child1:o1:sp125000:p1125000:p625000",
         "kind": "chair",
         "neighbors": [
@@ -1264,10 +1258,7 @@
           "chair:root.child1.child2.child2:o1:sp125000:p1250000:p500000",
           "chair:root.child1.child2.child3:o2:sp125000:p1250000:p750000"
         ],
-        "center": {
-          "x": 1.270833,
-          "y": 0.729167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.125,
@@ -1301,10 +1292,13 @@
             "x": 1.25,
             "y": 0.625
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.395833,
+          "y": 0.604167
+        },
         "id": "chair:root.child1.child2.child2:o1:sp125000:p1250000:p500000",
         "kind": "chair",
         "neighbors": [
@@ -1315,10 +1309,7 @@
           "chair:root.child2.child1.child1:o1:sp125000:p1375000:p375000",
           "chair:root.child2.child1.child3:o2:sp125000:p1500000:p500000"
         ],
-        "center": {
-          "x": 1.395833,
-          "y": 0.604167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.25,
@@ -1352,10 +1343,13 @@
             "x": 1.375,
             "y": 0.5
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.395833,
+          "y": 0.895833
+        },
         "id": "chair:root.child1.child2.child3:o2:sp125000:p1250000:p750000",
         "kind": "chair",
         "neighbors": [
@@ -1364,10 +1358,7 @@
           "chair:root.child1.child2.child2:o1:sp125000:p1250000:p500000",
           "chair:root.child2.child3.child3:o3:sp125000:p1500000:p750000"
         ],
-        "center": {
-          "x": 1.395833,
-          "y": 0.895833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 1.5,
@@ -1401,10 +1392,13 @@
             "x": 1.5,
             "y": 0.875
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.604167,
+          "y": 1.104167
+        },
         "id": "chair:root.child1.child3.child0:o0:sp125000:p500000:p1000000",
         "kind": "chair",
         "neighbors": [
@@ -1414,10 +1408,7 @@
           "chair:root.child1.child3.child3:o3:sp125000:p625000:p1125000",
           "chair:root.child3.child0.child2:o1:sp125000:p250000:p1000000"
         ],
-        "center": {
-          "x": 0.604167,
-          "y": 1.104167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.5,
@@ -1451,10 +1442,13 @@
             "x": 0.625,
             "y": 1.0
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.895833,
+          "y": 1.395833
+        },
         "id": "chair:root.child1.child3.child1:o2:sp125000:p750000:p1250000",
         "kind": "chair",
         "neighbors": [
@@ -1463,10 +1457,7 @@
           "chair:root.child1.child3.child3:o3:sp125000:p625000:p1125000",
           "chair:root.child3.child1.child0:o1:sp125000:p750000:p1500000"
         ],
-        "center": {
-          "x": 0.895833,
-          "y": 1.395833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 1.0,
@@ -1500,10 +1491,13 @@
             "x": 1.0,
             "y": 1.375
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.604167,
+          "y": 1.395833
+        },
         "id": "chair:root.child1.child3.child2:o3:sp125000:p500000:p1250000",
         "kind": "chair",
         "neighbors": [
@@ -1514,10 +1508,7 @@
           "chair:root.child3.child3.child1:o2:sp125000:p500000:p1500000",
           "chair:root.child3.child3.child3:o3:sp125000:p375000:p1375000"
         ],
-        "center": {
-          "x": 0.604167,
-          "y": 1.395833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.625,
@@ -1551,10 +1542,13 @@
             "x": 0.625,
             "y": 1.375
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.729167,
+          "y": 1.270833
+        },
         "id": "chair:root.child1.child3.child3:o3:sp125000:p625000:p1125000",
         "kind": "chair",
         "neighbors": [
@@ -1563,10 +1557,7 @@
           "chair:root.child1.child3.child1:o2:sp125000:p750000:p1250000",
           "chair:root.child1.child3.child2:o3:sp125000:p500000:p1250000"
         ],
-        "center": {
-          "x": 0.729167,
-          "y": 1.270833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.75,
@@ -1600,10 +1591,13 @@
             "x": 0.75,
             "y": 1.25
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 1.104167,
+          "y": 0.104167
+        },
         "id": "chair:root.child2.child0.child0:o0:sp125000:p1000000:0",
         "kind": "chair",
         "neighbors": [
@@ -1612,10 +1606,7 @@
           "chair:root.child2.child0.child2:o1:sp125000:p1250000:0",
           "chair:root.child2.child0.child3:o3:sp125000:p1000000:p250000"
         ],
-        "center": {
-          "x": 1.104167,
-          "y": 0.104167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 1.0,
@@ -1649,10 +1640,13 @@
             "x": 1.125,
             "y": 0.0
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 1.229167,
+          "y": 0.229167
+        },
         "id": "chair:root.child2.child0.child1:o0:sp125000:p1125000:p125000",
         "kind": "chair",
         "neighbors": [
@@ -1661,10 +1655,7 @@
           "chair:root.child2.child0.child3:o3:sp125000:p1000000:p250000",
           "chair:root.child2.child1.child0:o0:sp125000:p1250000:p250000"
         ],
-        "center": {
-          "x": 1.229167,
-          "y": 0.229167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 1.125,
@@ -1698,10 +1689,13 @@
             "x": 1.25,
             "y": 0.125
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 1.395833,
+          "y": 0.104167
+        },
         "id": "chair:root.child2.child0.child2:o1:sp125000:p1250000:0",
         "kind": "chair",
         "neighbors": [
@@ -1710,10 +1704,7 @@
           "chair:root.child2.child1.child0:o0:sp125000:p1250000:p250000",
           "chair:root.child2.child2.child0:o0:sp125000:p1500000:0"
         ],
-        "center": {
-          "x": 1.395833,
-          "y": 0.104167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.25,
@@ -1747,10 +1738,13 @@
             "x": 1.375,
             "y": 0.0
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.104167,
+          "y": 0.395833
+        },
         "id": "chair:root.child2.child0.child3:o3:sp125000:p1000000:p250000",
         "kind": "chair",
         "neighbors": [
@@ -1760,10 +1754,7 @@
           "chair:root.child2.child0.child1:o0:sp125000:p1125000:p125000",
           "chair:root.child2.child1.child0:o0:sp125000:p1250000:p250000"
         ],
-        "center": {
-          "x": 1.104167,
-          "y": 0.395833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 1.125,
@@ -1797,10 +1788,13 @@
             "x": 1.125,
             "y": 0.375
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 1.354167,
+          "y": 0.354167
+        },
         "id": "chair:root.child2.child1.child0:o0:sp125000:p1250000:p250000",
         "kind": "chair",
         "neighbors": [
@@ -1811,10 +1805,7 @@
           "chair:root.child2.child1.child1:o1:sp125000:p1375000:p375000",
           "chair:root.child2.child1.child2:o1:sp125000:p1500000:p250000"
         ],
-        "center": {
-          "x": 1.354167,
-          "y": 0.354167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 1.25,
@@ -1848,10 +1839,13 @@
             "x": 1.375,
             "y": 0.25
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 1.520833,
+          "y": 0.479167
+        },
         "id": "chair:root.child2.child1.child1:o1:sp125000:p1375000:p375000",
         "kind": "chair",
         "neighbors": [
@@ -1860,10 +1854,7 @@
           "chair:root.child2.child1.child2:o1:sp125000:p1500000:p250000",
           "chair:root.child2.child1.child3:o2:sp125000:p1500000:p500000"
         ],
-        "center": {
-          "x": 1.520833,
-          "y": 0.479167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.375,
@@ -1897,10 +1888,13 @@
             "x": 1.5,
             "y": 0.375
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.645833,
+          "y": 0.354167
+        },
         "id": "chair:root.child2.child1.child2:o1:sp125000:p1500000:p250000",
         "kind": "chair",
         "neighbors": [
@@ -1911,10 +1905,7 @@
           "chair:root.child2.child2.child1:o1:sp125000:p1625000:p125000",
           "chair:root.child2.child2.child3:o2:sp125000:p1750000:p250000"
         ],
-        "center": {
-          "x": 1.645833,
-          "y": 0.354167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.5,
@@ -1948,10 +1939,13 @@
             "x": 1.625,
             "y": 0.25
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.645833,
+          "y": 0.645833
+        },
         "id": "chair:root.child2.child1.child3:o2:sp125000:p1500000:p500000",
         "kind": "chair",
         "neighbors": [
@@ -1962,10 +1956,7 @@
           "chair:root.child2.child3.child1:o2:sp125000:p1625000:p625000",
           "chair:root.child2.child3.child3:o3:sp125000:p1500000:p750000"
         ],
-        "center": {
-          "x": 1.645833,
-          "y": 0.645833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 1.75,
@@ -1999,10 +1990,13 @@
             "x": 1.75,
             "y": 0.625
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 1.604167,
+          "y": 0.104167
+        },
         "id": "chair:root.child2.child2.child0:o0:sp125000:p1500000:0",
         "kind": "chair",
         "neighbors": [
@@ -2011,10 +2005,7 @@
           "chair:root.child2.child2.child1:o1:sp125000:p1625000:p125000",
           "chair:root.child2.child2.child2:o1:sp125000:p1750000:0"
         ],
-        "center": {
-          "x": 1.604167,
-          "y": 0.104167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 1.5,
@@ -2048,10 +2039,13 @@
             "x": 1.625,
             "y": 0.0
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 1.770833,
+          "y": 0.229167
+        },
         "id": "chair:root.child2.child2.child1:o1:sp125000:p1625000:p125000",
         "kind": "chair",
         "neighbors": [
@@ -2060,10 +2054,7 @@
           "chair:root.child2.child2.child2:o1:sp125000:p1750000:0",
           "chair:root.child2.child2.child3:o2:sp125000:p1750000:p250000"
         ],
-        "center": {
-          "x": 1.770833,
-          "y": 0.229167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.625,
@@ -2097,10 +2088,13 @@
             "x": 1.75,
             "y": 0.125
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.895833,
+          "y": 0.104167
+        },
         "id": "chair:root.child2.child2.child2:o1:sp125000:p1750000:0",
         "kind": "chair",
         "neighbors": [
@@ -2108,10 +2102,7 @@
           "chair:root.child2.child2.child1:o1:sp125000:p1625000:p125000",
           "chair:root.child2.child2.child3:o2:sp125000:p1750000:p250000"
         ],
-        "center": {
-          "x": 1.895833,
-          "y": 0.104167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.75,
@@ -2145,10 +2136,13 @@
             "x": 1.875,
             "y": 0.0
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.895833,
+          "y": 0.395833
+        },
         "id": "chair:root.child2.child2.child3:o2:sp125000:p1750000:p250000",
         "kind": "chair",
         "neighbors": [
@@ -2157,10 +2151,7 @@
           "chair:root.child2.child2.child2:o1:sp125000:p1750000:0",
           "chair:root.child2.child3.child0:o1:sp125000:p1750000:p500000"
         ],
-        "center": {
-          "x": 1.895833,
-          "y": 0.395833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 2.0,
@@ -2194,10 +2185,13 @@
             "x": 2.0,
             "y": 0.375
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 1.895833,
+          "y": 0.604167
+        },
         "id": "chair:root.child2.child3.child0:o1:sp125000:p1750000:p500000",
         "kind": "chair",
         "neighbors": [
@@ -2206,10 +2200,7 @@
           "chair:root.child2.child3.child1:o2:sp125000:p1625000:p625000",
           "chair:root.child2.child3.child2:o2:sp125000:p1750000:p750000"
         ],
-        "center": {
-          "x": 1.895833,
-          "y": 0.604167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 1.75,
@@ -2243,10 +2234,13 @@
             "x": 1.875,
             "y": 0.5
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 1.770833,
+          "y": 0.770833
+        },
         "id": "chair:root.child2.child3.child1:o2:sp125000:p1625000:p625000",
         "kind": "chair",
         "neighbors": [
@@ -2255,10 +2249,7 @@
           "chair:root.child2.child3.child2:o2:sp125000:p1750000:p750000",
           "chair:root.child2.child3.child3:o3:sp125000:p1500000:p750000"
         ],
-        "center": {
-          "x": 1.770833,
-          "y": 0.770833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 1.875,
@@ -2292,10 +2283,13 @@
             "x": 1.875,
             "y": 0.75
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 1.895833,
+          "y": 0.895833
+        },
         "id": "chair:root.child2.child3.child2:o2:sp125000:p1750000:p750000",
         "kind": "chair",
         "neighbors": [
@@ -2303,10 +2297,7 @@
           "chair:root.child2.child3.child1:o2:sp125000:p1625000:p625000",
           "chair:root.child2.child3.child3:o3:sp125000:p1500000:p750000"
         ],
-        "center": {
-          "x": 1.895833,
-          "y": 0.895833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 2.0,
@@ -2340,10 +2331,13 @@
             "x": 2.0,
             "y": 0.875
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 1.604167,
+          "y": 0.895833
+        },
         "id": "chair:root.child2.child3.child3:o3:sp125000:p1500000:p750000",
         "kind": "chair",
         "neighbors": [
@@ -2352,10 +2346,7 @@
           "chair:root.child2.child3.child1:o2:sp125000:p1625000:p625000",
           "chair:root.child2.child3.child2:o2:sp125000:p1750000:p750000"
         ],
-        "center": {
-          "x": 1.604167,
-          "y": 0.895833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 1.625,
@@ -2389,10 +2380,13 @@
             "x": 1.625,
             "y": 0.875
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.104167,
+          "y": 1.104167
+        },
         "id": "chair:root.child3.child0.child0:o0:sp125000:0:p1000000",
         "kind": "chair",
         "neighbors": [
@@ -2401,10 +2395,7 @@
           "chair:root.child3.child0.child2:o1:sp125000:p250000:p1000000",
           "chair:root.child3.child0.child3:o3:sp125000:0:p1250000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 1.104167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.0,
@@ -2438,10 +2429,13 @@
             "x": 0.125,
             "y": 1.0
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.229167,
+          "y": 1.229167
+        },
         "id": "chair:root.child3.child0.child1:o0:sp125000:p125000:p1125000",
         "kind": "chair",
         "neighbors": [
@@ -2450,10 +2444,7 @@
           "chair:root.child3.child0.child3:o3:sp125000:0:p1250000",
           "chair:root.child3.child3.child0:o0:sp125000:p250000:p1250000"
         ],
-        "center": {
-          "x": 0.229167,
-          "y": 1.229167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.125,
@@ -2487,10 +2478,13 @@
             "x": 0.25,
             "y": 1.125
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.395833,
+          "y": 1.104167
+        },
         "id": "chair:root.child3.child0.child2:o1:sp125000:p250000:p1000000",
         "kind": "chair",
         "neighbors": [
@@ -2500,10 +2494,7 @@
           "chair:root.child3.child0.child1:o0:sp125000:p125000:p1125000",
           "chair:root.child3.child3.child0:o0:sp125000:p250000:p1250000"
         ],
-        "center": {
-          "x": 0.395833,
-          "y": 1.104167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 0.25,
@@ -2537,10 +2528,13 @@
             "x": 0.375,
             "y": 1.0
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.104167,
+          "y": 1.395833
+        },
         "id": "chair:root.child3.child0.child3:o3:sp125000:0:p1250000",
         "kind": "chair",
         "neighbors": [
@@ -2549,10 +2543,7 @@
           "chair:root.child3.child2.child0:o0:sp125000:0:p1500000",
           "chair:root.child3.child3.child0:o0:sp125000:p250000:p1250000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 1.395833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.125,
@@ -2586,10 +2577,13 @@
             "x": 0.125,
             "y": 1.375
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.895833,
+          "y": 1.604167
+        },
         "id": "chair:root.child3.child1.child0:o1:sp125000:p750000:p1500000",
         "kind": "chair",
         "neighbors": [
@@ -2598,10 +2592,7 @@
           "chair:root.child3.child1.child2:o2:sp125000:p750000:p1750000",
           "chair:root.child3.child3.child1:o2:sp125000:p500000:p1500000"
         ],
-        "center": {
-          "x": 0.895833,
-          "y": 1.604167
-        },
+        "orientation_token": "1",
         "vertices": [
           {
             "x": 0.75,
@@ -2635,10 +2626,13 @@
             "x": 0.875,
             "y": 1.5
           }
-        ],
-        "orientation_token": "1"
+        ]
       },
       {
+        "center": {
+          "x": 0.770833,
+          "y": 1.770833
+        },
         "id": "chair:root.child3.child1.child1:o2:sp125000:p625000:p1625000",
         "kind": "chair",
         "neighbors": [
@@ -2647,10 +2641,7 @@
           "chair:root.child3.child1.child3:o3:sp125000:p500000:p1750000",
           "chair:root.child3.child3.child1:o2:sp125000:p500000:p1500000"
         ],
-        "center": {
-          "x": 0.770833,
-          "y": 1.770833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 0.875,
@@ -2684,10 +2675,13 @@
             "x": 0.875,
             "y": 1.75
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.895833,
+          "y": 1.895833
+        },
         "id": "chair:root.child3.child1.child2:o2:sp125000:p750000:p1750000",
         "kind": "chair",
         "neighbors": [
@@ -2695,10 +2689,7 @@
           "chair:root.child3.child1.child1:o2:sp125000:p625000:p1625000",
           "chair:root.child3.child1.child3:o3:sp125000:p500000:p1750000"
         ],
-        "center": {
-          "x": 0.895833,
-          "y": 1.895833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 1.0,
@@ -2732,10 +2723,13 @@
             "x": 1.0,
             "y": 1.875
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.604167,
+          "y": 1.895833
+        },
         "id": "chair:root.child3.child1.child3:o3:sp125000:p500000:p1750000",
         "kind": "chair",
         "neighbors": [
@@ -2744,10 +2738,7 @@
           "chair:root.child3.child2.child1:o2:sp125000:p250000:p1750000",
           "chair:root.child3.child3.child1:o2:sp125000:p500000:p1500000"
         ],
-        "center": {
-          "x": 0.604167,
-          "y": 1.895833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.625,
@@ -2781,10 +2772,13 @@
             "x": 0.625,
             "y": 1.875
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.104167,
+          "y": 1.604167
+        },
         "id": "chair:root.child3.child2.child0:o0:sp125000:0:p1500000",
         "kind": "chair",
         "neighbors": [
@@ -2793,10 +2787,7 @@
           "chair:root.child3.child2.child3:o3:sp125000:p125000:p1625000",
           "chair:root.child3.child3.child2:o3:sp125000:p250000:p1500000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 1.604167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.0,
@@ -2830,10 +2821,13 @@
             "x": 0.125,
             "y": 1.5
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.395833,
+          "y": 1.895833
+        },
         "id": "chair:root.child3.child2.child1:o2:sp125000:p250000:p1750000",
         "kind": "chair",
         "neighbors": [
@@ -2842,10 +2836,7 @@
           "chair:root.child3.child2.child3:o3:sp125000:p125000:p1625000",
           "chair:root.child3.child3.child2:o3:sp125000:p250000:p1500000"
         ],
-        "center": {
-          "x": 0.395833,
-          "y": 1.895833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 0.5,
@@ -2879,10 +2870,13 @@
             "x": 0.5,
             "y": 1.875
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.104167,
+          "y": 1.895833
+        },
         "id": "chair:root.child3.child2.child2:o3:sp125000:0:p1750000",
         "kind": "chair",
         "neighbors": [
@@ -2890,10 +2884,7 @@
           "chair:root.child3.child2.child1:o2:sp125000:p250000:p1750000",
           "chair:root.child3.child2.child3:o3:sp125000:p125000:p1625000"
         ],
-        "center": {
-          "x": 0.104167,
-          "y": 1.895833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.125,
@@ -2927,10 +2918,13 @@
             "x": 0.125,
             "y": 1.875
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.229167,
+          "y": 1.770833
+        },
         "id": "chair:root.child3.child2.child3:o3:sp125000:p125000:p1625000",
         "kind": "chair",
         "neighbors": [
@@ -2939,10 +2933,7 @@
           "chair:root.child3.child2.child2:o3:sp125000:0:p1750000",
           "chair:root.child3.child3.child2:o3:sp125000:p250000:p1500000"
         ],
-        "center": {
-          "x": 0.229167,
-          "y": 1.770833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.25,
@@ -2976,10 +2967,13 @@
             "x": 0.25,
             "y": 1.75
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.354167,
+          "y": 1.354167
+        },
         "id": "chair:root.child3.child3.child0:o0:sp125000:p250000:p1250000",
         "kind": "chair",
         "neighbors": [
@@ -2990,10 +2984,7 @@
           "chair:root.child3.child3.child2:o3:sp125000:p250000:p1500000",
           "chair:root.child3.child3.child3:o3:sp125000:p375000:p1375000"
         ],
-        "center": {
-          "x": 0.354167,
-          "y": 1.354167
-        },
+        "orientation_token": "0",
         "vertices": [
           {
             "x": 0.25,
@@ -3027,10 +3018,13 @@
             "x": 0.375,
             "y": 1.25
           }
-        ],
-        "orientation_token": "0"
+        ]
       },
       {
+        "center": {
+          "x": 0.645833,
+          "y": 1.645833
+        },
         "id": "chair:root.child3.child3.child1:o2:sp125000:p500000:p1500000",
         "kind": "chair",
         "neighbors": [
@@ -3041,10 +3035,7 @@
           "chair:root.child3.child3.child2:o3:sp125000:p250000:p1500000",
           "chair:root.child3.child3.child3:o3:sp125000:p375000:p1375000"
         ],
-        "center": {
-          "x": 0.645833,
-          "y": 1.645833
-        },
+        "orientation_token": "2",
         "vertices": [
           {
             "x": 0.75,
@@ -3078,10 +3069,13 @@
             "x": 0.75,
             "y": 1.625
           }
-        ],
-        "orientation_token": "2"
+        ]
       },
       {
+        "center": {
+          "x": 0.354167,
+          "y": 1.645833
+        },
         "id": "chair:root.child3.child3.child2:o3:sp125000:p250000:p1500000",
         "kind": "chair",
         "neighbors": [
@@ -3092,10 +3086,7 @@
           "chair:root.child3.child3.child1:o2:sp125000:p500000:p1500000",
           "chair:root.child3.child3.child3:o3:sp125000:p375000:p1375000"
         ],
-        "center": {
-          "x": 0.354167,
-          "y": 1.645833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.375,
@@ -3129,10 +3120,13 @@
             "x": 0.375,
             "y": 1.625
           }
-        ],
-        "orientation_token": "3"
+        ]
       },
       {
+        "center": {
+          "x": 0.479167,
+          "y": 1.520833
+        },
         "id": "chair:root.child3.child3.child3:o3:sp125000:p375000:p1375000",
         "kind": "chair",
         "neighbors": [
@@ -3141,10 +3135,7 @@
           "chair:root.child3.child3.child1:o2:sp125000:p500000:p1500000",
           "chair:root.child3.child3.child2:o3:sp125000:p250000:p1500000"
         ],
-        "center": {
-          "x": 0.479167,
-          "y": 1.520833
-        },
+        "orientation_token": "3",
         "vertices": [
           {
             "x": 0.5,
@@ -3178,9 +3169,18 @@
             "x": 0.5,
             "y": 1.5
           }
-        ],
-        "orientation_token": "3"
+        ]
       }
-    ]
-  }
+    ],
+    "topology_revision": "1f9d523c",
+    "topology_spec": {
+      "adjacency_mode": "edge",
+      "height": 2,
+      "patch_depth": 3,
+      "sizing_mode": "patch_depth",
+      "tiling_family": "chair",
+      "width": 2
+    }
+  },
+  "width": 0
 }
