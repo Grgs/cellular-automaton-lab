@@ -6,6 +6,8 @@ Public release status: `v0.2.0` preview. The preview is usable for public evalua
 
 Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://grgs.github.io/cellular-automaton-lab/)
 
+**First time here?** [`docs/ONBOARDING.md`](docs/ONBOARDING.md) is a one-page decision tree -- find the row that matches what you want to do (run the app, add a tiling, use the topology library, etc.) and follow the link. The [`examples/`](examples/README.md) directory has short, runnable Python scripts for each major subsystem.
+
 ![Current canvas-first workspace on a Kagome mixed-tiling board](docs/images/readme-workspace-kagome.png)
 
 ## Project Scope
