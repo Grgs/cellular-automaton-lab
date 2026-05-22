@@ -12,7 +12,7 @@ This is the short version of how tilings fit into the app.
   - examples: Archimedean variants, Cairo, Rhombille, dual/uniform-derived mixed tilings
 - Aperiodic substitution families
   - built through `backend/simulation/aperiodic_registry.py`
-  - shared helpers live in `backend/simulation/aperiodic_substitution.py` and `backend/simulation/aperiodic_support.py`
+  - shared helpers live in `backend/simulation/aperiodic_substitution.py` and the `backend/simulation/aperiodic_support/` package (`affine.py`, `geometry.py`, `neighbors.py`, `patches.py`, `types.py`)
   - examples: Penrose, Ammann-Beenker, Spectre, Taylor-Socolar, Sphinx, Hat, Chair, Robinson, Tuebingen Triangle, Dodecagonal Square-Triangle, Shield, Pinwheel
 
 ## Verification Layers

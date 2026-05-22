@@ -24,7 +24,7 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
 - [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py): registers which geometry keys are handled by the periodic face builder.
 - [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json): face template descriptor data (vertices, unit cell dimensions, slot vocabulary) for every `periodic_face` tiling.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py): aperiodic family dispatch.
-- [backend/simulation/aperiodic_support.py](../backend/simulation/aperiodic_support.py): shared affine, polygon, and patch helpers.
+- [backend/simulation/aperiodic_support/](../backend/simulation/aperiodic_support/): shared affine, polygon, and patch helpers (split across `affine.py`, `geometry.py`, `neighbors.py`, `patches.py`, and `types.py`).
 - [backend/simulation/reference_specs/](../backend/simulation/reference_specs/): reference family specs split by family class (`regular.py`, `periodic.py`, `aperiodic.py`). Add a `ReferenceFamilySpec` entry here for any tiling with a literature-verifiable cell count, degree histogram, or adjacency signature.
 - [frontend/controls/tiling-preview-data.ts](../frontend/controls/tiling-preview-data.ts): pre-computed polygon thumbnail data for the tiling picker. Without an entry here the tiling falls back to a generic square preview.
 - [frontend/geometry/registry.ts](../frontend/geometry/registry.ts): render adapter lookup by `render_kind`.

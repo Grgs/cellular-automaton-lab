@@ -345,8 +345,8 @@ Browser UI
   Penrose patch builder.
 - [backend/simulation/aperiodic_prototiles.py](../backend/simulation/aperiodic_prototiles.py)
   Public aperiodic patch facade and Penrose P3 conversion path.
-- [backend/simulation/aperiodic_support.py](../backend/simulation/aperiodic_support.py)
-  Shared aperiodic patch dataclasses, affine math, polygon helpers, and neighbor reconstruction.
+- [backend/simulation/aperiodic_support/](../backend/simulation/aperiodic_support/)
+  Shared aperiodic patch package. `types.py` holds the dataclasses and TypedDict records, `geometry.py` the vertex/edge/centroid helpers, `affine.py` the 2D affine math + orientation/chirality tokens, `neighbors.py` the float and exact-Fraction edge-neighbour detection, and `patches.py` the high-level patch constructors. `__init__.py` re-exports everything so legacy `from backend.simulation.aperiodic_support import X` callers work unchanged.
 - [backend/simulation/aperiodic_substitution.py](../backend/simulation/aperiodic_substitution.py)
   Reusable substitution-recipe helper for recursive affine expansion, structured substitution nodes, metadata propagation, and deterministic leaf flattening.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
@@ -367,7 +367,7 @@ Browser UI
 - [backend/simulation/aperiodic_dodecagonal_square_triangle.py](../backend/simulation/aperiodic_dodecagonal_square_triangle.py)
 - [backend/simulation/aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
 - [backend/simulation/aperiodic_pinwheel.py](../backend/simulation/aperiodic_pinwheel.py)
-  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Dodecagonal Square-Triangle, Shield, and Pinwheel. Pinwheel uses the exact-record helper path in `aperiodic_support.py`; the other rebuilt families still emit the standard polygon patch format.
+  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Dodecagonal Square-Triangle, Shield, and Pinwheel. Pinwheel uses the exact-record helper path in `aperiodic_support.patches` (via the new `ExactSimilaritySubstitution` shared helper); the other rebuilt families still emit the standard polygon patch format.
 
 ### Rules
 
@@ -453,7 +453,7 @@ Use this list to decide where cleanup work should start. These are the files wit
 - Aperiodic implementation quality:
   [aperiodic_registry.py](../backend/simulation/aperiodic_registry.py),
   [aperiodic_substitution.py](../backend/simulation/aperiodic_substitution.py),
-  [aperiodic_support.py](../backend/simulation/aperiodic_support.py),
+  [aperiodic_support/](../backend/simulation/aperiodic_support/),
   [aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
 - Literature verification size and ownership:
   [literature_reference_specs.py](../backend/simulation/literature_reference_specs.py),
