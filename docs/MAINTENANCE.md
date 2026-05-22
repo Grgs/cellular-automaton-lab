@@ -49,13 +49,13 @@ Pre-commit mirrors the same Python scope plus the frontend lint/format check, so
 
 ## Public Release Process
 
-The first clean public release line starts at `v0.1.0` and is intentionally a preview series. The public release surface is:
+The first clean public release line started at `v0.1.0` and continues as an ongoing preview series; `v0.3.0` is the current shipped tag. The public release surface is:
 
 - a tagged GitHub source release
 - the GitHub Pages standalone demo
 - the repository checkout for local use
 
-This repo does not publish npm or PyPI packages in the `v0.1.x` preview line.
+This repo does not publish npm or PyPI packages in the preview line.
 
 Before cutting a public release:
 
@@ -87,7 +87,7 @@ py -3 -m pre_commit run --hook-stage pre-push --all-files
    - one topology or rule switch works
    - one pattern import/export or persistence flow works
    - no obvious startup or console failure appears
-8. Publish concise release notes from [docs/releases/v0.1.0.md](releases/v0.1.0.md) or its successor for the target tag.
+8. Publish concise release notes from the matching file in [docs/releases/](releases/) for the target tag (current tags: `v0.1.0`, `v0.2.0`, `v0.3.0`).
 9. Tag only after the intended commit has passed the required validation and deploy path.
 
 Public docs must keep preview status and known limitations explicit. Do not imply package-registry support or long-term API stability before the project actually offers them.

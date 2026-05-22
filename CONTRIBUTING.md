@@ -1,6 +1,6 @@
 # Contributing
 
-Cellular Automaton Lab is a `v0.1.x` preview project. Contributions are welcome, but the repository is still the public integration surface: there is no npm package, PyPI package, plugin API, or long-term compatibility promise yet.
+Cellular Automaton Lab is a `v0.3.x` preview project. Contributions are welcome, but the repository is still the public integration surface: there is no npm package, PyPI package, plugin API, or long-term compatibility promise yet.
 
 ## First 30 Minutes
 
@@ -30,19 +30,7 @@ py -3 .\app.py
 
 ## Common Commands
 
-Use the npm script surface first; it wraps the repo-owned Python launchers and keeps local and CI commands aligned.
-
-```powershell
-npm run check:frontend
-npm run check:python
-npm run check:doc-links
-```
-
-For a broader local sweep:
-
-```powershell
-npm run check:ci-local
-```
+The canonical "what to run" list lives in [docs/ONBOARDING.md](docs/ONBOARDING.md#run-tests). Use the npm script surface first; it wraps the repo-owned Python launchers and keeps local and CI commands aligned.
 
 For focused change-specific commands, use [docs/TESTING_CHANGES.md](docs/TESTING_CHANGES.md). For every script under `tools/`, use [docs/TOOLS.md](docs/TOOLS.md).
 
