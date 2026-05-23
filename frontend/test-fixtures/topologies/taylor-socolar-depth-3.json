@@ -10,6 +10,10 @@
           "x": -0.0,
           "y": 0.3849
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -43,6 +47,11 @@
           "x": -0.0,
           "y": -1.347151
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -76,6 +85,11 @@
           "x": -0.0,
           "y": -3.079201
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -109,6 +123,10 @@
           "x": -0.0,
           "y": -4.811252
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:n5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -142,6 +160,11 @@
           "x": -0.0,
           "y": -6.543303
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:n6928203",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -174,6 +197,11 @@
           "x": -0.0,
           "y": 2.116951
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -207,6 +235,11 @@
           "x": -0.0,
           "y": 3.849002
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -240,6 +273,11 @@
           "x": -0.0,
           "y": 5.581053
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-0:p1000000:0:0:0:p1000000:p5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -273,6 +311,12 @@
           "x": -3.0,
           "y": 0.3849
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-0:p1000000:0:n3000000:0:p1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -306,6 +350,12 @@
           "x": -3.0,
           "y": -3.079201
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-0:p1000000:0:n3000000:0:p1000000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -339,6 +389,12 @@
           "x": -3.0,
           "y": -6.543303
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-0:p1000000:0:n3000000:0:p1000000:n6928203",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -371,6 +427,10 @@
           "x": -3.0,
           "y": 3.849002
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-0:p1000000:0:n3000000:0:p1000000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -404,6 +464,12 @@
           "x": -6.0,
           "y": 0.3849
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-0:p1000000:0:n6000000:0:p1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -437,6 +503,12 @@
           "x": -6.0,
           "y": -1.347151
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-0:p1000000:0:n6000000:0:p1000000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -470,6 +542,12 @@
           "x": -6.0,
           "y": 2.116951
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-0:p1000000:0:n6000000:0:p1000000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -502,6 +580,12 @@
           "x": 3.0,
           "y": 0.3849
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-0:p1000000:0:p3000000:0:p1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -535,6 +619,12 @@
           "x": 3.0,
           "y": -3.079201
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-0:p1000000:0:p3000000:0:p1000000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -568,6 +658,12 @@
           "x": 3.0,
           "y": -6.543303
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-0:p1000000:0:p3000000:0:p1000000:n6928203",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -600,6 +696,10 @@
           "x": 3.0,
           "y": 3.849002
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-0:p1000000:0:p3000000:0:p1000000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -633,6 +733,12 @@
           "x": 6.0,
           "y": 0.3849
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-0:p1000000:0:p6000000:0:p1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -666,6 +772,12 @@
           "x": 6.0,
           "y": -1.347151
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-0:p1000000:0:p6000000:0:p1000000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -699,6 +811,12 @@
           "x": 6.0,
           "y": 2.116951
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-0:p1000000:0:p6000000:0:p1000000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -731,6 +849,11 @@
           "x": -1.833333,
           "y": -4.522577
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n1500000:p866025:n500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -764,6 +887,12 @@
           "x": -1.833333,
           "y": -1.058475
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n1500000:p866025:n500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -797,6 +926,11 @@
           "x": -1.833333,
           "y": 2.405626
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n1500000:p866025:n500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -830,6 +964,11 @@
           "x": -1.833333,
           "y": 5.869728
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n1500000:p866025:n500000:p6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -863,6 +1002,12 @@
           "x": -3.333333,
           "y": -1.924501
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n3000000:p866025:n500000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -896,6 +1041,11 @@
           "x": -3.333333,
           "y": 5.003702
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n3000000:p866025:n500000:p5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -929,6 +1079,12 @@
           "x": -4.833333,
           "y": -2.790526
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n4500000:p866025:n500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -962,6 +1118,11 @@
           "x": -4.833333,
           "y": 4.137677
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n4500000:p866025:n500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -994,6 +1155,11 @@
           "x": -4.833333,
           "y": 0.673575
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:n4500000:p866025:n500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1027,6 +1193,12 @@
           "x": 1.166667,
           "y": -2.790526
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p1500000:p866025:n500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1060,6 +1232,12 @@
           "x": 1.166667,
           "y": -6.254628
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p1500000:p866025:n500000:n6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1092,6 +1270,11 @@
           "x": 1.166667,
           "y": 4.137677
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p1500000:p866025:n500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1125,6 +1308,11 @@
           "x": 1.166667,
           "y": 0.673575
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p1500000:p866025:n500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1158,6 +1346,12 @@
           "x": 2.666667,
           "y": -5.388603
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p3000000:p866025:n500000:n5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1191,6 +1385,11 @@
           "x": 2.666667,
           "y": 1.539601
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p3000000:p866025:n500000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1224,6 +1423,11 @@
           "x": 4.166667,
           "y": -4.522577
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p4500000:p866025:n500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1257,6 +1461,11 @@
           "x": 4.166667,
           "y": -1.058475
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p4500000:p866025:n500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1290,6 +1499,11 @@
           "x": 4.166667,
           "y": 2.405626
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p4500000:p866025:n500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1323,6 +1537,11 @@
           "x": 4.166667,
           "y": 5.869728
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p4500000:p866025:n500000:p6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1355,6 +1574,11 @@
           "x": 5.666667,
           "y": 3.271652
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p6000000:p866025:n500000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1387,6 +1611,11 @@
           "x": 7.166667,
           "y": 0.673575
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-120:n500000:n866025:p7500000:p866025:n500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1419,6 +1648,10 @@
           "x": -0.0,
           "y": -0.3849
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1452,6 +1685,11 @@
           "x": -0.0,
           "y": -2.116951
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1485,6 +1723,11 @@
           "x": -0.0,
           "y": -3.849002
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1518,6 +1761,11 @@
           "x": -0.0,
           "y": -5.581053
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:n5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1551,6 +1799,11 @@
           "x": -0.0,
           "y": 1.347151
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1584,6 +1837,11 @@
           "x": -0.0,
           "y": 3.079201
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1617,6 +1875,10 @@
           "x": 0.0,
           "y": 4.811252
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:p5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1650,6 +1912,11 @@
           "x": -0.0,
           "y": 6.543303
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-180:n1000000:0:0:0:n1000000:p6928203",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1682,6 +1949,12 @@
           "x": -3.0,
           "y": -0.3849
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-180:n1000000:0:n3000000:0:n1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1715,6 +1988,10 @@
           "x": -3.0,
           "y": -3.849002
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-180:n1000000:0:n3000000:0:n1000000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1748,6 +2025,12 @@
           "x": -3.0,
           "y": 3.079201
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-180:n1000000:0:n3000000:0:n1000000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1781,6 +2064,12 @@
           "x": -3.0,
           "y": 6.543303
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-180:n1000000:0:n3000000:0:n1000000:p6928203",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1813,6 +2102,12 @@
           "x": -6.0,
           "y": -0.3849
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-180:n1000000:0:n6000000:0:n1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1846,6 +2141,12 @@
           "x": -6.0,
           "y": -2.116951
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-180:n1000000:0:n6000000:0:n1000000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1878,6 +2179,12 @@
           "x": -6.0,
           "y": 1.347151
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-180:n1000000:0:n6000000:0:n1000000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1911,6 +2218,12 @@
           "x": 3.0,
           "y": -0.3849
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-180:n1000000:0:p3000000:0:n1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1944,6 +2257,10 @@
           "x": 3.0,
           "y": -3.849002
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-180:n1000000:0:p3000000:0:n1000000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -1977,6 +2294,12 @@
           "x": 3.0,
           "y": 3.079201
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-180:n1000000:0:p3000000:0:n1000000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2010,6 +2333,12 @@
           "x": 3.0,
           "y": 6.543303
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-180:n1000000:0:p3000000:0:n1000000:p6928203",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2042,6 +2371,12 @@
           "x": 6.0,
           "y": -0.3849
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-180:n1000000:0:p6000000:0:n1000000:0",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2075,6 +2410,12 @@
           "x": 6.0,
           "y": -2.116951
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-180:n1000000:0:p6000000:0:n1000000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2107,6 +2448,12 @@
           "x": 6.0,
           "y": 1.347151
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-180:n1000000:0:p6000000:0:n1000000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2140,6 +2487,12 @@
           "x": -1.166667,
           "y": -2.790526
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n1500000:n866025:n500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2173,6 +2526,12 @@
           "x": -1.166667,
           "y": -6.254628
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n1500000:n866025:n500000:n6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2205,6 +2564,11 @@
           "x": -1.166667,
           "y": 4.137677
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n1500000:n866025:n500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2238,6 +2602,11 @@
           "x": -1.166667,
           "y": 0.673575
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n1500000:n866025:n500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2271,6 +2640,12 @@
           "x": -2.666667,
           "y": -5.388603
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n3000000:n866025:n500000:n5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2304,6 +2679,11 @@
           "x": -2.666667,
           "y": 1.539601
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n3000000:n866025:n500000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2337,6 +2717,11 @@
           "x": -4.166667,
           "y": -4.522577
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n4500000:n866025:n500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2370,6 +2755,11 @@
           "x": -4.166667,
           "y": -1.058475
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n4500000:n866025:n500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2403,6 +2793,11 @@
           "x": -4.166667,
           "y": 2.405626
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n4500000:n866025:n500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2436,6 +2831,11 @@
           "x": -4.166667,
           "y": 5.869728
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n4500000:n866025:n500000:p6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2468,6 +2868,11 @@
           "x": -5.666667,
           "y": 3.271652
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n6000000:n866025:n500000:p3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2500,6 +2905,11 @@
           "x": -7.166667,
           "y": 0.673575
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:n7500000:n866025:n500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2532,6 +2942,11 @@
           "x": 1.833333,
           "y": -4.522577
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p1500000:n866025:n500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2565,6 +2980,12 @@
           "x": 1.833333,
           "y": -1.058475
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p1500000:n866025:n500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2598,6 +3019,11 @@
           "x": 1.833333,
           "y": 2.405626
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p1500000:n866025:n500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2631,6 +3057,11 @@
           "x": 1.833333,
           "y": 5.869728
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p1500000:n866025:n500000:p6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2664,6 +3095,12 @@
           "x": 3.333333,
           "y": -1.924501
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p3000000:n866025:n500000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2697,6 +3134,11 @@
           "x": 3.333333,
           "y": 5.003702
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p3000000:n866025:n500000:p5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2730,6 +3172,12 @@
           "x": 4.833333,
           "y": -2.790526
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p4500000:n866025:n500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2763,6 +3211,11 @@
           "x": 4.833333,
           "y": 4.137677
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p4500000:n866025:n500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2795,6 +3248,11 @@
           "x": 4.833333,
           "y": 0.673575
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-240:n500000:p866025:p4500000:n866025:n500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2828,6 +3286,11 @@
           "x": -1.166667,
           "y": -4.137677
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n1500000:n866025:p500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2861,6 +3324,11 @@
           "x": -1.166667,
           "y": -0.673575
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n1500000:n866025:p500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2894,6 +3362,12 @@
           "x": -1.166667,
           "y": 2.790526
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n1500000:n866025:p500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2927,6 +3401,12 @@
           "x": -1.166667,
           "y": 6.254628
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n1500000:n866025:p500000:p6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2959,6 +3439,11 @@
           "x": -2.666667,
           "y": -1.539601
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n3000000:n866025:p500000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -2992,6 +3477,12 @@
           "x": -2.666667,
           "y": 5.388603
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n3000000:n866025:p500000:p5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3025,6 +3516,11 @@
           "x": -4.166667,
           "y": -2.405626
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n4500000:n866025:p500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3058,6 +3554,11 @@
           "x": -4.166667,
           "y": -5.869728
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n4500000:n866025:p500000:n6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3090,6 +3591,11 @@
           "x": -4.166667,
           "y": 4.522577
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n4500000:n866025:p500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3123,6 +3629,11 @@
           "x": -4.166667,
           "y": 1.058475
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n4500000:n866025:p500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3156,6 +3667,11 @@
           "x": -5.666667,
           "y": -3.271652
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n6000000:n866025:p500000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3188,6 +3704,11 @@
           "x": -7.166667,
           "y": -0.673575
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:n7500000:n866025:p500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3220,6 +3741,11 @@
           "x": 1.833333,
           "y": -2.405626
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p1500000:n866025:p500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3253,6 +3779,11 @@
           "x": 1.833333,
           "y": -5.869728
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p1500000:n866025:p500000:n6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3286,6 +3817,11 @@
           "x": 1.833333,
           "y": 4.522577
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p1500000:n866025:p500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3319,6 +3855,12 @@
           "x": 1.833333,
           "y": 1.058475
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p1500000:n866025:p500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3352,6 +3894,11 @@
           "x": 3.333333,
           "y": -5.003702
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p3000000:n866025:p500000:n5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3385,6 +3932,12 @@
           "x": 3.333333,
           "y": 1.924501
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p3000000:n866025:p500000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3418,6 +3971,11 @@
           "x": 4.833333,
           "y": -4.137677
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p4500000:n866025:p500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3450,6 +4008,11 @@
           "x": 4.833333,
           "y": -0.673575
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p4500000:n866025:p500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3483,6 +4046,12 @@
           "x": 4.833333,
           "y": 2.790526
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-300:p500000:p866025:p4500000:n866025:p500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3516,6 +4085,11 @@
           "x": -1.833333,
           "y": -2.405626
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n1500000:p866025:p500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3549,6 +4123,11 @@
           "x": -1.833333,
           "y": -5.869728
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n1500000:p866025:p500000:n6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3582,6 +4161,11 @@
           "x": -1.833333,
           "y": 4.522577
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n1500000:p866025:p500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3615,6 +4199,12 @@
           "x": -1.833333,
           "y": 1.058475
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n1500000:p866025:p500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3648,6 +4238,11 @@
           "x": -3.333333,
           "y": -5.003702
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n3000000:p866025:p500000:n5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3681,6 +4276,12 @@
           "x": -3.333333,
           "y": 1.924501
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:paired",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n3000000:p866025:p500000:p1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3714,6 +4315,11 @@
           "x": -4.833333,
           "y": -4.137677
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n4500000:p866025:p500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3746,6 +4352,11 @@
           "x": -4.833333,
           "y": -0.673575
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-right",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n4500000:p866025:p500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3779,6 +4390,12 @@
           "x": -4.833333,
           "y": 2.790526
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-left",
+          "substitution-role:in-place",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:n4500000:p866025:p500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3812,6 +4429,11 @@
           "x": 1.166667,
           "y": -4.137677
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p1500000:p866025:p500000:n4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3845,6 +4467,11 @@
           "x": 1.166667,
           "y": -0.673575
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p1500000:p866025:p500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3878,6 +4505,12 @@
           "x": 1.166667,
           "y": 2.790526
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:in-place",
+          "substitution-role:paired",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p1500000:p866025:p500000:p2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3911,6 +4544,12 @@
           "x": 1.166667,
           "y": 6.254628
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p1500000:p866025:p500000:p6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3943,6 +4582,11 @@
           "x": 2.666667,
           "y": -1.539601
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:in-place",
+          "substitution-role:outer-left"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p3000000:p866025:p500000:n1732051",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -3976,6 +4620,12 @@
           "x": 2.666667,
           "y": 5.388603
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:paired",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p3000000:p866025:p500000:p5196152",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -4009,6 +4659,11 @@
           "x": 4.166667,
           "y": -2.405626
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p4500000:p866025:p500000:n2598076",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -4042,6 +4697,11 @@
           "x": 4.166667,
           "y": -5.869728
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p4500000:p866025:p500000:n6062178",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -4074,6 +4734,11 @@
           "x": 4.166667,
           "y": 4.522577
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p4500000:p866025:p500000:p4330127",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -4107,6 +4772,11 @@
           "x": 4.166667,
           "y": 1.058475
         },
+        "decoration_tokens": [
+          "hex-half:upper",
+          "substitution-role:outer-right",
+          "substitution-role:paired"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p4500000:p866025:p500000:p866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -4140,6 +4810,11 @@
           "x": 5.666667,
           "y": -3.271652
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:in-place"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p6000000:p866025:p500000:n3464102",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -4172,6 +4847,11 @@
           "x": 7.166667,
           "y": -0.673575
         },
+        "decoration_tokens": [
+          "hex-half:lower",
+          "substitution-role:outer-left",
+          "substitution-role:outer-right"
+        ],
         "id": "taylor:orientation-60:p500000:n866025:p7500000:p866025:p500000:n866025",
         "kind": "taylor-half-hex",
         "neighbors": [
@@ -4200,7 +4880,7 @@
         ]
       }
     ],
-    "topology_revision": "76f8c743",
+    "topology_revision": "6fb0349a",
     "topology_spec": {
       "adjacency_mode": "edge",
       "height": 14,
