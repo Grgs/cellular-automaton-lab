@@ -61,7 +61,7 @@ This performs five steps:
 1. stages a transient standalone build-input directory under `output/`
 2. writes a generated `standalone.html` wrapper plus staged `styles.css` and `favicon.svg` into that build-input directory
 3. builds the standalone Vite entry into `output/standalone/`
-4. exports `standalone-bootstrap.json` from the Python topology/defaults metadata
+4. exports `standalone-bootstrap.json` from the Python topology metadata and canonical `config/defaults.json` payload
 5. writes `standalone-python-bundle.json`, which contains the standalone Python source/config payload as one bundled JSON file
 
 The standalone output publishes `index.html` as the static-host entry file.
