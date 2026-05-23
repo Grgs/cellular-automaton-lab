@@ -146,8 +146,18 @@ class SimulationRuntimeTests(unittest.TestCase):
         self.assertLessEqual(active_delay, 1.0 / 6.0)
 
     def test_run_once_uses_updated_speed_for_delay(self) -> None:
+        # Inject a FakeClock that reports zero elapsed time during the
+        # step so the returned delay equals the full target. With real
+        # monotonic + sleep this test was flaky on loaded CI runners
+        # where the step could take longer than 1/12s, making delay
+        # floor at 0.0 and the ``assertGreater`` assertion fail.
+        clock = FakeClock()
         service = SimulationService(rule_registry=self.rule_registry)
-        runtime = SimulationRuntime(service)
+        runtime = SimulationRuntime(
+            service,
+            sleep_fn=clock.sleep,
+            monotonic_fn=clock.monotonic,
+        )
 
         service.update_config(speed=12)
         service.start()
