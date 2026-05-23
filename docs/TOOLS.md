@@ -209,7 +209,7 @@ python tools/regenerate_frontend_topology_fixtures.py --fixture shield-depth-3
 
 ### `tools/export_bootstrap_data.py`
 
-Exports the backend bootstrap payload (topology catalog, rule metadata, defaults) to a JSON path. Used by the standalone build pipeline to bake the bootstrap data into the bundle. Source: [export_bootstrap_data.py](../tools/export_bootstrap_data.py).
+Exports the backend bootstrap payload (topology catalog, rule metadata, and the canonical [config/defaults.json](../config/defaults.json) payload) to a JSON path. Used by the standalone build pipeline to bake the bootstrap data into the bundle. Source: [export_bootstrap_data.py](../tools/export_bootstrap_data.py).
 
 ```powershell
 py -3 tools/export_bootstrap_data.py <output-path>

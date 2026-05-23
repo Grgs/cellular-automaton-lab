@@ -68,6 +68,7 @@ function collectSourceFingerprintPaths() {
         (absolutePath) => path.relative(rootDir, absolutePath).replace(/\\/g, "/"),
     );
     for (const relativePath of [
+        "config/defaults.json",
         "tools/build-standalone.mjs",
         "package.json",
         "package-lock.json",
