@@ -5,10 +5,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.regenerate_frontend_topology_fixtures import (
+from backend.simulation.topology_types import (
     CONTENT_REVISION_HASH_LENGTH,
+    topology_content_revision as compute_content_revision,
+)
+from tools.regenerate_frontend_topology_fixtures import (
     DEFAULT_FIXTURE_MANIFEST_PATH,
-    compute_content_revision,
     discover_fixture_targets,
     fixture_drift_lines,
     load_fixture_targets,
