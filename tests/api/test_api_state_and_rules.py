@@ -523,7 +523,12 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertEqual(topology["topology_spec"], state["topology_spec"])
         self.assertEqual(len(topology["cells"]), len(state["cell_states"]))
         self.assertGreater(len(topology["cells"]), 100)
-        self.assertTrue(all(cell["kind"] == "taylor-half-hex" for cell in topology["cells"]))
+        self.assertTrue(
+            all(
+                cell["kind"] in ("taylor-half-hex-left", "taylor-half-hex-right")
+                for cell in topology["cells"]
+            )
+        )
 
     def test_sphinx_patch_depth_uses_generic_rule_and_family_cap(self) -> None:
         reset = self.client.post(

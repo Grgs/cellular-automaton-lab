@@ -142,7 +142,12 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
 
         self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
         self.assertGreater(deep.cell_count, shallow.cell_count)
-        self.assertTrue(all(cell.kind == "taylor-half-hex" for cell in deep.cells))
+        self.assertTrue(
+            all(
+                cell.kind in ("taylor-half-hex-left", "taylor-half-hex-right")
+                for cell in deep.cells
+            )
+        )
         self.assertTrue(all(cell.center is not None for cell in deep.cells))
         self.assertTrue(
             all(cell.vertices is not None and len(cell.vertices) == 4 for cell in deep.cells)

@@ -45,7 +45,8 @@ P1_STAR_KIND = "p1-star"
 AMMANN_RHOMB_KIND = "rhomb"
 AMMANN_SQUARE_KIND = "square"
 SPECTRE_KIND = "spectre"
-TAYLOR_HALF_HEX_KIND = "taylor-half-hex"
+TAYLOR_HALF_HEX_LEFT_KIND = "taylor-half-hex-left"
+TAYLOR_HALF_HEX_RIGHT_KIND = "taylor-half-hex-right"
 SPHINX_KIND = "sphinx"
 HAT_KIND = "hat"
 CHAIR_KIND = "chair"
@@ -224,7 +225,7 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         builder_kind="substitution_recipe",
         implementation_status="true_substitution",
-        public_cell_kinds=(TAYLOR_HALF_HEX_KIND,),
+        public_cell_kinds=(TAYLOR_HALF_HEX_LEFT_KIND, TAYLOR_HALF_HEX_RIGHT_KIND),
     ),
     SPHINX_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=SPHINX_GEOMETRY,
