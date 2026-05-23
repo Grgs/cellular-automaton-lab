@@ -41301,7 +41301,7 @@
         ]
       }
     ],
-    "topology_revision": "fixture-spectre-depth-3",
+    "topology_revision": "de8990ff",
     "topology_spec": {
       "adjacency_mode": "edge",
       "height": 109,

@@ -7,8 +7,7 @@
       "width": 3,
       "height": 3,
       "patchDepth": null,
-      "cellSize": 12,
-      "topologyRevision": "e76c1baeebfa"
+      "cellSize": 12
     },
     {
       "name": "chair-depth-3",
@@ -17,8 +16,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "chair-depth-3-v2"
+      "cellSize": 12
     },
     {
       "name": "dodecagonal-square-triangle-depth-3",
@@ -27,8 +25,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-dodecagonal-dodecagonal-square-triangle-depth-3"
+      "cellSize": 12
     },
     {
       "name": "hat-monotile-depth-3",
@@ -37,8 +34,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-hat-monotile-depth-3"
+      "cellSize": 12
     },
     {
       "name": "pinwheel-2-1-depth-3",
@@ -47,8 +43,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-pinwheel-2-1-depth-3-v2"
+      "cellSize": 12
     },
     {
       "name": "pinwheel-depth-3",
@@ -57,8 +52,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-pinwheel-depth-3-v2"
+      "cellSize": 12
     },
     {
       "name": "robinson-triangles-depth-3",
@@ -67,8 +61,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-robinson-triangles-depth-3-v2"
+      "cellSize": 12
     },
     {
       "name": "shield-depth-3",
@@ -77,8 +70,7 @@
       "width": 453,
       "height": 452,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "a7c66a960055"
+      "cellSize": 12
     },
     {
       "name": "spectre-depth-3",
@@ -87,8 +79,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-spectre-depth-3"
+      "cellSize": 12
     },
     {
       "name": "sphinx-depth-3",
@@ -97,8 +88,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-sphinx-depth-3"
+      "cellSize": 12
     },
     {
       "name": "taylor-socolar-depth-3",
@@ -107,8 +97,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-taylor-socolar-depth-3"
+      "cellSize": 12
     },
     {
       "name": "tuebingen-triangle-depth-3",
@@ -117,8 +106,7 @@
       "width": 0,
       "height": 0,
       "patchDepth": 3,
-      "cellSize": 12,
-      "topologyRevision": "fixture-tuebingen-triangle-depth-3"
+      "cellSize": 12
     }
   ]
 }

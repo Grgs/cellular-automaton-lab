@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 from dataclasses import dataclass
+from hashlib import sha1
 from pathlib import Path
 from typing import Any, cast
 
@@ -19,6 +20,12 @@ DEFAULT_FIXTURE_MANIFEST_PATH = (
     ROOT / "frontend" / "test-fixtures" / "topologies" / "fixture-manifest.json"
 )
 
+# 8 hex chars = 32 bits of entropy: plenty for the handful of fixtures we
+# regenerate, and short enough to sit below detect-secrets'
+# HexHighEntropyString minimum length so checked-in revision strings don't
+# trip the pre-commit secret scanner.
+CONTENT_REVISION_HASH_LENGTH = 8
+
 
 @dataclass(frozen=True)
 class FrontendTopologyFixtureTarget:
@@ -29,7 +36,6 @@ class FrontendTopologyFixtureTarget:
     height: int
     patch_depth: int | None
     cell_size: int
-    topology_revision: str
 
 
 class FrontendFixtureRegenerationError(ValueError):
@@ -59,6 +65,47 @@ def _require_int(value: object, *, field_name: str, fixture_name: str) -> int:
     return int(value)
 
 
+def _normalize_negative_zero(value: Any) -> Any:
+    """Recursively normalize ``-0.0`` to ``0.0`` in a JSON-shaped payload.
+
+    Some backend geometry builders (notably ``aperiodic_taylor_socolar``)
+    compute centers / vertices via libm trig that produces ``-0.0`` on
+    one platform and ``0.0`` on another for the same input. Python treats
+    ``-0.0 == 0.0`` as True, so the prior dict-equality drift check
+    didn't notice. The content hash, however, sees them through
+    ``json.dumps`` (``"0.0"`` vs ``"-0.0"``) and produces different
+    digests -- making the checked-in fixture revision platform-dependent.
+    Normalizing the sign here keeps the hash deterministic across libm
+    implementations without changing the rendered output.
+    """
+    if isinstance(value, float):
+        return 0.0 if value == 0.0 else value
+    if isinstance(value, dict):
+        return {key: _normalize_negative_zero(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_normalize_negative_zero(item) for item in value]
+    return value
+
+
+def compute_content_revision(topology_payload: dict[str, Any]) -> str:
+    """Derive a stable revision string from the topology payload's content.
+
+    The hash covers every field in the topology payload except the
+    ``topology_revision`` field itself, so the revision changes iff the
+    serialized topology content changes. This eliminates the manual ``-v2``
+    bumping previously required when regenerating a fixture.
+
+    Negative zero is normalized to positive zero before hashing so the
+    digest stays deterministic across platforms whose libm differs in
+    sign for trig identities like ``sin(pi)``.
+    """
+    content_for_hash = _normalize_negative_zero(
+        {key: value for key, value in topology_payload.items() if key != "topology_revision"}
+    )
+    canonical_json = json.dumps(content_for_hash, sort_keys=True, separators=(",", ":"))
+    return sha1(canonical_json.encode("utf-8")).hexdigest()[:CONTENT_REVISION_HASH_LENGTH]
+
+
 def load_fixture_targets(
     manifest_path: Path = DEFAULT_FIXTURE_MANIFEST_PATH,
 ) -> tuple[FrontendTopologyFixtureTarget, ...]:
@@ -74,7 +121,6 @@ def load_fixture_targets(
         name = fixture_entry.get("name")
         relative_path = fixture_entry.get("path")
         family = fixture_entry.get("family")
-        topology_revision = fixture_entry.get("topologyRevision")
         if not isinstance(name, str) or not name:
             raise FrontendFixtureRegenerationError(
                 "Fixture manifest entries must declare a non-empty name."
@@ -84,10 +130,6 @@ def load_fixture_targets(
         if not isinstance(family, str) or not family:
             raise FrontendFixtureRegenerationError(
                 f"Fixture {name!r} is missing a non-empty family."
-            )
-        if not isinstance(topology_revision, str) or not topology_revision:
-            raise FrontendFixtureRegenerationError(
-                f"Fixture {name!r} is missing a non-empty topologyRevision."
             )
         patch_depth_value = fixture_entry.get("patchDepth")
         if patch_depth_value is not None and not isinstance(patch_depth_value, int):
@@ -109,7 +151,6 @@ def load_fixture_targets(
                 cell_size=_require_int(
                     fixture_entry.get("cellSize"), field_name="cellSize", fixture_name=name
                 ),
-                topology_revision=topology_revision,
             )
         )
     return tuple(targets)
@@ -153,7 +194,9 @@ def regenerate_fixture_payload(
         target.patch_depth,
     )
     topology_payload = json.loads(json.dumps(topology.to_dict()))
-    topology_payload["topology_revision"] = target.topology_revision
+    # Replace the build-time revision (a hash of build inputs) with a content
+    # hash so the revision auto-bumps whenever the serialized content changes.
+    topology_payload["topology_revision"] = compute_content_revision(topology_payload)
     return {
         "geometry": target.family,
         "width": target.width,
@@ -174,7 +217,11 @@ def fixture_drift_lines(
     drift: list[str] = []
     for target in targets:
         regenerated = regenerate_fixture_payload(target)
-        current = _read_existing_fixture(target.path)
+        try:
+            current = _read_existing_fixture(target.path)
+        except FileNotFoundError:
+            drift.append(target.name)
+            continue
         if current != regenerated:
             drift.append(target.name)
     return drift

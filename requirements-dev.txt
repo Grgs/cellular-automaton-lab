@@ -28,6 +28,8 @@ detect-secrets==1.5.0
     # via -r requirements-dev.in
 distlib==0.4.0
     # via virtualenv
+execnet==2.1.2
+    # via pytest-xdist
 filelock==3.29.0
     # via
     #   cachecontrol
@@ -108,6 +110,8 @@ pytest==9.0.3
     #   -r requirements-dev.in
     #   pytest-cov
 pytest-cov==7.1.0
+    # via -r requirements-dev.in
+pytest-xdist==3.8.0
     # via -r requirements-dev.in
 python-discovery==1.2.2
     # via virtualenv

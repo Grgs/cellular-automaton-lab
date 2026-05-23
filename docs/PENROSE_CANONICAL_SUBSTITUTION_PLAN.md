@@ -132,11 +132,10 @@ Files that need to be touched:
 - `backend/simulation/data/reference_patch_canonical_fixtures.json` —
   regenerate the `robinson-triangles` `exact-depth-1` and `exact-depth-3`
   fixtures using `tools/regenerate_reference_fixtures.py`.
-- `frontend/test-fixtures/topologies/robinson-triangles-depth-3.json` and
-  `frontend/test-fixtures/topologies/fixture-manifest.json` — regenerate the
-  frontend Robinson fixture using
-  `tools/regenerate_frontend_topology_fixtures.py`. Bump
-  `topologyRevision` accordingly.
+- `frontend/test-fixtures/topologies/robinson-triangles-depth-3.json` —
+  regenerate the frontend Robinson fixture using
+  `tools/regenerate_frontend_topology_fixtures.py`. The embedded
+  `topology_revision` is now content-derived and auto-updates.
 - `frontend/test-fixtures/bootstrap-data.json` — regenerate via
   `tools/export_bootstrap_data.py`.
 - `frontend/controls/tiling-preview-data.ts` — refresh the Penrose / Robinson

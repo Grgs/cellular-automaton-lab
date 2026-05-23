@@ -6276,7 +6276,7 @@
         ]
       }
     ],
-    "topology_revision": "fixture-robinson-triangles-depth-3-v2",
+    "topology_revision": "09a2383a",
     "topology_spec": {
       "adjacency_mode": "edge",
       "height": 9,

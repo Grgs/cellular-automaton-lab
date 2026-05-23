@@ -404,6 +404,9 @@ Status: addressed. Frontend representative fixtures now have:
 - a shared manifest at `frontend/test-fixtures/topologies/fixture-manifest.json`
 - a deterministic regeneration/check tool at
   `tools/regenerate_frontend_topology_fixtures.py`
+- content-derived `topology_revision` strings inside each fixture, so the
+  revision auto-bumps on regeneration whenever the serialized topology
+  content actually changes
 
 That means browser-facing topology fixtures now follow the same basic workflow
 as backend reference fixtures: there is a checked manifest, a canonical
