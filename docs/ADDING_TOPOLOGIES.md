@@ -4,6 +4,27 @@ Use this guide when adding a new tiling family, adjacency mode, or topology gene
 
 For system context, start with [ARCHITECTURE.md](ARCHITECTURE.md), [CODE_MAP.md](CODE_MAP.md), and [TESTING_TILINGS.md](TESTING_TILINGS.md).
 
+## Fast path: aperiodic substitution families
+
+If the new family is an aperiodic substitution tiling (the most common case for new entries), `tools/scaffold_aperiodic_family.py` automates the mechanical wiring. It creates the generator skeleton, reference-spec stub, and test skeleton, and inserts the manifest / registry / topology / reference-spec-init entries. The placeholder substitution is structurally valid (loads end-to-end) so you can confirm wiring before implementing the real geometry.
+
+```powershell
+py -3 tools/scaffold_aperiodic_family.py \
+    --family-id widget-monotile \
+    --label "Widget Monotile" \
+    --kind widget \
+    --source-url https://tilings.math.uni-bielefeld.de/substitution/widget/
+```
+
+After scaffolding, follow the printed checklist:
+
+1. Implement the real substitution geometry in the generated `backend/simulation/aperiodic_<family>.py`.
+2. Fill in the depth expectations in the generated `backend/simulation/reference_specs/aperiodic/<family>.py`.
+3. Add a dead-palette entry under `frontend/canvas/family-dead-palette-manifest.json`.
+4. Regenerate the picker thumbnail, canonical fixtures, frontend topology fixtures, and bootstrap data using the tool invocations printed by the scaffold.
+
+The rest of this document is the manual reference. Use it when the scaffold doesn't fit (regular grid, periodic-face, or non-substitution aperiodic families) or when you need to understand what the scaffold is doing.
+
 ## Decide The Topology Type
 
 Choose the smallest existing model that fits the family:
