@@ -2,18 +2,19 @@
 
 Single index of every script under `tools/`. Each entry is a one-line summary, the canonical invocation, and (when relevant) a pointer to the deeper guide that already covers it.
 
-The CLI tools group into ten purposes:
+The CLI tools group into eleven purposes:
 
 1. [Build and serve](#build-and-serve)
 2. [Lint and format](#lint-and-format)
 3. [Pre-commit hooks](#pre-commit-hooks)
 4. [Tiling validation and verification](#tiling-validation-and-verification)
 5. [Browser diagnosis and render review](#browser-diagnosis-and-render-review)
-6. [Fixture and bootstrap regeneration](#fixture-and-bootstrap-regeneration)
-7. [Test runners and introspection](#test-runners-and-introspection)
-8. [Supply-chain audit](#supply-chain-audit)
-9. [Performance benchmarks](#performance-benchmarks)
-10. [Process cleanup](#process-cleanup)
+6. [Scaffolding](#scaffolding)
+7. [Fixture and bootstrap regeneration](#fixture-and-bootstrap-regeneration)
+8. [Test runners and introspection](#test-runners-and-introspection)
+9. [Supply-chain audit](#supply-chain-audit)
+10. [Performance benchmarks](#performance-benchmarks)
+11. [Process cleanup](#process-cleanup)
 
 For the npm-script surface (which wraps several of these), see the `scripts` block in [package.json](../package.json).
 
@@ -171,6 +172,20 @@ Explores topology cleanup factors for image-derived patch-depth topology familie
 
 ```powershell
 python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3
+```
+
+## Scaffolding
+
+### `tools/scaffold_aperiodic_family.py`
+
+Stamps out the boilerplate for a new aperiodic tiling family: generator skeleton, reference spec stub, test skeleton, plus surgical manifest / registry / topology / reference-spec-init inserts. Does NOT solve the geometry -- it produces a structurally-valid placeholder that loads end-to-end so wiring can be confirmed before the substitution rule is finalized. After running, follow the printed next-step checklist (define geometry, regenerate fixtures, add palette entry). Supports `--dry-run`. Source: [scaffold_aperiodic_family.py](../tools/scaffold_aperiodic_family.py).
+
+```powershell
+py -3 tools/scaffold_aperiodic_family.py \
+    --family-id widget-monotile \
+    --label "Widget Monotile" \
+    --kind widget \
+    --source-url https://example.org/widget
 ```
 
 ## Fixture and bootstrap regeneration
