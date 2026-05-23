@@ -764,7 +764,7 @@
         ]
       }
     ],
-    "topology_revision": "b17717c3",
+    "topology_revision": "c4f34d88",
     "topology_spec": {
       "adjacency_mode": "edge",
       "height": 5,

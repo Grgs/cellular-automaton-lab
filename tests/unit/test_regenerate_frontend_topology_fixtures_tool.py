@@ -123,6 +123,43 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
         )
         self.assertNotEqual(first_hash, compute_content_revision(mutated_payload))
 
+    def test_compute_content_revision_normalizes_negative_zero(self) -> None:
+        # Some backend builders (e.g. taylor-socolar) produce ``-0.0`` for
+        # some center / vertex coordinates on one platform and ``0.0`` on
+        # another (libm differences in trig identities like sin(pi)).
+        # Python treats ``-0.0 == 0.0`` so the dict-equality drift check
+        # is happy; the content hash must match too or the checked-in
+        # revision becomes platform-dependent. This test locks in the
+        # normalization that keeps hashes stable across platforms.
+        positive_zero_payload = {
+            "topology_spec": {"tiling_family": "demo"},
+            "cells": [
+                {
+                    "id": "c:0:0",
+                    "kind": "cell",
+                    "neighbors": [],
+                    "center": {"x": 0.0, "y": 1.5},
+                    "vertices": [{"x": 0.0, "y": 0.0}],
+                }
+            ],
+        }
+        negative_zero_payload = {
+            "topology_spec": {"tiling_family": "demo"},
+            "cells": [
+                {
+                    "id": "c:0:0",
+                    "kind": "cell",
+                    "neighbors": [],
+                    "center": {"x": -0.0, "y": 1.5},
+                    "vertices": [{"x": -0.0, "y": 0.0}],
+                }
+            ],
+        }
+        self.assertEqual(
+            compute_content_revision(positive_zero_payload),
+            compute_content_revision(negative_zero_payload),
+        )
+
     def test_regenerated_payload_revision_matches_computed_content_hash(self) -> None:
         shield_target = next(
             target for target in load_fixture_targets() if target.name == "shield-depth-3"
