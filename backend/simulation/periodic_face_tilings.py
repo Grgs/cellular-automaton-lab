@@ -26,6 +26,7 @@ from backend.simulation.topology_family_manifest import (
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
+    TILTWORK_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
     TYPE_7_PENTAGONAL_GEOMETRY,
 )
@@ -50,6 +51,7 @@ PERIODIC_FACE_TILING_GEOMETRIES = (
     FLORET_PENTAGONAL_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
     TYPE_7_PENTAGONAL_GEOMETRY,
+    TILTWORK_GEOMETRY,
 )
 
 _DATA_PATH = Path(__file__).with_name("data") / "periodic_face_patterns.json"

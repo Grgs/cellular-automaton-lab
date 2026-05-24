@@ -401,6 +401,16 @@
       ]
     },
     {
+      "geometry": "tiltwork",
+      "variants": [
+        {"label": "tiltwork-diamond", "selector": {"kind": "diamond"}, "color": {"token": "toneStone"}},
+        {"label": "tiltwork-tri-s1", "selector": {"kind": "corner-triangle", "slot": "s1"}, "color": {"token": "toneCream"}},
+        {"label": "tiltwork-tri-s2", "selector": {"kind": "corner-triangle", "slot": "s2"}, "color": {"token": "toneSand"}},
+        {"label": "tiltwork-tri-s3", "selector": {"kind": "corner-triangle", "slot": "s3"}, "color": {"token": "toneTan"}},
+        {"label": "tiltwork-tri-s4", "selector": {"kind": "corner-triangle", "slot": "s4"}, "color": {"token": "toneClay"}}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
