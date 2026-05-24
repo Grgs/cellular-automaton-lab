@@ -39,6 +39,7 @@ DART_KIND = "dart"
 KITE_HALF_ACUTE_KIND = "kite-half-acute"
 DART_HALF_OBTUSE_KIND = "dart-half-obtuse"
 P1_PENTAGON_KIND = "p1-pentagon"
+P1_PENTAGON_CLUSTER_KIND = "p1-pentagon-cluster"
 P1_DIAMOND_KIND = "p1-diamond"
 P1_BOAT_KIND = "p1-boat"
 P1_STAR_KIND = "p1-star"
@@ -140,10 +141,16 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # variants) and collapses each into the corresponding P1 prototile,
         # giving a patch that distributes pentagons, diamonds, boats, and
         # stars across the crop without the centered singular ring present
-        # in the all-zero pentagrid manifestation.
+        # in the all-zero pentagrid manifestation. The
+        # ``p1-pentagon-cluster`` kind is the 10-vertex decagonal cell
+        # emitted at each sun-vertex merge (canonical P1 pentagon
+        # position); ``p1-pentagon`` is reserved for unmerged thick
+        # rhombs that don't participate in any cluster (rhomb-region MLD
+        # representatives of the pentagonal P1 prototile).
         implementation_status="canonical_patch",
         public_cell_kinds=(
             P1_PENTAGON_KIND,
+            P1_PENTAGON_CLUSTER_KIND,
             P1_DIAMOND_KIND,
             P1_BOAT_KIND,
             P1_STAR_KIND,
