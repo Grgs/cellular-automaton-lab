@@ -64,6 +64,12 @@ FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal"
 TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal"
 SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual"
 KISRHOMBILLE_GEOMETRY = "kisrhombille"
+# Tiltwork is a non-canonical periodic tiling invented for this catalog:
+# a unit square with a center diamond (rotated square) inset and four
+# right-isosceles triangles in the corners. Vertex configurations are
+# (triangle, triangle, diamond, triangle, triangle, diamond) at edge
+# midpoints and (triangle, triangle, triangle, triangle) at corners.
+TILTWORK_GEOMETRY = "tiltwork"
 
 
 @dataclass(frozen=True)
@@ -369,6 +375,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
         default_rule="life-b2-s23",
+    ),
+    TILTWORK_GEOMETRY: _single_variant_family(
+        tiling_family=TILTWORK_GEOMETRY,
+        label="Tiltwork",
+        picker_group="Periodic Mixed",
+        picker_order=235,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
     ),
     SPECTRE_GEOMETRY: _translated_aperiodic_family(
         SPECTRE_GEOMETRY,
