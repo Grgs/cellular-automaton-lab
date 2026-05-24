@@ -421,6 +421,19 @@
       ]
     },
     {
+      "geometry": "sunburst",
+      "variants": [
+        {"label": "sunburst-s1", "selector": {"kind": "sunburst-triangle", "slot": "s1"}, "color": {"token": "toneCream"}},
+        {"label": "sunburst-s2", "selector": {"kind": "sunburst-triangle", "slot": "s2"}, "color": {"token": "toneSand"}},
+        {"label": "sunburst-s3", "selector": {"kind": "sunburst-triangle", "slot": "s3"}, "color": {"token": "toneTan"}},
+        {"label": "sunburst-s4", "selector": {"kind": "sunburst-triangle", "slot": "s4"}, "color": {"token": "toneStone"}},
+        {"label": "sunburst-s5", "selector": {"kind": "sunburst-triangle", "slot": "s5"}, "color": {"token": "toneClay"}},
+        {"label": "sunburst-s6", "selector": {"kind": "sunburst-triangle", "slot": "s6"}, "color": {"token": "toneLinen"}},
+        {"label": "sunburst-s7", "selector": {"kind": "sunburst-triangle", "slot": "s7"}, "color": {"token": "toneSand"}, "allowSharedDeadColor": true},
+        {"label": "sunburst-s8", "selector": {"kind": "sunburst-triangle", "slot": "s8"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},

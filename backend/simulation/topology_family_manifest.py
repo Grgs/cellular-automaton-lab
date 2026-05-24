@@ -70,6 +70,13 @@ KISRHOMBILLE_GEOMETRY = "kisrhombille"
 # (triangle, triangle, diamond, triangle, triangle, diamond) at edge
 # midpoints and (triangle, triangle, triangle, triangle) at corners.
 TILTWORK_GEOMETRY = "tiltwork"
+# Sunburst is a non-canonical periodic tiling invented for this catalog:
+# a unit square subdivided into eight right-isoceles triangles (legs equal
+# to half the square side) all sharing an apex at the square center, like
+# an eight-spoke compass. Vertex configurations: 8 triangle apex (45 deg)
+# at each square center, 4 triangle right-angles at each square corner,
+# 4 triangle right-angles at each square edge midpoint.
+SUNBURST_GEOMETRY = "sunburst"
 
 
 @dataclass(frozen=True)
@@ -381,6 +388,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         label="Tiltwork",
         picker_group="Periodic Mixed",
         picker_order=235,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    SUNBURST_GEOMETRY: _single_variant_family(
+        tiling_family=SUNBURST_GEOMETRY,
+        label="Sunburst",
+        picker_group="Periodic Mixed",
+        picker_order=237,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
