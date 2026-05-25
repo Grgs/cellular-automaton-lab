@@ -92,12 +92,25 @@ The deeper guide for this cluster is [docs/TESTING_TILINGS.md](TESTING_TILINGS.m
 
 ### `tools/sketch_tiling.py`
 
-Standalone sketch + validator for a candidate periodic tiling, runnable without wiring it into any of the backend manifests. Takes a Python sketch file that defines `FACES`, `CELL_WIDTH`, and `CELL_HEIGHT`, builds a 3x3 patch using the same builder the backend uses, then reports polygon overlaps, T-junctions, unmatched interior edges, and per-vertex interior-angle sums (in degrees) so you can immediately see e.g. "vertex (26, 45.03) has angle sum 300 deg, 5 polygons" instead of inferring it from the topology builder's neighbor-count histogram. Optionally emits an SVG visualization and a JSON descriptor stub ready to paste into [periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json). Exit code is 0 for a valid tiling and 1 otherwise. An example sketch lives under [tools/sketch_examples/](../tools/sketch_examples/). Use this when adding a new periodic mixed tiling — see step 4 of [docs/ADDING_TOPOLOGIES.md](ADDING_TOPOLOGIES.md). Source: [sketch_tiling.py](../tools/sketch_tiling.py).
+Standalone sketch + validator for a candidate periodic tiling, runnable without wiring it into any of the backend manifests. Takes a Python sketch file that defines `FACES`, `CELL_WIDTH`, and `CELL_HEIGHT`, builds a 3x3 patch using the same builder the backend uses, then reports polygon overlaps, T-junctions, unmatched interior edges, and per-vertex interior-angle sums (in degrees) so you can immediately see e.g. "vertex (26, 45.03) has angle sum 300 deg, 5 polygons" instead of inferring it from the topology builder's neighbor-count histogram. Optionally emits an SVG visualization, a JSON descriptor stub ready to paste into [periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json), and a complete Python reference-spec module ready to drop into [backend/simulation/reference_specs/periodic/](../backend/simulation/reference_specs/periodic/). Exit code is 0 for a valid tiling and 1 otherwise. An example sketch lives under [tools/sketch_examples/](../tools/sketch_examples/). Use this when adding a new periodic mixed tiling — see step 4 of [docs/ADDING_TOPOLOGIES.md](ADDING_TOPOLOGIES.md). Source: [sketch_tiling.py](../tools/sketch_tiling.py).
 
 ```powershell
 py -3 tools/sketch_tiling.py path/to/sketch.py
 py -3 tools/sketch_tiling.py path/to/sketch.py --svg out.svg --json out.json
+py -3 tools/sketch_tiling.py path/to/sketch.py --reference-spec out_spec.py --source-url https://example.com
 py -3 tools/sketch_tiling.py path/to/sketch.py --patch-size 4
+```
+
+### `tools/sketch_helpers.py`
+
+Geometric polygon constructors for sketch files. Saves you from spelling out `sqrt(3) / 2` or hand-deriving the third vertex of an equilateral triangle. Every helper returns vertices in CCW order with coordinates already rounded to 6 decimals (the same precision the backend's edge-matcher uses), so values computed two different ways agree exactly and the polygon-overlap validator never fires on float noise. Used by sketch files that you feed to `tools/sketch_tiling.py`. Source: [sketch_helpers.py](../tools/sketch_helpers.py).
+
+```python
+from tools.sketch_helpers import equilateral_triangle, square, regular_hexagon, square_with_mid_edge_vertices
+# equilateral_triangle((0, 0), (52, 0), side="above")  -> triangle vertices, apex up
+# square((0, 90), 52)                                  -> 4 square vertices
+# regular_hexagon((0, 0), 52, orientation="pointy-top")-> 6 hex vertices
+# square_with_mid_edge_vertices((0, 0), 52)            -> 8 vertices (4 corners + 4 midpoints, for T-junctions)
 ```
 
 ### `tools/validate_tilings.py`

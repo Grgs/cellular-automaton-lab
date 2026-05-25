@@ -10,10 +10,12 @@ emits an SVG visualization and a JSON descriptor stub ready to paste into
 Sketch file format (a regular Python module)::
 
     import math
+    from tools.sketch_helpers import equilateral_triangle, square
+
     EDGE = 52.0
     H = round(EDGE * math.sqrt(3) / 2, 6)
 
-    GEOMETRY = "my-tiling"             # optional; used in JSON stub
+    GEOMETRY = "my-tiling"             # optional; used in JSON / spec stubs
     LABEL = "My Tiling"                # optional
     BASE_EDGE = EDGE                   # optional
     CELL_WIDTH = 2 * EDGE
@@ -24,21 +26,40 @@ Sketch file format (a regular Python module)::
         {
             "slot": "ua",
             "kind": "triangle",
-            "vertices": [(0, 0), (EDGE, 0), (EDGE / 2, H)],
+            "vertices": equilateral_triangle((0, 0), (EDGE, 0), side="above"),
             # optional:
             # "prefix": "t",
             # "center": (26, 15.011),     # default = centroid
             # "repeat_x_extra": 0,
             # "repeat_y_extra": 0,
         },
+        {
+            "slot": "sa",
+            "kind": "square",
+            "vertices": square((0, 2 * H), EDGE),
+        },
         ...
     ]
+
+``tools/sketch_helpers.py`` ships polygon constructors so you never have
+to spell out ``sqrt(3) / 2``; every helper rounds to the same 6-decimal
+grid the backend's edge-matcher uses so coordinates derived two ways
+agree exactly.
 
 Usage::
 
     py tools/sketch_tiling.py path/to/sketch.py
     py tools/sketch_tiling.py path/to/sketch.py --svg out.svg --json out.json
+    py tools/sketch_tiling.py path/to/sketch.py --reference-spec out_spec.py \\
+        --source-url https://example.com/source
     py tools/sketch_tiling.py path/to/sketch.py --patch-size 4
+
+``--reference-spec`` emits a complete ready-to-drop reference-spec
+Python module under ``backend/simulation/reference_specs/periodic/`` with
+the geometry id, label, kind counts, degree histogram, adjacency pairs,
+slot vocabulary, and interior vertex configuration frequencies all filled
+in from what the sketch tool just observed - so the spec passes the
+reference verifier on its first run.
 
 Exit code is 0 if the sketch produces a valid tiling (no overlaps, all
 interior edges matched, every vertex's interior-angle sum is 360 degrees);
@@ -118,6 +139,7 @@ class SketchReport:
     cells: tuple[PeriodicFaceCell, ...]
     kind_counts: dict[str, int]
     degree_histogram: dict[int, int]
+    adjacency_pairs: tuple[tuple[str, str], ...]
     overlaps: tuple[OverlapPair, ...]
     unmatched_edges: tuple[UnmatchedEdge, ...]
     t_junctions: tuple[TJunction, ...]
@@ -404,10 +426,24 @@ def sketch(input_data: SketchInput, *, patch_size: int = 3) -> SketchReport:
             kinds = tuple(sorted(kind for _, kind in cfg.polygons))
             interior_kinds[kinds] += 1
 
+    # Adjacency pair histogram: every directed edge cell -> neighbor
+    # contributes one (kind_left, kind_right) pair (canonicalised by sort).
+    kind_by_id = {cell.id: cell.kind for cell in cells}
+    pair_set: set[tuple[str, str]] = set()
+    for cell in cells:
+        for neighbor_id in cell.neighbors:
+            neighbor_kind = kind_by_id.get(neighbor_id)
+            if neighbor_kind is None:
+                continue
+            pair = tuple(sorted((cell.kind, neighbor_kind)))
+            pair_set.add((pair[0], pair[1]))
+    adjacency_pairs = tuple(sorted(pair_set))
+
     return SketchReport(
         cells=cells,
         kind_counts=kind_counts,
         degree_histogram=degree_hist,
+        adjacency_pairs=adjacency_pairs,
         overlaps=overlaps,
         unmatched_edges=unmatched_edges,
         t_junctions=t_junctions,
@@ -546,6 +582,123 @@ def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
     return {input_data.geometry: descriptor}
 
 
+def emit_reference_spec(
+    input_data: SketchInput,
+    report: SketchReport,
+    *,
+    patch_size: int = 3,
+    source_url: str | None = None,
+) -> str:
+    """Return a complete reference-spec Python module as a string.
+
+    Drop the output into ``backend/simulation/reference_specs/periodic/``
+    (one file per geometry) and add the corresponding ``from . import
+    <module>`` and ``**<module>.SPECS`` lines to that package's
+    ``__init__.py``. The reference verifier will then check the geometry
+    against the cell counts, degree histogram, adjacency pairs, and
+    interior-vertex-configuration frequencies the sketch tool just
+    computed - which is exactly what the verifier itself computes at the
+    same patch size, so the spec passes on its first verifier run.
+    """
+    source_urls_repr = "()" if source_url is None else f'("{source_url}",)'
+
+    def _format_tuple_of_pairs(pairs: list[tuple[Any, Any]]) -> str:
+        if not pairs:
+            return "()"
+        if len(pairs) == 1:
+            (first, second) = pairs[0]
+            return f"(({first!r}, {second!r}),)"
+        lines = [f"({first!r}, {second!r})" for first, second in pairs]
+        joined = ",\n                    ".join(lines)
+        return f"(\n                    {joined},\n                )"
+
+    def _format_tuple(items: tuple[Any, ...]) -> str:
+        if not items:
+            return "()"
+        if len(items) == 1:
+            return f"({items[0]!r},)"
+        return repr(items)
+
+    def _format_kind_tuple(kinds: tuple[str, ...]) -> str:
+        if not kinds:
+            return "()"
+        if len(kinds) <= 4:
+            return _format_tuple(kinds)
+        # Long configurations look nicer broken across lines.
+        joined = ",\n                        ".join(repr(k) for k in kinds)
+        return f"(\n                        {joined},\n                    )"
+
+    kind_counts_lines = [(kind, count) for kind, count in sorted(report.kind_counts.items())]
+    degree_hist_lines = sorted(report.degree_histogram.items())
+    slot_vocabulary = tuple(sorted({face["slot"] for face in input_data.faces}))
+    allowed_kinds = tuple(sorted(report.kind_counts))
+
+    vertex_configs_sorted = sorted(report.interior_vertex_kinds.items(), key=lambda kv: kv[0])
+    vertex_config_repr_parts = [_format_kind_tuple(cfg) for cfg, _ in vertex_configs_sorted]
+    if not vertex_config_repr_parts:
+        configs_block = "()"
+    elif len(vertex_config_repr_parts) == 1:
+        configs_block = f"({vertex_config_repr_parts[0]},)"
+    else:
+        joined = ",\n                ".join(vertex_config_repr_parts)
+        configs_block = f"(\n                {joined},\n            )"
+
+    freq_lines = []
+    for cfg, count in vertex_configs_sorted:
+        freq_lines.append(
+            f"(\n                    {_format_kind_tuple(cfg)},\n                    {count},\n                )"
+        )
+    if not freq_lines:
+        freqs_block = "()"
+    elif len(freq_lines) == 1:
+        freqs_block = f"({freq_lines[0]},)"
+    else:
+        joined = ",\n                ".join(freq_lines)
+        freqs_block = f"(\n                {joined},\n            )"
+
+    return f'''from __future__ import annotations
+
+from backend.simulation.reference_specs.types import (
+    PeriodicDescriptorExpectation,
+    ReferenceDepthExpectation,
+    ReferenceFamilySpec,
+)
+
+# Generated by tools/sketch_tiling.py from
+# {Path(input_data.geometry).name} at patch_size={patch_size}. Counts and
+# vertex configuration frequencies reflect the open-boundary {patch_size}x{patch_size} sample
+# the reference verifier itself runs.
+
+SPECS = {{
+    "{input_data.geometry}": ReferenceFamilySpec(
+        geometry="{input_data.geometry}",
+        display_name="{input_data.label}",
+        source_urls={source_urls_repr},
+        canonical_root_seed_policy="descriptor-driven open-boundary {patch_size}x{patch_size} sample",
+        allowed_public_cell_kinds={_format_tuple(allowed_kinds)},
+        required_metadata=(),
+        sample_mode="grid",
+        depth_expectations={{
+            {patch_size}: ReferenceDepthExpectation(
+                exact_total_cells={len(report.cells)},
+                expected_kind_counts={_format_tuple_of_pairs(kind_counts_lines)},
+                expected_adjacency_pairs={_format_tuple_of_pairs(list(report.adjacency_pairs))},
+                expected_degree_histogram={_format_tuple_of_pairs(degree_hist_lines)},
+            ),
+        }},
+        periodic_descriptor=PeriodicDescriptorExpectation(
+            face_template_count={len(input_data.faces)},
+            slot_vocabulary={_format_tuple(slot_vocabulary)},
+            id_pattern="{{prefix}}:{{slot}}:{{x}}:{{y}}",
+            row_offset_x={input_data.row_offset_x},
+            expected_interior_vertex_configurations={configs_block},
+            expected_interior_vertex_configuration_frequencies={freqs_block},
+        ),
+    ),
+}}
+'''
+
+
 # --- CLI --------------------------------------------------------------------
 
 
@@ -618,6 +771,18 @@ def main(argv: list[str] | None = None) -> int:
         "--json", type=Path, dest="json_path", help="Write a JSON descriptor stub to this path"
     )
     parser.add_argument(
+        "--reference-spec",
+        type=Path,
+        dest="reference_spec_path",
+        help="Write a Python reference-spec module to this path",
+    )
+    parser.add_argument(
+        "--source-url",
+        type=str,
+        default=None,
+        help="Optional source URL embedded in the reference-spec module",
+    )
+    parser.add_argument(
         "--patch-size",
         type=int,
         default=3,
@@ -636,6 +801,12 @@ def main(argv: list[str] | None = None) -> int:
         descriptor = emit_descriptor_json(input_data)
         args.json_path.write_text(json.dumps(descriptor, indent=2) + "\n", encoding="utf-8")
         print(f"JSON descriptor stub written: {args.json_path}")
+    if args.reference_spec_path:
+        spec_source = emit_reference_spec(
+            input_data, report, patch_size=args.patch_size, source_url=args.source_url
+        )
+        args.reference_spec_path.write_text(spec_source, encoding="utf-8")
+        print(f"Reference spec module written: {args.reference_spec_path}")
 
     return 0 if report.is_valid else 1
 

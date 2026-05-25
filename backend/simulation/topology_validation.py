@@ -153,11 +153,36 @@ def _canonical_cell_pair(left: str, right: str) -> tuple[str, str]:
 
 
 def topology_polygons(topology: LatticeTopology) -> dict[str, Polygon]:
+    # For periodic-face tilings, snap each vertex to _COORDINATE_PRECISION
+    # (6 decimals) before constructing the Shapely polygon. Without this,
+    # two cells whose shared edge endpoint was computed by different float
+    # paths (e.g. one used the rounded JSON value 90.066642 and another
+    # used the unrounded 52*sqrt(3) = 90.06664199358...) can end up with
+    # the shared edge offset by ~1e-7, which Shapely reports as a tiny
+    # intersection area and the overlap validator flags as a real overlap.
+    # The edge-key path in periodic_face_tilings._edge_key already rounds
+    # to the same precision, so snapping here just brings the validator in
+    # line with the builder.
+    #
+    # Aperiodic substitution families intentionally use sub-1e-6 precision
+    # for their irrational vertex coordinates (golden ratio, sqrt(3)/3
+    # etc.) and snap-to-6-decimals breaks their surface-union analysis, so
+    # we scope the snap to periodic-face geometries.
+    from backend.simulation.periodic_face_tilings import is_periodic_face_tiling
+
+    snap = is_periodic_face_tiling(topology.geometry)
     polygons: dict[str, Polygon] = {}
     for cell in topology.cells:
         if cell.vertices is None:
             continue
-        polygons[cell.id] = Polygon(cell.vertices)
+        if snap:
+            vertices = tuple(
+                (round(x, _COORDINATE_PRECISION), round(y, _COORDINATE_PRECISION))
+                for x, y in cell.vertices
+            )
+            polygons[cell.id] = Polygon(vertices)
+        else:
+            polygons[cell.id] = Polygon(cell.vertices)
     return polygons
 
 
