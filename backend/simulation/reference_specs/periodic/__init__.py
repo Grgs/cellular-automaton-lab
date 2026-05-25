@@ -16,6 +16,7 @@ from . import snub_square_dual
 from . import type_7_pentagonal
 from . import kisrhombille
 from . import tiltwork
+from . import pythagorean
 
 PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **archimedean.SPECS,
@@ -32,6 +33,7 @@ PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **type_7_pentagonal.SPECS,
     **kisrhombille.SPECS,
     **tiltwork.SPECS,
+    **pythagorean.SPECS,
 }
 
 __all__ = ["PERIODIC_REFERENCE_FAMILY_SPECS"]

@@ -70,6 +70,12 @@ KISRHOMBILLE_GEOMETRY = "kisrhombille"
 # (triangle, triangle, diamond, triangle, triangle, diamond) at edge
 # midpoints and (triangle, triangle, triangle, triangle) at corners.
 TILTWORK_GEOMETRY = "tiltwork"
+# Pythagorean tiling: classic two-prototile tiling by two square sizes (here
+# 1:2 ratio). Non-edge-to-edge: every long-edge midpoint is a T-junction
+# where a small square's vertex meets the middle of a big square's edge.
+# To make every edge match exactly, big squares are modeled as 8-vertex
+# polygons (four corners plus four collinear mid-edge vertices).
+PYTHAGOREAN_GEOMETRY = "pythagorean"
 
 
 @dataclass(frozen=True)
@@ -381,6 +387,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         label="Tiltwork",
         picker_group="Periodic Mixed",
         picker_order=235,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    PYTHAGOREAN_GEOMETRY: _single_variant_family(
+        tiling_family=PYTHAGOREAN_GEOMETRY,
+        label="Pythagorean",
+        picker_group="Periodic Mixed",
+        picker_order=237,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),

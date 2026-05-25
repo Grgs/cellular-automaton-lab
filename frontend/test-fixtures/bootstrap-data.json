@@ -525,6 +525,32 @@
       }
     },
     {
+      "tiling_family": "pythagorean",
+      "label": "Pythagorean",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 237,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "pythagorean"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
       "tiling_family": "triakis-triangular",
       "label": "Triakis Triangular",
       "picker_group": "Periodic Mixed",
@@ -1348,6 +1374,21 @@
       "max_x": 100.0,
       "max_y": 100.0,
       "cell_count_per_unit": 5,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "pythagorean",
+      "label": "Pythagorean",
+      "metric_model": "pattern",
+      "base_edge": 25.0,
+      "unit_width": 125.0,
+      "unit_height": 125.0,
+      "min_dimension": 1,
+      "min_x": -25.0,
+      "min_y": -25.0,
+      "max_x": 125.0,
+      "max_y": 125.0,
+      "cell_count_per_unit": 10,
       "row_offset_x": 0.0
     }
   ],
