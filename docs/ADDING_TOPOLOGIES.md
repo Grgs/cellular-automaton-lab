@@ -66,6 +66,7 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
 4. Implement the backend builder.
    - Regular grids belong near [backend/simulation/topology_regular.py](../backend/simulation/topology_regular.py).
    - Periodic mixed tilings: add an entry to [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json) with the face template vertices, unit cell dimensions (`unit_width`, `unit_height`), slot vocabulary, and bounding extents. Then add the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` in [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py).
+   - Before hand-editing the JSON descriptor, **sketch the candidate faces in a Python file and run them through [tools/sketch_tiling.py](../tools/sketch_tiling.py)** to catch overlaps, T-junctions, unmatched edges, and per-vertex angle-sum mistakes before any of the manifest/registry wiring is in place. The tool emits a JSON descriptor stub on success that drops straight into `periodic_face_patterns.json`. See the example under [tools/sketch_examples/](../tools/sketch_examples/) for the input format.
    - Aperiodic families usually get a focused `backend/simulation/aperiodic_*.py` module plus registry wiring.
 5. Preserve topology contracts.
    - Cell ids must be deterministic and stable for the same topology spec.
