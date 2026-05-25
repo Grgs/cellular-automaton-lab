@@ -13,6 +13,7 @@ from __future__ import annotations
 import math
 import unittest
 from pathlib import Path
+from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 EXAMPLE_PATH = ROOT_DIR / "tools" / "sketch_examples" / "triangular_square_2uniform.py"
@@ -52,7 +53,7 @@ class SketchTilingTests(unittest.TestCase):
 
         # 2-uniform tiling with the central down-triangle removed: the gap
         # leaves unmatched edges and vertex angles short of 360 deg.
-        faces = [
+        faces: list[dict[str, Any]] = [
             {"slot": "ua", "kind": "triangle", "vertices": [(0, 0), (edge, 0), (edge / 2, h)]},
             {
                 "slot": "ub",
@@ -84,7 +85,7 @@ class SketchTilingTests(unittest.TestCase):
         from tools.sketch_tiling import SketchInput, sketch
 
         # Two identical squares occupying the same cell: 100% overlap.
-        faces = [
+        faces: list[dict[str, Any]] = [
             {"slot": "a", "kind": "square", "vertices": [(0, 0), (1, 0), (1, 1), (0, 1)]},
             {"slot": "b", "kind": "square", "vertices": [(0, 0), (1, 0), (1, 1), (0, 1)]},
         ]
