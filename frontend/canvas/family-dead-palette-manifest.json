@@ -421,6 +421,17 @@
       ]
     },
     {
+      "geometry": "pythagorean",
+      "variants": [
+        {"label": "pythagorean-large-b0", "selector": {"kind": "pythagorean-large", "slot": "b0"}, "color": {"token": "toneStone"}},
+        {"label": "pythagorean-large-b1", "selector": {"kind": "pythagorean-large", "slot": "b1"}, "color": {"token": "toneTan"}},
+        {"label": "pythagorean-large-b2", "selector": {"kind": "pythagorean-large", "slot": "b2"}, "color": {"token": "toneClay"}},
+        {"label": "pythagorean-large-b3", "selector": {"kind": "pythagorean-large", "slot": "b3"}, "color": {"token": "toneSand"}},
+        {"label": "pythagorean-large-b4", "selector": {"kind": "pythagorean-large", "slot": "b4"}, "color": {"token": "toneLinen"}},
+        {"label": "pythagorean-small", "selector": {"kind": "pythagorean-small"}, "color": {"token": "toneCream"}}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
