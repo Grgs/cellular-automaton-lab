@@ -100,6 +100,200 @@ class SketchTilingTests(unittest.TestCase):
         self.assertGreater(len(report.overlaps), 0)
         self.assertFalse(report.is_valid)
 
+    def test_emit_reference_spec_loads_and_matches_handwritten_spec(self) -> None:
+        """The generated reference-spec module loads as a Python module and
+        produces a SPECS dict whose counts match the hand-written one in the
+        backend catalog. (The hand-written spec also informs the verifier so
+        if the verifier passes for that geometry, the generated spec is
+        guaranteed to as well.)"""
+        import importlib.util
+        import tempfile
+
+        from tools.sketch_tiling import emit_reference_spec, load_sketch, sketch
+
+        input_data = load_sketch(EXAMPLE_PATH)
+        report = sketch(input_data, patch_size=3)
+        source = emit_reference_spec(input_data, report, patch_size=3)
+
+        # Module must be syntactically valid Python.
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".py", delete=False, encoding="utf-8"
+        ) as handle:
+            handle.write(source)
+            spec_path = Path(handle.name)
+        try:
+            spec_module_spec = importlib.util.spec_from_file_location("generated_spec", spec_path)
+            assert spec_module_spec is not None and spec_module_spec.loader is not None
+            module = importlib.util.module_from_spec(spec_module_spec)
+            spec_module_spec.loader.exec_module(module)
+        finally:
+            spec_path.unlink()
+
+        # Compare key fields against the existing hand-written spec for
+        # the same geometry.
+        from backend.simulation.reference_specs.periodic.triangular_square_2uniform import (
+            SPECS as REFERENCE_SPECS,
+        )
+
+        generated = module.SPECS["triangular-square-2uniform"]
+        expected = REFERENCE_SPECS["triangular-square-2uniform"]
+        self.assertEqual(generated.geometry, expected.geometry)
+        gen_depth = generated.depth_expectations[3]
+        exp_depth = expected.depth_expectations[3]
+        self.assertEqual(gen_depth.exact_total_cells, exp_depth.exact_total_cells)
+        self.assertEqual(
+            set(gen_depth.expected_kind_counts or ()),
+            set(exp_depth.expected_kind_counts or ()),
+        )
+        self.assertEqual(
+            set(gen_depth.expected_adjacency_pairs or ()),
+            set(exp_depth.expected_adjacency_pairs or ()),
+        )
+        self.assertEqual(
+            set(gen_depth.expected_degree_histogram or ()),
+            set(exp_depth.expected_degree_histogram or ()),
+        )
+        gen_periodic = generated.periodic_descriptor
+        exp_periodic = expected.periodic_descriptor
+        assert gen_periodic is not None and exp_periodic is not None
+        self.assertEqual(
+            dict(gen_periodic.expected_interior_vertex_configuration_frequencies),
+            dict(exp_periodic.expected_interior_vertex_configuration_frequencies),
+        )
+
+
+class SketchHelpersTests(unittest.TestCase):
+    def test_equilateral_triangle_is_equilateral(self) -> None:
+        from tools.sketch_helpers import equilateral_triangle
+
+        verts = equilateral_triangle((0, 0), (1, 0), side="above")
+        side_lengths = [
+            math.hypot(verts[i][0] - verts[(i + 1) % 3][0], verts[i][1] - verts[(i + 1) % 3][1])
+            for i in range(3)
+        ]
+        for length in side_lengths:
+            self.assertAlmostEqual(length, 1.0, places=5)
+
+    def test_equilateral_triangle_above_below_are_mirrors(self) -> None:
+        from tools.sketch_helpers import equilateral_triangle
+
+        above = equilateral_triangle((0, 0), (1, 0), side="above")
+        below = equilateral_triangle((0, 0), (1, 0), side="below")
+        # Apex y-coordinates are equal magnitude, opposite sign
+        # (above has apex at +sqrt(3)/2, below at -sqrt(3)/2)
+        self.assertAlmostEqual(above[2][1], -below[1][1], places=5)
+
+    def test_square_returns_four_ccw_vertices(self) -> None:
+        from tools.sketch_helpers import square
+
+        verts = square((0, 0), 1)
+        self.assertEqual(len(verts), 4)
+        self.assertEqual(verts[0], (0, 0))
+        self.assertEqual(verts[2], (1, 1))
+
+    def test_regular_hexagon_has_six_vertices_with_correct_edge_length(self) -> None:
+        from tools.sketch_helpers import regular_hexagon
+
+        verts = regular_hexagon((0, 0), 1.0, orientation="flat-top")
+        self.assertEqual(len(verts), 6)
+        for i in range(6):
+            length = math.hypot(
+                verts[i][0] - verts[(i + 1) % 6][0],
+                verts[i][1] - verts[(i + 1) % 6][1],
+            )
+            self.assertAlmostEqual(length, 1.0, places=5)
+
+    def test_square_with_mid_edge_vertices_returns_eight_vertices(self) -> None:
+        from tools.sketch_helpers import square_with_mid_edge_vertices
+
+        verts = square_with_mid_edge_vertices(
+            (0, 0), 50, bottom=True, right=True, top=True, left=True
+        )
+        self.assertEqual(len(verts), 8)
+        # Midpoints are present
+        self.assertIn((25.0, 0), verts)
+        self.assertIn((50, 25.0), verts)
+        self.assertIn((25.0, 50), verts)
+        self.assertIn((0, 25.0), verts)
+
+
+class TopologyValidationPrecisionFixTests(unittest.TestCase):
+    """Regression test for the 2-uniform precision-bug class: a tiny float
+    drift between a JSON-stored coordinate (rounded to 6 decimals) and a
+    math-derived coordinate (52 * sqrt(3) unrounded) should NOT trigger a
+    false-positive polygon overlap when the geometry is periodic-face."""
+
+    def test_periodic_face_geometry_snaps_to_grid(self) -> None:
+        from backend.simulation.topology_types import LatticeCell, LatticeTopology
+        from backend.simulation.topology_validation import topology_polygons
+
+        y_unrounded = 52 * math.sqrt(3)  # 90.06664199358161
+        y_rounded = 90.066642  # what JSON storage gives
+
+        cell1 = LatticeCell(
+            id="t1",
+            kind="triangle",
+            neighbors=(),
+            vertices=(
+                (0.0, y_rounded),
+                (52.0, y_rounded),
+                (26.0, y_rounded - 26 * math.sqrt(3)),
+            ),
+            center=(26.0, y_rounded - 9.0),
+        )
+        cell2 = LatticeCell(
+            id="s1",
+            kind="square",
+            neighbors=(),
+            vertices=(
+                (0.0, y_unrounded),
+                (52.0, y_unrounded),
+                (52.0, y_unrounded + 52),
+                (0.0, y_unrounded + 52),
+            ),
+            center=(26.0, y_unrounded + 26),
+        )
+        # Periodic-face geometry: snap-to-grid applies, no spurious overlap.
+        periodic_topology = LatticeTopology(
+            geometry="triangular-square-2uniform",
+            width=1,
+            height=1,
+            cells=(cell1, cell2),
+            topology_revision="test",
+            patch_depth=None,
+        )
+        polys = topology_polygons(periodic_topology)
+        self.assertAlmostEqual(polys["t1"].intersection(polys["s1"]).area, 0.0, places=10)
+
+    def test_aperiodic_geometry_skips_snap(self) -> None:
+        """For aperiodic substitution families, irrational vertex
+        coordinates intentionally use full float precision. The snap-to-grid
+        should NOT apply (it would create surface-union holes that don't
+        exist in the unsnapped representation)."""
+        from backend.simulation.topology_types import LatticeCell, LatticeTopology
+        from backend.simulation.topology_validation import topology_polygons
+
+        # An odd coordinate that would shift under 6-decimal rounding.
+        cell = LatticeCell(
+            id="p1",
+            kind="prototile",
+            neighbors=(),
+            vertices=((0.0, 0.0), (1.2345678901234, 0.0), (0.5, 0.8765432109876)),
+            center=(0.5, 0.3),
+        )
+        aperiodic_topology = LatticeTopology(
+            geometry="spectre",
+            width=1,
+            height=1,
+            cells=(cell,),
+            topology_revision="test",
+            patch_depth=None,
+        )
+        polys = topology_polygons(aperiodic_topology)
+        # Vertices preserved at full precision
+        coords = list(polys["p1"].exterior.coords)
+        self.assertAlmostEqual(coords[1][0], 1.2345678901234, places=12)
+
 
 if __name__ == "__main__":
     unittest.main()
