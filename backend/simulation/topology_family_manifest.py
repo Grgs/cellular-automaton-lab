@@ -83,6 +83,15 @@ PYTHAGOREAN_GEOMETRY = "pythagorean"
 # To make adjacency match, horizontal bricks are modeled as 6-vertex
 # polygons (four corners plus two collinear mid-long-edge vertices).
 HERRINGBONE_GEOMETRY = "herringbone"
+# 2-uniform tiling [3^6; 3^3.4^2]: combines pure-triangular and
+# elongated-triangular vertex types. Constructed by alternating wide
+# strips of pure triangular tiling (2 triangle rows tall, height
+# sqrt(3) at unit edge) with a single row of squares (height 1).
+# Interior vertices of the triangle strip have 6 triangles meeting
+# (3^6); vertices on the triangle/square boundary have 3 triangles
+# plus 2 squares (3^3.4^2). It's the smallest 2-uniform tiling that
+# uses only regular polygons and only two prototile shapes.
+TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY = "triangular-square-2uniform"
 
 
 @dataclass(frozen=True)
@@ -416,6 +425,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         label="Herringbone",
         picker_group="Periodic Mixed",
         picker_order=238,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY: _single_variant_family(
+        tiling_family=TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY,
+        label="2-uniform Triangle+Square",
+        picker_group="Periodic Mixed",
+        picker_order=239,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),

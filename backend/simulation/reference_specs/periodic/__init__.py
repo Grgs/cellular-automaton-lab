@@ -18,6 +18,7 @@ from . import kisrhombille
 from . import tiltwork
 from . import pythagorean
 from . import herringbone
+from . import triangular_square_2uniform
 
 PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **archimedean.SPECS,
@@ -36,6 +37,7 @@ PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **tiltwork.SPECS,
     **pythagorean.SPECS,
     **herringbone.SPECS,
+    **triangular_square_2uniform.SPECS,
 }
 
 __all__ = ["PERIODIC_REFERENCE_FAMILY_SPECS"]

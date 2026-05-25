@@ -577,6 +577,32 @@
       }
     },
     {
+      "tiling_family": "triangular-square-2uniform",
+      "label": "2-uniform Triangle+Square",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 239,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "triangular-square-2uniform"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
       "tiling_family": "triakis-triangular",
       "label": "Triakis Triangular",
       "picker_group": "Periodic Mixed",
@@ -1430,6 +1456,21 @@
       "max_x": 100.0,
       "max_y": 75.0,
       "cell_count_per_unit": 6,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "triangular-square-2uniform",
+      "label": "2-uniform Triangle+Square (3^6; 3^3.4^2)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 104.0,
+      "unit_height": 142.066642,
+      "min_dimension": 1,
+      "min_x": -26.0,
+      "min_y": 0.0,
+      "max_x": 104.0,
+      "max_y": 142.066642,
+      "cell_count_per_unit": 10,
       "row_offset_x": 0.0
     }
   ],

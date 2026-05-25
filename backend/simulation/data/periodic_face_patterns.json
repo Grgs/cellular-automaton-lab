@@ -11648,5 +11648,134 @@
         ]
       }
     ]
+  },
+  "triangular-square-2uniform": {
+    "geometry": "triangular-square-2uniform",
+    "label": "2-uniform Triangle+Square (3^6; 3^3.4^2)",
+    "base_edge": 52.0,
+    "unit_width": 104.0,
+    "unit_height": 142.066642,
+    "min_dimension": 1,
+    "min_x": -26.0,
+    "min_y": 0.0,
+    "max_x": 104.0,
+    "max_y": 142.066642,
+    "cell_count_per_unit": 10,
+    "faces": [
+      {
+        "slot": "ua",
+        "kind": "triangle",
+        "prefix": "t",
+        "center": {"x": 26.0, "y": 15.011107},
+        "vertices": [
+          {"x": 0.0, "y": 0.0},
+          {"x": 52.0, "y": 0.0},
+          {"x": 26.0, "y": 45.033321}
+        ]
+      },
+      {
+        "slot": "ub",
+        "kind": "triangle",
+        "prefix": "t",
+        "center": {"x": 78.0, "y": 15.011107},
+        "vertices": [
+          {"x": 52.0, "y": 0.0},
+          {"x": 104.0, "y": 0.0},
+          {"x": 78.0, "y": 45.033321}
+        ]
+      },
+      {
+        "slot": "da",
+        "kind": "triangle",
+        "prefix": "t",
+        "center": {"x": 52.0, "y": 30.022214},
+        "vertices": [
+          {"x": 26.0, "y": 45.033321},
+          {"x": 78.0, "y": 45.033321},
+          {"x": 52.0, "y": 0.0}
+        ]
+      },
+      {
+        "slot": "dleft",
+        "kind": "triangle",
+        "prefix": "t",
+        "repeat_x_extra": 1,
+        "center": {"x": 0.0, "y": 30.022214},
+        "vertices": [
+          {"x": -26.0, "y": 45.033321},
+          {"x": 26.0, "y": 45.033321},
+          {"x": 0.0, "y": 0.0}
+        ]
+      },
+      {
+        "slot": "uc",
+        "kind": "triangle",
+        "prefix": "t",
+        "center": {"x": 52.0, "y": 60.044428},
+        "vertices": [
+          {"x": 26.0, "y": 45.033321},
+          {"x": 78.0, "y": 45.033321},
+          {"x": 52.0, "y": 90.066642}
+        ]
+      },
+      {
+        "slot": "db",
+        "kind": "triangle",
+        "prefix": "t",
+        "center": {"x": 26.0, "y": 75.055535},
+        "vertices": [
+          {"x": 0.0, "y": 90.066642},
+          {"x": 52.0, "y": 90.066642},
+          {"x": 26.0, "y": 45.033321}
+        ]
+      },
+      {
+        "slot": "dc",
+        "kind": "triangle",
+        "prefix": "t",
+        "center": {"x": 78.0, "y": 75.055535},
+        "vertices": [
+          {"x": 52.0, "y": 90.066642},
+          {"x": 104.0, "y": 90.066642},
+          {"x": 78.0, "y": 45.033321}
+        ]
+      },
+      {
+        "slot": "uleftr2",
+        "kind": "triangle",
+        "prefix": "t",
+        "repeat_x_extra": 1,
+        "center": {"x": 0.0, "y": 60.044428},
+        "vertices": [
+          {"x": -26.0, "y": 45.033321},
+          {"x": 26.0, "y": 45.033321},
+          {"x": 0.0, "y": 90.066642}
+        ]
+      },
+      {
+        "slot": "sa",
+        "kind": "square",
+        "prefix": "s",
+        "center": {"x": 26.0, "y": 116.066642},
+        "vertices": [
+          {"x": 0.0, "y": 90.066642},
+          {"x": 52.0, "y": 90.066642},
+          {"x": 52.0, "y": 142.066642},
+          {"x": 0.0, "y": 142.066642}
+        ]
+      },
+      {
+        "slot": "sb",
+        "kind": "square",
+        "prefix": "s",
+        "center": {"x": 78.0, "y": 116.066642},
+        "vertices": [
+          {"x": 52.0, "y": 90.066642},
+          {"x": 104.0, "y": 90.066642},
+          {"x": 104.0, "y": 142.066642},
+          {"x": 52.0, "y": 142.066642}
+        ]
+      }
+    ]
   }
 }
