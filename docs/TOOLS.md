@@ -90,6 +90,16 @@ py -3 tools/run_detect_secrets.py --baseline .secrets.baseline --all-files
 
 The deeper guide for this cluster is [docs/TESTING_TILINGS.md](TESTING_TILINGS.md). Verification status table lives in [docs/TILING_VERIFICATION_STATUS.md](TILING_VERIFICATION_STATUS.md).
 
+### `tools/sketch_tiling.py`
+
+Standalone sketch + validator for a candidate periodic tiling, runnable without wiring it into any of the backend manifests. Takes a Python sketch file that defines `FACES`, `CELL_WIDTH`, and `CELL_HEIGHT`, builds a 3x3 patch using the same builder the backend uses, then reports polygon overlaps, T-junctions, unmatched interior edges, and per-vertex interior-angle sums (in degrees) so you can immediately see e.g. "vertex (26, 45.03) has angle sum 300 deg, 5 polygons" instead of inferring it from the topology builder's neighbor-count histogram. Optionally emits an SVG visualization and a JSON descriptor stub ready to paste into [periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json). Exit code is 0 for a valid tiling and 1 otherwise. An example sketch lives under [tools/sketch_examples/](../tools/sketch_examples/). Use this when adding a new periodic mixed tiling — see step 4 of [docs/ADDING_TOPOLOGIES.md](ADDING_TOPOLOGIES.md). Source: [sketch_tiling.py](../tools/sketch_tiling.py).
+
+```powershell
+py -3 tools/sketch_tiling.py path/to/sketch.py
+py -3 tools/sketch_tiling.py path/to/sketch.py --svg out.svg --json out.json
+py -3 tools/sketch_tiling.py path/to/sketch.py --patch-size 4
+```
+
 ### `tools/validate_tilings.py`
 
 Runs the geometry/topology validator across every tiling in the catalog. Catches non-deterministic builders, malformed adjacency, hole formation, and edge-multiplicity issues. This is the cheap geometric sanity check; run it whenever changing topology data. Source: [validate_tilings.py](../tools/validate_tilings.py).
