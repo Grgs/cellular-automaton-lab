@@ -432,6 +432,14 @@
       ]
     },
     {
+      "geometry": "herringbone",
+      "variants": [
+        {"label": "herringbone-h", "selector": {"kind": "herringbone-horizontal"}, "color": {"token": "toneStone"}},
+        {"label": "herringbone-v0", "selector": {"kind": "herringbone-vertical", "slot": "v0"}, "color": {"token": "toneCream"}},
+        {"label": "herringbone-v1", "selector": {"kind": "herringbone-vertical", "slot": "v1"}, "color": {"token": "toneSand"}}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
