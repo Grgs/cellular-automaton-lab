@@ -8,10 +8,16 @@ from backend.simulation.reference_specs.types import (
 
 # Herringbone tiling: 2:1 bricks (length 2, width 1) in two orientations -
 # horizontal (H) and vertical (V) - laid in alternating rows. The
-# fundamental domain is a 2x3 unit cell containing one H brick at the
-# bottom and two V bricks stacked above; tiling by translation gives the
+# fundamental domain is a 4x3 unit cell containing two H bricks at the
+# bottom and four V bricks stacked above; tiling by translation gives the
 # classic brick-and-plank running-bond pattern where every H row is
 # capped above and below by a row of V bricks.
+#
+# The unit cell has two H slots and four V slots rather than the minimal
+# one + two so the palette can give every brick a colour different from
+# its same-orientation neighbours - the palette selectors are limited to
+# (kind, slot) so descriptor-level slot variety is the only way to make
+# adjacent bricks of the same orientation visually distinct.
 #
 # The tiling is non-edge-to-edge in the same way Pythagorean is: each H
 # brick's long edge (length 2) is met at its midpoint by the short edges
@@ -36,10 +42,10 @@ SPECS = {
         sample_mode="grid",
         depth_expectations={
             3: ReferenceDepthExpectation(
-                exact_total_cells=27,
+                exact_total_cells=54,
                 expected_kind_counts=(
-                    ("herringbone-horizontal", 9),
-                    ("herringbone-vertical", 18),
+                    ("herringbone-horizontal", 18),
+                    ("herringbone-vertical", 36),
                 ),
                 expected_adjacency_pairs=(
                     ("herringbone-horizontal", "herringbone-horizontal"),
@@ -48,16 +54,16 @@ SPECS = {
                 ),
                 expected_degree_histogram=(
                     (2, 2),
-                    (3, 10),
-                    (4, 9),
+                    (3, 16),
+                    (4, 24),
                     (5, 4),
-                    (6, 2),
+                    (6, 8),
                 ),
             ),
         },
         periodic_descriptor=PeriodicDescriptorExpectation(
-            face_template_count=3,
-            slot_vocabulary=("h0", "v0", "v1"),
+            face_template_count=6,
+            slot_vocabulary=("h0", "h1", "v0", "v1", "v2", "v3"),
             id_pattern="{prefix}:{slot}:{x}:{y}",
             row_offset_x=0.0,
             expected_interior_vertex_configurations=(
@@ -76,9 +82,9 @@ SPECS = {
                 ),
             ),
             expected_interior_vertex_configuration_frequencies=(
-                # In the open-boundary 3x3 sample the verifier counts
-                # 10 brick-corner (4-valent) and 15 long-edge-midpoint
-                # (3-valent) interior vertices.
+                # In the open-boundary 3x3 sample (with the expanded 4x3
+                # unit cell) the verifier counts 25 brick-corner (4-valent)
+                # and 30 long-edge-midpoint (3-valent) interior vertices.
                 (
                     (
                         "herringbone-horizontal",
@@ -86,7 +92,7 @@ SPECS = {
                         "herringbone-vertical",
                         "herringbone-vertical",
                     ),
-                    10,
+                    25,
                 ),
                 (
                     (
@@ -94,7 +100,7 @@ SPECS = {
                         "herringbone-vertical",
                         "herringbone-vertical",
                     ),
-                    15,
+                    30,
                 ),
             ),
         ),

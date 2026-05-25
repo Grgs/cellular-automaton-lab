@@ -1422,14 +1422,14 @@
       "label": "Herringbone",
       "metric_model": "pattern",
       "base_edge": 25.0,
-      "unit_width": 50.0,
+      "unit_width": 100.0,
       "unit_height": 75.0,
       "min_dimension": 1,
       "min_x": 0.0,
       "min_y": 0.0,
-      "max_x": 50.0,
+      "max_x": 100.0,
       "max_y": 75.0,
-      "cell_count_per_unit": 3,
+      "cell_count_per_unit": 6,
       "row_offset_x": 0.0
     }
   ],

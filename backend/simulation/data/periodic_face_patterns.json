@@ -11544,14 +11544,14 @@
     "geometry": "herringbone",
     "label": "Herringbone",
     "base_edge": 25.0,
-    "unit_width": 50.0,
+    "unit_width": 100.0,
     "unit_height": 75.0,
     "min_dimension": 1,
     "min_x": 0.0,
     "min_y": 0.0,
-    "max_x": 50.0,
+    "max_x": 100.0,
     "max_y": 75.0,
-    "cell_count_per_unit": 3,
+    "cell_count_per_unit": 6,
     "faces": [
       {
         "slot": "h0",
@@ -11568,6 +11568,23 @@
           {"x": 50.0, "y": 25.0},
           {"x": 25.0, "y": 25.0},
           {"x": 0.0, "y": 25.0}
+        ]
+      },
+      {
+        "slot": "h1",
+        "kind": "herringbone-horizontal",
+        "prefix": "h",
+        "center": {
+          "x": 75.0,
+          "y": 12.5
+        },
+        "vertices": [
+          {"x": 50.0, "y": 0.0},
+          {"x": 75.0, "y": 0.0},
+          {"x": 100.0, "y": 0.0},
+          {"x": 100.0, "y": 25.0},
+          {"x": 75.0, "y": 25.0},
+          {"x": 50.0, "y": 25.0}
         ]
       },
       {
@@ -11598,6 +11615,36 @@
           {"x": 50.0, "y": 25.0},
           {"x": 50.0, "y": 75.0},
           {"x": 25.0, "y": 75.0}
+        ]
+      },
+      {
+        "slot": "v2",
+        "kind": "herringbone-vertical",
+        "prefix": "v",
+        "center": {
+          "x": 62.5,
+          "y": 50.0
+        },
+        "vertices": [
+          {"x": 50.0, "y": 25.0},
+          {"x": 75.0, "y": 25.0},
+          {"x": 75.0, "y": 75.0},
+          {"x": 50.0, "y": 75.0}
+        ]
+      },
+      {
+        "slot": "v3",
+        "kind": "herringbone-vertical",
+        "prefix": "v",
+        "center": {
+          "x": 87.5,
+          "y": 50.0
+        },
+        "vertices": [
+          {"x": 75.0, "y": 25.0},
+          {"x": 100.0, "y": 25.0},
+          {"x": 100.0, "y": 75.0},
+          {"x": 75.0, "y": 75.0}
         ]
       }
     ]
