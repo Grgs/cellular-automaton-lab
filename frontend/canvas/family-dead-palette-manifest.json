@@ -432,6 +432,21 @@
       ]
     },
     {
+      "geometry": "triangular-square-2uniform",
+      "variants": [
+        {"label": "tri-sq-2u-square-sa", "selector": {"kind": "square", "slot": "sa"}, "color": {"token": "toneClay"}},
+        {"label": "tri-sq-2u-square-sb", "selector": {"kind": "square", "slot": "sb"}, "color": {"token": "toneShadow"}},
+        {"label": "tri-sq-2u-tri-ua", "selector": {"kind": "triangle", "slot": "ua"}, "color": {"token": "toneCream"}},
+        {"label": "tri-sq-2u-tri-ub", "selector": {"kind": "triangle", "slot": "ub"}, "color": {"token": "toneTan"}},
+        {"label": "tri-sq-2u-tri-da", "selector": {"kind": "triangle", "slot": "da"}, "color": {"token": "toneLinen"}},
+        {"label": "tri-sq-2u-tri-dleft", "selector": {"kind": "triangle", "slot": "dleft"}, "color": {"token": "toneRose"}},
+        {"label": "tri-sq-2u-tri-uc", "selector": {"kind": "triangle", "slot": "uc"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
+        {"label": "tri-sq-2u-tri-db", "selector": {"kind": "triangle", "slot": "db"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true},
+        {"label": "tri-sq-2u-tri-dc", "selector": {"kind": "triangle", "slot": "dc"}, "color": {"token": "toneLinen"}, "allowSharedDeadColor": true},
+        {"label": "tri-sq-2u-tri-uleftr2", "selector": {"kind": "triangle", "slot": "uleftr2"}, "color": {"token": "toneRose"}, "allowSharedDeadColor": true}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
