@@ -76,6 +76,13 @@ TILTWORK_GEOMETRY = "tiltwork"
 # To make every edge match exactly, big squares are modeled as 8-vertex
 # polygons (four corners plus four collinear mid-edge vertices).
 PYTHAGOREAN_GEOMETRY = "pythagorean"
+# Herringbone tiling: 2:1 bricks in two orientations (horizontal and
+# vertical). Rows of horizontal bricks alternate with rows of vertical
+# bricks; each horizontal brick's long edge is met by the short edges
+# of two perpendicular vertical bricks at its midpoint (T-junctions).
+# To make adjacency match, horizontal bricks are modeled as 6-vertex
+# polygons (four corners plus two collinear mid-long-edge vertices).
+HERRINGBONE_GEOMETRY = "herringbone"
 # 2-uniform tiling [3^6; 3^3.4^2]: combines pure-triangular and
 # elongated-triangular vertex types. Constructed by alternating wide
 # strips of pure triangular tiling (2 triangle rows tall, height
@@ -407,6 +414,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         label="Pythagorean",
         picker_group="Periodic Mixed",
         picker_order=237,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    HERRINGBONE_GEOMETRY: _single_variant_family(
+        tiling_family=HERRINGBONE_GEOMETRY,
+        label="Herringbone",
+        picker_group="Periodic Mixed",
+        picker_order=238,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),

@@ -17,6 +17,7 @@ from . import type_7_pentagonal
 from . import kisrhombille
 from . import tiltwork
 from . import pythagorean
+from . import herringbone
 from . import triangular_square_2uniform
 
 PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
@@ -35,6 +36,7 @@ PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **kisrhombille.SPECS,
     **tiltwork.SPECS,
     **pythagorean.SPECS,
+    **herringbone.SPECS,
     **triangular_square_2uniform.SPECS,
 }
 

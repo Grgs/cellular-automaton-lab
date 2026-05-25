@@ -551,6 +551,32 @@
       }
     },
     {
+      "tiling_family": "herringbone",
+      "label": "Herringbone",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 238,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "herringbone"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
       "tiling_family": "triangular-square-2uniform",
       "label": "2-uniform Triangle+Square",
       "picker_group": "Periodic Mixed",
@@ -1415,6 +1441,21 @@
       "max_x": 125.0,
       "max_y": 125.0,
       "cell_count_per_unit": 10,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "herringbone",
+      "label": "Herringbone",
+      "metric_model": "pattern",
+      "base_edge": 25.0,
+      "unit_width": 100.0,
+      "unit_height": 75.0,
+      "min_dimension": 1,
+      "min_x": 0.0,
+      "min_y": 0.0,
+      "max_x": 100.0,
+      "max_y": 75.0,
+      "cell_count_per_unit": 6,
       "row_offset_x": 0.0
     },
     {
