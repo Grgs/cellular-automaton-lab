@@ -184,6 +184,7 @@ SPECS = {
                 (("square", "triangle", "square", "triangle", "triangle"), 53),
             ),
             expected_dual_candidate_geometries=(
+                "basketweave",
                 "cairo-pentagonal",
                 "prismatic-pentagonal",
                 "snub-square-dual",
@@ -225,6 +226,7 @@ SPECS = {
                 (("square", "square", "triangle", "triangle", "triangle"), 55),
             ),
             expected_dual_candidate_geometries=(
+                "basketweave",
                 "cairo-pentagonal",
                 "prismatic-pentagonal",
                 "snub-square-dual",
