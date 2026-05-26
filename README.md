@@ -1,5 +1,11 @@
 # Cellular Automaton Lab
 
+[![CI](https://github.com/Grgs/cellular-automaton-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Grgs/cellular-automaton-lab/actions/workflows/ci.yml)
+[![Supply Chain Audit](https://github.com/Grgs/cellular-automaton-lab/actions/workflows/supply-chain-audit.yml/badge.svg)](https://github.com/Grgs/cellular-automaton-lab/actions/workflows/supply-chain-audit.yml)
+[![Latest release](https://img.shields.io/github/v/release/Grgs/cellular-automaton-lab?label=release)](https://github.com/Grgs/cellular-automaton-lab/releases/latest)
+[![License: MIT](https://img.shields.io/github/license/Grgs/cellular-automaton-lab)](LICENSE)
+[![Live demo](https://img.shields.io/badge/demo-GitHub%20Pages-0969da)](https://grgs.github.io/cellular-automaton-lab/)
+
 Cellular Automaton Lab is a browser-based cellular automata playground built around topology-first boards. It supports classic lattices, periodic mixed tilings, and finite aperiodic patches in one app, with a Flask backend and a Vite-built TypeScript frontend.
 
 Public release status: `v0.3.0` preview. The preview is usable for public evaluation, local experimentation, and contribution, but it is not a long-term API or feature-stability promise.

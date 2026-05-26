@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contributor guide
+    url: https://github.com/Grgs/cellular-automaton-lab/blob/main/CONTRIBUTING.md
+    about: Start here for local setup, common commands, and contribution expectations.
+  - name: Security policy
+    url: https://github.com/Grgs/cellular-automaton-lab/blob/main/SECURITY.md
+    about: Use this for vulnerability reporting expectations and security guardrails.
+  - name: Live standalone demo
+    url: https://grgs.github.io/cellular-automaton-lab/
+    about: Try the current public demo before filing a behavior report.
