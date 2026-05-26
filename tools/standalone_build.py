@@ -18,9 +18,9 @@ from tools._common import (
     run_command,
 )
 from tools.provenance import (
-    compute_source_fingerprint,
-    git_dirty_status,
-    iter_source_fingerprint_paths,
+    compute_source_fingerprint as compute_source_fingerprint,
+    git_dirty_status as git_dirty_status,
+    iter_source_fingerprint_paths as iter_source_fingerprint_paths,
 )
 
 

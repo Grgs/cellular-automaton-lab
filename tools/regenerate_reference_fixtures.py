@@ -307,20 +307,21 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if bool(args.list_targets):
             if "local" in selected_modes(mode):
-                for target in discover_local_fixture_targets(
+                for local_target in discover_local_fixture_targets(
                     _read_local_fixtures(),
                     geometry=cast(str | None, args.geometry),
                     depth=cast(int | None, args.depth),
                 ):
-                    print(f"local {target.geometry} depth {target.depth}")
+                    print(f"local {local_target.geometry} depth {local_target.depth}")
             if "canonical" in selected_modes(mode):
-                for target in discover_canonical_fixture_targets(
+                for canonical_target in discover_canonical_fixture_targets(
                     _read_canonical_fixtures(),
                     geometry=cast(str | None, args.geometry),
                     depth=cast(int | None, args.depth),
                 ):
                     print(
-                        f"canonical {target.geometry} depth {target.depth} fixture {target.fixture_key}"
+                        f"canonical {canonical_target.geometry} depth {canonical_target.depth} "
+                        f"fixture {canonical_target.fixture_key}"
                     )
             return 0
         if args.check:

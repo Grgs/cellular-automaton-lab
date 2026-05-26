@@ -23,12 +23,14 @@ def _latency_parser() -> argparse.ArgumentParser:
 
 def _run_bench(argv: list[str] | None = None) -> int:
     _bench_parser().parse_args(argv)
-    return bench_engine.main() or 0
+    bench_engine.main()
+    return 0
 
 
 def _run_latency(argv: list[str] | None = None) -> int:
     _latency_parser().parse_args(argv)
-    return profile_tiling_latency.main() or 0
+    profile_tiling_latency.main()
+    return 0
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
