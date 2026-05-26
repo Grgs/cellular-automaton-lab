@@ -17,6 +17,9 @@ function normalizeDescriptor(
         max_y: descriptor.max_y,
         cell_count_per_unit: descriptor.cell_count_per_unit,
         row_offset_x: descriptor.row_offset_x,
+        ...(descriptor.lattice_skew_x !== undefined
+            ? { lattice_skew_x: descriptor.lattice_skew_x }
+            : {}),
     });
 }
 

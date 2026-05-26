@@ -28,6 +28,7 @@ from backend.simulation.topology_family_manifest import (
     PYTHAGOREAN_GEOMETRY,
     RHOMBILLE_GEOMETRY,
     SNUB_SQUARE_DUAL_GEOMETRY,
+    STEIN_14_PENTAGONAL_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TILTWORK_GEOMETRY,
     TRIAKIS_TRIANGULAR_GEOMETRY,
@@ -62,6 +63,7 @@ PERIODIC_FACE_TILING_GEOMETRIES = (
     TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY,
     BASKETWEAVE_GEOMETRY,
     TRIHEX_2UNIFORM_3636_3366_GEOMETRY,
+    STEIN_14_PENTAGONAL_GEOMETRY,
 )
 
 _DATA_PATH = Path(__file__).with_name("data") / "periodic_face_patterns.json"
@@ -108,10 +110,15 @@ class PeriodicFaceTilingDescriptor:
     face_kinds: tuple[str, ...]
     face_slots: tuple[str, ...]
     row_offset_x: float = 0.0
+    # When set, switches the lattice from the row_offset_x "alternating brick"
+    # semantic (only odd rows shifted) to a cumulative skew per row (every row
+    # shifted by k * lattice_skew_x). Needed for genuinely-skewed-parallelogram
+    # tilings like Stein-14 whose primitive cell is not axis-aligned.
+    lattice_skew_x: float | None = None
     id_pattern: str = "{prefix}:{slot}:{x}:{y}"
 
     def to_frontend_dict(self) -> PeriodicFaceTilingDescriptorPayload:
-        return {
+        payload: PeriodicFaceTilingDescriptorPayload = {
             "geometry": self.geometry,
             "label": self.label,
             "metric_model": self.metric_model,
@@ -126,6 +133,9 @@ class PeriodicFaceTilingDescriptor:
             "cell_count_per_unit": self.cell_count_per_unit,
             "row_offset_x": self.row_offset_x,
         }
+        if self.lattice_skew_x is not None:
+            payload["lattice_skew_x"] = self.lattice_skew_x
+        return payload
 
 
 class _JsonPoint(TypedDict):
@@ -157,6 +167,7 @@ class _JsonPatternDescriptor(TypedDict):
     cell_count_per_unit: int
     faces: list[_JsonFace]
     row_offset_x: NotRequired[float]
+    lattice_skew_x: NotRequired[float]
     id_pattern: NotRequired[str]
 
 
@@ -263,6 +274,12 @@ def _require_pattern_descriptor_payload(
             row_offset_x,
             context=f"{geometry_key}.row_offset_x",
         )
+    lattice_skew_x = payload.get("lattice_skew_x")
+    if lattice_skew_x is not None:
+        normalized_payload["lattice_skew_x"] = _require_float(
+            lattice_skew_x,
+            context=f"{geometry_key}.lattice_skew_x",
+        )
     id_pattern = payload.get("id_pattern")
     if id_pattern is not None:
         normalized_payload["id_pattern"] = _require_string(
@@ -359,12 +376,18 @@ def _pattern_cells(
     id_pattern: str,
     width: int,
     height: int,
+    lattice_skew_x: float | None = None,
 ) -> tuple[PeriodicFaceCell, ...]:
     cells: list[PeriodicFaceCell] = []
     for face in faces:
         for logical_y in range(height + face.repeat_y_extra):
             translate_y = logical_y * unit_height
-            translate_x_offset = row_offset_x if logical_y % 2 == 1 else 0.0
+            if lattice_skew_x is not None:
+                # Cumulative skew per row: every row shifts by k*lattice_skew_x.
+                translate_x_offset = lattice_skew_x * logical_y
+            else:
+                # Alternating "brick" semantic: only odd rows shifted.
+                translate_x_offset = row_offset_x if logical_y % 2 == 1 else 0.0
             for logical_x in range(width + face.repeat_x_extra):
                 translate_x = (logical_x * unit_width) + translate_x_offset
                 cells.append(
@@ -416,6 +439,7 @@ def _pattern_descriptor_from_payload(
     max_y = payload["max_y"]
     cell_count_per_unit = payload["cell_count_per_unit"]
     row_offset_x = payload.get("row_offset_x", 0.0)
+    lattice_skew_x = payload.get("lattice_skew_x")
     id_pattern = payload.get("id_pattern", "{prefix}:{slot}:{x}:{y}")
     face_template_count = len(faces)
     face_kinds = tuple(sorted({face.kind for face in faces}))
@@ -442,11 +466,13 @@ def _pattern_descriptor_from_payload(
             id_pattern,
             width,
             height,
+            lattice_skew_x,
         ),
         face_template_count=face_template_count,
         face_kinds=face_kinds,
         face_slots=face_slots,
         row_offset_x=row_offset_x,
+        lattice_skew_x=lattice_skew_x,
         id_pattern=id_pattern,
     )
 

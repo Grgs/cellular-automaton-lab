@@ -479,6 +479,17 @@
       ]
     },
     {
+      "geometry": "stein-14-pentagonal",
+      "variants": [
+        {"label": "stein14-t0", "selector": {"kind": "stein14", "slot": "t0"}, "color": {"token": "toneClay"}},
+        {"label": "stein14-t1", "selector": {"kind": "stein14", "slot": "t1"}, "color": {"token": "toneShadow"}},
+        {"label": "stein14-t2", "selector": {"kind": "stein14", "slot": "t2"}, "color": {"token": "toneCream"}},
+        {"label": "stein14-t3", "selector": {"kind": "stein14", "slot": "t3"}, "color": {"token": "toneTan"}},
+        {"label": "stein14-t4", "selector": {"kind": "stein14", "slot": "t4"}, "color": {"token": "toneLinen"}},
+        {"label": "stein14-t5", "selector": {"kind": "stein14", "slot": "t5"}, "color": {"token": "toneRose"}}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},

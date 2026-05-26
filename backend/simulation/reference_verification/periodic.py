@@ -400,9 +400,16 @@ def _periodic_face_translation_failures(
 
         below = cells_by_slot_and_grid.get((slot, logical_x, logical_y + 1))
         if below is not None:
-            expected_delta_x = (descriptor.row_offset_x if (logical_y + 1) % 2 == 1 else 0.0) - (
-                descriptor.row_offset_x if logical_y % 2 == 1 else 0.0
-            )
+            # For cumulative-skew lattices (lattice_skew_x set), every row
+            # shifts by lattice_skew_x relative to the previous one. For the
+            # alternating brick semantic (lattice_skew_x is None), only odd
+            # rows are shifted.
+            if descriptor.lattice_skew_x is not None:
+                expected_delta_x = descriptor.lattice_skew_x
+            else:
+                expected_delta_x = (
+                    descriptor.row_offset_x if (logical_y + 1) % 2 == 1 else 0.0
+                ) - (descriptor.row_offset_x if logical_y % 2 == 1 else 0.0)
             delta_x = below.center[0] - cell.center[0]
             delta_y = below.center[1] - cell.center[1]
             if not math.isclose(delta_y, descriptor.unit_height, abs_tol=_FLOAT_TOLERANCE):
