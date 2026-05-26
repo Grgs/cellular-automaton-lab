@@ -19,17 +19,13 @@ repos:
         stages: [pre-push, manual]
       - id: detect-secrets-staged
         name: detect-secrets (changed files)
-        entry: python -m tools security secrets --baseline .secrets.baseline
-        language: python
-        additional_dependencies:
-          - detect-secrets==1.5.0
+        entry: py -3 -m tools security secrets --baseline .secrets.baseline
+        language: system
         stages: [pre-commit]
       - id: detect-secrets-push
         name: detect-secrets (full repo)
-        entry: python -m tools security secrets --baseline .secrets.baseline --all-files
-        language: python
-        additional_dependencies:
-          - detect-secrets==1.5.0
+        entry: py -3 -m tools security secrets --baseline .secrets.baseline --all-files
+        language: system
         pass_filenames: false
         stages: [pre-push, manual]
       - id: ruff-python
