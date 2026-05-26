@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image
 
 from tests.e2e.support_runtime_host import ensure_current_standalone_build
-from tools.run_render_review_sweep import main
+from tools.cli import main as tools_main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -23,8 +23,10 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
     def test_tool_runs_two_case_host_sweep(self) -> None:
         with tempfile.TemporaryDirectory(prefix="render-review-sweep-tool-") as tmpdir:
             artifact_dir = Path(tmpdir) / "sweep"
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "sweep",
                     "--profile",
                     "shield-depth-3",
                     "--hosts",
@@ -80,8 +82,10 @@ class RenderReviewSweepToolIntegrationTests(unittest.TestCase):
                 cache_dir / "pinwheel-reference.png"
             )
 
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "sweep",
                     "--profile",
                     "pinwheel-depth-3",
                     "--hosts",

@@ -109,7 +109,7 @@ def _coverage_modules_available() -> bool:
     )
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -148,6 +148,11 @@ def main(argv: list[str] | None = None) -> int:
         default=".coverage",
         help="path for the combined data file when running both suites (default: .coverage)",
     )
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     if not _coverage_modules_available():

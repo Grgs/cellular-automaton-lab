@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from tests.e2e.support_runtime_host import ensure_current_standalone_build
-from tools.run_geometry_cleanup_workbench import main
+from tools.cli import main as tools_main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -16,8 +16,10 @@ class GeometryCleanupWorkbenchToolIntegrationTests(unittest.TestCase):
     def test_structural_cleanup_workbench_reports_compatibility_no_drift(self) -> None:
         with tempfile.TemporaryDirectory(prefix="geometry-cleanup-workbench-tool-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "workbench-cleanup",
                     "--family",
                     "shield",
                     "--patch-depth",
@@ -57,8 +59,10 @@ class GeometryCleanupWorkbenchBrowserIntegrationTests(unittest.TestCase):
     def test_browser_review_renders_injected_cleanup_candidate_topology(self) -> None:
         with tempfile.TemporaryDirectory(prefix="geometry-cleanup-workbench-browser-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "workbench-cleanup",
                     "--family",
                     "shield",
                     "--patch-depth",

@@ -20,26 +20,26 @@ The concrete loop used in this pass was:
 1. Render the current representative sample with the browser-backed review tool:
 
    ```powershell
-   python tools/render_canvas_review.py --profile pinwheel-depth-3
+   python -m tools browser review --profile pinwheel-depth-3
    ```
 
 2. Run the same review path through the managed host runner so startup, cleanup,
    and artifacts are owned by one command:
 
    ```powershell
-   python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
+   python -m tools browser check --host standalone --render-review --profile pinwheel-depth-3
    ```
 
 3. Sweep one obvious control manually to see whether the visible result changes:
 
    ```powershell
-   python tools/render_canvas_review.py --family pinwheel --patch-depth 4 --out /tmp/pinwheel-depth-4.png --summary-out /tmp/pinwheel-depth-4.json
+   python -m tools browser review --family pinwheel --patch-depth 4 --out /tmp/pinwheel-depth-4.png --summary-out /tmp/pinwheel-depth-4.json
    ```
 
 4. Run one targeted browser test through the managed host:
 
    ```powershell
-   python tools/run_browser_check.py --host standalone --unittest tests.e2e.playwright_case_suite.StandaloneCellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+   python -m tools browser check --host standalone --unittest tests.e2e.playwright_case_suite.StandaloneCellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
    ```
 
 5. Inspect the family builder and reference spec to locate the likely fix
@@ -210,7 +210,7 @@ than owning hard acceptance thresholds or promotion rules.
 
 8. One-command side-by-side diff review
    - Status: landed.
-   - `tools/run_render_review_diff.py` can either run a new render-review sweep
+   - `python -m tools browser diff` can either run a new render-review sweep
      or consume an existing `sweep-manifest.json`, then emit one HTML sheet plus
      one PNG contact sheet for side-by-side review.
 
@@ -403,7 +403,7 @@ Status: addressed. Frontend representative fixtures now have:
 
 - a shared manifest at `frontend/test-fixtures/topologies/fixture-manifest.json`
 - a deterministic regeneration/check tool at
-  `tools/regenerate_frontend_topology_fixtures.py`
+  `python -m tools fixtures frontend`
 - content-derived `topology_revision` strings inside each fixture, so the
   revision auto-bumps on regeneration whenever the serialized topology
   content actually changes

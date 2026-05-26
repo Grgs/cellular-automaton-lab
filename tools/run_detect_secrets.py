@@ -23,16 +23,21 @@ def _chunked(items: list[str], size: int) -> list[list[str]]:
     return [items[index : index + size] for index in range(0, len(items), size)]
 
 
-def _resolve_detect_secrets_hook() -> str:
+def _resolve_detect_secrets_hook() -> list[str]:
     executable = shutil.which("detect-secrets-hook")
-    if executable is None:
+    if executable is not None:
+        return [executable]
+    try:
+        __import__("detect_secrets.pre_commit_hook")
+    except ImportError as exc:
         raise RuntimeError(
-            "detect-secrets-hook is not available. Install detect-secrets or run through pre-commit."
-        )
-    return executable
+            "detect-secrets is not available. Install detect-secrets into the active Python "
+            "environment or make detect-secrets-hook available on PATH."
+        ) from exc
+    return [sys.executable, "-m", "detect_secrets.pre_commit_hook"]
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run detect-secrets against changed or tracked files."
     )
@@ -41,6 +46,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--all-files", action="store_true", help="Scan all tracked files.")
     parser.add_argument("paths", nargs="*", help="File paths supplied by pre-commit.")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     baseline = Path(args.baseline)
@@ -59,7 +69,10 @@ def main(argv: list[str] | None = None) -> int:
     executable = _resolve_detect_secrets_hook()
     exit_code = 0
     for chunk in _chunked(files, CHUNK_SIZE):
-        result = subprocess.run([executable, "--baseline", str(baseline), *chunk], check=False)
+        result = subprocess.run(
+            [*executable, "--baseline", str(baseline), *chunk],
+            check=False,
+        )
         if result.returncode != 0:
             exit_code = result.returncode
     return exit_code

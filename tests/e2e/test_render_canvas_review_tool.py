@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image
 
 from tests.e2e.support_runtime_host import ensure_current_standalone_build
-from tools.render_canvas_review import main
+from tools.cli import main as tools_main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -26,8 +26,10 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             png_path = output_dir / "chair.png"
             summary_path = output_dir / "chair.json"
 
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "review",
                     "--family",
                     "chair",
                     "--patch-depth",
@@ -90,8 +92,10 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             montage_path = output_dir / "montage.png"
             Image.new("RGBA", (50, 100), (255, 255, 255, 255)).save(reference_path)
 
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "review",
                     "--profile",
                     "pinwheel-depth-3",
                     "--literature-review",
@@ -157,8 +161,10 @@ class RenderCanvasReviewToolIntegrationTests(unittest.TestCase):
             png_path = output_dir / "shield-dark.png"
             summary_path = output_dir / "shield-dark.json"
 
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "review",
                     "--profile",
                     "shield-depth-3",
                     "--theme",

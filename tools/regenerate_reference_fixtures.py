@@ -283,23 +283,47 @@ def check_fixture_drift(
     return drift
 
 
-def _build_parser() -> argparse.ArgumentParser:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Regenerate checked-in literature reference fixture JSON.",
     )
-    parser.add_argument("--mode", choices=("local", "canonical", "both"), required=True)
+    parser.add_argument("--mode", choices=("local", "canonical", "both"), default="both")
     parser.add_argument("--all", action="store_true", dest="all_targets")
     parser.add_argument("--geometry")
     parser.add_argument("--depth", type=int)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--list-targets",
+        action="store_true",
+        help="List matching local and/or canonical fixture targets without rewriting files.",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = _build_parser()
+    parser = build_parser()
     args = parser.parse_args(argv)
     mode = cast(FixtureMode, args.mode)
     try:
+        if bool(args.list_targets):
+            if "local" in selected_modes(mode):
+                for local_target in discover_local_fixture_targets(
+                    _read_local_fixtures(),
+                    geometry=cast(str | None, args.geometry),
+                    depth=cast(int | None, args.depth),
+                ):
+                    print(f"local {local_target.geometry} depth {local_target.depth}")
+            if "canonical" in selected_modes(mode):
+                for canonical_target in discover_canonical_fixture_targets(
+                    _read_canonical_fixtures(),
+                    geometry=cast(str | None, args.geometry),
+                    depth=cast(int | None, args.depth),
+                ):
+                    print(
+                        f"canonical {canonical_target.geometry} depth {canonical_target.depth} "
+                        f"fixture {canonical_target.fixture_key}"
+                    )
+            return 0
         if args.check:
             drift = check_fixture_drift(
                 mode=mode,

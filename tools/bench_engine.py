@@ -99,7 +99,7 @@ def benchmark_board_case(
     }
 
 
-def main() -> None:
+def main() -> int | None:
     board_cases = [
         ("square-conway", ConwayLifeRule(), build_board("square", 180, 120, 1, 101)),
         ("hex-hexlife", HexLifeRule(), build_board("hex", 180, 120, 1, 202)),
@@ -122,7 +122,8 @@ def main() -> None:
             f"{name:18s}  optimized={result['optimized_ms']:8.2f} ms  "
             f"reference={result['reference_ms']:8.2f} ms  speedup={result['speedup']:5.2f}x"
         )
+    return None
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main() or 0)

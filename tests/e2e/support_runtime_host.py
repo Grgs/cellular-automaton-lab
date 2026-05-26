@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import shutil
@@ -16,6 +15,12 @@ from pathlib import Path
 from typing import Any, TextIO
 
 from playwright.sync_api import Page
+from tools.provenance import (
+    compute_source_fingerprint as compute_source_fingerprint_value,
+    git_dirty_status,
+    iter_source_fingerprint_paths,
+    read_git_output,
+)
 
 from tests.e2e.support_server import AppServer, JsonApiClient, cleanup_temporary_directory
 
@@ -30,65 +35,19 @@ _STANDALONE_REQUIRED_OUTPUTS = (
     "standalone-python-bundle.json",
 )
 _STANDALONE_BUILD_MANIFEST_NAME = "build-manifest.json"
-_SOURCE_FINGERPRINT_DIRS = ("frontend",)
-_SOURCE_FINGERPRINT_FILES = (
-    "tools/build-standalone.mjs",
-    "package.json",
-    "package-lock.json",
-)
-_STANDALONE_BUILD_COMMAND = ("run", "build:frontend:standalone")
-
-
-def _run_git_output(root: Path, *args: str) -> str | None:
-    try:
-        result = subprocess.run(
-            ["git", *args],
-            cwd=root,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-    except Exception:
-        return None
-    if result.returncode != 0:
-        return None
-    return result.stdout.strip()
-
-
-def _iter_source_fingerprint_paths(root: Path) -> tuple[str, ...]:
-    relative_paths: list[str] = []
-    for relative_dir in _SOURCE_FINGERPRINT_DIRS:
-        absolute_dir = root / relative_dir
-        if not absolute_dir.exists():
-            continue
-        for absolute_path in sorted(path for path in absolute_dir.rglob("*") if path.is_file()):
-            relative_paths.append(absolute_path.relative_to(root).as_posix())
-    for relative_file in _SOURCE_FINGERPRINT_FILES:
-        absolute_file = root / relative_file
-        if absolute_file.exists():
-            relative_paths.append(absolute_file.relative_to(root).as_posix())
-    return tuple(sorted(dict.fromkeys(relative_paths)))
 
 
 def compute_source_fingerprint(root: Path) -> tuple[str, tuple[str, ...]]:
-    hash_object = hashlib.sha256()
-    relative_paths = _iter_source_fingerprint_paths(root)
-    for relative_path in relative_paths:
-        absolute_path = root / relative_path
-        hash_object.update(relative_path.encode("utf-8"))
-        hash_object.update(b"\0")
-        hash_object.update(absolute_path.read_bytes())
-        hash_object.update(b"\0")
-    return hash_object.hexdigest(), relative_paths
+    relative_paths = iter_source_fingerprint_paths(root)
+    return compute_source_fingerprint_value(root, relative_paths), relative_paths
 
 
 @lru_cache(maxsize=4)
 def current_repo_provenance(root_path: str) -> dict[str, Any]:
     root = Path(root_path)
     source_fingerprint, source_files = compute_source_fingerprint(root)
-    git_head = _run_git_output(root, "rev-parse", "HEAD")
-    git_status = _run_git_output(root, "status", "--porcelain")
-    git_dirty = None if git_status is None else bool(git_status)
+    git_head = read_git_output(root, "rev-parse", "HEAD")
+    git_dirty = git_dirty_status(root)
     return {
         "gitHead": git_head,
         "gitDirty": git_dirty,
@@ -236,16 +195,10 @@ def standalone_build_status(root: Path) -> dict[str, Any]:
         "manifestPresent": standalone_build is not None,
         "buildCurrent": build_current,
         "reason": reason,
-        "recommendedBuildCommand": "npm run build:frontend:standalone",
-        "preferredStandaloneCommand": "npm run test:e2e:playwright:standalone",
+        "recommendedBuildCommand": "python -m tools build standalone",
+        "preferredStandaloneCommand": "python -m tools test e2e --suite standalone",
         "runtimeProvenance": provenance,
     }
-
-
-def _resolve_npm_executable() -> str:
-    if sys.platform == "win32":
-        return shutil.which("npm.cmd") or shutil.which("npm") or "npm.cmd"
-    return shutil.which("npm") or "npm"
 
 
 @lru_cache(maxsize=4)
@@ -254,7 +207,7 @@ def ensure_current_standalone_build(root_path: str) -> None:
     status = standalone_build_status(root)
     if bool(status.get("buildCurrent")):
         return
-    command = [_resolve_npm_executable(), *_STANDALONE_BUILD_COMMAND]
+    command = [sys.executable, "-m", "tools", "build", "standalone"]
     result = subprocess.run(
         command,
         cwd=root,
@@ -267,7 +220,7 @@ def ensure_current_standalone_build(root_path: str) -> None:
         stderr = f"\nstderr:\n{result.stderr}" if result.stderr else ""
         raise RuntimeError(
             "Standalone build refresh failed while preparing standalone-backed Python tests. "
-            "Run `npm run build:frontend:standalone` manually and fix the build error if it "
+            "Run `python -m tools build standalone` manually and fix the build error if it "
             f"persists.{stdout}{stderr}"
         )
     refreshed_status = standalone_build_status(root)
@@ -280,7 +233,7 @@ def ensure_current_standalone_build(root_path: str) -> None:
         warning_text = " " + " ".join(str(warning) for warning in warnings)
     raise RuntimeError(
         "Standalone build refresh completed, but the bundle is still not current: "
-        f"{reason}.{warning_text} Run `npm run build:frontend:standalone` manually and inspect "
+        f"{reason}.{warning_text} Run `python -m tools build standalone` manually and inspect "
         "the generated output/standalone/build-manifest.json."
     )
 
@@ -434,8 +387,8 @@ class StandaloneRuntimeHost(BrowserRuntimeHost):
                 "Standalone build outputs are missing before the static host can start.\n"
                 f"{formatted_outputs}\n"
                 "Direct Python standalone browser suites now expect prebuilt standalone outputs.\n"
-                "Preferred local path: `npm run test:e2e:playwright:standalone`\n"
-                "Build only: `npm run build:frontend:standalone`"
+                "Preferred local path: `python -m tools test e2e --suite standalone`\n"
+                "Build only: `python -m tools build standalone`"
             )
 
     def _start_process(self) -> None:

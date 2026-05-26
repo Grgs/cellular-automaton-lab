@@ -32,12 +32,12 @@ For maintenance workflows and repo-owned guardrails, see [MAINTENANCE.md](./MAIN
 
 ### Standalone browser runtime
 
-1. [tools/build-standalone.mjs](../tools/build-standalone.mjs)
-   Stages the transient standalone build input, runs the standalone Vite build, and finalizes the published static output.
+1. [tools/standalone_build.py](../tools/standalone_build.py)
+   Python-first standalone packager that stages the transient build input, runs the standalone Vite build, and finalizes the published static output.
 2. [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html)
    Shared shell source used by both Flask and the standalone wrapper.
-3. [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
-   Writes the generated standalone wrapper into the build-owned input directory.
+3. [tools/standalone_shell.py](../tools/standalone_shell.py)
+   Shared standalone wrapper renderer used by `python -m tools build standalone-shell` and the standalone build flow.
 4. [frontend/standalone.ts](../frontend/standalone.ts)
    `startStandaloneApp()` loads bootstrap JSON, creates the standalone worker environment, and then calls `initApp(...)`.
 5. [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts)
@@ -402,34 +402,42 @@ Browser UI
 
 ### Tooling
 
-- [tools/build-standalone.mjs](../tools/build-standalone.mjs)
-  Builds the static standalone site.
-- [tools/run-playwright.mjs](../tools/run-playwright.mjs)
-  Local Playwright runner used by npm scripts. It prepares Linux browser runtime libraries when needed, builds standalone output for standalone suites, and dispatches Python `unittest` modules.
-- [tools/render_canvas_review.py](../tools/render_canvas_review.py)
-  Focused browser-backed render-review CLI. Renders one topology through the real canvas path, supports named profiles, profile-owned literature metadata, optional reference montages, and writes PNG plus JSON summary output.
-- [tools/run_browser_check.py](../tools/run_browser_check.py)
-  Managed browser-diagnosis runner. Owns standalone/server host startup, readiness, logging, cleanup, and run-manifest output for focused render reviews or targeted Python `unittest` browser checks. Managed render-review runs default their PNG and JSON outputs into the run artifact directory.
-- [tools/run_render_review_sweep.py](../tools/run_render_review_sweep.py)
-  Small-matrix render-review orchestrator. Expands one named profile across selected hosts, themes, and sizes, reuses the managed runner for each case, and writes one top-level sweep manifest plus one comparable artifact directory per case, including literature-review status when enabled.
-- [tools/run_render_review_diff.py](../tools/run_render_review_diff.py)
+- [tools/cli.py](../tools/cli.py)
+  Unified `python -m tools ...` entrypoint. Registers the public command groups and dispatches into task-focused command modules.
+- [tools/command_docs.py](../tools/command_docs.py)
+  Single source of truth for command metadata, examples, and generated tools documentation.
+- [tools/commands/build.py](../tools/commands/build.py)
+  Public build group wiring for `standalone`, `standalone-shell`, and `bundle-size`.
+- [tools/standalone_build.py](../tools/standalone_build.py)
+  Builds the static standalone site and writes the provenance manifest.
+- [tools/standalone_shell.py](../tools/standalone_shell.py)
+  Shared standalone-shell renderer behind `python -m tools build standalone-shell`.
+- [tools/playwright_runner.py](../tools/playwright_runner.py)
+  Public Playwright runner behind `python -m tools test e2e`. Lists suites, prepares standalone builds, repairs Linux browser libraries when possible, and dispatches Python `unittest` modules.
+- [tools/commands/browser.py](../tools/commands/browser.py)
+  Public browser-diagnosis command wiring for review, managed checks, sweeps, diffs, workbenches, and standalone smoke tests.
+- [tools/render_review/review.py](../tools/render_review/review.py)
+  Focused browser-backed render-review implementation. Renders one topology through the real canvas path, supports named profiles, profile-owned literature metadata, optional reference montages, and writes PNG plus JSON summary output.
+- [tools/render_review/browser_check.py](../tools/render_review/browser_check.py)
+  Managed browser-diagnosis runner. Owns standalone/server host startup, readiness, logging, cleanup, and run-manifest output for focused render reviews or targeted Python `unittest` browser checks.
+- [tools/render_review/sweep.py](../tools/render_review/sweep.py)
+  Small-matrix render-review orchestrator. Expands one named profile across selected hosts, themes, and sizes, reuses the managed runner for each case, and writes one top-level sweep manifest plus one comparable artifact directory per case.
+- [tools/render_review/diff_review.py](../tools/render_review/diff_review.py)
   One-command render-review comparison sheet builder. It can run a new sweep or consume an existing `sweep-manifest.json`, then emits one HTML sheet plus one PNG contact sheet for side-by-side review.
 - [tools/dev_processes.py](../tools/dev_processes.py)
   Repo-scoped process inspection and cleanup helper for the known browser/server helper processes started from this repo.
-- [tools/run-python.mjs](../tools/run-python.mjs)
-  Cross-platform Python command wrapper used by npm scripts for repo tools.
+- [tools/commands/tilings.py](../tools/commands/tilings.py)
+  Public tilings group wiring for validation, verification, reporting, previews, sketching, and aperiodic scaffolding.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
-  Manifest-wide geometric sanity checker for catalog tilings. Prints a reminder to run the literature verifier for the full catalog companion checks.
+  Manifest-wide geometric sanity checker for catalog tilings.
 - [tools/verify_reference_tilings.py](../tools/verify_reference_tilings.py)
-  Literature-faithfulness verifier for the full topology catalog. Reports `PASS`, `KNOWN_DEVIATION`, or `FAIL` without changing the public app surface.
-- [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
-  Writes the standalone wrapper into the transient build-input directory.
+  Literature-faithfulness verifier for the full topology catalog.
 - [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)
   Exports bootstrap metadata for standalone mode.
+- [tools/tools_docs.py](../tools/tools_docs.py)
+  Generates and checks `docs/TOOLS.md` from the command registry.
 - [tools/render_review/browser_support/artifacts.py](../tools/render_review/browser_support/artifacts.py)
   Shared browser-failure artifact writer used by the managed runner, render-review tool, and Playwright harness so local diagnosis and failing tests emit the same core bundle shape.
-- [tools/validate_tilings.py](../tools/validate_tilings.py)
-  Validates topology descriptors and generated tilings.
 - [vite.config.ts](../vite.config.ts)
   Frontend build configuration.
 
@@ -483,4 +491,4 @@ Use this list to decide where cleanup work should start. These are the files wit
 - Standalone browser runtime:
   Start with [frontend/standalone.ts](../frontend/standalone.ts), [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts), and [backend/browser_runtime.py](../backend/browser_runtime.py)
 - Shared shell or startup wrappers:
-  Start with [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html), [backend/app_shell.py](../backend/app_shell.py), and [tools/render_standalone_shell.py](../tools/render_standalone_shell.py)
+  Start with [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html), [backend/app_shell.py](../backend/app_shell.py), and [tools/standalone_shell.py](../tools/standalone_shell.py)

@@ -17,10 +17,10 @@ This is the short version of how tilings fit into the app.
 
 ## Verification Layers
 
-- `tools/validate_tilings.py`
+- `python -m tools tilings validate`
   - geometric sanity only
   - asks “does the topology build, connect, and look internally valid?”
-- `tools/verify_reference_tilings.py`
+- `python -m tools tilings verify`
   - source-backed reference verification
   - asks “does the canonical sample match the literature-backed invariants we encoded?”
 

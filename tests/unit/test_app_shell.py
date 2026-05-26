@@ -30,14 +30,13 @@ class AppShellTests(unittest.TestCase):
             r'<option value="edge" selected="selected">Edge</option>\s*</select>',
         )
 
-    def test_render_standalone_shell_script_matches_generated_output(self) -> None:
+    def test_render_standalone_shell_cli_matches_generated_output(self) -> None:
         root_dir = Path(__file__).resolve().parents[2]
-        script_path = root_dir / "tools" / "render_standalone_shell.py"
 
         with tempfile.TemporaryDirectory(prefix="cellular-automaton-standalone-shell-") as tempdir:
             output_path = Path(tempdir) / "standalone.html"
             run(
-                [sys.executable, str(script_path), str(output_path)],
+                [sys.executable, "-m", "tools", "build", "standalone-shell", str(output_path)],
                 check=True,
                 cwd=root_dir,
             )

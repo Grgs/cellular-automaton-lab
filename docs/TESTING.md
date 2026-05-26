@@ -194,8 +194,8 @@ These tests should prove backend behavior without needing a real browser.
 Some correctness checks live in dedicated tooling rather than ordinary unit tests:
 
 ```powershell
-py -3 tools\validate_tilings.py
-py -3 tools\regenerate_frontend_topology_fixtures.py --all --check
+python -m tools tilings validate
+python -m tools fixtures frontend --all --check
 ```
 
 This validates geometry and tiling descriptors directly. It is part of the normal validation path because topology metadata is foundational to both backend behavior and frontend rendering.
@@ -240,10 +240,10 @@ npm run test:e2e:playwright:standalone
 npm run test:e2e:playwright:subset
 npm run build:frontend:standalone
 npm run build:standalone-and-test
-node ./tools/run-playwright.mjs --list-suites
+python -m tools test playwright-suites
 ```
 
-These npm scripts are the preferred local entrypoints because they own Playwright suite selection, Linux browser-runtime repair, and standalone-build setup when a suite needs it. The suite list comes from the Python Playwright manifest in `tests/e2e/playwright_suite_support.py`.
+These npm scripts are the preferred local entrypoints because they forward into the unified Python tools CLI, which owns Playwright suite selection, Linux browser-runtime repair, and standalone-build setup when a suite needs it. The suite list comes from the Python Playwright manifest in `tests/e2e/playwright_suite_support.py`.
 
 The runner now reuses `output/standalone/` when the existing build manifest matches the current checkout fingerprint. It only rebuilds the standalone bundle when required outputs are missing, the manifest is missing, or the build fingerprint no longer matches the current source tree.
 
@@ -309,20 +309,20 @@ Use the browser-diagnosis tools when you need a focused local answer instead of 
 Preferred paths:
 
 - Full suite or feature suite: use the npm Playwright entrypoints.
-- Structural-first candidate exploration for a patch-depth family: use `python tools/run_family_sample_workbench.py`.
-- Visual inspection of one rendered topology: use `python tools/render_canvas_review.py`.
-- Host-owned local debugging with guaranteed startup and cleanup: use `python tools/run_browser_check.py`.
-- Small comparison matrix across hosts, themes, or sizes: use `python tools/run_render_review_sweep.py`.
-- One HTML/PNG comparison artifact from a sweep: use `python tools/run_render_review_diff.py`.
+- Structural-first candidate exploration for a patch-depth family: use `python -m tools browser workbench-samples`.
+- Visual inspection of one rendered topology: use `python -m tools browser review`.
+- Host-owned local debugging with guaranteed startup and cleanup: use `python -m tools browser check`.
+- Small comparison matrix across hosts, themes, or sizes: use `python -m tools browser sweep`.
+- One HTML/PNG comparison artifact from a sweep: use `python -m tools browser diff`.
 
 Family sample workbench examples:
 
 ```powershell
-python tools/run_family_sample_workbench.py --family shield --patch-depth 3
-python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --browser-review --host standalone
-python tools/run_family_sample_workbench.py --family pinwheel --patch-depth 3
-python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3
-python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3 --browser-review --host standalone --theme dark
+python -m tools browser workbench-samples --family shield --patch-depth 3
+python -m tools browser workbench-samples --family shield --patch-depth 3 --browser-review --host standalone
+python -m tools browser workbench-samples --family pinwheel --patch-depth 3
+python -m tools browser workbench-cleanup --family shield --patch-depth 3
+python -m tools browser workbench-cleanup --family shield --patch-depth 3 --browser-review --host standalone --theme dark
 ```
 
 Use the workbench when:
@@ -346,33 +346,33 @@ Use the geometry cleanup workbench when the representative sample is already fix
 Direct render review examples:
 
 ```powershell
-python tools/render_canvas_review.py --list-profiles
-python tools/render_canvas_review.py --profile pinwheel-depth-3
-python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review
-python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review --reference C:\path\to\pinwheel-reference.png
+python -m tools browser review --list-profiles
+python -m tools browser review --profile pinwheel-depth-3
+python -m tools browser review --profile pinwheel-depth-3 --literature-review
+python -m tools browser review --profile pinwheel-depth-3 --literature-review --reference C:\path\to\pinwheel-reference.png
 ```
 
 Managed runner examples:
 
 ```powershell
-python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
-python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3 --literature-review
-python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
-python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+python -m tools browser check --host standalone --render-review --profile pinwheel-depth-3
+python -m tools browser check --host standalone --render-review --profile pinwheel-depth-3 --literature-review
+python -m tools browser check --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+python -m tools browser check --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
 ```
 
 Sweep example:
 
 ```powershell
-python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
-python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
+python -m tools browser sweep --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python -m tools browser sweep --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
 ```
 
 Diff-review examples:
 
 ```powershell
-python tools/run_render_review_diff.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
-python tools/run_render_review_diff.py --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
+python -m tools browser diff --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python -m tools browser diff --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
 ```
 
 Literature-review conventions:
@@ -386,9 +386,9 @@ Literature-review conventions:
 Repo-scoped process inspection and cleanup:
 
 ```powershell
-python tools/dev_processes.py list
-python tools/dev_processes.py kill --stale-browser-hosts
-python tools/dev_processes.py kill --port 5002
+python -m tools repo processes list
+python -m tools repo processes kill --stale-browser-hosts
+python -m tools repo processes kill --port 5002
 ```
 
 Artifact locations:
@@ -476,11 +476,11 @@ Managed runner manifests for successful `--unittest --success-artifacts` runs al
 
 Defaults:
 
-- `tools/render_canvas_review.py` is the preferred visual-inspection entrypoint.
-- `tools/run_browser_check.py` is the preferred direct-debug entrypoint when host lifecycle, logs, and cleanup must be owned by one command.
-- `tools/run_render_review_sweep.py` is the preferred entrypoint when a diagnosis loop needs a small matrix comparison rather than one run.
+- `python -m tools browser review` is the preferred visual-inspection entrypoint.
+- `python -m tools browser check` is the preferred direct-debug entrypoint when host lifecycle, logs, and cleanup must be owned by one command.
+- `python -m tools browser sweep` is the preferred entrypoint when a diagnosis loop needs a small matrix comparison rather than one run.
 - npm Playwright entrypoints remain the preferred full-suite path.
-- `tools/dev_processes.py` is the narrow cleanup fallback when you need to inspect or terminate repo-owned browser/server helper processes directly.
+- `python -m tools repo processes` is the narrow cleanup fallback when you need to inspect or terminate repo-owned browser/server helper processes directly.
 
 If a visual-review run depends on standalone provenance being current, rebuild
 the frontend outputs on the current HEAD first:
@@ -506,10 +506,10 @@ For backend-only changes:
 py -3 -m mypy --config-file mypy.ini
 py -3 -m unittest discover -s tests/unit -p "test_*.py"
 py -3 -m unittest discover -s tests/api -p "test_*.py"
-py -3 tools\validate_tilings.py
-py -3 tools\report_tiling_verification_strength.py
-py -3 tools\report_tiling_verification_strength.py --format detail
-py -3 tools\report_tiling_verification_strength.py --format json
+python -m tools tilings validate
+python -m tools tilings report
+python -m tools tilings report --format detail
+python -m tools tilings report --format json
 ```
 
 For changes that affect real UI flows, controls, persistence, or topology switching, add the relevant Playwright suite:
@@ -539,7 +539,7 @@ Playwright troubleshooting:
 - shard-specific server regression:
   run `npm run test:e2e:playwright:subset`
 - Linux browser library failures:
-  `node ./tools/run-playwright.mjs` can repair missing Playwright browser libraries only on Debian/Ubuntu-style environments with `apt`, `apt-cache`, and `dpkg-deb`
+  `python -m tools test e2e` can repair missing Playwright browser libraries only on Debian/Ubuntu-style environments with `apt`, `apt-cache`, and `dpkg-deb`
 - when those packaging tools are unavailable:
   install the listed shared libraries manually, then rerun the npm Playwright command you actually need
 
@@ -555,8 +555,8 @@ npm run check:doc-links
 npm run audit:supply-chain
 py -3 -m mypy --config-file mypy.ini
 py -3 -m unittest discover -s tests -p "test_*.py"
-py -3 tools\validate_tilings.py
-py -3 tools\verify_reference_tilings.py
+python -m tools tilings validate
+python -m tools tilings verify
 py -3 -m pre_commit run --hook-stage pre-push --all-files
 ```
 
@@ -621,3 +621,4 @@ When adding or refactoring tests:
 - keep topology and descriptor validation close to the data they protect
 
 The best outcome is a test suite that is fast to debug, layered by cost, and aligned with the actual architecture of the app.
+

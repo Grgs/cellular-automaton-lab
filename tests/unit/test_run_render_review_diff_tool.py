@@ -23,19 +23,19 @@ from tools.render_review.diff_review import (
 
 
 class RenderReviewDiffToolTests(unittest.TestCase):
-    def test_documented_thin_entrypoints_support_direct_help(self) -> None:
+    def test_browser_cli_subcommands_support_help(self) -> None:
         root = Path(__file__).resolve().parents[2]
-        for tool_path in (
-            "tools/render_canvas_review.py",
-            "tools/run_browser_check.py",
-            "tools/run_render_review_sweep.py",
-            "tools/run_render_review_diff.py",
-            "tools/run_family_sample_workbench.py",
-            "tools/run_geometry_cleanup_workbench.py",
+        for command_tokens in (
+            ("browser", "review"),
+            ("browser", "check"),
+            ("browser", "sweep"),
+            ("browser", "diff"),
+            ("browser", "workbench-samples"),
+            ("browser", "workbench-cleanup"),
         ):
-            with self.subTest(tool_path=tool_path):
+            with self.subTest(command_tokens=command_tokens):
                 result = subprocess.run(
-                    [sys.executable, tool_path, "--help"],
+                    [sys.executable, "-m", "tools", *command_tokens, "--help"],
                     cwd=root,
                     check=False,
                     stdout=subprocess.PIPE,

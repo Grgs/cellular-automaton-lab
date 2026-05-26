@@ -1,359 +1,374 @@
 # Tools Reference
 
-Single index of every script under `tools/`. Each entry is a one-line summary, the canonical invocation, and (when relevant) a pointer to the deeper guide that already covers it.
+Generated from the `python -m tools ...` command registry. Edit the CLI metadata, not this file by hand.
 
-The CLI tools group into eleven purposes:
+For npm convenience aliases, see the `scripts` block in [package.json](../package.json).
 
-1. [Build and serve](#build-and-serve)
-2. [Lint and format](#lint-and-format)
-3. [Pre-commit hooks](#pre-commit-hooks)
-4. [Tiling validation and verification](#tiling-validation-and-verification)
-5. [Browser diagnosis and render review](#browser-diagnosis-and-render-review)
-6. [Scaffolding](#scaffolding)
-7. [Fixture and bootstrap regeneration](#fixture-and-bootstrap-regeneration)
-8. [Test runners and introspection](#test-runners-and-introspection)
-9. [Supply-chain audit](#supply-chain-audit)
-10. [Performance benchmarks](#performance-benchmarks)
-11. [Process cleanup](#process-cleanup)
+## Build
 
-For the npm-script surface (which wraps several of these), see the `scripts` block in [package.json](../package.json).
+Build and inspect standalone frontend artifacts.
 
-## Build and serve
+### `python -m tools build standalone`
 
-### `tools/build-standalone.mjs`
+Build the standalone bundle into `output/standalone/` and write a build manifest.
 
-Builds the standalone single-file HTML bundle into `output/standalone/` and writes a `build-manifest.json` with the source-tree fingerprint. Wrapped by `npm run build:frontend:standalone`. Source: [build-standalone.mjs](../tools/build-standalone.mjs).
+Python-first replacement for the old standalone build script. It stages the standalone shell, runs Vite, writes bootstrap data, bundles backend/config Python sources, and records source provenance in `build-manifest.json`.
 
 ```powershell
-node ./tools/build-standalone.mjs
+python -m tools build standalone
 ```
 
-### `tools/render_standalone_shell.py`
+### `python -m tools build standalone-shell`
 
-Prints (or writes) the rendered HTML shell that the standalone build wraps. Used by the standalone build pipeline to produce `output/.standalone-build-input/standalone.html`. Source: [render_standalone_shell.py](../tools/render_standalone_shell.py).
+Render the standalone HTML shell to stdout or a file.
+
+Useful when inspecting the shared standalone wrapper independently from a full build.
 
 ```powershell
-py -3 tools/render_standalone_shell.py [output_path]
+python -m tools build standalone-shell
+python -m tools build standalone-shell output/.standalone-build-input/standalone.html
 ```
 
-### `tools/run-python.mjs`
+### `python -m tools build bundle-size`
 
-Cross-platform Python launcher used by npm scripts. Resolves `$env:PYTHON`, then `py -3` on Windows or `python3`/`python` on POSIX, and forwards remaining args. Source: [run-python.mjs](../tools/run-python.mjs).
+Check standalone bundle budgets and emit optional JSON or text reports.
+
+Runs the standalone bundle budget gate against `output/standalone/` and supports baseline comparisons for CI/history tracking.
 
 ```powershell
-node ./tools/run-python.mjs path/to/script.py [args...]
+python -m tools build bundle-size
+python -m tools build bundle-size --format json
 ```
 
-## Lint and format
+## Tilings
 
-### `tools/run_python_style.py`
+Validate, verify, preview, sketch, and scaffold tilings.
 
-Runs `ruff check`, `ruff format --check`, or `ruff format` against the repo-owned Python surface: `app.py`, `backend/`, `tests/`, and `tools/`. Wired into `pre-commit`. Source: [run_python_style.py](../tools/run_python_style.py).
+### `python -m tools tilings validate`
+
+Run geometry/topology validation across catalog tilings.
+
+Cheap sanity validation for topology structure, adjacency, holes, and edge multiplicity.
 
 ```powershell
-py -3 tools/run_python_style.py check
-py -3 tools/run_python_style.py format-check
-py -3 tools/run_python_style.py format
+python -m tools tilings validate
 ```
 
-### Documentation link checks
+### `python -m tools tilings verify`
 
-Validates Markdown links and heading anchors across repo documentation using Linkinator. Catches broken file paths, directory links, and `#anchor` references. External `https://`, `mailto:`, and local development server links are intentionally skipped because external link liveness is out of scope for this gate. Wrapped by `npm run check:doc-links`; options live in [linkinator.config.json](../linkinator.config.json).
+Run literature-backed reference verification across tiling families.
+
+Stricter verification than `tilings validate`, including signatures, fixtures, and connectivity invariants.
 
 ```powershell
-npm run check:doc-links
+python -m tools tilings verify
 ```
 
-## Pre-commit hooks
+### `python -m tools tilings report`
 
-These run automatically through [.pre-commit-config.yaml](../.pre-commit-config.yaml) when you commit or push. They are listed here so you can invoke them manually for debugging.
+Report per-family verification strength in summary, detail, or JSON format.
 
-### `tools/privacy_guard.py`
-
-Scans tracked repository files for personal information leaks: Windows/POSIX home-directory paths, consumer webmail addresses, and consumer cloud-share links. Lines tagged with `privacy-guard: allow` are skipped. Used at both `pre-commit` (changed files) and `pre-push` (full repo) stages. Source: [privacy_guard.py](../tools/privacy_guard.py).
+Aggregates implementation contracts, fixture coverage, and live verification results.
 
 ```powershell
-py -3 tools/privacy_guard.py [paths...]
-py -3 tools/privacy_guard.py --all-files
+python -m tools tilings report
+python -m tools tilings report --format detail
 ```
 
-### `tools/run_detect_secrets.py`
+### `python -m tools tilings preview`
 
-Wrapper that runs `detect-secrets` against changed files (pre-commit) or all tracked files (pre-push), comparing against [.secrets.baseline](../.secrets.baseline). Source: [run_detect_secrets.py](../tools/run_detect_secrets.py).
+Generate preview polygon data for the tiling picker.
+
+Supports periodic and aperiodic preview generation and discovery via `--list`.
 
 ```powershell
-py -3 tools/run_detect_secrets.py --baseline .secrets.baseline [paths...]
-py -3 tools/run_detect_secrets.py --baseline .secrets.baseline --all-files
+python -m tools tilings preview --list
+python -m tools tilings preview --geometry kisrhombille
 ```
 
-## Tiling validation and verification
+### `python -m tools tilings sketch`
 
-The deeper guide for this cluster is [docs/TESTING_TILINGS.md](TESTING_TILINGS.md). Verification status table lives in [docs/TILING_VERIFICATION_STATUS.md](TILING_VERIFICATION_STATUS.md).
+Sketch and validate a candidate periodic tiling without wiring it into the catalog.
 
-### `tools/sketch_tiling.py`
-
-Standalone sketch + validator for a candidate periodic tiling, runnable without wiring it into any of the backend manifests. Takes a Python sketch file that defines `FACES`, `CELL_WIDTH`, and `CELL_HEIGHT`, builds a 3x3 patch using the same builder the backend uses, then reports polygon overlaps, T-junctions, unmatched interior edges, and per-vertex interior-angle sums (in degrees) so you can immediately see e.g. "vertex (26, 45.03) has angle sum 300 deg, 5 polygons" instead of inferring it from the topology builder's neighbor-count histogram. Optionally emits an SVG visualization, a JSON descriptor stub ready to paste into [periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json), and a complete Python reference-spec module ready to drop into [backend/simulation/reference_specs/periodic/](../backend/simulation/reference_specs/periodic/). Exit code is 0 for a valid tiling and 1 otherwise. An example sketch lives under [tools/sketch_examples/](../tools/sketch_examples/). Use this when adding a new periodic mixed tiling — see step 4 of [docs/ADDING_TOPOLOGIES.md](ADDING_TOPOLOGIES.md). Source: [sketch_tiling.py](../tools/sketch_tiling.py).
+Builds a patch from a sketch file, reports topology/geometry issues, and can emit SVG/JSON/reference-spec outputs.
 
 ```powershell
-py -3 tools/sketch_tiling.py path/to/sketch.py
-py -3 tools/sketch_tiling.py path/to/sketch.py --svg out.svg --json out.json
-py -3 tools/sketch_tiling.py path/to/sketch.py --reference-spec out_spec.py --source-url https://example.com
-py -3 tools/sketch_tiling.py path/to/sketch.py --patch-size 4
+python -m tools tilings sketch tools/sketch_examples/triangular_square_2uniform.py
+python -m tools tilings sketch path/to/sketch.py --svg out.svg --json out.json
 ```
 
-### `tools/sketch_helpers.py`
+### `python -m tools tilings scaffold-aperiodic`
 
-Geometric polygon constructors for sketch files. Saves you from spelling out `sqrt(3) / 2` or hand-deriving the third vertex of an equilateral triangle. Every helper returns vertices in CCW order with coordinates already rounded to 6 decimals (the same precision the backend's edge-matcher uses), so values computed two different ways agree exactly and the polygon-overlap validator never fires on float noise. Used by sketch files that you feed to `tools/sketch_tiling.py`. Source: [sketch_helpers.py](../tools/sketch_helpers.py).
+Scaffold the boilerplate for a new aperiodic tiling family.
 
-```python
-from tools.sketch_helpers import equilateral_triangle, square, regular_hexagon, square_with_mid_edge_vertices
-# equilateral_triangle((0, 0), (52, 0), side="above")  -> triangle vertices, apex up
-# square((0, 90), 52)                                  -> 4 square vertices
-# regular_hexagon((0, 0), 52, orientation="pointy-top")-> 6 hex vertices
-# square_with_mid_edge_vertices((0, 0), 52)            -> 8 vertices (4 corners + 4 midpoints, for T-junctions)
-```
-
-### `tools/validate_tilings.py`
-
-Runs the geometry/topology validator across every tiling in the catalog. Catches non-deterministic builders, malformed adjacency, hole formation, and edge-multiplicity issues. This is the cheap geometric sanity check; run it whenever changing topology data. Source: [validate_tilings.py](../tools/validate_tilings.py).
+Creates the generator skeleton, reference spec, tests, and registry/manifest inserts before real geometry is implemented.
 
 ```powershell
-py -3 tools/validate_tilings.py
+python -m tools tilings scaffold-aperiodic --family-id widget-monotile --label "Widget Monotile" --kind widget --source-url https://example.org/widget
 ```
 
-### `tools/verify_reference_tilings.py`
+## Fixtures
 
-Runs the literature-reference verifier across every tiling family. Stricter than `validate_tilings.py`: checks signatures, periodic-face descriptors, exact interior vertex stars, dual-family invariants, polygon-area frequencies, rooted local-reference fixtures, and canonical patch fixtures. Returns non-zero on any blocking surface or connectivity regression. Source: [verify_reference_tilings.py](../tools/verify_reference_tilings.py).
+Regenerate or check checked-in fixture files.
+
+### `python -m tools fixtures reference`
+
+Regenerate or check literature reference fixtures.
+
+Supports `--check`, `--all`, targeted geometry/depth regeneration, and discovery with `--list-targets`.
 
 ```powershell
-py -3 tools/verify_reference_tilings.py
+python -m tools fixtures reference --all --mode both --check
+python -m tools fixtures reference --mode canonical --geometry pinwheel --depth 3
 ```
 
-### `tools/report_tiling_verification_strength.py`
+### `python -m tools fixtures frontend`
 
-Aggregates static catalog coverage, aperiodic implementation contracts, fixture presence, and live `verify_all_reference_families()` results into a per-family verification-strength report. Three formats: `summary` (default), `detail`, and `json`. Source: [report_tiling_verification_strength.py](../tools/report_tiling_verification_strength.py).
+Regenerate or check frontend representative topology fixtures.
+
+Supports `--check`, `--all`, targeted fixture names, and discovery with `--list-fixtures`.
 
 ```powershell
-py -3 tools/report_tiling_verification_strength.py
-py -3 tools/report_tiling_verification_strength.py --format detail
-py -3 tools/report_tiling_verification_strength.py --format json
+python -m tools fixtures frontend --all --check
+python -m tools fixtures frontend --fixture shield-depth-3
 ```
 
-## Browser diagnosis and render review
+## Bootstrap
 
-The deeper guide for this cluster is [docs/TESTING.md](TESTING.md), section "Browser Diagnosis And Failure Investigation". The tools share an implementation package under `tools/render_review/`; the top-level `tools/run_*.py` files are thin CLI entrypoints. Tools listed here in the order they're typically reached for during a diagnosis.
+Export bootstrapped backend metadata for standalone mode.
 
-### `tools/render_canvas_review.py`
+### `python -m tools bootstrap export`
 
-Renders one tiling family at a chosen depth through the real browser canvas path and saves a PNG plus JSON summary. Supports named profiles (`--list-profiles`), reference-image comparison (`--literature-review` + cached or `--reference` image), settle diagnostics, and visual-quality metrics. Preferred entrypoint when the question is "what does this currently look like?" Source: [render_canvas_review.py](../tools/render_canvas_review.py) → `tools/render_review/review.py`.
+Export the backend bootstrap payload to JSON.
+
+Writes topology catalog, rule metadata, and canonical defaults to a file for standalone/runtime consumers.
 
 ```powershell
-python tools/render_canvas_review.py --list-profiles
-python tools/render_canvas_review.py --profile pinwheel-depth-3
-python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review
+python -m tools bootstrap export frontend/test-fixtures/bootstrap-data.json
 ```
 
-### `tools/run_browser_check.py`
+## Browser
 
-Managed runner that owns server/standalone host startup, readiness, logs, and cleanup around either a render review or a delegated unittest. Use when host lifecycle ownership matters or you need a guaranteed artifact bundle on failure. Source: [run_browser_check.py](../tools/run_browser_check.py) → `tools/render_review/browser_check.py`.
+Run browser-backed reviews, sweeps, workbenches, and smoke checks.
+
+### `python -m tools browser review`
+
+Render one topology through the real browser canvas path and emit PNG/JSON artifacts.
+
+Supports named profiles, literature review, cached references, and visual metrics. Use `--list-profiles` for discovery.
 
 ```powershell
-python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
-python tools/run_browser_check.py --host server --unittest <dotted-test-id>
-python tools/run_browser_check.py --host server --success-artifacts --unittest <dotted-test-id>
+python -m tools browser review --list-profiles
+python -m tools browser review --profile pinwheel-depth-3
 ```
 
-### `tools/run_render_review_sweep.py`
+### `python -m tools browser check`
 
-Runs one render-review profile across a small matrix of hosts, themes, or sizes and emits one sweep manifest plus one comparable artifact tree. Use when the question is comparative rather than single-run. Source: [run_render_review_sweep.py](../tools/run_render_review_sweep.py) → `tools/render_review/sweep.py`.
+Own browser host startup/cleanup around one render review or targeted unittest.
+
+Managed runner for server or standalone browser checks with artifact manifests and failure bundling.
 
 ```powershell
-python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python -m tools browser check --host standalone --render-review --profile pinwheel-depth-3
+python -m tools browser check --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_chair_topology_switch_renders_aperiodic_patch
 ```
 
-### `tools/run_render_review_diff.py`
+### `python -m tools browser sweep`
 
-Either runs a new sweep or consumes an existing `sweep-manifest.json`, then emits one HTML sheet plus one PNG contact sheet for side-by-side review. Source: [run_render_review_diff.py](../tools/run_render_review_diff.py) → `tools/render_review/diff_review.py`.
+Run a small matrix of comparable render-review cases.
+
+Expands a render-review profile across hosts, themes, or sizes and writes one sweep manifest plus case artifacts.
 
 ```powershell
-python tools/run_render_review_diff.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
-python tools/run_render_review_diff.py --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
+python -m tools browser sweep --profile shield-depth-3 --hosts standalone,server
 ```
 
-### `tools/run_family_sample_workbench.py`
+### `python -m tools browser diff`
 
-Explores candidate representative samples for patch-depth topology families. Compares candidates structurally by count, connectivity, bounds, holes, and diagnostic validation, with optional browser review against injected candidate topology payloads. Source: [run_family_sample_workbench.py](../tools/run_family_sample_workbench.py) → `tools/render_review/family_sample_workbench.py`.
+Build an HTML/PNG comparison sheet from a sweep or by running a new sweep.
+
+Useful when reviewing host/theme/depth differences side by side.
 
 ```powershell
-python tools/run_family_sample_workbench.py --family shield --patch-depth 3
-python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --browser-review --host standalone
+python -m tools browser diff --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python -m tools browser diff --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
 ```
 
-### `tools/run_geometry_cleanup_workbench.py`
+### `python -m tools browser workbench-samples`
 
-Explores topology cleanup factors for image-derived patch-depth topology families. Compares cleanup candidates by overlap severity, bounds drift, and optional browser-visible gutter risk. Currently meaningful for `shield`. Source: [run_geometry_cleanup_workbench.py](../tools/run_geometry_cleanup_workbench.py) → `tools/render_review/geometry_cleanup_workbench.py`.
+Explore candidate representative samples for patch-depth families.
+
+Compares structural candidates and can optionally inject them into a browser-backed render review.
 
 ```powershell
-python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3
+python -m tools browser workbench-samples --family shield --patch-depth 3
+python -m tools browser workbench-samples --family shield --patch-depth 3 --browser-review --host standalone
 ```
 
-## Scaffolding
+### `python -m tools browser workbench-cleanup`
 
-### `tools/scaffold_aperiodic_family.py`
+Explore cleanup-factor candidates for image-derived patch-depth families.
 
-Stamps out the boilerplate for a new aperiodic tiling family: generator skeleton, reference spec stub, test skeleton, plus surgical manifest / registry / topology / reference-spec-init inserts. Does NOT solve the geometry -- it produces a structurally-valid placeholder that loads end-to-end so wiring can be confirmed before the substitution rule is finalized. After running, follow the printed next-step checklist (define geometry, regenerate fixtures, add palette entry). Supports `--dry-run`. Source: [scaffold_aperiodic_family.py](../tools/scaffold_aperiodic_family.py).
+Compares overlap severity, bounds drift, and optional browser-visible gutter risk.
 
 ```powershell
-py -3 tools/scaffold_aperiodic_family.py \
-    --family-id widget-monotile \
-    --label "Widget Monotile" \
-    --kind widget \
-    --source-url https://example.org/widget
+python -m tools browser workbench-cleanup --family shield --patch-depth 3
+python -m tools browser workbench-cleanup --family shield --patch-depth 3 --browser-review --host standalone
 ```
 
-## Fixture and bootstrap regeneration
+### `python -m tools browser smoke-standalone`
 
-### `tools/regenerate_reference_fixtures.py`
+Run the standalone smoke test against a prebuilt bundle.
 
-Regenerates checked-in literature reference fixture JSON (rooted local-reference fixtures, canonical patch fixtures). Use when generator or verifier changes intentionally shift fixture expectations; review the resulting git diff carefully. Source: [regenerate_reference_fixtures.py](../tools/regenerate_reference_fixtures.py).
+Launches headless Chromium, waits for bootstrap readiness, and fails on unexpected startup errors.
 
 ```powershell
-py -3 tools/regenerate_reference_fixtures.py --all --mode both
+python -m tools browser smoke-standalone
+python -m tools browser smoke-standalone --format json --output output/standalone-smoke.json
 ```
 
-### `tools/regenerate_frontend_topology_fixtures.py`
+## Tests
 
-Regenerates checked-in frontend representative topology fixture JSON used by browser-visible geometry and palette tests. Supports `--check` mode (no writes, exit non-zero on drift) and `--fixture <name>` for a single target. Source: [regenerate_frontend_topology_fixtures.py](../tools/regenerate_frontend_topology_fixtures.py).
+Run Playwright suites, backend coverage, and standalone build introspection.
+
+### `python -m tools test e2e`
+
+Run Playwright suites through the Python CLI, or run the broader local e2e orchestrator.
+
+Use `--list-suites` to inspect suite names, `--suite` to run a specific suite, or `--orchestrated` to run the old frontend-plus-chunked-playwright workflow.
 
 ```powershell
-python tools/regenerate_frontend_topology_fixtures.py --all --check
-python tools/regenerate_frontend_topology_fixtures.py --fixture shield-depth-3
+python -m tools test e2e --list-suites
+python -m tools test e2e --suite server
+python -m tools test e2e --orchestrated
 ```
 
-### `tools/export_bootstrap_data.py`
+### `python -m tools test coverage`
 
-Exports the backend bootstrap payload (topology catalog, rule metadata, and the canonical [config/defaults.json](../config/defaults.json) payload) to a JSON path. Used by the standalone build pipeline to bake the bootstrap data into the bundle. Source: [export_bootstrap_data.py](../tools/export_bootstrap_data.py).
+Run backend coverage for the unit suite, API suite, or both.
+
+Mirrors the CI coverage flow and supports XML/HTML outputs plus `--fail-under`.
 
 ```powershell
-py -3 tools/export_bootstrap_data.py <output-path>
+python -m tools test coverage
+python -m tools test coverage --suite unit --fail-under 80
 ```
 
-## Test runners and introspection
+### `python -m tools test playwright-suites`
 
-### `tools/run-playwright.mjs`
+Print the public Playwright suite manifest.
 
-Entrypoint for Playwright suites. Selects a suite by semantic name (`all`, `server`, `standalone`, `subset`, or per-feature), consults [tools/print_standalone_build_status.py](#toolsprint_standalone_build_statuspy) before rebuilding, and on Linux can repair missing browser libraries via `apt`/`dpkg-deb`. Wrapped by `npm run test:e2e:playwright[:server|:standalone|:subset]`. Source: [run-playwright.mjs](../tools/run-playwright.mjs).
+Structured replacement for the old manifest-print helper.
 
 ```powershell
-node ./tools/run-playwright.mjs --list-suites
-node ./tools/run-playwright.mjs --suite server
-node ./tools/run-playwright.mjs --suite standalone
+python -m tools test playwright-suites
+python -m tools test playwright-suites --format names
 ```
 
-### `tools/run_e2e.py`
+### `python -m tools test standalone-build-status`
 
-Top-level orchestrator that runs frontend Vitest checks, the suite-integrity guard, a frontend build, and chunked Playwright subsets sequentially. Used in CI shard configurations. Source: [run_e2e.py](../tools/run_e2e.py).
+Print standalone build freshness and provenance status.
+
+Reports whether `output/standalone/` is current for standalone-backed browser workflows.
 
 ```powershell
-py -3 tools/run_e2e.py
+python -m tools test standalone-build-status
+python -m tools test standalone-build-status --format summary
 ```
 
-### `tools/print_playwright_suite_manifest.py`
+## Security
 
-Prints the JSON suite manifest declared by [tests/e2e/playwright_suite_support.py](../tests/e2e/playwright_suite_support.py). Consumed by `run-playwright.mjs` to enumerate suites. Source: [print_playwright_suite_manifest.py](../tools/print_playwright_suite_manifest.py).
+Run privacy, secret-scanning, and supply-chain checks.
+
+### `python -m tools security privacy`
+
+Scan tracked repo files for personal-information leaks.
+
+Supports pre-commit filename arguments or full-repo mode with `--all-files`.
 
 ```powershell
-py -3 tools/print_playwright_suite_manifest.py
+python -m tools security privacy --all-files
+python -m tools security privacy README.md docs/TOOLS.md
 ```
 
-### `tools/print_standalone_build_status.py`
+### `python -m tools security secrets`
 
-Prints the JSON standalone build-status report (existence, manifest fingerprint, sources hash). Consumed by `run-playwright.mjs` to decide whether to reuse `output/standalone/` or rebuild. Source: [print_standalone_build_status.py](../tools/print_standalone_build_status.py).
+Run `detect-secrets` against changed files or the full tracked repo.
+
+Wrapper around the repo baseline with the same changed-file/full-repo split used in pre-commit.
 
 ```powershell
-py -3 tools/print_standalone_build_status.py
+python -m tools security secrets --baseline .secrets.baseline --all-files
 ```
 
-### `tools/run_coverage.py`
+### `python -m tools security supply-chain`
 
-Runs the backend `unit` suite, the `api` suite, or both under `pytest-cov`, then combines split suite data with `coverage` and prints a report. Mirrors the CI workflow so contributors can reproduce the same backend coverage numbers locally. Supports `--fail-under <pct>` for a local threshold gate, `--xml <path>` for Cobertura output, and `--html <dir>` for an interactive report. Wrapped by `npm run coverage:backend`. Source: [run_coverage.py](../tools/run_coverage.py).
+Run the combined Python and npm supply-chain audit.
+
+Runs `pip-audit` plus `npm audit` and can emit summary or JSON findings.
 
 ```powershell
-py -3 tools/run_coverage.py
-py -3 tools/run_coverage.py --suite unit
-py -3 tools/run_coverage.py --fail-under 80
-py -3 tools/run_coverage.py --xml output/coverage/coverage.xml --html output/coverage/html
+python -m tools security supply-chain
+python -m tools security supply-chain --severity moderate --format json
 ```
 
-### `tools/smoke_test_standalone.py`
+## Performance
 
-Fast standalone-only smoke gate. Spins up `StandaloneRuntimeHost` against a prebuilt `output/standalone/` bundle, launches headless Chromium, navigates to the standalone URL, and waits for the readiness signal that says the bundled bootstrap has hydrated. Captures every console message and `pageerror` event during startup and fails the run on any error-level event (with a small allowlist for benign Pyodide notices). Reports total wall-clock time and the bootstrap-only sub-time. Cheap enough for an inner-loop check (typically a few seconds on a warm cache) where the full Playwright standalone suite would be overkill. Wrapped by `npm run smoke:standalone`. Source: [smoke_test_standalone.py](../tools/smoke_test_standalone.py).
+Run engine and topology performance investigations.
+
+### `python -m tools perf bench`
+
+Run engine microbenchmarks across representative rule/topology scenarios.
+
+Benchmarks the optimized engine path against a reference-style helper path.
 
 ```powershell
-py -3 tools/smoke_test_standalone.py
-py -3 tools/smoke_test_standalone.py --timeout-seconds 60
-py -3 tools/smoke_test_standalone.py --format json --output output/standalone-smoke.json
+python -m tools perf bench
 ```
 
-### `tools/check_bundle_size.py`
+### `python -m tools perf latency`
 
-Walks the standalone build (`output/standalone/`), classifies each file into a category by glob, sums raw and gzipped bytes per category, and gates on the per-category and total budgets defined in [tools/standalone_bundle_budget.json](../tools/standalone_bundle_budget.json). Exits non-zero on any budget violation. Optional `--baseline <prior-manifest.json>` adds a delta-from-baseline column for change tracking, and `--output <path>` writes a machine-readable JSON manifest alongside the formatted summary so CI can publish historical bundle sizes. Wrapped by `npm run check:bundle-size`. Source: [check_bundle_size.py](../tools/check_bundle_size.py).
+Profile topology-build, backend-mutation, and browser-roundtrip latency.
+
+Uses a real Playwright browser and server host for end-to-end timing investigations.
 
 ```powershell
-py -3 tools/check_bundle_size.py
-py -3 tools/check_bundle_size.py --format json
-py -3 tools/check_bundle_size.py --output output/bundle-size.txt
-py -3 tools/check_bundle_size.py --baseline output/bundle-size.baseline.json
+python -m tools perf latency
 ```
 
-## Supply-chain audit
+## Repo
 
-### `tools/run_supply_chain_audit.py`
+Run repo-level maintenance commands.
 
-Runs `pip-audit` against `requirements.txt` and `requirements-dev.txt` and `npm audit` against `package-lock.json`, and emits a unified findings summary. Exits non-zero when either ecosystem reports a finding at or above the configured severity threshold (default: `high`). Wired into `npm run audit:supply-chain` and a nightly cron in [.github/workflows/supply-chain-audit.yml](../.github/workflows/supply-chain-audit.yml). Source: [run_supply_chain_audit.py](../tools/run_supply_chain_audit.py).
+### `python -m tools repo processes`
+
+Inspect or clean up repo-scoped helper processes.
+
+Lists or kills server/standalone/browser helper processes and their ports.
 
 ```powershell
-py -3 tools/run_supply_chain_audit.py
-py -3 tools/run_supply_chain_audit.py --ecosystem python
-py -3 tools/run_supply_chain_audit.py --severity moderate --format json
-py -3 tools/run_supply_chain_audit.py --ignore-pip-vuln PYSEC-2025-61
+python -m tools repo processes list
+python -m tools repo processes kill --stale-browser-hosts
 ```
 
-## Performance benchmarks
+### `python -m tools repo python-style`
 
-### `tools/bench_engine.py`
+Run repo-owned Ruff style commands for Python sources.
 
-Microbenchmarks the simulation engine's optimized step path against a helper-driven reference path that approximates the pre-optimization implementation. Reports median ms and speedup per scenario across square Conway, hex Hexlife, triangle Trilife, multi-state Whirlpool/HexWhirlpool, and Archimedean 4.8.8 boards. Source: [bench_engine.py](../tools/bench_engine.py).
+Supports `check`, `format-check`, and `format` over the repo Python surface.
 
 ```powershell
-py -3 tools/bench_engine.py
+python -m tools repo python-style check
+python -m tools repo python-style format-check
 ```
 
-### `tools/profile_tiling_latency.py`
+### `python -m tools repo tools-docs`
 
-Profiles end-to-end latency for `build_topology` (cached and uncached), backend reset, backend toggle, and the full browser request roundtrip across a few representative topology cases. Spins up an `AppServer` and a real Playwright browser; useful when investigating perceived slowness on a specific tiling. Source: [profile_tiling_latency.py](../tools/profile_tiling_latency.py).
+Generate or check `docs/TOOLS.md` from the CLI registry.
+
+Use `--check` in tests/CI and `--write` when intentionally refreshing the generated tools reference.
 
 ```powershell
-py -3 tools/profile_tiling_latency.py
+python -m tools repo tools-docs --check
+python -m tools repo tools-docs --write
 ```
-
-## Process cleanup
-
-### `tools/dev_processes.py`
-
-Inspects or kills repo-scoped browser/server helper processes (server-host, standalone-host, leaked Playwright child processes). Narrow cleanup fallback when a previous run left helpers behind. Source: [dev_processes.py](../tools/dev_processes.py).
-
-```powershell
-python tools/dev_processes.py list
-python tools/dev_processes.py kill --port 5002
-python tools/dev_processes.py kill --stale-browser-hosts
-```
-
-## See also
-
-- [docs/MAINTENANCE.md](MAINTENANCE.md) — repo hygiene, guardrails, "Tooling Ownership" section for the render-review package layout
-- [docs/TESTING.md](TESTING.md) — test strategy and the deep dive on browser diagnosis
-- [docs/TESTING_TILINGS.md](TESTING_TILINGS.md) — tiling validation and verification workflow
-- [docs/CODE_MAP.md](CODE_MAP.md) — runtime-oriented source guide
-- [.pre-commit-config.yaml](../.pre-commit-config.yaml) — which tools run on commit/push
-- [package.json](../package.json) — npm scripts that wrap these tools

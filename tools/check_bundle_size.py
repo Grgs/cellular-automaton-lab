@@ -300,7 +300,7 @@ def _load_baseline(path: Path) -> dict[str, dict[str, int]] | None:
     return out
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -340,6 +340,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="exit 0 even when budget violations are present",
     )
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     try:

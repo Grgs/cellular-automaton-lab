@@ -53,7 +53,7 @@ jobs:
       - name: Check standalone bundle size budget
         run: |
           mkdir -p output/bundle-size
-          python tools/check_bundle_size.py \
+          python -m tools build bundle-size \
             --output output/bundle-size/standalone-bundle-size.txt
 
       - name: Upload bundle-size manifest
@@ -177,10 +177,10 @@ jobs:
         run: python -m mypy --config-file mypy.ini
 
       - name: Validate tiling descriptors
-        run: python tools/validate_tilings.py
+        run: python -m tools tilings validate
 
       - name: Verify literature-backed tiling references
-        run: python tools/verify_reference_tilings.py
+        run: python -m tools tilings verify
 
       - name: Run Playwright suite integrity guard
         run: python -m unittest -q tests.e2e.test_playwright_suite_integrity
@@ -468,7 +468,7 @@ jobs:
       - name: Run standalone smoke test
         run: |
           mkdir -p output/standalone-smoke
-          python tools/smoke_test_standalone.py \
+          python -m tools browser smoke-standalone \
             --output output/standalone-smoke/summary.txt
 
       - name: Upload standalone smoke artifact

@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from tests.e2e.support_runtime_host import ensure_current_standalone_build
-from tools.run_browser_check import main
+from tools.cli import main as tools_main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -17,8 +17,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
         ensure_current_standalone_build(str(ROOT_DIR))
         with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-") as tmpdir:
             output_dir = Path(tmpdir)
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "check",
                     "--host",
                     "standalone",
                     "--artifact-dir",
@@ -59,8 +61,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
     def test_runner_delegates_server_render_review(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-") as tmpdir:
             output_dir = Path(tmpdir)
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "check",
                     "--host",
                     "server",
                     "--artifact-dir",
@@ -103,8 +107,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
         ensure_current_standalone_build(str(ROOT_DIR))
         with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-profile-") as tmpdir:
             output_dir = Path(tmpdir)
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "check",
                     "--host",
                     "standalone",
                     "--artifact-dir",
@@ -125,8 +131,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
     def test_runner_copies_condensed_profile_expectations_for_server_profile_review(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-profile-") as tmpdir:
             output_dir = Path(tmpdir)
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "check",
                     "--host",
                     "server",
                     "--artifact-dir",
@@ -147,8 +155,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
         ensure_current_standalone_build(str(ROOT_DIR))
         with tempfile.TemporaryDirectory(prefix="run-browser-check-standalone-unittest-") as tmpdir:
             output_dir = Path(tmpdir)
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "check",
                     "--host",
                     "standalone",
                     "--artifact-dir",
@@ -171,8 +181,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
     def test_runner_delegates_server_unittest(self) -> None:
         with tempfile.TemporaryDirectory(prefix="run-browser-check-server-unittest-") as tmpdir:
             output_dir = Path(tmpdir)
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "check",
                     "--host",
                     "server",
                     "--artifact-dir",
@@ -196,8 +208,10 @@ class RunBrowserCheckToolIntegrationTests(unittest.TestCase):
             prefix="run-browser-check-server-unittest-success-"
         ) as tmpdir:
             output_dir = Path(tmpdir)
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "check",
                     "--host",
                     "server",
                     "--success-artifacts",

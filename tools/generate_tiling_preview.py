@@ -337,7 +337,7 @@ def _list_aperiodic_geometries() -> None:
         print(f"  {geometry} ({_APERIODIC_DEFAULT_DEPTHS[geometry]})")
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--geometry",
@@ -378,6 +378,11 @@ def main(argv: list[str] | None = None) -> int:
             "_APERIODIC_DEFAULT_DEPTHS). Aperiodic mode only."
         ),
     )
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
 
     args = parser.parse_args(argv)
 

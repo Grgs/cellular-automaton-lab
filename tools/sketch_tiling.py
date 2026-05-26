@@ -760,7 +760,7 @@ def _print_report(input_data: SketchInput, report: SketchReport) -> None:
     print("RESULT:", "VALID" if report.is_valid else "INVALID")
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Sketch and validate a candidate tiling without backend wiring.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -788,6 +788,11 @@ def main(argv: list[str] | None = None) -> int:
         default=3,
         help="Build an NxN patch for validation (default: 3)",
     )
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     input_data = load_sketch(args.sketch)

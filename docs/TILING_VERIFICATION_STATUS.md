@@ -6,8 +6,8 @@ Implementation-status contracts for aperiodic families live in `backend/simulati
 
 Legend:
 
-- `Geometric sanity`: passes `py -3 tools/validate_tilings.py`
-- `Literature verification`: passes `py -3 tools/verify_reference_tilings.py`
+- `Geometric sanity`: passes `python -m tools tilings validate`
+- `Literature verification`: passes `python -m tools tilings verify`
 - `Strength`: how strong the current literature check is
 
 ## Current Status

@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(dirname, "..");
+const rootDir = path.resolve(dirname, "..", "..");
 const args = process.argv.slice(2);
 const pythonCandidates =
     process.platform === "win32"
@@ -18,15 +18,11 @@ const pythonCandidates =
               ["python", []],
           ];
 
-if (args.length === 0) {
-    throw new Error("Expected a Python script path or module invocation.");
-}
-
 for (const [command, prefixArgs] of pythonCandidates) {
     if (!command) {
         continue;
     }
-    const result = spawnSync(command, [...prefixArgs, ...args], {
+    const result = spawnSync(command, [...prefixArgs, "-m", "tools", ...args], {
         cwd: rootDir,
         stdio: "inherit",
         shell: false,

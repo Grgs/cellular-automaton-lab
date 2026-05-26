@@ -288,7 +288,7 @@ def _to_serializable(results: list[EcosystemResult], threshold: str) -> dict[str
     return payload
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -327,6 +327,11 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="write the formatted output to this file as well as stdout",
     )
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     ignore_ids = frozenset(args.ignore_pip_vuln)

@@ -80,8 +80,8 @@ Run or update:
 Suggested commands:
 
 ```powershell
-py -3 tools\validate_tilings.py
-py -3 tools\verify_reference_tilings.py
+python -m tools tilings validate
+python -m tools tilings verify
 npm run fixtures:reference:check
 npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geometry/render-bounds.test.ts
 py -3 -m unittest -q tests.unit.test_topology_validation
@@ -121,7 +121,7 @@ npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
 npm run build:frontend:standalone
-py -3 tools\check_bundle_size.py
+python -m tools build bundle-size
 npm run test:e2e:playwright:server
 ```
 
@@ -158,7 +158,7 @@ Suggested commands:
 ```powershell
 npm run build:frontend:standalone
 npm run smoke:standalone
-py -3 tools\check_bundle_size.py
+python -m tools build bundle-size
 npm run test:e2e:playwright:standalone
 ```
 
