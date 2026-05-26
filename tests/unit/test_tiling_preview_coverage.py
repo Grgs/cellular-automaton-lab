@@ -61,7 +61,7 @@ class TilingPreviewCoverageTests(unittest.TestCase):
             missing,
             f"Topologies registered in the catalog but missing from "
             f"frontend/controls/tiling-preview-data.ts: {missing}\n"
-            f"Run `py -3 tools/generate_tiling_preview.py --geometry <key>` "
+            f"Run `python -m tools tilings preview --geometry <key>` "
             f"to generate the polygon data.",
         )
 

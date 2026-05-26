@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from tests.e2e.support_runtime_host import ensure_current_standalone_build
-from tools.run_family_sample_workbench import main
+from tools.cli import main as tools_main
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -16,8 +16,10 @@ class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
     def test_structural_only_shield_window_workbench_keeps_exact_output_stable(self) -> None:
         with tempfile.TemporaryDirectory(prefix="family-sample-workbench-tool-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "workbench-samples",
                     "--family",
                     "shield",
                     "--patch-depth",
@@ -51,8 +53,10 @@ class FamilySampleWorkbenchToolIntegrationTests(unittest.TestCase):
     def test_baseline_pinwheel_workbench_produces_single_candidate_summary(self) -> None:
         with tempfile.TemporaryDirectory(prefix="family-sample-workbench-pinwheel-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "workbench-samples",
                     "--family",
                     "pinwheel",
                     "--patch-depth",
@@ -83,8 +87,10 @@ class FamilySampleWorkbenchBrowserIntegrationTests(unittest.TestCase):
     def test_browser_review_renders_injected_candidate_topology(self) -> None:
         with tempfile.TemporaryDirectory(prefix="family-sample-workbench-browser-") as tmpdir:
             artifact_dir = Path(tmpdir) / "workbench"
-            exit_code = main(
+            exit_code = tools_main(
                 [
+                    "browser",
+                    "workbench-samples",
                     "--family",
                     "shield",
                     "--patch-depth",

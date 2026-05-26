@@ -65,6 +65,15 @@ def argv_contains_script(argv: tuple[str, ...], relative_path: str) -> bool:
     return any(normalize_token(token).endswith(normalized_path) for token in argv)
 
 
+def argv_contains_sequence(argv: tuple[str, ...], sequence: tuple[str, ...]) -> bool:
+    if len(sequence) == 0 or len(argv) < len(sequence):
+        return False
+    for index in range(len(argv) - len(sequence) + 1):
+        if argv[index : index + len(sequence)] == sequence:
+            return True
+    return False
+
+
 def find_module_index(argv: tuple[str, ...], module_name: str) -> int | None:
     for index in range(len(argv) - 1):
         if argv[index] == "-m" and argv[index + 1] == module_name:
@@ -113,9 +122,15 @@ def classify_repo_process(
             cwd=cwd,
             port=parse_server_port(environ),
         )
-    if cwd == ROOT_DIR and argv_contains_script(argv, "tools/run_browser_check.py"):
+    if cwd == ROOT_DIR and (
+        argv_contains_script(argv, "tools/run_browser_check.py")
+        or argv_contains_sequence(argv, ("-m", "tools", "browser", "check"))
+    ):
         return RepoProcess(pid=pid, kind="managed-browser-check", command=command, cwd=cwd)
-    if cwd == ROOT_DIR and argv_contains_script(argv, "tools/render_canvas_review.py"):
+    if cwd == ROOT_DIR and (
+        argv_contains_script(argv, "tools/render_canvas_review.py")
+        or argv_contains_sequence(argv, ("-m", "tools", "browser", "review"))
+    ):
         return RepoProcess(pid=pid, kind="render-review", command=command, cwd=cwd)
     return None
 

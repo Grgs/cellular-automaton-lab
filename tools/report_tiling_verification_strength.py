@@ -289,7 +289,7 @@ def render_verification_strength_report(
     raise ValueError(f"Unsupported report format '{output_format}'.")
 
 
-def _parse_args(argv: list[str] | None) -> argparse.Namespace:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Report literature verification strength and live verification status for each tiling family.",
     )
@@ -304,11 +304,11 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         type=Path,
         help="Optional file path to write the rendered report to.",
     )
-    return parser.parse_args(argv)
+    return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = _parse_args(argv)
+    args = build_parser().parse_args(argv)
     rows = build_verification_strength_rows()
     rendered = render_verification_strength_report(rows, output_format=args.format)
     if args.output is not None:

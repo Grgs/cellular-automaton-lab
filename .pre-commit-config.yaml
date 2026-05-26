@@ -8,25 +8,25 @@ repos:
     hooks:
       - id: privacy-guard-staged
         name: privacy guard (changed files)
-        entry: python tools/privacy_guard.py
+        entry: python -m tools security privacy
         language: python
         stages: [pre-commit]
       - id: privacy-guard-push
         name: privacy guard (full repo)
-        entry: python tools/privacy_guard.py --all-files
+        entry: python -m tools security privacy --all-files
         language: python
         pass_filenames: false
         stages: [pre-push, manual]
       - id: detect-secrets-staged
         name: detect-secrets (changed files)
-        entry: python tools/run_detect_secrets.py --baseline .secrets.baseline
+        entry: python -m tools security secrets --baseline .secrets.baseline
         language: python
         additional_dependencies:
           - detect-secrets==1.5.0
         stages: [pre-commit]
       - id: detect-secrets-push
         name: detect-secrets (full repo)
-        entry: python tools/run_detect_secrets.py --baseline .secrets.baseline --all-files
+        entry: python -m tools security secrets --baseline .secrets.baseline --all-files
         language: python
         additional_dependencies:
           - detect-secrets==1.5.0
@@ -34,7 +34,7 @@ repos:
         stages: [pre-push, manual]
       - id: ruff-python
         name: ruff (python)
-        entry: python tools/run_python_style.py check
+        entry: python -m tools repo python-style check
         language: python
         additional_dependencies:
           - ruff==0.15.11
@@ -42,7 +42,7 @@ repos:
         stages: [pre-commit, manual]
       - id: ruff-format-python
         name: ruff format (python)
-        entry: python tools/run_python_style.py format-check
+        entry: python -m tools repo python-style format-check
         language: python
         additional_dependencies:
           - ruff==0.15.11

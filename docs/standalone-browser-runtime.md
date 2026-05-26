@@ -193,7 +193,7 @@ The current implementation was verified with:
 npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
-node .\tools\run-playwright.mjs --list-suites
+python -m tools test playwright-suites
 npm run test:e2e:playwright:server
 npm run test:e2e:playwright:standalone
 Test-Path .\output\standalone\.nojekyll
@@ -218,7 +218,7 @@ That browser coverage now exercises:
 - Pyodide is loaded from the CDN configured in `frontend/standalone/worker-client.ts`; the standalone build does not yet vend Pyodide assets locally for fully offline use.
 - The standalone Python runtime still bypasses Flask-specific HTTP concerns such as request objects and response wrappers; only payload validation and simulation contracts are shared.
 - The standalone build is aimed at static hosting with network access. If offline hosting becomes a requirement, Pyodide must be vendored into the output and loaded locally.
-- The Node Playwright runner can self-repair missing Chromium shared libraries only on Debian/Ubuntu-style Linux environments with `apt`, `apt-cache`, and `dpkg-deb`.
+- `python -m tools test e2e` can self-repair missing Chromium shared libraries only on Debian/Ubuntu-style Linux environments with `apt`, `apt-cache`, and `dpkg-deb`.
 
 ## Remaining Work Checklist
 

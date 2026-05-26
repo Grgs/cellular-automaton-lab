@@ -75,8 +75,8 @@ npm run check:doc-links
 npm run audit:supply-chain
 py -3 -m mypy --config-file mypy.ini
 py -3 -m unittest discover -s tests -p "test_*.py"
-py -3 tools\validate_tilings.py
-py -3 tools\verify_reference_tilings.py
+python -m tools tilings validate
+python -m tools tilings verify
 py -3 -m pre_commit run --hook-stage pre-push --all-files
 ```
 
@@ -126,13 +126,13 @@ Browser diagnosis and workbench implementation now lives under `tools/render_rev
 - `geometry_cleanup_workbench.py`
 - `profiles.py`
 
-The top-level files in `tools/` are now CLI entrypoints only:
+The public tooling surface now lives under the unified Python CLI:
 
-- `tools/render_canvas_review.py`
-- `tools/run_browser_check.py`
-- `tools/run_render_review_sweep.py`
-- `tools/run_render_review_diff.py`
-- `tools/run_family_sample_workbench.py`
-- `tools/run_geometry_cleanup_workbench.py`
+- `python -m tools browser review`
+- `python -m tools browser check`
+- `python -m tools browser sweep`
+- `python -m tools browser diff`
+- `python -m tools browser workbench-samples`
+- `python -m tools browser workbench-cleanup`
 
-When adding shared render-review or workbench logic, put it in `tools/render_review/` and keep the top-level commands thin.
+When adding shared render-review or workbench logic, put it in `tools/render_review/`. When adding user-facing command wiring, put it in `tools/commands/browser.py` so the public surface stays centralized under `python -m tools ...`.

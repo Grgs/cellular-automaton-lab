@@ -7,7 +7,7 @@ This file is the quick guide for validating tiling work.
 ### 1. Geometric sanity
 
 ```powershell
-py -3 tools/validate_tilings.py
+python -m tools tilings validate
 ```
 
 Use this first. It tells you whether the catalog tilings build and pass the topology validator.
@@ -15,12 +15,12 @@ Use this first. It tells you whether the catalog tilings build and pass the topo
 ### 2. Literature verification
 
 ```powershell
-py -3 tools/verify_reference_tilings.py
+python -m tools tilings verify
 ```
 
 Use this second. It checks the canonical samples against the source-backed invariants in `backend/simulation/literature_reference_specs.py`.
 
-It now also checks that canonical samples are contiguous in the topology neighbor graph. That means `verify_reference_tilings.py` can fail even when `validate_tilings.py` still passes, because graph contiguity is now treated as a literature-backed invariant rather than only a shared-validator option.
+It now also checks that canonical samples are contiguous in the topology neighbor graph. That means `python -m tools tilings verify` can fail even when `python -m tools tilings validate` still passes, because graph contiguity is now treated as a literature-backed invariant rather than only a shared-validator option.
 
 It also now checks that canonical samples do not enclose empty holes in the merged topology surface. That means a tiling can be connected and overlap-free, yet still fail literature verification if it forms a ring of cells around bounded empty gaps.
 
@@ -62,7 +62,7 @@ Representative render-space overlap checks also dedupe exact rendered duplicate 
 ### 6. Verification-strength report
 
 ```powershell
-py -3 tools/report_tiling_verification_strength.py
+python -m tools tilings report
 ```
 
 Use this when you want a quick per-family summary of which invariant layers are currently active, such as descriptor checks, local-reference fixtures, exact-path verification, or strict validation.
@@ -82,8 +82,8 @@ checked manifest and regeneration tool instead of editing or exporting them by
 hand:
 
 ```powershell
-python tools/regenerate_frontend_topology_fixtures.py --all --check
-python tools/regenerate_frontend_topology_fixtures.py --fixture shield-depth-3
+python -m tools fixtures frontend --all --check
+python -m tools fixtures frontend --fixture shield-depth-3
 ```
 
 The fixture manifest lives at
@@ -113,32 +113,32 @@ Playwright test.
 npm run fixtures:reference:check
 ```
 
-Use this when generator or verifier changes may affect checked-in rooted local-reference or canonical patch fixtures. It reports fixture drift without rewriting the JSON files. To intentionally update fixtures, run `py -3 tools/regenerate_reference_fixtures.py --all --mode both` and review the resulting git diff.
+Use this when generator or verifier changes may affect checked-in rooted local-reference or canonical patch fixtures. It reports fixture drift without rewriting the JSON files. To intentionally update fixtures, run `python -m tools fixtures reference --all --mode both` and review the resulting git diff.
 
 ### 9. Visual review
 
 ```powershell
-python tools/render_canvas_review.py --list-profiles
-python tools/render_canvas_review.py --profile pinwheel-depth-3
-python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review
-python tools/render_canvas_review.py --profile pinwheel-depth-3 --literature-review --reference C:\path\to\pinwheel-reference.png
-python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3
-python tools/run_browser_check.py --host standalone --render-review --profile pinwheel-depth-3 --literature-review
-python tools/run_browser_check.py --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
-python tools/run_browser_check.py --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
-python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
-python tools/run_render_review_sweep.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
-python tools/run_render_review_diff.py --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
-python tools/run_render_review_diff.py --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
+python -m tools browser review --list-profiles
+python -m tools browser review --profile pinwheel-depth-3
+python -m tools browser review --profile pinwheel-depth-3 --literature-review
+python -m tools browser review --profile pinwheel-depth-3 --literature-review --reference C:\path\to\pinwheel-reference.png
+python -m tools browser check --host standalone --render-review --profile pinwheel-depth-3
+python -m tools browser check --host standalone --render-review --profile pinwheel-depth-3 --literature-review
+python -m tools browser check --host server --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+python -m tools browser check --host server --success-artifacts --unittest tests.e2e.playwright_case_suite.CellularAutomatonUITests.test_pinwheel_topology_switch_renders_aperiodic_patch
+python -m tools browser sweep --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python -m tools browser sweep --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server --literature-review
+python -m tools browser diff --profile pinwheel-depth-3 --patch-depths 3,4 --hosts standalone,server
+python -m tools browser diff --sweep-manifest output/render-review-sweeps/<run>/sweep-manifest.json
 ```
 
 Use these when the open question is visual rather than topological:
 
-- `render_canvas_review.py` is the preferred path for producing a real canvas PNG plus JSON metrics from the browser render path.
-- `run_browser_check.py` is the preferred path when you need the same browser review or a targeted Playwright test with owned host startup, cleanup, logs, and a run manifest.
-- `run_render_review_sweep.py` is the preferred path when you need to compare a small matrix of hosts, themes, or depths without hand-running each case.
-- `run_render_review_diff.py` is the preferred path when you need one HTML/PNG sheet from a sweep, either by running a new sweep or summarizing an existing `sweep-manifest.json`.
-- `run_family_sample_workbench.py` is the preferred path when the first question is “which candidate representative sample should we compare?” rather than “how does the shipped sample render?”
+- `python -m tools browser review` is the preferred path for producing a real canvas PNG plus JSON metrics from the browser render path.
+- `python -m tools browser check` is the preferred path when you need the same browser review or a targeted Playwright test with owned host startup, cleanup, logs, and a run manifest.
+- `python -m tools browser sweep` is the preferred path when you need to compare a small matrix of hosts, themes, or depths without hand-running each case.
+- `python -m tools browser diff` is the preferred path when you need one HTML/PNG sheet from a sweep, either by running a new sweep or summarizing an existing `sweep-manifest.json`.
+- `python -m tools browser workbench-samples` is the preferred path when the first question is “which candidate representative sample should we compare?” rather than “how does the shipped sample render?”
 - npm Playwright entrypoints remain the preferred full-suite path when you want broad browser regression coverage rather than one focused diagnosis.
 
 If the visual question is specifically dead/live distinguishability for a
@@ -149,13 +149,13 @@ representative cells and are less brittle than screenshot goldens.
 Family sample workbench examples:
 
 ```powershell
-python tools/run_family_sample_workbench.py --family shield --patch-depth 3
-python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --values 193.39344,204.13752,214.8816
-python tools/run_family_sample_workbench.py --family shield --patch-depth 3 --browser-review --host standalone
-python tools/run_family_sample_workbench.py --family pinwheel --patch-depth 3
-python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3
-python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3 --values 0.941,0.951,0.961
-python tools/run_geometry_cleanup_workbench.py --family shield --patch-depth 3 --browser-review --host standalone --theme dark
+python -m tools browser workbench-samples --family shield --patch-depth 3
+python -m tools browser workbench-samples --family shield --patch-depth 3 --values 193.39344,204.13752,214.8816
+python -m tools browser workbench-samples --family shield --patch-depth 3 --browser-review --host standalone
+python -m tools browser workbench-samples --family pinwheel --patch-depth 3
+python -m tools browser workbench-cleanup --family shield --patch-depth 3
+python -m tools browser workbench-cleanup --family shield --patch-depth 3 --values 0.941,0.951,0.961
+python -m tools browser workbench-cleanup --family shield --patch-depth 3 --browser-review --host standalone --theme dark
 ```
 
 Workbench notes:
@@ -185,12 +185,12 @@ Literature-review boundary:
 Output locations:
 
 - successful render review: `output/render-review/`
-- managed `run_browser_check.py --render-review`: `output/browser-check/<timestamp-mode-host>/`
+- managed `python -m tools browser check --render-review`: `output/browser-check/<timestamp-mode-host>/`
 - literature reference cache: `output/literature-reference-cache/`
 - standalone build provenance: `output/standalone/build-manifest.json`
 - direct render-review failure artifacts: `output/render-review-artifacts/`
 - managed runner manifests and artifacts: `output/browser-check/<timestamp-mode-host>/`
-- managed `run_browser_check.py --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
+- managed `python -m tools browser check --unittest --success-artifacts`: `output/browser-check/<timestamp-mode-host>/test-artifacts/`
 - render-review sweeps: `output/render-review-sweeps/<timestamp-profile>/`
 - render-review diff sheets: next to the sweep manifest, or `output/render-review-diffs/<timestamp-profile>/` when the diff command runs the sweep
 - family sample workbench runs: `output/family-sample-workbench/<timestamp-family-depth>/`
@@ -229,10 +229,10 @@ The standard visual-metrics block now includes:
 
 ## How To Read Failures
 
-- `validate_tilings.py` fails
+- `python -m tools tilings validate` fails
   - likely generator bug
   - possibly topology validation options are too strict or too loose for that family
-- `verify_reference_tilings.py` fails
+- `python -m tools tilings verify` fails
   - generator drift
   - wrong source-backed invariant
   - stale expected signature after an intentional generator change
@@ -253,8 +253,8 @@ The standard visual-metrics block now includes:
 ## Recommended Workflow
 
 1. Change generator, verifier, or spec.
-2. Run `py -3 tools/validate_tilings.py`.
-3. Run `py -3 tools/verify_reference_tilings.py`.
+2. Run `python -m tools tilings validate`.
+3. Run `python -m tools tilings verify`.
 4. If signatures changed intentionally, update the spec and rerun.
 5. Run the focused verifier unit test.
 6. Run the full backend regression sweep.

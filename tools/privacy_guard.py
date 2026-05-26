@@ -134,7 +134,7 @@ def scan_paths(paths: list[str], *, all_files: bool) -> list[str]:
     return violations
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Scan tracked repository files for personal information leaks."
     )
@@ -144,6 +144,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Scan all tracked files instead of the provided list.",
     )
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     violations = scan_paths(args.paths, all_files=args.all_files)

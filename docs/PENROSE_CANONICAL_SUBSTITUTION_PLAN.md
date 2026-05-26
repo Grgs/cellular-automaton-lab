@@ -131,15 +131,15 @@ Files that need to be touched:
   `true_substitution` for all four families.
 - `backend/simulation/data/reference_patch_canonical_fixtures.json` —
   regenerate the `robinson-triangles` `exact-depth-1` and `exact-depth-3`
-  fixtures using `tools/regenerate_reference_fixtures.py`.
+  fixtures using `python -m tools fixtures reference`.
 - `frontend/test-fixtures/topologies/robinson-triangles-depth-3.json` —
   regenerate the frontend Robinson fixture using
-  `tools/regenerate_frontend_topology_fixtures.py`. The embedded
+  `python -m tools fixtures frontend`. The embedded
   `topology_revision` is now content-derived and auto-updates.
 - `frontend/test-fixtures/bootstrap-data.json` — regenerate via
-  `tools/export_bootstrap_data.py`.
+  `python -m tools bootstrap export`.
 - `frontend/controls/tiling-preview-data.ts` — refresh the Penrose / Robinson
-  thumbnails using `tools/generate_tiling_preview.py`.
+  thumbnails using `python -m tools tilings preview`.
 - For Option 2 only: `frontend/canvas/family-dead-palette-manifest.json`,
   any palette manifests under `frontend/canvas/`, and any picker swatch
   metadata that lists kite/dart kinds.
@@ -165,8 +165,8 @@ Tests that lock in the current (non-canonical) numbers:
 Validation tools to re-run:
 
 ```powershell
-py -3 tools\validate_tilings.py
-py -3 tools\verify_reference_tilings.py
+python -m tools tilings validate
+python -m tools tilings verify
 npm run fixtures:reference:check
 py -3 -m unittest discover -s tests
 npm run test:frontend
@@ -177,7 +177,7 @@ npm run test:e2e:playwright:server
 
 The fix is done when, in a single coherent change:
 
-- `verify_reference_tilings.py` passes on canonical depth counts:
+- `python -m tools tilings verify` passes on canonical depth counts:
   `5/15/40/105` for P2 and P3, `10/30/80/210` for Robinson Triangles, with
   the relevant Bielefeld URLs as the cited sources.
 - `implementation_status` for all four families is `true_substitution` and

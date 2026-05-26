@@ -209,6 +209,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_FIXTURE_MANIFEST_PATH,
         help="Fixture manifest path. Defaults to the checked-in frontend fixture manifest.",
     )
+    parser.add_argument(
+        "--list-fixtures",
+        action="store_true",
+        help="List fixture names declared by the manifest without regenerating files.",
+    )
     return parser
 
 
@@ -216,6 +221,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
+        if bool(args.list_fixtures):
+            for target in load_fixture_targets(Path(args.manifest)):
+                print(f"{target.name} -> {target.path}")
+            return 0
         targets = discover_fixture_targets(
             manifest_path=Path(args.manifest),
             all_targets=bool(args.all_targets),

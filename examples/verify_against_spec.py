@@ -2,7 +2,7 @@
 
 The verifier compares a computed patch's cell counts, kind frequencies, and
 adjacency invariants against a hand-curated ``ReferenceFamilySpec`` (sourced
-from the literature). This is the same path ``tools/verify_reference_tilings.py``
+from the literature). This is the same path ``python -m tools tilings verify``
 uses for the whole catalog; here we drive it for a single family so you can
 see the output shape.
 

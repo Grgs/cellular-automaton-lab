@@ -6,10 +6,10 @@ For system context, start with [ARCHITECTURE.md](ARCHITECTURE.md), [CODE_MAP.md]
 
 ## Fast path: aperiodic substitution families
 
-If the new family is an aperiodic substitution tiling (the most common case for new entries), `tools/scaffold_aperiodic_family.py` automates the mechanical wiring. It creates the generator skeleton, reference-spec stub, and test skeleton, and inserts the manifest / registry / topology / reference-spec-init entries. The placeholder substitution is structurally valid (loads end-to-end) so you can confirm wiring before implementing the real geometry.
+If the new family is an aperiodic substitution tiling (the most common case for new entries), `python -m tools tilings scaffold-aperiodic` automates the mechanical wiring. It creates the generator skeleton, reference-spec stub, and test skeleton, and inserts the manifest / registry / topology / reference-spec-init entries. The placeholder substitution is structurally valid (loads end-to-end) so you can confirm wiring before implementing the real geometry.
 
 ```powershell
-py -3 tools/scaffold_aperiodic_family.py \
+python -m tools tilings scaffold-aperiodic \
     --family-id widget-monotile \
     --label "Widget Monotile" \
     --kind widget \
@@ -77,7 +77,7 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
    - Reuse an existing `render_kind` when possible.
    - Add a new geometry adapter only when the existing regular, periodic polygon, or aperiodic polygon adapters cannot represent the family.
 7. Add a picker thumbnail.
-   - Run `py -3 tools/generate_tiling_preview.py --geometry <key>` to generate a ready-to-paste entry for [frontend/controls/tiling-preview-data.ts](../frontend/controls/tiling-preview-data.ts). The tool centers the viewbox on the highest-degree vertex, tiles enough unit cells to fill the `0 0 120 72` viewbox, and auto-detects the number of fill indices from the face kinds.
+   - Run `python -m tools tilings preview --geometry <key>` to generate a ready-to-paste entry for [frontend/controls/tiling-preview-data.ts](../frontend/controls/tiling-preview-data.ts). The tool centers the viewbox on the highest-degree vertex, tiles enough unit cells to fill the `0 0 120 72` viewbox, and auto-detects the number of fill indices from the face kinds.
    - Paste the output after the entry for the topologically nearest tiling (same family class, similar picker order).
    - Fill indices 0–3 map to the four picker swatch colors; use `--fill-count 1` to override the auto-detection for tilings where a single color is preferred regardless of face kind count.
    - Without this entry the picker shows a generic square fallback.
@@ -138,11 +138,11 @@ Useful commands:
 
 ```powershell
 # Generate a picker thumbnail for a new periodic face tiling
-py -3 tools\generate_tiling_preview.py --geometry <key>
-py -3 tools\generate_tiling_preview.py --list
+python -m tools tilings preview --geometry <key>
+python -m tools tilings preview --list
 
-py -3 tools\validate_tilings.py
-py -3 tools\verify_reference_tilings.py
+python -m tools tilings validate
+python -m tools tilings verify
 npm run fixtures:reference:check
 npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geometry/render-bounds.test.ts
 py -3 -m unittest -q tests.unit.test_topology_validation

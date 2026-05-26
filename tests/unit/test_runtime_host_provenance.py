@@ -2,14 +2,18 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from tools import provenance
+from tools.standalone_build import compute_source_fingerprint as build_compute_source_fingerprint
 from tests.e2e.support_runtime_host import (
     build_runtime_provenance_report,
     compute_source_fingerprint,
+    current_repo_provenance,
     ensure_current_standalone_build,
     load_standalone_build_manifest,
     standalone_build_status,
@@ -28,13 +32,38 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
                 "console.log('a');\n", encoding="utf-8"
             )
             (root / "tools").mkdir()
-            (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
+            (root / "tools" / "standalone_build.py").write_text("print('ok')\n", encoding="utf-8")
             (root / "package.json").write_text("{}\n", encoding="utf-8")
             fingerprint_a, source_files_a = compute_source_fingerprint(root)
             fingerprint_b, source_files_b = compute_source_fingerprint(root)
             self.assertEqual(fingerprint_a, fingerprint_b)
             self.assertEqual(source_files_a, source_files_b)
             self.assertIn("frontend/app-runtime.ts", source_files_a)
+
+    def test_current_repo_provenance_reports_clean_dirty_and_unavailable_states(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="runtime-host-provenance-") as tmpdir:
+            root = Path(tmpdir)
+            (root / "frontend").mkdir()
+            (root / "frontend" / "app-runtime.ts").write_text(
+                "console.log('a');\n", encoding="utf-8"
+            )
+            (root / "tools").mkdir()
+            (root / "tools" / "standalone_build.py").write_text("print('ok')\n", encoding="utf-8")
+            (root / "package.json").write_text("{}\n", encoding="utf-8")
+            (root / "package-lock.json").write_text("{}\n", encoding="utf-8")
+            with patch("tests.e2e.support_runtime_host.read_git_output", return_value="abc123"):
+                with patch("tests.e2e.support_runtime_host.git_dirty_status", return_value=False):
+                    clean = current_repo_provenance.__wrapped__(str(root))
+                with patch("tests.e2e.support_runtime_host.git_dirty_status", return_value=True):
+                    dirty = current_repo_provenance.__wrapped__(str(root))
+                with patch("tests.e2e.support_runtime_host.git_dirty_status", return_value=None):
+                    unavailable = current_repo_provenance.__wrapped__(str(root))
+        self.assertFalse(clean["gitDirty"])
+        self.assertTrue(dirty["gitDirty"])
+        self.assertIsNone(unavailable["gitDirty"])
+
+    def test_runtime_host_and_build_share_fingerprint_helper(self) -> None:
+        self.assertIs(build_compute_source_fingerprint, provenance.compute_source_fingerprint)
 
     def test_load_standalone_build_manifest_summarizes_manifest(self) -> None:
         with tempfile.TemporaryDirectory(prefix="runtime-host-build-manifest-") as tmpdir:
@@ -65,7 +94,7 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
                 "console.log('a');\n", encoding="utf-8"
             )
             (root / "tools").mkdir()
-            (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
+            (root / "tools" / "standalone_build.py").write_text("print('ok')\n", encoding="utf-8")
             (root / "package.json").write_text("{}\n", encoding="utf-8")
             (root / "package-lock.json").write_text("{}\n", encoding="utf-8")
             output_dir = root / "output" / "standalone"
@@ -103,7 +132,7 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
                 "console.log('a');\n", encoding="utf-8"
             )
             (root / "tools").mkdir()
-            (root / "tools" / "build-standalone.mjs").write_text("export {};\n", encoding="utf-8")
+            (root / "tools" / "standalone_build.py").write_text("print('ok')\n", encoding="utf-8")
             (root / "package.json").write_text("{}\n", encoding="utf-8")
             output_dir = root / "output" / "standalone"
             output_dir.mkdir(parents=True)
@@ -199,21 +228,18 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
             side_effect=[stale_status, current_status],
         ) as status:
             with patch(
-                "tests.e2e.support_runtime_host._resolve_npm_executable", return_value="npm"
-            ):
-                with patch(
-                    "tests.e2e.support_runtime_host.subprocess.run",
-                    return_value=subprocess.CompletedProcess(
-                        ["npm", "run", "build:frontend:standalone"],
-                        0,
-                        stdout="ok",
-                        stderr="",
-                    ),
-                ) as run:
-                    ensure_current_standalone_build("/tmp/repo")
+                "tests.e2e.support_runtime_host.subprocess.run",
+                return_value=subprocess.CompletedProcess(
+                    [sys.executable, "-m", "tools", "build", "standalone"],
+                    0,
+                    stdout="ok",
+                    stderr="",
+                ),
+            ) as run:
+                ensure_current_standalone_build("/tmp/repo")
         self.assertEqual(status.call_count, 2)
         run.assert_called_once_with(
-            ["npm", "run", "build:frontend:standalone"],
+            [sys.executable, "-m", "tools", "build", "standalone"],
             cwd=Path("/tmp/repo"),
             check=False,
             capture_output=True,
@@ -231,19 +257,16 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
             return_value=stale_status,
         ):
             with patch(
-                "tests.e2e.support_runtime_host._resolve_npm_executable", return_value="npm"
+                "tests.e2e.support_runtime_host.subprocess.run",
+                return_value=subprocess.CompletedProcess(
+                    [sys.executable, "-m", "tools", "build", "standalone"],
+                    1,
+                    stdout="stdout text",
+                    stderr="stderr text",
+                ),
             ):
-                with patch(
-                    "tests.e2e.support_runtime_host.subprocess.run",
-                    return_value=subprocess.CompletedProcess(
-                        ["npm", "run", "build:frontend:standalone"],
-                        1,
-                        stdout="stdout text",
-                        stderr="stderr text",
-                    ),
-                ):
-                    with self.assertRaises(RuntimeError) as context:
-                        ensure_current_standalone_build("/tmp/repo")
+                with self.assertRaises(RuntimeError) as context:
+                    ensure_current_standalone_build("/tmp/repo")
         self.assertIn("Standalone build refresh failed", str(context.exception))
         self.assertIn("stdout text", str(context.exception))
         self.assertIn("stderr text", str(context.exception))
@@ -263,19 +286,16 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
             side_effect=[stale_status, stale_status],
         ):
             with patch(
-                "tests.e2e.support_runtime_host._resolve_npm_executable", return_value="npm"
+                "tests.e2e.support_runtime_host.subprocess.run",
+                return_value=subprocess.CompletedProcess(
+                    [sys.executable, "-m", "tools", "build", "standalone"],
+                    0,
+                    stdout="ok",
+                    stderr="",
+                ),
             ):
-                with patch(
-                    "tests.e2e.support_runtime_host.subprocess.run",
-                    return_value=subprocess.CompletedProcess(
-                        ["npm", "run", "build:frontend:standalone"],
-                        0,
-                        stdout="ok",
-                        stderr="",
-                    ),
-                ):
-                    with self.assertRaises(RuntimeError) as context:
-                        ensure_current_standalone_build("/tmp/repo")
+                with self.assertRaises(RuntimeError) as context:
+                    ensure_current_standalone_build("/tmp/repo")
         self.assertIn("bundle is still not current", str(context.exception))
         self.assertIn(
             "source fingerprint differs from current checkout",

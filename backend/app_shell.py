@@ -33,7 +33,7 @@ class AppShellRenderValues(TypedDict):
 
 
 _STANDALONE_DOCUMENT_TEMPLATE = """<!DOCTYPE html>
-<!-- Generated from frontend/shell/app-shell-body.html by tools/render_standalone_shell.py. -->
+<!-- Generated from frontend/shell/app-shell-body.html by python -m tools build standalone-shell. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">

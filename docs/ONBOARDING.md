@@ -86,15 +86,15 @@ After recent refactoring this is roughly a 5-file change. The walkthrough is
 
 Then regenerate fixtures + bootstrap data:
 
-```
-python tools/regenerate_reference_fixtures.py --mode canonical --geometry <name> --depth 1
-python tools/regenerate_reference_fixtures.py --mode canonical --geometry <name> --depth 3
-python tools/regenerate_frontend_topology_fixtures.py --fixture <name>-depth-3
-python tools/export_bootstrap_data.py frontend/test-fixtures/bootstrap-data.json
-python tools/generate_tiling_preview.py --aperiodic --geometry <name>  # paste into tiling-preview-data.ts
+```powershell
+python -m tools fixtures reference --mode canonical --geometry <name> --depth 1
+python -m tools fixtures reference --mode canonical --geometry <name> --depth 3
+python -m tools fixtures frontend --fixture <name>-depth-3
+python -m tools bootstrap export frontend/test-fixtures/bootstrap-data.json
+python -m tools tilings preview --aperiodic --geometry <name>  # paste into tiling-preview-data.ts
 ```
 
-Final check: `python tools/validate_tilings.py` and `python tools/verify_reference_tilings.py`.
+Final check: `python -m tools tilings validate` and `python -m tools tilings verify`.
 
 ## Add a new automaton rule
 
@@ -114,8 +114,8 @@ and `backend/rules/hexlife.py` are the closest reference.
 | Linkinator + doc links | `npm run check:doc-links` |
 | Mypy | `npm run typecheck:python` |
 | Python lint + format + mypy (one shot) | `npm run check:python` |
-| Full reference verification | `python tools/verify_reference_tilings.py` |
-| Tiling validation | `python tools/validate_tilings.py` |
+| Full reference verification | `python -m tools tilings verify` |
+| Tiling validation | `python -m tools tilings validate` |
 | Playwright (browser) | `npm run test:e2e:playwright` |
 
 [`docs/TESTING.md`](TESTING.md) covers the per-suite conventions in detail.
@@ -123,9 +123,9 @@ and `backend/rules/hexlife.py` are the closest reference.
 ## What I shouldn't do unless I've read more
 
 - **Don't edit the bootstrap-data.json directly** -- it's generated; regenerate
-  with `python tools/export_bootstrap_data.py frontend/test-fixtures/bootstrap-data.json`.
+  with `python -m tools bootstrap export frontend/test-fixtures/bootstrap-data.json`.
 - **Don't edit the canonical reference fixtures by hand** -- same; use
-  `tools/regenerate_reference_fixtures.py`.
+  `python -m tools fixtures reference`.
 - **Don't promote an aperiodic family out of `Experimental` without manual
   visual review** against the published substitution. The pinwheel and
   pinwheel-2-1 entries are intentionally gated this way; see

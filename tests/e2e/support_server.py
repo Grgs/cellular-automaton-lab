@@ -1,14 +1,17 @@
 import json
 import os
+import shutil
 import socket
 import subprocess
 import sys
 import tempfile
 import time
 import urllib.request
+from functools import lru_cache
 from pathlib import Path
 from typing import IO, Protocol
 
+from backend.frontend_build import frontend_server_build_status
 from backend.payload_types import (
     RawJsonDocument,
     ResetControlRequestPayload,
@@ -20,6 +23,44 @@ from tests.typed_payloads import require_simulation_state_payload, require_topol
 
 class PollingProcess(Protocol):
     def poll(self) -> int | None: ...
+
+
+def _resolve_npm_executable() -> str:
+    if sys.platform == "win32":
+        return shutil.which("npm.cmd") or shutil.which("npm") or "npm.cmd"
+    return shutil.which("npm") or "npm"
+
+
+@lru_cache(maxsize=4)
+def ensure_current_frontend_server_build(root_path: str, static_folder: str) -> None:
+    root = Path(root_path)
+    status = frontend_server_build_status(root, static_folder)
+    if bool(status.get("buildCurrent")):
+        return
+    command = [_resolve_npm_executable(), "run", "build:frontend"]
+    result = subprocess.run(
+        command,
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        stdout = f"\nstdout:\n{result.stdout}" if result.stdout else ""
+        stderr = f"\nstderr:\n{result.stderr}" if result.stderr else ""
+        raise RuntimeError(
+            "Frontend build refresh failed while preparing server-backed browser tests. "
+            "Run `npm run build:frontend` manually and fix the build error if it persists."
+            f"{stdout}{stderr}"
+        )
+    refreshed_status = frontend_server_build_status(root, static_folder)
+    if bool(refreshed_status.get("buildCurrent")):
+        return
+    reason = str(refreshed_status.get("reason") or "frontend build is stale")
+    raise RuntimeError(
+        "Frontend build refresh completed, but the server bundle is still not current: "
+        f"{reason}. Run `npm run build:frontend` manually and inspect `static/dist/`."
+    )
 
 
 def cleanup_temporary_directory(
@@ -123,6 +164,7 @@ class AppServer:
     def start(self) -> None:
         if self.process and self.process.poll() is None:
             return
+        ensure_current_frontend_server_build(str(self.root), str(self.root / "static"))
         env = os.environ.copy()
         env["PORT"] = str(self.port)
         env["APP_INSTANCE_PATH"] = self.instance_dir.name

@@ -32,7 +32,7 @@ def _resolve_detect_secrets_hook() -> str:
     return executable
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run detect-secrets against changed or tracked files."
     )
@@ -41,6 +41,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--all-files", action="store_true", help="Scan all tracked files.")
     parser.add_argument("paths", nargs="*", help="File paths supplied by pre-commit.")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     baseline = Path(args.baseline)

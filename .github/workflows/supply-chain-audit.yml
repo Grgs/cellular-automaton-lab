@@ -12,7 +12,7 @@ on:
       - "requirements*.txt"
       - "package.json"
       - "package-lock.json"
-      - "tools/run_supply_chain_audit.py"
+      - "tools/**"
       - ".github/workflows/supply-chain-audit.yml"
 
 concurrency:
@@ -56,10 +56,10 @@ jobs:
       - name: Run supply-chain audit
         run: |
           mkdir -p output/supply-chain-audit
-          python tools/run_supply_chain_audit.py \
+          python -m tools security supply-chain \
             --format summary \
             --output output/supply-chain-audit/summary.txt
-          python tools/run_supply_chain_audit.py \
+          python -m tools security supply-chain \
             --format json \
             --no-fail \
             --output output/supply-chain-audit/findings.json

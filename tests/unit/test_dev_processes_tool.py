@@ -48,13 +48,13 @@ class DevProcessesToolTests(unittest.TestCase):
         runner = classify_repo_process(
             pid=1,
             cwd=dev_processes.ROOT_DIR,
-            argv=("python", "tools/run_browser_check.py", "--host", "standalone"),
+            argv=("python", "-m", "tools", "browser", "check", "--host", "standalone"),
             environ={},
         )
         review = classify_repo_process(
             pid=2,
             cwd=dev_processes.ROOT_DIR,
-            argv=("python", "tools/render_canvas_review.py", "--profile", "pinwheel-depth-3"),
+            argv=("python", "-m", "tools", "browser", "review", "--profile", "pinwheel-depth-3"),
             environ={},
         )
         self.assertEqual(runner.kind if runner else None, "managed-browser-check")
@@ -73,7 +73,7 @@ class DevProcessesToolTests(unittest.TestCase):
             RepoProcess(
                 3,
                 "managed-browser-check",
-                "python tools/run_browser_check.py",
+                "python -m tools browser check",
                 dev_processes.ROOT_DIR,
                 None,
             ),
