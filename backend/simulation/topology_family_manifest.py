@@ -99,6 +99,15 @@ BASKETWEAVE_GEOMETRY = "basketweave"
 # plus 2 squares (3^3.4^2). It's the smallest 2-uniform tiling that
 # uses only regular polygons and only two prototile shapes.
 TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY = "triangular-square-2uniform"
+# 2-uniform tiling [3.6.3.6; 3^2.6^2]: combines trihexagonal vertex types
+# with "elongated trihex" vertices. Constructed from rows of pointy-top
+# hexagons that share vertical edges within each row (creating (3^2.6^2)
+# vertices at the shared corners), with diamond gaps between rows filled
+# by pairs of equilateral triangles. The vertices where adjacent rows of
+# hexes meet end-on-end are (3.6.3.6) vertices (THTH order). Edge-to-edge;
+# no T-junctions. Uses only triangles + hexagons (complements the
+# triangle+square 2-uniform).
+TRIHEX_2UNIFORM_3636_3366_GEOMETRY = "trihex-2uniform-3636-3366"
 
 
 @dataclass(frozen=True)
@@ -469,6 +478,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         label="Basketweave",
         picker_group="Periodic Mixed",
         picker_order=242,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    TRIHEX_2UNIFORM_3636_3366_GEOMETRY: _single_variant_family(
+        tiling_family=TRIHEX_2UNIFORM_3636_3366_GEOMETRY,
+        label="2-uniform Trihex",
+        picker_group="Periodic Mixed",
+        picker_order=243,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),

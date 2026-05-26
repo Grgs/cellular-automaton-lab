@@ -20,6 +20,7 @@ from . import pythagorean
 from . import herringbone
 from . import triangular_square_2uniform
 from . import basketweave
+from . import trihex_2uniform_3636_3366
 
 PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **archimedean.SPECS,
@@ -40,6 +41,7 @@ PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **herringbone.SPECS,
     **triangular_square_2uniform.SPECS,
     **basketweave.SPECS,
+    **trihex_2uniform_3636_3366.SPECS,
 }
 
 __all__ = ["PERIODIC_REFERENCE_FAMILY_SPECS"]
