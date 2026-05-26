@@ -165,7 +165,7 @@ def default_reset_payload(
     }
 
 
-def main() -> None:
+def main() -> int | None:
     server = AppServer()
     server.start()
     try:
@@ -235,7 +235,8 @@ def main() -> None:
             browser.close()
     finally:
         server.close()
+    return None
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main() or 0)
