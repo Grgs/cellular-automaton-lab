@@ -19,12 +19,12 @@ repos:
         stages: [pre-push, manual]
       - id: detect-secrets-staged
         name: detect-secrets (changed files)
-        entry: py -3 -m tools security secrets --baseline .secrets.baseline
+        entry: node tools/internal/python_tools_entry.mjs security secrets --baseline .secrets.baseline
         language: system
         stages: [pre-commit]
       - id: detect-secrets-push
         name: detect-secrets (full repo)
-        entry: py -3 -m tools security secrets --baseline .secrets.baseline --all-files
+        entry: node tools/internal/python_tools_entry.mjs security secrets --baseline .secrets.baseline --all-files
         language: system
         pass_filenames: false
         stages: [pre-push, manual]

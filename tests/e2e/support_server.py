@@ -11,7 +11,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import IO, Protocol
 
-from backend.frontend_build import frontend_server_build_status
+from backend.frontend_build import (
+    _FRONTEND_BUILD_BYPASS_ENV,
+    frontend_server_build_status,
+)
 from backend.payload_types import (
     RawJsonDocument,
     ResetControlRequestPayload,
@@ -33,6 +36,16 @@ def _resolve_npm_executable() -> str:
 
 @lru_cache(maxsize=4)
 def ensure_current_frontend_server_build(root_path: str, static_folder: str) -> None:
+    # CI jobs that download a prebuilt frontend dist set ALLOW_STALE_FRONTEND_BUILD=1
+    # because they don't `npm ci` and so can't rebuild on-the-fly. Honour the same
+    # bypass that backend.frontend_build.require_current_frontend_server_build does.
+    if str(os.environ.get(_FRONTEND_BUILD_BYPASS_ENV, "")).strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }:
+        return
     root = Path(root_path)
     status = frontend_server_build_status(root, static_folder)
     if bool(status.get("buildCurrent")):
