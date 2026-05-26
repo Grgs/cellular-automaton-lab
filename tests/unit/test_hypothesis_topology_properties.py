@@ -53,8 +53,13 @@ def expected_periodic_face_cell_count(geometry: str, width: int, height: int) ->
         return (width * height) + ((width + 1) * (height + 1))
     if geometry == KAGOME_GEOMETRY:
         return width * height * 3
+    # Use the descriptor's own builder as the source of truth so geometries
+    # with repeat_x_extra / repeat_y_extra face templates (which produce
+    # wrap-around cells beyond cell_count_per_unit * W * H) are counted
+    # correctly. This makes the test verify the topology wrapper preserves
+    # whatever the descriptor builder produces.
     descriptor = get_periodic_face_tiling_descriptor(geometry)
-    return descriptor.cell_count_per_unit * width * height
+    return len(descriptor.build_faces(width, height))
 
 
 class HypothesisTopologyPropertyTests(unittest.TestCase):

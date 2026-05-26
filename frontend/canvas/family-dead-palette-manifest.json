@@ -471,6 +471,14 @@
       ]
     },
     {
+      "geometry": "trihex-2uniform-3636-3366",
+      "variants": [
+        {"label": "trihex-2u-hex", "selector": {"kind": "hexagon"}, "color": {"token": "toneClay"}},
+        {"label": "trihex-2u-tl", "selector": {"kind": "triangle", "slot": "tl"}, "color": {"token": "toneCream"}},
+        {"label": "trihex-2u-tr", "selector": {"kind": "triangle", "slot": "tr"}, "color": {"token": "toneTan"}}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
