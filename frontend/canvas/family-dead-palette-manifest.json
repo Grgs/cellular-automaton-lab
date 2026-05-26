@@ -458,6 +458,19 @@
       ]
     },
     {
+      "geometry": "basketweave",
+      "variants": [
+        {"label": "basketweave-h1", "selector": {"kind": "basketweave-brick", "slot": "h1"}, "color": {"token": "toneClay"}},
+        {"label": "basketweave-h2", "selector": {"kind": "basketweave-brick", "slot": "h2"}, "color": {"token": "toneShadow"}},
+        {"label": "basketweave-h3", "selector": {"kind": "basketweave-brick", "slot": "h3"}, "color": {"token": "toneShadow"}, "allowSharedDeadColor": true},
+        {"label": "basketweave-h4", "selector": {"kind": "basketweave-brick", "slot": "h4"}, "color": {"token": "toneClay"}, "allowSharedDeadColor": true},
+        {"label": "basketweave-v1", "selector": {"kind": "basketweave-brick", "slot": "v1"}, "color": {"token": "toneCream"}},
+        {"label": "basketweave-v2", "selector": {"kind": "basketweave-brick", "slot": "v2"}, "color": {"token": "toneTan"}},
+        {"label": "basketweave-v3", "selector": {"kind": "basketweave-brick", "slot": "v3"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
+        {"label": "basketweave-v4", "selector": {"kind": "basketweave-brick", "slot": "v4"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true}
+      ]
+    },
+    {
       "geometry": "spectre",
       "variants": [
         {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},

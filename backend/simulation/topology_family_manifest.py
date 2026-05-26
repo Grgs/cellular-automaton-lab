@@ -83,6 +83,13 @@ PYTHAGOREAN_GEOMETRY = "pythagorean"
 # To make adjacency match, horizontal bricks are modeled as 6-vertex
 # polygons (four corners plus two collinear mid-long-edge vertices).
 HERRINGBONE_GEOMETRY = "herringbone"
+# Basketweave tiling: 2:1 bricks in two orientations arranged so that
+# pairs of parallel bricks form 50x50 blocks, which then alternate
+# orientation in a checkerboard pattern. Non-edge-to-edge: every brick
+# has exactly one long edge whose midpoint hosts a T-junction with a
+# perpendicular brick. Each brick is modeled as a 5-vertex polygon
+# (four corners plus a single mid-edge vertex on that long edge).
+BASKETWEAVE_GEOMETRY = "basketweave"
 # 2-uniform tiling [3^6; 3^3.4^2]: combines pure-triangular and
 # elongated-triangular vertex types. Constructed by alternating wide
 # strips of pure triangular tiling (2 triangle rows tall, height
@@ -451,6 +458,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         label="Triakis Triangular",
         picker_group="Periodic Mixed",
         picker_order=240,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    BASKETWEAVE_GEOMETRY: _single_variant_family(
+        tiling_family=BASKETWEAVE_GEOMETRY,
+        label="Basketweave",
+        picker_group="Periodic Mixed",
+        picker_order=242,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
