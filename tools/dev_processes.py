@@ -122,15 +122,9 @@ def classify_repo_process(
             cwd=cwd,
             port=parse_server_port(environ),
         )
-    if cwd == ROOT_DIR and (
-        argv_contains_script(argv, "tools/run_browser_check.py")
-        or argv_contains_sequence(argv, ("-m", "tools", "browser", "check"))
-    ):
+    if cwd == ROOT_DIR and argv_contains_sequence(argv, ("-m", "tools", "browser", "check")):
         return RepoProcess(pid=pid, kind="managed-browser-check", command=command, cwd=cwd)
-    if cwd == ROOT_DIR and (
-        argv_contains_script(argv, "tools/render_canvas_review.py")
-        or argv_contains_sequence(argv, ("-m", "tools", "browser", "review"))
-    ):
+    if cwd == ROOT_DIR and argv_contains_sequence(argv, ("-m", "tools", "browser", "review")):
         return RepoProcess(pid=pid, kind="render-review", command=command, cwd=cwd)
     return None
 
