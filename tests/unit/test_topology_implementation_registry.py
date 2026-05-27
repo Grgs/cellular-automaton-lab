@@ -5,6 +5,7 @@ from backend.simulation.topology_implementation_registry import (
     get_topology_implementation,
     render_kind_for_geometry,
 )
+from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
 
 
 class TopologyImplementationRegistryTests(unittest.TestCase):
@@ -77,6 +78,11 @@ class TopologyImplementationRegistryTests(unittest.TestCase):
         self.assertIn("dodecagonal-square-triangle", geometries)
         self.assertIn("shield", geometries)
         self.assertIn("pinwheel", geometries)
+
+    def test_registry_covers_every_supported_geometry_without_fallback(self) -> None:
+        for geometry in SUPPORTED_GEOMETRIES:
+            with self.subTest(geometry=geometry):
+                self.assertEqual(get_topology_implementation(geometry).geometry_key, geometry)
 
 
 if __name__ == "__main__":

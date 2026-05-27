@@ -655,10 +655,36 @@
       }
     },
     {
+      "tiling_family": "pentagon-crosses",
+      "label": "Pentagon Crosses",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 243,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "pentagon-crosses"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
       "tiling_family": "trihex-2uniform-3636-3366",
       "label": "2-uniform Trihex",
       "picker_group": "Periodic Mixed",
-      "picker_order": 243,
+      "picker_order": 244,
       "sizing_mode": "grid",
       "family": "mixed",
       "render_kind": "polygon_periodic",
@@ -684,7 +710,7 @@
       "tiling_family": "stein-14-pentagonal",
       "label": "Stein 14 Pentagonal",
       "picker_group": "Periodic Mixed",
-      "picker_order": 244,
+      "picker_order": 245,
       "sizing_mode": "grid",
       "family": "mixed",
       "render_kind": "polygon_periodic",
@@ -1564,6 +1590,21 @@
       "max_x": 100.0,
       "max_y": 100.0,
       "cell_count_per_unit": 8,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "pentagon-crosses",
+      "label": "Pentagon Crosses",
+      "metric_model": "pattern",
+      "base_edge": 35.0,
+      "unit_width": 133.682476,
+      "unit_height": 133.682476,
+      "min_dimension": 1,
+      "min_x": -11.261082,
+      "min_y": -11.261082,
+      "max_x": 144.943558,
+      "max_y": 144.943558,
+      "cell_count_per_unit": 4,
       "row_offset_x": 0.0
     },
     {
