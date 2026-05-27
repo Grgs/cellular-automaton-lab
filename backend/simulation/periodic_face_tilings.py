@@ -390,39 +390,70 @@ def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, 
     # T-junction adjacency: in non-edge-to-edge tilings like Stein-14, one
     # cell's vertex sits on the midpoint of another cell's edge. The two
     # cells share a half-edge but have no matching endpoint pair, so they
-    # don't show up in edge_map. Detect this case explicitly: for every
-    # edge (A, B) shared by N cells, find any OTHER cell that has a vertex
-    # strictly inside the segment (A, B). That vertex-owner is a T-junction
-    # neighbour of every cell whose polygon owns the edge.
+    # don't show up in edge_map.
     #
-    # Build a vertex->cells index keyed by the same 6-decimal snap the edge
-    # keys use, so a vertex at exactly an existing endpoint isn't mistaken
-    # for a T-junction.
-    vertex_index: dict[tuple[float, float], set[str]] = {}
-    for cell in cells:
-        for vertex in cell.vertices:
-            key = (round(vertex[0], 6), round(vertex[1], 6))
-            vertex_index.setdefault(key, set()).add(cell.id)
+    # Restrict the scan to single-owner edges: an edge with 2+ owners is
+    # already fully matched at its endpoints (typical edge-to-edge case),
+    # so any vertex on its interior is either a degeneracy or already
+    # captured by the edge-key match. Single-owner edges are the boundary
+    # edges and the T-junction-carrying edges; only the latter benefit from
+    # this pass. This skips >99% of the work in edge-to-edge tilings.
+    #
+    # For each single-owner edge, look up candidate vertices via a coarse
+    # grid hash (cell side = max edge length we'd plausibly contain). This
+    # avoids the O(V*E) all-pairs check that dominated previously.
+    single_owner_edges = [
+        (edge_key_tuple, edge_cells)
+        for edge_key_tuple, edge_cells in edge_map.items()
+        if len(set(edge_cells)) == 1
+    ]
+    if single_owner_edges:
+        vertex_index: dict[tuple[float, float], set[str]] = {}
+        for cell in cells:
+            for vertex in cell.vertices:
+                key = (round(vertex[0], 6), round(vertex[1], 6))
+                vertex_index.setdefault(key, set()).add(cell.id)
 
-    for edge_key_tuple, edge_cells in edge_map.items():
-        edge_a, edge_b = edge_key_tuple
-        edge_owner_set = set(edge_cells)
-        for vertex_key, vertex_owners in vertex_index.items():
-            if vertex_key == edge_a or vertex_key == edge_b:
-                continue
-            if vertex_owners.issubset(edge_owner_set):
-                continue  # nothing new to link
-            if not _point_on_segment(vertex_key, edge_a, edge_b):
-                continue
-            # vertex_owners and edge_owners are T-junction-adjacent across
-            # this edge: each pair (edge_owner, vertex_owner) shares the
-            # half-edge from edge_a to vertex_key (or vertex_key to edge_b).
-            for edge_owner in edge_owner_set:
-                for vertex_owner in vertex_owners:
-                    if vertex_owner == edge_owner:
-                        continue
-                    neighbor_sets[edge_owner].add(vertex_owner)
-                    neighbor_sets[vertex_owner].add(edge_owner)
+        # Spatial hash: bin vertices by a coarse grid so each edge looks up
+        # only the vertices that might lie inside its bounding box. Bin size
+        # is chosen larger than the longest edge so every relevant vertex
+        # falls in at most 2x2 bins relative to the edge midpoint.
+        max_edge_length = 0.0
+        for (a, b), _ in single_owner_edges:
+            length = math.hypot(b[0] - a[0], b[1] - a[1])
+            if length > max_edge_length:
+                max_edge_length = length
+        bin_size = max(max_edge_length, 1.0)
+        vertex_bins: dict[tuple[int, int], list[tuple[float, float]]] = {}
+        for vertex_key in vertex_index:
+            bx = int(vertex_key[0] // bin_size)
+            by = int(vertex_key[1] // bin_size)
+            vertex_bins.setdefault((bx, by), []).append(vertex_key)
+
+        for edge_key_tuple, edge_cells in single_owner_edges:
+            edge_a, edge_b = edge_key_tuple
+            edge_owner_set = set(edge_cells)
+            # Look up vertices in bins that overlap the edge's bounding box.
+            bx_lo = int(min(edge_a[0], edge_b[0]) // bin_size)
+            bx_hi = int(max(edge_a[0], edge_b[0]) // bin_size)
+            by_lo = int(min(edge_a[1], edge_b[1]) // bin_size)
+            by_hi = int(max(edge_a[1], edge_b[1]) // bin_size)
+            for bx in range(bx_lo, bx_hi + 1):
+                for by in range(by_lo, by_hi + 1):
+                    for vertex_key in vertex_bins.get((bx, by), ()):
+                        if vertex_key == edge_a or vertex_key == edge_b:
+                            continue
+                        vertex_owners = vertex_index[vertex_key]
+                        if vertex_owners.issubset(edge_owner_set):
+                            continue
+                        if not _point_on_segment(vertex_key, edge_a, edge_b):
+                            continue
+                        for edge_owner in edge_owner_set:
+                            for vertex_owner in vertex_owners:
+                                if vertex_owner == edge_owner:
+                                    continue
+                                neighbor_sets[edge_owner].add(vertex_owner)
+                                neighbor_sets[vertex_owner].add(edge_owner)
 
     return tuple(
         PeriodicFaceCell(
