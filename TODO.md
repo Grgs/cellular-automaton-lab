@@ -15,7 +15,7 @@ The `v0.4.0` public preview has been released (after `v0.1.0`, `v0.2.0`, and `v0
 
 ### Future release follow-up
 
-- Add a manual post-deploy GitHub Pages smoke check routine to the release workflow if the preview release cadence becomes regular.
+- Add an automated post-deploy GitHub Pages smoke check if the preview release cadence becomes regular; the manual smoke routine and pre/post release publication guard now live in [docs/MAINTENANCE.md](docs/MAINTENANCE.md#public-release-process).
 - Revisit whether the verification-strength JSON report should become a CI artifact once there is a concrete consumer for it.
 
 ## Now

@@ -372,3 +372,14 @@ Use `--check` in tests/CI and `--write` when intentionally refreshing the genera
 python -m tools repo tools-docs --check
 python -m tools repo tools-docs --write
 ```
+
+### `python -m tools repo release-check`
+
+Check release readiness before publishing and verify publication afterward.
+
+Guards the preview-release handoff so a merged release PR is not mistaken for a published GitHub tag/release. Use `--phase pre-publish` before tagging and `--phase post-publish` after creating the GitHub Release.
+
+```powershell
+python -m tools repo release-check --version v0.4.0 --phase pre-publish
+python -m tools repo release-check --version v0.4.0 --phase post-publish
+```
