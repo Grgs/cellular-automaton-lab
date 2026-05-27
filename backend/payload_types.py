@@ -209,6 +209,7 @@ class PeriodicFaceTilingDescriptorPayload(TypedDict):
     max_y: float
     cell_count_per_unit: int
     row_offset_x: float
+    lattice_skew_x: NotRequired[float]
 
 
 class SimulationDefaultsPayload(TypedDict):

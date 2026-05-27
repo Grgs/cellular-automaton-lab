@@ -55,17 +55,28 @@ function patternBounds(
     const unitWidth = descriptor?.unit_width || 0;
     const unitHeight = descriptor?.unit_height || 0;
     const rowOffsetX = descriptor?.row_offset_x || 0;
-    const hasShiftedRows = Math.max(height, 1) > 1;
-    const minX = Math.min(
-        descriptor?.min_x || 0,
-        (descriptor?.min_x || 0) + (hasShiftedRows && rowOffsetX < 0 ? rowOffsetX : 0),
-    );
+    const latticeSkewX = descriptor?.lattice_skew_x;
+    const safeWidth = Math.max(width, 1);
+    const safeHeight = Math.max(height, 1);
+    // For cumulative-skew lattices the row x-offset compounds across rows
+    // (each row k shifts by k * latticeSkewX). For the alternating brick
+    // semantic the offset is rowOffsetX on odd rows only.
+    const maxRowShift =
+        latticeSkewX !== undefined
+            ? Math.max(0, latticeSkewX) * (safeHeight - 1)
+            : safeHeight > 1 && rowOffsetX > 0
+              ? rowOffsetX
+              : 0;
+    const minRowShift =
+        latticeSkewX !== undefined
+            ? Math.min(0, latticeSkewX) * (safeHeight - 1)
+            : safeHeight > 1 && rowOffsetX < 0
+              ? rowOffsetX
+              : 0;
+    const minX = (descriptor?.min_x || 0) + minRowShift;
     const minY = descriptor?.min_y || 0;
-    const maxX =
-        (descriptor?.max_x || 0) +
-        (Math.max(width, 1) - 1) * unitWidth +
-        (hasShiftedRows && rowOffsetX > 0 ? rowOffsetX : 0);
-    const maxY = (descriptor?.max_y || 0) + (Math.max(height, 1) - 1) * unitHeight;
+    const maxX = (descriptor?.max_x || 0) + (safeWidth - 1) * unitWidth + maxRowShift;
+    const maxY = (descriptor?.max_y || 0) + (safeHeight - 1) * unitHeight;
     return {
         minX,
         minY,

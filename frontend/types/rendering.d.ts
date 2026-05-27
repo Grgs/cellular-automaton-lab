@@ -131,6 +131,7 @@ export interface PeriodicFaceTilingDescriptor {
     max_y: number;
     cell_count_per_unit: number;
     row_offset_x: number;
+    lattice_skew_x?: number;
 }
 
 export interface HexGeometryCache {

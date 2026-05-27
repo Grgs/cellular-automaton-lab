@@ -108,6 +108,16 @@ TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY = "triangular-square-2uniform"
 # no T-junctions. Uses only triangles + hexagons (complements the
 # triangle+square 2-uniform).
 TRIHEX_2UNIFORM_3636_3366_GEOMETRY = "trihex-2uniform-3636-3366"
+# Stein-14 pentagonal: the 14th of the 15 known monohedral convex pentagonal
+# tilings, discovered by Rolf Stein (1985). Has completely determined tile
+# proportions (no degrees of freedom): 2a=2c=d=e with A=90 deg and angle B
+# satisfying sin(B) = (sqrt(57) - 3) / 8 (B obtuse ~145.34 deg). The 6-tile
+# primitive unit has p2 symmetry and is 3-isohedral (3 orbit classes of tiles
+# under p2). Genuinely SKEW LATTICE: the two translation basis vectors do
+# not span an axis-aligned rectangle, requiring the periodic_face system's
+# cumulative-skew lattice_skew_x mode (every row shifted by k*skew, not the
+# alternating-row brick semantic).
+STEIN_14_PENTAGONAL_GEOMETRY = "stein-14-pentagonal"
 
 
 @dataclass(frozen=True)
@@ -492,6 +502,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    STEIN_14_PENTAGONAL_GEOMETRY: _single_variant_family(
+        tiling_family=STEIN_14_PENTAGONAL_GEOMETRY,
+        label="Stein 14 Pentagonal",
+        picker_group="Periodic Mixed",
+        picker_order=244,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 8, 6, 14),
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
