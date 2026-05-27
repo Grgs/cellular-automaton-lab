@@ -162,6 +162,82 @@ class SketchTilingTests(unittest.TestCase):
         )
 
 
+class SketchTilingLatticeSkewTests(unittest.TestCase):
+    """``LATTICE_SKEW_X`` plumbs through to the same builder the catalog uses,
+    so a skewed-parallelogram tiling like Stein-14 can be iterated against the
+    sketch validator before any catalog wiring exists."""
+
+    STEIN14_SKETCH = ROOT_DIR / "tools" / "sketch_examples" / "stein_14_pentagonal.py"
+
+    def test_lattice_skew_x_is_read_from_sketch_module(self) -> None:
+        from tools.sketch_tiling import load_sketch
+
+        input_data = load_sketch(self.STEIN14_SKETCH)
+        self.assertAlmostEqual(input_data.lattice_skew_x or 0.0, -153.02078259, places=6)
+        self.assertEqual(input_data.row_offset_x, 0.0)
+
+    def test_lattice_skew_x_drives_cumulative_skew_per_row(self) -> None:
+        from tools.sketch_tiling import load_sketch, sketch
+
+        input_data = load_sketch(self.STEIN14_SKETCH)
+        report = sketch(input_data, patch_size=2)
+        # 6 face templates x 2x2 patch = 24 cells.
+        self.assertEqual(len(report.cells), 24)
+        # Pick the t0 cells at logical (0, 0) and (0, 1) and confirm their
+        # centres differ by the skew vector (not by 0 as the brick semantic
+        # would imply for an even row).
+        by_id = {cell.id: cell for cell in report.cells}
+        c00 = by_id["p:t0:0:0"]
+        c01 = by_id["p:t0:0:1"]
+        delta_x = c01.center[0] - c00.center[0]
+        delta_y = c01.center[1] - c00.center[1]
+        self.assertAlmostEqual(delta_x, input_data.lattice_skew_x or 0.0, places=4)
+        self.assertAlmostEqual(delta_y, input_data.cell_height, places=4)
+
+    def test_emit_descriptor_includes_lattice_skew_x_when_set(self) -> None:
+        from tools.sketch_tiling import emit_descriptor_json, load_sketch
+
+        input_data = load_sketch(self.STEIN14_SKETCH)
+        descriptor = emit_descriptor_json(input_data)
+        entry = descriptor["stein-14-pentagonal"]
+        self.assertAlmostEqual(entry["lattice_skew_x"], -153.02078259, places=6)
+        self.assertNotIn("row_offset_x", entry)
+
+    def test_emit_descriptor_omits_lattice_skew_x_when_not_set(self) -> None:
+        """The triangle+square 2-uniform example doesn't use the skew lattice;
+        its descriptor must not get a stray ``lattice_skew_x`` field."""
+        from tools.sketch_tiling import emit_descriptor_json, load_sketch
+
+        input_data = load_sketch(EXAMPLE_PATH)
+        descriptor = emit_descriptor_json(input_data)
+        entry = descriptor["triangular-square-2uniform"]
+        self.assertNotIn("lattice_skew_x", entry)
+
+    def test_setting_both_offset_modes_raises(self) -> None:
+        """Sketches must pick one lattice semantic. Setting both should error
+        at load time so the failure is loud and immediate."""
+        import tempfile
+
+        from tools.sketch_tiling import load_sketch
+
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".py", delete=False, encoding="utf-8"
+        ) as handle:
+            handle.write(
+                "CELL_WIDTH = 100.0\n"
+                "CELL_HEIGHT = 100.0\n"
+                "ROW_OFFSET_X = 50.0\n"
+                "LATTICE_SKEW_X = -25.0\n"
+                "FACES = []\n"
+            )
+            sketch_path = Path(handle.name)
+        try:
+            with self.assertRaisesRegex(RuntimeError, "mutually exclusive"):
+                load_sketch(sketch_path)
+        finally:
+            sketch_path.unlink()
+
+
 class SketchHelpersTests(unittest.TestCase):
     def test_equilateral_triangle_is_equilateral(self) -> None:
         from tools.sketch_helpers import equilateral_triangle
