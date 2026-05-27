@@ -16,11 +16,15 @@ def run_passthrough_command(
     target_main: MainFunc,
     doc: CommandDoc,
     parser_factory: ParserFactory | None = None,
+    allow_parser_remainder: bool = False,
 ) -> int:
     if parser_factory is not None:
         parser = parser_factory()
         parser.prog = doc.label
-        parser.parse_args(argv)
+        if allow_parser_remainder:
+            parser.parse_known_args(argv)
+        else:
+            parser.parse_args(argv)
     return target_main(argv)
 
 
@@ -31,6 +35,7 @@ def add_passthrough_command(
     doc: CommandDoc,
     target_main: MainFunc,
     parser_factory: ParserFactory | None = None,
+    allow_parser_remainder: bool = False,
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser(
         name,
@@ -42,5 +47,6 @@ def add_passthrough_command(
         _passthrough_target=target_main,
         _passthrough_doc=doc,
         _passthrough_parser_factory=parser_factory,
+        _passthrough_allow_parser_remainder=allow_parser_remainder,
     )
     return parser

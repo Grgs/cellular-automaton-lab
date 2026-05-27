@@ -69,6 +69,9 @@ def main(argv: list[str] | None = None) -> int:
                 target_main=passthrough_target,
                 doc=getattr(args, "_passthrough_doc"),
                 parser_factory=getattr(args, "_passthrough_parser_factory"),
+                allow_parser_remainder=bool(
+                    getattr(args, "_passthrough_allow_parser_remainder", False)
+                ),
             )
         )
     runner = getattr(args, "_run", None)
