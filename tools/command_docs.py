@@ -331,6 +331,16 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("repo", "generated-check"),
+        "repo",
+        "Run freshness checks for generated repo-owned files.",
+        "Umbrella check for generated surfaces that otherwise require separate commands: tools docs, bootstrap test fixture data, frontend topology fixtures, and reference fixtures. Focused commands remain available for targeted refreshes.",
+        (
+            "python -m tools repo generated-check",
+            "python -m tools repo generated-check --only tools-docs",
+        ),
+    ),
+    CommandDoc(
         ("repo", "release-check"),
         "repo",
         "Check release readiness before publishing and verify publication afterward.",

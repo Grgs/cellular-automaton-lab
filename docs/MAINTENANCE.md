@@ -135,6 +135,16 @@ To upgrade a single pinned package, edit the `.in` file and rerun the command ab
 
 Lockfiles are generated on the maintainer's local platform. Cross-platform installs work because all current pinned packages publish wheels for both Windows and Linux at the resolved versions, and the only platform-conditional transitive dep (`colorama`, pulled in by `click`) is pure-Python and installs harmlessly on Linux CI.
 
+## Generated File Freshness
+
+Generated repo-owned files should be checked through the umbrella freshness command before review when a change touches CLI metadata, bootstrap data, topology fixtures, or reference fixtures:
+
+```powershell
+python -m tools repo generated-check
+```
+
+The command combines the focused freshness checks for `docs/TOOLS.md`, `frontend/test-fixtures/bootstrap-data.json`, frontend topology fixtures, and literature reference fixtures. Keep the focused commands available for targeted refresh work, but prefer the umbrella command when preparing maintenance or release-oriented changes.
+
 ## Tooling Ownership
 
 Browser diagnosis and workbench implementation now lives under `tools/render_review/`:
