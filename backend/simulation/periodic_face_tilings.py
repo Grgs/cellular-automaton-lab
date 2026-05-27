@@ -335,6 +335,38 @@ def _sort_neighbor_ids(
     return tuple(sorted(neighbor_ids, key=sort_key))
 
 
+_T_JUNCTION_DISTANCE_TOLERANCE = 1e-3
+
+
+def _point_on_segment(
+    point: tuple[float, float],
+    seg_start: tuple[float, float],
+    seg_end: tuple[float, float],
+    *,
+    tolerance: float = _T_JUNCTION_DISTANCE_TOLERANCE,
+) -> bool:
+    """True iff ``point`` lies strictly inside the closed segment seg_start->
+    seg_end (excluding the endpoints themselves), within ``tolerance`` in the
+    perpendicular direction. Used to detect T-junction adjacency where one
+    tile's vertex sits on the midpoint of another tile's edge."""
+    px, py = point
+    ax, ay = seg_start
+    bx, by = seg_end
+    dx, dy = bx - ax, by - ay
+    length_sq = dx * dx + dy * dy
+    if length_sq < tolerance * tolerance:
+        return False
+    # Parametric position of point on the seg_start->seg_end line: t in [0, 1].
+    t = ((px - ax) * dx + (py - ay) * dy) / length_sq
+    if t <= tolerance or t >= 1.0 - tolerance:
+        return False  # endpoint or off-segment, no T-junction
+    # Perpendicular distance from point to line (a, b).
+    proj_x = ax + t * dx
+    proj_y = ay + t * dy
+    perp_sq = (px - proj_x) ** 2 + (py - proj_y) ** 2
+    return perp_sq <= tolerance * tolerance
+
+
 def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, ...]:
     cells_by_id = {cell.id: cell for cell in cells}
     edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = {}
@@ -354,6 +386,43 @@ def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, 
             neighbor_sets[cell_id].update(
                 other_id for other_id in unique_edge_cells if other_id != cell_id
             )
+
+    # T-junction adjacency: in non-edge-to-edge tilings like Stein-14, one
+    # cell's vertex sits on the midpoint of another cell's edge. The two
+    # cells share a half-edge but have no matching endpoint pair, so they
+    # don't show up in edge_map. Detect this case explicitly: for every
+    # edge (A, B) shared by N cells, find any OTHER cell that has a vertex
+    # strictly inside the segment (A, B). That vertex-owner is a T-junction
+    # neighbour of every cell whose polygon owns the edge.
+    #
+    # Build a vertex->cells index keyed by the same 6-decimal snap the edge
+    # keys use, so a vertex at exactly an existing endpoint isn't mistaken
+    # for a T-junction.
+    vertex_index: dict[tuple[float, float], set[str]] = {}
+    for cell in cells:
+        for vertex in cell.vertices:
+            key = (round(vertex[0], 6), round(vertex[1], 6))
+            vertex_index.setdefault(key, set()).add(cell.id)
+
+    for edge_key_tuple, edge_cells in edge_map.items():
+        edge_a, edge_b = edge_key_tuple
+        edge_owner_set = set(edge_cells)
+        for vertex_key, vertex_owners in vertex_index.items():
+            if vertex_key == edge_a or vertex_key == edge_b:
+                continue
+            if vertex_owners.issubset(edge_owner_set):
+                continue  # nothing new to link
+            if not _point_on_segment(vertex_key, edge_a, edge_b):
+                continue
+            # vertex_owners and edge_owners are T-junction-adjacent across
+            # this edge: each pair (edge_owner, vertex_owner) shares the
+            # half-edge from edge_a to vertex_key (or vertex_key to edge_b).
+            for edge_owner in edge_owner_set:
+                for vertex_owner in vertex_owners:
+                    if vertex_owner == edge_owner:
+                        continue
+                    neighbor_sets[edge_owner].add(vertex_owner)
+                    neighbor_sets[vertex_owner].add(edge_owner)
 
     return tuple(
         PeriodicFaceCell(
