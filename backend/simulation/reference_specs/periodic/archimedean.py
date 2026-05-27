@@ -186,6 +186,7 @@ SPECS = {
             expected_dual_candidate_geometries=(
                 "basketweave",
                 "cairo-pentagonal",
+                "pentagon-crosses",
                 "prismatic-pentagonal",
                 "snub-square-dual",
                 "type-7-pentagonal",
@@ -228,6 +229,7 @@ SPECS = {
             expected_dual_candidate_geometries=(
                 "basketweave",
                 "cairo-pentagonal",
+                "pentagon-crosses",
                 "prismatic-pentagonal",
                 "snub-square-dual",
                 "type-7-pentagonal",
