@@ -20,7 +20,11 @@ Sketch file format (a regular Python module)::
     BASE_EDGE = EDGE                   # optional
     CELL_WIDTH = 2 * EDGE
     CELL_HEIGHT = 2 * H + EDGE
-    ROW_OFFSET_X = 0.0                 # optional, default 0
+    ROW_OFFSET_X = 0.0                 # optional, default 0 (alternating brick)
+    # LATTICE_SKEW_X = -10.0           # optional; when set, every row k
+    #                                  # cumulatively shifts by k*skew (skewed
+    #                                  # parallelogram lattice, e.g. Stein-14).
+    #                                  # Mutually exclusive with ROW_OFFSET_X.
 
     FACES = [
         {
@@ -101,6 +105,11 @@ class SketchInput:
     cell_width: float
     cell_height: float
     row_offset_x: float = 0.0
+    # When set, switches the lattice from the row_offset_x "alternating brick"
+    # semantic (only odd rows shifted) to a cumulative skew per row (every row
+    # shifted by k * lattice_skew_x). Needed for genuinely-skewed-parallelogram
+    # tilings like Stein-14. Mutually exclusive with row_offset_x.
+    lattice_skew_x: float | None = None
     base_edge: float | None = None
     geometry: str = "sketch-tiling"
     label: str = "Sketch Tiling"
@@ -183,11 +192,21 @@ def load_sketch(path: Path) -> SketchInput:
             f"Sketch {path} must define FACES (list), CELL_WIDTH, CELL_HEIGHT."
         ) from error
 
+    row_offset_x = float(getattr(module, "ROW_OFFSET_X", 0.0))
+    lattice_skew_x_raw = getattr(module, "LATTICE_SKEW_X", None)
+    lattice_skew_x = None if lattice_skew_x_raw is None else float(lattice_skew_x_raw)
+    if lattice_skew_x is not None and row_offset_x != 0.0:
+        raise RuntimeError(
+            f"Sketch {path} sets both ROW_OFFSET_X and LATTICE_SKEW_X. They describe "
+            "mutually exclusive lattice semantics (alternating brick vs cumulative skew). "
+            "Pick one."
+        )
     return SketchInput(
         faces=faces,
         cell_width=cell_width,
         cell_height=cell_height,
-        row_offset_x=float(getattr(module, "ROW_OFFSET_X", 0.0)),
+        row_offset_x=row_offset_x,
+        lattice_skew_x=lattice_skew_x,
         base_edge=getattr(module, "BASE_EDGE", None),
         geometry=str(getattr(module, "GEOMETRY", "sketch-tiling")),
         label=str(getattr(module, "LABEL", "Sketch Tiling")),
@@ -387,6 +406,7 @@ def sketch(input_data: SketchInput, *, patch_size: int = 3) -> SketchReport:
         id_pattern="{prefix}:{slot}:{x}:{y}",
         width=patch_size,
         height=patch_size,
+        lattice_skew_x=input_data.lattice_skew_x,
     )
 
     kind_counts = dict(Counter(c.kind for c in cells))
@@ -579,6 +599,8 @@ def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
     }
     if input_data.row_offset_x:
         descriptor["row_offset_x"] = input_data.row_offset_x
+    if input_data.lattice_skew_x is not None:
+        descriptor["lattice_skew_x"] = input_data.lattice_skew_x
     return {input_data.geometry: descriptor}
 
 
