@@ -90,6 +90,10 @@ HERRINGBONE_GEOMETRY = "herringbone"
 # perpendicular brick. Each brick is modeled as a 5-vertex polygon
 # (four corners plus a single mid-edge vertex on that long edge).
 BASKETWEAVE_GEOMETRY = "basketweave"
+# Type-4 pentagonal cross motif: four congruent pentagons meet in a p4
+# cross-shaped cluster, giving the periodic catalog a visually distinct
+# pentagonal option without leaning on triangle/square subdivisions.
+PENTAGON_CROSSES_GEOMETRY = "pentagon-crosses"
 # 2-uniform tiling [3^6; 3^3.4^2]: combines pure-triangular and
 # elongated-triangular vertex types. Constructed by alternating wide
 # strips of pure triangular tiling (2 triangle rows tall, height
@@ -494,11 +498,22 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
+    PENTAGON_CROSSES_GEOMETRY: _single_variant_family(
+        tiling_family=PENTAGON_CROSSES_GEOMETRY,
+        label="Pentagon Crosses",
+        picker_group="Periodic Mixed",
+        picker_order=243,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
     TRIHEX_2UNIFORM_3636_3366_GEOMETRY: _single_variant_family(
         tiling_family=TRIHEX_2UNIFORM_3636_3366_GEOMETRY,
         label="2-uniform Trihex",
         picker_group="Periodic Mixed",
-        picker_order=243,
+        picker_order=244,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
@@ -509,7 +524,7 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         tiling_family=STEIN_14_PENTAGONAL_GEOMETRY,
         label="Stein 14 Pentagonal",
         picker_group="Periodic Mixed",
-        picker_order=244,
+        picker_order=245,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 8, 6, 14),

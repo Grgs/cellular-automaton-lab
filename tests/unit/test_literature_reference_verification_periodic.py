@@ -222,7 +222,7 @@ class LiteratureReferenceVerificationPeriodicTests(unittest.TestCase):
             spec,
             periodic_descriptor=replace(
                 periodic_descriptor,
-                expected_dual_structure_signature=((5, 54),),
+                expected_dual_structure_signature=((5, 999),),
             ),
         )
 
