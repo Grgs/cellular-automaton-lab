@@ -3,7 +3,16 @@
 This is a curated narrative changelog of completed work. Active and upcoming work
 lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
-## `v0.3.x` Preview Release Candidate
+## `v0.4.0` Preview Release Candidate
+
+- Added several periodic mixed tilings after `v0.3.0`, including Pythagorean, Herringbone, Basketweave, two 2-uniform triangle/hex/square variants, Stein 14 Pentagonal, Pentagon Crosses, and supporting sketch/validation tooling for descriptor-driven topology work.
+- Added the two-prototile `pinwheel-2-1` aperiodic family and repaired the Conway-Radin `pinwheel` second-root vertex ordering so exact-affine substitution patches render as the intended pinwheel field.
+- Replaced the `dodecagonal-square-triangle` finite-oracle runtime with a decorated periodic `3.12.12` square-triangle generator that scales without vendored literature data, while keeping its non-canonical status documented.
+- Improved perceived simulation speed control by presenting target speed separately from measured actual cadence and by adapting polling cadence to the selected target.
+- Reduced expensive neighbor construction paths for both periodic-face and segment-overlap aperiodic tilings, including large speedups for `pinwheel-2-1`, `chair`, `penrose-p2-kite-dart`, `robinson-triangles`, and `tuebingen-triangle` at their deeper preview patch depths.
+- Consolidated repo tooling under the Python `tools` CLI, added onboarding/examples, strengthened pre-commit/CI parity, and refreshed source-reference/verification fixtures for the expanded catalog.
+
+## `v0.3.0` Preview Release Candidate
 
 - Added `type-7-pentagonal` as a new periodic convex pentagonal family through the existing `periodic_face` descriptor architecture, with backend catalog wiring, picker preview data, and periodic reference validation.
 - Added `penrose-p1-pentagon-boat-star` as a separate centered singular-pentagrid Penrose P1 family that emits the full `pentagon` / `diamond` / `boat` / `star` vocabulary instead of overloading the older distributed P1 manifestation.

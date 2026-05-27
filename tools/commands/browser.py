@@ -29,6 +29,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("browser", "check"),
         target_main=browser_check.main,
         parser_factory=browser_check.build_parser,
+        allow_parser_remainder=True,
     )
     add_passthrough_command(
         subparsers,
