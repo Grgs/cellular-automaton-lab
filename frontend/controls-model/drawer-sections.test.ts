@@ -31,6 +31,24 @@ describe("controls-model drawer sections", () => {
         expect(viewModel.cellSizeVisible).toBe(false);
     });
 
+    it("shows compact actual-speed feedback while running", async () => {
+        const { buildDrawerTopologyViewModel } = await import("./drawer-topology.js");
+        const state = await buildControlsModelState();
+        state.isRunning = true;
+        state.speed = 20;
+        state.measuredSpeed = 9.6;
+
+        const viewModel = buildDrawerTopologyViewModel({
+            state,
+            syncState: EMPTY_SYNC_STATE,
+        });
+
+        expect(viewModel.speedLabel).toBe("Target 20 gen/s");
+        expect(viewModel.speedActualVisible).toBe(true);
+        expect(viewModel.speedActualLabel).toBe("Limited: 9.6 gen/s");
+        expect(viewModel.speedLimited).toBe(true);
+    });
+
     it("builds rule and palette state independently from the broader drawer builder", async () => {
         const { buildDrawerRulePaletteViewModel } = await import("./drawer-rule-palette.js");
         const state = await buildControlsModelState();

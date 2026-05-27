@@ -153,6 +153,9 @@ export interface DrawerTopologyViewModel {
     adjacencyModeVisible: boolean;
     speedValue: string;
     speedLabel: string;
+    speedActualLabel: string;
+    speedActualVisible: boolean;
+    speedLimited: boolean;
     unsafeSizingEnabled: boolean;
     tileColorsEnabled: boolean;
     cellSizeVisible: boolean;

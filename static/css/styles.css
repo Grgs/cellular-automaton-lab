@@ -680,6 +680,36 @@ button.tiling-preview-card.is-selected {
     min-width: 104px;
 }
 
+.speed-stepper {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    gap: 5px;
+    align-items: center;
+}
+
+.speed-stepper-btn {
+    min-height: 34px;
+    padding: 0;
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.speed-stepper-input {
+    text-align: center;
+}
+
+.speed-actual-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+}
+
+.speed-actual-label[data-tone="warning"] {
+    color: var(--accent-dark);
+}
+
 .top-slider-value {
     font-family: var(--mono);
     font-size: 0.74rem;
@@ -1299,6 +1329,11 @@ button.theme-toggle .theme-icon-moon {
 
 .drawer-speed-control {
     margin-top: 10px;
+}
+
+.drawer-speed-control .top-slider-value,
+.drawer-speed-control .speed-actual-label {
+    line-height: 1.1;
 }
 
 .panel-section h2 {

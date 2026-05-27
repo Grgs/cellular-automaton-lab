@@ -40,8 +40,12 @@ export interface DomElements {
     ruleSummaryText: HTMLElement | null;
     ruleDescription: HTMLElement | null;
     paintPalette: HTMLElement | null;
+    speedField: HTMLElement | null;
+    speedDownBtn: HTMLButtonElement | null;
     speedInput: HTMLInputElement | null;
+    speedUpBtn: HTMLButtonElement | null;
     speedLabel: HTMLElement | null;
+    speedActualLabel: HTMLElement | null;
     cellSizeField: HTMLElement | null;
     cellSizeInput: HTMLInputElement | null;
     cellSizeLabel: HTMLElement | null;
