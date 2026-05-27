@@ -80,15 +80,37 @@ python -m tools tilings verify
 py -3 -m pre_commit run --hook-stage pre-push --all-files
 ```
 
-6. Require GitHub Actions CI to pass on the exact release commit, including the Pages build path.
-7. Verify the deployed GitHub Pages demo manually:
+6. Merge the release-candidate PR into `main`, then fetch and fast-forward local `main` to the merged commit:
+
+```powershell
+git fetch origin --prune --tags
+git switch main
+git pull --ff-only
+python -m tools repo release-check --version vX.Y.Z --phase pre-publish
+```
+
+The pre-publish check must pass before tagging. It intentionally expects the target tag and GitHub Release to be absent.
+
+7. Require GitHub Actions CI to pass on the exact release commit, including the Pages build path.
+8. Tag and publish the GitHub Release from the clean, synced `main` checkout:
+
+```powershell
+git tag -a vX.Y.Z origin/main -m "vX.Y.Z preview release"
+git push origin vX.Y.Z
+gh release create vX.Y.Z --title "vX.Y.Z" --notes-file docs/releases/vX.Y.Z.md --latest
+python -m tools repo release-check --version vX.Y.Z --phase post-publish
+```
+
+The post-publish check must pass before considering the release complete. It verifies the local tag, remote tag, GitHub Release, and latest-release pointer.
+
+9. Verify the deployed GitHub Pages demo manually:
    - app loads successfully
    - one simulation run/pause/step flow works
    - one topology or rule switch works
    - one pattern import/export or persistence flow works
    - no obvious startup or console failure appears
-8. Publish concise release notes from the matching file in [docs/releases/](releases/) for the target tag (current tags: `v0.1.0`, `v0.2.0`, `v0.3.0`, `v0.4.0`).
-9. Tag only after the intended commit has passed the required validation and deploy path.
+10. Keep concise release notes in the matching file in [docs/releases/](releases/) for the target tag and use that file as the `gh release create --notes-file` input (current tags: `v0.1.0`, `v0.2.0`, `v0.3.0`, `v0.4.0`).
+11. Tag only after the intended commit has passed the required validation and deploy path. Do not stop at a merged release PR; GitHub does not list a new release until the tag and GitHub Release exist.
 
 Public docs must keep preview status and known limitations explicit. Do not imply package-registry support or long-term API stability before the project actually offers them.
 
@@ -112,6 +134,16 @@ py -3 -m piptools compile --strip-extras --output-file=requirements-dev.txt requ
 To upgrade a single pinned package, edit the `.in` file and rerun the command above. To upgrade everything, add `--upgrade` to the `piptools compile` invocations.
 
 Lockfiles are generated on the maintainer's local platform. Cross-platform installs work because all current pinned packages publish wheels for both Windows and Linux at the resolved versions, and the only platform-conditional transitive dep (`colorama`, pulled in by `click`) is pure-Python and installs harmlessly on Linux CI.
+
+## Generated File Freshness
+
+Generated repo-owned files should be checked through the umbrella freshness command before review when a change touches CLI metadata, bootstrap data, topology fixtures, or reference fixtures:
+
+```powershell
+python -m tools repo generated-check
+```
+
+The command combines the focused freshness checks for `docs/TOOLS.md`, `frontend/test-fixtures/bootstrap-data.json`, frontend topology fixtures, and literature reference fixtures. Keep the focused commands available for targeted refresh work, but prefer the umbrella command when preparing maintenance or release-oriented changes.
 
 ## Tooling Ownership
 

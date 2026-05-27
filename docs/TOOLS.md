@@ -372,3 +372,25 @@ Use `--check` in tests/CI and `--write` when intentionally refreshing the genera
 python -m tools repo tools-docs --check
 python -m tools repo tools-docs --write
 ```
+
+### `python -m tools repo generated-check`
+
+Run freshness checks for generated repo-owned files.
+
+Umbrella check for generated surfaces that otherwise require separate commands: tools docs, bootstrap test fixture data, frontend topology fixtures, and reference fixtures. Focused commands remain available for targeted refreshes.
+
+```powershell
+python -m tools repo generated-check
+python -m tools repo generated-check --only tools-docs
+```
+
+### `python -m tools repo release-check`
+
+Check release readiness before publishing and verify publication afterward.
+
+Guards the preview-release handoff so a merged release PR is not mistaken for a published GitHub tag/release. Use `--phase pre-publish` before tagging and `--phase post-publish` after creating the GitHub Release.
+
+```powershell
+python -m tools repo release-check --version v0.4.0 --phase pre-publish
+python -m tools repo release-check --version v0.4.0 --phase post-publish
+```

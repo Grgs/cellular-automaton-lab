@@ -3,6 +3,11 @@
 This is a curated narrative changelog of completed work. Active and upcoming work
 lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
+## Unreleased
+
+- Added a repo-owned `release-check` command and maintenance playbook updates so preview releases have explicit pre-publish and post-publish gates for tags, GitHub Releases, and the latest-release pointer.
+- Added a repo-owned `generated-check` umbrella command for generated docs, bootstrap data, frontend topology fixtures, and reference fixture freshness checks.
+
 ## `v0.4.0` Preview Release Candidate
 
 - Added several periodic mixed tilings after `v0.3.0`, including Pythagorean, Herringbone, Basketweave, two 2-uniform triangle/hex/square variants, Stein 14 Pentagonal, Pentagon Crosses, and supporting sketch/validation tooling for descriptor-driven topology work.
