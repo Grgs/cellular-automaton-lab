@@ -19,6 +19,65 @@ from .types import (
     PatchRecord,
 )
 
+ExactLineKey = tuple[int, int, Fraction]
+FloatLineKey = tuple[float, float, float]
+FLOAT_LINE_KEY_PRECISION = 6
+
+
+def _normalized_exact_direction(
+    start: tuple[Fraction, Fraction],
+    end: tuple[Fraction, Fraction],
+) -> tuple[int, int] | None:
+    delta_x = end[0] - start[0]
+    delta_y = end[1] - start[1]
+    if delta_x == 0 and delta_y == 0:
+        return None
+
+    common_denominator = math.lcm(delta_x.denominator, delta_y.denominator)
+    integer_x = delta_x.numerator * (common_denominator // delta_x.denominator)
+    integer_y = delta_y.numerator * (common_denominator // delta_y.denominator)
+    divisor = math.gcd(abs(integer_x), abs(integer_y))
+    unit_x = integer_x // divisor
+    unit_y = integer_y // divisor
+    if unit_x < 0 or (unit_x == 0 and unit_y < 0):
+        unit_x = -unit_x
+        unit_y = -unit_y
+    return unit_x, unit_y
+
+
+def _exact_line_key(
+    start: tuple[Fraction, Fraction],
+    end: tuple[Fraction, Fraction],
+) -> ExactLineKey | None:
+    direction = _normalized_exact_direction(start, end)
+    if direction is None:
+        return None
+    unit_x, unit_y = direction
+    offset = (unit_x * start[1]) - (unit_y * start[0])
+    return unit_x, unit_y, offset
+
+
+def _float_line_key(
+    start: tuple[float, float],
+    end: tuple[float, float],
+) -> FloatLineKey | None:
+    delta_x = end[0] - start[0]
+    delta_y = end[1] - start[1]
+    length = math.hypot(delta_x, delta_y)
+    if math.isclose(length, 0.0, abs_tol=1e-12):
+        return None
+    unit_x = delta_x / length
+    unit_y = delta_y / length
+    if unit_x < 0 or (math.isclose(unit_x, 0.0, abs_tol=1e-12) and unit_y < 0):
+        unit_x = -unit_x
+        unit_y = -unit_y
+    offset = (unit_x * start[1]) - (unit_y * start[0])
+    return (
+        round(unit_x, FLOAT_LINE_KEY_PRECISION),
+        round(unit_y, FLOAT_LINE_KEY_PRECISION),
+        round(offset, FLOAT_LINE_KEY_PRECISION),
+    )
+
 
 def _edges_overlap_with_positive_length(
     first_left: tuple[float, float],
@@ -111,25 +170,33 @@ def build_exact_neighbors(
             neighbor_sets[neighbor_right].add(neighbor_left)
         return {cell_id: tuple(sorted(neighbors)) for cell_id, neighbors in neighbor_sets.items()}
 
-    exact_edges: list[tuple[str, tuple[Fraction, Fraction], tuple[Fraction, Fraction]]] = []
+    exact_edges_by_line: dict[
+        ExactLineKey,
+        list[tuple[str, tuple[Fraction, Fraction], tuple[Fraction, Fraction]]],
+    ] = defaultdict(list)
     for record in records:
         vertices = record["vertices"]
         for index, left in enumerate(vertices):
-            exact_edges.append((record["id"], left, vertices[(index + 1) % len(vertices)]))
+            right = vertices[(index + 1) % len(vertices)]
+            line_key = _exact_line_key(left, right)
+            if line_key is None:
+                continue
+            exact_edges_by_line[line_key].append((record["id"], left, right))
 
-    for index, (left_id, left_start, left_end) in enumerate(exact_edges):
-        for right_id, right_start, right_end in exact_edges[index + 1 :]:
-            if left_id == right_id:
-                continue
-            if not _exact_edges_overlap_with_positive_length(
-                left_start,
-                left_end,
-                right_start,
-                right_end,
-            ):
-                continue
-            neighbor_sets[left_id].add(right_id)
-            neighbor_sets[right_id].add(left_id)
+    for exact_edges in exact_edges_by_line.values():
+        for index, (left_id, left_start, left_end) in enumerate(exact_edges):
+            for right_id, right_start, right_end in exact_edges[index + 1 :]:
+                if left_id == right_id:
+                    continue
+                if not _exact_edges_overlap_with_positive_length(
+                    left_start,
+                    left_end,
+                    right_start,
+                    right_end,
+                ):
+                    continue
+                neighbor_sets[left_id].add(right_id)
+                neighbor_sets[right_id].add(left_id)
 
     return {cell_id: tuple(sorted(neighbors)) for cell_id, neighbors in neighbor_sets.items()}
 
@@ -142,24 +209,32 @@ def build_edge_neighbors(
 ) -> dict[str, tuple[str, ...]]:
     neighbor_sets: dict[str, set[str]] = {record["id"]: set() for record in records}
     if neighbor_mode == "segment_overlap":
-        edges: list[tuple[str, tuple[float, float], tuple[float, float]]] = []
+        edges_by_line: dict[
+            FloatLineKey,
+            list[tuple[str, tuple[float, float], tuple[float, float]]],
+        ] = defaultdict(list)
         for record in records:
             vertices = record["vertices"]
             for index, left in enumerate(vertices):
-                edges.append((record["id"], left, vertices[(index + 1) % len(vertices)]))
-        for index, (left_id, left_start, left_end) in enumerate(edges):
-            for right_id, right_start, right_end in edges[index + 1 :]:
-                if left_id == right_id:
+                right = vertices[(index + 1) % len(vertices)]
+                line_key = _float_line_key(left, right)
+                if line_key is None:
                     continue
-                if not _edges_overlap_with_positive_length(
-                    left_start,
-                    left_end,
-                    right_start,
-                    right_end,
-                ):
-                    continue
-                neighbor_sets[left_id].add(right_id)
-                neighbor_sets[right_id].add(left_id)
+                edges_by_line[line_key].append((record["id"], left, right))
+        for edges in edges_by_line.values():
+            for index, (left_id, left_start, left_end) in enumerate(edges):
+                for right_id, right_start, right_end in edges[index + 1 :]:
+                    if left_id == right_id:
+                        continue
+                    if not _edges_overlap_with_positive_length(
+                        left_start,
+                        left_end,
+                        right_start,
+                        right_end,
+                    ):
+                        continue
+                    neighbor_sets[left_id].add(right_id)
+                    neighbor_sets[right_id].add(left_id)
         return {cell_id: tuple(sorted(neighbors)) for cell_id, neighbors in neighbor_sets.items()}
 
     edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = defaultdict(list)
