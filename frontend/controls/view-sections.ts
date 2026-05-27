@@ -176,8 +176,27 @@ export function renderSimulationSections(
     elements: DomElements,
     viewModel: ControlsViewModel,
 ): void {
+    if (elements.speedField) {
+        elements.speedField.classList.toggle("is-speed-limited", viewModel.speedLimited);
+    }
     elements.speedInput!.value = viewModel.speedValue;
     elements.speedLabel!.textContent = viewModel.speedLabel;
+    const speedValue = Number(viewModel.speedValue);
+    const speedMin = Number(elements.speedInput?.min);
+    const speedMax = Number(elements.speedInput?.max);
+    if (elements.speedDownBtn) {
+        elements.speedDownBtn.disabled =
+            Number.isFinite(speedValue) && Number.isFinite(speedMin) && speedValue <= speedMin;
+    }
+    if (elements.speedUpBtn) {
+        elements.speedUpBtn.disabled =
+            Number.isFinite(speedValue) && Number.isFinite(speedMax) && speedValue >= speedMax;
+    }
+    if (elements.speedActualLabel) {
+        elements.speedActualLabel.hidden = !viewModel.speedActualVisible;
+        elements.speedActualLabel.textContent = viewModel.speedActualLabel;
+        elements.speedActualLabel.dataset.tone = viewModel.speedLimited ? "warning" : "info";
+    }
     if (elements.tilingFamilySelect) {
         populateTilingFamilies(
             elements,

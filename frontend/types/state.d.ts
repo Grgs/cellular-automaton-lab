@@ -27,6 +27,11 @@ export interface AppState {
     isRunning: boolean;
     generation: number;
     speed: number;
+    measuredSpeed: number | null;
+    measuredSpeedSample: {
+        generation: number;
+        timestampMs: number;
+    } | null;
     topologySpec: TopologySpec;
     patchDepth: number;
     pendingPatchDepth: number | null;

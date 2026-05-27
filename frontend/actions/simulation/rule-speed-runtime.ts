@@ -4,6 +4,7 @@ import {
     setEditorRule,
     setRuleSelectionOrigin,
 } from "../../state/simulation-state.js";
+import { MAX_SPEED, MIN_SPEED } from "../../state/constants.js";
 import { ruleRequiresSquareDimensions } from "../../rule-constraints.js";
 import type {
     ConfigSyncBody,
@@ -68,7 +69,11 @@ export function createRuleSpeedRuntime({
     }
 
     function applySpeedSelection(nextSpeed: number): void {
-        configSyncController.scheduleSpeedSync(nextSpeed);
+        const normalizedSpeed = Math.min(
+            MAX_SPEED,
+            Math.max(MIN_SPEED, Math.round(Number(nextSpeed) || MIN_SPEED)),
+        );
+        configSyncController.scheduleSpeedSync(normalizedSpeed);
         renderControlPanel();
     }
 

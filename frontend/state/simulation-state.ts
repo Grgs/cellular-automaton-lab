@@ -69,6 +69,8 @@ export function createAppState(): AppState {
         isRunning: false,
         generation: 0,
         speed: DEFAULT_SPEED,
+        measuredSpeed: null,
+        measuredSpeedSample: null,
         topologySpec: { ...DEFAULT_TOPOLOGY_SPEC },
         patchDepth: DEFAULT_PATCH_DEPTH,
         pendingPatchDepth: null,

@@ -239,7 +239,7 @@ def render_server_app_shell(
         "speed_min": _format_number(simulation_defaults["min_speed"]),
         "speed_max": _format_number(simulation_defaults["max_speed"]),
         "speed_value": speed_value,
-        "speed_label": f"{speed_value} gen/s",
+        "speed_label": f"Target {speed_value} gen/s",
         "adjacency_field_hidden": _default_adjacency_hidden_attribute(
             tiling_family=selected_tiling_family,
             adjacency_mode=selected_adjacency_mode,
@@ -268,7 +268,7 @@ def render_standalone_app_shell() -> str:
         "speed_min": "1",
         "speed_max": "30",
         "speed_value": "5",
-        "speed_label": "5 gen/s",
+        "speed_label": "Target 5 gen/s",
         "adjacency_field_hidden": "hidden",
         "adjacency_mode_options": "",
     }

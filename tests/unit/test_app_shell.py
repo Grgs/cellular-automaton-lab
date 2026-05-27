@@ -23,7 +23,7 @@ class AppShellTests(unittest.TestCase):
         self.assertIn('<div id="app-startup-error" hidden></div>', rendered)
         self.assertIn('<option value="square" selected="selected">Square</option>', rendered)
         self.assertIn('value="12"', rendered)
-        self.assertIn(">7 gen/s<", rendered)
+        self.assertIn(">Target 7 gen/s<", rendered)
         self.assertRegex(
             rendered,
             r'<select id="adjacency-mode-select">\s*'

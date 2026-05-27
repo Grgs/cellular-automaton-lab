@@ -280,8 +280,8 @@
                 </header>
 
                 <nav class="drawer-nav" aria-label="Jump to section">
-                    <a href="#sim-section" class="drawer-nav-pill">Simulation</a>
                     <a href="#topology-section" class="drawer-nav-pill">Topology</a>
+                    <a href="#sim-section" class="drawer-nav-pill">Simulation</a>
                     <a href="#patterns-section" class="drawer-nav-pill">Patterns</a>
                     <a href="#display-section" class="drawer-nav-pill">Display</a>
                     <a href="#advanced-section" class="drawer-nav-pill">Advanced</a>
@@ -322,36 +322,6 @@
                             class="selection-inspector-rows selection-inspector-advanced-rows"
                         ></div>
                     </details>
-                </section>
-
-                <section id="sim-section" class="panel-section drawer-section">
-                    <h2>Simulation</h2>
-                    <label class="top-control compact-select drawer-control drawer-rule-control">
-                        <span class="top-control-label">Rule</span>
-                        <select id="rule-select"></select>
-                    </label>
-                    <p id="rule-summary-text" class="rule-summary"></p>
-                    <details id="rule-notes-toggle" class="rule-help-toggle">
-                        <summary>Rule Notes</summary>
-                        <p id="rule-description" class="rule-description"></p>
-                    </details>
-                    <label
-                        id="speed-field"
-                        class="top-control top-compact-control drawer-control speed-control drawer-speed-control"
-                    >
-                        <span class="top-control-label">Speed</span>
-                        <input
-                            id="speed-input"
-                            class="top-manual-input"
-                            type="number"
-                            inputmode="numeric"
-                            min="__SPEED_MIN__"
-                            max="__SPEED_MAX__"
-                            step="1"
-                            value="__SPEED_VALUE__"
-                        />
-                        <span id="speed-label" class="top-slider-value">__SPEED_LABEL__</span>
-                    </label>
                 </section>
 
                 <section id="topology-section" class="panel-section drawer-section">
@@ -406,6 +376,60 @@
                                 >__PATCH_DEPTH_LABEL__</span
                             >
                         </label>
+                    </div>
+                </section>
+
+                <section id="sim-section" class="panel-section drawer-section">
+                    <h2>Simulation</h2>
+                    <label class="top-control compact-select drawer-control drawer-rule-control">
+                        <span class="top-control-label">Rule</span>
+                        <select id="rule-select"></select>
+                    </label>
+                    <p id="rule-summary-text" class="rule-summary"></p>
+                    <details id="rule-notes-toggle" class="rule-help-toggle">
+                        <summary>Rule Notes</summary>
+                        <p id="rule-description" class="rule-description"></p>
+                    </details>
+                    <div
+                        id="speed-field"
+                        class="top-control top-compact-control drawer-control speed-control drawer-speed-control"
+                    >
+                        <label class="top-control-label" for="speed-input">Target Speed</label>
+                        <div class="speed-stepper">
+                            <button
+                                id="speed-down-btn"
+                                class="speed-stepper-btn"
+                                type="button"
+                                aria-label="Decrease target speed"
+                            >
+                                -
+                            </button>
+                            <input
+                                id="speed-input"
+                                class="top-manual-input speed-stepper-input"
+                                type="number"
+                                inputmode="numeric"
+                                min="__SPEED_MIN__"
+                                max="__SPEED_MAX__"
+                                step="1"
+                                value="__SPEED_VALUE__"
+                            />
+                            <button
+                                id="speed-up-btn"
+                                class="speed-stepper-btn"
+                                type="button"
+                                aria-label="Increase target speed"
+                            >
+                                +
+                            </button>
+                        </div>
+                        <span id="speed-label" class="top-slider-value">__SPEED_LABEL__</span>
+                        <span
+                            id="speed-actual-label"
+                            class="speed-actual-label"
+                            aria-live="polite"
+                            hidden
+                        ></span>
                     </div>
                 </section>
 

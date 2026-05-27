@@ -10,6 +10,47 @@ import { setActiveRule, setTopology, setTopologySpec } from "./simulation-state.
 import type { SimulationSnapshot, TopologyPayload, TopologySpec } from "../types/domain.js";
 import type { AppState } from "../types/state.js";
 
+function nowMs(): number {
+    return typeof performance !== "undefined" && typeof performance.now === "function"
+        ? performance.now()
+        : Date.now();
+}
+
+function updateMeasuredSpeed(state: AppState, simulationState: SimulationSnapshot): void {
+    const generation = Number(simulationState.generation) || 0;
+    if (!simulationState.running) {
+        state.measuredSpeed = null;
+        state.measuredSpeedSample = null;
+        return;
+    }
+
+    const timestampMs = nowMs();
+    const previousSample = state.measuredSpeedSample;
+    if (!previousSample || generation < previousSample.generation) {
+        state.measuredSpeedSample = { generation, timestampMs };
+        state.measuredSpeed = null;
+        return;
+    }
+
+    const generationDelta = generation - previousSample.generation;
+    if (generationDelta <= 0) {
+        return;
+    }
+
+    const elapsedSeconds = (timestampMs - previousSample.timestampMs) / 1000;
+    if (elapsedSeconds <= 0) {
+        state.measuredSpeedSample = { generation, timestampMs };
+        return;
+    }
+
+    const nextMeasuredSpeed = generationDelta / elapsedSeconds;
+    state.measuredSpeed =
+        state.measuredSpeed === null
+            ? nextMeasuredSpeed
+            : state.measuredSpeed * 0.6 + nextMeasuredSpeed * 0.4;
+    state.measuredSpeedSample = { generation, timestampMs };
+}
+
 function normalizeIncomingTopology(
     simulationState: SimulationSnapshot,
     topologySpec: TopologySpec,
@@ -26,6 +67,7 @@ export function applySimulationSnapshot(
     state: AppState,
     simulationState: SimulationSnapshot,
 ): void {
+    updateMeasuredSpeed(state, simulationState);
     state.previewTopology = null;
     state.previewTopologyRevision = null;
     state.previewCellStatesById = null;

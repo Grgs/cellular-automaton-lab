@@ -16,12 +16,32 @@ export function bindSimulationControls(
 ): void {
     const cueTimeouts = new WeakMap<HTMLInputElement, BrowserTimerId>();
 
-    bindInputControl(
-        elements.speedInput,
-        "input",
-        () => Number(elements.speedInput!.value),
-        actions.changeSpeed,
-    );
+    bindConstrainedNumericControl({
+        input: elements.speedInput,
+        field: elements.speedField,
+        onInput: actions.changeSpeed,
+        cueTimeouts,
+        setTimeoutFn,
+        clearTimeoutFn,
+    });
+    bindButtonControl(elements.speedDownBtn, () => {
+        const input = elements.speedInput;
+        if (!input) {
+            return;
+        }
+        const current = Number(input.value);
+        const minimum = Number(input.min);
+        actions.changeSpeed(Math.max(minimum, (Number.isFinite(current) ? current : minimum) - 1));
+    });
+    bindButtonControl(elements.speedUpBtn, () => {
+        const input = elements.speedInput;
+        if (!input) {
+            return;
+        }
+        const current = Number(input.value);
+        const maximum = Number(input.max);
+        actions.changeSpeed(Math.min(maximum, (Number.isFinite(current) ? current : maximum) + 1));
+    });
     bindInputControl(
         elements.tilingFamilySelect,
         "change",
