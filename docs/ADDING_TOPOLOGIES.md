@@ -152,6 +152,18 @@ py -3 -m unittest -q tests.api.test_api_state_and_rules
 npm run test:e2e:playwright:server
 ```
 
+## Periodic Face Tilings With Skewed Or Non-Edge-To-Edge Lattices
+
+The descriptor's lattice is `(unit_width, 0)` along x and a second basis vector along y. Two ways to express the second basis:
+
+- **`row_offset_x`** (default semantic) - only odd rows shift by `row_offset_x`. The lattice is a 2-row brick stack. Used by `cairo-pentagonal`, `trihexagonal-3-6-3-6`, and any tiling where `row_offset_x == unit_width / 2` (so the cumulative shift modulo `unit_width` is zero after 2 rows).
+
+- **`lattice_skew_x`** (set to opt in) - every row shifts cumulatively by `k * lattice_skew_x`. The lattice is a genuine skewed parallelogram. Used by `stein-14-pentagonal`. Mutually exclusive with `row_offset_x` at descriptor level (set one or the other; never both).
+
+When choosing the rotation: orient the tiling so one basis vector becomes horizontal (`(unit_width, 0)`). The other vector becomes `(lattice_skew_x, unit_height)`. The sign of `lattice_skew_x` follows the direction of the rotated vector (negative means rows shift leftward as y grows). The unit cell's vertices DO NOT need to fit inside a rectangle - they form a parallelogram, and `min_x`/`max_x` should describe the actual tile extent (which may exceed `unit_width`).
+
+**Non-edge-to-edge tilings** (T-junctions where one tile's vertex sits on the midpoint of another tile's edge): the periodic-face neighbor builder detects T-junction adjacency automatically since the post-Stein-14 fix. No descriptor flag is needed for that. But if the tiling combines T-junctions with **irrational coordinates** (Stein-14, Stein-15, some Reinhardt/Rice pentagons), the topology validator's strict `1e-7` overlap tolerance can flag spurious overlaps from float-precision drift between the stored vertex and the geometric midpoint. Add the geometry id to `_NON_EDGE_TO_EDGE_IRRATIONAL_GEOMETRIES` in `backend/simulation/topology_validation.py` to opt into a looser `1e-3` tolerance, and note the looser tolerance in `docs/TILING_KNOWN_DEVIATIONS.md`.
+
 ## Common Pitfalls
 
 - Do not add catalog metadata without a builder and render path.
@@ -160,6 +172,7 @@ npm run test:e2e:playwright:server
 - Do not refresh generated fixtures by hand. Use the repo-owned regeneration tools and review the resulting diff.
 - Do not forget the picker thumbnail. Without an entry in `tiling-preview-data.ts` the tiling silently falls back to a generic square preview in the picker menu.
 - For periodic face tilings, the face template data belongs in `periodic_face_patterns.json`, not in `periodic_face_tilings.py`. Adding only the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` without a JSON entry will produce an empty or broken topology at runtime.
+- Do not set both `row_offset_x` and `lattice_skew_x` in the same descriptor; they describe mutually exclusive lattice semantics. See the "Periodic Face Tilings With Skewed Or Non-Edge-To-Edge Lattices" section above.
 - For Laves (dual) tilings, cross-link the primal tiling's reference spec with `expected_dual_geometry` so the duality relationship is verified automatically.
 - Python files must pass `ruff format` or the pre-commit hook will reject the commit. Run `py -3 -m ruff format <file>` before staging if you write or generate Python with non-standard formatting.
 
