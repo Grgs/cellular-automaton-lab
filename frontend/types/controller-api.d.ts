@@ -2,8 +2,10 @@ import type {
     AppBootstrapData,
     CellIdentifier,
     CellStateUpdate,
+    CompareRequest,
     PersistedSimulationSnapshotV5,
     RulesResponse,
+    SeedComparisonResult,
     SimulationSnapshot,
     TopologySpec,
 } from "./domain.js";
@@ -70,6 +72,7 @@ export interface SimulationBackend {
     toggleCell(cell: CellTargetRequest): Promise<SimulationSnapshot>;
     setCell(cell: CellTargetRequest, state: number): Promise<SimulationSnapshot>;
     setCells(cells: CellUpdateRequest[]): Promise<SimulationSnapshot>;
+    compareSeed(request: CompareRequest): Promise<SeedComparisonResult>;
 }
 
 export interface SimulationStatePersistence {

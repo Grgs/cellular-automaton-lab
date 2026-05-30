@@ -214,6 +214,13 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
             const response = await request("/api/cells/set-many", { cells });
             return requireSnapshot(response.snapshot);
         },
+        async compareSeed(compareRequest) {
+            const response = await request("/api/compare", compareRequest);
+            if (!response.comparison) {
+                throw new Error("Standalone runtime did not return a comparison result.");
+            }
+            return response.comparison;
+        },
     };
 
     return {

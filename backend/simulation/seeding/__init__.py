@@ -20,6 +20,11 @@ from backend.simulation.seeding.metrics import (
     hamming,
     population,
 )
+from backend.simulation.seeding.request import (
+    CompareRequest,
+    parse_compare_request,
+    run_compare_request,
+)
 from backend.simulation.seeding.traversal import (
     DEFAULT_TRAVERSAL,
     TRAVERSALS,
@@ -32,6 +37,7 @@ from backend.simulation.seeding.traversal import (
 
 __all__ = [
     "DEFAULT_TRAVERSAL",
+    "CompareRequest",
     "SeedComparison",
     "TRAVERSALS",
     "TopologyComparisonResult",
@@ -43,6 +49,8 @@ __all__ = [
     "hamming",
     "normalize_bits",
     "paint_bits",
+    "parse_compare_request",
     "population",
     "row_major_order",
+    "run_compare_request",
 ]

@@ -246,6 +246,17 @@ Browser UI
 - [frontend/topology.ts](../frontend/topology.ts)
   Topology helpers like `indexTopology(...)`, `findTopologyCellById(...)`
 
+### Compare mode
+
+A self-contained overlay that runs one seed under one rule across many tilings and renders the result. It is mounted once from [frontend/app-runtime.ts](../frontend/app-runtime.ts) and talks to the backend through `SimulationBackend.compareSeed(...)` (HTTP `POST /api/compare` on the server, the `/api/compare` worker command in standalone).
+
+- [frontend/compare/compare-panel.ts](../frontend/compare/compare-panel.ts)
+  `mountComparePanel(...)`: the launcher button, modal form (rule/seed/traversal/steps/tilings), run orchestration, and results rendering.
+- [frontend/compare/compare-charts.ts](../frontend/compare/compare-charts.ts)
+  Pure layout helpers plus the SVG phase portrait (`live(t)/live(0)` per tiling) and the end-state classification grid.
+- [frontend/compare/compare-styles.ts](../frontend/compare/compare-styles.ts) and [frontend/compare/compare-options.ts](../frontend/compare/compare-options.ts)
+  Injected stylesheet and the traversal option list.
+
 ## Backend Map
 
 ### Flask host and request layer
@@ -256,7 +267,7 @@ Browser UI
   Shared shell rendering for the Flask wrapper and standalone shell generation.
 - [backend/web/routes.py](../backend/web/routes.py)
   Thin Flask routes and JSON response helpers.
-  Main endpoints: `get_state()`, `get_rules()`, `get_bootstrap()`, `start()`, `pause()`, `resume()`, `step()`, `reset()`, `update_config()`, `toggle_cell()`, `set_cell()`, `set_cells()`
+  Main endpoints: `get_state()`, `get_rules()`, `get_bootstrap()`, `start()`, `pause()`, `resume()`, `step()`, `reset()`, `update_config()`, `toggle_cell()`, `set_cell()`, `set_cells()`, `compare()` (`POST /api/compare`, runs a seed sweep without mutating simulation state)
 - [backend/web/state_actions.py](../backend/web/state_actions.py)
   `StateActionService`
 - [backend/web/requests.py](../backend/web/requests.py)

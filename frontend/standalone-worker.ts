@@ -4,6 +4,7 @@ import type {
     PersistedSimulationSnapshotV5,
     RuleDefinition,
     RulesResponse,
+    SeedComparisonResult,
     SimulationSnapshot,
     TopologyPayload,
     TopologySpec,
@@ -315,6 +316,25 @@ function optionalString(value: unknown): string | undefined {
     return typeof value === "string" ? value : undefined;
 }
 
+function optionalComparison(value: unknown, context: string): SeedComparisonResult | undefined {
+    if (value === undefined) {
+        return undefined;
+    }
+    if (!isPlainObject(value) || !Array.isArray(value.results)) {
+        throw new Error(`${context} returned an invalid comparison payload.`);
+    }
+    return {
+        rule_name: String(value.rule_name ?? ""),
+        seed: String(value.seed ?? ""),
+        seed_bits: Number(value.seed_bits ?? 0),
+        traversal: String(value.traversal ?? ""),
+        steps: Number(value.steps ?? 0),
+        grid_size: Number(value.grid_size ?? 0),
+        degenerate: Boolean(value.degenerate),
+        results: value.results as SeedComparisonResult["results"],
+    };
+}
+
 function parseInitResponse(raw: string): {
     snapshot?: SimulationSnapshot;
     persistedSnapshot: PersistedSimulationSnapshotV5 | null;
@@ -339,6 +359,7 @@ function parseRequestResponse(raw: string): {
     error?: string;
     snapshot?: SimulationSnapshot;
     rules?: RulesResponse["rules"];
+    comparison?: SeedComparisonResult;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 } {
     const payload = parseRuntimeJson(raw, "Standalone request");
@@ -347,6 +368,7 @@ function parseRequestResponse(raw: string): {
         error?: string;
         snapshot?: SimulationSnapshot;
         rules?: RulesResponse["rules"];
+        comparison?: SeedComparisonResult;
         persistedSnapshot?: PersistedSimulationSnapshotV5;
     } = {
         ok: requireBoolean(payload.ok, "Standalone request", "ok"),
@@ -362,6 +384,10 @@ function parseRequestResponse(raw: string): {
     const rules = optionalRules(payload.rules, "Standalone request");
     if (rules !== undefined) {
         result.rules = rules;
+    }
+    const comparison = optionalComparison(payload.comparison, "Standalone request");
+    if (comparison !== undefined) {
+        result.comparison = comparison;
     }
     const persistedSnapshot = optionalPersistedSnapshot(
         payload.persisted_snapshot,
@@ -471,7 +497,9 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             });
             return;
         }
-        syncSnapshotState(payload.snapshot);
+        if (payload.snapshot !== undefined) {
+            syncSnapshotState(payload.snapshot);
+        }
         scheduleTickLoop();
         postMessage({
             type: "response",
@@ -479,6 +507,7 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             ok: true,
             ...(payload.snapshot === undefined ? {} : { snapshot: payload.snapshot }),
             ...(payload.rules === undefined ? {} : { rules: payload.rules }),
+            ...(payload.comparison === undefined ? {} : { comparison: payload.comparison }),
             ...(payload.persistedSnapshot === undefined
                 ? {}
                 : { persistedSnapshot: payload.persistedSnapshot }),

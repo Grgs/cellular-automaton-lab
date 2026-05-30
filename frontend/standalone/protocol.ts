@@ -1,6 +1,8 @@
 import type {
+    CompareRequest,
     PersistedSimulationSnapshotV5,
     RulesResponse,
+    SeedComparisonResult,
     SimulationSnapshot,
 } from "../types/domain.js";
 import type {
@@ -15,6 +17,7 @@ import type {
 export type StandaloneCommandPath =
     | "/api/state"
     | "/api/rules"
+    | "/api/compare"
     | "/api/cells/toggle"
     | "/api/cells/set"
     | "/api/cells/set-many"
@@ -35,7 +38,8 @@ export type StandaloneRequestPayload =
     | ConfigSyncBody
     | CellTargetRequest
     | CellUpdateRequest
-    | CellUpdatesRequest;
+    | CellUpdatesRequest
+    | CompareRequest;
 
 export interface StandaloneRequestMessage {
     type: "request";
@@ -62,6 +66,7 @@ export interface StandaloneSuccessResponse {
     ok: true;
     snapshot?: SimulationSnapshot;
     rules?: RulesResponse["rules"];
+    comparison?: SeedComparisonResult;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 }
 

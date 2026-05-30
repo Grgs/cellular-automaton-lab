@@ -16,6 +16,7 @@ from backend.payload_types import (
 from backend.rules import RuleRegistry
 from backend.frontend_assets import FrontendAssetManifest
 from backend.simulation.coordinator import SimulationCoordinator
+from backend.simulation.seeding import run_compare_request
 from backend.simulation.service import SimulationOperationError
 from backend.web.state_actions import StateActionService
 from backend.web.requests import (
@@ -126,6 +127,16 @@ def get_meta() -> Response:
 @api_bp.get("/bootstrap")
 def get_bootstrap() -> Response:
     return jsonify(build_bootstrap_payload(current_app.config["SERVER_META"]))
+
+
+@api_bp.post("/compare")
+def compare() -> JsonRouteResult:
+    payload = get_payload(request)
+    try:
+        comparison = run_compare_request(payload)
+    except (RequestValidationError, ValueError) as exc:
+        return json_error(str(exc))
+    return jsonify({"comparison": comparison})
 
 
 @api_bp.post("/control/start")

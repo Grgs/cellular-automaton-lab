@@ -178,6 +178,45 @@ export interface RulesResponse {
     rules: RuleDefinition[];
 }
 
+export interface CompareRequest {
+    seed: string;
+    rule?: string;
+    traversal?: string;
+    steps?: number;
+    grid_size?: number;
+    geometries?: readonly string[];
+}
+
+export interface TopologyComparisonResultPayload {
+    geometry: string;
+    tiling_family: string;
+    family: string;
+    cell_count: number;
+    seed_bits: number;
+    seed_cells: number;
+    initial_population: number;
+    final_population: number;
+    normalized_population: number;
+    classification: string;
+    period: number | null;
+    steps_run: number;
+    extinction_step: number | null;
+    note: string | null;
+    population: number[];
+    change_rate: number[];
+}
+
+export interface SeedComparisonResult {
+    rule_name: string;
+    seed: string;
+    seed_bits: number;
+    traversal: string;
+    steps: number;
+    grid_size: number;
+    degenerate: boolean;
+    results: TopologyComparisonResultPayload[];
+}
+
 export interface CellIdentifier {
     id: string;
 }
