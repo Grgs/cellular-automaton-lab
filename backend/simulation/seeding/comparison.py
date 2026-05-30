@@ -33,6 +33,7 @@ from backend.simulation.topology_catalog import (
     geometry_uses_patch_depth,
     get_topology_variant_for_geometry,
     minimum_grid_dimension_for_geometry,
+    topology_spec_payload,
 )
 
 # Default sweep parameters. Kept modest so a full 46-tiling sweep finishes fast.
@@ -63,6 +64,11 @@ class TopologyComparisonResult:
     steps_run: int
     extinction_step: int | None
     note: str | None = None
+    # Populated only when compare_seed(..., include_states=True). These let a
+    # caller reconstruct the begin/end board (e.g. an "open in board" link).
+    topology_spec: dict[str, Any] | None = None
+    initial_cells_by_id: dict[str, int] | None = None
+    final_cells_by_id: dict[str, int] | None = None
 
     @property
     def initial_population(self) -> int:
@@ -79,7 +85,7 @@ class TopologyComparisonResult:
         return self.final_population / self.initial_population
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload: dict[str, Any] = {
             "geometry": self.geometry,
             "tiling_family": self.tiling_family,
             "family": self.family,
@@ -97,6 +103,13 @@ class TopologyComparisonResult:
             "population": self.population,
             "change_rate": self.change_rate,
         }
+        if self.topology_spec is not None:
+            payload["topology_spec"] = self.topology_spec
+        if self.initial_cells_by_id is not None:
+            payload["initial_cells_by_id"] = self.initial_cells_by_id
+        if self.final_cells_by_id is not None:
+            payload["final_cells_by_id"] = self.final_cells_by_id
+        return payload
 
 
 @dataclass
@@ -157,6 +170,7 @@ def _run_single(
     steps: int,
     grid_size: int,
     live_state: int,
+    include_states: bool,
 ) -> TopologyComparisonResult:
     variant = get_topology_variant_for_geometry(geometry)
     width, height, patch_depth = _board_size_for(geometry, grid_size)
@@ -178,11 +192,13 @@ def _run_single(
     period: int | None = None
     steps_run = 0
     current = board
+    final_board = board
     divisor = max(1, frame.cell_count)
 
     for step in range(1, steps + 1):
         nxt = engine.step_board(current, rule)
         steps_run = step
+        final_board = nxt
         populations.append(population(nxt.cell_states))
         change_rates.append(hamming(current.cell_states, nxt.cell_states) / divisor)
         key = tuple(nxt.cell_states)
@@ -192,7 +208,7 @@ def _run_single(
         seen[key] = step
         current = nxt
 
-    return TopologyComparisonResult(
+    result = TopologyComparisonResult(
         geometry=geometry,
         tiling_family=variant.tiling_family,
         family=variant.family,
@@ -207,6 +223,13 @@ def _run_single(
         extinction_step=first_extinction_step(populations),
         note=note,
     )
+    if include_states:
+        result.topology_spec = dict(
+            topology_spec_payload(geometry, width=width, height=height, patch_depth=patch_depth)
+        )
+        result.initial_cells_by_id = dict(cells_by_id)
+        result.final_cells_by_id = final_board.states_by_id(omit_zero=True)
+    return result
 
 
 def compare_seed(
@@ -218,6 +241,7 @@ def compare_seed(
     steps: int = DEFAULT_STEPS,
     grid_size: int = DEFAULT_GRID_SIZE,
     live_state: int = 1,
+    include_states: bool = False,
 ) -> SeedComparison:
     """Sweep one seed under one rule across ``geometries`` (all tilings by default).
 
@@ -255,6 +279,7 @@ def compare_seed(
                 steps=steps,
                 grid_size=grid_size,
                 live_state=live_state,
+                include_states=include_states,
             )
         except Exception as error:  # noqa: BLE001 - one bad tiling must not abort the sweep
             variant = get_topology_variant_for_geometry(geometry)  # geometry validated above

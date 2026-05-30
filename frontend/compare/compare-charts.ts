@@ -184,6 +184,8 @@ export function buildPhasePortraitSvg(
 
 export interface ComparePanelCallbacks {
     onRowHover?: (geometry: string | null) => void;
+    /** Optional per-row action cell (e.g. open/share links). Omitted when it returns null. */
+    renderRowActions?: (result: TopologyComparisonResultPayload) => Node | null;
 }
 
 /** Build the classification grid: rows = tilings, coloured by end-state class. */
@@ -194,6 +196,7 @@ export function buildClassificationGrid(
     const rows = [...comparison.results].sort(
         (a, b) => a.family.localeCompare(b.family) || a.geometry.localeCompare(b.geometry),
     );
+    const withActions = Boolean(callbacks.renderRowActions);
 
     const table = document.createElement("table");
     table.className = "compare-grid";
@@ -201,7 +204,9 @@ export function buildClassificationGrid(
     const head = document.createElement("thead");
     head.innerHTML =
         "<tr><th>Tiling</th><th>Family</th><th>Cells</th><th>live₀→liveₙ</th>" +
-        "<th>norm</th><th>End state</th></tr>";
+        "<th>norm</th><th>End state</th>" +
+        (withActions ? "<th>Open / share</th>" : "") +
+        "</tr>";
     table.append(head);
 
     const body = document.createElement("tbody");
@@ -223,6 +228,15 @@ export function buildClassificationGrid(
             `<td>${result.normalized_population.toFixed(2)}</td>` +
             `<td><span class="compare-chip" style="--chip:${style.color}">` +
             `${escapeHtml(style.label)}</span>${escapeHtml(note)}</td>`;
+        if (withActions) {
+            const actionsCell = document.createElement("td");
+            actionsCell.className = "compare-grid__actions";
+            const actions = callbacks.renderRowActions?.(result);
+            if (actions) {
+                actionsCell.append(actions);
+            }
+            row.append(actionsCell);
+        }
         body.append(row);
     }
     table.append(body);

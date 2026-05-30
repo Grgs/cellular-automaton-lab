@@ -121,6 +121,26 @@ class CompareSeedTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             compare_seed(seed="111", geometries=("square",), traversal="spiral")
 
+    def test_include_states_returns_reconstructable_begin_and_end(self) -> None:
+        comparison = compare_seed(
+            seed="0111110", geometries=("square",), steps=8, include_states=True
+        )
+        result = comparison.results[0]
+        self.assertIsNotNone(result.topology_spec)
+        assert result.topology_spec is not None
+        self.assertEqual(result.topology_spec["tiling_family"], "square")
+        self.assertGreater(result.topology_spec["width"], 0)
+        self.assertGreater(result.topology_spec["height"], 0)
+        self.assertIsNotNone(result.initial_cells_by_id)
+        assert result.initial_cells_by_id is not None
+        self.assertEqual(len(result.initial_cells_by_id), result.seed_cells)
+        self.assertIsNotNone(result.final_cells_by_id)
+
+    def test_states_omitted_by_default(self) -> None:
+        result = compare_seed(seed="111", geometries=("square",), steps=3).results[0]
+        self.assertIsNone(result.topology_spec)
+        self.assertNotIn("topology_spec", result.to_dict())
+
 
 class MetricsTests(unittest.TestCase):
     def test_population_counts_non_zero_states(self) -> None:

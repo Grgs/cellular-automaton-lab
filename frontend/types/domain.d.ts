@@ -185,6 +185,7 @@ export interface CompareRequest {
     steps?: number;
     grid_size?: number;
     geometries?: readonly string[];
+    include_states?: boolean;
 }
 
 export interface TopologyComparisonResultPayload {
@@ -204,6 +205,11 @@ export interface TopologyComparisonResultPayload {
     note: string | null;
     population: number[];
     change_rate: number[];
+    // Present only when the request set include_states: true. Together they
+    // reconstruct the begin/end board for an "open in board" / share link.
+    topology_spec?: TopologySpec;
+    initial_cells_by_id?: Record<string, number>;
+    final_cells_by_id?: Record<string, number>;
 }
 
 export interface SeedComparisonResult {
