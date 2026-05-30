@@ -389,6 +389,17 @@ Browser UI
   - [backend/rules/whirlpool.py](../backend/rules/whirlpool.py)
   - [backend/rules/penrose_greenberg_hastings.py](../backend/rules/penrose_greenberg_hastings.py)
 
+### Seed comparison
+
+[backend/simulation/seeding](../backend/simulation/seeding) maps one seed onto many topologies so the same rule can be compared across tilings. It is headless and reuses the cached `TopologyFrame`, so it works without Flask.
+
+- [backend/simulation/seeding/traversal.py](../backend/simulation/seeding/traversal.py)
+  Canonical cell-id orderings (`bfs_ring_order`, `row_major_order`) plus `paint_bits`. The seed bit-string is walked in traversal order, preserving live-cell count across tilings.
+- [backend/simulation/seeding/metrics.py](../backend/simulation/seeding/metrics.py)
+  Rule-agnostic measurement: `population`, `hamming` change rate, and end-state `classify` (extinct / still-life / oscillator / unsettled).
+- [backend/simulation/seeding/comparison.py](../backend/simulation/seeding/comparison.py)
+  `compare_seed(...)` sweeps a seed across geometries, detects cycles, isolates per-tiling errors, and flags degenerate seeds.
+
 ## Tests And Tooling
 
 ### Tests
@@ -427,7 +438,9 @@ Browser UI
 - [tools/dev_processes.py](../tools/dev_processes.py)
   Repo-scoped process inspection and cleanup helper for the known browser/server helper processes started from this repo.
 - [tools/commands/tilings.py](../tools/commands/tilings.py)
-  Public tilings group wiring for validation, verification, reporting, previews, sketching, and aperiodic scaffolding.
+  Public tilings group wiring for validation, verification, reporting, previews, sketching, aperiodic scaffolding, and seed comparison.
+- [tools/compare_seed.py](../tools/compare_seed.py)
+  Backs `python -m tools tilings compare`: runs a seed under one rule across many tilings and reports population, end-state classification, and the degenerate-seed guard as a table or JSON.
 - [tools/validate_tilings.py](../tools/validate_tilings.py)
   Manifest-wide geometric sanity checker for catalog tilings.
 - [tools/verify_reference_tilings.py](../tools/verify_reference_tilings.py)
