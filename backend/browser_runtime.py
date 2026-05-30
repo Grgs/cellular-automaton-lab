@@ -19,6 +19,7 @@ from backend.contract_validation import (
 from backend.payload_types import PersistedSimulationSnapshotInput
 from backend.rules import RuleRegistry
 from backend.simulation.persistence import SimulationStateStore
+from backend.simulation.seeding import run_compare_request
 from backend.simulation.service import SimulationOperationError, SimulationService
 from backend.simulation.state_restore import SimulationStateRestorer
 
@@ -101,6 +102,8 @@ class BrowserSimulationRuntime:
                 return self.get_state_response()
             if path == "/api/rules":
                 return self.get_rules_response()
+            if path == "/api/compare":
+                return json.dumps({"ok": True, "comparison": run_compare_request(request_payload)})
             if path == "/api/control/start":
                 self.service.start()
             elif path == "/api/control/pause":

@@ -76,6 +76,7 @@ Main API endpoints:
 - `GET /api/topology`
 - `GET /api/rules`
 - `GET /api/meta`
+- `POST /api/compare`
 - `POST /api/control/start`
 - `POST /api/control/pause`
 - `POST /api/control/resume`
@@ -85,6 +86,8 @@ Main API endpoints:
 - `POST /api/cells/toggle`
 - `POST /api/cells/set`
 - `POST /api/cells/set-many`
+
+`POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. The standalone runtime exposes the same operation as an `/api/compare` worker command, sharing the request parser, so the compare-mode UI works identically in server and standalone hosts.
 
 ### Coordinator And Runtime
 

@@ -28,6 +28,7 @@ It is intended for comparing how familiar automata behave on different local nei
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
+- compare-mode overlay that runs one seed across many tilings and charts how topology shapes the outcome (also scriptable via `python -m tools tilings compare`)
 - sparse pattern persistence keyed by stable topology cell IDs
 - TypeScript frontend in `frontend/` with Vitest unit tests and Playwright browser coverage
 

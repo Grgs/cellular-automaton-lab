@@ -1,4 +1,10 @@
-import type { CellIdentifier, RulesResponse, SimulationSnapshot } from "./types/domain.js";
+import type {
+    CellIdentifier,
+    CompareRequest,
+    RulesResponse,
+    SeedComparisonResult,
+    SimulationSnapshot,
+} from "./types/domain.js";
 import type {
     ConfigSyncBody,
     EmptyControlCommandPath,
@@ -81,6 +87,14 @@ export function postControl(
     });
 }
 
+export async function compareSeedRequest(body: CompareRequest): Promise<SeedComparisonResult> {
+    const response = await request<{ comparison: SeedComparisonResult }>("/api/compare", {
+        method: "POST",
+        body: JSON.stringify(body),
+    });
+    return response.comparison;
+}
+
 export function createHttpSimulationBackend(): SimulationBackend {
     return {
         getState: fetchState,
@@ -90,5 +104,6 @@ export function createHttpSimulationBackend(): SimulationBackend {
         toggleCell: toggleCellRequest,
         setCell: setCellRequest,
         setCells: setCellsRequest,
+        compareSeed: compareSeedRequest,
     };
 }
