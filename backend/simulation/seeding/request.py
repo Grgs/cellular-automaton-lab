@@ -33,6 +33,7 @@ class CompareRequest:
     steps: int
     grid_size: int
     geometries: tuple[str, ...] | None
+    include_states: bool
 
 
 def _bounded_int(value: Any, *, default: int, low: int, high: int, name: str) -> int:
@@ -96,6 +97,7 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
         steps=steps,
         grid_size=grid_size,
         geometries=geometries,
+        include_states=bool(payload.get("include_states", False)),
     )
 
 
@@ -109,5 +111,6 @@ def run_compare_request(payload: Mapping[str, Any]) -> dict[str, Any]:
         traversal=request.traversal,
         steps=request.steps,
         grid_size=request.grid_size,
+        include_states=request.include_states,
     )
     return comparison.to_dict()

@@ -124,4 +124,16 @@ export const COMPARE_PANEL_STYLES = `
 .compare-grid tbody tr:hover { background: var(--btn-soft-bg, rgba(0, 0, 0, 0.05)); }
 .compare-grid__name { font-family: var(--mono, monospace); }
 .compare-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; color: #fff; background: var(--chip, #6d756f); font-size: 11px; }
+.compare-grid__actions { white-space: nowrap; }
+.compare-row-actions { display: inline-flex; gap: 4px; }
+.compare-link {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    color: var(--ink, #1f2430);
+    cursor: pointer;
+}
+.compare-link:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
 `;

@@ -1,8 +1,44 @@
-import type { AppBootstrapData, CompareRequest, RuleDefinition } from "../types/domain.js";
+import type {
+    AppBootstrapData,
+    CompareRequest,
+    PatternPayload,
+    RuleDefinition,
+    SeedComparisonResult,
+    TopologyComparisonResultPayload,
+} from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import { buildShareUrl } from "../share-link.js";
 import { TRAVERSAL_OPTIONS } from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
 import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
+
+// Mirrors the pattern schema in pattern-io.ts / parsers/pattern.ts; reused so a
+// begin/end state can be encoded as a shareable board link.
+const PATTERN_FORMAT = "cellular-automaton-lab-pattern";
+const PATTERN_VERSION = 5;
+
+/** Build a shareable board pattern for a result's begin or end state, if states were returned. */
+function buildStatePattern(
+    comparison: SeedComparisonResult,
+    result: TopologyComparisonResultPayload,
+    phase: "begin" | "end",
+): PatternPayload | null {
+    const cells = phase === "begin" ? result.initial_cells_by_id : result.final_cells_by_id;
+    if (!result.topology_spec || cells === undefined) {
+        return null;
+    }
+    return {
+        format: PATTERN_FORMAT,
+        version: PATTERN_VERSION,
+        topology_spec: result.topology_spec,
+        rule: comparison.rule_name,
+        cells_by_id: cells,
+    };
+}
+
+function openPatternInTab(pattern: PatternPayload): void {
+    window.open(buildShareUrl(pattern, window.location.href), "_blank", "noopener");
+}
 
 interface MountComparePanelOptions {
     backend: SimulationBackend;
@@ -320,6 +356,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             steps: clampNumber(stepsInput.value, 1, 500, 50),
             grid_size: clampNumber(gridInput.value, 2, 64, 16),
             geometries: [...selected],
+            include_states: true,
         };
 
         try {
@@ -351,8 +388,65 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             }),
             buildPhasePortraitSvg(comparison),
             el("div", { class: "compare-section-title", textContent: "End-state classification" }),
-            buildClassificationGrid(comparison, { onRowHover: highlightGeometry }),
+            buildClassificationGrid(comparison, {
+                onRowHover: highlightGeometry,
+                renderRowActions: (result) => renderRowActions(comparison, result),
+            }),
         );
+    }
+
+    function renderRowActions(
+        comparison: SeedComparisonResult,
+        result: TopologyComparisonResultPayload,
+    ): Node | null {
+        const begin = buildStatePattern(comparison, result, "begin");
+        if (!begin) {
+            return null;
+        }
+        const end = buildStatePattern(comparison, result, "end");
+        const wrap = el("div", { class: "compare-row-actions" });
+        wrap.append(
+            linkButton("begin ↗", "Open the seed on this tiling", () => openPatternInTab(begin)),
+        );
+        if (end) {
+            wrap.append(
+                linkButton("end ↗", "Open the final state on this tiling", () =>
+                    openPatternInTab(end),
+                ),
+            );
+        }
+        wrap.append(copyLinkButton(end ?? begin));
+        return wrap;
+    }
+
+    function linkButton(label: string, title: string, onClick: () => void): HTMLButtonElement {
+        const button = el("button", { class: "compare-link", type: "button", title }, [label]);
+        button.addEventListener("click", onClick);
+        return button;
+    }
+
+    function copyLinkButton(pattern: PatternPayload): HTMLButtonElement {
+        const button = el(
+            "button",
+            { class: "compare-link", type: "button", title: "Copy a shareable link to this state" },
+            ["⧉ link"],
+        );
+        button.addEventListener("click", () => {
+            const url = buildShareUrl(pattern, window.location.href);
+            const clipboard = navigator.clipboard;
+            if (!clipboard) {
+                window.prompt("Copy this share link:", url);
+                return;
+            }
+            void clipboard.writeText(url).then(
+                () => {
+                    button.textContent = "copied";
+                    window.setTimeout(() => (button.textContent = "⧉ link"), 1200);
+                },
+                () => window.prompt("Copy this share link:", url),
+            );
+        });
+        return button;
     }
 
     function open(): void {

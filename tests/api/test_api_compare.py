@@ -48,6 +48,32 @@ class ApiCompareTests(ApiTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("error", response.get_json())
 
+    def test_compare_include_states_returns_board_payloads(self) -> None:
+        response = self.client.post(
+            "/api/compare",
+            json={
+                "seed": "0111110",
+                "geometries": ["square"],
+                "steps": 8,
+                "include_states": True,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        result = response.get_json()["comparison"]["results"][0]
+        self.assertIn("topology_spec", result)
+        self.assertIn("initial_cells_by_id", result)
+        self.assertIn("final_cells_by_id", result)
+        self.assertEqual(result["topology_spec"]["tiling_family"], "square")
+        self.assertGreater(result["topology_spec"]["width"], 0)
+
+    def test_compare_omits_states_by_default(self) -> None:
+        response = self.client.post(
+            "/api/compare",
+            json={"seed": "111", "geometries": ["square"], "steps": 3},
+        )
+        result = response.get_json()["comparison"]["results"][0]
+        self.assertNotIn("topology_spec", result)
+
     def test_compare_rejects_out_of_range_steps(self) -> None:
         response = self.client.post(
             "/api/compare",

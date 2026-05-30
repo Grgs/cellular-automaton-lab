@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { mountComparePanel } from "./compare-panel.js";
+import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type {
     AppBootstrapData,
     SeedComparisonResult,
@@ -54,7 +54,7 @@ function comparisonResult(): SeedComparisonResult {
         results: [
             {
                 geometry: "square",
-                tiling_family: "Square",
+                tiling_family: "square",
                 family: "regular",
                 cell_count: 100,
                 seed_bits: 3,
@@ -69,6 +69,16 @@ function comparisonResult(): SeedComparisonResult {
                 note: null,
                 population: [3, 4, 4],
                 change_rate: [0.04, 0],
+                topology_spec: {
+                    tiling_family: "square",
+                    adjacency_mode: "edge",
+                    sizing_mode: "grid",
+                    width: 16,
+                    height: 16,
+                    patch_depth: 0,
+                },
+                initial_cells_by_id: { "c:1:1": 1, "c:2:1": 1, "c:1:2": 1 },
+                final_cells_by_id: { "c:1:1": 1, "c:2:1": 1 },
             },
         ],
     };
@@ -104,12 +114,19 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
 }
 
 describe("mountComparePanel", () => {
+    beforeEach(() => {
+        installFrontendGlobals();
+        vi.resetModules();
+    });
+
     afterEach(() => {
         document.body.innerHTML = "";
         document.getElementById("compare-panel-styles")?.remove();
+        vi.restoreAllMocks();
     });
 
-    it("mounts a toggle and a hidden dialog without throwing", () => {
+    it("mounts a toggle and a hidden dialog without throwing", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const handle = mountComparePanel({ backend, bootstrapData: bootstrapData() });
         const toggle = document.querySelector(".compare-toggle");
@@ -123,6 +140,7 @@ describe("mountComparePanel", () => {
     });
 
     it("runs a comparison and renders the portrait and grid", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
@@ -137,5 +155,28 @@ describe("mountComparePanel", () => {
         const request = compareSeed.mock.calls.at(0)?.[0];
         expect(request?.geometries).toContain("square");
         expect(request?.traversal).toBe("bfs");
+        expect(request?.include_states).toBe(true);
+    });
+
+    it("renders open/share links and opens a share URL in a new tab", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-row-actions")).not.toBeNull();
+        });
+        const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
+        const labels = buttons.map((button) => button.textContent);
+        expect(labels).toEqual(["begin ↗", "end ↗", "⧉ link"]);
+
+        buttons[0]?.click();
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        const openedUrl = String(openSpy.mock.calls.at(0)?.[0] ?? "");
+        expect(openedUrl).toContain("#share=v1.");
     });
 });
