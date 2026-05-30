@@ -107,6 +107,18 @@ Creates the generator skeleton, reference spec, tests, and registry/manifest ins
 python -m tools tilings scaffold-aperiodic --family-id widget-monotile --label "Widget Monotile" --kind widget --source-url https://example.org/widget
 ```
 
+### `python -m tools tilings compare`
+
+Compare one seed under one rule across many tilings.
+
+Maps a seed onto each topology through a canonical traversal (`bfs` rings by default), runs the same rule, and reports population, end-state classification, and a degenerate-seed guard. Supports `--rule`, `--traversal`, `--steps`, `--grid-size`, `--geometries`, and JSON output.
+
+```powershell
+python -m tools tilings compare
+python -m tools tilings compare "01100 11000 01000" --rule conway --steps 80
+python -m tools tilings compare --geometries square,hex,kagome --format json
+```
+
 ## Fixtures
 
 Regenerate or check checked-in fixture files.

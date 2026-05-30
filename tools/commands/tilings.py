@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 
 from tools import (
+    compare_seed,
     generate_tiling_preview,
     report_tiling_verification_strength,
     scaffold_aperiodic_family,
@@ -80,4 +81,11 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("tilings", "scaffold-aperiodic"),
         target_main=scaffold_aperiodic_family.main,
         parser_factory=scaffold_aperiodic_family.build_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="compare",
+        doc=command_doc("tilings", "compare"),
+        target_main=compare_seed.main,
+        parser_factory=compare_seed.build_parser,
     )

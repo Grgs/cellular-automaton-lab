@@ -125,6 +125,17 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("tilings", "compare"),
+        "tilings",
+        "Compare one seed under one rule across many tilings.",
+        "Maps a seed onto each topology through a canonical traversal (`bfs` rings by default), runs the same rule, and reports population, end-state classification, and a degenerate-seed guard. Supports `--rule`, `--traversal`, `--steps`, `--grid-size`, `--geometries`, and JSON output.",
+        (
+            "python -m tools tilings compare",
+            'python -m tools tilings compare "01100 11000 01000" --rule conway --steps 80',
+            "python -m tools tilings compare --geometries square,hex,kagome --format json",
+        ),
+    ),
+    CommandDoc(
         ("fixtures", "reference"),
         "fixtures",
         "Regenerate or check literature reference fixtures.",
