@@ -248,12 +248,12 @@ Browser UI
 
 ### Compare mode
 
-A self-contained overlay that runs one seed under one rule across many tilings and renders the result. It is mounted once from [frontend/app-runtime.ts](../frontend/app-runtime.ts) and talks to the backend through `SimulationBackend.compareSeed(...)` (HTTP `POST /api/compare` on the server, the `/api/compare` worker command in standalone).
+A self-contained overlay that runs one seed under one rule across many tilings and renders the result. It is mounted once from [frontend/app-runtime.ts](../frontend/app-runtime.ts) and talks to the backend through `SimulationBackend.compareSeed(...)` (HTTP `POST /api/compare` on the server, the `/api/compare` worker command in standalone). The UI asks for optional state payloads so each result row can open or copy share links for the seed state and final state on that tiling.
 
 - [frontend/compare/compare-panel.ts](../frontend/compare/compare-panel.ts)
-  `mountComparePanel(...)`: the launcher button, modal form (rule/seed/traversal/steps/tilings), run orchestration, and results rendering.
+  `mountComparePanel(...)`: the launcher button, modal form (rule/seed/traversal/steps/tilings), run orchestration, results rendering, and compare-row share/open actions.
 - [frontend/compare/compare-charts.ts](../frontend/compare/compare-charts.ts)
-  Pure layout helpers plus the SVG phase portrait (`live(t)/live(0)` per tiling) and the end-state classification grid.
+  Pure layout helpers plus the SVG phase portrait (`live(t)/live(0)` per tiling) and the end-state classification grid, including the optional per-row action cell hook.
 - [frontend/compare/compare-styles.ts](../frontend/compare/compare-styles.ts) and [frontend/compare/compare-options.ts](../frontend/compare/compare-options.ts)
   Injected stylesheet and the traversal option list.
 
@@ -409,7 +409,7 @@ A self-contained overlay that runs one seed under one rule across many tilings a
 - [backend/simulation/seeding/metrics.py](../backend/simulation/seeding/metrics.py)
   Rule-agnostic measurement: `population`, `hamming` change rate, and end-state `classify` (extinct / still-life / oscillator / unsettled).
 - [backend/simulation/seeding/comparison.py](../backend/simulation/seeding/comparison.py)
-  `compare_seed(...)` sweeps a seed across geometries, detects cycles, isolates per-tiling errors, and flags degenerate seeds.
+  `compare_seed(...)` sweeps a seed across geometries, detects cycles, isolates per-tiling errors, flags degenerate seeds, and can optionally return sparse begin/end board states for callers that need reconstructable links.
 
 ## Tests And Tooling
 

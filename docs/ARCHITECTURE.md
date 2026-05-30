@@ -87,7 +87,7 @@ Main API endpoints:
 - `POST /api/cells/set`
 - `POST /api/cells/set-many`
 
-`POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. The standalone runtime exposes the same operation as an `/api/compare` worker command, sharing the request parser, so the compare-mode UI works identically in server and standalone hosts.
+`POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. Requests may set `include_states: true` to include each tiling's topology spec plus sparse begin/end `cells_by_id` maps; the compare-mode UI uses those optional fields to create shareable board links. The standalone runtime exposes the same operation as an `/api/compare` worker command, sharing the request parser, so the compare-mode UI works identically in server and standalone hosts.
 
 ### Coordinator And Runtime
 
