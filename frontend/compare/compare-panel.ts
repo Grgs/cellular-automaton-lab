@@ -5,12 +5,18 @@ import type {
     RuleDefinition,
     SeedComparisonResult,
     TopologyComparisonResultPayload,
+    TopologyPreview,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
 import { TRAVERSAL_OPTIONS } from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
+import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
+
+// Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
+// patches are not offered a thumbnail (the backend would reject them anyway).
+const MAX_PREVIEW_CELLS = 4000;
 
 // Mirrors the pattern schema in pattern-io.ts / parsers/pattern.ts; reused so a
 // begin/end state can be encoded as a shareable board link.
@@ -126,6 +132,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     let rulesLoaded = false;
     let running = false;
     let lastFocus: HTMLElement | null = null;
+    const previewCache = new Map<string, Promise<TopologyPreview>>();
 
     const toggleButton = el(
         "button",
@@ -416,7 +423,107 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             );
         }
         wrap.append(copyLinkButton(end ?? begin));
+        if (
+            result.topology_spec &&
+            result.cell_count > 0 &&
+            result.cell_count <= MAX_PREVIEW_CELLS
+        ) {
+            const previewButton = linkButton("▸ preview", "Show begin/end thumbnails", () =>
+                togglePreview(comparison, result, previewButton),
+            );
+            wrap.append(previewButton);
+        }
         return wrap;
+    }
+
+    function previewKey(result: TopologyComparisonResultPayload): string {
+        const spec = result.topology_spec;
+        return `${result.geometry}:${spec?.width}x${spec?.height}:${spec?.patch_depth}`;
+    }
+
+    function fetchPreview(result: TopologyComparisonResultPayload): Promise<TopologyPreview> {
+        const key = previewKey(result);
+        let pending = previewCache.get(key);
+        if (!pending) {
+            const spec = result.topology_spec;
+            pending = options.backend.previewTopology({
+                geometry: result.geometry,
+                width: spec?.width ?? 16,
+                height: spec?.height ?? 16,
+                ...(spec?.patch_depth === undefined ? {} : { patch_depth: spec.patch_depth }),
+            });
+            previewCache.set(key, pending);
+        }
+        return pending;
+    }
+
+    function liveColorForRule(ruleName: string): (state: number) => string {
+        const rule = rules.find((candidate) => candidate.name === ruleName);
+        const colorByValue = new Map<number, string>();
+        for (const definition of rule?.states ?? []) {
+            colorByValue.set(definition.value, definition.color);
+        }
+        return (state) => colorByValue.get(state) ?? "var(--live, #1f2430)";
+    }
+
+    function thumbnailBlock(
+        label: string,
+        preview: TopologyPreview,
+        cellsById: Record<string, number>,
+        liveColor: (state: number) => string,
+    ): HTMLElement {
+        return el("div", { class: "compare-thumb-block" }, [
+            el("div", { class: "compare-thumb-label", textContent: label }),
+            buildBoardThumbnailSvg(preview, cellsById, { liveColor, label: `${label} state` }),
+        ]);
+    }
+
+    function togglePreview(
+        comparison: SeedComparisonResult,
+        result: TopologyComparisonResultPayload,
+        button: HTMLButtonElement,
+    ): void {
+        const row = button.closest("tr");
+        if (!row) {
+            return;
+        }
+        const sibling = row.nextElementSibling;
+        if (sibling instanceof HTMLElement && sibling.classList.contains("compare-detail")) {
+            sibling.remove();
+            button.textContent = "▸ preview";
+            return;
+        }
+        button.textContent = "▾ preview";
+        const cell = el("td", { class: "compare-detail-cell" });
+        cell.colSpan = row.children.length;
+        cell.append(el("div", { class: "compare-detail-status", textContent: "Loading preview…" }));
+        const detail = el("tr", { class: "compare-detail" }, [cell]);
+        row.after(detail);
+        void renderPreviewInto(comparison, result, cell);
+    }
+
+    async function renderPreviewInto(
+        comparison: SeedComparisonResult,
+        result: TopologyComparisonResultPayload,
+        cell: HTMLTableCellElement,
+    ): Promise<void> {
+        try {
+            const preview = await fetchPreview(result);
+            const liveColor = liveColorForRule(comparison.rule_name);
+            cell.replaceChildren(
+                el("div", { class: "compare-detail-grid" }, [
+                    thumbnailBlock("Begin", preview, result.initial_cells_by_id ?? {}, liveColor),
+                    thumbnailBlock("End", preview, result.final_cells_by_id ?? {}, liveColor),
+                ]),
+            );
+        } catch (error) {
+            cell.replaceChildren(
+                el("div", {
+                    class: "compare-detail-status",
+                    textContent: `Preview failed: ${error instanceof Error ? error.message : String(error)}`,
+                }),
+            );
+        }
     }
 
     function linkButton(label: string, title: string, onClick: () => void): HTMLButtonElement {

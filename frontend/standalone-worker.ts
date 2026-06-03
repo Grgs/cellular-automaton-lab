@@ -7,6 +7,7 @@ import type {
     SeedComparisonResult,
     SimulationSnapshot,
     TopologyPayload,
+    TopologyPreview,
     TopologySpec,
 } from "./types/domain.js";
 import type {
@@ -316,6 +317,19 @@ function optionalString(value: unknown): string | undefined {
     return typeof value === "string" ? value : undefined;
 }
 
+function optionalTopologyPreview(value: unknown, context: string): TopologyPreview | undefined {
+    if (value === undefined) {
+        return undefined;
+    }
+    if (!isPlainObject(value) || !Array.isArray(value.cells)) {
+        throw new Error(`${context} returned an invalid topology preview.`);
+    }
+    return {
+        topology_revision: String(value.topology_revision ?? ""),
+        cells: value.cells as TopologyPreview["cells"],
+    };
+}
+
 function optionalComparison(value: unknown, context: string): SeedComparisonResult | undefined {
     if (value === undefined) {
         return undefined;
@@ -360,6 +374,7 @@ function parseRequestResponse(raw: string): {
     snapshot?: SimulationSnapshot;
     rules?: RulesResponse["rules"];
     comparison?: SeedComparisonResult;
+    topologyPreview?: TopologyPreview;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 } {
     const payload = parseRuntimeJson(raw, "Standalone request");
@@ -369,6 +384,7 @@ function parseRequestResponse(raw: string): {
         snapshot?: SimulationSnapshot;
         rules?: RulesResponse["rules"];
         comparison?: SeedComparisonResult;
+        topologyPreview?: TopologyPreview;
         persistedSnapshot?: PersistedSimulationSnapshotV5;
     } = {
         ok: requireBoolean(payload.ok, "Standalone request", "ok"),
@@ -388,6 +404,10 @@ function parseRequestResponse(raw: string): {
     const comparison = optionalComparison(payload.comparison, "Standalone request");
     if (comparison !== undefined) {
         result.comparison = comparison;
+    }
+    const topologyPreview = optionalTopologyPreview(payload.topology_preview, "Standalone request");
+    if (topologyPreview !== undefined) {
+        result.topologyPreview = topologyPreview;
     }
     const persistedSnapshot = optionalPersistedSnapshot(
         payload.persisted_snapshot,
@@ -508,6 +528,9 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             ...(payload.snapshot === undefined ? {} : { snapshot: payload.snapshot }),
             ...(payload.rules === undefined ? {} : { rules: payload.rules }),
             ...(payload.comparison === undefined ? {} : { comparison: payload.comparison }),
+            ...(payload.topologyPreview === undefined
+                ? {}
+                : { topologyPreview: payload.topologyPreview }),
             ...(payload.persistedSnapshot === undefined
                 ? {}
                 : { persistedSnapshot: payload.persistedSnapshot }),

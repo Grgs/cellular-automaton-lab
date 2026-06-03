@@ -333,6 +333,7 @@ PAYLOAD_TYPE_UNION_CONTRACTS: tuple[PayloadTypeUnionContract, ...] = (
             "CellUpdateRequest",
             "CellUpdatesRequest",
             "CompareRequest",
+            "TopologyPreviewRequest",
         ),
         frontend_path=STANDALONE_PROTOCOL_FRONTEND_PATH,
         host_interface_name="StandaloneRequestMessage",

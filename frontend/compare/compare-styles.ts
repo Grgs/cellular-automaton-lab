@@ -136,4 +136,14 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-link:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
+.compare-detail > td { background: var(--help-bg, rgba(0, 0, 0, 0.03)); padding: 10px 8px; }
+.compare-detail-status { font-size: 12px; color: var(--muted, #6d756f); }
+.compare-detail-grid { display: flex; gap: 18px; flex-wrap: wrap; }
+.compare-thumb-block { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.compare-thumb-label { font-size: 11px; color: var(--muted, #6d756f); text-transform: uppercase; letter-spacing: 0.04em; }
+.compare-thumb {
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background: var(--field-bg, #fff);
+}
 `;

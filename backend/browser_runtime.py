@@ -21,6 +21,7 @@ from backend.rules import RuleRegistry
 from backend.simulation.persistence import SimulationStateStore
 from backend.simulation.seeding import run_compare_request
 from backend.simulation.service import SimulationOperationError, SimulationService
+from backend.simulation.topology_preview import build_topology_preview
 from backend.simulation.state_restore import SimulationStateRestorer
 
 
@@ -104,6 +105,10 @@ class BrowserSimulationRuntime:
                 return self.get_rules_response()
             if path == "/api/compare":
                 return json.dumps({"ok": True, "comparison": run_compare_request(request_payload)})
+            if path == "/api/topology/preview":
+                return json.dumps(
+                    {"ok": True, "topology_preview": build_topology_preview(request_payload)}
+                )
             if path == "/api/control/start":
                 self.service.start()
             elif path == "/api/control/pause":

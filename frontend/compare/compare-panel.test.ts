@@ -109,6 +109,22 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
         setCell: async () => snapshot,
         setCells: async () => snapshot,
         compareSeed,
+        previewTopology: async () => ({
+            topology_revision: "t",
+            cells: [
+                {
+                    id: "c:1:1",
+                    kind: "square",
+                    center: { x: 0.5, y: 0.5 },
+                    vertices: [
+                        { x: 0, y: 0 },
+                        { x: 1, y: 0 },
+                        { x: 1, y: 1 },
+                        { x: 0, y: 1 },
+                    ],
+                },
+            ],
+        }),
     };
     return { backend, compareSeed };
 }
@@ -172,11 +188,41 @@ describe("mountComparePanel", () => {
         });
         const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
         const labels = buttons.map((button) => button.textContent);
-        expect(labels).toEqual(["begin ↗", "end ↗", "⧉ link"]);
+        expect(labels).toEqual(["begin ↗", "end ↗", "⧉ link", "▸ preview"]);
 
         buttons[0]?.click();
         expect(openSpy).toHaveBeenCalledTimes(1);
         const openedUrl = String(openSpy.mock.calls.at(0)?.[0] ?? "");
         expect(openedUrl).toContain("#share=v1.");
+    });
+
+    it("expands a row preview into begin/end thumbnails", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-row-actions")).not.toBeNull();
+        });
+        const previewButton = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-link"),
+        ].find((button) => button.textContent?.includes("preview"));
+        expect(previewButton).toBeTruthy();
+        previewButton?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-thumb")).toHaveLength(2);
+        });
+        const labels = [...document.querySelectorAll(".compare-thumb-label")].map(
+            (n) => n.textContent,
+        );
+        expect(labels).toEqual(["Begin", "End"]);
+
+        // toggling again collapses the detail row
+        previewButton?.click();
+        expect(document.querySelector(".compare-detail")).toBeNull();
     });
 });
