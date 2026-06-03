@@ -91,12 +91,12 @@ export const COMPARE_PANEL_STYLES = `
     width: 20px;
     height: 20px;
     padding: 0;
-    border: 1px solid var(--cell-line-soft, rgba(31, 36, 48, 0.12));
+    border: 1px solid var(--field-border, rgba(31, 36, 48, 0.18));
     border-radius: 3px;
     background: var(--cell-dead, #fdf8ef);
     cursor: pointer;
 }
-.compare-seedpad-cell.is-on { background: var(--live, #1f2430); border-color: var(--live, #1f2430); }
+.compare-seedpad-cell.is-on { background: var(--accent, #bf5a36); border-color: var(--accent-dark, #8a3d20); }
 .compare-tilings-block { margin-top: 14px; }
 .compare-tilings-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .compare-tilings-summary { font-size: 12px; color: var(--muted, #6d756f); margin-right: auto; }
