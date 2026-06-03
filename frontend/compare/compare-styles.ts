@@ -64,6 +64,39 @@ export const COMPARE_PANEL_STYLES = `
     font-family: var(--mono, monospace);
     font-size: 13px;
 }
+.compare-seedpad-block { margin-top: 14px; }
+.compare-seedpad-title { font-size: 12px; color: var(--muted, #6d756f); margin-bottom: 6px; }
+.compare-seedpad { display: flex; flex-direction: column; gap: 8px; }
+.compare-seedpad-controls { display: flex; align-items: center; gap: 10px; }
+.compare-seedpad-widthlabel { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted, #6d756f); }
+.compare-seedpad-width {
+    width: 52px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--field-border, rgba(0, 0, 0, 0.15));
+    background: var(--field-bg, #fff);
+    color: var(--field-text, #1f2430);
+    font-family: var(--mono, monospace);
+    font-size: 12px;
+}
+.compare-seedpad-info { font-size: 12px; color: var(--muted, #6d756f); }
+.compare-seedpad-grid {
+    display: grid;
+    gap: 2px;
+    width: max-content;
+    max-width: 100%;
+    touch-action: none;
+}
+.compare-seedpad-cell {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid var(--cell-line-soft, rgba(31, 36, 48, 0.12));
+    border-radius: 3px;
+    background: var(--cell-dead, #fdf8ef);
+    cursor: pointer;
+}
+.compare-seedpad-cell.is-on { background: var(--live, #1f2430); border-color: var(--live, #1f2430); }
 .compare-tilings-block { margin-top: 14px; }
 .compare-tilings-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .compare-tilings-summary { font-size: 12px; color: var(--muted, #6d756f); margin-right: auto; }

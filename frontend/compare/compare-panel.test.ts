@@ -196,6 +196,30 @@ describe("mountComparePanel", () => {
         expect(openedUrl).toContain("#share=v1.");
     });
 
+    it("renders a seed pad wired to the seed field", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        expect(document.querySelector(".compare-seedpad")).not.toBeNull();
+        const seedField = document.querySelector<HTMLInputElement>(
+            'input.compare-field[type="text"]',
+        );
+        const before = seedField?.value;
+        const offCell = document.querySelector<HTMLButtonElement>(
+            ".compare-seedpad-cell:not(.is-on)",
+        );
+        const row = offCell?.getAttribute("data-row");
+        const col = offCell?.getAttribute("data-col");
+        offCell?.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+        expect(seedField?.value).not.toBe(before);
+        // the pad re-renders, so re-query the same position
+        const painted = document.querySelector<HTMLButtonElement>(
+            `.compare-seedpad-cell[data-row="${row}"][data-col="${col}"]`,
+        );
+        expect(painted?.classList.contains("is-on")).toBe(true);
+    });
+
     it("expands a row preview into begin/end thumbnails", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
