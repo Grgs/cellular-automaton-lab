@@ -4,6 +4,8 @@ import type {
     RulesResponse,
     SeedComparisonResult,
     SimulationSnapshot,
+    TopologyPreview,
+    TopologyPreviewRequest,
 } from "../types/domain.js";
 import type {
     CellTargetRequest,
@@ -18,6 +20,7 @@ export type StandaloneCommandPath =
     | "/api/state"
     | "/api/rules"
     | "/api/compare"
+    | "/api/topology/preview"
     | "/api/cells/toggle"
     | "/api/cells/set"
     | "/api/cells/set-many"
@@ -39,7 +42,8 @@ export type StandaloneRequestPayload =
     | CellTargetRequest
     | CellUpdateRequest
     | CellUpdatesRequest
-    | CompareRequest;
+    | CompareRequest
+    | TopologyPreviewRequest;
 
 export interface StandaloneRequestMessage {
     type: "request";
@@ -67,6 +71,7 @@ export interface StandaloneSuccessResponse {
     snapshot?: SimulationSnapshot;
     rules?: RulesResponse["rules"];
     comparison?: SeedComparisonResult;
+    topologyPreview?: TopologyPreview;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 }
 

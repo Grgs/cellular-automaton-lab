@@ -7,6 +7,8 @@ import type {
     RulesResponse,
     SeedComparisonResult,
     SimulationSnapshot,
+    TopologyPreview,
+    TopologyPreviewRequest,
     TopologySpec,
 } from "./domain.js";
 
@@ -73,6 +75,7 @@ export interface SimulationBackend {
     setCell(cell: CellTargetRequest, state: number): Promise<SimulationSnapshot>;
     setCells(cells: CellUpdateRequest[]): Promise<SimulationSnapshot>;
     compareSeed(request: CompareRequest): Promise<SeedComparisonResult>;
+    previewTopology(request: TopologyPreviewRequest): Promise<TopologyPreview>;
 }
 
 export interface SimulationStatePersistence {

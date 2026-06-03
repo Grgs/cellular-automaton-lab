@@ -248,12 +248,14 @@ Browser UI
 
 ### Compare mode
 
-A self-contained overlay that runs one seed under one rule across many tilings and renders the result. It is mounted once from [frontend/app-runtime.ts](../frontend/app-runtime.ts) and talks to the backend through `SimulationBackend.compareSeed(...)` (HTTP `POST /api/compare` on the server, the `/api/compare` worker command in standalone). The UI asks for optional state payloads so each result row can open or copy share links for the seed state and final state on that tiling.
+A self-contained overlay that runs one seed under one rule across many tilings and renders the result. It is mounted once from [frontend/app-runtime.ts](../frontend/app-runtime.ts) and talks to the backend through `SimulationBackend.compareSeed(...)` (HTTP `POST /api/compare` on the server, the `/api/compare` worker command in standalone). The UI asks for optional state payloads so each result row can open or copy share links for the seed state and final state on that tiling, and can expand an inline begin/end thumbnail.
 
 - [frontend/compare/compare-panel.ts](../frontend/compare/compare-panel.ts)
-  `mountComparePanel(...)`: the launcher button, modal form (rule/seed/traversal/steps/tilings), run orchestration, results rendering, and compare-row share/open actions.
+  `mountComparePanel(...)`: the launcher button, modal form (rule/seed/traversal/steps/tilings), run orchestration, results rendering, compare-row share/open actions, and the per-row thumbnail expander (fetches geometry via `SimulationBackend.previewTopology(...)`, cached per tiling).
 - [frontend/compare/compare-charts.ts](../frontend/compare/compare-charts.ts)
   Pure layout helpers plus the SVG phase portrait (`live(t)/live(0)` per tiling) and the end-state classification grid, including the optional per-row action cell hook.
+- [frontend/compare/compare-thumbnail.ts](../frontend/compare/compare-thumbnail.ts)
+  Renders a tiling's board as an SVG (one polygon per cell, coloured by state) from a `topology_preview` payload, with pure bounds/fit helpers.
 - [frontend/compare/compare-styles.ts](../frontend/compare/compare-styles.ts) and [frontend/compare/compare-options.ts](../frontend/compare/compare-options.ts)
   Injected stylesheet and the traversal option list.
 
@@ -267,7 +269,7 @@ A self-contained overlay that runs one seed under one rule across many tilings a
   Shared shell rendering for the Flask wrapper and standalone shell generation.
 - [backend/web/routes.py](../backend/web/routes.py)
   Thin Flask routes and JSON response helpers.
-  Main endpoints: `get_state()`, `get_rules()`, `get_bootstrap()`, `start()`, `pause()`, `resume()`, `step()`, `reset()`, `update_config()`, `toggle_cell()`, `set_cell()`, `set_cells()`, `compare()` (`POST /api/compare`, runs a seed sweep without mutating simulation state)
+  Main endpoints: `get_state()`, `get_rules()`, `get_bootstrap()`, `start()`, `pause()`, `resume()`, `step()`, `reset()`, `update_config()`, `toggle_cell()`, `set_cell()`, `set_cells()`, `compare()` (`POST /api/compare`, runs a seed sweep without mutating simulation state), `topology_preview()` (`POST /api/topology/preview`, builds one tiling with per-cell geometry for thumbnails)
 - [backend/web/state_actions.py](../backend/web/state_actions.py)
   `StateActionService`
 - [backend/web/requests.py](../backend/web/requests.py)

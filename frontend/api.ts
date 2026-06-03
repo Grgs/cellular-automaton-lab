@@ -4,6 +4,8 @@ import type {
     RulesResponse,
     SeedComparisonResult,
     SimulationSnapshot,
+    TopologyPreview,
+    TopologyPreviewRequest,
 } from "./types/domain.js";
 import type {
     ConfigSyncBody,
@@ -95,6 +97,16 @@ export async function compareSeedRequest(body: CompareRequest): Promise<SeedComp
     return response.comparison;
 }
 
+export async function previewTopologyRequest(
+    body: TopologyPreviewRequest,
+): Promise<TopologyPreview> {
+    const response = await request<{ topology_preview: TopologyPreview }>("/api/topology/preview", {
+        method: "POST",
+        body: JSON.stringify(body),
+    });
+    return response.topology_preview;
+}
+
 export function createHttpSimulationBackend(): SimulationBackend {
     return {
         getState: fetchState,
@@ -105,5 +117,6 @@ export function createHttpSimulationBackend(): SimulationBackend {
         setCell: setCellRequest,
         setCells: setCellsRequest,
         compareSeed: compareSeedRequest,
+        previewTopology: previewTopologyRequest,
     };
 }

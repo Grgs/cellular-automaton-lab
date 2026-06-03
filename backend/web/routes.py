@@ -17,6 +17,7 @@ from backend.rules import RuleRegistry
 from backend.frontend_assets import FrontendAssetManifest
 from backend.simulation.coordinator import SimulationCoordinator
 from backend.simulation.seeding import run_compare_request
+from backend.simulation.topology_preview import build_topology_preview
 from backend.simulation.service import SimulationOperationError
 from backend.web.state_actions import StateActionService
 from backend.web.requests import (
@@ -137,6 +138,16 @@ def compare() -> JsonRouteResult:
     except (RequestValidationError, ValueError) as exc:
         return json_error(str(exc))
     return jsonify({"comparison": comparison})
+
+
+@api_bp.post("/topology/preview")
+def topology_preview() -> JsonRouteResult:
+    payload = get_payload(request)
+    try:
+        topology = build_topology_preview(payload)
+    except (RequestValidationError, ValueError) as exc:
+        return json_error(str(exc))
+    return jsonify({"topology_preview": topology})
 
 
 @api_bp.post("/control/start")

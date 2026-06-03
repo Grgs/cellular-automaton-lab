@@ -221,6 +221,13 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
             }
             return response.comparison;
         },
+        async previewTopology(previewRequest) {
+            const response = await request("/api/topology/preview", previewRequest);
+            if (!response.topologyPreview) {
+                throw new Error("Standalone runtime did not return a topology preview.");
+            }
+            return response.topologyPreview;
+        },
     };
 
     return {

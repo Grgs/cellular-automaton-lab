@@ -223,6 +223,25 @@ export interface SeedComparisonResult {
     results: TopologyComparisonResultPayload[];
 }
 
+export interface TopologyPreviewRequest {
+    geometry: string;
+    width: number;
+    height: number;
+    patch_depth?: number;
+}
+
+export interface TopologyPreviewCell {
+    id: string;
+    kind: string;
+    center: PointPayload;
+    vertices: PointPayload[];
+}
+
+export interface TopologyPreview {
+    topology_revision: string;
+    cells: TopologyPreviewCell[];
+}
+
 export interface CellIdentifier {
     id: string;
 }

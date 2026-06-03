@@ -77,6 +77,7 @@ Main API endpoints:
 - `GET /api/rules`
 - `GET /api/meta`
 - `POST /api/compare`
+- `POST /api/topology/preview`
 - `POST /api/control/start`
 - `POST /api/control/pause`
 - `POST /api/control/resume`
@@ -87,7 +88,7 @@ Main API endpoints:
 - `POST /api/cells/set`
 - `POST /api/cells/set-many`
 
-`POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. Requests may set `include_states: true` to include each tiling's topology spec plus sparse begin/end `cells_by_id` maps; the compare-mode UI uses those optional fields to create shareable board links. The standalone runtime exposes the same operation as an `/api/compare` worker command, sharing the request parser, so the compare-mode UI works identically in server and standalone hosts.
+`POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. Requests may set `include_states: true` to include each tiling's topology spec plus sparse begin/end `cells_by_id` maps; the compare-mode UI uses those optional fields to create shareable board links and inline thumbnails. `POST /api/topology/preview` ([backend/simulation/topology_preview.py](../backend/simulation/topology_preview.py)) is a second stateless helper that builds one tiling and returns its cells with per-cell geometry, which the thumbnail renderer draws. Both endpoints are exposed as matching `/api/...` worker commands in the standalone runtime, sharing their request parsers, so compare-mode works identically in server and standalone hosts.
 
 ### Coordinator And Runtime
 
