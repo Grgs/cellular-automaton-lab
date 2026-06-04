@@ -256,6 +256,8 @@ A self-contained overlay that runs one seed under one rule across many tilings a
   Pure layout helpers plus the SVG phase portrait (`live(t)/live(0)` per tiling) and the end-state classification grid, including the optional per-row action cell hook.
 - [frontend/compare/compare-thumbnail.ts](../frontend/compare/compare-thumbnail.ts)
   Renders a tiling's board as an SVG (one polygon per cell, coloured by state) from a `topology_preview` payload, with pure bounds/fit helpers.
+- [frontend/compare/compare-seed-pad.ts](../frontend/compare/compare-seed-pad.ts)
+  `createSeedPad(...)`: a paint grid for designing the seed by drawing, two-way bound to the seed bit string (the exact inverse of the traversal: read row-major to bits, fill row-major from bits). Pure bit/grid helpers are exported for tests.
 - [frontend/compare/compare-styles.ts](../frontend/compare/compare-styles.ts) and [frontend/compare/compare-options.ts](../frontend/compare/compare-options.ts)
   Injected stylesheet and the traversal option list.
 

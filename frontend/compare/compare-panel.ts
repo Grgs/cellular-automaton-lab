@@ -12,6 +12,7 @@ import { buildShareUrl } from "../share-link.js";
 import { TRAVERSAL_OPTIONS } from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
+import { createSeedPad } from "./compare-seed-pad.js";
 import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
@@ -171,6 +172,14 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
     const tilingList = el("div", { class: "compare-tilings" });
 
+    const seedPad = createSeedPad({
+        getSeed: () => seedInput.value,
+        onSeedChange: (formatted) => {
+            seedInput.value = formatted;
+        },
+    });
+    seedInput.addEventListener("input", () => seedPad.syncFromSeed());
+
     const runButton = el("button", { class: "compare-run", type: "button" }, ["Run comparison"]);
     const statusLine = el("div", { class: "compare-status", role: "status" });
     const resultsArea = el("div", { class: "compare-results" });
@@ -206,6 +215,13 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                 labeledField("Traversal", traversalSelect),
                 labeledField("Steps", stepsInput),
                 labeledField("Grid size", gridInput),
+            ]),
+            el("div", { class: "compare-seedpad-block" }, [
+                el("div", {
+                    class: "compare-seedpad-title",
+                    textContent: "Or draw the seed (read row-major into the bit string)",
+                }),
+                seedPad.element,
             ]),
             el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
             el("div", { class: "compare-actions" }, [runButton, statusLine]),
@@ -588,6 +604,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     return {
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
+            seedPad.dispose();
             toggleButton.remove();
             backdrop.remove();
         },
