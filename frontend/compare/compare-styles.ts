@@ -97,6 +97,11 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-seedpad-cell.is-on { background: var(--accent, #bf5a36); border-color: var(--accent-dark, #8a3d20); }
+.compare-seedpreview { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.compare-seedpreview-empty { font-size: 12px; color: var(--muted, #6d756f); }
+.compare-seedpreview-item { display: flex; flex-direction: column; gap: 3px; align-items: center; }
+.compare-seedpreview-label { font-size: 10px; color: var(--muted, #6d756f); max-width: 100px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.compare-seedpreview-slot { display: flex; align-items: center; justify-content: center; min-width: 96px; min-height: 60px; font-size: 11px; color: var(--muted, #6d756f); }
 .compare-tilings-block { margin-top: 14px; }
 .compare-tilings-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .compare-tilings-summary { font-size: 12px; color: var(--muted, #6d756f); margin-right: auto; }
