@@ -15,7 +15,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from backend.simulation.rule_context_frames import topology_frame_for
 from backend.simulation.rule_context_geometry import cell_geometry
+from backend.simulation.seeding.comparison import board_size_for
+from backend.simulation.seeding.traversal import TRAVERSALS
 from backend.simulation.topology import build_topology
 from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
 
@@ -45,20 +48,33 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(geometry, str) or geometry not in SUPPORTED_GEOMETRIES:
         raise ValueError("'geometry' must be a supported geometry key.")
 
-    width = _bounded_int(
-        payload.get("width"), default=16, low=_MIN_DIMENSION, high=_MAX_DIMENSION, name="width"
-    )
-    height = _bounded_int(
-        payload.get("height"), default=16, low=_MIN_DIMENSION, high=_MAX_DIMENSION, name="height"
-    )
-    patch_depth_value = payload.get("patch_depth")
-    patch_depth = (
-        None
-        if patch_depth_value in (None, "")
-        else _bounded_int(
-            patch_depth_value, default=0, low=0, high=_MAX_PATCH_DEPTH, name="patch_depth"
+    grid_size_value = payload.get("grid_size")
+    if grid_size_value not in (None, ""):
+        # Match the size a comparison sweep would use for this geometry, so a
+        # live seed preview lands cells exactly where the run will.
+        grid_size = _bounded_int(
+            grid_size_value, default=16, low=_MIN_DIMENSION, high=_MAX_DIMENSION, name="grid_size"
         )
-    )
+        width, height, patch_depth = board_size_for(geometry, grid_size)
+    else:
+        width = _bounded_int(
+            payload.get("width"), default=16, low=_MIN_DIMENSION, high=_MAX_DIMENSION, name="width"
+        )
+        height = _bounded_int(
+            payload.get("height"),
+            default=16,
+            low=_MIN_DIMENSION,
+            high=_MAX_DIMENSION,
+            name="height",
+        )
+        patch_depth_value = payload.get("patch_depth")
+        patch_depth = (
+            None
+            if patch_depth_value in (None, "")
+            else _bounded_int(
+                patch_depth_value, default=0, low=0, high=_MAX_PATCH_DEPTH, name="patch_depth"
+            )
+        )
 
     topology = build_topology(geometry, width, height, patch_depth)
     if topology.cell_count > _MAX_PREVIEW_CELLS:
@@ -77,4 +93,17 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
                 "vertices": [{"x": vertex[0], "y": vertex[1]} for vertex in (vertices or ())],
             }
         )
-    return {"topology_revision": topology.topology_revision, "cells": cells}
+
+    result: dict[str, Any] = {"topology_revision": topology.topology_revision, "cells": cells}
+
+    # When a traversal is requested, also return the canonical cell-id order so a
+    # caller can place a seed bit-string onto this tiling client-side (the same
+    # mapping the comparison uses), e.g. for a live seed preview.
+    traversal = payload.get("traversal")
+    if traversal is not None:
+        if not isinstance(traversal, str) or traversal not in TRAVERSALS:
+            raise ValueError(f"'traversal' must be one of: {', '.join(sorted(TRAVERSALS))}.")
+        frame = topology_frame_for(topology)
+        result["order"] = list(TRAVERSALS[traversal](frame))
+
+    return result

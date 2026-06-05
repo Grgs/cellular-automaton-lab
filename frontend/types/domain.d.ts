@@ -225,9 +225,12 @@ export interface SeedComparisonResult {
 
 export interface TopologyPreviewRequest {
     geometry: string;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     patch_depth?: number;
+    /** When set, the tiling is built at the size a comparison sweep would use. */
+    grid_size?: number;
+    traversal?: string;
 }
 
 export interface TopologyPreviewCell {
@@ -240,6 +243,8 @@ export interface TopologyPreviewCell {
 export interface TopologyPreview {
     topology_revision: string;
     cells: TopologyPreviewCell[];
+    /** Cell ids in canonical traversal order; present only when a traversal was requested. */
+    order?: string[];
 }
 
 export interface CellIdentifier {

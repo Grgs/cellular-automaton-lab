@@ -13,6 +13,7 @@ import { TRAVERSAL_OPTIONS } from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
+import { createSeedPreview } from "./compare-seed-preview.js";
 import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
@@ -172,13 +173,30 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
     const tilingList = el("div", { class: "compare-tilings" });
 
+    const seedPreview = createSeedPreview({
+        backend: options.backend,
+        getSeed: () => seedInput.value,
+        getTraversal: () => traversalSelect.value,
+        getGridSize: () => clampNumber(gridInput.value, 2, 64, 16),
+        getTilings: () =>
+            allTilings
+                .filter((tiling) => selected.has(tiling.geometry))
+                .map((tiling) => ({ geometry: tiling.geometry, label: tiling.label })),
+    });
+
     const seedPad = createSeedPad({
         getSeed: () => seedInput.value,
         onSeedChange: (formatted) => {
             seedInput.value = formatted;
+            seedPreview.redraw();
         },
     });
-    seedInput.addEventListener("input", () => seedPad.syncFromSeed());
+    seedInput.addEventListener("input", () => {
+        seedPad.syncFromSeed();
+        seedPreview.redraw();
+    });
+    traversalSelect.addEventListener("change", () => seedPreview.refresh());
+    gridInput.addEventListener("change", () => seedPreview.refresh());
 
     const runButton = el("button", { class: "compare-run", type: "button" }, ["Run comparison"]);
     const statusLine = el("div", { class: "compare-status", role: "status" });
@@ -222,6 +240,11 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                     textContent: "Or draw the seed (read row-major into the bit string)",
                 }),
                 seedPad.element,
+                el("div", {
+                    class: "compare-seedpad-title",
+                    textContent: "Seed lands like this on:",
+                }),
+                seedPreview.element,
             ]),
             el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
             el("div", { class: "compare-actions" }, [runButton, statusLine]),
@@ -257,15 +280,18 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         allButton.addEventListener("click", () => {
             allTilings.forEach((option) => selected.add(option.geometry));
             renderTilingChecklist();
+            seedPreview.refresh();
         });
         noneButton.addEventListener("click", () => {
             selected.clear();
             renderTilingChecklist();
+            seedPreview.refresh();
         });
         resetButton.addEventListener("click", () => {
             selected.clear();
             defaultSelection(allTilings).forEach((geometry) => selected.add(geometry));
             renderTilingChecklist();
+            seedPreview.refresh();
         });
         return el("div", { class: "compare-tilings-controls" }, [
             el("span", { class: "compare-tilings-summary", id: "compare-tilings-summary" }),
@@ -306,6 +332,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                         selected.delete(option.geometry);
                     }
                     updateSummary();
+                    seedPreview.refresh();
                 });
                 group.append(
                     el("label", { class: "compare-tiling" }, [
@@ -576,6 +603,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         backdrop.hidden = false;
         void ensureRules();
+        seedPreview.refresh();
         dialog.focus();
     }
 
@@ -605,6 +633,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             seedPad.dispose();
+            seedPreview.dispose();
             toggleButton.remove();
             backdrop.remove();
         },

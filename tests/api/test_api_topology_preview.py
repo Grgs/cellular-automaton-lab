@@ -42,6 +42,31 @@ class ApiTopologyPreviewTests(ApiTestCase):
         )
         self.assertEqual(self.get_state()["generation"], before)
 
+    def test_preview_returns_traversal_order_when_requested(self) -> None:
+        response = self.client.post(
+            "/api/topology/preview",
+            json={"geometry": "square", "width": 4, "height": 4, "traversal": "bfs"},
+        )
+        self.assertEqual(response.status_code, 200)
+        preview = response.get_json()["topology_preview"]
+        order = preview["order"]
+        cell_ids = {cell["id"] for cell in preview["cells"]}
+        self.assertEqual(len(order), len(preview["cells"]))
+        self.assertEqual(set(order), cell_ids)  # a permutation of every cell
+
+    def test_preview_omits_order_without_traversal(self) -> None:
+        response = self.client.post(
+            "/api/topology/preview", json={"geometry": "square", "width": 4, "height": 4}
+        )
+        self.assertNotIn("order", response.get_json()["topology_preview"])
+
+    def test_preview_rejects_unknown_traversal(self) -> None:
+        response = self.client.post(
+            "/api/topology/preview",
+            json={"geometry": "square", "traversal": "spiral"},
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_preview_rejects_unknown_geometry(self) -> None:
         response = self.client.post("/api/topology/preview", json={"geometry": "not-a-tiling"})
         self.assertEqual(response.status_code, 400)

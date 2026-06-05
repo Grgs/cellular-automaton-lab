@@ -327,6 +327,7 @@ function optionalTopologyPreview(value: unknown, context: string): TopologyPrevi
     return {
         topology_revision: String(value.topology_revision ?? ""),
         cells: value.cells as TopologyPreview["cells"],
+        ...(Array.isArray(value.order) ? { order: value.order as string[] } : {}),
     };
 }
 

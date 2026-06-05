@@ -258,6 +258,8 @@ A self-contained overlay that runs one seed under one rule across many tilings a
   Renders a tiling's board as an SVG (one polygon per cell, coloured by state) from a `topology_preview` payload, with pure bounds/fit helpers.
 - [frontend/compare/compare-seed-pad.ts](../frontend/compare/compare-seed-pad.ts)
   `createSeedPad(...)`: a paint grid for designing the seed by drawing, two-way bound to the seed bit string (the exact inverse of the traversal: read row-major to bits, fill row-major from bits). Pure bit/grid helpers are exported for tests.
+- [frontend/compare/compare-seed-preview.ts](../frontend/compare/compare-seed-preview.ts)
+  `createSeedPreview(...)`: a live strip showing where the drawn seed lands on the first few selected tilings. Fetches each tiling's geometry and canonical cell `order` once (via `previewTopology` with a `traversal`), then places the seed client-side (`placeSeedOnOrder`, the same mapping the comparison uses) and re-renders begin-state thumbnails as you draw.
 - [frontend/compare/compare-styles.ts](../frontend/compare/compare-styles.ts) and [frontend/compare/compare-options.ts](../frontend/compare/compare-options.ts)
   Injected stylesheet and the traversal option list.
 

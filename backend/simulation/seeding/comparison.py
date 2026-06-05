@@ -150,8 +150,12 @@ class SeedComparison:
         }
 
 
-def _board_size_for(geometry: str, grid_size: int) -> tuple[int, int, int | None]:
-    """Resolve (width, height, patch_depth) for a topology's default sizing."""
+def board_size_for(geometry: str, grid_size: int) -> tuple[int, int, int | None]:
+    """Resolve (width, height, patch_depth) for a topology's default sizing.
+
+    Shared so the topology-preview endpoint can build a tiling at the exact size
+    a sweep uses, which keeps a live seed preview consistent with the run.
+    """
     variant = get_topology_variant_for_geometry(geometry)
     if geometry_uses_patch_depth(geometry):
         patch_depth = default_patch_depth_for_tiling_family(variant.tiling_family)
@@ -173,7 +177,7 @@ def _run_single(
     include_states: bool,
 ) -> TopologyComparisonResult:
     variant = get_topology_variant_for_geometry(geometry)
-    width, height, patch_depth = _board_size_for(geometry, grid_size)
+    width, height, patch_depth = board_size_for(geometry, grid_size)
     board = empty_board(geometry, width, height, patch_depth)
     frame = topology_frame_for(board.topology)
 

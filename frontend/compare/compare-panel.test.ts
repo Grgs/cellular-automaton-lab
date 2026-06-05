@@ -238,7 +238,8 @@ describe("mountComparePanel", () => {
         previewButton?.click();
 
         await vi.waitFor(() => {
-            expect(document.querySelectorAll(".compare-thumb")).toHaveLength(2);
+            // scope to the expanded detail row (the seed-preview strip also renders thumbnails)
+            expect(document.querySelectorAll(".compare-detail .compare-thumb")).toHaveLength(2);
         });
         const labels = [...document.querySelectorAll(".compare-thumb-label")].map(
             (n) => n.textContent,
