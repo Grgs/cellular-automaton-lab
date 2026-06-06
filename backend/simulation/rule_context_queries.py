@@ -128,14 +128,21 @@ class RuleContext:
         turn: str | None = None,
         cell_id: str | None = None,
     ) -> int:
+        # Hot path: count over raw neighbor frames + cell states directly, without
+        # materialising a NeighborSelection per neighbor (radial/turn live on the
+        # neighbor frame). This is the dominant cost when stepping Life-like rules.
         allowed = None if not states else set(states)
-        return sum(
-            1
-            for selection in self._iter_neighbor_selections(cell_id=cell_id)
-            if (allowed is None or selection.state in allowed)
-            and (radial is None or selection.radial == radial)
-            and (turn is None or selection.turn == turn)
-        )
+        resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
+        cell_states = self._cell_states
+        count = 0
+        for neighbor in self._frame.cells[resolved_index].neighbors:
+            if radial is not None and neighbor.radial != radial:
+                continue
+            if turn is not None and neighbor.turn != turn:
+                continue
+            if allowed is None or int(cell_states[neighbor.index]) in allowed:
+                count += 1
+        return count
 
     def count_live_neighbors(
         self,
@@ -144,14 +151,18 @@ class RuleContext:
         turn: str | None = None,
         cell_id: str | None = None,
     ) -> int:
-        return self.count_neighbors(
-            radial=radial, turn=turn, cell_id=cell_id
-        ) - self.count_neighbors(
-            0,
-            radial=radial,
-            turn=turn,
-            cell_id=cell_id,
-        )
+        # Single pass counting non-zero neighbours (no two count_neighbors calls).
+        resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
+        cell_states = self._cell_states
+        count = 0
+        for neighbor in self._frame.cells[resolved_index].neighbors:
+            if radial is not None and neighbor.radial != radial:
+                continue
+            if turn is not None and neighbor.turn != turn:
+                continue
+            if cell_states[neighbor.index] != 0:
+                count += 1
+        return count
 
     def has_neighbor_state(
         self,
