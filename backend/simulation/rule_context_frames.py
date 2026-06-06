@@ -14,7 +14,10 @@ from backend.simulation.rule_context_geometry import (
 from backend.simulation.topology_types import LatticeTopology
 
 _ANGLE_EPSILON = 1e-9
-_MAX_TOPOLOGY_FRAME_CACHE_SIZE = 32
+# Sized to comfortably hold every shipped tiling's frame at once, so a
+# cross-topology comparison sweep (and repeated sweeps) never thrash the LRU and
+# rebuild frames it just evicted. The live app only ever touches a handful.
+_MAX_TOPOLOGY_FRAME_CACHE_SIZE = 64
 _TOPOLOGY_FRAME_CACHE: OrderedDict[str, "TopologyFrame"] = OrderedDict()
 
 
