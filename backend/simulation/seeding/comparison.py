@@ -20,6 +20,7 @@ from backend.simulation.seeding.metrics import (
     hamming,
     population,
 )
+from backend.simulation.seeding.shapes import NAMED_PATTERNS, place_pattern
 from backend.simulation.seeding.traversal import (
     DEFAULT_TRAVERSAL,
     TRAVERSALS,
@@ -175,17 +176,26 @@ def _run_single(
     grid_size: int,
     live_state: int,
     include_states: bool,
+    pattern: str | None,
 ) -> TopologyComparisonResult:
     variant = get_topology_variant_for_geometry(geometry)
     width, height, patch_depth = board_size_for(geometry, grid_size)
     board = empty_board(geometry, width, height, patch_depth)
     frame = topology_frame_for(board.topology)
 
-    order = TRAVERSALS[traversal](frame)
     note: str | None = None
-    if len(bits) > frame.cell_count:
-        note = "seed-truncated"
-    cells_by_id = paint_bits(order, bits, live=live_state)
+    if pattern is not None:
+        # Policy A: place a recognisable shape geometrically (nearest cell).
+        seed_size = len(NAMED_PATTERNS[pattern])
+        cells_by_id = {
+            cell_id: live_state for cell_id in place_pattern(frame, NAMED_PATTERNS[pattern])
+        }
+    else:
+        order = TRAVERSALS[traversal](frame)
+        if len(bits) > frame.cell_count:
+            note = "seed-truncated"
+        seed_size = len(bits)
+        cells_by_id = paint_bits(order, bits, live=live_state)
     for cell_id, state in cells_by_id.items():
         board.set_state_for(cell_id, state)
 
@@ -217,7 +227,7 @@ def _run_single(
         tiling_family=variant.tiling_family,
         family=variant.family,
         cell_count=frame.cell_count,
-        seed_bits=len(bits),
+        seed_bits=seed_size,
         seed_cells=len(cells_by_id),
         population=populations,
         change_rate=change_rates,
@@ -246,17 +256,24 @@ def compare_seed(
     grid_size: int = DEFAULT_GRID_SIZE,
     live_state: int = 1,
     include_states: bool = False,
+    pattern: str | None = None,
 ) -> SeedComparison:
     """Sweep one seed under one rule across ``geometries`` (all tilings by default).
 
-    The same rule is applied to every topology; the seed's live-cell count is
-    held constant across topologies by the traversal mapping. A topology that
-    fails to build is recorded with ``note="error"`` rather than aborting the
-    sweep.
+    The same rule is applied to every topology. By default the seed is a bit
+    string mapped onto each tiling by the ``traversal`` (preserving live-cell
+    count). When ``pattern`` names a shape, that recognisable shape is placed
+    geometrically on each tiling instead (Policy A), preserving its 2-D form. A
+    topology that fails to build is recorded with ``note="error"`` rather than
+    aborting the sweep.
     """
     if traversal not in TRAVERSALS:
         raise ValueError(
             f"Unknown traversal {traversal!r}. Available: {', '.join(sorted(TRAVERSALS))}."
+        )
+    if pattern is not None and pattern not in NAMED_PATTERNS:
+        raise ValueError(
+            f"Unknown pattern {pattern!r}. Available: {', '.join(sorted(NAMED_PATTERNS))}."
         )
     bits = normalize_bits(seed)
     rule = RuleRegistry().get(rule_name)
@@ -284,6 +301,7 @@ def compare_seed(
                 grid_size=grid_size,
                 live_state=live_state,
                 include_states=include_states,
+                pattern=pattern,
             )
         except Exception as error:  # noqa: BLE001 - one bad tiling must not abort the sweep
             variant = get_topology_variant_for_geometry(geometry)  # geometry validated above

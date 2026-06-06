@@ -220,6 +220,29 @@ describe("mountComparePanel", () => {
         expect(painted?.classList.contains("is-on")).toBe(true);
     });
 
+    it("shape mode sends a pattern and hides the bit pad", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+
+        const shapeSelect = [
+            ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
+        ].find((select) => [...select.options].some((option) => option.value === "glider"));
+        if (!shapeSelect) {
+            throw new Error("missing shape select");
+        }
+        shapeSelect.value = "glider";
+        shapeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+        const padBlock = document.querySelector<HTMLElement>(".compare-seedpad-block");
+        expect(padBlock?.style.display).toBe("none");
+
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
+        expect(compareSeed.mock.calls.at(0)?.[0]?.pattern).toBe("glider");
+    });
+
     it("expands a row preview into begin/end thumbnails", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();

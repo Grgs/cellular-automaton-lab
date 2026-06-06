@@ -25,6 +25,11 @@ from backend.simulation.seeding.request import (
     parse_compare_request,
     run_compare_request,
 )
+from backend.simulation.seeding.shapes import (
+    NAMED_PATTERNS,
+    PATTERN_NAMES,
+    place_pattern,
+)
 from backend.simulation.seeding.traversal import (
     DEFAULT_TRAVERSAL,
     TRAVERSALS,
@@ -37,6 +42,8 @@ from backend.simulation.seeding.traversal import (
 
 __all__ = [
     "DEFAULT_TRAVERSAL",
+    "NAMED_PATTERNS",
+    "PATTERN_NAMES",
     "CompareRequest",
     "SeedComparison",
     "TRAVERSALS",
@@ -50,6 +57,7 @@ __all__ = [
     "normalize_bits",
     "paint_bits",
     "parse_compare_request",
+    "place_pattern",
     "population",
     "row_major_order",
     "run_compare_request",
