@@ -60,6 +60,34 @@ class ApiTopologyPreviewTests(ApiTestCase):
         )
         self.assertNotIn("order", response.get_json()["topology_preview"])
 
+    def test_preview_returns_shape_cells_for_named_pattern(self) -> None:
+        response = self.client.post(
+            "/api/topology/preview",
+            json={"geometry": "square", "width": 8, "height": 8, "pattern": "blinker"},
+        )
+        self.assertEqual(response.status_code, 200)
+        preview = response.get_json()["topology_preview"]
+        shape_cells = preview["shape_cells"]
+        cell_ids = {cell["id"] for cell in preview["cells"]}
+        # A blinker is three distinct cells, each an existing cell of this tiling.
+        self.assertEqual(len(shape_cells), 3)
+        self.assertTrue(set(shape_cells).issubset(cell_ids))
+        self.assertTrue(all(state == 1 for state in shape_cells.values()))
+
+    def test_preview_omits_shape_cells_without_pattern(self) -> None:
+        response = self.client.post(
+            "/api/topology/preview", json={"geometry": "square", "width": 4, "height": 4}
+        )
+        self.assertNotIn("shape_cells", response.get_json()["topology_preview"])
+
+    def test_preview_rejects_unknown_pattern(self) -> None:
+        response = self.client.post(
+            "/api/topology/preview",
+            json={"geometry": "square", "pattern": "not-a-shape"},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("error", response.get_json())
+
     def test_preview_rejects_unknown_traversal(self) -> None:
         response = self.client.post(
             "/api/topology/preview",

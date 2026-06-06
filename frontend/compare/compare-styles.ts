@@ -65,6 +65,7 @@ export const COMPARE_PANEL_STYLES = `
     font-size: 13px;
 }
 .compare-seedpad-block { margin-top: 14px; }
+.compare-seedpreview-block { margin-top: 14px; }
 .compare-seedpad-title { font-size: 12px; color: var(--muted, #6d756f); margin-bottom: 6px; }
 .compare-seedpad { display: flex; flex-direction: column; gap: 8px; }
 .compare-seedpad-controls { display: flex; align-items: center; gap: 10px; }
