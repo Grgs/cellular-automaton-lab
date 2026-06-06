@@ -14,7 +14,7 @@ import type {
     ViewportController,
 } from "./controller-view.js";
 import type { DomElements } from "./dom.js";
-import type { SimulationSnapshot } from "./domain.js";
+import type { PatternPayload, SimulationSnapshot } from "./domain.js";
 import type { AppState } from "./state.js";
 
 export interface SimulationReconcilerDependencies {
@@ -65,6 +65,7 @@ export interface AppController {
     applySimulationState(simulationState: SimulationSnapshot, options?: { source?: string }): void;
     applyCellSize(nextCellSize: number): void;
     applyPaintState(nextPaintState: number): void;
+    loadPattern(payload: PatternPayload): Promise<SimulationSnapshot | null>;
     getState(): AppState;
     getInteractions(): InteractionController | null;
     getViewportController(): ViewportController | null;

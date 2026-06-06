@@ -22,6 +22,7 @@ function createActions(overrides: Partial<AppActionSet> = {}): AppActionSet {
         pastePattern: vi.fn(),
         copyShareLink: vi.fn(),
         applyShareLinkFromHash: vi.fn(),
+        loadPattern: vi.fn(),
         loadPresetSeed: vi.fn(),
         changePresetSeedSelection: vi.fn(),
         loadShowcaseDemo: vi.fn(),

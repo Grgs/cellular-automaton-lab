@@ -196,6 +196,32 @@ describe("mountComparePanel", () => {
         expect(openedUrl).toContain("#share=v1.");
     });
 
+    it("loads begin/end into the board and closes when onOpenPattern is provided", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+        const onOpenPattern = vi.fn();
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData(), onOpenPattern });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-row-actions")).not.toBeNull();
+        });
+        const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
+        const labels = buttons.map((button) => button.textContent);
+        expect(labels).toEqual(["begin", "end", "⧉ link", "▸ preview"]);
+
+        buttons[0]?.click();
+        expect(onOpenPattern).toHaveBeenCalledTimes(1);
+        expect(openSpy).not.toHaveBeenCalled();
+        const loaded = onOpenPattern.mock.calls.at(0)?.[0] as { cells_by_id?: unknown };
+        expect(loaded?.cells_by_id).toBeDefined();
+        // dialog closes after loading in place
+        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+    });
+
     it("renders a seed pad wired to the seed field", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();

@@ -209,6 +209,23 @@ export function createPatternActions({
         });
     }
 
+    async function loadPattern(payload: PatternPayload): Promise<SimulationSnapshot | null> {
+        let parsedPattern: ParsedPattern;
+        try {
+            parsedPattern = parsePatternText(serializePatternPayload(payload));
+        } catch (error) {
+            handlePatternError("Load failed", error);
+            return null;
+        }
+        return importRuntime.applyParsedPattern(parsedPattern, {
+            failurePrefix: "Load failed",
+            successMessage: "Loaded board.",
+            cancelMessage: "Load canceled.",
+            blockingActivity: BLOCKING_ACTIVITY_APPLY_SHARE_LINK,
+            skipConfirm: true,
+        });
+    }
+
     return {
         openPatternImport,
         importPatternFile: (file) => importPatternFile(file),
@@ -217,5 +234,6 @@ export function createPatternActions({
         pastePattern: () => pastePattern(),
         copyShareLink: () => copyShareLink(),
         applyShareLinkFromHash: () => applyShareLinkFromHash(),
+        loadPattern: (payload) => loadPattern(payload),
     };
 }
