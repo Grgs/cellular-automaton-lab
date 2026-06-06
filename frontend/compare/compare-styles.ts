@@ -174,6 +174,14 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-link:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
+.compare-row-note {
+    font-size: 11px;
+    padding: 2px 7px;
+    color: var(--muted, #6d756f);
+    font-style: italic;
+    align-self: center;
+    cursor: help;
+}
 .compare-detail > td { background: var(--help-bg, rgba(0, 0, 0, 0.03)); padding: 10px 8px; }
 .compare-detail-status { font-size: 12px; color: var(--muted, #6d756f); }
 .compare-detail-grid { display: flex; gap: 18px; flex-wrap: wrap; }

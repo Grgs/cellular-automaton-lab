@@ -24,7 +24,11 @@ from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
 
 # A thumbnail of a very large patch is neither useful nor cheap to ship, so the
 # preview refuses oversized topologies. The frontend also gates on cell_count.
-_MAX_PREVIEW_CELLS = 4000
+# The cap covers the default sweep size of most tilings (so their begin/end
+# preview is offered); only a few extra-dense aperiodic/Archimedean tilings whose
+# default patch runs into the tens of thousands of cells stay above it, where the
+# ~5 MiB payload and DOM cost would not earn a useful 132 px thumbnail.
+_MAX_PREVIEW_CELLS = 10000
 _MIN_DIMENSION = 2
 _MAX_DIMENSION = 64
 _MAX_PATCH_DEPTH = 12

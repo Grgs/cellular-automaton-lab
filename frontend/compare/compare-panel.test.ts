@@ -299,4 +299,31 @@ describe("mountComparePanel", () => {
         previewButton?.click();
         expect(document.querySelector(".compare-detail")).toBeNull();
     });
+
+    it("shows a 'preview too large' note instead of a preview for oversized tilings", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const oversized = comparisonResult();
+        const oversizedRow = oversized.results[0];
+        if (!oversizedRow) {
+            throw new Error("missing result row");
+        }
+        oversizedRow.cell_count = 50000;
+        const { backend } = fakeBackend();
+        const wideBackend: SimulationBackend = { ...backend, compareSeed: async () => oversized };
+        mountComparePanel({ backend: wideBackend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-row-actions")).not.toBeNull();
+        });
+        const note = document.querySelector<HTMLElement>(".compare-row-note");
+        expect(note?.textContent).toBe("preview too large");
+        expect(note?.getAttribute("title")).toContain("50,000");
+        const previewButton = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-link"),
+        ].find((button) => button.textContent?.includes("preview"));
+        expect(previewButton).toBeUndefined();
+    });
 });

@@ -18,7 +18,7 @@ import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
 // patches are not offered a thumbnail (the backend would reject them anyway).
-const MAX_PREVIEW_CELLS = 4000;
+const MAX_PREVIEW_CELLS = 10000;
 
 // Mirrors the pattern schema in pattern-io.ts / parsers/pattern.ts; reused so a
 // begin/end state can be encoded as a shareable board link.
@@ -518,15 +518,23 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             wrap.append(linkButton(endLabel, endTitle, () => openPattern(end)));
         }
         wrap.append(copyLinkButton(end ?? begin));
-        if (
-            result.topology_spec &&
-            result.cell_count > 0 &&
-            result.cell_count <= MAX_PREVIEW_CELLS
-        ) {
-            const previewButton = linkButton("▸ preview", "Show begin/end thumbnails", () =>
-                togglePreview(comparison, result, previewButton),
-            );
-            wrap.append(previewButton);
+        if (result.topology_spec && result.cell_count > 0) {
+            if (result.cell_count <= MAX_PREVIEW_CELLS) {
+                const previewButton = linkButton("▸ preview", "Show begin/end thumbnails", () =>
+                    togglePreview(comparison, result, previewButton),
+                );
+                wrap.append(previewButton);
+            } else {
+                // Too dense for a useful 132 px thumbnail; say so rather than
+                // silently dropping the preview affordance.
+                wrap.append(
+                    el("span", {
+                        class: "compare-row-note",
+                        textContent: "preview too large",
+                        title: `${result.cell_count.toLocaleString()} cells exceeds the ${MAX_PREVIEW_CELLS.toLocaleString()}-cell preview limit`,
+                    }),
+                );
+            }
         }
         return wrap;
     }
