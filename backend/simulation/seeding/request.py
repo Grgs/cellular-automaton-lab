@@ -17,6 +17,7 @@ from backend.simulation.seeding.comparison import (
     DEFAULT_STEPS,
     compare_seed,
 )
+from backend.simulation.seeding.shapes import NAMED_PATTERNS
 from backend.simulation.seeding.traversal import DEFAULT_TRAVERSAL, TRAVERSALS
 
 # Guard rails so a single request cannot ask for an unboundedly large sweep.
@@ -34,6 +35,7 @@ class CompareRequest:
     grid_size: int
     geometries: tuple[str, ...] | None
     include_states: bool
+    pattern: str | None
 
 
 def _bounded_int(value: Any, *, default: int, low: int, high: int, name: str) -> int:
@@ -49,9 +51,21 @@ def _bounded_int(value: Any, *, default: int, low: int, high: int, name: str) ->
 
 
 def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
-    seed = payload.get("seed")
-    if not isinstance(seed, str) or not seed.strip():
-        raise ValueError("'seed' must be a non-empty string.")
+    pattern_value = payload.get("pattern")
+    pattern = pattern_value if isinstance(pattern_value, str) and pattern_value else None
+    if pattern is not None and pattern not in NAMED_PATTERNS:
+        raise ValueError(
+            f"Unknown pattern {pattern!r}. Available: {', '.join(sorted(NAMED_PATTERNS))}."
+        )
+
+    seed_value = payload.get("seed")
+    if pattern is None:
+        # Bit-string mode requires a seed; in pattern mode the seed is ignored.
+        if not isinstance(seed_value, str) or not seed_value.strip():
+            raise ValueError("'seed' must be a non-empty string.")
+        seed = seed_value
+    else:
+        seed = seed_value if isinstance(seed_value, str) else ""
     if len(seed) > _MAX_SEED_LENGTH:
         raise ValueError(f"'seed' must be at most {_MAX_SEED_LENGTH} characters.")
 
@@ -98,6 +112,7 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
         grid_size=grid_size,
         geometries=geometries,
         include_states=bool(payload.get("include_states", False)),
+        pattern=pattern,
     )
 
 
@@ -112,5 +127,6 @@ def run_compare_request(payload: Mapping[str, Any]) -> dict[str, Any]:
         steps=request.steps,
         grid_size=request.grid_size,
         include_states=request.include_states,
+        pattern=request.pattern,
     )
     return comparison.to_dict()

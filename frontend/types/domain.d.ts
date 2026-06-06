@@ -186,6 +186,8 @@ export interface CompareRequest {
     grid_size?: number;
     geometries?: readonly string[];
     include_states?: boolean;
+    /** When set, seed each tiling with this named shape (Policy A) instead of the bit seed. */
+    pattern?: string;
 }
 
 export interface TopologyComparisonResultPayload {

@@ -415,7 +415,9 @@ A self-contained overlay that runs one seed under one rule across many tilings a
 - [backend/simulation/seeding/metrics.py](../backend/simulation/seeding/metrics.py)
   Rule-agnostic measurement: `population`, `hamming` change rate, and end-state `classify` (extinct / still-life / oscillator / unsettled).
 - [backend/simulation/seeding/comparison.py](../backend/simulation/seeding/comparison.py)
-  `compare_seed(...)` sweeps a seed across geometries, detects cycles, isolates per-tiling errors, flags degenerate seeds, and can optionally return sparse begin/end board states for callers that need reconstructable links.
+  `compare_seed(...)` sweeps a seed across geometries, detects cycles, isolates per-tiling errors, flags degenerate seeds, and can optionally return sparse begin/end board states for callers that need reconstructable links. Accepts a `pattern` for shape-mode seeding.
+- [backend/simulation/seeding/shapes.py](../backend/simulation/seeding/shapes.py)
+  Policy A: a named-pattern library (glider, R-pentomino, …) and `place_pattern(...)`, which centres a recognisable shape on a topology and lights the nearest cell to each point — preserving the 2-D shape across tilings instead of the live-cell count.
 
 ## Tests And Tooling
 
