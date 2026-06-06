@@ -52,6 +52,8 @@ interface MountComparePanelOptions {
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
     host?: HTMLElement;
+    /** When provided, begin/end open into the current board instead of a new tab. */
+    onOpenPattern?: (pattern: PatternPayload) => void;
 }
 
 interface TilingOption {
@@ -445,6 +447,15 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         );
     }
 
+    function openPattern(pattern: PatternPayload): void {
+        if (options.onOpenPattern) {
+            options.onOpenPattern(pattern);
+            close();
+            return;
+        }
+        openPatternInTab(pattern);
+    }
+
     function renderRowActions(
         comparison: SeedComparisonResult,
         result: TopologyComparisonResultPayload,
@@ -455,15 +466,18 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         }
         const end = buildStatePattern(comparison, result, "end");
         const wrap = el("div", { class: "compare-row-actions" });
-        wrap.append(
-            linkButton("begin ↗", "Open the seed on this tiling", () => openPatternInTab(begin)),
-        );
+        const inPlace = options.onOpenPattern;
+        const beginLabel = inPlace ? "begin" : "begin ↗";
+        const beginTitle = inPlace
+            ? "Load the seed on this tiling into the board"
+            : "Open the seed on this tiling in a new tab";
+        wrap.append(linkButton(beginLabel, beginTitle, () => openPattern(begin)));
         if (end) {
-            wrap.append(
-                linkButton("end ↗", "Open the final state on this tiling", () =>
-                    openPatternInTab(end),
-                ),
-            );
+            const endLabel = inPlace ? "end" : "end ↗";
+            const endTitle = inPlace
+                ? "Load the final state on this tiling into the board"
+                : "Open the final state on this tiling in a new tab";
+            wrap.append(linkButton(endLabel, endTitle, () => openPattern(end)));
         }
         wrap.append(copyLinkButton(end ?? begin));
         if (

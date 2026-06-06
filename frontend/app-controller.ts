@@ -109,6 +109,7 @@ export function createAppController({
         applySimulationState: sync.applySimulationState,
         applyCellSize: (nextCellSize) => controlActions?.setCellSize?.(nextCellSize),
         applyPaintState: (nextPaintState) => controlActions?.setPaintState(nextPaintState),
+        loadPattern: (payload) => controlActions?.loadPattern(payload) ?? Promise.resolve(null),
         getState: () => state,
         getInteractions: () => interactions,
         getViewportController: () => viewportController,

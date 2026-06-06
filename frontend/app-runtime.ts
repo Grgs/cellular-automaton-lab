@@ -44,7 +44,13 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
     disposeReviewApi = installReviewApi({ controller, gridView, elements });
     try {
         const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
-        comparePanel = mountComparePanel({ backend, bootstrapData });
+        comparePanel = mountComparePanel({
+            backend,
+            bootstrapData,
+            onOpenPattern: (payload) => {
+                void controller.loadPattern(payload);
+            },
+        });
     } catch (error) {
         handleAppError(error);
     }

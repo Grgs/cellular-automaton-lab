@@ -82,6 +82,7 @@ export interface PatternActionSet {
     pastePattern(): Promise<SimulationSnapshot | null>;
     copyShareLink(): Promise<string | null>;
     applyShareLinkFromHash(): Promise<SimulationSnapshot | null>;
+    loadPattern(payload: PatternPayload): Promise<SimulationSnapshot | null>;
 }
 
 export interface PresetActionSet {
