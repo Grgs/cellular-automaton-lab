@@ -74,6 +74,22 @@ class ApiCompareTests(ApiTestCase):
         result = response.get_json()["comparison"]["results"][0]
         self.assertNotIn("topology_spec", result)
 
+    def test_compare_pattern_mode_seeds_a_shape_without_a_seed(self) -> None:
+        response = self.client.post(
+            "/api/compare",
+            json={"pattern": "glider", "geometries": ["square", "hex"], "steps": 8},
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.get_json()["comparison"]["results"]
+        self.assertEqual([result["seed_cells"] for result in results], [5, 5])
+
+    def test_compare_rejects_unknown_pattern(self) -> None:
+        response = self.client.post(
+            "/api/compare",
+            json={"pattern": "spaceship", "geometries": ["square"]},
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_compare_rejects_out_of_range_steps(self) -> None:
         response = self.client.post(
             "/api/compare",

@@ -141,6 +141,25 @@ class CompareSeedTests(unittest.TestCase):
         self.assertIsNone(result.topology_spec)
         self.assertNotIn("topology_spec", result.to_dict())
 
+    def test_pattern_mode_places_the_shape_geometrically(self) -> None:
+        # A glider has 5 cells; on a large grid all 5 land on distinct cells.
+        comparison = compare_seed(pattern="glider", seed="", geometries=("square", "hex"), steps=5)
+        for result in comparison.results:
+            self.assertEqual(result.seed_cells, 5)
+            self.assertEqual(result.seed_bits, 5)
+            self.assertNotEqual(result.classification, "error")
+
+    def test_pattern_blinker_oscillates_on_square(self) -> None:
+        # A geometrically placed blinker is a real Conway blinker (period 2).
+        result = compare_seed(pattern="blinker", seed="", geometries=("square",), steps=10).results[
+            0
+        ]
+        self.assertEqual(result.classification, "oscillator-p2")
+
+    def test_unknown_pattern_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            compare_seed(pattern="spaceship", seed="", geometries=("square",))
+
 
 class MetricsTests(unittest.TestCase):
     def test_population_counts_non_zero_states(self) -> None:
