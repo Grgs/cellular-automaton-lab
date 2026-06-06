@@ -9,7 +9,7 @@ import type {
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
-import { TRAVERSAL_OPTIONS } from "./compare-options.js";
+import { SEED_SHAPE_OPTIONS, TRAVERSAL_OPTIONS } from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
@@ -172,8 +172,18 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         min: "2",
         max: "64",
     });
+    const shapeSelect = el(
+        "select",
+        { class: "compare-field" },
+        SEED_SHAPE_OPTIONS.map((option) =>
+            el("option", { value: option.value, textContent: option.label }),
+        ),
+    );
 
     const tilingList = el("div", { class: "compare-tilings" });
+
+    // "" = bit-string seed (pad/preview); otherwise a named shape (Policy A).
+    const isShapeMode = (): boolean => shapeSelect.value !== "";
 
     const seedPreview = createSeedPreview({
         backend: options.backend,
@@ -190,15 +200,26 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         getSeed: () => seedInput.value,
         onSeedChange: (formatted) => {
             seedInput.value = formatted;
-            seedPreview.redraw();
+            redrawPreview();
         },
     });
+    // The bit pad + live preview only apply to the bit-string seed.
+    const refreshPreview = (): void => {
+        if (!isShapeMode()) {
+            seedPreview.refresh();
+        }
+    };
+    const redrawPreview = (): void => {
+        if (!isShapeMode()) {
+            seedPreview.redraw();
+        }
+    };
     seedInput.addEventListener("input", () => {
         seedPad.syncFromSeed();
-        seedPreview.redraw();
+        redrawPreview();
     });
-    traversalSelect.addEventListener("change", () => seedPreview.refresh());
-    gridInput.addEventListener("change", () => seedPreview.refresh());
+    traversalSelect.addEventListener("change", refreshPreview);
+    gridInput.addEventListener("change", refreshPreview);
 
     const runButton = el("button", { class: "compare-run", type: "button" }, ["Run comparison"]);
     const statusLine = el("div", { class: "compare-status", role: "status" });
@@ -209,6 +230,29 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         { class: "compare-close", type: "button", "aria-label": "Close" },
         ["×"],
     );
+
+    const seedPadBlock = el("div", { class: "compare-seedpad-block" }, [
+        el("div", {
+            class: "compare-seedpad-title",
+            textContent: "Or draw the seed (read row-major into the bit string)",
+        }),
+        seedPad.element,
+        el("div", {
+            class: "compare-seedpad-title",
+            textContent: "Seed lands like this on:",
+        }),
+        seedPreview.element,
+    ]);
+
+    // Switching seed source toggles the bit pad/preview and refreshes accordingly.
+    shapeSelect.addEventListener("change", () => {
+        const shapeMode = isShapeMode();
+        seedPadBlock.style.display = shapeMode ? "none" : "";
+        seedInput.disabled = shapeMode;
+        if (!shapeMode) {
+            seedPreview.refresh();
+        }
+    });
 
     const dialog = el(
         "div",
@@ -231,23 +275,13 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             }),
             el("div", { class: "compare-form" }, [
                 labeledField("Rule", ruleSelect),
+                labeledField("Seed source", shapeSelect),
                 labeledField("Seed (bits)", seedInput),
                 labeledField("Traversal", traversalSelect),
                 labeledField("Steps", stepsInput),
                 labeledField("Grid size", gridInput),
             ]),
-            el("div", { class: "compare-seedpad-block" }, [
-                el("div", {
-                    class: "compare-seedpad-title",
-                    textContent: "Or draw the seed (read row-major into the bit string)",
-                }),
-                seedPad.element,
-                el("div", {
-                    class: "compare-seedpad-title",
-                    textContent: "Seed lands like this on:",
-                }),
-                seedPreview.element,
-            ]),
+            seedPadBlock,
             el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
             el("div", { class: "compare-actions" }, [runButton, statusLine]),
             resultsArea,
@@ -282,18 +316,18 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         allButton.addEventListener("click", () => {
             allTilings.forEach((option) => selected.add(option.geometry));
             renderTilingChecklist();
-            seedPreview.refresh();
+            refreshPreview();
         });
         noneButton.addEventListener("click", () => {
             selected.clear();
             renderTilingChecklist();
-            seedPreview.refresh();
+            refreshPreview();
         });
         resetButton.addEventListener("click", () => {
             selected.clear();
             defaultSelection(allTilings).forEach((geometry) => selected.add(geometry));
             renderTilingChecklist();
-            seedPreview.refresh();
+            refreshPreview();
         });
         return el("div", { class: "compare-tilings-controls" }, [
             el("span", { class: "compare-tilings-summary", id: "compare-tilings-summary" }),
@@ -334,7 +368,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                         selected.delete(option.geometry);
                     }
                     updateSummary();
-                    seedPreview.refresh();
+                    refreshPreview();
                 });
                 group.append(
                     el("label", { class: "compare-tiling" }, [
@@ -409,12 +443,16 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             grid_size: clampNumber(gridInput.value, 2, 64, 16),
             geometries: [...selected],
             include_states: true,
+            ...(isShapeMode() ? { pattern: shapeSelect.value } : {}),
         };
 
         try {
             const comparison = await options.backend.compareSeed(request);
             renderResults(comparison);
-            statusLine.textContent = `Done — ${comparison.results.length} tilings, ${comparison.seed_bits} bits.`;
+            const sourceDesc = isShapeMode()
+                ? `shape "${shapeSelect.value}"`
+                : `${comparison.seed_bits} bits`;
+            statusLine.textContent = `Done — ${comparison.results.length} tilings, ${sourceDesc}.`;
         } catch (error) {
             statusLine.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
         } finally {
@@ -617,7 +655,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         backdrop.hidden = false;
         void ensureRules();
-        seedPreview.refresh();
+        refreshPreview();
         dialog.focus();
     }
 
