@@ -5,7 +5,7 @@
         {"name": "bootstrap-data", "patterns": ["standalone-bootstrap.json"], "raw": 50000, "gzip": 12000},
         {"name": "python-bundle", "patterns": ["standalone-python-bundle.json"], "raw": 9500000, "gzip": 3000000},
         {"name": "build-manifest", "patterns": ["build-manifest.json"], "raw": 25000, "gzip": 6000},
-        {"name": "js-runtime", "patterns": ["assets/app-runtime-*.js"], "raw": 335000, "gzip": 93500},
+        {"name": "js-runtime", "patterns": ["assets/app-runtime-*.js"], "raw": 350000, "gzip": 101000},
         {"name": "js-standalone", "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"], "raw": 25000, "gzip": 8000},
         {"name": "css", "patterns": ["assets/*.css"], "raw": 35000, "gzip": 7100},
         {"name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000},

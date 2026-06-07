@@ -11,27 +11,33 @@ const FAMILIES: TopologyOption[] = [
         label: "Square",
         group: "Classic",
         order: 10,
+        family: "regular",
         previewKey: "square",
         renderKind: "regular_grid",
         sizingMode: "grid",
+        searchAliases: [],
     },
     {
         value: "hex",
         label: "Hexagonal",
         group: "Classic",
         order: 20,
+        family: "regular",
         previewKey: "hex",
         renderKind: "regular_grid",
         sizingMode: "grid",
+        searchAliases: ["honeycomb"],
     },
     {
         value: "penrose-p3-rhombs",
         label: "Penrose P3 Rhombs",
         group: "Aperiodic",
         order: 220,
+        family: "aperiodic",
         previewKey: "penrose-p3-rhombs",
         renderKind: "polygon_aperiodic",
         sizingMode: "patch_depth",
+        searchAliases: ["fat skinny rhombs"],
     },
 ];
 
@@ -90,9 +96,11 @@ describe("controls/view-options tiling picker", () => {
             label: "Square-Octagon",
             group: "Periodic Mixed",
             order: 110,
+            family: "mixed",
             previewKey: "archimedean-4-8-8",
             renderKind: "polygon_periodic",
             sizingMode: "grid",
+            searchAliases: ["4 8 8", "488"],
         });
 
         const polygons = Array.from(thumbnail.querySelectorAll("polygon"));

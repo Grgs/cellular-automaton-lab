@@ -84,12 +84,47 @@ function tilingOptionsSignature(families: readonly TopologyOption[]): string {
                 family.group,
                 family.value,
                 family.label,
+                family.family,
                 family.previewKey,
                 family.renderKind,
                 family.sizingMode,
+                family.searchAliases.join(","),
             ].join(":"),
         )
         .join("|");
+}
+
+function normalizeTilingSearchText(value: string): string {
+    return value
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+}
+
+function tilingSearchForms(value: string): string[] {
+    const normalized = normalizeTilingSearchText(value);
+    if (!normalized) {
+        return [];
+    }
+    const compact = normalized.replace(/\s+/g, "");
+    return compact === normalized ? [normalized] : [normalized, compact];
+}
+
+function tilingSearchText(optionData: TopologyOption): string {
+    const terms = [
+        optionData.label,
+        optionData.value,
+        optionData.group,
+        optionData.family,
+        optionData.sizingMode === "patch_depth" ? "patch depth substitution" : "grid cell size",
+        optionData.renderKind,
+        optionData.previewKey,
+        ...optionData.searchAliases,
+    ];
+    return [...new Set(terms.flatMap(tilingSearchForms))].join(" ");
 }
 
 function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {
@@ -97,16 +132,7 @@ function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {
     button.type = "button";
     button.className = "tiling-preview-card";
     button.dataset.tilingFamily = optionData.value;
-    button.dataset.searchText = [
-        optionData.label,
-        optionData.value,
-        optionData.group,
-        optionData.sizingMode === "patch_depth" ? "patch" : "grid",
-        optionData.renderKind,
-        optionData.previewKey,
-    ]
-        .join(" ")
-        .toLowerCase();
+    button.dataset.searchText = tilingSearchText(optionData);
     button.setAttribute("aria-pressed", "false");
 
     const thumbnail = document.createElement("span");

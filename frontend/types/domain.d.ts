@@ -102,9 +102,11 @@ export interface TopologyOption {
     label: string;
     group: string;
     order: number;
+    family: string;
     previewKey: string;
     renderKind: string;
     sizingMode: string;
+    searchAliases: readonly string[];
 }
 
 export interface AdjacencyModeOption {
