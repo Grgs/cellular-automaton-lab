@@ -122,6 +122,8 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         patchDepthInput: null,
         patchDepthLabel: null,
         themeToggleBtn: null,
+        ruleSearchInput: null,
+        ruleSearchStatus: null,
         ruleSelect: null,
         runToggleBtn: null,
         stepBtn: null,

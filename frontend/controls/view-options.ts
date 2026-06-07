@@ -3,6 +3,13 @@ import type { DomElements } from "../types/dom.js";
 import type { RuleSelectOption } from "../types/ui.js";
 import { createTilingPreviewThumbnail } from "./tiling-preview.js";
 
+interface RuleSelectRenderState {
+    rules: readonly RuleSelectOption[];
+    selectedValue: string;
+}
+
+const ruleSelectState = new WeakMap<HTMLSelectElement, RuleSelectRenderState>();
+
 function populateOptions<
     TOption extends object,
     TValueKey extends keyof TOption,
@@ -34,7 +41,95 @@ export function populateRules(
     rules: readonly RuleSelectOption[],
     selectedValue = "",
 ): void {
-    populateOptions(elements.ruleSelect, rules, "name", "displayName", selectedValue);
+    if (!elements.ruleSelect) {
+        return;
+    }
+    ruleSelectState.set(elements.ruleSelect, { rules, selectedValue });
+    renderRuleOptions(elements, rules, selectedValue);
+}
+
+export function refreshRuleFilter(elements: DomElements): void {
+    const selectElement = elements.ruleSelect;
+    if (!selectElement) {
+        return;
+    }
+    const renderState = ruleSelectState.get(selectElement);
+    if (!renderState) {
+        return;
+    }
+    renderRuleOptions(elements, renderState.rules, renderState.selectedValue);
+}
+
+function normalizedRuleSearchText(value: string): string {
+    return value.trim().toLowerCase();
+}
+
+function ruleMatchesSearch(rule: RuleSelectOption, query: string): boolean {
+    if (!query) {
+        return true;
+    }
+    const searchableText = normalizedRuleSearchText(
+        rule.searchText || `${rule.displayName} ${rule.name}`,
+    );
+    return query.split(/\s+/).every((token) => searchableText.includes(token));
+}
+
+function renderRuleOptions(
+    elements: DomElements,
+    rules: readonly RuleSelectOption[],
+    selectedValue: string,
+): void {
+    const selectElement = elements.ruleSelect;
+    if (!selectElement) {
+        return;
+    }
+
+    const query = normalizedRuleSearchText(elements.ruleSearchInput?.value ?? "");
+    const matchingRules = rules.filter((rule) => ruleMatchesSearch(rule, query));
+    const selectedRule = rules.find((rule) => rule.name === selectedValue) ?? null;
+    const selectedRuleAlreadyVisible = Boolean(
+        selectedRule && matchingRules.some((rule) => rule.name === selectedRule.name),
+    );
+    const visibleRules =
+        selectedRule && query && !selectedRuleAlreadyVisible
+            ? [selectedRule, ...matchingRules]
+            : matchingRules;
+
+    selectElement.innerHTML = "";
+    if (visibleRules.length === 0) {
+        const optionElement = document.createElement("option");
+        optionElement.value = "";
+        optionElement.textContent = "No rules match this search";
+        optionElement.disabled = true;
+        optionElement.selected = true;
+        selectElement.appendChild(optionElement);
+    } else {
+        visibleRules.forEach((rule) => {
+            const optionElement = document.createElement("option");
+            optionElement.value = rule.name;
+            optionElement.textContent = rule.displayName;
+            optionElement.title = rule.description;
+            if (optionElement.value === selectedValue) {
+                optionElement.selected = true;
+            }
+            selectElement.appendChild(optionElement);
+        });
+    }
+
+    if (!elements.ruleSearchStatus) {
+        return;
+    }
+    if (!query) {
+        elements.ruleSearchStatus.textContent = `${rules.length} rules available`;
+        return;
+    }
+    if (matchingRules.length === 0 && selectedRule) {
+        elements.ruleSearchStatus.textContent = "No matches; current rule remains selected";
+        return;
+    }
+    const keptCurrentText =
+        selectedRule && !selectedRuleAlreadyVisible ? " · current rule kept" : "";
+    elements.ruleSearchStatus.textContent = `Showing ${matchingRules.length} / ${rules.length} rules${keptCurrentText}`;
 }
 
 export function populateTilingFamilies(

@@ -66,6 +66,8 @@ export const elements: DomElements = {
     patchDepthInput: elementById("patch-depth-input"),
     patchDepthLabel: elementById("patch-depth-label"),
     themeToggleBtn: elementById("theme-toggle-btn"),
+    ruleSearchInput: elementById("rule-search-input"),
+    ruleSearchStatus: elementById("rule-search-status"),
     ruleSelect: elementById("rule-select"),
     runToggleBtn: elementById("run-toggle-btn"),
     stepBtn: elementById("step-btn"),

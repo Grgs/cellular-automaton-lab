@@ -400,7 +400,21 @@
                     </div>
                     <label class="top-control compact-select drawer-control drawer-rule-control">
                         <span class="top-control-label">Rule</span>
+                        <input
+                            id="rule-search-input"
+                            class="rule-search-input"
+                            type="search"
+                            placeholder="Search rules"
+                            autocomplete="off"
+                            aria-label="Search rules"
+                            aria-describedby="rule-search-status"
+                        />
                         <select id="rule-select"></select>
+                        <span
+                            id="rule-search-status"
+                            class="rule-search-status"
+                            aria-live="polite"
+                        ></span>
                     </label>
                     <p id="rule-summary-text" class="rule-summary"></p>
                     <details id="rule-notes-toggle" class="rule-help-toggle">
