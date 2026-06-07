@@ -246,6 +246,7 @@ export interface TopologyPreviewCell {
 
 export interface TopologyPreview {
     topology_revision: string;
+    topology_spec: TopologySpec;
     cells: TopologyPreviewCell[];
     /** Cell ids in canonical traversal order; present only when a traversal was requested. */
     order?: string[];

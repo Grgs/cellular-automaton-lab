@@ -1,11 +1,23 @@
 import { describe, expect, it } from "vitest";
 
 import { buildBoardThumbnailSvg, computeBounds, fitDimensions } from "./compare-thumbnail.js";
-import type { TopologyPreview } from "../types/domain.js";
+import type { TopologyPreview, TopologySpec } from "../types/domain.js";
+
+function topologySpec(): TopologySpec {
+    return {
+        tiling_family: "square",
+        adjacency_mode: "edge",
+        sizing_mode: "grid",
+        width: 2,
+        height: 1,
+        patch_depth: 0,
+    };
+}
 
 function preview(): TopologyPreview {
     return {
         topology_revision: "r",
+        topology_spec: topologySpec(),
         cells: [
             {
                 id: "a",

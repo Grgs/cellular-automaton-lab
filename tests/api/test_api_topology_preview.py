@@ -18,6 +18,17 @@ class ApiTopologyPreviewTests(ApiTestCase):
         self.assertEqual(response.status_code, 200)
         preview = response.get_json()["topology_preview"]
         self.assertIn("topology_revision", preview)
+        self.assertEqual(
+            preview["topology_spec"],
+            {
+                "tiling_family": "hex",
+                "adjacency_mode": "edge",
+                "sizing_mode": "grid",
+                "width": 6,
+                "height": 6,
+                "patch_depth": 4,
+            },
+        )
         self.assertGreater(len(preview["cells"]), 0)
         cell = preview["cells"][0]
         self.assertIn("id", cell)

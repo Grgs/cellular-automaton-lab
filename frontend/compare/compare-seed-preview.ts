@@ -28,6 +28,12 @@ export interface SeedPreviewOptions {
     getTilings(): SeedPreviewTiling[];
     /** Named shape for Policy-A placement, or "" for bit-string seeding. */
     getPattern?(): string;
+    getPreviewHref?(entry: {
+        cellsById: Record<string, number>;
+        geometry: string;
+        label: string;
+        preview: TopologyPreview;
+    }): string | null;
     maxTilings?: number;
 }
 
@@ -62,6 +68,18 @@ function el(tag: string, className: string, text?: string): HTMLElement {
         node.textContent = text;
     }
     return node;
+}
+
+function thumbnailLink(href: string, label: string, thumbnail: SVGSVGElement): HTMLAnchorElement {
+    const anchor = document.createElement("a");
+    anchor.className = "compare-thumb-link";
+    anchor.href = href;
+    anchor.target = "_blank";
+    anchor.rel = "noopener";
+    anchor.title = `Open ${label} seed placement`;
+    anchor.setAttribute("aria-label", `Open ${label} seed placement`);
+    anchor.append(thumbnail);
+    return anchor;
 }
 
 interface PreviewEntry {
@@ -120,13 +138,19 @@ export function createSeedPreview(options: SeedPreviewOptions): SeedPreviewContr
         const cellsById = currentPattern()
             ? (entry.preview.shape_cells ?? {})
             : placeSeedOnOrder(entry.preview.order ?? [], toBits(options.getSeed()));
-        slot.replaceChildren(
-            buildBoardThumbnailSvg(entry.preview, cellsById, {
-                size: THUMB_SIZE,
-                liveColor: () => "var(--accent, #bf5a36)",
-                label: `${entry.label} seed placement`,
-            }),
-        );
+        const thumbnail = buildBoardThumbnailSvg(entry.preview, cellsById, {
+            size: THUMB_SIZE,
+            liveColor: () => "var(--accent, #bf5a36)",
+            label: `${entry.label} seed placement`,
+        });
+        const href =
+            options.getPreviewHref?.({
+                cellsById,
+                geometry: entry.geometry,
+                label: entry.label,
+                preview: entry.preview,
+            }) ?? null;
+        slot.replaceChildren(href ? thumbnailLink(href, entry.label, thumbnail) : thumbnail);
     }
 
     function renderSkeleton(): void {

@@ -21,7 +21,7 @@ from backend.simulation.seeding.comparison import board_size_for
 from backend.simulation.seeding.shapes import NAMED_PATTERNS, place_pattern
 from backend.simulation.seeding.traversal import TRAVERSALS
 from backend.simulation.topology import build_topology
-from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
+from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES, topology_spec_payload
 
 # A thumbnail of a very large patch is neither useful nor cheap to ship, so the
 # preview refuses oversized topologies. The frontend also gates on cell_count.
@@ -99,7 +99,18 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
             }
         )
 
-    result: dict[str, Any] = {"topology_revision": topology.topology_revision, "cells": cells}
+    result: dict[str, Any] = {
+        "topology_revision": topology.topology_revision,
+        "topology_spec": dict(
+            topology_spec_payload(
+                geometry,
+                width=width,
+                height=height,
+                patch_depth=patch_depth,
+            )
+        ),
+        "cells": cells,
+    }
 
     # When a traversal is requested, also return the canonical cell-id order so a
     # caller can place a seed bit-string onto this tiling client-side (the same

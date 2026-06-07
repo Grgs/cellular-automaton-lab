@@ -2,11 +2,23 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createSeedPreview, placeSeedOnOrder } from "./compare-seed-preview.js";
 import type { SimulationBackend } from "../types/controller.js";
-import type { SimulationSnapshot, TopologyPreview } from "../types/domain.js";
+import type { SimulationSnapshot, TopologyPreview, TopologySpec } from "../types/domain.js";
+
+function topologySpec(): TopologySpec {
+    return {
+        tiling_family: "square",
+        adjacency_mode: "edge",
+        sizing_mode: "grid",
+        width: 4,
+        height: 4,
+        patch_depth: 0,
+    };
+}
 
 function previewWith(order: string[]): TopologyPreview {
     return {
         topology_revision: "t",
+        topology_spec: topologySpec(),
         order,
         cells: order.map((id, index) => ({
             id,
@@ -93,6 +105,31 @@ describe("createSeedPreview", () => {
 
         const request = previewTopology.mock.calls.at(0)?.[0];
         expect(request).toMatchObject({ geometry: "square", grid_size: 4, traversal: "bfs" });
+    });
+
+    it("wraps placement thumbnails in links when a preview href is provided", async () => {
+        const { backend } = backendReturning(previewWith(["a", "b", "c", "d"]));
+        const preview = createSeedPreview({
+            backend,
+            getSeed: () => "1010",
+            getTraversal: () => "bfs",
+            getGridSize: () => 4,
+            getTilings: () => [{ geometry: "square", label: "Square" }],
+            getPreviewHref: ({ cellsById, preview: topologyPreview }) => {
+                expect(cellsById).toEqual({ a: 1, c: 1 });
+                expect(topologyPreview.topology_spec.tiling_family).toBe("square");
+                return "#share=v1.seed";
+            },
+        });
+        document.body.append(preview.element);
+        preview.refresh();
+
+        await vi.waitFor(() => {
+            expect(preview.element.querySelector(".compare-thumb-link")).not.toBeNull();
+        });
+        const link = preview.element.querySelector<HTMLAnchorElement>(".compare-thumb-link");
+        expect(link?.getAttribute("href")).toBe("#share=v1.seed");
+        expect(link?.querySelector(".compare-thumb")).not.toBeNull();
     });
 
     it("renders shape_cells and requests a pattern (not a traversal) in shape mode", async () => {
