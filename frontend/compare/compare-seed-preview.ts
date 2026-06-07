@@ -26,6 +26,8 @@ export interface SeedPreviewOptions {
     getGridSize(): number;
     /** Selected tilings in display order; only the first few are previewed. */
     getTilings(): SeedPreviewTiling[];
+    /** Named shape for Policy-A placement, or "" for bit-string seeding. */
+    getPattern?(): string;
     maxTilings?: number;
 }
 
@@ -76,18 +78,26 @@ export function createSeedPreview(options: SeedPreviewOptions): SeedPreviewContr
     let entries: PreviewEntry[] = [];
     let redrawTimer: number | null = null;
 
+    function currentPattern(): string {
+        return options.getPattern?.() ?? "";
+    }
+
     function cacheKey(geometry: string): string {
-        return `${geometry}:${options.getGridSize()}:${options.getTraversal()}`;
+        const pattern = currentPattern();
+        return pattern
+            ? `${geometry}:${options.getGridSize()}:shape:${pattern}`
+            : `${geometry}:${options.getGridSize()}:${options.getTraversal()}`;
     }
 
     function fetchPreview(geometry: string): Promise<TopologyPreview> {
         const key = cacheKey(geometry);
         let pending = cache.get(key);
         if (!pending) {
+            const pattern = currentPattern();
             pending = options.backend.previewTopology({
                 geometry,
                 grid_size: options.getGridSize(),
-                traversal: options.getTraversal(),
+                ...(pattern ? { pattern } : { traversal: options.getTraversal() }),
             });
             cache.set(key, pending);
         }
@@ -107,7 +117,9 @@ export function createSeedPreview(options: SeedPreviewOptions): SeedPreviewContr
             slot.textContent = "…";
             return;
         }
-        const cellsById = placeSeedOnOrder(entry.preview.order ?? [], toBits(options.getSeed()));
+        const cellsById = currentPattern()
+            ? (entry.preview.shape_cells ?? {})
+            : placeSeedOnOrder(entry.preview.order ?? [], toBits(options.getSeed()));
         slot.replaceChildren(
             buildBoardThumbnailSvg(entry.preview, cellsById, {
                 size: THUMB_SIZE,

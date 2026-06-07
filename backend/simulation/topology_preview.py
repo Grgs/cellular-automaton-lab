@@ -18,6 +18,7 @@ from typing import Any
 from backend.simulation.rule_context_frames import topology_frame_for
 from backend.simulation.rule_context_geometry import cell_geometry
 from backend.simulation.seeding.comparison import board_size_for
+from backend.simulation.seeding.shapes import NAMED_PATTERNS, place_pattern
 from backend.simulation.seeding.traversal import TRAVERSALS
 from backend.simulation.topology import build_topology
 from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
@@ -109,5 +110,14 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
             raise ValueError(f"'traversal' must be one of: {', '.join(sorted(TRAVERSALS))}.")
         frame = topology_frame_for(topology)
         result["order"] = list(TRAVERSALS[traversal](frame))
+
+    # When a named shape is requested, return the exact cells the comparison would
+    # light (Policy A geometric placement), so a live preview matches the run.
+    pattern = payload.get("pattern")
+    if pattern not in (None, ""):
+        if not isinstance(pattern, str) or pattern not in NAMED_PATTERNS:
+            raise ValueError(f"'pattern' must be one of: {', '.join(sorted(NAMED_PATTERNS))}.")
+        frame = topology_frame_for(topology)
+        result["shape_cells"] = place_pattern(frame, NAMED_PATTERNS[pattern])
 
     return result

@@ -95,6 +95,34 @@ describe("createSeedPreview", () => {
         expect(request).toMatchObject({ geometry: "square", grid_size: 4, traversal: "bfs" });
     });
 
+    it("renders shape_cells and requests a pattern (not a traversal) in shape mode", async () => {
+        const shapePreview: TopologyPreview = {
+            ...previewWith(["a", "b", "c", "d"]),
+            shape_cells: { b: 1, d: 1 },
+        };
+        const { backend, previewTopology } = backendReturning(shapePreview);
+        const preview = createSeedPreview({
+            backend,
+            getSeed: () => "0000", // ignored in shape mode
+            getTraversal: () => "bfs",
+            getGridSize: () => 4,
+            getPattern: () => "blinker",
+            getTilings: () => [{ geometry: "square", label: "Square" }],
+        });
+        document.body.append(preview.element);
+        preview.refresh();
+
+        await vi.waitFor(() => {
+            expect(preview.element.querySelectorAll(".compare-thumb")).toHaveLength(1);
+        });
+        // Live cells come from shape_cells (b, d), not the seed bit-string.
+        expect(preview.element.querySelectorAll(".compare-thumb polygon.is-live")).toHaveLength(2);
+
+        const request = previewTopology.mock.calls.at(0)?.[0];
+        expect(request).toMatchObject({ geometry: "square", grid_size: 4, pattern: "blinker" });
+        expect(request).not.toHaveProperty("traversal");
+    });
+
     it("caps the number of previewed tilings", async () => {
         const { backend } = backendReturning(previewWith(["a", "b"]));
         const preview = createSeedPreview({

@@ -233,6 +233,8 @@ export interface TopologyPreviewRequest {
     /** When set, the tiling is built at the size a comparison sweep would use. */
     grid_size?: number;
     traversal?: string;
+    /** When set, the named shape's geometric placement is returned as shape_cells. */
+    pattern?: string;
 }
 
 export interface TopologyPreviewCell {
@@ -247,6 +249,8 @@ export interface TopologyPreview {
     cells: TopologyPreviewCell[];
     /** Cell ids in canonical traversal order; present only when a traversal was requested. */
     order?: string[];
+    /** Live cell ids for a named shape's placement; present only when a pattern was requested. */
+    shape_cells?: Record<string, number>;
 }
 
 export interface CellIdentifier {

@@ -190,6 +190,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         getSeed: () => seedInput.value,
         getTraversal: () => traversalSelect.value,
         getGridSize: () => clampNumber(gridInput.value, 2, 64, 16),
+        getPattern: () => shapeSelect.value,
         getTilings: () =>
             allTilings
                 .filter((tiling) => selected.has(tiling.geometry))
@@ -203,16 +204,13 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             redrawPreview();
         },
     });
-    // The bit pad + live preview only apply to the bit-string seed.
+    // The live preview applies to both seed sources: a bit string placed by
+    // traversal, or a named shape placed geometrically (Policy A).
     const refreshPreview = (): void => {
-        if (!isShapeMode()) {
-            seedPreview.refresh();
-        }
+        seedPreview.refresh();
     };
     const redrawPreview = (): void => {
-        if (!isShapeMode()) {
-            seedPreview.redraw();
-        }
+        seedPreview.redraw();
     };
     seedInput.addEventListener("input", () => {
         seedPad.syncFromSeed();
@@ -237,6 +235,11 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             textContent: "Or draw the seed (read row-major into the bit string)",
         }),
         seedPad.element,
+    ]);
+
+    // The placement preview applies to both seed sources, so it lives outside the
+    // bit-pad block (which is hidden in shape mode).
+    const seedPreviewBlock = el("div", { class: "compare-seedpreview-block" }, [
         el("div", {
             class: "compare-seedpad-title",
             textContent: "Seed lands like this on:",
@@ -249,9 +252,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         const shapeMode = isShapeMode();
         seedPadBlock.style.display = shapeMode ? "none" : "";
         seedInput.disabled = shapeMode;
-        if (!shapeMode) {
-            seedPreview.refresh();
-        }
+        seedPreview.refresh();
     });
 
     const dialog = el(
@@ -282,6 +283,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                 labeledField("Grid size", gridInput),
             ]),
             seedPadBlock,
+            seedPreviewBlock,
             el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
             el("div", { class: "compare-actions" }, [runButton, statusLine]),
             resultsArea,
