@@ -191,6 +191,14 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         getTraversal: () => traversalSelect.value,
         getGridSize: () => clampNumber(gridInput.value, 2, 64, 16),
         getPattern: () => shapeSelect.value,
+        getPreviewHref: ({ cellsById, preview }) =>
+            patternShareUrl({
+                format: PATTERN_FORMAT,
+                version: PATTERN_VERSION,
+                topology_spec: preview.topology_spec,
+                rule: selectedRuleName(),
+                cells_by_id: cellsById,
+            }),
         getTilings: () =>
             allTilings
                 .filter((tiling) => selected.has(tiling.geometry))
@@ -232,9 +240,13 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     const seedPadBlock = el("div", { class: "compare-seedpad-block" }, [
         el("div", {
             class: "compare-seedpad-title",
-            textContent: "Or draw the seed (read row-major into the bit string)",
+            textContent: "Draw the seed",
         }),
         seedPad.element,
+        el("details", { class: "compare-seedbits" }, [
+            el("summary", { class: "compare-seedbits-summary", textContent: "Bit string" }),
+            labeledField("Seed bits", seedInput),
+        ]),
     ]);
 
     // The placement preview applies to both seed sources, so it lives outside the
@@ -282,7 +294,6 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             el("div", { class: "compare-form" }, [
                 labeledField("Rule", ruleSelect),
                 labeledField("Seed source", shapeSelect),
-                labeledField("Seed (bits)", seedInput),
                 labeledField("Traversal", traversalSelect),
                 labeledField("Steps", stepsInput),
                 labeledField("Grid size", gridInput),
@@ -396,6 +407,14 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         runButton.disabled = running || selected.size === 0;
     }
 
+    function selectedRuleName(): string {
+        return ruleSelect.value || rules[0]?.name || "conway";
+    }
+
+    function patternShareUrl(pattern: PatternPayload): string {
+        return buildShareUrl(pattern, window.location.href);
+    }
+
     async function ensureRules(): Promise<void> {
         if (rulesLoaded) {
             return;
@@ -443,7 +462,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
         const request: CompareRequest = {
             seed: seedInput.value,
-            rule: ruleSelect.value || "conway",
+            rule: selectedRuleName(),
             traversal: traversalSelect.value,
             steps: clampNumber(stepsInput.value, 1, 500, 50),
             grid_size: clampNumber(gridInput.value, 2, 64, 16),
@@ -590,10 +609,29 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         preview: TopologyPreview,
         cellsById: Record<string, number>,
         liveColor: (state: number) => string,
+        pattern: PatternPayload | null = null,
     ): HTMLElement {
+        const thumbnail = buildBoardThumbnailSvg(preview, cellsById, {
+            liveColor,
+            label: `${label} state`,
+        });
+        const media = pattern
+            ? el(
+                  "a",
+                  {
+                      class: "compare-thumb-link",
+                      href: patternShareUrl(pattern),
+                      target: "_blank",
+                      rel: "noopener",
+                      title: `Open ${label.toLowerCase()} state`,
+                      "aria-label": `Open ${label.toLowerCase()} state`,
+                  },
+                  [thumbnail],
+              )
+            : thumbnail;
         return el("div", { class: "compare-thumb-block" }, [
             el("div", { class: "compare-thumb-label", textContent: label }),
-            buildBoardThumbnailSvg(preview, cellsById, { liveColor, label: `${label} state` }),
+            media,
         ]);
     }
 
@@ -631,8 +669,20 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             const liveColor = liveColorForRule(comparison.rule_name);
             cell.replaceChildren(
                 el("div", { class: "compare-detail-grid" }, [
-                    thumbnailBlock("Begin", preview, result.initial_cells_by_id ?? {}, liveColor),
-                    thumbnailBlock("End", preview, result.final_cells_by_id ?? {}, liveColor),
+                    thumbnailBlock(
+                        "Begin",
+                        preview,
+                        result.initial_cells_by_id ?? {},
+                        liveColor,
+                        buildStatePattern(comparison, result, "begin"),
+                    ),
+                    thumbnailBlock(
+                        "End",
+                        preview,
+                        result.final_cells_by_id ?? {},
+                        liveColor,
+                        buildStatePattern(comparison, result, "end"),
+                    ),
                 ]),
             );
         } catch (error) {
@@ -658,7 +708,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     ): HTMLButtonElement {
         const button = el("button", { class: "compare-link", type: "button", title }, [label]);
         button.addEventListener("click", () => {
-            const url = buildShareUrl(pattern, window.location.href);
+            const url = patternShareUrl(pattern);
             const clipboard = navigator.clipboard;
             if (!clipboard) {
                 window.prompt("Copy this share link:", url);

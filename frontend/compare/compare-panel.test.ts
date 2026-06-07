@@ -111,6 +111,14 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
         compareSeed,
         previewTopology: async () => ({
             topology_revision: "t",
+            topology_spec: {
+                tiling_family: "square",
+                adjacency_mode: "edge",
+                sizing_mode: "grid",
+                width: 16,
+                height: 16,
+                patch_depth: 0,
+            },
             cells: [
                 {
                     id: "c:1:1",
@@ -321,6 +329,13 @@ describe("mountComparePanel", () => {
             // scope to the expanded detail row (the seed-preview strip also renders thumbnails)
             expect(document.querySelectorAll(".compare-detail .compare-thumb")).toHaveLength(2);
         });
+        expect(document.querySelectorAll(".compare-detail .compare-thumb-link")).toHaveLength(2);
+        const hrefs = [...document.querySelectorAll<HTMLAnchorElement>(".compare-detail a")].map(
+            (anchor) => anchor.getAttribute("href") ?? "",
+        );
+        expect(hrefs).toHaveLength(2);
+        expect(hrefs.every((href) => href.includes("#share=v1."))).toBe(true);
+        expect(hrefs[0]).not.toEqual(hrefs[1]);
         const labels = [...document.querySelectorAll(".compare-thumb-label")].map(
             (n) => n.textContent,
         );

@@ -17,6 +17,7 @@ export const COMPARE_PANEL_STYLES = `
 .compare-toggle:hover { background: var(--btn-primary-hover, #a44928); }
 .compare-toggle:focus-visible,
 .compare-close:focus-visible,
+.compare-thumb-link:focus-visible,
 .compare-field:focus-visible,
 .compare-seedpad-width:focus-visible,
 .compare-seedpad-cell:focus-visible,
@@ -109,6 +110,14 @@ export const COMPARE_PANEL_STYLES = `
     font-size: 12px;
 }
 .compare-seedpad-info { font-size: 12px; color: var(--muted, #6d756f); }
+.compare-seedbits { max-width: 180px; }
+.compare-seedbits-summary {
+    width: max-content;
+    color: var(--muted, #6d756f);
+    cursor: pointer;
+    font-size: 12px;
+}
+.compare-seedbits .compare-label { margin-top: 6px; }
 .compare-seedpad-grid {
     display: grid;
     gap: 2px;
@@ -264,6 +273,16 @@ export const COMPARE_PANEL_STYLES = `
 .compare-detail-grid { display: flex; gap: 18px; flex-wrap: wrap; }
 .compare-thumb-block { display: flex; flex-direction: column; gap: 4px; align-items: center; }
 .compare-thumb-label { font-size: 11px; color: var(--muted, #6d756f); text-transform: uppercase; letter-spacing: 0.04em; }
+.compare-thumb-link {
+    display: inline-flex;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+}
+.compare-thumb-link:hover .compare-thumb {
+    border-color: var(--accent, #bf5a36);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #bf5a36) 28%, transparent);
+}
 .compare-thumb {
     border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
     border-radius: 8px;
