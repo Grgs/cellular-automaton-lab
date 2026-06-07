@@ -167,12 +167,32 @@ function populateTilingPreviewMenu(menu: HTMLElement, families: readonly Topolog
     });
 
     const fragment = document.createDocumentFragment();
-    const searchRow = document.createElement("label");
+    const searchRow = document.createElement("div");
     searchRow.className = "tiling-picker-search-row";
 
-    const searchLabel = document.createElement("span");
-    searchLabel.className = "sr-only";
-    searchLabel.textContent = "Search tilings";
+    const searchHeader = document.createElement("div");
+    searchHeader.className = "tiling-picker-search-header";
+
+    const searchTitle = document.createElement("strong");
+    searchTitle.className = "tiling-picker-search-title";
+    searchTitle.textContent = "Choose tiling";
+
+    const currentLabel = document.createElement("span");
+    currentLabel.className = "tiling-picker-menu-current";
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "tiling-picker-close";
+    closeButton.setAttribute("aria-label", "Close tiling picker");
+    closeButton.title = "Close";
+    closeButton.textContent = "×";
+
+    const searchLabel = document.createElement("label");
+    searchLabel.className = "tiling-picker-search-label";
+
+    const searchAssistiveLabel = document.createElement("span");
+    searchAssistiveLabel.className = "sr-only";
+    searchAssistiveLabel.textContent = "Search tilings";
 
     const searchInput = document.createElement("input");
     searchInput.className = "tiling-picker-search";
@@ -180,7 +200,9 @@ function populateTilingPreviewMenu(menu: HTMLElement, families: readonly Topolog
     searchInput.placeholder = "Search tilings";
     searchInput.autocomplete = "off";
 
-    searchRow.append(searchLabel, searchInput);
+    searchHeader.append(searchTitle, currentLabel, closeButton);
+    searchLabel.append(searchAssistiveLabel, searchInput);
+    searchRow.append(searchHeader, searchLabel);
     fragment.appendChild(searchRow);
 
     const list = document.createElement("div");
@@ -214,16 +236,23 @@ function populateTilingPreviewMenu(menu: HTMLElement, families: readonly Topolog
 }
 
 function syncTilingPreviewSelection(menu: HTMLElement, selectedValue: string): void {
+    let selectedLabel = "";
     menu.querySelectorAll<HTMLButtonElement>(".tiling-preview-card").forEach((button) => {
         const selected = button.dataset.tilingFamily === selectedValue;
         button.classList.toggle("is-selected", selected);
         button.setAttribute("aria-pressed", selected ? "true" : "false");
         if (selected) {
+            selectedLabel =
+                button.querySelector<HTMLElement>(".tiling-preview-card-label")?.textContent ?? "";
             button.setAttribute("aria-current", "true");
             return;
         }
         button.removeAttribute("aria-current");
     });
+    const currentLabel = menu.querySelector<HTMLElement>(".tiling-picker-menu-current");
+    if (currentLabel) {
+        currentLabel.textContent = selectedLabel ? `Current: ${selectedLabel}` : "";
+    }
 }
 
 function syncSelectedTilingPreview(

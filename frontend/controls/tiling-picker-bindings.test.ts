@@ -21,6 +21,9 @@ function createElements(): DomElements {
     const search = document.createElement("input");
     search.type = "search";
     search.className = "tiling-picker-search";
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "tiling-picker-close";
 
     const regularGroup = document.createElement("section");
     regularGroup.className = "tiling-preview-group";
@@ -65,7 +68,7 @@ function createElements(): DomElements {
     empty.className = "tiling-picker-empty";
     empty.hidden = true;
     empty.textContent = "No tilings match this search.";
-    menu.append(search, regularGroup, mixedGroup, empty);
+    menu.append(closeButton, search, regularGroup, mixedGroup, empty);
 
     const toggle = document.createElement("button");
     toggle.type = "button";
@@ -116,6 +119,22 @@ describe("controls/tiling-picker-bindings", () => {
 
         expect(elements.tilingPickerMenu?.hidden).toBe(true);
         expect(elements.tilingPickerToggle?.getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("closes the preview picker from the menu close button", () => {
+        const elements = createElements();
+        const changeTilingFamily = vi.fn();
+
+        bindTilingPreviewPicker(elements, createActions(changeTilingFamily));
+        elements.tilingPickerToggle?.click();
+        elements.tilingPickerMenu
+            ?.querySelector<HTMLButtonElement>(".tiling-picker-close")
+            ?.click();
+
+        expect(elements.tilingPickerMenu?.hidden).toBe(true);
+        expect(elements.tilingPickerToggle?.getAttribute("aria-expanded")).toBe("false");
+        expect(elements.tilingFamilySelect?.value).toBe("square");
+        expect(changeTilingFamily).not.toHaveBeenCalled();
     });
 
     it("filters preview cards without selecting a hidden tiling", () => {

@@ -150,6 +150,14 @@ export function bindTilingPreviewPicker(
     });
 
     menu.addEventListener("click", (event) => {
+        const closeButton =
+            event.target instanceof Element
+                ? event.target.closest<HTMLButtonElement>(".tiling-picker-close")
+                : null;
+        if (closeButton) {
+            close({ restoreFocus: true });
+            return;
+        }
         const target =
             event.target instanceof Element
                 ? event.target.closest<HTMLButtonElement>(".tiling-preview-card")

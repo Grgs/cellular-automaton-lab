@@ -67,6 +67,10 @@ describe("controls/view-options tiling picker", () => {
             elements.tilingPickerMenu?.querySelector(".tiling-preview-card.is-selected")
                 ?.textContent,
         ).toContain("Hexagonal");
+        expect(
+            elements.tilingPickerMenu?.querySelector(".tiling-picker-menu-current")?.textContent,
+        ).toBe("Current: Hexagonal");
+        expect(elements.tilingPickerMenu?.querySelector(".tiling-picker-close")).not.toBeNull();
         expect(elements.tilingPickerCurrentPreview?.querySelector("svg")).not.toBeNull();
         expect(elements.tilingPickerCurrentLabel?.textContent).toBe("Hexagonal");
     });
@@ -84,6 +88,9 @@ describe("controls/view-options tiling picker", () => {
             elements.tilingPickerMenu?.querySelector(".tiling-preview-card.is-selected")
                 ?.textContent,
         ).toContain("Penrose P3 Rhombs");
+        expect(
+            elements.tilingPickerMenu?.querySelector(".tiling-picker-menu-current")?.textContent,
+        ).toBe("Current: Penrose P3 Rhombs");
         expect(elements.tilingPickerCurrentPreview?.dataset.previewSignature).toBe(
             "penrose-p3-rhombs:penrose-p3-rhombs",
         );
