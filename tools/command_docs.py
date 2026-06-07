@@ -315,10 +315,22 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("repo", "processes"),
         "repo",
         "Inspect or clean up repo-scoped helper processes.",
-        "Lists or kills server/standalone/browser helper processes and their ports.",
+        "Lists or kills server/standalone/browser helper processes and their ports. On Windows, discovery uses PowerShell process and listening-port data instead of procfs.",
         (
             "python -m tools repo processes list",
             "python -m tools repo processes kill --stale-browser-hosts",
+            "python -m tools repo processes kill --port 5000",
+        ),
+    ),
+    CommandDoc(
+        ("repo", "cleanup"),
+        "repo",
+        "Clean up stale repo-owned local app/browser host processes.",
+        "Shortcut for the common localhost-refused case. With no flags it cleans up stale server and standalone hosts; pass `--port` or `--repo` for a more specific or broader cleanup.",
+        (
+            "python -m tools repo cleanup",
+            "python -m tools repo cleanup --port 5000",
+            "python -m tools repo cleanup --repo",
         ),
     ),
     CommandDoc(

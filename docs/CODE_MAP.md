@@ -455,7 +455,7 @@ A self-contained overlay that runs one seed under one rule across many tilings a
 - [tools/render_review/diff_review.py](../tools/render_review/diff_review.py)
   One-command render-review comparison sheet builder. It can run a new sweep or consume an existing `sweep-manifest.json`, then emits one HTML sheet plus one PNG contact sheet for side-by-side review.
 - [tools/dev_processes.py](../tools/dev_processes.py)
-  Repo-scoped process inspection and cleanup helper for the known browser/server helper processes started from this repo.
+  Repo-scoped process inspection and cleanup helper for known browser/server helper processes, including the quick stale-host cleanup command and Windows listening-port discovery.
 - [tools/commands/tilings.py](../tools/commands/tilings.py)
   Public tilings group wiring for validation, verification, reporting, previews, sketching, aperiodic scaffolding, and seed comparison.
 - [tools/compare_seed.py](../tools/compare_seed.py)
