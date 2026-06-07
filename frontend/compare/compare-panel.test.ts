@@ -163,6 +163,12 @@ function clickPreset(label: string): void {
     button.click();
 }
 
+function activePresetLabels(): string[] {
+    return [...document.querySelectorAll<HTMLButtonElement>(".compare-tilings-presets button")]
+        .filter((button) => button.getAttribute("aria-pressed") === "true")
+        .map((button) => button.textContent ?? "");
+}
+
 function tilingLabels(): string[] {
     return [...document.querySelectorAll<HTMLElement>(".compare-tiling span")].map(
         (node) => node.textContent ?? "",
@@ -177,6 +183,36 @@ function checkedTilingLabels(): string[] {
 
 function summaryText(): string {
     return document.querySelector<HTMLElement>(".compare-tilings-summary")?.textContent ?? "";
+}
+
+function familyHeaderTexts(): string[] {
+    return [...document.querySelectorAll<HTMLElement>(".compare-tilings-family")].map((header) => {
+        const family = header.querySelector<HTMLElement>("span:nth-child(2)")?.textContent ?? "";
+        const count = header.querySelector<HTMLElement>(".compare-family-count")?.textContent ?? "";
+        return `${family} ${count}`;
+    });
+}
+
+function menuByLabel(label: string): HTMLDetailsElement {
+    const menu = [...document.querySelectorAll<HTMLDetailsElement>(".compare-action-menu")].find(
+        (candidate) => candidate.querySelector("summary")?.textContent === label,
+    );
+    if (!menu) {
+        throw new Error(`missing action menu ${label}`);
+    }
+    return menu;
+}
+
+function clickMenuItem(menuLabel: string, itemLabel: string): void {
+    const menu = menuByLabel(menuLabel);
+    menu.open = true;
+    const item = [...menu.querySelectorAll<HTMLButtonElement>(".compare-action-menu-item")].find(
+        (candidate) => candidate.textContent === itemLabel,
+    );
+    if (!item) {
+        throw new Error(`missing ${itemLabel} in ${menuLabel} menu`);
+    }
+    item.click();
 }
 
 describe("mountComparePanel", () => {
@@ -201,6 +237,7 @@ describe("mountComparePanel", () => {
         expect(backdrop?.hidden).toBe(true);
         // Default representative selection: both regular grids + one per other family.
         expect(document.querySelectorAll(".compare-tiling input:checked")).toHaveLength(5);
+        expect(activePresetLabels()).toEqual(["Representative"]);
         handle.dispose();
         expect(document.querySelector(".compare-toggle")).toBeNull();
     });
@@ -211,11 +248,13 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
         expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+        expect(familyHeaderTexts()).toEqual(["regular 2/2", "mixed 1/1", "periodic 1/1", "aperiodic 1/2"]);
 
         setTilingSearch("Penrose");
         expect(tilingLabels()).toEqual(["Penrose"]);
         expect(checkedTilingLabels()).toEqual([]);
         expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+        expect(familyHeaderTexts()).toEqual(["aperiodic 1/2"]);
 
         setTilingSearch("aperiodic");
         expect(tilingLabels()).toEqual(["Spectre", "Penrose"]);
@@ -243,14 +282,18 @@ describe("mountComparePanel", () => {
         clickPreset("Regular");
         expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
         expect(summaryText()).toBe("2 / 6 selected · Regular 2");
+        expect(activePresetLabels()).toEqual(["Regular"]);
+        expect(familyHeaderTexts()).toEqual(["regular 2/2", "mixed 0/1", "periodic 0/1", "aperiodic 0/2"]);
 
         clickPreset("Mixed");
         expect(checkedTilingLabels()).toEqual(["Kagome", "Periodic Face"]);
         expect(summaryText()).toBe("2 / 6 selected · Mixed 2");
+        expect(activePresetLabels()).toEqual(["Mixed"]);
 
         clickPreset("Aperiodic");
         expect(checkedTilingLabels()).toEqual(["Spectre", "Penrose"]);
         expect(summaryText()).toBe("2 / 6 selected · Aperiodic 2");
+        expect(activePresetLabels()).toEqual(["Aperiodic"]);
 
         clickPreset("All");
         expect(checkedTilingLabels()).toEqual([
@@ -262,10 +305,12 @@ describe("mountComparePanel", () => {
             "Penrose",
         ]);
         expect(summaryText()).toBe("6 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 2");
+        expect(activePresetLabels()).toEqual(["All"]);
 
         clickPreset("None");
         expect(checkedTilingLabels()).toEqual([]);
         expect(summaryText()).toBe("0 / 6 selected");
+        expect(activePresetLabels()).toEqual(["None"]);
 
         clickPreset("Representative");
         expect(checkedTilingLabels()).toEqual([
@@ -276,6 +321,22 @@ describe("mountComparePanel", () => {
             "Spectre",
         ]);
         expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+        expect(activePresetLabels()).toEqual(["Representative"]);
+    });
+
+    it("clears the active preset when the selection becomes custom", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        clickPreset("Regular");
+        expect(activePresetLabels()).toEqual(["Regular"]);
+
+        document.querySelector<HTMLInputElement>(".compare-tiling input:checked")?.click();
+
+        expect(summaryText()).toBe("1 / 6 selected · Regular 1");
+        expect(activePresetLabels()).toEqual([]);
+        expect(familyHeaderTexts()).toEqual(["regular 1/2", "mixed 0/1", "periodic 0/1", "aperiodic 0/2"]);
     });
 
     it("runs with selected tilings hidden by the current search", async () => {
@@ -312,7 +373,7 @@ describe("mountComparePanel", () => {
         expect(request?.include_states).toBe(true);
     });
 
-    it("renders open/share links and opens a share URL in a new tab", async () => {
+    it("renders grouped row actions and opens a share URL from the open menu", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
         const { backend } = fakeBackend();
@@ -324,11 +385,12 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
         });
-        const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
-        const labels = buttons.map((button) => button.textContent);
-        expect(labels).toEqual(["begin ↗", "end ↗", "⧉ begin", "⧉ end", "▸ preview"]);
+        const actions = [...document.querySelectorAll<HTMLElement>(".compare-row-actions .compare-link")].map(
+            (action) => action.textContent,
+        );
+        expect(actions).toEqual(["Open", "Copy", "▸ preview"]);
 
-        buttons[0]?.click();
+        clickMenuItem("Open", "Begin");
         expect(openSpy).toHaveBeenCalledTimes(1);
         const openedUrl = String(openSpy.mock.calls.at(0)?.[0] ?? "");
         expect(openedUrl).toContain("#share=v1.");
@@ -347,14 +409,14 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
         });
-        const linkButtons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
-        const beginLink = linkButtons.find((b) => b.textContent === "⧉ begin");
-        const endLink = linkButtons.find((b) => b.textContent === "⧉ end");
-        expect(beginLink).toBeTruthy();
-        expect(endLink).toBeTruthy();
+        const copyMenu = menuByLabel("Copy");
+        const copyItems = [...copyMenu.querySelectorAll(".compare-action-menu-item")].map(
+            (item) => item.textContent,
+        );
+        expect(copyItems).toEqual(["Begin", "End"]);
 
-        beginLink?.click();
-        endLink?.click();
+        clickMenuItem("Copy", "Begin");
+        clickMenuItem("Copy", "End");
         await vi.waitFor(() => expect(writeText).toHaveBeenCalledTimes(2));
         const [beginUrl, endUrl] = writeText.mock.calls.map((call) => String(call[0]));
         expect(beginUrl).toContain("#share=v1.");
@@ -378,11 +440,12 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
         });
-        const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
-        const labels = buttons.map((button) => button.textContent);
-        expect(labels).toEqual(["begin", "end", "⧉ begin", "⧉ end", "▸ preview"]);
+        const actions = [...document.querySelectorAll<HTMLElement>(".compare-row-actions .compare-link")].map(
+            (action) => action.textContent,
+        );
+        expect(actions).toEqual(["Open", "Copy", "▸ preview"]);
 
-        buttons[0]?.click();
+        clickMenuItem("Open", "Begin");
         expect(onOpenPattern).toHaveBeenCalledTimes(1);
         expect(openSpy).not.toHaveBeenCalled();
         const loaded = onOpenPattern.mock.calls.at(0)?.[0] as { cells_by_id?: unknown };

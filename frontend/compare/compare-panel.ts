@@ -64,6 +64,12 @@ interface TilingOption {
 
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
 
+interface ActionMenuItem {
+    label: string;
+    title: string;
+    onClick(): void;
+}
+
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
 
@@ -140,6 +146,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     let lastFocus: HTMLElement | null = null;
     let tilingSearchQuery = "";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
+    const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
 
     const toggleButton = el(
         "button",
@@ -333,8 +340,10 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                 class: "compare-mini",
                 type: "button",
                 textContent: label,
+                "aria-pressed": "false",
             });
             button.addEventListener("click", () => applyTilingPreset(preset));
+            presetButtons.set(preset, button);
             return button;
         };
         return el("div", { class: "compare-tilings-controls" }, [
@@ -381,6 +390,11 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                         style: `background:${familyColor(family)}`,
                     }),
                     el("span", { textContent: family }),
+                    el("span", {
+                        class: "compare-family-count",
+                        "data-family": family,
+                        textContent: familySelectionCountText(family),
+                    }),
                 ]),
             );
             for (const option of optionsForFamily) {
@@ -424,26 +438,70 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     function applyTilingPreset(preset: TilingPreset): void {
-        selected.clear();
-        if (preset === "representative") {
-            defaultSelection(allTilings).forEach((geometry) => selected.add(geometry));
-        } else if (preset === "regular") {
-            allTilings
-                .filter((option) => option.family === "regular")
-                .forEach((option) => selected.add(option.geometry));
-        } else if (preset === "mixed") {
-            allTilings
-                .filter((option) => isMixedFamily(option.family))
-                .forEach((option) => selected.add(option.geometry));
-        } else if (preset === "aperiodic") {
-            allTilings
-                .filter((option) => option.family === "aperiodic")
-                .forEach((option) => selected.add(option.geometry));
-        } else if (preset === "all") {
-            allTilings.forEach((option) => selected.add(option.geometry));
-        }
+        replaceSelection(selectionForPreset(preset));
         renderTilingChecklist();
         refreshPreview();
+    }
+
+    function selectionForPreset(preset: TilingPreset): Set<string> {
+        if (preset === "representative") {
+            return defaultSelection(allTilings);
+        }
+        if (preset === "regular") {
+            return new Set(
+                allTilings
+                    .filter((option) => option.family === "regular")
+                    .map((option) => option.geometry),
+            );
+        }
+        if (preset === "mixed") {
+            return new Set(
+                allTilings
+                    .filter((option) => isMixedFamily(option.family))
+                    .map((option) => option.geometry),
+            );
+        }
+        if (preset === "aperiodic") {
+            return new Set(
+                allTilings
+                    .filter((option) => option.family === "aperiodic")
+                    .map((option) => option.geometry),
+            );
+        }
+        if (preset === "all") {
+            return new Set(allTilings.map((option) => option.geometry));
+        }
+        return new Set();
+    }
+
+    function replaceSelection(nextSelection: Set<string>): void {
+        selected.clear();
+        nextSelection.forEach((geometry) => selected.add(geometry));
+    }
+
+    function sameSelection(left: Set<string>, right: Set<string>): boolean {
+        return left.size === right.size && [...left].every((geometry) => right.has(geometry));
+    }
+
+    function activePreset(): TilingPreset | null {
+        const presets: TilingPreset[] = [
+            "representative",
+            "regular",
+            "mixed",
+            "aperiodic",
+            "all",
+            "none",
+        ];
+        return presets.find((preset) => sameSelection(selected, selectionForPreset(preset))) ?? null;
+    }
+
+    function updatePresetButtons(): void {
+        const active = activePreset();
+        for (const [preset, button] of presetButtons) {
+            const isActive = preset === active;
+            button.classList.toggle("is-active", isActive);
+            button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        }
     }
 
     function updateSummary(): void {
@@ -451,7 +509,38 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         if (summary) {
             summary.textContent = summaryText();
         }
+        updateFamilyCountLabels();
+        updatePresetButtons();
         runButton.disabled = running || selected.size === 0;
+    }
+
+    function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
+        let selectedCount = 0;
+        let totalCount = 0;
+        for (const option of allTilings) {
+            if (option.family !== family) {
+                continue;
+            }
+            totalCount += 1;
+            if (selected.has(option.geometry)) {
+                selectedCount += 1;
+            }
+        }
+        return { selectedCount, totalCount };
+    }
+
+    function familySelectionCountText(family: string): string {
+        const { selectedCount, totalCount } = familySelectionCounts(family);
+        return `${selectedCount}/${totalCount}`;
+    }
+
+    function updateFamilyCountLabels(): void {
+        dialog.querySelectorAll<HTMLElement>(".compare-family-count").forEach((node) => {
+            const family = node.dataset.family;
+            if (family) {
+                node.textContent = familySelectionCountText(family);
+            }
+        });
     }
 
     function summaryText(): string {
@@ -602,26 +691,41 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         const end = buildStatePattern(comparison, result, "end");
         const wrap = el("div", { class: "compare-row-actions" });
         const inPlace = options.onOpenPattern;
-        const beginLabel = inPlace ? "begin" : "begin ↗";
         const beginTitle = inPlace
             ? "Load the seed on this tiling into the board"
             : "Open the seed on this tiling in a new tab";
-        wrap.append(linkButton(beginLabel, beginTitle, () => openPattern(begin)));
+        const openItems: ActionMenuItem[] = [
+            {
+                label: "Begin",
+                title: beginTitle,
+                onClick: () => openPattern(begin),
+            },
+        ];
         if (end) {
-            const endLabel = inPlace ? "end" : "end ↗";
             const endTitle = inPlace
                 ? "Load the final state on this tiling into the board"
                 : "Open the final state on this tiling in a new tab";
-            wrap.append(linkButton(endLabel, endTitle, () => openPattern(end)));
+            openItems.push({
+                label: "End",
+                title: endTitle,
+                onClick: () => openPattern(end),
+            });
         }
+        wrap.append(actionMenu("Open", "Open state", openItems));
         if (end) {
             // Symmetric with the open buttons: a shareable link for either state.
             wrap.append(
-                copyLinkButton(begin, "⧉ begin", "Copy a shareable link to the seed state"),
-                copyLinkButton(end, "⧉ end", "Copy a shareable link to the final state"),
+                actionMenu("Copy", "Copy share link", [
+                    copyLinkMenuItem(begin, "Begin", "Copy a shareable link to the seed state"),
+                    copyLinkMenuItem(end, "End", "Copy a shareable link to the final state"),
+                ]),
             );
         } else {
-            wrap.append(copyLinkButton(begin, "⧉ link", "Copy a shareable link to this state"));
+            wrap.append(
+                actionMenu("Copy", "Copy share link", [
+                    copyLinkMenuItem(begin, "Link", "Copy a shareable link to this state"),
+                ]),
+            );
         }
         if (result.topology_spec && result.cell_count > 0) {
             if (result.cell_count <= MAX_PREVIEW_CELLS) {
@@ -771,28 +875,58 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         return button;
     }
 
-    function copyLinkButton(
+    function actionMenu(label: string, title: string, items: ActionMenuItem[]): HTMLElement {
+        const details = el("details", { class: "compare-action-menu" });
+        const summary = el("summary", { class: "compare-link", title, textContent: label });
+        const panel = el(
+            "div",
+            { class: "compare-action-menu-panel" },
+            items.map((item) => {
+                const button = el(
+                    "button",
+                    {
+                        class: "compare-action-menu-item",
+                        type: "button",
+                        title: item.title,
+                        textContent: item.label,
+                    },
+                );
+                button.addEventListener("click", () => {
+                    details.removeAttribute("open");
+                    item.onClick();
+                });
+                return button;
+            }),
+        );
+        details.append(summary, panel);
+        return details;
+    }
+
+    function copyLinkMenuItem(
         pattern: PatternPayload,
-        label = "⧉ link",
-        title = "Copy a shareable link to this state",
-    ): HTMLButtonElement {
-        const button = el("button", { class: "compare-link", type: "button", title }, [label]);
-        button.addEventListener("click", () => {
-            const url = patternShareUrl(pattern);
-            const clipboard = navigator.clipboard;
-            if (!clipboard) {
-                window.prompt("Copy this share link:", url);
-                return;
-            }
-            void clipboard.writeText(url).then(
-                () => {
-                    button.textContent = "copied";
-                    window.setTimeout(() => (button.textContent = label), 1200);
-                },
-                () => window.prompt("Copy this share link:", url),
-            );
-        });
-        return button;
+        label: string,
+        title: string,
+    ): ActionMenuItem {
+        return {
+            label,
+            title,
+            onClick: () => copyPatternLink(pattern, label),
+        };
+    }
+
+    function copyPatternLink(pattern: PatternPayload, copiedLabel: string): void {
+        const url = patternShareUrl(pattern);
+        const clipboard = navigator.clipboard;
+        if (!clipboard) {
+            window.prompt("Copy this share link:", url);
+            return;
+        }
+        void clipboard.writeText(url).then(
+            () => {
+                statusLine.textContent = `Copied ${copiedLabel.toLowerCase()} share link.`;
+            },
+            () => window.prompt("Copy this share link:", url),
+        );
     }
 
     function open(): void {
