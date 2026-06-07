@@ -62,6 +62,8 @@ interface TilingOption {
     family: string;
 }
 
+type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
+
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
 
@@ -136,6 +138,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     let rulesLoaded = false;
     let running = false;
     let lastFocus: HTMLElement | null = null;
+    let tilingSearchQuery = "";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
 
     const toggleButton = el(
@@ -181,6 +184,12 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     );
 
     const tilingList = el("div", { class: "compare-tilings" });
+    const tilingSearchInput = el("input", {
+        class: "compare-field compare-tilings-search",
+        type: "search",
+        placeholder: "Search tilings",
+        "aria-label": "Search tilings",
+    });
 
     // "" = bit-string seed (pad/preview); otherwise a named shape (Policy A).
     const isShapeMode = (): boolean => shapeSelect.value !== "";
@@ -315,49 +324,50 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     function tilingControlsBar(): HTMLElement {
-        const allButton = el("button", {
-            class: "compare-mini",
-            type: "button",
-            textContent: "All",
-        });
-        const noneButton = el("button", {
-            class: "compare-mini",
-            type: "button",
-            textContent: "None",
-        });
-        const resetButton = el("button", {
-            class: "compare-mini",
-            type: "button",
-            textContent: "Representative",
-        });
-        allButton.addEventListener("click", () => {
-            allTilings.forEach((option) => selected.add(option.geometry));
+        tilingSearchInput.addEventListener("input", () => {
+            tilingSearchQuery = tilingSearchInput.value;
             renderTilingChecklist();
-            refreshPreview();
         });
-        noneButton.addEventListener("click", () => {
-            selected.clear();
-            renderTilingChecklist();
-            refreshPreview();
-        });
-        resetButton.addEventListener("click", () => {
-            selected.clear();
-            defaultSelection(allTilings).forEach((geometry) => selected.add(geometry));
-            renderTilingChecklist();
-            refreshPreview();
-        });
+        const presetButton = (label: string, preset: TilingPreset): HTMLButtonElement => {
+            const button = el("button", {
+                class: "compare-mini",
+                type: "button",
+                textContent: label,
+            });
+            button.addEventListener("click", () => applyTilingPreset(preset));
+            return button;
+        };
         return el("div", { class: "compare-tilings-controls" }, [
             el("span", { class: "compare-tilings-summary", id: "compare-tilings-summary" }),
-            allButton,
-            noneButton,
-            resetButton,
+            el("div", { class: "compare-tilings-tools" }, [
+                tilingSearchInput,
+                el("div", { class: "compare-tilings-presets" }, [
+                    presetButton("Representative", "representative"),
+                    presetButton("Regular", "regular"),
+                    presetButton("Mixed", "mixed"),
+                    presetButton("Aperiodic", "aperiodic"),
+                    presetButton("All", "all"),
+                    presetButton("None", "none"),
+                ]),
+            ]),
         ]);
     }
 
     function renderTilingChecklist(): void {
         tilingList.replaceChildren();
+        const visibleTilings = allTilings.filter((option) => matchesTilingSearch(option));
+        if (visibleTilings.length === 0) {
+            tilingList.append(
+                el("div", {
+                    class: "compare-tilings-empty",
+                    textContent: "No tilings match this search.",
+                }),
+            );
+            updateSummary();
+            return;
+        }
         const byFamily = new Map<string, TilingOption[]>();
-        for (const option of allTilings) {
+        for (const option of visibleTilings) {
             const bucket = byFamily.get(option.family) ?? [];
             bucket.push(option);
             byFamily.set(option.family, bucket);
@@ -399,12 +409,72 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         updateSummary();
     }
 
+    function matchesTilingSearch(option: TilingOption): boolean {
+        const query = tilingSearchQuery.trim().toLowerCase();
+        if (query.length === 0) {
+            return true;
+        }
+        return [option.label, option.geometry, option.family].some((value) =>
+            value.toLowerCase().includes(query),
+        );
+    }
+
+    function isMixedFamily(family: string): boolean {
+        return family === "mixed" || family === "periodic";
+    }
+
+    function applyTilingPreset(preset: TilingPreset): void {
+        selected.clear();
+        if (preset === "representative") {
+            defaultSelection(allTilings).forEach((geometry) => selected.add(geometry));
+        } else if (preset === "regular") {
+            allTilings
+                .filter((option) => option.family === "regular")
+                .forEach((option) => selected.add(option.geometry));
+        } else if (preset === "mixed") {
+            allTilings
+                .filter((option) => isMixedFamily(option.family))
+                .forEach((option) => selected.add(option.geometry));
+        } else if (preset === "aperiodic") {
+            allTilings
+                .filter((option) => option.family === "aperiodic")
+                .forEach((option) => selected.add(option.geometry));
+        } else if (preset === "all") {
+            allTilings.forEach((option) => selected.add(option.geometry));
+        }
+        renderTilingChecklist();
+        refreshPreview();
+    }
+
     function updateSummary(): void {
         const summary = dialog.querySelector("#compare-tilings-summary");
         if (summary) {
-            summary.textContent = `${selected.size} / ${allTilings.length} selected`;
+            summary.textContent = summaryText();
         }
         runButton.disabled = running || selected.size === 0;
+    }
+
+    function summaryText(): string {
+        const counts = { regular: 0, mixed: 0, aperiodic: 0 };
+        for (const option of allTilings) {
+            if (!selected.has(option.geometry)) {
+                continue;
+            }
+            if (option.family === "regular") {
+                counts.regular += 1;
+            } else if (isMixedFamily(option.family)) {
+                counts.mixed += 1;
+            } else if (option.family === "aperiodic") {
+                counts.aperiodic += 1;
+            }
+        }
+        const parts = [
+            `${selected.size} / ${allTilings.length} selected`,
+            ...(counts.regular > 0 ? [`Regular ${counts.regular}`] : []),
+            ...(counts.mixed > 0 ? [`Mixed ${counts.mixed}`] : []),
+            ...(counts.aperiodic > 0 ? [`Aperiodic ${counts.aperiodic}`] : []),
+        ];
+        return parts.join(" · ");
     }
 
     function selectedRuleName(): string {

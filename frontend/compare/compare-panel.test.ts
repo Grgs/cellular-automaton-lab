@@ -33,7 +33,10 @@ function bootstrapData(): AppBootstrapData {
         topology_catalog: [
             topology("Square", "square", "regular"),
             topology("Hex", "hex", "regular"),
+            topology("Kagome", "kagome", "mixed"),
+            topology("Periodic Face", "periodic-face", "periodic"),
             topology("Spectre", "spectre", "aperiodic"),
+            topology("Penrose", "penrose", "aperiodic"),
         ],
         periodic_face_tilings: [],
         aperiodic_families: [],
@@ -137,6 +140,45 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
     return { backend, compareSeed };
 }
 
+function openCompareDialog(): void {
+    document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+}
+
+function setTilingSearch(query: string): void {
+    const search = document.querySelector<HTMLInputElement>(".compare-tilings-search");
+    if (!search) {
+        throw new Error("missing tiling search");
+    }
+    search.value = query;
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function clickPreset(label: string): void {
+    const button = [...document.querySelectorAll<HTMLButtonElement>(".compare-mini")].find(
+        (candidate) => candidate.textContent === label,
+    );
+    if (!button) {
+        throw new Error(`missing preset ${label}`);
+    }
+    button.click();
+}
+
+function tilingLabels(): string[] {
+    return [...document.querySelectorAll<HTMLElement>(".compare-tiling span")].map(
+        (node) => node.textContent ?? "",
+    );
+}
+
+function checkedTilingLabels(): string[] {
+    return [...document.querySelectorAll<HTMLLabelElement>(".compare-tiling")]
+        .filter((label) => label.querySelector<HTMLInputElement>("input")?.checked)
+        .map((label) => label.querySelector("span")?.textContent ?? "");
+}
+
+function summaryText(): string {
+    return document.querySelector<HTMLElement>(".compare-tilings-summary")?.textContent ?? "";
+}
+
 describe("mountComparePanel", () => {
     beforeEach(() => {
         installFrontendGlobals();
@@ -157,10 +199,98 @@ describe("mountComparePanel", () => {
         const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
         expect(toggle).not.toBeNull();
         expect(backdrop?.hidden).toBe(true);
-        // Default representative selection: both regular grids + one aperiodic.
-        expect(document.querySelectorAll(".compare-tiling input:checked")).toHaveLength(3);
+        // Default representative selection: both regular grids + one per other family.
+        expect(document.querySelectorAll(".compare-tiling input:checked")).toHaveLength(5);
         handle.dispose();
         expect(document.querySelector(".compare-toggle")).toBeNull();
+    });
+
+    it("filters tilings by search without changing the selected set", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+
+        setTilingSearch("Penrose");
+        expect(tilingLabels()).toEqual(["Penrose"]);
+        expect(checkedTilingLabels()).toEqual([]);
+        expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+
+        setTilingSearch("aperiodic");
+        expect(tilingLabels()).toEqual(["Spectre", "Penrose"]);
+    });
+
+    it("shows an empty state when no tilings match the search", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        setTilingSearch("not-a-tiling");
+
+        expect(document.querySelector(".compare-tilings-empty")?.textContent).toBe(
+            "No tilings match this search.",
+        );
+        expect(tilingLabels()).toEqual([]);
+        expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+    });
+
+    it("applies tiling presets and updates the family summary", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        clickPreset("Regular");
+        expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
+        expect(summaryText()).toBe("2 / 6 selected · Regular 2");
+
+        clickPreset("Mixed");
+        expect(checkedTilingLabels()).toEqual(["Kagome", "Periodic Face"]);
+        expect(summaryText()).toBe("2 / 6 selected · Mixed 2");
+
+        clickPreset("Aperiodic");
+        expect(checkedTilingLabels()).toEqual(["Spectre", "Penrose"]);
+        expect(summaryText()).toBe("2 / 6 selected · Aperiodic 2");
+
+        clickPreset("All");
+        expect(checkedTilingLabels()).toEqual([
+            "Square",
+            "Hex",
+            "Kagome",
+            "Periodic Face",
+            "Spectre",
+            "Penrose",
+        ]);
+        expect(summaryText()).toBe("6 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 2");
+
+        clickPreset("None");
+        expect(checkedTilingLabels()).toEqual([]);
+        expect(summaryText()).toBe("0 / 6 selected");
+
+        clickPreset("Representative");
+        expect(checkedTilingLabels()).toEqual([
+            "Square",
+            "Hex",
+            "Kagome",
+            "Periodic Face",
+            "Spectre",
+        ]);
+        expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+    });
+
+    it("runs with selected tilings hidden by the current search", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        openCompareDialog();
+        clickPreset("Regular");
+        setTilingSearch("Penrose");
+        expect(tilingLabels()).toEqual(["Penrose"]);
+
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
+        expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["square", "hex"]);
     });
 
     it("runs a comparison and renders the portrait and grid", async () => {

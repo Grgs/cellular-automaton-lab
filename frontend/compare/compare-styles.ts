@@ -141,8 +141,18 @@ export const COMPARE_PANEL_STYLES = `
 .compare-seedpreview-label { font-size: 10px; color: var(--muted, #6d756f); max-width: 100px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .compare-seedpreview-slot { display: flex; align-items: center; justify-content: center; min-width: 96px; min-height: 60px; font-size: 11px; color: var(--muted, #6d756f); }
 .compare-tilings-block { margin-top: 14px; }
-.compare-tilings-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-.compare-tilings-summary { font-size: 12px; color: var(--muted, #6d756f); margin-right: auto; }
+.compare-tilings-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.compare-tilings-summary { flex: 1 1 220px; font-size: 12px; color: var(--muted, #6d756f); }
+.compare-tilings-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: 1 1 420px;
+    min-width: 0;
+}
+.compare-tilings-search { max-width: 180px; }
+.compare-tilings-presets { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
 .compare-mini {
     font-size: 12px;
     padding: 4px 10px;
@@ -162,6 +172,13 @@ export const COMPARE_PANEL_STYLES = `
     border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
     border-radius: 10px;
     background: var(--help-bg, rgba(0, 0, 0, 0.03));
+}
+.compare-tilings-empty {
+    grid-column: 1 / -1;
+    padding: 18px 8px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted, #6d756f);
 }
 .compare-tilings-group { min-width: 0; }
 .compare-tilings-family { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted, #6d756f); margin-bottom: 4px; }
@@ -299,6 +316,9 @@ export const COMPARE_PANEL_STYLES = `
     .compare-form { grid-template-columns: 1fr; }
     .compare-seed-workspace { grid-template-columns: 1fr; }
     .compare-seedpreview { gap: 10px; }
+    .compare-tilings-tools { justify-content: flex-start; flex-basis: 100%; }
+    .compare-tilings-search { max-width: none; }
+    .compare-tilings-presets { justify-content: flex-start; }
     .compare-tilings { grid-template-columns: 1fr; max-height: 240px; }
     .compare-actions {
         bottom: -16px;
