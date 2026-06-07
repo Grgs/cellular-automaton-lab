@@ -551,6 +551,24 @@ h1 {
     box-shadow: var(--shadow);
 }
 
+.tiling-picker-search-row {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.tiling-picker-search {
+    min-height: 34px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+}
+
+.tiling-picker-empty {
+    padding: 18px 10px 10px;
+    color: var(--muted);
+    font-size: 0.86rem;
+    text-align: center;
+}
+
 .tiling-preview-group + .tiling-preview-group {
     margin-top: 12px;
     padding-top: 10px;

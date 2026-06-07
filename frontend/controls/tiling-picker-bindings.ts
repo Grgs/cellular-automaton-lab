@@ -11,8 +11,8 @@ function setTilingPickerOpen(elements: DomElements, open: boolean): void {
 }
 
 function focusSelectedTilingCard(menu: HTMLElement): void {
-    const selectedCard = menu.querySelector<HTMLButtonElement>(".tiling-preview-card.is-selected");
-    const fallbackCard = menu.querySelector<HTMLButtonElement>(".tiling-preview-card");
+    const selectedCard = tilingCards(menu).find((card) => card.classList.contains("is-selected"));
+    const fallbackCard = tilingCards(menu)[0];
     const target = selectedCard ?? fallbackCard;
     if (!target) {
         return;
@@ -25,8 +25,19 @@ function focusSelectedTilingCard(menu: HTMLElement): void {
     });
 }
 
+function focusTilingPickerSearch(menu: HTMLElement): boolean {
+    const search = tilingPickerSearchInput(menu);
+    if (!search) {
+        return false;
+    }
+    search.focus({ preventScroll: true });
+    return true;
+}
+
 function tilingCards(menu: HTMLElement): HTMLButtonElement[] {
-    return Array.from(menu.querySelectorAll<HTMLButtonElement>(".tiling-preview-card"));
+    return Array.from(menu.querySelectorAll<HTMLButtonElement>(".tiling-preview-card")).filter(
+        (card) => !card.hidden,
+    );
 }
 
 function focusRelativeTilingCard(menu: HTMLElement, offset: number): void {
@@ -43,6 +54,37 @@ function focusEdgeTilingCard(menu: HTMLElement, edge: "first" | "last"): void {
     const cards = tilingCards(menu);
     const target = edge === "first" ? cards[0] : cards[cards.length - 1];
     target?.focus();
+}
+
+function tilingPickerSearchInput(menu: HTMLElement): HTMLInputElement | null {
+    return menu.querySelector<HTMLInputElement>(".tiling-picker-search");
+}
+
+function filterTilingPreviewCards(menu: HTMLElement, rawQuery: string): void {
+    const query = rawQuery.trim().toLowerCase();
+    let hasMatches = false;
+    menu.querySelectorAll<HTMLElement>(".tiling-preview-group").forEach((group) => {
+        let groupHasMatches = false;
+        group.querySelectorAll<HTMLButtonElement>(".tiling-preview-card").forEach((card) => {
+            const matches = query === "" || (card.dataset.searchText ?? "").includes(query);
+            card.hidden = !matches;
+            groupHasMatches ||= matches;
+        });
+        group.hidden = !groupHasMatches;
+        hasMatches ||= groupHasMatches;
+    });
+    const empty = menu.querySelector<HTMLElement>(".tiling-picker-empty");
+    if (empty) {
+        empty.hidden = hasMatches;
+    }
+}
+
+function resetTilingPreviewFilter(menu: HTMLElement): void {
+    const search = tilingPickerSearchInput(menu);
+    if (search) {
+        search.value = "";
+    }
+    filterTilingPreviewCards(menu, "");
 }
 
 export function bindTilingPreviewPicker(
@@ -63,8 +105,11 @@ export function bindTilingPreviewPicker(
     };
 
     const open = () => {
+        resetTilingPreviewFilter(menu);
         setTilingPickerOpen(elements, true);
-        focusSelectedTilingCard(menu);
+        if (!focusTilingPickerSearch(menu)) {
+            focusSelectedTilingCard(menu);
+        }
     };
 
     toggle.addEventListener("click", (event) => {
@@ -93,6 +138,18 @@ export function bindTilingPreviewPicker(
     });
 
     menu.addEventListener("keydown", (event) => {
+        if (event.target === tilingPickerSearchInput(menu)) {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                close({ restoreFocus: true });
+                return;
+            }
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                focusEdgeTilingCard(menu, "first");
+            }
+            return;
+        }
         if (event.key === "Escape") {
             event.preventDefault();
             close({ restoreFocus: true });
@@ -117,6 +174,16 @@ export function bindTilingPreviewPicker(
             event.preventDefault();
             focusEdgeTilingCard(menu, "last");
         }
+    });
+
+    menu.addEventListener("input", (event) => {
+        if (!(event.target instanceof HTMLInputElement)) {
+            return;
+        }
+        if (!event.target.classList.contains("tiling-picker-search")) {
+            return;
+        }
+        filterTilingPreviewCards(menu, event.target.value);
     });
 
     elements.tilingFamilySelect?.addEventListener("change", () => {

@@ -12,18 +12,35 @@ function createElements(): DomElements {
 
     const menu = document.createElement("div");
     menu.hidden = true;
+    const search = document.createElement("input");
+    search.type = "search";
+    search.className = "tiling-picker-search";
+
+    const regularGroup = document.createElement("section");
+    regularGroup.className = "tiling-preview-group";
     const squareButton = document.createElement("button");
     squareButton.type = "button";
     squareButton.className = "tiling-preview-card is-selected";
     squareButton.dataset.tilingFamily = "square";
+    squareButton.dataset.searchText = "square regular grid";
     squareButton.textContent = "Square";
+    regularGroup.append(squareButton);
 
+    const mixedGroup = document.createElement("section");
+    mixedGroup.className = "tiling-preview-group";
     const hexButton = document.createElement("button");
     hexButton.type = "button";
     hexButton.className = "tiling-preview-card";
     hexButton.dataset.tilingFamily = "hex";
+    hexButton.dataset.searchText = "hexagonal regular grid";
     hexButton.textContent = "Hexagonal";
-    menu.append(squareButton, hexButton);
+    mixedGroup.append(hexButton);
+
+    const empty = document.createElement("div");
+    empty.className = "tiling-picker-empty";
+    empty.hidden = true;
+    empty.textContent = "No tilings match this search.";
+    menu.append(search, regularGroup, mixedGroup, empty);
 
     const toggle = document.createElement("button");
     toggle.type = "button";
@@ -74,5 +91,39 @@ describe("controls/tiling-picker-bindings", () => {
 
         expect(elements.tilingPickerMenu?.hidden).toBe(true);
         expect(elements.tilingPickerToggle?.getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("filters preview cards without selecting a hidden tiling", () => {
+        const elements = createElements();
+        const changeTilingFamily = vi.fn();
+
+        bindTilingPreviewPicker(elements, createActions(changeTilingFamily));
+        elements.tilingPickerToggle?.click();
+
+        const search =
+            elements.tilingPickerMenu?.querySelector<HTMLInputElement>(".tiling-picker-search");
+        search!.value = "hex";
+        search!.dispatchEvent(new Event("input", { bubbles: true }));
+
+        const square = elements.tilingPickerMenu?.querySelector<HTMLButtonElement>(
+            "[data-tiling-family='square']",
+        );
+        const hex = elements.tilingPickerMenu?.querySelector<HTMLButtonElement>(
+            "[data-tiling-family='hex']",
+        );
+        expect(square?.hidden).toBe(true);
+        expect(hex?.hidden).toBe(false);
+        expect(
+            elements.tilingPickerMenu?.querySelector<HTMLElement>(".tiling-picker-empty")?.hidden,
+        ).toBe(true);
+        expect(elements.tilingFamilySelect?.value).toBe("square");
+        expect(changeTilingFamily).not.toHaveBeenCalled();
+
+        search!.value = "nope";
+        search!.dispatchEvent(new Event("input", { bubbles: true }));
+        expect(hex?.hidden).toBe(true);
+        expect(
+            elements.tilingPickerMenu?.querySelector<HTMLElement>(".tiling-picker-empty")?.hidden,
+        ).toBe(false);
     });
 });

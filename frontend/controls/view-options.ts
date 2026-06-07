@@ -97,6 +97,16 @@ function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {
     button.type = "button";
     button.className = "tiling-preview-card";
     button.dataset.tilingFamily = optionData.value;
+    button.dataset.searchText = [
+        optionData.label,
+        optionData.value,
+        optionData.group,
+        optionData.sizingMode === "patch_depth" ? "patch" : "grid",
+        optionData.renderKind,
+        optionData.previewKey,
+    ]
+        .join(" ")
+        .toLowerCase();
     button.setAttribute("aria-pressed", "false");
 
     const thumbnail = document.createElement("span");
@@ -131,6 +141,25 @@ function populateTilingPreviewMenu(menu: HTMLElement, families: readonly Topolog
     });
 
     const fragment = document.createDocumentFragment();
+    const searchRow = document.createElement("label");
+    searchRow.className = "tiling-picker-search-row";
+
+    const searchLabel = document.createElement("span");
+    searchLabel.className = "sr-only";
+    searchLabel.textContent = "Search tilings";
+
+    const searchInput = document.createElement("input");
+    searchInput.className = "tiling-picker-search";
+    searchInput.type = "search";
+    searchInput.placeholder = "Search tilings";
+    searchInput.autocomplete = "off";
+
+    searchRow.append(searchLabel, searchInput);
+    fragment.appendChild(searchRow);
+
+    const list = document.createElement("div");
+    list.className = "tiling-picker-list";
+
     groups.forEach((options, groupName) => {
         const group = document.createElement("section");
         group.className = "tiling-preview-group";
@@ -146,8 +175,15 @@ function populateTilingPreviewMenu(menu: HTMLElement, families: readonly Topolog
         });
 
         group.append(title, grid);
-        fragment.appendChild(group);
+        list.appendChild(group);
     });
+
+    const empty = document.createElement("div");
+    empty.className = "tiling-picker-empty";
+    empty.hidden = true;
+    empty.textContent = "No tilings match this search.";
+
+    fragment.append(list, empty);
     menu.replaceChildren(fragment);
 }
 
