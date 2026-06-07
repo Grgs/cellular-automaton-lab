@@ -519,7 +519,15 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                 : "Open the final state on this tiling in a new tab";
             wrap.append(linkButton(endLabel, endTitle, () => openPattern(end)));
         }
-        wrap.append(copyLinkButton(end ?? begin));
+        if (end) {
+            // Symmetric with the open buttons: a shareable link for either state.
+            wrap.append(
+                copyLinkButton(begin, "⧉ begin", "Copy a shareable link to the seed state"),
+                copyLinkButton(end, "⧉ end", "Copy a shareable link to the final state"),
+            );
+        } else {
+            wrap.append(copyLinkButton(begin, "⧉ link", "Copy a shareable link to this state"));
+        }
         if (result.topology_spec && result.cell_count > 0) {
             if (result.cell_count <= MAX_PREVIEW_CELLS) {
                 const previewButton = linkButton("▸ preview", "Show begin/end thumbnails", () =>
@@ -637,12 +645,12 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         return button;
     }
 
-    function copyLinkButton(pattern: PatternPayload): HTMLButtonElement {
-        const button = el(
-            "button",
-            { class: "compare-link", type: "button", title: "Copy a shareable link to this state" },
-            ["⧉ link"],
-        );
+    function copyLinkButton(
+        pattern: PatternPayload,
+        label = "⧉ link",
+        title = "Copy a shareable link to this state",
+    ): HTMLButtonElement {
+        const button = el("button", { class: "compare-link", type: "button", title }, [label]);
         button.addEventListener("click", () => {
             const url = buildShareUrl(pattern, window.location.href);
             const clipboard = navigator.clipboard;
@@ -653,7 +661,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             void clipboard.writeText(url).then(
                 () => {
                     button.textContent = "copied";
-                    window.setTimeout(() => (button.textContent = "⧉ link"), 1200);
+                    window.setTimeout(() => (button.textContent = label), 1200);
                 },
                 () => window.prompt("Copy this share link:", url),
             );
