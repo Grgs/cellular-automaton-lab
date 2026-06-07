@@ -246,10 +246,15 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         }),
         seedPreview.element,
     ]);
+    const seedWorkspace = el("div", { class: "compare-seed-workspace" }, [
+        seedPadBlock,
+        seedPreviewBlock,
+    ]);
 
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
     shapeSelect.addEventListener("change", () => {
         const shapeMode = isShapeMode();
+        seedWorkspace.classList.toggle("is-shape-mode", shapeMode);
         seedPadBlock.style.display = shapeMode ? "none" : "";
         seedInput.disabled = shapeMode;
         seedPreview.refresh();
@@ -282,8 +287,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                 labeledField("Steps", stepsInput),
                 labeledField("Grid size", gridInput),
             ]),
-            seedPadBlock,
-            seedPreviewBlock,
+            seedWorkspace,
             el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
             el("div", { class: "compare-actions" }, [runButton, statusLine]),
             resultsArea,
@@ -480,10 +484,12 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             }),
             buildPhasePortraitSvg(comparison),
             el("div", { class: "compare-section-title", textContent: "End-state classification" }),
-            buildClassificationGrid(comparison, {
-                onRowHover: highlightGeometry,
-                renderRowActions: (result) => renderRowActions(comparison, result),
-            }),
+            el("div", { class: "compare-grid-scroll" }, [
+                buildClassificationGrid(comparison, {
+                    onRowHover: highlightGeometry,
+                    renderRowActions: (result) => renderRowActions(comparison, result),
+                }),
+            ]),
         );
     }
 
