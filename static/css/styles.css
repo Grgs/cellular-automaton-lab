@@ -1955,8 +1955,8 @@ button.theme-toggle .theme-icon-moon {
     z-index: 6;
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 5px 8px;
+    gap: 6px;
+    padding: 6px 9px;
     border: 1px solid rgba(255, 255, 255, 0.22);
     border-radius: 999px;
     background: rgba(255, 251, 245, 0.94);
@@ -1965,19 +1965,26 @@ button.theme-toggle .theme-icon-moon {
     max-width: calc(100% - 28px);
 }
 
+.canvas-toolbar[data-edit-mode="armed"] {
+    border-color: rgba(68, 126, 255, 0.36);
+    box-shadow:
+        0 12px 24px rgba(15, 22, 34, 0.1),
+        0 0 0 2px rgba(68, 126, 255, 0.08);
+}
+
 .canvas-toolbar-sep {
     width: 1px;
-    height: 18px;
-    background: rgba(31, 36, 48, 0.14);
+    height: 20px;
+    background: rgba(31, 36, 48, 0.12);
     flex: 0 0 auto;
-    margin: 0 3px;
+    margin: 0 1px;
 }
 
 /* Collapsed state: show only arm button */
 .canvas-toolbar-controls {
     display: none;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
 }
 
 .canvas-toolbar[data-edit-mode="armed"] .canvas-toolbar-arm-btn {
@@ -1989,19 +1996,20 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-toolbar-arm-btn {
-    padding: 3px 10px;
-    font-size: 0.78rem;
+    padding: 5px 12px;
+    font-size: 0.82rem;
     font-weight: 600;
     line-height: 1.5;
-    background: transparent;
+    background: rgba(31, 36, 48, 0.045);
     border: none;
     color: var(--ink);
     cursor: pointer;
     white-space: nowrap;
-    border-radius: 6px;
+    border-radius: 999px;
 }
 
 .canvas-toolbar-arm-btn:hover {
+    background: rgba(31, 36, 48, 0.08);
     color: var(--accent);
 }
 
@@ -2010,12 +2018,15 @@ button.theme-toggle .theme-icon-moon {
 .canvas-toolbar-brush {
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
+    padding: 2px;
+    border-radius: 999px;
+    background: rgba(31, 36, 48, 0.045);
 }
 
 .canvas-toolbar-swatch-btn {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     border-radius: 999px;
     border: 2px solid rgba(31, 36, 48, 0.18);
     padding: 0;
@@ -2037,8 +2048,8 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-toolbar-swatch {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 999px;
     display: block;
     border: 1px solid var(--swatch-border);
@@ -2046,21 +2057,22 @@ button.theme-toggle .theme-icon-moon {
 
 .canvas-toolbar-tool-btn,
 .canvas-toolbar-brush-btn {
-    padding: 3px 7px;
-    font-size: 0.72rem;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 4px 8px;
+    font-size: 0.76rem;
     font-weight: 600;
     line-height: 1.4;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: 999px;
     color: var(--ink);
     cursor: pointer;
     white-space: nowrap;
 }
 
 .canvas-toolbar-brush-btn {
-    min-width: 22px;
-    padding: 3px 5px;
+    padding: 4px 6px;
     text-align: center;
     font-family: var(--mono);
 }
@@ -2077,8 +2089,8 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-toolbar-act-btn {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2086,7 +2098,7 @@ button.theme-toggle .theme-icon-moon {
     font-size: 0.85rem;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: 999px;
     color: var(--ink);
     cursor: pointer;
 }
@@ -2169,8 +2181,22 @@ button.theme-toggle .theme-icon-moon {
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
 }
 
+:root[data-theme="dark"] .canvas-toolbar[data-edit-mode="armed"] {
+    border-color: rgba(119, 164, 255, 0.34);
+    box-shadow:
+        0 14px 28px rgba(0, 0, 0, 0.22),
+        0 0 0 2px rgba(119, 164, 255, 0.1);
+}
+
 :root[data-theme="dark"] .canvas-toolbar-sep {
     background: rgba(231, 237, 248, 0.12);
+}
+
+:root[data-theme="dark"] .canvas-toolbar-arm-btn,
+:root[data-theme="dark"] .canvas-toolbar-palette,
+:root[data-theme="dark"] .canvas-toolbar-tools,
+:root[data-theme="dark"] .canvas-toolbar-brush {
+    background: rgba(231, 237, 248, 0.06);
 }
 
 :root[data-theme="dark"] .canvas-toolbar-swatch-btn {
@@ -2183,7 +2209,8 @@ button.theme-toggle .theme-icon-moon {
 
 :root[data-theme="dark"] .canvas-toolbar-tool-btn:hover:not(:disabled),
 :root[data-theme="dark"] .canvas-toolbar-brush-btn:hover:not(:disabled),
-:root[data-theme="dark"] .canvas-toolbar-act-btn:hover:not(:disabled) {
+:root[data-theme="dark"] .canvas-toolbar-act-btn:hover:not(:disabled),
+:root[data-theme="dark"] .canvas-toolbar-arm-btn:hover {
     background: rgba(231, 237, 248, 0.08);
 }
 
