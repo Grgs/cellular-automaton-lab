@@ -2465,6 +2465,112 @@ button.theme-toggle .theme-icon-moon {
     .canvas-toolbar {
         bottom: 12px;
         left: 12px;
+        right: 12px;
+        max-width: none;
+        padding: 7px;
+        border-radius: 18px;
+        align-items: stretch;
+    }
+
+    .canvas-toolbar-arm-btn {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        border-radius: 12px;
+        background: rgba(31, 36, 48, 0.06);
+    }
+
+    .canvas-toolbar[data-edit-mode="armed"] .canvas-toolbar-controls {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .canvas-toolbar-sep {
+        display: none;
+    }
+
+    .canvas-toolbar-palette,
+    .canvas-toolbar-tools,
+    .canvas-toolbar-brush {
+        min-height: 38px;
+        padding: 3px;
+        gap: 4px;
+        border: 1px solid rgba(31, 36, 48, 0.1);
+        border-radius: 999px;
+        background: rgba(31, 36, 48, 0.045);
+    }
+
+    .canvas-toolbar-palette {
+        order: 1;
+        flex: 1 1 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .canvas-toolbar-tools {
+        order: 2;
+        flex: 1 1 158px;
+    }
+
+    .canvas-toolbar-brush {
+        order: 3;
+        flex: 0 1 auto;
+    }
+
+    .canvas-toolbar-swatch-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .canvas-toolbar-swatch {
+        width: 22px;
+        height: 22px;
+    }
+
+    .canvas-toolbar-tool-btn,
+    .canvas-toolbar-brush-btn,
+    .canvas-toolbar-act-btn {
+        min-width: 32px;
+        min-height: 32px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+    }
+
+    .canvas-toolbar-tool-btn {
+        flex: 1 1 32px;
+        padding: 5px 8px;
+    }
+
+    .canvas-toolbar-brush-btn {
+        width: 32px;
+        padding: 5px 7px;
+    }
+
+    .canvas-toolbar-act-btn {
+        order: 4;
+        width: 34px;
+        height: 34px;
+        background: rgba(31, 36, 48, 0.045);
+    }
+
+    .canvas-toolbar-help-btn {
+        margin-left: auto;
+    }
+
+    .canvas-toolbar-shortcuts {
+        right: 0;
+        max-width: 100%;
+        white-space: normal;
+        gap: 6px 12px;
+        font-size: 0.76rem;
+    }
+
+    .canvas-edit-cue {
+        bottom: 74px;
+        min-width: min(300px, calc(100% - 28px));
+        max-width: calc(100% - 28px);
     }
 
     .drawer-backdrop {
