@@ -1358,21 +1358,25 @@ button.theme-toggle .theme-icon-moon {
 .drawer-nav {
     position: sticky;
     top: -12px;
+    z-index: 2;
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
     margin: 0 -12px;
     padding: 8px 12px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
     background: var(--panel-strong);
 }
 
 .drawer-nav-pill {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 4px 10px;
     border: 1px solid var(--line);
     border-radius: 10px;
+    background: var(--btn-soft-bg);
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--muted);
     text-decoration: none;
     white-space: nowrap;
@@ -1389,11 +1393,45 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .drawer-section {
+    position: relative;
     scroll-margin-top: 78px;
     padding: 9px 10px;
     border: 1px solid var(--line);
     border-radius: 16px;
     background: var(--status-tile-bg);
+}
+
+.drawer-section::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 0;
+    width: 3px;
+    border-radius: 999px;
+    background: var(--accent);
+    opacity: 0.42;
+}
+
+.drawer-section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin: -1px 0 9px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--line);
+}
+
+.drawer-section-meta {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .drawer-control-grid {
@@ -1433,7 +1471,7 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .panel-section h2 {
-    margin: 0 0 8px;
+    margin: 0;
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.09em;
