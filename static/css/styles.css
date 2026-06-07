@@ -1107,6 +1107,17 @@ button.theme-toggle .theme-icon-moon {
     pointer-events: none;
 }
 
+.canvas-first-action-hint::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: calc(100% - 1px);
+    width: 1px;
+    height: 18px;
+    transform: translateX(-50%);
+    background: linear-gradient(rgba(191, 90, 54, 0.44), rgba(191, 90, 54, 0));
+}
+
 .canvas-first-action-hint strong {
     font-size: 0.9rem;
     line-height: 1.15;
@@ -1347,14 +1358,14 @@ button.theme-toggle .theme-icon-moon {
     display: grid;
     gap: 8px;
     padding: 10px 11px;
-    border: 1px solid var(--line);
+    border: 1px solid rgba(191, 90, 54, 0.22);
     border-radius: 14px;
     background: var(--status-tile-bg);
     font-size: 0.8rem;
 }
 
 .drawer-showcase-title {
-    color: var(--muted);
+    color: var(--accent-dark);
     font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -2483,10 +2494,14 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .canvas-first-action-hint {
-        top: 56%;
+        top: 46%;
         min-width: min(260px, calc(100% - 36px));
         max-width: calc(100% - 36px);
         padding: 10px 12px;
+    }
+
+    .canvas-first-action-hint::after {
+        height: 14px;
     }
 
     .canvas-toolbar {

@@ -194,7 +194,7 @@ export function buildQuickStartHintState(
         patternStatusText === "";
 
     return {
-        quickStartHintText: "Or click the grid to paint.",
+        quickStartHintText: "Or start by painting one tile.",
         quickStartHintVisible: shouldShow,
     };
 }

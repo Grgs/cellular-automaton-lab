@@ -133,7 +133,7 @@ describe("controls/view-sections control shell", () => {
             topologyStatusLabel: "Aperiodic • Canonical patch",
             topologyStatusDetail: "Backend implementation and verification agree.",
             quickStartHintVisible: true,
-            quickStartHintText: "Or click the grid to paint.",
+            quickStartHintText: "Or start by painting one tile.",
             drawerVisible: true,
             backdropVisible: false,
             drawerToggleLabel: "Hide Inspector",
@@ -152,10 +152,10 @@ describe("controls/view-sections control shell", () => {
         expect(elements.topologyStatus?.textContent).toContain("Aperiodic");
         expect(elements.topologyStatus?.textContent).toContain("Backend implementation");
         expect(elements.quickStartHint?.hidden).toBe(false);
-        expect(elements.quickStartHintText?.textContent).toBe("Or click the grid to paint.");
+        expect(elements.quickStartHintText?.textContent).toBe("Or start by painting one tile.");
         expect(elements.canvasFirstActionHint?.hidden).toBe(false);
         expect(elements.canvasFirstActionHintText?.textContent).toBe(
-            "Paint one tile, then press Run.",
+            "Paint a tile, then press Run.",
         );
     });
 

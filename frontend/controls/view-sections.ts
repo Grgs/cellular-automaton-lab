@@ -92,7 +92,7 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
         elements.canvasFirstActionHint.hidden = !viewModel.quickStartHintVisible;
     }
     if (elements.canvasFirstActionHintText) {
-        elements.canvasFirstActionHintText.textContent = "Paint one tile, then press Run.";
+        elements.canvasFirstActionHintText.textContent = "Paint a tile, then press Run.";
     }
     if (elements.blockingActivityOverlay) {
         elements.blockingActivityOverlay.hidden = !viewModel.blockingActivityVisible;
