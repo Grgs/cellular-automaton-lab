@@ -428,16 +428,21 @@ h1 {
 }
 
 .top-bar-topology-group {
-    flex: 0 1 auto;
+    flex: 1 1 280px;
+    min-width: 0;
 }
 
 .top-bar-tiling-control {
-    min-width: 296px;
     z-index: 8;
 }
 
 .top-bar-actions-group {
     margin-left: auto;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--status-tile-line);
+    border-radius: 16px;
+    background: var(--status-tile-bg);
 }
 
 .top-control {
@@ -449,6 +454,10 @@ h1 {
 
 .compact-select {
     min-width: 138px;
+}
+
+.top-bar-tiling-control {
+    min-width: min(360px, 24vw);
 }
 
 .top-control-label {
@@ -870,7 +879,11 @@ button.primary-action:hover:not(:disabled) {
 }
 
 .top-bar-action {
-    min-width: 66px;
+    min-width: 58px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    box-shadow: none;
+    white-space: nowrap;
 }
 
 button.is-running {
@@ -1265,10 +1278,14 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .drawer-nav {
+    position: sticky;
+    top: -12px;
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    padding: 2px 0 4px;
+    margin: 0 -12px;
+    padding: 8px 12px;
+    background: var(--panel-strong);
 }
 
 .drawer-nav-pill {
@@ -1289,8 +1306,8 @@ button.theme-toggle .theme-icon-moon {
 
 .drawer-nav-pill:hover {
     background: var(--btn-soft-hover);
-    color: var(--text);
-    border-color: var(--accent-border);
+    color: var(--ink);
+    border-color: var(--accent);
 }
 
 .drawer-section {
