@@ -1246,13 +1246,17 @@ button.theme-toggle .theme-icon-moon {
     gap: 2px;
 }
 
+.drawer-message-stack {
+    display: grid;
+    gap: 8px;
+}
+
 .inspector-theme-toggle {
     flex: 0 0 auto;
     align-self: flex-start;
 }
 
 .drawer-quick-start-hint {
-    margin-top: 6px;
     display: grid;
     gap: 8px;
     padding: 10px 11px;
@@ -1430,20 +1434,26 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .pattern-status {
-    min-height: 20px;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--status-tile-bg);
     color: var(--muted);
     font-size: 0.82rem;
     line-height: 1.4;
 }
 
 .inspector-status {
-    margin-top: 6px;
+    margin: 0;
 }
 
 .topology-status {
     display: grid;
     gap: 2px;
-    min-height: 20px;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--status-tile-bg);
 }
 
 .topology-status-label {

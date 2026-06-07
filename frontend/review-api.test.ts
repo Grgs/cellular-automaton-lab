@@ -82,7 +82,6 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         generationText: document.createElement("span"),
         ruleText: null,
         gridSizeText: document.createElement("span"),
-        gridSizePanelText: null,
         inspectorTilingText: null,
         inspectorRuleText: null,
         topologyStatus: null,

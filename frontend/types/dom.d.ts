@@ -20,7 +20,6 @@ export interface DomElements {
     generationText: HTMLElement | null;
     ruleText: HTMLElement | null;
     gridSizeText: HTMLElement | null;
-    gridSizePanelText: HTMLElement | null;
     inspectorTilingText: HTMLElement | null;
     inspectorRuleText: HTMLElement | null;
     topologyStatus: HTMLElement | null;

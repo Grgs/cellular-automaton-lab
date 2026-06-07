@@ -26,7 +26,6 @@ export const elements: DomElements = {
     generationText: elementById("generation-text"),
     ruleText: elementById("rule-text"),
     gridSizeText: elementById("grid-size-text"),
-    gridSizePanelText: elementById("grid-size-panel-text"),
     inspectorTilingText: elementById("inspector-tiling-text"),
     inspectorRuleText: elementById("inspector-rule-text"),
     topologyStatus: elementById("topology-status"),

@@ -127,7 +127,6 @@
                     <div class="canvas-hud-context-block">
                         <span class="canvas-hud-label">Board</span>
                         <strong id="grid-size-text" class="canvas-hud-value">-- x --</strong>
-                        <span id="grid-size-panel-text" class="sr-only">-- x --</span>
                     </div>
                 </div>
             </div>
@@ -242,13 +241,15 @@
                                 >Loading rule...</span
                             >
                         </div>
-                        <div
-                            id="topology-status"
-                            class="topology-status inspector-status"
-                            hidden
-                            aria-live="polite"
-                        ></div>
                     </div>
+                </header>
+                <div class="drawer-message-stack" aria-label="Current setup messages">
+                    <div
+                        id="topology-status"
+                        class="topology-status inspector-status"
+                        hidden
+                        aria-live="polite"
+                    ></div>
                     <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
                         <span class="drawer-showcase-title">Try a starting point</span>
                         <span class="drawer-showcase-actions">
@@ -284,7 +285,7 @@
                         hidden
                         aria-live="polite"
                     ></div>
-                </header>
+                </div>
 
                 <nav class="drawer-nav" aria-label="Jump to section">
                     <a href="#topology-section" class="drawer-nav-pill">Topology</a>

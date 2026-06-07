@@ -113,7 +113,6 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
     }
     elements.ruleText!.textContent = viewModel.ruleText;
     elements.gridSizeText!.textContent = viewModel.gridSizeText;
-    elements.gridSizePanelText!.textContent = viewModel.gridSizeText;
     if (elements.inspectorTilingText) {
         elements.inspectorTilingText.textContent = viewModel.inspectorTilingText;
     }
