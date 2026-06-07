@@ -188,12 +188,43 @@ describe("mountComparePanel", () => {
         });
         const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
         const labels = buttons.map((button) => button.textContent);
-        expect(labels).toEqual(["begin ↗", "end ↗", "⧉ link", "▸ preview"]);
+        expect(labels).toEqual(["begin ↗", "end ↗", "⧉ begin", "⧉ end", "▸ preview"]);
 
         buttons[0]?.click();
         expect(openSpy).toHaveBeenCalledTimes(1);
         const openedUrl = String(openSpy.mock.calls.at(0)?.[0] ?? "");
         expect(openedUrl).toContain("#share=v1.");
+    });
+
+    it("copies distinct share links for the begin and end states", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const writeText = vi.fn(async (_text: string) => {});
+        vi.stubGlobal("navigator", { clipboard: { writeText } });
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-row-actions")).not.toBeNull();
+        });
+        const linkButtons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
+        const beginLink = linkButtons.find((b) => b.textContent === "⧉ begin");
+        const endLink = linkButtons.find((b) => b.textContent === "⧉ end");
+        expect(beginLink).toBeTruthy();
+        expect(endLink).toBeTruthy();
+
+        beginLink?.click();
+        endLink?.click();
+        await vi.waitFor(() => expect(writeText).toHaveBeenCalledTimes(2));
+        const [beginUrl, endUrl] = writeText.mock.calls.map((call) => String(call[0]));
+        expect(beginUrl).toContain("#share=v1.");
+        expect(endUrl).toContain("#share=v1.");
+        // begin (3 seed cells) and end (2 cells) encode different boards.
+        expect(beginUrl).not.toEqual(endUrl);
+
+        vi.unstubAllGlobals();
     });
 
     it("loads begin/end into the board and closes when onOpenPattern is provided", async () => {
@@ -211,7 +242,7 @@ describe("mountComparePanel", () => {
         });
         const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-link")];
         const labels = buttons.map((button) => button.textContent);
-        expect(labels).toEqual(["begin", "end", "⧉ link", "▸ preview"]);
+        expect(labels).toEqual(["begin", "end", "⧉ begin", "⧉ end", "▸ preview"]);
 
         buttons[0]?.click();
         expect(onOpenPattern).toHaveBeenCalledTimes(1);
