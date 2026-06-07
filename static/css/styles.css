@@ -1287,6 +1287,11 @@ button.theme-toggle .theme-icon-moon {
     overflow: auto;
 }
 
+.drawer-sticky-summary {
+    display: grid;
+    gap: 8px;
+}
+
 .panel-section {
     margin: 0;
 }
@@ -2373,9 +2378,14 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .control-drawer {
-        width: min(360px, calc(100vw - 20px));
-        max-width: 100%;
-        transform: translateX(calc(100% + 12px));
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        width: min(380px, calc(100vw - 16px));
+        max-width: calc(100vw - 16px);
+        border-radius: 20px;
+        box-shadow: 0 20px 44px rgba(15, 22, 34, 0.2);
+        transform: translateX(calc(100% + 16px));
     }
 
     .control-drawer[data-open="true"] {
@@ -2384,7 +2394,59 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .control-drawer[data-open="false"] {
-        transform: translateX(calc(100% + 12px));
+        transform: translateX(calc(100% + 16px));
+    }
+
+    .control-drawer-inner {
+        padding: 10px;
+        gap: 7px;
+    }
+
+    .drawer-sticky-summary {
+        position: sticky;
+        top: -10px;
+        z-index: 5;
+        margin: -10px -10px 0;
+        padding: 10px 10px 8px;
+        border-bottom: 1px solid var(--line);
+        background: var(--panel-strong);
+    }
+
+    .drawer-sticky-summary .drawer-header {
+        padding: 8px 10px;
+        border-radius: 14px;
+    }
+
+    .drawer-sticky-summary .drawer-message-stack {
+        gap: 6px;
+    }
+
+    .drawer-sticky-summary .drawer-quick-start-hint {
+        padding: 8px 9px;
+    }
+
+    .drawer-sticky-summary .drawer-nav {
+        position: static;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+
+    .drawer-nav-pill {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+
+    .drawer-section {
+        scroll-margin-top: 150px;
+        padding: 8px 9px;
+        border-radius: 14px;
+    }
+
+    .drawer-section-heading {
+        margin-bottom: 8px;
+        padding-bottom: 6px;
     }
 
     .canvas-hud {

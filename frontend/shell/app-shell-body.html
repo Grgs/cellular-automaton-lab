@@ -240,69 +240,71 @@
 
         <aside id="control-drawer" class="control-drawer" aria-hidden="false" data-open="true">
             <div class="control-drawer-inner">
-                <header class="drawer-header">
-                    <div class="drawer-header-copy">
-                        <div class="drawer-header-context">
-                            <strong id="inspector-tiling-text" class="drawer-header-title"
-                                >Loading...</strong
-                            >
-                            <span id="inspector-rule-text" class="drawer-header-subtitle"
-                                >Loading rule...</span
+                <div class="drawer-sticky-summary">
+                    <header class="drawer-header">
+                        <div class="drawer-header-copy">
+                            <div class="drawer-header-context">
+                                <strong id="inspector-tiling-text" class="drawer-header-title"
+                                    >Loading...</strong
+                                >
+                                <span id="inspector-rule-text" class="drawer-header-subtitle"
+                                    >Loading rule...</span
+                                >
+                            </div>
+                        </div>
+                    </header>
+                    <div class="drawer-message-stack" aria-label="Current setup messages">
+                        <div
+                            id="topology-status"
+                            class="topology-status inspector-status"
+                            hidden
+                            aria-live="polite"
+                        ></div>
+                        <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
+                            <span class="drawer-showcase-title">Try a starting point</span>
+                            <span class="drawer-showcase-actions">
+                                <button
+                                    id="showcase-whirlpool-btn"
+                                    class="soft-action showcase-action-button"
+                                    type="button"
+                                >
+                                    Whirlpool Demo
+                                </button>
+                                <button
+                                    id="showcase-wireworld-btn"
+                                    class="soft-action showcase-action-button"
+                                    type="button"
+                                >
+                                    WireWorld Demo
+                                </button>
+                                <button
+                                    id="showcase-penrose-btn"
+                                    class="soft-action showcase-action-button showcase-action-button-wide"
+                                    type="button"
+                                >
+                                    Penrose Demo
+                                </button>
+                            </span>
+                            <span id="quick-start-hint-text" class="drawer-showcase-hint"
+                                >Or click the grid to paint.</span
                             >
                         </div>
+                        <div
+                            id="pattern-status"
+                            class="pattern-status inspector-status"
+                            hidden
+                            aria-live="polite"
+                        ></div>
                     </div>
-                </header>
-                <div class="drawer-message-stack" aria-label="Current setup messages">
-                    <div
-                        id="topology-status"
-                        class="topology-status inspector-status"
-                        hidden
-                        aria-live="polite"
-                    ></div>
-                    <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
-                        <span class="drawer-showcase-title">Try a starting point</span>
-                        <span class="drawer-showcase-actions">
-                            <button
-                                id="showcase-whirlpool-btn"
-                                class="soft-action showcase-action-button"
-                                type="button"
-                            >
-                                Whirlpool Demo
-                            </button>
-                            <button
-                                id="showcase-wireworld-btn"
-                                class="soft-action showcase-action-button"
-                                type="button"
-                            >
-                                WireWorld Demo
-                            </button>
-                            <button
-                                id="showcase-penrose-btn"
-                                class="soft-action showcase-action-button showcase-action-button-wide"
-                                type="button"
-                            >
-                                Penrose Demo
-                            </button>
-                        </span>
-                        <span id="quick-start-hint-text" class="drawer-showcase-hint"
-                            >Or click the grid to paint.</span
-                        >
-                    </div>
-                    <div
-                        id="pattern-status"
-                        class="pattern-status inspector-status"
-                        hidden
-                        aria-live="polite"
-                    ></div>
-                </div>
 
-                <nav class="drawer-nav" aria-label="Jump to section">
-                    <a href="#topology-section" class="drawer-nav-pill">Topology</a>
-                    <a href="#sim-section" class="drawer-nav-pill">Simulation</a>
-                    <a href="#patterns-section" class="drawer-nav-pill">Patterns</a>
-                    <a href="#display-section" class="drawer-nav-pill">Display</a>
-                    <a href="#advanced-section" class="drawer-nav-pill">Advanced</a>
-                </nav>
+                    <nav class="drawer-nav" aria-label="Jump to section">
+                        <a href="#topology-section" class="drawer-nav-pill">Topology</a>
+                        <a href="#sim-section" class="drawer-nav-pill">Simulation</a>
+                        <a href="#patterns-section" class="drawer-nav-pill">Patterns</a>
+                        <a href="#display-section" class="drawer-nav-pill">Display</a>
+                        <a href="#advanced-section" class="drawer-nav-pill">Advanced</a>
+                    </nav>
+                </div>
 
                 <section
                     id="selection-inspector-section"
