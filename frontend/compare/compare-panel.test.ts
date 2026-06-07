@@ -248,7 +248,12 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
         expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
-        expect(familyHeaderTexts()).toEqual(["regular 2/2", "mixed 1/1", "periodic 1/1", "aperiodic 1/2"]);
+        expect(familyHeaderTexts()).toEqual([
+            "regular 2/2",
+            "mixed 1/1",
+            "periodic 1/1",
+            "aperiodic 1/2",
+        ]);
 
         setTilingSearch("Penrose");
         expect(tilingLabels()).toEqual(["Penrose"]);
@@ -283,7 +288,12 @@ describe("mountComparePanel", () => {
         expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
         expect(summaryText()).toBe("2 / 6 selected · Regular 2");
         expect(activePresetLabels()).toEqual(["Regular"]);
-        expect(familyHeaderTexts()).toEqual(["regular 2/2", "mixed 0/1", "periodic 0/1", "aperiodic 0/2"]);
+        expect(familyHeaderTexts()).toEqual([
+            "regular 2/2",
+            "mixed 0/1",
+            "periodic 0/1",
+            "aperiodic 0/2",
+        ]);
 
         clickPreset("Mixed");
         expect(checkedTilingLabels()).toEqual(["Kagome", "Periodic Face"]);
@@ -336,7 +346,12 @@ describe("mountComparePanel", () => {
 
         expect(summaryText()).toBe("1 / 6 selected · Regular 1");
         expect(activePresetLabels()).toEqual([]);
-        expect(familyHeaderTexts()).toEqual(["regular 1/2", "mixed 0/1", "periodic 0/1", "aperiodic 0/2"]);
+        expect(familyHeaderTexts()).toEqual([
+            "regular 1/2",
+            "mixed 0/1",
+            "periodic 0/1",
+            "aperiodic 0/2",
+        ]);
     });
 
     it("runs with selected tilings hidden by the current search", async () => {
@@ -385,9 +400,9 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
         });
-        const actions = [...document.querySelectorAll<HTMLElement>(".compare-row-actions .compare-link")].map(
-            (action) => action.textContent,
-        );
+        const actions = [
+            ...document.querySelectorAll<HTMLElement>(".compare-row-actions .compare-link"),
+        ].map((action) => action.textContent);
         expect(actions).toEqual(["Open", "Copy", "▸ preview"]);
 
         clickMenuItem("Open", "Begin");
@@ -440,9 +455,9 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
         });
-        const actions = [...document.querySelectorAll<HTMLElement>(".compare-row-actions .compare-link")].map(
-            (action) => action.textContent,
-        );
+        const actions = [
+            ...document.querySelectorAll<HTMLElement>(".compare-row-actions .compare-link"),
+        ].map((action) => action.textContent);
         expect(actions).toEqual(["Open", "Copy", "▸ preview"]);
 
         clickMenuItem("Open", "Begin");

@@ -492,7 +492,9 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             "all",
             "none",
         ];
-        return presets.find((preset) => sameSelection(selected, selectionForPreset(preset))) ?? null;
+        return (
+            presets.find((preset) => sameSelection(selected, selectionForPreset(preset))) ?? null
+        );
     }
 
     function updatePresetButtons(): void {
@@ -882,15 +884,12 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             "div",
             { class: "compare-action-menu-panel" },
             items.map((item) => {
-                const button = el(
-                    "button",
-                    {
-                        class: "compare-action-menu-item",
-                        type: "button",
-                        title: item.title,
-                        textContent: item.label,
-                    },
-                );
+                const button = el("button", {
+                    class: "compare-action-menu-item",
+                    type: "button",
+                    title: item.title,
+                    textContent: item.label,
+                });
                 button.addEventListener("click", () => {
                     details.removeAttribute("open");
                     item.onClick();
