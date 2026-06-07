@@ -7,7 +7,7 @@
         {"name": "build-manifest", "patterns": ["build-manifest.json"], "raw": 25000, "gzip": 6000},
         {"name": "js-runtime", "patterns": ["assets/app-runtime-*.js"], "raw": 350000, "gzip": 101000},
         {"name": "js-standalone", "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"], "raw": 25000, "gzip": 8000},
-        {"name": "css", "patterns": ["assets/*.css"], "raw": 35000, "gzip": 7100},
+        {"name": "css", "patterns": ["assets/*.css"], "raw": 36500, "gzip": 7500},
         {"name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000},
         {"name": "other", "patterns": ["*"], "raw": 1000}
     ],

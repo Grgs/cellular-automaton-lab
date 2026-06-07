@@ -555,9 +555,61 @@ h1 {
     position: sticky;
     top: -12px;
     z-index: 1;
+    display: grid;
+    gap: 8px;
     margin: -12px -12px 10px;
     padding: 12px;
     background: var(--panel-strong);
+}
+
+.tiling-picker-search-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.tiling-picker-search-title {
+    font-size: 0.86rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.tiling-picker-menu-current {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tiling-picker-close {
+    flex: 0 0 auto;
+    width: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border-radius: 999px;
+    background: var(--btn-soft-bg);
+    color: var(--ink);
+    border-color: var(--btn-soft-line);
+    box-shadow: none;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.tiling-picker-close:hover:not(:disabled),
+.tiling-picker-close:focus-visible {
+    background: var(--btn-soft-hover);
+    border-color: var(--accent);
+    box-shadow: none;
+}
+
+.tiling-picker-search-label {
+    display: block;
 }
 
 .tiling-picker-search {
@@ -2157,15 +2209,46 @@ button.theme-toggle .theme-icon-moon {
         bottom: 12px;
         left: 12px;
         right: 12px;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
         width: auto;
         max-height: none;
         padding: 0 12px 12px;
+        border-radius: 18px;
+        overflow: hidden;
     }
 
     .tiling-picker-search-row {
         top: 0;
         margin: 0 -12px 10px;
         padding: 12px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .tiling-picker-search-header {
+        gap: 10px;
+    }
+
+    .tiling-picker-search-title {
+        font-size: 0.95rem;
+    }
+
+    .tiling-picker-menu-current {
+        font-size: 0.78rem;
+    }
+
+    .tiling-picker-search {
+        min-height: 40px;
+    }
+
+    .tiling-picker-list {
+        min-height: 0;
+        overflow: auto;
+        padding-bottom: 6px;
+    }
+
+    .tiling-picker-empty {
+        align-self: start;
     }
 
     .tiling-preview-grid {
