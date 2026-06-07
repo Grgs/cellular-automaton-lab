@@ -76,6 +76,8 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         blockingActivityDetail: null,
         canvasHud: null,
         canvasEditCue: null,
+        canvasFirstActionHint: null,
+        canvasFirstActionHintText: null,
         canvasHudTilingText: null,
         canvasHudAdjacencyText: null,
         statusText: document.createElement("span"),

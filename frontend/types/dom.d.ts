@@ -14,6 +14,8 @@ export interface DomElements {
     blockingActivityDetail: HTMLElement | null;
     canvasHud: HTMLElement | null;
     canvasEditCue: HTMLElement | null;
+    canvasFirstActionHint: HTMLElement | null;
+    canvasFirstActionHintText: HTMLElement | null;
     canvasHudTilingText: HTMLElement | null;
     canvasHudAdjacencyText: HTMLElement | null;
     statusText: HTMLElement | null;

@@ -91,6 +91,8 @@ describe("controls/view-sections control shell", () => {
             canvasHudAdjacencyText: document.createElement("span"),
             canvasHud: document.createElement("div"),
             canvasEditCue: document.createElement("div"),
+            canvasFirstActionHint: document.createElement("div"),
+            canvasFirstActionHintText: document.createElement("span"),
             blockingActivityOverlay: document.createElement("div"),
             blockingActivityMessage: document.createElement("strong"),
             blockingActivityDetail: document.createElement("span"),
@@ -151,6 +153,10 @@ describe("controls/view-sections control shell", () => {
         expect(elements.topologyStatus?.textContent).toContain("Backend implementation");
         expect(elements.quickStartHint?.hidden).toBe(false);
         expect(elements.quickStartHintText?.textContent).toBe("Or click the grid to paint.");
+        expect(elements.canvasFirstActionHint?.hidden).toBe(false);
+        expect(elements.canvasFirstActionHintText?.textContent).toBe(
+            "Paint one tile, then press Run.",
+        );
     });
 
     it("renders pattern status as a separate drawer message state", () => {

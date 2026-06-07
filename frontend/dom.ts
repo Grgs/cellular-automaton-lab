@@ -20,6 +20,8 @@ export const elements: DomElements = {
     blockingActivityDetail: elementById("blocking-activity-detail"),
     canvasHud: elementById("canvas-hud"),
     canvasEditCue: elementById("canvas-edit-cue"),
+    canvasFirstActionHint: elementById("canvas-first-action-hint"),
+    canvasFirstActionHintText: elementById("canvas-first-action-hint-text"),
     canvasHudTilingText: elementById("canvas-hud-tiling-text"),
     canvasHudAdjacencyText: elementById("canvas-hud-adjacency-text"),
     statusText: elementById("status-text"),
