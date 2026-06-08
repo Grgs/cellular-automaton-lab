@@ -248,9 +248,6 @@ class TopologyValidationTests(unittest.TestCase):
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
                 self.assertEqual(validation.hole_count, 0)
 
-    def test_canonical_sample_surface_holes_flag_current_hole_regressions(self) -> None:
-        self.skipTest("There are currently no known canonical sample hole regressions.")
-
     def test_snub_square_regression_is_covered_by_shared_validator(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)
         validation = validate_topology(
