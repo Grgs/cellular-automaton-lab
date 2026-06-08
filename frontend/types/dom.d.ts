@@ -3,6 +3,7 @@ export interface DomElements {
     topBar: HTMLElement | null;
     mainStage: HTMLElement | null;
     controlDrawer: HTMLElement | null;
+    drawerNav: HTMLElement | null;
     drawerBackdrop: HTMLElement | null;
     drawerToggleBtn: HTMLButtonElement | null;
     "rule-notes-toggle": HTMLDetailsElement | null;

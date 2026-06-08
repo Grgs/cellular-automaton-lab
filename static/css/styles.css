@@ -1439,6 +1439,19 @@ button.theme-toggle .theme-icon-moon {
     border-color: var(--accent);
 }
 
+.drawer-nav-pill.is-active,
+.drawer-nav-pill[aria-current="true"] {
+    background: color-mix(in srgb, var(--accent) 14%, var(--panel-strong));
+    color: var(--ink);
+    border-color: color-mix(in srgb, var(--accent) 58%, var(--line));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.drawer-nav-pill.is-active:hover,
+.drawer-nav-pill[aria-current="true"]:hover {
+    background: color-mix(in srgb, var(--accent) 20%, var(--panel-strong));
+}
+
 .drawer-section {
     position: relative;
     scroll-margin-top: 78px;

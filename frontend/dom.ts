@@ -9,6 +9,7 @@ export const elements: DomElements = {
     topBar: elementById("top-bar"),
     mainStage: elementById("main-stage"),
     controlDrawer: elementById("control-drawer"),
+    drawerNav: elementById("drawer-nav"),
     drawerBackdrop: elementById("drawer-backdrop"),
     drawerToggleBtn: elementById("drawer-toggle-btn"),
     "rule-notes-toggle": elementById("rule-notes-toggle"),

@@ -65,6 +65,7 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         topBar: null,
         mainStage: null,
         controlDrawer: null,
+        drawerNav: null,
         drawerBackdrop: null,
         drawerToggleBtn: null,
         "rule-notes-toggle": null,
