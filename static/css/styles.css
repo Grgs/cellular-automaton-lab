@@ -1494,6 +1494,13 @@ button.theme-toggle .theme-icon-moon {
     white-space: nowrap;
 }
 
+.drawer-section-summary {
+    margin: -2px 0 10px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
 .drawer-control-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1908,13 +1915,47 @@ button.theme-toggle .theme-icon-moon {
     justify-self: start;
 }
 
+.drawer-action-stack {
+    display: grid;
+    gap: 8px;
+}
+
+.drawer-action-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid var(--line);
+}
+
+.drawer-action-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.drawer-action-row-copy {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.drawer-action-row-copy strong {
+    font-size: 0.82rem;
+    line-height: 1.2;
+}
+
 .patterns-share-btn {
-    width: 100%;
-    margin-bottom: 10px;
+    width: auto;
+    min-width: 124px;
 }
 
 .file-io-toggle {
-    margin-top: 10px;
+    margin-top: 8px;
+}
+
+.drawer-file-io-hint {
+    padding-bottom: 0;
 }
 
 .rule-help-toggle .file-io-panel {
@@ -2641,5 +2682,14 @@ button.theme-toggle .theme-icon-moon {
     .drawer-control-grid,
     .drawer-board-actions {
         grid-template-columns: 1fr;
+    }
+
+    .drawer-action-row {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .patterns-share-btn {
+        width: 100%;
     }
 }

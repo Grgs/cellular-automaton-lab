@@ -351,6 +351,9 @@
                         <h2>Topology</h2>
                         <span class="drawer-section-meta">Board shape</span>
                     </div>
+                    <p class="drawer-section-summary">
+                        Tune how the current tiling is generated and how large each tile appears.
+                    </p>
                     <div class="drawer-control-grid drawer-topology-grid">
                         <label
                             id="adjacency-mode-field"
@@ -409,6 +412,9 @@
                         <h2>Simulation</h2>
                         <span class="drawer-section-meta">Rule & pace</span>
                     </div>
+                    <p class="drawer-section-summary">
+                        Choose the rule that evolves cells and set the target stepping speed.
+                    </p>
                     <label class="top-control compact-select drawer-control drawer-rule-control">
                         <span class="top-control-label">Rule</span>
                         <input
@@ -480,27 +486,45 @@
                         <h2>Patterns</h2>
                         <span class="drawer-section-meta">Seeds & I/O</span>
                     </div>
-                    <button
-                        id="share-link-btn"
-                        class="soft-action patterns-share-btn"
-                        type="button"
-                        title="Copy a link that restores this exact board"
-                    >
-                        Copy Share Link
-                    </button>
-                    <div id="preset-seed-controls" class="preset-seed-controls">
-                        <select
-                            id="preset-seed-select"
-                            hidden
-                            aria-label="Preset seed pattern"
-                        ></select>
-                        <button id="preset-seed-btn" class="soft-action" type="button">
-                            Preset Seed
-                        </button>
-                    </div>
-                    <p id="preset-helper-text" class="hint preset-helper-text">
-                        Loads a curated seed for this rule and board.
+                    <p class="drawer-section-summary">
+                        Save, share, or load starting boards for the current topology and rule.
                     </p>
+                    <div class="drawer-action-stack">
+                        <div class="drawer-action-row drawer-pattern-share-row">
+                            <span class="drawer-action-row-copy">
+                                <strong>Share board</strong>
+                                <span class="hint"
+                                    >Copy a link that restores this exact setup.</span
+                                >
+                            </span>
+                            <button
+                                id="share-link-btn"
+                                class="soft-action patterns-share-btn"
+                                type="button"
+                                title="Copy a link that restores this exact board"
+                            >
+                                Copy Share Link
+                            </button>
+                        </div>
+                        <div class="drawer-action-row drawer-pattern-seed-row">
+                            <span class="drawer-action-row-copy">
+                                <strong>Start from a seed</strong>
+                                <span id="preset-helper-text" class="hint preset-helper-text">
+                                    Loads a curated seed for this rule and board.
+                                </span>
+                            </span>
+                            <div id="preset-seed-controls" class="preset-seed-controls">
+                                <select
+                                    id="preset-seed-select"
+                                    hidden
+                                    aria-label="Preset seed pattern"
+                                ></select>
+                                <button id="preset-seed-btn" class="soft-action" type="button">
+                                    Preset Seed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <input
                         id="pattern-import-input"
                         type="file"
@@ -510,6 +534,9 @@
                     />
                     <details class="file-io-toggle rule-help-toggle">
                         <summary>File I/O</summary>
+                        <p class="hint drawer-file-io-hint">
+                            Move board JSON in or out of the app for saved experiments.
+                        </p>
                         <div class="file-io-panel drawer-action-grid">
                             <button id="import-pattern-btn" class="soft-action" type="button">
                                 Import Pattern
@@ -532,6 +559,9 @@
                         <h2>Display</h2>
                         <span class="drawer-section-meta">Theme</span>
                     </div>
+                    <p class="drawer-section-summary">
+                        Adjust visual styling without changing the underlying board state.
+                    </p>
                     <label
                         id="tile-colors-field"
                         class="buried-setting-toggle"
@@ -574,6 +604,9 @@
                         <h2>Advanced</h2>
                         <span class="drawer-section-meta">Limits</span>
                     </div>
+                    <p class="drawer-section-summary">
+                        Use these only when you need to override defaults or reset saved state.
+                    </p>
                     <label
                         id="unsafe-sizing-field"
                         class="buried-setting-toggle"
