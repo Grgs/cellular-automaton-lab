@@ -386,9 +386,10 @@ Literature-review conventions:
 Repo-scoped process inspection and cleanup:
 
 ```powershell
+python -m tools repo cleanup
 python -m tools repo processes list
 python -m tools repo processes kill --stale-browser-hosts
-python -m tools repo processes kill --port 5002
+python -m tools repo processes kill --port 5000
 ```
 
 Artifact locations:
@@ -480,7 +481,8 @@ Defaults:
 - `python -m tools browser check` is the preferred direct-debug entrypoint when host lifecycle, logs, and cleanup must be owned by one command.
 - `python -m tools browser sweep` is the preferred entrypoint when a diagnosis loop needs a small matrix comparison rather than one run.
 - npm Playwright entrypoints remain the preferred full-suite path.
-- `python -m tools repo processes` is the narrow cleanup fallback when you need to inspect or terminate repo-owned browser/server helper processes directly.
+- `python -m tools repo cleanup` is the quick stale-localhost cleanup fallback.
+- `python -m tools repo processes` is the narrow inspection/kill fallback when you need to inspect or terminate repo-owned browser/server helper processes directly.
 
 If a visual-review run depends on standalone provenance being current, rebuild
 the frontend outputs on the current HEAD first:
@@ -621,4 +623,3 @@ When adding or refactoring tests:
 - keep topology and descriptor validation close to the data they protect
 
 The best outcome is a test suite that is fast to debug, layered by cost, and aligned with the actual architecture of the app.
-

@@ -3,6 +3,7 @@ export interface DomElements {
     topBar: HTMLElement | null;
     mainStage: HTMLElement | null;
     controlDrawer: HTMLElement | null;
+    drawerNav: HTMLElement | null;
     drawerBackdrop: HTMLElement | null;
     drawerToggleBtn: HTMLButtonElement | null;
     "rule-notes-toggle": HTMLDetailsElement | null;
@@ -14,13 +15,14 @@ export interface DomElements {
     blockingActivityDetail: HTMLElement | null;
     canvasHud: HTMLElement | null;
     canvasEditCue: HTMLElement | null;
+    canvasFirstActionHint: HTMLElement | null;
+    canvasFirstActionHintText: HTMLElement | null;
     canvasHudTilingText: HTMLElement | null;
     canvasHudAdjacencyText: HTMLElement | null;
     statusText: HTMLElement | null;
     generationText: HTMLElement | null;
     ruleText: HTMLElement | null;
     gridSizeText: HTMLElement | null;
-    gridSizePanelText: HTMLElement | null;
     inspectorTilingText: HTMLElement | null;
     inspectorRuleText: HTMLElement | null;
     topologyStatus: HTMLElement | null;
@@ -61,6 +63,8 @@ export interface DomElements {
     patchDepthInput: HTMLInputElement | null;
     patchDepthLabel: HTMLElement | null;
     themeToggleBtn: HTMLButtonElement | null;
+    ruleSearchInput: HTMLInputElement | null;
+    ruleSearchStatus: HTMLElement | null;
     ruleSelect: HTMLSelectElement | null;
     runToggleBtn: HTMLButtonElement | null;
     stepBtn: HTMLButtonElement | null;

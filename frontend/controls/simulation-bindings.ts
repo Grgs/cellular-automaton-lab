@@ -1,6 +1,7 @@
 import { bindButtonControl, bindInputControl } from "./binding-primitives.js";
 import { bindConstrainedNumericControl } from "./limit-cues.js";
 import { bindTilingPreviewPicker } from "./tiling-picker-bindings.js";
+import { refreshRuleFilter } from "./view-options.js";
 import type { AppActionSet } from "../types/actions.js";
 import type { DomElements } from "../types/dom.js";
 import type { BrowserTimerId } from "../types/controller.js";
@@ -60,6 +61,11 @@ export function bindSimulationControls(
         () => elements.ruleSelect!.value,
         actions.changeRule,
     );
+    if (elements.ruleSearchInput) {
+        elements.ruleSearchInput.addEventListener("input", () => {
+            refreshRuleFilter(elements);
+        });
+    }
 
     bindConstrainedNumericControl({
         input: elements.cellSizeInput,

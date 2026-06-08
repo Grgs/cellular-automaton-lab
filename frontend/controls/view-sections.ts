@@ -88,6 +88,12 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
         elements.canvasEditCue.hidden = !viewModel.canvasEditCueVisible;
         elements.canvasEditCue.textContent = viewModel.canvasEditCueText || "";
     }
+    if (elements.canvasFirstActionHint) {
+        elements.canvasFirstActionHint.hidden = !viewModel.quickStartHintVisible;
+    }
+    if (elements.canvasFirstActionHintText) {
+        elements.canvasFirstActionHintText.textContent = "Paint a tile, then press Run.";
+    }
     if (elements.blockingActivityOverlay) {
         elements.blockingActivityOverlay.hidden = !viewModel.blockingActivityVisible;
         elements.blockingActivityOverlay.setAttribute(
@@ -113,7 +119,6 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
     }
     elements.ruleText!.textContent = viewModel.ruleText;
     elements.gridSizeText!.textContent = viewModel.gridSizeText;
-    elements.gridSizePanelText!.textContent = viewModel.gridSizeText;
     if (elements.inspectorTilingText) {
         elements.inspectorTilingText.textContent = viewModel.inspectorTilingText;
     }

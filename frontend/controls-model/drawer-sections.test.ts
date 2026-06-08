@@ -60,7 +60,12 @@ describe("controls-model drawer sections", () => {
 
         expect(viewModel.ruleSelectValue).toBe("signal-rule");
         expect(viewModel.ruleOptions).toEqual([
-            { name: "signal-rule", displayName: "Signal Rule" },
+            {
+                name: "signal-rule",
+                displayName: "Signal Rule",
+                description: "Signal states",
+                searchText: "signal-rule Signal Rule Signal states Dead Signal",
+            },
         ]);
         expect(viewModel.paletteStates).toEqual([{ value: 2, label: "Signal", color: "#ff0000" }]);
     });

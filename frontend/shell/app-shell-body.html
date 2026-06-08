@@ -79,12 +79,19 @@
                         id="reset-btn"
                         class="soft-action top-bar-action"
                         type="button"
+                        aria-label="Reset board"
                         title="Clear the board and restart the current setup."
                     >
-                        Reset Board
+                        Reset
                     </button>
-                    <button id="random-btn" class="soft-action top-bar-action" type="button">
-                        Random Reset
+                    <button
+                        id="random-btn"
+                        class="soft-action top-bar-action"
+                        type="button"
+                        aria-label="Random reset"
+                        title="Seed a random board"
+                    >
+                        Random
                     </button>
                 </div>
 
@@ -120,13 +127,21 @@
                     <div class="canvas-hud-context-block">
                         <span class="canvas-hud-label">Board</span>
                         <strong id="grid-size-text" class="canvas-hud-value">-- x --</strong>
-                        <span id="grid-size-panel-text" class="sr-only">-- x --</span>
                     </div>
                 </div>
             </div>
             <div id="canvas-edit-cue" class="canvas-edit-cue" hidden aria-live="polite">
                 Edit mode active. Click or drag to paint. Unarmed click or drag applies the selected
                 paint state.
+            </div>
+            <div
+                id="canvas-first-action-hint"
+                class="canvas-first-action-hint"
+                hidden
+                aria-live="polite"
+            >
+                <strong>Start with one tile</strong>
+                <span id="canvas-first-action-hint-text">Paint a tile, then press Run.</span>
             </div>
             <div
                 id="canvas-toolbar"
@@ -225,74 +240,81 @@
 
         <aside id="control-drawer" class="control-drawer" aria-hidden="false" data-open="true">
             <div class="control-drawer-inner">
-                <header class="drawer-header">
-                    <div class="drawer-header-copy">
-                        <div class="drawer-header-context">
-                            <strong id="inspector-tiling-text" class="drawer-header-title"
-                                >Loading...</strong
-                            >
-                            <span id="inspector-rule-text" class="drawer-header-subtitle"
-                                >Loading rule...</span
-                            >
+                <div class="drawer-sticky-summary">
+                    <header class="drawer-header">
+                        <div class="drawer-header-copy">
+                            <div class="drawer-header-context">
+                                <strong id="inspector-tiling-text" class="drawer-header-title"
+                                    >Loading...</strong
+                                >
+                                <span id="inspector-rule-text" class="drawer-header-subtitle"
+                                    >Loading rule...</span
+                                >
+                            </div>
                         </div>
+                    </header>
+                    <div class="drawer-message-stack" aria-label="Current setup messages">
                         <div
                             id="topology-status"
                             class="topology-status inspector-status"
                             hidden
                             aria-live="polite"
                         ></div>
+                        <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
+                            <span class="drawer-showcase-title">Demo starting points</span>
+                            <span class="drawer-showcase-actions">
+                                <button
+                                    id="showcase-whirlpool-btn"
+                                    class="soft-action showcase-action-button"
+                                    type="button"
+                                >
+                                    Whirlpool Demo
+                                </button>
+                                <button
+                                    id="showcase-wireworld-btn"
+                                    class="soft-action showcase-action-button"
+                                    type="button"
+                                >
+                                    WireWorld Demo
+                                </button>
+                                <button
+                                    id="showcase-penrose-btn"
+                                    class="soft-action showcase-action-button showcase-action-button-wide"
+                                    type="button"
+                                >
+                                    Penrose Demo
+                                </button>
+                            </span>
+                            <span id="quick-start-hint-text" class="drawer-showcase-hint"
+                                >Or start by painting one tile.</span
+                            >
+                        </div>
+                        <div
+                            id="pattern-status"
+                            class="pattern-status inspector-status"
+                            hidden
+                            aria-live="polite"
+                        ></div>
                     </div>
-                    <div id="quick-start-hint" class="hint drawer-quick-start-hint" hidden>
-                        <span class="drawer-showcase-title">Try a starting point</span>
-                        <span class="drawer-showcase-actions">
-                            <button
-                                id="showcase-whirlpool-btn"
-                                class="soft-action showcase-action-button"
-                                type="button"
-                            >
-                                Whirlpool Demo
-                            </button>
-                            <button
-                                id="showcase-wireworld-btn"
-                                class="soft-action showcase-action-button"
-                                type="button"
-                            >
-                                WireWorld Demo
-                            </button>
-                            <button
-                                id="showcase-penrose-btn"
-                                class="soft-action showcase-action-button showcase-action-button-wide"
-                                type="button"
-                            >
-                                Penrose Demo
-                            </button>
-                        </span>
-                        <span id="quick-start-hint-text" class="drawer-showcase-hint"
-                            >Or click the grid to paint.</span
-                        >
-                    </div>
-                    <div
-                        id="pattern-status"
-                        class="pattern-status inspector-status"
-                        hidden
-                        aria-live="polite"
-                    ></div>
-                </header>
 
-                <nav class="drawer-nav" aria-label="Jump to section">
-                    <a href="#topology-section" class="drawer-nav-pill">Topology</a>
-                    <a href="#sim-section" class="drawer-nav-pill">Simulation</a>
-                    <a href="#patterns-section" class="drawer-nav-pill">Patterns</a>
-                    <a href="#display-section" class="drawer-nav-pill">Display</a>
-                    <a href="#advanced-section" class="drawer-nav-pill">Advanced</a>
-                </nav>
+                    <nav id="drawer-nav" class="drawer-nav" aria-label="Jump to section">
+                        <a href="#topology-section" class="drawer-nav-pill">Topology</a>
+                        <a href="#sim-section" class="drawer-nav-pill">Simulation</a>
+                        <a href="#patterns-section" class="drawer-nav-pill">Patterns</a>
+                        <a href="#display-section" class="drawer-nav-pill">Display</a>
+                        <a href="#advanced-section" class="drawer-nav-pill">Advanced</a>
+                    </nav>
+                </div>
 
                 <section
                     id="selection-inspector-section"
                     class="panel-section drawer-section"
                     hidden
                 >
-                    <h2>Cell Metadata</h2>
+                    <div class="drawer-section-heading">
+                        <h2>Cell Metadata</h2>
+                        <span class="drawer-section-meta">Selection</span>
+                    </div>
                     <div class="selection-inspector-header">
                         <strong id="selection-inspector-title" class="selection-inspector-title"
                             >No Cells Selected</strong
@@ -325,7 +347,10 @@
                 </section>
 
                 <section id="topology-section" class="panel-section drawer-section">
-                    <h2>Topology</h2>
+                    <div class="drawer-section-heading">
+                        <h2>Topology</h2>
+                        <span class="drawer-section-meta">Board shape</span>
+                    </div>
                     <div class="drawer-control-grid drawer-topology-grid">
                         <label
                             id="adjacency-mode-field"
@@ -380,10 +405,27 @@
                 </section>
 
                 <section id="sim-section" class="panel-section drawer-section">
-                    <h2>Simulation</h2>
+                    <div class="drawer-section-heading">
+                        <h2>Simulation</h2>
+                        <span class="drawer-section-meta">Rule & pace</span>
+                    </div>
                     <label class="top-control compact-select drawer-control drawer-rule-control">
                         <span class="top-control-label">Rule</span>
+                        <input
+                            id="rule-search-input"
+                            class="rule-search-input"
+                            type="search"
+                            placeholder="Search rules"
+                            autocomplete="off"
+                            aria-label="Search rules"
+                            aria-describedby="rule-search-status"
+                        />
                         <select id="rule-select"></select>
+                        <span
+                            id="rule-search-status"
+                            class="rule-search-status"
+                            aria-live="polite"
+                        ></span>
                     </label>
                     <p id="rule-summary-text" class="rule-summary"></p>
                     <details id="rule-notes-toggle" class="rule-help-toggle">
@@ -434,7 +476,10 @@
                 </section>
 
                 <section id="patterns-section" class="panel-section drawer-section">
-                    <h2>Patterns</h2>
+                    <div class="drawer-section-heading">
+                        <h2>Patterns</h2>
+                        <span class="drawer-section-meta">Seeds & I/O</span>
+                    </div>
                     <button
                         id="share-link-btn"
                         class="soft-action patterns-share-btn"
@@ -483,7 +528,10 @@
                 </section>
 
                 <section id="display-section" class="panel-section drawer-section">
-                    <h2>Display</h2>
+                    <div class="drawer-section-heading">
+                        <h2>Display</h2>
+                        <span class="drawer-section-meta">Theme</span>
+                    </div>
                     <label
                         id="tile-colors-field"
                         class="buried-setting-toggle"
@@ -522,7 +570,10 @@
                 </section>
 
                 <section id="advanced-section" class="panel-section drawer-section">
-                    <h2>Advanced</h2>
+                    <div class="drawer-section-heading">
+                        <h2>Advanced</h2>
+                        <span class="drawer-section-meta">Limits</span>
+                    </div>
                     <label
                         id="unsafe-sizing-field"
                         class="buried-setting-toggle"

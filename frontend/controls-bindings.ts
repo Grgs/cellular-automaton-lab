@@ -1,5 +1,6 @@
 import { bindChromeControls } from "./controls/chrome-bindings.js";
 import { bindDisclosureAndShortcutControls } from "./controls/disclosure-bindings.js";
+import { bindDrawerNavSectionFeedback } from "./controls/drawer-nav-bindings.js";
 import { bindEditorAndPatternControls } from "./controls/editor-pattern-bindings.js";
 import { bindSimulationControls } from "./controls/simulation-bindings.js";
 import type { AppActionSet } from "./types/actions.js";
@@ -15,4 +16,5 @@ export function bindControls(
     bindEditorAndPatternControls(elements, actions);
     bindChromeControls(elements, actions);
     bindDisclosureAndShortcutControls(elements, actions);
+    bindDrawerNavSectionFeedback(elements);
 }

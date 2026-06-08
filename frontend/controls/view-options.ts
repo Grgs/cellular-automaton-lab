@@ -3,6 +3,13 @@ import type { DomElements } from "../types/dom.js";
 import type { RuleSelectOption } from "../types/ui.js";
 import { createTilingPreviewThumbnail } from "./tiling-preview.js";
 
+interface RuleSelectRenderState {
+    rules: readonly RuleSelectOption[];
+    selectedValue: string;
+}
+
+const ruleSelectState = new WeakMap<HTMLSelectElement, RuleSelectRenderState>();
+
 function populateOptions<
     TOption extends object,
     TValueKey extends keyof TOption,
@@ -34,7 +41,95 @@ export function populateRules(
     rules: readonly RuleSelectOption[],
     selectedValue = "",
 ): void {
-    populateOptions(elements.ruleSelect, rules, "name", "displayName", selectedValue);
+    if (!elements.ruleSelect) {
+        return;
+    }
+    ruleSelectState.set(elements.ruleSelect, { rules, selectedValue });
+    renderRuleOptions(elements, rules, selectedValue);
+}
+
+export function refreshRuleFilter(elements: DomElements): void {
+    const selectElement = elements.ruleSelect;
+    if (!selectElement) {
+        return;
+    }
+    const renderState = ruleSelectState.get(selectElement);
+    if (!renderState) {
+        return;
+    }
+    renderRuleOptions(elements, renderState.rules, renderState.selectedValue);
+}
+
+function normalizedRuleSearchText(value: string): string {
+    return value.trim().toLowerCase();
+}
+
+function ruleMatchesSearch(rule: RuleSelectOption, query: string): boolean {
+    if (!query) {
+        return true;
+    }
+    const searchableText = normalizedRuleSearchText(
+        rule.searchText || `${rule.displayName} ${rule.name}`,
+    );
+    return query.split(/\s+/).every((token) => searchableText.includes(token));
+}
+
+function renderRuleOptions(
+    elements: DomElements,
+    rules: readonly RuleSelectOption[],
+    selectedValue: string,
+): void {
+    const selectElement = elements.ruleSelect;
+    if (!selectElement) {
+        return;
+    }
+
+    const query = normalizedRuleSearchText(elements.ruleSearchInput?.value ?? "");
+    const matchingRules = rules.filter((rule) => ruleMatchesSearch(rule, query));
+    const selectedRule = rules.find((rule) => rule.name === selectedValue) ?? null;
+    const selectedRuleAlreadyVisible = Boolean(
+        selectedRule && matchingRules.some((rule) => rule.name === selectedRule.name),
+    );
+    const visibleRules =
+        selectedRule && query && !selectedRuleAlreadyVisible
+            ? [selectedRule, ...matchingRules]
+            : matchingRules;
+
+    selectElement.innerHTML = "";
+    if (visibleRules.length === 0) {
+        const optionElement = document.createElement("option");
+        optionElement.value = "";
+        optionElement.textContent = "No rules match this search";
+        optionElement.disabled = true;
+        optionElement.selected = true;
+        selectElement.appendChild(optionElement);
+    } else {
+        visibleRules.forEach((rule) => {
+            const optionElement = document.createElement("option");
+            optionElement.value = rule.name;
+            optionElement.textContent = rule.displayName;
+            optionElement.title = rule.description;
+            if (optionElement.value === selectedValue) {
+                optionElement.selected = true;
+            }
+            selectElement.appendChild(optionElement);
+        });
+    }
+
+    if (!elements.ruleSearchStatus) {
+        return;
+    }
+    if (!query) {
+        elements.ruleSearchStatus.textContent = `${rules.length} rules available`;
+        return;
+    }
+    if (matchingRules.length === 0 && selectedRule) {
+        elements.ruleSearchStatus.textContent = "No matches; current rule remains selected";
+        return;
+    }
+    const keptCurrentText =
+        selectedRule && !selectedRuleAlreadyVisible ? " · current rule kept" : "";
+    elements.ruleSearchStatus.textContent = `Showing ${matchingRules.length} / ${rules.length} rules${keptCurrentText}`;
 }
 
 export function populateTilingFamilies(
@@ -84,12 +179,47 @@ function tilingOptionsSignature(families: readonly TopologyOption[]): string {
                 family.group,
                 family.value,
                 family.label,
+                family.family,
                 family.previewKey,
                 family.renderKind,
                 family.sizingMode,
+                family.searchAliases.join(","),
             ].join(":"),
         )
         .join("|");
+}
+
+function normalizeTilingSearchText(value: string): string {
+    return value
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+}
+
+function tilingSearchForms(value: string): string[] {
+    const normalized = normalizeTilingSearchText(value);
+    if (!normalized) {
+        return [];
+    }
+    const compact = normalized.replace(/\s+/g, "");
+    return compact === normalized ? [normalized] : [normalized, compact];
+}
+
+function tilingSearchText(optionData: TopologyOption): string {
+    const terms = [
+        optionData.label,
+        optionData.value,
+        optionData.group,
+        optionData.family,
+        optionData.sizingMode === "patch_depth" ? "patch depth substitution" : "grid cell size",
+        optionData.renderKind,
+        optionData.previewKey,
+        ...optionData.searchAliases,
+    ];
+    return [...new Set(terms.flatMap(tilingSearchForms))].join(" ");
 }
 
 function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {
@@ -97,6 +227,7 @@ function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {
     button.type = "button";
     button.className = "tiling-preview-card";
     button.dataset.tilingFamily = optionData.value;
+    button.dataset.searchText = tilingSearchText(optionData);
     button.setAttribute("aria-pressed", "false");
 
     const thumbnail = document.createElement("span");
@@ -131,6 +262,47 @@ function populateTilingPreviewMenu(menu: HTMLElement, families: readonly Topolog
     });
 
     const fragment = document.createDocumentFragment();
+    const searchRow = document.createElement("div");
+    searchRow.className = "tiling-picker-search-row";
+
+    const searchHeader = document.createElement("div");
+    searchHeader.className = "tiling-picker-search-header";
+
+    const searchTitle = document.createElement("strong");
+    searchTitle.className = "tiling-picker-search-title";
+    searchTitle.textContent = "Choose tiling";
+
+    const currentLabel = document.createElement("span");
+    currentLabel.className = "tiling-picker-menu-current";
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "tiling-picker-close";
+    closeButton.setAttribute("aria-label", "Close tiling picker");
+    closeButton.title = "Close";
+    closeButton.textContent = "×";
+
+    const searchLabel = document.createElement("label");
+    searchLabel.className = "tiling-picker-search-label";
+
+    const searchAssistiveLabel = document.createElement("span");
+    searchAssistiveLabel.className = "sr-only";
+    searchAssistiveLabel.textContent = "Search tilings";
+
+    const searchInput = document.createElement("input");
+    searchInput.className = "tiling-picker-search";
+    searchInput.type = "search";
+    searchInput.placeholder = "Search tilings";
+    searchInput.autocomplete = "off";
+
+    searchHeader.append(searchTitle, currentLabel, closeButton);
+    searchLabel.append(searchAssistiveLabel, searchInput);
+    searchRow.append(searchHeader, searchLabel);
+    fragment.appendChild(searchRow);
+
+    const list = document.createElement("div");
+    list.className = "tiling-picker-list";
+
     groups.forEach((options, groupName) => {
         const group = document.createElement("section");
         group.className = "tiling-preview-group";
@@ -146,22 +318,36 @@ function populateTilingPreviewMenu(menu: HTMLElement, families: readonly Topolog
         });
 
         group.append(title, grid);
-        fragment.appendChild(group);
+        list.appendChild(group);
     });
+
+    const empty = document.createElement("div");
+    empty.className = "tiling-picker-empty";
+    empty.hidden = true;
+    empty.textContent = "No tilings match this search.";
+
+    fragment.append(list, empty);
     menu.replaceChildren(fragment);
 }
 
 function syncTilingPreviewSelection(menu: HTMLElement, selectedValue: string): void {
+    let selectedLabel = "";
     menu.querySelectorAll<HTMLButtonElement>(".tiling-preview-card").forEach((button) => {
         const selected = button.dataset.tilingFamily === selectedValue;
         button.classList.toggle("is-selected", selected);
         button.setAttribute("aria-pressed", selected ? "true" : "false");
         if (selected) {
+            selectedLabel =
+                button.querySelector<HTMLElement>(".tiling-preview-card-label")?.textContent ?? "";
             button.setAttribute("aria-current", "true");
             return;
         }
         button.removeAttribute("aria-current");
     });
+    const currentLabel = menu.querySelector<HTMLElement>(".tiling-picker-menu-current");
+    if (currentLabel) {
+        currentLabel.textContent = selectedLabel ? `Current: ${selectedLabel}` : "";
+    }
 }
 
 function syncSelectedTilingPreview(

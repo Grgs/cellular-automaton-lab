@@ -18,6 +18,8 @@ export interface LabeledOption<TValue extends string | number = string | number>
 export interface RuleSelectOption {
     name: string;
     displayName: string;
+    description: string;
+    searchText: string;
 }
 
 export interface PaintPaletteState {

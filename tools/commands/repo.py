@@ -18,6 +18,13 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     )
     add_passthrough_command(
         subparsers,
+        name="cleanup",
+        doc=command_doc("repo", "cleanup"),
+        target_main=dev_processes.cleanup_main,
+        parser_factory=dev_processes.build_cleanup_parser,
+    )
+    add_passthrough_command(
+        subparsers,
         name="python-style",
         doc=command_doc("repo", "python-style"),
         target_main=run_python_style.main,

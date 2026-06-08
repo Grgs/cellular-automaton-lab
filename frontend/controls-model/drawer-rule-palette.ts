@@ -19,6 +19,18 @@ export function buildDrawerRulePaletteViewModel({
         ruleOptions: availableRules.map((rule) => ({
             name: rule.name,
             displayName: rule.display_name || rule.label || rule.name,
+            description: rule.description ?? "",
+            searchText: [
+                rule.name,
+                rule.display_name,
+                rule.label,
+                rule.description,
+                ...(Array.isArray(rule.states)
+                    ? rule.states.map((cellState) => cellState.label)
+                    : []),
+            ]
+                .filter(Boolean)
+                .join(" "),
         })),
         ruleDescription: paletteRule?.description ?? "",
         paletteStates: Array.isArray(paletteRule?.states)

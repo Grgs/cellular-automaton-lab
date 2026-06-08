@@ -38,6 +38,7 @@
         "eslint-config-prettier": "^10.1.8",
         "jsdom": "^29.0.1",
         "linkinator": "7.6.1",
+        "match-sorter": "^8.3.0",
         "polygon-clipping": "^0.15.7",
         "prettier": "^3.8.3",
         "typescript": "^5.8.0",
