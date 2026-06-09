@@ -1,3 +1,5 @@
+import { matchSorter, rankings } from "match-sorter";
+
 import type { AdjacencyModeOption, PresetMetadata, TopologyOption } from "../types/domain.js";
 import type { DomElements } from "../types/dom.js";
 import type { RuleSelectOption } from "../types/ui.js";
@@ -8,6 +10,7 @@ interface RuleSelectRenderState {
     selectedValue: string;
 }
 
+const RULE_SEARCH_EXAMPLES = "Try signal, circuit, excitable, wave, replicator, or B3/S23";
 const ruleSelectState = new WeakMap<HTMLSelectElement, RuleSelectRenderState>();
 
 function populateOptions<
@@ -61,17 +64,61 @@ export function refreshRuleFilter(elements: DomElements): void {
 }
 
 function normalizedRuleSearchText(value: string): string {
-    return value.trim().toLowerCase();
+    return value
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
 }
 
-function ruleMatchesSearch(rule: RuleSelectOption, query: string): boolean {
-    if (!query) {
-        return true;
+function ruleSearchForms(value: string): string[] {
+    const normalized = normalizedRuleSearchText(value);
+    if (!normalized) {
+        return [];
     }
-    const searchableText = normalizedRuleSearchText(
+    const compact = normalized.replace(/\s+/g, "");
+    return compact === normalized ? [normalized] : [normalized, compact];
+}
+
+function ruleQueryForms(value: string): string[] {
+    const forms = ruleSearchForms(value);
+    const compact = forms[forms.length - 1] ?? "";
+    if (/^b\d+s\d+$/.test(compact)) {
+        return [compact];
+    }
+    return forms;
+}
+
+function ruleSearchText(rule: RuleSelectOption): string {
+    return [
         rule.searchText || `${rule.displayName} ${rule.name}`,
+        ...ruleSearchForms(rule.searchText || `${rule.displayName} ${rule.name}`),
+    ].join(" ");
+}
+
+function rulesMatchingSearch(
+    rules: readonly RuleSelectOption[],
+    query: string,
+): RuleSelectOption[] {
+    const queries = ruleQueryForms(query);
+    if (queries.length === 0) {
+        return [...rules];
+    }
+    const tokenMatchedRules = rules.filter((rule) => {
+        const searchableText = normalizedRuleSearchText(ruleSearchText(rule));
+        return queries.some((ruleQuery) =>
+            ruleQuery.split(/\s+/).every((token) => searchableText.includes(token)),
+        );
+    });
+    const rankedRules = queries.flatMap((ruleQuery) =>
+        matchSorter(tokenMatchedRules, ruleQuery, {
+            keys: [ruleSearchText],
+            threshold: rankings.CONTAINS,
+        }),
     );
-    return query.split(/\s+/).every((token) => searchableText.includes(token));
+    return [...new Set([...rankedRules, ...tokenMatchedRules])];
 }
 
 function renderRuleOptions(
@@ -84,8 +131,9 @@ function renderRuleOptions(
         return;
     }
 
-    const query = normalizedRuleSearchText(elements.ruleSearchInput?.value ?? "");
-    const matchingRules = rules.filter((rule) => ruleMatchesSearch(rule, query));
+    const rawQuery = elements.ruleSearchInput?.value.trim() ?? "";
+    const query = normalizedRuleSearchText(rawQuery);
+    const matchingRules = rulesMatchingSearch(rules, query);
     const selectedRule = rules.find((rule) => rule.name === selectedValue) ?? null;
     const selectedRuleAlreadyVisible = Boolean(
         selectedRule && matchingRules.some((rule) => rule.name === selectedRule.name),
@@ -120,16 +168,16 @@ function renderRuleOptions(
         return;
     }
     if (!query) {
-        elements.ruleSearchStatus.textContent = `${rules.length} rules available`;
+        elements.ruleSearchStatus.textContent = `${rules.length} rules available · ${RULE_SEARCH_EXAMPLES}`;
         return;
     }
     if (matchingRules.length === 0 && selectedRule) {
-        elements.ruleSearchStatus.textContent = "No matches; current rule remains selected";
+        elements.ruleSearchStatus.textContent = `No matches for "${rawQuery}"; current rule remains selected`;
         return;
     }
     const keptCurrentText =
         selectedRule && !selectedRuleAlreadyVisible ? " · current rule kept" : "";
-    elements.ruleSearchStatus.textContent = `Showing ${matchingRules.length} / ${rules.length} rules${keptCurrentText}`;
+    elements.ruleSearchStatus.textContent = `Showing ${matchingRules.length} / ${rules.length} rules for "${rawQuery}"${keptCurrentText}`;
 }
 
 export function populateTilingFamilies(

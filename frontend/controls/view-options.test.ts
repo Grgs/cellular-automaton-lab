@@ -47,7 +47,7 @@ const RULES: RuleSelectOption[] = [
         name: "conway",
         displayName: "Conway Life",
         description: "Classic binary survival rule.",
-        searchText: "conway Conway Life classic binary survival dead live",
+        searchText: "conway Conway Life classic binary survival dead live B3/S23",
     },
     {
         name: "wireworld",
@@ -61,6 +61,21 @@ const RULES: RuleSelectOption[] = [
         description: "Excitable waves for aperiodic tilings.",
         searchText:
             "penrose-gh Penrose Greenberg-Hastings excitable waves resting excited refractory",
+    },
+];
+
+const NOTATION_RULES: RuleSelectOption[] = [
+    {
+        name: "conway",
+        displayName: "Life: Conway (B3/S23)",
+        description: "Classic Game of Life with births on 3 neighbors and survival on 2 or 3.",
+        searchText: "conway Life Conway B3/S23 b3s23 classic game of life",
+    },
+    {
+        name: "highlife",
+        displayName: "Life: HighLife (B36/S23)",
+        description: "Life variant with births on 3 or 6 neighbors.",
+        searchText: "highlife Life HighLife B36/S23 b36s23 replicator",
     },
 ];
 
@@ -156,7 +171,9 @@ describe("controls/view-options rule picker", () => {
 
         populateRules(elements, RULES, "conway");
         expect(elements.ruleSelect?.querySelectorAll("option")).toHaveLength(3);
-        expect(elements.ruleSearchStatus?.textContent).toBe("3 rules available");
+        expect(elements.ruleSearchStatus?.textContent).toBe(
+            "3 rules available · Try signal, circuit, excitable, wave, replicator, or B3/S23",
+        );
 
         elements.ruleSearchInput!.value = "conductor";
         refreshRuleFilter(elements);
@@ -167,7 +184,7 @@ describe("controls/view-options rule picker", () => {
         ]);
         expect(elements.ruleSelect?.value).toBe("conway");
         expect(elements.ruleSearchStatus?.textContent).toBe(
-            "Showing 1 / 3 rules · current rule kept",
+            'Showing 1 / 3 rules for "conductor" · current rule kept',
         );
 
         elements.ruleSearchInput!.value = "excited";
@@ -185,6 +202,14 @@ describe("controls/view-options rule picker", () => {
             "conway",
             "wireworld",
         ]);
+
+        elements.ruleSearchInput!.value = "B3/S23";
+        refreshRuleFilter(elements);
+
+        expect(Array.from(elements.ruleSelect!.options).map((option) => option.value)).toEqual([
+            "conway",
+        ]);
+        expect(elements.ruleSearchStatus?.textContent).toBe('Showing 1 / 3 rules for "B3/S23"');
     });
 
     it("does not mutate selection when no rules match the search", () => {
@@ -199,7 +224,30 @@ describe("controls/view-options rule picker", () => {
         ]);
         expect(elements.ruleSelect?.value).toBe("wireworld");
         expect(elements.ruleSearchStatus?.textContent).toBe(
-            "No matches; current rule remains selected",
+            'No matches for "not a rule"; current rule remains selected',
+        );
+    });
+
+    it("treats life notation queries as exact compact matches", () => {
+        const elements = createRuleElements();
+
+        populateRules(elements, NOTATION_RULES, "conway");
+        elements.ruleSearchInput!.value = "B3/S23";
+        refreshRuleFilter(elements);
+
+        expect(Array.from(elements.ruleSelect!.options).map((option) => option.value)).toEqual([
+            "conway",
+        ]);
+
+        elements.ruleSearchInput!.value = "B36/S23";
+        refreshRuleFilter(elements);
+
+        expect(Array.from(elements.ruleSelect!.options).map((option) => option.value)).toEqual([
+            "conway",
+            "highlife",
+        ]);
+        expect(elements.ruleSearchStatus?.textContent).toBe(
+            'Showing 1 / 2 rules for "B36/S23" · current rule kept',
         );
     });
 });

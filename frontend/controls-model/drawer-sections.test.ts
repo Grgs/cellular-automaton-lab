@@ -64,7 +64,8 @@ describe("controls-model drawer sections", () => {
                 name: "signal-rule",
                 displayName: "Signal Rule",
                 description: "Signal states",
-                searchText: "signal-rule Signal Rule Signal states Dead Signal",
+                searchText:
+                    "signal-rule Signal Rule Signal states Dead Signal cellular automaton automata",
             },
         ]);
         expect(viewModel.paletteStates).toEqual([{ value: 2, label: "Signal", color: "#ff0000" }]);
