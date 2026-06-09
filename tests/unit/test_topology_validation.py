@@ -1,5 +1,6 @@
 import sys
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 try:
@@ -100,6 +101,33 @@ def _topology(*cells: LatticeCell, revision: str = "fixture-v1") -> LatticeTopol
         height=1,
         topology_revision=revision,
         cells=cells,
+    )
+
+
+def _topology_without_cell(
+    topology: LatticeTopology,
+    removed_cell_id: str,
+    *,
+    revision: str = "fixture-carved-hole",
+) -> LatticeTopology:
+    remaining_ids = {cell.id for cell in topology.cells if cell.id != removed_cell_id}
+    return LatticeTopology(
+        geometry=topology.geometry,
+        width=topology.width,
+        height=topology.height,
+        topology_revision=revision,
+        patch_depth=topology.patch_depth,
+        cells=tuple(
+            replace(
+                cell,
+                neighbors=tuple(
+                    neighbor_id if neighbor_id in remaining_ids else None
+                    for neighbor_id in cell.neighbors
+                ),
+            )
+            for cell in topology.cells
+            if cell.id != removed_cell_id
+        ),
     )
 
 
@@ -247,6 +275,22 @@ class TopologyValidationTests(unittest.TestCase):
 
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
                 self.assertEqual(validation.hole_count, 0)
+
+    def test_builder_derived_periodic_face_hole_is_detected(self) -> None:
+        full_topology = build_topology("archimedean-4-8-8", 3, 3)
+        topology = _topology_without_cell(full_topology, "o:1:1")
+
+        validation = validate_topology(
+            topology,
+            check_surface=True,
+            check_overlaps=False,
+            check_edge_multiplicity=False,
+            check_graph_connectivity=False,
+        )
+
+        self.assertFalse(validation.is_valid)
+        self.assertEqual(validation.surface_component_count, 1)
+        self.assertEqual(validation.hole_count, 1)
 
     def test_snub_square_regression_is_covered_by_shared_validator(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)
