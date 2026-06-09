@@ -29,7 +29,7 @@ For periodic families, it also checks periodic-face descriptor semantics, exact 
 ### 3. Focused verifier unit tests
 
 ```powershell
-py -3 -m unittest discover -s tests/unit -p "test_literature_reference_verification*.py"
+python -m pytest -q tests/unit/test_literature_reference_verification*.py
 ```
 
 Use this when changing verifier behavior, specs, or signatures. The verifier suite is split across `test_literature_reference_verification.py` (general/catalog/tool-level), `test_literature_reference_verification_periodic.py` (periodic-face descriptor checks), and `test_literature_reference_verification_aperiodic.py` (aperiodic family checks plus fixture-mismatch reporting).
@@ -37,9 +37,9 @@ Use this when changing verifier behavior, specs, or signatures. The verifier sui
 ### 4. Full backend regression sweep
 
 ```powershell
-py -3 -m unittest discover -s tests/unit -p "test_*.py"
-py -3 -m unittest discover -s tests/api -p "test_*.py"
-py -3 -m mypy --config-file mypy.ini
+python -m pytest -q -rs tests/unit
+python -m pytest -q -rs tests/api
+python -m mypy --config-file mypy.ini
 ```
 
 Use this before committing verifier or generator changes.
@@ -47,7 +47,7 @@ Use this before committing verifier or generator changes.
 ### 5. Polygon no-overlap checks
 
 ```powershell
-py -3 -m unittest -q tests.unit.test_topology_validation
+python -m pytest -q tests/unit/test_topology_validation.py
 npm run test:frontend
 ```
 

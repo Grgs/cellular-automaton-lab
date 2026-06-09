@@ -12,6 +12,14 @@ In practice, the test stack is:
 
 The repository does not rely on a single “everything is tested in the browser” approach. Most logic is validated before a real browser is involved.
 
+## Tool Entrypoints
+
+Prefer the repo-owned npm scripts and `python -m tools ...` commands when they exist. The npm scripts in [package.json](../package.json) call the same Python-first tools CLI through `tools/internal/python_tools_entry.mjs`, which keeps local runs aligned with CI and with the documented tool surface in [TOOLS.md](TOOLS.md).
+
+Use direct `python -m pytest ...` commands for Python unit, API, and Python e2e test directories. Those tests are mostly `unittest`-style test classes, but CI and local coverage use pytest as the collector/runner for backend suites.
+
+The Playwright browser suites are still Python `unittest` modules internally. Run them through the npm Playwright scripts or `python -m tools test e2e` unless you are debugging the underlying runner itself.
+
 ## Local Git Guards
 
 The repo also includes local git guards built on `pre-commit`. They are meant to catch privacy leaks and obvious secret exposure before code is pushed.
@@ -25,14 +33,14 @@ The guard stack uses:
 Install the hooks with:
 
 ```powershell
-py -3 -m pre_commit install --hook-type pre-commit --hook-type pre-push
+python -m pre_commit install --hook-type pre-commit --hook-type pre-push
 ```
 
 Run them manually with:
 
 ```powershell
-py -3 -m pre_commit run --all-files
-py -3 -m pre_commit run --hook-stage pre-push --all-files
+python -m pre_commit run --all-files
+python -m pre_commit run --hook-stage pre-push --all-files
 ```
 
 The privacy guard blocks patterns such as:
@@ -121,7 +129,7 @@ Use frontend unit tests when:
 Backend and shared Python support code are checked with mypy:
 
 ```powershell
-py -3 -m mypy --config-file mypy.ini
+python -m mypy --config-file mypy.ini
 ```
 
 This protects:
@@ -140,7 +148,7 @@ Python unit tests live under [tests/unit](../tests/unit).
 Run them with:
 
 ```powershell
-py -3 -m unittest discover -s tests/unit -p "test_*.py"
+python -m pytest -q -rs tests/unit
 ```
 
 These cover:
@@ -169,7 +177,7 @@ API tests live under [tests/api](../tests/api).
 Run them with:
 
 ```powershell
-py -3 -m unittest discover -s tests/api -p "test_*.py"
+python -m pytest -q -rs tests/api
 ```
 
 These tests verify:
@@ -188,6 +196,26 @@ Use API tests when:
 - changing how backend mutations are exposed over HTTP
 
 These tests should prove backend behavior without needing a real browser.
+
+### Python Skips And Cache
+
+Use `-rs` on pytest commands when auditing the suite so skip reasons are visible:
+
+```powershell
+python -m pytest -q -rs tests/unit
+python -m pytest -q -rs tests/api
+python -m pytest -q -rs tests/e2e
+```
+
+The expected local skip is [tests/unit/test_dev_processes_tool.py](../tests/unit/test_dev_processes_tool.py), which requires both a prebuilt standalone output directory and a procfs-backed environment. It usually skips on Windows because that process-kill integration path depends on procfs-style process inspection.
+
+To inspect skip markers directly:
+
+```powershell
+rg -n "skipTest|skipUnless|skipIf|pytest\\.skip|pytest\\.mark\\.skip|pytestmark" tests frontend -g "*.py" -g "*.ts"
+```
+
+Pytest cache is routed through `output/.pytest_cache` by [pytest.ini](../pytest.ini). That keeps local pytest state in the repo's ignored output area and avoids stale or inaccessible root `.pytest_cache` directories.
 
 ### 6. Topology And Descriptor Validation Tools
 
@@ -250,11 +278,11 @@ The runner now reuses `output/standalone/` when the existing build manifest matc
 Direct Python entrypoints are still useful when debugging CI internals, but they are not the preferred local path:
 
 ```powershell
-py -3 -m unittest -q tests.e2e.test_playwright_suite_integrity
-py -3 -m unittest -q tests.e2e.test_playwright_overlays_and_editor
-py -3 -m unittest -q tests.e2e.test_playwright_pattern_and_showcase
-py -3 -m unittest -q tests.e2e.test_playwright_rules_and_picker
-py -3 -m unittest -q tests.e2e.test_playwright_topology_and_persistence
+python -m unittest -q tests.e2e.test_playwright_suite_integrity
+python -m unittest -q tests.e2e.test_playwright_overlays_and_editor
+python -m unittest -q tests.e2e.test_playwright_pattern_and_showcase
+python -m unittest -q tests.e2e.test_playwright_rules_and_picker
+python -m unittest -q tests.e2e.test_playwright_topology_and_persistence
 ```
 
 The palette alias coverage is generated inside the shared Playwright case suite,
@@ -284,13 +312,13 @@ or build the artifacts first:
 
 ```powershell
 npm run build:frontend:standalone
-py -3 -m unittest -q tests.e2e.test_playwright_standalone_runtime
+python -m unittest -q tests.e2e.test_playwright_standalone_runtime
 ```
 
 The repo still supports a chunked subset runner for local or CI-style shard debugging, even though the current GitHub workflow runs the server Playwright suite as one combined job:
 
 ```powershell
-py -3 -m unittest -q tests.e2e.playwright_chunk_subset
+python -m unittest -q tests.e2e.playwright_chunk_subset
 ```
 
 Browser tests are the highest-cost layer. They should validate:
@@ -505,9 +533,9 @@ npm run test:frontend
 For backend-only changes:
 
 ```powershell
-py -3 -m mypy --config-file mypy.ini
-py -3 -m unittest discover -s tests/unit -p "test_*.py"
-py -3 -m unittest discover -s tests/api -p "test_*.py"
+python -m mypy --config-file mypy.ini
+python -m pytest -q -rs tests/unit
+python -m pytest -q -rs tests/api
 python -m tools tilings validate
 python -m tools tilings report
 python -m tools tilings report --format detail
@@ -555,11 +583,11 @@ npm run build:frontend:standalone
 npm run smoke:standalone
 npm run check:doc-links
 npm run audit:supply-chain
-py -3 -m mypy --config-file mypy.ini
-py -3 -m unittest discover -s tests -p "test_*.py"
+python -m mypy --config-file mypy.ini
+python -m pytest -q -rs tests/unit tests/api tests/e2e
 python -m tools tilings validate
 python -m tools tilings verify
-py -3 -m pre_commit run --hook-stage pre-push --all-files
+python -m pre_commit run --hook-stage pre-push --all-files
 ```
 
 ## CI Strategy

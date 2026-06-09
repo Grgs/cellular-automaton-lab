@@ -11,9 +11,9 @@ Common baseline commands:
 ```powershell
 npm run typecheck:frontend
 npm run test:frontend
-py -3 -m mypy --config-file mypy.ini
-py -3 -m unittest discover -s tests/unit -p "test_*.py"
-py -3 -m unittest discover -s tests/api -p "test_*.py"
+python -m mypy --config-file mypy.ini
+python -m pytest -q -rs tests/unit
+python -m pytest -q -rs tests/api
 ```
 
 Before release-oriented changes, also run the release-confidence commands in [README.md](../README.md) and [MAINTENANCE.md](MAINTENANCE.md).
@@ -59,10 +59,10 @@ Run or update:
 Suggested commands:
 
 ```powershell
-py -3 -m unittest -q tests.unit.test_simulation_engine
-py -3 -m unittest -q tests.api.test_api_state_and_rules
+python -m pytest -q tests/unit/test_simulation_engine.py
+python -m pytest -q tests/api/test_api_state_and_rules.py
 npm run test:frontend
-npm run test:e2e:playwright:server
+python -m tools test e2e --suite rules_and_picker
 ```
 
 ## If You Change A Topology
@@ -84,9 +84,9 @@ python -m tools tilings validate
 python -m tools tilings verify
 npm run fixtures:reference:check
 npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geometry/render-bounds.test.ts
-py -3 -m unittest -q tests.unit.test_topology_validation
-py -3 -m unittest -q tests.api.test_api_state_and_rules
-npm run test:e2e:playwright:server
+python -m pytest -q tests/unit/test_topology_validation.py
+python -m pytest -q tests/api/test_api_state_and_rules.py
+python -m tools test e2e --suite topology_and_persistence
 ```
 
 ## If You Change Presets Or Patterns
@@ -102,7 +102,7 @@ Suggested commands:
 
 ```powershell
 npm run test:frontend -- frontend/presets.test.ts frontend/pattern-io.test.ts frontend/actions/pattern-import-runtime.test.ts
-py -3 -m unittest -q tests.e2e.test_playwright_pattern_and_showcase
+python -m tools test e2e --suite pattern_and_showcase
 ```
 
 ## If You Change Frontend UI Or Controls
@@ -137,9 +137,9 @@ Run or update:
 Suggested commands:
 
 ```powershell
-py -3 -m mypy --config-file mypy.ini
-py -3 -m unittest discover -s tests/unit -p "test_*request*.py"
-py -3 -m unittest discover -s tests/api -p "test_*.py"
+python -m mypy --config-file mypy.ini
+python -m pytest -q tests/unit/test_request_models.py tests/unit/test_requests.py
+python -m pytest -q -rs tests/api
 npm run test:e2e:playwright:server
 ```
 
