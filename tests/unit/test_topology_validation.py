@@ -1,5 +1,6 @@
 import sys
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 try:
@@ -8,6 +9,10 @@ try:
         LatticeCell,
         LatticeTopology,
         build_topology,
+    )
+    from backend.simulation.topology_catalog_data import (
+        TOPOLOGY_SIZING_POLICIES,
+        TOPOLOGY_VARIANTS,
     )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
@@ -23,6 +28,10 @@ try:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.topology_family_manifest import (
+        GEOMETRY_MINIMUM_GRID_DIMENSIONS,
+        PATCH_DEPTH_CONTROL,
     )
     from backend.simulation.topology_validation import (
         analyze_topology_overlap_areas,
@@ -37,6 +46,10 @@ except ModuleNotFoundError:
         LatticeTopology,
         build_topology,
     )
+    from backend.simulation.topology_catalog_data import (
+        TOPOLOGY_SIZING_POLICIES,
+        TOPOLOGY_VARIANTS,
+    )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -51,6 +64,10 @@ except ModuleNotFoundError:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.topology_family_manifest import (
+        GEOMETRY_MINIMUM_GRID_DIMENSIONS,
+        PATCH_DEPTH_CONTROL,
     )
     from backend.simulation.topology_validation import (
         analyze_topology_overlap_areas,
@@ -101,6 +118,43 @@ def _topology(*cells: LatticeCell, revision: str = "fixture-v1") -> LatticeTopol
         topology_revision=revision,
         cells=cells,
     )
+
+
+def _topology_without_cell(
+    topology: LatticeTopology,
+    removed_cell_id: str,
+    *,
+    revision: str = "fixture-carved-hole",
+) -> LatticeTopology:
+    remaining_ids = {cell.id for cell in topology.cells if cell.id != removed_cell_id}
+    return LatticeTopology(
+        geometry=topology.geometry,
+        width=topology.width,
+        height=topology.height,
+        topology_revision=revision,
+        patch_depth=topology.patch_depth,
+        cells=tuple(
+            replace(
+                cell,
+                neighbors=tuple(
+                    neighbor_id if neighbor_id in remaining_ids else None
+                    for neighbor_id in cell.neighbors
+                ),
+            )
+            for cell in topology.cells
+            if cell.id != removed_cell_id
+        ),
+    )
+
+
+def _catalog_hole_sample_parameters(
+    tiling_family: str, geometry: str
+) -> tuple[int, int, int | None]:
+    policy = TOPOLOGY_SIZING_POLICIES[tiling_family]
+    if policy.control == PATCH_DEPTH_CONTROL:
+        return 0, 0, min(policy.default, 3)
+    sample_size = max(3, GEOMETRY_MINIMUM_GRID_DIMENSIONS[geometry])
+    return sample_size, sample_size, None
 
 
 class TopologyValidationTests(unittest.TestCase):
@@ -248,8 +302,53 @@ class TopologyValidationTests(unittest.TestCase):
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
                 self.assertEqual(validation.hole_count, 0)
 
-    def test_canonical_sample_surface_holes_flag_current_hole_regressions(self) -> None:
-        self.skipTest("There are currently no known canonical sample hole regressions.")
+    def test_shipped_polygon_tilings_with_surface_checks_are_hole_free(self) -> None:
+        checked_geometries: set[str] = set()
+        for variant in TOPOLOGY_VARIANTS:
+            geometry = variant.geometry_key
+            if geometry in checked_geometries:
+                continue
+            validation_options = recommended_validation_options(geometry)
+            if not validation_options["check_surface"]:
+                continue
+            width, height, patch_depth = _catalog_hole_sample_parameters(
+                variant.tiling_family, geometry
+            )
+            topology = build_topology(geometry, width, height, patch_depth=patch_depth)
+            if not any(cell.vertices is not None for cell in topology.cells):
+                continue
+            checked_geometries.add(geometry)
+
+            with self.subTest(geometry=geometry):
+                validation = validate_topology(
+                    topology,
+                    check_surface=True,
+                    check_overlaps=False,
+                    check_edge_multiplicity=False,
+                    check_graph_connectivity=False,
+                )
+
+                self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+                self.assertEqual(validation.surface_component_count, 1)
+                self.assertEqual(validation.hole_count, 0)
+
+        self.assertGreaterEqual(len(checked_geometries), 40)
+
+    def test_builder_derived_periodic_face_hole_is_detected(self) -> None:
+        full_topology = build_topology("archimedean-4-8-8", 3, 3)
+        topology = _topology_without_cell(full_topology, "o:1:1")
+
+        validation = validate_topology(
+            topology,
+            check_surface=True,
+            check_overlaps=False,
+            check_edge_multiplicity=False,
+            check_graph_connectivity=False,
+        )
+
+        self.assertFalse(validation.is_valid)
+        self.assertEqual(validation.surface_component_count, 1)
+        self.assertEqual(validation.hole_count, 1)
 
     def test_snub_square_regression_is_covered_by_shared_validator(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)
