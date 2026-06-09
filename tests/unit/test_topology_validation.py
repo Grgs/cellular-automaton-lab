@@ -10,6 +10,10 @@ try:
         LatticeTopology,
         build_topology,
     )
+    from backend.simulation.topology_catalog_data import (
+        TOPOLOGY_SIZING_POLICIES,
+        TOPOLOGY_VARIANTS,
+    )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -24,6 +28,10 @@ try:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.topology_family_manifest import (
+        GEOMETRY_MINIMUM_GRID_DIMENSIONS,
+        PATCH_DEPTH_CONTROL,
     )
     from backend.simulation.topology_validation import (
         analyze_topology_overlap_areas,
@@ -38,6 +46,10 @@ except ModuleNotFoundError:
         LatticeTopology,
         build_topology,
     )
+    from backend.simulation.topology_catalog_data import (
+        TOPOLOGY_SIZING_POLICIES,
+        TOPOLOGY_VARIANTS,
+    )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -52,6 +64,10 @@ except ModuleNotFoundError:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.topology_family_manifest import (
+        GEOMETRY_MINIMUM_GRID_DIMENSIONS,
+        PATCH_DEPTH_CONTROL,
     )
     from backend.simulation.topology_validation import (
         analyze_topology_overlap_areas,
@@ -129,6 +145,16 @@ def _topology_without_cell(
             if cell.id != removed_cell_id
         ),
     )
+
+
+def _catalog_hole_sample_parameters(
+    tiling_family: str, geometry: str
+) -> tuple[int, int, int | None]:
+    policy = TOPOLOGY_SIZING_POLICIES[tiling_family]
+    if policy.control == PATCH_DEPTH_CONTROL:
+        return 0, 0, min(policy.default, 3)
+    sample_size = max(3, GEOMETRY_MINIMUM_GRID_DIMENSIONS[geometry])
+    return sample_size, sample_size, None
 
 
 class TopologyValidationTests(unittest.TestCase):
@@ -275,6 +301,38 @@ class TopologyValidationTests(unittest.TestCase):
 
                 self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
                 self.assertEqual(validation.hole_count, 0)
+
+    def test_shipped_polygon_tilings_with_surface_checks_are_hole_free(self) -> None:
+        checked_geometries: set[str] = set()
+        for variant in TOPOLOGY_VARIANTS:
+            geometry = variant.geometry_key
+            if geometry in checked_geometries:
+                continue
+            validation_options = recommended_validation_options(geometry)
+            if not validation_options["check_surface"]:
+                continue
+            width, height, patch_depth = _catalog_hole_sample_parameters(
+                variant.tiling_family, geometry
+            )
+            topology = build_topology(geometry, width, height, patch_depth=patch_depth)
+            if not any(cell.vertices is not None for cell in topology.cells):
+                continue
+            checked_geometries.add(geometry)
+
+            with self.subTest(geometry=geometry):
+                validation = validate_topology(
+                    topology,
+                    check_surface=True,
+                    check_overlaps=False,
+                    check_edge_multiplicity=False,
+                    check_graph_connectivity=False,
+                )
+
+                self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+                self.assertEqual(validation.surface_component_count, 1)
+                self.assertEqual(validation.hole_count, 0)
+
+        self.assertGreaterEqual(len(checked_geometries), 40)
 
     def test_builder_derived_periodic_face_hole_is_detected(self) -> None:
         full_topology = build_topology("archimedean-4-8-8", 3, 3)
