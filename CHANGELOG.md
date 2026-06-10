@@ -6,6 +6,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 ## Unreleased
 
 - Broadened the ruff lint gate with bugbear, pyupgrade, and import sorting (`B`, `UP`, `I`) and modernized the Python tree to match: sorted imports, PEP 695 type aliases and generics, `datetime.UTC`, explicit `zip()` strictness, and explicit exception chaining.
+- Hardened and streamlined CI automation: all GitHub Actions references are pinned to commit SHAs, a Dependabot auto-merge workflow lands green minor/patch updates automatically (majors stay manual), `merge_group` support prepares CI for a merge queue, a Windows job runs the backend unit suite, and the Playwright jobs skip browser downloads on cache hits.
 - Added a tag-triggered Release workflow that validates release prerequisites, rebuilds and smoke-tests the standalone bundle from the tagged commit, and publishes the GitHub Release with the bundle zip attached, replacing the manual `gh release create` step.
 - Added Dependabot update automation for pip, npm, and GitHub Actions dependencies, Node/Python toolchain pins (`engines`, `.nvmrc`, `.python-version`), and version-agnostic preview wording in governance docs.
 - Added coverage gates that run on every CI event including pull requests: the combined backend unit + API report must stay at or above 75% line coverage (also enforced by `npm run coverage:backend`), and the frontend Vitest run (`npm run coverage:frontend`) enforces ratchet thresholds in `vite.config.ts`.
