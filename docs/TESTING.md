@@ -601,13 +601,21 @@ This job runs first and blocks the browser matrix. It covers:
 - typed frontend source invariants
 - frontend typecheck
 - frontend build
-- frontend Vitest suites
+- frontend Vitest suites with coverage thresholds
 - mypy
 - tiling validation
 - Python unit and API tests with coverage
 - Playwright suite integrity guard
 
 The point of this job is to reject obvious or structural failures before spending time on browser subsets.
+
+Coverage is gated on every run, including pull requests. The combined backend
+unit + API report must stay at or above 75% line coverage. The frontend Vitest
+run enforces ratchet thresholds (configured in `vite.config.ts`) that are
+deliberately lower because Vitest only measures unit-testable code; the
+Playwright suites own the browser-driven paths that this measurement cannot
+see. Raise the thresholds when coverage grows; do not lower them to admit a
+regression.
 
 ### Playwright Subset Matrix
 
