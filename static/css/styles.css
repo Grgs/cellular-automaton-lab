@@ -715,12 +715,6 @@ button.tiling-preview-card.is-selected {
     stroke-linejoin: round;
 }
 
-.tiling-preview-line {
-    stroke: var(--cell-line-strong);
-    stroke-width: 1.4;
-    stroke-linecap: round;
-}
-
 /*
  * Picker thumbnails pull from the same tile-tone palette the canvas uses, so
  * clicking a thumbnail previews the canvas colors you'll see. The 4-fill
@@ -749,10 +743,6 @@ button.tiling-preview-card.is-selected {
     background:
         linear-gradient(135deg, rgba(231, 237, 248, 0.08), rgba(231, 237, 248, 0.02)),
         var(--field-bg);
-}
-
-.top-slider {
-    min-width: 156px;
 }
 
 .top-compact-control {
@@ -905,22 +895,6 @@ button:disabled {
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
-}
-
-button.secondary {
-    background-color: var(--btn-secondary-bg);
-    color: var(--btn-secondary-text);
-    border-color: var(--btn-secondary-line);
-}
-
-button.secondary:hover:not(:disabled) {
-    background-color: var(--btn-secondary-hover);
-}
-
-button.secondary:disabled {
-    background-color: var(--btn-secondary-disabled-bg);
-    color: var(--btn-secondary-disabled-text);
-    border-color: var(--btn-secondary-disabled-line);
 }
 
 button.soft-action {
@@ -1316,27 +1290,10 @@ button.theme-toggle .theme-icon-moon {
     gap: 4px;
 }
 
-.drawer-header-main {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-}
-
 .drawer-header-copy {
     display: grid;
     gap: 4px;
     min-width: 0;
-}
-
-.drawer-eyebrow {
-    margin: 0;
-    color: var(--accent-dark);
-    font-family: var(--mono);
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
 }
 
 .drawer-header-context {
@@ -1347,11 +1304,6 @@ button.theme-toggle .theme-icon-moon {
 .drawer-message-stack {
     display: grid;
     gap: 8px;
-}
-
-.inspector-theme-toggle {
-    flex: 0 0 auto;
-    align-self: flex-start;
 }
 
 .drawer-quick-start-hint {
@@ -1507,10 +1459,6 @@ button.theme-toggle .theme-icon-moon {
     gap: 8px;
 }
 
-.drawer-board-grid {
-    grid-template-columns: minmax(0, 1fr);
-}
-
 .drawer-topology-grid {
     grid-template-columns: minmax(0, 1fr);
 }
@@ -1559,30 +1507,13 @@ button.theme-toggle .theme-icon-moon {
     letter-spacing: 0.09em;
 }
 
-.drawer-action-grid,
-.editor-action-row {
+.drawer-action-grid {
     display: grid;
     gap: 7px;
 }
 
 .drawer-action-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.editor-action-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.drawer-board-actions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px;
-    align-items: start;
-    margin-top: 8px;
-}
-
-.drawer-action-button {
-    white-space: nowrap;
 }
 
 .preset-seed-controls {
@@ -1660,19 +1591,9 @@ button.theme-toggle .theme-icon-moon {
     color: #ff9c89;
 }
 
-.paint-palette,
-.editor-tool-grid,
-.brush-size-grid {
+.paint-palette {
     display: grid;
     gap: 8px;
-}
-
-.editor-tool-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.brush-size-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .paint-palette {
@@ -1742,24 +1663,6 @@ button.theme-toggle .theme-icon-moon {
 
 .selection-inspector-advanced-rows {
     padding: 10px 12px 12px;
-}
-
-.editor-brush-block {
-    margin-top: 10px;
-}
-
-.drawer-tuning-grid {
-    margin-bottom: 10px;
-}
-
-.editor-subtitle {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--muted);
-    font-size: 0.76rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
 }
 
 .editor-shortcut-hint {
@@ -1868,16 +1771,6 @@ button.theme-toggle .theme-icon-moon {
 .rule-help-toggle .hint:last-child,
 .rule-help-toggle .rule-description:last-child {
     padding-bottom: 12px;
-}
-
-.reset-settings-toggle {
-    margin-top: 12px;
-}
-
-.reset-settings-panel {
-    display: grid;
-    gap: 10px;
-    padding: 10px 12px 12px;
 }
 
 .buried-setting-toggle {
@@ -2674,13 +2567,11 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .drawer-action-grid,
-    .editor-action-row,
     .drawer-showcase-actions {
         grid-template-columns: 1fr;
     }
 
-    .drawer-control-grid,
-    .drawer-board-actions {
+    .drawer-control-grid {
         grid-template-columns: 1fr;
     }
 
