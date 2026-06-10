@@ -58,7 +58,7 @@ jobs:
 
       - name: Upload bundle-size manifest
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: standalone-bundle-size
           path: output/bundle-size
@@ -70,13 +70,13 @@ jobs:
           tar -czf standalone-output.tgz output/standalone
 
       - name: Upload frontend dist artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-dist-tarball
           path: frontend-dist.tgz
 
       - name: Upload standalone output artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: standalone-output-tarball
           path: standalone-output.tgz
@@ -231,7 +231,7 @@ jobs:
           python -m coverage report -m --data-file=.coverage.unit | tee -a coverage-unit.txt
 
       - name: Upload backend unit coverage data
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: backend-coverage-unit
           include-hidden-files: true
@@ -264,7 +264,7 @@ jobs:
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Download frontend dist artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: frontend-dist-tarball
 
@@ -279,7 +279,7 @@ jobs:
             -n auto --dist loadfile | tee coverage-api.txt
 
       - name: Upload backend API coverage data
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: backend-coverage-api
           include-hidden-files: true
@@ -312,13 +312,13 @@ jobs:
           python -m pip install coverage==7.11.0
 
       - name: Download backend unit coverage data
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: backend-coverage-unit
           path: coverage-artifacts/unit
 
       - name: Download backend API coverage data
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: backend-coverage-api
           path: coverage-artifacts/api
@@ -333,7 +333,7 @@ jobs:
           python -m coverage xml -o coverage-unit-api.xml
 
       - name: Upload backend coverage artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: backend-coverage
           path: |
@@ -371,7 +371,7 @@ jobs:
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Download frontend dist artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: frontend-dist-tarball
 
@@ -389,7 +389,7 @@ jobs:
 
       - name: Upload Playwright server artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-server
           path: ${{ github.workspace }}/e2e-artifacts/server-browser
@@ -426,7 +426,7 @@ jobs:
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Download standalone output artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: standalone-output-tarball
 
@@ -444,7 +444,7 @@ jobs:
 
       - name: Upload standalone smoke artifact
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: standalone-smoke
           path: output/standalone-smoke
@@ -457,7 +457,7 @@ jobs:
 
       - name: Upload standalone Playwright artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-standalone-browser
           path: ${{ github.workspace }}/e2e-artifacts/standalone-browser
@@ -477,10 +477,10 @@ jobs:
 
     steps:
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Download standalone output artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: standalone-output-tarball
 
@@ -488,7 +488,7 @@ jobs:
         run: tar -xzf standalone-output.tgz -C .
 
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: output/standalone
 
@@ -508,4 +508,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

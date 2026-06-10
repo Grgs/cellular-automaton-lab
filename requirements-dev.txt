@@ -16,7 +16,7 @@ cfgv==3.5.0
     # via pre-commit
 charset-normalizer==3.4.7
     # via requests
-coverage==7.11.0
+coverage==7.14.1
     # via
     #   -r requirements-dev.in
     #   pytest-cov
@@ -37,7 +37,7 @@ filelock==3.29.0
     #   virtualenv
 greenlet==3.5.0
     # via playwright
-hypothesis==6.151.9
+hypothesis==6.155.2
     # via -r requirements-dev.in
 identify==2.6.19
     # via pre-commit
@@ -87,11 +87,13 @@ platformdirs==4.9.6
     #   pip-audit
     #   python-discovery
     #   virtualenv
-pluggy==1.6.0
-    # via pytest
-playwright==1.58.0
+playwright==1.60.0
     # via -r requirements-dev.in
-pre-commit==4.5.1
+pluggy==1.6.0
+    # via
+    #   pytest
+    #   pytest-cov
+pre-commit==4.6.0
     # via -r requirements-dev.in
 py-serializable==2.1.0
     # via cyclonedx-python-lib
@@ -109,6 +111,7 @@ pytest==9.0.3
     # via
     #   -r requirements-dev.in
     #   pytest-cov
+    #   pytest-xdist
 pytest-cov==7.1.0
     # via -r requirements-dev.in
 pytest-xdist==3.8.0
@@ -126,7 +129,7 @@ requests==2.33.1
     #   pip-audit
 rich==15.0.0
     # via pip-audit
-ruff==0.15.11
+ruff==0.15.16
     # via -r requirements-dev.in
 shapely==2.1.2
     # via -r requirements-dev.in
