@@ -103,7 +103,7 @@ pygments==2.20.0
     # via
     #   pytest
     #   rich
-pymupdf==1.27.2.2
+pymupdf==1.27.2.3
     # via -r requirements-dev.in
 pyparsing==3.3.2
     # via pip-requirements-parser
