@@ -18,10 +18,10 @@ from backend.simulation.engine import SimulationEngine
 from backend.simulation.models import SimulationSnapshot
 from backend.simulation.persistence import SimulationStateStore
 from backend.simulation.persistence_coordinator import TimerFactory
-from backend.simulation.topology import LatticeTopology
 from backend.simulation.runtime import SimulationRuntime
 from backend.simulation.service import SimulationService
 from backend.simulation.state_restore import SimulationStateRestorer
+from backend.simulation.topology import LatticeTopology
 
 P = ParamSpec("P")
 

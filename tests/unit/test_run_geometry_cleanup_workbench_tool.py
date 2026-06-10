@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import asdict
 import tempfile
 import unittest
+from dataclasses import asdict
 from pathlib import Path
 
 from backend.simulation.reference_verification.observation import observe_topology

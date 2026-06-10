@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import argparse
 
-from tools.command_docs import command_doc
+from tools import smoke_test_standalone
 from tools.cli_support import add_passthrough_command
+from tools.command_docs import command_doc
 from tools.render_review import (
     browser_check,
     diff_review,
@@ -12,7 +13,6 @@ from tools.render_review import (
     review,
     sweep,
 )
-from tools import smoke_test_standalone
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:

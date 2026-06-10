@@ -3,6 +3,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
+from backend.simulation.aperiodic_ammann_beenker import build_ammann_beenker_patch
+from backend.simulation.aperiodic_chair import build_chair_patch
+from backend.simulation.aperiodic_dodecagonal_square_triangle import (
+    build_dodecagonal_square_triangle_patch,
+)
 from backend.simulation.aperiodic_family_manifest import (
     AMMANN_BEENKER_GEOMETRY,
     APERIODIC_FAMILY_MANIFEST,
@@ -16,13 +21,11 @@ from backend.simulation.aperiodic_family_manifest import (
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
-    SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
+    SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
 )
-from backend.simulation.aperiodic_ammann_beenker import build_ammann_beenker_patch
-from backend.simulation.aperiodic_chair import build_chair_patch
 from backend.simulation.aperiodic_hat import build_hat_patch
 from backend.simulation.aperiodic_penrose_p1 import build_penrose_p1_patch
 from backend.simulation.aperiodic_penrose_p1_pbs import build_penrose_p1_pbs_patch
@@ -31,15 +34,11 @@ from backend.simulation.aperiodic_pinwheel import build_pinwheel_patch
 from backend.simulation.aperiodic_pinwheel_2_1 import build_pinwheel_2_1_patch
 from backend.simulation.aperiodic_robinson_triangles import build_robinson_triangles_patch
 from backend.simulation.aperiodic_shield import build_shield_patch
-from backend.simulation.aperiodic_dodecagonal_square_triangle import (
-    build_dodecagonal_square_triangle_patch,
-)
-from backend.simulation.aperiodic_sphinx import build_sphinx_patch
 from backend.simulation.aperiodic_spectre import build_spectre_patch
+from backend.simulation.aperiodic_sphinx import build_sphinx_patch
 from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.aperiodic_taylor_socolar import build_taylor_socolar_patch
 from backend.simulation.aperiodic_tuebingen_triangle import build_tuebingen_triangle_patch
-
 
 AperiodicPatchBuilder = Callable[[int], AperiodicPatch]
 

@@ -6,14 +6,13 @@ from pathlib import Path
 from random import Random
 from typing import TypeVar
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.rules.conway import ConwayLifeRule
 from backend.rules.archlife488 import ArchLife488Rule
 from backend.rules.base import AutomatonRule
+from backend.rules.conway import ConwayLifeRule
 from backend.rules.hexlife import HexLifeRule
 from backend.rules.hexwhirlpool import HexWhirlpoolRule
 from backend.rules.trilife import TriLifeRule
@@ -56,7 +55,9 @@ def build_board(
     return board
 
 
-def median_ms(runner: Callable[[], TRunnerResult], repeats: int = 7, warmups: int = 2) -> float:
+def median_ms[TRunnerResult](
+    runner: Callable[[], TRunnerResult], repeats: int = 7, warmups: int = 2
+) -> float:
     for _ in range(warmups):
         runner()
     timings = []

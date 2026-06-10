@@ -44,7 +44,9 @@ def main() -> int:
     for step in range(1, 5):
         board = engine.step_board(board, rule)
         live_ids = sorted(
-            cell.id for cell, state in zip(board.topology.cells, board.cell_states) if state
+            cell.id
+            for cell, state in zip(board.topology.cells, board.cell_states, strict=True)
+            if state
         )
         print(f"step {step}: {len(live_ids)} live cells -> {live_ids}")
     return 0

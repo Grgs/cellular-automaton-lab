@@ -15,14 +15,16 @@ from pathlib import Path
 from typing import Any, TextIO
 
 from playwright.sync_api import Page
+
+from tests.e2e.support_server import AppServer, JsonApiClient, cleanup_temporary_directory
 from tools.provenance import (
     compute_source_fingerprint as compute_source_fingerprint_value,
+)
+from tools.provenance import (
     git_dirty_status,
     iter_source_fingerprint_paths,
     read_git_output,
 )
-
-from tests.e2e.support_server import AppServer, JsonApiClient, cleanup_temporary_directory
 
 _EXTERNAL_RUNTIME_HOST_KIND_ENV = "E2E_EXTERNAL_RUNTIME_HOST_KIND"
 _EXTERNAL_RUNTIME_BASE_URL_ENV = "E2E_EXTERNAL_RUNTIME_BASE_URL"
@@ -146,9 +148,9 @@ def _wait_until_ready(
                 if exit_code is not None:
                     raise RuntimeError(
                         f"Host exited before becoming ready (exit code {exit_code})."
-                    )
+                    ) from None
             if time.time() > deadline:
-                raise RuntimeError("Host did not start in time.")
+                raise RuntimeError("Host did not start in time.") from None
             time.sleep(0.25)
 
 

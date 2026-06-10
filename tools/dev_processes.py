@@ -4,13 +4,14 @@ import argparse
 import json
 import os
 import shlex
-import signal
 import shutil
+import signal
 import subprocess
 import time
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 STANDALONE_OUTPUT_DIR = ROOT_DIR / "output" / "standalone"

@@ -38,8 +38,7 @@ class RenderReviewDiffToolTests(unittest.TestCase):
                     [sys.executable, "-m", "tools", *command_tokens, "--help"],
                     cwd=root,
                     check=False,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                    capture_output=True,
                     text=True,
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)

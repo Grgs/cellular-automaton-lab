@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import Literal, NotRequired, TypedDict
 
-
 COORDINATE_PRECISION = 6
 
 Affine = tuple[float, float, float, float, float, float]
@@ -44,13 +43,13 @@ class Vec:
     x: float
     y: float
 
-    def __add__(self, other: "Vec") -> "Vec":
+    def __add__(self, other: Vec) -> Vec:
         return Vec(self.x + other.x, self.y + other.y)
 
-    def __sub__(self, other: "Vec") -> "Vec":
+    def __sub__(self, other: Vec) -> Vec:
         return Vec(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, scalar: float) -> "Vec":
+    def __mul__(self, scalar: float) -> Vec:
         return Vec(self.x * scalar, self.y * scalar)
 
 

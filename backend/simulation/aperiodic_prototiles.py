@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+from backend.simulation.aperiodic_family_manifest import (
+    PENROSE_GEOMETRY,
+    PENROSE_VERTEX_GEOMETRY,
+)
 from backend.simulation.aperiodic_registry import build_registered_aperiodic_patch
 from backend.simulation.aperiodic_support import AperiodicPatch, AperiodicPatchCell
 from backend.simulation.penrose import (
     PENROSE_EDGE_ADJACENCY,
     PENROSE_VERTEX_ADJACENCY,
     build_penrose_patch,
-)
-from backend.simulation.aperiodic_family_manifest import (
-    PENROSE_GEOMETRY,
-    PENROSE_VERTEX_GEOMETRY,
 )
 
 

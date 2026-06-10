@@ -4,7 +4,6 @@ import unittest
 from pathlib import Path
 from subprocess import run
 
-
 try:
     from backend.app_shell import render_server_app_shell, render_standalone_document
     from backend.defaults import APP_DEFAULTS

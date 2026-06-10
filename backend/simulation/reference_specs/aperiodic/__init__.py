@@ -2,19 +2,21 @@ from __future__ import annotations
 
 from backend.simulation.reference_specs.types import ReferenceFamilySpec
 
-from . import penrose
-from . import ammann_beenker
-from . import spectre
-from . import taylor_socolar
-from . import sphinx
-from . import chair
-from . import robinson_triangles
-from . import hat_monotile
-from . import tuebingen_triangle
-from . import dodecagonal_square_triangle
-from . import shield
-from . import pinwheel
-from . import pinwheel_2_1
+from . import (
+    ammann_beenker,
+    chair,
+    dodecagonal_square_triangle,
+    hat_monotile,
+    penrose,
+    pinwheel,
+    pinwheel_2_1,
+    robinson_triangles,
+    shield,
+    spectre,
+    sphinx,
+    taylor_socolar,
+    tuebingen_triangle,
+)
 
 APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **penrose.SPECS,

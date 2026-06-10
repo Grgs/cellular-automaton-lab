@@ -49,7 +49,6 @@ from tools.render_review.browser_support.render_review import (  # noqa: E402
     wait_for_page_bootstrapped,
 )
 
-
 # Console messages that match any of these patterns are treated as benign.
 # Keep this list very short — the whole point of the smoke test is to catch
 # unexpected startup noise. New entries should reference an issue or a clear

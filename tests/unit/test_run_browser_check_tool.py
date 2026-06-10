@@ -6,12 +6,12 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tools.render_review.browser_check import (
+    build_parser,
     build_run_manifest,
-    require_current_standalone_build,
     ensure_render_review_outputs,
+    require_current_standalone_build,
     resolve_default_artifact_dir,
     resolve_host_kind,
-    build_parser,
 )
 from tools.render_review.review import parse_cli_args as parse_render_canvas_review_cli_args
 

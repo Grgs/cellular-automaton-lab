@@ -27,7 +27,6 @@ from backend.simulation.aperiodic_support import (
     scale,
 )
 
-
 PHI = (1 + math.sqrt(5)) / 2
 XI = cmath.exp((2j * math.pi) / 5)
 CONTRACTION = XI + (XI**4)

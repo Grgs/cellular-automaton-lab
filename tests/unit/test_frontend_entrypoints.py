@@ -3,7 +3,6 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-
 ROOT_DIR = Path(__file__).resolve().parents[2]
 LEGACY_SERVER_ENTRY = "/".join(("frontend", "app.ts"))
 LEGACY_RUNTIME_ENTRY = "/".join(("frontend", "main.ts"))

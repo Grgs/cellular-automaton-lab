@@ -9,7 +9,6 @@ from pathlib import Path
 from hypothesis import HealthCheck, settings
 from hypothesis.configuration import set_hypothesis_home_dir
 
-
 set_hypothesis_home_dir(Path(tempfile.gettempdir()) / "cellular-automaton-lab-hypothesis")
 
 settings.register_profile(

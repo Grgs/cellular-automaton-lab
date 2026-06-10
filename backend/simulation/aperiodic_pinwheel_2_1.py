@@ -34,7 +34,6 @@ from backend.simulation.aperiodic_support import (
     ExactPatchRecord,
 )
 
-
 # Tokens re-exported for callers that already imported them from this module.
 TILE_FAMILY = PINWHEEL_2_1_TILE_FAMILY
 KIND_SMALL = PINWHEEL_2_1_SMALL_KIND

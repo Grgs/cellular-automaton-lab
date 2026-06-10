@@ -23,7 +23,6 @@ from backend.simulation.topology_catalog import (
     get_topology_variant_for_geometry,
 )
 
-
 # A small fixed palette keyed by cell kind -> fill colour.
 _PALETTE = (
     "#f4c2c2",

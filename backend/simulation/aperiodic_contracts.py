@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -12,7 +12,6 @@ from backend.simulation.aperiodic_family_manifest import (
 )
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
-
 
 AperiodicImplementationStatus = Literal[
     "true_substitution",

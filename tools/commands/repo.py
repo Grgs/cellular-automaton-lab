@@ -3,9 +3,10 @@ from __future__ import annotations
 import argparse
 
 from tools import dev_processes, generated_check, release_check, run_python_style
-from tools.command_docs import command_doc
 from tools.cli_support import add_passthrough_command
-from tools.tools_docs import build_parser as tools_docs_parser, main as tools_docs_main
+from tools.command_docs import command_doc
+from tools.tools_docs import build_parser as tools_docs_parser
+from tools.tools_docs import main as tools_docs_main
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:

@@ -25,7 +25,6 @@ from backend.simulation.aperiodic_support import (
     ExactPatchRecord,
 )
 
-
 _ZERO = Fraction(0, 1)
 _ONE = Fraction(1, 1)
 _TWO = Fraction(2, 1)

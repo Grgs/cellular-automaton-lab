@@ -55,19 +55,19 @@ class _Vector:
     x: float
     y: float
 
-    def __add__(self, other: "_Vector") -> "_Vector":
+    def __add__(self, other: _Vector) -> _Vector:
         return _Vector(self.x + other.x, self.y + other.y)
 
-    def __sub__(self, other: "_Vector") -> "_Vector":
+    def __sub__(self, other: _Vector) -> _Vector:
         return _Vector(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, scalar: float) -> "_Vector":
+    def __mul__(self, scalar: float) -> _Vector:
         return _Vector(self.x * scalar, self.y * scalar)
 
-    def __truediv__(self, scalar: float) -> "_Vector":
+    def __truediv__(self, scalar: float) -> _Vector:
         return _Vector(self.x / scalar, self.y / scalar)
 
-    def dot(self, other: "_Vector") -> float:
+    def dot(self, other: _Vector) -> float:
         return (self.x * other.x) + (self.y * other.y)
 
     @cached_property
@@ -80,7 +80,7 @@ class _Grid:
     origin: _Vector
     grid_size: _Vector
 
-    def cell(self, x_multiple: int, y_multiple: int) -> "_GridCell":
+    def cell(self, x_multiple: int, y_multiple: int) -> _GridCell:
         return _GridCell(self, x_multiple, y_multiple)
 
 
@@ -120,17 +120,17 @@ class _PentAngle:
     def __init__(self, index: int) -> None:
         self.index = int(index % 5)
 
-    def sin(self, other: "_PentAngle" | None = None) -> float:
+    def sin(self, other: _PentAngle | None = None) -> float:
         if other is None:
             return self._SIN[self.index]
         return self._SIN[(other.index - self.index) % 5]
 
-    def cos(self, other: "_PentAngle" | None = None) -> float:
+    def cos(self, other: _PentAngle | None = None) -> float:
         if other is None:
             return self._COS[self.index]
         return self._COS[(other.index - self.index) % 5]
 
-    def inverse_sin(self, other: "_PentAngle") -> float:
+    def inverse_sin(self, other: _PentAngle) -> float:
         return self._INVERSE_SIN[(other.index - self.index) % 5]
 
     def unit(self) -> _Vector:
@@ -184,7 +184,7 @@ def _intersection(
 
 
 class _StripFamily:
-    def __init__(self, tiling: "_PenroseTiling", offset: float, pent_angle: _PentAngle) -> None:
+    def __init__(self, tiling: _PenroseTiling, offset: float, pent_angle: _PentAngle) -> None:
         self.tiling = tiling
         self.offset = offset
         self.pent_angle = pent_angle
@@ -196,7 +196,7 @@ class _StripFamily:
         direction = self.direction()
         return _Vector(direction.y, -direction.x)
 
-    def strip(self, multiple: int) -> "_Strip":
+    def strip(self, multiple: int) -> _Strip:
         return _Strip(self, multiple)
 
     def strips_near_point(self, point: _Vector) -> Iterator[_Strip]:
@@ -222,18 +222,18 @@ class _Strip:
         point = self.origin()
         return point, point + (self.family.direction() * 1000)
 
-    def intersection(self, other: "_Strip") -> _Vector | None:
+    def intersection(self, other: _Strip) -> _Vector | None:
         if self.family.pent_angle.index == other.family.pent_angle.index:
             return None
         return _intersection(*self.two_points(), *other.two_points())
 
-    def intersection_distance_from_point(self, other: "_Strip") -> float:
+    def intersection_distance_from_point(self, other: _Strip) -> float:
         intersection = self.intersection(other)
         if intersection is None:
             raise ValueError("Parallel strips do not intersect.")
         return (intersection - self.origin()).dot(self.family.direction())
 
-    def rhombus_at_intersection(self, other: "_Strip") -> "_Rhombus":
+    def rhombus_at_intersection(self, other: _Strip) -> _Rhombus:
         lattice_coords = [0] * 5
         lattice_coords[self.family.pent_angle.index] = self.multiple
         distance = self.intersection_distance_from_point(other)
@@ -257,7 +257,7 @@ class _Strip:
 
         return _Rhombus(self, other, tuple(lattice_coords))
 
-    def rhombus(self, target_distance: float) -> "_Rhombus":
+    def rhombus(self, target_distance: float) -> _Rhombus:
         forward_rhombus = next(self.rhombi(target_distance, True))
         backward_rhombus = next(self.rhombi(target_distance, False))
         candidates = [forward_rhombus, backward_rhombus]

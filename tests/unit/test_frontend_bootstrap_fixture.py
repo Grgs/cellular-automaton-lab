@@ -7,7 +7,6 @@ from pathlib import Path
 from backend.bootstrap_data import build_bootstrap_payload
 from backend.dev_server import APP_NAME
 
-
 ROOT = Path(__file__).resolve().parents[2]
 BOOTSTRAP_FIXTURE_PATH = ROOT / "frontend" / "test-fixtures" / "bootstrap-data.json"
 

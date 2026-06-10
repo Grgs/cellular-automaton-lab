@@ -48,9 +48,7 @@ def topology_revision(
     changing inputs — use ``topology_content_revision`` instead.
     """
     digest = sha1(
-        f"{geometry}:{width}:{height}:{patch_depth if patch_depth is not None else '-'}:graph-v1".encode(
-            "utf-8"
-        )
+        f"{geometry}:{width}:{height}:{patch_depth if patch_depth is not None else '-'}:graph-v1".encode()
     ).hexdigest()
     return digest[:12]
 
@@ -222,7 +220,7 @@ class SimulationBoard:
     topology: LatticeTopology
     cell_states: list[int]
 
-    def clone(self) -> "SimulationBoard":
+    def clone(self) -> SimulationBoard:
         return SimulationBoard(
             topology=self.topology,
             cell_states=self.cell_states.copy(),

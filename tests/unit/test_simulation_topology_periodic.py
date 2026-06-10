@@ -1,17 +1,17 @@
-from collections import Counter
 import sys
 import unittest
+from collections import Counter
 from pathlib import Path
 
 try:
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.archlife_extended import (
+        ArchLife3464Rule,
+        ArchLife4612Rule,
         ArchLife31212Rule,
         ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
-        ArchLife3464Rule,
-        ArchLife4612Rule,
     )
     from backend.rules.kagome_life import KagomeLifeRule
     from backend.simulation.engine import SimulationEngine
@@ -36,12 +36,12 @@ except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.archlife_extended import (
+        ArchLife3464Rule,
+        ArchLife4612Rule,
         ArchLife31212Rule,
         ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
-        ArchLife3464Rule,
-        ArchLife4612Rule,
     )
     from backend.rules.kagome_life import KagomeLifeRule
     from backend.simulation.engine import SimulationEngine

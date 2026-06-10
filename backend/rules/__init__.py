@@ -3,17 +3,17 @@ from __future__ import annotations
 from backend.payload_types import RuleDefinitionPayload
 from backend.rules.archlife488 import ArchLife488Rule
 from backend.rules.archlife_extended import (
+    ArchLife3464Rule,
+    ArchLife4612Rule,
     ArchLife31212Rule,
     ArchLife33336Rule,
     ArchLife33344Rule,
     ArchLife33434Rule,
-    ArchLife3464Rule,
-    ArchLife4612Rule,
 )
 from backend.rules.base import AutomatonRule
 from backend.rules.conway import ConwayLifeRule
-from backend.rules.highlife import HighLifeRule
 from backend.rules.hexlife import HexLifeRule
+from backend.rules.highlife import HighLifeRule
 from backend.rules.kagome_life import KagomeLifeRule
 from backend.rules.life_b2s23 import LifeB2S23Rule
 from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule

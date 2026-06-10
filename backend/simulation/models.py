@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from backend.defaults import (
-    DEFAULT_HEIGHT,
     DEFAULT_ADJACENCY_MODE,
     DEFAULT_GEOMETRY,
+    DEFAULT_HEIGHT,
     DEFAULT_PATCH_DEPTH,
     DEFAULT_SPEED,
     DEFAULT_TILING_FAMILY,
@@ -23,6 +23,10 @@ from backend.payload_types import (
     TopologySpecInput,
     TopologySpecPayload,
 )
+from backend.simulation.topology import (
+    LatticeTopology,
+    SimulationBoard,
+)
 from backend.simulation.topology_catalog import (
     get_topology_definition,
     get_topology_variant_for_geometry,
@@ -34,10 +38,6 @@ from backend.simulation.topology_catalog import (
     unsafe_maximum_patch_depth_for_tiling_family,
 )
 from backend.simulation.topology_family_manifest import EDGE_ADJACENCY
-from backend.simulation.topology import (
-    LatticeTopology,
-    SimulationBoard,
-)
 
 if TYPE_CHECKING:
     from backend.rules.base import AutomatonRule
@@ -134,7 +134,7 @@ class TopologySpec:
         height: int = DEFAULT_HEIGHT,
         patch_depth: int = DEFAULT_PATCH_DEPTH,
         unsafe_size_override: bool = False,
-    ) -> "TopologySpec":
+    ) -> TopologySpec:
         tiling_family_id = str(tiling_family)
         definition = get_topology_definition(tiling_family_id)
         resolved_adjacency_mode = normalize_adjacency_mode(tiling_family_id, adjacency_mode)
@@ -178,7 +178,7 @@ class TopologySpec:
         width: int = DEFAULT_WIDTH,
         height: int = DEFAULT_HEIGHT,
         patch_depth: int = DEFAULT_PATCH_DEPTH,
-    ) -> "TopologySpec":
+    ) -> TopologySpec:
         variant = get_topology_variant_for_geometry(str(geometry))
         return cls.from_values(
             tiling_family=variant.tiling_family,
@@ -196,7 +196,7 @@ class TopologySpec:
         height: int | None = None,
         patch_depth: int | None = None,
         unsafe_size_override: bool | None = None,
-    ) -> "TopologySpec":
+    ) -> TopologySpec:
         return self.from_values(
             tiling_family=self.tiling_family if tiling_family is None else tiling_family,
             adjacency_mode=self.adjacency_mode if adjacency_mode is None else adjacency_mode,
@@ -239,7 +239,7 @@ class SimulationConfig:
         height: int = DEFAULT_HEIGHT,
         speed: float = DEFAULT_SPEED,
         patch_depth: int = DEFAULT_PATCH_DEPTH,
-    ) -> "SimulationConfig":
+    ) -> SimulationConfig:
         resolved_topology_spec: TopologySpec
         if isinstance(topology_spec, TopologySpec):
             resolved_topology_spec = TopologySpec.from_values(
@@ -317,7 +317,7 @@ class SimulationConfig:
         height: int | None = None,
         speed: float | None = None,
         patch_depth: int | None = None,
-    ) -> "SimulationConfig":
+    ) -> SimulationConfig:
         if topology_spec is not None:
             if isinstance(topology_spec, TopologySpec):
                 base_topology_spec = self.from_values(
@@ -386,7 +386,7 @@ class RuleSnapshot:
     supports_all_topologies: bool
 
     @classmethod
-    def from_rule(cls, rule: AutomatonRule) -> "RuleSnapshot":
+    def from_rule(cls, rule: AutomatonRule) -> RuleSnapshot:
         return cls(
             name=rule.name,
             display_name=rule.display_name,

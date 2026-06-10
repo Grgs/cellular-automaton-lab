@@ -18,7 +18,6 @@ from tests.e2e.playwright_suite_support import (
 from tests.e2e.support_runtime_host import standalone_build_status
 from tools._common import ROOT_DIR, run_command
 
-
 DEFAULT_PLAYWRIGHT_SUBSET_COUNT = 6
 PLAYWRIGHT_LIB_ROOT = ROOT_DIR / "output" / "playwright-linux-libs"
 PLAYWRIGHT_LIB_DEB_DIR = PLAYWRIGHT_LIB_ROOT / "debs"

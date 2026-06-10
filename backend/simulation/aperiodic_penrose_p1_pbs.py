@@ -51,7 +51,6 @@ from backend.simulation.aperiodic_support import (
     rounded_point,
 )
 
-
 PENROSE_P1_PBS_BASE_HALF_EXTENT = 1.6
 
 _MULTIGRID_KIND_TO_CELL_KIND = {

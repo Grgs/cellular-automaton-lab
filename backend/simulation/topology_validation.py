@@ -11,7 +11,6 @@ from shapely.validation import explain_validity
 from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_MANIFEST
 from backend.simulation.topology import LatticeTopology
 
-
 # Snap-to-grid precision for periodic-face tilings. 6 decimals reconciles
 # JSON-stored coordinates (which round to 6 places) with math-derived ones
 # (e.g. 52*sqrt(3) at full float64). For non-edge-to-edge tilings with

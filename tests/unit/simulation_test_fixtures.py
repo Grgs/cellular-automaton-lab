@@ -1,7 +1,6 @@
 from backend.rules.base import AutomatonRule
 from backend.simulation.rule_context import RuleContext
 
-
 BLINKER_GRID = [
     [0, 1, 0],
     [0, 1, 0],

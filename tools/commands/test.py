@@ -4,13 +4,15 @@ import argparse
 import json
 
 from tools import run_coverage
-from tools.command_docs import command_doc
 from tools.cli_support import add_passthrough_command
+from tools.command_docs import command_doc
 from tools.playwright_runner import (
     build_e2e_parser,
-    main as playwright_main,
     standalone_build_status_payload,
     suite_manifest_payload,
+)
+from tools.playwright_runner import (
+    main as playwright_main,
 )
 
 

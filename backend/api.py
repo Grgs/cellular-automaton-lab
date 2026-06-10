@@ -8,8 +8,8 @@ from backend.defaults import APP_DEFAULTS
 from backend.dev_server import APP_NAME
 from backend.frontend_assets import FrontendAssetManifest
 from backend.payload_types import ServerMetaPayload
-from backend.simulation.periodic_face_tilings import describe_periodic_face_tilings
 from backend.simulation.bootstrap import register_simulation
+from backend.simulation.periodic_face_tilings import describe_periodic_face_tilings
 from backend.simulation.topology_catalog import describe_topologies
 from backend.web.routes import api_bp, page_bp
 

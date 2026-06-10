@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-
 REGULAR_GRID_SUMMARY_RE = re.compile(r"^\s*(?P<width>\d+)\s*x\s*(?P<height>\d+)\s*$")
 APERIODIC_PATCH_DEPTH_SUMMARY_RE = re.compile(r"^\s*Depth\s+(?P<depth>\d+)\b")
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-
 AperiodicBuilderKind = Literal["compatibility_patch", "substitution_recipe"]
 AperiodicImplementationStatus = Literal[
     "true_substitution",

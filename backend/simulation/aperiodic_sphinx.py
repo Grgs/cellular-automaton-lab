@@ -22,7 +22,6 @@ from backend.simulation.aperiodic_support import (
     translation,
 )
 
-
 _SQRT3_OVER_2 = math.sqrt(3) / 2
 _SPHINX_BASE_VERTICES = (
     Vec(-0.5, _SQRT3_OVER_2),

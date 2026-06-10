@@ -5,7 +5,6 @@ from collections.abc import Callable
 
 from tools.command_docs import CommandDoc
 
-
 MainFunc = Callable[[list[str] | None], int]
 ParserFactory = Callable[[], argparse.ArgumentParser]
 

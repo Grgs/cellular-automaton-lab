@@ -1,11 +1,11 @@
 import unittest
 
+from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
 from backend.simulation.topology_implementation_registry import (
     describe_topology_implementations,
     get_topology_implementation,
     render_kind_for_geometry,
 )
-from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
 
 
 class TopologyImplementationRegistryTests(unittest.TestCase):

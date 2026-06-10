@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from backend.simulation.topology_builders import build_topology
 from backend.simulation.topology_types import SimulationBoard

@@ -7,7 +7,6 @@ from typing import TypedDict
 
 from backend.payload_types import AppDefaultsPayload, TopologyCatalogEntryPayload
 
-
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SHARED_APP_SHELL_BODY_PATH = ROOT_DIR / "frontend" / "shell" / "app-shell-body.html"
 PICKER_GROUP_ORDER = ("Classic", "Periodic Mixed", "Aperiodic")

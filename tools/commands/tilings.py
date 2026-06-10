@@ -11,8 +11,8 @@ from tools import (
     validate_tilings,
     verify_reference_tilings,
 )
-from tools.command_docs import command_doc
 from tools.cli_support import add_passthrough_command
+from tools.command_docs import command_doc
 
 
 def _validate_parser() -> argparse.ArgumentParser:

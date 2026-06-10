@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict, dataclass
 import datetime as dt
-from hashlib import sha1
 import json
 import sys
+from dataclasses import asdict, dataclass
+from hashlib import sha1
 from pathlib import Path
 from typing import Any
 
@@ -438,7 +438,7 @@ def run_geometry_cleanup_workbench(
         "host": request.host if request.browser_review else None,
         "theme": request.theme if request.browser_review else None,
         "baselineCleanupScale": baseline_candidate.parameter_value,
-        "startedAt": dt.datetime.now(tz=dt.timezone.utc).isoformat(),
+        "startedAt": dt.datetime.now(tz=dt.UTC).isoformat(),
         "candidates": [],
     }
     exit_status = "failure"
@@ -511,7 +511,7 @@ def run_geometry_cleanup_workbench(
         raise
     finally:
         manifest["exitStatus"] = exit_status
-        manifest["stoppedAt"] = dt.datetime.now(tz=dt.timezone.utc).isoformat()
+        manifest["stoppedAt"] = dt.datetime.now(tz=dt.UTC).isoformat()
         write_json(manifest_path, manifest)
 
 

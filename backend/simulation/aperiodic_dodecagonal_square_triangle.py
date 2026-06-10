@@ -15,7 +15,6 @@ from backend.simulation.aperiodic_support import (
     patch_from_records,
 )
 
-
 # Decorated 3.12.12 Archimedean tiling.
 #
 # The classical Archimedean (3.12.12) tiling places one regular dodecagon and

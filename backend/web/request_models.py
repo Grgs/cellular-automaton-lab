@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from backend.payload_types import CellTargetPayload, CellUpdatePayload, TopologySpecRequestPayload
-
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+
+from backend.payload_types import CellTargetPayload, CellUpdatePayload, TopologySpecRequestPayload
 
 
 def blank_to_none(value: object) -> object | None:

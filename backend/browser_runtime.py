@@ -21,12 +21,12 @@ from backend.rules import RuleRegistry
 from backend.simulation.persistence import SimulationStateStore
 from backend.simulation.seeding import run_compare_request
 from backend.simulation.service import SimulationOperationError, SimulationService
-from backend.simulation.topology_preview import build_topology_preview
 from backend.simulation.state_restore import SimulationStateRestorer
+from backend.simulation.topology_preview import build_topology_preview
 
 
 class NoopLock:
-    def __enter__(self) -> "NoopLock":
+    def __enter__(self) -> NoopLock:
         return self
 
     def __exit__(
@@ -62,7 +62,7 @@ class BrowserSimulationRuntime:
     state_restorer: SimulationStateRestorer
 
     @classmethod
-    def create(cls) -> "BrowserSimulationRuntime":
+    def create(cls) -> BrowserSimulationRuntime:
         rule_registry = RuleRegistry()
         return cls(
             rule_registry=rule_registry,

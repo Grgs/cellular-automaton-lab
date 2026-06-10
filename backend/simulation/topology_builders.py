@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from functools import lru_cache
-from typing import Iterable
 
 from backend.simulation.topology_implementation_registry import get_topology_implementation
 from backend.simulation.topology_types import LatticeCell, LatticeTopology, topology_revision

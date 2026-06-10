@@ -50,14 +50,12 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 # Imported lazily so this module is importable without the full backend.
 from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_MANIFEST
-
 
 _FAMILY_ID_PATTERN = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
 

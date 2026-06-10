@@ -5,7 +5,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-
 try:
     from tests.e2e.support_browser import BrowserAppTestCase
     from tests.e2e.support_runtime_host import StandaloneRuntimeHost

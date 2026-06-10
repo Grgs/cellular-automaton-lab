@@ -101,4 +101,8 @@ def paint_bits(order: list[str], bits: str, *, live: int = 1) -> dict[str, int]:
     cell count is therefore identical across topologies for a given seed,
     provided the seed fits.
     """
-    return {cell_id: live for cell_id, bit in zip(order, normalize_bits(bits)) if bit == "1"}
+    return {
+        cell_id: live
+        for cell_id, bit in zip(order, normalize_bits(bits), strict=False)
+        if bit == "1"
+    }

@@ -2,27 +2,29 @@ from __future__ import annotations
 
 from backend.simulation.reference_specs.types import ReferenceFamilySpec
 
-from . import archimedean
-from . import trihexagonal_3_6_3_6
-from . import cairo_pentagonal
-from . import rhombille
-from . import deltoidal_hexagonal
-from . import tetrakis_square
-from . import triakis_triangular
-from . import deltoidal_trihexagonal
-from . import prismatic_pentagonal
-from . import floret_pentagonal
-from . import snub_square_dual
-from . import type_7_pentagonal
-from . import kisrhombille
-from . import tiltwork
-from . import pythagorean
-from . import herringbone
-from . import triangular_square_2uniform
-from . import basketweave
-from . import pentagon_crosses
-from . import trihex_2uniform_3636_3366
-from . import stein_14_pentagonal
+from . import (
+    archimedean,
+    basketweave,
+    cairo_pentagonal,
+    deltoidal_hexagonal,
+    deltoidal_trihexagonal,
+    floret_pentagonal,
+    herringbone,
+    kisrhombille,
+    pentagon_crosses,
+    prismatic_pentagonal,
+    pythagorean,
+    rhombille,
+    snub_square_dual,
+    stein_14_pentagonal,
+    tetrakis_square,
+    tiltwork,
+    triakis_triangular,
+    triangular_square_2uniform,
+    trihex_2uniform_3636_3366,
+    trihexagonal_3_6_3_6,
+    type_7_pentagonal,
+)
 
 PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **archimedean.SPECS,

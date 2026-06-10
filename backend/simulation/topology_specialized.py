@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from backend.simulation.aperiodic_prototiles import build_aperiodic_patch
-from backend.simulation.periodic_face_tilings import build_periodic_face_cells
 from backend.simulation.aperiodic_support import AperiodicPatch
+from backend.simulation.periodic_face_tilings import build_periodic_face_cells
 from backend.simulation.topology_types import LatticeCell, LatticeTopology, topology_revision
 
 

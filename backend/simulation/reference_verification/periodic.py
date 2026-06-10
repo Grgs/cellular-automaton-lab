@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from collections import Counter
 import math
 import re
+from collections import Counter
 
 from backend.simulation.literature_reference_specs import (
     REFERENCE_FAMILY_SPECS,

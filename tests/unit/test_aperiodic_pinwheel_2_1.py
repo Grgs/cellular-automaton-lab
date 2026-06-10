@@ -5,22 +5,20 @@ import unittest
 from fractions import Fraction
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.simulation.aperiodic_pinwheel_2_1 import (
+    _ALL_CHILDREN,
+    _BASE_TRIANGLE,
     KIND_LARGE,
     KIND_SMALL,
     TILE_FAMILY,
-    _ALL_CHILDREN,
-    _BASE_TRIANGLE,
     _subdivide,
     build_pinwheel_2_1_patch,
     collect_pinwheel_2_1_exact_records,
 )
-
 
 ExactPoint = tuple[Fraction, Fraction]
 ExactTriangle = tuple[ExactPoint, ExactPoint, ExactPoint]

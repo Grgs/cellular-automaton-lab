@@ -4,7 +4,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -13,10 +12,10 @@ from backend.bootstrap_data import build_bootstrap_payload, describe_aperiodic_f
 from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_IDS,
     APERIODIC_FAMILY_MANIFEST,
+    PENROSE_VERTEX_GEOMETRY,
 )
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
-from backend.simulation.aperiodic_family_manifest import PENROSE_VERTEX_GEOMETRY
 
 
 class AperiodicFamilyContractTests(unittest.TestCase):

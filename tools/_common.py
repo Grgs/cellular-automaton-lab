@@ -7,7 +7,6 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Final
 
-
 ROOT_DIR: Final[Path] = Path(__file__).resolve().parents[1]
 
 

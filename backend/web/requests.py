@@ -16,7 +16,6 @@ from backend.contract_validation import (
 )
 from backend.payload_types import RawJsonObject
 
-
 RequestValidationError = ContractValidationError
 __all__ = [
     "RequestValidationError",

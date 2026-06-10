@@ -6,8 +6,7 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, TypeAlias, cast
-
+from typing import Literal, cast
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -26,10 +25,9 @@ from backend.simulation.reference_verification.types import (
     _LocalReferenceAnchorPayload,
 )
 
-
 FixtureMode = Literal["local", "canonical", "both"]
-LocalFixturePayload: TypeAlias = dict[str, dict[str, dict[str, _LocalReferenceAnchorPayload]]]
-CanonicalFixturePayload: TypeAlias = dict[str, dict[str, _CanonicalPatchFixturePayload]]
+type LocalFixturePayload = dict[str, dict[str, dict[str, _LocalReferenceAnchorPayload]]]
+type CanonicalFixturePayload = dict[str, dict[str, _CanonicalPatchFixturePayload]]
 
 
 @dataclass(frozen=True)

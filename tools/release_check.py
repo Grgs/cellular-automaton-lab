@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, cast
 
-
 ROOT_DIR = Path(__file__).resolve().parents[1]
 VERSION_PATTERN = re.compile(r"^v\d+\.\d+\.\d+$")
 Phase = Literal["pre-publish", "post-publish"]

@@ -3,7 +3,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -13,13 +12,13 @@ from tools.regenerate_reference_fixtures import (
     FixtureRegenerationError,
     LocalFixtureTarget,
     _canonical_drift_lines,
+    _read_canonical_fixtures,
+    _read_local_fixtures,
     check_fixture_drift,
     discover_canonical_fixture_targets,
     discover_local_fixture_targets,
     regenerate_canonical_fixtures,
     regenerate_local_fixtures,
-    _read_canonical_fixtures,
-    _read_local_fixtures,
 )
 
 

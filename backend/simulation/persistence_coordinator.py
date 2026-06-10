@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Callable
-from typing import Protocol, TypeAlias
+from typing import Protocol
 
 
 class TimerLike(Protocol):
@@ -11,7 +11,7 @@ class TimerLike(Protocol):
     def cancel(self) -> None: ...
 
 
-TimerFactory: TypeAlias = Callable[[float, Callable[[], None]], TimerLike]
+type TimerFactory = Callable[[float, Callable[[], None]], TimerLike]
 
 
 class PersistenceCoordinator:

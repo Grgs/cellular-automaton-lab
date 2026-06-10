@@ -12,12 +12,12 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from backend.payload_types import TopologyPayload
-
 from tools.render_review.browser_support.artifacts import create_artifact_dir
+from tools.render_review.profiles import find_render_review_profile
 from tools.render_review.review import (
     DEFAULT_REFERENCE_CACHE_DIR,
-    condense_profile_expectations,
     condense_overlap_hotspots,
+    condense_profile_expectations,
     condense_settle_diagnostics,
     condense_transform_report,
     condense_visual_metrics,
@@ -25,7 +25,6 @@ from tools.render_review.review import (
     resolve_render_review_request,
     with_review_topology_payload,
 )
-from tools.render_review.profiles import find_render_review_profile
 
 VALID_HOSTS = ("standalone", "server")
 VALID_THEMES = ("light", "dark")
@@ -46,7 +45,7 @@ def resolve_default_workbench_artifact_dir(
     if artifact_dir is not None:
         artifact_dir.mkdir(parents=True, exist_ok=True)
         return artifact_dir
-    timestamp = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y%m%d-%H%M%S-%f")
+    timestamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S-%f")
     return create_artifact_dir(
         name=f"{timestamp}-{name}",
         default_parent=default_parent,

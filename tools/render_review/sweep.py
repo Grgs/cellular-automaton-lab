@@ -12,19 +12,19 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from tools.render_review.browser_check import ManagedRenderReviewRun, run_managed_render_review
 from tools.render_review.browser_support.artifacts import create_artifact_dir
+from tools.render_review.profiles import RenderReviewProfile, resolve_render_review_profile
 from tools.render_review.review import (
     DEFAULT_REFERENCE_CACHE_DIR,
     ResolvedRenderReviewRequest,
+    condense_overlap_hotspots,
     condense_profile_expectations,
     condense_settle_diagnostics,
-    condense_overlap_hotspots,
     condense_transform_report,
     condense_visual_metrics,
     resolve_render_review_request,
 )
-from tools.render_review.profiles import RenderReviewProfile, resolve_render_review_profile
-from tools.render_review.browser_check import ManagedRenderReviewRun, run_managed_render_review
 
 DEFAULT_SWEEP_OUTPUT_DIR = ROOT_DIR / "output" / "render-review-sweeps"
 VALID_HOSTS = ("standalone", "server")
@@ -135,7 +135,7 @@ def resolve_default_sweep_artifact_dir(
     if artifact_dir is not None:
         artifact_dir.mkdir(parents=True, exist_ok=True)
         return artifact_dir
-    timestamp = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y%m%d-%H%M%S")
+    timestamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
     return create_artifact_dir(
         name=f"{timestamp}-{profile_name}",
         default_parent=DEFAULT_SWEEP_OUTPUT_DIR,
@@ -387,7 +387,7 @@ def run_render_review_sweep(
             "referenceCacheDir": _serialize_path(request.reference_cache_dir),
             "allowStaleStandalone": request.allow_stale_standalone,
         },
-        "startedAt": dt.datetime.now(tz=dt.timezone.utc).isoformat(),
+        "startedAt": dt.datetime.now(tz=dt.UTC).isoformat(),
         "cases": [],
     }
     exit_status = "failure"
@@ -412,7 +412,7 @@ def run_render_review_sweep(
         raise
     finally:
         manifest["exitStatus"] = exit_status
-        manifest["stoppedAt"] = dt.datetime.now(tz=dt.timezone.utc).isoformat()
+        manifest["stoppedAt"] = dt.datetime.now(tz=dt.UTC).isoformat()
         write_sweep_manifest(manifest_path, manifest)
 
 

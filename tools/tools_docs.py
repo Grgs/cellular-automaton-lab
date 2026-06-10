@@ -6,7 +6,6 @@ from pathlib import Path
 from tools._common import ROOT_DIR
 from tools.command_docs import COMMANDS, GROUPS
 
-
 TOOLS_DOC_PATH = ROOT_DIR / "docs" / "TOOLS.md"
 
 

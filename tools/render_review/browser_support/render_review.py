@@ -10,9 +10,10 @@ from collections import Counter, deque
 from pathlib import Path
 from typing import Any, Protocol, TypedDict, cast
 
-from backend.payload_types import TopologyPayload
-from playwright.sync_api import Page
 from PIL import Image
+from playwright.sync_api import Page
+
+from backend.payload_types import TopologyPayload
 
 
 class CanvasVisualSummary(TypedDict):
@@ -661,7 +662,7 @@ def wait_for_patch_render_complete(
                         requestAnimationFrame(() => requestAnimationFrame(() => resolve(null)));
                     })"""
                 )
-                settled_at = dt.datetime.now(tz=dt.timezone.utc).isoformat()
+                settled_at = dt.datetime.now(tz=dt.UTC).isoformat()
                 return {
                     "settled": True,
                     "stablePollCountRequired": stable_poll_count,

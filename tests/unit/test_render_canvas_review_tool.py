@@ -8,13 +8,18 @@ from pathlib import Path
 
 from PIL import Image
 
+from tools.render_review.profiles import (
+    ExpectedWarning,
+    RenderReviewProfile,
+    ReviewChecklistItem,
+)
 from tools.render_review.review import (
     DEFAULT_OUTPUT_DIR,
-    build_visual_metrics,
+    build_consistency_report,
     build_overlap_hotspots_summary,
     build_profile_expectations,
     build_reference_montage,
-    build_consistency_report,
+    build_visual_metrics,
     compute_orientation_diversity,
     compute_radial_symmetry_score,
     condense_overlap_hotspots,
@@ -22,17 +27,12 @@ from tools.render_review.review import (
     condense_transform_report,
     condense_visual_metrics,
     main,
-    parse_grid_size_text,
     parse_cli_args,
+    parse_grid_size_text,
     resolve_montage_path,
     resolve_output_paths,
     resolve_render_review_request,
     with_review_topology_payload,
-)
-from tools.render_review.profiles import (
-    ExpectedWarning,
-    RenderReviewProfile,
-    ReviewChecklistItem,
 )
 
 

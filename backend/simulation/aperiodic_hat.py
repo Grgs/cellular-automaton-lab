@@ -13,7 +13,6 @@ from backend.simulation.aperiodic_support import (
     polygon_centroid,
 )
 
-
 _SQRT12 = math.sqrt(12.0)
 _OUTPUT_SCALE = 0.44
 

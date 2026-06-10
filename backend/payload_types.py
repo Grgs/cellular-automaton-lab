@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Literal, NotRequired, Required, TypeAlias, TypedDict
+from typing import Literal, NotRequired, Required, TypedDict
 
-
-RawJsonObject: TypeAlias = dict[str, object]
-RawJsonArray: TypeAlias = list[object]
-RawJsonDocument: TypeAlias = RawJsonObject | RawJsonArray | str | int | float | bool | None
-SparseCellsByIdPayload: TypeAlias = dict[str, int]
+type RawJsonObject = dict[str, object]
+type RawJsonArray = list[object]
+type RawJsonDocument = RawJsonObject | RawJsonArray | str | int | float | bool | None
+type SparseCellsByIdPayload = dict[str, int]
 
 
 class FrontendManifestRecord(TypedDict, total=False):
@@ -16,7 +15,7 @@ class FrontendManifestRecord(TypedDict, total=False):
     css: list[str]
 
 
-FrontendManifestPayload: TypeAlias = dict[str, FrontendManifestRecord]
+type FrontendManifestPayload = dict[str, FrontendManifestRecord]
 
 
 class TopologySpecPayload(TypedDict):
@@ -86,7 +85,7 @@ class TopologySpecPatch(TypedDict, total=False):
     unsafe_size_override: bool
 
 
-TopologySpecInput: TypeAlias = TopologySpecPayload | TopologySpecRequestPayload | TopologySpecPatch
+type TopologySpecInput = TopologySpecPayload | TopologySpecRequestPayload | TopologySpecPatch
 
 
 class ConfigTopologySpecPatchPayload(TypedDict, total=False):
@@ -125,7 +124,7 @@ class PersistedSimulationSnapshotCandidate(TypedDict, total=False):
     cells_by_id: object
 
 
-PersistedSimulationSnapshotInput: TypeAlias = (
+type PersistedSimulationSnapshotInput = (
     PersistedSimulationSnapshotV5 | PersistedSimulationSnapshotCandidate
 )
 
@@ -283,7 +282,7 @@ class CellUpdatePayload(CellTargetPayload):
     state: int
 
 
-CellUpdatesPayload: TypeAlias = list[CellUpdatePayload]
+type CellUpdatesPayload = list[CellUpdatePayload]
 
 
 class CellUpdatesRequestPayload(TypedDict):

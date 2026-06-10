@@ -5,16 +5,15 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import TypedDict
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from backend.simulation.topology import build_topology
 from backend.simulation.topology_catalog import (
     TOPOLOGY_VARIANTS,
     is_aperiodic_geometry,
 )
-from backend.simulation.topology import build_topology
 from backend.simulation.topology_validation import (
     TopologyValidationResult,
     recommended_validation_options,

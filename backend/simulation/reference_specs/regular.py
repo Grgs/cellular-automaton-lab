@@ -3,7 +3,6 @@ from __future__ import annotations
 from .helpers import REGULAR_TILING_SOURCES
 from .types import ReferenceDepthExpectation, ReferenceFamilySpec
 
-
 REGULAR_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     "square": ReferenceFamilySpec(
         geometry="square",

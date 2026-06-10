@@ -7,6 +7,8 @@ from pathlib import Path
 
 from backend.simulation.topology_types import (
     CONTENT_REVISION_HASH_LENGTH,
+)
+from backend.simulation.topology_types import (
     topology_content_revision as compute_content_revision,
 )
 from tools.regenerate_frontend_topology_fixtures import (

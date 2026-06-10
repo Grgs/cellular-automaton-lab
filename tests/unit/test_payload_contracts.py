@@ -4,7 +4,6 @@ import unittest
 from dataclasses import dataclass
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -15,7 +14,6 @@ from backend.payload_contracts import (
     payload_field_contracts,
     payload_type_union_contracts,
 )
-
 
 _INTERFACE_HEADER_PATTERN = re.compile(
     r"export interface (?P<name>[A-Za-z0-9_]+)(?: extends (?P<extends>[^{]+))? \{"

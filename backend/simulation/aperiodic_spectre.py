@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cache
 
 from backend.simulation.aperiodic_family_manifest import SPECTRE_KIND
 from backend.simulation.aperiodic_substitution import (
@@ -137,7 +137,7 @@ def _spectre_supertile_quad(
     )
 
 
-@lru_cache(maxsize=None)
+@cache
 def _spectre_template_for_depth(label: str, depth: int) -> _SpectreTemplate:
     if depth <= 0:
         return _SPECTRE_BASE_TEMPLATES[label]

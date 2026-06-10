@@ -20,7 +20,6 @@ from backend.simulation.topology_catalog import (
     normalize_adjacency_mode,
 )
 
-
 SNAPSHOT_VERSION: Literal[5] = 5
 
 

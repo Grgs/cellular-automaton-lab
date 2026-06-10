@@ -4,7 +4,7 @@ import argparse
 import json
 import os
 import shutil
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from backend.app_shell import render_standalone_document
@@ -19,10 +19,13 @@ from tools._common import (
 )
 from tools.provenance import (
     compute_source_fingerprint as compute_source_fingerprint,
+)
+from tools.provenance import (
     git_dirty_status as git_dirty_status,
+)
+from tools.provenance import (
     iter_source_fingerprint_paths as iter_source_fingerprint_paths,
 )
-
 
 OUTPUT_DIR = ROOT_DIR / "output" / "standalone"
 STANDALONE_BUILD_INPUT_DIR = ROOT_DIR / "output" / ".standalone-build-input"
@@ -111,7 +114,7 @@ def write_python_bundle() -> None:
 def write_build_manifest() -> None:
     source_files = iter_source_fingerprint_paths(ROOT_DIR)
     manifest = {
-        "builtAt": datetime.now(tz=timezone.utc).isoformat(),
+        "builtAt": datetime.now(tz=UTC).isoformat(),
         "gitHead": read_command_output(["git", "rev-parse", "HEAD"]),
         "gitDirty": git_dirty_status(ROOT_DIR),
         "sourceFingerprint": compute_source_fingerprint(ROOT_DIR, source_files),
