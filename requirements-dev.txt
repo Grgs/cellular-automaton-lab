@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=requirements-dev.txt --strip-extras requirements-dev.in
 #
+ast-serialize==0.5.0
+    # via mypy
 boolean-py==5.0
     # via license-expression
 cachecontrol==0.14.4
@@ -45,7 +47,7 @@ idna==3.16
     # via requests
 iniconfig==2.3.0
     # via pytest
-librt==0.9.0
+librt==0.11.0
     # via mypy
 license-expression==30.4.4
     # via cyclonedx-python-lib
@@ -55,7 +57,7 @@ mdurl==0.1.2
     # via markdown-it-py
 msgpack==1.1.2
     # via cachecontrol
-mypy==1.19.1
+mypy==2.1.0
     # via -r requirements-dev.in
 mypy-extensions==1.1.0
     # via mypy
