@@ -85,7 +85,9 @@ export function bindEditorAndPatternControls(elements: DomElements, actions: App
         const shortcuts = elements.canvasToolbarShortcuts;
         helpBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            const open = shortcuts.hidden;
+            // Element.hidden is boolean | "until-found"; this toggle only deals
+            // in fully hidden/shown, so collapse it to a boolean.
+            const open = Boolean(shortcuts.hidden);
             shortcuts.hidden = !open;
             helpBtn.setAttribute("aria-expanded", open ? "true" : "false");
             helpBtn.classList.toggle("is-active", open);
