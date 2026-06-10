@@ -76,8 +76,8 @@ function thumbnailLink(href: string, label: string, thumbnail: SVGSVGElement): H
     anchor.href = href;
     anchor.target = "_blank";
     anchor.rel = "noopener";
-    anchor.title = `Open ${label} seed placement`;
-    anchor.setAttribute("aria-label", `Open ${label} seed placement`);
+    anchor.title = `Open ${label} seed placement in a new tab`;
+    anchor.setAttribute("aria-label", `Open ${label} seed placement in a new tab`);
     anchor.append(thumbnail);
     return anchor;
 }
