@@ -133,5 +133,7 @@ describe("geometry/polygon-overlap", () => {
             const overlaps = await overlapsForFixture(filename);
             expect(overlaps, filename).toEqual([]);
         }
-    }, 30_000);
+        // Coverage instrumentation roughly doubles this sweep's runtime, so the
+        // timeout budgets for the instrumented run, not the bare one.
+    }, 90_000);
 });

@@ -1,6 +1,9 @@
 {
     "name": "cellular-automaton-lab",
     "private": true,
+    "engines": {
+        "node": ">=22"
+    },
     "scripts": {
         "build:frontend": "vite build --mode server",
         "build:frontend:server": "vite build --mode server",
@@ -26,7 +29,8 @@
         "check:ci-local": "npm run check:python && npm run check:frontend && node ./tools/internal/python_tools_entry.mjs tilings validate && node ./tools/internal/python_tools_entry.mjs tilings verify && npm run test:e2e:playwright",
         "fixtures:reference:check": "node ./tools/internal/python_tools_entry.mjs fixtures reference --all --mode both --check",
         "audit:supply-chain": "node ./tools/internal/python_tools_entry.mjs security supply-chain",
-        "coverage:backend": "node ./tools/internal/python_tools_entry.mjs test coverage",
+        "coverage:backend": "node ./tools/internal/python_tools_entry.mjs test coverage --fail-under 75",
+        "coverage:frontend": "vitest run --coverage",
         "check:bundle-size": "node ./tools/internal/python_tools_entry.mjs build bundle-size",
         "smoke:standalone": "node ./tools/internal/python_tools_entry.mjs browser smoke-standalone",
         "check:doc-links": "linkinator \"*.md\" \".github/**/*.md\" \"docs/**/*.md\""
@@ -34,6 +38,7 @@
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/node": "^25.5.0",
+        "@vitest/coverage-v8": "^4.1.8",
         "eslint": "^10.3.0",
         "eslint-config-prettier": "^10.1.8",
         "jsdom": "^29.0.1",

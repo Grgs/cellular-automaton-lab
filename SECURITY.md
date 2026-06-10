@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-The public `v0.1.x` line is a preview release. Security fixes target the current default branch and the latest tagged preview when practical.
+The public release line is a preview series. Security fixes target the current default branch and the latest tagged preview when practical.
 
 ## Reporting A Vulnerability
 

@@ -1,6 +1,6 @@
 # Contributing
 
-Cellular Automaton Lab is a `v0.3.x` preview project. Contributions are welcome, but the repository is still the public integration surface: there is no npm package, PyPI package, plugin API, or long-term compatibility promise yet.
+Cellular Automaton Lab is a preview-series project. Contributions are welcome, but the repository is still the public integration surface: there is no npm package, PyPI package, plugin API, or long-term compatibility promise yet.
 
 ## First 30 Minutes
 
