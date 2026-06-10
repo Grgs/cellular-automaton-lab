@@ -395,6 +395,31 @@ def _insert_before(text: str, anchor: str, insertion: str, *, filename: str) -> 
     return text.replace(anchor, insertion + anchor, 1)
 
 
+def _insert_sorted_line_in_import_block(
+    text: str,
+    import_header: str,
+    line: str,
+    *,
+    filename: str,
+) -> str:
+    occurrences = text.count(import_header)
+    if occurrences != 1:
+        raise ScaffoldError(
+            f"Import block header not unique in {filename} "
+            f"({occurrences} occurrences): {import_header!r}."
+        )
+    body_start = text.index(import_header) + len(import_header)
+    body_end = text.find(")\n", body_start)
+    if body_end == -1:
+        raise ScaffoldError(f"Cannot find closing parenthesis for import block in {filename}.")
+
+    lines = text[body_start:body_end].splitlines(keepends=True)
+    if line in lines:
+        return text
+    lines.append(line)
+    return text[:body_start] + "".join(sorted(lines)) + text[body_end:]
+
+
 def patch_family_manifest(text: str, spec: ScaffoldSpec) -> str:
     # 1. Geometry constant: append after the last `*_GEOMETRY = "..."` line.
     geom_const_block = f'{spec.geometry_const} = "{spec.family_id}"\n'
@@ -453,17 +478,12 @@ def patch_family_manifest(text: str, spec: ScaffoldSpec) -> str:
 
 
 def patch_registry(text: str, spec: ScaffoldSpec) -> str:
-    # 1. Add geometry to the manifest-import block, appended last.
-    geometry_import_anchor = ")\nfrom backend.simulation.aperiodic_ammann_beenker"
-    insertion = f"    {spec.geometry_const},\n"
-    if geometry_import_anchor not in text:
-        raise ScaffoldError(
-            "aperiodic_registry.py manifest import block anchor missing; refactor likely."
-        )
-    text = text.replace(
-        geometry_import_anchor,
-        insertion + geometry_import_anchor,
-        1,
+    # 1. Add geometry to the manifest-import block.
+    text = _insert_sorted_line_in_import_block(
+        text,
+        "from backend.simulation.aperiodic_family_manifest import (\n",
+        f"    {spec.geometry_const},\n",
+        filename="aperiodic_registry.py",
     )
 
     # 2. Builder import: append after the last `from backend.simulation.aperiodic_*` import.
@@ -489,17 +509,12 @@ def patch_registry(text: str, spec: ScaffoldSpec) -> str:
 
 
 def patch_topology_family_manifest(text: str, spec: ScaffoldSpec) -> str:
-    # 1. Append geometry to the manifest-import block.
-    geometry_import_anchor = ")\nfrom backend.simulation.topology_catalog_types"
-    insertion = f"    {spec.geometry_const},\n"
-    if geometry_import_anchor not in text:
-        raise ScaffoldError(
-            "topology_family_manifest.py import block anchor missing; refactor likely."
-        )
-    text = text.replace(
-        geometry_import_anchor,
-        insertion + geometry_import_anchor,
-        1,
+    # 1. Add geometry to the manifest-import block.
+    text = _insert_sorted_line_in_import_block(
+        text,
+        "from backend.simulation.aperiodic_family_manifest import (\n",
+        f"    {spec.geometry_const},\n",
+        filename="topology_family_manifest.py",
     )
 
     # 2. TOPOLOGY_FAMILY_MANIFEST entry: insert before its closing `}` block.
@@ -515,14 +530,12 @@ def patch_topology_family_manifest(text: str, spec: ScaffoldSpec) -> str:
 
 def patch_reference_specs_init(text: str, spec: ScaffoldSpec) -> str:
     # 1. Add `from . import <family>`
-    import_line = f"from . import {spec.snake}\n"
-    last_import_anchor = list(re.finditer(r"^from \. import [a-z0-9_]+\n", text, re.MULTILINE))
-    if not last_import_anchor:
-        raise ScaffoldError(
-            "Cannot find `from . import <family>` lines in reference_specs/aperiodic/__init__.py."
-        )
-    insertion_point = last_import_anchor[-1].end()
-    text = text[:insertion_point] + import_line + text[insertion_point:]
+    text = _insert_sorted_line_in_import_block(
+        text,
+        "from . import (\n",
+        f"    {spec.snake},\n",
+        filename="reference_specs/aperiodic/__init__.py",
+    )
 
     # 2. Add `**<family>.SPECS,` inside APERIODIC_REFERENCE_FAMILY_SPECS dict.
     specs_line = f"    **{spec.snake}.SPECS,\n"

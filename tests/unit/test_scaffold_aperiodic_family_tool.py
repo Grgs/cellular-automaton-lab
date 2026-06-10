@@ -201,7 +201,7 @@ class PatchFunctionTests(unittest.TestCase):
 
     def test_reference_specs_init_patch_wires_new_module(self) -> None:
         out = patch_reference_specs_init(self.ref_init_text, self.spec)
-        self.assertIn("from . import scaffold_demo", out)
+        self.assertIn("    scaffold_demo,\n", out)
         self.assertIn("**scaffold_demo.SPECS,", out)
         compile(out, "<patched-ref-init>", "exec")
 
