@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from backend.simulation.topology_types import (
-    LatticeCell,
     REGULAR_CELL_KIND,
+    LatticeCell,
     regular_cell_id,
 )
 

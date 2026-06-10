@@ -5,7 +5,6 @@ from typing import Any
 
 from backend import payload_types
 
-
 DOMAIN_FRONTEND_PATH = "frontend/types/domain.d.ts"
 CONTROLLER_API_FRONTEND_PATH = "frontend/types/controller-api.d.ts"
 STANDALONE_PROTOCOL_FRONTEND_PATH = "frontend/standalone/protocol.ts"

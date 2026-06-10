@@ -288,7 +288,7 @@ def collect_diff_review_cases(
 
 
 def _default_diff_artifact_dir(*, profile_name: str | None) -> Path:
-    timestamp = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y%m%d-%H%M%S")
+    timestamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
     suffix = profile_name or "manifest"
     return create_artifact_dir(
         name=f"{timestamp}-{suffix}",

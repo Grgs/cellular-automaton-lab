@@ -13,7 +13,6 @@ from tools.cli import main as tools_main
 from tools.standalone_build import compute_source_fingerprint as build_compute_source_fingerprint
 from tools.tools_docs import TOOLS_DOC_PATH, render_tools_reference
 
-
 ROOT = Path(__file__).resolve().parents[2]
 GROUPS = (
     "build",

@@ -8,9 +8,9 @@ from unittest import mock
 
 try:
     from tools.smoke_test_standalone import (
+        _BENIGN_CONSOLE_PATTERNS,
         ConsoleEvent,
         SmokeResult,
-        _BENIGN_CONSOLE_PATTERNS,
         _format_summary,
         _to_serializable,
         main,
@@ -18,9 +18,9 @@ try:
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tools.smoke_test_standalone import (
+        _BENIGN_CONSOLE_PATTERNS,
         ConsoleEvent,
         SmokeResult,
-        _BENIGN_CONSOLE_PATTERNS,
         _format_summary,
         _to_serializable,
         main,

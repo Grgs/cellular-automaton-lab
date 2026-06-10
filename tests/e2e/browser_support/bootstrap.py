@@ -14,20 +14,24 @@ from playwright.sync_api import (
     Browser,
     BrowserContext,
     ConsoleMessage,
-    Error as PlaywrightError,
     Page,
     Playwright,
     Response,
-    TimeoutError as PlaywrightTimeoutError,
     ViewportSize,
     sync_playwright,
+)
+from playwright.sync_api import (
+    Error as PlaywrightError,
+)
+from playwright.sync_api import (
+    TimeoutError as PlaywrightTimeoutError,
 )
 
 from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tests.e2e.support_server import JsonApiClient
 from tools.render_review.browser_support.artifacts import (
-    E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV,
     E2E_ARTIFACTS_DIR_ENV,
+    E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV,
     capture_browser_artifacts,
     capture_browser_failure_artifacts,
     create_artifact_dir,

@@ -17,13 +17,12 @@ from backend.simulation.aperiodic_family_manifest import (
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
-    SPHINX_GEOMETRY,
     SPECTRE_GEOMETRY,
+    SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
 )
 from backend.simulation.topology_catalog_types import SizingPolicyDefinition
-
 
 DEFAULT_SQUARE_RULE = "conway"
 DEFAULT_MIN_GRID_SIZE = 3

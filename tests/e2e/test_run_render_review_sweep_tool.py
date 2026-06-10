@@ -10,7 +10,6 @@ from PIL import Image
 from tests.e2e.support_runtime_host import ensure_current_standalone_build
 from tools.cli import main as tools_main
 
-
 ROOT_DIR = Path(__file__).resolve().parents[2]
 
 

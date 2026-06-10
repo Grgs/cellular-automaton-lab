@@ -22,7 +22,6 @@ from backend.simulation.aperiodic_support import (
     translation,
 )
 
-
 # Franz Gahler published an exact recursive shield tiling renderer as a
 # hand-coded PostScript program. This module translates that marked symbolic
 # substitution into the app's public square / triangle / shield topology model.

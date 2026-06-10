@@ -6,7 +6,6 @@ from backend.api import create_app
 from backend.dev_server import prepare_dev_server, resolve_replace_existing
 from backend.frontend_build import require_current_frontend_server_build
 
-
 app = create_app()
 
 
@@ -32,7 +31,7 @@ if __name__ == "__main__":
         )
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
-        raise SystemExit(1)
+        raise SystemExit(1) from None
 
     if replaced_listener is not None and replaced_listener.pid is not None:
         print(f"Replaced stale dev server on port {port} (pid {replaced_listener.pid}).")

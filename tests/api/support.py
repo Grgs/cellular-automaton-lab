@@ -2,8 +2,9 @@ import sys
 import tempfile
 import time
 import unittest
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, ClassVar, NotRequired, TypedDict, Unpack
+from typing import ClassVar, NotRequired, TypedDict, Unpack
 
 from flask import Flask
 from flask.testing import FlaskClient

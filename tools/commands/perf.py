@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 
 from tools import bench_engine, profile_tiling_latency
-from tools.command_docs import command_doc
 from tools.cli_support import add_passthrough_command
+from tools.command_docs import command_doc
 
 
 def _bench_parser() -> argparse.ArgumentParser:

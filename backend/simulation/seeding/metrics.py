@@ -22,7 +22,7 @@ def population(states: Sequence[int]) -> int:
 
 def hamming(previous: Sequence[int], current: Sequence[int]) -> int:
     """Count of cells whose state changed between two steps."""
-    return sum(1 for before, after in zip(previous, current) if before != after)
+    return sum(1 for before, after in zip(previous, current, strict=True) if before != after)
 
 
 def first_extinction_step(populations: Sequence[int]) -> int | None:

@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 
 from tools import regenerate_frontend_topology_fixtures, regenerate_reference_fixtures
-from tools.command_docs import command_doc
 from tools.cli_support import add_passthrough_command
+from tools.command_docs import command_doc
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:

@@ -6,16 +6,16 @@ from typing import ClassVar, TypedDict
 try:
     from backend.defaults import DEFAULT_RULE_NAME
     from backend.rules import RuleRegistry
-    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.archlife_extended import (
+        ArchLife3464Rule,
+        ArchLife4612Rule,
         ArchLife31212Rule,
         ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
-        ArchLife3464Rule,
-        ArchLife4612Rule,
     )
+    from backend.rules.base import AutomatonRule
     from backend.rules.hexlife import HexLifeRule
     from backend.rules.kagome_life import KagomeLifeRule
     from backend.rules.life_b2s23 import LifeB2S23Rule
@@ -34,16 +34,16 @@ except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.defaults import DEFAULT_RULE_NAME
     from backend.rules import RuleRegistry
-    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
     from backend.rules.archlife_extended import (
+        ArchLife3464Rule,
+        ArchLife4612Rule,
         ArchLife31212Rule,
         ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
-        ArchLife3464Rule,
-        ArchLife4612Rule,
     )
+    from backend.rules.base import AutomatonRule
     from backend.rules.hexlife import HexLifeRule
     from backend.rules.kagome_life import KagomeLifeRule
     from backend.rules.life_b2s23 import LifeB2S23Rule

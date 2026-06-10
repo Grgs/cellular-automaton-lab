@@ -3,7 +3,6 @@ from __future__ import annotations
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
 
-
 BINARY_STATES = (
     CellStateDefinition(0, "Dead", "#f8f1e5"),
     CellStateDefinition(1, "Live", "#1f2430"),

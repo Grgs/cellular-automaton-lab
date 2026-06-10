@@ -89,7 +89,7 @@ class RuleContext:
     def topology_revision(self) -> str:
         return self._frame.topology_revision
 
-    def for_cell_id(self, cell_id: str) -> "RuleContext":
+    def for_cell_id(self, cell_id: str) -> RuleContext:
         return RuleContext(self._frame, self._cell_states, self._frame.index_for(cell_id))
 
     def has_cell(self, cell_id: str) -> bool:

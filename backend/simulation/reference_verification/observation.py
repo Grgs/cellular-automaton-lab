@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import json
 from collections import Counter
 from hashlib import sha1
-import json
 
 import networkx as nx
 

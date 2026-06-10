@@ -36,7 +36,6 @@ from backend.simulation.aperiodic_support import (
     patch_from_exact_records,
 )
 
-
 ExactPoint = tuple[Fraction, Fraction]
 ExactTriangle = tuple[ExactPoint, ExactPoint, ExactPoint]
 

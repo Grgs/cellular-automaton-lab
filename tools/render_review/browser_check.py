@@ -15,27 +15,29 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from tests.e2e.support_runtime_host import (
+    BrowserRuntimeHost,
+    create_runtime_host,
+    standalone_build_status,
+)
 from tools.render_review.browser_support.artifacts import (
     E2E_CAPTURE_SUCCESS_ARTIFACTS_ENV,
     capture_browser_failure_artifacts,
     create_artifact_dir,
     write_run_manifest,
 )
-from tests.e2e.support_runtime_host import (
-    BrowserRuntimeHost,
-    create_runtime_host,
-    standalone_build_status,
-)
 from tools.render_review.review import (
     ResolvedRenderReviewRequest,
+    condense_overlap_hotspots,
     condense_profile_expectations,
     condense_settle_diagnostics,
-    condense_overlap_hotspots,
     condense_transform_report,
     condense_visual_metrics,
-    parse_cli_args as parse_render_canvas_review_cli_args,
     render_canvas_review,
     resolve_render_review_request,
+)
+from tools.render_review.review import (
+    parse_cli_args as parse_render_canvas_review_cli_args,
 )
 
 EXTERNAL_RUNTIME_HOST_KIND_ENV = "E2E_EXTERNAL_RUNTIME_HOST_KIND"
@@ -133,7 +135,7 @@ def resolve_default_artifact_dir(
     if artifact_dir is not None:
         artifact_dir.mkdir(parents=True, exist_ok=True)
         return artifact_dir
-    timestamp = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y%m%d-%H%M%S")
+    timestamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
     return create_artifact_dir(
         name=f"{timestamp}-{mode_name}-{host_kind}",
         default_parent=DEFAULT_BROWSER_CHECK_DIR,
@@ -150,7 +152,7 @@ def build_run_manifest(
         "artifactDir": _serialize_path(artifact_dir),
         "hostKind": host_kind,
         "mode": mode_name,
-        "startedAt": dt.datetime.now(tz=dt.timezone.utc).isoformat(),
+        "startedAt": dt.datetime.now(tz=dt.UTC).isoformat(),
     }
 
 
@@ -293,7 +295,7 @@ def run_managed_render_review(
     finally:
         if host is not None:
             host.close()
-        run_manifest["stoppedAt"] = dt.datetime.now(tz=dt.timezone.utc).isoformat()
+        run_manifest["stoppedAt"] = dt.datetime.now(tz=dt.UTC).isoformat()
         manifest_path = write_run_manifest(resolved_artifact_dir, run_manifest)
     if review_result is None or manifest_path is None:
         raise RuntimeError("Managed render review did not complete.")
@@ -431,7 +433,7 @@ def main(argv: list[str] | None = None) -> int:
         if host is not None:
             host.close()
         run_manifest["exitStatus"] = exit_status
-        run_manifest["stoppedAt"] = dt.datetime.now(tz=dt.timezone.utc).isoformat()
+        run_manifest["stoppedAt"] = dt.datetime.now(tz=dt.UTC).isoformat()
         manifest_path = write_run_manifest(artifact_dir, run_manifest)
         print(f"artifact_dir={artifact_dir}")
         print(f"run_manifest={manifest_path}")

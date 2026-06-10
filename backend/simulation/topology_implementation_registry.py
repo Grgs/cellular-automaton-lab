@@ -1,18 +1,21 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, Literal
+from typing import TYPE_CHECKING, Literal
 
-from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_IDS
-from backend.simulation.aperiodic_family_manifest import PENROSE_VERTEX_GEOMETRY
+from backend.simulation.aperiodic_family_manifest import (
+    APERIODIC_FAMILY_IDS,
+    PENROSE_VERTEX_GEOMETRY,
+)
 from backend.simulation.topology_family_manifest import (
+    ARCHIMEDEAN_488_GEOMETRY,
+    ARCHIMEDEAN_3464_GEOMETRY,
+    ARCHIMEDEAN_4612_GEOMETRY,
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_33336_GEOMETRY,
     ARCHIMEDEAN_33344_GEOMETRY,
     ARCHIMEDEAN_33434_GEOMETRY,
-    ARCHIMEDEAN_3464_GEOMETRY,
-    ARCHIMEDEAN_4612_GEOMETRY,
-    ARCHIMEDEAN_488_GEOMETRY,
     BASKETWEAVE_GEOMETRY,
     CAIRO_GEOMETRY,
     DELTOIDAL_HEXAGONAL_GEOMETRY,

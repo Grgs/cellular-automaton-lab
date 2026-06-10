@@ -1,39 +1,36 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TypeVar
 
 from flask import Blueprint, Response, current_app, jsonify, render_template, request
 from markupsafe import Markup
 
 from backend.app_shell import render_server_app_shell
 from backend.bootstrap_data import build_bootstrap_payload
+from backend.frontend_assets import FrontendAssetManifest
 from backend.payload_types import (
     ApiErrorPayload,
     RawJsonObject,
     RulesResponsePayload,
 )
 from backend.rules import RuleRegistry
-from backend.frontend_assets import FrontendAssetManifest
 from backend.simulation.coordinator import SimulationCoordinator
 from backend.simulation.seeding import run_compare_request
-from backend.simulation.topology_preview import build_topology_preview
 from backend.simulation.service import SimulationOperationError
-from backend.web.state_actions import StateActionService
+from backend.simulation.topology_preview import build_topology_preview
 from backend.web.requests import (
     RequestValidationError,
     get_payload,
 )
-
+from backend.web.state_actions import StateActionService
 
 page_bp = Blueprint("pages", __name__)
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
-_ExtensionT = TypeVar("_ExtensionT")
 JsonRouteResult = Response | tuple[Response, int]
 
 
-def _require_extension(name: str, expected_type: type[_ExtensionT]) -> _ExtensionT:
+def _require_extension[ExtensionT](name: str, expected_type: type[ExtensionT]) -> ExtensionT:
     extension = current_app.extensions.get(name)
     if not isinstance(extension, expected_type):
         raise RuntimeError(f"Flask extension '{name}' is not initialized correctly.")

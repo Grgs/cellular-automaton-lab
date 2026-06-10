@@ -11,6 +11,20 @@ from backend.simulation.topology_catalog_data import (
     TOPOLOGY_SIZING_POLICIES,
     TOPOLOGY_VARIANTS,
 )
+from backend.simulation.topology_catalog_queries import (
+    describe_topologies as describe_topology_entries,
+)
+from backend.simulation.topology_catalog_queries import (
+    describe_topology_variants as describe_variant_entries,
+)
+from backend.simulation.topology_catalog_queries import (
+    topology_spec_payload as build_topology_spec_payload,
+)
+from backend.simulation.topology_catalog_types import (
+    SizingPolicyDefinition,
+    TopologyDefinition,
+    TopologyVariantDefinition,
+)
 from backend.simulation.topology_family_manifest import (
     DEFAULT_MIN_GRID_SIZE,
     DEFAULT_TOPOLOGY_PATCH_DEPTH,
@@ -19,16 +33,6 @@ from backend.simulation.topology_family_manifest import (
     PICKER_GROUP_ORDER,
 )
 from backend.simulation.topology_implementation_registry import render_kind_for_geometry
-from backend.simulation.topology_catalog_queries import (
-    describe_topologies as describe_topology_entries,
-    describe_topology_variants as describe_variant_entries,
-    topology_spec_payload as build_topology_spec_payload,
-)
-from backend.simulation.topology_catalog_types import (
-    SizingPolicyDefinition,
-    TopologyDefinition,
-    TopologyVariantDefinition,
-)
 
 __all__ = [
     "GEOMETRY_DEFAULT_RULES",

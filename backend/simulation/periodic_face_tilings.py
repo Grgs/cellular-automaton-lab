@@ -1,21 +1,22 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from functools import lru_cache
 import json
 import math
+from collections.abc import Callable
+from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
-from typing import Callable, NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from backend.payload_types import PeriodicFaceTilingDescriptorPayload, RawJsonObject
 from backend.simulation.topology_family_manifest import (
+    ARCHIMEDEAN_488_GEOMETRY,
+    ARCHIMEDEAN_3464_GEOMETRY,
+    ARCHIMEDEAN_4612_GEOMETRY,
     ARCHIMEDEAN_31212_GEOMETRY,
     ARCHIMEDEAN_33336_GEOMETRY,
     ARCHIMEDEAN_33344_GEOMETRY,
     ARCHIMEDEAN_33434_GEOMETRY,
-    ARCHIMEDEAN_3464_GEOMETRY,
-    ARCHIMEDEAN_4612_GEOMETRY,
-    ARCHIMEDEAN_488_GEOMETRY,
     BASKETWEAVE_GEOMETRY,
     CAIRO_GEOMETRY,
     DELTOIDAL_HEXAGONAL_GEOMETRY,

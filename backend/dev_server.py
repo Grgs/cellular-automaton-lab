@@ -6,14 +6,14 @@ import signal
 import socket
 import subprocess
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, TypedDict
+from typing import TypedDict
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
 from backend.payload_types import ServerMetaPayload
-
 
 APP_NAME = "cellular-automaton-lab"
 

@@ -52,7 +52,6 @@ from backend.simulation.aperiodic_support import (
     rounded_point,
 )
 
-
 # Depth-0 half-extent: large enough to capture multiple distributed sun/star
 # configurations without immediately inflating to an oversized crop. Subsequent
 # depths scale by phi per round, matching the quasiperiodic scale hierarchy of

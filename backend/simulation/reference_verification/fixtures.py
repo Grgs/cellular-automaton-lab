@@ -8,12 +8,12 @@ from backend.simulation.topology_types import LatticeCell, LatticeTopology
 
 from .observation import _polygon_area
 from .types import (
+    ReferenceCheckFailure,
     _CanonicalPatchCellPayload,
     _CanonicalPatchFixturePayload,
     _LocalReferenceAnchorPayload,
     _LocalReferenceNeighborPayload,
     _LocalReferencePayload,
-    ReferenceCheckFailure,
 )
 
 _LOCAL_REFERENCE_FIXTURE_PATH = (

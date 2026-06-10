@@ -8,8 +8,6 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from tools import provenance
-from tools.standalone_build import compute_source_fingerprint as build_compute_source_fingerprint
 from tests.e2e.support_runtime_host import (
     build_runtime_provenance_report,
     compute_source_fingerprint,
@@ -18,6 +16,8 @@ from tests.e2e.support_runtime_host import (
     load_standalone_build_manifest,
     standalone_build_status,
 )
+from tools import provenance
+from tools.standalone_build import compute_source_fingerprint as build_compute_source_fingerprint
 
 
 class RuntimeHostProvenanceTests(unittest.TestCase):

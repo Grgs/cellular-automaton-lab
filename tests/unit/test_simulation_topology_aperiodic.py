@@ -1,23 +1,12 @@
-from collections import Counter
 import sys
 import unittest
+from collections import Counter
 from pathlib import Path
 
 try:
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.life_b2s23 import LifeB2S23Rule
     from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
-    from backend.simulation.engine import SimulationEngine
-    from backend.simulation.aperiodic_family_manifest import (
-        SHIELD_SHIELD_KIND,
-        SHIELD_SQUARE_KIND,
-        SHIELD_TRIANGLE_KIND,
-    )
-    from backend.simulation.penrose import build_penrose_patch
-    from backend.simulation.topology import (
-        build_topology,
-        empty_board,
-    )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -28,10 +17,19 @@ try:
         PINWHEEL_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
         SHIELD_GEOMETRY,
+        SHIELD_SHIELD_KIND,
+        SHIELD_SQUARE_KIND,
+        SHIELD_TRIANGLE_KIND,
         SPECTRE_GEOMETRY,
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.engine import SimulationEngine
+    from backend.simulation.penrose import build_penrose_patch
+    from backend.simulation.topology import (
+        build_topology,
+        empty_board,
     )
     from backend.simulation.topology_validation import validate_topology
 except ModuleNotFoundError:
@@ -39,17 +37,6 @@ except ModuleNotFoundError:
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.life_b2s23 import LifeB2S23Rule
     from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
-    from backend.simulation.engine import SimulationEngine
-    from backend.simulation.aperiodic_family_manifest import (
-        SHIELD_SHIELD_KIND,
-        SHIELD_SQUARE_KIND,
-        SHIELD_TRIANGLE_KIND,
-    )
-    from backend.simulation.penrose import build_penrose_patch
-    from backend.simulation.topology import (
-        build_topology,
-        empty_board,
-    )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -60,10 +47,19 @@ except ModuleNotFoundError:
         PINWHEEL_GEOMETRY,
         ROBINSON_TRIANGLES_GEOMETRY,
         SHIELD_GEOMETRY,
+        SHIELD_SHIELD_KIND,
+        SHIELD_SQUARE_KIND,
+        SHIELD_TRIANGLE_KIND,
         SPECTRE_GEOMETRY,
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.engine import SimulationEngine
+    from backend.simulation.penrose import build_penrose_patch
+    from backend.simulation.topology import (
+        build_topology,
+        empty_board,
     )
     from backend.simulation.topology_validation import validate_topology
 

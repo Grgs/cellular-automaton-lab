@@ -26,10 +26,10 @@ from backend.simulation.aperiodic_penrose_canonical import (
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     PatchRecord,
+    Vec,
     encode_float,
     patch_from_records,
     polygon_centroid,
-    Vec,
 )
 
 

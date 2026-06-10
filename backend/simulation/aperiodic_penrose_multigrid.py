@@ -41,7 +41,6 @@ import math
 from collections import defaultdict
 from dataclasses import dataclass
 
-
 PHI = (1.0 + math.sqrt(5.0)) / 2.0
 
 # Standard Penrose pentagrid offsets: all 1/5, sum = 1 (singular). Produces

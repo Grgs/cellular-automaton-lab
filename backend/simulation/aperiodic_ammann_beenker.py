@@ -14,7 +14,6 @@ from backend.simulation.aperiodic_support import (
     rounded_point,
 )
 
-
 SILVER_RATIO = 1 + math.sqrt(2)
 
 _AB_DIRECTIONS = tuple(

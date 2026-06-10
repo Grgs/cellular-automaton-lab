@@ -9,7 +9,6 @@ from typing import Literal, cast
 from tools._common import ROOT_DIR
 from tools.tools_docs import TOOLS_DOC_PATH, render_tools_reference
 
-
 BOOTSTRAP_FIXTURE_PATH = ROOT_DIR / "frontend" / "test-fixtures" / "bootstrap-data.json"
 CheckName = Literal["tools-docs", "bootstrap", "frontend-fixtures", "reference-fixtures"]
 ALL_CHECKS: tuple[CheckName, ...] = (

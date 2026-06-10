@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from backend.simulation.reference_specs.helpers import (
+    _alphabetic_slots,
+)
 from backend.simulation.reference_specs.types import (
     PeriodicDescriptorExpectation,
     ReferenceDepthExpectation,
     ReferenceFamilySpec,
-)
-from backend.simulation.reference_specs.helpers import (
-    _alphabetic_slots,
 )
 
 SPECS = {

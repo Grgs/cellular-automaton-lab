@@ -5,7 +5,6 @@ from pathlib import Path
 
 from tools._common import ROOT_DIR, collect_files, run_command
 
-
 SOURCE_FINGERPRINT_DIRS = ("frontend",)
 SOURCE_FINGERPRINT_FILES = (
     "config/defaults.json",

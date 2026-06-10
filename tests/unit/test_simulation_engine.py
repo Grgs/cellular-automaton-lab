@@ -3,8 +3,8 @@ import unittest
 from pathlib import Path
 
 try:
-    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
+    from backend.rules.base import AutomatonRule
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.hexlife import HexLifeRule
     from backend.rules.trilife import TriLifeRule
@@ -17,8 +17,8 @@ try:
     from backend.simulation.topology_family_manifest import ARCHIMEDEAN_488_GEOMETRY
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from backend.rules.base import AutomatonRule
     from backend.rules.archlife488 import ArchLife488Rule
+    from backend.rules.base import AutomatonRule
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.hexlife import HexLifeRule
     from backend.rules.trilife import TriLifeRule

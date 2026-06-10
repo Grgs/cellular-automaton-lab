@@ -4,16 +4,6 @@ from dataclasses import replace
 from pathlib import Path
 
 try:
-    from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
-    from backend.simulation.topology import (
-        LatticeCell,
-        LatticeTopology,
-        build_topology,
-    )
-    from backend.simulation.topology_catalog_data import (
-        TOPOLOGY_SIZING_POLICIES,
-        TOPOLOGY_VARIANTS,
-    )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -28,6 +18,16 @@ try:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
+    from backend.simulation.topology import (
+        LatticeCell,
+        LatticeTopology,
+        build_topology,
+    )
+    from backend.simulation.topology_catalog_data import (
+        TOPOLOGY_SIZING_POLICIES,
+        TOPOLOGY_VARIANTS,
     )
     from backend.simulation.topology_family_manifest import (
         GEOMETRY_MINIMUM_GRID_DIMENSIONS,
@@ -40,16 +40,6 @@ try:
     )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
-    from backend.simulation.topology import (
-        LatticeCell,
-        LatticeTopology,
-        build_topology,
-    )
-    from backend.simulation.topology_catalog_data import (
-        TOPOLOGY_SIZING_POLICIES,
-        TOPOLOGY_VARIANTS,
-    )
     from backend.simulation.aperiodic_family_manifest import (
         CHAIR_GEOMETRY,
         DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
@@ -64,6 +54,16 @@ except ModuleNotFoundError:
         SPHINX_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
+    )
+    from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
+    from backend.simulation.topology import (
+        LatticeCell,
+        LatticeTopology,
+        build_topology,
+    )
+    from backend.simulation.topology_catalog_data import (
+        TOPOLOGY_SIZING_POLICIES,
+        TOPOLOGY_VARIANTS,
     )
     from backend.simulation.topology_family_manifest import (
         GEOMETRY_MINIMUM_GRID_DIMENSIONS,

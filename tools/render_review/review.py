@@ -5,18 +5,20 @@ import json
 import math
 import re
 import sys
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from backend.payload_types import TopologyPayload
 from PIL import Image, ImageOps
 from playwright.sync_api import Page, sync_playwright
 
+from backend.payload_types import TopologyPayload
+from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tools.render_review.browser_support.artifacts import (
     capture_browser_failure_artifacts,
     create_artifact_dir,
@@ -30,14 +32,13 @@ from tools.render_review.browser_support.render_review import (
     browser_topology_summary,
     browser_transform_report,
     canvas_visual_summary,
-    select_tiling_family,
     save_canvas_png,
+    select_tiling_family,
     set_cell_size,
     set_patch_depth,
     wait_for_page_bootstrapped,
     wait_for_patch_render_complete,
 )
-from tests.e2e.support_runtime_host import BrowserRuntimeHost, create_runtime_host
 from tools.render_review.profiles import (
     ExpectedWarning,
     LiteratureReference,
@@ -45,8 +46,8 @@ from tools.render_review.profiles import (
     describe_render_review_profile,
     iter_render_review_profiles,
     resolve_overlap_policy,
-    resolve_render_review_profile,
     resolve_profile_reference_cache_path,
+    resolve_render_review_profile,
 )
 
 DEFAULT_VIEWPORT_WIDTH = 1200

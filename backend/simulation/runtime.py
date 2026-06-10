@@ -3,7 +3,7 @@ from __future__ import annotations
 import threading
 import time
 from collections.abc import Callable
-from typing import Protocol, TypeAlias
+from typing import Protocol
 
 
 class RuntimeLoopService(Protocol):
@@ -20,7 +20,7 @@ class ThreadLike(Protocol):
     def is_alive(self) -> bool: ...
 
 
-ThreadFactory: TypeAlias = Callable[..., ThreadLike]
+type ThreadFactory = Callable[..., ThreadLike]
 
 
 class SimulationRuntime:

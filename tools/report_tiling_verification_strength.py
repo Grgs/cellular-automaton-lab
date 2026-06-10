@@ -8,7 +8,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -22,7 +21,6 @@ from backend.simulation.reference_verification.types import (
     VerificationStatus,
 )
 from backend.simulation.topology_validation import recommended_validation_options
-
 
 _LOCAL_REFERENCE_FIXTURE_PATH = (
     ROOT / "backend" / "simulation" / "data" / "reference_patch_local_fixtures.json"

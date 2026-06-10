@@ -64,7 +64,6 @@ from backend.simulation.aperiodic_support import (
     translation,
 )
 
-
 _SQRT3 = math.sqrt(3)
 _HALF_HEX_BASE_VERTICES = (
     Vec(-1.0, 0.0),

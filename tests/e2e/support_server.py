@@ -114,9 +114,9 @@ class JsonApiClient:
                     if exit_code is not None:
                         raise RuntimeError(
                             f"Server exited before becoming ready (exit code {exit_code})."
-                        )
+                        ) from None
                 if time.time() > deadline:
-                    raise RuntimeError("Server did not start in time.")
+                    raise RuntimeError("Server did not start in time.") from None
                 time.sleep(0.25)
 
     def request_json(

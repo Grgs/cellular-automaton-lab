@@ -6,7 +6,6 @@ from collections import OrderedDict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-
 try:
     from tests.e2e.playwright_case_suite import (
         CellularAutomatonUITests,
@@ -122,7 +121,7 @@ def _available_test_cases() -> dict[str, type[unittest.TestCase]]:
 def _iter_case_test_names(case_classes: tuple[type[unittest.TestCase], ...]) -> list[str]:
     names: list[str] = []
     for case_cls in case_classes:
-        for name, member in inspect.getmembers(case_cls, predicate=callable):
+        for name, _member in inspect.getmembers(case_cls, predicate=callable):
             if name.startswith("test_"):
                 names.append(_test_id(case_cls, name))
     return sorted(names)

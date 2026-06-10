@@ -7,7 +7,6 @@ from backend.simulation.topology_family_manifest import (
     TOPOLOGY_FAMILY_MANIFEST,
 )
 
-
 TOPOLOGY_SIZING_POLICIES = {
     tiling_family: definition.sizing_policy
     for tiling_family, definition in TOPOLOGY_FAMILY_MANIFEST.items()

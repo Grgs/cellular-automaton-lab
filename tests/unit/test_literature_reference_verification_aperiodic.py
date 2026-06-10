@@ -1,6 +1,6 @@
-from dataclasses import replace
 import sys
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -12,8 +12,8 @@ from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.literature_reference_verification import (
     _canonical_patch_payload,
     _depth_topology_expectation_failures,
-    _local_reference_fixture_failures,
     _load_canonical_reference_fixtures,
+    _local_reference_fixture_failures,
     verify_reference_family,
 )
 from backend.simulation.topology import build_topology
@@ -403,7 +403,7 @@ class LiteratureReferenceVerificationAperiodicTests(unittest.TestCase):
         self.assertEqual(result.status, "PASS")
         self.assertFalse(result.failures)
         spans = [observation.bounds_longest_span for observation in result.observations]
-        self.assertTrue(all(left < right for left, right in zip(spans, spans[1:])))
+        self.assertTrue(all(left < right for left, right in zip(spans, spans[1:], strict=False)))
 
 
 if __name__ == "__main__":

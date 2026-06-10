@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from math import pi, sqrt
 from collections.abc import Iterable
+from math import pi, sqrt
 
 from backend.simulation.topology import LatticeCell, LatticeTopology, parse_regular_cell_id
 from backend.simulation.topology_catalog import get_topology_variant_for_geometry

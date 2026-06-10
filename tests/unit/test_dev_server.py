@@ -5,7 +5,6 @@ from types import TracebackType
 from unittest import mock
 
 try:
-    from backend.payload_types import ServerMetaPayload
     from backend.dev_server import (
         APP_NAME,
         ListeningProcess,
@@ -13,9 +12,9 @@ try:
         fetch_server_meta,
         prepare_dev_server,
     )
+    from backend.payload_types import ServerMetaPayload
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from backend.payload_types import ServerMetaPayload
     from backend.dev_server import (
         APP_NAME,
         ListeningProcess,
@@ -23,6 +22,7 @@ except ModuleNotFoundError:
         fetch_server_meta,
         prepare_dev_server,
     )
+    from backend.payload_types import ServerMetaPayload
 
 
 class _FakeUrlResponse:

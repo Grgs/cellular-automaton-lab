@@ -28,7 +28,7 @@ class FrontendAssetManifest:
         self._manifest_content = manifest_content
 
     @classmethod
-    def load(cls, static_folder: str | None) -> "FrontendAssetManifest":
+    def load(cls, static_folder: str | None) -> FrontendAssetManifest:
         if not static_folder:
             raise RuntimeError(
                 "Frontend assets could not be resolved because Flask static_folder is not configured."

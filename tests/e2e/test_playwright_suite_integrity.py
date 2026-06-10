@@ -1,22 +1,21 @@
-from collections import Counter
 import unittest
+from collections import Counter
 
-from backend.simulation.topology_catalog import default_patch_depth_for_tiling_family
 from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
-
+from backend.simulation.topology_catalog import default_patch_depth_for_tiling_family
 from tests.e2e.playwright_suite_support import (
     DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
     PLAYWRIGHT_FEATURE_NAMES,
     build_playwright_suite,
     build_server_playwright_suite,
-    iter_public_playwright_suite_names,
     iter_playwright_feature_test_names,
-    playwright_suite_manifest_payload,
-    iter_server_playwright_test_names,
-    iter_server_playwright_subset_test_names,
-    iter_standalone_runtime_test_names,
     iter_playwright_subset_test_names,
     iter_playwright_test_names,
+    iter_public_playwright_suite_names,
+    iter_server_playwright_subset_test_names,
+    iter_server_playwright_test_names,
+    iter_standalone_runtime_test_names,
+    playwright_suite_manifest_payload,
 )
 from tests.e2e.support_browser import parse_grid_summary_text
 

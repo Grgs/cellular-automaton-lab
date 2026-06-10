@@ -7,12 +7,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
-from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 from backend.simulation.literature_reference_verification import (
     observe_reference_patch,
     verify_all_reference_families,
     verify_reference_family,
 )
+from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
 from tools.verify_reference_tilings import main as verify_reference_main
 
 

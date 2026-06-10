@@ -4,7 +4,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -202,7 +201,7 @@ class PatchFunctionTests(unittest.TestCase):
 
     def test_reference_specs_init_patch_wires_new_module(self) -> None:
         out = patch_reference_specs_init(self.ref_init_text, self.spec)
-        self.assertIn("from . import scaffold_demo", out)
+        self.assertIn("    scaffold_demo,\n", out)
         self.assertIn("**scaffold_demo.SPECS,", out)
         compile(out, "<patched-ref-init>", "exec")
 

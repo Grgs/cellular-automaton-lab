@@ -7,5 +7,5 @@ exclude = [
 ]
 
 [lint]
-select = ["F", "E7", "E9"]
+select = ["F", "E7", "E9", "I", "B", "UP"]
 

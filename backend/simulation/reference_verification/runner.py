@@ -37,8 +37,8 @@ def _builder_signal_failures(
 
 
 def _pinwheel_exact_path_failures() -> list[ReferenceCheckFailure]:
-    from backend.simulation.aperiodic_support import AperiodicPatch
     from backend.simulation.aperiodic_pinwheel import collect_pinwheel_exact_records
+    from backend.simulation.aperiodic_support import AperiodicPatch
 
     def _bounds_longest_span(patch: AperiodicPatch) -> float:
         vertices = [vertex for cell in patch.cells for vertex in (cell.vertices or ())]

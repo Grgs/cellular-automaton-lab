@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import argparse
-from importlib import import_module
 import sys
+from importlib import import_module
 
-from tools.command_docs import GROUPS
 from tools.cli_support import run_passthrough_command
-
+from tools.command_docs import GROUPS
 
 GROUP_REGISTRARS = {
     "build": "tools.commands.build",
@@ -67,8 +66,8 @@ def main(argv: list[str] | None = None) -> int:
             run_passthrough_command(
                 list(unknown),
                 target_main=passthrough_target,
-                doc=getattr(args, "_passthrough_doc"),
-                parser_factory=getattr(args, "_passthrough_parser_factory"),
+                doc=args._passthrough_doc,
+                parser_factory=args._passthrough_parser_factory,
                 allow_parser_remainder=bool(
                     getattr(args, "_passthrough_allow_parser_remainder", False)
                 ),
