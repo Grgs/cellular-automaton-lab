@@ -170,8 +170,8 @@ jobs:
       - name: Build frontend
         run: npm run build:frontend
 
-      - name: Run frontend unit tests
-        run: npm run test:frontend
+      - name: Run frontend unit tests with coverage
+        run: npm run coverage:frontend
 
       - name: Run type checking
         run: python -m mypy --config-file mypy.ini
@@ -216,17 +216,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: Run unit tests
-        if: github.event_name == 'pull_request'
-        run: |
-          set -o pipefail
-          python -m pytest -q -s tests/unit \
-            --ignore=tests/unit/test_aperiodic_pinwheel_2_1.py \
-            -n auto --dist loadfile | tee coverage-unit.txt
-          python -m pytest -q -s tests/unit/test_aperiodic_pinwheel_2_1.py | tee -a coverage-unit.txt
-
       - name: Run unit tests with coverage
-        if: github.event_name != 'pull_request'
         run: |
           set -o pipefail
           COVERAGE_FILE=.coverage.unit.parallel python -m pytest -q -s tests/unit \
@@ -241,7 +231,6 @@ jobs:
           python -m coverage report -m --data-file=.coverage.unit | tee -a coverage-unit.txt
 
       - name: Upload backend unit coverage data
-        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v6
         with:
           name: backend-coverage-unit
@@ -282,14 +271,7 @@ jobs:
       - name: Extract frontend dist artifact
         run: tar -xzf frontend-dist.tgz -C .
 
-      - name: Run API tests
-        if: github.event_name == 'pull_request'
-        run: |
-          set -o pipefail
-          python -m pytest -q -s tests/api -n auto --dist loadfile | tee coverage-api.txt
-
       - name: Run API tests with coverage
-        if: github.event_name != 'pull_request'
         run: |
           set -o pipefail
           COVERAGE_FILE=.coverage.api python -m pytest -q -s tests/api \
@@ -297,7 +279,6 @@ jobs:
             -n auto --dist loadfile | tee coverage-api.txt
 
       - name: Upload backend API coverage data
-        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v6
         with:
           name: backend-coverage-api
@@ -316,11 +297,9 @@ jobs:
 
     steps:
       - name: Check out repository
-        if: github.event_name != 'pull_request'
         uses: actions/checkout@v6
 
       - name: Set up Python
-        if: github.event_name != 'pull_request'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
@@ -328,46 +307,38 @@ jobs:
           cache-dependency-path: requirements-dev.txt
 
       - name: Install coverage
-        if: github.event_name != 'pull_request'
         run: |
           python -m pip install --upgrade pip
           python -m pip install coverage==7.11.0
 
       - name: Download backend unit coverage data
-        if: github.event_name != 'pull_request'
         uses: actions/download-artifact@v5
         with:
           name: backend-coverage-unit
           path: coverage-artifacts/unit
 
       - name: Download backend API coverage data
-        if: github.event_name != 'pull_request'
         uses: actions/download-artifact@v5
         with:
           name: backend-coverage-api
           path: coverage-artifacts/api
 
       - name: Combine backend coverage reports
-        if: github.event_name != 'pull_request'
         run: |
+          set -o pipefail
           cp coverage-artifacts/unit/.coverage.unit .coverage.unit
           cp coverage-artifacts/api/.coverage.api .coverage.api
           python -m coverage combine .coverage.unit .coverage.api
-          python -m coverage report -m | tee coverage-unit-api.txt
+          python -m coverage report -m --fail-under=75 | tee coverage-unit-api.txt
           python -m coverage xml -o coverage-unit-api.xml
 
       - name: Upload backend coverage artifacts
-        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v6
         with:
           name: backend-coverage
           path: |
             coverage-unit-api.txt
             coverage-unit-api.xml
-
-      - name: Skip backend coverage report on pull requests
-        if: github.event_name == 'pull_request'
-        run: echo "Backend coverage reports run on push to main and workflow_dispatch."
 
   e2e-playwright:
     name: Playwright Server

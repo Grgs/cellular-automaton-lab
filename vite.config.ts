@@ -60,6 +60,26 @@ export default defineConfig(({ mode }) => {
         test: {
             environment: "jsdom",
             include: ["frontend/**/*.test.ts"],
+            coverage: {
+                provider: "v8",
+                include: ["frontend/**/*.ts"],
+                exclude: [
+                    "frontend/**/*.test.ts",
+                    "frontend/**/*.d.ts",
+                    "frontend/test-fixtures/**",
+                    "frontend/test-helpers/**",
+                ],
+                reporter: ["text-summary"],
+                // Ratchet floor for vitest-only coverage; Playwright e2e suites
+                // cover the UI paths this measurement cannot see. Raise these
+                // when unit coverage grows; never lower them to admit a regression.
+                thresholds: {
+                    statements: 48,
+                    branches: 36,
+                    functions: 46,
+                    lines: 48,
+                },
+            },
         },
     };
 });

@@ -5,6 +5,8 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Added Dependabot update automation for pip, npm, and GitHub Actions dependencies, Node/Python toolchain pins (`engines`, `.nvmrc`, `.python-version`), and version-agnostic preview wording in governance docs.
+- Added coverage gates that run on every CI event including pull requests: the combined backend unit + API report must stay at or above 75% line coverage (also enforced by `npm run coverage:backend`), and the frontend Vitest run (`npm run coverage:frontend`) enforces ratchet thresholds in `vite.config.ts`.
 - Added a repo-owned `release-check` command and maintenance playbook updates so preview releases have explicit pre-publish and post-publish gates for tags, GitHub Releases, and the latest-release pointer.
 - Added a repo-owned `generated-check` umbrella command for generated docs, bootstrap data, frontend topology fixtures, and reference fixture freshness checks.
 
