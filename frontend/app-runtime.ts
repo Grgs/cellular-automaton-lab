@@ -3,7 +3,7 @@ import { createHttpSimulationBackend } from "./api.js";
 import { bootstrapDataFromWindow } from "./bootstrap-data.js";
 import { elements } from "./dom.js";
 import { createAppController } from "./app-controller.js";
-import { mountComparePanel, type ComparePanelHandle } from "./compare/compare-panel.js";
+import { mountCompareLauncher, type CompareLauncherHandle } from "./compare/compare-launcher.js";
 import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
 
@@ -13,11 +13,11 @@ function handleAppError(error: unknown): void {
 
 let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
-let comparePanel: ComparePanelHandle | null = null;
+let compareLauncher: CompareLauncherHandle | null = null;
 
 export function disposeApp(): void {
-    comparePanel?.dispose();
-    comparePanel = null;
+    compareLauncher?.dispose();
+    compareLauncher = null;
     disposeReviewApi?.();
     disposeReviewApi = null;
     activeController?.dispose();
@@ -44,7 +44,7 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
     disposeReviewApi = installReviewApi({ controller, gridView, elements });
     try {
         const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
-        comparePanel = mountComparePanel({
+        compareLauncher = mountCompareLauncher({
             backend,
             bootstrapData,
             onOpenPattern: (payload) => {

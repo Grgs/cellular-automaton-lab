@@ -54,6 +54,14 @@ interface MountComparePanelOptions {
     host?: HTMLElement;
     /** When provided, begin/end open into the current board instead of a new tab. */
     onOpenPattern?: (pattern: PatternPayload) => void;
+    /**
+     * Pre-existing toggle button to bind to (used by the lazy launcher so the
+     * toggle can render before this module loads). When omitted the panel
+     * creates and appends its own toggle.
+     */
+    trigger?: HTMLButtonElement;
+    /** Open the dialog immediately after mounting (e.g. right after a lazy load). */
+    openOnMount?: boolean;
 }
 
 interface TilingOption {
@@ -148,11 +156,14 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     const previewCache = new Map<string, Promise<TopologyPreview>>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
 
-    const toggleButton = el(
-        "button",
-        { class: "compare-toggle", type: "button", title: "Compare a seed across tilings" },
-        ["⊞ Compare tilings"],
-    );
+    const ownsToggle = options.trigger === undefined;
+    const toggleButton =
+        options.trigger ??
+        el(
+            "button",
+            { class: "compare-toggle", type: "button", title: "Compare a seed across tilings" },
+            ["⊞ Compare tilings"],
+        );
 
     const ruleSelect = el("select", { class: "compare-field" });
     const seedInput = el("input", {
@@ -323,7 +334,11 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
     const backdrop = el("div", { class: "compare-backdrop", hidden: true }, [dialog]);
 
-    host.append(toggleButton, backdrop);
+    if (ownsToggle) {
+        host.append(toggleButton, backdrop);
+    } else {
+        host.append(backdrop);
+    }
     renderTilingChecklist();
 
     function labeledField(label: string, field: HTMLElement): HTMLLabelElement {
@@ -799,8 +814,8 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                       href: patternShareUrl(pattern),
                       target: "_blank",
                       rel: "noopener",
-                      title: `Open ${label.toLowerCase()} state`,
-                      "aria-label": `Open ${label.toLowerCase()} state`,
+                      title: `Open ${label.toLowerCase()} state in a new tab`,
+                      "aria-label": `Open ${label.toLowerCase()} state in a new tab`,
                   },
                   [thumbnail],
               )
@@ -944,7 +959,25 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
     function onKeydown(event: KeyboardEvent): void {
         if (event.key === "Escape" && !backdrop.hidden) {
+            // Let an open action menu swallow Escape first; only close the dialog
+            // when no menu is open.
+            const openMenu = dialog.querySelector(".compare-action-menu[open]");
+            if (openMenu) {
+                openMenu.removeAttribute("open");
+                return;
+            }
             close();
+        }
+    }
+
+    // Native <details> menus stay open until re-clicked; close any open one when
+    // the click lands outside it so only one menu is ever open at a time.
+    function onDocumentPointerDown(event: Event): void {
+        const target = event.target;
+        for (const menu of dialog.querySelectorAll(".compare-action-menu[open]")) {
+            if (!(target instanceof Node) || !menu.contains(target)) {
+                menu.removeAttribute("open");
+            }
         }
     }
 
@@ -957,13 +990,21 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         }
     });
     document.addEventListener("keydown", onKeydown);
+    document.addEventListener("pointerdown", onDocumentPointerDown);
+
+    if (options.openOnMount) {
+        open();
+    }
 
     return {
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
+            document.removeEventListener("pointerdown", onDocumentPointerDown);
             seedPad.dispose();
             seedPreview.dispose();
-            toggleButton.remove();
+            if (ownsToggle) {
+                toggleButton.remove();
+            }
             backdrop.remove();
         },
     };

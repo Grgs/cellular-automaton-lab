@@ -411,6 +411,33 @@ describe("mountComparePanel", () => {
         expect(openedUrl).toContain("#share=v1.");
     });
 
+    it("closes an open action menu when clicking outside it", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-row-actions")).not.toBeNull();
+        });
+
+        const openMenu = menuByLabel("Open");
+        openMenu.open = true;
+        // A pointerdown elsewhere in the dialog closes the open menu.
+        const elsewhere = document.querySelector<HTMLElement>(".compare-run") ?? document.body;
+        elsewhere.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+        expect(openMenu.open).toBe(false);
+
+        // Opening a second menu closes the first so only one is ever open.
+        const copyMenu = menuByLabel("Copy");
+        openMenu.open = true;
+        copyMenu
+            .querySelector("summary")
+            ?.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+        expect(openMenu.open).toBe(false);
+    });
+
     it("copies distinct share links for the begin and end states", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const writeText = vi.fn(async (_text: string) => {});
