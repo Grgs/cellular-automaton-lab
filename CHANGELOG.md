@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Added a tag-triggered Release workflow that validates release prerequisites, rebuilds and smoke-tests the standalone bundle from the tagged commit, and publishes the GitHub Release with the bundle zip attached, replacing the manual `gh release create` step.
 - Added a repo-owned `release-check` command and maintenance playbook updates so preview releases have explicit pre-publish and post-publish gates for tags, GitHub Releases, and the latest-release pointer.
 - Added a repo-owned `generated-check` umbrella command for generated docs, bootstrap data, frontend topology fixtures, and reference fixture freshness checks.
 

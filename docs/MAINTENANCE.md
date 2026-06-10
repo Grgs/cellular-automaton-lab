@@ -92,12 +92,18 @@ python -m tools repo release-check --version vX.Y.Z --phase pre-publish
 The pre-publish check must pass before tagging. It intentionally expects the target tag and GitHub Release to be absent.
 
 7. Require GitHub Actions CI to pass on the exact release commit, including the Pages build path.
-8. Tag and publish the GitHub Release from the clean, synced `main` checkout:
+8. Tag from the clean, synced `main` checkout and push the tag:
 
 ```powershell
 git tag -a vX.Y.Z origin/main -m "vX.Y.Z preview release"
 git push origin vX.Y.Z
-gh release create vX.Y.Z --title "vX.Y.Z" --notes-file docs/releases/vX.Y.Z.md --latest
+```
+
+Pushing the tag triggers the [Release workflow](../.github/workflows/release.yml). It validates the release prerequisites (release-notes file, version present in release-facing docs, tag commit contained in `main`), rebuilds `static/dist/` and `output/standalone/` from the tagged commit, checks the bundle-size budget, smoke-tests the standalone bundle in a real browser, and publishes the GitHub Release using `docs/releases/vX.Y.Z.md` as the notes, with the standalone bundle zip attached and the latest-release pointer updated. If the GitHub Release already exists (for example after a manual `gh release create`), the workflow only uploads the bundle asset.
+
+After the workflow completes, verify publication:
+
+```powershell
 python -m tools repo release-check --version vX.Y.Z --phase post-publish
 ```
 
@@ -109,7 +115,7 @@ The post-publish check must pass before considering the release complete. It ver
    - one topology or rule switch works
    - one pattern import/export or persistence flow works
    - no obvious startup or console failure appears
-10. Keep concise release notes in the matching file in [docs/releases/](releases/) for the target tag and use that file as the `gh release create --notes-file` input (current tags: `v0.1.0`, `v0.2.0`, `v0.3.0`, `v0.4.0`).
+10. Keep concise release notes in the matching file in [docs/releases/](releases/) for the target tag; the Release workflow uses that file as the GitHub Release notes (current tags: `v0.1.0`, `v0.2.0`, `v0.3.0`, `v0.4.0`).
 11. Tag only after the intended commit has passed the required validation and deploy path. Do not stop at a merged release PR; GitHub does not list a new release until the tag and GitHub Release exist.
 
 Public docs must keep preview status and known limitations explicit. Do not imply package-registry support or long-term API stability before the project actually offers them.
