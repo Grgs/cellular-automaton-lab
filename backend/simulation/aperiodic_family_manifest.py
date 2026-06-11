@@ -310,12 +310,15 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         geometry=PINWHEEL_GEOMETRY,
         catalog_label="Pinwheel",
         reference_label="Pinwheel",
-        picker_group="Aperiodic",
+        picker_group="Experimental",
         picker_order=340,
         default_rule="life-b2-s23",
         builder_kind="substitution_recipe",
         implementation_status="exact_affine",
         public_cell_kinds=(PINWHEEL_TRIANGLE_KIND,),
+        promotion_blocker=(
+            "Experimental until manual visual review accepts the exact-affine implementation."
+        ),
         depth_semantics_label="exact affine substitution depth",
     ),
     PINWHEEL_2_1_GEOMETRY: AperiodicFamilyManifestEntry(

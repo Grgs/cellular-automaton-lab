@@ -50,6 +50,7 @@ The repo now exposes per-family implementation contracts, but some family status
 
 Next action:
 
+- Keep `pinwheel` in `Experimental` until manual visible review justifies promotion.
 - Keep `dodecagonal-square-triangle` documented as a decorated periodic `3.12.12` square-triangle generator unless a faithful canonical Schlottmann marked-prototile implementation replaces it.
 - Keep product status, verification status, and known-deviation docs aligned in the same change.
 
@@ -88,7 +89,7 @@ The following roadmap items are considered done and should not be reopened witho
 
 ## Do Not Do Yet
 
-- Do not promote `dodecagonal-square-triangle` until its implementation blocker (a canonical Schlottmann marked-prototile substitution) is resolved.
+- Do not promote `dodecagonal-square-triangle` or `pinwheel` until their implementation and visual-review blockers are resolved.
 - Do not centralize all constants into one global config file.
 - Do not rewrite the app controller stack without a concrete ownership problem that the existing splits cannot handle.
 - Do not replace Playwright coverage with unit tests for flows that genuinely require DOM, canvas, browser storage, or standalone worker execution.
