@@ -17,12 +17,14 @@ describe("aperiodic-family-registry", () => {
 
         expect(listAperiodicFamilyMetadata().length).toBeGreaterThan(0);
         expect(getAperiodicFamilyMetadata("penrose-p3-rhombs")?.label).toBe("Penrose P3 Rhombs");
-        expect(getAperiodicFamilyMetadata("pinwheel")?.promotion_blocker).toContain(
+        expect(getAperiodicFamilyMetadata("pinwheel-2-1")?.promotion_blocker).toContain(
             "manual visual review",
         );
-        expect(isExperimentalAperiodicFamily("pinwheel")).toBe(true);
+        expect(isExperimentalAperiodicFamily("pinwheel-2-1")).toBe(true);
+        expect(isExperimentalAperiodicFamily("pinwheel")).toBe(false);
         expect(isExperimentalAperiodicFamily("penrose-p3-rhombs")).toBe(false);
-        expect(describeAperiodicFamilyStatus("pinwheel")?.tone).toBe("warning");
+        expect(describeAperiodicFamilyStatus("pinwheel-2-1")?.tone).toBe("warning");
+        expect(describeAperiodicFamilyStatus("pinwheel")?.tone).toBe("info");
         expect(describeAperiodicFamilyStatus("penrose-p3-rhombs")?.tone).toBe("info");
     });
 });

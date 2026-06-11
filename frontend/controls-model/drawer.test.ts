@@ -109,7 +109,7 @@ describe("controls-model/drawer selection inspector", () => {
         const state = await buildControlsModelState();
         state.topologySpec = {
             ...state.topologySpec,
-            tiling_family: "pinwheel",
+            tiling_family: "pinwheel-2-1",
             sizing_mode: "patch_depth",
             patch_depth: 3,
         };

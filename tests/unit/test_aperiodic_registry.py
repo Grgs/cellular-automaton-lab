@@ -42,9 +42,12 @@ class AperiodicRegistryTests(unittest.TestCase):
                 self.assertTrue(contract.verification_modes)
 
     def test_experimental_aperiodics_keep_explicit_promotion_blockers(self) -> None:
-        for geometry in ("dodecagonal-square-triangle", "pinwheel"):
+        for geometry in ("dodecagonal-square-triangle", "pinwheel-2-1"):
             with self.subTest(geometry=geometry):
                 self.assertIsNotNone(APERIODIC_IMPLEMENTATION_CONTRACTS[geometry].promotion_blocker)
+
+    def test_pinwheel_no_longer_has_a_promotion_blocker(self) -> None:
+        self.assertIsNone(APERIODIC_IMPLEMENTATION_CONTRACTS["pinwheel"].promotion_blocker)
 
     def test_shield_no_longer_has_a_promotion_blocker(self) -> None:
         self.assertIsNone(APERIODIC_IMPLEMENTATION_CONTRACTS["shield"].promotion_blocker)
