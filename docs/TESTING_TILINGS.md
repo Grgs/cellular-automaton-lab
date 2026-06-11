@@ -39,7 +39,7 @@ Use this when changing verifier behavior, specs, or signatures. The verifier sui
 ```powershell
 python -m pytest -q -rs tests/unit
 python -m pytest -q -rs tests/api
-python -m mypy --config-file mypy.ini
+python -m mypy --config-file pyproject.toml
 ```
 
 Use this before committing verifier or generator changes.

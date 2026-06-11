@@ -175,7 +175,7 @@ jobs:
         run: npm run coverage:frontend
 
       - name: Run type checking
-        run: python -m mypy --config-file mypy.ini
+        run: python -m mypy --config-file pyproject.toml
 
       - name: Validate tiling descriptors
         run: python -m tools tilings validate
@@ -222,11 +222,11 @@ jobs:
           set -o pipefail
           COVERAGE_FILE=.coverage.unit.parallel python -m pytest -q -s tests/unit \
             --ignore=tests/unit/test_aperiodic_pinwheel_2_1.py \
-            --cov=backend --cov=tools --cov-config=.coveragerc --cov-report= \
+            --cov=backend --cov=tools --cov-config=pyproject.toml --cov-report= \
             -n auto --dist loadfile | tee coverage-unit.txt
           COVERAGE_FILE=.coverage.unit.serial python -m pytest -q -s \
             tests/unit/test_aperiodic_pinwheel_2_1.py \
-            --cov=backend --cov=tools --cov-config=.coveragerc --cov-report= | tee -a coverage-unit.txt
+            --cov=backend --cov=tools --cov-config=pyproject.toml --cov-report= | tee -a coverage-unit.txt
           python -m coverage combine --keep --data-file=.coverage.unit \
             .coverage.unit.parallel .coverage.unit.serial
           python -m coverage report -m --data-file=.coverage.unit | tee -a coverage-unit.txt
@@ -310,7 +310,7 @@ jobs:
         run: |
           set -o pipefail
           COVERAGE_FILE=.coverage.api python -m pytest -q -s tests/api \
-            --cov=backend --cov=tools --cov-config=.coveragerc --cov-report=term-missing \
+            --cov=backend --cov=tools --cov-config=pyproject.toml --cov-report=term-missing \
             -n auto --dist loadfile | tee coverage-api.txt
 
       - name: Upload backend API coverage data

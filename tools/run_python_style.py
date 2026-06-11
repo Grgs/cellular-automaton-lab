@@ -14,9 +14,9 @@ STYLE_TARGETS = (
 )
 
 STYLE_COMMANDS = {
-    "check": ["check", "--config", "ruff.toml"],
-    "format-check": ["format", "--check", "--config", "ruff.toml"],
-    "format": ["format", "--config", "ruff.toml"],
+    "check": ["check", "--config", "pyproject.toml"],
+    "format-check": ["format", "--check", "--config", "pyproject.toml"],
+    "format": ["format", "--config", "pyproject.toml"],
 }
 
 

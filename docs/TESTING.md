@@ -129,7 +129,7 @@ Use frontend unit tests when:
 Backend and shared Python support code are checked with mypy:
 
 ```powershell
-python -m mypy --config-file mypy.ini
+python -m mypy --config-file pyproject.toml
 ```
 
 This protects:
@@ -215,7 +215,7 @@ To inspect skip markers directly:
 rg -n "skipTest|skipUnless|skipIf|pytest\\.skip|pytest\\.mark\\.skip|pytestmark" tests frontend -g "*.py" -g "*.ts"
 ```
 
-Pytest cache is routed through `output/.pytest_cache` by [pytest.ini](../pytest.ini). That keeps local pytest state in the repo's ignored output area and avoids stale or inaccessible root `.pytest_cache` directories.
+Pytest cache is routed through `output/.pytest_cache` by the `[tool.pytest.ini_options]` table in [pyproject.toml](../pyproject.toml). That keeps local pytest state in the repo's ignored output area and avoids stale or inaccessible root `.pytest_cache` directories.
 
 ### 6. Topology And Descriptor Validation Tools
 
@@ -533,7 +533,7 @@ npm run test:frontend
 For backend-only changes:
 
 ```powershell
-python -m mypy --config-file mypy.ini
+python -m mypy --config-file pyproject.toml
 python -m pytest -q -rs tests/unit
 python -m pytest -q -rs tests/api
 python -m tools tilings validate
@@ -583,7 +583,7 @@ npm run build:frontend:standalone
 npm run smoke:standalone
 npm run check:doc-links
 npm run audit:supply-chain
-python -m mypy --config-file mypy.ini
+python -m mypy --config-file pyproject.toml
 python -m pytest -q -rs tests/unit tests/api tests/e2e
 python -m tools tilings validate
 python -m tools tilings verify

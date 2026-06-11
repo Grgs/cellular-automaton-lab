@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Consolidated Python tool configuration (`ruff.toml`, `mypy.ini`, `pytest.ini`, `.coveragerc`) into a single `pyproject.toml` with no behavior changes.
 - Regenerated the Python lockfiles with `--generate-hashes --allow-unsafe` so pip verifies download integrity for every pinned file and rejects unpinned requirements at install time.
 - Broadened the ruff lint gate with bugbear, pyupgrade, and import sorting (`B`, `UP`, `I`) and modernized the Python tree to match: sorted imports, PEP 695 type aliases and generics, `datetime.UTC`, explicit `zip()` strictness, and explicit exception chaining.
 - Hardened and streamlined CI automation: all GitHub Actions references are pinned to commit SHAs, a Dependabot auto-merge workflow lands green minor/patch updates automatically (majors stay manual), `merge_group` support prepares CI for a merge queue, a Windows job runs the backend unit suite, and the Playwright jobs skip browser downloads on cache hits.

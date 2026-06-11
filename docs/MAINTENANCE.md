@@ -73,7 +73,7 @@ npm run build:frontend:standalone
 npm run smoke:standalone
 npm run check:doc-links
 npm run audit:supply-chain
-py -3 -m mypy --config-file mypy.ini
+py -3 -m mypy --config-file pyproject.toml
 py -3 -m unittest discover -s tests -p "test_*.py"
 python -m tools tilings validate
 python -m tools tilings verify
