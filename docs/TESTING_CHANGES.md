@@ -11,7 +11,7 @@ Common baseline commands:
 ```powershell
 npm run typecheck:frontend
 npm run test:frontend
-python -m mypy --config-file mypy.ini
+python -m mypy --config-file pyproject.toml
 python -m pytest -q -rs tests/unit
 python -m pytest -q -rs tests/api
 ```
@@ -137,7 +137,7 @@ Run or update:
 Suggested commands:
 
 ```powershell
-python -m mypy --config-file mypy.ini
+python -m mypy --config-file pyproject.toml
 python -m pytest -q tests/unit/test_request_models.py tests/unit/test_requests.py
 python -m pytest -q -rs tests/api
 npm run test:e2e:playwright:server

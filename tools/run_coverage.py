@@ -2,7 +2,7 @@
 
 Mirrors the CI workflow locally so contributors can reproduce the same
 backend coverage numbers without pushing a branch. Coverage configuration
-lives in `.coveragerc`; this tool only orchestrates pytest-cov suite runs and
+lives in `pyproject.toml`; this tool only orchestrates pytest-cov suite runs and
 the coverage combine/report lifecycle needed when multiple suites are selected.
 
 Examples:
@@ -68,7 +68,7 @@ def _pytest_cov(suite: SuiteSpec) -> list[str]:
         suite.discover_path,
         "--cov=backend",
         "--cov=tools",
-        "--cov-config=.coveragerc",
+        "--cov-config=pyproject.toml",
         "--cov-report=",
     ]
 

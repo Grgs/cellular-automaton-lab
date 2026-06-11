@@ -17,7 +17,7 @@
         "lint:frontend:eslint": "eslint \"frontend/**/*.ts\" \"vite.config.ts\"",
         "lint:python": "node ./tools/internal/python_tools_entry.mjs repo python-style check",
         "typecheck:frontend": "tsc -p tsconfig.json --noEmit",
-        "typecheck:python": "node ./tools/internal/python_exec.mjs -m mypy --config-file mypy.ini",
+        "typecheck:python": "node ./tools/internal/python_exec.mjs -m mypy --config-file pyproject.toml",
         "test:frontend": "vitest run",
         "test:e2e:playwright": "node ./tools/internal/python_tools_entry.mjs test e2e --suite all",
         "test:e2e:playwright:server": "node ./tools/internal/python_tools_entry.mjs test e2e --suite server",
