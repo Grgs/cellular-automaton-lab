@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Promoted `pinwheel` out of `Experimental` into the main `Aperiodic` picker group after a manual visual review on June 11, 2026 accepted the exact-affine patch against the published Conway-Radin / Bielefeld reference (interior-field isotropy, boundary dominance, and orientation mix at depths 3 and 4, with zero representative render-space overlaps and all automated gates already passing).
 - Consolidated Python tool configuration (`ruff.toml`, `mypy.ini`, `pytest.ini`, `.coveragerc`) into a single `pyproject.toml` with no behavior changes.
 - Regenerated the Python lockfiles with `--generate-hashes --allow-unsafe` so pip verifies download integrity for every pinned file and rejects unpinned requirements at install time.
 - Broadened the ruff lint gate with bugbear, pyupgrade, and import sorting (`B`, `UP`, `I`) and modernized the Python tree to match: sorted imports, PEP 695 type aliases and generics, `datetime.UTC`, explicit `zip()` strictness, and explicit exception chaining.
