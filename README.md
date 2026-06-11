@@ -133,7 +133,7 @@ This release does not publish an npm package or a PyPI package. The repository i
 
 ## Preview Status And Known Limitations
 
-- `pinwheel` remains labeled `Experimental` because manual visible review still does not justify promotion, even though automated checks now pass.
+- `pinwheel` remains labeled `Experimental`: a June 11, 2026 literature comparison found the subdivision shears tiles from depth 2 onward (equal areas but non-congruent triangles), so the patch is not yet the Conway-Radin pinwheel field even though automated gates pass.
 - `dodecagonal-square-triangle` is currently implemented as a decorated `3.12.12` Archimedean generator rather than the canonical Schlottmann quasi-periodic square-triangle tiling.
 - The standalone GitHub Pages demo targets static hosting with network access and still loads Pyodide from a CDN rather than bundling it for offline use.
 

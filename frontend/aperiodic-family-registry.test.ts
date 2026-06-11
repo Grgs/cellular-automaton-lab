@@ -18,7 +18,7 @@ describe("aperiodic-family-registry", () => {
         expect(listAperiodicFamilyMetadata().length).toBeGreaterThan(0);
         expect(getAperiodicFamilyMetadata("penrose-p3-rhombs")?.label).toBe("Penrose P3 Rhombs");
         expect(getAperiodicFamilyMetadata("pinwheel")?.promotion_blocker).toContain(
-            "manual visual review",
+            "Experimental until",
         );
         expect(isExperimentalAperiodicFamily("pinwheel")).toBe(true);
         expect(isExperimentalAperiodicFamily("penrose-p3-rhombs")).toBe(false);

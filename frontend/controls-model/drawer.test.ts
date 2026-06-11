@@ -124,6 +124,6 @@ describe("controls-model/drawer selection inspector", () => {
         expect(viewModel.topologyStatusVisible).toBe(true);
         expect(viewModel.topologyStatusTone).toBe("warning");
         expect(viewModel.topologyStatusLabel).toContain("Experimental");
-        expect(viewModel.topologyStatusDetail).toContain("manual visual review");
+        expect(viewModel.topologyStatusDetail).toContain("Experimental until");
     });
 });

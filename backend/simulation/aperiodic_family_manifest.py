@@ -317,7 +317,9 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         implementation_status="exact_affine",
         public_cell_kinds=(PINWHEEL_TRIANGLE_KIND,),
         promotion_blocker=(
-            "Experimental until manual visual review accepts the exact-affine implementation."
+            "Experimental until the subdivision emits congruent 1:2:sqrt(5) children at every "
+            "depth; the 2026-06-11 literature comparison found sheared grandchildren from "
+            "depth 2 onward (only 20/50 canonical triangles at depth 2)."
         ),
         depth_semantics_label="exact affine substitution depth",
     ),
