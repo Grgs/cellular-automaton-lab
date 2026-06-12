@@ -136,109 +136,54 @@
         "neighbors": [
           {
             "area": 1.0,
-            "chirality_token": "right",
+            "chirality_token": "left",
             "decoration_tokens": null,
             "delta": [
-              1.013684,
-              2.742911
+              0.149071,
+              1.19257
             ],
             "kind": "pinwheel-triangle",
-            "orientation_token": "0"
+            "orientation_token": "143"
           },
           {
             "area": 1.0,
             "chirality_token": "right",
             "decoration_tokens": null,
             "delta": [
-              -2.474582,
-              -3.10068
+              -1.192569,
+              -0.596285
             ],
             "kind": "pinwheel-triangle",
-            "orientation_token": "234"
-          },
-          {
-            "area": 1.0,
-            "chirality_token": "right",
-            "decoration_tokens": null,
-            "delta": [
-              -0.357771,
-              -0.178885
-            ],
-            "kind": "pinwheel-triangle",
-            "orientation_token": "51"
-          },
-          {
-            "area": 1.0,
-            "chirality_token": "right",
-            "decoration_tokens": null,
-            "delta": [
-              -3.309381,
-              -5.008792
-            ],
-            "kind": "pinwheel-triangle",
-            "orientation_token": "53"
-          },
-          {
-            "area": 1.0,
-            "chirality_token": "right",
-            "decoration_tokens": null,
-            "delta": [
-              0.044721,
-              -0.536656
-            ],
-            "kind": "pinwheel-triangle",
-            "orientation_token": "53"
+            "orientation_token": "180"
           },
           {
             "area": 1.0,
             "chirality_token": "left",
             "decoration_tokens": null,
             "delta": [
-              -2.414954,
-              -3.816222
+              0.745356,
+              0.0
             ],
             "kind": "pinwheel-triangle",
-            "orientation_token": "72"
+            "orientation_token": "233"
           },
           {
             "area": 1.0,
-            "chirality_token": "left",
+            "chirality_token": "right",
             "decoration_tokens": null,
             "delta": [
-              0.939148,
-              0.655914
+              -0.447213,
+              0.894427
             ],
             "kind": "pinwheel-triangle",
-            "orientation_token": "72"
-          },
-          {
-            "area": 1.0,
-            "chirality_token": "left",
-            "decoration_tokens": null,
-            "delta": [
-              -1.147848,
-              -2.623653
-            ],
-            "kind": "pinwheel-triangle",
-            "orientation_token": "95"
-          },
-          {
-            "area": 1.0,
-            "chirality_token": "left",
-            "decoration_tokens": null,
-            "delta": [
-              2.206254,
-              1.848483
-            ],
-            "kind": "pinwheel-triangle",
-            "orientation_token": "95"
+            "orientation_token": "90"
           }
         ],
         "root": {
           "area": 1.0,
           "chirality_token": "left",
           "decoration_tokens": null,
-          "degree": 9,
+          "degree": 4,
           "kind": "pinwheel-triangle",
           "orientation_token": "53"
         }
