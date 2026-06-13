@@ -38,13 +38,13 @@ It is intended for comparing how familiar automata behave on different local nei
 
 ![Snub Trihexagonal mixed Life](docs/images/readme-snub-trihexagonal-overview.png)
 
-### Square board with Conway after several generations
+### Pinwheel aperiodic patch with depth controls
 
-![Square board with evolved Conway patterns](docs/images/readme-workspace-conway.png)
+![Pinwheel aperiodic patch with patch-depth controls](docs/images/readme-pinwheel-overview.png)
 
-### Penrose P3 Rhombs with patch-depth controls
+### Tiling picker thumbnails for pentagonal families
 
-![Penrose P3 Rhombs overview](docs/images/readme-penrose-p3-overview.png)
+![Tiling picker filtered to pentagonal thumbnails](docs/images/readme-tiling-picker-thumbnails.png)
 
 ## Suggested Demo Flows
 
