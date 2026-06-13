@@ -92,6 +92,10 @@ DEFAULT_MIN_DOMINANT_FILL_COUNT = 100
 CANVAS_PNG_DATA_URL_PREFIX = "data:image/png;base64,"
 
 
+def is_control_reset_response_url(url: str) -> bool:
+    return url.rstrip("/").endswith("/control/reset")
+
+
 class OccupiedBounds(TypedDict):
     minX: int
     maxX: int
@@ -513,7 +517,9 @@ def select_tiling_family(
         )
         return None
     with page.expect_response(
-        lambda response: response.request.method == "POST" and "/api/control/reset" in response.url,
+        lambda response: (
+            response.request.method == "POST" and is_control_reset_response_url(response.url)
+        ),
         timeout=timeout_ms,
     ) as response_info:
         _drive_tiling_picker()

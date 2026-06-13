@@ -2,6 +2,8 @@ import sys
 import unittest
 from pathlib import Path
 
+from backend.payload_types import SimulationStatePayload
+
 try:
     from tests.api.support import ApiTestCase
     from tests.typed_payloads import require_simulation_state_payload
@@ -16,7 +18,7 @@ class ApiSessionTests(ApiTestCase):
     def session_path(session_id: str, path: str) -> str:
         return f"/api/sessions/{session_id}{path}"
 
-    def session_state(self, session_id: str):
+    def session_state(self, session_id: str) -> SimulationStatePayload:
         response = self.client.get(self.session_path(session_id, "/state"))
         self.assertEqual(response.status_code, 200)
         return require_simulation_state_payload(

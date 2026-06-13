@@ -94,8 +94,19 @@ def cleanup_temporary_directory(
 
 
 class JsonApiClient:
-    def __init__(self, base_url: str) -> None:
+    def __init__(self, base_url: str, *, session_id: str | None = None) -> None:
         self.base_url = base_url.rstrip("/")
+        self.session_id = session_id
+
+    def with_session(self, session_id: str | None) -> "JsonApiClient":
+        return JsonApiClient(self.base_url, session_id=session_id)
+
+    def _session_path(self, path: str) -> str:
+        if self.session_id is None:
+            return path
+        if not path.startswith("/api/"):
+            return path
+        return f"/api/sessions/{self.session_id}{path.removeprefix('/api')}"
 
     def wait_until_ready(
         self,
@@ -127,7 +138,7 @@ class JsonApiClient:
     ) -> RawJsonDocument:
         body = None if payload is None else json.dumps(payload).encode("utf-8")
         request = urllib.request.Request(
-            f"{self.base_url}{path}",
+            f"{self.base_url}{self._session_path(path)}",
             data=body,
             method=method,
             headers={"Content-Type": "application/json"},

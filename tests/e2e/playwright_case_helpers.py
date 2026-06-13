@@ -80,6 +80,11 @@ class SharedUiFlowHelpers:
     def initialize_shared_ui_flow(self) -> None:
         case = self._case()
         case.goto_page(f"{case.host.base_url}/", wait_until="load")
+        if case.api is not None:
+            session_id = case.page.evaluate("() => window.APP_SESSION_ID || null")
+            if session_id is not None and not isinstance(session_id, str):
+                raise AssertionError(f"browser session id was invalid: {session_id!r}")
+            case.api = case.api.with_session(session_id)
         self._ensure_drawer_open()
 
     def _expect(self, selector: str) -> Any:
