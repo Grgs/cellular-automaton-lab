@@ -9,7 +9,6 @@ try:
         ArchLife3464Rule,
         ArchLife4612Rule,
         ArchLife31212Rule,
-        ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
     )
@@ -39,7 +38,6 @@ except ModuleNotFoundError:
         ArchLife3464Rule,
         ArchLife4612Rule,
         ArchLife31212Rule,
-        ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
     )
@@ -266,7 +264,7 @@ class SimulationTopologyPeriodicTests(unittest.TestCase):
             ("archimedean-4-6-12", ArchLife4612Rule(), "dodecagon", 4),
             ("archimedean-3-3-4-3-4", ArchLife33434Rule(), "square", 3),
             ("archimedean-3-3-3-4-4", ArchLife33344Rule(), "square", 2),
-            ("archimedean-3-3-3-3-6", ArchLife33336Rule(), "hexagon", 4),
+            ("archimedean-3-3-3-3-6", KagomeLifeRule(), "hexagon", 4),
         ]
 
         for geometry, rule, kind, live_neighbor_count in cases:

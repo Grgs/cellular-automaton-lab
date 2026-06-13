@@ -304,7 +304,7 @@
       ],
       "default_adjacency_mode": "edge",
       "default_rules": {
-        "edge": "archlife-3-3-3-3-6"
+        "edge": "kagome-life"
       },
       "geometry_keys": {
         "edge": "archimedean-3-3-3-3-6"

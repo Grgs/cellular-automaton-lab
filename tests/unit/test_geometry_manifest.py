@@ -159,7 +159,7 @@ class GeometryManifestTests(unittest.TestCase):
             ARCHIMEDEAN_4612_GEOMETRY: "archlife-4-6-12",
             ARCHIMEDEAN_33434_GEOMETRY: "archlife-3-3-4-3-4",
             ARCHIMEDEAN_33344_GEOMETRY: "archlife-3-3-3-4-4",
-            ARCHIMEDEAN_33336_GEOMETRY: "archlife-3-3-3-3-6",
+            ARCHIMEDEAN_33336_GEOMETRY: "kagome-life",
         }
 
         for geometry, default_rule in expected.items():

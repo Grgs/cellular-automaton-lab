@@ -259,7 +259,7 @@ class ApiTestCase(unittest.TestCase):
 
     def assert_kagome_rule(self, payload: SimulationStatePayload) -> None:
         self.assertEqual(payload["rule"]["name"], "kagome-life")
-        self.assertEqual(payload["rule"]["display_name"], "Mixed Life: Kagome (3.6.3.6)")
+        self.assertEqual(payload["rule"]["display_name"], "Mixed Life: Triangle-Hexagon (B2/B234)")
         self.assertEqual(payload["rule"]["default_paint_state"], 1)
         self.assertTrue(payload["rule"]["supports_randomize"])
         self.assertEqual(payload["rule"]["rule_protocol"], "universal-v1")

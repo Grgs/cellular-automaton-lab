@@ -316,7 +316,7 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 16, 14, 20),
-        default_rule="archlife-3-3-3-3-6",
+        default_rule="kagome-life",
         minimum_grid_dimension=1,
     ),
     CAIRO_GEOMETRY: _single_variant_family(

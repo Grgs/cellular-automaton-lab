@@ -11,7 +11,6 @@ try:
         ArchLife3464Rule,
         ArchLife4612Rule,
         ArchLife31212Rule,
-        ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
     )
@@ -39,7 +38,6 @@ except ModuleNotFoundError:
         ArchLife3464Rule,
         ArchLife4612Rule,
         ArchLife31212Rule,
-        ArchLife33336Rule,
         ArchLife33344Rule,
         ArchLife33434Rule,
     )
@@ -280,6 +278,7 @@ class SimulationRuleTests(unittest.TestCase):
         self.assertTrue(self.rule_registry.has("hexlife"))
         self.assertTrue(self.rule_registry.has("hexwhirlpool"))
         self.assertTrue(self.rule_registry.has("kagome-life"))
+        self.assertTrue(self.rule_registry.has("archlife-3-3-3-3-6"))
         self.assertTrue(self.rule_registry.has("life-b2-s23"))
         self.assertTrue(self.rule_registry.has("penrose-life"))
         self.assertTrue(self.rule_registry.has("penrose-vertex-life"))
@@ -316,6 +315,7 @@ class SimulationRuleTests(unittest.TestCase):
 
         self.assertEqual(display_names, sorted(display_names, key=str.lower))
         self.assertNotIn("hexwhirlpool", rule_names)
+        self.assertNotIn("archlife-3-3-3-3-6", rule_names)
         for description in descriptions:
             self.assertEqual(description["rule_protocol"], "universal-v1")
             self.assertTrue(description["supports_all_topologies"])
@@ -499,6 +499,7 @@ class SimulationRuleTests(unittest.TestCase):
         rule = KagomeLifeRule()
         self.assert_rule_snapshot(rule)
         self.assertTrue(rule.supports_randomize)
+        self.assertEqual(rule.display_name, "Mixed Life: Triangle-Hexagon (B2/B234)")
         self.assertEqual(
             rule.next_state(
                 build_context(
@@ -580,10 +581,6 @@ class SimulationRuleTests(unittest.TestCase):
                 ArchLife33344Rule(),
                 [("triangle", 0, 2, 1), ("square", 0, 2, 1), ("square", 1, 3, 1)],
             ),
-            (
-                ArchLife33336Rule(),
-                [("triangle", 0, 2, 1), ("hexagon", 0, 4, 1), ("hexagon", 1, 1, 0)],
-            ),
         ]
 
         for rule, transitions in cases:
@@ -624,6 +621,10 @@ class SimulationRuleTests(unittest.TestCase):
             self.rule_registry.get("penrose-vertex-life"), self.rule_registry.get("conway")
         )
         self.assertIs(self.rule_registry.get("hexwhirlpool"), self.rule_registry.get("whirlpool"))
+        self.assertIs(
+            self.rule_registry.get("archlife-3-3-3-3-6"),
+            self.rule_registry.get("kagome-life"),
+        )
 
     def test_directional_counts_only_real_excited_neighbors(self) -> None:
         rule = WhirlpoolRule()

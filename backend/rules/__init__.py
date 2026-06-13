@@ -6,7 +6,6 @@ from backend.rules.archlife_extended import (
     ArchLife3464Rule,
     ArchLife4612Rule,
     ArchLife31212Rule,
-    ArchLife33336Rule,
     ArchLife33344Rule,
     ArchLife33434Rule,
 )
@@ -26,7 +25,6 @@ from backend.simulation.topology_family_manifest import SQUARE_GEOMETRY
 
 RULE_TYPES: tuple[type[AutomatonRule], ...] = (
     ArchLife31212Rule,
-    ArchLife33336Rule,
     ArchLife33344Rule,
     ArchLife33434Rule,
     ArchLife3464Rule,
@@ -51,6 +49,7 @@ class RuleRegistry:
         "penrose-life": "life-b2-s23",
         "penrose-vertex-life": "conway",
         "hexwhirlpool": "whirlpool",
+        "archlife-3-3-3-3-6": "kagome-life",
     }
 
     def __init__(self) -> None:

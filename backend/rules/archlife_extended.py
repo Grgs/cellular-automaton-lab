@@ -61,14 +61,3 @@ class ArchLife33344Rule(KindLifeRule, AutomatonRule):
         "square": (frozenset({2, 3}), frozenset({2, 3})),
     }
     default_kind = "square"
-
-
-class ArchLife33336Rule(KindLifeRule, AutomatonRule):
-    name = "archlife-3-3-3-3-6"
-    display_name = "Mixed Life: Snub Trihexagonal (3.3.3.3.6)"
-    description = "Snub trihexagonal Life rule with B2/S23 triangles and B234/S23 hexagons."
-    kind_thresholds = {
-        "triangle": (frozenset({2}), frozenset({2, 3})),
-        "hexagon": (frozenset({2, 3, 4}), frozenset({2, 3})),
-    }
-    default_kind = "hexagon"

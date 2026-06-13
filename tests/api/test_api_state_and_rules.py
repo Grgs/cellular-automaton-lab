@@ -57,7 +57,6 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertIn("archlife-4-6-12", rule_names)
         self.assertIn("archlife-3-3-4-3-4", rule_names)
         self.assertIn("archlife-3-3-3-4-4", rule_names)
-        self.assertIn("archlife-3-3-3-3-6", rule_names)
         self.assertIn("conway", rule_names)
         self.assertIn("highlife", rule_names)
         self.assertIn("kagome-life", rule_names)
@@ -70,6 +69,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertNotIn("ammann-beenker-life", rule_names)
         self.assertNotIn("cairo-life", rule_names)
         self.assertNotIn("penrose-p2-life", rule_names)
+        self.assertNotIn("archlife-3-3-3-3-6", rule_names)
         self.assertNotIn("custom", rule_names)
 
         archlife = self.get_rule_definition("archlife488")
@@ -81,10 +81,6 @@ class ApiStateAndRulesTests(ApiTestCase):
         archlife_31212 = self.get_rule_definition("archlife-3-12-12")
         self.assert_universal_rule_contract(archlife_31212)
         self.assertEqual([cell_state["value"] for cell_state in archlife_31212["states"]], [0, 1])
-
-        archlife_33336 = self.get_rule_definition("archlife-3-3-3-3-6")
-        self.assert_universal_rule_contract(archlife_33336)
-        self.assertEqual([cell_state["value"] for cell_state in archlife_33336["states"]], [0, 1])
 
         hexlife = self.get_rule_definition("hexlife")
         self.assertEqual(hexlife["default_paint_state"], 1)
@@ -214,7 +210,7 @@ class ApiStateAndRulesTests(ApiTestCase):
             ("archimedean-4-6-12", "archlife-4-6-12", {"square", "hexagon", "dodecagon"}),
             ("archimedean-3-3-4-3-4", "archlife-3-3-4-3-4", {"triangle", "square"}),
             ("archimedean-3-3-3-4-4", "archlife-3-3-3-4-4", {"triangle", "square"}),
-            ("archimedean-3-3-3-3-6", "archlife-3-3-3-3-6", {"triangle", "hexagon"}),
+            ("archimedean-3-3-3-3-6", "kagome-life", {"triangle", "hexagon"}),
         ]
 
         for geometry, rule_name, expected_kinds in cases:
@@ -739,6 +735,7 @@ class ApiStateAndRulesTests(ApiTestCase):
         for requested_rule, expected_rule in (
             ("penrose-life", "life-b2-s23"),
             ("penrose-vertex-life", "conway"),
+            ("archlife-3-3-3-3-6", "kagome-life"),
         ):
             with self.subTest(rule=requested_rule):
                 reset = self.client.post(
