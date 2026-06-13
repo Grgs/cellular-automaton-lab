@@ -9,6 +9,7 @@ data file.
 
 from __future__ import annotations
 
+import json
 import re
 import unittest
 from pathlib import Path
@@ -18,20 +19,32 @@ from backend.simulation.topology_catalog import TOPOLOGY_CATALOG
 _PREVIEW_DATA_PATH = (
     Path(__file__).resolve().parents[2] / "frontend" / "controls" / "tiling-preview-data.ts"
 )
+_PALETTE_MANIFEST_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "frontend"
+    / "canvas"
+    / "family-dead-palette-manifest.json"
+)
 
 # The three regular tilings have hard-coded inline render logic in
 # tiling-preview.ts and do not need a POLYGON_PREVIEW_DATA entry.
 _INLINE_PREVIEW_KEYS = frozenset({"square", "hex", "triangle"})
 
-# Keys are either "quoted-with-dashes" or unquoted (no dashes).
-_KEY_PATTERN = re.compile(r'^\s{4}(?:"([a-z][a-z0-9-]*)"|([a-z][a-z0-9]+)):\s*', re.MULTILINE)
+_ENTRY_PATTERN = re.compile(
+    r'^\s{4}(?:"([a-z][a-z0-9-]*)"|([a-z][a-z0-9]+)):\s*(?:\n\s*)?"([^"]*)",',
+    re.MULTILINE,
+)
+
+
+def _preview_data_entries() -> dict[str, str]:
+    """Return geometry key -> polygon data entries from tiling-preview-data.ts."""
+    content = _PREVIEW_DATA_PATH.read_text(encoding="utf-8")
+    return {a or b: payload for a, b, payload in _ENTRY_PATTERN.findall(content)}
 
 
 def _preview_data_keys() -> frozenset[str]:
     """Return the set of geometry keys defined in tiling-preview-data.ts."""
-    content = _PREVIEW_DATA_PATH.read_text(encoding="utf-8")
-    keys = {a or b for a, b in _KEY_PATTERN.findall(content)}
-    return frozenset(keys)
+    return frozenset(_preview_data_entries())
 
 
 def _required_preview_keys() -> frozenset[str]:
@@ -45,6 +58,14 @@ def _required_preview_keys() -> frozenset[str]:
         for d in TOPOLOGY_CATALOG
         if d.geometry_keys[d.default_adjacency_mode] not in _INLINE_PREVIEW_KEYS
     )
+
+
+def _polygon_fills(polygon_data: str) -> list[str]:
+    return [
+        polygon_payload.split(":", 1)[0]
+        for polygon_payload in polygon_data.split(";")
+        if ":" in polygon_payload
+    ]
 
 
 class TilingPreviewCoverageTests(unittest.TestCase):
@@ -77,6 +98,32 @@ class TilingPreviewCoverageTests(unittest.TestCase):
             f"Entries in tiling-preview-data.ts with no corresponding topology "
             f"in the catalog: {orphaned}",
         )
+
+    def test_palette_backed_previews_use_named_fill_tokens(self) -> None:
+        """Canvas palette-backed thumbnail data should not use generic numeric fills."""
+        entries = _preview_data_entries()
+        manifest = json.loads(_PALETTE_MANIFEST_PATH.read_text(encoding="utf-8"))
+        palette_backed_keys = [
+            family["geometry"] for family in manifest["families"] if family["geometry"] in entries
+        ]
+
+        self.assertGreater(len(palette_backed_keys), 20)
+        offenders = {
+            key: sorted({fill for fill in _polygon_fills(entries[key]) if fill.isdigit()})
+            for key in palette_backed_keys
+        }
+        offenders = {key: fills for key, fills in offenders.items() if fills}
+        self.assertFalse(
+            offenders,
+            f"Palette-backed tiling thumbnails must use named fill tokens: {offenders}",
+        )
+
+    def test_kagome_preview_uses_legacy_dead_alt_tokens(self) -> None:
+        """Kagome is not in the palette manifest, but canvas renders its triangle
+        variants with the legacy deadAlt tone."""
+        fills = set(_polygon_fills(_preview_data_entries()["trihexagonal-3-6-3-6"]))
+
+        self.assertEqual(fills, {"dead", "deadAlt"})
 
 
 if __name__ == "__main__":

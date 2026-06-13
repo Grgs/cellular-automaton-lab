@@ -100,7 +100,7 @@ function regularPolygonPoints(
 function addSquarePreview(svg: SVGSVGElement): void {
     for (let row = 0; row < 4; row += 1) {
         for (let column = 0; column < 6; column += 1) {
-            addRect(svg, 8 + column * 18, 6 + row * 16, 17, 15, row + column);
+            addRect(svg, 8 + column * 18, 6 + row * 16, 17, 15);
         }
     }
 }
@@ -117,7 +117,6 @@ function addHexPreview(svg: SVGSVGElement): void {
                     12,
                     Math.PI / 6,
                 ),
-                row + column,
             );
         }
     }
@@ -130,24 +129,16 @@ function addTrianglePreview(svg: SVGSVGElement): void {
         for (let column = 0; column < 7; column += 1) {
             const x = 2 + column * side;
             const y = 5 + row * height;
-            addPolygon(
-                svg,
-                [
-                    [x, y + height],
-                    [x + side / 2, y],
-                    [x + side, y + height],
-                ],
-                row + column,
-            );
-            addPolygon(
-                svg,
-                [
-                    [x + side / 2, y],
-                    [x + side + side / 2, y],
-                    [x + side, y + height],
-                ],
-                row + column + 1,
-            );
+            addPolygon(svg, [
+                [x, y + height],
+                [x + side / 2, y],
+                [x + side, y + height],
+            ]);
+            addPolygon(svg, [
+                [x + side / 2, y],
+                [x + side + side / 2, y],
+                [x + side, y + height],
+            ]);
         }
     }
 }

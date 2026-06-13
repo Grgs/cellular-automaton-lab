@@ -87,6 +87,7 @@ class GenerateTilingPreviewToolTests(unittest.TestCase):
 
         self.assertEqual(cell_count, 5)
         self.assertEqual(color_count, 3)
+        self.assertIn("toneCream:", polygon_data)
         self.assertIn("toneClay:", polygon_data)
         self.assertIn("toneFlax:", polygon_data)
 

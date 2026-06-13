@@ -711,6 +711,15 @@
           "color": {"token": "toneStone"}
         },
         {
+          "label": "dst-square-default",
+          "selector": {
+            "kind": "dodecagonal-square-triangle-square",
+            "tile_family": "dodecagonal-square-triangle"
+          },
+          "color": {"token": "toneCream"},
+          "allowSharedDeadColor": true
+        },
+        {
           "label": "dst-triangle-blue",
           "selector": {
             "kind": "dodecagonal-square-triangle-triangle",

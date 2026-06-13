@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import familyDeadPaletteManifest from "../canvas/family-dead-palette-manifest.json";
 import { populateRules, populateTilingFamilies, refreshRuleFilter } from "./view-options.js";
 import { createTilingPreviewThumbnail } from "./tiling-preview.js";
+import { POLYGON_PREVIEW_DATA } from "./tiling-preview-data.js";
 import type { TopologyOption } from "../types/domain.js";
 import type { DomElements } from "../types/dom.js";
 import type { RuleSelectOption } from "../types/ui.js";
@@ -78,6 +80,23 @@ const NOTATION_RULES: RuleSelectOption[] = [
         searchText: "highlife Life HighLife B36/S23 b36s23 replicator",
     },
 ];
+
+function previewFills(previewKey: string): string[] {
+    return (POLYGON_PREVIEW_DATA[previewKey] ?? "")
+        .split(";")
+        .map((polygonPayload) => polygonPayload.split(":", 1)[0] ?? "")
+        .filter(Boolean);
+}
+
+function thumbnailFillClasses(thumbnail: SVGSVGElement): Set<string> {
+    return new Set(
+        Array.from(thumbnail.querySelectorAll("polygon")).flatMap((polygon) =>
+            Array.from(polygon.classList).filter((className) =>
+                className.startsWith("tiling-preview-fill-"),
+            ),
+        ),
+    );
+}
 
 function createElements(): DomElements {
     const elements: Partial<DomElements> = {
@@ -185,8 +204,44 @@ describe("controls/view-options tiling picker", () => {
         expect(polygons).toHaveLength(5);
         expect(sideCounts.has(3)).toBe(true);
         expect(sideCounts.has(4)).toBe(true);
+        expect(thumbnail.querySelector("[data-fill-token='toneCream']")).not.toBeNull();
         expect(thumbnail.querySelector("[data-fill-token='toneClay']")).not.toBeNull();
         expect(thumbnail.querySelector("[data-fill-token='toneFlax']")).not.toBeNull();
+    });
+
+    it("keeps regular grid thumbnails on the neutral dead fill", () => {
+        ["square", "hex", "triangle"].forEach((previewKey) => {
+            const thumbnail = createTilingPreviewThumbnail({
+                value: previewKey,
+                label: previewKey,
+                group: "Classic",
+                order: 10,
+                family: "regular",
+                previewKey,
+                renderKind: "regular_grid",
+                sizingMode: "grid",
+                searchAliases: [],
+            });
+
+            expect(thumbnailFillClasses(thumbnail)).toEqual(new Set(["tiling-preview-fill-a"]));
+            expect(thumbnail.querySelector("[data-fill-token]")).toBeNull();
+        });
+    });
+
+    it("uses canvas palette tokens for palette-backed static thumbnails", () => {
+        const paletteBackedPreviewKeys = familyDeadPaletteManifest.families
+            .map((family) => family.geometry)
+            .filter((previewKey) => previewKey in POLYGON_PREVIEW_DATA);
+
+        expect(paletteBackedPreviewKeys.length).toBeGreaterThan(20);
+        paletteBackedPreviewKeys.forEach((previewKey) => {
+            const numericFills = previewFills(previewKey).filter((fill) => /^\d+$/.test(fill));
+            expect(numericFills, `${previewKey} should use named palette fill tokens`).toEqual([]);
+        });
+    });
+
+    it("matches Kagome's legacy canvas dead/deadAlt colors", () => {
+        expect(new Set(previewFills("trihexagonal-3-6-3-6"))).toEqual(new Set(["dead", "deadAlt"]));
     });
 
     it("keeps Type 7 pentagonal thumbnails on the neutral single-prototile fill", () => {
@@ -203,16 +258,9 @@ describe("controls/view-options tiling picker", () => {
         });
 
         const polygons = Array.from(thumbnail.querySelectorAll("polygon"));
-        const fillClasses = new Set(
-            polygons.flatMap((polygon) =>
-                Array.from(polygon.classList).filter((className) =>
-                    className.startsWith("tiling-preview-fill-"),
-                ),
-            ),
-        );
 
         expect(polygons.length).toBeGreaterThan(10);
-        expect(fillClasses).toEqual(new Set(["tiling-preview-fill-a"]));
+        expect(thumbnailFillClasses(thumbnail)).toEqual(new Set(["tiling-preview-fill-a"]));
         expect(thumbnail.querySelector("[data-fill-token]")).toBeNull();
     });
 });
