@@ -47,6 +47,10 @@ Python linting and formatting now cover the full repo-owned Python surface:
 
 Pre-commit mirrors the same Python scope plus the frontend lint/format check, so local hooks and scripted runs exercise the same rules.
 
+### Shell Pipelines Must Not Hide Failures
+
+Any multi-line shell step that pipes a command whose exit code matters (`pytest ... | tee`, `tool | tail`, `coverage report --fail-under=N | tee`) must run under `pipefail`, or the failure is masked by the last stage of the pipe and the step passes green. Start such CI `run:` blocks with `set -o pipefail` (or set the step's `shell: bash`, which GitHub invokes with `-o pipefail`); apply the same rule in repo-owned `tools/` shell. This has bitten the coverage gate and the tiling-verify sweep before — a green step that was actually failing. When in doubt, prefer not piping the command whose status you care about.
+
 ## Public Release Process
 
 The first clean public release line started at `v0.1.0` and continues as an ongoing preview series; `v0.5.0` is the current shipped tag. The public release surface is:
@@ -142,6 +146,22 @@ py -3 -m piptools compile --strip-extras --generate-hashes --allow-unsafe --outp
 To upgrade a single pinned package, edit the `.in` file and rerun the command above. To upgrade everything, add `--upgrade` to the `piptools compile` invocations.
 
 Lockfiles are generated on the maintainer's local platform. Cross-platform installs work because `--generate-hashes` records hashes for every published file of a pinned version (all platform wheels plus the sdist), and the only platform-conditional transitive dep (`colorama`, pulled in by `click`) is pure-Python and installs harmlessly on Linux CI.
+
+## Promoting Or Demoting A Tiling Family
+
+Moving an aperiodic family between the `Experimental` and `Aperiodic` picker groups touches more surfaces than the manifest. Each was a separate CI failure or missed edit during the `pinwheel` promotion; change them together.
+
+**Before promoting, prove faithfulness against an independent reference.** Automated gates (canonical-patch fixtures, counts, areas, adjacency) are generated from the same builder, so they confirm self-consistency, not correctness. Compare the rendered patch against the published source image/spec, or assert a falsifiable numeric criterion. For substitution tilings whose tiles must stay similar to a prototile, add `expected_triangle_side_ratios` to the family's reference spec so per-tile congruence is machine-enforced — this is what caught the `pinwheel` subdivision shear that every other gate passed.
+
+Edit set:
+
+- **Manifest** — [`backend/simulation/aperiodic_family_manifest.py`](../backend/simulation/aperiodic_family_manifest.py): flip `picker_group`, add or remove `promotion_blocker`, and set `polygon_surface_check=False` if the substitution is non-edge-to-edge (T-junctions split Shapely's polygon union even when the adjacency graph is sound).
+- **Bootstrap fixture** — regenerate, do not hand-edit: `python -m tools bootstrap export frontend/test-fixtures/bootstrap-data.json`.
+- **Backend tests** — [`test_geometry_manifest.py`](../tests/unit/test_geometry_manifest.py) (picker-group grouping), [`test_aperiodic_registry.py`](../tests/unit/test_aperiodic_registry.py) (promotion-blocker presence), [`test_report_tiling_verification_strength_tool.py`](../tests/unit/test_report_tiling_verification_strength_tool.py) (strength tags **and** the per-family `promotion_blocker:` block — easy to miss, since waiving a check also drops its strength tag), and [`test_api_bootstrap.py`](../tests/api/test_api_bootstrap.py).
+- **Frontend tests** — [`aperiodic-family-registry.test.ts`](../frontend/aperiodic-family-registry.test.ts) (`isExperimentalAperiodicFamily`, status tone, blocker text) and [`controls-model/drawer.test.ts`](../frontend/controls-model/drawer.test.ts) (experimental blocker text). Use a still-experimental family as the example so these don't churn on every promotion.
+- **Docs** — `docs/TILING_VERIFICATION_STATUS.md`, `docs/TILING_KNOWN_DEVIATIONS.md`, `README.md` preview-limitations, `TODO.md`, `docs/CODE_QUALITY_ROADMAP.md`, and `CHANGELOG.md`.
+
+Then run `python -m tools repo generated-check`, `python -m tools tilings validate`, `python -m tools tilings verify`, the backend and frontend test suites, and a live picker check that the family appears in the intended group. The Windows CI job has caught stale fixtures and platform-specific surface-check differences that Linux-only local runs missed — do not treat a green local Linux run as sufficient for a manifest change.
 
 ## Generated File Freshness
 
