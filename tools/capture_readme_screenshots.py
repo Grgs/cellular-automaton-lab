@@ -8,7 +8,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from PIL import Image
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Page, ViewportSize, sync_playwright
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -23,7 +23,7 @@ from tools.render_review.browser_support.render_review import (
 )
 
 DEFAULT_OUTPUT_DIR = ROOT_DIR / "docs" / "images"
-VIEWPORT = {"width": 1440, "height": 980}
+VIEWPORT: ViewportSize = {"width": 1440, "height": 980}
 TIMEOUT_MS = 60_000
 
 
