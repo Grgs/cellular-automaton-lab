@@ -5,7 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
-No completed changes yet.
+- Documented a tiling promotion/demotion maintenance checklist and a CI pipefail guardrail in `docs/MAINTENANCE.md`, capturing the coupled edit set and independent-reference review step learned from the `pinwheel` promotion.
 
 ## `v0.5.0` Preview Release Candidate
 
