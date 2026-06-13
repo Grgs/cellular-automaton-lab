@@ -18,6 +18,17 @@ interface CellMutation extends CellIdentifier {
     state: number;
 }
 
+export interface HttpSimulationBackendOptions {
+    sessionId?: string;
+}
+
+function sessionPath(path: string, sessionId: string | undefined): string {
+    if (!sessionId) {
+        return path;
+    }
+    return `/api/sessions/${encodeURIComponent(sessionId)}${path.slice("/api".length)}`;
+}
+
 export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const response = await fetch(path, {
         headers: { "Content-Type": "application/json" },
@@ -31,12 +42,12 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     return response.json();
 }
 
-export function fetchState(): Promise<SimulationSnapshot> {
-    return request<SimulationSnapshot>("/api/state");
+export function fetchState(sessionId?: string): Promise<SimulationSnapshot> {
+    return request<SimulationSnapshot>(sessionPath("/api/state", sessionId));
 }
 
-export function fetchRules(): Promise<RulesResponse> {
-    return request<RulesResponse>("/api/rules");
+export function fetchRules(sessionId?: string): Promise<RulesResponse> {
+    return request<RulesResponse>(sessionPath("/api/rules", sessionId));
 }
 
 function normalizeCellPayload(cell: CellIdentifier): CellIdentifier {
@@ -51,23 +62,33 @@ function normalizeCellPayload(cell: CellIdentifier): CellIdentifier {
     throw new Error("Cell mutations require a topology cell id.");
 }
 
-export function toggleCellRequest(cell: CellIdentifier): Promise<SimulationSnapshot> {
-    return request<SimulationSnapshot>("/api/cells/toggle", {
+export function toggleCellRequest(
+    cell: CellIdentifier,
+    sessionId?: string,
+): Promise<SimulationSnapshot> {
+    return request<SimulationSnapshot>(sessionPath("/api/cells/toggle", sessionId), {
         method: "POST",
         body: JSON.stringify(normalizeCellPayload(cell)),
     });
 }
 
-export function setCellRequest(cell: CellIdentifier, state: number): Promise<SimulationSnapshot> {
+export function setCellRequest(
+    cell: CellIdentifier,
+    state: number,
+    sessionId?: string,
+): Promise<SimulationSnapshot> {
     const payload = normalizeCellPayload(cell);
-    return request<SimulationSnapshot>("/api/cells/set", {
+    return request<SimulationSnapshot>(sessionPath("/api/cells/set", sessionId), {
         method: "POST",
         body: JSON.stringify({ ...payload, state }),
     });
 }
 
-export function setCellsRequest(cells: CellMutation[]): Promise<SimulationSnapshot> {
-    return request<SimulationSnapshot>("/api/cells/set-many", {
+export function setCellsRequest(
+    cells: CellMutation[],
+    sessionId?: string,
+): Promise<SimulationSnapshot> {
+    return request<SimulationSnapshot>(sessionPath("/api/cells/set-many", sessionId), {
         method: "POST",
         body: JSON.stringify({ cells }),
     });
@@ -82,41 +103,64 @@ export function postControl(path: "/api/config", body: ConfigSyncBody): Promise<
 export function postControl(
     path: EmptyControlCommandPath | "/api/control/reset" | "/api/config",
     body?: ConfigSyncBody | ResetControlBody,
+    sessionId?: string,
+): Promise<SimulationSnapshot>;
+export function postControl(
+    path: EmptyControlCommandPath | "/api/control/reset" | "/api/config",
+    body?: ConfigSyncBody | ResetControlBody,
+    sessionId?: string,
 ): Promise<SimulationSnapshot> {
-    return request<SimulationSnapshot>(path, {
+    return request<SimulationSnapshot>(sessionPath(path, sessionId), {
         method: "POST",
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
 }
 
-export async function compareSeedRequest(body: CompareRequest): Promise<SeedComparisonResult> {
-    const response = await request<{ comparison: SeedComparisonResult }>("/api/compare", {
-        method: "POST",
-        body: JSON.stringify(body),
-    });
+export async function compareSeedRequest(
+    body: CompareRequest,
+    sessionId?: string,
+): Promise<SeedComparisonResult> {
+    const response = await request<{ comparison: SeedComparisonResult }>(
+        sessionPath("/api/compare", sessionId),
+        {
+            method: "POST",
+            body: JSON.stringify(body),
+        },
+    );
     return response.comparison;
 }
 
 export async function previewTopologyRequest(
     body: TopologyPreviewRequest,
+    sessionId?: string,
 ): Promise<TopologyPreview> {
-    const response = await request<{ topology_preview: TopologyPreview }>("/api/topology/preview", {
-        method: "POST",
-        body: JSON.stringify(body),
-    });
+    const response = await request<{ topology_preview: TopologyPreview }>(
+        sessionPath("/api/topology/preview", sessionId),
+        {
+            method: "POST",
+            body: JSON.stringify(body),
+        },
+    );
     return response.topology_preview;
 }
 
-export function createHttpSimulationBackend(): SimulationBackend {
+export function createHttpSimulationBackend({
+    sessionId,
+}: HttpSimulationBackendOptions = {}): SimulationBackend {
+    const postControlForSession = ((
+        path: EmptyControlCommandPath | "/api/control/reset" | "/api/config",
+        body?: ConfigSyncBody | ResetControlBody,
+    ) => postControl(path, body, sessionId)) as SimulationBackend["postControl"];
+
     return {
-        getState: fetchState,
-        getRules: fetchRules,
+        getState: () => fetchState(sessionId),
+        getRules: () => fetchRules(sessionId),
         dispose() {},
-        postControl,
-        toggleCell: toggleCellRequest,
-        setCell: setCellRequest,
-        setCells: setCellsRequest,
-        compareSeed: compareSeedRequest,
-        previewTopology: previewTopologyRequest,
+        postControl: postControlForSession,
+        toggleCell: (cell) => toggleCellRequest(cell, sessionId),
+        setCell: (cell, state) => setCellRequest(cell, state, sessionId),
+        setCells: (cells) => setCellsRequest(cells, sessionId),
+        compareSeed: (body) => compareSeedRequest(body, sessionId),
+        previewTopology: (body) => previewTopologyRequest(body, sessionId),
     };
 }

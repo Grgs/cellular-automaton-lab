@@ -57,16 +57,16 @@ class ApiTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.app.extensions["simulation_coordinator"].shutdown()
+        cls.app.extensions["simulation_sessions"].shutdown()
         cls.instance_dir.cleanup()
         super().tearDownClass()
 
     @classmethod
     def recreate_app(cls, *, persist_current: bool = True) -> None:
         if persist_current:
-            cls.app.extensions["simulation_coordinator"].shutdown()
+            cls.app.extensions["simulation_sessions"].shutdown()
         else:
-            cls.app.extensions["simulation_coordinator"].stop_background_loop()
+            cls.app.extensions["simulation_sessions"].stop_background_loops()
         cls.app = create_app(instance_path=cls.instance_dir.name)
         cls.client = cls.app.test_client()
 

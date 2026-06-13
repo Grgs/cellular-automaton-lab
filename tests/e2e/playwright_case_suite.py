@@ -19,6 +19,7 @@ try:
         palette_fixture_test_suffix,
     )
     from tools.render_review.browser_support.render_review import (
+        is_control_reset_response_url,
         select_tiling_family,
         set_patch_depth,
     )
@@ -32,6 +33,7 @@ except ModuleNotFoundError:
         palette_fixture_test_suffix,
     )
     from tools.render_review.browser_support.render_review import (
+        is_control_reset_response_url,
         select_tiling_family,
         set_patch_depth,
     )
@@ -175,7 +177,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         if case.api is not None:
             with case.page.expect_response(
                 lambda response: (
-                    response.request.method == "POST" and "/api/control/reset" in response.url
+                    response.request.method == "POST"
+                    and is_control_reset_response_url(response.url)
                 ),
                 timeout=60_000,
             ) as response_info:

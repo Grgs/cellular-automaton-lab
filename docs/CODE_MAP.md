@@ -18,16 +18,18 @@ For maintenance workflows and repo-owned guardrails, see [MAINTENANCE.md](./MAIN
 2. [backend/api.py](../backend/api.py)
    Flask app factory. `create_app(...)` wires config, frontend assets, topology metadata, simulation extensions, and routes.
 3. [backend/simulation/bootstrap.py](../backend/simulation/bootstrap.py)
-   `register_simulation(app)` creates and stores the simulation coordinator and rule registry.
+   `register_simulation(app)` creates and stores the rule registry and session registry.
 4. [backend/web/routes.py](../backend/web/routes.py)
-   HTTP entrypoints for state fetches and mutations.
+   HTTP entrypoints for state fetches and mutations. Server-mode simulation calls use `/api/sessions/<session_id>/...` and resolve the session coordinator lazily.
 5. [backend/web/state_actions.py](../backend/web/state_actions.py)
    Bridges validated request payloads to simulation mutations.
-6. [backend/simulation/coordinator.py](../backend/simulation/coordinator.py)
+6. [backend/simulation/sessions.py](../backend/simulation/sessions.py)
+   Owns session-id validation and per-session coordinator lifecycle/persistence paths.
+7. [backend/simulation/coordinator.py](../backend/simulation/coordinator.py)
    Coordinates runtime, persistence, restore, and simulation service.
-7. [backend/simulation/service.py](../backend/simulation/service.py)
+8. [backend/simulation/service.py](../backend/simulation/service.py)
    Main synchronous simulation API used by the host layers.
-8. [backend/simulation/engine.py](../backend/simulation/engine.py)
+9. [backend/simulation/engine.py](../backend/simulation/engine.py)
    Pure stepping engine that asks the current rule for each cell's next state.
 
 ### Standalone browser runtime
@@ -75,7 +77,8 @@ For maintenance workflows and repo-owned guardrails, see [MAINTENANCE.md](./MAIN
 ```text
 Browser UI
   -> frontend/api.ts
-  -> backend/web/routes.py
+  -> backend/web/routes.py (/api/sessions/<session_id>/...)
+  -> backend/simulation/sessions.py
   -> backend/web/state_actions.py
   -> backend/simulation/coordinator.py
   -> backend/simulation/service.py

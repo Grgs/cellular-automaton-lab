@@ -1,22 +1,21 @@
 from __future__ import annotations
 
 import atexit
-from pathlib import Path
 
 from flask import Flask
 
 from backend.rules import RuleRegistry
-from backend.simulation.coordinator import SimulationCoordinator
-from backend.simulation.persistence import SimulationStateStore
+from backend.simulation.sessions import SimulationSessionRegistry
 
 
-def register_simulation(app: Flask) -> SimulationCoordinator:
+def register_simulation(app: Flask) -> SimulationSessionRegistry:
     rule_registry = RuleRegistry()
-    state_store = SimulationStateStore(Path(app.instance_path) / "simulation_state.json")
-    simulation = SimulationCoordinator(rule_registry=rule_registry, state_store=state_store)
-    simulation.start_background_loop()
+    session_registry = SimulationSessionRegistry(
+        rule_registry=rule_registry,
+        instance_path=app.instance_path,
+    )
 
     app.extensions["rule_registry"] = rule_registry
-    app.extensions["simulation_coordinator"] = simulation
-    atexit.register(simulation.shutdown)
-    return simulation
+    app.extensions["simulation_sessions"] = session_registry
+    atexit.register(session_registry.shutdown)
+    return session_registry
