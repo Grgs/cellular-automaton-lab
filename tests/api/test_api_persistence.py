@@ -13,8 +13,13 @@ except ModuleNotFoundError:
 
 
 class ApiPersistenceTests(ApiTestCase):
+    def default_session_state_path(self) -> Path:
+        state_path = Path(self.app.instance_path) / "sessions" / "default.json"
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        return state_path
+
     def test_app_ignores_preexisting_persisted_snapshot_with_retired_version(self) -> None:
-        state_path = Path(self.app.instance_path) / "simulation_state.json"
+        state_path = self.default_session_state_path()
         state_path.write_text(
             json.dumps(
                 {
@@ -43,7 +48,7 @@ class ApiPersistenceTests(ApiTestCase):
 
         with self.assertLogs("backend.simulation.coordinator", level="WARNING") as logs:
             type(self).recreate_app(persist_current=False)
-        payload = self.get_state()
+            payload = self.get_state()
 
         self.assertIn("Persisted simulation state version is unsupported.", "\n".join(logs.output))
         self.assertEqual(payload["topology_spec"]["tiling_family"], "square")
@@ -61,7 +66,7 @@ class ApiPersistenceTests(ApiTestCase):
         self.assertTrue(all(state == 0 for state in payload["cell_states"]))
 
     def test_app_boots_from_preexisting_persisted_snapshot_v5(self) -> None:
-        state_path = Path(self.app.instance_path) / "simulation_state.json"
+        state_path = self.default_session_state_path()
         state_path.write_text(
             json.dumps(
                 {

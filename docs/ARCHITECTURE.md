@@ -2,7 +2,7 @@
 
 `cellular-automaton-lab` is a topology-first cellular automaton app with a Flask backend and a Vite-built TypeScript frontend.
 
-The backend owns canonical simulation state, rule evaluation, topology transitions, persistence, and background stepping. The frontend renders that state, lets the user edit cells and controls, and sends explicit HTTP mutations back to the backend. The browser does not evolve the automaton locally.
+The backend owns canonical simulation state, rule evaluation, topology transitions, persistence, and background stepping. In server mode, that state is scoped by browser session id: the frontend creates a stable local session id and sends simulation traffic through `/api/sessions/<session_id>/...`, while each session owns its own coordinator and persisted snapshot. The frontend renders that state, lets the user edit cells and controls, and sends explicit HTTP mutations back to the backend. The browser does not evolve the automaton locally.
 
 ## System Overview
 
@@ -10,8 +10,10 @@ The backend owns canonical simulation state, rule evaluation, topology transitio
 flowchart LR
     Browser["Browser"] --> Frontend["TypeScript app"]
     Frontend --> Routes["Flask routes"]
+    Routes --> Sessions["SimulationSessionRegistry"]
     Routes --> StateActions["StateActionService"]
-    Routes --> Coordinator["SimulationCoordinator"]
+    StateActions --> Coordinator["SimulationCoordinator"]
+    Sessions --> Coordinator
     Coordinator --> Runtime["SimulationRuntime"]
     Coordinator --> Persist["Coordinator persistence + restore"]
     Coordinator --> Service["SimulationService"]
@@ -38,7 +40,7 @@ Important rules:
 
 - `frontend/` is the only authored frontend source tree.
 - `static/dist/` is generated build output.
-- Backend snapshots are authoritative for topology, rule, speed, running state, generation, and cell states.
+- Backend snapshots are authoritative for topology, rule, speed, running state, generation, and cell states within a session.
 - Frontend edits and control changes are explicit mutations that return the next canonical snapshot.
 
 Maintenance workflows and repo-owned guardrails live in [MAINTENANCE.md](./MAINTENANCE.md).
@@ -69,24 +71,27 @@ The short version:
 
 Typed mutation application lives in [backend/web/state_actions.py](../backend/web/state_actions.py), not in the route handlers themselves.
 
-Main API endpoints:
+Server-mode simulation endpoints are exposed under `/api/sessions/<session_id>/...`. The unscoped `/api/...` simulation endpoints remain as a default-session compatibility shim for local tools and older tests.
 
-- `GET /`
-- `GET /api/state`
-- `GET /api/topology`
-- `GET /api/rules`
+Main session API endpoints:
+
+- `GET /api/sessions/<session_id>/state`
+- `GET /api/sessions/<session_id>/topology`
+- `GET /api/sessions/<session_id>/rules`
 - `GET /api/meta`
 - `POST /api/compare`
 - `POST /api/topology/preview`
-- `POST /api/control/start`
-- `POST /api/control/pause`
-- `POST /api/control/resume`
-- `POST /api/control/step`
-- `POST /api/control/reset`
-- `POST /api/config`
-- `POST /api/cells/toggle`
-- `POST /api/cells/set`
-- `POST /api/cells/set-many`
+- `POST /api/sessions/<session_id>/compare`
+- `POST /api/sessions/<session_id>/topology/preview`
+- `POST /api/sessions/<session_id>/control/start`
+- `POST /api/sessions/<session_id>/control/pause`
+- `POST /api/sessions/<session_id>/control/resume`
+- `POST /api/sessions/<session_id>/control/step`
+- `POST /api/sessions/<session_id>/control/reset`
+- `POST /api/sessions/<session_id>/config`
+- `POST /api/sessions/<session_id>/cells/toggle`
+- `POST /api/sessions/<session_id>/cells/set`
+- `POST /api/sessions/<session_id>/cells/set-many`
 
 `POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. Requests may set `include_states: true` to include each tiling's topology spec plus sparse begin/end `cells_by_id` maps; the compare-mode UI uses those optional fields to create shareable board links and inline thumbnails. `POST /api/topology/preview` ([backend/simulation/topology_preview.py](../backend/simulation/topology_preview.py)) is a second stateless helper that builds one tiling and returns its cells with per-cell geometry, which the thumbnail renderer draws. Both endpoints are exposed as matching `/api/...` worker commands in the standalone runtime, sharing their request parsers, so compare-mode works identically in server and standalone hosts.
 
@@ -99,7 +104,7 @@ Main API endpoints:
 - [backend/simulation/coordinator_restore.py](../backend/simulation/coordinator_restore.py) owns persisted-state restore flow.
 - [backend/simulation/coordinator_mutations.py](../backend/simulation/coordinator_mutations.py) owns immediate vs deferred mutation dispatch.
 
-[backend/simulation/bootstrap.py](../backend/simulation/bootstrap.py) wires the rule registry, coordinator, and persistent state store into Flask extensions.
+[backend/simulation/bootstrap.py](../backend/simulation/bootstrap.py) wires the rule registry and simulation session registry into Flask extensions. Each server session lazily creates a coordinator with a session-specific persistent state store under the app instance path.
 
 ### Simulation Service
 

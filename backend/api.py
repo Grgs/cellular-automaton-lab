@@ -11,7 +11,7 @@ from backend.payload_types import ServerMetaPayload
 from backend.simulation.bootstrap import register_simulation
 from backend.simulation.periodic_face_tilings import describe_periodic_face_tilings
 from backend.simulation.topology_catalog import describe_topologies
-from backend.web.routes import api_bp, page_bp
+from backend.web.routes import api_bp, page_bp, session_api_bp
 
 
 def create_app(*, instance_path: str | None = None) -> Flask:
@@ -44,4 +44,5 @@ def create_app(*, instance_path: str | None = None) -> Flask:
 
     app.register_blueprint(page_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(session_api_bp)
     return app

@@ -50,6 +50,7 @@ declare global {
         APP_TOPOLOGIES: ReadonlyArray<BootstrappedTopologyDefinition>;
         APP_PERIODIC_FACE_TILINGS: ReadonlyArray<PeriodicFaceTilingDescriptor>;
         APP_APERIODIC_FAMILIES: ReadonlyArray<BootstrappedAperiodicFamilyDefinition>;
+        APP_SESSION_ID?: string;
         __appReady?: boolean;
         __reviewApi?: ReviewApi | null;
     }
