@@ -9,7 +9,13 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.generate_tiling_preview import _generate_polygon_data, _load_descriptors, _tiled_vertices
+from tools.generate_tiling_preview import (
+    _APERIODIC_DEFAULT_DEPTHS,
+    _aperiodic_polygon_data,
+    _generate_polygon_data,
+    _load_descriptors,
+    _tiled_vertices,
+)
 
 
 class GenerateTilingPreviewToolTests(unittest.TestCase):
@@ -70,3 +76,29 @@ class GenerateTilingPreviewToolTests(unittest.TestCase):
         unstaggered = _generate_polygon_data(without_stagger, fill_count=1)
 
         self.assertNotEqual(generated, unstaggered)
+
+    def test_dodecagonal_preview_uses_representative_depth_and_palette_tokens(self) -> None:
+        self.assertEqual(_APERIODIC_DEFAULT_DEPTHS["dodecagonal-square-triangle"], 1)
+
+        polygon_data, cell_count, color_count = _aperiodic_polygon_data(
+            "dodecagonal-square-triangle",
+            _APERIODIC_DEFAULT_DEPTHS["dodecagonal-square-triangle"],
+        )
+
+        self.assertEqual(cell_count, 5)
+        self.assertEqual(color_count, 3)
+        self.assertIn("toneClay:", polygon_data)
+        self.assertIn("toneFlax:", polygon_data)
+
+    def test_periodic_polygon_data_can_emit_palette_tokens(self) -> None:
+        descriptors = _load_descriptors()
+        descriptor = descriptors["archimedean-4-8-8"]
+
+        generated = _generate_polygon_data(
+            descriptor,
+            fill_count=2,
+            geometry="archimedean-4-8-8",
+        )
+
+        self.assertIn("toneCream:", generated)
+        self.assertIn("toneTan:", generated)

@@ -163,6 +163,31 @@ describe("controls/view-options tiling picker", () => {
             polygons.every((polygon) => polygon.getAttribute("points")?.includes("NaN") === false),
         ).toBe(true);
     });
+
+    it("renders dodecagonal square-triangle thumbnails with sampled geometry and palette tokens", () => {
+        const thumbnail = createTilingPreviewThumbnail({
+            value: "dodecagonal-square-triangle",
+            label: "Dodecagonal Square-Triangle",
+            group: "Aperiodic",
+            order: 270,
+            family: "aperiodic",
+            previewKey: "dodecagonal-square-triangle",
+            renderKind: "polygon_aperiodic",
+            sizingMode: "patch_depth",
+            searchAliases: ["square triangle"],
+        });
+
+        const polygons = Array.from(thumbnail.querySelectorAll("polygon"));
+        const sideCounts = new Set(
+            polygons.map((polygon) => polygon.getAttribute("points")?.split(" ").length ?? 0),
+        );
+
+        expect(polygons).toHaveLength(5);
+        expect(sideCounts.has(3)).toBe(true);
+        expect(sideCounts.has(4)).toBe(true);
+        expect(thumbnail.querySelector("[data-fill-token='toneClay']")).not.toBeNull();
+        expect(thumbnail.querySelector("[data-fill-token='toneFlax']")).not.toBeNull();
+    });
 });
 
 describe("controls/view-options rule picker", () => {

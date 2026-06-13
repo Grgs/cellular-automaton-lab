@@ -26,8 +26,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Mapping
+from functools import cache
 from pathlib import Path
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 if TYPE_CHECKING:
     from backend.simulation.topology import LatticeCell
@@ -61,7 +63,7 @@ _APERIODIC_DEFAULT_DEPTHS: dict[str, int] = {
     "spectre": 1,
     "taylor-socolar": 1,
     "ammann-beenker": 1,
-    "dodecagonal-square-triangle": 0,
+    "dodecagonal-square-triangle": 1,
     "penrose-p3-rhombs": 1,
     "penrose-p2-kite-dart": 1,
     "penrose-p1-pentagon-diamond": 0,
@@ -86,6 +88,11 @@ class PreviewDescriptor(TypedDict, total=False):
     faces: list[PreviewFace]
     unit_width: float
     unit_height: float
+
+
+class PaletteVariant(TypedDict):
+    selector: dict[str, str]
+    color: str | dict[str, str]
 
 
 # ---------------------------------------------------------------------------
@@ -167,10 +174,59 @@ def _best_center(
     return min(candidates, key=lambda v: (v[0] - cx) ** 2 + (v[1] - cy) ** 2)
 
 
+@cache
+def _palette_variants_for_geometry(geometry: str) -> tuple[PaletteVariant, ...]:
+    manifest = json.loads(_PALETTE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    for entry in manifest["families"]:
+        if entry["geometry"] == geometry:
+            return tuple(entry.get("variants", ()))
+    return ()
+
+
+def _source_value(source: Mapping[str, Any] | object, field: str) -> str | None:
+    if isinstance(source, Mapping):
+        value = source.get(field)
+    else:
+        value = getattr(source, field, None)
+    return None if value is None else str(value)
+
+
+def _variant_matches_source(
+    source: Mapping[str, Any] | object,
+    variant: PaletteVariant,
+) -> bool:
+    return all(
+        _source_value(source, field) == str(expected)
+        for field, expected in variant["selector"].items()
+    )
+
+
+def _color_token(color: str | dict[str, str]) -> str:
+    if isinstance(color, str):
+        return color
+    return color.get("token", "")
+
+
+def _palette_fill_for_source(
+    geometry: str | None,
+    source: Mapping[str, Any] | object,
+    fallback: str,
+) -> str:
+    if not geometry:
+        return fallback
+    for variant in _palette_variants_for_geometry(geometry):
+        if _variant_matches_source(source, variant):
+            token = _color_token(variant["color"])
+            if token:
+                return token
+    return fallback
+
+
 def _generate_polygon_data(
     descriptor: PreviewDescriptor,
     *,
     fill_count: int = 1,
+    geometry: str | None = None,
 ) -> str:
     """Return the polygon data string for a tiling descriptor.
 
@@ -203,7 +259,7 @@ def _generate_polygon_data(
 
     # Tile a 3x3 grid of unit cells; keep only polygons that visibly overlap
     # the viewbox [0, _VIEWBOX_W] x [0, _VIEWBOX_H] (strict intersection).
-    polygons: list[tuple[int, list[tuple[int, int]]]] = []
+    polygons: list[tuple[str, list[tuple[int, int]]]] = []
     for ix in range(-1, 3):
         for iy in range(-1, 2):
             dx = (ix * unit_w) + (row_offset_x if iy % 2 != 0 else 0.0)
@@ -213,7 +269,8 @@ def _generate_polygon_data(
                 xs = [p[0] for p in vpts]
                 ys = [p[1] for p in vpts]
                 if max(xs) > 0 and min(xs) < _VIEWBOX_W and max(ys) > 0 and min(ys) < _VIEWBOX_H:
-                    fill_index = slot_index % fill_count
+                    fill_index = str(slot_index % fill_count)
+                    fill_index = _palette_fill_for_source(geometry, face, fill_index)
                     polygons.append((fill_index, vpts))
 
     parts = []
@@ -323,12 +380,15 @@ def _aperiodic_polygon_data(geometry: str, depth: int) -> tuple[str, int, int]:
     # Stable selector -> color index mapping in cell traversal order.
     value_to_index: dict[tuple[str, ...], int] = {}
     parts: list[str] = []
+    fills: set[str] = set()
     for cell in cells:
-        color_index = _color_index_for_cell(cell, selector_fields, value_to_index)
+        fallback_index = str(_color_index_for_cell(cell, selector_fields, value_to_index))
+        fill = _palette_fill_for_source(geometry, cell, fallback_index)
+        fills.add(fill)
         coords = " ".join(f"{x},{y}" for x, y in (tx(v[0], v[1]) for v in cell.vertices or ()))
-        parts.append(f"{color_index}:{coords}")
+        parts.append(f"{fill}:{coords}")
 
-    return ";".join(parts), len(cells), max(1, len(value_to_index))
+    return ";".join(parts), len(cells), max(1, len(fills))
 
 
 def _list_aperiodic_geometries() -> None:
@@ -440,7 +500,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
 
-    polygon_data = _generate_polygon_data(descriptor, fill_count=fill_count)
+    polygon_data = _generate_polygon_data(descriptor, fill_count=fill_count, geometry=key)
     label = descriptor.get("label", key)
     faces_per_unit = descriptor.get("cell_count_per_unit", "?")
 

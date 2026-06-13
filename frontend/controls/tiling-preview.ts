@@ -13,6 +13,22 @@ const PREVIEW_FILL_CLASSES = [
     "tiling-preview-fill-d",
 ] as const;
 
+const PREVIEW_FILL_TOKEN_CSS: Readonly<Record<string, string>> = {
+    dead: "var(--cell-dead, var(--dead, #f8f1e5))",
+    deadAlt: "var(--cell-dead-alt, #d5bb8f)",
+    accent: "var(--accent, #bf5a36)",
+    accentStrong: "var(--accent-dark, var(--accent, #8a3d20))",
+    toneCream: "var(--tone-cream, #f8f1e5)",
+    toneLinen: "var(--tone-linen, #ead6b6)",
+    toneSand: "var(--tone-sand, #efe4d0)",
+    toneFlax: "var(--tone-flax, #e1cdac)",
+    toneTan: "var(--tone-tan, #e5c089)",
+    toneStone: "var(--tone-stone, #d5bb8f)",
+    toneRose: "var(--tone-rose, #dbc1b2)",
+    toneClay: "var(--tone-clay, #c88d4b)",
+    toneShadow: "var(--tone-shadow, #b89a6e)",
+};
+
 function svgElement<TElement extends SVGElement>(tagName: string): TElement {
     return document.createElementNS(SVG_NS, tagName) as TElement;
 }
@@ -25,14 +41,26 @@ function pointsAttribute(points: readonly Point[]): string {
     return points.map(([x, y]) => `${formatPoint(x)},${formatPoint(y)}`).join(" ");
 }
 
-function previewFill(index: number): string {
+function previewFillClass(index: number): string {
     return PREVIEW_FILL_CLASSES[index % PREVIEW_FILL_CLASSES.length] ?? PREVIEW_FILL_CLASSES[0];
 }
 
-function addPolygon(svg: SVGSVGElement, points: readonly Point[], fillIndex = 0): void {
+function addPolygon(
+    svg: SVGSVGElement,
+    points: readonly Point[],
+    fill: string | number = "0",
+): void {
     const polygon = svgElement<SVGPolygonElement>("polygon");
     polygon.setAttribute("points", pointsAttribute(points));
-    polygon.setAttribute("class", `tiling-preview-shape ${previewFill(fillIndex)}`);
+    polygon.classList.add("tiling-preview-shape");
+    const numericFillIndex = Number(fill);
+    if (Number.isInteger(numericFillIndex) && numericFillIndex >= 0) {
+        polygon.classList.add(previewFillClass(numericFillIndex));
+    } else {
+        const fillToken = String(fill);
+        polygon.setAttribute("data-fill-token", fillToken);
+        polygon.setAttribute("fill", PREVIEW_FILL_TOKEN_CSS[fillToken] ?? fillToken);
+    }
     svg.appendChild(polygon);
 }
 
@@ -144,7 +172,7 @@ function addPolygonDataPreview(svg: SVGSVGElement, payload: string): boolean {
         if (separatorIndex < 0) {
             return;
         }
-        const fillIndex = Number(polygonPayload.slice(0, separatorIndex));
+        const fill = polygonPayload.slice(0, separatorIndex).trim();
         const points = polygonPayload
             .slice(separatorIndex + 1)
             .split(" ")
@@ -153,7 +181,7 @@ function addPolygonDataPreview(svg: SVGSVGElement, payload: string): boolean {
         if (points.length < 3) {
             return;
         }
-        addPolygon(svg, points, Number.isFinite(fillIndex) ? fillIndex : 0);
+        addPolygon(svg, points, fill || "0");
         rendered = true;
     });
     return rendered;

@@ -24,7 +24,7 @@ _PREVIEW_DATA_PATH = (
 _INLINE_PREVIEW_KEYS = frozenset({"square", "hex", "triangle"})
 
 # Keys are either "quoted-with-dashes" or unquoted (no dashes).
-_KEY_PATTERN = re.compile(r'"([a-z][a-z0-9-]*)":|([a-z][a-z0-9]+):')
+_KEY_PATTERN = re.compile(r'^\s{4}(?:"([a-z][a-z0-9-]*)"|([a-z][a-z0-9]+)):\s*', re.MULTILINE)
 
 
 def _preview_data_keys() -> frozenset[str]:
