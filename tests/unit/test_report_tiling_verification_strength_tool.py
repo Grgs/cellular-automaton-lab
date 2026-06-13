@@ -48,7 +48,7 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         )
         self.assertIn(
             "pinwheel\tpatch_depth\texact_affine\tPASS\t"
-            "sample-exact,metadata,local-reference,canonical-patch,exact-path,strict-validation",
+            "sample-exact,metadata,local-reference,canonical-patch,exact-path",
             output,
         )
         self.assertIn(
@@ -128,8 +128,9 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         self.assertEqual(pinwheel["verification_status"], "PASS")
         self.assertTrue(pinwheel["has_local_reference"])
         self.assertTrue(pinwheel["has_canonical_patch"])
-        self.assertTrue(pinwheel["strict_validation"])
+        self.assertFalse(pinwheel["strict_validation"])
         self.assertIn("exact-path", pinwheel["strength_tags"])
+        self.assertNotIn("strict-validation", pinwheel["strength_tags"])
         self.assertIn("canonical-patch", pinwheel["verification_modes"])
 
         for geometry in ("spectre", "sphinx", "taylor-socolar"):
@@ -149,9 +150,17 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         shield_block = output.split("shield (Shield)", maxsplit=1)[1].split("\n\n", maxsplit=1)[0]
         self.assertNotIn("promotion_blocker:", shield_block)
         self.assertIn("pinwheel (Pinwheel)", output)
+        pinwheel_block = output.split("pinwheel (Pinwheel)", maxsplit=1)[1].split(
+            "\n\n", maxsplit=1
+        )[0]
+        self.assertNotIn("promotion_blocker:", pinwheel_block)
+        self.assertIn("pinwheel-2-1 (Pinwheel 2-1)", output)
+        pinwheel_2_1_block = output.split("pinwheel-2-1 (Pinwheel 2-1)", maxsplit=1)[1].split(
+            "\n\n", maxsplit=1
+        )[0]
         self.assertIn(
             "promotion_blocker: Experimental until manual visual review accepts the exact-affine implementation.",
-            output,
+            pinwheel_2_1_block,
         )
         self.assertIn("exact_reference_mode: pinwheel_exact", output)
         self.assertIn("robinson-triangles (Robinson Triangles)", output)
