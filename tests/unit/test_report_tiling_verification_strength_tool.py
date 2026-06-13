@@ -153,10 +153,7 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         pinwheel_block = output.split("pinwheel (Pinwheel)", maxsplit=1)[1].split(
             "\n\n", maxsplit=1
         )[0]
-        self.assertIn(
-            "promotion_blocker: Experimental until a fresh manual visual review accepts the corrected patch",
-            pinwheel_block,
-        )
+        self.assertNotIn("promotion_blocker:", pinwheel_block)
         self.assertIn("pinwheel-2-1 (Pinwheel 2-1)", output)
         pinwheel_2_1_block = output.split("pinwheel-2-1 (Pinwheel 2-1)", maxsplit=1)[1].split(
             "\n\n", maxsplit=1

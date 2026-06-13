@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Promoted `pinwheel` into the main `Aperiodic` picker group on June 12, 2026 after a fresh manual review accepted the corrected congruent patch against the Bielefeld reference, with the new per-tile congruence invariant standing behind the automated gates.
 - Fixed the `pinwheel` subdivision shear found by the June 11, 2026 literature comparison: three of the five child tuples were declared in non-canonical vertex order, making the base-to-child map an angle-mismatched affine transform that distorted all of their descendants. Every tile is now a congruent `1:2:sqrt(5)` triangle at every depth, the depth-1 chirality split matches the published 3-right + 2-left rule, and the reference verifier gained a per-tile congruence invariant (`expected_triangle_side_ratios`, applied to `pinwheel` and `pinwheel-2-1`) so this defect class can no longer pass automated gates.
 - Reverted the same-day `pinwheel` promotion after a literature comparison against the Bielefeld pinwheel patch found the subdivision shears tiles from depth 2 onward: areas stay exactly equal and chirality balances, but only 20/50 depth-2 triangles keep the canonical `1:2:sqrt(5)` shape, so the patch is not the Conway-Radin pinwheel field beyond depth 1. The family stays `Experimental` with the defect recorded as its promotion blocker.
 - Consolidated Python tool configuration (`ruff.toml`, `mypy.ini`, `pytest.ini`, `.coveragerc`) into a single `pyproject.toml` with no behavior changes.
