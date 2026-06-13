@@ -34,12 +34,17 @@ _BASE_TRIANGLE: ExactTriangle = (
     (_TWO, _ZERO),
     (_TWO, _ONE),
 )
+# Every child tuple must list its vertices in the same canonical
+# (small-angle, right-angle, large-angle) order as ``_BASE_TRIANGLE``:
+# ``map_local`` sends base vertices to the child tuple positionally, so a
+# mis-ordered tuple makes that map an angle-mismatched affine transform
+# (equal area, wrong shape) and shears every descendant of that child.
 _PINWHEEL_CHILDREN: tuple[ExactTriangle, ...] = (
     ((_ZERO, _ZERO), (Fraction(4, 5), Fraction(2, 5)), (_ONE, _ZERO)),
-    ((Fraction(4, 5), Fraction(2, 5)), (_ONE, _ZERO), (Fraction(8, 5), Fraction(4, 5))),
-    ((_ONE, _ZERO), (Fraction(8, 5), Fraction(4, 5)), (Fraction(9, 5), Fraction(2, 5))),
+    ((Fraction(8, 5), Fraction(4, 5)), (Fraction(4, 5), Fraction(2, 5)), (_ONE, _ZERO)),
+    ((_ONE, _ZERO), (Fraction(9, 5), Fraction(2, 5)), (Fraction(8, 5), Fraction(4, 5))),
     ((_ONE, _ZERO), (Fraction(9, 5), Fraction(2, 5)), (_TWO, _ZERO)),
-    ((Fraction(8, 5), Fraction(4, 5)), (_TWO, _ZERO), (_TWO, _ONE)),
+    ((_TWO, _ZERO), (Fraction(8, 5), Fraction(4, 5)), (_TWO, _ONE)),
 )
 _ROOT_TRIANGLES: tuple[ExactTriangle, ...] = (
     _BASE_TRIANGLE,

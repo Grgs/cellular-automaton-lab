@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from backend.simulation.aperiodic_family_manifest import (
     PINWHEEL_GEOMETRY,
     PINWHEEL_TRIANGLE_KIND,
@@ -12,6 +14,8 @@ from backend.simulation.reference_specs.types import (
 )
 
 from ._helpers import _public_cell_kinds, _reference_label
+
+_PINWHEEL_SIDE_RATIOS = (1.0, 2.0, math.sqrt(5))
 
 SPECS = {
     PINWHEEL_GEOMETRY: ReferenceFamilySpec(
@@ -31,6 +35,7 @@ SPECS = {
         ),
         depth_expectations={
             0: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_SIDE_RATIOS,
                 exact_total_cells=2,
                 required_kinds=(PINWHEEL_TRIANGLE_KIND,),
                 required_adjacency_pairs=((PINWHEEL_TRIANGLE_KIND, PINWHEEL_TRIANGLE_KIND),),
@@ -43,6 +48,7 @@ SPECS = {
                 min_unique_chirality_tokens=1,
             ),
             1: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_SIDE_RATIOS,
                 exact_total_cells=10,
                 min_unique_orientation_tokens=4,
                 min_bounds_longest_span=3.0,
@@ -50,13 +56,20 @@ SPECS = {
                 canonical_patch_include_id=True,
             ),
             2: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_SIDE_RATIOS,
                 exact_total_cells=50,
                 min_unique_orientation_tokens=10,
                 min_bounds_longest_span=6.0,
             ),
             3: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_SIDE_RATIOS,
                 exact_total_cells=250,
-                min_unique_orientation_tokens=30,
+                # The similarity-preserving subdivision grows hypotenuse
+                # directions linearly (2 + 4d per depth for the two-root
+                # rectangle seed): 2, 6, 10, 14 at depths 0..3. The previous
+                # minimum of 30 was calibrated against the sheared pre-fix
+                # geometry, whose distorted triangles inflated the count.
+                min_unique_orientation_tokens=14,
                 min_bounds_longest_span=12.0,
                 canonical_patch_fixture_key="exact-depth-3",
                 canonical_patch_include_id=True,

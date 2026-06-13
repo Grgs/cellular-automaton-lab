@@ -287,7 +287,6 @@ class TopologyValidationTests(unittest.TestCase):
             (HAT_MONOTILE_GEOMETRY, 3),
             (DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 3),
             (TUEBINGEN_TRIANGLE_GEOMETRY, 3),
-            (PINWHEEL_GEOMETRY, 3),
         ):
             with self.subTest(geometry=geometry):
                 topology = build_topology(geometry, 0, 0, patch_depth=patch_depth)
@@ -370,7 +369,6 @@ class TopologyValidationTests(unittest.TestCase):
             HAT_MONOTILE_GEOMETRY,
             TUEBINGEN_TRIANGLE_GEOMETRY,
             DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-            PINWHEEL_GEOMETRY,
         ):
             with self.subTest(geometry=geometry):
                 options = recommended_validation_options(geometry)
@@ -385,10 +383,13 @@ class TopologyValidationTests(unittest.TestCase):
                     },
                 )
 
+        # The similarity-correct pinwheel subdivision is not edge-to-edge, so
+        # its polygon-union surface check is waived like pinwheel-2-1's; the
+        # remaining strict checks stay on.
         self.assertEqual(
             recommended_validation_options(PINWHEEL_GEOMETRY),
             {
-                "check_surface": True,
+                "check_surface": False,
                 "check_overlaps": True,
                 "check_edge_multiplicity": True,
                 "check_graph_connectivity": True,

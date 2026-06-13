@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from backend.simulation.literature_reference_specs import (
     REFERENCE_FAMILY_SPECS,
     MetadataRequirement,
@@ -374,6 +376,85 @@ def _depth_topology_expectation_failures(
                     depth=depth,
                 )
             )
+    if expectation.expected_triangle_side_ratios is not None:
+        failures.extend(
+            _triangle_congruence_failures(
+                depth=depth,
+                topology=topology,
+                expected_ratios=expectation.expected_triangle_side_ratios,
+            )
+        )
     failures.extend(_local_reference_fixture_failures(geometry, depth, topology))
     failures.extend(_canonical_patch_fixture_failures(geometry, depth, topology, expectation))
+    return failures
+
+
+_TRIANGLE_RATIO_RELATIVE_TOLERANCE = 1e-6
+
+
+def _triangle_congruence_failures(
+    *,
+    depth: int,
+    topology: LatticeTopology,
+    expected_ratios: tuple[float, float, float],
+) -> list[ReferenceCheckFailure]:
+    """Require every cell to be a triangle similar to the family prototile.
+
+    Sorted side lengths are normalized by the shortest side and compared to
+    ``expected_ratios`` with a relative tolerance, so the check is invariant
+    to patch scale, rotation, reflection, and chirality.
+    """
+    non_triangle = 0
+    non_congruent = 0
+    worst_example: tuple[str, tuple[float, float, float]] | None = None
+    worst_error = 0.0
+    for cell in topology.cells:
+        vertices = cell.vertices
+        if vertices is None or len(vertices) != 3:
+            non_triangle += 1
+            continue
+        side_lengths = sorted(
+            math.dist(vertices[index], vertices[(index + 1) % 3]) for index in range(3)
+        )
+        shortest = side_lengths[0]
+        if shortest <= 0.0:
+            non_triangle += 1
+            continue
+        observed = (1.0, side_lengths[1] / shortest, side_lengths[2] / shortest)
+        error = max(
+            abs(observed_ratio - expected_ratio) / expected_ratio
+            for observed_ratio, expected_ratio in zip(observed, expected_ratios, strict=True)
+        )
+        if error > _TRIANGLE_RATIO_RELATIVE_TOLERANCE:
+            non_congruent += 1
+            if error > worst_error:
+                worst_error = error
+                worst_example = (cell.id, observed)
+    failures: list[ReferenceCheckFailure] = []
+    if non_triangle:
+        failures.append(
+            ReferenceCheckFailure(
+                code="non-triangle-cell",
+                message=(
+                    f"Depth {depth} expected every cell to be a triangle but "
+                    f"{non_triangle} cells have a different vertex count."
+                ),
+                depth=depth,
+            )
+        )
+    if non_congruent:
+        assert worst_example is not None
+        worst_id, worst_ratios = worst_example
+        failures.append(
+            ReferenceCheckFailure(
+                code="non-congruent-tile",
+                message=(
+                    f"Depth {depth} expected every tile similar to the prototile with side "
+                    f"ratios {expected_ratios!r} but {non_congruent} of {len(topology.cells)} "
+                    f"cells deviate; worst is '{worst_id}' with ratios "
+                    f"({worst_ratios[0]:.6f}, {worst_ratios[1]:.6f}, {worst_ratios[2]:.6f})."
+                ),
+                depth=depth,
+            )
+        )
     return failures

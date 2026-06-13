@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from backend.simulation.aperiodic_family_manifest import (
     PINWHEEL_2_1_GEOMETRY,
     PINWHEEL_2_1_LARGE_KIND,
@@ -12,6 +14,8 @@ from backend.simulation.reference_specs.types import (
 )
 
 from ._helpers import _public_cell_kinds, _reference_label
+
+_PINWHEEL_2_1_SIDE_RATIOS = (1.0, 4.0, math.sqrt(17))
 
 SPECS = {
     PINWHEEL_2_1_GEOMETRY: ReferenceFamilySpec(
@@ -32,6 +36,7 @@ SPECS = {
         ),
         depth_expectations={
             0: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_2_1_SIDE_RATIOS,
                 exact_total_cells=2,
                 expected_kind_counts=((PINWHEEL_2_1_LARGE_KIND, 2),),
                 required_kinds=(PINWHEEL_2_1_LARGE_KIND,),
@@ -45,6 +50,7 @@ SPECS = {
                 min_unique_orientation_tokens=2,
             ),
             1: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_2_1_SIDE_RATIOS,
                 exact_total_cells=10,
                 # One small + four large per root x two roots = 2 small +
                 # 8 large. Entries sorted alphabetically (verifier compares
@@ -60,6 +66,7 @@ SPECS = {
                 canonical_patch_include_id=True,
             ),
             2: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_2_1_SIDE_RATIOS,
                 exact_total_cells=50,
                 expected_kind_counts=(
                     (PINWHEEL_2_1_LARGE_KIND, 40),
@@ -68,6 +75,7 @@ SPECS = {
                 min_unique_orientation_tokens=10,
             ),
             3: ReferenceDepthExpectation(
+                expected_triangle_side_ratios=_PINWHEEL_2_1_SIDE_RATIOS,
                 exact_total_cells=250,
                 expected_kind_counts=(
                     (PINWHEEL_2_1_LARGE_KIND, 200),

@@ -59,6 +59,13 @@ class ReferenceDepthExpectation:
     expected_signature: str | None = None
     canonical_patch_fixture_key: str | None = None
     canonical_patch_include_id: bool = False
+    # When set, every cell polygon must be a triangle whose sorted side
+    # lengths, normalized by the shortest side, match these ratios within a
+    # small relative tolerance. This pins per-tile congruence to the family's
+    # prototile shape (e.g. ``(1.0, 2.0, sqrt(5))`` for pinwheel), which the
+    # count/area/adjacency invariants cannot see: an angle-mismatched affine
+    # subdivision preserves areas and counts while shearing tile shapes.
+    expected_triangle_side_ratios: tuple[float, float, float] | None = None
 
 
 @dataclass(frozen=True)
