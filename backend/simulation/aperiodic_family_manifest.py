@@ -331,7 +331,7 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         geometry=PINWHEEL_2_1_GEOMETRY,
         catalog_label="Pinwheel 2-1",
         reference_label="Pinwheel 2-1",
-        picker_group="Experimental",
+        picker_group="Aperiodic",
         picker_order=345,
         default_rule="life-b2-s23",
         builder_kind="substitution_recipe",
@@ -350,9 +350,6 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # near-disconnected pieces at depth 3 specifically. See
         # docs/TILING_KNOWN_DEVIATIONS.md for the full rationale.
         polygon_surface_check=False,
-        promotion_blocker=(
-            "Experimental until manual visual review accepts the exact-affine implementation."
-        ),
     ),
 }
 

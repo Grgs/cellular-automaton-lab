@@ -158,10 +158,14 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
         pinwheel_2_1_block = output.split("pinwheel-2-1 (Pinwheel 2-1)", maxsplit=1)[1].split(
             "\n\n", maxsplit=1
         )[0]
-        self.assertIn(
-            "promotion_blocker: Experimental until manual visual review accepts the exact-affine implementation.",
-            pinwheel_2_1_block,
-        )
+        self.assertNotIn("promotion_blocker:", pinwheel_2_1_block)
+        # dodecagonal-square-triangle is now the only experimental aperiodic family,
+        # so it is where the detail output still surfaces a promotion blocker.
+        self.assertIn("dodecagonal-square-triangle (Dodecagonal Square-Triangle)", output)
+        dodecagonal_block = output.split(
+            "dodecagonal-square-triangle (Dodecagonal Square-Triangle)", maxsplit=1
+        )[1].split("\n\n", maxsplit=1)[0]
+        self.assertIn("promotion_blocker:", dodecagonal_block)
         self.assertIn("exact_reference_mode: pinwheel_exact", output)
         self.assertIn("robinson-triangles (Robinson Triangles)", output)
         self.assertIn("tuebingen-triangle (Tuebingen Triangle)", output)

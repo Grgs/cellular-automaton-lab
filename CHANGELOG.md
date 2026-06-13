@@ -5,7 +5,8 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
-No completed changes yet.
+- Promoted `pinwheel-2-1` into the main `Aperiodic` picker group on June 13, 2026 after a visual review against the published Bielefeld patch accepted the rendered field; its exact-`Fraction` `1:4:sqrt(17)` tiles are congruence-verified at every depth, leaving `dodecagonal-square-triangle` as the only experimental aperiodic family.
+- Added a `pinwheel-2-1-depth-3` render-review profile so the family's visual review is a repeatable, literature-anchored gate rather than a one-off check.
 
 ## `v0.5.0` Preview Release Candidate
 

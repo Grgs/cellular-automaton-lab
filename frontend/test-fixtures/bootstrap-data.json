@@ -1178,6 +1178,32 @@
       }
     },
     {
+      "tiling_family": "pinwheel-2-1",
+      "label": "Pinwheel 2-1",
+      "picker_group": "Aperiodic",
+      "picker_order": 345,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "pinwheel-2-1"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
       "tiling_family": "dodecagonal-square-triangle",
       "label": "Dodecagonal Square-Triangle",
       "picker_group": "Experimental",
@@ -1202,32 +1228,6 @@
         "min": 0,
         "max": 6,
         "unsafe_max": 60
-      }
-    },
-    {
-      "tiling_family": "pinwheel-2-1",
-      "label": "Pinwheel 2-1",
-      "picker_group": "Experimental",
-      "picker_order": 345,
-      "sizing_mode": "patch_depth",
-      "family": "aperiodic",
-      "render_kind": "polygon_aperiodic",
-      "viewport_sync_mode": "presentation-only",
-      "supported_adjacency_modes": [
-        "edge"
-      ],
-      "default_adjacency_mode": "edge",
-      "default_rules": {
-        "edge": "life-b2-s23"
-      },
-      "geometry_keys": {
-        "edge": "pinwheel-2-1"
-      },
-      "sizing_policy": {
-        "control": "patch_depth",
-        "default": 3,
-        "min": 0,
-        "max": 4
       }
     }
   ],
@@ -1810,9 +1810,9 @@
     {
       "tiling_family": "pinwheel-2-1",
       "label": "Pinwheel 2-1",
-      "experimental": true,
+      "experimental": false,
       "implementation_status": "exact_affine",
-      "promotion_blocker": "Experimental until manual visual review accepts the exact-affine implementation.",
+      "promotion_blocker": null,
       "public_cell_kinds": [
         "pinwheel-2-1-small-triangle",
         "pinwheel-2-1-large-triangle"
