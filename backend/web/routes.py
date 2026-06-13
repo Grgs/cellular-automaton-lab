@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-
 from flask import Blueprint, Response, current_app, jsonify, render_template, request
 from markupsafe import Markup
 
@@ -10,7 +8,6 @@ from backend.bootstrap_data import build_bootstrap_payload
 from backend.frontend_assets import FrontendAssetManifest
 from backend.payload_types import (
     ApiErrorPayload,
-    RawJsonObject,
     RulesResponsePayload,
 )
 from backend.rules import RuleRegistry
@@ -48,10 +45,7 @@ def simulation_sessions() -> SimulationSessionRegistry:
 
 
 def simulation_coordinator(session_id: str = DEFAULT_SESSION_ID) -> SimulationCoordinator:
-    try:
-        return simulation_sessions().get(session_id)
-    except SimulationSessionError as exc:
-        raise RequestValidationError(str(exc)) from exc
+    return simulation_sessions().get(session_id)
 
 
 def rule_registry() -> RuleRegistry:
@@ -71,44 +65,23 @@ def json_error(message: str, status_code: int = 400) -> tuple[Response, int]:
     return jsonify(payload), status_code
 
 
-def state_response(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    try:
-        coordinator = simulation_coordinator(session_id)
-    except RequestValidationError as exc:
-        return json_error(str(exc))
-    return jsonify(coordinator.get_state().to_dict())
+# Invalid session ids, request-contract violations, and rejected simulation
+# operations are all client errors reported as a 400 with a JSON body. One
+# app-wide handler per type lets every route resolve a coordinator and apply
+# its action directly, instead of repeating the same try/except in each one.
+@api_bp.app_errorhandler(SimulationSessionError)
+@api_bp.app_errorhandler(RequestValidationError)
+@api_bp.app_errorhandler(SimulationOperationError)
+def handle_api_request_error(exc: ValueError) -> tuple[Response, int]:
+    return json_error(str(exc))
 
 
-def topology_response(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    try:
-        coordinator = simulation_coordinator(session_id)
-    except RequestValidationError as exc:
-        return json_error(str(exc))
-    topology = coordinator.get_topology()
-    return jsonify(topology.to_dict())
+def state_response(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    return jsonify(simulation_coordinator(session_id).get_state().to_dict())
 
 
-def validated_state_action(
-    session_id: str,
-    action_factory: Callable[[StateActionService], Callable[[RawJsonObject], None]],
-) -> JsonRouteResult:
-    payload = get_payload(request)
-    try:
-        action_factory(state_actions(session_id))(payload)
-    except (RequestValidationError, SimulationOperationError) as exc:
-        return json_error(str(exc))
-    return state_response(session_id)
-
-
-def control_state_action(
-    session_id: str,
-    action_factory: Callable[[SimulationCoordinator], Callable[[], None]],
-) -> JsonRouteResult:
-    try:
-        action_factory(simulation_coordinator(session_id))()
-    except RequestValidationError as exc:
-        return json_error(str(exc))
-    return state_response(session_id)
+def topology_response(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    return jsonify(simulation_coordinator(session_id).get_topology().to_dict())
 
 
 @page_bp.get("/")
@@ -133,7 +106,7 @@ def index() -> str:
 
 @api_bp.get("/state")
 @session_api_bp.get("/state")
-def get_state(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
+def get_state(session_id: str = DEFAULT_SESSION_ID) -> Response:
     return state_response(session_id)
 
 
@@ -146,7 +119,7 @@ def get_rules(session_id: str = DEFAULT_SESSION_ID) -> Response:
 
 @api_bp.get("/topology")
 @session_api_bp.get("/topology")
-def get_topology(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
+def get_topology(session_id: str = DEFAULT_SESSION_ID) -> Response:
     return topology_response(session_id)
 
 
@@ -184,53 +157,62 @@ def topology_preview(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
 
 @api_bp.post("/control/start")
 @session_api_bp.post("/control/start")
-def start(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return control_state_action(session_id, lambda coordinator: coordinator.start)
+def start(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    simulation_coordinator(session_id).start()
+    return state_response(session_id)
 
 
 @api_bp.post("/control/pause")
 @session_api_bp.post("/control/pause")
-def pause(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return control_state_action(session_id, lambda coordinator: coordinator.pause)
+def pause(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    simulation_coordinator(session_id).pause()
+    return state_response(session_id)
 
 
 @api_bp.post("/control/resume")
 @session_api_bp.post("/control/resume")
-def resume(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return control_state_action(session_id, lambda coordinator: coordinator.resume)
+def resume(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    simulation_coordinator(session_id).resume()
+    return state_response(session_id)
 
 
 @api_bp.post("/control/step")
 @session_api_bp.post("/control/step")
-def step(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return control_state_action(session_id, lambda coordinator: coordinator.step)
+def step(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    simulation_coordinator(session_id).step()
+    return state_response(session_id)
 
 
 @api_bp.post("/control/reset")
 @session_api_bp.post("/control/reset")
-def reset(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return validated_state_action(session_id, lambda actions: actions.apply_reset_payload)
+def reset(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    state_actions(session_id).apply_reset_payload(get_payload(request))
+    return state_response(session_id)
 
 
 @api_bp.post("/config")
 @session_api_bp.post("/config")
-def update_config(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return validated_state_action(session_id, lambda actions: actions.apply_config_payload)
+def update_config(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    state_actions(session_id).apply_config_payload(get_payload(request))
+    return state_response(session_id)
 
 
 @api_bp.post("/cells/toggle")
 @session_api_bp.post("/cells/toggle")
-def toggle_cell(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return validated_state_action(session_id, lambda actions: actions.apply_toggle_cell_payload)
+def toggle_cell(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    state_actions(session_id).apply_toggle_cell_payload(get_payload(request))
+    return state_response(session_id)
 
 
 @api_bp.post("/cells/set")
 @session_api_bp.post("/cells/set")
-def set_cell(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return validated_state_action(session_id, lambda actions: actions.apply_set_cell_payload)
+def set_cell(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    state_actions(session_id).apply_set_cell_payload(get_payload(request))
+    return state_response(session_id)
 
 
 @api_bp.post("/cells/set-many")
 @session_api_bp.post("/cells/set-many")
-def set_cells(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    return validated_state_action(session_id, lambda actions: actions.apply_set_cells_payload)
+def set_cells(session_id: str = DEFAULT_SESSION_ID) -> Response:
+    state_actions(session_id).apply_set_cells_payload(get_payload(request))
+    return state_response(session_id)
