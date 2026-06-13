@@ -6,6 +6,7 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_MONOTILE_GEOMETRY,
     PENROSE_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    PINWHEEL_2_1_GEOMETRY,
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
@@ -222,6 +223,13 @@ class GeometryManifestTests(unittest.TestCase):
     def test_pinwheel_geometry_is_grouped_as_aperiodic(self) -> None:
         definition = get_topology_variant_for_geometry(PINWHEEL_GEOMETRY)
         family_definition = get_topology_definition(PINWHEEL_GEOMETRY)
+
+        self.assertEqual(definition.picker_group, "Aperiodic")
+        self.assertEqual(family_definition.picker_group, "Aperiodic")
+
+    def test_pinwheel_2_1_geometry_is_grouped_as_aperiodic(self) -> None:
+        definition = get_topology_variant_for_geometry(PINWHEEL_2_1_GEOMETRY)
+        family_definition = get_topology_definition(PINWHEEL_2_1_GEOMETRY)
 
         self.assertEqual(definition.picker_group, "Aperiodic")
         self.assertEqual(family_definition.picker_group, "Aperiodic")

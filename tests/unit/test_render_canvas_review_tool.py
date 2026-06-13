@@ -65,6 +65,7 @@ class RenderCanvasReviewToolTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         rendered = stdout.getvalue()
         self.assertIn("pinwheel-depth-3: family=pinwheel, depth=3", rendered)
+        self.assertIn("pinwheel-2-1-depth-3: family=pinwheel-2-1, depth=3", rendered)
         self.assertIn(
             "dodecagonal-square-triangle-depth-3: family=dodecagonal-square-triangle, depth=3",
             rendered,

@@ -133,7 +133,7 @@ This release does not publish an npm package or a PyPI package. The repository i
 
 ## Preview Status And Known Limitations
 
-- `pinwheel-2-1` remains labeled `Experimental` until manual visual review accepts its exact-affine implementation; the single-prototile `pinwheel` was promoted to the main `Aperiodic` group on June 12, 2026 after a review of the corrected congruent patch.
+- `pinwheel` and `pinwheel-2-1` both ship in the main `Aperiodic` group: `pinwheel` was promoted on June 12, 2026 after correcting its subdivision shear, and `pinwheel-2-1` on June 13, 2026 after a visual review against the published Bielefeld patch (its exact-`Fraction` `1:4:sqrt(17)` tiles are congruence-verified at every depth).
 - `dodecagonal-square-triangle` is currently implemented as a decorated `3.12.12` Archimedean generator rather than the canonical Schlottmann quasi-periodic square-triangle tiling.
 - The standalone GitHub Pages demo targets static hosting with network access and still loads Pyodide from a CDN rather than bundling it for offline use.
 
