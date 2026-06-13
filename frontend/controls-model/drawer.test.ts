@@ -109,7 +109,7 @@ describe("controls-model/drawer selection inspector", () => {
         const state = await buildControlsModelState();
         state.topologySpec = {
             ...state.topologySpec,
-            tiling_family: "pinwheel-2-1",
+            tiling_family: "pinwheel",
             sizing_mode: "patch_depth",
             patch_depth: 3,
         };
@@ -124,6 +124,6 @@ describe("controls-model/drawer selection inspector", () => {
         expect(viewModel.topologyStatusVisible).toBe(true);
         expect(viewModel.topologyStatusTone).toBe("warning");
         expect(viewModel.topologyStatusLabel).toContain("Experimental");
-        expect(viewModel.topologyStatusDetail).toContain("manual visual review");
+        expect(viewModel.topologyStatusDetail).toContain("Experimental until");
     });
 });
