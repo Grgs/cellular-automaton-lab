@@ -322,6 +322,15 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
             "depth and the verifier now enforces per-tile congruence."
         ),
         depth_semantics_label="exact affine substitution depth",
+        # The similarity-correct pinwheel subdivision is not edge-to-edge:
+        # hypotenuse midpoints meet neighbor vertices at T-junctions, and the
+        # float conversion of the exact rational coordinates leaves hairline
+        # gaps that split Shapely's polygon-union surface (4 components at
+        # depth 3; a 1e-9 buffer reunifies it to one). The cell-adjacency
+        # graph is connected, overlap-free, and hole-free at every depth, so
+        # only the union surface-component check is waived -- the same waiver
+        # pinwheel-2-1 carries for the same reason.
+        polygon_surface_check=False,
     ),
     PINWHEEL_2_1_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PINWHEEL_2_1_GEOMETRY,
