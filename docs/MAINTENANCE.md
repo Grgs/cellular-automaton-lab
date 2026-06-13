@@ -49,7 +49,7 @@ Pre-commit mirrors the same Python scope plus the frontend lint/format check, so
 
 ## Public Release Process
 
-The first clean public release line started at `v0.1.0` and continues as an ongoing preview series; `v0.4.0` is the current shipped tag. The public release surface is:
+The first clean public release line started at `v0.1.0` and continues as an ongoing preview series; `v0.5.0` is the current shipped tag. The public release surface is:
 
 - a tagged GitHub source release
 - the GitHub Pages standalone demo
@@ -115,7 +115,7 @@ The post-publish check must pass before considering the release complete. It ver
    - one topology or rule switch works
    - one pattern import/export or persistence flow works
    - no obvious startup or console failure appears
-10. Keep concise release notes in the matching file in [docs/releases/](releases/) for the target tag; the Release workflow uses that file as the GitHub Release notes (current tags: `v0.1.0`, `v0.2.0`, `v0.3.0`, `v0.4.0`).
+10. Keep concise release notes in the matching file in [docs/releases/](releases/) for the target tag; the Release workflow uses that file as the GitHub Release notes (current tags: `v0.1.0`, `v0.2.0`, `v0.3.0`, `v0.4.0`, `v0.5.0`).
 11. Tag only after the intended commit has passed the required validation and deploy path. Do not stop at a merged release PR; GitHub does not list a new release until the tag and GitHub Release exist.
 
 Public docs must keep preview status and known limitations explicit. Do not imply package-registry support or long-term API stability before the project actually offers them.

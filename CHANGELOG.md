@@ -5,9 +5,16 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+No completed changes yet.
+
+## `v0.5.0` Preview Release Candidate
+
+- Added compare mode as a first-class workflow: live seed previews, draw-the-seed input, shareable begin/end links, open-in-place result loading, geometric shape seeding, denser cross-topology previews, and clearer compare modal actions.
+- Polished the main app chrome, mobile canvas toolbar, drawer sections, tiling picker, rule search, first-action onboarding, and compare modal so repeated topology/rule switching is easier to scan and operate.
 - Promoted `pinwheel` into the main `Aperiodic` picker group on June 12, 2026 after a fresh manual review accepted the corrected congruent patch against the Bielefeld reference, with the new per-tile congruence invariant standing behind the automated gates.
 - Fixed the `pinwheel` subdivision shear found by the June 11, 2026 literature comparison: three of the five child tuples were declared in non-canonical vertex order, making the base-to-child map an angle-mismatched affine transform that distorted all of their descendants. Every tile is now a congruent `1:2:sqrt(5)` triangle at every depth, the depth-1 chirality split matches the published 3-right + 2-left rule, and the reference verifier gained a per-tile congruence invariant (`expected_triangle_side_ratios`, applied to `pinwheel` and `pinwheel-2-1`) so this defect class can no longer pass automated gates.
-- Reverted the same-day `pinwheel` promotion after a literature comparison against the Bielefeld pinwheel patch found the subdivision shears tiles from depth 2 onward: areas stay exactly equal and chirality balances, but only 20/50 depth-2 triangles keep the canonical `1:2:sqrt(5)` shape, so the patch is not the Conway-Radin pinwheel field beyond depth 1. The family stays `Experimental` with the defect recorded as its promotion blocker.
+- Fixed tiling picker thumbnail fidelity by regenerating stale sampled geometry, aligning Type 7 Pentagonal with its neutral canvas fill, and making palette-backed thumbnails use the same named fill tokens as the canvas renderer.
+- Consolidated the duplicate triangle-hexagon Life rule entry so the rule catalog exposes one canonical mixed-tiling rule instead of parallel aliases.
 - Consolidated Python tool configuration (`ruff.toml`, `mypy.ini`, `pytest.ini`, `.coveragerc`) into a single `pyproject.toml` with no behavior changes.
 - Regenerated the Python lockfiles with `--generate-hashes --allow-unsafe` so pip verifies download integrity for every pinned file and rejects unpinned requirements at install time.
 - Broadened the ruff lint gate with bugbear, pyupgrade, and import sorting (`B`, `UP`, `I`) and modernized the Python tree to match: sorted imports, PEP 695 type aliases and generics, `datetime.UTC`, explicit `zip()` strictness, and explicit exception chaining.

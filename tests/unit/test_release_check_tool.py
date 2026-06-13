@@ -6,6 +6,8 @@ from unittest.mock import patch
 
 from tools.release_check import CheckResult, _check_version_shape, collect_checks
 
+NEXT_RELEASE_VERSION = "v0.5.0"
+
 
 def _completed(stdout: str = "", returncode: int = 0) -> subprocess.CompletedProcess[str]:
     return subprocess.CompletedProcess(["mock"], returncode, stdout=stdout, stderr="")
@@ -19,7 +21,7 @@ class ReleaseCheckToolTests(unittest.TestCase):
                 ("branch", "--show-current"): "main",
                 ("rev-parse", "HEAD"): "abc123",
                 ("rev-parse", "origin/main"): "abc123",
-                ("tag", "--list", "v0.4.0"): "",
+                ("tag", "--list", NEXT_RELEASE_VERSION): "",
             }
             return values.get(args)
 
@@ -28,7 +30,7 @@ class ReleaseCheckToolTests(unittest.TestCase):
             patch("tools.release_check._run_command", return_value=_completed()),
             patch("tools.release_check._gh_json", return_value=None),
         ):
-            checks = collect_checks("v0.4.0", phase="pre-publish", target_branch="main")
+            checks = collect_checks(NEXT_RELEASE_VERSION, phase="pre-publish", target_branch="main")
 
         self.assertTrue(all(check.ok for check in checks), checks)
 
