@@ -188,6 +188,33 @@ describe("controls/view-options tiling picker", () => {
         expect(thumbnail.querySelector("[data-fill-token='toneClay']")).not.toBeNull();
         expect(thumbnail.querySelector("[data-fill-token='toneFlax']")).not.toBeNull();
     });
+
+    it("keeps Type 7 pentagonal thumbnails on the neutral single-prototile fill", () => {
+        const thumbnail = createTilingPreviewThumbnail({
+            value: "type-7-pentagonal",
+            label: "Type 7 Pentagonal",
+            group: "Periodic",
+            order: 180,
+            family: "periodic",
+            previewKey: "type-7-pentagonal",
+            renderKind: "polygon_periodic",
+            sizingMode: "grid",
+            searchAliases: ["pentagon"],
+        });
+
+        const polygons = Array.from(thumbnail.querySelectorAll("polygon"));
+        const fillClasses = new Set(
+            polygons.flatMap((polygon) =>
+                Array.from(polygon.classList).filter((className) =>
+                    className.startsWith("tiling-preview-fill-"),
+                ),
+            ),
+        );
+
+        expect(polygons.length).toBeGreaterThan(10);
+        expect(fillClasses).toEqual(new Set(["tiling-preview-fill-a"]));
+        expect(thumbnail.querySelector("[data-fill-token]")).toBeNull();
+    });
 });
 
 describe("controls/view-options rule picker", () => {
