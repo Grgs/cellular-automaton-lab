@@ -8,7 +8,6 @@ The `v0.4.0` public preview has been released (after `v0.1.0`, `v0.2.0`, and `v0
 
 ### Current preview limitations
 
-- Keep `pinwheel` in `Experimental` until a fresh manual visual review accepts the corrected congruent patch (the depth-2+ subdivision shear was fixed on June 11, 2026 and the verifier now enforces per-tile congruence).
 - Keep `dodecagonal-square-triangle` documented as a decorated `3.12.12` Archimedean generator, not a canonical Schlottmann quasi-periodic marked-prototile implementation.
 - Keep the standalone public demo's Pyodide CDN dependency documented until full offline bundling is implemented.
 - Keep finite-sample verifier boundaries and exact-path render tolerances documented in the known-deviation notes until stronger verification replaces them.
@@ -20,7 +19,6 @@ The `v0.4.0` public preview has been released (after `v0.1.0`, `v0.2.0`, and `v0
 
 ## Now
 
-- Re-run the `pinwheel` promotion review against the corrected congruent patch (subdivision fixed and per-tile congruence invariant added on June 11, 2026).
 - For `dodecagonal-square-triangle`, the runtime is now a decorated 3.12.12 Archimedean generator: hexagonal lattice of regular dodecagonal supercells decomposed into six unit squares plus twelve unit equilateral triangles, with two bridging triangles per supercell. It tiles the plane exactly, scales without depth limit, and uses no vendored data. It is not the canonical Schlottmann quasi-periodic tiling (which would require marked prototiles); the supercell layout is locally 6-fold symmetric and the global tiling is periodic at the supercell scale.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
 
