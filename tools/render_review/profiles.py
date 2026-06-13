@@ -96,6 +96,52 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
         ),
         expected_warnings=(STANDALONE_BACKEND_UNAVAILABLE_WARNING,),
     ),
+    "pinwheel-2-1-depth-3": RenderReviewProfile(
+        name="pinwheel-2-1-depth-3",
+        family="pinwheel-2-1",
+        patch_depth=3,
+        literature_reference=LiteratureReference(
+            citation_label="Pinwheel-2-1 substitution (Tilings Encyclopedia)",
+            primary_source_url="https://tilings.math.uni-bielefeld.de/substitution/pinwheel-2-1/",
+            review_note=(
+                "Compare against the published pinwheel-2-1 patch. The signature is "
+                "extreme 1:4:sqrt(17) tile elongation arranged in radiating fan clusters, "
+                "with the smaller prototile interspersed among the larger one. Per-tile "
+                "congruence to the 1:4:sqrt(17) prototile is already machine-enforced by "
+                "the reference verifier; this profile is the visual-field counterpart."
+            ),
+            cache_filename="pinwheel-2-1-reference.png",
+        ),
+        review_checklist=(
+            ReviewChecklistItem(
+                id="prototile-elongation",
+                label="Tiles read as elongated 1:4:sqrt(17) right triangles",
+                guidance=(
+                    "Check that every visible tile is the same long, thin right-triangle "
+                    "shape (no sheared or near-equilateral triangles), matching the "
+                    "published prototile."
+                ),
+            ),
+            ReviewChecklistItem(
+                id="two-prototile-mix",
+                label="Both prototile sizes are present",
+                guidance=(
+                    "Check that the smaller prototile appears interspersed among the larger "
+                    "one rather than being absent or dominant; the substitution emits one "
+                    "small per four large per parent."
+                ),
+            ),
+            ReviewChecklistItem(
+                id="fan-clustering",
+                label="Fan/spiral clustering matches the reference",
+                guidance=(
+                    "Check that tiles group into the radiating pinwheel fans seen in the "
+                    "published patch instead of a directional or grid-like band."
+                ),
+            ),
+        ),
+        expected_warnings=(STANDALONE_BACKEND_UNAVAILABLE_WARNING,),
+    ),
     "shield-depth-3": RenderReviewProfile(
         name="shield-depth-3",
         family="shield",
