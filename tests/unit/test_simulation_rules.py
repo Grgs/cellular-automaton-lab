@@ -1027,6 +1027,225 @@ class SimulationRuleTests(unittest.TestCase):
         self.assertEqual(rule.next_state(blocked_ctx), rule.RESTING)
         self.assertEqual(rule.next_state(allowed_ctx), rule.EXCITED)
 
+    def test_whirlpool_outer_zone_relay_uses_strong_trailing_wake(self) -> None:
+        rule = WhirlpoolRule()
+        relayed_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-in",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+        damped_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-in",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+                make_neighbor_spec(
+                    rule.REFRACTORY,
+                    neighbor_id="drag-ccw",
+                    radial="outward",
+                    turn="counterclockwise",
+                    clockwise_index=2,
+                ),
+            ],
+        )
+
+        self.assertEqual(rule.next_state(relayed_ctx), rule.EXCITED)
+        self.assertEqual(rule.next_state(damped_ctx), rule.RESTING)
+
+    def test_whirlpool_outer_zone_uses_tangential_clockwise_wake(self) -> None:
+        rule = WhirlpoolRule()
+        relayed_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+            ],
+        )
+        outward_drag_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="outward-drag",
+                    radial="outward",
+                    turn="aligned",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+        counter_drag_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="counter-drag",
+                    radial="level",
+                    turn="counterclockwise",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+
+        self.assertEqual(rule.next_state(relayed_ctx), rule.EXCITED)
+        self.assertEqual(rule.next_state(outward_drag_ctx), rule.RESTING)
+        self.assertEqual(rule.next_state(counter_drag_ctx), rule.RESTING)
+
+    def test_whirlpool_outer_refractory_can_rejoin_guided_wake(self) -> None:
+        rule = WhirlpoolRule()
+        relayed_ctx = build_context(
+            rule.REFRACTORY,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-in",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+        damped_ctx = build_context(
+            rule.REFRACTORY,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-in",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+                make_neighbor_spec(
+                    rule.REFRACTORY,
+                    neighbor_id="drag-ccw",
+                    radial="outward",
+                    turn="counterclockwise",
+                    clockwise_index=2,
+                ),
+            ],
+        )
+
+        self.assertEqual(rule.next_state(relayed_ctx), rule.EXCITED)
+        self.assertEqual(rule.next_state(damped_ctx), rule.RESTING)
+
+    def test_whirlpool_rim_zone_requires_more_than_strong_trailing_wake(self) -> None:
+        rule = WhirlpoolRule()
+        wake_only_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.94,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-in",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+        relayed_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.94,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-cw",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-in",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=1,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=2,
+                ),
+            ],
+        )
+
+        self.assertEqual(rule.next_state(wake_only_ctx), rule.RESTING)
+        self.assertEqual(rule.next_state(relayed_ctx), rule.EXCITED)
+
 
 if __name__ == "__main__":
     unittest.main()
