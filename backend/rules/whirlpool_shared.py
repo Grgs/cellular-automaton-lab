@@ -110,6 +110,20 @@ class WhirlpoolRuleBase(AutomatonRule):
         wake = self.wake_counts(ctx, cell_id=cell_id)
         return wake["support"] - wake["resistance"]
 
+    def has_outer_guided_relay(self, ctx: RuleContext, counts: dict[str, int]) -> bool:
+        if self.zone_for_radius(ctx.radial_ratio) != "outer":
+            return False
+        wake = self.wake_counts(ctx)
+        guided_clockwise_pressure = counts["clockwise"] + min(1, wake["clockwise"])
+        guided_swirl_margin = self.swirl_margin(counts) + self.wake_score(ctx)
+        return (
+            wake["support"] >= 2
+            and wake["resistance"] == 0
+            and guided_clockwise_pressure >= 1
+            and guided_swirl_margin >= 1
+            and counts["outward"] <= 1
+        )
+
     def should_excite_resting(self, ctx: RuleContext, counts: dict[str, int]) -> bool:
         zone = self.zone_for_radius(ctx.radial_ratio)
         outward_excited = counts["outward"]
@@ -152,9 +166,9 @@ class WhirlpoolRuleBase(AutomatonRule):
 
         if zone == "outer":
             return (
-                guided_inward_pressure >= 2
+                (guided_inward_pressure >= 2 or strong_trailing_wake)
                 and guided_swirl_margin >= 1
-                and (guided_clockwise_pressure >= 1 or total_excited >= 3)
+                and (guided_clockwise_pressure >= 1 or total_excited >= 3 or strong_trailing_wake)
                 and outward_excited <= 1
             )
 
@@ -178,6 +192,8 @@ class WhirlpoolRuleBase(AutomatonRule):
                 return self.EXCITED
             if self.zone_for_radius(ctx.radial_ratio) == "outer":
                 if counts["inward"] >= 1 and (counts["clockwise"] >= 1 or counts["total"] >= 2):
+                    return self.EXCITED
+                if self.has_outer_guided_relay(ctx, counts):
                     return self.EXCITED
             return self.RESTING
         if ctx.current_state != self.RESTING:
