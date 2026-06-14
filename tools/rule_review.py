@@ -175,7 +175,11 @@ def _hex_to_rgb(value: str) -> tuple[int, int, int]:
     text = value.strip().lstrip("#")
     if len(text) != 6:
         return (31, 36, 48)
-    return tuple(int(text[index : index + 2], 16) for index in (0, 2, 4))
+    return (
+        int(text[0:2], 16),
+        int(text[2:4], 16),
+        int(text[4:6], 16),
+    )
 
 
 def _state_colors(rule: AutomatonRule) -> dict[int, tuple[int, int, int]]:
