@@ -15,6 +15,7 @@ class WhirlpoolRule(WhirlpoolRuleBase):
     description = (
         "Clockwise outward-spiraling vortex centered on a one- or two-cell eye. "
         "Excitation is driven outward from inner neighbors and shaped by tangential "
-        "clockwise bias across multiple radial bands. Source cells emit directional "
-        "pulses without advancing through the cycle."
+        "clockwise bias across multiple radial bands. Trailing wake cells guide broken "
+        "arms while refractory wake cells damp counter-rotating fronts. Source cells "
+        "emit directional pulses without advancing through the cycle."
     )
