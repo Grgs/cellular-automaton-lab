@@ -9,6 +9,7 @@ from tools.command_docs import GROUPS
 
 GROUP_REGISTRARS = {
     "build": "tools.commands.build",
+    "rules": "tools.commands.rules",
     "tilings": "tools.commands.tilings",
     "fixtures": "tools.commands.fixtures",
     "bootstrap": "tools.commands.bootstrap",
