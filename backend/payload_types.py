@@ -149,6 +149,7 @@ class RuleDefinitionPayload(TypedDict):
     supports_randomize: bool
     rule_protocol: str
     supports_all_topologies: bool
+    compatible_tiling_families: list[str] | None
 
 
 class RulesResponsePayload(TypedDict):

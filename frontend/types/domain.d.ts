@@ -170,6 +170,7 @@ export interface ApiRuleDefinition {
     states: CellStateDefinition[];
     rule_protocol: string;
     supports_all_topologies: boolean;
+    compatible_tiling_families: string[] | null;
 }
 
 export interface RuleDefinition extends ApiRuleDefinition {

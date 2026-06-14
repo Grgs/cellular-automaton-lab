@@ -29,6 +29,10 @@ class CellStateDefinition:
 RULE_PROTOCOL_UNIVERSAL_V1 = "universal-v1"
 
 
+class RuleTopologyCompatibilityError(ValueError):
+    """Raised when a rule is applied to a tiling family it does not support."""
+
+
 class AutomatonRule(ABC):
     """Base contract for pluggable automaton rule modules."""
 
@@ -36,7 +40,13 @@ class AutomatonRule(ABC):
     display_name: str = "Base Rule"
     description: str = "Abstract base rule."
     rule_protocol: str = RULE_PROTOCOL_UNIVERSAL_V1
-    supports_all_topologies: bool = True
+    # Tiling families this rule is designed for, or ``None`` for a rule that
+    # works on any topology. Universal Life-like and multistate rules stay
+    # ``None`` so the same rule can be compared across many neighborhoods --
+    # the app's core purpose. Only kind-specific rules (which look up
+    # per-cell-kind thresholds and silently misbehave elsewhere) restrict
+    # themselves to the families whose cell kinds they actually handle.
+    compatible_tiling_families: tuple[str, ...] | None = None
     states: tuple[CellStateDefinition, ...] = (
         CellStateDefinition(0, "Dead", "#f8f1e5"),
         CellStateDefinition(1, "Live", "#1f2430"),
@@ -47,6 +57,16 @@ class AutomatonRule(ABC):
     @property
     def supports_randomize(self) -> bool:
         return bool(self.randomize_weights)
+
+    @property
+    def supports_all_topologies(self) -> bool:
+        return self.compatible_tiling_families is None
+
+    def supports_tiling_family(self, tiling_family: str) -> bool:
+        return (
+            self.compatible_tiling_families is None
+            or tiling_family in self.compatible_tiling_families
+        )
 
     def state_definitions(self) -> tuple[CellStateDefinition, ...]:
         return tuple(self.states)

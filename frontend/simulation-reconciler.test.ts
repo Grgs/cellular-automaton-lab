@@ -84,6 +84,7 @@ describe("simulation-reconciler", () => {
                 supports_randomize: true,
                 rule_protocol: "universal-v1",
                 supports_all_topologies: true,
+                compatible_tiling_families: null,
             },
             topology_revision: "new-revision",
             topology: {

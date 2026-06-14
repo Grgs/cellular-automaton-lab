@@ -11,6 +11,7 @@ class KagomeLifeRule(KindLifeRule, AutomatonRule):
         "Triangle-hexagon Life rule with B2/S23 triangles and B234/S23 hexagons; "
         "used by Kagome and snub trihexagonal tilings."
     )
+    compatible_tiling_families = ("trihexagonal-3-6-3-6", "archimedean-3-3-3-3-6")
     kind_thresholds = {
         "triangle": (frozenset({2}), frozenset({2, 3})),
         "hexagon": (frozenset({2, 3, 4}), frozenset({2, 3})),

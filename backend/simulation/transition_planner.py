@@ -9,7 +9,7 @@ from backend.payload_types import (
     TopologySpecPatch,
 )
 from backend.rules import RuleRegistry
-from backend.rules.base import AutomatonRule
+from backend.rules.base import AutomatonRule, RuleTopologyCompatibilityError
 from backend.rules.constraints import normalize_rule_dimensions
 from backend.simulation.models import SimulationConfig, SimulationStateData, TopologySpec
 from backend.simulation.topology_catalog import (
@@ -42,6 +42,18 @@ class RestoreTransitionPlan:
     rule: AutomatonRule
     generation: int
     board_payload_kind: str
+
+
+def _require_rule_supports_family(rule: AutomatonRule, tiling_family: str) -> None:
+    """Reject a user-initiated rule/topology pairing the rule cannot run on.
+
+    Applied to reset and config transitions only -- restore stays lenient so
+    older persisted snapshots with now-disallowed pairings still load.
+    """
+    if not rule.supports_tiling_family(tiling_family):
+        raise RuleTopologyCompatibilityError(
+            f"Rule '{rule.name}' does not support the '{tiling_family}' tiling family."
+        )
 
 
 def _coerce_int(value: object, fallback: int) -> int:
@@ -106,6 +118,7 @@ def plan_reset_transition(
         next_geometry=next_geometry,
         rule_name=rule_name,
     )
+    _require_rule_supports_family(next_rule, next_topology_spec.tiling_family)
     next_width, next_height = normalize_rule_dimensions(
         next_rule,
         next_topology_spec.width,
@@ -136,6 +149,9 @@ def plan_config_transition(
     next_rule = current_state.rule
     if rule_name is not None:
         next_rule = rule_registry.get(rule_name)
+    # A config patch never changes the tiling family (that goes through reset),
+    # so validate the effective rule against the current family.
+    _require_rule_supports_family(next_rule, current_state.config.tiling_family)
 
     next_width = (
         topology_spec.get("width")

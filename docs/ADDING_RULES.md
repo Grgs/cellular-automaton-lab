@@ -27,6 +27,7 @@ Rules receive a topology-aware `RuleContext`, so they should ask for neighbors t
    - `states`: tuple of `CellStateDefinition` values.
    - `default_paint_state`: state selected for painting by default.
    - `randomize_weights`: optional state weights for random reset.
+   - `compatible_tiling_families`: leave unset (`None`) for a rule that works on any topology, so it can be compared across neighborhoods. Set it to a tuple of tiling-family ids only for rules that require specific cell kinds (for example the kind-threshold mixed-tiling rules); the picker and the `/api/config` + `/api/control/reset` endpoints reject the rule on any other family. Every family that defaults to the rule must be listed (a test enforces this).
 3. Implement `next_state(ctx)`.
    - Use `ctx.current_state` for the current cell.
    - Use `ctx.count_live_neighbors()`, `ctx.count_neighbors(...)`, `ctx.neighbor_states()`, or directional helpers for neighbor behavior.

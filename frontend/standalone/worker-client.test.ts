@@ -116,6 +116,7 @@ const snapshot: SimulationSnapshot = {
         supports_randomize: true,
         rule_protocol: "universal-v1",
         supports_all_topologies: true,
+        compatible_tiling_families: null,
     },
     topology_revision: "rev-1",
     topology: {

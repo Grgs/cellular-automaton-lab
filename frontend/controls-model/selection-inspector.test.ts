@@ -11,6 +11,7 @@ const activeRule: RuleDefinition = {
     supports_randomize: false,
     rule_protocol: "test",
     supports_all_topologies: true,
+    compatible_tiling_families: null,
     states: [
         { value: 0, label: "Dead", color: "#000000", paintable: false },
         { value: 2, label: "Signal", color: "#ff0000", paintable: true },

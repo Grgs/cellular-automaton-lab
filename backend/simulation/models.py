@@ -384,6 +384,7 @@ class RuleSnapshot:
     supports_randomize: bool
     rule_protocol: str
     supports_all_topologies: bool
+    compatible_tiling_families: list[str] | None
 
     @classmethod
     def from_rule(cls, rule: AutomatonRule) -> RuleSnapshot:
@@ -396,6 +397,11 @@ class RuleSnapshot:
             supports_randomize=rule.supports_randomize,
             rule_protocol=rule.rule_protocol,
             supports_all_topologies=rule.supports_all_topologies,
+            compatible_tiling_families=(
+                list(rule.compatible_tiling_families)
+                if rule.compatible_tiling_families is not None
+                else None
+            ),
         )
 
     def to_dict(self) -> RuleDefinitionPayload:
@@ -408,6 +414,7 @@ class RuleSnapshot:
             "supports_randomize": self.supports_randomize,
             "rule_protocol": self.rule_protocol,
             "supports_all_topologies": self.supports_all_topologies,
+            "compatible_tiling_families": self.compatible_tiling_families,
         }
 
 

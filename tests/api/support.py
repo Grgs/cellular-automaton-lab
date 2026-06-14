@@ -254,7 +254,8 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(payload["rule"]["default_paint_state"], 1)
         self.assertTrue(payload["rule"]["supports_randomize"])
         self.assertEqual(payload["rule"]["rule_protocol"], "universal-v1")
-        self.assertTrue(payload["rule"]["supports_all_topologies"])
+        self.assertFalse(payload["rule"]["supports_all_topologies"])
+        self.assertEqual(payload["rule"]["compatible_tiling_families"], ["archimedean-4-8-8"])
         self.assertEqual([cell_state["value"] for cell_state in payload["rule"]["states"]], [0, 1])
 
     def assert_kagome_rule(self, payload: SimulationStatePayload) -> None:
@@ -263,5 +264,9 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(payload["rule"]["default_paint_state"], 1)
         self.assertTrue(payload["rule"]["supports_randomize"])
         self.assertEqual(payload["rule"]["rule_protocol"], "universal-v1")
-        self.assertTrue(payload["rule"]["supports_all_topologies"])
+        self.assertFalse(payload["rule"]["supports_all_topologies"])
+        self.assertEqual(
+            payload["rule"]["compatible_tiling_families"],
+            ["trihexagonal-3-6-3-6", "archimedean-3-3-3-3-6"],
+        )
         self.assertEqual([cell_state["value"] for cell_state in payload["rule"]["states"]], [0, 1])
