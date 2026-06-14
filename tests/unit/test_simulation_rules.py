@@ -1080,6 +1080,66 @@ class SimulationRuleTests(unittest.TestCase):
         self.assertEqual(rule.next_state(relayed_ctx), rule.EXCITED)
         self.assertEqual(rule.next_state(damped_ctx), rule.RESTING)
 
+    def test_whirlpool_outer_zone_uses_tangential_clockwise_wake(self) -> None:
+        rule = WhirlpoolRule()
+        relayed_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+            ],
+        )
+        outward_drag_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="outward-drag",
+                    radial="outward",
+                    turn="aligned",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+        counter_drag_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.72,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="counter-drag",
+                    radial="level",
+                    turn="counterclockwise",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+
+        self.assertEqual(rule.next_state(relayed_ctx), rule.EXCITED)
+        self.assertEqual(rule.next_state(outward_drag_ctx), rule.RESTING)
+        self.assertEqual(rule.next_state(counter_drag_ctx), rule.RESTING)
+
     def test_whirlpool_outer_refractory_can_rejoin_guided_wake(self) -> None:
         rule = WhirlpoolRule()
         relayed_ctx = build_context(

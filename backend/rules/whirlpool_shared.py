@@ -116,8 +116,14 @@ class WhirlpoolRuleBase(AutomatonRule):
         wake = self.wake_counts(ctx)
         guided_clockwise_pressure = counts["clockwise"] + min(1, wake["clockwise"])
         guided_swirl_margin = self.swirl_margin(counts) + self.wake_score(ctx)
+        tangential_relay = (
+            wake["clockwise"] >= 1
+            and wake["resistance"] == 0
+            and counts["counterclockwise"] == 0
+            and counts["outward"] == 0
+        )
         return (
-            wake["support"] >= 2
+            (wake["support"] >= 2 or tangential_relay)
             and wake["resistance"] == 0
             and guided_clockwise_pressure >= 1
             and guided_swirl_margin >= 1
@@ -138,6 +144,13 @@ class WhirlpoolRuleBase(AutomatonRule):
         guided_clockwise_pressure = clockwise_excited + min(1, wake["clockwise"])
         guided_swirl_margin = swirl_margin + wake_score
         strong_trailing_wake = wake["support"] >= 2
+        outer_tangential_relay = (
+            zone == "outer"
+            and wake["clockwise"] >= 1
+            and wake["resistance"] == 0
+            and counterclockwise_excited == 0
+            and outward_excited == 0
+        )
 
         if zone == "eye":
             return total_excited >= 1
@@ -166,7 +179,7 @@ class WhirlpoolRuleBase(AutomatonRule):
 
         if zone == "outer":
             return (
-                (guided_inward_pressure >= 2 or strong_trailing_wake)
+                (guided_inward_pressure >= 2 or strong_trailing_wake or outer_tangential_relay)
                 and guided_swirl_margin >= 1
                 and (guided_clockwise_pressure >= 1 or total_excited >= 3 or strong_trailing_wake)
                 and outward_excited <= 1
