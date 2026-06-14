@@ -266,6 +266,105 @@ def build_source_context(rule: WhirlpoolRule, *, target_state: int | None = None
     return RuleContext(frame, [resolved_target_state, rule.SOURCE, rule.RESTING, rule.EXCITED], 0)
 
 
+def build_wake_guided_source_context(rule: WhirlpoolRule) -> RuleContext:
+    cells = (
+        TopologyCellFrame(
+            id="target",
+            kind="cell",
+            center=(0.0, 0.0),
+            vertices=None,
+            degree=2,
+            shell_rank=2,
+            radial_distance=0.6,
+            radial_ratio=0.6,
+            polar_angle=0.0,
+            neighbors=(
+                TopologyNeighborFrame(
+                    index=1,
+                    radial="inward",
+                    turn="aligned",
+                    radial_delta=-0.1,
+                    angle_delta=0.0,
+                    clockwise_index=0,
+                ),
+                TopologyNeighborFrame(
+                    index=3,
+                    radial="inward",
+                    turn="clockwise",
+                    radial_delta=-0.2,
+                    angle_delta=-0.3,
+                    clockwise_index=1,
+                ),
+            ),
+        ),
+        TopologyCellFrame(
+            id="source",
+            kind="cell",
+            center=(1.0, 0.0),
+            vertices=None,
+            degree=2,
+            shell_rank=1,
+            radial_distance=0.4,
+            radial_ratio=0.4,
+            polar_angle=0.0,
+            neighbors=(
+                TopologyNeighborFrame(
+                    index=2,
+                    radial="outward",
+                    turn="clockwise",
+                    radial_delta=0.4,
+                    angle_delta=-0.3,
+                    clockwise_index=0,
+                ),
+                TopologyNeighborFrame(
+                    index=0,
+                    radial="outward",
+                    turn="clockwise",
+                    radial_delta=0.4,
+                    angle_delta=-0.2,
+                    clockwise_index=1,
+                ),
+            ),
+        ),
+        TopologyCellFrame(
+            id="stale-target",
+            kind="cell",
+            center=(1.0, 1.0),
+            vertices=None,
+            degree=0,
+            shell_rank=2,
+            radial_distance=0.7,
+            radial_ratio=0.7,
+            polar_angle=0.0,
+            neighbors=(),
+        ),
+        TopologyCellFrame(
+            id="wake",
+            kind="cell",
+            center=(-1.0, 0.0),
+            vertices=None,
+            degree=0,
+            shell_rank=1,
+            radial_distance=0.4,
+            radial_ratio=0.4,
+            polar_angle=0.0,
+            neighbors=(),
+        ),
+    )
+    frame = TopologyFrame(
+        adjacency_mode="edge",
+        topology_revision="wake-guided-source-test",
+        center=(0.0, 0.0),
+        cell_count=4,
+        bounds=(0.0, 0.0, 0.0, 0.0),
+        max_shell_rank=2,
+        max_radial_distance=1.0,
+        cells=cells,
+        _index_by_id={cell.id: index for index, cell in enumerate(cells)},
+    )
+    return RuleContext(frame, [rule.RESTING, rule.SOURCE, rule.RESTING, rule.TRAILING], 0)
+
+
 class SimulationRuleTests(unittest.TestCase):
     rule_registry: ClassVar[RuleRegistry]
 
@@ -715,6 +814,14 @@ class SimulationRuleTests(unittest.TestCase):
         self.assertTrue(rule.has_incoming_source_pulse(target_ctx))
         self.assertEqual(rule.next_state(target_ctx), rule.EXCITED)
 
+    def test_whirlpool_source_prefers_wake_guided_resting_target(self) -> None:
+        rule = WhirlpoolRule()
+        target_ctx = build_wake_guided_source_context(rule)
+
+        self.assertEqual(rule.source_emission_target_id(target_ctx, "source"), "target")
+        self.assertTrue(rule.has_incoming_source_pulse(target_ctx))
+        self.assertEqual(rule.next_state(target_ctx), rule.EXCITED)
+
     def test_whirlpool_source_does_not_overwrite_non_resting_target(self) -> None:
         rule = WhirlpoolRule()
         target_ctx = build_source_context(rule, target_state=rule.TRAILING)
@@ -767,6 +874,98 @@ class SimulationRuleTests(unittest.TestCase):
 
         self.assertEqual(rule.next_state(blocked_ctx), rule.RESTING)
         self.assertEqual(rule.next_state(allowed_ctx), rule.EXCITED)
+
+    def test_whirlpool_shear_zone_uses_trailing_wake_as_clockwise_guidance(self) -> None:
+        rule = WhirlpoolRule()
+        guided_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.42,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-align",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+        damped_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.42,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.EXCITED,
+                    neighbor_id="in-align",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="inward",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+                make_neighbor_spec(
+                    rule.REFRACTORY,
+                    neighbor_id="drag-ccw",
+                    radial="outward",
+                    turn="counterclockwise",
+                    clockwise_index=2,
+                ),
+            ],
+        )
+
+        self.assertEqual(rule.next_state(guided_ctx), rule.EXCITED)
+        self.assertEqual(rule.next_state(damped_ctx), rule.RESTING)
+
+    def test_whirlpool_shear_zone_bridges_broken_arm_with_strong_wake(self) -> None:
+        rule = WhirlpoolRule()
+        bridged_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.42,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-in",
+                    radial="inward",
+                    turn="aligned",
+                    clockwise_index=0,
+                ),
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=1,
+                ),
+            ],
+        )
+        weak_ctx = build_context(
+            rule.RESTING,
+            radial_ratio=0.42,
+            neighbor_specs=[
+                make_neighbor_spec(
+                    rule.TRAILING,
+                    neighbor_id="wake-cw",
+                    radial="level",
+                    turn="clockwise",
+                    clockwise_index=0,
+                ),
+            ],
+        )
+
+        self.assertEqual(rule.next_state(bridged_ctx), rule.EXCITED)
+        self.assertEqual(rule.next_state(weak_ctx), rule.RESTING)
 
     def test_whirlpool_outer_zone_requires_positive_clockwise_margin(self) -> None:
         rule = WhirlpoolRule()
