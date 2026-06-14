@@ -203,6 +203,12 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-tiling:hover { background: var(--btn-soft-bg, rgba(0, 0, 0, 0.05)); }
+.compare-tiling.is-disabled {
+    color: var(--muted, #6d756f);
+    cursor: not-allowed;
+    opacity: 0.58;
+}
+.compare-tiling.is-disabled:hover { background: transparent; }
 .compare-tiling:focus-within {
     outline: 2px solid var(--focus, #7aa7ff);
     outline-offset: 2px;

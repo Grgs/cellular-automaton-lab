@@ -1,6 +1,7 @@
 import type { RuleDefinition } from "../types/domain.js";
 import type { AppState } from "../types/state.js";
-import type { DrawerRulePaletteViewModel } from "../types/ui.js";
+import type { DrawerRulePaletteViewModel, RuleSelectOption } from "../types/ui.js";
+import { compatibleTilingFamiliesLabel, ruleSupportsTilingFamily } from "../rule-compatibility.js";
 
 function lifeNotationAliases(...values: Array<string | null | undefined>): string[] {
     return values.flatMap((value) => {
@@ -60,21 +61,29 @@ export function buildDrawerRulePaletteViewModel({
     paletteRule: RuleDefinition | null;
 }): DrawerRulePaletteViewModel {
     const availableRules = Array.isArray(state.rules) ? state.rules : [];
+    const tilingFamily = state.topologySpec?.tiling_family ?? null;
+    const compatibleRules = availableRules.filter((rule) =>
+        ruleSupportsTilingFamily(rule, tilingFamily),
+    );
+    const paletteRuleIsUnsupported =
+        Boolean(paletteRule) && !ruleSupportsTilingFamily(paletteRule, tilingFamily);
 
-    return {
-        ruleSummaryText:
-            paletteRule?.description ||
-            "Select a rule to see its evolution notes and paint states.",
-        ruleSelectValue: paletteRule ? paletteRule.name : "",
-        ruleOptions: availableRules.map((rule) => ({
+    function buildRuleOption(rule: RuleDefinition, disabled = false): RuleSelectOption {
+        const displayName = rule.display_name || rule.label || rule.name;
+        const unsupportedText =
+            disabled && tilingFamily
+                ? `Unsupported on ${tilingFamily}; supports ${compatibleTilingFamiliesLabel(rule)}`
+                : "";
+        return {
             name: rule.name,
-            displayName: rule.display_name || rule.label || rule.name,
-            description: rule.description ?? "",
+            displayName: disabled ? `${displayName} (unsupported on this tiling)` : displayName,
+            description: [rule.description ?? "", unsupportedText].filter(Boolean).join(" "),
             searchText: [
                 rule.name,
                 rule.display_name,
                 rule.label,
                 rule.description,
+                unsupportedText,
                 ...(Array.isArray(rule.states)
                     ? rule.states.map((cellState) => cellState.label)
                     : []),
@@ -82,7 +91,25 @@ export function buildDrawerRulePaletteViewModel({
             ]
                 .filter(Boolean)
                 .join(" "),
-        })),
+            ...(disabled ? { disabled: true } : {}),
+        };
+    }
+
+    const ruleOptions = compatibleRules.map((rule) => buildRuleOption(rule));
+    if (
+        paletteRule &&
+        paletteRuleIsUnsupported &&
+        !ruleOptions.some((rule) => rule.name === paletteRule.name)
+    ) {
+        ruleOptions.unshift(buildRuleOption(paletteRule, true));
+    }
+
+    return {
+        ruleSummaryText:
+            paletteRule?.description ||
+            "Select a rule to see its evolution notes and paint states.",
+        ruleSelectValue: paletteRule ? paletteRule.name : "",
+        ruleOptions,
         ruleDescription: paletteRule?.description ?? "",
         paletteStates: Array.isArray(paletteRule?.states)
             ? paletteRule.states

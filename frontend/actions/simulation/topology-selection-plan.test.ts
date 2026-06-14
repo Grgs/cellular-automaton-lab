@@ -164,6 +164,48 @@ describe("topology-selection-plan", () => {
         expect(result.resetBody.topology_spec.height).toBe(33);
     });
 
+    it("does not preserve a user-selected rule on an incompatible target topology", async () => {
+        const { createAppState } = await import("../../state/simulation-state.js");
+        const { planTopologySelection } = await import("./topology-selection-plan.js");
+
+        const state = createAppState();
+        state.width = 30;
+        state.height = 20;
+        state.topologySpec = {
+            tiling_family: "archimedean-4-8-8",
+            adjacency_mode: "edge",
+            sizing_mode: "grid",
+            width: 30,
+            height: 20,
+            patch_depth: 0,
+        };
+        state.activeRule = {
+            ...makeRule("archlife-488"),
+            compatible_tiling_families: ["archimedean-4-8-8"],
+            supports_all_topologies: false,
+        };
+
+        const result = planTopologySelection({
+            state,
+            nextTopologySpec: {
+                tiling_family: "square",
+                adjacency_mode: "edge",
+                width: 30,
+                height: 20,
+                patch_depth: 0,
+            },
+            preserveRuleOnTopologySelection: true,
+            getViewportDimensions: vi.fn(() => ({ width: 30, height: 20 })),
+        });
+
+        expect(result.kind).toBe("apply");
+        if (result.kind !== "apply") {
+            throw new Error("expected an apply plan");
+        }
+        expect(result.requestedRuleName).toBeNull();
+        expect(result.resetBody.rule).toBeNull();
+    });
+
     it("builds reset payloads from the current topology, rule, and speed", async () => {
         const { createAppState } = await import("../../state/simulation-state.js");
         const { buildCurrentTopologyResetPayload } = await import("./topology-selection-plan.js");

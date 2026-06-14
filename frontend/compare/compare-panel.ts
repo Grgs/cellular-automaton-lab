@@ -15,6 +15,7 @@ import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
 import { createSeedPreview } from "./compare-seed-preview.js";
 import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
+import { ruleSupportsTilingFamily } from "../rule-compatibility.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
 // patches are not offered a thumbnail (the backend would reject them anyway).
@@ -66,6 +67,7 @@ interface MountComparePanelOptions {
 
 interface TilingOption {
     geometry: string;
+    tilingFamily: string;
     label: string;
     family: string;
 }
@@ -109,6 +111,7 @@ function tilingOptions(bootstrapData: AppBootstrapData): TilingOption[] {
     return bootstrapData.topology_catalog
         .map((definition) => ({
             geometry: definition.geometry_keys[definition.default_adjacency_mode] ?? "",
+            tilingFamily: definition.tiling_family,
             label: definition.label,
             family: definition.family,
         }))
@@ -378,6 +381,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     function renderTilingChecklist(): void {
+        pruneSelectionForSelectedRule();
         tilingList.replaceChildren();
         const visibleTilings = allTilings.filter((option) => matchesTilingSearch(option));
         if (visibleTilings.length === 0) {
@@ -413,11 +417,20 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                 ]),
             );
             for (const option of optionsForFamily) {
+                const compatible = tilingCompatibleWithSelectedRule(option);
                 const checkbox = el("input", {
                     type: "checkbox",
-                    checked: selected.has(option.geometry),
+                    checked: compatible && selected.has(option.geometry),
+                    disabled: !compatible,
+                    title: compatible ? "" : "Unsupported for the selected rule",
                 });
                 checkbox.addEventListener("change", () => {
+                    if (!tilingCompatibleWithSelectedRule(option)) {
+                        checkbox.checked = false;
+                        selected.delete(option.geometry);
+                        updateSummary();
+                        return;
+                    }
                     if (checkbox.checked) {
                         selected.add(option.geometry);
                     } else {
@@ -427,10 +440,14 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                     refreshPreview();
                 });
                 group.append(
-                    el("label", { class: "compare-tiling" }, [
-                        checkbox,
-                        el("span", { textContent: option.label }),
-                    ]),
+                    el(
+                        "label",
+                        {
+                            class: compatible ? "compare-tiling" : "compare-tiling is-disabled",
+                            title: compatible ? "" : "Unsupported for the selected rule",
+                        },
+                        [checkbox, el("span", { textContent: option.label })],
+                    ),
                 );
             }
             tilingList.append(group);
@@ -538,6 +555,9 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             if (option.family !== family) {
                 continue;
             }
+            if (!tilingCompatibleWithSelectedRule(option)) {
+                continue;
+            }
             totalCount += 1;
             if (selected.has(option.geometry)) {
                 selectedCount += 1;
@@ -575,7 +595,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             }
         }
         const parts = [
-            `${selected.size} / ${allTilings.length} selected`,
+            `${selected.size} / ${compatibleTilingsForSelectedRule().length} selected`,
             ...(counts.regular > 0 ? [`Regular ${counts.regular}`] : []),
             ...(counts.mixed > 0 ? [`Mixed ${counts.mixed}`] : []),
             ...(counts.aperiodic > 0 ? [`Aperiodic ${counts.aperiodic}`] : []),
@@ -585,6 +605,37 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
     function selectedRuleName(): string {
         return ruleSelect.value || rules[0]?.name || "conway";
+    }
+
+    function selectedRule(): RuleDefinition | null {
+        return rules.find((rule) => rule.name === selectedRuleName()) ?? null;
+    }
+
+    function tilingCompatibleWithSelectedRule(option: TilingOption): boolean {
+        return ruleSupportsTilingFamily(selectedRule(), option.tilingFamily);
+    }
+
+    function compatibleTilingsForSelectedRule(): TilingOption[] {
+        return allTilings.filter((option) => tilingCompatibleWithSelectedRule(option));
+    }
+
+    function pruneSelectionForSelectedRule({ selectAllIfEmpty = false } = {}): void {
+        const compatibleTilings = compatibleTilingsForSelectedRule();
+        const compatibleGeometries = new Set(compatibleTilings.map((option) => option.geometry));
+        let changed = false;
+        for (const geometry of [...selected]) {
+            if (!compatibleGeometries.has(geometry)) {
+                selected.delete(geometry);
+                changed = true;
+            }
+        }
+        if (selectAllIfEmpty && selected.size === 0 && compatibleTilings.length > 0) {
+            compatibleTilings.forEach((option) => selected.add(option.geometry));
+            changed = true;
+        }
+        if (changed) {
+            refreshPreview();
+        }
     }
 
     function patternShareUrl(pattern: PatternPayload): string {
@@ -611,6 +662,13 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         if (conway) {
             ruleSelect.value = "conway";
         }
+        ruleSelect.addEventListener("change", () => {
+            pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
+            renderTilingChecklist();
+            refreshPreview();
+        });
+        pruneSelectionForSelectedRule();
+        renderTilingChecklist();
     }
 
     function setRunning(next: boolean): void {

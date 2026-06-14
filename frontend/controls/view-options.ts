@@ -157,6 +157,7 @@ function renderRuleOptions(
             optionElement.value = rule.name;
             optionElement.textContent = rule.displayName;
             optionElement.title = rule.description;
+            optionElement.disabled = rule.disabled === true;
             if (optionElement.value === selectedValue) {
                 optionElement.selected = true;
             }

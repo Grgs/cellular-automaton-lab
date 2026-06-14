@@ -11,6 +11,7 @@ import {
     resolveTopologyVariantKey,
     topologyUsesPatchDepth,
 } from "../../topology-catalog.js";
+import { ruleSupportsTilingFamily } from "../../rule-compatibility.js";
 import type { ResetControlBody, ViewportDimensions } from "../../types/controller.js";
 import type { TopologySpec } from "../../types/domain.js";
 import type { AppState } from "../../types/state.js";
@@ -192,9 +193,11 @@ export function planTopologySelection({
     const describedTopologySpec = describeTopologySpec(nextTopologySpec);
     const optimisticPatchDepth = resolveSelectedPatchDepthForTopology(state, nextTopologySpec);
     const optimisticCellSize = resolveSelectedCellSizeForTopology(state, nextTopologySpec);
-    const requestedRuleName = preserveRuleOnTopologySelection
-        ? (state.activeRule?.name ?? null)
-        : null;
+    const requestedRuleName =
+        preserveRuleOnTopologySelection &&
+        ruleSupportsTilingFamily(state.activeRule, describedTopologySpec.tiling_family)
+            ? (state.activeRule?.name ?? null)
+            : null;
 
     const resolvedTopologySpec: TopologySpec = topologyUsesPatchDepth(describedTopologySpec)
         ? {

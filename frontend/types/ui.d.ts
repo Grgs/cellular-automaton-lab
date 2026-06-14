@@ -20,6 +20,7 @@ export interface RuleSelectOption {
     displayName: string;
     description: string;
     searchText: string;
+    disabled?: boolean;
 }
 
 export interface PaintPaletteState {
