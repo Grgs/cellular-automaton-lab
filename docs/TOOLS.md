@@ -40,6 +40,21 @@ python -m tools build bundle-size
 python -m tools build bundle-size --format json
 ```
 
+## Rules
+
+Render and inspect automaton rule evolution.
+
+### `python -m tools rules review`
+
+Render selected generations for one rule, topology, and seed.
+
+Backend-only rule troubleshooting helper that writes per-generation PNG frames, a montage, and a JSON summary with state counts, changed-cell counts, and live-cell bounds. Supports binary seeds, named geometric patterns, cells-by-id JSON, and square Whirlpool presets.
+
+```powershell
+python -m tools rules review --rule whirlpool --preset anchored-source-vortex --generations 0,5,15,30
+python -m tools rules review --rule conway --pattern glider --width 40 --height 30
+```
+
 ## Tilings
 
 Validate, verify, preview, sketch, and scaffold tilings.

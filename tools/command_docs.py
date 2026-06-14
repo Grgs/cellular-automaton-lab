@@ -26,6 +26,7 @@ class GroupDoc:
 
 GROUPS: Final[tuple[GroupDoc, ...]] = (
     GroupDoc("build", "Build", "Build and inspect standalone frontend artifacts."),
+    GroupDoc("rules", "Rules", "Render and inspect automaton rule evolution."),
     GroupDoc("tilings", "Tilings", "Validate, verify, preview, sketch, and scaffold tilings."),
     GroupDoc("fixtures", "Fixtures", "Regenerate or check checked-in fixture files."),
     GroupDoc("bootstrap", "Bootstrap", "Export bootstrapped backend metadata for standalone mode."),
@@ -69,6 +70,16 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         (
             "python -m tools build bundle-size",
             "python -m tools build bundle-size --format json",
+        ),
+    ),
+    CommandDoc(
+        ("rules", "review"),
+        "rules",
+        "Render selected generations for one rule, topology, and seed.",
+        "Backend-only rule troubleshooting helper that writes per-generation PNG frames, a montage, and a JSON summary with state counts, changed-cell counts, and live-cell bounds. Supports binary seeds, named geometric patterns, cells-by-id JSON, and square Whirlpool presets.",
+        (
+            "python -m tools rules review --rule whirlpool --preset anchored-source-vortex --generations 0,5,15,30",
+            "python -m tools rules review --rule conway --pattern glider --width 40 --height 30",
         ),
     ),
     CommandDoc(

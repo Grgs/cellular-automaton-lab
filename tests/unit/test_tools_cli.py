@@ -16,6 +16,7 @@ from tools.tools_docs import TOOLS_DOC_PATH, render_tools_reference
 ROOT = Path(__file__).resolve().parents[2]
 GROUPS = (
     "build",
+    "rules",
     "tilings",
     "fixtures",
     "bootstrap",
