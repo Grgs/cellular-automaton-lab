@@ -71,6 +71,60 @@ describe("controls-model drawer sections", () => {
         expect(viewModel.paletteStates).toEqual([{ value: 2, label: "Signal", color: "#ff0000" }]);
     });
 
+    it("filters the rule picker to rules compatible with the current tiling", async () => {
+        const { buildDrawerRulePaletteViewModel } = await import("./drawer-rule-palette.js");
+        const state = await buildControlsModelState();
+        const restrictedRule = {
+            ...state.activeRule!,
+            name: "archlife-488",
+            display_name: "ArchLife 4.8.8",
+            compatible_tiling_families: ["archimedean-4-8-8"],
+        };
+        state.rules = [state.activeRule!, restrictedRule];
+        state.topologySpec = {
+            ...state.topologySpec,
+            tiling_family: "square",
+        };
+
+        const viewModel = buildDrawerRulePaletteViewModel({
+            state,
+            paletteRule: state.activeRule,
+        });
+
+        expect(viewModel.ruleOptions.map((rule) => rule.name)).toEqual(["signal-rule"]);
+    });
+
+    it("keeps an unsupported selected legacy rule visible but disabled", async () => {
+        const { buildDrawerRulePaletteViewModel } = await import("./drawer-rule-palette.js");
+        const state = await buildControlsModelState();
+        const restrictedRule = {
+            ...state.activeRule!,
+            name: "archlife-488",
+            display_name: "ArchLife 4.8.8",
+            compatible_tiling_families: ["archimedean-4-8-8"],
+        };
+        state.rules = [state.activeRule!, restrictedRule];
+        state.topologySpec = {
+            ...state.topologySpec,
+            tiling_family: "square",
+        };
+
+        const viewModel = buildDrawerRulePaletteViewModel({
+            state,
+            paletteRule: restrictedRule,
+        });
+
+        expect(viewModel.ruleSelectValue).toBe("archlife-488");
+        expect(viewModel.ruleOptions.map((rule) => rule.name)).toEqual([
+            "archlife-488",
+            "signal-rule",
+        ]);
+        expect(viewModel.ruleOptions[0]).toMatchObject({
+            disabled: true,
+            displayName: "ArchLife 4.8.8 (unsupported on this tiling)",
+        });
+    });
+
     it("builds pattern controls independently from preset selection and topology availability", async () => {
         const { buildPresetSelection } = await import("../preset-selection.js");
         const { buildDrawerPatternViewModel } = await import("./drawer-patterns.js");

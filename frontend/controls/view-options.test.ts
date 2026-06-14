@@ -328,6 +328,30 @@ describe("controls/view-options rule picker", () => {
         );
     });
 
+    it("renders unsupported selected rules as disabled options", () => {
+        const elements = createRuleElements();
+
+        populateRules(
+            elements,
+            [
+                {
+                    name: "archlife-488",
+                    displayName: "ArchLife 4.8.8 (unsupported on this tiling)",
+                    description: "Unsupported on square.",
+                    searchText: "archlife 4.8.8 unsupported",
+                    disabled: true,
+                },
+                ...RULES,
+            ],
+            "archlife-488",
+        );
+
+        const selected = elements.ruleSelect!.selectedOptions[0];
+        expect(selected?.value).toBe("archlife-488");
+        expect(selected?.disabled).toBe(true);
+        expect(selected?.textContent).toBe("ArchLife 4.8.8 (unsupported on this tiling)");
+    });
+
     it("treats life notation queries as exact compact matches", () => {
         const elements = createRuleElements();
 

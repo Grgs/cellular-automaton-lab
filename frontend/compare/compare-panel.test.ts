@@ -105,6 +105,17 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
                     supports_all_topologies: true,
                     compatible_tiling_families: null,
                 },
+                {
+                    name: "kagome-life",
+                    display_name: "Kagome Life",
+                    description: "",
+                    default_paint_state: 1,
+                    supports_randomize: true,
+                    states: [],
+                    rule_protocol: "mixed-v1",
+                    supports_all_topologies: false,
+                    compatible_tiling_families: ["Kagome"],
+                },
             ],
         }),
         dispose: () => {},
@@ -179,6 +190,12 @@ function tilingLabels(): string[] {
 function checkedTilingLabels(): string[] {
     return [...document.querySelectorAll<HTMLLabelElement>(".compare-tiling")]
         .filter((label) => label.querySelector<HTMLInputElement>("input")?.checked)
+        .map((label) => label.querySelector("span")?.textContent ?? "");
+}
+
+function disabledTilingLabels(): string[] {
+    return [...document.querySelectorAll<HTMLLabelElement>(".compare-tiling")]
+        .filter((label) => label.querySelector<HTMLInputElement>("input")?.disabled)
         .map((label) => label.querySelector("span")?.textContent ?? "");
 }
 
@@ -368,6 +385,45 @@ describe("mountComparePanel", () => {
         document.querySelector<HTMLButtonElement>(".compare-run")?.click();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["square", "hex"]);
+    });
+
+    it("limits compare tilings to the selected rule's compatible families", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        openCompareDialog();
+        await vi.waitFor(() => {
+            expect(
+                [...document.querySelectorAll<HTMLSelectElement>("select.compare-field")].some(
+                    (select) =>
+                        [...select.options].some((option) => option.value === "kagome-life"),
+                ),
+            ).toBe(true);
+        });
+        const ruleSelect = [
+            ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
+        ].find((select) => [...select.options].some((option) => option.value === "kagome-life"));
+        if (!ruleSelect) {
+            throw new Error("missing rule select");
+        }
+        ruleSelect.value = "kagome-life";
+        ruleSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+        expect(checkedTilingLabels()).toEqual(["Kagome"]);
+        expect(disabledTilingLabels()).toEqual([
+            "Square",
+            "Hex",
+            "Periodic Face",
+            "Spectre",
+            "Penrose",
+        ]);
+        expect(summaryText()).toBe("1 / 1 selected · Mixed 1");
+
+        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
+        expect(compareSeed.mock.calls.at(0)?.[0]?.rule).toBe("kagome-life");
+        expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["kagome"]);
     });
 
     it("runs a comparison and renders the portrait and grid", async () => {
