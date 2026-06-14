@@ -454,7 +454,7 @@ class ApiMultistateTests(ApiTestCase):
         self.assertEqual(self.regular_cell_state(payload, 8, 1), 1)
         self.assertEqual(sum(self.cells_by_id(payload).values()), 3)
 
-    def test_archlife_can_be_selected_on_archimedean_and_square(self) -> None:
+    def test_archlife_is_accepted_on_its_family_and_rejected_off_it(self) -> None:
         arch_reset = self.client.post(
             "/api/control/reset",
             json={
@@ -493,9 +493,12 @@ class ApiMultistateTests(ApiTestCase):
         )
         self.assertEqual(square_reset.status_code, 200)
 
+        # archlife488 handles only the 4.8.8 square/octagon kinds, so selecting
+        # it on a plain square grid is now rejected rather than silently misapplied.
         square_switch = self.client.post("/api/config", json={"rule": "archlife488"})
-        self.assertEqual(square_switch.status_code, 200)
-        self.assertEqual(square_switch.get_json()["rule"]["name"], "archlife488")
+        self.assertEqual(square_switch.status_code, 400)
+        self.assertIn("archlife488", square_switch.get_json()["error"])
+        self.assertEqual(self.get_state()["rule"]["name"], "conway")
 
 
 if __name__ == "__main__":

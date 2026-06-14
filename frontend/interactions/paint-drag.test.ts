@@ -55,6 +55,7 @@ function createSimulationSnapshot(): SimulationSnapshot {
         states: [],
         rule_protocol: "totalistic",
         supports_all_topologies: true,
+        compatible_tiling_families: null,
     };
     return {
         topology_spec: topologySpec,

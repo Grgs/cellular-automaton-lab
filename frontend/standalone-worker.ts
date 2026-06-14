@@ -178,6 +178,12 @@ function requireTopologySpec(value: unknown, context: string): TopologySpec {
     };
 }
 
+function isCompatibleTilingFamilies(value: unknown): value is string[] | null {
+    return (
+        value === null || (Array.isArray(value) && value.every((item) => typeof item === "string"))
+    );
+}
+
 function requireRuleDefinition(value: unknown, context: string): RuleDefinition {
     if (
         !isPlainObject(value) ||
@@ -188,7 +194,8 @@ function requireRuleDefinition(value: unknown, context: string): RuleDefinition 
         typeof value.supports_randomize !== "boolean" ||
         !Array.isArray(value.states) ||
         typeof value.rule_protocol !== "string" ||
-        typeof value.supports_all_topologies !== "boolean"
+        typeof value.supports_all_topologies !== "boolean" ||
+        !isCompatibleTilingFamilies(value.compatible_tiling_families)
     ) {
         throw new Error(`${context} returned an invalid rule definition.`);
     }
@@ -218,6 +225,7 @@ function requireRuleDefinition(value: unknown, context: string): RuleDefinition 
         states,
         rule_protocol: value.rule_protocol,
         supports_all_topologies: value.supports_all_topologies,
+        compatible_tiling_families: value.compatible_tiling_families,
         ...(typeof value.label === "string" ? { label: value.label } : {}),
     };
 }

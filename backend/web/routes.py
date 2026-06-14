@@ -11,6 +11,7 @@ from backend.payload_types import (
     RulesResponsePayload,
 )
 from backend.rules import RuleRegistry
+from backend.rules.base import RuleTopologyCompatibilityError
 from backend.simulation.coordinator import SimulationCoordinator
 from backend.simulation.seeding import run_compare_request
 from backend.simulation.service import SimulationOperationError
@@ -72,6 +73,7 @@ def json_error(message: str, status_code: int = 400) -> tuple[Response, int]:
 @api_bp.app_errorhandler(SimulationSessionError)
 @api_bp.app_errorhandler(RequestValidationError)
 @api_bp.app_errorhandler(SimulationOperationError)
+@api_bp.app_errorhandler(RuleTopologyCompatibilityError)
 def handle_api_request_error(exc: ValueError) -> tuple[Response, int]:
     return json_error(str(exc))
 

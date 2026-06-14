@@ -16,6 +16,7 @@ function makeRule(name = "conway"): RuleDefinition {
         ],
         rule_protocol: "life-like",
         supports_all_topologies: true,
+        compatible_tiling_families: null,
     };
 }
 

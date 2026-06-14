@@ -20,8 +20,16 @@ except ModuleNotFoundError:
 class ApiStateAndRulesTests(ApiTestCase):
     def assert_universal_rule_contract(self, payload: RuleDefinitionPayload) -> None:
         self.assertTrue(payload["supports_all_topologies"])
+        self.assertIsNone(payload["compatible_tiling_families"])
         self.assertEqual(payload["rule_protocol"], "universal-v1")
         self.assertNotIn("supported_topologies", payload)
+
+    def assert_restricted_rule_contract(
+        self, payload: RuleDefinitionPayload, families: list[str]
+    ) -> None:
+        self.assertFalse(payload["supports_all_topologies"])
+        self.assertEqual(payload["compatible_tiling_families"], families)
+        self.assertEqual(payload["rule_protocol"], "universal-v1")
 
     def test_meta_endpoint_reports_server_identity(self) -> None:
         response = self.client.get("/api/meta")
@@ -75,11 +83,11 @@ class ApiStateAndRulesTests(ApiTestCase):
         archlife = self.get_rule_definition("archlife488")
         self.assertEqual(archlife["default_paint_state"], 1)
         self.assertTrue(archlife["supports_randomize"])
-        self.assert_universal_rule_contract(archlife)
+        self.assert_restricted_rule_contract(archlife, ["archimedean-4-8-8"])
         self.assertEqual([cell_state["value"] for cell_state in archlife["states"]], [0, 1])
 
         archlife_31212 = self.get_rule_definition("archlife-3-12-12")
-        self.assert_universal_rule_contract(archlife_31212)
+        self.assert_restricted_rule_contract(archlife_31212, ["archimedean-3-12-12"])
         self.assertEqual([cell_state["value"] for cell_state in archlife_31212["states"]], [0, 1])
 
         hexlife = self.get_rule_definition("hexlife")
@@ -112,7 +120,9 @@ class ApiStateAndRulesTests(ApiTestCase):
         kagome = self.get_rule_definition("kagome-life")
         self.assertEqual(kagome["default_paint_state"], 1)
         self.assertTrue(kagome["supports_randomize"])
-        self.assert_universal_rule_contract(kagome)
+        self.assert_restricted_rule_contract(
+            kagome, ["trihexagonal-3-6-3-6", "archimedean-3-3-3-3-6"]
+        )
         self.assertEqual([cell_state["value"] for cell_state in kagome["states"]], [0, 1])
 
         life_b2_s23 = self.get_rule_definition("life-b2-s23")
@@ -162,6 +172,58 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertNotIn("width", payload)
         self.assertNotIn("height", payload)
         self.assertNotIn("patch_depth", payload)
+
+    def test_config_rejects_rule_incompatible_with_current_topology(self) -> None:
+        # Default topology is square; kagome-life only supports triangle/hexagon
+        # families, so selecting it via config is rejected with a 400.
+        response = self.client.post("/api/config", json={"rule": "kagome-life"})
+
+        self.assertEqual(response.status_code, 400)
+        body = response.get_json()
+        self.assertIn("kagome-life", body["error"])
+        self.assertIn("square", body["error"])
+
+    def test_config_accepts_universal_rule_on_any_topology(self) -> None:
+        response = self.client.post("/api/config", json={"rule": "highlife"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.get_state()["rule"]["name"], "highlife")
+
+    def test_reset_accepts_rule_on_its_compatible_topology(self) -> None:
+        response = self.client.post(
+            "/api/control/reset",
+            json={
+                "topology_spec": {
+                    "tiling_family": "trihexagonal-3-6-3-6",
+                    "adjacency_mode": "edge",
+                    "width": 5,
+                    "height": 5,
+                    "patch_depth": 0,
+                },
+                "rule": "kagome-life",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.get_state()["rule"]["name"], "kagome-life")
+
+    def test_reset_rejects_rule_incompatible_with_target_topology(self) -> None:
+        response = self.client.post(
+            "/api/control/reset",
+            json={
+                "topology_spec": {
+                    "tiling_family": "square",
+                    "adjacency_mode": "edge",
+                    "width": 5,
+                    "height": 5,
+                    "patch_depth": 0,
+                },
+                "rule": "kagome-life",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("kagome-life", response.get_json()["error"])
 
     def test_topology_endpoint_and_archimedean_state_contract(self) -> None:
         reset = self.client.post(
@@ -732,17 +794,19 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertEqual(len(topology["cells"]), len(state["cell_states"]))
 
     def test_retired_penrose_rule_names_resolve_to_canonical_rules(self) -> None:
-        for requested_rule, expected_rule in (
-            ("penrose-life", "life-b2-s23"),
-            ("penrose-vertex-life", "conway"),
-            ("archlife-3-3-3-3-6", "kagome-life"),
+        # Each alias is reset onto a topology the resolved rule supports, so the
+        # case exercises alias resolution rather than topology compatibility.
+        for requested_rule, expected_rule, tiling_family in (
+            ("penrose-life", "life-b2-s23", "square"),
+            ("penrose-vertex-life", "conway", "square"),
+            ("archlife-3-3-3-3-6", "kagome-life", "trihexagonal-3-6-3-6"),
         ):
             with self.subTest(rule=requested_rule):
                 reset = self.client.post(
                     "/api/control/reset",
                     json={
                         "topology_spec": {
-                            "tiling_family": "square",
+                            "tiling_family": tiling_family,
                             "adjacency_mode": "edge",
                             "width": 5,
                             "height": 4,

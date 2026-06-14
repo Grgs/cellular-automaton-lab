@@ -22,6 +22,7 @@ function buildRule(): RuleDefinition {
         supports_randomize: true,
         rule_protocol: "universal-v1",
         supports_all_topologies: true,
+        compatible_tiling_families: null,
     };
 }
 

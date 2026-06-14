@@ -318,13 +318,21 @@ class SimulationRuleTests(unittest.TestCase):
         self.assertNotIn("archlife-3-3-3-3-6", rule_names)
         for description in descriptions:
             self.assertEqual(description["rule_protocol"], "universal-v1")
-            self.assertTrue(description["supports_all_topologies"])
+            # supports_all_topologies is derived from compatible_tiling_families:
+            # universal rules declare None, restricted rules declare a family list.
+            self.assertEqual(
+                description["supports_all_topologies"],
+                description["compatible_tiling_families"] is None,
+            )
             self.assertNotIn("supported_topologies", description)
 
     def assert_rule_snapshot(self, rule: AutomatonRule) -> None:
         payload = RuleSnapshot.from_rule(rule).to_dict()
         self.assertEqual(payload["rule_protocol"], "universal-v1")
-        self.assertTrue(payload["supports_all_topologies"])
+        self.assertEqual(
+            payload["supports_all_topologies"],
+            payload["compatible_tiling_families"] is None,
+        )
         self.assertNotIn("supported_topologies", payload)
 
     def test_wireworld_rule_transitions(self) -> None:

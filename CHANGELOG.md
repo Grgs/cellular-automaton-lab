@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Made rule/topology compatibility explicit and enforced: rules declare `compatible_tiling_families` (universal rules stay `None` so any rule can still be compared across neighborhoods), the kind-specific mixed-tiling rules now restrict themselves to the families whose cell kinds they handle, and reset/config requests reject an incompatible rule with a 400 while restore stays lenient for older snapshots. The per-rule families are surfaced in the rule payload for the picker, and a test enforces that every topology's default rule supports its own family.
 - Bounded the simulation session registry with an LRU cap (default 64): a new session past the cap evicts the least-recently-used one, flushing its state to disk so a re-accessed session restores losslessly. This caps the number of live background threads and resident coordinators regardless of how many distinct session ids arrive.
 - Centralized session/request/operation error handling in the web routes behind Flask error handlers, removing the per-route `try/except` boilerplate and the action-factory lambdas so each route resolves a coordinator and applies its action directly.
 - Promoted `pinwheel-2-1` into the main `Aperiodic` picker group on June 13, 2026 after a visual review against the published Bielefeld patch accepted the rendered field; its exact-`Fraction` `1:4:sqrt(17)` tiles are congruence-verified at every depth, leaving `dodecagonal-square-triangle` as the only experimental aperiodic family.

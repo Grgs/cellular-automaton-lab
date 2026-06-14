@@ -79,6 +79,17 @@ def require_cell_state_payload(value: object, *, context: str) -> CellStatePaylo
 def require_rule_definition_payload(value: object, *, context: str) -> RuleDefinitionPayload:
     payload = _require_json_object(value, context=context)
     states = _require_json_list(payload.get("states"), context=f"{context}.states")
+    raw_families = payload.get("compatible_tiling_families")
+    compatible_tiling_families: list[str] | None
+    if raw_families is None:
+        compatible_tiling_families = None
+    else:
+        compatible_tiling_families = [
+            _require_str(item, context=f"{context}.compatible_tiling_families[{index}]")
+            for index, item in enumerate(
+                _require_json_list(raw_families, context=f"{context}.compatible_tiling_families")
+            )
+        ]
     return {
         "name": _require_str(payload.get("name"), context=f"{context}.name"),
         "display_name": _require_str(
@@ -104,6 +115,7 @@ def require_rule_definition_payload(value: object, *, context: str) -> RuleDefin
             payload.get("supports_all_topologies"),
             context=f"{context}.supports_all_topologies",
         ),
+        "compatible_tiling_families": compatible_tiling_families,
     }
 
 
