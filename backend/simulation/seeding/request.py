@@ -12,10 +12,15 @@ from dataclasses import dataclass
 from typing import Any
 
 from backend.simulation.seeding.comparison import (
+    DEFAULT_FILMSTRIP_FRAMES,
+    DEFAULT_FILMSTRIP_GRID_SIZE,
     DEFAULT_GRID_SIZE,
     DEFAULT_RULE,
     DEFAULT_STEPS,
+    MAX_FILMSTRIP_FRAMES,
+    MAX_FILMSTRIP_TILINGS,
     compare_seed,
+    run_seed_filmstrip,
 )
 from backend.simulation.seeding.shapes import NAMED_PATTERNS
 from backend.simulation.seeding.traversal import DEFAULT_TRAVERSAL, TRAVERSALS
@@ -130,3 +135,68 @@ def run_compare_request(payload: Mapping[str, Any]) -> dict[str, Any]:
         pattern=request.pattern,
     )
     return comparison.to_dict()
+
+
+@dataclass(frozen=True)
+class FilmstripRequest:
+    seed: str
+    rule_name: str
+    traversal: str
+    frame_count: int
+    grid_size: int
+    geometries: tuple[str, ...]
+    pattern: str | None
+
+
+def parse_filmstrip_request(payload: Mapping[str, Any]) -> FilmstripRequest:
+    base = parse_compare_request(payload)
+
+    # The live filmstrip runs an explicit, small set of tilings side by side,
+    # so geometries are required (not an optional "all tilings" sweep) and
+    # capped to keep per-frame compute and payload bounded.
+    if base.geometries is None:
+        raise ValueError("'geometries' must list the tilings to run side by side.")
+    if len(base.geometries) > MAX_FILMSTRIP_TILINGS:
+        raise ValueError(
+            f"'geometries' must list at most {MAX_FILMSTRIP_TILINGS} tilings for side-by-side play."
+        )
+
+    frame_count = _bounded_int(
+        payload.get("frames"),
+        default=DEFAULT_FILMSTRIP_FRAMES,
+        low=1,
+        high=MAX_FILMSTRIP_FRAMES,
+        name="frames",
+    )
+    grid_size = _bounded_int(
+        payload.get("grid_size"),
+        default=DEFAULT_FILMSTRIP_GRID_SIZE,
+        low=2,
+        high=_MAX_GRID_SIZE,
+        name="grid_size",
+    )
+
+    return FilmstripRequest(
+        seed=base.seed,
+        rule_name=base.rule_name,
+        traversal=base.traversal,
+        frame_count=frame_count,
+        grid_size=grid_size,
+        geometries=base.geometries,
+        pattern=base.pattern,
+    )
+
+
+def run_filmstrip_request(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate ``payload``, run the synchronized filmstrip, and serialise it."""
+    request = parse_filmstrip_request(payload)
+    filmstrip = run_seed_filmstrip(
+        seed=request.seed,
+        rule_name=request.rule_name,
+        geometries=request.geometries,
+        traversal=request.traversal,
+        frame_count=request.frame_count,
+        grid_size=request.grid_size,
+        pattern=request.pattern,
+    )
+    return filmstrip.to_dict()

@@ -13,7 +13,7 @@ from typing import Any
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.simulation.engine import SimulationEngine
-from backend.simulation.rule_context_frames import topology_frame_for
+from backend.simulation.rule_context_frames import TopologyFrame, topology_frame_for
 from backend.simulation.seeding.metrics import (
     classify,
     first_extinction_step,
@@ -27,7 +27,7 @@ from backend.simulation.seeding.traversal import (
     normalize_bits,
     paint_bits,
 )
-from backend.simulation.topology import empty_board
+from backend.simulation.topology import SimulationBoard, empty_board
 from backend.simulation.topology_catalog import (
     SUPPORTED_GEOMETRIES,
     default_patch_depth_for_tiling_family,
@@ -41,6 +41,14 @@ from backend.simulation.topology_catalog import (
 DEFAULT_RULE = "conway"
 DEFAULT_STEPS = 50
 DEFAULT_GRID_SIZE = 16
+
+# Live side-by-side defaults. The filmstrip captures every generation's board
+# state for a handful of tilings, so it is deliberately small: a few tilings, a
+# bounded frame count, and a modest grid keep the payload and compute in check.
+DEFAULT_FILMSTRIP_FRAMES = 60
+MAX_FILMSTRIP_FRAMES = 240
+DEFAULT_FILMSTRIP_GRID_SIZE = 12
+MAX_FILMSTRIP_TILINGS = 6
 
 # A comparison is flagged degenerate when more than this fraction of viable
 # tilings go extinct in fewer than EARLY_EXTINCTION_STEPS generations.
@@ -166,19 +174,34 @@ def board_size_for(geometry: str, grid_size: int) -> tuple[int, int, int | None]
     return dimension, dimension, patch_depth
 
 
-def _run_single(
+@dataclass(frozen=True)
+class _SeededBoard:
+    """A built, seeded board plus the seeding metadata both callers need."""
+
+    board: SimulationBoard
+    frame: TopologyFrame
+    cells_by_id: dict[str, int]
+    note: str | None
+    seed_size: int
+    width: int
+    height: int
+    patch_depth: int | None
+
+
+def _build_seeded_board(
     geometry: str,
     *,
-    rule: AutomatonRule,
     bits: str,
     traversal: str,
-    steps: int,
     grid_size: int,
     live_state: int,
-    include_states: bool,
     pattern: str | None,
-) -> TopologyComparisonResult:
-    variant = get_topology_variant_for_geometry(geometry)
+) -> _SeededBoard:
+    """Build a topology board and paint the seed onto it.
+
+    Shared by the metrics sweep (``_run_single``) and the live filmstrip
+    (``run_seed_filmstrip``) so both seed every topology identically.
+    """
     width, height, patch_depth = board_size_for(geometry, grid_size)
     board = empty_board(geometry, width, height, patch_depth)
     frame = topology_frame_for(board.topology)
@@ -198,6 +221,45 @@ def _run_single(
         cells_by_id = paint_bits(order, bits, live=live_state)
     for cell_id, state in cells_by_id.items():
         board.set_state_for(cell_id, state)
+    return _SeededBoard(
+        board=board,
+        frame=frame,
+        cells_by_id=cells_by_id,
+        note=note,
+        seed_size=seed_size,
+        width=width,
+        height=height,
+        patch_depth=patch_depth,
+    )
+
+
+def _run_single(
+    geometry: str,
+    *,
+    rule: AutomatonRule,
+    bits: str,
+    traversal: str,
+    steps: int,
+    grid_size: int,
+    live_state: int,
+    include_states: bool,
+    pattern: str | None,
+) -> TopologyComparisonResult:
+    variant = get_topology_variant_for_geometry(geometry)
+    seeded = _build_seeded_board(
+        geometry,
+        bits=bits,
+        traversal=traversal,
+        grid_size=grid_size,
+        live_state=live_state,
+        pattern=pattern,
+    )
+    board = seeded.board
+    frame = seeded.frame
+    cells_by_id = seeded.cells_by_id
+    note = seeded.note
+    seed_size = seeded.seed_size
+    width, height, patch_depth = seeded.width, seeded.height, seeded.patch_depth
 
     engine = SimulationEngine()
     populations = [population(board.cell_states)]
@@ -322,3 +384,201 @@ def compare_seed(
             )
         comparison.results.append(result)
     return comparison
+
+
+@dataclass
+class TopologyFilmstrip:
+    """Per-generation board states for one tiling, for live side-by-side play.
+
+    ``topology`` is the full geometry payload (cells/vertices) sent once so the
+    client can render the board; ``frames`` is one sparse live-cell map per
+    generation (``frames[0]`` is the seed), all tilings sharing the same frame
+    count so a single client clock keeps them synchronised.
+    """
+
+    geometry: str
+    tiling_family: str
+    family: str
+    cell_count: int
+    topology: dict[str, Any]
+    topology_spec: dict[str, Any]
+    frames: list[dict[str, int]]
+    extinction_step: int | None
+    period: int | None
+    note: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "geometry": self.geometry,
+            "tiling_family": self.tiling_family,
+            "family": self.family,
+            "cell_count": self.cell_count,
+            "topology": self.topology,
+            "topology_spec": self.topology_spec,
+            "frames": self.frames,
+            "extinction_step": self.extinction_step,
+            "period": self.period,
+            "note": self.note,
+        }
+
+
+@dataclass
+class SeedFilmstrip:
+    """A synchronized live run of one seed and rule across a few tilings."""
+
+    rule_name: str
+    seed: str
+    traversal: str
+    frame_count: int
+    grid_size: int
+    tilings: list[TopologyFilmstrip] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "rule_name": self.rule_name,
+            "seed": self.seed,
+            "traversal": self.traversal,
+            "frame_count": self.frame_count,
+            "grid_size": self.grid_size,
+            "tilings": [tiling.to_dict() for tiling in self.tilings],
+        }
+
+
+def _run_single_filmstrip(
+    geometry: str,
+    *,
+    rule: AutomatonRule,
+    bits: str,
+    traversal: str,
+    frame_count: int,
+    grid_size: int,
+    live_state: int,
+    pattern: str | None,
+) -> TopologyFilmstrip:
+    variant = get_topology_variant_for_geometry(geometry)
+    seeded = _build_seeded_board(
+        geometry,
+        bits=bits,
+        traversal=traversal,
+        grid_size=grid_size,
+        live_state=live_state,
+        pattern=pattern,
+    )
+    board = seeded.board
+
+    engine = SimulationEngine()
+    frames: list[dict[str, int]] = [board.states_by_id(omit_zero=True)]
+    seen: dict[tuple[int, ...], int] = {tuple(board.cell_states): 0}
+    period: int | None = None
+    extinction_step: int | None = None
+    current = board
+    # Every tiling captures the same number of frames so the client can advance
+    # them on one shared clock. A board that reaches a fixed point, cycle, or
+    # extinction simply repeats; those frames are cheap (sparse, often empty).
+    for step in range(1, frame_count):
+        nxt = engine.step_board(current, rule)
+        frames.append(nxt.states_by_id(omit_zero=True))
+        if extinction_step is None and population(nxt.cell_states) == 0:
+            extinction_step = step
+        if period is None:
+            key = tuple(nxt.cell_states)
+            if key in seen:
+                period = step - seen[key]
+            else:
+                seen[key] = step
+        current = nxt
+
+    return TopologyFilmstrip(
+        geometry=geometry,
+        tiling_family=variant.tiling_family,
+        family=variant.family,
+        cell_count=seeded.frame.cell_count,
+        topology=dict(board.topology.to_dict()),
+        topology_spec=dict(
+            topology_spec_payload(
+                geometry,
+                width=seeded.width,
+                height=seeded.height,
+                patch_depth=seeded.patch_depth,
+            )
+        ),
+        frames=frames,
+        extinction_step=extinction_step,
+        period=period,
+        note=seeded.note,
+    )
+
+
+def run_seed_filmstrip(
+    *,
+    seed: str,
+    rule_name: str = DEFAULT_RULE,
+    geometries: tuple[str, ...],
+    traversal: str = DEFAULT_TRAVERSAL,
+    frame_count: int = DEFAULT_FILMSTRIP_FRAMES,
+    grid_size: int = DEFAULT_FILMSTRIP_GRID_SIZE,
+    live_state: int = 1,
+    pattern: str | None = None,
+) -> SeedFilmstrip:
+    """Run one seed under one rule across a few tilings, capturing every frame.
+
+    Unlike ``compare_seed`` (which sweeps all tilings for aggregate metrics),
+    this keeps the full per-generation board state for a small, explicit set of
+    tilings so they can be played back synchronously side by side. A tiling that
+    fails to build is recorded with ``note="error"`` and empty frames rather
+    than aborting the run.
+    """
+    if traversal not in TRAVERSALS:
+        raise ValueError(
+            f"Unknown traversal {traversal!r}. Available: {', '.join(sorted(TRAVERSALS))}."
+        )
+    if pattern is not None and pattern not in NAMED_PATTERNS:
+        raise ValueError(
+            f"Unknown pattern {pattern!r}. Available: {', '.join(sorted(NAMED_PATTERNS))}."
+        )
+    if not geometries:
+        raise ValueError("At least one geometry is required for a filmstrip.")
+    if len(geometries) > MAX_FILMSTRIP_TILINGS:
+        raise ValueError(f"At most {MAX_FILMSTRIP_TILINGS} tilings can run side by side.")
+    unknown = [geometry for geometry in geometries if geometry not in SUPPORTED_GEOMETRIES]
+    if unknown:
+        raise ValueError(f"Unknown geometry key(s): {', '.join(unknown)}.")
+    resolved_frame_count = max(1, min(int(frame_count), MAX_FILMSTRIP_FRAMES))
+
+    bits = normalize_bits(seed)
+    rule = RuleRegistry().get(rule_name)
+    filmstrip = SeedFilmstrip(
+        rule_name=rule.name,
+        seed=seed,
+        traversal=traversal,
+        frame_count=resolved_frame_count,
+        grid_size=grid_size,
+    )
+    for geometry in geometries:
+        try:
+            tiling = _run_single_filmstrip(
+                geometry,
+                rule=rule,
+                bits=bits,
+                traversal=traversal,
+                frame_count=resolved_frame_count,
+                grid_size=grid_size,
+                live_state=live_state,
+                pattern=pattern,
+            )
+        except Exception as error:  # noqa: BLE001 - one bad tiling must not abort the run
+            variant = get_topology_variant_for_geometry(geometry)  # geometry validated above
+            tiling = TopologyFilmstrip(
+                geometry=geometry,
+                tiling_family=variant.tiling_family,
+                family=variant.family,
+                cell_count=0,
+                topology={},
+                topology_spec={},
+                frames=[],
+                extinction_step=None,
+                period=None,
+                note=f"error: {error}",
+            )
+        filmstrip.tilings.append(tiling)
+    return filmstrip

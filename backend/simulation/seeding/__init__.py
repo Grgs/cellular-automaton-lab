@@ -11,8 +11,11 @@ from __future__ import annotations
 
 from backend.simulation.seeding.comparison import (
     SeedComparison,
+    SeedFilmstrip,
     TopologyComparisonResult,
+    TopologyFilmstrip,
     compare_seed,
+    run_seed_filmstrip,
 )
 from backend.simulation.seeding.metrics import (
     classify,
@@ -22,8 +25,11 @@ from backend.simulation.seeding.metrics import (
 )
 from backend.simulation.seeding.request import (
     CompareRequest,
+    FilmstripRequest,
     parse_compare_request,
+    parse_filmstrip_request,
     run_compare_request,
+    run_filmstrip_request,
 )
 from backend.simulation.seeding.shapes import (
     NAMED_PATTERNS,
@@ -45,9 +51,12 @@ __all__ = [
     "NAMED_PATTERNS",
     "PATTERN_NAMES",
     "CompareRequest",
+    "FilmstripRequest",
     "SeedComparison",
+    "SeedFilmstrip",
     "TRAVERSALS",
     "TopologyComparisonResult",
+    "TopologyFilmstrip",
     "Traversal",
     "bfs_ring_order",
     "classify",
@@ -57,8 +66,11 @@ __all__ = [
     "normalize_bits",
     "paint_bits",
     "parse_compare_request",
+    "parse_filmstrip_request",
     "place_pattern",
     "population",
     "row_major_order",
     "run_compare_request",
+    "run_seed_filmstrip",
+    "run_filmstrip_request",
 ]

@@ -19,7 +19,7 @@ from backend.contract_validation import (
 from backend.payload_types import PersistedSimulationSnapshotInput
 from backend.rules import RuleRegistry
 from backend.simulation.persistence import SimulationStateStore
-from backend.simulation.seeding import run_compare_request
+from backend.simulation.seeding import run_compare_request, run_filmstrip_request
 from backend.simulation.service import SimulationOperationError, SimulationService
 from backend.simulation.state_restore import SimulationStateRestorer
 from backend.simulation.topology_preview import build_topology_preview
@@ -105,6 +105,8 @@ class BrowserSimulationRuntime:
                 return self.get_rules_response()
             if path == "/api/compare":
                 return json.dumps({"ok": True, "comparison": run_compare_request(request_payload)})
+            if path == "/api/compare/filmstrip":
+                return json.dumps({"ok": True, "filmstrip": run_filmstrip_request(request_payload)})
             if path == "/api/topology/preview":
                 return json.dumps(
                     {"ok": True, "topology_preview": build_topology_preview(request_payload)}

@@ -13,7 +13,7 @@ from backend.payload_types import (
 from backend.rules import RuleRegistry
 from backend.rules.base import RuleTopologyCompatibilityError
 from backend.simulation.coordinator import SimulationCoordinator
-from backend.simulation.seeding import run_compare_request
+from backend.simulation.seeding import run_compare_request, run_filmstrip_request
 from backend.simulation.service import SimulationOperationError
 from backend.simulation.sessions import (
     DEFAULT_SESSION_ID,
@@ -144,6 +144,17 @@ def compare(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
     except (RequestValidationError, ValueError) as exc:
         return json_error(str(exc))
     return jsonify({"comparison": comparison})
+
+
+@api_bp.post("/compare/filmstrip")
+@session_api_bp.post("/compare/filmstrip")
+def compare_filmstrip(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
+    payload = get_payload(request)
+    try:
+        filmstrip = run_filmstrip_request(payload)
+    except (RequestValidationError, ValueError) as exc:
+        return json_error(str(exc))
+    return jsonify({"filmstrip": filmstrip})
 
 
 @api_bp.post("/topology/preview")
