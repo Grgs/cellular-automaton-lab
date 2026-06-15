@@ -1,8 +1,10 @@
 import type {
     CellIdentifier,
     CompareRequest,
+    FilmstripRequest,
     RulesResponse,
     SeedComparisonResult,
+    SeedFilmstripResult,
     SimulationSnapshot,
     TopologyPreview,
     TopologyPreviewRequest,
@@ -130,6 +132,20 @@ export async function compareSeedRequest(
     return response.comparison;
 }
 
+export async function requestFilmstripRequest(
+    body: FilmstripRequest,
+    sessionId?: string,
+): Promise<SeedFilmstripResult> {
+    const response = await request<{ filmstrip: SeedFilmstripResult }>(
+        sessionPath("/api/compare/filmstrip", sessionId),
+        {
+            method: "POST",
+            body: JSON.stringify(body),
+        },
+    );
+    return response.filmstrip;
+}
+
 export async function previewTopologyRequest(
     body: TopologyPreviewRequest,
     sessionId?: string,
@@ -161,6 +177,7 @@ export function createHttpSimulationBackend({
         setCell: (cell, state) => setCellRequest(cell, state, sessionId),
         setCells: (cells) => setCellsRequest(cells, sessionId),
         compareSeed: (body) => compareSeedRequest(body, sessionId),
+        requestFilmstrip: (body) => requestFilmstripRequest(body, sessionId),
         previewTopology: (body) => previewTopologyRequest(body, sessionId),
     };
 }

@@ -221,6 +221,13 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
             }
             return response.comparison;
         },
+        async requestFilmstrip(filmstripRequest) {
+            const response = await request("/api/compare/filmstrip", filmstripRequest);
+            if (!response.filmstrip) {
+                throw new Error("Standalone runtime did not return a filmstrip result.");
+            }
+            return response.filmstrip;
+        },
         async previewTopology(previewRequest) {
             const response = await request("/api/topology/preview", previewRequest);
             if (!response.topologyPreview) {

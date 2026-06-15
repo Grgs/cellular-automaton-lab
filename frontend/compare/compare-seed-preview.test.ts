@@ -58,6 +58,14 @@ function backendReturning(preview: TopologyPreview): {
             degenerate: false,
             results: [],
         }),
+        requestFilmstrip: async () => ({
+            rule_name: "conway",
+            seed: "",
+            traversal: "bfs",
+            frame_count: 0,
+            grid_size: 12,
+            tilings: [],
+        }),
         previewTopology,
     };
     return { backend, previewTopology };

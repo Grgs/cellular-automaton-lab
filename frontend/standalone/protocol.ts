@@ -1,8 +1,10 @@
 import type {
     CompareRequest,
+    FilmstripRequest,
     PersistedSimulationSnapshotV5,
     RulesResponse,
     SeedComparisonResult,
+    SeedFilmstripResult,
     SimulationSnapshot,
     TopologyPreview,
     TopologyPreviewRequest,
@@ -20,6 +22,7 @@ export type StandaloneCommandPath =
     | "/api/state"
     | "/api/rules"
     | "/api/compare"
+    | "/api/compare/filmstrip"
     | "/api/topology/preview"
     | "/api/cells/toggle"
     | "/api/cells/set"
@@ -43,6 +46,7 @@ export type StandaloneRequestPayload =
     | CellUpdateRequest
     | CellUpdatesRequest
     | CompareRequest
+    | FilmstripRequest
     | TopologyPreviewRequest;
 
 export interface StandaloneRequestMessage {
@@ -71,6 +75,7 @@ export interface StandaloneSuccessResponse {
     snapshot?: SimulationSnapshot;
     rules?: RulesResponse["rules"];
     comparison?: SeedComparisonResult;
+    filmstrip?: SeedFilmstripResult;
     topologyPreview?: TopologyPreview;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 }

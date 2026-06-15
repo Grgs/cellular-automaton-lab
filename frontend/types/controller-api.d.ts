@@ -3,9 +3,11 @@ import type {
     CellIdentifier,
     CellStateUpdate,
     CompareRequest,
+    FilmstripRequest,
     PersistedSimulationSnapshotV5,
     RulesResponse,
     SeedComparisonResult,
+    SeedFilmstripResult,
     SimulationSnapshot,
     TopologyPreview,
     TopologyPreviewRequest,
@@ -75,6 +77,7 @@ export interface SimulationBackend {
     setCell(cell: CellTargetRequest, state: number): Promise<SimulationSnapshot>;
     setCells(cells: CellUpdateRequest[]): Promise<SimulationSnapshot>;
     compareSeed(request: CompareRequest): Promise<SeedComparisonResult>;
+    requestFilmstrip(request: FilmstripRequest): Promise<SeedFilmstripResult>;
     previewTopology(request: TopologyPreviewRequest): Promise<TopologyPreview>;
 }
 

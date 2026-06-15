@@ -228,6 +228,44 @@ export interface SeedComparisonResult {
     results: TopologyComparisonResultPayload[];
 }
 
+export interface FilmstripRequest {
+    seed: string;
+    rule?: string;
+    traversal?: string;
+    /** Number of generations (including the seed frame) to capture. */
+    frames?: number;
+    grid_size?: number;
+    /** The explicit tilings to run side by side (required for a filmstrip). */
+    geometries: readonly string[];
+    /** When set, seed each tiling with this named shape instead of the bit seed. */
+    pattern?: string;
+}
+
+export interface TopologyFilmstrip {
+    geometry: string;
+    tiling_family: string;
+    family: string;
+    cell_count: number;
+    /** Full geometry, sent once so the client can render the board. */
+    topology: TopologyPayload;
+    topology_spec: TopologySpec;
+    /** One sparse live-cell map per generation; frames[0] is the seed. */
+    frames: Record<string, number>[];
+    extinction_step: number | null;
+    period: number | null;
+    note: string | null;
+}
+
+export interface SeedFilmstripResult {
+    rule_name: string;
+    seed: string;
+    traversal: string;
+    /** All tilings share this frame count so one client clock keeps them in sync. */
+    frame_count: number;
+    grid_size: number;
+    tilings: TopologyFilmstrip[];
+}
+
 export interface TopologyPreviewRequest {
     geometry: string;
     width?: number;
