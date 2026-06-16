@@ -4,6 +4,10 @@ import { bootstrapDataFromWindow } from "./bootstrap-data.js";
 import { elements } from "./dom.js";
 import { createAppController } from "./app-controller.js";
 import { mountCompareLauncher, type CompareLauncherHandle } from "./compare/compare-launcher.js";
+import {
+    mountLiveCompareWorkspace,
+    type LiveCompareWorkspaceHandle,
+} from "./live-compare/live-compare.js";
 import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
 
@@ -14,8 +18,11 @@ function handleAppError(error: unknown): void {
 let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
 let compareLauncher: CompareLauncherHandle | null = null;
+let liveCompareWorkspace: LiveCompareWorkspaceHandle | null = null;
 
 export function disposeApp(): void {
+    liveCompareWorkspace?.dispose();
+    liveCompareWorkspace = null;
     compareLauncher?.dispose();
     compareLauncher = null;
     disposeReviewApi?.();
@@ -50,6 +57,14 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             onOpenPattern: (payload) => {
                 void controller.loadPattern(payload);
             },
+        });
+        liveCompareWorkspace = mountLiveCompareWorkspace({
+            trigger: elements.splitViewToggleBtn,
+            gridPanel: elements.gridPanel,
+            bootstrapData,
+            baseSessionId: window.APP_SESSION_ID ?? null,
+            mainBackend: backend,
+            createGridView: (canvas) => createCanvasGridView({ canvas }),
         });
     } catch (error) {
         handleAppError(error);

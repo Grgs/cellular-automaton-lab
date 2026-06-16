@@ -1185,6 +1185,141 @@ button.theme-toggle .theme-icon-moon {
     cursor: default;
 }
 
+.grid-panel.is-live-compare > :not(.live-compare-workspace) {
+    display: none;
+}
+
+.main-stage.is-live-compare,
+.main-stage.is-drawer-open.is-live-compare {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.main-stage.is-live-compare .control-drawer {
+    display: none;
+}
+
+.live-compare-workspace {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.live-compare-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+}
+
+.live-compare-summary {
+    min-width: 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.live-compare-action,
+.live-compare-pane-action {
+    border: 1px solid var(--btn-soft-line);
+    border-radius: 6px;
+    background: var(--btn-soft-bg);
+    color: var(--btn-soft-text);
+    font: inherit;
+    font-size: 0.82rem;
+    line-height: 1;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.live-compare-action:hover,
+.live-compare-pane-action:hover {
+    background: var(--btn-soft-hover);
+    border-color: var(--accent);
+}
+
+.live-compare-panes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    min-height: 0;
+}
+
+.live-compare-pane {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--dead);
+}
+
+.live-compare-pane.is-active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.live-compare-pane-header {
+    display: grid;
+    grid-template-columns: auto auto minmax(150px, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+}
+
+.live-compare-pane-title {
+    font-size: 0.88rem;
+}
+
+.live-compare-pane-meta {
+    display: flex;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.live-compare-tiling-select {
+    min-width: 0;
+    width: 100%;
+    border: 1px solid var(--field-border);
+    border-radius: 6px;
+    background: var(--field-bg);
+    color: var(--field-text);
+    font: inherit;
+    font-size: 0.82rem;
+    padding: 7px 8px;
+}
+
+.live-compare-pane-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.live-compare-pane-viewport {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    padding: 12px;
+}
+
+.live-compare-canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
 .blocking-activity-overlay {
     position: absolute;
     inset: 0;
@@ -2225,6 +2360,23 @@ button.theme-toggle .theme-icon-moon {
 }
 
 @media (max-width: 860px) {
+    .live-compare-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .live-compare-panes {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .live-compare-pane-header {
+        grid-template-columns: 1fr;
+    }
+
+    .live-compare-pane-actions {
+        flex-wrap: wrap;
+    }
+
     .app-frame {
         width: min(1400px, calc(100vw - 16px));
         height: 100dvh;

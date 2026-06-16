@@ -133,6 +133,7 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         stepBtn: null,
         resetBtn: null,
         randomBtn: null,
+        splitViewToggleBtn: null,
         resetAllSettingsBtn: null,
         presetSeedControls: null,
         presetSeedSelect: null,
