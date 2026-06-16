@@ -2,14 +2,21 @@ import { createCanvasGridView } from "./canvas-view.js";
 import { createHttpSimulationBackend } from "./api.js";
 import { bootstrapDataFromWindow } from "./bootstrap-data.js";
 import { elements } from "./dom.js";
+import { buildEditorToolCells } from "./editor-operations.js";
 import { createAppController } from "./app-controller.js";
 import { mountCompareLauncher, type CompareLauncherHandle } from "./compare/compare-launcher.js";
+import { getGeometryAdapter } from "./geometry/registry.js";
 import {
     mountLiveCompareWorkspace,
+    type LiveCompareCellSizeOptions,
     type LiveCompareWorkspaceHandle,
 } from "./live-compare/live-compare.js";
 import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
+
+interface FitRenderCellSizeAdapter {
+    fitRenderCellSize?: (options: LiveCompareCellSizeOptions) => number;
+}
 
 function handleAppError(error: unknown): void {
     console.error(error);
@@ -78,6 +85,11 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             },
             onReturnToSingleView: () => controller.refreshState(),
             createGridView: (canvas) => createCanvasGridView({ canvas }),
+            buildEditorToolCells,
+            resolveCellSize: (options) => {
+                const adapter = getGeometryAdapter(options.geometry) as FitRenderCellSizeAdapter;
+                return adapter.fitRenderCellSize?.(options) ?? options.fallbackCellSize;
+            },
         });
     } catch (error) {
         handleAppError(error);

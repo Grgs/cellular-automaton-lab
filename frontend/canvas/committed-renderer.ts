@@ -228,9 +228,11 @@ export function createCanvasCommittedRenderer({
 
     function getCellFromPointerEvent(event: MouseEvent | PointerEvent): PaintableCell | null {
         const rect = canvas.getBoundingClientRect();
+        const scaleX = rect.width > 0 ? metrics.cssWidth / rect.width : 1;
+        const scaleY = rect.height > 0 ? metrics.cssHeight / rect.height : 1;
         return resolveGeometryCellFromOffset(
-            event.clientX - rect.left,
-            event.clientY - rect.top,
+            (event.clientX - rect.left) * scaleX,
+            (event.clientY - rect.top) * scaleY,
             metrics.width,
             metrics.height,
             cellSize,

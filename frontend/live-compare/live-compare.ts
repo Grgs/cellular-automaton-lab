@@ -1,13 +1,27 @@
 import { createHttpSimulationBackend } from "../api.js";
+import {
+    DEFAULT_BRUSH_SIZE,
+    DEFAULT_EDITOR_TOOL,
+    EDITOR_TOOL_BRUSH,
+    EDITOR_TOOL_FILL,
+    EDITOR_TOOL_LINE,
+    EDITOR_TOOL_RECTANGLE,
+    EDITOR_TOOLS,
+    clampBrushSize,
+} from "../editor-tools.js";
+import type { EditorTool } from "../editor-tools.js";
 import type { SimulationBackend } from "../types/controller-api.js";
 import type { GridView } from "../types/controller-view.js";
 import type {
     AppBootstrapData,
     BootstrappedTopologyDefinition,
-    CellIdentifier,
+    IndexedTopologyCell,
     SimulationSnapshot,
+    TopologyIndex,
     TopologySpec,
 } from "../types/domain.js";
+import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
+import type { AppState } from "../types/state.js";
 
 const STORAGE_KEY = "cellular-automaton-lab.live-compare.v1";
 const POLL_INTERVAL_MS = 250;
@@ -28,9 +42,30 @@ export interface LiveCompareWorkspaceOptions {
     onReturnToSingleView?: () => void | Promise<void>;
     backendFactory?: (sessionId: string) => SimulationBackend;
     createGridView?: (canvas: HTMLCanvasElement) => GridView;
+    resolveCellSize?: (options: LiveCompareCellSizeOptions) => number;
+    buildEditorToolCells?: LiveCompareEditorCellsBuilder;
     storage?: Storage | null;
     onError?: (error: unknown) => void;
 }
+
+export interface LiveCompareCellSizeOptions {
+    viewportWidth: number;
+    viewportHeight: number;
+    width: number;
+    height: number;
+    topology: SimulationSnapshot["topology"];
+    geometry: string;
+    fallbackCellSize: number;
+}
+
+export type LiveCompareEditorCellsBuilder = (
+    state: AppState,
+    tool: string,
+    startCell: PaintableCell,
+    endCell: PaintableCell | null | undefined,
+    paintState: number,
+    brushSize: number,
+) => PreviewPaintCell[];
 
 export interface LiveCompareControlElements {
     statusText?: HTMLElement | null;
@@ -52,6 +87,7 @@ export interface LiveCompareWorkspaceHandle {
 
 interface PaneElements {
     root: HTMLElement;
+    viewport: HTMLElement;
     canvas: HTMLCanvasElement;
     status: HTMLElement;
     generation: HTMLElement;
@@ -70,6 +106,16 @@ interface PaneState {
     elements: PaneElements;
     snapshot: SimulationSnapshot | null;
     pollTimer: number | null;
+}
+
+interface PaneEditGesture {
+    pane: PaneState;
+    tool: EditorTool;
+    pointerId: number | null;
+    startCell: PaintableCell;
+    currentCell: PaintableCell;
+    previewCells: Map<string, PreviewPaintCell>;
+    moved: boolean;
 }
 
 function readStorage(storage: Storage | null | undefined): LiveCompareStorageState {
@@ -224,6 +270,7 @@ function createPaneElements(
 
     return {
         root,
+        viewport,
         canvas,
         status,
         generation,
@@ -234,10 +281,128 @@ function createPaneElements(
     };
 }
 
+function paneEditorState(
+    snapshot: SimulationSnapshot,
+    renderCellSize: number,
+    selectedEditorTool: EditorTool,
+    brushSize: number,
+    selectedPaintState: number,
+): AppState {
+    return {
+        topology: snapshot.topology,
+        topologyIndex: indexPaneTopology(snapshot),
+        topologySpec: snapshot.topology_spec,
+        width: snapshot.topology.width ?? snapshot.topology_spec.width,
+        height: snapshot.topology.height ?? snapshot.topology_spec.height,
+        cellStates: snapshot.cell_states,
+        cellSize: renderCellSize,
+        renderCellSize,
+        activeRule: snapshot.rule,
+        rules: [snapshot.rule],
+        editorRuleName: snapshot.rule.name,
+        ruleSelectionOrigin: "default",
+        selectedEditorTool,
+        brushSize,
+        selectedPaintState,
+        selectedPresetIdsByRule: {},
+        undoStack: [],
+        redoStack: [],
+        pollTimer: null,
+        isRunning: snapshot.running,
+        generation: snapshot.generation,
+        speed: snapshot.speed,
+        measuredSpeed: null,
+        measuredSpeedSample: null,
+        patchDepth: snapshot.topology_spec.patch_depth,
+        pendingPatchDepth: null,
+        patchDepthByTilingFamily: {},
+        unsafeSizingEnabled: false,
+        tileColorsEnabled: true,
+        topologyRevision: snapshot.topology_revision,
+        previewTopology: null,
+        previewTopologyRevision: null,
+        previewCellStatesById: null,
+        cellSizeByTilingFamily: {},
+        drawerOpen: false,
+        overlaysDismissed: false,
+        inspectorTemporarilyHidden: false,
+        overlayRunPending: false,
+        runningOverlayRestoreActive: false,
+        inspectorOccludesGrid: false,
+        editArmed: true,
+        editCueVisible: false,
+        firstRunHintDismissed: true,
+        blockingActivityKind: null,
+        blockingActivityMessage: "",
+        blockingActivityDetail: "",
+        blockingActivityVisible: false,
+        blockingActivityStartedAt: null,
+        patternStatus: { message: "", tone: "" },
+    };
+}
+
+function resolvePanePaintState(snapshot: SimulationSnapshot, selectedPaintState: number): number {
+    const paintableStates = snapshot.rule.states.filter((state) => state.paintable !== false);
+    if (paintableStates.some((state) => state.value === selectedPaintState)) {
+        return selectedPaintState;
+    }
+    return (
+        paintableStates.find((state) => state.value === snapshot.rule.default_paint_state)?.value ??
+        paintableStates.find((state) => state.value !== 0)?.value ??
+        paintableStates[0]?.value ??
+        1
+    );
+}
+
+function cssPixelValue(value: string): number {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function fitCanvasElementToViewport(canvas: HTMLCanvasElement, viewport: HTMLElement): void {
+    const canvasWidth = Number.parseFloat(canvas.style.width) || canvas.width;
+    const canvasHeight = Number.parseFloat(canvas.style.height) || canvas.height;
+    if (canvasWidth <= 0 || canvasHeight <= 0) {
+        return;
+    }
+    const viewportStyle = window.getComputedStyle(viewport);
+    const availableWidth = Math.max(
+        1,
+        viewport.clientWidth -
+            cssPixelValue(viewportStyle.paddingLeft) -
+            cssPixelValue(viewportStyle.paddingRight),
+    );
+    const availableHeight = Math.max(
+        1,
+        viewport.clientHeight -
+            cssPixelValue(viewportStyle.paddingTop) -
+            cssPixelValue(viewportStyle.paddingBottom),
+    );
+    const scale = Math.min(1, availableWidth / canvasWidth, availableHeight / canvasHeight);
+    canvas.style.width = `${canvasWidth * scale}px`;
+    canvas.style.height = `${canvasHeight * scale}px`;
+}
+
+function indexPaneTopology(snapshot: SimulationSnapshot): TopologyIndex {
+    const byId = new Map<string, IndexedTopologyCell>();
+    snapshot.topology.cells.forEach((cell, index) => {
+        byId.set(cell.id, { ...cell, index });
+    });
+    return { byId };
+}
+
+function findPaneCellById(
+    topologyIndex: TopologyIndex,
+    cellId: string,
+): IndexedTopologyCell | null {
+    return topologyIndex.byId.get(cellId) ?? null;
+}
+
 function renderPane(
     pane: PaneState,
     bootstrapData: AppBootstrapData,
     definitions: readonly BootstrappedTopologyDefinition[],
+    resolveCellSize: LiveCompareWorkspaceOptions["resolveCellSize"],
 ): void {
     const snapshot = pane.snapshot;
     if (!snapshot) {
@@ -246,7 +411,21 @@ function renderPane(
         return;
     }
     const geometry = geometryForSpec(definitions, snapshot.topology_spec);
-    const cellSize = bootstrapData.app_defaults.ui.cell_size;
+    const fallbackCellSize = bootstrapData.app_defaults.ui.cell_size;
+    const viewportWidth = pane.elements.viewport.clientWidth;
+    const viewportHeight = pane.elements.viewport.clientHeight;
+    const cellSize =
+        viewportWidth > 0 && viewportHeight > 0
+            ? (resolveCellSize?.({
+                  viewportWidth,
+                  viewportHeight,
+                  width: snapshot.topology.width ?? snapshot.topology_spec.width,
+                  height: snapshot.topology.height ?? snapshot.topology_spec.height,
+                  topology: snapshot.topology,
+                  geometry,
+                  fallbackCellSize,
+              }) ?? fallbackCellSize)
+            : fallbackCellSize;
     pane.gridView.render?.(
         {
             topology: snapshot.topology,
@@ -258,6 +437,7 @@ function renderPane(
         snapshot.rule.states,
         geometry,
     );
+    fitCanvasElementToViewport(pane.elements.canvas, pane.elements.viewport);
     pane.elements.status.textContent = snapshot.running ? "Running" : "Paused";
     pane.elements.generation.textContent = `Gen ${snapshot.generation}`;
     pane.elements.runButton.textContent = snapshot.running ? "Pause" : "Run";
@@ -283,6 +463,10 @@ export function mountLiveCompareWorkspace({
     },
     storage = typeof window !== "undefined" ? window.localStorage : null,
     onError = (error) => console.error(error),
+    resolveCellSize,
+    buildEditorToolCells = (_state, _tool, startCell, _endCell, paintState) => [
+        { ...startCell, state: paintState },
+    ],
 }: LiveCompareWorkspaceOptions): LiveCompareWorkspaceHandle {
     if (!trigger || !gridPanel) {
         return { dispose() {}, isOpen: () => false };
@@ -307,13 +491,40 @@ export function mountLiveCompareWorkspace({
 
     const toolbar = element("div", "live-compare-toolbar");
     const summary = element("span", "live-compare-summary", "Split View");
+    const transportActions = element("div", "live-compare-toolbar-group");
     const runBoth = element("button", "live-compare-action", "Run Both");
     runBoth.type = "button";
     const pauseBoth = element("button", "live-compare-action", "Pause Both");
     pauseBoth.type = "button";
     const stepBoth = element("button", "live-compare-action", "Step Both");
     stepBoth.type = "button";
-    toolbar.append(summary, runBoth, pauseBoth, stepBoth);
+    transportActions.append(runBoth, pauseBoth, stepBoth);
+
+    const editorTools = element("div", "live-compare-toolbar-group");
+    const toolButtons = new Map<EditorTool, HTMLButtonElement>();
+    for (const tool of EDITOR_TOOLS) {
+        const button = element(
+            "button",
+            "live-compare-editor-tool",
+            tool === EDITOR_TOOL_RECTANGLE ? "Rect" : tool.charAt(0).toUpperCase() + tool.slice(1),
+        );
+        button.type = "button";
+        button.dataset.tool = tool;
+        toolButtons.set(tool, button);
+        editorTools.append(button);
+    }
+    const brushTools = element("div", "live-compare-toolbar-group");
+    const brushButtons = new Map<number, HTMLButtonElement>();
+    for (const size of [1, 2, 3]) {
+        const button = element("button", "live-compare-editor-tool", `${size}`);
+        button.type = "button";
+        button.dataset.brushSize = String(size);
+        button.setAttribute("aria-label", `Brush size ${size}`);
+        brushButtons.set(size, button);
+        brushTools.append(button);
+    }
+    const paintPalette = element("div", "live-compare-paint-palette");
+    toolbar.append(summary, transportActions, editorTools, brushTools, paintPalette);
 
     const paneGrid = element("div", "live-compare-panes");
     root.append(toolbar, paneGrid);
@@ -346,56 +557,131 @@ export function mountLiveCompareWorkspace({
     let open = false;
     let disposed = false;
     let activePane: PaneState | null = null;
+    let selectedEditorTool: EditorTool = DEFAULT_EDITOR_TOOL;
+    let brushSize = DEFAULT_BRUSH_SIZE;
+    let selectedPaintState = 1;
+    let activeGesture: PaneEditGesture | null = null;
+    let suppressFollowupClick = false;
     const cleanupCallbacks: Array<() => void> = [];
+    const disabledControlState = new Map<
+        HTMLButtonElement | HTMLSelectElement,
+        { disabled: boolean; title: string }
+    >();
 
-    function closeTilingPicker(): void {
-        if (controls.tilingPickerMenu) {
+    function setSplitDisabledControls(disabled: boolean): void {
+        const targets = [
+            controls.resetBtn,
+            controls.randomBtn,
+            controls.tilingPickerToggle,
+            controls.tilingFamilySelect,
+        ].filter((node): node is HTMLButtonElement | HTMLSelectElement => Boolean(node));
+        for (const target of targets) {
+            if (disabled) {
+                if (!disabledControlState.has(target)) {
+                    disabledControlState.set(target, {
+                        disabled: target.disabled,
+                        title: target.title,
+                    });
+                }
+                target.disabled = true;
+                target.title = "Use the split pane controls while Split View is open.";
+            } else {
+                const previous = disabledControlState.get(target);
+                if (previous) {
+                    target.disabled = previous.disabled;
+                    target.title = previous.title;
+                }
+            }
+        }
+        if (!disabled) {
+            disabledControlState.clear();
+        }
+        if (disabled && controls.tilingPickerMenu) {
             controls.tilingPickerMenu.hidden = true;
         }
-        controls.tilingPickerToggle?.setAttribute("aria-expanded", "false");
+        if (disabled) {
+            controls.tilingPickerToggle?.setAttribute("aria-expanded", "false");
+        }
     }
 
-    function setSelectedTopTiling(tilingFamily: string): void {
-        if (controls.tilingFamilySelect) {
-            controls.tilingFamilySelect.value = tilingFamily;
+    function paneRunSummary(): string {
+        const runningCount = panes.filter((pane) => pane.snapshot?.running).length;
+        if (runningCount === panes.length) {
+            return "Running";
         }
-        if (controls.tilingPickerCurrentLabel) {
-            controls.tilingPickerCurrentLabel.textContent = topologyLabel(
-                definitions,
-                tilingFamily,
+        if (runningCount === 0) {
+            return "Paused";
+        }
+        return "Mixed";
+    }
+
+    function generationSummary(): string {
+        const generations = panes.map((pane) => pane.snapshot?.generation ?? 0);
+        if (generations.every((generation) => generation === generations[0])) {
+            return String(generations[0] ?? 0);
+        }
+        return generations.join(" / ");
+    }
+
+    function renderEditorToolbar(): void {
+        toolButtons.forEach((button, tool) => {
+            button.classList.toggle("is-selected", tool === selectedEditorTool);
+            button.setAttribute("aria-pressed", tool === selectedEditorTool ? "true" : "false");
+        });
+        brushButtons.forEach((button, size) => {
+            button.classList.toggle("is-selected", size === brushSize);
+            button.setAttribute("aria-pressed", size === brushSize ? "true" : "false");
+        });
+        const snapshot = activePane?.snapshot;
+        paintPalette.replaceChildren();
+        if (!snapshot) {
+            return;
+        }
+        selectedPaintState = resolvePanePaintState(snapshot, selectedPaintState);
+        for (const state of snapshot.rule.states.filter(
+            (candidate) => candidate.paintable !== false,
+        )) {
+            const button = element("button", "live-compare-paint-state", state.label);
+            button.type = "button";
+            button.dataset.state = String(state.value);
+            button.classList.toggle("is-selected", state.value === selectedPaintState);
+            button.setAttribute(
+                "aria-pressed",
+                state.value === selectedPaintState ? "true" : "false",
             );
-        }
-        const menu = controls.tilingPickerMenu;
-        if (menu) {
-            menu.querySelectorAll<HTMLButtonElement>(".tiling-preview-card").forEach((card) => {
-                card.classList.toggle("is-selected", card.dataset.tilingFamily === tilingFamily);
+            const swatch = element("span", "live-compare-paint-swatch");
+            swatch.style.background = state.color;
+            button.prepend(swatch);
+            button.addEventListener("click", () => {
+                selectedPaintState = state.value;
+                renderEditorToolbar();
             });
+            paintPalette.append(button);
         }
     }
 
     function updateTopControls(): void {
-        if (!open || !activePane?.snapshot) {
+        if (!open) {
             return;
         }
-        const snapshot = activePane.snapshot;
         if (controls.statusText) {
-            controls.statusText.textContent = `${activePane.title}: ${
-                snapshot.running ? "Running" : "Paused"
-            }`;
+            controls.statusText.textContent = `Split: ${paneRunSummary()}`;
         }
         if (controls.generationText) {
-            controls.generationText.textContent = String(snapshot.generation);
+            controls.generationText.textContent = generationSummary();
         }
         if (controls.runToggleBtn) {
-            controls.runToggleBtn.textContent = snapshot.running ? "Pause" : "Run";
-            controls.runToggleBtn.classList.toggle("is-running", snapshot.running);
-            controls.runToggleBtn.dataset.controlAction = snapshot.running ? "pause" : "run";
+            const anyRunning = panes.some((pane) => pane.snapshot?.running);
+            controls.runToggleBtn.textContent = anyRunning ? "Pause" : "Run";
+            controls.runToggleBtn.classList.toggle("is-running", anyRunning);
+            controls.runToggleBtn.dataset.controlAction = anyRunning ? "pause" : "run";
             controls.runToggleBtn.setAttribute(
                 "aria-label",
-                `${snapshot.running ? "Pause" : "Run"} ${activePane.title} split pane`,
+                `${anyRunning ? "Pause" : "Run"} both split panes`,
             );
         }
-        setSelectedTopTiling(snapshot.topology_spec.tiling_family);
+        summary.textContent = `Split View - ${paneRunSummary()}`;
+        renderEditorToolbar();
     }
 
     function setActivePane(pane: PaneState): void {
@@ -428,10 +714,8 @@ export function mountLiveCompareWorkspace({
 
     async function applyPaneSnapshot(pane: PaneState, snapshot: SimulationSnapshot): Promise<void> {
         pane.snapshot = snapshot;
-        renderPane(pane, bootstrapData, definitions);
-        if (pane === activePane) {
-            updateTopControls();
-        }
+        renderPane(pane, bootstrapData, definitions, resolveCellSize);
+        updateTopControls();
         syncPoll(pane);
     }
 
@@ -481,16 +765,129 @@ export function mountLiveCompareWorkspace({
         await applyPaneSnapshot(pane, await pane.backend.postControl(path));
     }
 
-    async function editPaneCell(pane: PaneState, cell: CellIdentifier): Promise<void> {
+    async function runAllPanes(): Promise<void> {
+        await Promise.all(
+            panes.map(async (pane) => {
+                const snapshot = pane.snapshot ?? (await pane.backend.getState());
+                if (!snapshot.running) {
+                    await sendPaneRunToggle(pane);
+                }
+            }),
+        );
+    }
+
+    async function pauseAllPanes(): Promise<void> {
+        await Promise.all(
+            panes.map(async (pane) => {
+                const snapshot = pane.snapshot ?? (await pane.backend.getState());
+                if (snapshot.running) {
+                    await applyPaneSnapshot(
+                        pane,
+                        await pane.backend.postControl("/api/control/pause"),
+                    );
+                }
+            }),
+        );
+    }
+
+    async function runToggleAllPanes(): Promise<void> {
+        if (panes.some((pane) => pane.snapshot?.running)) {
+            await pauseAllPanes();
+            return;
+        }
+        await runAllPanes();
+    }
+
+    async function stepAllPanes(): Promise<void> {
+        await Promise.all(
+            panes.map((pane) =>
+                pane.backend
+                    .postControl("/api/control/step")
+                    .then((snapshot) => applyPaneSnapshot(pane, snapshot)),
+            ),
+        );
+    }
+
+    function buildPaneToolCells(
+        pane: PaneState,
+        tool: EditorTool,
+        startCell: PaintableCell,
+        endCell: PaintableCell | null,
+    ): PreviewPaintCell[] {
+        const snapshot = pane.snapshot;
+        if (!snapshot) {
+            return [];
+        }
+        const geometry = geometryForSpec(definitions, snapshot.topology_spec);
+        const state = paneEditorState(
+            snapshot,
+            bootstrapData.app_defaults.ui.cell_size,
+            selectedEditorTool,
+            brushSize,
+            resolvePanePaintState(snapshot, selectedPaintState),
+        );
+        state.renderCellSize =
+            resolveCellSize?.({
+                viewportWidth: pane.elements.viewport.clientWidth,
+                viewportHeight: pane.elements.viewport.clientHeight,
+                width: snapshot.topology.width ?? snapshot.topology_spec.width,
+                height: snapshot.topology.height ?? snapshot.topology_spec.height,
+                topology: snapshot.topology,
+                geometry,
+                fallbackCellSize: bootstrapData.app_defaults.ui.cell_size,
+            }) ?? bootstrapData.app_defaults.ui.cell_size;
+        state.cellSize = state.renderCellSize;
+        const paintState = resolvePanePaintState(snapshot, selectedPaintState);
+        const cells = buildEditorToolCells(state, tool, startCell, endCell, paintState, brushSize);
+        if (cells.length > 0 || (tool !== EDITOR_TOOL_BRUSH && tool !== EDITOR_TOOL_FILL)) {
+            return cells;
+        }
+        return [{ ...startCell, state: paintState }];
+    }
+
+    async function commitPaneCells(pane: PaneState, cells: PreviewPaintCell[]): Promise<void> {
         setActivePane(pane);
+        const snapshot = pane.snapshot ?? (await pane.backend.getState());
+        const topologyIndex = indexPaneTopology(snapshot);
+        const updates = cells.flatMap((cell) => {
+            const resolved = findPaneCellById(topologyIndex, cell.id);
+            if (!resolved) {
+                return [];
+            }
+            const state = Number(cell.state);
+            if (Number(snapshot.cell_states[resolved.index] ?? 0) === state) {
+                return [];
+            }
+            return [{ id: resolved.id, state }];
+        });
+        if (updates.length === 0) {
+            return;
+        }
         const wasRunning = Boolean(pane.snapshot?.running);
         if (wasRunning) {
             await applyPaneSnapshot(pane, await pane.backend.postControl("/api/control/pause"));
         }
-        await applyPaneSnapshot(pane, await pane.backend.toggleCell(cell));
+        await applyPaneSnapshot(pane, await pane.backend.setCells(updates));
         if (wasRunning) {
             await applyPaneSnapshot(pane, await pane.backend.postControl("/api/control/resume"));
         }
+    }
+
+    function previewPaneCells(pane: PaneState, cells: PreviewPaintCell[]): void {
+        pane.gridView.setPreviewCells(cells);
+        pane.gridView.setGestureOutline(cells, selectedPaintState === 0 ? "erase" : "paint");
+    }
+
+    function clearPanePreview(pane: PaneState): void {
+        pane.gridView.clearPreview();
+        pane.gridView.clearGestureOutline();
+    }
+
+    function suppressNextClick(): void {
+        suppressFollowupClick = true;
+        window.setTimeout(() => {
+            suppressFollowupClick = false;
+        }, 0);
     }
 
     function setOpen(nextOpen: boolean): void {
@@ -505,12 +902,14 @@ export function mountLiveCompareWorkspace({
         triggerButton.textContent = open ? "Single View" : "Split View";
         if (open) {
             void mainBackend?.postControl("/api/control/pause").catch(onError);
+            setSplitDisabledControls(true);
             setActivePane(activePane ?? panes[0]!);
             void initializePaneSessions()
                 .then(() => updateTopControls())
                 .catch(onError);
         } else {
             panes.forEach(clearPoll);
+            setSplitDisabledControls(false);
             void Promise.resolve(onReturnToSingleView()).catch(onError);
         }
     }
@@ -529,12 +928,126 @@ export function mountLiveCompareWorkspace({
             pane.elements.root.focus();
             event.stopPropagation();
         });
-        pane.elements.canvas.addEventListener("click", (event) => {
+        pane.elements.canvas.addEventListener("pointerdown", (event) => {
             const cell = pane.gridView.getCellFromPointerEvent?.(event) ?? null;
             if (!cell) {
                 return;
             }
-            void editPaneCell(pane, cell).catch(onError);
+            event.preventDefault();
+            event.stopPropagation();
+            setActivePane(pane);
+            const paintableCell = cell as PaintableCell;
+            if (selectedEditorTool === EDITOR_TOOL_FILL) {
+                const cells = buildPaneToolCells(
+                    pane,
+                    EDITOR_TOOL_FILL,
+                    paintableCell,
+                    paintableCell,
+                );
+                previewPaneCells(pane, cells);
+                suppressNextClick();
+                void commitPaneCells(pane, cells)
+                    .then(() => clearPanePreview(pane))
+                    .catch(onError);
+                return;
+            }
+            const tool =
+                selectedEditorTool === EDITOR_TOOL_LINE ||
+                selectedEditorTool === EDITOR_TOOL_RECTANGLE
+                    ? selectedEditorTool
+                    : EDITOR_TOOL_BRUSH;
+            const cells = buildPaneToolCells(pane, tool, paintableCell, paintableCell);
+            activeGesture = {
+                pane,
+                tool,
+                pointerId: event.pointerId ?? null,
+                startCell: paintableCell,
+                currentCell: paintableCell,
+                previewCells: new Map(cells.map((previewCell) => [previewCell.id, previewCell])),
+                moved: false,
+            };
+            previewPaneCells(pane, cells);
+            pane.elements.canvas.setPointerCapture?.(event.pointerId);
+        });
+        pane.elements.canvas.addEventListener("pointermove", (event) => {
+            if (!activeGesture || activeGesture.pane !== pane) {
+                return;
+            }
+            const cell = pane.gridView.getCellFromPointerEvent?.(event) ?? null;
+            if (!cell) {
+                return;
+            }
+            event.preventDefault();
+            const paintableCell = cell as PaintableCell;
+            if (activeGesture.currentCell.id === paintableCell.id) {
+                return;
+            }
+            activeGesture.moved = true;
+            const cells =
+                activeGesture.tool === EDITOR_TOOL_BRUSH
+                    ? buildPaneToolCells(
+                          pane,
+                          EDITOR_TOOL_LINE,
+                          activeGesture.currentCell,
+                          paintableCell,
+                      )
+                    : buildPaneToolCells(
+                          pane,
+                          activeGesture.tool,
+                          activeGesture.startCell,
+                          paintableCell,
+                      );
+            if (activeGesture.tool === EDITOR_TOOL_BRUSH) {
+                cells.forEach((previewCell) =>
+                    activeGesture?.previewCells.set(previewCell.id, previewCell),
+                );
+            } else {
+                activeGesture.previewCells = new Map(
+                    cells.map((previewCell) => [previewCell.id, previewCell]),
+                );
+            }
+            activeGesture.currentCell = paintableCell;
+            previewPaneCells(pane, Array.from(activeGesture.previewCells.values()));
+        });
+        pane.elements.canvas.addEventListener("pointerup", (event) => {
+            if (!activeGesture || activeGesture.pane !== pane) {
+                return;
+            }
+            event.preventDefault();
+            pane.elements.canvas.releasePointerCapture?.(event.pointerId);
+            const cells = Array.from(activeGesture.previewCells.values());
+            activeGesture = null;
+            suppressNextClick();
+            void commitPaneCells(pane, cells)
+                .then(() => clearPanePreview(pane))
+                .catch(onError);
+        });
+        pane.elements.canvas.addEventListener("click", (event) => {
+            if (suppressFollowupClick || activeGesture) {
+                return;
+            }
+            const cell = pane.gridView.getCellFromPointerEvent?.(event) ?? null;
+            if (!cell) {
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            setActivePane(pane);
+            const paintableCell = cell as PaintableCell;
+            const tool =
+                selectedEditorTool === EDITOR_TOOL_FILL ? EDITOR_TOOL_FILL : EDITOR_TOOL_BRUSH;
+            const cells = buildPaneToolCells(pane, tool, paintableCell, paintableCell);
+            previewPaneCells(pane, cells);
+            void commitPaneCells(pane, cells)
+                .then(() => clearPanePreview(pane))
+                .catch(onError);
+        });
+        pane.elements.canvas.addEventListener("pointercancel", () => {
+            if (!activeGesture || activeGesture.pane !== pane) {
+                return;
+            }
+            activeGesture = null;
+            clearPanePreview(pane);
         });
         pane.elements.tilingSelect.addEventListener("change", () => {
             setActivePane(pane);
@@ -566,27 +1079,9 @@ export function mountLiveCompareWorkspace({
         });
     }
 
-    function activePaneOrFallback(): PaneState {
-        return activePane ?? panes[0]!;
-    }
-
-    function definitionForTilingFamily(
-        tilingFamily: string,
-    ): BootstrappedTopologyDefinition | null {
-        return definitions.find((candidate) => candidate.tiling_family === tilingFamily) ?? null;
-    }
-
-    function definitionForPane(pane: PaneState): BootstrappedTopologyDefinition {
-        return (
-            definitionForTilingFamily(
-                pane.snapshot?.topology_spec.tiling_family ?? pane.elements.tilingSelect.value,
-            ) ?? paneDefinitions[pane.id]
-        );
-    }
-
     function interceptClick(
         button: HTMLButtonElement | null | undefined,
-        action: (pane: PaneState) => Promise<void>,
+        action: () => Promise<void>,
     ): void {
         if (!button) {
             return;
@@ -597,7 +1092,7 @@ export function mountLiveCompareWorkspace({
             }
             event.preventDefault();
             event.stopImmediatePropagation();
-            void action(activePaneOrFallback()).catch(onError);
+            void action().catch(onError);
         };
         button.addEventListener("click", listener, { capture: true });
         cleanupCallbacks.push(() =>
@@ -605,96 +1100,35 @@ export function mountLiveCompareWorkspace({
         );
     }
 
-    interceptClick(controls.runToggleBtn, sendPaneRunToggle);
-    interceptClick(controls.stepBtn, async (pane) => {
-        await applyPaneSnapshot(pane, await pane.backend.postControl("/api/control/step"));
-    });
-    interceptClick(controls.resetBtn, async (pane) => {
-        await resetPaneToTopology(pane, definitionForPane(pane));
-    });
-    interceptClick(controls.randomBtn, async (pane) => {
-        await resetPaneToTopology(pane, definitionForPane(pane), true);
-    });
-
-    if (controls.tilingFamilySelect) {
-        const listener = (event: Event) => {
-            if (!open) {
-                return;
-            }
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            const definition = definitionForTilingFamily(controls.tilingFamilySelect?.value ?? "");
-            if (!definition) {
-                return;
-            }
-            void resetPaneToTopology(activePaneOrFallback(), definition).catch(onError);
-        };
-        controls.tilingFamilySelect.addEventListener("change", listener, { capture: true });
-        cleanupCallbacks.push(() =>
-            controls.tilingFamilySelect?.removeEventListener("change", listener, { capture: true }),
-        );
-    }
-
-    if (controls.tilingPickerMenu) {
-        const listener = (event: MouseEvent) => {
-            if (!open || !(event.target instanceof Element)) {
-                return;
-            }
-            const target = event.target.closest<HTMLButtonElement>(".tiling-preview-card");
-            const tilingFamily = target?.dataset.tilingFamily ?? "";
-            const definition = definitionForTilingFamily(tilingFamily);
-            if (!definition) {
-                return;
-            }
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            setSelectedTopTiling(tilingFamily);
-            closeTilingPicker();
-            controls.tilingPickerToggle?.focus();
-            void resetPaneToTopology(activePaneOrFallback(), definition).catch(onError);
-        };
-        controls.tilingPickerMenu.addEventListener("click", listener, { capture: true });
-        cleanupCallbacks.push(() =>
-            controls.tilingPickerMenu?.removeEventListener("click", listener, { capture: true }),
-        );
-    }
+    interceptClick(controls.runToggleBtn, runToggleAllPanes);
+    interceptClick(controls.stepBtn, stepAllPanes);
 
     runBoth.addEventListener("click", () => {
-        void Promise.all(
-            panes.map(async (pane) => {
-                const snapshot = pane.snapshot ?? (await pane.backend.getState());
-                if (!snapshot.running) {
-                    await sendPaneRunToggle(pane);
-                }
-            }),
-        ).catch(onError);
+        void runAllPanes().catch(onError);
     });
     pauseBoth.addEventListener("click", () => {
-        void Promise.all(
-            panes.map(async (pane) => {
-                const snapshot = pane.snapshot ?? (await pane.backend.getState());
-                if (snapshot.running) {
-                    await applyPaneSnapshot(
-                        pane,
-                        await pane.backend.postControl("/api/control/pause"),
-                    );
-                }
-            }),
-        ).catch(onError);
+        void pauseAllPanes().catch(onError);
     });
     stepBoth.addEventListener("click", () => {
-        void Promise.all(
-            panes.map((pane) =>
-                pane.backend
-                    .postControl("/api/control/step")
-                    .then((snapshot) => applyPaneSnapshot(pane, snapshot)),
-            ),
-        ).catch(onError);
+        void stepAllPanes().catch(onError);
+    });
+
+    toolButtons.forEach((button, tool) => {
+        button.addEventListener("click", () => {
+            selectedEditorTool = tool;
+            renderEditorToolbar();
+        });
+    });
+    brushButtons.forEach((button, size) => {
+        button.addEventListener("click", () => {
+            brushSize = clampBrushSize(size);
+            renderEditorToolbar();
+        });
     });
 
     function handleResize(): void {
         if (open) {
-            panes.forEach((pane) => renderPane(pane, bootstrapData, definitions));
+            panes.forEach((pane) => renderPane(pane, bootstrapData, definitions, resolveCellSize));
         }
     }
 
@@ -710,6 +1144,7 @@ export function mountLiveCompareWorkspace({
             root.remove();
             hostGridPanel.classList.remove("is-live-compare");
             mainStage?.classList.remove("is-live-compare");
+            setSplitDisabledControls(false);
             window.removeEventListener("resize", handleResize);
             triggerButton.removeEventListener("click", handleTriggerClick);
             cleanupCallbacks.forEach((cleanup) => cleanup());

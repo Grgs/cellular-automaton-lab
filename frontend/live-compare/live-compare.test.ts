@@ -157,7 +157,19 @@ class FakeBackend implements SimulationBackend {
     });
 
     setCell = vi.fn(async () => this.state);
-    setCells = vi.fn(async () => this.state);
+    setCells = vi.fn(async (cells) => {
+        const nextStates = [...this.state.cell_states];
+        for (const cell of cells) {
+            const index = this.state.topology.cells.findIndex(
+                (candidate) => candidate.id === cell.id,
+            );
+            if (index >= 0) {
+                nextStates[index] = cell.state;
+            }
+        }
+        this.state = { ...this.state, cell_states: nextStates };
+        return this.state;
+    });
 }
 
 function createGridView(): GridView {
@@ -227,7 +239,7 @@ describe("live compare workspace", () => {
         expect(trigger.textContent).toBe("Single View");
     });
 
-    it("click editing mutates only the pane under the pointer", async () => {
+    it("drawing mutates only the pane under the pointer", async () => {
         const trigger = document.createElement("button");
         const gridPanel = document.createElement("section");
         document.body.append(trigger, gridPanel);
@@ -253,15 +265,53 @@ describe("live compare workspace", () => {
         });
 
         const rightCanvas = gridPanel.querySelectorAll(".live-compare-canvas")[1]!;
-        rightCanvas.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        rightCanvas.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, pointerId: 1 }));
+        rightCanvas.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
 
         await vi.waitFor(() => {
-            expect(backends.get("s-edit-right")?.toggleCell).toHaveBeenCalledTimes(1);
+            expect(backends.get("s-edit-right")?.setCells).toHaveBeenCalledWith([
+                { id: "c:0:0", state: 1 },
+            ]);
         });
-        expect(backends.get("s-edit-left")?.toggleCell).not.toHaveBeenCalled();
+        expect(backends.get("s-edit-left")?.setCells).not.toHaveBeenCalled();
     });
 
-    it("routes top-row run controls to the active pane", async () => {
+    it("supports click-only canvas editing", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends = new Map<string, FakeBackend>();
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-click-edit",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.set(sessionId, backend);
+                return backend;
+            },
+            createGridView,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(gridPanel.querySelectorAll(".live-compare-canvas")).toHaveLength(2);
+        });
+
+        const leftCanvas = gridPanel.querySelector(".live-compare-canvas")!;
+        leftCanvas.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+        await vi.waitFor(() => {
+            expect(backends.get("s-click-edit-left")?.setCells).toHaveBeenCalledWith([
+                { id: "c:0:0", state: 1 },
+            ]);
+        });
+    });
+
+    it("routes top-row run controls to both panes", async () => {
         const trigger = document.createElement("button");
         const gridPanel = document.createElement("section");
         const stepBtn = document.createElement("button");
@@ -290,19 +340,17 @@ describe("live compare workspace", () => {
             expect(gridPanel.querySelectorAll(".live-compare-pane")).toHaveLength(2);
         });
 
-        const rightPane = gridPanel.querySelector<HTMLElement>("[data-pane='right']")!;
-        rightPane.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
         stepBtn.click();
 
         await vi.waitFor(() => {
+            expect(backends.get("s-top-left")?.state.generation).toBe(1);
             expect(backends.get("s-top-right")?.state.generation).toBe(1);
             expect(generationText.textContent).toBe("1");
         });
-        expect(backends.get("s-top-left")?.state.generation).toBe(0);
-        expect(statusText.textContent).toContain("Right");
+        expect(statusText.textContent).toContain("Split");
     });
 
-    it("routes top-row tiling picker choices to the active pane", async () => {
+    it("does not route top-row tiling picker choices to split panes", async () => {
         const trigger = document.createElement("button");
         const gridPanel = document.createElement("section");
         const tilingFamilySelect = document.createElement("select");
@@ -353,17 +401,10 @@ describe("live compare workspace", () => {
             expect(gridPanel.querySelectorAll(".live-compare-pane")).toHaveLength(2);
         });
 
-        const rightPane = gridPanel.querySelector<HTMLElement>("[data-pane='right']")!;
-        rightPane.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
         squareCard.click();
 
-        await vi.waitFor(() => {
-            expect(backends.get("s-picker-right")?.state.topology_spec.tiling_family).toBe(
-                "square",
-            );
-        });
+        expect(tilingPickerToggle.disabled).toBe(true);
         expect(backends.get("s-picker-left")?.state.topology_spec.tiling_family).toBe("square");
-        expect(tilingFamilySelect.value).toBe("square");
-        expect(tilingPickerCurrentLabel.textContent).toBe("Square");
+        expect(backends.get("s-picker-right")?.state.topology_spec.tiling_family).toBe("hex");
     });
 });

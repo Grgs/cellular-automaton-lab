@@ -1211,7 +1211,8 @@ button.theme-toggle .theme-icon-moon {
 .live-compare-toolbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     gap: 10px;
     padding: 10px 12px;
     border: 1px solid var(--line);
@@ -1225,8 +1226,22 @@ button.theme-toggle .theme-icon-moon {
     font-size: 0.85rem;
 }
 
+.live-compare-toolbar-group,
+.live-compare-paint-palette {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.live-compare-paint-palette {
+    flex-wrap: wrap;
+}
+
 .live-compare-action,
-.live-compare-pane-action {
+.live-compare-pane-action,
+.live-compare-editor-tool,
+.live-compare-paint-state {
     border: 1px solid var(--btn-soft-line);
     border-radius: 6px;
     background: var(--btn-soft-bg);
@@ -1239,9 +1254,33 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .live-compare-action:hover,
-.live-compare-pane-action:hover {
+.live-compare-pane-action:hover,
+.live-compare-editor-tool:hover,
+.live-compare-paint-state:hover {
     background: var(--btn-soft-hover);
     border-color: var(--accent);
+}
+
+.live-compare-editor-tool.is-selected,
+.live-compare-paint-state.is-selected {
+    background: var(--panel-strong);
+    border-color: var(--accent);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.live-compare-paint-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.live-compare-paint-swatch {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--swatch-border);
+    border-radius: 999px;
+    flex: 0 0 auto;
 }
 
 .live-compare-panes {
@@ -1259,7 +1298,7 @@ button.theme-toggle .theme-icon-moon {
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 8px;
-    background: var(--dead);
+    background: var(--grid-panel-bg);
 }
 
 .live-compare-pane.is-active {
@@ -1313,6 +1352,7 @@ button.theme-toggle .theme-icon-moon {
     min-height: 0;
     overflow: auto;
     padding: 12px;
+    background: var(--grid-panel-bg);
 }
 
 .live-compare-canvas {
