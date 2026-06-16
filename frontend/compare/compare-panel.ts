@@ -1,6 +1,7 @@
 import type {
     AppBootstrapData,
     CompareRequest,
+    FilmstripRequest,
     PatternPayload,
     RuleDefinition,
     SeedComparisonResult,
@@ -14,6 +15,7 @@ import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./c
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
 import { createSeedPreview } from "./compare-seed-preview.js";
+import { createFilmstripView, type FilmstripViewController } from "./compare-filmstrip-view.js";
 import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
 import { ruleSupportsTilingFamily } from "../rule-compatibility.js";
 
@@ -258,8 +260,19 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     gridInput.addEventListener("change", refreshPreview);
 
     const runButton = el("button", { class: "compare-run", type: "button" }, ["Run comparison"]);
+    const playButton = el(
+        "button",
+        {
+            class: "compare-run compare-run-secondary",
+            type: "button",
+            title: "Run every selected tiling on a shared clock and play them side by side",
+        },
+        ["▶ Play side by side"],
+    );
     const statusLine = el("div", { class: "compare-status", role: "status" });
+    const filmstripArea = el("div", { class: "compare-filmstrip-area", hidden: true });
     const resultsArea = el("div", { class: "compare-results" });
+    let filmstripView: FilmstripViewController | null = null;
 
     const closeButton = el(
         "button",
@@ -330,7 +343,8 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             ]),
             seedWorkspace,
             el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
-            el("div", { class: "compare-actions" }, [runButton, statusLine]),
+            el("div", { class: "compare-actions" }, [runButton, playButton, statusLine]),
+            filmstripArea,
             resultsArea,
         ],
     );
@@ -545,7 +559,9 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         }
         updateFamilyCountLabels();
         updatePresetButtons();
-        runButton.disabled = running || selected.size === 0;
+        const disabled = running || selected.size === 0;
+        runButton.disabled = disabled;
+        playButton.disabled = disabled;
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -712,6 +728,44 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
                 ? `shape "${shapeSelect.value}"`
                 : `${comparison.seed_bits} bits`;
             statusLine.textContent = `Done — ${comparison.results.length} tilings, ${sourceDesc}.`;
+        } catch (error) {
+            statusLine.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+        } finally {
+            setRunning(false);
+        }
+    }
+
+    async function runFilmstrip(): Promise<void> {
+        if (running || selected.size === 0) {
+            return;
+        }
+        setRunning(true);
+        statusLine.textContent = `Building filmstrip for ${selected.size} tilings…`;
+
+        const request: FilmstripRequest = {
+            seed: seedInput.value,
+            rule: selectedRuleName(),
+            traversal: traversalSelect.value,
+            // The backend further clamps frames to its filmstrip ceiling.
+            frames: clampNumber(stepsInput.value, 1, 500, 50),
+            grid_size: clampNumber(gridInput.value, 2, 64, 16),
+            geometries: [...selected],
+            ...(isShapeMode() ? { pattern: shapeSelect.value } : {}),
+        };
+
+        try {
+            const filmstrip = await options.backend.requestFilmstrip(request);
+            if (!filmstripView) {
+                filmstripView = createFilmstripView({
+                    backend: options.backend,
+                    getLiveColor: () => liveColorForRule(selectedRuleName()),
+                    loop: true,
+                });
+                filmstripArea.append(filmstripView.element);
+            }
+            filmstripArea.hidden = false;
+            await filmstripView.load(filmstrip);
+            statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
             statusLine.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
         } finally {
@@ -1042,6 +1096,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     toggleButton.addEventListener("click", open);
     closeButton.addEventListener("click", close);
     runButton.addEventListener("click", () => void runComparison());
+    playButton.addEventListener("click", () => void runFilmstrip());
     backdrop.addEventListener("click", (event) => {
         if (event.target === backdrop) {
             close();
@@ -1060,6 +1115,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             document.removeEventListener("pointerdown", onDocumentPointerDown);
             seedPad.dispose();
             seedPreview.dispose();
+            filmstripView?.dispose();
             if (ownsToggle) {
                 toggleButton.remove();
             }
