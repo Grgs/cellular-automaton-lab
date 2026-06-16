@@ -295,6 +295,12 @@ export const COMPARE_PANEL_STYLES = `
 .compare-saved-select {
     min-width: 0;
 }
+.compare-saved-empty {
+    margin-top: 7px;
+    color: var(--muted, #6d756f);
+    font-size: 11px;
+    line-height: 1.35;
+}
 .compare-actions {
     position: sticky;
     bottom: -20px;
@@ -325,6 +331,15 @@ export const COMPARE_PANEL_STYLES = `
 }
 .compare-run-secondary:hover:not(:disabled) { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
 .compare-status { flex: 1 1 auto; min-width: 140px; font-size: 12px; color: var(--muted, #6d756f); }
+.compare-live-state {
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+    background: var(--help-bg, rgba(0, 0, 0, 0.03));
+    color: var(--muted, #6d756f);
+    font-size: 12px;
+}
 .compare-filmstrip-area[hidden] { display: none; }
 .compare-results { margin-top: 16px; padding-bottom: 8px; }
 .compare-section-title { font-size: 13px; font-weight: 600; margin: 16px 0 8px; }
@@ -489,6 +504,13 @@ export const COMPARE_PANEL_STYLES = `
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 14px 16px;
     align-items: start;
+}
+.compare-dialog--workspace .compare-filmstrip-boards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.compare-dialog--workspace .compare-filmstrip-slot .compare-thumb {
+    width: min(100%, 220px);
+    height: auto;
 }
 .compare-filmstrip-board { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .compare-filmstrip-label {

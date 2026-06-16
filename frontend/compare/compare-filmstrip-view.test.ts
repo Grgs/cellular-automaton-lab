@@ -155,6 +155,32 @@ describe("createFilmstripView", () => {
         );
     });
 
+    it("labels the transport and board list for assistive technology", async () => {
+        const backend = stubBackend(async () => squarePreview());
+        const clock = manualScheduler();
+        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
+        document.body.append(view.element);
+
+        await view.load(filmstrip([tiling("square", [{ a: 1 }])], 1));
+
+        expect(view.element.getAttribute("role")).toBe("region");
+        expect(view.element.getAttribute("aria-label")).toBe("Synchronized side-by-side filmstrip");
+        expect(
+            view.element.querySelector(".compare-filmstrip-transport")?.getAttribute("role"),
+        ).toBe("group");
+        expect(view.element.querySelector(".compare-filmstrip-boards")?.getAttribute("role")).toBe(
+            "list",
+        );
+        expect(view.element.querySelector(".compare-filmstrip-board")?.getAttribute("role")).toBe(
+            "listitem",
+        );
+        expect(
+            view.element
+                .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[title="Play / pause"]')
+                ?.getAttribute("aria-label"),
+        ).toBe("Play / pause");
+    });
+
     it("advances every board in lockstep on each clock tick while playing", async () => {
         const backend = stubBackend(async () => squarePreview());
         const clock = manualScheduler();

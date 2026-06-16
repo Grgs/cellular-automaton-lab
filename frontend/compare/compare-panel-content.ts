@@ -347,6 +347,10 @@ export function createComparePanelContent(
         type: "button",
         textContent: "Delete run",
     });
+    const savedRunHint = el("div", {
+        class: "compare-saved-empty",
+        id: "compare-saved-runs-hint",
+    });
     const savedTilingSetNameInput = el("input", {
         class: "compare-field compare-saved-name",
         type: "text",
@@ -372,7 +376,18 @@ export function createComparePanelContent(
         type: "button",
         textContent: "Delete set",
     });
+    const savedTilingSetHint = el("div", {
+        class: "compare-saved-empty",
+        id: "compare-saved-tilings-hint",
+    });
     const statusLine = el("div", { class: "compare-status", role: "status" });
+    const liveStateLine = el("div", {
+        class: "compare-live-state",
+        role: "status",
+        "aria-live": "polite",
+        textContent:
+            "No live filmstrip yet. Select at least two tilings, then choose Play side by side.",
+    });
     const filmstripArea = el("div", { class: "compare-filmstrip-area", hidden: true });
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
@@ -427,6 +442,7 @@ export function createComparePanelContent(
         el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
         savedCompareControls(),
         el("div", { class: "compare-actions" }, [runButton, playButton, copyRunButton, statusLine]),
+        liveStateLine,
         filmstripArea,
         resultsArea,
     ]);
@@ -479,26 +495,47 @@ export function createComparePanelContent(
         deleteTilingSetButton.addEventListener("click", deleteSelectedTilingSet);
 
         return el("div", { class: "compare-saved" }, [
-            el("section", { class: "compare-saved-section" }, [
-                el("h3", { class: "compare-saved-title", textContent: "Saved runs" }),
-                el("div", { class: "compare-saved-row" }, [
-                    savedRunNameInput,
-                    saveRunButton,
-                    savedRunSelect,
-                    loadRunButton,
-                    deleteRunButton,
-                ]),
-            ]),
-            el("section", { class: "compare-saved-section" }, [
-                el("h3", { class: "compare-saved-title", textContent: "Saved tiling sets" }),
-                el("div", { class: "compare-saved-row" }, [
-                    savedTilingSetNameInput,
-                    saveTilingSetButton,
-                    savedTilingSetSelect,
-                    loadTilingSetButton,
-                    deleteTilingSetButton,
-                ]),
-            ]),
+            el(
+                "section",
+                { class: "compare-saved-section", "aria-labelledby": "compare-saved-runs-title" },
+                [
+                    el("h3", {
+                        class: "compare-saved-title",
+                        id: "compare-saved-runs-title",
+                        textContent: "Saved runs",
+                    }),
+                    el("div", { class: "compare-saved-row" }, [
+                        savedRunNameInput,
+                        saveRunButton,
+                        savedRunSelect,
+                        loadRunButton,
+                        deleteRunButton,
+                    ]),
+                    savedRunHint,
+                ],
+            ),
+            el(
+                "section",
+                {
+                    class: "compare-saved-section",
+                    "aria-labelledby": "compare-saved-tilings-title",
+                },
+                [
+                    el("h3", {
+                        class: "compare-saved-title",
+                        id: "compare-saved-tilings-title",
+                        textContent: "Saved tiling sets",
+                    }),
+                    el("div", { class: "compare-saved-row" }, [
+                        savedTilingSetNameInput,
+                        saveTilingSetButton,
+                        savedTilingSetSelect,
+                        loadTilingSetButton,
+                        deleteTilingSetButton,
+                    ]),
+                    savedTilingSetHint,
+                ],
+            ),
         ]);
     }
 
@@ -669,7 +706,11 @@ export function createComparePanelContent(
         updatePresetButtons();
         const disabled = running || selected.size === 0;
         runButton.disabled = disabled;
-        playButton.disabled = disabled;
+        playButton.disabled = running || selected.size < 2;
+        playButton.title =
+            selected.size < 2
+                ? "Select at least two tilings to play them side by side"
+                : "Run every selected tiling on a shared clock and play them side by side";
         copyRunButton.disabled = disabled;
     }
 
@@ -802,6 +843,12 @@ export function createComparePanelContent(
         deleteRunButton.disabled = !hasRuns;
         loadTilingSetButton.disabled = !hasTilingSets;
         deleteTilingSetButton.disabled = !hasTilingSets;
+        savedRunHint.textContent = hasRuns
+            ? `${savedRuns.length} saved run${savedRuns.length === 1 ? "" : "s"} available.`
+            : "No saved runs yet. Name the current setup and choose Save run.";
+        savedTilingSetHint.textContent = hasTilingSets
+            ? `${savedTilingSets.length} saved tiling set${savedTilingSets.length === 1 ? "" : "s"} available.`
+            : "No saved tiling sets yet. Select tilings, name the set, and choose Save set.";
     }
 
     function populateSavedSelect(
@@ -984,6 +1031,8 @@ export function createComparePanelContent(
         resultsArea.replaceChildren();
         filmstripArea.hidden = true;
         activeFilmstrip = null;
+        liveStateLine.textContent =
+            "Run link loaded. Choose Play side by side when you are ready to build the live filmstrip.";
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
@@ -1030,11 +1079,20 @@ export function createComparePanelContent(
     }
 
     async function runFilmstrip(): Promise<void> {
-        if (running || selected.size === 0) {
+        if (running) {
+            return;
+        }
+        if (selected.size < 2) {
+            statusLine.textContent = "Select at least two tilings to play side by side.";
+            liveStateLine.textContent =
+                "The live filmstrip needs two or more selected tilings for comparison.";
+            filmstripArea.hidden = true;
             return;
         }
         setRunning(true);
         statusLine.textContent = `Building filmstrip for ${selected.size} tilings…`;
+        liveStateLine.textContent = "Building live side-by-side filmstrip…";
+        filmstripArea.hidden = false;
 
         const request: FilmstripRequest = {
             seed: seedInput.value,
@@ -1061,9 +1119,13 @@ export function createComparePanelContent(
             }
             filmstripArea.hidden = false;
             await filmstripView.load(filmstrip);
+            liveStateLine.textContent = `Live filmstrip ready with ${filmstrip.tilings.length} tilings and ${filmstrip.frame_count} generations.`;
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
-            statusLine.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+            const message = error instanceof Error ? error.message : String(error);
+            liveStateLine.textContent = `Live filmstrip failed: ${message}`;
+            statusLine.textContent = `Error: ${message}`;
+            filmstripArea.hidden = true;
         } finally {
             setRunning(false);
         }

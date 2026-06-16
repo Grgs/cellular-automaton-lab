@@ -38,13 +38,6 @@ Decisions already taken (so the steps are unambiguous):
 - **Standalone parity is mandatory** for every step: hash/`localStorage` only, no
   server-only state.
 
-### Phase C — persistent & shareable runs
-
-- **C5 — Workspace nav & layout polish.** Tune the filmstrip board grid to use
-  the full-page width (larger boards when there is room); add empty/loading/error
-  states for saved runs and the live view; pass a keyboard-focus and `aria`
-  review for the full-page workspace.
-
 ### Closeout — definition of done
 
 - Standalone smoke coverage: exercise C1–C3 in the Pyodide build via the

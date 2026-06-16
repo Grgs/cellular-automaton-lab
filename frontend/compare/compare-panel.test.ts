@@ -308,6 +308,32 @@ describe("mountComparePanel", () => {
         expect(document.querySelector(".compare-toggle")).toBeNull();
     });
 
+    it("shows empty saved-state hints and disables unavailable saved actions", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        const hints = [...document.querySelectorAll<HTMLElement>(".compare-saved-empty")].map(
+            (hint) => hint.textContent,
+        );
+        expect(hints).toEqual([
+            "No saved runs yet. Name the current setup and choose Save run.",
+            "No saved tiling sets yet. Select tilings, name the set, and choose Save set.",
+        ]);
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Saved compare runs"]')
+                ?.disabled,
+        ).toBe(true);
+        const loadRun = [...document.querySelectorAll<HTMLButtonElement>("button")].find(
+            (button) => button.textContent === "Load run",
+        );
+        const deleteSet = [...document.querySelectorAll<HTMLButtonElement>("button")].find(
+            (button) => button.textContent === "Delete set",
+        );
+        expect(loadRun?.disabled).toBe(true);
+        expect(deleteSet?.disabled).toBe(true);
+    });
+
     it("filters tilings by search without changing the selected set", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -664,6 +690,51 @@ describe("mountComparePanel", () => {
         const loaded = onOpenPattern.mock.calls.at(0)?.[0] as { cells_by_id?: unknown };
         expect(loaded?.cells_by_id).toEqual({ "c:2:1": 1 });
         expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+    });
+
+    it("explains why live side-by-side playback is unavailable with one tiling", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        clickPreset("None");
+        document.querySelector<HTMLInputElement>(".compare-tiling input")?.click();
+
+        const playSideBySide = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
+        ].find((button) => button.textContent === "▶ Play side by side");
+        expect(playSideBySide?.disabled).toBe(true);
+        expect(playSideBySide?.title).toBe("Select at least two tilings to play them side by side");
+        expect(document.querySelector<HTMLElement>(".compare-live-state")?.textContent).toBe(
+            "No live filmstrip yet. Select at least two tilings, then choose Play side by side.",
+        );
+    });
+
+    it("reports live filmstrip build failures in the live-view state", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const failingBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => {
+                throw new Error("filmstrip boom");
+            },
+        };
+        mountComparePanel({ backend: failingBackend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        clickPreset("Regular");
+        const playSideBySide = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
+        ].find((button) => button.textContent === "▶ Play side by side");
+        playSideBySide?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector<HTMLElement>(".compare-live-state")?.textContent).toBe(
+                "Live filmstrip failed: filmstrip boom",
+            );
+        });
+        expect(document.querySelector<HTMLElement>(".compare-filmstrip-area")?.hidden).toBe(true);
     });
 
     it("renders a seed pad wired to the seed field", async () => {

@@ -83,6 +83,7 @@ function linkButton(label: string, title: string, onClick: () => void): HTMLButt
     node.className = "compare-link compare-filmstrip-open";
     node.textContent = label;
     node.title = title;
+    node.setAttribute("aria-label", title);
     node.addEventListener("click", onClick);
     return node;
 }
@@ -93,6 +94,7 @@ function button(label: string, title: string, onClick: () => void): HTMLButtonEl
     node.className = "compare-filmstrip-btn";
     node.textContent = label;
     node.title = title;
+    node.setAttribute("aria-label", title);
     node.addEventListener("click", onClick);
     return node;
 }
@@ -104,8 +106,12 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     const getLiveColor = options.getLiveColor ?? (() => () => "var(--live, #1f2430)");
 
     const root = el("div", "compare-filmstrip");
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-label", "Synchronized side-by-side filmstrip");
 
     const transport = el("div", "compare-filmstrip-transport");
+    transport.setAttribute("role", "group");
+    transport.setAttribute("aria-label", "Filmstrip playback controls");
     const playButton = button("▶ Play", "Play / pause", () => player.toggle());
     const stepBackButton = button("⏮", "Step back one generation", () => player.step(-1));
     const stepForwardButton = button("⏭", "Step forward one generation", () => player.step(1));
@@ -119,6 +125,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     scrubber.setAttribute("aria-label", "Generation");
     scrubber.addEventListener("input", () => player.seek(Number(scrubber.value)));
     const counter = el("span", "compare-filmstrip-counter", "—");
+    counter.setAttribute("aria-live", "polite");
 
     const speedSelect = document.createElement("select");
     speedSelect.className = "compare-filmstrip-speed";
@@ -151,6 +158,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     );
 
     const boardsArea = el("div", "compare-filmstrip-boards");
+    boardsArea.setAttribute("role", "list");
+    boardsArea.setAttribute("aria-label", "Compared tiling boards");
     root.append(transport, boardsArea);
 
     let player = new FilmstripPlayer(0, { loop: options.loop ?? false });
@@ -258,6 +267,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const label = el("div", "compare-filmstrip-label", tiling.geometry);
             const countLabel = el("div", "compare-filmstrip-count");
             const cell = el("div", "compare-filmstrip-board");
+            cell.setAttribute("role", "listitem");
             const openButton = options.onOpenFrame
                 ? linkButton(
                       "Open gen 0",
