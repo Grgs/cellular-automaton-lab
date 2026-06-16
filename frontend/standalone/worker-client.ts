@@ -15,6 +15,10 @@ import type {
 
 const DEFAULT_PYODIDE_BASE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/";
 
+export interface StandaloneEnvironmentOptions {
+    persistState?: boolean;
+}
+
 interface PendingRequest {
     resolve: (
         value:
@@ -37,11 +41,14 @@ function requireSnapshot(snapshot: SimulationSnapshot | undefined): SimulationSn
     return snapshot;
 }
 
-export async function createStandaloneEnvironment(bootstrapData: AppBootstrapData): Promise<{
+export async function createStandaloneEnvironment(
+    bootstrapData: AppBootstrapData,
+    { persistState = true }: StandaloneEnvironmentOptions = {},
+): Promise<{
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
 }> {
-    const persistence = await createSimulationStatePersistence();
+    const persistence = persistState ? await createSimulationStatePersistence() : null;
     const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), {
         type: "classic",
     });
@@ -65,7 +72,9 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
         }
         const message = event.data;
         if (message.type === "persist") {
-            void persistence.save(message.persistedSnapshot);
+            if (persistence) {
+                void persistence.save(message.persistedSnapshot);
+            }
             return;
         }
         const pending = pendingRequests.get(message.requestId);
@@ -110,7 +119,7 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
         });
     }
 
-    const persistedSnapshot = await persistence.load();
+    const persistedSnapshot = persistence ? await persistence.load() : null;
     const initRequestId = createRequestId();
     let initResponse:
         | StandaloneSuccessResponse
@@ -137,7 +146,7 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
         dispose();
         throw new Error(initResponse.error);
     }
-    if (initResponse.persistedSnapshot) {
+    if (initResponse.persistedSnapshot && persistence) {
         await persistence.save(initResponse.persistedSnapshot);
     }
 
@@ -160,7 +169,7 @@ export async function createStandaloneEnvironment(bootstrapData: AppBootstrapDat
         if (!response.ok) {
             throw new Error(response.error);
         }
-        if (response.persistedSnapshot) {
+        if (response.persistedSnapshot && persistence) {
             await persistence.save(response.persistedSnapshot);
         }
         return response;

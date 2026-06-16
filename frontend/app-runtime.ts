@@ -65,12 +65,17 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
                 void controller.loadPattern(payload);
             },
         });
+        const liveCompareBaseSessionId =
+            options.liveCompareBaseSessionId ?? window.APP_SESSION_ID ?? null;
         liveCompareWorkspace = mountLiveCompareWorkspace({
             trigger: elements.splitViewToggleBtn,
             gridPanel: elements.gridPanel,
             bootstrapData,
-            baseSessionId: window.APP_SESSION_ID ?? null,
+            baseSessionId: liveCompareBaseSessionId,
             mainBackend: backend,
+            ...(options.liveCompareBackendFactory
+                ? { backendFactory: options.liveCompareBackendFactory }
+                : {}),
             controls: {
                 statusText: elements.statusText,
                 generationText: elements.generationText,

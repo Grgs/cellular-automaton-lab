@@ -150,6 +150,7 @@ async function loadWorkerClientModule() {
         load: vi.fn<() => Promise<PersistedSimulationSnapshotV5 | null>>(async () => null),
         save: vi.fn<(nextSnapshot: PersistedSimulationSnapshotV5) => Promise<void>>(async () => {}),
     };
+    const createSimulationStatePersistence = vi.fn(async () => persistence);
     let lastWorker: FakeWorker | null = null;
     function rememberWorker(worker: FakeWorker): void {
         lastWorker = worker;
@@ -166,13 +167,14 @@ async function loadWorkerClientModule() {
     );
 
     vi.doMock("./persistence.js", () => ({
-        createSimulationStatePersistence: vi.fn(async () => persistence),
+        createSimulationStatePersistence,
     }));
 
     const module = await import("./worker-client.js");
     return {
         module,
         persistence,
+        createSimulationStatePersistence,
         worker: () => {
             if (!lastWorker) {
                 throw new Error("worker was not created");
@@ -253,6 +255,31 @@ describe("standalone worker client", () => {
 
         await expect(environmentPromise).rejects.toThrow("Pyodide failed to load");
         expect(worker().terminated).toBe(true);
+    });
+
+    it("can initialize temporary runtimes without persisted state", async () => {
+        const { module, persistence, createSimulationStatePersistence, worker } =
+            await loadWorkerClientModule();
+
+        const environmentPromise = module.createStandaloneEnvironment(bootstrapData, {
+            persistState: false,
+        });
+        await flushAsyncStartup();
+        const initMessage = lastInitMessage(worker());
+        expect(initMessage.persistedSnapshot).toBeNull();
+        expect(createSimulationStatePersistence).not.toHaveBeenCalled();
+        worker().dispatchMessage({
+            type: "ready",
+            requestId: initMessage.requestId,
+            snapshot,
+            persistedSnapshot,
+        });
+
+        await expect(environmentPromise).resolves.toEqual({
+            backend: expect.objectContaining({ getState: expect.any(Function) }),
+            bootstrapData,
+        });
+        expect(persistence.save).not.toHaveBeenCalled();
     });
 
     it("rejects failed command responses", async () => {
