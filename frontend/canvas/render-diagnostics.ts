@@ -19,15 +19,29 @@ function isFinitePoint(
 }
 
 function boundsFromVertices(vertices: Array<{ x: number; y: number }>): GeometryBounds | null {
-    if (vertices.length === 0) {
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    let hasVertex = false;
+
+    for (const vertex of vertices) {
+        const x = Number(vertex.x);
+        const y = Number(vertex.y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+            continue;
+        }
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+        hasVertex = true;
+    }
+
+    if (!hasVertex) {
         return null;
     }
-    const xValues = vertices.map((vertex) => Number(vertex.x));
-    const yValues = vertices.map((vertex) => Number(vertex.y));
-    const minX = Math.min(...xValues);
-    const maxX = Math.max(...xValues);
-    const minY = Math.min(...yValues);
-    const maxY = Math.max(...yValues);
+
     return {
         minX,
         maxX,

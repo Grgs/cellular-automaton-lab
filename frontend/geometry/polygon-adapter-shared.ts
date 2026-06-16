@@ -41,23 +41,42 @@ export function measurePolygonBounds(
     points: readonly Point2D[],
     fallbackCenter: Point2D | null = null,
 ): PolygonBounds | null {
-    const normalizedPoints = points
-        .map((point) => normalizePoint(point))
-        .filter((point): point is Point2D => point !== null);
     const resolvedFallback = normalizePoint(fallbackCenter);
-    const source =
-        normalizedPoints.length > 0 ? normalizedPoints : resolvedFallback ? [resolvedFallback] : [];
-    if (source.length === 0) {
+
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    let hasPoint = false;
+
+    function includePoint(point: Point2D): void {
+        minX = Math.min(minX, point.x);
+        maxX = Math.max(maxX, point.x);
+        minY = Math.min(minY, point.y);
+        maxY = Math.max(maxY, point.y);
+        hasPoint = true;
+    }
+
+    for (const rawPoint of points) {
+        const point = normalizePoint(rawPoint);
+        if (point) {
+            includePoint(point);
+        }
+    }
+
+    if (!hasPoint && resolvedFallback) {
+        includePoint(resolvedFallback);
+    }
+
+    if (!hasPoint) {
         return null;
     }
 
-    const xs = source.map((point) => point.x);
-    const ys = source.map((point) => point.y);
     return {
-        minX: Math.min(...xs),
-        maxX: Math.max(...xs),
-        minY: Math.min(...ys),
-        maxY: Math.max(...ys),
+        minX,
+        maxX,
+        minY,
+        maxY,
     };
 }
 
