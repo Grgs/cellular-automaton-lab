@@ -97,6 +97,21 @@ describe("geometry/periodic-mixed-adapter", () => {
         expect(context.stroke).toHaveBeenCalledWith(strokePath);
     });
 
+    it("honors a caller-provided viewport cell cap", async () => {
+        const { createPeriodicMixedGeometryAdapter } = await import("./periodic-mixed-adapter.js");
+        const adapter = createPeriodicMixedGeometryAdapter(SNUB_SQUARE_GEOMETRY);
+
+        const dimensions = adapter.fitViewport?.({
+            viewportWidth: 1200,
+            viewportHeight: 1200,
+            cellSize: 8,
+            maxCellCount: 48,
+        });
+
+        expect(dimensions).toBeTruthy();
+        expect(12 * dimensions!.width * dimensions!.height).toBeLessThanOrEqual(48);
+    });
+
     it("strokes preview cells immediately while keeping committed cell draws fill-only", async () => {
         const { createPeriodicMixedGeometryAdapter } = await import("./periodic-mixed-adapter.js");
         const adapter = createPeriodicMixedGeometryAdapter(SNUB_SQUARE_GEOMETRY);

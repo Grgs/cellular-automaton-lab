@@ -73,6 +73,15 @@ export interface CanvasCommittedRenderer {
     getRenderedCellCenter(cellId: string): { x: number; y: number } | null;
 }
 
+interface RenderDiagnosticsContext {
+    topology: TopologyPayload | null;
+    geometryCache: GeometryCache | null;
+    geometry: string;
+    adapterFamily: "regular" | "mixed" | "aperiodic";
+    metrics: CanvasSurfaceMetrics;
+    cellSize: number;
+}
+
 function canvasBorderRadius(gap: number): string {
     return gap === 0 ? "0px" : "18px";
 }
@@ -96,6 +105,8 @@ export function createCanvasCommittedRenderer({
     let tileColorsEnabled = true;
     let renderDiagnostics: RenderDiagnosticsSnapshot | null = null;
     let resolvedRenderDiagnostics: RenderDiagnosticsSnapshot | null = null;
+    let renderDiagnosticsContext: RenderDiagnosticsContext | null = null;
+    let renderDiagnosticsSampled = false;
     let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
         pixelWidth: canvas.width,
@@ -192,13 +203,17 @@ export function createCanvasCommittedRenderer({
         });
         geometryCacheKey = nextCache.cacheKey;
         geometryCache = nextCache.geometryCache;
-        renderDiagnostics = sampleRenderDiagnostics(topology, geometryCache, {
+        renderDiagnostics = null;
+        resolvedRenderDiagnostics = null;
+        renderDiagnosticsSampled = false;
+        renderDiagnosticsContext = {
+            topology,
+            geometryCache,
             geometry,
             adapterFamily: adapter.family,
             metrics,
             cellSize,
-        });
-        resolvedRenderDiagnostics = null;
+        };
 
         drawCommittedGrid();
     }
@@ -247,13 +262,26 @@ export function createCanvasCommittedRenderer({
     }
 
     function getRenderDiagnostics(): RenderDiagnosticsSnapshot | null {
+        if (!renderDiagnosticsSampled && renderDiagnosticsContext !== null) {
+            renderDiagnostics = sampleRenderDiagnostics(
+                renderDiagnosticsContext.topology,
+                renderDiagnosticsContext.geometryCache,
+                {
+                    geometry: renderDiagnosticsContext.geometry,
+                    adapterFamily: renderDiagnosticsContext.adapterFamily,
+                    metrics: renderDiagnosticsContext.metrics,
+                    cellSize: renderDiagnosticsContext.cellSize,
+                },
+            );
+            renderDiagnosticsSampled = true;
+        }
         if (renderDiagnostics === null) {
             return null;
         }
         if (resolvedRenderDiagnostics === null) {
             resolvedRenderDiagnostics = resolveRenderDiagnosticsSnapshot(
                 renderDiagnostics,
-                geometryCache,
+                renderDiagnosticsContext?.geometryCache ?? geometryCache,
             );
         }
         return resolvedRenderDiagnostics ? structuredClone(resolvedRenderDiagnostics) : null;

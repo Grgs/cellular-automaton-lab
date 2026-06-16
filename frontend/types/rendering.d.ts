@@ -215,6 +215,7 @@ export interface GeometryFitViewportArgs {
     viewportHeight: number;
     cellSize: number;
     fallbackDimensions?: ViewportDimensions;
+    maxCellCount?: number;
 }
 
 export interface GeometryFitRenderCellSizeArgs {

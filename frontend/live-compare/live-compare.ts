@@ -25,6 +25,7 @@ import type { AppState } from "../types/state.js";
 
 const STORAGE_KEY = "cellular-automaton-lab.live-compare.v1";
 const POLL_INTERVAL_MS = 250;
+const SPLIT_MIXED_VIEWPORT_CELL_COUNT = 1800;
 
 type PaneId = "left" | "right";
 
@@ -57,6 +58,7 @@ export interface LiveCompareViewportDimensionsOptions {
     geometry: string;
     cellSize: number;
     fallbackDimensions: ViewportDimensions;
+    maxCellCount?: number;
 }
 
 export interface LiveCompareCellSizeOptions {
@@ -765,6 +767,7 @@ export function mountLiveCompareWorkspace({
                       geometry,
                       cellSize: definition.sizing_policy.default,
                       fallbackDimensions,
+                      maxCellCount: SPLIT_MIXED_VIEWPORT_CELL_COUNT,
                   }) ?? fallbackDimensions)
                 : fallbackDimensions;
         const snapshot = await pane.backend.postControl("/api/control/reset", {

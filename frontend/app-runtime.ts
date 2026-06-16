@@ -20,6 +20,7 @@ interface FitRenderCellSizeAdapter {
         viewportHeight: number;
         cellSize: number;
         fallbackDimensions?: { width: number; height: number };
+        maxCellCount?: number;
     }) => {
         width: number;
         height: number;
@@ -102,14 +103,16 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             buildEditorToolCells,
             resolveViewportDimensions: (options) => {
                 const adapter = getGeometryAdapter(options.geometry) as FitRenderCellSizeAdapter;
-                return (
-                    adapter.fitViewport?.({
-                        viewportWidth: options.viewportWidth,
-                        viewportHeight: options.viewportHeight,
-                        cellSize: options.cellSize,
-                        fallbackDimensions: options.fallbackDimensions,
-                    }) ?? options.fallbackDimensions
-                );
+                const fitOptions = {
+                    viewportWidth: options.viewportWidth,
+                    viewportHeight: options.viewportHeight,
+                    cellSize: options.cellSize,
+                    fallbackDimensions: options.fallbackDimensions,
+                    ...(options.maxCellCount !== undefined
+                        ? { maxCellCount: options.maxCellCount }
+                        : {}),
+                };
+                return adapter.fitViewport?.(fitOptions) ?? options.fallbackDimensions;
             },
             resolveCellSize: (options) => {
                 const adapter = getGeometryAdapter(options.geometry) as FitRenderCellSizeAdapter;

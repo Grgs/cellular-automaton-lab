@@ -269,9 +269,11 @@ export function constrainMixedViewportDimensions(
         return { width, height };
     }
 
+    const clampToMixedRange = (value: number): number =>
+        Math.min(MAX_GRID_DIMENSION, Math.max(minimum, value));
     const scale = Math.sqrt(maxCellCount / initialCount);
-    width = clampGridDimension(Math.floor(width * scale));
-    height = clampGridDimension(Math.floor(height * scale));
+    width = clampToMixedRange(Math.floor(width * scale));
+    height = clampToMixedRange(Math.floor(height * scale));
 
     while (countCells(width, height) > maxCellCount && (width > minimum || height > minimum)) {
         if (width >= height && width > minimum) {

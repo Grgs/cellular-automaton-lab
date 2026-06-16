@@ -511,6 +511,7 @@ describe("live compare workspace", () => {
             geometry: "archimedean-3-3-3-3-6",
             cellSize: 16,
             fallbackDimensions: { width: 12, height: 10 },
+            maxCellCount: 1800,
         });
         expect(backends.get("s-heavy-mixed-left")?.postControl).toHaveBeenLastCalledWith(
             "/api/control/reset",

@@ -186,6 +186,7 @@ function patternViewportDimensions(
     viewportWidth: number,
     viewportHeight: number,
     cellSize: number,
+    maxCellCount?: number,
 ) {
     const estimatedHeight = estimatePatternDimension(
         viewportHeight,
@@ -221,7 +222,7 @@ function patternViewportDimensions(
         { width, height },
         cellSize,
         (nextWidth, nextHeight) => descriptor.cell_count_per_unit * nextWidth * nextHeight,
-        undefined,
+        maxCellCount,
         descriptor.min_dimension,
     );
 }
@@ -248,11 +249,20 @@ function createPatternViewportFit(descriptor: PeriodicFaceTilingDescriptor) {
         viewportWidth,
         viewportHeight,
         cellSize,
+        maxCellCount,
     }: {
         viewportWidth: number;
         viewportHeight: number;
         cellSize: number;
-    }) => patternViewportDimensions(descriptor, viewportWidth, viewportHeight, cellSize);
+        maxCellCount?: number;
+    }) =>
+        patternViewportDimensions(
+            descriptor,
+            viewportWidth,
+            viewportHeight,
+            cellSize,
+            maxCellCount,
+        );
 }
 
 function createMetricsBuilder(descriptor: PeriodicFaceTilingDescriptor) {
