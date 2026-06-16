@@ -40,18 +40,6 @@ Decisions already taken (so the steps are unambiguous):
 
 ### Phase C — persistent & shareable runs
 
-- **C2 — Result → build from the live view.** The static results table already
-  opens begin/end in place; the live filmstrip view does not. Add a per-board
-  "Open this generation in build" action that turns a tiling's current
-  `frames[index]` into a `PatternPayload` and loads it via the existing
-  `onOpenPattern` path, returning to `#/build`. Threads an `onOpenPattern`
-  callback through `createFilmstripView`.
-- **C3 — Persisted named runs (+ custom tiling sets).** Save the current run
-  configuration under a name; list / load / rename / delete from the workspace,
-  backed by a small `localStorage` store module. Fold custom/pinned tiling sets
-  into the same store (a saved named tiling selection that applies alongside the
-  built-in Representative/Regular/Mixed/Aperiodic presets). Done when a saved run
-  and a saved tiling set both restore losslessly after a full reload.
 - **C5 — Workspace nav & layout polish.** Tune the filmstrip board grid to use
   the full-page width (larger boards when there is room); add empty/loading/error
   states for saved runs and the live view; pass a keyboard-focus and `aria`
@@ -59,8 +47,6 @@ Decisions already taken (so the steps are unambiguous):
 
 ### Closeout — definition of done
 
-- Docs: a "Compare workspace" section in the user-facing docs/README; document
-  the `run=` link format next to the share-link format; CHANGELOG narrative.
 - Standalone smoke coverage: exercise C1–C3 in the Pyodide build via the
   Playwright standalone suite so parity is enforced, not assumed.
 - The feature is complete when, in **both** the server and standalone builds, you

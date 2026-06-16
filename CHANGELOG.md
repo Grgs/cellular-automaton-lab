@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Completed the compare workspace persistence and live-frame handoff loop: users can save/load/delete named compare runs and custom tiling sets in browser `localStorage`, open a synchronized filmstrip board's current generation back into build mode, and keep using portable `run=v1...` links for cross-device handoff.
 - Made compare mode addressable as a `#/compare` hash route: the panel is deep-linkable and integrated with browser history, so opening it pushes the route, closing clears it, and Back/Forward open and close it. The route coexists with `#share=` board links and works in the standalone build.
 - Promoted compare mode to a full-page workspace: on the `#/compare` route it now fills the viewport with a "Back to build" affordance instead of opening as a centred modal over the board. The same panel still supports the modal presentation; the presentation is a parameter of the shared shell.
 - Added shareable compare run links: `run=v1.<base64url>` links restore seed/rule/traversal/grid/frame-count/tiling selections in the `#/compare` workspace without auto-running. A run link that is malformed or tagged with a newer, unsupported version now reports the problem in the workspace status line instead of failing silently.

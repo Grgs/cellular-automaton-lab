@@ -160,6 +160,30 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
     return { backend, compareSeed };
 }
 
+function memoryStorage(): Storage {
+    const values = new Map<string, string>();
+    return {
+        get length() {
+            return values.size;
+        },
+        clear(): void {
+            values.clear();
+        },
+        getItem(key: string): string | null {
+            return values.get(key) ?? null;
+        },
+        key(index: number): string | null {
+            return [...values.keys()][index] ?? null;
+        },
+        removeItem(key: string): void {
+            values.delete(key);
+        },
+        setItem(key: string, value: string): void {
+            values.set(key, value);
+        },
+    };
+}
+
 function openCompareDialog(): void {
     document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
 }
@@ -179,6 +203,16 @@ function clickPreset(label: string): void {
     );
     if (!button) {
         throw new Error(`missing preset ${label}`);
+    }
+    button.click();
+}
+
+function clickButton(label: string): void {
+    const button = [...document.querySelectorAll<HTMLButtonElement>("button")].find(
+        (candidate) => candidate.textContent === label,
+    );
+    if (!button) {
+        throw new Error(`missing button ${label}`);
     }
     button.click();
 }
@@ -245,12 +279,17 @@ describe("mountComparePanel", () => {
     beforeEach(() => {
         installFrontendGlobals();
         vi.resetModules();
+        Object.defineProperty(window, "localStorage", {
+            configurable: true,
+            value: memoryStorage(),
+        });
     });
 
     afterEach(() => {
         document.body.innerHTML = "";
         document.getElementById("compare-panel-styles")?.remove();
         window.history.replaceState(null, "", "/");
+        window.localStorage?.clear();
         vi.restoreAllMocks();
     });
 
@@ -562,6 +601,71 @@ describe("mountComparePanel", () => {
         expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
     });
 
+    it("loads the live filmstrip's current generation into the board", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+        const onOpenPattern = vi.fn();
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => ({
+                rule_name: "conway",
+                seed: "111",
+                traversal: "bfs",
+                frame_count: 2,
+                grid_size: 16,
+                tilings: [
+                    {
+                        geometry: "square",
+                        tiling_family: "square",
+                        family: "regular",
+                        cell_count: 100,
+                        topology: {} as never,
+                        topology_spec: {
+                            tiling_family: "square",
+                            adjacency_mode: "edge",
+                            sizing_mode: "grid",
+                            width: 16,
+                            height: 16,
+                            patch_depth: 0,
+                        },
+                        frames: [{ "c:1:1": 1 }, { "c:2:1": 1 }],
+                        extinction_step: null,
+                        period: null,
+                        note: null,
+                    },
+                ],
+            }),
+        };
+        mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            onOpenPattern,
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        const playSideBySide = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
+        ].find((button) => button.textContent === "▶ Play side by side");
+        playSideBySide?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+        document
+            .querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[title="Step forward one generation"]',
+            )
+            ?.click();
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-open")?.click();
+
+        expect(onOpenPattern).toHaveBeenCalledTimes(1);
+        expect(openSpy).not.toHaveBeenCalled();
+        const loaded = onOpenPattern.mock.calls.at(0)?.[0] as { cells_by_id?: unknown };
+        expect(loaded?.cells_by_id).toEqual({ "c:2:1": 1 });
+        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+    });
+
     it("renders a seed pad wired to the seed field", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -632,6 +736,54 @@ describe("mountComparePanel", () => {
         vi.unstubAllGlobals();
     });
 
+    it("persists saved runs and tiling sets across remounts", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const first = mountComparePanel({ backend, bootstrapData: bootstrapData() });
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        clickPreset("Regular");
+
+        const runNameInput = document.querySelector<HTMLInputElement>(
+            'input[aria-label="Saved run name"]',
+        );
+        const tilingSetNameInput = document.querySelector<HTMLInputElement>(
+            'input[aria-label="Saved tiling set name"]',
+        );
+        if (!runNameInput || !tilingSetNameInput) {
+            throw new Error("missing saved compare controls");
+        }
+        runNameInput.value = "Regular run";
+        tilingSetNameInput.value = "Regular pair";
+        clickButton("Save run");
+        clickButton("Save set");
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+            'Saved tiling set "Regular pair".',
+        );
+
+        first.dispose();
+        document.body.innerHTML = "";
+        const second = mountComparePanel({ backend, bootstrapData: bootstrapData() });
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        clickPreset("None");
+        expect(checkedTilingLabels()).toEqual([]);
+
+        clickButton("Load set");
+        expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+            'Loaded tiling set "Regular pair".',
+        );
+
+        clickPreset("None");
+        clickButton("Load run");
+        await vi.waitFor(() => {
+            expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+                "Loaded run link — 2 tilings ready.",
+            );
+        });
+        second.dispose();
+    });
+
     it("applies a decoded run config without running it", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
@@ -648,7 +800,9 @@ describe("mountComparePanel", () => {
         });
 
         const fields = [
-            ...document.querySelectorAll<HTMLInputElement | HTMLSelectElement>(".compare-field"),
+            ...document.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+                ".compare-form .compare-field, .compare-seedbits .compare-field",
+            ),
         ];
         expect(fields.map((field) => field.value)).toEqual([
             "kagome-life",
@@ -657,7 +811,6 @@ describe("mountComparePanel", () => {
             "12",
             "8",
             "101",
-            "",
         ]);
         expect(checkedTilingLabels()).toEqual(["Kagome"]);
         expect(compareSeed).not.toHaveBeenCalled();

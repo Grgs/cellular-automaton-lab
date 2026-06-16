@@ -19,7 +19,9 @@ import type {
     PatternPayload,
     RuleDefinition,
     SeedComparisonResult,
+    SeedFilmstripResult,
     TopologyComparisonResultPayload,
+    TopologyFilmstrip,
     TopologyPreview,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
@@ -31,6 +33,16 @@ import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
 import { createSeedPreview } from "./compare-seed-preview.js";
 import { createFilmstripView, type FilmstripViewController } from "./compare-filmstrip-view.js";
+import {
+    deleteSavedCompareRun,
+    deleteSavedTilingSet,
+    listSavedCompareRuns,
+    listSavedTilingSets,
+    saveCompareRun,
+    saveTilingSet,
+    type SavedCompareRun,
+    type SavedTilingSet,
+} from "./compare-storage.js";
 import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
 import { ruleSupportsTilingFamily } from "../rule-compatibility.js";
 
@@ -61,6 +73,25 @@ function buildStatePattern(
         version: PATTERN_VERSION,
         topology_spec: result.topology_spec,
         rule: comparison.rule_name,
+        cells_by_id: cells,
+    };
+}
+
+/** Build a shareable board pattern for the live filmstrip's current generation. */
+function buildFilmstripFramePattern(
+    filmstrip: SeedFilmstripResult,
+    tiling: TopologyFilmstrip,
+    frameIndex: number,
+): PatternPayload | null {
+    const cells = tiling.frames[frameIndex];
+    if (!tiling.topology_spec || cells === undefined) {
+        return null;
+    }
+    return {
+        format: PATTERN_FORMAT,
+        version: PATTERN_VERSION,
+        topology_spec: tiling.topology_spec,
+        rule: filmstrip.rule_name,
         cells_by_id: cells,
     };
 }
@@ -178,6 +209,10 @@ export function createComparePanelContent(
     let tilingSearchQuery = "";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
+    let savedRuns: SavedCompareRun[] = [];
+    let savedTilingSets: SavedTilingSet[] = [];
+    let editingSavedRunId = "";
+    let editingSavedTilingSetId = "";
 
     const ruleSelect = el("select", { class: "compare-field" });
     const seedInput = el("input", {
@@ -287,10 +322,61 @@ export function createComparePanelContent(
         },
         ["Copy run link"],
     );
+    const savedRunNameInput = el("input", {
+        class: "compare-field compare-saved-name",
+        type: "text",
+        placeholder: "Run name",
+        "aria-label": "Saved run name",
+    });
+    const savedRunSelect = el("select", {
+        class: "compare-field compare-saved-select",
+        "aria-label": "Saved compare runs",
+    });
+    const saveRunButton = el("button", {
+        class: "compare-mini",
+        type: "button",
+        textContent: "Save run",
+    });
+    const loadRunButton = el("button", {
+        class: "compare-mini",
+        type: "button",
+        textContent: "Load run",
+    });
+    const deleteRunButton = el("button", {
+        class: "compare-mini",
+        type: "button",
+        textContent: "Delete run",
+    });
+    const savedTilingSetNameInput = el("input", {
+        class: "compare-field compare-saved-name",
+        type: "text",
+        placeholder: "Tiling set name",
+        "aria-label": "Saved tiling set name",
+    });
+    const savedTilingSetSelect = el("select", {
+        class: "compare-field compare-saved-select",
+        "aria-label": "Saved tiling sets",
+    });
+    const saveTilingSetButton = el("button", {
+        class: "compare-mini",
+        type: "button",
+        textContent: "Save set",
+    });
+    const loadTilingSetButton = el("button", {
+        class: "compare-mini",
+        type: "button",
+        textContent: "Load set",
+    });
+    const deleteTilingSetButton = el("button", {
+        class: "compare-mini",
+        type: "button",
+        textContent: "Delete set",
+    });
     const statusLine = el("div", { class: "compare-status", role: "status" });
     const filmstripArea = el("div", { class: "compare-filmstrip-area", hidden: true });
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
+    let activeFilmstrip: SeedFilmstripResult | null = null;
 
     const seedPadBlock = el("div", { class: "compare-seedpad-block" }, [
         el("div", {
@@ -339,12 +425,14 @@ export function createComparePanelContent(
         ]),
         seedWorkspace,
         el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
+        savedCompareControls(),
         el("div", { class: "compare-actions" }, [runButton, playButton, copyRunButton, statusLine]),
         filmstripArea,
         resultsArea,
     ]);
 
     renderTilingChecklist();
+    refreshSavedControls();
 
     function labeledField(label: string, field: HTMLElement): HTMLLabelElement {
         return el("label", { class: "compare-label" }, [el("span", { textContent: label }), field]);
@@ -377,6 +465,38 @@ export function createComparePanelContent(
                     presetButton("Aperiodic", "aperiodic"),
                     presetButton("All", "all"),
                     presetButton("None", "none"),
+                ]),
+            ]),
+        ]);
+    }
+
+    function savedCompareControls(): HTMLElement {
+        saveRunButton.addEventListener("click", saveCurrentRun);
+        loadRunButton.addEventListener("click", () => void loadSelectedRun());
+        deleteRunButton.addEventListener("click", deleteSelectedRun);
+        saveTilingSetButton.addEventListener("click", saveCurrentTilingSet);
+        loadTilingSetButton.addEventListener("click", loadSelectedTilingSet);
+        deleteTilingSetButton.addEventListener("click", deleteSelectedTilingSet);
+
+        return el("div", { class: "compare-saved" }, [
+            el("section", { class: "compare-saved-section" }, [
+                el("h3", { class: "compare-saved-title", textContent: "Saved runs" }),
+                el("div", { class: "compare-saved-row" }, [
+                    savedRunNameInput,
+                    saveRunButton,
+                    savedRunSelect,
+                    loadRunButton,
+                    deleteRunButton,
+                ]),
+            ]),
+            el("section", { class: "compare-saved-section" }, [
+                el("h3", { class: "compare-saved-title", textContent: "Saved tiling sets" }),
+                el("div", { class: "compare-saved-row" }, [
+                    savedTilingSetNameInput,
+                    saveTilingSetButton,
+                    savedTilingSetSelect,
+                    loadTilingSetButton,
+                    deleteTilingSetButton,
                 ]),
             ]),
         ]);
@@ -666,6 +786,132 @@ export function createComparePanelContent(
         return buildCompareRunUrl(currentRunConfig(), window.location.href);
     }
 
+    function refreshSavedControls(preferredRunId = "", preferredTilingSetId = ""): void {
+        savedRuns = listSavedCompareRuns();
+        savedTilingSets = listSavedTilingSets();
+        populateSavedSelect(savedRunSelect, savedRuns, "No saved runs", preferredRunId);
+        populateSavedSelect(
+            savedTilingSetSelect,
+            savedTilingSets,
+            "No saved tiling sets",
+            preferredTilingSetId,
+        );
+        const hasRuns = savedRuns.length > 0;
+        const hasTilingSets = savedTilingSets.length > 0;
+        loadRunButton.disabled = !hasRuns;
+        deleteRunButton.disabled = !hasRuns;
+        loadTilingSetButton.disabled = !hasTilingSets;
+        deleteTilingSetButton.disabled = !hasTilingSets;
+    }
+
+    function populateSavedSelect(
+        select: HTMLSelectElement,
+        items: readonly { id: string; name: string }[],
+        emptyLabel: string,
+        preferredId: string,
+    ): void {
+        select.replaceChildren();
+        if (items.length === 0) {
+            select.append(el("option", { value: "", textContent: emptyLabel }));
+            select.disabled = true;
+            return;
+        }
+        select.disabled = false;
+        for (const item of items) {
+            select.append(el("option", { value: item.id, textContent: item.name }));
+        }
+        if (preferredId && [...select.options].some((option) => option.value === preferredId)) {
+            select.value = preferredId;
+        }
+    }
+
+    function saveCurrentRun(): void {
+        try {
+            const replaceId = editingSavedRunId;
+            const saved = saveCompareRun(savedRunNameInput.value, currentRunConfig());
+            if (replaceId && replaceId !== saved.id) {
+                deleteSavedCompareRun(replaceId);
+            }
+            editingSavedRunId = saved.id;
+            savedRunNameInput.value = saved.name;
+            refreshSavedControls(saved.id, savedTilingSetSelect.value);
+            statusLine.textContent = `Saved run "${saved.name}".`;
+        } catch (error) {
+            statusLine.textContent = `Could not save run: ${error instanceof Error ? error.message : String(error)}`;
+        }
+    }
+
+    async function loadSelectedRun(): Promise<void> {
+        const saved = savedRuns.find((run) => run.id === savedRunSelect.value);
+        if (!saved) {
+            return;
+        }
+        await applyRunConfig(saved.config);
+        editingSavedRunId = saved.id;
+        savedRunNameInput.value = saved.name;
+        refreshSavedControls(saved.id, savedTilingSetSelect.value);
+    }
+
+    function deleteSelectedRun(): void {
+        const saved = savedRuns.find((run) => run.id === savedRunSelect.value);
+        if (!saved) {
+            return;
+        }
+        deleteSavedCompareRun(saved.id);
+        if (editingSavedRunId === saved.id) {
+            editingSavedRunId = "";
+        }
+        refreshSavedControls("", savedTilingSetSelect.value);
+        statusLine.textContent = `Deleted run "${saved.name}".`;
+    }
+
+    function saveCurrentTilingSet(): void {
+        try {
+            const replaceId = editingSavedTilingSetId;
+            const saved = saveTilingSet(savedTilingSetNameInput.value, [...selected]);
+            if (replaceId && replaceId !== saved.id) {
+                deleteSavedTilingSet(replaceId);
+            }
+            editingSavedTilingSetId = saved.id;
+            savedTilingSetNameInput.value = saved.name;
+            refreshSavedControls(savedRunSelect.value, saved.id);
+            statusLine.textContent = `Saved tiling set "${saved.name}".`;
+        } catch (error) {
+            statusLine.textContent = `Could not save tiling set: ${error instanceof Error ? error.message : String(error)}`;
+        }
+    }
+
+    function loadSelectedTilingSet(): void {
+        const saved = savedTilingSets.find((set) => set.id === savedTilingSetSelect.value);
+        if (!saved) {
+            return;
+        }
+        const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
+        replaceSelection(
+            new Set(saved.geometries.filter((geometry) => knownGeometries.has(geometry))),
+        );
+        pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
+        renderTilingChecklist();
+        refreshPreview();
+        editingSavedTilingSetId = saved.id;
+        savedTilingSetNameInput.value = saved.name;
+        refreshSavedControls(savedRunSelect.value, saved.id);
+        statusLine.textContent = `Loaded tiling set "${saved.name}".`;
+    }
+
+    function deleteSelectedTilingSet(): void {
+        const saved = savedTilingSets.find((set) => set.id === savedTilingSetSelect.value);
+        if (!saved) {
+            return;
+        }
+        deleteSavedTilingSet(saved.id);
+        if (editingSavedTilingSetId === saved.id) {
+            editingSavedTilingSetId = "";
+        }
+        refreshSavedControls(savedRunSelect.value);
+        statusLine.textContent = `Deleted tiling set "${saved.name}".`;
+    }
+
     async function ensureRules(): Promise<void> {
         if (rulesLoaded) {
             return;
@@ -737,6 +983,7 @@ export function createComparePanelContent(
         refreshPreview();
         resultsArea.replaceChildren();
         filmstripArea.hidden = true;
+        activeFilmstrip = null;
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
@@ -802,11 +1049,13 @@ export function createComparePanelContent(
 
         try {
             const filmstrip = await options.backend.requestFilmstrip(request);
+            activeFilmstrip = filmstrip;
             if (!filmstripView) {
                 filmstripView = createFilmstripView({
                     backend: options.backend,
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
+                    onOpenFrame: openFilmstripFrame,
                 });
                 filmstripArea.append(filmstripView.element);
             }
@@ -818,6 +1067,18 @@ export function createComparePanelContent(
         } finally {
             setRunning(false);
         }
+    }
+
+    function openFilmstripFrame(tiling: TopologyFilmstrip, frameIndex: number): void {
+        if (!activeFilmstrip) {
+            return;
+        }
+        const pattern = buildFilmstripFramePattern(activeFilmstrip, tiling, frameIndex);
+        if (!pattern) {
+            statusLine.textContent = "This generation cannot be opened in build mode.";
+            return;
+        }
+        openPattern(pattern);
     }
 
     function renderResults(comparison: Parameters<typeof buildPhasePortraitSvg>[0]): void {

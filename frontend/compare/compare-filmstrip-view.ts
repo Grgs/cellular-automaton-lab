@@ -15,7 +15,7 @@ import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { FilmstripPlayer, type FilmstripPlayerState } from "./filmstrip-player.js";
 
 const DEFAULT_FPS = 8;
-const DEFAULT_THUMB_SIZE = 150;
+const DEFAULT_THUMB_SIZE = 180;
 
 /** Playback speed multipliers offered in the transport bar. */
 const SPEED_OPTIONS: readonly { label: string; value: number }[] = [
@@ -46,6 +46,8 @@ export interface FilmstripViewOptions {
     thumbSize?: number;
     /** Loop back to the seed frame after the last instead of stopping. */
     loop?: boolean;
+    /** Called when the user wants to load one board's current generation into build mode. */
+    onOpenFrame?: (tiling: TopologyFilmstrip, frameIndex: number) => void;
     /** Overridable clock; defaults to `window.setInterval`. */
     scheduler?: IntervalScheduler;
 }
@@ -61,6 +63,7 @@ interface BoardEntry {
     tiling: TopologyFilmstrip;
     slot: HTMLElement;
     countLabel: HTMLElement;
+    openButton?: HTMLButtonElement;
     preview?: TopologyPreview;
     error?: string;
 }
@@ -71,6 +74,16 @@ function el(tag: string, className: string, text?: string): HTMLElement {
     if (text !== undefined) {
         node.textContent = text;
     }
+    return node;
+}
+
+function linkButton(label: string, title: string, onClick: () => void): HTMLButtonElement {
+    const node = document.createElement("button");
+    node.type = "button";
+    node.className = "compare-link compare-filmstrip-open";
+    node.textContent = label;
+    node.title = title;
+    node.addEventListener("click", onClick);
     return node;
 }
 
@@ -163,17 +176,26 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     }
 
     function renderBoard(entry: BoardEntry, index: number): void {
+        const frame = entry.tiling.frames[index] ?? {};
         if (entry.error) {
             entry.slot.textContent = entry.error.includes("limit") ? "too large" : "unavailable";
             entry.countLabel.textContent = "";
+            if (entry.openButton) {
+                entry.openButton.disabled = true;
+                entry.openButton.title = "This board is unavailable.";
+            }
             return;
         }
         const preview = entry.preview;
         if (!preview) {
             entry.slot.textContent = "…";
+            if (entry.openButton) {
+                entry.openButton.disabled = true;
+                entry.openButton.title = "Load the board preview before opening this generation.";
+            }
             return;
         }
-        const cellsById = entry.tiling.frames[index] ?? {};
+        const cellsById = frame;
         const svg = buildBoardThumbnailSvg(preview, cellsById, {
             size: thumbSize,
             liveColor: getLiveColor(),
@@ -184,6 +206,11 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         const extinct =
             entry.tiling.extinction_step !== null && index >= entry.tiling.extinction_step;
         entry.countLabel.textContent = extinct ? "extinct" : `${liveCells} live`;
+        if (entry.openButton) {
+            entry.openButton.disabled = false;
+            entry.openButton.textContent = `Open gen ${index}`;
+            entry.openButton.title = `Load ${entry.tiling.geometry} generation ${index} into build mode`;
+        }
     }
 
     function renderAllBoards(index: number): void {
@@ -231,9 +258,19 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const label = el("div", "compare-filmstrip-label", tiling.geometry);
             const countLabel = el("div", "compare-filmstrip-count");
             const cell = el("div", "compare-filmstrip-board");
+            const openButton = options.onOpenFrame
+                ? linkButton(
+                      "Open gen 0",
+                      `Load ${tiling.geometry} generation 0 into build mode`,
+                      () => options.onOpenFrame?.(tiling, player.index),
+                  )
+                : undefined;
             cell.append(label, slot, countLabel);
+            if (openButton) {
+                cell.append(openButton);
+            }
             boardsArea.append(cell);
-            return { tiling, slot, countLabel };
+            return { tiling, slot, countLabel, ...(openButton ? { openButton } : {}) };
         });
 
         unsubscribe = player.subscribe(onPlayerState);

@@ -236,6 +236,38 @@ describe("createFilmstripView", () => {
         expect(liveCount(view)).toBe(2);
     });
 
+    it("opens the current generation for a board when requested", async () => {
+        const backend = stubBackend(async () => squarePreview());
+        const clock = manualScheduler();
+        const opened: Array<{ geometry: string; frameIndex: number }> = [];
+        const view = createFilmstripView({
+            backend,
+            scheduler: clock.scheduler,
+            onOpenFrame: (tiling, frameIndex) => {
+                opened.push({ geometry: tiling.geometry, frameIndex });
+            },
+        });
+        document.body.append(view.element);
+        await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3));
+
+        transportButton(view, "Step forward one generation").click();
+        const openButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-open");
+        expect(openButton?.textContent).toBe("Open gen 1");
+        openButton?.click();
+
+        expect(opened).toEqual([{ geometry: "square", frameIndex: 1 }]);
+    });
+
+    it("omits open-generation actions when no callback is provided", async () => {
+        const backend = stubBackend(async () => squarePreview());
+        const clock = manualScheduler();
+        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
+        document.body.append(view.element);
+        await view.load(filmstrip([tiling("square", [{ a: 1 }])], 1));
+
+        expect(view.element.querySelector(".compare-filmstrip-open")).toBeNull();
+    });
+
     it("re-times the running clock when the speed changes", async () => {
         const backend = stubBackend(async () => squarePreview());
         const clock = manualScheduler();
