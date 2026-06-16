@@ -76,6 +76,7 @@ export const elements: DomElements = {
     stepBtn: elementById("step-btn"),
     resetBtn: elementById("reset-btn"),
     randomBtn: elementById("random-btn"),
+    splitViewToggleBtn: elementById("split-view-toggle-btn"),
     resetAllSettingsBtn: elementById("reset-all-settings-btn"),
     presetSeedControls: elementById("preset-seed-controls"),
     presetSeedSelect: elementById("preset-seed-select"),

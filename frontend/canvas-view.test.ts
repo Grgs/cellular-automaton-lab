@@ -298,6 +298,159 @@ describe("canvas-view", () => {
         expect(drawGestureOutlineLayer).toHaveBeenCalledTimes(gestureCallsBeforeRevisionChange);
     });
 
+    it("resolves pointer cells from CSS-scaled canvas coordinates", async () => {
+        const scaledMetrics = {
+            ...BASE_METRICS,
+            width: 2,
+            height: 2,
+            cssWidth: 24,
+            cssHeight: 24,
+            pixelWidth: 24,
+            pixelHeight: 24,
+        };
+
+        vi.doMock("./canvas/surface.js", () => ({
+            createCanvasSurface: () => ({
+                context: {} as CanvasRenderingContext2D,
+                committedCanvas: document.createElement("canvas"),
+                committedContext: {} as CanvasRenderingContext2D,
+                resize: () => scaledMetrics,
+                restoreCommittedSurface: vi.fn(),
+            }),
+        }));
+        vi.doMock("./canvas/render-layers.js", () => ({
+            drawCommittedLayer: vi.fn(),
+            drawHoverLayer: vi.fn(),
+            drawSelectionLayer: vi.fn(),
+            drawPreviewLayer: vi.fn(),
+            drawGestureOutlineLayer: vi.fn(),
+        }));
+        vi.doMock("./geometry/registry.js", () => ({
+            getGeometryAdapter: () => ({
+                buildMetrics: () => scaledMetrics,
+                family: "regular",
+                resolveCellFromOffset: ({
+                    offsetX,
+                    offsetY,
+                }: {
+                    offsetX: number;
+                    offsetY: number;
+                }) => ({
+                    id: `c:${Math.floor(offsetX / 12)}:${Math.floor(offsetY / 12)}`,
+                }),
+            }),
+            isSupportedGeometry: () => true,
+        }));
+        vi.doMock("./canvas/cache.js", () => ({
+            resolveGeometryCache: () => ({ cacheKey: "cache", geometryCache: null }),
+        }));
+        vi.doMock("./canvas/render-style.js", () => ({
+            DEFAULT_COLORS: {
+                line: "rgba(31, 36, 48, 0.16)",
+                dead: "#f8f1e5",
+                deadAlt: "#d5bb8f",
+                lineSoft: "rgba(31, 36, 48, 0.10)",
+                lineStrong: "rgba(31, 36, 48, 0.20)",
+                lineAperiodic: "rgba(31, 36, 48, 0.24)",
+                live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
+                toneCream: "#f8f1e5",
+                toneLinen: "#ead6b6",
+                toneSand: "#efe4d0",
+                toneFlax: "#e1cdac",
+                toneTan: "#e5c089",
+                toneStone: "#d5bb8f",
+                toneRose: "#dbc1b2",
+                toneClay: "#c88d4b",
+                toneShadow: "#b89a6e",
+            },
+            buildStateColorLookup: () => new Map([[0, "#f8f1e5"]]),
+            readCanvasColors: () => ({
+                line: "rgba(31, 36, 48, 0.16)",
+                dead: "#f8f1e5",
+                deadAlt: "#d5bb8f",
+                lineSoft: "rgba(31, 36, 48, 0.10)",
+                lineStrong: "rgba(31, 36, 48, 0.20)",
+                lineAperiodic: "rgba(31, 36, 48, 0.24)",
+                live: "#1f2430",
+                accent: "#bf5a36",
+                accentStrong: "#8a3d20",
+                toneCream: "#f8f1e5",
+                toneLinen: "#ead6b6",
+                toneSand: "#efe4d0",
+                toneFlax: "#e1cdac",
+                toneTan: "#e5c089",
+                toneStone: "#d5bb8f",
+                toneRose: "#dbc1b2",
+                toneClay: "#c88d4b",
+                toneShadow: "#b89a6e",
+            }),
+            resolveCanvasRenderStyle: () => ({
+                mode: "standard",
+                geometry: "square",
+                lineColorToken: "lineSoft",
+                triangleStrokeEnabled: false,
+                lineColor: "rgba(31, 36, 48, 0.10)",
+                aperiodicLineColor: "rgba(31, 36, 48, 0.24)",
+                hoverTintColor: "rgba(31, 36, 48, 0.20)",
+                hoverStrokeColor: "#1f2430",
+                selectionTintColor: "rgba(191, 90, 54, 0.16)",
+                selectionStrokeColor: "#8a3d20",
+                gesturePaintStrokeColor: "#8a3d20",
+                gestureEraseStrokeColor: "rgba(31, 36, 48, 0.24)",
+            }),
+            resolveDeadCellColor: vi.fn(),
+            resolveRenderedCellColor: () => "#f8f1e5",
+            resolveRenderDetailLevel: vi.fn(),
+            resolveRenderStyle: vi.fn(),
+            resolveStateColor: vi.fn(),
+        }));
+
+        const { createCanvasGridView } = await import("./canvas-view.js");
+        const canvas = document.createElement("canvas");
+        canvas.getBoundingClientRect = () =>
+            ({
+                left: 10,
+                top: 20,
+                right: 22,
+                bottom: 32,
+                width: 12,
+                height: 12,
+                x: 10,
+                y: 20,
+                toJSON: () => ({}),
+            }) as DOMRect;
+        const view = createCanvasGridView({ canvas });
+        const topology = topologyPayload();
+
+        view.render(
+            {
+                topology: {
+                    ...topology,
+                    topology_spec: {
+                        ...topology.topology_spec,
+                        width: 2,
+                        height: 2,
+                    },
+                    width: 2,
+                    height: 2,
+                },
+                cellStates: [0, 0, 0, 0],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "square",
+        );
+
+        expect(
+            view.getCellFromPointerEvent(
+                new PointerEvent("pointerdown", { clientX: 19, clientY: 29 }),
+            )?.id,
+        ).toBe("c:1:1");
+    });
+
     it("centers presentation-only canvases inside larger viewports without centering backend-synced grids", async () => {
         const resize = vi.fn(() => ({ ...BASE_METRICS, cssWidth: 120, cssHeight: 60 }));
 
