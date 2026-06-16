@@ -64,6 +64,19 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             bootstrapData,
             baseSessionId: window.APP_SESSION_ID ?? null,
             mainBackend: backend,
+            controls: {
+                statusText: elements.statusText,
+                generationText: elements.generationText,
+                runToggleBtn: elements.runToggleBtn,
+                stepBtn: elements.stepBtn,
+                resetBtn: elements.resetBtn,
+                randomBtn: elements.randomBtn,
+                tilingFamilySelect: elements.tilingFamilySelect,
+                tilingPickerMenu: elements.tilingPickerMenu,
+                tilingPickerToggle: elements.tilingPickerToggle,
+                tilingPickerCurrentLabel: elements.tilingPickerCurrentLabel,
+            },
+            onReturnToSingleView: () => controller.refreshState(),
             createGridView: (canvas) => createCanvasGridView({ canvas }),
         });
     } catch (error) {

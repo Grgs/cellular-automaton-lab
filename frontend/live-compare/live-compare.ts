@@ -24,10 +24,25 @@ export interface LiveCompareWorkspaceOptions {
     bootstrapData: AppBootstrapData;
     baseSessionId?: string | null;
     mainBackend?: SimulationBackend;
+    controls?: LiveCompareControlElements;
+    onReturnToSingleView?: () => void | Promise<void>;
     backendFactory?: (sessionId: string) => SimulationBackend;
     createGridView?: (canvas: HTMLCanvasElement) => GridView;
     storage?: Storage | null;
     onError?: (error: unknown) => void;
+}
+
+export interface LiveCompareControlElements {
+    statusText?: HTMLElement | null;
+    generationText?: HTMLElement | null;
+    runToggleBtn?: HTMLButtonElement | null;
+    stepBtn?: HTMLButtonElement | null;
+    resetBtn?: HTMLButtonElement | null;
+    randomBtn?: HTMLButtonElement | null;
+    tilingFamilySelect?: HTMLSelectElement | null;
+    tilingPickerMenu?: HTMLElement | null;
+    tilingPickerToggle?: HTMLButtonElement | null;
+    tilingPickerCurrentLabel?: HTMLElement | null;
 }
 
 export interface LiveCompareWorkspaceHandle {
@@ -260,6 +275,8 @@ export function mountLiveCompareWorkspace({
     bootstrapData,
     baseSessionId,
     mainBackend,
+    controls = {},
+    onReturnToSingleView = () => {},
     backendFactory = (sessionId) => createHttpSimulationBackend({ sessionId }),
     createGridView = () => {
         throw new Error("Live compare requires a grid view factory.");
@@ -328,6 +345,66 @@ export function mountLiveCompareWorkspace({
 
     let open = false;
     let disposed = false;
+    let activePane: PaneState | null = null;
+    const cleanupCallbacks: Array<() => void> = [];
+
+    function closeTilingPicker(): void {
+        if (controls.tilingPickerMenu) {
+            controls.tilingPickerMenu.hidden = true;
+        }
+        controls.tilingPickerToggle?.setAttribute("aria-expanded", "false");
+    }
+
+    function setSelectedTopTiling(tilingFamily: string): void {
+        if (controls.tilingFamilySelect) {
+            controls.tilingFamilySelect.value = tilingFamily;
+        }
+        if (controls.tilingPickerCurrentLabel) {
+            controls.tilingPickerCurrentLabel.textContent = topologyLabel(
+                definitions,
+                tilingFamily,
+            );
+        }
+        const menu = controls.tilingPickerMenu;
+        if (menu) {
+            menu.querySelectorAll<HTMLButtonElement>(".tiling-preview-card").forEach((card) => {
+                card.classList.toggle("is-selected", card.dataset.tilingFamily === tilingFamily);
+            });
+        }
+    }
+
+    function updateTopControls(): void {
+        if (!open || !activePane?.snapshot) {
+            return;
+        }
+        const snapshot = activePane.snapshot;
+        if (controls.statusText) {
+            controls.statusText.textContent = `${activePane.title}: ${
+                snapshot.running ? "Running" : "Paused"
+            }`;
+        }
+        if (controls.generationText) {
+            controls.generationText.textContent = String(snapshot.generation);
+        }
+        if (controls.runToggleBtn) {
+            controls.runToggleBtn.textContent = snapshot.running ? "Pause" : "Run";
+            controls.runToggleBtn.classList.toggle("is-running", snapshot.running);
+            controls.runToggleBtn.dataset.controlAction = snapshot.running ? "pause" : "run";
+            controls.runToggleBtn.setAttribute(
+                "aria-label",
+                `${snapshot.running ? "Pause" : "Run"} ${activePane.title} split pane`,
+            );
+        }
+        setSelectedTopTiling(snapshot.topology_spec.tiling_family);
+    }
+
+    function setActivePane(pane: PaneState): void {
+        activePane = pane;
+        panes.forEach((candidate) =>
+            candidate.elements.root.classList.toggle("is-active", candidate === pane),
+        );
+        updateTopControls();
+    }
 
     function clearPoll(pane: PaneState): void {
         if (pane.pollTimer !== null) {
@@ -352,6 +429,9 @@ export function mountLiveCompareWorkspace({
     async function applyPaneSnapshot(pane: PaneState, snapshot: SimulationSnapshot): Promise<void> {
         pane.snapshot = snapshot;
         renderPane(pane, bootstrapData, definitions);
+        if (pane === activePane) {
+            updateTopControls();
+        }
         syncPoll(pane);
     }
 
@@ -402,6 +482,7 @@ export function mountLiveCompareWorkspace({
     }
 
     async function editPaneCell(pane: PaneState, cell: CellIdentifier): Promise<void> {
+        setActivePane(pane);
         const wasRunning = Boolean(pane.snapshot?.running);
         if (wasRunning) {
             await applyPaneSnapshot(pane, await pane.backend.postControl("/api/control/pause"));
@@ -424,9 +505,13 @@ export function mountLiveCompareWorkspace({
         triggerButton.textContent = open ? "Single View" : "Split View";
         if (open) {
             void mainBackend?.postControl("/api/control/pause").catch(onError);
-            void initializePaneSessions().catch(onError);
+            setActivePane(activePane ?? panes[0]!);
+            void initializePaneSessions()
+                .then(() => updateTopControls())
+                .catch(onError);
         } else {
             panes.forEach(clearPoll);
+            void Promise.resolve(onReturnToSingleView()).catch(onError);
         }
     }
 
@@ -440,9 +525,7 @@ export function mountLiveCompareWorkspace({
 
     for (const pane of panes) {
         pane.elements.root.addEventListener("pointerdown", (event) => {
-            panes.forEach((candidate) =>
-                candidate.elements.root.classList.toggle("is-active", candidate === pane),
-            );
+            setActivePane(pane);
             pane.elements.root.focus();
             event.stopPropagation();
         });
@@ -454,6 +537,7 @@ export function mountLiveCompareWorkspace({
             void editPaneCell(pane, cell).catch(onError);
         });
         pane.elements.tilingSelect.addEventListener("change", () => {
+            setActivePane(pane);
             const definition = definitions.find(
                 (candidate) => candidate.tiling_family === pane.elements.tilingSelect.value,
             );
@@ -462,21 +546,117 @@ export function mountLiveCompareWorkspace({
             }
         });
         pane.elements.runButton.addEventListener("click", () => {
+            setActivePane(pane);
             void sendPaneRunToggle(pane).catch(onError);
         });
         pane.elements.stepButton.addEventListener("click", () => {
+            setActivePane(pane);
             void pane.backend
                 .postControl("/api/control/step")
                 .then((snapshot) => applyPaneSnapshot(pane, snapshot))
                 .catch(onError);
         });
         pane.elements.resetButton.addEventListener("click", () => {
+            setActivePane(pane);
             const definition =
                 definitions.find(
                     (candidate) => candidate.tiling_family === pane.elements.tilingSelect.value,
                 ) ?? paneDefinitions[pane.id];
             void resetPaneToTopology(pane, definition).catch(onError);
         });
+    }
+
+    function activePaneOrFallback(): PaneState {
+        return activePane ?? panes[0]!;
+    }
+
+    function definitionForTilingFamily(
+        tilingFamily: string,
+    ): BootstrappedTopologyDefinition | null {
+        return definitions.find((candidate) => candidate.tiling_family === tilingFamily) ?? null;
+    }
+
+    function definitionForPane(pane: PaneState): BootstrappedTopologyDefinition {
+        return (
+            definitionForTilingFamily(
+                pane.snapshot?.topology_spec.tiling_family ?? pane.elements.tilingSelect.value,
+            ) ?? paneDefinitions[pane.id]
+        );
+    }
+
+    function interceptClick(
+        button: HTMLButtonElement | null | undefined,
+        action: (pane: PaneState) => Promise<void>,
+    ): void {
+        if (!button) {
+            return;
+        }
+        const listener = (event: MouseEvent) => {
+            if (!open) {
+                return;
+            }
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            void action(activePaneOrFallback()).catch(onError);
+        };
+        button.addEventListener("click", listener, { capture: true });
+        cleanupCallbacks.push(() =>
+            button.removeEventListener("click", listener, { capture: true }),
+        );
+    }
+
+    interceptClick(controls.runToggleBtn, sendPaneRunToggle);
+    interceptClick(controls.stepBtn, async (pane) => {
+        await applyPaneSnapshot(pane, await pane.backend.postControl("/api/control/step"));
+    });
+    interceptClick(controls.resetBtn, async (pane) => {
+        await resetPaneToTopology(pane, definitionForPane(pane));
+    });
+    interceptClick(controls.randomBtn, async (pane) => {
+        await resetPaneToTopology(pane, definitionForPane(pane), true);
+    });
+
+    if (controls.tilingFamilySelect) {
+        const listener = (event: Event) => {
+            if (!open) {
+                return;
+            }
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const definition = definitionForTilingFamily(controls.tilingFamilySelect?.value ?? "");
+            if (!definition) {
+                return;
+            }
+            void resetPaneToTopology(activePaneOrFallback(), definition).catch(onError);
+        };
+        controls.tilingFamilySelect.addEventListener("change", listener, { capture: true });
+        cleanupCallbacks.push(() =>
+            controls.tilingFamilySelect?.removeEventListener("change", listener, { capture: true }),
+        );
+    }
+
+    if (controls.tilingPickerMenu) {
+        const listener = (event: MouseEvent) => {
+            if (!open || !(event.target instanceof Element)) {
+                return;
+            }
+            const target = event.target.closest<HTMLButtonElement>(".tiling-preview-card");
+            const tilingFamily = target?.dataset.tilingFamily ?? "";
+            const definition = definitionForTilingFamily(tilingFamily);
+            if (!definition) {
+                return;
+            }
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            setSelectedTopTiling(tilingFamily);
+            closeTilingPicker();
+            controls.tilingPickerToggle?.focus();
+            void resetPaneToTopology(activePaneOrFallback(), definition).catch(onError);
+        };
+        controls.tilingPickerMenu.addEventListener("click", listener, { capture: true });
+        cleanupCallbacks.push(() =>
+            controls.tilingPickerMenu?.removeEventListener("click", listener, { capture: true }),
+        );
     }
 
     runBoth.addEventListener("click", () => {
@@ -532,6 +712,7 @@ export function mountLiveCompareWorkspace({
             mainStage?.classList.remove("is-live-compare");
             window.removeEventListener("resize", handleResize);
             triggerButton.removeEventListener("click", handleTriggerClick);
+            cleanupCallbacks.forEach((cleanup) => cleanup());
             triggerButton.setAttribute("aria-pressed", "false");
             triggerButton.textContent = "Split View";
         },
