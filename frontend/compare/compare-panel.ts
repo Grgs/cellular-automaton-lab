@@ -10,6 +10,7 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import type { CompareRunConfig } from "./compare-run-link.js";
 import {
     createComparePanelContent,
     ensureComparePanelStyles,
@@ -42,6 +43,7 @@ export interface ComparePanelHandle {
     open(): void;
     close(): void;
     isOpen(): boolean;
+    applyRunConfig(config: CompareRunConfig): Promise<void>;
     dispose(): void;
 }
 
@@ -182,6 +184,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         open,
         close,
         isOpen: () => !backdrop.hidden,
+        applyRunConfig: (config) => content.applyRunConfig(config),
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             content.dispose();

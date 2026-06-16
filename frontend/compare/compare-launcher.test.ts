@@ -156,6 +156,30 @@ describe("mountCompareLauncher", () => {
             expect(backdrop).not.toBeNull();
             expect(backdrop?.hidden).toBe(false);
         });
+        expect(document.querySelector(".compare-dialog--workspace")).not.toBeNull();
+        expect(document.querySelector(".compare-back")?.textContent).toBe("← Back to build");
+    });
+
+    it("restores a run link without starting the run", async () => {
+        const { encodeCompareRunFragment } = await import("./compare-run-link.js");
+        window.location.hash = `#/compare&${encodeCompareRunFragment({
+            seed: "101",
+            rule: "conway",
+            traversal: "row-major",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["square"],
+        })}`;
+        await mount();
+
+        await vi.waitFor(() => {
+            expect(
+                document.querySelector<HTMLInputElement>('input.compare-field[type="text"]')?.value,
+            ).toBe("101");
+        });
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+            "Loaded run link — 1 tilings ready.",
+        );
     });
 
     it("mirrors the route into the hash on open and clears it on close", async () => {

@@ -24,6 +24,7 @@ import type {
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
+import { buildCompareRunUrl, type CompareRunConfig } from "./compare-run-link.js";
 import { SEED_SHAPE_OPTIONS, TRAVERSAL_OPTIONS } from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
@@ -82,6 +83,8 @@ export interface ComparePanelContentHandle {
     element: HTMLElement;
     /** Call when the content becomes visible: load rules and refresh previews. */
     activate(): void;
+    /** Populate the workspace from a decoded run link without running it. */
+    applyRunConfig(config: CompareRunConfig): Promise<void>;
     /** Let an open action menu consume Escape; returns true when it did. */
     handleEscape(): boolean;
     dispose(): void;
@@ -273,6 +276,15 @@ export function createComparePanelContent(
         },
         ["▶ Play side by side"],
     );
+    const copyRunButton = el(
+        "button",
+        {
+            class: "compare-run compare-run-secondary",
+            type: "button",
+            title: "Copy a link that restores this compare run setup",
+        },
+        ["Copy run link"],
+    );
     const statusLine = el("div", { class: "compare-status", role: "status" });
     const filmstripArea = el("div", { class: "compare-filmstrip-area", hidden: true });
     const resultsArea = el("div", { class: "compare-results" });
@@ -306,10 +318,7 @@ export function createComparePanelContent(
 
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
     shapeSelect.addEventListener("change", () => {
-        const shapeMode = isShapeMode();
-        seedWorkspace.classList.toggle("is-shape-mode", shapeMode);
-        seedPadBlock.style.display = shapeMode ? "none" : "";
-        seedInput.disabled = shapeMode;
+        syncShapeMode();
         seedPreview.refresh();
     });
 
@@ -328,7 +337,7 @@ export function createComparePanelContent(
         ]),
         seedWorkspace,
         el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
-        el("div", { class: "compare-actions" }, [runButton, playButton, statusLine]),
+        el("div", { class: "compare-actions" }, [runButton, playButton, copyRunButton, statusLine]),
         filmstripArea,
         resultsArea,
     ]);
@@ -539,6 +548,7 @@ export function createComparePanelContent(
         const disabled = running || selected.size === 0;
         runButton.disabled = disabled;
         playButton.disabled = disabled;
+        copyRunButton.disabled = disabled;
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -635,6 +645,25 @@ export function createComparePanelContent(
         return buildShareUrl(pattern, window.location.href);
     }
 
+    function currentRunConfig(): CompareRunConfig {
+        const config: CompareRunConfig = {
+            seed: seedInput.value,
+            rule: selectedRuleName(),
+            traversal: traversalSelect.value,
+            frames: clampNumber(stepsInput.value, 1, 500, 50),
+            grid_size: clampNumber(gridInput.value, 2, 64, 16),
+            geometries: [...selected],
+        };
+        if (isShapeMode()) {
+            config.pattern = shapeSelect.value;
+        }
+        return config;
+    }
+
+    function compareRunUrl(): string {
+        return buildCompareRunUrl(currentRunConfig(), window.location.href);
+    }
+
     async function ensureRules(): Promise<void> {
         if (rulesLoaded) {
             return;
@@ -668,6 +697,45 @@ export function createComparePanelContent(
         running = next;
         runButton.textContent = next ? "Running…" : "Run comparison";
         updateSummary();
+    }
+
+    function selectHasValue(select: HTMLSelectElement, value: string): boolean {
+        return [...select.options].some((option) => option.value === value);
+    }
+
+    function syncShapeMode(): void {
+        const shapeMode = isShapeMode();
+        seedWorkspace.classList.toggle("is-shape-mode", shapeMode);
+        seedPadBlock.style.display = shapeMode ? "none" : "";
+        seedInput.disabled = shapeMode;
+    }
+
+    async function applyRunConfig(config: CompareRunConfig): Promise<void> {
+        await ensureRules();
+
+        seedInput.value = config.seed;
+        seedPad.syncFromSeed();
+        if (selectHasValue(ruleSelect, config.rule)) {
+            ruleSelect.value = config.rule;
+        }
+        if (selectHasValue(traversalSelect, config.traversal)) {
+            traversalSelect.value = config.traversal;
+        }
+        stepsInput.value = String(config.frames);
+        gridInput.value = String(config.grid_size);
+        shapeSelect.value =
+            config.pattern && selectHasValue(shapeSelect, config.pattern) ? config.pattern : "";
+        syncShapeMode();
+
+        const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
+        replaceSelection(
+            new Set(config.geometries.filter((geometry) => knownGeometries.has(geometry))),
+        );
+        renderTilingChecklist();
+        refreshPreview();
+        resultsArea.replaceChildren();
+        filmstripArea.hidden = true;
+        statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
     function highlightGeometry(geometry: string | null): void {
@@ -1032,6 +1100,21 @@ export function createComparePanelContent(
         );
     }
 
+    function copyRunLink(): void {
+        const url = compareRunUrl();
+        const clipboard = navigator.clipboard;
+        if (!clipboard) {
+            window.prompt("Copy this run link:", url);
+            return;
+        }
+        void clipboard.writeText(url).then(
+            () => {
+                statusLine.textContent = "Copied run link.";
+            },
+            () => window.prompt("Copy this run link:", url),
+        );
+    }
+
     // Native <details> menus stay open until re-clicked; close any open one when
     // the click lands outside it so only one menu is ever open at a time.
     function onDocumentPointerDown(event: Event): void {
@@ -1045,6 +1128,7 @@ export function createComparePanelContent(
 
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
+    copyRunButton.addEventListener("click", copyRunLink);
     document.addEventListener("pointerdown", onDocumentPointerDown);
 
     return {
@@ -1054,6 +1138,7 @@ export function createComparePanelContent(
             refreshPreview();
             highlightGeometry(null);
         },
+        applyRunConfig,
         handleEscape(): boolean {
             const openMenu = root.querySelector(".compare-action-menu[open]");
             if (openMenu) {

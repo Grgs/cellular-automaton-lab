@@ -7,6 +7,7 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import { decodeCompareRunFragment, readCompareRunBodyFromHash } from "./compare-run-link.js";
 import type { ComparePanelHandle } from "./compare-panel.js";
 import {
     hashHasCompareRoute,
@@ -72,6 +73,28 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
 
     let panel: ComparePanelHandle | null = null;
     let loading = false;
+    let lastAppliedRunBody: string | null = null;
+    let disposed = false;
+
+    async function applyRunFromHashIfPresent(): Promise<void> {
+        if (!panel || disposed) {
+            return;
+        }
+        const body = readCompareRunBodyFromHash(window.location.hash);
+        if (!body || body === lastAppliedRunBody) {
+            return;
+        }
+        try {
+            const config = decodeCompareRunFragment(window.location.hash);
+            if (!config) {
+                return;
+            }
+            await panel.applyRunConfig(config);
+            lastAppliedRunBody = body;
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     // The URL hash is the source of truth for whether compare is open, so it is
     // deep-linkable and back/forward navigable. Opening/closing the panel mirrors
@@ -96,8 +119,12 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
     }
 
     async function loadAndOpen(): Promise<void> {
+        if (disposed) {
+            return;
+        }
         if (panel) {
             panel.open();
+            await applyRunFromHashIfPresent();
             return;
         }
         if (loading) {
@@ -107,6 +134,9 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
         toggle.disabled = true;
         try {
             const { mountComparePanel } = await import("./compare-panel.js");
+            if (disposed) {
+                return;
+            }
             panel = mountComparePanel({
                 backend: options.backend,
                 bootstrapData: options.bootstrapData,
@@ -118,6 +148,7 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
                 onOpen: () => navigateCompare(true),
                 onClose: () => navigateCompare(false),
             });
+            await applyRunFromHashIfPresent();
         } finally {
             loading = false;
             toggle.disabled = false;
@@ -125,16 +156,18 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
     }
 
     function syncFromHash(): void {
+        if (disposed) {
+            return;
+        }
         if (hashHasCompareRoute(window.location.hash)) {
             void loadAndOpen();
-        } else {
-            panel?.close();
+            return;
         }
+        panel?.close();
     }
 
-    // The toggle navigates rather than opening directly; the hashchange below
-    // does the opening, keeping the URL and the panel in lockstep. Kept (not
-    // {once}) so a failed first load can be retried on a later click.
+    // Kept (not {once}) so a failed first lazy load can be retried and later
+    // clicks reopen the workspace through the same route-aware path.
     toggle.addEventListener("click", () => void loadAndOpen());
     window.addEventListener("hashchange", syncFromHash);
     // Honour a deep link (e.g. #/compare) present on first load.
@@ -142,6 +175,7 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
 
     return {
         dispose(): void {
+            disposed = true;
             window.removeEventListener("hashchange", syncFromHash);
             panel?.dispose();
             panel = null;

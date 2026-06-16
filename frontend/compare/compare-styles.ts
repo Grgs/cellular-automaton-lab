@@ -44,6 +44,19 @@ export const COMPARE_PANEL_STYLES = `
     align-items: stretch;
     justify-content: stretch;
 }
+.compare-dialog {
+    width: min(880px, 96vw);
+    max-height: 92vh;
+    overflow: auto;
+    background: var(--panel-strong, #fff);
+    color: var(--ink, #1f2430);
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+    border-radius: var(--radius, 16px);
+    box-shadow: var(--shadow, 0 18px 40px rgba(0, 0, 0, 0.25));
+    padding: 20px 22px;
+    font-family: var(--sans, sans-serif);
+    scrollbar-gutter: stable;
+}
 .compare-dialog--workspace {
     width: 100%;
     max-width: none;
@@ -61,6 +74,16 @@ export const COMPARE_PANEL_STYLES = `
     padding-left: 0;
     padding-right: 0;
 }
+.compare-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.compare-title { font-size: 18px; margin: 0; }
+.compare-close {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--muted, #6d756f);
+}
 .compare-close.compare-back {
     border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
     background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
@@ -73,29 +96,6 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-close.compare-back:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
-.compare-dialog {
-    width: min(880px, 96vw);
-    max-height: 92vh;
-    overflow: auto;
-    background: var(--panel-strong, #fff);
-    color: var(--ink, #1f2430);
-    border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
-    border-radius: var(--radius, 16px);
-    box-shadow: var(--shadow, 0 18px 40px rgba(0, 0, 0, 0.25));
-    padding: 20px 22px;
-    font-family: var(--sans, sans-serif);
-    scrollbar-gutter: stable;
-}
-.compare-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.compare-title { font-size: 18px; margin: 0; }
-.compare-close {
-    border: none;
-    background: transparent;
-    font-size: 24px;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--muted, #6d756f);
-}
 .compare-content { display: contents; }
 .compare-intro { color: var(--muted, #6d756f); font-size: 13px; margin: 6px 0 14px; }
 .compare-form {
