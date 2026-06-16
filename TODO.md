@@ -38,19 +38,8 @@ Decisions already taken (so the steps are unambiguous):
 - **Standalone parity is mandatory** for every step: hash/`localStorage` only, no
   server-only state.
 
-### Phase 0 — land the in-flight compare PRs
-
-- Merge the open `#/compare` routing and full-page workspace PRs into `main`
-  before starting the steps below, so Phase C is not built on an unmerged stack.
-
 ### Phase C — persistent & shareable runs
 
-- **C1 — Shareable run links.** Encode a run configuration (seed/pattern, rule,
-  traversal, grid size, frame count, explicit tiling set) into the hash as a new
-  slot (e.g. `#/compare&run=v1.<base64url>`), mirroring `share-link.ts` and its
-  slot model so it coexists with `#share=` board links. Add a "Copy run link"
-  control; on cold load, reconstruct the workspace (reconstruct-and-wait). Pure
-  encode/decode + validation module with unit tests, plus a launcher test.
 - **C2 — Result → build from the live view.** The static results table already
   opens begin/end in place; the live filmstrip view does not. Add a per-board
   "Open this generation in build" action that turns a tiling's current

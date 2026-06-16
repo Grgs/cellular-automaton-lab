@@ -250,6 +250,7 @@ describe("mountComparePanel", () => {
     afterEach(() => {
         document.body.innerHTML = "";
         document.getElementById("compare-panel-styles")?.remove();
+        window.history.replaceState(null, "", "/");
         vi.restoreAllMocks();
     });
 
@@ -606,6 +607,63 @@ describe("mountComparePanel", () => {
         document.querySelector<HTMLButtonElement>(".compare-run")?.click();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.pattern).toBe("glider");
+    });
+
+    it("copies a shareable run link for the current workspace setup", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const writeText = vi.fn(async (_text: string) => {});
+        vi.stubGlobal("navigator", { clipboard: { writeText } });
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        const copyRunButton = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
+        ].find((button) => button.textContent === "Copy run link");
+        copyRunButton?.click();
+
+        await vi.waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+        const copiedUrl = String(writeText.mock.calls.at(0)?.[0] ?? "");
+        expect(copiedUrl).toContain("#/compare&run=v1.");
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+            "Copied run link.",
+        );
+
+        vi.unstubAllGlobals();
+    });
+
+    it("applies a decoded run config without running it", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        const handle = mountComparePanel({ backend, bootstrapData: bootstrapData() });
+
+        await handle.applyRunConfig({
+            seed: "101",
+            rule: "kagome-life",
+            traversal: "row-major",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["kagome"],
+            pattern: "glider",
+        });
+
+        const fields = [
+            ...document.querySelectorAll<HTMLInputElement | HTMLSelectElement>(".compare-field"),
+        ];
+        expect(fields.map((field) => field.value)).toEqual([
+            "kagome-life",
+            "glider",
+            "row-major",
+            "12",
+            "8",
+            "101",
+            "",
+        ]);
+        expect(checkedTilingLabels()).toEqual(["Kagome"]);
+        expect(compareSeed).not.toHaveBeenCalled();
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+            "Loaded run link — 1 tilings ready.",
+        );
     });
 
     it("expands a row preview into begin/end thumbnails", async () => {

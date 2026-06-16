@@ -7,6 +7,13 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import {
+    addCompareRouteToHash,
+    decodeCompareRunFragment,
+    hashHasCompareRoute,
+    readCompareRunBodyFromHash,
+    removeCompareRouteFromHash,
+} from "./compare-run-link.js";
 import type { ComparePanelHandle } from "./compare-panel.js";
 
 const TOGGLE_STYLE_ID = "compare-toggle-styles";
@@ -67,15 +74,67 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
 
     let panel: ComparePanelHandle | null = null;
     let loading = false;
+    let lastAppliedRunBody: string | null = null;
+    let disposed = false;
+
+    function setCompareRoute(open: boolean): void {
+        const currentHash = window.location.hash;
+        const nextHash = open
+            ? addCompareRouteToHash(currentHash)
+            : removeCompareRouteFromHash(currentHash);
+        if (nextHash === currentHash) {
+            return;
+        }
+        if (!nextHash) {
+            window.history.replaceState(
+                null,
+                "",
+                `${window.location.pathname}${window.location.search}`,
+            );
+            return;
+        }
+        window.location.hash = nextHash;
+    }
+
+    async function applyRunFromHashIfPresent(): Promise<void> {
+        if (!panel || disposed) {
+            return;
+        }
+        const body = readCompareRunBodyFromHash(window.location.hash);
+        if (!body || body === lastAppliedRunBody) {
+            return;
+        }
+        try {
+            const config = decodeCompareRunFragment(window.location.hash);
+            if (!config) {
+                return;
+            }
+            await panel.applyRunConfig(config);
+            lastAppliedRunBody = body;
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     async function loadAndOpen(): Promise<void> {
-        if (panel || loading) {
+        if (disposed) {
+            return;
+        }
+        if (panel) {
+            panel.open();
+            await applyRunFromHashIfPresent();
+            return;
+        }
+        if (loading) {
             return;
         }
         loading = true;
         toggle.disabled = true;
         try {
             const { mountComparePanel } = await import("./compare-panel.js");
+            if (disposed) {
+                return;
+            }
             panel = mountComparePanel({
                 backend: options.backend,
                 bootstrapData: options.bootstrapData,
@@ -83,20 +142,38 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
                 ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
                 trigger: toggle,
                 openOnMount: true,
+                presentation: "workspace",
+                onOpen: () => setCompareRoute(true),
+                onClose: () => setCompareRoute(false),
             });
+            await applyRunFromHashIfPresent();
         } finally {
             loading = false;
             toggle.disabled = false;
         }
     }
 
-    // After the panel mounts it binds its own click->open on this same toggle;
-    // this handler then early-returns. Kept (not {once}) so a failed first load
-    // can be retried on a later click.
+    function onHashChange(): void {
+        if (disposed) {
+            return;
+        }
+        if (hashHasCompareRoute(window.location.hash)) {
+            void loadAndOpen();
+            return;
+        }
+        panel?.close();
+    }
+
+    // Kept (not {once}) so a failed first lazy load can be retried and later
+    // clicks reopen the workspace through the same route-aware path.
     toggle.addEventListener("click", () => void loadAndOpen());
+    window.addEventListener("hashchange", onHashChange);
+    onHashChange();
 
     return {
         dispose(): void {
+            disposed = true;
+            window.removeEventListener("hashchange", onHashChange);
             panel?.dispose();
             panel = null;
             toggle.remove();

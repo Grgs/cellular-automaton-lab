@@ -8,6 +8,7 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import type { CompareRunConfig } from "./compare-run-link.js";
 import {
     createComparePanelContent,
     ensureComparePanelStyles,
@@ -28,9 +29,17 @@ interface MountComparePanelOptions {
     trigger?: HTMLButtonElement;
     /** Open the dialog immediately after mounting (e.g. right after a lazy load). */
     openOnMount?: boolean;
+    /** Modal keeps legacy overlay behavior; workspace fills the viewport behind the hash route. */
+    presentation?: "modal" | "workspace";
+    onOpen?: () => void;
+    onClose?: () => void;
 }
 
 export interface ComparePanelHandle {
+    open(): void;
+    close(): void;
+    isOpen(): boolean;
+    applyRunConfig(config: CompareRunConfig): Promise<void>;
     dispose(): void;
 }
 
@@ -61,6 +70,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export function mountComparePanel(options: MountComparePanelOptions): ComparePanelHandle {
     ensureComparePanelStyles();
     const host = options.host ?? document.body;
+    const workspace = options.presentation === "workspace";
     let lastFocus: HTMLElement | null = null;
 
     const ownsToggle = options.trigger === undefined;
@@ -79,18 +89,16 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         onRequestClose: () => close(),
     });
 
-    const closeButton = el(
-        "button",
-        { class: "compare-close", type: "button", "aria-label": "Close" },
-        ["×"],
-    );
+    const closeButton = workspace
+        ? el("button", { class: "compare-close compare-back", type: "button" }, ["← Back to build"])
+        : el("button", { class: "compare-close", type: "button", "aria-label": "Close" }, ["×"]);
 
     const dialog = el(
         "div",
         {
-            class: "compare-dialog",
+            class: workspace ? "compare-dialog compare-dialog--workspace" : "compare-dialog",
             role: "dialog",
-            "aria-modal": "true",
+            "aria-modal": workspace ? null : "true",
             "aria-label": "Compare tilings",
             tabindex: "-1",
         },
@@ -103,7 +111,14 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         ],
     );
 
-    const backdrop = el("div", { class: "compare-backdrop", hidden: true }, [dialog]);
+    const backdrop = el(
+        "div",
+        {
+            class: workspace ? "compare-backdrop compare-backdrop--workspace" : "compare-backdrop",
+            hidden: true,
+        },
+        [dialog],
+    );
 
     if (ownsToggle) {
         host.append(toggleButton, backdrop);
@@ -112,15 +127,23 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     function open(): void {
+        if (!backdrop.hidden) {
+            return;
+        }
         lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         backdrop.hidden = false;
         content.activate();
         dialog.focus();
+        options.onOpen?.();
     }
 
     function close(): void {
+        if (backdrop.hidden) {
+            return;
+        }
         backdrop.hidden = true;
         lastFocus?.focus();
+        options.onClose?.();
     }
 
     function onKeydown(event: KeyboardEvent): void {
@@ -136,11 +159,13 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
     toggleButton.addEventListener("click", open);
     closeButton.addEventListener("click", close);
-    backdrop.addEventListener("click", (event) => {
-        if (event.target === backdrop) {
-            close();
-        }
-    });
+    if (!workspace) {
+        backdrop.addEventListener("click", (event) => {
+            if (event.target === backdrop) {
+                close();
+            }
+        });
+    }
     document.addEventListener("keydown", onKeydown);
 
     if (options.openOnMount) {
@@ -148,6 +173,10 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     return {
+        open,
+        close,
+        isOpen: () => !backdrop.hidden,
+        applyRunConfig: (config) => content.applyRunConfig(config),
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             content.dispose();

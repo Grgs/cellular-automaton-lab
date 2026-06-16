@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Added the compare workspace hash route and shareable run links: `#/compare` now opens the full-page compare workspace with a Back to build affordance, and `run=v1.<base64url>` links restore seed/rule/traversal/grid/frame-count/tiling selections without auto-running.
 - Added a synchronized compare filmstrip engine (`POST /api/compare/filmstrip`, mirrored in the standalone runtime): one seed and rule are run across a small, explicit set of tilings, capturing every generation's board state so the tilings can be played back side by side on one shared clock. Bounded for live use (at most 6 tilings, 240 frames, modest grid) with sparse per-frame state and per-tiling geometry sent once. This is the backend foundation for the live side-by-side compare view.
 - Wired the filmstrip endpoint into the frontend simulation backend (HTTP and standalone) and added a headless `FilmstripPlayer` synchronized-playback model (one shared frame index across all tilings, play/pause/step/seek/loop), the consumable layer the live side-by-side view will render.
 - Added the live side-by-side compare view: a "Play side by side" action in the compare panel runs the selected tilings through the filmstrip engine and plays them in lockstep off one shared clock, with transport controls (play/pause, step, reset, a generation scrubber, and a speed selector) and a per-board live-cell/extinction readout.

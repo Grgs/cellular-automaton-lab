@@ -80,6 +80,7 @@ function fakeBackend(): SimulationBackend {
 describe("mountCompareLauncher", () => {
     beforeEach(() => {
         installFrontendGlobals();
+        window.history.replaceState(null, "", "/");
         vi.resetModules();
     });
 
@@ -87,23 +88,31 @@ describe("mountCompareLauncher", () => {
         document.body.innerHTML = "";
         document.getElementById("compare-toggle-styles")?.remove();
         document.getElementById("compare-panel-styles")?.remove();
+        window.history.replaceState(null, "", "/");
         vi.restoreAllMocks();
     });
 
     it("renders the toggle eagerly without loading the panel module", async () => {
         const { mountCompareLauncher } = await import("./compare-launcher.js");
-        mountCompareLauncher({ backend: fakeBackend(), bootstrapData: bootstrapData() });
+        const handle = mountCompareLauncher({
+            backend: fakeBackend(),
+            bootstrapData: bootstrapData(),
+        });
 
         const toggle = document.querySelector<HTMLButtonElement>(".compare-toggle");
         expect(toggle).not.toBeNull();
         expect(document.getElementById("compare-toggle-styles")).not.toBeNull();
         // The heavy panel (its dialog/backdrop) is not mounted until first click.
         expect(document.querySelector(".compare-backdrop")).toBeNull();
+        handle.dispose();
     });
 
     it("lazily mounts and opens the panel on first click", async () => {
         const { mountCompareLauncher } = await import("./compare-launcher.js");
-        mountCompareLauncher({ backend: fakeBackend(), bootstrapData: bootstrapData() });
+        const handle = mountCompareLauncher({
+            backend: fakeBackend(),
+            bootstrapData: bootstrapData(),
+        });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
 
@@ -115,6 +124,7 @@ describe("mountCompareLauncher", () => {
         });
         // The lazy load reuses the existing toggle rather than adding a second one.
         expect(document.querySelectorAll(".compare-toggle")).toHaveLength(1);
+        handle.dispose();
     });
 
     it("disposes the lazily-mounted panel and removes the toggle", async () => {
@@ -131,5 +141,50 @@ describe("mountCompareLauncher", () => {
         handle.dispose();
         expect(document.querySelector(".compare-toggle")).toBeNull();
         expect(document.querySelector(".compare-backdrop")).toBeNull();
+    });
+
+    it("opens the full-page workspace from the compare hash route", async () => {
+        const { mountCompareLauncher } = await import("./compare-launcher.js");
+        window.location.hash = "#/compare";
+        const handle = mountCompareLauncher({
+            backend: fakeBackend(),
+            bootstrapData: bootstrapData(),
+        });
+
+        await vi.waitFor(() => {
+            const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
+            expect(backdrop).not.toBeNull();
+            expect(backdrop?.hidden).toBe(false);
+        });
+        expect(document.querySelector(".compare-dialog--workspace")).not.toBeNull();
+        expect(document.querySelector(".compare-back")?.textContent).toBe("← Back to build");
+        handle.dispose();
+    });
+
+    it("restores a run link without starting the run", async () => {
+        const { encodeCompareRunFragment } = await import("./compare-run-link.js");
+        const { mountCompareLauncher } = await import("./compare-launcher.js");
+        window.location.hash = `#/compare&${encodeCompareRunFragment({
+            seed: "101",
+            rule: "conway",
+            traversal: "row-major",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["square"],
+        })}`;
+        const handle = mountCompareLauncher({
+            backend: fakeBackend(),
+            bootstrapData: bootstrapData(),
+        });
+
+        await vi.waitFor(() => {
+            expect(
+                document.querySelector<HTMLInputElement>('input.compare-field[type="text"]')?.value,
+            ).toBe("101");
+        });
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+            "Loaded run link — 1 tilings ready.",
+        );
+        handle.dispose();
     });
 });
