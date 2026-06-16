@@ -114,6 +114,7 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
                 ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
                 trigger: toggle,
                 openOnMount: true,
+                presentation: "workspace",
                 onOpen: () => navigateCompare(true),
                 onClose: () => navigateCompare(false),
             });
