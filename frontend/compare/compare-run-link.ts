@@ -146,25 +146,6 @@ function validateConfig(value: unknown): CompareRunConfig {
     return config;
 }
 
-export function hashHasCompareRoute(hash: string): boolean {
-    return splitHashIntoSlots(hash).some((slot) => slot.raw === COMPARE_ROUTE_SLOT);
-}
-
-export function addCompareRouteToHash(hash: string): string {
-    const slots = splitHashIntoSlots(hash).map((slot) => slot.raw);
-    return slots.includes(COMPARE_ROUTE_SLOT)
-        ? joinSlots(slots)
-        : joinSlots([COMPARE_ROUTE_SLOT, ...slots]);
-}
-
-export function removeCompareRouteFromHash(hash: string): string {
-    return joinSlots(
-        splitHashIntoSlots(hash)
-            .filter((slot) => slot.raw !== COMPARE_ROUTE_SLOT)
-            .map((slot) => slot.raw),
-    );
-}
-
 export function encodeCompareRunFragment(config: CompareRunConfig): string {
     return `${RUN_HASH_PREFIX}${RUN_BODY_PREFIX}${base64UrlEncode(JSON.stringify(config))}`;
 }

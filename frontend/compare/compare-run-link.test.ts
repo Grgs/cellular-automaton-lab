@@ -72,13 +72,4 @@ describe("compare-run-link", () => {
         expect(url).toContain("share=v1.board");
         expect(url).toContain("theme=dark");
     });
-
-    it("adds and removes the compare route slot independently", async () => {
-        const { addCompareRouteToHash, hashHasCompareRoute, removeCompareRouteFromHash } =
-            await import("./compare-run-link.js");
-
-        expect(addCompareRouteToHash("#share=v1.board")).toBe("#/compare&share=v1.board");
-        expect(hashHasCompareRoute("#/compare&share=v1.board")).toBe(true);
-        expect(removeCompareRouteFromHash("#/compare&run=v1.abc")).toBe("#run=v1.abc");
-    });
 });

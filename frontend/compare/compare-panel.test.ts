@@ -704,6 +704,33 @@ describe("mountComparePanel", () => {
         expect(document.querySelector(".compare-detail")).toBeNull();
     });
 
+    it("renders a full-page workspace presentation that does not dismiss on backdrop click", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            backend,
+            bootstrapData: bootstrapData(),
+            presentation: "workspace",
+            openOnMount: true,
+        });
+
+        const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
+        const dialog = document.querySelector<HTMLElement>(".compare-dialog");
+        expect(backdrop?.classList.contains("compare-backdrop--workspace")).toBe(true);
+        expect(dialog?.classList.contains("compare-dialog--workspace")).toBe(true);
+        expect(document.querySelector(".compare-back")?.textContent).toBe("← Back to build");
+        expect(backdrop?.hidden).toBe(false);
+
+        // The workspace has no "outside": a backdrop click must not close it.
+        backdrop?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(backdrop?.hidden).toBe(false);
+
+        // The Back affordance still closes it.
+        document.querySelector<HTMLButtonElement>(".compare-back")?.click();
+        expect(backdrop?.hidden).toBe(true);
+        handle.dispose();
+    });
+
     it("shows a 'preview too large' note instead of a preview for oversized tilings", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const oversized = comparisonResult();

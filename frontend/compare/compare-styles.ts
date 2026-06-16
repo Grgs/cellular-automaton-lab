@@ -65,6 +65,7 @@ export const COMPARE_PANEL_STYLES = `
     border: none;
     border-radius: 0;
     box-shadow: none;
+    /* Fill the viewport but keep the content readable by centring it. */
     padding: 18px max(22px, calc((100vw - 1040px) / 2));
 }
 .compare-dialog--workspace .compare-actions {

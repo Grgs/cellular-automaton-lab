@@ -7,14 +7,13 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
-import {
-    addCompareRouteToHash,
-    decodeCompareRunFragment,
-    hashHasCompareRoute,
-    readCompareRunBodyFromHash,
-    removeCompareRouteFromHash,
-} from "./compare-run-link.js";
+import { decodeCompareRunFragment, readCompareRunBodyFromHash } from "./compare-run-link.js";
 import type { ComparePanelHandle } from "./compare-panel.js";
+import {
+    hashHasCompareRoute,
+    hashWithCompareRoute,
+    hashWithoutCompareRoute,
+} from "./compare-route.js";
 
 const TOGGLE_STYLE_ID = "compare-toggle-styles";
 
@@ -77,25 +76,6 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
     let lastAppliedRunBody: string | null = null;
     let disposed = false;
 
-    function setCompareRoute(open: boolean): void {
-        const currentHash = window.location.hash;
-        const nextHash = open
-            ? addCompareRouteToHash(currentHash)
-            : removeCompareRouteFromHash(currentHash);
-        if (nextHash === currentHash) {
-            return;
-        }
-        if (!nextHash) {
-            window.history.replaceState(
-                null,
-                "",
-                `${window.location.pathname}${window.location.search}`,
-            );
-            return;
-        }
-        window.location.hash = nextHash;
-    }
-
     async function applyRunFromHashIfPresent(): Promise<void> {
         if (!panel || disposed) {
             return;
@@ -113,6 +93,28 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
             lastAppliedRunBody = body;
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    // The URL hash is the source of truth for whether compare is open, so it is
+    // deep-linkable and back/forward navigable. Opening/closing the panel mirrors
+    // the route into the hash; a hashchange (e.g. the back button) drives the panel.
+    function navigateCompare(toCompare: boolean): void {
+        const current = window.location.hash;
+        const next = toCompare ? hashWithCompareRoute(current) : hashWithoutCompareRoute(current);
+        if (next === current) {
+            return;
+        }
+        if (next === "") {
+            // Strip the hash without leaving a bare "#"; the panel is already
+            // closed by the time this runs, so no re-sync is needed.
+            window.history.replaceState(
+                null,
+                "",
+                `${window.location.pathname}${window.location.search}`,
+            );
+        } else {
+            window.location.hash = next;
         }
     }
 
@@ -143,8 +145,8 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
                 trigger: toggle,
                 openOnMount: true,
                 presentation: "workspace",
-                onOpen: () => setCompareRoute(true),
-                onClose: () => setCompareRoute(false),
+                onOpen: () => navigateCompare(true),
+                onClose: () => navigateCompare(false),
             });
             await applyRunFromHashIfPresent();
         } finally {
@@ -153,7 +155,7 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
         }
     }
 
-    function onHashChange(): void {
+    function syncFromHash(): void {
         if (disposed) {
             return;
         }
@@ -167,13 +169,14 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
     // Kept (not {once}) so a failed first lazy load can be retried and later
     // clicks reopen the workspace through the same route-aware path.
     toggle.addEventListener("click", () => void loadAndOpen());
-    window.addEventListener("hashchange", onHashChange);
-    onHashChange();
+    window.addEventListener("hashchange", syncFromHash);
+    // Honour a deep link (e.g. #/compare) present on first load.
+    syncFromHash();
 
     return {
         dispose(): void {
             disposed = true;
-            window.removeEventListener("hashchange", onHashChange);
+            window.removeEventListener("hashchange", syncFromHash);
             panel?.dispose();
             panel = null;
             toggle.remove();

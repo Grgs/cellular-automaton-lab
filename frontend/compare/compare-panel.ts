@@ -1,9 +1,11 @@
 /**
- * The modal presentation of the compare panel. This is a thin shell: it owns the
- * floating toggle, the backdrop/dialog chrome, focus handling, and Escape/
- * backdrop dismissal, and delegates all of the actual panel UI and behaviour to
- * `createComparePanelContent`. A future workspace route can reuse that same
- * content element full-page without any of this modal scaffolding.
+ * The presentational shell for the compare panel. It owns the floating toggle,
+ * the backdrop/dialog chrome, focus handling, and dismissal, and delegates all
+ * of the actual panel UI and behaviour to `createComparePanelContent`.
+ *
+ * Two presentations share this shell: the default centred `modal`, and the
+ * full-page `workspace` (used by the `#/compare` route) which fills the viewport
+ * and offers a "Back to build" affordance instead of a corner close button.
  */
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
@@ -29,10 +31,12 @@ interface MountComparePanelOptions {
     trigger?: HTMLButtonElement;
     /** Open the dialog immediately after mounting (e.g. right after a lazy load). */
     openOnMount?: boolean;
-    /** Modal keeps legacy overlay behavior; workspace fills the viewport behind the hash route. */
-    presentation?: "modal" | "workspace";
+    /** Fired when the dialog becomes visible (used to mirror the route into the hash). */
     onOpen?: () => void;
+    /** Fired when the dialog is dismissed (used to clear the route from the hash). */
     onClose?: () => void;
+    /** "modal" (default) centres a card; "workspace" fills the viewport as a page. */
+    presentation?: "modal" | "workspace";
 }
 
 export interface ComparePanelHandle {
@@ -70,7 +74,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export function mountComparePanel(options: MountComparePanelOptions): ComparePanelHandle {
     ensureComparePanelStyles();
     const host = options.host ?? document.body;
-    const workspace = options.presentation === "workspace";
+    const isWorkspace = options.presentation === "workspace";
     let lastFocus: HTMLElement | null = null;
 
     const ownsToggle = options.trigger === undefined;
@@ -89,16 +93,16 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         onRequestClose: () => close(),
     });
 
-    const closeButton = workspace
+    const closeButton = isWorkspace
         ? el("button", { class: "compare-close compare-back", type: "button" }, ["← Back to build"])
         : el("button", { class: "compare-close", type: "button", "aria-label": "Close" }, ["×"]);
 
     const dialog = el(
         "div",
         {
-            class: workspace ? "compare-dialog compare-dialog--workspace" : "compare-dialog",
+            class: isWorkspace ? "compare-dialog compare-dialog--workspace" : "compare-dialog",
             role: "dialog",
-            "aria-modal": workspace ? null : "true",
+            "aria-modal": isWorkspace ? null : "true",
             "aria-label": "Compare tilings",
             tabindex: "-1",
         },
@@ -114,7 +118,9 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     const backdrop = el(
         "div",
         {
-            class: workspace ? "compare-backdrop compare-backdrop--workspace" : "compare-backdrop",
+            class: isWorkspace
+                ? "compare-backdrop compare-backdrop--workspace"
+                : "compare-backdrop",
             hidden: true,
         },
         [dialog],
@@ -159,7 +165,9 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
 
     toggleButton.addEventListener("click", open);
     closeButton.addEventListener("click", close);
-    if (!workspace) {
+    // The full-page workspace has no "outside" to click; only the modal dismisses
+    // on a backdrop click.
+    if (!isWorkspace) {
         backdrop.addEventListener("click", (event) => {
             if (event.target === backdrop) {
                 close();
