@@ -182,6 +182,20 @@ describe("mountCompareLauncher", () => {
         );
     });
 
+    it("surfaces a status message for a run link it cannot open", async () => {
+        // A newer-version run slot the current build cannot decode.
+        window.location.hash = "#/compare&run=v2.bogus";
+        await mount();
+
+        await vi.waitFor(() => {
+            const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
+            expect(backdrop?.hidden).toBe(false);
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "newer version",
+            );
+        });
+    });
+
     it("mirrors the route into the hash on open and clears it on close", async () => {
         await mount();
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();

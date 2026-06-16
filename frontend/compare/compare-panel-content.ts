@@ -85,6 +85,8 @@ export interface ComparePanelContentHandle {
     activate(): void;
     /** Populate the workspace from a decoded run link without running it. */
     applyRunConfig(config: CompareRunConfig): Promise<void>;
+    /** Show a run-link load problem in the status line (e.g. an unreadable link). */
+    reportRunLinkError(message: string): void;
     /** Let an open action menu consume Escape; returns true when it did. */
     handleEscape(): boolean;
     dispose(): void;
@@ -1139,6 +1141,9 @@ export function createComparePanelContent(
             highlightGeometry(null);
         },
         applyRunConfig,
+        reportRunLinkError(message: string): void {
+            statusLine.textContent = message;
+        },
         handleEscape(): boolean {
             const openMenu = root.querySelector(".compare-action-menu[open]");
             if (openMenu) {

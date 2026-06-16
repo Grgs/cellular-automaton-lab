@@ -44,6 +44,7 @@ export interface ComparePanelHandle {
     close(): void;
     isOpen(): boolean;
     applyRunConfig(config: CompareRunConfig): Promise<void>;
+    reportRunLinkError(message: string): void;
     dispose(): void;
 }
 
@@ -185,6 +186,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         close,
         isOpen: () => !backdrop.hidden,
         applyRunConfig: (config) => content.applyRunConfig(config),
+        reportRunLinkError: (message) => content.reportRunLinkError(message),
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             content.dispose();
