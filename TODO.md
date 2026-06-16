@@ -17,6 +17,68 @@ The `v0.4.0` public preview has been released (after `v0.1.0`, `v0.2.0`, and `v0
 - Add an automated post-deploy GitHub Pages smoke check if the preview release cadence becomes regular; the manual smoke routine and pre/post release publication guard now live in [docs/MAINTENANCE.md](docs/MAINTENANCE.md#public-release-process).
 - Revisit whether the verification-strength JSON report should become a CI artifact once there is a concrete consumer for it.
 
+## Compare workspace & synchronized side-by-side
+
+Roadmap to "complete" for the compare-as-a-first-class-workspace feature. The
+synchronized side-by-side engine, the live N-board view, the panel/modal
+decoupling, the `#/compare` hash route, and the full-page workspace presentation
+are done (see [CHANGELOG.md](CHANGELOG.md); routing + full-page land via the
+open compare PRs). What remains, sequenced, one reviewable PR per step.
+
+Decisions already taken (so the steps are unambiguous):
+
+- **Persistence is client-side** (`localStorage`), namespaced. Keeps the server
+  and standalone Pyodide builds symmetric; cross-device transfer is handled by
+  run links, not a server store.
+- **Run links reconstruct-and-wait**: opening a run link populates the workspace
+  and selects the tilings but does not auto-run or auto-play, to avoid surprise
+  compute on cold load.
+- **Navigation stays the floating toggle + in-workspace "Back to build"**; header
+  Build/Compare tabs are deferred (see Maybe) to avoid an app-shell rewrite.
+- **Standalone parity is mandatory** for every step: hash/`localStorage` only, no
+  server-only state.
+
+### Phase 0 — land the in-flight compare PRs
+
+- Merge the open `#/compare` routing and full-page workspace PRs into `main`
+  before starting the steps below, so Phase C is not built on an unmerged stack.
+
+### Phase C — persistent & shareable runs
+
+- **C1 — Shareable run links.** Encode a run configuration (seed/pattern, rule,
+  traversal, grid size, frame count, explicit tiling set) into the hash as a new
+  slot (e.g. `#/compare&run=v1.<base64url>`), mirroring `share-link.ts` and its
+  slot model so it coexists with `#share=` board links. Add a "Copy run link"
+  control; on cold load, reconstruct the workspace (reconstruct-and-wait). Pure
+  encode/decode + validation module with unit tests, plus a launcher test.
+- **C2 — Result → build from the live view.** The static results table already
+  opens begin/end in place; the live filmstrip view does not. Add a per-board
+  "Open this generation in build" action that turns a tiling's current
+  `frames[index]` into a `PatternPayload` and loads it via the existing
+  `onOpenPattern` path, returning to `#/build`. Threads an `onOpenPattern`
+  callback through `createFilmstripView`.
+- **C3 — Persisted named runs (+ custom tiling sets).** Save the current run
+  configuration under a name; list / load / rename / delete from the workspace,
+  backed by a small `localStorage` store module. Fold custom/pinned tiling sets
+  into the same store (a saved named tiling selection that applies alongside the
+  built-in Representative/Regular/Mixed/Aperiodic presets). Done when a saved run
+  and a saved tiling set both restore losslessly after a full reload.
+- **C5 — Workspace nav & layout polish.** Tune the filmstrip board grid to use
+  the full-page width (larger boards when there is room); add empty/loading/error
+  states for saved runs and the live view; pass a keyboard-focus and `aria`
+  review for the full-page workspace.
+
+### Closeout — definition of done
+
+- Docs: a "Compare workspace" section in the user-facing docs/README; document
+  the `run=` link format next to the share-link format; CHANGELOG narrative.
+- Standalone smoke coverage: exercise C1–C3 in the Pyodide build via the
+  Playwright standalone suite so parity is enforced, not assumed.
+- The feature is complete when, in **both** the server and standalone builds, you
+  can: open `#/compare`, build a side-by-side run, play it synchronized, open a
+  frame into build, save the run, reload and restore it, and open a copied run
+  link in a fresh tab — with green CI and updated docs.
+
 ## Now
 
 - For `dodecagonal-square-triangle`, the runtime is now a decorated 3.12.12 Archimedean generator: hexagonal lattice of regular dodecagonal supercells decomposed into six unit squares plus twelve unit equilateral triangles, with two bridging triangles per supercell. It tiles the plane exactly, scales without depth limit, and uses no vendored data. It is not the canonical Schlottmann quasi-periodic tiling (which would require marked prototiles); the supercell layout is locally 6-fold symmetric and the global tiling is periodic at the supercell scale.
@@ -39,6 +101,7 @@ The `v0.4.0` public preview has been released (after `v0.1.0`, `v0.2.0`, and `v0
 
 ## Maybe
 
+- Replace the floating compare toggle with explicit Build/Compare header tabs once the compare workspace is established, if the floating entry point feels secondary to its first-class status; deferred from the compare-workspace roadmap to avoid an app-shell rewrite.
 - Extend browser-visible rendering-bounds verification from geometry-level sanity into richer layout regression checks.
 - Revisit polygon/regular geometry sharing only if square, hex, and triangle adapters start duplicating overlay or hit-test policy; keep their local math unless a shared path is clearly simpler.
 
