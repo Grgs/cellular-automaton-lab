@@ -11,7 +11,7 @@ import {
 } from "../editor-tools.js";
 import type { EditorTool } from "../editor-tools.js";
 import type { SimulationBackend } from "../types/controller-api.js";
-import type { GridView } from "../types/controller-view.js";
+import type { GridView, ViewportDimensions } from "../types/controller-view.js";
 import type {
     AppBootstrapData,
     BootstrappedTopologyDefinition,
@@ -42,10 +42,21 @@ export interface LiveCompareWorkspaceOptions {
     onReturnToSingleView?: () => void | Promise<void>;
     backendFactory?: (sessionId: string) => SimulationBackend;
     createGridView?: (canvas: HTMLCanvasElement) => GridView;
+    resolveViewportDimensions?: (
+        options: LiveCompareViewportDimensionsOptions,
+    ) => ViewportDimensions;
     resolveCellSize?: (options: LiveCompareCellSizeOptions) => number;
     buildEditorToolCells?: LiveCompareEditorCellsBuilder;
     storage?: Storage | null;
     onError?: (error: unknown) => void;
+}
+
+export interface LiveCompareViewportDimensionsOptions {
+    viewportWidth: number;
+    viewportHeight: number;
+    geometry: string;
+    cellSize: number;
+    fallbackDimensions: ViewportDimensions;
 }
 
 export interface LiveCompareCellSizeOptions {
@@ -181,6 +192,7 @@ function geometryForSpec(
 function resetSpecForTopology(
     definition: BootstrappedTopologyDefinition,
     defaults: AppBootstrapData["app_defaults"]["simulation"],
+    dimensions?: ViewportDimensions | null,
 ): TopologySpec {
     const defaultSpec = defaults.topology_spec;
     return {
@@ -188,6 +200,7 @@ function resetSpecForTopology(
         tiling_family: definition.tiling_family,
         adjacency_mode: definition.default_adjacency_mode,
         sizing_mode: definition.sizing_mode,
+        ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
         patch_depth:
             definition.sizing_policy.control === "patch_depth"
                 ? definition.sizing_policy.default
@@ -461,6 +474,7 @@ export function mountLiveCompareWorkspace({
     createGridView = () => {
         throw new Error("Live compare requires a grid view factory.");
     },
+    resolveViewportDimensions,
     storage = typeof window !== "undefined" ? window.localStorage : null,
     onError = (error) => console.error(error),
     resolveCellSize,
@@ -734,8 +748,31 @@ export function mountLiveCompareWorkspace({
         randomize = false,
     ): Promise<void> {
         const fallbackRule = pane.snapshot?.rule.name ?? bootstrapData.app_defaults.simulation.rule;
+        const fallbackDimensions = {
+            width: bootstrapData.app_defaults.simulation.topology_spec.width,
+            height: bootstrapData.app_defaults.simulation.topology_spec.height,
+        };
+        const viewportWidth = pane.elements.viewport.clientWidth;
+        const viewportHeight = pane.elements.viewport.clientHeight;
+        const geometry = topologyGeometry(definition);
+        const dimensions =
+            definition.sizing_policy.control === "cell_size" &&
+            viewportWidth > 0 &&
+            viewportHeight > 0
+                ? (resolveViewportDimensions?.({
+                      viewportWidth,
+                      viewportHeight,
+                      geometry,
+                      cellSize: definition.sizing_policy.default,
+                      fallbackDimensions,
+                  }) ?? fallbackDimensions)
+                : fallbackDimensions;
         const snapshot = await pane.backend.postControl("/api/control/reset", {
-            topology_spec: resetSpecForTopology(definition, bootstrapData.app_defaults.simulation),
+            topology_spec: resetSpecForTopology(
+                definition,
+                bootstrapData.app_defaults.simulation,
+                dimensions,
+            ),
             speed: pane.snapshot?.speed ?? bootstrapData.app_defaults.simulation.speed,
             rule: defaultRuleForTopology(definition, fallbackRule),
             randomize,

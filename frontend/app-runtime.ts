@@ -15,6 +15,15 @@ import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
 
 interface FitRenderCellSizeAdapter {
+    fitViewport?: (options: {
+        viewportWidth: number;
+        viewportHeight: number;
+        cellSize: number;
+        fallbackDimensions?: { width: number; height: number };
+    }) => {
+        width: number;
+        height: number;
+    };
     fitRenderCellSize?: (options: LiveCompareCellSizeOptions) => number;
 }
 
@@ -91,6 +100,17 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             onReturnToSingleView: () => controller.refreshState(),
             createGridView: (canvas) => createCanvasGridView({ canvas }),
             buildEditorToolCells,
+            resolveViewportDimensions: (options) => {
+                const adapter = getGeometryAdapter(options.geometry) as FitRenderCellSizeAdapter;
+                return (
+                    adapter.fitViewport?.({
+                        viewportWidth: options.viewportWidth,
+                        viewportHeight: options.viewportHeight,
+                        cellSize: options.cellSize,
+                        fallbackDimensions: options.fallbackDimensions,
+                    }) ?? options.fallbackDimensions
+                );
+            },
             resolveCellSize: (options) => {
                 const adapter = getGeometryAdapter(options.geometry) as FitRenderCellSizeAdapter;
                 return adapter.fitRenderCellSize?.(options) ?? options.fallbackCellSize;

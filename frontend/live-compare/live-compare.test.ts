@@ -12,6 +12,7 @@ function topologyDefinition(
     tilingFamily: string,
     label: string,
     order: number,
+    overrides: Partial<BootstrappedTopologyDefinition> = {},
 ): BootstrappedTopologyDefinition {
     return {
         tiling_family: tilingFamily,
@@ -32,6 +33,7 @@ function topologyDefinition(
             min: 4,
             max: 48,
         },
+        ...overrides,
     };
 }
 
@@ -69,6 +71,20 @@ const bootstrapData: AppBootstrapData = {
     topology_catalog: [
         topologyDefinition("square", "Square", 1),
         topologyDefinition("hex", "Hexagonal", 2),
+        topologyDefinition("archimedean-3-3-3-3-6", "Snub Trihexagonal", 3, {
+            picker_group: "Periodic Mixed",
+            family: "mixed",
+            render_kind: "polygon_periodic",
+            viewport_sync_mode: "backend-sync",
+            default_rules: { edge: "kagome-life" },
+            geometry_keys: { edge: "archimedean-3-3-3-3-6" },
+            sizing_policy: {
+                control: "cell_size",
+                default: 16,
+                min: 14,
+                max: 20,
+            },
+        }),
     ],
     periodic_face_tilings: [],
     aperiodic_families: [],
@@ -443,6 +459,70 @@ describe("live compare workspace", () => {
                 { id: "c:1:0", state: 1 },
             ]);
         });
+    });
+
+    it("fits heavy mixed tiling resets to the split pane viewport", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends = new Map<string, FakeBackend>();
+        const resolveViewportDimensions = vi.fn(() => ({ width: 6, height: 5 }));
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-heavy-mixed",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.set(sessionId, backend);
+                return backend;
+            },
+            createGridView,
+            resolveViewportDimensions,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(gridPanel.querySelectorAll(".live-compare-pane")).toHaveLength(2);
+        });
+
+        const leftPane = gridPanel.querySelector('.live-compare-pane[data-pane="left"]')!;
+        const leftViewport = leftPane.querySelector(".live-compare-pane-viewport")!;
+        Object.defineProperty(leftViewport, "clientWidth", { configurable: true, value: 360 });
+        Object.defineProperty(leftViewport, "clientHeight", { configurable: true, value: 260 });
+        const leftSelect = leftPane.querySelector<HTMLSelectElement>(
+            ".live-compare-tiling-select",
+        )!;
+        resolveViewportDimensions.mockClear();
+
+        leftSelect.value = "archimedean-3-3-3-3-6";
+        leftSelect.dispatchEvent(new Event("change"));
+
+        await vi.waitFor(() => {
+            expect(backends.get("s-heavy-mixed-left")?.state.topology_spec.tiling_family).toBe(
+                "archimedean-3-3-3-3-6",
+            );
+        });
+        expect(resolveViewportDimensions).toHaveBeenCalledWith({
+            viewportWidth: 360,
+            viewportHeight: 260,
+            geometry: "archimedean-3-3-3-3-6",
+            cellSize: 16,
+            fallbackDimensions: { width: 12, height: 10 },
+        });
+        expect(backends.get("s-heavy-mixed-left")?.postControl).toHaveBeenLastCalledWith(
+            "/api/control/reset",
+            expect.objectContaining({
+                rule: "kagome-life",
+                topology_spec: expect.objectContaining({
+                    tiling_family: "archimedean-3-3-3-3-6",
+                    width: 6,
+                    height: 5,
+                }),
+            }),
+        );
     });
 
     it("routes top-row run controls to both panes", async () => {
