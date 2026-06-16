@@ -111,4 +111,6 @@ export interface SetCellsRequestFunction {
 export interface InitAppOptions {
     backend?: SimulationBackend;
     bootstrapData?: AppBootstrapData | null;
+    liveCompareBaseSessionId?: string | null;
+    liveCompareBackendFactory?: (sessionId: string) => SimulationBackend;
 }

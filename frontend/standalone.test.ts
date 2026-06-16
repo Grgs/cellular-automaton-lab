@@ -141,6 +141,7 @@ describe("standalone startup", () => {
             bootstrapData: typeof bootstrapData;
         }>();
         const initDeferred = deferred<void>();
+        const initApp = vi.fn(() => initDeferred.promise);
 
         vi.doMock("./bootstrap-data.js", () => ({
             fetchBootstrapData: vi.fn(() => bootstrapDeferred.promise),
@@ -151,7 +152,7 @@ describe("standalone startup", () => {
         }));
         vi.doMock("./app-runtime.js", () => ({
             disposeApp: vi.fn(),
-            initApp: vi.fn(() => initDeferred.promise),
+            initApp,
         }));
 
         await import("./standalone.js");
@@ -178,6 +179,14 @@ describe("standalone startup", () => {
 
         environmentDeferred.resolve({ backend: {}, bootstrapData });
         await flushAsyncStartup();
+        expect(initApp).toHaveBeenCalledWith(
+            expect.objectContaining({
+                backend: {},
+                bootstrapData,
+                liveCompareBaseSessionId: "standalone",
+                liveCompareBackendFactory: expect.any(Function),
+            }),
+        );
         expect(startupMessage().textContent).toBe("Starting Python runtime");
         expect(startupDetail().textContent?.trim()).toBe(
             "Loading Pyodide, bundled Python sources, and the first board.",

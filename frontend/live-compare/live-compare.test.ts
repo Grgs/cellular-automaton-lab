@@ -76,13 +76,25 @@ const bootstrapData: AppBootstrapData = {
     snapshot_version: 5,
 };
 
-function snapshot(tilingFamily = "square", running = false, generation = 0): SimulationSnapshot {
+function snapshot(
+    tilingFamily = "square",
+    running = false,
+    generation = 0,
+    width = 1,
+): SimulationSnapshot {
+    const cells = Array.from({ length: width }, (_, x) => ({
+        id: `c:${x}:0`,
+        kind: "cell",
+        x,
+        y: 0,
+        neighbors: [],
+    }));
     return {
         topology_spec: {
             tiling_family: tilingFamily,
             adjacency_mode: "edge",
             sizing_mode: "grid",
-            width: 1,
+            width,
             height: 1,
             patch_depth: 3,
         },
@@ -110,13 +122,15 @@ function snapshot(tilingFamily = "square", running = false, generation = 0): Sim
                 tiling_family: tilingFamily,
                 adjacency_mode: "edge",
                 sizing_mode: "grid",
-                width: 1,
+                width,
                 height: 1,
                 patch_depth: 3,
             },
-            cells: [{ id: "c:0:0", kind: "cell", neighbors: [] }],
+            width,
+            height: 1,
+            cells,
         },
-        cell_states: [0],
+        cell_states: Array.from({ length: width }, () => 0),
     };
 }
 
@@ -136,8 +150,13 @@ class FakeBackend implements SimulationBackend {
     postControl = vi.fn(async (path: string, body?: unknown) => {
         this.calls.push(path);
         if (path === "/api/control/reset") {
-            const resetBody = body as { topology_spec: { tiling_family: string } };
-            this.state = snapshot(resetBody.topology_spec.tiling_family);
+            const resetBody = body as { topology_spec: { tiling_family: string; width: number } };
+            this.state = snapshot(
+                resetBody.topology_spec.tiling_family,
+                false,
+                0,
+                resetBody.topology_spec.width,
+            );
         } else if (path === "/api/control/start" || path === "/api/control/resume") {
             this.state = { ...this.state, running: true };
         } else if (path === "/api/control/pause") {
@@ -185,6 +204,42 @@ function createGridView(): GridView {
         flashGestureOutline: vi.fn(),
         clearGestureOutline: vi.fn(),
     };
+}
+
+function createCoordinateGridView(): GridView {
+    return {
+        ...createGridView(),
+        getCellFromPointerEvent: vi.fn((event: Event) => {
+            const rect = (event.currentTarget as HTMLElement | null)?.getBoundingClientRect();
+            if (!rect) {
+                return null;
+            }
+            const clientX = (event as MouseEvent).clientX;
+            const x = clientX - rect.left < rect.width / 2 ? 0 : 1;
+            return { id: `c:${x}:0`, x, y: 0 };
+        }),
+    };
+}
+
+function setCanvasRect(canvas: Element): void {
+    canvas.getBoundingClientRect = () =>
+        ({
+            left: 20,
+            top: 10,
+            right: 120,
+            bottom: 60,
+            width: 100,
+            height: 50,
+            x: 20,
+            y: 10,
+            toJSON: () => ({}),
+        }) as DOMRect;
+}
+
+function createCanvasPointerEvent(type: string, clientX: number): PointerEvent {
+    const event = new MouseEvent(type, { bubbles: true, clientX });
+    Object.defineProperty(event, "pointerId", { value: 1 });
+    return event as PointerEvent;
 }
 
 afterEach(() => {
@@ -307,6 +362,85 @@ describe("live compare workspace", () => {
         await vi.waitFor(() => {
             expect(backends.get("s-click-edit-left")?.setCells).toHaveBeenCalledWith([
                 { id: "c:0:0", state: 1 },
+            ]);
+        });
+    });
+
+    it("click editing uses the cell resolved from scaled canvas coordinates", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends = new Map<string, FakeBackend>();
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-scaled-click",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.set(sessionId, backend);
+                return backend;
+            },
+            createGridView: createCoordinateGridView,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(gridPanel.querySelectorAll(".live-compare-canvas")).toHaveLength(2);
+        });
+
+        const leftCanvas = gridPanel.querySelector(".live-compare-canvas")!;
+        setCanvasRect(leftCanvas);
+        leftCanvas.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 95 }));
+
+        await vi.waitFor(() => {
+            expect(backends.get("s-scaled-click-left")?.setCells).toHaveBeenCalledWith([
+                { id: "c:1:0", state: 1 },
+            ]);
+        });
+    });
+
+    it("brush editing follows the cells resolved from scaled canvas coordinates", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends = new Map<string, FakeBackend>();
+        const buildEditorToolCells = vi.fn((_state, _tool, startCell, endCell, paintState) =>
+            [startCell, endCell ?? startCell].map((cell) => ({ id: cell.id, state: paintState })),
+        );
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-scaled-brush",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.set(sessionId, backend);
+                return backend;
+            },
+            createGridView: createCoordinateGridView,
+            buildEditorToolCells,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(gridPanel.querySelectorAll(".live-compare-canvas")).toHaveLength(2);
+        });
+
+        const leftCanvas = gridPanel.querySelector(".live-compare-canvas")!;
+        setCanvasRect(leftCanvas);
+        leftCanvas.dispatchEvent(createCanvasPointerEvent("pointerdown", 30));
+        leftCanvas.dispatchEvent(createCanvasPointerEvent("pointermove", 95));
+        leftCanvas.dispatchEvent(createCanvasPointerEvent("pointerup", 95));
+
+        await vi.waitFor(() => {
+            expect(backends.get("s-scaled-brush-left")?.setCells).toHaveBeenCalledWith([
+                { id: "c:0:0", state: 1 },
+                { id: "c:1:0", state: 1 },
             ]);
         });
     });
