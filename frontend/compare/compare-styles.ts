@@ -61,6 +61,7 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
     color: var(--muted, #6d756f);
 }
+.compare-content { display: contents; }
 .compare-intro { color: var(--muted, #6d756f); font-size: 13px; margin: 6px 0 14px; }
 .compare-form {
     display: grid;
