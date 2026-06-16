@@ -428,7 +428,7 @@ h1 {
 }
 
 .top-bar-topology-group {
-    flex: 1 1 280px;
+    flex: 0 0 clamp(220px, 20vw, 300px);
     min-width: 0;
 }
 
@@ -437,6 +437,7 @@ h1 {
 }
 
 .top-bar-actions-group {
+    flex: 0 0 auto;
     margin-left: auto;
     gap: 4px;
     padding: 4px;
@@ -457,7 +458,8 @@ h1 {
 }
 
 .top-bar-tiling-control {
-    min-width: min(360px, 24vw);
+    width: 100%;
+    min-width: 0;
 }
 
 .top-control-label {
@@ -2386,8 +2388,23 @@ button.theme-toggle .theme-icon-moon {
         gap: 10px;
     }
 
+    .top-bar-strip {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
     .top-bar-controls {
+        width: 100%;
+        flex-wrap: wrap;
         gap: 6px;
+    }
+
+    .top-bar-control-group {
+        flex-wrap: wrap;
+    }
+
+    .top-bar-actions-group {
+        margin-left: 0;
     }
 
     .top-bar-brand {
@@ -2395,7 +2412,7 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .top-bar-tiling-control {
-        min-width: 262px;
+        min-width: 0;
     }
 }
 
