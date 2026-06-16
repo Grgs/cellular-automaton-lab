@@ -97,6 +97,49 @@ class ApiCompareTests(ApiTestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_filmstrip_returns_synchronized_frames_per_tiling(self) -> None:
+        response = self.client.post(
+            "/api/compare/filmstrip",
+            json={
+                "seed": "0110 1100 0100",
+                "rule": "conway",
+                "geometries": ["square", "hex", "triangle"],
+                "frames": 10,
+                "grid_size": 8,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        filmstrip = response.get_json()["filmstrip"]
+        self.assertEqual(filmstrip["frame_count"], 10)
+        tilings = filmstrip["tilings"]
+        self.assertEqual(
+            [tiling["tiling_family"] for tiling in tilings], ["square", "hex", "triangle"]
+        )
+        for tiling in tilings:
+            self.assertEqual(len(tiling["frames"]), 10)  # synchronized frame counts
+            self.assertTrue(tiling["topology"]["cells"])  # renderable geometry
+            self.assertEqual(tiling["topology_spec"]["tiling_family"], tiling["tiling_family"])
+
+    def test_filmstrip_does_not_disturb_running_simulation_state(self) -> None:
+        before = self.get_state()["generation"]
+        self.client.post(
+            "/api/compare/filmstrip",
+            json={"seed": "111", "geometries": ["square"], "frames": 5},
+        )
+        self.assertEqual(self.get_state()["generation"], before)
+
+    def test_filmstrip_requires_geometries(self) -> None:
+        response = self.client.post("/api/compare/filmstrip", json={"seed": "111"})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("geometries", response.get_json()["error"])
+
+    def test_filmstrip_rejects_too_many_tilings(self) -> None:
+        response = self.client.post(
+            "/api/compare/filmstrip",
+            json={"seed": "1", "geometries": ["square"] * 7},
+        )
+        self.assertEqual(response.status_code, 400)
+
 
 if __name__ == "__main__":
     unittest.main()

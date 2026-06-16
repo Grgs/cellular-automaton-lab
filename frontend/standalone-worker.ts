@@ -5,6 +5,7 @@ import type {
     RuleDefinition,
     RulesResponse,
     SeedComparisonResult,
+    SeedFilmstripResult,
     SimulationSnapshot,
     TopologyPayload,
     TopologyPreview,
@@ -343,6 +344,23 @@ function optionalTopologyPreview(value: unknown, context: string): TopologyPrevi
     };
 }
 
+function optionalFilmstrip(value: unknown, context: string): SeedFilmstripResult | undefined {
+    if (value === undefined) {
+        return undefined;
+    }
+    if (!isPlainObject(value) || !Array.isArray(value.tilings)) {
+        throw new Error(`${context} returned an invalid filmstrip payload.`);
+    }
+    return {
+        rule_name: String(value.rule_name ?? ""),
+        seed: String(value.seed ?? ""),
+        traversal: String(value.traversal ?? ""),
+        frame_count: Number(value.frame_count ?? 0),
+        grid_size: Number(value.grid_size ?? 0),
+        tilings: value.tilings as SeedFilmstripResult["tilings"],
+    };
+}
+
 function optionalComparison(value: unknown, context: string): SeedComparisonResult | undefined {
     if (value === undefined) {
         return undefined;
@@ -387,6 +405,7 @@ function parseRequestResponse(raw: string): {
     snapshot?: SimulationSnapshot;
     rules?: RulesResponse["rules"];
     comparison?: SeedComparisonResult;
+    filmstrip?: SeedFilmstripResult;
     topologyPreview?: TopologyPreview;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 } {
@@ -397,6 +416,7 @@ function parseRequestResponse(raw: string): {
         snapshot?: SimulationSnapshot;
         rules?: RulesResponse["rules"];
         comparison?: SeedComparisonResult;
+        filmstrip?: SeedFilmstripResult;
         topologyPreview?: TopologyPreview;
         persistedSnapshot?: PersistedSimulationSnapshotV5;
     } = {
@@ -417,6 +437,10 @@ function parseRequestResponse(raw: string): {
     const comparison = optionalComparison(payload.comparison, "Standalone request");
     if (comparison !== undefined) {
         result.comparison = comparison;
+    }
+    const filmstrip = optionalFilmstrip(payload.filmstrip, "Standalone request");
+    if (filmstrip !== undefined) {
+        result.filmstrip = filmstrip;
     }
     const topologyPreview = optionalTopologyPreview(payload.topology_preview, "Standalone request");
     if (topologyPreview !== undefined) {
@@ -541,6 +565,7 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             ...(payload.snapshot === undefined ? {} : { snapshot: payload.snapshot }),
             ...(payload.rules === undefined ? {} : { rules: payload.rules }),
             ...(payload.comparison === undefined ? {} : { comparison: payload.comparison }),
+            ...(payload.filmstrip === undefined ? {} : { filmstrip: payload.filmstrip }),
             ...(payload.topologyPreview === undefined
                 ? {}
                 : { topologyPreview: payload.topologyPreview }),

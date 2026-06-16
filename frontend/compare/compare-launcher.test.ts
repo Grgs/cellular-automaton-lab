@@ -54,6 +54,14 @@ function fakeBackend(): SimulationBackend {
             degenerate: false,
             results: [],
         }),
+        requestFilmstrip: async () => ({
+            rule_name: "conway",
+            seed: "",
+            traversal: "bfs",
+            frame_count: 0,
+            grid_size: 12,
+            tilings: [],
+        }),
         previewTopology: async () => ({
             topology_revision: "t",
             topology_spec: {

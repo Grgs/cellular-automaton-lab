@@ -39,6 +39,37 @@ class BrowserRuntimeTests(unittest.TestCase):
         self.assertTrue(tick_response["stepped"])
         self.assertGreaterEqual(tick_response["snapshot"]["generation"], 1)
 
+    def test_handle_request_runs_compare_filmstrip(self) -> None:
+        initialize_runtime()
+
+        response = json.loads(
+            handle_request(
+                "/api/compare/filmstrip",
+                json.dumps(
+                    {
+                        "seed": "11",
+                        "rule": "conway",
+                        "geometries": ["square", "hex"],
+                        "frames": 5,
+                    }
+                ),
+            )
+        )
+        self.assertTrue(response["ok"])
+        filmstrip = response["filmstrip"]
+        self.assertEqual(filmstrip["frame_count"], 5)
+        self.assertEqual(
+            {tiling["tiling_family"] for tiling in filmstrip["tilings"]}, {"square", "hex"}
+        )
+        self.assertEqual(len(filmstrip["tilings"][0]["frames"]), 5)
+
+    def test_handle_request_rejects_filmstrip_without_geometries(self) -> None:
+        initialize_runtime()
+
+        response = json.loads(handle_request("/api/compare/filmstrip", json.dumps({"seed": "11"})))
+        self.assertFalse(response["ok"])
+        self.assertIn("geometries", response["error"])
+
     def test_initialize_runtime_restores_serialized_snapshot(self) -> None:
         initialize_runtime()
         response = json.loads(

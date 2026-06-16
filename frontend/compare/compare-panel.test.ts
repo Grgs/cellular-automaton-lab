@@ -124,6 +124,14 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
         setCell: async () => snapshot,
         setCells: async () => snapshot,
         compareSeed,
+        requestFilmstrip: async () => ({
+            rule_name: "conway",
+            seed: "",
+            traversal: "bfs",
+            frame_count: 0,
+            grid_size: 12,
+            tilings: [],
+        }),
         previewTopology: async () => ({
             topology_revision: "t",
             topology_spec: {

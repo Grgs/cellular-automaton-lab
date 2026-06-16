@@ -1,0 +1,272 @@
+/**
+ * The live, synchronized side-by-side view. It takes a `SeedFilmstripResult`
+ * (one board state per generation for each tiling, all sharing one frame count)
+ * and plays every tiling in lockstep off a single {@link FilmstripPlayer}.
+ *
+ * The player owns the shared frame index; this view owns the clock (a fixed-rate
+ * interval that calls `player.advance()`), the transport controls, and the
+ * rendering: per tiling it fetches the board geometry once, then redraws
+ * `frames[index]` with {@link buildBoardThumbnailSvg} whenever the index moves.
+ */
+
+import type { SimulationBackend } from "../types/controller.js";
+import type { SeedFilmstripResult, TopologyFilmstrip, TopologyPreview } from "../types/domain.js";
+import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
+import { FilmstripPlayer, type FilmstripPlayerState } from "./filmstrip-player.js";
+
+const DEFAULT_FPS = 8;
+const DEFAULT_THUMB_SIZE = 150;
+
+/** Playback speed multipliers offered in the transport bar. */
+const SPEED_OPTIONS: readonly { label: string; value: number }[] = [
+    { label: "0.5×", value: 0.5 },
+    { label: "1×", value: 1 },
+    { label: "2×", value: 2 },
+    { label: "4×", value: 4 },
+];
+
+/** Injectable interval clock so playback is deterministic under test. */
+export interface IntervalScheduler {
+    setInterval(handler: () => void, ms: number): number;
+    clearInterval(id: number): void;
+}
+
+const WINDOW_SCHEDULER: IntervalScheduler = {
+    setInterval: (handler, ms) => window.setInterval(handler, ms),
+    clearInterval: (id) => window.clearInterval(id),
+};
+
+export interface FilmstripViewOptions {
+    backend: SimulationBackend;
+    /** Resolver for the live-cell colour (tracks the selected rule's palette). */
+    getLiveColor?: () => (state: number) => string;
+    /** Base frames per second at 1× speed. */
+    fps?: number;
+    /** Rendered board size in px. */
+    thumbSize?: number;
+    /** Loop back to the seed frame after the last instead of stopping. */
+    loop?: boolean;
+    /** Overridable clock; defaults to `window.setInterval`. */
+    scheduler?: IntervalScheduler;
+}
+
+export interface FilmstripViewController {
+    element: HTMLElement;
+    /** Render a filmstrip and reset playback to the seed frame (paused). */
+    load(filmstrip: SeedFilmstripResult): Promise<void>;
+    dispose(): void;
+}
+
+interface BoardEntry {
+    tiling: TopologyFilmstrip;
+    slot: HTMLElement;
+    countLabel: HTMLElement;
+    preview?: TopologyPreview;
+    error?: string;
+}
+
+function el(tag: string, className: string, text?: string): HTMLElement {
+    const node = document.createElement(tag);
+    node.className = className;
+    if (text !== undefined) {
+        node.textContent = text;
+    }
+    return node;
+}
+
+function button(label: string, title: string, onClick: () => void): HTMLButtonElement {
+    const node = document.createElement("button");
+    node.type = "button";
+    node.className = "compare-filmstrip-btn";
+    node.textContent = label;
+    node.title = title;
+    node.addEventListener("click", onClick);
+    return node;
+}
+
+export function createFilmstripView(options: FilmstripViewOptions): FilmstripViewController {
+    const fps = options.fps ?? DEFAULT_FPS;
+    const thumbSize = options.thumbSize ?? DEFAULT_THUMB_SIZE;
+    const scheduler = options.scheduler ?? WINDOW_SCHEDULER;
+    const getLiveColor = options.getLiveColor ?? (() => () => "var(--live, #1f2430)");
+
+    const root = el("div", "compare-filmstrip");
+
+    const transport = el("div", "compare-filmstrip-transport");
+    const playButton = button("▶ Play", "Play / pause", () => player.toggle());
+    const stepBackButton = button("⏮", "Step back one generation", () => player.step(-1));
+    const stepForwardButton = button("⏭", "Step forward one generation", () => player.step(1));
+    const resetButton = button("↺", "Back to the seed", () => player.reset());
+    const scrubber = document.createElement("input");
+    scrubber.type = "range";
+    scrubber.className = "compare-filmstrip-scrubber";
+    scrubber.min = "0";
+    scrubber.max = "0";
+    scrubber.value = "0";
+    scrubber.setAttribute("aria-label", "Generation");
+    scrubber.addEventListener("input", () => player.seek(Number(scrubber.value)));
+    const counter = el("span", "compare-filmstrip-counter", "—");
+
+    const speedSelect = document.createElement("select");
+    speedSelect.className = "compare-filmstrip-speed";
+    speedSelect.setAttribute("aria-label", "Playback speed");
+    for (const option of SPEED_OPTIONS) {
+        const node = document.createElement("option");
+        node.value = String(option.value);
+        node.textContent = option.label;
+        if (option.value === 1) {
+            node.selected = true;
+        }
+        speedSelect.append(node);
+    }
+    speedSelect.addEventListener("change", () => {
+        // Re-time an in-flight clock so the speed change takes effect immediately.
+        if (tickHandle !== null) {
+            stopTick();
+            startTick();
+        }
+    });
+
+    transport.append(
+        resetButton,
+        stepBackButton,
+        playButton,
+        stepForwardButton,
+        scrubber,
+        counter,
+        speedSelect,
+    );
+
+    const boardsArea = el("div", "compare-filmstrip-boards");
+    root.append(transport, boardsArea);
+
+    let player = new FilmstripPlayer(0, { loop: options.loop ?? false });
+    let unsubscribe: (() => void) | null = null;
+    let boards: BoardEntry[] = [];
+    let lastRenderedIndex = -1;
+    let tickHandle: number | null = null;
+
+    function intervalMs(): number {
+        const multiplier = Number(speedSelect.value) || 1;
+        return Math.max(16, Math.round(1000 / (fps * multiplier)));
+    }
+
+    function startTick(): void {
+        tickHandle = scheduler.setInterval(() => player.advance(), intervalMs());
+    }
+
+    function stopTick(): void {
+        if (tickHandle !== null) {
+            scheduler.clearInterval(tickHandle);
+            tickHandle = null;
+        }
+    }
+
+    function renderBoard(entry: BoardEntry, index: number): void {
+        if (entry.error) {
+            entry.slot.textContent = entry.error.includes("limit") ? "too large" : "unavailable";
+            entry.countLabel.textContent = "";
+            return;
+        }
+        const preview = entry.preview;
+        if (!preview) {
+            entry.slot.textContent = "…";
+            return;
+        }
+        const cellsById = entry.tiling.frames[index] ?? {};
+        const svg = buildBoardThumbnailSvg(preview, cellsById, {
+            size: thumbSize,
+            liveColor: getLiveColor(),
+            label: `${entry.tiling.geometry} generation ${index}`,
+        });
+        entry.slot.replaceChildren(svg);
+        const liveCells = Object.keys(cellsById).length;
+        const extinct =
+            entry.tiling.extinction_step !== null && index >= entry.tiling.extinction_step;
+        entry.countLabel.textContent = extinct ? "extinct" : `${liveCells} live`;
+    }
+
+    function renderAllBoards(index: number): void {
+        for (const entry of boards) {
+            renderBoard(entry, index);
+        }
+        lastRenderedIndex = index;
+    }
+
+    function onPlayerState(state: FilmstripPlayerState): void {
+        playButton.textContent = state.playing ? "⏸ Pause" : "▶ Play";
+        const playable = state.frameCount > 1;
+        playButton.disabled = !playable;
+        scrubber.disabled = !playable;
+        scrubber.max = String(Math.max(0, state.frameCount - 1));
+        scrubber.value = String(state.index);
+        counter.textContent =
+            state.frameCount === 0 ? "—" : `gen ${state.index} / ${state.frameCount - 1}`;
+
+        if (state.playing && tickHandle === null) {
+            startTick();
+        } else if (!state.playing && tickHandle !== null) {
+            stopTick();
+        }
+        if (state.index !== lastRenderedIndex) {
+            renderAllBoards(state.index);
+        }
+    }
+
+    function teardownRun(): void {
+        stopTick();
+        unsubscribe?.();
+        unsubscribe = null;
+        boards = [];
+        lastRenderedIndex = -1;
+    }
+
+    async function load(filmstrip: SeedFilmstripResult): Promise<void> {
+        teardownRun();
+        player = new FilmstripPlayer(filmstrip.frame_count, { loop: options.loop ?? false });
+
+        boardsArea.replaceChildren();
+        boards = filmstrip.tilings.map((tiling) => {
+            const slot = el("div", "compare-filmstrip-slot", "…");
+            const label = el("div", "compare-filmstrip-label", tiling.geometry);
+            const countLabel = el("div", "compare-filmstrip-count");
+            const cell = el("div", "compare-filmstrip-board");
+            cell.append(label, slot, countLabel);
+            boardsArea.append(cell);
+            return { tiling, slot, countLabel };
+        });
+
+        unsubscribe = player.subscribe(onPlayerState);
+        // Prime the transport and the (still "…") board skeletons before previews load.
+        onPlayerState(player.state);
+
+        await Promise.all(
+            boards.map(async (entry) => {
+                const spec = entry.tiling.topology_spec;
+                try {
+                    entry.preview = await options.backend.previewTopology({
+                        geometry: entry.tiling.geometry,
+                        width: spec.width,
+                        height: spec.height,
+                        ...(spec.patch_depth === undefined
+                            ? {}
+                            : { patch_depth: spec.patch_depth }),
+                    });
+                    delete entry.error;
+                } catch (error) {
+                    entry.error = error instanceof Error ? error.message : String(error);
+                }
+                renderBoard(entry, player.index);
+            }),
+        );
+    }
+
+    return {
+        element: root,
+        load,
+        dispose(): void {
+            teardownRun();
+            root.remove();
+        },
+    };
+}
