@@ -40,12 +40,16 @@ Decisions already taken (so the steps are unambiguous):
 
 ### Closeout — definition of done
 
-- Standalone smoke coverage: exercise C1–C3 in the Pyodide build via the
-  Playwright standalone suite so parity is enforced, not assumed.
+- Standalone smoke coverage: **done** — the Playwright standalone suite now
+  exercises the run-link deep link (C1) and saved-run persistence across reload
+  (C3) against the Pyodide build. C2's open-in-build reuses the host
+  `onOpenPattern`/`loadPattern` path (no standalone-specific surface) and is
+  covered by the frontend vitest suite.
 - The feature is complete when, in **both** the server and standalone builds, you
   can: open `#/compare`, build a side-by-side run, play it synchronized, open a
   frame into build, save the run, reload and restore it, and open a copied run
-  link in a fresh tab — with green CI and updated docs.
+  link in a fresh tab — with green CI and updated docs. The only remaining gate is
+  merging the open compare PR into `main`.
 
 ## Now
 
