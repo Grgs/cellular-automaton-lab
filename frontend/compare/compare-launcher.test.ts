@@ -77,13 +77,33 @@ function fakeBackend(): SimulationBackend {
     };
 }
 
+function resetHash(): void {
+    // Strip the hash without firing hashchange (live listeners are disposed first).
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+}
+
 describe("mountCompareLauncher", () => {
+    const handles: Array<{ dispose(): void }> = [];
+
+    async function mount(): Promise<void> {
+        const { mountCompareLauncher } = await import("./compare-launcher.js");
+        handles.push(
+            mountCompareLauncher({ backend: fakeBackend(), bootstrapData: bootstrapData() }),
+        );
+    }
+
     beforeEach(() => {
         installFrontendGlobals();
         vi.resetModules();
+        resetHash();
     });
 
     afterEach(() => {
+        // Dispose launchers so their hashchange listeners don't leak into later tests.
+        while (handles.length > 0) {
+            handles.pop()?.dispose();
+        }
+        resetHash();
         document.body.innerHTML = "";
         document.getElementById("compare-toggle-styles")?.remove();
         document.getElementById("compare-panel-styles")?.remove();
@@ -91,8 +111,7 @@ describe("mountCompareLauncher", () => {
     });
 
     it("renders the toggle eagerly without loading the panel module", async () => {
-        const { mountCompareLauncher } = await import("./compare-launcher.js");
-        mountCompareLauncher({ backend: fakeBackend(), bootstrapData: bootstrapData() });
+        await mount();
 
         const toggle = document.querySelector<HTMLButtonElement>(".compare-toggle");
         expect(toggle).not.toBeNull();
@@ -102,8 +121,7 @@ describe("mountCompareLauncher", () => {
     });
 
     it("lazily mounts and opens the panel on first click", async () => {
-        const { mountCompareLauncher } = await import("./compare-launcher.js");
-        mountCompareLauncher({ backend: fakeBackend(), bootstrapData: bootstrapData() });
+        await mount();
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
 
@@ -118,18 +136,51 @@ describe("mountCompareLauncher", () => {
     });
 
     it("disposes the lazily-mounted panel and removes the toggle", async () => {
-        const { mountCompareLauncher } = await import("./compare-launcher.js");
-        const handle = mountCompareLauncher({
-            backend: fakeBackend(),
-            bootstrapData: bootstrapData(),
-        });
+        await mount();
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-backdrop")).not.toBeNull();
         });
 
-        handle.dispose();
+        handles.pop()?.dispose();
         expect(document.querySelector(".compare-toggle")).toBeNull();
         expect(document.querySelector(".compare-backdrop")).toBeNull();
+    });
+
+    it("opens via a #/compare deep link present on first load", async () => {
+        window.location.hash = "#/compare";
+        await mount();
+
+        await vi.waitFor(() => {
+            const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
+            expect(backdrop).not.toBeNull();
+            expect(backdrop?.hidden).toBe(false);
+        });
+    });
+
+    it("mirrors the route into the hash on open and clears it on close", async () => {
+        await mount();
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(false);
+        });
+        expect(window.location.hash).toBe("#/compare");
+
+        document.querySelector<HTMLButtonElement>(".compare-close")?.click();
+        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+        expect(window.location.hash).toBe("");
+    });
+
+    it("closes the panel when the hash navigates away from compare", async () => {
+        await mount();
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(false);
+        });
+
+        // Simulate the back button leaving the compare route.
+        window.location.hash = "";
+        window.dispatchEvent(new Event("hashchange"));
+        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
     });
 });

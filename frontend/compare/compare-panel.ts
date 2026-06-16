@@ -28,9 +28,16 @@ interface MountComparePanelOptions {
     trigger?: HTMLButtonElement;
     /** Open the dialog immediately after mounting (e.g. right after a lazy load). */
     openOnMount?: boolean;
+    /** Fired when the dialog becomes visible (used to mirror the route into the hash). */
+    onOpen?: () => void;
+    /** Fired when the dialog is dismissed (used to clear the route from the hash). */
+    onClose?: () => void;
 }
 
 export interface ComparePanelHandle {
+    open(): void;
+    close(): void;
+    isOpen(): boolean;
     dispose(): void;
 }
 
@@ -112,15 +119,23 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     function open(): void {
+        if (!backdrop.hidden) {
+            return;
+        }
         lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         backdrop.hidden = false;
         content.activate();
         dialog.focus();
+        options.onOpen?.();
     }
 
     function close(): void {
+        if (backdrop.hidden) {
+            return;
+        }
         backdrop.hidden = true;
         lastFocus?.focus();
+        options.onClose?.();
     }
 
     function onKeydown(event: KeyboardEvent): void {
@@ -148,6 +163,9 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     return {
+        open,
+        close,
+        isOpen: () => !backdrop.hidden,
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             content.dispose();
