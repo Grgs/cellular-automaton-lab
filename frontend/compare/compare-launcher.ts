@@ -7,7 +7,11 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
-import { decodeCompareRunFragment, readCompareRunBodyFromHash } from "./compare-run-link.js";
+import {
+    CompareRunLinkDecodeError,
+    decodeCompareRunFragment,
+    readCompareRunBodyFromHash,
+} from "./compare-run-link.js";
 import type { ComparePanelHandle } from "./compare-panel.js";
 import {
     hashHasCompareRoute,
@@ -77,22 +81,30 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
     let disposed = false;
 
     async function applyRunFromHashIfPresent(): Promise<void> {
-        if (!panel || disposed) {
+        const activePanel = panel;
+        if (!activePanel || disposed) {
             return;
         }
         const body = readCompareRunBodyFromHash(window.location.hash);
         if (!body || body === lastAppliedRunBody) {
             return;
         }
+        // Mark this body handled up front so a malformed link is reported once,
+        // not re-processed on every later hashchange.
+        lastAppliedRunBody = body;
         try {
             const config = decodeCompareRunFragment(window.location.hash);
             if (!config) {
                 return;
             }
-            await panel.applyRunConfig(config);
-            lastAppliedRunBody = body;
+            await activePanel.applyRunConfig(config);
         } catch (error) {
-            console.error(error);
+            if (error instanceof CompareRunLinkDecodeError) {
+                activePanel.reportRunLinkError(error.message);
+            } else {
+                console.error(error);
+                activePanel.reportRunLinkError("This run link could not be opened.");
+            }
         }
     }
 

@@ -150,10 +150,11 @@ export function encodeCompareRunFragment(config: CompareRunConfig): string {
     return `${RUN_HASH_PREFIX}${RUN_BODY_PREFIX}${base64UrlEncode(JSON.stringify(config))}`;
 }
 
+/** The raw run-slot body including its version tag (e.g. `v1.<payload>`), or null if absent. */
 export function readCompareRunBodyFromHash(hash: string): string | null {
     for (const slot of splitHashIntoSlots(hash)) {
-        if (slot.tagWithEquals === RUN_HASH_PREFIX && slot.body.startsWith(RUN_BODY_PREFIX)) {
-            return slot.body.slice(RUN_BODY_PREFIX.length);
+        if (slot.tagWithEquals === RUN_HASH_PREFIX) {
+            return slot.body;
         }
     }
     return null;
@@ -164,9 +165,17 @@ export function decodeCompareRunFragment(hash: string): CompareRunConfig | null 
     if (!body) {
         return null;
     }
+    if (!body.startsWith(RUN_BODY_PREFIX)) {
+        // A run slot is present but tagged with a version this build does not
+        // understand; surface that instead of silently dropping the link.
+        throw new CompareRunLinkDecodeError(
+            "This run link was created by a newer version of the app and can't be opened here.",
+        );
+    }
+    const payload = body.slice(RUN_BODY_PREFIX.length);
     let parsed: unknown;
     try {
-        parsed = JSON.parse(base64UrlDecode(body));
+        parsed = JSON.parse(base64UrlDecode(payload));
     } catch (error) {
         if (error instanceof CompareRunLinkDecodeError) {
             throw error;

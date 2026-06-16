@@ -61,6 +61,20 @@ describe("compare-run-link", () => {
         );
     });
 
+    it("rejects a run link tagged with an unsupported (newer) version", async () => {
+        const { CompareRunLinkDecodeError, decodeCompareRunFragment } =
+            await import("./compare-run-link.js");
+
+        // A run slot is present but its version tag is not understood here; this
+        // must surface as an error rather than be silently ignored as "no link".
+        expect(() => decodeCompareRunFragment("#/compare&run=v2.eyJhIjoxfQ")).toThrow(
+            CompareRunLinkDecodeError,
+        );
+        expect(() => decodeCompareRunFragment("#/compare&run=v2.eyJhIjoxfQ")).toThrow(
+            /newer version/,
+        );
+    });
+
     it("builds a run URL without disturbing other hash slots", async () => {
         const { buildCompareRunUrl } = await import("./compare-run-link.js");
         const url = buildCompareRunUrl(

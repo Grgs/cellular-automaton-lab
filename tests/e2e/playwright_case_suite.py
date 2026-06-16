@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 import sys
 import tempfile
@@ -37,6 +38,12 @@ except ModuleNotFoundError:
         select_tiling_family,
         set_patch_depth,
     )
+
+
+def _encode_compare_run_fragment(config: dict[str, object]) -> str:
+    """Mirror compare-run-link.ts encodeCompareRunFragment: run=v1.<base64url(JSON)>."""
+    payload = base64.urlsafe_b64encode(json.dumps(config).encode("utf-8")).decode("ascii")
+    return f"run=v1.{payload.rstrip('=')}"
 
 
 class SharedUiFlowMixin(SharedUiFlowHelpers):
@@ -397,6 +404,59 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self.assertEqual(
             persisted_after_reload["cells_by_id"], persisted_before_reload["cells_by_id"]
         )
+
+    def test_compare_run_link_restores_workspace_in_standalone(self) -> None:
+        # C1 parity: a #/compare&run= deep link opens the full-page workspace in
+        # the Pyodide build and restores the saved setup without auto-running.
+        fragment = _encode_compare_run_fragment(
+            {
+                "seed": "101",
+                "rule": "conway",
+                "traversal": "bfs",
+                "frames": 12,
+                "grid_size": 8,
+                "geometries": ["square"],
+            }
+        )
+        self.page.evaluate("(hash) => { window.location.hash = hash; }", f"#/compare&{fragment}")
+
+        self._expect(".compare-dialog--workspace").to_be_visible()
+        self._expect(".compare-seedbits input.compare-field").to_have_value("101")
+        self._expect(".compare-status").to_contain_text("Loaded run link")
+        # Reconstruct-and-wait: the link must not have started a comparison.
+        self._expect(".compare-grid").to_have_count(0)
+
+    def test_saved_compare_run_persists_across_reload_in_standalone(self) -> None:
+        # C3 parity: saving a run writes to localStorage in the Pyodide build and
+        # the run is still listed after a full reload.
+        self.page.click(".compare-toggle")
+        self._expect(".compare-backdrop").to_be_visible()
+
+        run_name = "Standalone smoke run"
+        self.page.fill('input[aria-label="Saved run name"]', run_name)
+        self.page.get_by_role("button", name="Save run", exact=True).click()
+        self._expect(".compare-status").to_contain_text("Saved run")
+
+        saved_run_names = self.page.evaluate(
+            """() => {
+                const raw = window.localStorage.getItem("cellular-automaton-lab.compare.v1");
+                if (!raw) {
+                    return [];
+                }
+                try {
+                    return (JSON.parse(raw).runs || []).map((run) => run.name);
+                } catch {
+                    return [];
+                }
+            }"""
+        )
+        self.assertIn(run_name, saved_run_names)
+
+        self.reload_page(wait_until="load")
+
+        # The persisted #/compare route reopens the workspace after reload.
+        self._expect(".compare-backdrop").to_be_visible()
+        self._expect('select[aria-label="Saved compare runs"]').to_contain_text(run_name)
 
 
 class StandaloneRuntimeFailureTests(BrowserAppTestCase):

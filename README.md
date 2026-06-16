@@ -28,7 +28,7 @@ It is intended for comparing how familiar automata behave on different local nei
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
-- compare-mode overlay that runs one seed across many tilings, charts how topology shapes the outcome, and opens begin/end states as shareable board links (also scriptable via `python -m tools tilings compare`)
+- compare workspace that runs one shared seed across many tilings, charts topology-sensitive outcomes, plays synchronized side-by-side filmstrips, saves named runs locally, and opens any result generation back into build mode (also scriptable via `python -m tools tilings compare`)
 - sparse pattern persistence keyed by stable topology cell IDs
 - TypeScript frontend in `frontend/` with Vitest unit tests and Playwright browser coverage
 
@@ -54,7 +54,21 @@ It is intended for comparing how familiar automata behave on different local nei
 - Compare `Penrose P1 Pentagon-Diamond (Distributed)` with `Penrose P1 Pentagon-Boat-Star` to see the difference between the distributed vertex-merge manifestation and the centered singular pentagrid patch.
 - Try the convex pentagonal periodic catalog with Cairo, Prismatic, Floret, Type 7, Stein 14, and Pentagon Crosses to compare how the same rule family behaves on distinct pentagon adjacencies.
 - Try Whirlpool or HexWhirlpool from the preset/showcase controls for a quick multi-state animation that exercises more than binary Life-like states.
+- Open `#/compare` or use the floating compare button to compare one seed across tilings. Use **Run comparison** for the phase portrait/table, **Play side by side** for synchronized boards, and **Open gen N** on a live board to bring that generation back into build mode.
 - Reload the standalone GitHub Pages demo after changing topology or state to check browser persistence without the Flask server.
+
+## Compare Workspace
+
+Compare mode is available from the floating **Compare tilings** button or directly at `#/compare`. It uses a shared seed, rule, traversal, frame count, and grid size so each selected tiling starts from comparable conditions. The tiling checklist and presets define the side-by-side panes; unsupported rule/tiling combinations are disabled in the picker and rejected by the backend if submitted directly.
+
+The workspace has two run paths:
+
+- **Run comparison** returns a phase portrait plus a result table. Each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
+- **Play side by side** builds a synchronized filmstrip. Play, pause, step, reset, scrub, and speed controls operate one shared clock across all boards. Each board has an **Open gen N** action that loads its current generation into build mode.
+
+Use **Copy run link** to create a `#/compare&run=v1.<base64url-json>` URL. Opening that link restores the compare setup without auto-running or auto-playing, so cold loads do not start surprise work. Use **Saved runs** and **Saved tiling sets** to keep named compare setups in browser `localStorage`; they work in both the Flask app and the standalone demo, but they are local to the current browser/device. Run links are the portable format.
+
+Current limits are intentional for interactive use: live filmstrips are bounded to a small selected set of tilings and a capped frame count by the backend, and compare mode is designed around one shared seed/rule configuration rather than independent per-pane rules.
 
 ## How It Works
 

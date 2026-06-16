@@ -38,35 +38,18 @@ Decisions already taken (so the steps are unambiguous):
 - **Standalone parity is mandatory** for every step: hash/`localStorage` only, no
   server-only state.
 
-### Phase C — persistent & shareable runs
-
-- **C2 — Result → build from the live view.** The static results table already
-  opens begin/end in place; the live filmstrip view does not. Add a per-board
-  "Open this generation in build" action that turns a tiling's current
-  `frames[index]` into a `PatternPayload` and loads it via the existing
-  `onOpenPattern` path, returning to `#/build`. Threads an `onOpenPattern`
-  callback through `createFilmstripView`.
-- **C3 — Persisted named runs (+ custom tiling sets).** Save the current run
-  configuration under a name; list / load / rename / delete from the workspace,
-  backed by a small `localStorage` store module. Fold custom/pinned tiling sets
-  into the same store (a saved named tiling selection that applies alongside the
-  built-in Representative/Regular/Mixed/Aperiodic presets). Done when a saved run
-  and a saved tiling set both restore losslessly after a full reload.
-- **C5 — Workspace nav & layout polish.** Tune the filmstrip board grid to use
-  the full-page width (larger boards when there is room); add empty/loading/error
-  states for saved runs and the live view; pass a keyboard-focus and `aria`
-  review for the full-page workspace.
-
 ### Closeout — definition of done
 
-- Docs: a "Compare workspace" section in the user-facing docs/README; document
-  the `run=` link format next to the share-link format; CHANGELOG narrative.
-- Standalone smoke coverage: exercise C1–C3 in the Pyodide build via the
-  Playwright standalone suite so parity is enforced, not assumed.
+- Standalone smoke coverage: **done** — the Playwright standalone suite now
+  exercises the run-link deep link (C1) and saved-run persistence across reload
+  (C3) against the Pyodide build. C2's open-in-build reuses the host
+  `onOpenPattern`/`loadPattern` path (no standalone-specific surface) and is
+  covered by the frontend vitest suite.
 - The feature is complete when, in **both** the server and standalone builds, you
   can: open `#/compare`, build a side-by-side run, play it synchronized, open a
   frame into build, save the run, reload and restore it, and open a copied run
-  link in a fresh tab — with green CI and updated docs.
+  link in a fresh tab — with green CI and updated docs. The only remaining gate is
+  merging the open compare PR into `main`.
 
 ## Now
 
