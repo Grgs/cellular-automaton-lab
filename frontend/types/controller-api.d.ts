@@ -113,4 +113,5 @@ export interface InitAppOptions {
     bootstrapData?: AppBootstrapData | null;
     liveCompareBaseSessionId?: string | null;
     liveCompareBackendFactory?: (sessionId: string) => SimulationBackend;
+    liveCompareDisposeBackendsOnClose?: boolean;
 }

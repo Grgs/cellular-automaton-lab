@@ -178,6 +178,7 @@ export async function startStandaloneApp(): Promise<void> {
         bootstrapData: environment.bootstrapData,
         liveCompareBaseSessionId: "standalone",
         liveCompareBackendFactory: createStandaloneSplitBackendFactory(environment.bootstrapData),
+        liveCompareDisposeBackendsOnClose: true,
     });
     hideStartupOverlay();
     installPageLifecycleDisposal();

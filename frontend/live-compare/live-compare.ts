@@ -43,6 +43,7 @@ export interface LiveCompareWorkspaceOptions {
     controls?: LiveCompareControlElements;
     onReturnToSingleView?: () => void | Promise<void>;
     backendFactory?: (sessionId: string) => SimulationBackend;
+    disposeBackendsOnClose?: boolean;
     createGridView?: (canvas: HTMLCanvasElement) => GridView;
     resolveViewportDimensions?: (
         options: LiveCompareViewportDimensionsOptions,
@@ -488,6 +489,7 @@ export function mountLiveCompareWorkspace({
     controls = {},
     onReturnToSingleView = () => {},
     backendFactory = (sessionId) => createHttpSimulationBackend({ sessionId }),
+    disposeBackendsOnClose = false,
     createGridView = () => {
         throw new Error("Live compare requires a grid view factory.");
     },
@@ -567,6 +569,7 @@ export function mountLiveCompareWorkspace({
     };
 
     const panes: PaneState[] = (["left", "right"] as PaneId[]).map((paneId) => {
+        const sessionId = paneSessionId(baseSessionId, paneId);
         const elements = createPaneElements(
             paneId,
             paneId === "left" ? "Left" : "Right",
@@ -576,8 +579,8 @@ export function mountLiveCompareWorkspace({
         return {
             id: paneId,
             title: paneId === "left" ? "Left" : "Right",
-            sessionId: paneSessionId(baseSessionId, paneId),
-            backend: backendFactory(paneSessionId(baseSessionId, paneId)),
+            sessionId,
+            backend: backendFactory(sessionId),
             gridView: createGridView(elements.canvas),
             elements,
             snapshot: null,
@@ -593,6 +596,7 @@ export function mountLiveCompareWorkspace({
     let selectedPaintState = 1;
     let activeGesture: PaneEditGesture | null = null;
     let suppressFollowupClick = false;
+    let forcePaneInitialization = false;
     const cleanupCallbacks: Array<() => void> = [];
     const disabledControlState = new Map<
         HTMLButtonElement | HTMLSelectElement,
@@ -730,6 +734,14 @@ export function mountLiveCompareWorkspace({
         }
     }
 
+    function disposePaneBackend(pane: PaneState): void {
+        clearPoll(pane);
+        clearPanePreview(pane);
+        pane.snapshot = null;
+        void Promise.resolve(pane.backend.dispose()).catch(onError);
+        pane.backend = backendFactory(pane.sessionId);
+    }
+
     function syncPoll(pane: PaneState): void {
         if (disposed || !open || !pane.snapshot?.running) {
             clearPoll(pane);
@@ -802,7 +814,8 @@ export function mountLiveCompareWorkspace({
 
     async function initializePaneSessions(): Promise<void> {
         const stored = readStorage(storage);
-        if (!stored.initialized) {
+        if (!stored.initialized || forcePaneInitialization) {
+            forcePaneInitialization = false;
             await Promise.all(
                 panes.map((pane) => resetPaneToTopology(pane, paneDefinitions[pane.id])),
             );
@@ -965,7 +978,12 @@ export function mountLiveCompareWorkspace({
                 .then(() => updateTopControls())
                 .catch(onError);
         } else {
-            panes.forEach(clearPoll);
+            if (disposeBackendsOnClose) {
+                panes.forEach(disposePaneBackend);
+                forcePaneInitialization = true;
+            } else {
+                panes.forEach(clearPoll);
+            }
             setSplitDisabledControls(false);
             void Promise.resolve(onReturnToSingleView()).catch(onError);
         }

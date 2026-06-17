@@ -329,6 +329,53 @@ describe("live compare workspace", () => {
         expect(trigger.textContent).toBe("Single View");
     });
 
+    it("disposes and recreates pane backends on close when configured", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends: FakeBackend[] = [];
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-dispose",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.push(backend);
+                return backend;
+            },
+            disposeBackendsOnClose: true,
+            createGridView,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(backends).toHaveLength(2);
+            expect(backends[0]?.calls).toContain("/api/control/reset");
+            expect(backends[1]?.calls).toContain("/api/control/reset");
+        });
+
+        trigger.click();
+
+        await vi.waitFor(() => {
+            expect(backends).toHaveLength(4);
+            expect(backends[0]?.dispose).toHaveBeenCalledOnce();
+            expect(backends[1]?.dispose).toHaveBeenCalledOnce();
+        });
+        expect(gridPanel.classList.contains("is-live-compare")).toBe(false);
+
+        trigger.click();
+
+        await vi.waitFor(() => {
+            expect(backends[2]?.calls).toContain("/api/control/reset");
+            expect(backends[3]?.calls).toContain("/api/control/reset");
+        });
+        expect(backends[2]?.sessionId).toBe("s-dispose-left");
+        expect(backends[3]?.sessionId).toBe("s-dispose-right");
+    });
+
     it("drawing mutates only the pane under the pointer", async () => {
         const trigger = document.createElement("button");
         const gridPanel = document.createElement("section");
