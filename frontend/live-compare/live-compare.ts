@@ -26,6 +26,7 @@ import type { AppState } from "../types/state.js";
 const STORAGE_KEY = "cellular-automaton-lab.live-compare.v1";
 const POLL_INTERVAL_MS = 250;
 const SPLIT_MIXED_VIEWPORT_CELL_COUNT = 1800;
+const SPLIT_PATCH_DEPTH_BY_TILING_FAMILY = new Map<string, number>([["ammann-beenker", 3]]);
 
 type PaneId = "left" | "right";
 
@@ -195,6 +196,7 @@ function resetSpecForTopology(
     definition: BootstrappedTopologyDefinition,
     defaults: AppBootstrapData["app_defaults"]["simulation"],
     dimensions?: ViewportDimensions | null,
+    patchDepth?: number | null,
 ): TopologySpec {
     const defaultSpec = defaults.topology_spec;
     return {
@@ -205,9 +207,22 @@ function resetSpecForTopology(
         ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
         patch_depth:
             definition.sizing_policy.control === "patch_depth"
-                ? definition.sizing_policy.default
+                ? (patchDepth ?? definition.sizing_policy.default)
                 : defaultSpec.patch_depth,
     };
+}
+
+function splitPatchDepthForTopology(definition: BootstrappedTopologyDefinition): number | null {
+    if (definition.sizing_policy.control !== "patch_depth") {
+        return null;
+    }
+    const configuredDepth =
+        SPLIT_PATCH_DEPTH_BY_TILING_FAMILY.get(definition.tiling_family) ??
+        definition.sizing_policy.default;
+    return Math.min(
+        definition.sizing_policy.max,
+        Math.max(definition.sizing_policy.min, configuredDepth),
+    );
 }
 
 function defaultRuleForTopology(
@@ -757,6 +772,7 @@ export function mountLiveCompareWorkspace({
         const viewportWidth = pane.elements.viewport.clientWidth;
         const viewportHeight = pane.elements.viewport.clientHeight;
         const geometry = topologyGeometry(definition);
+        const patchDepth = splitPatchDepthForTopology(definition);
         const dimensions =
             definition.sizing_policy.control === "cell_size" &&
             viewportWidth > 0 &&
@@ -775,6 +791,7 @@ export function mountLiveCompareWorkspace({
                 definition,
                 bootstrapData.app_defaults.simulation,
                 dimensions,
+                patchDepth,
             ),
             speed: pane.snapshot?.speed ?? bootstrapData.app_defaults.simulation.speed,
             rule: defaultRuleForTopology(definition, fallbackRule),
