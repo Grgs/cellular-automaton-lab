@@ -85,6 +85,21 @@ const bootstrapData: AppBootstrapData = {
                 max: 20,
             },
         }),
+        topologyDefinition("ammann-beenker", "Ammann-Beenker", 4, {
+            picker_group: "Aperiodic",
+            sizing_mode: "patch_depth",
+            family: "aperiodic",
+            render_kind: "polygon_aperiodic",
+            viewport_sync_mode: "presentation-only",
+            default_rules: { edge: "life-b2-s23" },
+            geometry_keys: { edge: "ammann-beenker" },
+            sizing_policy: {
+                control: "patch_depth",
+                default: 4,
+                min: 0,
+                max: 4,
+            },
+        }),
     ],
     periodic_face_tilings: [],
     aperiodic_families: [],
@@ -97,6 +112,7 @@ function snapshot(
     running = false,
     generation = 0,
     width = 1,
+    patchDepth = 3,
 ): SimulationSnapshot {
     const cells = Array.from({ length: width }, (_, x) => ({
         id: `c:${x}:0`,
@@ -112,7 +128,7 @@ function snapshot(
             sizing_mode: "grid",
             width,
             height: 1,
-            patch_depth: 3,
+            patch_depth: patchDepth,
         },
         speed: 5,
         running,
@@ -140,7 +156,7 @@ function snapshot(
                 sizing_mode: "grid",
                 width,
                 height: 1,
-                patch_depth: 3,
+                patch_depth: patchDepth,
             },
             width,
             height: 1,
@@ -166,12 +182,15 @@ class FakeBackend implements SimulationBackend {
     postControl = vi.fn(async (path: string, body?: unknown) => {
         this.calls.push(path);
         if (path === "/api/control/reset") {
-            const resetBody = body as { topology_spec: { tiling_family: string; width: number } };
+            const resetBody = body as {
+                topology_spec: { tiling_family: string; width: number; patch_depth?: number };
+            };
             this.state = snapshot(
                 resetBody.topology_spec.tiling_family,
                 false,
                 0,
                 resetBody.topology_spec.width,
+                resetBody.topology_spec.patch_depth ?? 3,
             );
         } else if (path === "/api/control/start" || path === "/api/control/resume") {
             this.state = { ...this.state, running: true };
@@ -308,6 +327,53 @@ describe("live compare workspace", () => {
         });
         expect(gridPanel.classList.contains("is-live-compare")).toBe(true);
         expect(trigger.textContent).toBe("Single View");
+    });
+
+    it("disposes and recreates pane backends on close when configured", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends: FakeBackend[] = [];
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-dispose",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.push(backend);
+                return backend;
+            },
+            disposeBackendsOnClose: true,
+            createGridView,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(backends).toHaveLength(2);
+            expect(backends[0]?.calls).toContain("/api/control/reset");
+            expect(backends[1]?.calls).toContain("/api/control/reset");
+        });
+
+        trigger.click();
+
+        await vi.waitFor(() => {
+            expect(backends).toHaveLength(4);
+            expect(backends[0]?.dispose).toHaveBeenCalledOnce();
+            expect(backends[1]?.dispose).toHaveBeenCalledOnce();
+        });
+        expect(gridPanel.classList.contains("is-live-compare")).toBe(false);
+
+        trigger.click();
+
+        await vi.waitFor(() => {
+            expect(backends[2]?.calls).toContain("/api/control/reset");
+            expect(backends[3]?.calls).toContain("/api/control/reset");
+        });
+        expect(backends[2]?.sessionId).toBe("s-dispose-left");
+        expect(backends[3]?.sessionId).toBe("s-dispose-right");
     });
 
     it("drawing mutates only the pane under the pointer", async () => {
@@ -521,6 +587,58 @@ describe("live compare workspace", () => {
                     tiling_family: "archimedean-3-3-3-3-6",
                     width: 6,
                     height: 5,
+                }),
+            }),
+        );
+    });
+
+    it("uses a shallower Ammann-Beenker patch in split view", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends = new Map<string, FakeBackend>();
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-ammann",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.set(sessionId, backend);
+                return backend;
+            },
+            createGridView,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(gridPanel.querySelectorAll(".live-compare-pane")).toHaveLength(2);
+        });
+
+        const leftPane = gridPanel.querySelector('.live-compare-pane[data-pane="left"]')!;
+        const leftSelect = leftPane.querySelector<HTMLSelectElement>(
+            ".live-compare-tiling-select",
+        )!;
+
+        leftSelect.value = "ammann-beenker";
+        leftSelect.dispatchEvent(new Event("change"));
+
+        await vi.waitFor(() => {
+            expect(backends.get("s-ammann-left")?.state.topology_spec.tiling_family).toBe(
+                "ammann-beenker",
+            );
+        });
+        expect(backends.get("s-ammann-left")?.state.topology_spec.patch_depth).toBe(3);
+        expect(backends.get("s-ammann-left")?.postControl).toHaveBeenLastCalledWith(
+            "/api/control/reset",
+            expect.objectContaining({
+                rule: "life-b2-s23",
+                topology_spec: expect.objectContaining({
+                    tiling_family: "ammann-beenker",
+                    sizing_mode: "patch_depth",
+                    patch_depth: 3,
                 }),
             }),
         );

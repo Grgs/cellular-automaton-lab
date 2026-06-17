@@ -26,6 +26,7 @@ import type { AppState } from "../types/state.js";
 const STORAGE_KEY = "cellular-automaton-lab.live-compare.v1";
 const POLL_INTERVAL_MS = 250;
 const SPLIT_MIXED_VIEWPORT_CELL_COUNT = 1800;
+const SPLIT_PATCH_DEPTH_BY_TILING_FAMILY = new Map<string, number>([["ammann-beenker", 3]]);
 
 type PaneId = "left" | "right";
 
@@ -42,6 +43,7 @@ export interface LiveCompareWorkspaceOptions {
     controls?: LiveCompareControlElements;
     onReturnToSingleView?: () => void | Promise<void>;
     backendFactory?: (sessionId: string) => SimulationBackend;
+    disposeBackendsOnClose?: boolean;
     createGridView?: (canvas: HTMLCanvasElement) => GridView;
     resolveViewportDimensions?: (
         options: LiveCompareViewportDimensionsOptions,
@@ -195,6 +197,7 @@ function resetSpecForTopology(
     definition: BootstrappedTopologyDefinition,
     defaults: AppBootstrapData["app_defaults"]["simulation"],
     dimensions?: ViewportDimensions | null,
+    patchDepth?: number | null,
 ): TopologySpec {
     const defaultSpec = defaults.topology_spec;
     return {
@@ -205,9 +208,22 @@ function resetSpecForTopology(
         ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
         patch_depth:
             definition.sizing_policy.control === "patch_depth"
-                ? definition.sizing_policy.default
+                ? (patchDepth ?? definition.sizing_policy.default)
                 : defaultSpec.patch_depth,
     };
+}
+
+function splitPatchDepthForTopology(definition: BootstrappedTopologyDefinition): number | null {
+    if (definition.sizing_policy.control !== "patch_depth") {
+        return null;
+    }
+    const configuredDepth =
+        SPLIT_PATCH_DEPTH_BY_TILING_FAMILY.get(definition.tiling_family) ??
+        definition.sizing_policy.default;
+    return Math.min(
+        definition.sizing_policy.max,
+        Math.max(definition.sizing_policy.min, configuredDepth),
+    );
 }
 
 function defaultRuleForTopology(
@@ -473,6 +489,7 @@ export function mountLiveCompareWorkspace({
     controls = {},
     onReturnToSingleView = () => {},
     backendFactory = (sessionId) => createHttpSimulationBackend({ sessionId }),
+    disposeBackendsOnClose = false,
     createGridView = () => {
         throw new Error("Live compare requires a grid view factory.");
     },
@@ -552,6 +569,7 @@ export function mountLiveCompareWorkspace({
     };
 
     const panes: PaneState[] = (["left", "right"] as PaneId[]).map((paneId) => {
+        const sessionId = paneSessionId(baseSessionId, paneId);
         const elements = createPaneElements(
             paneId,
             paneId === "left" ? "Left" : "Right",
@@ -561,8 +579,8 @@ export function mountLiveCompareWorkspace({
         return {
             id: paneId,
             title: paneId === "left" ? "Left" : "Right",
-            sessionId: paneSessionId(baseSessionId, paneId),
-            backend: backendFactory(paneSessionId(baseSessionId, paneId)),
+            sessionId,
+            backend: backendFactory(sessionId),
             gridView: createGridView(elements.canvas),
             elements,
             snapshot: null,
@@ -578,6 +596,7 @@ export function mountLiveCompareWorkspace({
     let selectedPaintState = 1;
     let activeGesture: PaneEditGesture | null = null;
     let suppressFollowupClick = false;
+    let forcePaneInitialization = false;
     const cleanupCallbacks: Array<() => void> = [];
     const disabledControlState = new Map<
         HTMLButtonElement | HTMLSelectElement,
@@ -715,6 +734,14 @@ export function mountLiveCompareWorkspace({
         }
     }
 
+    function disposePaneBackend(pane: PaneState): void {
+        clearPoll(pane);
+        clearPanePreview(pane);
+        pane.snapshot = null;
+        void Promise.resolve(pane.backend.dispose()).catch(onError);
+        pane.backend = backendFactory(pane.sessionId);
+    }
+
     function syncPoll(pane: PaneState): void {
         if (disposed || !open || !pane.snapshot?.running) {
             clearPoll(pane);
@@ -757,6 +784,7 @@ export function mountLiveCompareWorkspace({
         const viewportWidth = pane.elements.viewport.clientWidth;
         const viewportHeight = pane.elements.viewport.clientHeight;
         const geometry = topologyGeometry(definition);
+        const patchDepth = splitPatchDepthForTopology(definition);
         const dimensions =
             definition.sizing_policy.control === "cell_size" &&
             viewportWidth > 0 &&
@@ -775,6 +803,7 @@ export function mountLiveCompareWorkspace({
                 definition,
                 bootstrapData.app_defaults.simulation,
                 dimensions,
+                patchDepth,
             ),
             speed: pane.snapshot?.speed ?? bootstrapData.app_defaults.simulation.speed,
             rule: defaultRuleForTopology(definition, fallbackRule),
@@ -785,7 +814,8 @@ export function mountLiveCompareWorkspace({
 
     async function initializePaneSessions(): Promise<void> {
         const stored = readStorage(storage);
-        if (!stored.initialized) {
+        if (!stored.initialized || forcePaneInitialization) {
+            forcePaneInitialization = false;
             await Promise.all(
                 panes.map((pane) => resetPaneToTopology(pane, paneDefinitions[pane.id])),
             );
@@ -948,7 +978,12 @@ export function mountLiveCompareWorkspace({
                 .then(() => updateTopControls())
                 .catch(onError);
         } else {
-            panes.forEach(clearPoll);
+            if (disposeBackendsOnClose) {
+                panes.forEach(disposePaneBackend);
+                forcePaneInitialization = true;
+            } else {
+                panes.forEach(clearPoll);
+            }
             setSplitDisabledControls(false);
             void Promise.resolve(onReturnToSingleView()).catch(onError);
         }

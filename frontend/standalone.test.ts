@@ -185,6 +185,7 @@ describe("standalone startup", () => {
                 bootstrapData,
                 liveCompareBaseSessionId: "standalone",
                 liveCompareBackendFactory: expect.any(Function),
+                liveCompareDisposeBackendsOnClose: true,
             }),
         );
         expect(startupMessage().textContent).toBe("Starting Python runtime");

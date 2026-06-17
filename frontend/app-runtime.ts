@@ -6,13 +6,13 @@ import { buildEditorToolCells } from "./editor-operations.js";
 import { createAppController } from "./app-controller.js";
 import { mountCompareLauncher, type CompareLauncherHandle } from "./compare/compare-launcher.js";
 import { getGeometryAdapter } from "./geometry/registry.js";
-import {
-    mountLiveCompareWorkspace,
-    type LiveCompareCellSizeOptions,
-    type LiveCompareWorkspaceHandle,
-} from "./live-compare/live-compare.js";
 import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
+import type {
+    LiveCompareCellSizeOptions,
+    LiveCompareWorkspaceHandle,
+    LiveCompareWorkspaceOptions,
+} from "./live-compare/live-compare.js";
 
 interface FitRenderCellSizeAdapter {
     fitViewport?: (options: {
@@ -36,6 +36,99 @@ let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
 let compareLauncher: CompareLauncherHandle | null = null;
 let liveCompareWorkspace: LiveCompareWorkspaceHandle | null = null;
+
+function mountLazyLiveCompareWorkspace(
+    options: LiveCompareWorkspaceOptions,
+): LiveCompareWorkspaceHandle {
+    const trigger = options.trigger;
+    if (!trigger || !options.gridPanel) {
+        return { dispose() {}, isOpen: () => false };
+    }
+    const triggerButton = trigger;
+    if (!options.baseSessionId || options.bootstrapData.topology_catalog.length === 0) {
+        triggerButton.disabled = true;
+        triggerButton.title = "Live split view requires independent server sessions.";
+        return { dispose() {}, isOpen: () => false };
+    }
+
+    let disposed = false;
+    let workspace: LiveCompareWorkspaceHandle | null = null;
+    let loading: Promise<LiveCompareWorkspaceHandle | null> | null = null;
+    const initialText = triggerButton.textContent;
+    const initialDisabled = triggerButton.disabled;
+    const initialAriaBusy = triggerButton.getAttribute("aria-busy");
+
+    function restoreTriggerLoadingState(): void {
+        triggerButton.disabled = initialDisabled;
+        if (initialAriaBusy === null) {
+            triggerButton.removeAttribute("aria-busy");
+        } else {
+            triggerButton.setAttribute("aria-busy", initialAriaBusy);
+        }
+        if (!workspace) {
+            triggerButton.textContent = initialText;
+        }
+    }
+
+    async function loadWorkspace(): Promise<LiveCompareWorkspaceHandle | null> {
+        if (workspace) {
+            return workspace;
+        }
+        loading ??= import("./live-compare/live-compare.js")
+            .then(({ mountLiveCompareWorkspace }) => {
+                if (disposed) {
+                    return null;
+                }
+                workspace = mountLiveCompareWorkspace(options);
+                return workspace;
+            })
+            .finally(() => {
+                loading = null;
+                if (!disposed) {
+                    restoreTriggerLoadingState();
+                }
+            });
+        return loading;
+    }
+
+    const handleClick = (event: MouseEvent): void => {
+        if (workspace || disposed) {
+            return;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        triggerButton.disabled = true;
+        triggerButton.setAttribute("aria-busy", "true");
+        triggerButton.textContent = "Loading Split";
+        void loadWorkspace()
+            .then((loadedWorkspace) => {
+                if (!disposed && loadedWorkspace && !loadedWorkspace.isOpen()) {
+                    triggerButton.click();
+                }
+            })
+            .catch((error) => {
+                restoreTriggerLoadingState();
+                (options.onError ?? handleAppError)(error);
+            });
+    };
+
+    triggerButton.setAttribute("aria-pressed", "false");
+    triggerButton.textContent = "Split View";
+    triggerButton.addEventListener("click", handleClick, { capture: true });
+
+    return {
+        dispose(): void {
+            disposed = true;
+            triggerButton.removeEventListener("click", handleClick, true);
+            workspace?.dispose();
+            workspace = null;
+            restoreTriggerLoadingState();
+            triggerButton.textContent = "Split View";
+            triggerButton.setAttribute("aria-pressed", "false");
+        },
+        isOpen: () => workspace?.isOpen() ?? false,
+    };
+}
 
 export function disposeApp(): void {
     liveCompareWorkspace?.dispose();
@@ -77,12 +170,13 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
         });
         const liveCompareBaseSessionId =
             options.liveCompareBaseSessionId ?? window.APP_SESSION_ID ?? null;
-        liveCompareWorkspace = mountLiveCompareWorkspace({
+        liveCompareWorkspace = mountLazyLiveCompareWorkspace({
             trigger: elements.splitViewToggleBtn,
             gridPanel: elements.gridPanel,
             bootstrapData,
             baseSessionId: liveCompareBaseSessionId,
             mainBackend: backend,
+            disposeBackendsOnClose: options.liveCompareDisposeBackendsOnClose ?? false,
             ...(options.liveCompareBackendFactory
                 ? { backendFactory: options.liveCompareBackendFactory }
                 : {}),
