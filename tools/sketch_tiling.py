@@ -476,17 +476,11 @@ def _is_interior_edge(
     key: tuple[tuple[float, float], tuple[float, float]],
     patch_bounds: tuple[float, float, float, float],
 ) -> bool:
-    """An edge is interior if neither endpoint sits on the patch bounding box."""
+    """An edge is interior only when both endpoints are strictly inside the patch."""
     min_x, min_y, max_x, max_y = patch_bounds
     margin = 1e-3
     for x, y in key:
-        on_boundary = (
-            abs(x - min_x) < margin
-            or abs(x - max_x) < margin
-            or abs(y - min_y) < margin
-            or abs(y - max_y) < margin
-        )
-        if on_boundary:
+        if x <= min_x + margin or x >= max_x - margin or y <= min_y + margin or y >= max_y - margin:
             return False
     return True
 
