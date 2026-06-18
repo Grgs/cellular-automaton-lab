@@ -6,6 +6,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 ## Unreleased
 
 - Add the 2-uniform #18 tiling `[3^6; 3^2.4.3.4]` with regular triangle and square faces.
+- Add the 2-uniform #13 tiling `[3^6; 3^2.4.12]` with regular triangle, square, and dodecagon faces.
 - Added a Right-Triangle periodic mixed tiling that splits each square-grid cell into congruent 45-45-90 triangles, with descriptor validation, picker thumbnail data, and reference verification coverage.
 - Added the 2-uniform 3-4-6-12 tiling, combining regular triangles, squares, hexagons, and dodecagons in the canonical 3.4.6.4 and 4.6.12 vertex configurations, with reference verification and picker preview coverage. Each face kind gets its own dead-cell tone (dodecagon→hexagon→square→triangle darkening with size), and a new `regular_polygon_kinds` reference invariant independently asserts every face is a regular polygon from its own vertices, catching sheared faces that the count/area/vertex-configuration checks cannot see.
 - Completed the compare workspace persistence and live-frame handoff loop: users can save/load/delete named compare runs and custom tiling sets in browser `localStorage`, open a synchronized filmstrip board's current generation back into build mode, and keep using portable `run=v1...` links for cross-device handoff.

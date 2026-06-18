@@ -55,6 +55,12 @@ const NEW_PERIODIC_TILINGS = [
         maxCellSize: 20,
     },
     {
+        geometry: "uniform-2-13-36-32412",
+        label: "2-uniform #13 (3^6; 3^2.4.12)",
+        defaultCellSize: 10,
+        maxCellSize: 18,
+    },
+    {
         geometry: "uniform-3-4-6-12",
         label: "2-uniform 3-4-6-12",
         defaultCellSize: 10,

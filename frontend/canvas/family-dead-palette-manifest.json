@@ -861,6 +861,38 @@
       ]
     },
     {
+      "geometry": "uniform-2-13-36-32412",
+      "variants": [
+        {
+          "label": "uniform-2-13-dodecagon",
+          "selector": {
+            "kind": "dodecagon"
+          },
+          "color": {
+            "token": "toneCream"
+          }
+        },
+        {
+          "label": "uniform-2-13-square",
+          "selector": {
+            "kind": "square"
+          },
+          "color": {
+            "token": "toneStone"
+          }
+        },
+        {
+          "label": "uniform-2-13-triangle",
+          "selector": {
+            "kind": "triangle"
+          },
+          "color": {
+            "token": "toneClay"
+          }
+        }
+      ]
+    },
+    {
       "geometry": "uniform-3-4-6-12",
       "variants": [
         {
