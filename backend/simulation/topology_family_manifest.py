@@ -56,6 +56,10 @@ CAIRO_GEOMETRY = "cairo-pentagonal"
 RHOMBILLE_GEOMETRY = "rhombille"
 DELTOIDAL_HEXAGONAL_GEOMETRY = "deltoidal-hexagonal"
 TETRAKIS_SQUARE_GEOMETRY = "tetrakis-square"
+# Square-grid split into congruent 45-45-90 triangles. This is intentionally
+# distinct from the equilateral triangular lattice and gives users a simple
+# non-regular triangle topology with anisotropic diagonal structure.
+RIGHT_TRIANGLE_GEOMETRY = "right-triangle"
 TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular"
 DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
 PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal"
@@ -426,6 +430,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
         default_rule="life-b2-s23",
+    ),
+    RIGHT_TRIANGLE_GEOMETRY: _single_variant_family(
+        tiling_family=RIGHT_TRIANGLE_GEOMETRY,
+        label="Right-Triangle",
+        picker_group="Periodic Mixed",
+        picker_order=232,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
     ),
     TILTWORK_GEOMETRY: _single_variant_family(
         tiling_family=TILTWORK_GEOMETRY,

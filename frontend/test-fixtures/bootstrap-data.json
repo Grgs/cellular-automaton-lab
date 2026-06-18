@@ -499,6 +499,32 @@
       }
     },
     {
+      "tiling_family": "right-triangle",
+      "label": "Right-Triangle",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 232,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "right-triangle"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
       "tiling_family": "tiltwork",
       "label": "Tiltwork",
       "picker_group": "Periodic Mixed",
@@ -1425,6 +1451,21 @@
       "max_x": 52.0,
       "max_y": 52.0,
       "cell_count_per_unit": 4,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "right-triangle",
+      "label": "Right-Triangle",
+      "metric_model": "pattern",
+      "base_edge": 50.0,
+      "unit_width": 50.0,
+      "unit_height": 50.0,
+      "min_dimension": 1,
+      "min_x": 0.0,
+      "min_y": 0.0,
+      "max_x": 50.0,
+      "max_y": 50.0,
+      "cell_count_per_unit": 2,
       "row_offset_x": 0.0
     },
     {

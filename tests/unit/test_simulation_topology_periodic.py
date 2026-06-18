@@ -26,6 +26,7 @@ try:
         KAGOME_GEOMETRY,
         PRISMATIC_PENTAGONAL_GEOMETRY,
         RHOMBILLE_GEOMETRY,
+        RIGHT_TRIANGLE_GEOMETRY,
         SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
@@ -218,6 +219,7 @@ class SimulationTopologyPeriodicTests(unittest.TestCase):
             PRISMATIC_PENTAGONAL_GEOMETRY: {"pentagon"},
             FLORET_PENTAGONAL_GEOMETRY: {"pentagon"},
             SNUB_SQUARE_DUAL_GEOMETRY: {"pentagon"},
+            RIGHT_TRIANGLE_GEOMETRY: {"right-triangle"},
         }
 
         for geometry, expected_kinds in cases.items():

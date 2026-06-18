@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Added a Right-Triangle periodic mixed tiling that splits each square-grid cell into congruent 45-45-90 triangles, with descriptor validation, picker thumbnail data, and reference verification coverage.
 - Completed the compare workspace persistence and live-frame handoff loop: users can save/load/delete named compare runs and custom tiling sets in browser `localStorage`, open a synchronized filmstrip board's current generation back into build mode, and keep using portable `run=v1...` links for cross-device handoff.
 - Polished the compare workspace layout and review states: the full-page filmstrip uses wider board tracks, saved-run and saved-tiling controls explain empty states, live side-by-side playback reports loading/error/ready status, and the filmstrip transport/board grid have clearer keyboard and ARIA affordances.
 - Made compare mode addressable as a `#/compare` hash route: the panel is deep-linkable and integrated with browser history, so opening it pushes the route, closing clears it, and Back/Forward open and close it. The route coexists with `#share=` board links and works in the standalone build.

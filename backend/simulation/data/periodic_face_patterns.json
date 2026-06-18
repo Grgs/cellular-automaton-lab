@@ -6062,6 +6062,67 @@
       }
     ]
   },
+  "right-triangle": {
+    "geometry": "right-triangle",
+    "label": "Right-Triangle",
+    "base_edge": 50.0,
+    "unit_width": 50.0,
+    "unit_height": 50.0,
+    "min_dimension": 1,
+    "min_x": 0.0,
+    "min_y": 0.0,
+    "max_x": 50.0,
+    "max_y": 50.0,
+    "cell_count_per_unit": 2,
+    "faces": [
+      {
+        "slot": "lower",
+        "kind": "right-triangle",
+        "prefix": "t",
+        "center": {
+          "x": 33.333333,
+          "y": 16.666667
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 50.0,
+            "y": 0.0
+          },
+          {
+            "x": 50.0,
+            "y": 50.0
+          }
+        ]
+      },
+      {
+        "slot": "upper",
+        "kind": "right-triangle",
+        "prefix": "t",
+        "center": {
+          "x": 16.666667,
+          "y": 33.333333
+        },
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 50.0,
+            "y": 50.0
+          },
+          {
+            "x": 0.0,
+            "y": 50.0
+          }
+        ]
+      }
+    ]
+  },
   "triakis-triangular": {
     "geometry": "triakis-triangular",
     "label": "Triakis Triangular",
