@@ -1,0 +1,61 @@
+{
+  "geometry": "right-triangle",
+  "label": "Right-Triangle",
+  "base_edge": 50,
+  "unit_width": 50,
+  "unit_height": 50,
+  "min_dimension": 1,
+  "min_x": 0,
+  "min_y": 0,
+  "max_x": 50,
+  "max_y": 50,
+  "cell_count_per_unit": 2,
+  "faces": [
+    {
+      "slot": "lower",
+      "kind": "right-triangle",
+      "prefix": "t",
+      "center": {
+        "x": 33.333333,
+        "y": 16.666667
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 50,
+          "y": 0
+        },
+        {
+          "x": 50,
+          "y": 50
+        }
+      ]
+    },
+    {
+      "slot": "upper",
+      "kind": "right-triangle",
+      "prefix": "t",
+      "center": {
+        "x": 16.666667,
+        "y": 33.333333
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 50,
+          "y": 50
+        },
+        {
+          "x": 0,
+          "y": 50
+        }
+      ]
+    }
+  ]
+}

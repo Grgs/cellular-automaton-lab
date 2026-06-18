@@ -1,0 +1,140 @@
+{
+  "geometry": "cairo-pentagonal",
+  "label": "Cairo Pentagonal",
+  "unit_width": 142,
+  "unit_height": 71,
+  "base_edge": 30,
+  "min_dimension": 1,
+  "min_x": 0,
+  "min_y": 15,
+  "max_x": 142,
+  "max_y": 127,
+  "row_offset_x": 71,
+  "cell_count_per_unit": 4,
+  "faces": [
+    {
+      "slot": "a",
+      "kind": "pentagon",
+      "prefix": "p",
+      "center": {
+        "x": 71,
+        "y": 45.6
+      },
+      "vertices": [
+        {
+          "x": 86,
+          "y": 71
+        },
+        {
+          "x": 56,
+          "y": 71
+        },
+        {
+          "x": 35.5,
+          "y": 35.5
+        },
+        {
+          "x": 71,
+          "y": 15
+        },
+        {
+          "x": 106.5,
+          "y": 35.5
+        }
+      ]
+    },
+    {
+      "slot": "b",
+      "kind": "pentagon",
+      "prefix": "p",
+      "center": {
+        "x": 25.4,
+        "y": 71
+      },
+      "vertices": [
+        {
+          "x": 56,
+          "y": 71
+        },
+        {
+          "x": 35.5,
+          "y": 106.5
+        },
+        {
+          "x": 0,
+          "y": 86
+        },
+        {
+          "x": 0,
+          "y": 56
+        },
+        {
+          "x": 35.5,
+          "y": 35.5
+        }
+      ]
+    },
+    {
+      "slot": "c",
+      "kind": "pentagon",
+      "prefix": "p",
+      "center": {
+        "x": 116.6,
+        "y": 71
+      },
+      "vertices": [
+        {
+          "x": 142,
+          "y": 86
+        },
+        {
+          "x": 106.5,
+          "y": 106.5
+        },
+        {
+          "x": 86,
+          "y": 71
+        },
+        {
+          "x": 106.5,
+          "y": 35.5
+        },
+        {
+          "x": 142,
+          "y": 56
+        }
+      ]
+    },
+    {
+      "slot": "d",
+      "kind": "pentagon",
+      "prefix": "p",
+      "center": {
+        "x": 71,
+        "y": 96.4
+      },
+      "vertices": [
+        {
+          "x": 106.5,
+          "y": 106.5
+        },
+        {
+          "x": 71,
+          "y": 127
+        },
+        {
+          "x": 35.5,
+          "y": 106.5
+        },
+        {
+          "x": 56,
+          "y": 71
+        },
+        {
+          "x": 86,
+          "y": 71
+        }
+      ]
+    }
+  ]
+}

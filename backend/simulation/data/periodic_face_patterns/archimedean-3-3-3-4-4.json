@@ -1,0 +1,307 @@
+{
+  "geometry": "archimedean-3-3-3-4-4",
+  "label": "Elongated Triangular (3.3.3.4.4)",
+  "base_edge": 52,
+  "unit_width": 104,
+  "unit_height": 194,
+  "min_dimension": 1,
+  "cell_count_per_unit": 12,
+  "min_x": -26,
+  "min_y": 0,
+  "max_x": 104,
+  "max_y": 194,
+  "faces": [
+    {
+      "slot": "a",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 52,
+        "y": 82
+      },
+      "vertices": [
+        {
+          "x": 26,
+          "y": 97
+        },
+        {
+          "x": 52,
+          "y": 52
+        },
+        {
+          "x": 78,
+          "y": 97
+        }
+      ]
+    },
+    {
+      "slot": "b",
+      "kind": "square",
+      "prefix": "s",
+      "center": {
+        "x": 78,
+        "y": 26
+      },
+      "vertices": [
+        {
+          "x": 52,
+          "y": 0
+        },
+        {
+          "x": 104,
+          "y": 0
+        },
+        {
+          "x": 104,
+          "y": 52
+        },
+        {
+          "x": 52,
+          "y": 52
+        }
+      ]
+    },
+    {
+      "slot": "c",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 78,
+        "y": 67
+      },
+      "vertices": [
+        {
+          "x": 52,
+          "y": 52
+        },
+        {
+          "x": 78,
+          "y": 97
+        },
+        {
+          "x": 104,
+          "y": 52
+        }
+      ]
+    },
+    {
+      "slot": "d",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 78,
+        "y": 179
+      },
+      "vertices": [
+        {
+          "x": 52,
+          "y": 194
+        },
+        {
+          "x": 78,
+          "y": 149
+        },
+        {
+          "x": 104,
+          "y": 194
+        }
+      ]
+    },
+    {
+      "slot": "e",
+      "kind": "square",
+      "prefix": "s",
+      "center": {
+        "x": 52,
+        "y": 123
+      },
+      "vertices": [
+        {
+          "x": 26,
+          "y": 97
+        },
+        {
+          "x": 78,
+          "y": 97
+        },
+        {
+          "x": 78,
+          "y": 149
+        },
+        {
+          "x": 26,
+          "y": 149
+        }
+      ]
+    },
+    {
+      "slot": "f",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 52,
+        "y": 164
+      },
+      "vertices": [
+        {
+          "x": 26,
+          "y": 149
+        },
+        {
+          "x": 52,
+          "y": 194
+        },
+        {
+          "x": 78,
+          "y": 149
+        }
+      ]
+    },
+    {
+      "slot": "g",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 26,
+        "y": 179
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 194
+        },
+        {
+          "x": 26,
+          "y": 149
+        },
+        {
+          "x": 52,
+          "y": 194
+        }
+      ]
+    },
+    {
+      "slot": "h",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 0,
+        "y": 164
+      },
+      "vertices": [
+        {
+          "x": -26,
+          "y": 149
+        },
+        {
+          "x": 0,
+          "y": 194
+        },
+        {
+          "x": 26,
+          "y": 149
+        }
+      ]
+    },
+    {
+      "slot": "i",
+      "kind": "square",
+      "prefix": "s",
+      "center": {
+        "x": 0,
+        "y": 123
+      },
+      "vertices": [
+        {
+          "x": -26,
+          "y": 97
+        },
+        {
+          "x": 26,
+          "y": 97
+        },
+        {
+          "x": 26,
+          "y": 149
+        },
+        {
+          "x": -26,
+          "y": 149
+        }
+      ]
+    },
+    {
+      "slot": "j",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 0,
+        "y": 82
+      },
+      "vertices": [
+        {
+          "x": -26,
+          "y": 97
+        },
+        {
+          "x": 0,
+          "y": 52
+        },
+        {
+          "x": 26,
+          "y": 97
+        }
+      ]
+    },
+    {
+      "slot": "k",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 26,
+        "y": 67
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 52
+        },
+        {
+          "x": 26,
+          "y": 97
+        },
+        {
+          "x": 52,
+          "y": 52
+        }
+      ]
+    },
+    {
+      "slot": "l",
+      "kind": "square",
+      "prefix": "s",
+      "center": {
+        "x": 26,
+        "y": 26
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 52,
+          "y": 0
+        },
+        {
+          "x": 52,
+          "y": 52
+        },
+        {
+          "x": 0,
+          "y": 52
+        }
+      ]
+    }
+  ]
+}

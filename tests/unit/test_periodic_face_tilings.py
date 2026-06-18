@@ -1,15 +1,16 @@
 import json
+import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from backend.simulation import periodic_face_tilings
+from backend.simulation.periodic_face_pattern_data import load_periodic_face_pattern_payloads
 from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
 
 
 class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
-    """Verify that PERIODIC_FACE_TILING_GEOMETRIES and periodic_face_patterns.json
-    are kept in sync — every registered geometry must have a descriptor entry and
-    every descriptor entry must be registered."""
+    """Verify that registered geometries and descriptor files stay in sync."""
 
     def test_registered_geometries_all_have_json_descriptors(self) -> None:
         descriptors = periodic_face_tilings._loaded_pattern_descriptors()
@@ -17,7 +18,7 @@ class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
         self.assertFalse(
             missing,
             f"Geometries registered in PERIODIC_FACE_TILING_GEOMETRIES but missing "
-            f"from periodic_face_patterns.json: {missing}",
+            f"from the periodic-face descriptor directory: {missing}",
         )
 
     def test_json_descriptors_all_have_registered_geometries(self) -> None:
@@ -25,7 +26,7 @@ class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
         orphaned = sorted(set(descriptors) - set(PERIODIC_FACE_TILING_GEOMETRIES))
         self.assertFalse(
             orphaned,
-            f"Entries in periodic_face_patterns.json not registered in "
+            f"Periodic-face descriptor files not registered in "
             f"PERIODIC_FACE_TILING_GEOMETRIES: {orphaned}",
         )
 
@@ -41,37 +42,45 @@ class PeriodicFaceTilingPayloadTests(unittest.TestCase):
         periodic_face_tilings._descriptor_registry.cache_clear()
         super().tearDown()
 
-    def test_loaded_pattern_descriptors_rejects_non_object_payload(self) -> None:
+    def test_loaded_pattern_descriptors_rejects_invalid_face_entries(self) -> None:
+        malformed_descriptor = {
+            "geometry": "archimedean-4-8-8",
+            "label": "Square-Octagon (4.8.8)",
+            "unit_width": 1.0,
+            "unit_height": 1.0,
+            "base_edge": 1.0,
+            "min_dimension": 1,
+            "min_x": 0.0,
+            "min_y": 0.0,
+            "max_x": 1.0,
+            "max_y": 1.0,
+            "cell_count_per_unit": 2,
+            "faces": ["bad-face"],
+        }
         with mock.patch(
-            "backend.simulation.periodic_face_tilings.Path.read_text",
-            return_value="[]",
+            "backend.simulation.periodic_face_tilings.load_periodic_face_pattern_payloads",
+            return_value={"archimedean-4-8-8": malformed_descriptor},
         ):
             with self.assertRaisesRegex(ValueError, "invalid"):
                 periodic_face_tilings._loaded_pattern_descriptors()
 
-    def test_loaded_pattern_descriptors_rejects_invalid_face_entries(self) -> None:
-        malformed_payload = {
-            "archimedean-4-8-8": {
-                "geometry": "archimedean-4-8-8",
-                "label": "Square-Octagon (4.8.8)",
-                "unit_width": 1.0,
-                "unit_height": 1.0,
-                "base_edge": 1.0,
-                "min_dimension": 1,
-                "min_x": 0.0,
-                "min_y": 0.0,
-                "max_x": 1.0,
-                "max_y": 1.0,
-                "cell_count_per_unit": 2,
-                "faces": ["bad-face"],
-            }
-        }
-        with mock.patch(
-            "backend.simulation.periodic_face_tilings.Path.read_text",
-            return_value=json.dumps(malformed_payload),
-        ):
-            with self.assertRaisesRegex(ValueError, "invalid"):
-                periodic_face_tilings._loaded_pattern_descriptors()
+
+class PeriodicFacePatternDataTests(unittest.TestCase):
+    def test_loader_rejects_non_object_descriptor(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "example.json"
+            path.write_text(json.dumps([]), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "example.json.*invalid"):
+                load_periodic_face_pattern_payloads(Path(temp_dir))
+
+    def test_loader_requires_filename_to_match_geometry(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "wrong-name.json"
+            path.write_text(json.dumps({"geometry": "example"}), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "must use the geometry key"):
+                load_periodic_face_pattern_payloads(Path(temp_dir))
 
 
 class TJunctionNeighborDetectionTests(unittest.TestCase):

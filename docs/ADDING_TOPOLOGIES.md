@@ -43,7 +43,7 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
 - [backend/simulation/topology_implementation_registry.py](../backend/simulation/topology_implementation_registry.py): builder kind and render kind dispatch.
 - [backend/simulation/topology_regular.py](../backend/simulation/topology_regular.py): regular grid cell builders.
 - [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py): registers which geometry keys are handled by the periodic face builder.
-- [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json): face template descriptor data (vertices, unit cell dimensions, slot vocabulary) for every `periodic_face` tiling.
+- [backend/simulation/data/periodic_face_patterns/](../backend/simulation/data/periodic_face_patterns/): one face template descriptor per `periodic_face` tiling, named `<geometry-key>.json`.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py): aperiodic family dispatch.
 - [backend/simulation/aperiodic_support/](../backend/simulation/aperiodic_support/): shared affine, polygon, and patch helpers (split across `affine.py`, `geometry.py`, `neighbors.py`, `patches.py`, and `types.py`).
 - [backend/simulation/reference_specs/](../backend/simulation/reference_specs/): reference family specs split by family class (`regular.py`, `periodic.py`, `aperiodic.py`). Add a `ReferenceFamilySpec` entry here for any tiling with a literature-verifiable cell count, degree histogram, or adjacency signature.
@@ -65,8 +65,8 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
    - Add the geometry to the matching implementation group or provide a focused builder wrapper.
 4. Implement the backend builder.
    - Regular grids belong near [backend/simulation/topology_regular.py](../backend/simulation/topology_regular.py).
-   - Periodic mixed tilings: add an entry to [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json) with the face template vertices, unit cell dimensions (`unit_width`, `unit_height`), slot vocabulary, and bounding extents. Then add the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` in [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py).
-   - Before hand-editing the JSON descriptor, **sketch the candidate faces in a Python file and run them through [tools/sketch_tiling.py](../tools/sketch_tiling.py)** to catch overlaps, T-junctions, unmatched edges, and per-vertex angle-sum mistakes before any of the manifest/registry wiring is in place. The tool emits a JSON descriptor stub on success that drops straight into `periodic_face_patterns.json`. See the example under [tools/sketch_examples/](../tools/sketch_examples/) for the input format.
+   - Periodic mixed tilings: add [backend/simulation/data/periodic_face_patterns/<geometry-key>.json](../backend/simulation/data/periodic_face_patterns/) with the face template vertices, unit cell dimensions (`unit_width`, `unit_height`), slot vocabulary, and bounding extents. The filename must match the descriptor's `geometry` value. Then add the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` in [backend/simulation/periodic_face_tilings.py](../backend/simulation/periodic_face_tilings.py).
+   - Before hand-editing the JSON descriptor, **sketch the candidate faces in a Python file and run them through [tools/sketch_tiling.py](../tools/sketch_tiling.py)** to catch overlaps, T-junctions, unmatched edges, and per-vertex angle-sum mistakes before any of the manifest/registry wiring is in place. Pass `--json backend/simulation/data/periodic_face_patterns/<geometry-key>.json` to write the descriptor directly to its final location. See the example under [tools/sketch_examples/](../tools/sketch_examples/) for the input format.
    - Aperiodic families usually get a focused `backend/simulation/aperiodic_*.py` module plus registry wiring.
 5. Preserve topology contracts.
    - Cell ids must be deterministic and stable for the same topology spec.
@@ -121,7 +121,7 @@ _PERIODIC_FACE_GEOMETRIES = (
 
 Also export the new constant through [backend/simulation/topology_catalog_data.py](../backend/simulation/topology_catalog_data.py) and [backend/simulation/topology_catalog.py](../backend/simulation/topology_catalog.py) (both `__all__` and the import list) if runtime modules need to import it from the catalog surface.
 
-The actual face template descriptor belongs in [backend/simulation/data/periodic_face_patterns.json](../backend/simulation/data/periodic_face_patterns.json) — not in `periodic_face_tilings.py`. That file only lists which geometry keys are dispatched through the periodic face builder. The JSON entry should include enough geometry (vertex coordinates, `unit_width`, `unit_height`, slot vocabulary) for deterministic cell ids, neighbors, and polygon rendering.
+The actual face template descriptor belongs in its own file under [backend/simulation/data/periodic_face_patterns/](../backend/simulation/data/periodic_face_patterns/) — not in `periodic_face_tilings.py`. That module only lists which geometry keys are dispatched through the periodic face builder. The JSON descriptor should include enough geometry (vertex coordinates, `unit_width`, `unit_height`, slot vocabulary) for deterministic cell ids, neighbors, and polygon rendering.
 
 If a topology cannot be represented by an existing builder kind and `render_kind`, add the smallest new builder or adapter path that preserves the same payload contracts.
 
@@ -171,7 +171,7 @@ When choosing the rotation: orient the tiling so one basis vector becomes horizo
 - Do not silently accept mathematical shortcuts. If a family is finite-sample, approximate, or decorated rather than canonical, document that boundary.
 - Do not refresh generated fixtures by hand. Use the repo-owned regeneration tools and review the resulting diff.
 - Do not forget the picker thumbnail. Without an entry in `tiling-preview-data.ts` the tiling silently falls back to a generic square preview in the picker menu.
-- For periodic face tilings, the face template data belongs in `periodic_face_patterns.json`, not in `periodic_face_tilings.py`. Adding only the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` without a JSON entry will produce an empty or broken topology at runtime.
+- For periodic face tilings, the face template data belongs in `periodic_face_patterns/<geometry-key>.json`, not in `periodic_face_tilings.py`. Adding only the geometry key to `PERIODIC_FACE_TILING_GEOMETRIES` without a descriptor file will produce an empty or broken topology at runtime.
 - Do not set both `row_offset_x` and `lattice_skew_x` in the same descriptor; they describe mutually exclusive lattice semantics. See the "Periodic Face Tilings With Skewed Or Non-Edge-To-Edge Lattices" section above.
 - For Laves (dual) tilings, cross-link the primal tiling's reference spec with `expected_dual_geometry` so the duality relationship is verified automatically.
 - Python files must pass `ruff format` or the pre-commit hook will reject the commit. Run `py -3 -m ruff format <file>` before staging if you write or generate Python with non-standard formatting.

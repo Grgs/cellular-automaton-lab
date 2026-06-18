@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import json
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 from typing import NotRequired, TypedDict
 
 from backend.payload_types import PeriodicFaceTilingDescriptorPayload, RawJsonObject
+from backend.simulation.periodic_face_pattern_data import load_periodic_face_pattern_payloads
 from backend.simulation.topology_family_manifest import (
     ARCHIMEDEAN_488_GEOMETRY,
     ARCHIMEDEAN_3464_GEOMETRY,
@@ -77,7 +76,6 @@ PERIODIC_FACE_TILING_GEOMETRIES = (
     STEIN_14_PENTAGONAL_GEOMETRY,
 )
 
-_DATA_PATH = Path(__file__).with_name("data") / "periodic_face_patterns.json"
 _ANGLE_START = -3 * math.pi / 4
 
 
@@ -301,14 +299,8 @@ def _require_pattern_descriptor_payload(
 
 
 def _load_pattern_payload() -> dict[str, _JsonPatternDescriptor]:
-    payload = _require_object(
-        json.loads(_DATA_PATH.read_text(encoding="utf-8")),
-        context="Periodic face tiling data payload",
-    )
     normalized_payload: dict[str, _JsonPatternDescriptor] = {}
-    for geometry_key, descriptor_payload in payload.items():
-        if not isinstance(geometry_key, str) or not geometry_key:
-            raise ValueError("Periodic face tiling data payload is invalid.")
+    for geometry_key, descriptor_payload in load_periodic_face_pattern_payloads().items():
         normalized_payload[geometry_key] = _require_pattern_descriptor_payload(
             descriptor_payload,
             geometry_key=geometry_key,

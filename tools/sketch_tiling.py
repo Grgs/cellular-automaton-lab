@@ -4,8 +4,8 @@ Lets you iterate on a candidate periodic tiling *without* wiring it into the
 backend manifests. Takes a Python sketch file describing the faces of a unit
 cell, builds a 3x3 patch using the same builder the backend uses, then
 reports overlaps, T-junctions, vertex configurations with angle sums, and
-emits an SVG visualization and a JSON descriptor stub ready to paste into
-``backend/simulation/data/periodic_face_patterns.json``.
+emits an SVG visualization and a JSON descriptor ready to save under
+``backend/simulation/data/periodic_face_patterns/<geometry>.json``.
 
 Sketch file format (a regular Python module)::
 
