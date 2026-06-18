@@ -20,6 +20,15 @@ EXAMPLE_PATH = ROOT_DIR / "tools" / "sketch_examples" / "triangular_square_2unif
 
 
 class SketchTilingTests(unittest.TestCase):
+    def test_edges_outside_logical_patch_are_boundary_edges(self) -> None:
+        from tools.sketch_tiling import _is_interior_edge
+
+        bounds = (0.0, 0.0, 10.0, 10.0)
+
+        self.assertFalse(_is_interior_edge(((-2.0, 3.0), (-2.0, 4.0)), bounds))
+        self.assertFalse(_is_interior_edge(((12.0, 3.0), (12.0, 4.0)), bounds))
+        self.assertTrue(_is_interior_edge(((2.0, 3.0), (2.0, 4.0)), bounds))
+
     def test_example_sketch_is_valid_and_matches_backend(self) -> None:
         from tools.sketch_tiling import load_sketch, sketch
 

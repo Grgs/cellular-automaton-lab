@@ -25,6 +25,7 @@ from . import (
     trihex_2uniform_3636_3366,
     trihexagonal_3_6_3_6,
     type_7_pentagonal,
+    uniform_34612,
 )
 
 PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
@@ -50,6 +51,7 @@ PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **pentagon_crosses.SPECS,
     **trihex_2uniform_3636_3366.SPECS,
     **stein_14_pentagonal.SPECS,
+    **uniform_34612.SPECS,
 }
 
 __all__ = ["PERIODIC_REFERENCE_FAMILY_SPECS"]

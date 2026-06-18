@@ -115,6 +115,10 @@ TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY = "triangular-square-2uniform"
 # no T-junctions. Uses only triangles + hexagons (complements the
 # triangle+square 2-uniform).
 TRIHEX_2UNIFORM_3636_3366_GEOMETRY = "trihex-2uniform-3636-3366"
+# Demiregular tiling combining the 3.4.6.4 and 4.6.12 vertex orbits.
+# Its regular triangle, square, hexagon, and dodecagon faces make it the
+# catalog's first periodic tiling with four polygon kinds in one topology.
+UNIFORM_34612_GEOMETRY = "uniform-3-4-6-12"
 # Stein-14 pentagonal: the 14th of the 15 known monohedral convex pentagonal
 # tilings, discovered by Rolf Stein (1985). Has completely determined tile
 # proportions (no degrees of freedom): 2a=2c=d=e with A=90 deg and angle B
@@ -531,6 +535,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    UNIFORM_34612_GEOMETRY: _single_variant_family(
+        tiling_family=UNIFORM_34612_GEOMETRY,
+        label="2-uniform 3-4-6-12",
+        picker_group="Periodic Mixed",
+        picker_order=246,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),

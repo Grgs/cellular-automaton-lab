@@ -836,6 +836,47 @@
           }
         }
       ]
+    },
+    {
+      "geometry": "uniform-3-4-6-12",
+      "variants": [
+        {
+          "label": "uniform-34612-dodecagon",
+          "selector": {
+            "kind": "dodecagon"
+          },
+          "color": {
+            "token": "toneCream"
+          }
+        },
+        {
+          "label": "uniform-34612-hexagon",
+          "selector": {
+            "kind": "hexagon"
+          },
+          "color": {
+            "token": "toneTan"
+          }
+        },
+        {
+          "label": "uniform-34612-square",
+          "selector": {
+            "kind": "square"
+          },
+          "color": {
+            "token": "toneStone"
+          }
+        },
+        {
+          "label": "uniform-34612-triangle",
+          "selector": {
+            "kind": "triangle"
+          },
+          "color": {
+            "token": "toneClay"
+          }
+        }
+      ]
     }
   ]
 }

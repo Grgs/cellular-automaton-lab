@@ -30,6 +30,7 @@ try:
         SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
+        UNIFORM_34612_GEOMETRY,
     )
     from backend.simulation.topology_validation import validate_topology
 except ModuleNotFoundError:
@@ -59,6 +60,7 @@ except ModuleNotFoundError:
         SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
+        UNIFORM_34612_GEOMETRY,
     )
     from backend.simulation.topology_validation import validate_topology
 
@@ -249,6 +251,19 @@ class SimulationTopologyPeriodicTests(unittest.TestCase):
             Counter(cell.kind for cell in topology.cells),
             Counter({"triangle": 8, "square": 4}),
         )
+
+    def test_uniform_34612_has_expected_face_mix_and_valid_interior(self) -> None:
+        topology = build_topology(UNIFORM_34612_GEOMETRY, 3, 3)
+
+        self.assertEqual(topology.cell_count, 241)
+        self.assertEqual(
+            Counter(cell.kind for cell in topology.cells),
+            Counter({"triangle": 42, "square": 114, "hexagon": 60, "dodecagon": 25}),
+        )
+        validation = validate_topology(topology)
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+        self.assertFalse(validation.edge_multiplicity_issues)
+        self.assertEqual(validation.hole_count, 0)
 
     def test_snub_square_interior_edges_are_fully_shared(self) -> None:
         topology = build_topology("archimedean-3-3-4-3-4", 3, 3)

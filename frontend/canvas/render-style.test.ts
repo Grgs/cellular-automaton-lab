@@ -20,6 +20,7 @@ const PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal";
 const FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal";
 const SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual";
 const TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal";
+const UNIFORM_34612_GEOMETRY = "uniform-3-4-6-12";
 
 function installRenderStyleTestGlobals(): void {
     installFrontendGlobals();
@@ -61,6 +62,12 @@ describe("canvas/render-style", () => {
             { geometry: ARCHIMEDEAN_4612_GEOMETRY, kind: "dodecagon", expected: colors.toneCream },
             { geometry: ARCHIMEDEAN_4612_GEOMETRY, kind: "hexagon", expected: colors.toneTan },
             { geometry: ARCHIMEDEAN_4612_GEOMETRY, kind: "square", expected: colors.toneClay },
+            // 3.4.6.12 is the catalog's only four-kind periodic tiling; its faces
+            // darken with decreasing polygon size (dodecagon -> triangle).
+            { geometry: UNIFORM_34612_GEOMETRY, kind: "dodecagon", expected: colors.toneCream },
+            { geometry: UNIFORM_34612_GEOMETRY, kind: "hexagon", expected: colors.toneTan },
+            { geometry: UNIFORM_34612_GEOMETRY, kind: "square", expected: colors.toneStone },
+            { geometry: UNIFORM_34612_GEOMETRY, kind: "triangle", expected: colors.toneClay },
             { geometry: ARCHIMEDEAN_33434_GEOMETRY, kind: "square", expected: colors.toneCream },
             { geometry: ARCHIMEDEAN_33434_GEOMETRY, kind: "triangle", expected: colors.toneTan },
             { geometry: ARCHIMEDEAN_33344_GEOMETRY, kind: "square", expected: colors.toneCream },
