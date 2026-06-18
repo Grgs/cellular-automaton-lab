@@ -838,6 +838,29 @@
       ]
     },
     {
+      "geometry": "uniform-2-18-36-33434",
+      "variants": [
+        {
+          "label": "uniform-2-18-square",
+          "selector": {
+            "kind": "square"
+          },
+          "color": {
+            "token": "toneStone"
+          }
+        },
+        {
+          "label": "uniform-2-18-triangle",
+          "selector": {
+            "kind": "triangle"
+          },
+          "color": {
+            "token": "toneClay"
+          }
+        }
+      ]
+    },
+    {
       "geometry": "uniform-3-4-6-12",
       "variants": [
         {

@@ -115,6 +115,9 @@ TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY = "triangular-square-2uniform"
 # no T-junctions. Uses only triangles + hexagons (complements the
 # triangle+square 2-uniform).
 TRIHEX_2UNIFORM_3636_3366_GEOMETRY = "trihex-2uniform-3636-3366"
+# 2-uniform tiling #18 [3^6; 3^2.4.3.4]: regular triangles and squares
+# arranged with both pure-triangular and snub-square vertex orbits.
+UNIFORM_2_18_GEOMETRY = "uniform-2-18-36-33434"
 # Demiregular tiling combining the 3.4.6.4 and 4.6.12 vertex orbits.
 # Its regular triangle, square, hexagon, and dodecagon faces make it the
 # catalog's first periodic tiling with four polygon kinds in one topology.
@@ -538,11 +541,22 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
+    UNIFORM_2_18_GEOMETRY: _single_variant_family(
+        tiling_family=UNIFORM_2_18_GEOMETRY,
+        label="2-uniform #18 (3^6; 3^2.4.3.4)",
+        picker_group="Periodic Mixed",
+        picker_order=246,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
     UNIFORM_34612_GEOMETRY: _single_variant_family(
         tiling_family=UNIFORM_34612_GEOMETRY,
         label="2-uniform 3-4-6-12",
         picker_group="Periodic Mixed",
-        picker_order=246,
+        picker_order=247,
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
