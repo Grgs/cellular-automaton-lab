@@ -384,6 +384,14 @@ def _depth_topology_expectation_failures(
                 expected_ratios=expectation.expected_triangle_side_ratios,
             )
         )
+    if expectation.regular_polygon_kinds:
+        failures.extend(
+            _regular_polygon_failures(
+                depth=depth,
+                topology=topology,
+                kinds=frozenset(expectation.regular_polygon_kinds),
+            )
+        )
     failures.extend(_local_reference_fixture_failures(geometry, depth, topology))
     failures.extend(_canonical_patch_fixture_failures(geometry, depth, topology, expectation))
     return failures
@@ -458,3 +466,93 @@ def _triangle_congruence_failures(
             )
         )
     return failures
+
+
+_REGULAR_POLYGON_RELATIVE_TOLERANCE = 1e-3
+
+
+def _interior_angle(
+    previous: tuple[float, float],
+    vertex: tuple[float, float],
+    following: tuple[float, float],
+) -> float | None:
+    ax, ay = previous[0] - vertex[0], previous[1] - vertex[1]
+    bx, by = following[0] - vertex[0], following[1] - vertex[1]
+    a_length = math.hypot(ax, ay)
+    b_length = math.hypot(bx, by)
+    if a_length <= 0.0 or b_length <= 0.0:
+        return None
+    cosine = max(-1.0, min(1.0, (ax * bx + ay * by) / (a_length * b_length)))
+    return math.acos(cosine)
+
+
+def _regular_polygon_failures(
+    *,
+    depth: int,
+    topology: LatticeTopology,
+    kinds: frozenset[str],
+) -> list[ReferenceCheckFailure]:
+    """Require every cell of the named kinds to be a regular polygon.
+
+    A polygon is regular iff all edge lengths are equal and all interior angles
+    are equal. Both are checked from the cell's own vertices with a relative
+    tolerance, so the check is invariant to patch scale, position, and
+    orientation while still catching sheared or dented faces that preserve cell
+    counts, areas, and vertex configurations.
+    """
+    checked = 0
+    irregular = 0
+    worst_example: tuple[str, str, float] | None = None
+    worst_error = 0.0
+    for cell in topology.cells:
+        if cell.kind not in kinds:
+            continue
+        checked += 1
+        vertices = cell.vertices
+        if vertices is None or len(vertices) < 3:
+            irregular += 1
+            continue
+        count = len(vertices)
+        edges = [
+            math.dist(vertices[index], vertices[(index + 1) % count]) for index in range(count)
+        ]
+        angles = [
+            _interior_angle(
+                vertices[(index - 1) % count], vertices[index], vertices[(index + 1) % count]
+            )
+            for index in range(count)
+        ]
+        mean_edge = sum(edges) / count
+        if mean_edge <= 0.0 or any(angle is None for angle in angles):
+            irregular += 1
+            continue
+        resolved_angles = [angle for angle in angles if angle is not None]
+        mean_angle = sum(resolved_angles) / count
+        edge_error = max(abs(edge - mean_edge) / mean_edge for edge in edges)
+        angle_error = (
+            max(abs(angle - mean_angle) / mean_angle for angle in resolved_angles)
+            if mean_angle > 0.0
+            else math.inf
+        )
+        error = max(edge_error, angle_error)
+        if error > _REGULAR_POLYGON_RELATIVE_TOLERANCE:
+            irregular += 1
+            if error > worst_error:
+                worst_error = error
+                worst_example = (cell.id, cell.kind, error)
+    if not irregular:
+        return []
+    detail = ""
+    if worst_example is not None:
+        worst_id, worst_kind, error = worst_example
+        detail = f" worst is '{worst_id}' ({worst_kind}) deviating by {error:.2e}."
+    return [
+        ReferenceCheckFailure(
+            code="non-regular-polygon",
+            message=(
+                f"Depth {depth} expected every cell of kinds {sorted(kinds)} to be a regular "
+                f"polygon but {irregular} of {checked} checked cells are irregular.{detail}"
+            ),
+            depth=depth,
+        )
+    ]

@@ -32,6 +32,11 @@ SPECS = {
                 ),
                 expected_degree_histogram=((2, 12), (3, 48), (4, 112), (6, 48), (7, 8), (12, 13)),
                 expected_signature="e848c971b946",  # pragma: allowlist secret
+                # Every face in the 3.4.6.12 tiling is a regular polygon by
+                # definition; assert it independently from the cells' own
+                # vertices so a sheared face can't slip past the count/area/
+                # vertex-configuration checks.
+                regular_polygon_kinds=("dodecagon", "hexagon", "square", "triangle"),
             ),
         },
         periodic_descriptor=PeriodicDescriptorExpectation(

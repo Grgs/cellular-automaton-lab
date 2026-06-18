@@ -66,6 +66,14 @@ class ReferenceDepthExpectation:
     # count/area/adjacency invariants cannot see: an angle-mismatched affine
     # subdivision preserves areas and counts while shearing tile shapes.
     expected_triangle_side_ratios: tuple[float, float, float] | None = None
+    # When set, every cell of these kinds must be a regular polygon: all edge
+    # lengths equal and all interior angles equal within a small relative
+    # tolerance. This is an independent geometric truth (a regular n-gon is
+    # fully determined by n) that the count/area/adjacency/vertex-configuration
+    # invariants cannot see -- a sheared or dented face can preserve cell counts,
+    # areas, and even which polygon kinds meet at a vertex while ceasing to be
+    # regular. Used by uniform tilings whose faces are regular by definition.
+    regular_polygon_kinds: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
