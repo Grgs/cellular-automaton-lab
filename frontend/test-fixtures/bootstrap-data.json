@@ -837,6 +837,32 @@
       }
     },
     {
+      "tiling_family": "uniform-2-10-36-3262",
+      "label": "2-uniform #10 (3^6; 3^2.6^2)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 249,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "uniform-2-10-36-3262"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 8,
+        "max": 18
+      }
+    },
+    {
       "tiling_family": "prismatic-pentagonal",
       "label": "Prismatic Pentagonal",
       "picker_group": "Periodic Mixed",
@@ -1739,6 +1765,21 @@
       "max_x": 129.90375,
       "max_y": 125.0,
       "cell_count_per_unit": 3,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "uniform-2-10-36-3262",
+      "label": "2-uniform #10 (3^6; 3^2.6^2)",
+      "metric_model": "pattern",
+      "base_edge": 52.0,
+      "unit_width": 156.0,
+      "unit_height": 270.199926,
+      "min_dimension": 1,
+      "min_x": -44.571429,
+      "min_y": -40.306048,
+      "max_x": 156.0,
+      "max_y": 270.199926,
+      "cell_count_per_unit": 16,
       "row_offset_x": 0.0
     },
     {
