@@ -7,6 +7,7 @@ function setTilingPickerOpen(elements: DomElements, open: boolean): void {
     if (elements.tilingPickerMenu) {
         elements.tilingPickerMenu.hidden = !open;
     }
+    elements.topBar?.classList.toggle("is-tiling-picker-open", open);
     if (elements.tilingPickerToggle) {
         elements.tilingPickerToggle.setAttribute("aria-expanded", open ? "true" : "false");
     }
@@ -34,6 +35,12 @@ function focusTilingPickerSearch(menu: HTMLElement): boolean {
     }
     search.focus({ preventScroll: true });
     return true;
+}
+
+function usesCompactTilingPicker(): boolean {
+    return (
+        typeof window.matchMedia === "function" && window.matchMedia("(max-width: 860px)").matches
+    );
 }
 
 function tilingCards(menu: HTMLElement): HTMLButtonElement[] {
@@ -135,7 +142,7 @@ export function bindTilingPreviewPicker(
     const open = () => {
         resetTilingPreviewFilter(menu);
         setTilingPickerOpen(elements, true);
-        if (!focusTilingPickerSearch(menu)) {
+        if (usesCompactTilingPicker() || !focusTilingPickerSearch(menu)) {
             focusSelectedTilingCard(menu);
         }
     };
