@@ -1,6 +1,5 @@
 {
   "geometry": "herringbone",
-  "label": "Herringbone",
   "base_edge": 25,
   "unit_width": 100,
   "unit_height": 75,

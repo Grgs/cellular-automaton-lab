@@ -1,6 +1,5 @@
 {
   "geometry": "right-triangle",
-  "label": "Right-Triangle",
   "base_edge": 50,
   "unit_width": 50,
   "unit_height": 50,

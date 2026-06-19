@@ -1,6 +1,5 @@
 {
   "geometry": "deltoidal-hexagonal",
-  "label": "Deltoidal Hexagonal",
   "base_edge": 40.993902,
   "unit_width": 142,
   "unit_height": 246,

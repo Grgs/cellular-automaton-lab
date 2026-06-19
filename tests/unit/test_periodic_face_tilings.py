@@ -7,6 +7,7 @@ from unittest import mock
 from backend.simulation import periodic_face_tilings
 from backend.simulation.periodic_face_pattern_data import load_periodic_face_pattern_payloads
 from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
+from backend.simulation.topology_family_manifest import TOPOLOGY_FAMILY_MANIFEST
 
 
 class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
@@ -30,6 +31,17 @@ class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
             f"PERIODIC_FACE_TILING_GEOMETRIES: {orphaned}",
         )
 
+    def test_catalog_labels_are_injected_from_family_manifest(self) -> None:
+        raw_descriptors = load_periodic_face_pattern_payloads()
+        descriptors = periodic_face_tilings._loaded_pattern_descriptors()
+
+        for geometry, raw_descriptor in raw_descriptors.items():
+            with self.subTest(geometry=geometry):
+                self.assertNotIn("label", raw_descriptor)
+                self.assertEqual(
+                    descriptors[geometry].label, TOPOLOGY_FAMILY_MANIFEST[geometry].label
+                )
+
 
 class PeriodicFaceTilingPayloadTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -45,7 +57,6 @@ class PeriodicFaceTilingPayloadTests(unittest.TestCase):
     def test_loaded_pattern_descriptors_rejects_invalid_face_entries(self) -> None:
         malformed_descriptor = {
             "geometry": "archimedean-4-8-8",
-            "label": "Square-Octagon (4.8.8)",
             "unit_width": 1.0,
             "unit_height": 1.0,
             "base_edge": 1.0,

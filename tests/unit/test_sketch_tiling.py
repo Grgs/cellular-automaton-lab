@@ -208,9 +208,11 @@ class SketchTilingLatticeSkewTests(unittest.TestCase):
 
         input_data = load_sketch(self.STEIN14_SKETCH)
         descriptor = emit_descriptor_json(input_data)
-        entry = descriptor["stein-14-pentagonal"]
-        self.assertAlmostEqual(entry["lattice_skew_x"], -153.02078259, places=6)
-        self.assertNotIn("row_offset_x", entry)
+        self.assertEqual(descriptor["geometry"], "stein-14-pentagonal")
+        self.assertAlmostEqual(descriptor["lattice_skew_x"], -153.02078259, places=6)
+        self.assertNotIn("row_offset_x", descriptor)
+        self.assertNotIn("label", descriptor)
+        self.assertEqual(descriptor["min_dimension"], 1)
 
     def test_emit_descriptor_omits_lattice_skew_x_when_not_set(self) -> None:
         """The triangle+square 2-uniform example doesn't use the skew lattice;
@@ -219,8 +221,7 @@ class SketchTilingLatticeSkewTests(unittest.TestCase):
 
         input_data = load_sketch(EXAMPLE_PATH)
         descriptor = emit_descriptor_json(input_data)
-        entry = descriptor["triangular-square-2uniform"]
-        self.assertNotIn("lattice_skew_x", entry)
+        self.assertNotIn("lattice_skew_x", descriptor)
 
     def test_setting_both_offset_modes_raises(self) -> None:
         """Sketches must pick one lattice semantic. Setting both should error

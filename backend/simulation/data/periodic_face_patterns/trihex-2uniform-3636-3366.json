@@ -1,6 +1,5 @@
 {
   "geometry": "trihex-2uniform-3636-3366",
-  "label": "2-uniform Trihex (3.6.3.6; 3^2.6^2)",
   "base_edge": 50,
   "unit_width": 86.6025,
   "unit_height": 100,

@@ -33,6 +33,7 @@ from backend.simulation.topology_family_manifest import (
     STEIN_14_PENTAGONAL_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TILTWORK_GEOMETRY,
+    TOPOLOGY_FAMILY_MANIFEST,
     TRIAKIS_TRIANGULAR_GEOMETRY,
     TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY,
     TRIHEX_2UNIFORM_3636_3366_GEOMETRY,
@@ -164,7 +165,6 @@ class _JsonFace(TypedDict):
 
 class _JsonPatternDescriptor(TypedDict):
     geometry: str
-    label: str
     unit_width: float
     unit_height: float
     base_edge: float
@@ -253,7 +253,6 @@ def _require_pattern_descriptor_payload(
         raise ValueError(f"Periodic face tiling descriptor '{geometry_key}'.faces is invalid.")
     normalized_payload: _JsonPatternDescriptor = {
         "geometry": _require_string(payload.get("geometry"), context=f"{geometry_key}.geometry"),
-        "label": _require_string(payload.get("label"), context=f"{geometry_key}.label"),
         "unit_width": _require_float(
             payload.get("unit_width"), context=f"{geometry_key}.unit_width"
         ),
@@ -531,7 +530,9 @@ def _pattern_descriptor_from_payload(
         for face in payload["faces"]
     )
     geometry = payload["geometry"]
-    label = payload["label"]
+    manifest_entry = TOPOLOGY_FAMILY_MANIFEST.get(geometry)
+    if manifest_entry is None:
+        raise ValueError(f"Periodic face tiling geometry '{geometry}' is missing catalog metadata.")
     unit_width = payload["unit_width"]
     unit_height = payload["unit_height"]
     base_edge = payload["base_edge"]
@@ -550,7 +551,7 @@ def _pattern_descriptor_from_payload(
 
     return PeriodicFaceTilingDescriptor(
         geometry=geometry,
-        label=label,
+        label=manifest_entry.label,
         metric_model="pattern",
         base_edge=base_edge,
         unit_width=unit_width,

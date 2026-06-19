@@ -604,7 +604,7 @@
     },
     {
       "tiling_family": "triangular-square-2uniform",
-      "label": "2-uniform Triangle+Square",
+      "label": "2-uniform Triangle+Square (3^6; 3^3.4^2)",
       "picker_group": "Periodic Mixed",
       "picker_order": 239,
       "sizing_mode": "grid",
@@ -708,7 +708,7 @@
     },
     {
       "tiling_family": "trihex-2uniform-3636-3366",
-      "label": "2-uniform Trihex",
+      "label": "2-uniform Trihex (3.6.3.6; 3^2.6^2)",
       "picker_group": "Periodic Mixed",
       "picker_order": 244,
       "sizing_mode": "grid",

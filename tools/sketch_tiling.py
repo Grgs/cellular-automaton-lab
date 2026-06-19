@@ -577,9 +577,8 @@ def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
     min_y = min(v[1] for v in all_vertices)
     max_y = max(v[1] for v in all_vertices)
 
-    descriptor = {
+    descriptor: dict[str, Any] = {
         "geometry": input_data.geometry,
-        "label": input_data.label,
         "base_edge": input_data.base_edge or input_data.cell_width / 2,
         "unit_width": input_data.cell_width,
         "unit_height": input_data.cell_height,
@@ -595,7 +594,7 @@ def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
         descriptor["row_offset_x"] = input_data.row_offset_x
     if input_data.lattice_skew_x is not None:
         descriptor["lattice_skew_x"] = input_data.lattice_skew_x
-    return {input_data.geometry: descriptor}
+    return descriptor
 
 
 def emit_reference_spec(

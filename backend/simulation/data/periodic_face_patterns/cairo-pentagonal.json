@@ -1,6 +1,5 @@
 {
   "geometry": "cairo-pentagonal",
-  "label": "Cairo Pentagonal",
   "unit_width": 142,
   "unit_height": 71,
   "base_edge": 30,

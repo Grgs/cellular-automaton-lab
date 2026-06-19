@@ -1,6 +1,5 @@
 {
   "geometry": "pythagorean",
-  "label": "Pythagorean",
   "base_edge": 25,
   "unit_width": 125,
   "unit_height": 125,
