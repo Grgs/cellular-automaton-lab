@@ -8,7 +8,7 @@ Demonstrates the LATTICE_SKEW_X field: Stein-14 sits on a genuine
 skewed parallelogram lattice rather than the brick-alternating offset
 that ROW_OFFSET_X covers. The sketch tool plumbs LATTICE_SKEW_X through
 to the same _pattern_cells builder the backend uses, so the same
-geometry that lands in periodic_face_patterns.json can be iterated
+geometry that lands in its periodic-face descriptor can be iterated
 here first.
 
 Run with:
@@ -16,7 +16,7 @@ Run with:
     py tools/sketch_tiling.py tools/sketch_examples/stein_14_pentagonal.py
 
 Coordinates are the same ones shipped in
-backend/simulation/data/periodic_face_patterns.json (extracted by
+backend/simulation/data/periodic_face_patterns/stein-14-pentagonal.json (extracted by
 porting Rolf Stein's original Java construction algorithm, rounded to
 8 decimal places). The sketch validator's strict T-junction check will
 flag this geometry because the irrational midpoint relationship can't

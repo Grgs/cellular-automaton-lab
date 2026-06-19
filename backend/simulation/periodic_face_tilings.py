@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import json
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 from typing import NotRequired, TypedDict
 
 from backend.payload_types import PeriodicFaceTilingDescriptorPayload, RawJsonObject
+from backend.simulation.periodic_face_pattern_data import load_periodic_face_pattern_payloads
 from backend.simulation.topology_family_manifest import (
     ARCHIMEDEAN_488_GEOMETRY,
     ARCHIMEDEAN_3464_GEOMETRY,
@@ -34,6 +33,7 @@ from backend.simulation.topology_family_manifest import (
     STEIN_14_PENTAGONAL_GEOMETRY,
     TETRAKIS_SQUARE_GEOMETRY,
     TILTWORK_GEOMETRY,
+    TOPOLOGY_FAMILY_MANIFEST,
     TRIAKIS_TRIANGULAR_GEOMETRY,
     TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY,
     TRIHEX_2UNIFORM_3636_3366_GEOMETRY,
@@ -77,7 +77,6 @@ PERIODIC_FACE_TILING_GEOMETRIES = (
     STEIN_14_PENTAGONAL_GEOMETRY,
 )
 
-_DATA_PATH = Path(__file__).with_name("data") / "periodic_face_patterns.json"
 _ANGLE_START = -3 * math.pi / 4
 
 
@@ -166,7 +165,6 @@ class _JsonFace(TypedDict):
 
 class _JsonPatternDescriptor(TypedDict):
     geometry: str
-    label: str
     unit_width: float
     unit_height: float
     base_edge: float
@@ -255,7 +253,6 @@ def _require_pattern_descriptor_payload(
         raise ValueError(f"Periodic face tiling descriptor '{geometry_key}'.faces is invalid.")
     normalized_payload: _JsonPatternDescriptor = {
         "geometry": _require_string(payload.get("geometry"), context=f"{geometry_key}.geometry"),
-        "label": _require_string(payload.get("label"), context=f"{geometry_key}.label"),
         "unit_width": _require_float(
             payload.get("unit_width"), context=f"{geometry_key}.unit_width"
         ),
@@ -301,14 +298,8 @@ def _require_pattern_descriptor_payload(
 
 
 def _load_pattern_payload() -> dict[str, _JsonPatternDescriptor]:
-    payload = _require_object(
-        json.loads(_DATA_PATH.read_text(encoding="utf-8")),
-        context="Periodic face tiling data payload",
-    )
     normalized_payload: dict[str, _JsonPatternDescriptor] = {}
-    for geometry_key, descriptor_payload in payload.items():
-        if not isinstance(geometry_key, str) or not geometry_key:
-            raise ValueError("Periodic face tiling data payload is invalid.")
+    for geometry_key, descriptor_payload in load_periodic_face_pattern_payloads().items():
         normalized_payload[geometry_key] = _require_pattern_descriptor_payload(
             descriptor_payload,
             geometry_key=geometry_key,
@@ -539,7 +530,9 @@ def _pattern_descriptor_from_payload(
         for face in payload["faces"]
     )
     geometry = payload["geometry"]
-    label = payload["label"]
+    manifest_entry = TOPOLOGY_FAMILY_MANIFEST.get(geometry)
+    if manifest_entry is None:
+        raise ValueError(f"Periodic face tiling geometry '{geometry}' is missing catalog metadata.")
     unit_width = payload["unit_width"]
     unit_height = payload["unit_height"]
     base_edge = payload["base_edge"]
@@ -558,7 +551,7 @@ def _pattern_descriptor_from_payload(
 
     return PeriodicFaceTilingDescriptor(
         geometry=geometry,
-        label=label,
+        label=manifest_entry.label,
         metric_model="pattern",
         base_edge=base_edge,
         unit_width=unit_width,

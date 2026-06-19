@@ -1,0 +1,133 @@
+{
+  "geometry": "tiltwork",
+  "base_edge": 50,
+  "unit_width": 100,
+  "unit_height": 100,
+  "min_dimension": 1,
+  "min_x": 0,
+  "min_y": 0,
+  "max_x": 100,
+  "max_y": 100,
+  "cell_count_per_unit": 5,
+  "faces": [
+    {
+      "slot": "s0",
+      "kind": "diamond",
+      "prefix": "d",
+      "center": {
+        "x": 50,
+        "y": 50
+      },
+      "vertices": [
+        {
+          "x": 50,
+          "y": 0
+        },
+        {
+          "x": 100,
+          "y": 50
+        },
+        {
+          "x": 50,
+          "y": 100
+        },
+        {
+          "x": 0,
+          "y": 50
+        }
+      ]
+    },
+    {
+      "slot": "s1",
+      "kind": "corner-triangle",
+      "prefix": "t",
+      "center": {
+        "x": 16.666667,
+        "y": 16.666667
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 50,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 50
+        }
+      ]
+    },
+    {
+      "slot": "s2",
+      "kind": "corner-triangle",
+      "prefix": "t",
+      "center": {
+        "x": 83.333333,
+        "y": 16.666667
+      },
+      "vertices": [
+        {
+          "x": 50,
+          "y": 0
+        },
+        {
+          "x": 100,
+          "y": 0
+        },
+        {
+          "x": 100,
+          "y": 50
+        }
+      ]
+    },
+    {
+      "slot": "s3",
+      "kind": "corner-triangle",
+      "prefix": "t",
+      "center": {
+        "x": 83.333333,
+        "y": 83.333333
+      },
+      "vertices": [
+        {
+          "x": 100,
+          "y": 50
+        },
+        {
+          "x": 100,
+          "y": 100
+        },
+        {
+          "x": 50,
+          "y": 100
+        }
+      ]
+    },
+    {
+      "slot": "s4",
+      "kind": "corner-triangle",
+      "prefix": "t",
+      "center": {
+        "x": 16.666667,
+        "y": 83.333333
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 50
+        },
+        {
+          "x": 50,
+          "y": 100
+        },
+        {
+          "x": 0,
+          "y": 100
+        }
+      ]
+    }
+  ]
+}

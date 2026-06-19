@@ -1,0 +1,106 @@
+{
+  "geometry": "tetrakis-square",
+  "base_edge": 41.846368,
+  "unit_width": 52,
+  "unit_height": 52,
+  "min_dimension": 1,
+  "min_x": 0,
+  "min_y": 0,
+  "max_x": 52,
+  "max_y": 52,
+  "cell_count_per_unit": 4,
+  "faces": [
+    {
+      "slot": "s0",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 26,
+        "y": 8.666667
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 52,
+          "y": 0
+        },
+        {
+          "x": 26,
+          "y": 26
+        }
+      ]
+    },
+    {
+      "slot": "s1",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 43.333333,
+        "y": 26
+      },
+      "vertices": [
+        {
+          "x": 52,
+          "y": 0
+        },
+        {
+          "x": 52,
+          "y": 52
+        },
+        {
+          "x": 26,
+          "y": 26
+        }
+      ]
+    },
+    {
+      "slot": "s2",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 26,
+        "y": 43.333333
+      },
+      "vertices": [
+        {
+          "x": 52,
+          "y": 52
+        },
+        {
+          "x": 0,
+          "y": 52
+        },
+        {
+          "x": 26,
+          "y": 26
+        }
+      ]
+    },
+    {
+      "slot": "s3",
+      "kind": "triangle",
+      "prefix": "t",
+      "center": {
+        "x": 8.666667,
+        "y": 26
+      },
+      "vertices": [
+        {
+          "x": 0,
+          "y": 52
+        },
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 26,
+          "y": 26
+        }
+      ]
+    }
+  ]
+}

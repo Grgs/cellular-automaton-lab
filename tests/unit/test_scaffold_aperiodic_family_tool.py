@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import sys
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,6 +18,7 @@ from tools.scaffold_aperiodic_family import (
     patch_reference_specs_init,
     patch_registry,
     patch_topology_family_manifest,
+    print_followups,
     render_generator_module,
     render_reference_spec,
     render_test_skeleton,
@@ -51,6 +54,18 @@ class BuildSpecTests(unittest.TestCase):
                 picker_order=None,
                 picker_group="Experimental",
             )
+
+    def test_followups_distinguish_inherited_from_family_specific_coverage(self) -> None:
+        output = StringIO()
+
+        with redirect_stdout(output):
+            print_followups(_demo_spec())
+
+        rendered = output.getvalue()
+        self.assertIn("python -m tools tilings validate", rendered)
+        self.assertIn("python -m tools tilings verify", rendered)
+        self.assertIn("Inherited catalog-wide coverage", rendered)
+        self.assertIn("substitution-specific behavior and fixtures", rendered)
 
     def test_rejects_invalid_family_id_pattern(self) -> None:
         for bad in ("Pinwheel2", "pinwheel_2", "-leading", "trailing-", "two--dashes"):

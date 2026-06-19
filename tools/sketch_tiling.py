@@ -4,8 +4,8 @@ Lets you iterate on a candidate periodic tiling *without* wiring it into the
 backend manifests. Takes a Python sketch file describing the faces of a unit
 cell, builds a 3x3 patch using the same builder the backend uses, then
 reports overlaps, T-junctions, vertex configurations with angle sums, and
-emits an SVG visualization and a JSON descriptor stub ready to paste into
-``backend/simulation/data/periodic_face_patterns.json``.
+emits an SVG visualization and a JSON descriptor ready to save under
+``backend/simulation/data/periodic_face_patterns/<geometry>.json``.
 
 Sketch file format (a regular Python module)::
 
@@ -577,9 +577,8 @@ def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
     min_y = min(v[1] for v in all_vertices)
     max_y = max(v[1] for v in all_vertices)
 
-    descriptor = {
+    descriptor: dict[str, Any] = {
         "geometry": input_data.geometry,
-        "label": input_data.label,
         "base_edge": input_data.base_edge or input_data.cell_width / 2,
         "unit_width": input_data.cell_width,
         "unit_height": input_data.cell_height,
@@ -595,7 +594,7 @@ def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
         descriptor["row_offset_x"] = input_data.row_offset_x
     if input_data.lattice_skew_x is not None:
         descriptor["lattice_skew_x"] = input_data.lattice_skew_x
-    return {input_data.geometry: descriptor}
+    return descriptor
 
 
 def emit_reference_spec(

@@ -86,14 +86,14 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("tilings", "validate"),
         "tilings",
         "Run geometry/topology validation across catalog tilings.",
-        "Cheap sanity validation for topology structure, adjacency, holes, and edge multiplicity.",
+        "Traverses every registered mixed and aperiodic catalog geometry and performs cheap sanity validation for topology structure, adjacency, holes, and edge multiplicity.",
         ("python -m tools tilings validate",),
     ),
     CommandDoc(
         ("tilings", "verify"),
         "tilings",
         "Run literature-backed reference verification across tiling families.",
-        "Stricter verification than `tilings validate`, including signatures, fixtures, and connectivity invariants.",
+        "Traverses the full registered catalog and applies stricter verification than `tilings validate`, including required reference specs, signatures, fixtures, and connectivity invariants.",
         ("python -m tools tilings verify",),
     ),
     CommandDoc(

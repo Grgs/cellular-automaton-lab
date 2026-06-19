@@ -487,7 +487,7 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY: _single_variant_family(
         tiling_family=TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY,
-        label="2-uniform Triangle+Square",
+        label="2-uniform Triangle+Square (3^6; 3^3.4^2)",
         picker_group="Periodic Mixed",
         picker_order=239,
         family="mixed",
@@ -535,7 +535,7 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     TRIHEX_2UNIFORM_3636_3366_GEOMETRY: _single_variant_family(
         tiling_family=TRIHEX_2UNIFORM_3636_3366_GEOMETRY,
-        label="2-uniform Trihex",
+        label="2-uniform Trihex (3.6.3.6; 3^2.6^2)",
         picker_group="Periodic Mixed",
         picker_order=244,
         family="mixed",

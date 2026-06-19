@@ -1,7 +1,7 @@
 """Generate POLYGON_PREVIEW_DATA entries for tiling-preview-data.ts.
 
-Periodic-face mode (default): reads face template vertices from
-periodic_face_patterns.json, scales them to fit the 120x72 SVG viewbox,
+Periodic-face mode (default): reads face template vertices from the
+periodic-face descriptor directory, scales them to fit the 120x72 SVG viewbox,
 and prints a ready-to-paste polygon data string. The viewbox is centered
 on the highest-degree vertex; a 3x3 grid of unit cells is tiled and
 clipped to the viewbox.
@@ -29,7 +29,7 @@ import sys
 from collections.abc import Mapping
 from functools import cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 if TYPE_CHECKING:
     from backend.simulation.topology import LatticeCell
@@ -38,7 +38,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-_DATA_PATH = ROOT / "backend" / "simulation" / "data" / "periodic_face_patterns.json"
+from backend.simulation.periodic_face_pattern_data import (  # noqa: E402
+    load_periodic_face_pattern_payloads,
+)
+
 _PALETTE_MANIFEST_PATH = ROOT / "frontend" / "canvas" / "family-dead-palette-manifest.json"
 _VIEWBOX_W = 120
 _VIEWBOX_H = 72
@@ -231,7 +234,7 @@ def _generate_polygon_data(
     """Return the polygon data string for a tiling descriptor.
 
     Args:
-        descriptor: One entry from periodic_face_patterns.json.
+        descriptor: One periodic-face geometry descriptor.
         fill_count: Number of distinct fill indices to cycle through.
             Use 1 for uniform Laves tilings; use the number of distinct
             cell kinds for Archimedean tilings.
@@ -287,11 +290,11 @@ def _generate_polygon_data(
 
 
 def _load_descriptors() -> dict[str, PreviewDescriptor]:
-    return json.loads(_DATA_PATH.read_text(encoding="utf-8"))
+    return cast(dict[str, PreviewDescriptor], load_periodic_face_pattern_payloads())
 
 
 def _list_geometries(descriptors: dict[str, PreviewDescriptor]) -> None:
-    print("Available geometries in periodic_face_patterns.json:")
+    print("Available periodic-face geometries:")
     for key in sorted(descriptors):
         print(f"  {key}")
 
@@ -425,7 +428,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help=(
             "Build the polygon data from a real depth-N aperiodic patch instead of "
-            "reading from periodic_face_patterns.json."
+            "reading from the periodic-face descriptor directory."
         ),
     )
     parser.add_argument(
@@ -485,7 +488,7 @@ def main(argv: list[str] | None = None) -> int:
     if key not in descriptors:
         available = ", ".join(sorted(descriptors))
         print(
-            f"Geometry '{key}' not found in periodic_face_patterns.json.\nAvailable: {available}",
+            f"Geometry '{key}' has no periodic-face descriptor.\nAvailable: {available}",
             file=sys.stderr,
         )
         return 1
