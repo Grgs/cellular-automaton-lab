@@ -115,6 +115,9 @@ TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY = "triangular-square-2uniform"
 # no T-junctions. Uses only triangles + hexagons (complements the
 # triangle+square 2-uniform).
 TRIHEX_2UNIFORM_3636_3366_GEOMETRY = "trihex-2uniform-3636-3366"
+# 2-uniform tiling #10 [3^6; 3^2.6^2]: hexagons share three alternating
+# edges in a honeycomb arrangement, leaving pure triangular-lattice gaps.
+UNIFORM_2_10_GEOMETRY = "uniform-2-10-36-3262"
 # 2-uniform tiling #18 [3^6; 3^2.4.3.4]: regular triangles and squares
 # arranged with both pure-triangular and snub-square vertex orbits.
 UNIFORM_2_18_GEOMETRY = "uniform-2-18-36-33434"
@@ -541,6 +544,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         family="mixed",
         viewport_sync_mode="backend-sync",
         sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
+    ),
+    UNIFORM_2_10_GEOMETRY: _single_variant_family(
+        tiling_family=UNIFORM_2_10_GEOMETRY,
+        label="2-uniform #10 (3^6; 3^2.6^2)",
+        picker_group="Periodic Mixed",
+        picker_order=249,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 10, 8, 18),
         default_rule="life-b2-s23",
         minimum_grid_dimension=1,
     ),
