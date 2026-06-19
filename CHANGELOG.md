@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Added an end-to-end periodic tiling workflow: SVG inspection, board-shape diagnostics, transactional catalog installation, preview write/check support, and descriptor/reference auto-discovery.
 - Add the 2-uniform #18 tiling `[3^6; 3^2.4.3.4]` with regular triangle and square faces.
 - Add the 2-uniform #13 tiling `[3^6; 3^2.4.12]` with regular triangle, square, and dodecagon faces.
 - Added a Right-Triangle periodic mixed tiling that splits each square-grid cell into congruent 45-45-90 triangles, with descriptor validation, picker thumbnail data, and reference verification coverage.

@@ -112,6 +112,28 @@ python -m tools tilings sketch tools/sketch_examples/triangular_square_2uniform.
 python -m tools tilings sketch path/to/sketch.py --svg out.svg --json out.json
 ```
 
+### `python -m tools tilings inspect-svg`
+
+Inspect polygon geometry and translation candidates in a reference SVG.
+
+Classifies straight-sided polygons, reports repeated center translations, and can emit a normalized editable sketch starter.
+
+```powershell
+python -m tools tilings inspect-svg reference.svg
+python -m tools tilings inspect-svg reference.svg --sketch-output output/starter.py
+```
+
+### `python -m tools tilings add-periodic`
+
+Install a validated periodic sketch across catalog and generated surfaces.
+
+Writes the descriptor, reference spec, manifest metadata, palette, preview, permanent sketch, and bootstrap fixture as one rollback-safe operation. Supports --dry-run and --check.
+
+```powershell
+python -m tools tilings add-periodic sketch.py --source-url https://example.org/reference.svg --picker-order 250 --dry-run
+python -m tools tilings add-periodic tools/sketch_examples/example.py --check
+```
+
 ### `python -m tools tilings scaffold-aperiodic`
 
 Scaffold the boilerplate for a new aperiodic tiling family.

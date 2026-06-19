@@ -127,6 +127,26 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("tilings", "inspect-svg"),
+        "tilings",
+        "Inspect polygon geometry and translation candidates in a reference SVG.",
+        "Classifies straight-sided polygons, reports repeated center translations, and can emit a normalized editable sketch starter.",
+        (
+            "python -m tools tilings inspect-svg reference.svg",
+            "python -m tools tilings inspect-svg reference.svg --sketch-output output/starter.py",
+        ),
+    ),
+    CommandDoc(
+        ("tilings", "add-periodic"),
+        "tilings",
+        "Install a validated periodic sketch across catalog and generated surfaces.",
+        "Writes the descriptor, reference spec, manifest metadata, palette, preview, permanent sketch, and bootstrap fixture as one rollback-safe operation. Supports --dry-run and --check.",
+        (
+            "python -m tools tilings add-periodic sketch.py --source-url https://example.org/reference.svg --picker-order 250 --dry-run",
+            "python -m tools tilings add-periodic tools/sketch_examples/example.py --check",
+        ),
+    ),
+    CommandDoc(
         ("tilings", "scaffold-aperiodic"),
         "tilings",
         "Scaffold the boilerplate for a new aperiodic tiling family.",
