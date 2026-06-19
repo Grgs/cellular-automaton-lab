@@ -1776,16 +1776,16 @@
       "label": "2-uniform #13 (3^6; 3^2.4.12)",
       "metric_model": "pattern",
       "base_edge": 52.0,
-      "unit_width": 426.199926,
-      "unit_height": 123.033321,
+      "unit_width": 246.066642,
+      "unit_height": 213.099963,
       "min_dimension": 1,
       "min_x": -97.033321,
-      "min_y": -97.033321,
-      "max_x": 400.199926,
-      "max_y": 123.033321,
+      "min_y": -187.099963,
+      "max_x": 395.099963,
+      "max_y": 97.033321,
       "cell_count_per_unit": 16,
       "row_offset_x": 0.0,
-      "lattice_skew_x": 213.099963
+      "lattice_skew_x": -123.033321
     },
     {
       "geometry": "stein-14-pentagonal",

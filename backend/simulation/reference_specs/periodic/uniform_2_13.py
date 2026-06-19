@@ -33,16 +33,14 @@ SPECS = {
                     ("triangle", "triangle"),
                 ),
                 expected_degree_histogram=(
-                    (1, 4),
-                    (2, 38),
-                    (3, 82),
-                    (4, 12),
-                    (7, 2),
+                    (1, 6),
+                    (2, 32),
+                    (3, 84),
+                    (4, 16),
                     (8, 2),
-                    (11, 2),
-                    (12, 2),
+                    (12, 4),
                 ),
-                expected_signature="af78044443f9",  # pragma: allowlist secret
+                expected_signature="6ae9f47020d8",  # pragma: allowlist secret
                 regular_polygon_kinds=("dodecagon", "square", "triangle"),
             ),
         },
@@ -73,8 +71,8 @@ SPECS = {
                 ("triangle", "triangle", "triangle", "triangle", "triangle", "triangle"),
             ),
             expected_interior_vertex_configuration_frequencies=(
-                (("dodecagon", "square", "triangle", "triangle"), 72),
-                (("triangle", "triangle", "triangle", "triangle", "triangle", "triangle"), 10),
+                (("dodecagon", "square", "triangle", "triangle"), 70),
+                (("triangle", "triangle", "triangle", "triangle", "triangle", "triangle"), 12),
             ),
         ),
     ),

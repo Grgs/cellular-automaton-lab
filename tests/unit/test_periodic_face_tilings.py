@@ -42,6 +42,19 @@ class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
                     descriptors[geometry].label, TOPOLOGY_FAMILY_MANIFEST[geometry].label
                 )
 
+    def test_uniform_2_13_uses_a_balanced_primitive_lattice(self) -> None:
+        descriptor = periodic_face_tilings.get_periodic_face_tiling_descriptor(
+            "uniform-2-13-36-32412"
+        )
+        cells = descriptor.build_faces(3, 3)
+        x_values = [vertex[0] for cell in cells for vertex in cell.vertices]
+        y_values = [vertex[1] for cell in cells for vertex in cell.vertices]
+        aspect_ratio = (max(x_values) - min(x_values)) / (max(y_values) - min(y_values))
+
+        self.assertAlmostEqual(descriptor.lattice_skew_x or 0.0, -123.033321, places=6)
+        self.assertEqual(descriptor.face_template_count, 16)
+        self.assertLess(aspect_ratio, 2.0)
+
 
 class PeriodicFaceTilingPayloadTests(unittest.TestCase):
     def setUp(self) -> None:
