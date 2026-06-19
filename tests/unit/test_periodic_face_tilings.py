@@ -55,6 +55,19 @@ class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
         self.assertEqual(descriptor.face_template_count, 16)
         self.assertLess(aspect_ratio, 2.0)
 
+    def test_uniform_2_12_uses_a_balanced_rectangular_lattice(self) -> None:
+        descriptor = periodic_face_tilings.get_periodic_face_tiling_descriptor(
+            "uniform-2-12-3262-346"
+        )
+        cells = descriptor.build_faces(3, 3)
+        x_values = [vertex[0] for cell in cells for vertex in cell.vertices]
+        y_values = [vertex[1] for cell in cells for vertex in cell.vertices]
+        aspect_ratio = (max(x_values) - min(x_values)) / (max(y_values) - min(y_values))
+
+        self.assertEqual(descriptor.face_template_count, 20)
+        self.assertGreater(aspect_ratio, 0.5)
+        self.assertLess(aspect_ratio, 2.0)
+
 
 class PeriodicFaceTilingPayloadTests(unittest.TestCase):
     def setUp(self) -> None:
