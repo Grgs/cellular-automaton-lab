@@ -63,7 +63,7 @@ Validate, verify, preview, sketch, and scaffold tilings.
 
 Run geometry/topology validation across catalog tilings.
 
-Cheap sanity validation for topology structure, adjacency, holes, and edge multiplicity.
+Traverses every registered mixed and aperiodic catalog geometry and performs cheap sanity validation for topology structure, adjacency, holes, and edge multiplicity.
 
 ```powershell
 python -m tools tilings validate
@@ -73,7 +73,7 @@ python -m tools tilings validate
 
 Run literature-backed reference verification across tiling families.
 
-Stricter verification than `tilings validate`, including signatures, fixtures, and connectivity invariants.
+Traverses the full registered catalog and applies stricter verification than `tilings validate`, including required reference specs, signatures, fixtures, and connectivity invariants.
 
 ```powershell
 python -m tools tilings verify

@@ -664,9 +664,14 @@ def print_followups(spec: ScaffoldSpec) -> None:
     print("  py -3 tools/export_bootstrap_data.py frontend/test-fixtures/bootstrap-data.json")
     print()
     print("Then validate:")
-    print("  py -3 tools/validate_tilings.py")
-    print("  py -3 tools/verify_reference_tilings.py")
-    print(f"  py -3 -m pytest tests/unit/test_aperiodic_{spec.snake}.py")
+    print("  python -m tools tilings validate")
+    print("  python -m tools tilings verify")
+    print(f"  python -m pytest tests/unit/test_aperiodic_{spec.snake}.py")
+    print()
+    print("Inherited catalog-wide coverage (do not create duplicate per-family tests):")
+    print("  - registration, implementation dispatch, topology structure, and graph validity")
+    print("  - reference-spec coverage, picker preview coverage, and frontend adapter dispatch")
+    print("Keep the generated family test focused on substitution-specific behavior and fixtures.")
 
 
 def build_parser() -> argparse.ArgumentParser:

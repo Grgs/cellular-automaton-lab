@@ -85,6 +85,23 @@ If the family is approximate, finite-sample-only, visually provisional, or inten
    - Add a `ReferenceFamilySpec` to the appropriate file under [backend/simulation/reference_specs/](../backend/simulation/reference_specs/) (`regular.py`, `periodic.py`, or `aperiodic.py`). Include cell counts, degree histograms, adjacency pairs, and an SHA-prefix signature derived from `verify_reference_tilings.py`.
    - If the tiling is the dual of an existing one, add `expected_dual_geometry` to both the primal and dual `PeriodicDescriptorExpectation` entries to keep the duality relationship machine-checked.
 
+## Automatic Coverage
+
+Registering a topology opts it into the checks below. Do not create a per-tiling copy of these tests. Add focused tests only for behavior or mathematical invariants unique to the new family.
+
+| Inherited check | Coverage | Command or test |
+| --- | --- | --- |
+| Descriptor and registry synchronization | Every periodic descriptor has one registered geometry and no orphaned file | `tests/unit/test_periodic_face_tilings.py` |
+| Implementation dispatch | Every supported geometry resolves without the square fallback | `tests/unit/test_topology_implementation_registry.py` |
+| Geometry and graph validity | Every mixed and aperiodic catalog geometry is checked for topology structure, adjacency, holes, and edge multiplicity | `python -m tools tilings validate` |
+| Grid-size variation | Periodic geometries are sampled across widths and heights from 1 through 3 | `tests/unit/test_hypothesis_topology_properties.py` |
+| Reference coverage | Every catalog geometry requires a reference spec and passes its declared signatures and invariants | `python -m tools tilings verify` |
+| Picker preview coverage | Every non-regular picker entry has a thumbnail and no orphaned thumbnail remains | `tests/unit/test_tiling_preview_coverage.py` |
+| Frontend catalog and adapter dispatch | Every bootstrapped topology appears in picker options and resolves its default geometry adapter | `frontend/topology-catalog-bootstrap.test.ts` |
+| Bootstrap freshness | Generated frontend and standalone metadata remains derived from backend manifests | `python -m tools repo generated-check` |
+
+The periodic scaffold should wire a geometry into these catalog-driven surfaces and generate only tiling-specific artifacts, such as its descriptor and reference expectations. It should not generate generic test files.
+
 ## Small Example
 
 For a periodic mixed tiling that can use the existing polygon renderer, the change usually has three pieces: catalog metadata, implementation registry wiring, and descriptor data. This example is shortened to show the shape:
