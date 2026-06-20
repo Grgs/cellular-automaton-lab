@@ -222,6 +222,8 @@ def _translated_aperiodic_family(
     )
 
 
+UNIFORM_2_19_V1_36_346_GEOMETRY = "uniform-2-19-v1-36-346"
+
 TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     SQUARE_GEOMETRY: _single_variant_family(
         tiling_family=SQUARE_GEOMETRY,
@@ -697,6 +699,17 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         # 2 * 5^d). Depth 4 = 625 cells; same effective ceiling as the
         # original pinwheel.
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+    ),
+    UNIFORM_2_19_V1_36_346_GEOMETRY: _single_variant_family(
+        tiling_family=UNIFORM_2_19_V1_36_346_GEOMETRY,
+        label="2-uniform #19 variant 1 (3^6; 3^4.6)",
+        picker_group="Periodic Mixed",
+        picker_order=251,
+        family="mixed",
+        viewport_sync_mode="backend-sync",
+        sizing_policy=SizingPolicyDefinition(CELL_SIZE_CONTROL, 12, 8, 20),
+        default_rule="life-b2-s23",
+        minimum_grid_dimension=1,
     ),
 }
 

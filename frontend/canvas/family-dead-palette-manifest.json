@@ -978,6 +978,29 @@
           }
         }
       ]
+    },
+    {
+      "geometry": "uniform-2-19-v1-36-346",
+      "variants": [
+        {
+          "label": "uniform-2-19-v1-36-346-hexagon",
+          "selector": {
+            "kind": "hexagon"
+          },
+          "color": {
+            "token": "toneCream"
+          }
+        },
+        {
+          "label": "uniform-2-19-v1-36-346-triangle",
+          "selector": {
+            "kind": "triangle"
+          },
+          "color": {
+            "token": "toneClay"
+          }
+        }
+      ]
     }
   ]
 }
