@@ -37,6 +37,9 @@ The order is intentional:
   - [Snub trihexagonal tiling](https://en.wikipedia.org/wiki/Snub_trihexagonal_tiling)
 - `trihexagonal-3-6-3-6`
   - [Trihexagonal tiling](https://en.wikipedia.org/wiki/Trihexagonal_tiling)
+- `uniform-2-10-36-3262`
+  - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
+  - [2-uniform #10 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n10.svg)
 - `cairo-pentagonal`
   - [Cairo pentagonal tiling](https://en.wikipedia.org/wiki/Cairo_pentagonal_tiling)
 - `rhombille`

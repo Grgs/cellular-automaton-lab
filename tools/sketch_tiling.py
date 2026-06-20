@@ -154,6 +154,19 @@ class SketchReport:
     t_junctions: tuple[TJunction, ...]
     vertex_configurations: tuple[VertexConfiguration, ...]
     interior_vertex_kinds: dict[tuple[str, ...], int]
+    patch_bounds: tuple[float, float, float, float]
+
+    @property
+    def invalid_interior_vertices(self) -> tuple[VertexConfiguration, ...]:
+        min_x, min_y, max_x, max_y = self.patch_bounds
+        return tuple(
+            vertex
+            for vertex in self.vertex_configurations
+            if min_x < vertex.position[0] < max_x
+            and min_y < vertex.position[1] < max_y
+            and len({cell_id for cell_id, _ in vertex.polygons}) >= 4
+            and abs(vertex.angle_sum_degrees - 360.0) > _ANGLE_TOLERANCE_DEGREES
+        )
 
     @property
     def rendered_aspect_ratio(self) -> float:
@@ -173,11 +186,7 @@ class SketchReport:
             not self.overlaps
             and not self.t_junctions
             and not self.unmatched_edges
-            and all(
-                abs(v.angle_sum_degrees - 360.0) <= _ANGLE_TOLERANCE_DEGREES
-                for v in self.vertex_configurations
-                if len({cell_id for cell_id, _ in v.polygons}) >= 4
-            )
+            and not self.invalid_interior_vertices
         )
 
 
@@ -478,6 +487,7 @@ def sketch(input_data: SketchInput, *, patch_size: int = 3) -> SketchReport:
         t_junctions=t_junctions,
         vertex_configurations=vertex_configs,
         interior_vertex_kinds=dict(interior_kinds),
+        patch_bounds=logical_bounds,
     )
 
 
@@ -770,15 +780,10 @@ def _print_report(input_data: SketchInput, report: SketchReport) -> None:
     for kinds, count in sorted(report.interior_vertex_kinds.items(), key=lambda kv: -kv[1]):
         print(f"  {count:4d}x  {kinds}")
 
-    bad_angle_vertices = [
-        v
-        for v in report.vertex_configurations
-        if abs(v.angle_sum_degrees - 360.0) > _ANGLE_TOLERANCE_DEGREES
-        and len({cell_id for cell_id, _ in v.polygons}) >= 4
-    ]
+    bad_angle_vertices = report.invalid_interior_vertices
     if bad_angle_vertices:
         print()
-        print(f"VERTICES WITH NON-360 DEG ANGLE SUM (likely interior): {len(bad_angle_vertices)}")
+        print(f"INTERIOR VERTICES WITH NON-360 DEG ANGLE SUM: {len(bad_angle_vertices)}")
         for v in bad_angle_vertices[:5]:
             print(f"  {v.position}: {v.angle_sum_degrees:.2f} deg ({len(v.polygons)} polygons)")
 
