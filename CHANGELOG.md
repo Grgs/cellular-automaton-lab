@@ -6,6 +6,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 ## Unreleased
 
 - Add the 2-uniform #12 tiling `[3^2.6^2; 3^4.6]` with regular triangle and hexagon faces.
+- Add the 2-uniform #10 tiling `[3^6; 3^2.6^2]` with regular triangle and hexagon faces.
 - Add the 2-uniform #18 tiling `[3^6; 3^2.4.3.4]` with regular triangle and square faces.
 - Add the 2-uniform #13 tiling `[3^6; 3^2.4.12]` with regular triangle, square, and dodecagon faces.
 - Added a Right-Triangle periodic mixed tiling that splits each square-grid cell into congruent 45-45-90 triangles, with descriptor validation, picker thumbnail data, and reference verification coverage.
