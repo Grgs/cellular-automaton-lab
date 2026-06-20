@@ -1,65 +1,29 @@
 from __future__ import annotations
 
+from importlib import import_module
+from pathlib import Path
+from typing import cast
+
 from backend.simulation.reference_specs.types import ReferenceFamilySpec
 
-from . import (
-    archimedean,
-    basketweave,
-    cairo_pentagonal,
-    deltoidal_hexagonal,
-    deltoidal_trihexagonal,
-    floret_pentagonal,
-    herringbone,
-    kisrhombille,
-    pentagon_crosses,
-    prismatic_pentagonal,
-    pythagorean,
-    rhombille,
-    right_triangle,
-    snub_square_dual,
-    stein_14_pentagonal,
-    tetrakis_square,
-    tiltwork,
-    triakis_triangular,
-    triangular_square_2uniform,
-    trihex_2uniform_3636_3366,
-    trihexagonal_3_6_3_6,
-    type_7_pentagonal,
-    uniform_2_10,
-    uniform_2_12,
-    uniform_2_13,
-    uniform_2_18,
-    uniform_34612,
-)
 
-PERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
-    **archimedean.SPECS,
-    **trihexagonal_3_6_3_6.SPECS,
-    **cairo_pentagonal.SPECS,
-    **rhombille.SPECS,
-    **deltoidal_hexagonal.SPECS,
-    **tetrakis_square.SPECS,
-    **triakis_triangular.SPECS,
-    **deltoidal_trihexagonal.SPECS,
-    **prismatic_pentagonal.SPECS,
-    **floret_pentagonal.SPECS,
-    **snub_square_dual.SPECS,
-    **type_7_pentagonal.SPECS,
-    **kisrhombille.SPECS,
-    **tiltwork.SPECS,
-    **pythagorean.SPECS,
-    **right_triangle.SPECS,
-    **herringbone.SPECS,
-    **triangular_square_2uniform.SPECS,
-    **basketweave.SPECS,
-    **pentagon_crosses.SPECS,
-    **trihex_2uniform_3636_3366.SPECS,
-    **stein_14_pentagonal.SPECS,
-    **uniform_2_12.SPECS,
-    **uniform_2_10.SPECS,
-    **uniform_2_13.SPECS,
-    **uniform_2_18.SPECS,
-    **uniform_34612.SPECS,
-}
+def _discover_periodic_specs() -> dict[str, ReferenceFamilySpec]:
+    discovered: dict[str, ReferenceFamilySpec] = {}
+    package_dir = Path(__file__).parent
+    for path in sorted(package_dir.glob("*.py")):
+        if path.stem == "__init__":
+            continue
+        module = import_module(f"{__name__}.{path.stem}")
+        specs = cast(dict[str, ReferenceFamilySpec] | None, getattr(module, "SPECS", None))
+        if specs is None:
+            continue
+        duplicates = sorted(set(discovered).intersection(specs))
+        if duplicates:
+            raise ValueError(f"Duplicate periodic reference specs: {duplicates}")
+        discovered.update(specs)
+    return discovered
+
+
+PERIODIC_REFERENCE_FAMILY_SPECS = _discover_periodic_specs()
 
 __all__ = ["PERIODIC_REFERENCE_FAMILY_SPECS"]

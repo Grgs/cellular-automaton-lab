@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 
 from tools import (
+    add_periodic_tiling,
     compare_seed,
     generate_tiling_preview,
+    inspect_tiling_svg,
     report_tiling_verification_strength,
     scaffold_aperiodic_family,
     sketch_tiling,
@@ -74,6 +76,20 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("tilings", "sketch"),
         target_main=sketch_tiling.main,
         parser_factory=sketch_tiling.build_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="inspect-svg",
+        doc=command_doc("tilings", "inspect-svg"),
+        target_main=inspect_tiling_svg.main,
+        parser_factory=inspect_tiling_svg.build_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="add-periodic",
+        doc=command_doc("tilings", "add-periodic"),
+        target_main=add_periodic_tiling.main,
+        parser_factory=add_periodic_tiling.build_parser,
     )
     add_passthrough_command(
         subparsers,

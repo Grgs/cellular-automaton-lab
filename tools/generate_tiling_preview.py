@@ -17,6 +17,7 @@ Usage:
     py -3 tools/generate_tiling_preview.py --geometry kisrhombille
     py -3 tools/generate_tiling_preview.py --geometry kisrhombille --fill-count 1
     py -3 tools/generate_tiling_preview.py --list
+    py -3 tools/generate_tiling_preview.py --geometry kisrhombille --write
     py -3 tools/generate_tiling_preview.py --aperiodic --geometry pinwheel --depth 1
     py -3 tools/generate_tiling_preview.py --aperiodic --list
 """
@@ -25,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections.abc import Mapping
 from functools import cache
@@ -43,6 +45,7 @@ from backend.simulation.periodic_face_pattern_data import (  # noqa: E402
 )
 
 _PALETTE_MANIFEST_PATH = ROOT / "frontend" / "canvas" / "family-dead-palette-manifest.json"
+_PREVIEW_DATA_PATH = ROOT / "frontend" / "controls" / "tiling-preview-data.ts"
 _VIEWBOX_W = 120
 _VIEWBOX_H = 72
 _VIEWBOX_MARGIN = 4
@@ -96,6 +99,44 @@ class PreviewDescriptor(TypedDict, total=False):
 class PaletteVariant(TypedDict):
     selector: dict[str, str]
     color: str | dict[str, str]
+
+
+def preview_entry_source(geometry: str, polygon_data: str) -> str:
+    quoted = f'"{geometry}"' if "-" in geometry else geometry
+    return f'    {quoted}:\n        "{polygon_data}",'
+
+
+def update_preview_source(source: str, geometry: str, polygon_data: str) -> tuple[str, bool]:
+    entry = preview_entry_source(geometry, polygon_data)
+    key = re.escape(geometry)
+    pattern = re.compile(
+        rf'^    (?:(?:"{key}")|(?:{key})):\s*(?:\n\s*)?"[^"]*",',
+        re.MULTILINE,
+    )
+    match = pattern.search(source)
+    if match:
+        updated = source[: match.start()] + entry + source[match.end() :]
+        return updated, updated != source
+    marker = "\n};"
+    if marker not in source:
+        raise ValueError("Could not find POLYGON_PREVIEW_DATA closing marker.")
+    return source.replace(marker, f"\n{entry}{marker}", 1), True
+
+
+def write_preview_entry(
+    geometry: str,
+    polygon_data: str,
+    *,
+    output_path: Path = _PREVIEW_DATA_PATH,
+    check: bool = False,
+) -> bool:
+    source = output_path.read_text(encoding="utf-8")
+    updated, changed = update_preview_source(source, geometry, polygon_data)
+    if check:
+        return not changed
+    if changed:
+        output_path.write_text(updated, encoding="utf-8")
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -230,6 +271,7 @@ def _generate_polygon_data(
     *,
     fill_count: int = 1,
     geometry: str | None = None,
+    palette_tokens: Mapping[str, str] | None = None,
 ) -> str:
     """Return the polygon data string for a tiling descriptor.
 
@@ -273,7 +315,11 @@ def _generate_polygon_data(
                 ys = [p[1] for p in vpts]
                 if max(xs) > 0 and min(xs) < _VIEWBOX_W and max(ys) > 0 and min(ys) < _VIEWBOX_H:
                     fill_index = str(slot_index % fill_count)
-                    fill_index = _palette_fill_for_source(geometry, face, fill_index)
+                    kind = str(face.get("kind", ""))
+                    if palette_tokens and kind in palette_tokens:
+                        fill_index = palette_tokens[kind]
+                    else:
+                        fill_index = _palette_fill_for_source(geometry, face, fill_index)
                     polygons.append((fill_index, vpts))
 
     parts = []
@@ -441,6 +487,17 @@ def build_parser() -> argparse.ArgumentParser:
             "_APERIODIC_DEFAULT_DEPTHS). Aperiodic mode only."
         ),
     )
+    output_mode = parser.add_mutually_exclusive_group()
+    output_mode.add_argument(
+        "--write",
+        action="store_true",
+        help="Write or replace the generated entry in tiling-preview-data.ts.",
+    )
+    output_mode.add_argument(
+        "--check",
+        action="store_true",
+        help="Exit nonzero when tiling-preview-data.ts does not contain the generated entry.",
+    )
     return parser
 
 
@@ -462,9 +519,17 @@ def main(argv: list[str] | None = None) -> int:
         )
         polygon_data, cell_count, color_count = _aperiodic_polygon_data(args.geometry, depth)
         print(f"// {args.geometry} depth {depth} -- {cell_count} cells, {color_count} color(s)")
-        quoted = f'"{args.geometry}"' if "-" in args.geometry else args.geometry
-        print(f"    {quoted}:")
-        print(f'        "{polygon_data}",')
+        if args.write or args.check:
+            current = write_preview_entry(args.geometry, polygon_data, check=args.check)
+            if not current:
+                print(f"Preview entry for '{args.geometry}' is stale.", file=sys.stderr)
+                return 1
+            print(
+                f"Preview entry for '{args.geometry}' "
+                f"{'is current' if args.check else 'was written'}: {_PREVIEW_DATA_PATH}"
+            )
+            return 0
+        print(preview_entry_source(args.geometry, polygon_data))
         return 0
 
     descriptors = _load_descriptors()
@@ -508,8 +573,17 @@ def main(argv: list[str] | None = None) -> int:
     faces_per_unit = descriptor.get("cell_count_per_unit", "?")
 
     print(f"// {label} — {faces_per_unit} faces per unit cell")
-    print(f"    {key}:")
-    print(f'        "{polygon_data}",')
+    if args.write or args.check:
+        current = write_preview_entry(key, polygon_data, check=args.check)
+        if not current:
+            print(f"Preview entry for '{key}' is stale.", file=sys.stderr)
+            return 1
+        print(
+            f"Preview entry for '{key}' "
+            f"{'is current' if args.check else 'was written'}: {_PREVIEW_DATA_PATH}"
+        )
+        return 0
+    print(preview_entry_source(key, polygon_data))
     return 0
 
 

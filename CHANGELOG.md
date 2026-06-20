@@ -5,6 +5,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 
 ## Unreleased
 
+- Added an end-to-end periodic tiling workflow: SVG inspection, board-shape diagnostics, transactional catalog installation, preview write/check support, and descriptor/reference auto-discovery.
 - Add the 2-uniform #12 tiling `[3^2.6^2; 3^4.6]` with regular triangle and hexagon faces.
 - Add the 2-uniform #10 tiling `[3^6; 3^2.6^2]` with regular triangle and hexagon faces.
 - Add the 2-uniform #18 tiling `[3^6; 3^2.4.3.4]` with regular triangle and square faces.

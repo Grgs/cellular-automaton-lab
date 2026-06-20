@@ -169,6 +169,15 @@ class SketchReport:
         )
 
     @property
+    def rendered_aspect_ratio(self) -> float:
+        vertices = [vertex for cell in self.cells for vertex in cell.vertices]
+        if not vertices:
+            return 0.0
+        width = max(x for x, _ in vertices) - min(x for x, _ in vertices)
+        height = max(y for _, y in vertices) - min(y for _, y in vertices)
+        return width / height if height > 0 else float("inf")
+
+    @property
     def is_valid(self) -> bool:
         # An interior vertex has 4+ polygons meeting at it (a boundary
         # corner has 1-2; a boundary edge has 2-3). Require every such
@@ -617,13 +626,12 @@ def emit_reference_spec(
     """Return a complete reference-spec Python module as a string.
 
     Drop the output into ``backend/simulation/reference_specs/periodic/``
-    (one file per geometry) and add the corresponding ``from . import
-    <module>`` and ``**<module>.SPECS`` lines to that package's
-    ``__init__.py``. The reference verifier will then check the geometry
-    against the cell counts, degree histogram, adjacency pairs, and
-    interior-vertex-configuration frequencies the sketch tool just
-    computed - which is exactly what the verifier itself computes at the
-    same patch size, so the spec passes on its first verifier run.
+    (one file per geometry); the package discovers it automatically. The
+    reference verifier will then check the geometry against the cell counts,
+    degree histogram, adjacency pairs, and interior-vertex-configuration
+    frequencies the sketch tool just computed - which is exactly what the
+    verifier itself computes at the same patch size, so the spec passes on
+    its first verifier run.
     """
     source_urls_repr = "()" if source_url is None else f'("{source_url}",)'
 
@@ -732,6 +740,9 @@ def _print_report(input_data: SketchInput, report: SketchReport) -> None:
     print(f"cell: {input_data.cell_width} x {input_data.cell_height}")
     print(f"face templates: {len(input_data.faces)}")
     print(f"patch cells: {len(report.cells)}")
+    print(f"rendered aspect ratio: {report.rendered_aspect_ratio:.3f}")
+    if report.rendered_aspect_ratio < 0.5 or report.rendered_aspect_ratio > 2.0:
+        print("WARNING: rendered patch is strip-shaped; consider a balanced packaged unit cell.")
     print(f"kind counts: {report.kind_counts}")
     print(f"degree histogram: {report.degree_histogram}")
 
