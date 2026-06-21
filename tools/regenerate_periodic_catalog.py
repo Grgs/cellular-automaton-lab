@@ -34,8 +34,14 @@ def _literal_string(node: ast.AST | None) -> str | None:
     return node.value if isinstance(node, ast.Constant) and isinstance(node.value, str) else None
 
 
-def _reference_records(root: Path) -> dict[str, tuple[str, ...]]:
-    records: dict[str, tuple[str, ...]] = {}
+def _reference_geometries(root: Path) -> set[str]:
+    """Geometry keys that have a periodic reference spec.
+
+    Only the presence of a spec per geometry matters here (callers cross-check
+    that every descriptor has one); the spec's ``source_urls`` are owned and
+    reported elsewhere, so this deliberately reads just the geometry key.
+    """
+    geometries: set[str] = set()
     for path in sorted((root / _REFERENCE_DIR).glob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
@@ -46,20 +52,12 @@ def _reference_records(root: Path) -> dict[str, tuple[str, ...]]:
                 continue
             keywords = {keyword.arg: keyword.value for keyword in node.keywords if keyword.arg}
             geometry = _literal_string(keywords.get("geometry"))
-            urls_node = keywords.get("source_urls")
             if geometry is None:
                 continue
-            urls = (
-                tuple(
-                    value for item in urls_node.elts if (value := _literal_string(item)) is not None
-                )
-                if isinstance(urls_node, (ast.Tuple, ast.List))
-                else ()
-            )
-            if geometry in records:
+            if geometry in geometries:
                 raise ValueError(f"Duplicate periodic reference specs for '{geometry}'.")
-            records[geometry] = urls
-    return records
+            geometries.add(geometry)
+    return geometries
 
 
 def _descriptor_payloads(root: Path) -> dict[str, dict[str, Any]]:
@@ -75,11 +73,10 @@ def _descriptor_payloads(root: Path) -> dict[str, dict[str, Any]]:
 
 def discover_catalog_sources(root: Path = ROOT_DIR) -> dict[str, dict[str, Any]]:
     descriptors = _descriptor_payloads(root)
-    references = _reference_records(root)
+    reference_keys = _reference_geometries(root)
     metadata = load_periodic_face_catalog_sources(root / _METADATA_DIR)
     descriptor_keys = set(descriptors)
     metadata_keys = set(metadata)
-    reference_keys = set(references)
     problems: list[str] = []
     if missing := sorted(descriptor_keys - metadata_keys):
         problems.append("descriptors missing catalog metadata: " + ", ".join(missing))
