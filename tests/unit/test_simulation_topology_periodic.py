@@ -30,6 +30,7 @@ try:
         SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
+        UNIFORM_2_2_3122_34312_GEOMETRY,
         UNIFORM_2_10_GEOMETRY,
         UNIFORM_2_12_GEOMETRY,
         UNIFORM_2_13_GEOMETRY,
@@ -66,6 +67,7 @@ except ModuleNotFoundError:
         SNUB_SQUARE_DUAL_GEOMETRY,
         TETRAKIS_SQUARE_GEOMETRY,
         TRIAKIS_TRIANGULAR_GEOMETRY,
+        UNIFORM_2_2_3122_34312_GEOMETRY,
         UNIFORM_2_10_GEOMETRY,
         UNIFORM_2_12_GEOMETRY,
         UNIFORM_2_13_GEOMETRY,
@@ -349,6 +351,19 @@ class SimulationTopologyPeriodicTests(unittest.TestCase):
         self.assertEqual(
             Counter(cell.kind for cell in topology.cells),
             Counter({"triangle": 129, "hexagon": 46}),
+        )
+        validation = validate_topology(topology)
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+        self.assertFalse(validation.edge_multiplicity_issues)
+        self.assertEqual(validation.hole_count, 0)
+
+    def test_uniform_2_2_has_expected_face_mix_and_valid_interior(self) -> None:
+        topology = build_topology(UNIFORM_2_2_3122_34312_GEOMETRY, 3, 3)
+
+        self.assertEqual(topology.cell_count, 61)
+        self.assertEqual(
+            Counter(cell.kind for cell in topology.cells),
+            Counter({"triangle": 36, "dodecagon": 16, "square": 9}),
         )
         validation = validate_topology(topology)
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
