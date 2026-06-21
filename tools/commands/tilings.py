@@ -7,6 +7,7 @@ from tools import (
     compare_seed,
     generate_tiling_preview,
     inspect_tiling_svg,
+    regenerate_periodic_catalog,
     report_tiling_verification_strength,
     scaffold_aperiodic_family,
     sketch_tiling,
@@ -90,6 +91,13 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("tilings", "add-periodic"),
         target_main=add_periodic_tiling.main,
         parser_factory=add_periodic_tiling.build_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="regenerate-catalog",
+        doc=command_doc("tilings", "regenerate-catalog"),
+        target_main=regenerate_periodic_catalog.main,
+        parser_factory=regenerate_periodic_catalog.build_parser,
     )
     add_passthrough_command(
         subparsers,

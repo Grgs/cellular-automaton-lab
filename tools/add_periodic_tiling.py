@@ -61,6 +61,17 @@ def _module_name(geometry: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", geometry.lower()).strip("_")
 
 
+def _existing_reference_path(root: Path, geometry: str) -> Path | None:
+    matches = [
+        path
+        for path in sorted((root / _REFERENCE_DIR).glob("*.py"))
+        if f'"{geometry}"' in path.read_text(encoding="utf-8")
+    ]
+    if len(matches) > 1:
+        raise ValueError(f"Multiple reference modules already define '{geometry}'.")
+    return matches[0] if matches else None
+
+
 def _manifest_assignment(tree: ast.Module) -> ast.Assign | ast.AnnAssign:
     for node in tree.body:
         if isinstance(node, ast.Assign):
@@ -84,21 +95,52 @@ def update_manifest_source(
     geometry: str,
     label: str,
     metadata: InstallMetadata,
+    reconcile: bool = False,
 ) -> str:
-    if geometry in source:
-        raise ValueError(f"Geometry '{geometry}' is already present in the topology manifest.")
     tree = ast.parse(source)
     assignment = _manifest_assignment(tree)
     if assignment.end_lineno is None or assignment.lineno is None:
         raise ValueError("Topology manifest source positions are unavailable.")
-    lines = source.splitlines(keepends=True)
     constant = _constant_name(geometry)
+    constants = {
+        target.id: node.value.value
+        for node in tree.body
+        if isinstance(node, (ast.Assign, ast.AnnAssign))
+        for target in (node.targets if isinstance(node, ast.Assign) else (node.target,))
+        if isinstance(target, ast.Name)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
+    }
+    manifest_value = assignment.value
+    if not isinstance(manifest_value, ast.Dict):
+        raise ValueError("TOPOLOGY_FAMILY_MANIFEST must be a dictionary literal.")
+    existing_entry: tuple[ast.expr, ast.expr] | None = None
+    for key, value in zip(manifest_value.keys, manifest_value.values, strict=True):
+        if key is None:
+            continue
+        resolved_key = (
+            constants.get(key.id)
+            if isinstance(key, ast.Name)
+            else key.value
+            if isinstance(key, ast.Constant)
+            else None
+        )
+        if resolved_key == geometry:
+            existing_entry = (key, value)
+            break
+    existing_constant = next(
+        (name for name, value in constants.items() if value == geometry),
+        None,
+    )
+    if (existing_entry is not None or existing_constant is not None) and not reconcile:
+        raise ValueError(f"Geometry '{geometry}' is already present in the topology manifest.")
+
+    lines = source.splitlines(keepends=True)
     constant_line = f"{constant} = {json.dumps(geometry)}\n\n"
-    lines.insert(assignment.lineno - 1, constant_line)
-    closing_index = assignment.end_lineno
+    entry_constant = existing_constant or constant
     entry = (
-        f"    {constant}: _single_variant_family(\n"
-        f"        tiling_family={constant},\n"
+        f"    {entry_constant}: _single_variant_family(\n"
+        f"        tiling_family={entry_constant},\n"
         f"        label={json.dumps(label)},\n"
         '        picker_group="Periodic Mixed",\n'
         f"        picker_order={metadata.picker_order},\n"
@@ -112,6 +154,18 @@ def update_manifest_source(
         "        minimum_grid_dimension=1,\n"
         "    ),\n"
     )
+    if existing_entry is not None:
+        key, value = existing_entry
+        if key.lineno is None or value.end_lineno is None:
+            raise ValueError("Existing topology manifest entry has no source position.")
+        lines[key.lineno - 1 : value.end_lineno] = entry.splitlines(keepends=True)
+        return "".join(lines)
+
+    if existing_constant is None:
+        lines.insert(assignment.lineno - 1, constant_line)
+        closing_index = assignment.end_lineno
+    else:
+        closing_index = assignment.end_lineno - 1
     lines.insert(closing_index, entry)
     return "".join(lines)
 
@@ -135,14 +189,73 @@ def _palette_entry(geometry: str, kinds: tuple[str, ...], tokens: dict[str, str]
     }
 
 
-def update_palette_source(source: str, entry: dict[str, Any]) -> str:
+def update_palette_source(
+    source: str,
+    entry: dict[str, Any],
+    *,
+    reconcile: bool = False,
+) -> str:
     payload = json.loads(source)
     families = payload.get("families")
     if not isinstance(families, list):
         raise ValueError("Palette manifest does not contain a families list.")
     geometry = entry["geometry"]
-    if any(isinstance(family, dict) and family.get("geometry") == geometry for family in families):
-        raise ValueError(f"Palette entry for '{geometry}' already exists.")
+    existing_index = next(
+        (
+            index
+            for index, family in enumerate(families)
+            if isinstance(family, dict) and family.get("geometry") == geometry
+        ),
+        None,
+    )
+    if existing_index is not None:
+        if not reconcile:
+            raise ValueError(f"Palette entry for '{geometry}' already exists.")
+        existing_family = families[existing_index]
+        existing_labels = {
+            variant.get("selector", {}).get("kind"): variant.get("label")
+            for variant in existing_family.get("variants", [])
+            if isinstance(variant, dict)
+        }
+        for variant in entry.get("variants", []):
+            kind = variant.get("selector", {}).get("kind")
+            if kind in existing_labels and existing_labels[kind]:
+                variant["label"] = existing_labels[kind]
+        if families[existing_index] == entry:
+            return source
+        marker = f'"geometry": {json.dumps(geometry)}'
+        marker_index = source.find(marker)
+        object_start = source.rfind("{", 0, marker_index)
+        if marker_index < 0 or object_start < 0:
+            raise ValueError(f"Palette source block for '{geometry}' was not found.")
+        depth = 0
+        in_string = False
+        escaped = False
+        object_end = -1
+        for index in range(object_start, len(source)):
+            character = source[index]
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif character == "\\":
+                    escaped = True
+                elif character == '"':
+                    in_string = False
+                continue
+            if character == '"':
+                in_string = True
+            elif character == "{":
+                depth += 1
+            elif character == "}":
+                depth -= 1
+                if depth == 0:
+                    object_end = index + 1
+                    break
+        if object_end < 0:
+            raise ValueError(f"Palette source block for '{geometry}' is unterminated.")
+        rendered = json.dumps(entry, indent=2)
+        indented = "\n".join("    " + line for line in rendered.splitlines())
+        return source[:object_start] + indented.lstrip() + source[object_end:]
     rendered = json.dumps(entry, indent=2)
     indented = "\n".join("    " + line for line in rendered.splitlines())
     marker = "\n  ]\n}"
@@ -171,6 +284,7 @@ def build_install_plan(
     root: Path = ROOT_DIR,
     patch_size: int = 4,
     allow_strip: bool = False,
+    reconcile: bool = False,
 ) -> tuple[PlannedWrite, ...]:
     input_data = load_sketch(sketch_path)
     report = sketch(input_data, patch_size=patch_size)
@@ -187,10 +301,20 @@ def build_install_plan(
     geometry = input_data.geometry
     descriptor = emit_descriptor_json(input_data)
     descriptor_path = root / _DESCRIPTOR_DIR / f"{geometry}.json"
-    reference_path = root / _REFERENCE_DIR / f"{_module_name(geometry)}.py"
-    permanent_sketch_path = root / _SKETCH_DIR / f"{_module_name(geometry)}.py"
+    canonical_reference_path = root / _REFERENCE_DIR / f"{_module_name(geometry)}.py"
+    reference_path = (
+        _existing_reference_path(root, geometry) or canonical_reference_path
+        if reconcile
+        else canonical_reference_path
+    )
+    sketch_directory = (root / _SKETCH_DIR).resolve()
+    permanent_sketch_path = (
+        sketch_path
+        if reconcile and sketch_path.resolve().parent == sketch_directory
+        else root / _SKETCH_DIR / f"{_module_name(geometry)}.py"
+    )
     for path in (descriptor_path, reference_path):
-        if path.exists():
+        if path.exists() and not reconcile:
             raise ValueError(f"Refusing to overwrite existing generated file: {path}")
 
     kinds = tuple(sorted(report.kind_counts))
@@ -203,8 +327,13 @@ def build_install_plan(
         geometry=geometry,
         label=input_data.label,
         metadata=metadata,
+        reconcile=reconcile,
     )
-    palette_source = update_palette_source(palette_path.read_text(encoding="utf-8"), palette_entry)
+    palette_source = update_palette_source(
+        palette_path.read_text(encoding="utf-8"),
+        palette_entry,
+        reconcile=reconcile,
+    )
     preview_descriptor = cast(PreviewDescriptor, descriptor)
     polygon_data = _generate_polygon_data(
         preview_descriptor,
@@ -229,7 +358,7 @@ def build_install_plan(
         PlannedWrite(preview_path, preview_source),
     ]
     if sketch_path.resolve() != permanent_sketch_path.resolve():
-        if permanent_sketch_path.exists():
+        if permanent_sketch_path.exists() and not reconcile:
             raise ValueError(f"Permanent sketch path already exists: {permanent_sketch_path}")
         writes.append(PlannedWrite(permanent_sketch_path, sketch_path.read_text(encoding="utf-8")))
     return tuple(writes)
@@ -255,6 +384,11 @@ def apply_install_plan(writes: tuple[PlannedWrite, ...], *, root: Path = ROOT_DI
         if python_paths:
             _run([sys.executable, "-m", "ruff", "format", *python_paths], root=root)
             _run([sys.executable, "-m", "ruff", "check", *python_paths], root=root)
+        if any(write.path == root / _PREVIEW_PATH for write in writes):
+            _run(
+                ["npm", "exec", "prettier", "--", "--write", str(_PREVIEW_PATH)],
+                root=root,
+            )
         _run(
             [
                 sys.executable,
@@ -343,6 +477,11 @@ def build_parser() -> argparse.ArgumentParser:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true")
     mode.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--reconcile",
+        action="store_true",
+        help="Upsert existing generated files and shared catalog metadata.",
+    )
     parser.add_argument("--source-url")
     parser.add_argument("--picker-order", type=int)
     parser.add_argument("--default-cell-size", type=int, default=12)
@@ -395,6 +534,7 @@ def main(argv: list[str] | None = None) -> int:
             metadata,
             patch_size=args.patch_size,
             allow_strip=args.allow_strip,
+            reconcile=args.reconcile,
         )
         if args.dry_run:
             print("Planned writes:")
@@ -406,7 +546,8 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError, RuntimeError) as error:
         print(str(error), file=sys.stderr)
         return 1
-    print(f"Installed periodic tiling '{input_data.geometry}'.")
+    action = "Reconciled" if args.reconcile else "Installed"
+    print(f"{action} periodic tiling '{input_data.geometry}'.")
     return 0
 
 

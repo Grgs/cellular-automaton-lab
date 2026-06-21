@@ -140,10 +140,22 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("tilings", "add-periodic"),
         "tilings",
         "Install a validated periodic sketch across catalog and generated surfaces.",
-        "Writes the descriptor, reference spec, manifest metadata, palette, preview, permanent sketch, and bootstrap fixture as one rollback-safe operation. Supports --dry-run and --check.",
+        "Writes the descriptor, reference spec, manifest metadata, palette, preview, permanent sketch, and bootstrap fixture as one rollback-safe operation. Supports --dry-run, --check, and --reconcile for idempotent post-rebase repair.",
         (
             "python -m tools tilings add-periodic sketch.py --source-url https://example.org/reference.svg --picker-order 250 --dry-run",
+            "python -m tools tilings add-periodic sketch.py --source-url https://example.org/reference.svg --picker-order 250 --reconcile",
             "python -m tools tilings add-periodic tools/sketch_examples/example.py --check",
+        ),
+    ),
+    CommandDoc(
+        ("tilings", "regenerate-catalog"),
+        "tilings",
+        "Rebuild scaffold-generated periodic catalog surfaces after rebases.",
+        "Discovers descriptors, reference specs, and permanent sketches; deterministically reconciles generated descriptors, references, manifest entries, palettes, previews, bootstrap metadata, and bootstrap bundle-budget headroom while preserving legacy handwritten specs.",
+        (
+            "python -m tools tilings regenerate-catalog --dry-run",
+            "python -m tools tilings regenerate-catalog",
+            "python -m tools tilings regenerate-catalog --check",
         ),
     ),
     CommandDoc(

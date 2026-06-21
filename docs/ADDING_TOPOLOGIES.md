@@ -24,6 +24,19 @@ python -m tools tilings add-periodic output/candidate.py `
 
 `add-periodic` installs the validated sketch, descriptor, manifest metadata, reference spec, dead-state palette, picker preview, and standalone bootstrap fixture in one rollback-safe operation. It runs catalog and literature verification before keeping the writes. Use `--palette kind=token` when a face kind has no suitable default and `--check` to detect drift later.
 
+After rebasing or resolving additive catalog conflicts, use the idempotent reconciliation paths:
+
+```powershell
+python -m tools tilings add-periodic tools/sketch_examples/example.py `
+    --source-url https://example.org/reference.svg `
+    --picker-order 250 `
+    --reconcile
+python -m tools tilings regenerate-catalog
+python -m tools tilings regenerate-catalog --check
+```
+
+`add-periodic --reconcile` upserts an existing tiling, including installations where the descriptor was written before the manifest entry. `regenerate-catalog` discovers all periodic descriptors and reference modules, then rebuilds shared surfaces for scaffold-managed tilings: manifest entries, dead palettes, picker previews, standalone bootstrap metadata, and bootstrap bundle-budget headroom. It preserves handwritten legacy reference specs and specialized verification additions.
+
 ## Fast path: aperiodic substitution families
 
 If the new family is an aperiodic substitution tiling (the most common case for new entries), `python -m tools tilings scaffold-aperiodic` automates the mechanical wiring. It creates the generator skeleton, reference-spec stub, and test skeleton, and inserts the manifest / registry / topology / reference-spec-init entries. The placeholder substitution is structurally valid (loads end-to-end) so you can confirm wiring before implementing the real geometry.

@@ -6,7 +6,10 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
+from backend.simulation.periodic_face_tilings import (
+    PERIODIC_FACE_TILING_GEOMETRIES,
+    _ordered_periodic_geometries,
+)
 from backend.simulation.topology_implementation_registry import get_topology_implementation
 from tools.add_periodic_tiling import (
     InstallMetadata,
@@ -16,6 +19,10 @@ from tools.add_periodic_tiling import (
 )
 from tools.generate_tiling_preview import update_preview_source
 from tools.inspect_tiling_svg import inspect_svg, render_sketch_starter
+from tools.regenerate_periodic_catalog import (
+    discover_catalog_sources,
+    refresh_bootstrap_budget_source,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -28,6 +35,12 @@ class PeriodicRegistryDiscoveryTests(unittest.TestCase):
                 self.assertEqual(implementation.geometry_key, geometry)
                 self.assertEqual(implementation.builder_kind, "periodic_face")
                 self.assertEqual(implementation.render_kind, "polygon_periodic")
+
+    def test_orphan_descriptor_remains_importable_for_reconciliation(self) -> None:
+        ordered = _ordered_periodic_geometries(frozenset({"square", "orphan-periodic"}))
+
+        self.assertIn("orphan-periodic", ordered)
+        self.assertEqual(ordered[-1], "orphan-periodic")
 
 
 class PreviewSourceUpdateTests(unittest.TestCase):
@@ -175,6 +188,119 @@ FACES: list[dict[str, Any]] = [
             self.assertEqual(existing.read_text(encoding="utf-8"), "before")
             self.assertFalse(created.exists())
             self.assertEqual(bootstrap.read_text(encoding="utf-8"), "bootstrap-before")
+
+    def test_reconcile_upserts_an_existing_installation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            sketch_path = self._write_root_inputs(root)
+            original_metadata = InstallMetadata(
+                source_url="https://example.org/square.svg",
+                picker_order=999,
+                default_cell_size=12,
+                min_cell_size=8,
+                max_cell_size=20,
+                default_rule="life-b2-s23",
+                palette_tokens={"square": "toneStone"},
+            )
+            for write in build_install_plan(
+                sketch_path,
+                original_metadata,
+                root=root,
+                patch_size=3,
+            ):
+                write.path.parent.mkdir(parents=True, exist_ok=True)
+                write.path.write_text(write.content, encoding="utf-8")
+
+            manifest_path = root / "backend/simulation/topology_family_manifest.py"
+            manifest_path.write_text(
+                manifest_path.read_text(encoding="utf-8").replace(
+                    "TOOL_TEST_SQUARE_GEOMETRY",
+                    "LEGACY_TOOL_TEST_SQUARE_GEOMETRY",
+                ),
+                encoding="utf-8",
+            )
+            reference_path = (
+                root / "backend/simulation/reference_specs/periodic/tool_test_square.py"
+            )
+            legacy_reference_path = reference_path.with_name("legacy_square_reference.py")
+            reference_path.rename(legacy_reference_path)
+
+            updated_metadata = InstallMetadata(
+                source_url="https://example.org/rebased-square.svg",
+                picker_order=1001,
+                default_cell_size=14,
+                min_cell_size=9,
+                max_cell_size=22,
+                default_rule="conway",
+                palette_tokens={"square": "toneCream"},
+            )
+            writes = build_install_plan(
+                sketch_path,
+                updated_metadata,
+                root=root,
+                patch_size=3,
+                reconcile=True,
+            )
+
+        contents = {write.path.relative_to(root).as_posix(): write.content for write in writes}
+        manifest = contents["backend/simulation/topology_family_manifest.py"]
+        palette = json.loads(contents["frontend/canvas/family-dead-palette-manifest.json"])
+        compile(manifest, "topology_family_manifest.py", "exec")
+        self.assertEqual(manifest.count("LEGACY_TOOL_TEST_SQUARE_GEOMETRY:"), 1)
+        self.assertNotIn("    TOOL_TEST_SQUARE_GEOMETRY:", manifest)
+        self.assertIn("picker_order=1001", manifest)
+        self.assertIn("CELL_SIZE_CONTROL, 14, 9, 22", manifest)
+        family = next(
+            item for item in palette["families"] if item["geometry"] == "tool-test-square"
+        )
+        self.assertEqual(len(family["variants"]), 1)
+        self.assertEqual(family["variants"][0]["color"]["token"], "toneCream")
+        self.assertIn(
+            "rebased-square.svg",
+            contents["backend/simulation/reference_specs/periodic/legacy_square_reference.py"],
+        )
+
+
+class RegeneratePeriodicCatalogTests(unittest.TestCase):
+    def test_discovers_all_descriptors_and_generated_sources(self) -> None:
+        inventory = discover_catalog_sources(ROOT)
+
+        self.assertTrue(inventory.descriptor_geometries <= inventory.reference_geometries)
+        self.assertEqual(
+            {source.geometry for source in inventory.sources},
+            {
+                "uniform-2-10-36-3262",
+                "uniform-2-12-3262-346",
+                "uniform-2-19-v1-36-346",
+                "uniform-2-2-3122-34312",
+                "uniform-3-4-36-3262-63",
+            },
+        )
+
+    def test_bootstrap_budget_only_grows_when_headroom_is_low(self) -> None:
+        source = json.dumps(
+            {
+                "categories": [
+                    {"name": "bootstrap-data", "raw": 100, "gzip": 20},
+                ]
+            }
+        )
+
+        refreshed = json.loads(refresh_bootstrap_budget_source(source, b"x" * 100))
+        category = refreshed["categories"][0]
+        self.assertGreaterEqual(category["raw"], 115)
+        self.assertGreaterEqual(category["gzip"], 20)
+
+        stable_source = json.dumps(
+            {
+                "categories": [
+                    {"name": "bootstrap-data", "raw": 10_000, "gzip": 1_000},
+                ]
+            }
+        )
+        stable = json.loads(refresh_bootstrap_budget_source(stable_source, b"small"))
+        self.assertEqual(stable["categories"][0]["raw"], 10_000)
+        self.assertEqual(stable["categories"][0]["gzip"], 1_000)
 
 
 if __name__ == "__main__":
