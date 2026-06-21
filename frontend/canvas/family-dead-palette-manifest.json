@@ -1,6 +1,25 @@
 {
   "families": [
     {
+      "geometry": "triangle",
+      "variants": [
+        {
+          "label": "triangle-up",
+          "selector": {
+            "orientation_token": "up"
+          },
+          "color": {"token": "dead"}
+        },
+        {
+          "label": "triangle-down",
+          "selector": {
+            "orientation_token": "down"
+          },
+          "color": {"token": "deadAlt"}
+        }
+      ]
+    },
+    {
       "geometry": "archimedean-4-8-8",
       "variants": [
         {
@@ -132,6 +151,43 @@
           "label": "archimedean-3-3-3-3-6-triangle",
           "selector": {"kind": "triangle"},
           "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "cairo-pentagonal",
+      "variants": [
+        {
+          "label": "cairo-pentagon-a",
+          "selector": {
+            "kind": "pentagon",
+            "slot": "a"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "cairo-pentagon-b",
+          "selector": {
+            "kind": "pentagon",
+            "slot": "b"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "cairo-pentagon-c",
+          "selector": {
+            "kind": "pentagon",
+            "slot": "c"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "cairo-pentagon-d",
+          "selector": {
+            "kind": "pentagon",
+            "slot": "d"
+          },
+          "color": {"token": "toneStone"}
         }
       ]
     },
@@ -402,6 +458,43 @@
           },
           "color": {"token": "toneFlax"},
           "allowSharedDeadColor": true
+        }
+      ]
+    },
+    {
+      "geometry": "tetrakis-square",
+      "variants": [
+        {
+          "label": "tetrakis-triangle-s0",
+          "selector": {
+            "kind": "triangle",
+            "slot": "s0"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "tetrakis-triangle-s1",
+          "selector": {
+            "kind": "triangle",
+            "slot": "s1"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "tetrakis-triangle-s2",
+          "selector": {
+            "kind": "triangle",
+            "slot": "s2"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "tetrakis-triangle-s3",
+          "selector": {
+            "kind": "triangle",
+            "slot": "s3"
+          },
+          "color": {"token": "toneStone"}
         }
       ]
     },

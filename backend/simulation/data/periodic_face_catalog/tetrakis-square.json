@@ -16,6 +16,50 @@
   "source_urls": [
     "https://en.wikipedia.org/wiki/Tetrakis_square_tiling"
   ],
-  "palette": null,
-  "preview_data": "0:28,4 60,4 44,20;0:60,4 92,4 76,20;0:28,36 60,36 44,52;0:60,36 92,36 76,52;0:60,4 60,36 44,20;0:92,4 92,36 76,20;0:60,36 60,68 44,52;0:92,36 92,68 76,52;0:60,36 28,36 44,20;0:92,36 60,36 76,20;0:60,68 28,68 44,52;0:92,68 60,68 76,52;0:28,36 28,4 44,20;0:60,36 60,4 76,20;0:28,68 28,36 44,52;0:60,68 60,36 76,52"
+  "palette": {
+    "geometry": "tetrakis-square",
+    "variants": [
+      {
+        "label": "tetrakis-triangle-s0",
+        "selector": {
+          "kind": "triangle",
+          "slot": "s0"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "tetrakis-triangle-s1",
+        "selector": {
+          "kind": "triangle",
+          "slot": "s1"
+        },
+        "color": {
+          "token": "toneLinen"
+        }
+      },
+      {
+        "label": "tetrakis-triangle-s2",
+        "selector": {
+          "kind": "triangle",
+          "slot": "s2"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "tetrakis-triangle-s3",
+        "selector": {
+          "kind": "triangle",
+          "slot": "s3"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneLinen:60,-36 60,36 24,0;toneTan:60,36 -12,36 24,0;toneStone:-12,36 -12,-36 24,0;toneCream:-12,36 60,36 24,72;toneLinen:60,36 60,108 24,72;toneStone:-12,108 -12,36 24,72;toneLinen:132,-36 132,36 96,0;toneTan:132,36 60,36 96,0;toneStone:60,36 60,-36 96,0;toneCream:60,36 132,36 96,72;toneLinen:132,36 132,108 96,72;toneStone:60,108 60,36 96,72"
 }

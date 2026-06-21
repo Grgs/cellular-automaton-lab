@@ -6,6 +6,7 @@ lives in [TODO.md](TODO.md). For mechanical commit history, see `git log`.
 ## Unreleased
 
 - Moved Kagome onto the data-driven dead-cell palette: its hexagon and the two triangle orientations now carry explicit catalog tones (cream / tan / stone) for both the canvas and the picker thumbnail, replacing the hardcoded `dead`/`deadAlt` special case in `state-colors.ts`.
+- Gave Cairo Pentagonal and Tetrakis Square four-tone orientation palettes (their four prototile orientations now read distinctly on both canvas and thumbnail) and moved the base triangle grid's up/down two-tone onto the data-driven palette, removing the last hardcoded `deadAlt` branch in `state-colors.ts`. Dense single-prototile lattices (triakis, floret, prismatic/snub/type-7 pentagonal) deliberately stay on the neutral fill, since their tens of per-instance slots would make a multi-tone background noisy.
 - Added an end-to-end periodic tiling workflow: SVG inspection, board-shape diagnostics, transactional catalog installation, preview write/check support, and descriptor/reference auto-discovery.
 - Add the 2-uniform #12 tiling `[3^2.6^2; 3^4.6]` with regular triangle and hexagon faces.
 - Add the 2-uniform #10 tiling `[3^6; 3^2.6^2]` with regular triangle and hexagon faces.

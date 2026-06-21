@@ -29,8 +29,20 @@ export function resolveDeadCellColor(
 
     const normalizedGeometry = normalizeGeometry(geometry);
     if (tileColorsEnabled) {
+        // Regular triangle grids carry no per-cell topology object, so derive the
+        // up/down orientation from the grid coordinates and attach it as an
+        // orientation token. The data-driven palette then assigns the tone, the
+        // same path every mixed/aperiodic family uses -- no hardcoded fill here.
+        const lookupCell =
+            normalizedGeometry === "triangle" &&
+            typeof x === "number" &&
+            typeof y === "number" &&
+            Number.isInteger(x) &&
+            Number.isInteger(y)
+                ? { ...(cell ?? {}), orientation_token: triangleOrientation(x, y) }
+                : cell;
         const registeredFamilyDeadColor = resolveRegisteredFamilyDeadColor(
-            (cell as TopologyCell | null | undefined) ?? null,
+            (lookupCell as TopologyCell | null | undefined) ?? null,
             fallbackColors,
             normalizedGeometry,
         );
@@ -39,16 +51,6 @@ export function resolveDeadCellColor(
         }
     }
 
-    if (
-        normalizedGeometry === "triangle" &&
-        typeof x === "number" &&
-        typeof y === "number" &&
-        Number.isInteger(x) &&
-        Number.isInteger(y) &&
-        triangleOrientation(x, y) === "down"
-    ) {
-        return fallbackColors.deadAlt;
-    }
     return fallbackColors.dead;
 }
 
