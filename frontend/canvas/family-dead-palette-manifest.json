@@ -1003,6 +1003,29 @@
       ]
     },
     {
+      "geometry": "uniform-3-4-36-3262-63",
+      "variants": [
+        {
+          "label": "uniform-3-4-36-3262-63-hexagon",
+          "selector": {
+            "kind": "hexagon"
+          },
+          "color": {
+            "token": "toneCream"
+          }
+        },
+        {
+          "label": "uniform-3-4-36-3262-63-triangle",
+          "selector": {
+            "kind": "triangle"
+          },
+          "color": {
+            "token": "toneClay"
+          }
+        }
+      ]
+    },
+    {
       "geometry": "uniform-2-2-3122-34312",
       "variants": [
         {
