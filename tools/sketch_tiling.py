@@ -92,6 +92,9 @@ from backend.simulation.periodic_face_tilings import (  # noqa: E402
     PeriodicFaceCell,
     _pattern_cells,
 )
+from backend.simulation.reference_verification.periodic import (  # noqa: E402
+    _periodic_face_interior_vertex_configuration_frequencies,
+)
 
 _COORD_PRECISION = 4  # decimals; matches backend's edge-key precision
 _OVERLAP_AREA_TOLERANCE = 1e-3
@@ -457,12 +460,9 @@ def sketch(input_data: SketchInput, *, patch_size: int = 3) -> SketchReport:
 
     vertex_configs = _vertex_configurations(cells)
 
-    # Interior vertex kind histogram (vertices whose angle sum ~= 360 deg)
-    interior_kinds: Counter[tuple[str, ...]] = Counter()
-    for cfg in vertex_configs:
-        if abs(cfg.angle_sum_degrees - 360.0) <= _ANGLE_TOLERANCE_DEGREES:
-            kinds = tuple(sorted(kind for _, kind in cfg.polygons))
-            interior_kinds[kinds] += 1
+    # Use the verifier's cyclic canonicalization so generated expectations
+    # preserve alternating face orders such as 3.4.3.12.
+    interior_kinds = dict(_periodic_face_interior_vertex_configuration_frequencies(cells))
 
     # Adjacency pair histogram: every directed edge cell -> neighbor
     # contributes one (kind_left, kind_right) pair (canonicalised by sort).
@@ -486,7 +486,7 @@ def sketch(input_data: SketchInput, *, patch_size: int = 3) -> SketchReport:
         unmatched_edges=unmatched_edges,
         t_junctions=t_junctions,
         vertex_configurations=vertex_configs,
-        interior_vertex_kinds=dict(interior_kinds),
+        interior_vertex_kinds=interior_kinds,
         patch_bounds=logical_bounds,
     )
 

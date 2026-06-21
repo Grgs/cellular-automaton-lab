@@ -18,6 +18,7 @@ from typing import Any
 ROOT_DIR = Path(__file__).resolve().parents[2]
 EXAMPLE_PATH = ROOT_DIR / "tools" / "sketch_examples" / "triangular_square_2uniform.py"
 UNIFORM_2_10_PATH = ROOT_DIR / "tools" / "sketch_examples" / "uniform_2_10.py"
+UNIFORM_2_2_PATH = ROOT_DIR / "tools" / "sketch_examples" / "uniform_2_2_3122_34312.py"
 
 
 class SketchTilingTests(unittest.TestCase):
@@ -71,6 +72,20 @@ class SketchTilingTests(unittest.TestCase):
         self.assertEqual(report.unmatched_edges, ())
         self.assertEqual(report.t_junctions, ())
         self.assertEqual(report.invalid_interior_vertices, ())
+        self.assertTrue(report.is_valid)
+
+    def test_uniform_2_2_preserves_alternating_vertex_order(self) -> None:
+        from tools.sketch_tiling import load_sketch, sketch
+
+        report = sketch(load_sketch(UNIFORM_2_2_PATH), patch_size=4)
+
+        self.assertEqual(
+            report.interior_vertex_kinds,
+            {
+                ("dodecagon", "dodecagon", "triangle"): 64,
+                ("dodecagon", "triangle", "square", "triangle"): 64,
+            },
+        )
         self.assertTrue(report.is_valid)
 
     def test_missing_face_is_flagged_as_invalid(self) -> None:

@@ -941,6 +941,32 @@
       }
     },
     {
+      "tiling_family": "uniform-2-2-3122-34312",
+      "label": "2-uniform #2 (3.12^2; 3.4.3.12)",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 253,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "uniform-2-2-3122-34312"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 12,
+        "min": 8,
+        "max": 20
+      }
+    },
+    {
       "tiling_family": "floret-pentagonal",
       "label": "Floret Pentagonal",
       "picker_group": "Periodic Mixed",
@@ -1894,6 +1920,21 @@
       "max_x": 6.0,
       "max_y": 5.19615,
       "cell_count_per_unit": 52,
+      "row_offset_x": 0.0
+    },
+    {
+      "geometry": "uniform-2-2-3122-34312",
+      "label": "2-uniform #2 (3.12^2; 3.4.3.12)",
+      "metric_model": "pattern",
+      "base_edge": 1.0,
+      "unit_width": 3.73205,
+      "unit_height": 3.73205,
+      "min_dimension": 1,
+      "min_x": -1.866025,
+      "min_y": -1.866025,
+      "max_x": 3.73205,
+      "max_y": 3.73205,
+      "cell_count_per_unit": 6,
       "row_offset_x": 0.0
     },
     {
