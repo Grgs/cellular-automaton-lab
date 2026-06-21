@@ -1,0 +1,21 @@
+{
+  "geometry": "trihexagonal-3-6-3-6",
+  "label": "Kagome / Trihexagonal (3.6.3.6)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 120,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 24
+  },
+  "default_rule": "kagome-life",
+  "minimum_grid_dimension": 3,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Trihexagonal_tiling"
+  ],
+  "palette": null,
+  "preview_data": "dead:42,17 49,30 42,42 27,42 19,30 27,17;dead:71,17 78,30 71,42 56,42 49,30 56,17;dead:56,42 64,55 56,68 42,68 34,55 42,42;dead:86,42 93,55 86,68 71,68 64,55 71,42;deadAlt:34,4 27,17 42,17;deadAlt:64,4 56,17 71,17;deadAlt:49,30 42,42 56,42;deadAlt:78,30 71,42 86,42;deadAlt:42,17 56,17 49,30;deadAlt:71,17 86,17 78,30;deadAlt:56,42 71,42 64,55;deadAlt:86,42 101,42 93,55"
+}

@@ -1,0 +1,52 @@
+{
+  "geometry": "archimedean-3-4-6-4",
+  "label": "Rhombitrihexagonal (3.4.6.4)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 140,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 14,
+    "min": 10,
+    "max": 20
+  },
+  "default_rule": "archlife-3-4-6-4",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Rhombitrihexagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "archimedean-3-4-6-4",
+    "variants": [
+      {
+        "label": "archimedean-3-4-6-4-hexagon",
+        "selector": {
+          "kind": "hexagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "archimedean-3-4-6-4-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "archimedean-3-4-6-4-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneTan:65,4 71,15 61,21 55,10;toneClay:65,4 71,15 78,4;toneCream:61,21 61,33 71,39 82,33 82,21 71,15;toneClay:78,50 71,39 65,50;toneTan:65,50 78,50 78,62 65,62;toneTan:61,33 55,44 65,50 71,39;toneCream:44,50 44,62 55,68 65,62 65,50 55,44;toneTan:49,33 55,44 44,50 38,39;toneClay:49,33 55,44 61,33;toneTan:49,21 61,21 61,33 49,33;toneTan:44,4 38,15 49,21 55,10;toneClay:61,21 55,10 49,21"
+}

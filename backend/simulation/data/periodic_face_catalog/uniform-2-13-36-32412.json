@@ -1,0 +1,53 @@
+{
+  "geometry": "uniform-2-13-36-32412",
+  "label": "2-uniform #13 (3^6; 3^2.4.12)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 248,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 10,
+    "min": 8,
+    "max": 18
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/List_of_k-uniform_tilings",
+    "https://commons.wikimedia.org/wiki/File:2-uniform_n13.svg"
+  ],
+  "palette": {
+    "geometry": "uniform-2-13-36-32412",
+    "variants": [
+      {
+        "label": "uniform-2-13-dodecagon",
+        "selector": {
+          "kind": "dodecagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "uniform-2-13-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "uniform-2-13-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneStone:-6,36 -14,21 1,12 10,27;toneStone:27,27 36,12 51,21 42,36;toneClay:10,27 18,12 1,12;toneClay:18,12 27,-3 36,12;toneClay:10,27 18,12 27,27;toneClay:27,27 18,12 36,12;toneClay:51,21 69,21 60,36;toneClay:42,36 51,21 60,36;toneClay:18,84 27,69 36,84;toneCream:51,-21 51,-3 42,12 27,21 10,21 -6,12 -14,-3 -14,-21 -6,-36 10,-45 27,-45 42,-36;toneClay:42,12 51,-3 60,12;toneClay:69,-3 60,12 51,-3;toneCream:51,51 51,69 42,84 27,93 10,93 -6,84 -14,69 -14,51 -6,36 10,27 27,27 42,36;toneStone:78,36 69,21 84,12 93,27;toneStone:69,51 69,69 51,69 51,51;toneStone:110,27 119,12 134,21 126,36;toneClay:51,51 60,36 42,36;toneClay:78,36 60,36 69,21;toneClay:93,27 102,12 84,12;toneClay:102,12 110,-3 119,12;toneClay:93,27 102,12 110,27;toneClay:69,51 51,51 60,36;toneClay:69,51 60,36 78,36;toneClay:110,27 102,12 119,12;toneClay:42,84 51,69 60,84;toneClay:69,69 60,84 51,69;toneClay:102,84 110,69 119,84;toneCream:134,-21 134,-3 126,12 110,21 93,21 78,12 69,-3 69,-21 78,-36 93,-45 110,-45 126,-36;toneCream:134,51 134,69 126,84 110,93 93,93 78,84 69,69 69,51 78,36 93,27 110,27 126,36"
+}

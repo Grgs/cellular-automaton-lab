@@ -1,0 +1,19 @@
+{
+  "geometry": "right-triangle",
+  "label": "Right-Triangle",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 232,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [],
+  "palette": null,
+  "preview_data": "0:-12,-36 60,-36 60,36;0:-12,-36 60,36 -12,36;0:-12,36 60,36 60,108;0:-12,36 60,108 -12,108;0:60,-36 132,-36 132,36;0:60,-36 132,36 60,36;0:60,36 132,36 132,108;0:60,36 132,108 60,108"
+}

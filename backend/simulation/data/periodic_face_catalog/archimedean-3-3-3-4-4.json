@@ -1,0 +1,43 @@
+{
+  "geometry": "archimedean-3-3-3-4-4",
+  "label": "Elongated Triangular (3.3.3.4.4)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 170,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 18,
+    "min": 12,
+    "max": 20
+  },
+  "default_rule": "archlife-3-3-3-4-4",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Elongated_triangular_tiling"
+  ],
+  "palette": {
+    "geometry": "archimedean-3-3-3-4-4",
+    "variants": [
+      {
+        "label": "archimedean-3-3-3-4-4-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "archimedean-3-3-3-4-4-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneTan:56,36 64,21 73,36;toneCream:64,4 81,4 81,21 64,21;toneTan:64,21 73,36 81,21;toneTan:64,68 73,53 81,68;toneCream:56,36 73,36 73,53 56,53;toneTan:56,53 64,68 73,53;toneTan:47,68 56,53 64,68;toneTan:39,53 47,68 56,53;toneCream:39,36 56,36 56,53 39,53;toneTan:39,36 47,21 56,36;toneTan:47,21 56,36 64,21;toneCream:47,4 64,4 64,21 47,21"
+}

@@ -127,7 +127,7 @@ python -m tools tilings inspect-svg reference.svg --sketch-output output/starter
 
 Install a validated periodic sketch across catalog and generated surfaces.
 
-Writes the descriptor, reference spec, manifest metadata, palette, preview, permanent sketch, and bootstrap fixture as one rollback-safe operation. Supports --dry-run, --check, and --reconcile for idempotent post-rebase repair.
+Writes the descriptor, reference spec, permanent sketch, and authoritative per-tiling metadata, then regenerates the server aggregate, palette, preview, bootstrap fixture, and budget headroom as one rollback-safe operation. Supports --dry-run, --check, and --reconcile.
 
 ```powershell
 python -m tools tilings add-periodic sketch.py --source-url https://example.org/reference.svg --picker-order 250 --dry-run
@@ -137,9 +137,9 @@ python -m tools tilings add-periodic tools/sketch_examples/example.py --check
 
 ### `python -m tools tilings regenerate-catalog`
 
-Rebuild scaffold-generated periodic catalog surfaces after rebases.
+Rebuild every periodic catalog surface after rebases.
 
-Discovers descriptors, reference specs, and permanent sketches; deterministically reconciles generated descriptors, references, manifest entries, palettes, previews, bootstrap metadata, and bootstrap bundle-budget headroom while preserving legacy handwritten specs.
+Validates one-to-one descriptor, metadata, and reference-spec discovery, then deterministically rebuilds the server aggregate, palettes, previews, standalone bootstrap metadata, and bootstrap bundle-budget headroom while preserving handwritten reference specs.
 
 ```powershell
 python -m tools tilings regenerate-catalog --dry-run

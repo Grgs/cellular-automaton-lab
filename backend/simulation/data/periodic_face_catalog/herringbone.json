@@ -1,0 +1,85 @@
+{
+  "geometry": "herringbone",
+  "label": "Herringbone",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 238,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Herringbone_pattern"
+  ],
+  "palette": {
+    "geometry": "herringbone",
+    "variants": [
+      {
+        "label": "herringbone-h0",
+        "selector": {
+          "kind": "herringbone-horizontal",
+          "slot": "h0"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      },
+      {
+        "label": "herringbone-h1",
+        "selector": {
+          "kind": "herringbone-horizontal",
+          "slot": "h1"
+        },
+        "color": {
+          "token": "toneShadow"
+        }
+      },
+      {
+        "label": "herringbone-v0",
+        "selector": {
+          "kind": "herringbone-vertical",
+          "slot": "v0"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "herringbone-v1",
+        "selector": {
+          "kind": "herringbone-vertical",
+          "slot": "v1"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "herringbone-v2",
+        "selector": {
+          "kind": "herringbone-vertical",
+          "slot": "v2"
+        },
+        "color": {
+          "token": "toneLinen"
+        }
+      },
+      {
+        "label": "herringbone-v3",
+        "selector": {
+          "kind": "herringbone-vertical",
+          "slot": "v3"
+        },
+        "color": {
+          "token": "toneRose"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneTan:-12,-36 12,-36 12,12 -12,12;toneLinen:12,-36 36,-36 36,12 12,12;toneRose:36,-36 60,-36 60,12 36,12;toneClay:-36,12 -12,12 12,12 12,36 -12,36 -36,36;toneShadow:12,12 36,12 60,12 60,36 36,36 12,36;toneTan:-12,36 12,36 12,84 -12,84;toneLinen:12,36 36,36 36,84 12,84;toneRose:36,36 60,36 60,84 36,84;toneCream:60,-36 84,-36 84,12 60,12;toneTan:84,-36 108,-36 108,12 84,12;toneLinen:108,-36 132,-36 132,12 108,12;toneClay:60,12 84,12 108,12 108,36 84,36 60,36;toneShadow:108,12 132,12 156,12 156,36 132,36 108,36;toneCream:60,36 84,36 84,84 60,84;toneTan:84,36 108,36 108,84 84,84;toneLinen:108,36 132,36 132,84 108,84"
+}

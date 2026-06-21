@@ -1,0 +1,151 @@
+{
+  "geometry": "deltoidal-trihexagonal",
+  "label": "Deltoidal Trihexagonal",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 210,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Deltoidal_trihexagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "deltoidal-trihexagonal",
+    "variants": [
+      {
+        "label": "deltoidal-trihexagonal-s5",
+        "selector": {
+          "kind": "kite",
+          "slot": "s5"
+        },
+        "color": {
+          "token": "toneLinen"
+        }
+      },
+      {
+        "label": "deltoidal-trihexagonal-s10",
+        "selector": {
+          "kind": "kite",
+          "slot": "s10"
+        },
+        "color": {
+          "token": "toneLinen"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "deltoidal-trihexagonal-s3",
+        "selector": {
+          "kind": "kite",
+          "slot": "s3"
+        },
+        "color": {
+          "token": "toneSand"
+        }
+      },
+      {
+        "label": "deltoidal-trihexagonal-s8",
+        "selector": {
+          "kind": "kite",
+          "slot": "s8"
+        },
+        "color": {
+          "token": "toneSand"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "deltoidal-trihexagonal-s2",
+        "selector": {
+          "kind": "kite",
+          "slot": "s2"
+        },
+        "color": {
+          "token": "toneFlax"
+        }
+      },
+      {
+        "label": "deltoidal-trihexagonal-s9",
+        "selector": {
+          "kind": "kite",
+          "slot": "s9"
+        },
+        "color": {
+          "token": "toneFlax"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "deltoidal-trihexagonal-s4",
+        "selector": {
+          "kind": "kite",
+          "slot": "s4"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "deltoidal-trihexagonal-s11",
+        "selector": {
+          "kind": "kite",
+          "slot": "s11"
+        },
+        "color": {
+          "token": "toneTan"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "deltoidal-trihexagonal-s0",
+        "selector": {
+          "kind": "kite",
+          "slot": "s0"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "deltoidal-trihexagonal-s6",
+        "selector": {
+          "kind": "kite",
+          "slot": "s6"
+        },
+        "color": {
+          "token": "toneStone"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "deltoidal-trihexagonal-s1",
+        "selector": {
+          "kind": "kite",
+          "slot": "s1"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      },
+      {
+        "label": "deltoidal-trihexagonal-s7",
+        "selector": {
+          "kind": "kite",
+          "slot": "s7"
+        },
+        "color": {
+          "token": "toneClay"
+        },
+        "allowSharedDeadColor": true
+      }
+    ]
+  },
+  "preview_data": "toneTan:-2,0 18,0 18,12 8,18;toneStone:-2,0 8,18 -2,24 -13,18;toneClay:8,18 18,12 29,18 18,36;toneSand:-2,24 8,18 18,36 -2,36;toneLinen:-2,36 18,36 8,54 -2,48;toneStone:18,36 29,54 18,60 8,54;toneClay:-13,54 -2,48 8,54 -2,72;toneFlax:8,54 18,60 18,72 -2,72;toneLinen:18,0 39,0 29,18 18,12;toneTan:39,0 60,0 60,12 50,18;toneStone:39,0 50,18 39,24 29,18;toneClay:50,18 60,12 70,18 60,36;toneFlax:29,18 39,24 39,36 18,36;toneSand:39,24 50,18 60,36 39,36;toneTan:18,36 39,36 39,48 29,54;toneLinen:39,36 60,36 50,54 39,48;toneStone:60,36 70,54 60,60 50,54;toneClay:29,54 39,48 50,54 39,72;toneSand:18,60 29,54 39,72 18,72;toneFlax:50,54 60,60 60,72 39,72;toneLinen:60,0 81,0 70,18 60,12;toneTan:81,0 102,0 102,12 91,18;toneStone:81,0 91,18 81,24 70,18;toneClay:91,18 102,12 112,18 102,36;toneFlax:70,18 81,24 81,36 60,36;toneSand:81,24 91,18 102,36 81,36;toneTan:60,36 81,36 81,48 70,54;toneLinen:81,36 102,36 91,54 81,48;toneStone:102,36 112,54 102,60 91,54;toneClay:70,54 81,48 91,54 81,72;toneSand:60,60 70,54 81,72 60,72;toneFlax:91,54 102,60 102,72 81,72;toneLinen:102,0 122,0 112,18 102,12;toneStone:122,0 133,18 122,24 112,18;toneFlax:112,18 122,24 122,36 102,36;toneTan:102,36 122,36 122,48 112,54;toneClay:112,54 122,48 133,54 122,72;toneSand:102,60 112,54 122,72 102,72"
+}

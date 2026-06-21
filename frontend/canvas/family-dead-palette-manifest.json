@@ -116,6 +116,802 @@
       ]
     },
     {
+      "geometry": "rhombille",
+      "variants": [
+        {
+          "label": "rhombille-horizontal-a",
+          "selector": {
+            "kind": "rhombus",
+            "slot": "s0"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "rhombille-horizontal-b",
+          "selector": {
+            "kind": "rhombus",
+            "slot": "s3"
+          },
+          "color": {"token": "toneLinen"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "rhombille-rising-a",
+          "selector": {
+            "kind": "rhombus",
+            "slot": "s1"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "rhombille-rising-b",
+          "selector": {
+            "kind": "rhombus",
+            "slot": "s4"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "rhombille-falling-a",
+          "selector": {
+            "kind": "rhombus",
+            "slot": "s2"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "rhombille-falling-b",
+          "selector": {
+            "kind": "rhombus",
+            "slot": "s5"
+          },
+          "color": {"token": "toneClay"},
+          "allowSharedDeadColor": true
+        }
+      ]
+    },
+    {
+      "geometry": "deltoidal-trihexagonal",
+      "variants": [
+        {
+          "label": "deltoidal-trihexagonal-s5",
+          "selector": {
+            "kind": "kite",
+            "slot": "s5"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "deltoidal-trihexagonal-s10",
+          "selector": {
+            "kind": "kite",
+            "slot": "s10"
+          },
+          "color": {"token": "toneLinen"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-trihexagonal-s3",
+          "selector": {
+            "kind": "kite",
+            "slot": "s3"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "deltoidal-trihexagonal-s8",
+          "selector": {
+            "kind": "kite",
+            "slot": "s8"
+          },
+          "color": {"token": "toneSand"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-trihexagonal-s2",
+          "selector": {
+            "kind": "kite",
+            "slot": "s2"
+          },
+          "color": {"token": "toneFlax"}
+        },
+        {
+          "label": "deltoidal-trihexagonal-s9",
+          "selector": {
+            "kind": "kite",
+            "slot": "s9"
+          },
+          "color": {"token": "toneFlax"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-trihexagonal-s4",
+          "selector": {
+            "kind": "kite",
+            "slot": "s4"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "deltoidal-trihexagonal-s11",
+          "selector": {
+            "kind": "kite",
+            "slot": "s11"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-trihexagonal-s0",
+          "selector": {
+            "kind": "kite",
+            "slot": "s0"
+          },
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "deltoidal-trihexagonal-s6",
+          "selector": {
+            "kind": "kite",
+            "slot": "s6"
+          },
+          "color": {"token": "toneStone"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-trihexagonal-s1",
+          "selector": {
+            "kind": "kite",
+            "slot": "s1"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "deltoidal-trihexagonal-s7",
+          "selector": {
+            "kind": "kite",
+            "slot": "s7"
+          },
+          "color": {"token": "toneClay"},
+          "allowSharedDeadColor": true
+        }
+      ]
+    },
+    {
+      "geometry": "deltoidal-hexagonal",
+      "variants": [
+        {
+          "label": "deltoidal-hexagonal-k0",
+          "selector": {
+            "kind": "kite",
+            "slot": "k0"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "deltoidal-hexagonal-k7",
+          "selector": {
+            "kind": "kite",
+            "slot": "k7"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-hexagonal-k1",
+          "selector": {
+            "kind": "kite",
+            "slot": "k1"
+          },
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "deltoidal-hexagonal-k6",
+          "selector": {
+            "kind": "kite",
+            "slot": "k6"
+          },
+          "color": {"token": "toneStone"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-hexagonal-k2",
+          "selector": {
+            "kind": "kite",
+            "slot": "k2"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "deltoidal-hexagonal-k9",
+          "selector": {
+            "kind": "kite",
+            "slot": "k9"
+          },
+          "color": {"token": "toneClay"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-hexagonal-k3",
+          "selector": {
+            "kind": "kite",
+            "slot": "k3"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "deltoidal-hexagonal-k8",
+          "selector": {
+            "kind": "kite",
+            "slot": "k8"
+          },
+          "color": {"token": "toneLinen"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-hexagonal-k4",
+          "selector": {
+            "kind": "kite",
+            "slot": "k4"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "deltoidal-hexagonal-k11",
+          "selector": {
+            "kind": "kite",
+            "slot": "k11"
+          },
+          "color": {"token": "toneSand"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "deltoidal-hexagonal-k5",
+          "selector": {
+            "kind": "kite",
+            "slot": "k5"
+          },
+          "color": {"token": "toneFlax"}
+        },
+        {
+          "label": "deltoidal-hexagonal-k10",
+          "selector": {
+            "kind": "kite",
+            "slot": "k10"
+          },
+          "color": {"token": "toneFlax"},
+          "allowSharedDeadColor": true
+        }
+      ]
+    },
+    {
+      "geometry": "tiltwork",
+      "variants": [
+        {
+          "label": "tiltwork-diamond",
+          "selector": {"kind": "diamond"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "tiltwork-tri-s1",
+          "selector": {
+            "kind": "corner-triangle",
+            "slot": "s1"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "tiltwork-tri-s2",
+          "selector": {
+            "kind": "corner-triangle",
+            "slot": "s2"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "tiltwork-tri-s3",
+          "selector": {
+            "kind": "corner-triangle",
+            "slot": "s3"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "tiltwork-tri-s4",
+          "selector": {
+            "kind": "corner-triangle",
+            "slot": "s4"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "pythagorean",
+      "variants": [
+        {
+          "label": "pythagorean-large-b0",
+          "selector": {
+            "kind": "pythagorean-large",
+            "slot": "b0"
+          },
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "pythagorean-large-b1",
+          "selector": {
+            "kind": "pythagorean-large",
+            "slot": "b1"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "pythagorean-large-b2",
+          "selector": {
+            "kind": "pythagorean-large",
+            "slot": "b2"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "pythagorean-large-b3",
+          "selector": {
+            "kind": "pythagorean-large",
+            "slot": "b3"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "pythagorean-large-b4",
+          "selector": {
+            "kind": "pythagorean-large",
+            "slot": "b4"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "pythagorean-small",
+          "selector": {"kind": "pythagorean-small"},
+          "color": {"token": "toneCream"}
+        }
+      ]
+    },
+    {
+      "geometry": "herringbone",
+      "variants": [
+        {
+          "label": "herringbone-h0",
+          "selector": {
+            "kind": "herringbone-horizontal",
+            "slot": "h0"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "herringbone-h1",
+          "selector": {
+            "kind": "herringbone-horizontal",
+            "slot": "h1"
+          },
+          "color": {"token": "toneShadow"}
+        },
+        {
+          "label": "herringbone-v0",
+          "selector": {
+            "kind": "herringbone-vertical",
+            "slot": "v0"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "herringbone-v1",
+          "selector": {
+            "kind": "herringbone-vertical",
+            "slot": "v1"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "herringbone-v2",
+          "selector": {
+            "kind": "herringbone-vertical",
+            "slot": "v2"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "herringbone-v3",
+          "selector": {
+            "kind": "herringbone-vertical",
+            "slot": "v3"
+          },
+          "color": {"token": "toneRose"}
+        }
+      ]
+    },
+    {
+      "geometry": "triangular-square-2uniform",
+      "variants": [
+        {
+          "label": "tri-sq-2u-square-sa",
+          "selector": {
+            "kind": "square",
+            "slot": "sa"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "tri-sq-2u-square-sb",
+          "selector": {
+            "kind": "square",
+            "slot": "sb"
+          },
+          "color": {"token": "toneShadow"}
+        },
+        {
+          "label": "tri-sq-2u-tri-ua",
+          "selector": {
+            "kind": "triangle",
+            "slot": "ua"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "tri-sq-2u-tri-ub",
+          "selector": {
+            "kind": "triangle",
+            "slot": "ub"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "tri-sq-2u-tri-da",
+          "selector": {
+            "kind": "triangle",
+            "slot": "da"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "tri-sq-2u-tri-dleft",
+          "selector": {
+            "kind": "triangle",
+            "slot": "dleft"
+          },
+          "color": {"token": "toneRose"}
+        },
+        {
+          "label": "tri-sq-2u-tri-uc",
+          "selector": {
+            "kind": "triangle",
+            "slot": "uc"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "tri-sq-2u-tri-db",
+          "selector": {
+            "kind": "triangle",
+            "slot": "db"
+          },
+          "color": {"token": "toneCream"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "tri-sq-2u-tri-dc",
+          "selector": {
+            "kind": "triangle",
+            "slot": "dc"
+          },
+          "color": {"token": "toneLinen"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "tri-sq-2u-tri-uleftr2",
+          "selector": {
+            "kind": "triangle",
+            "slot": "uleftr2"
+          },
+          "color": {"token": "toneRose"},
+          "allowSharedDeadColor": true
+        }
+      ]
+    },
+    {
+      "geometry": "basketweave",
+      "variants": [
+        {
+          "label": "basketweave-h1",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "h1"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "basketweave-h2",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "h2"
+          },
+          "color": {"token": "toneShadow"}
+        },
+        {
+          "label": "basketweave-h3",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "h3"
+          },
+          "color": {"token": "toneShadow"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "basketweave-h4",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "h4"
+          },
+          "color": {"token": "toneClay"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "basketweave-v1",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "v1"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "basketweave-v2",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "v2"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "basketweave-v3",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "v3"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "basketweave-v4",
+          "selector": {
+            "kind": "basketweave-brick",
+            "slot": "v4"
+          },
+          "color": {"token": "toneCream"},
+          "allowSharedDeadColor": true
+        }
+      ]
+    },
+    {
+      "geometry": "trihex-2uniform-3636-3366",
+      "variants": [
+        {
+          "label": "trihex-2u-hex",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "trihex-2u-tl",
+          "selector": {
+            "kind": "triangle",
+            "slot": "tl"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "trihex-2u-tr",
+          "selector": {
+            "kind": "triangle",
+            "slot": "tr"
+          },
+          "color": {"token": "toneTan"}
+        }
+      ]
+    },
+    {
+      "geometry": "stein-14-pentagonal",
+      "variants": [
+        {
+          "label": "stein14-t0",
+          "selector": {
+            "kind": "stein14",
+            "slot": "t0"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "stein14-t1",
+          "selector": {
+            "kind": "stein14",
+            "slot": "t1"
+          },
+          "color": {"token": "toneShadow"}
+        },
+        {
+          "label": "stein14-t2",
+          "selector": {
+            "kind": "stein14",
+            "slot": "t2"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "stein14-t3",
+          "selector": {
+            "kind": "stein14",
+            "slot": "t3"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "stein14-t4",
+          "selector": {
+            "kind": "stein14",
+            "slot": "t4"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "stein14-t5",
+          "selector": {
+            "kind": "stein14",
+            "slot": "t5"
+          },
+          "color": {"token": "toneRose"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-2-18-36-33434",
+      "variants": [
+        {
+          "label": "uniform-2-18-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "uniform-2-18-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-3-4-6-12",
+      "variants": [
+        {
+          "label": "uniform-34612-dodecagon",
+          "selector": {"kind": "dodecagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "uniform-34612-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "uniform-34612-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "uniform-34612-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-2-13-36-32412",
+      "variants": [
+        {
+          "label": "uniform-2-13-dodecagon",
+          "selector": {"kind": "dodecagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "uniform-2-13-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "uniform-2-13-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-2-10-36-3262",
+      "variants": [
+        {
+          "label": "uniform-2-10-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "uniform-2-10-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-2-12-3262-346",
+      "variants": [
+        {
+          "label": "uniform-2-12-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "uniform-2-12-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-2-19-v1-36-346",
+      "variants": [
+        {
+          "label": "uniform-2-19-v1-36-346-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "uniform-2-19-v1-36-346-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-3-4-36-3262-63",
+      "variants": [
+        {
+          "label": "uniform-3-4-36-3262-63-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "uniform-3-4-36-3262-63-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-2-2-3122-34312",
+      "variants": [
+        {
+          "label": "uniform-2-2-3122-34312-dodecagon",
+          "selector": {"kind": "dodecagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "uniform-2-2-3122-34312-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "uniform-2-2-3122-34312-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
       "geometry": "penrose-p1-pentagon-diamond",
       "variants": [
         {
@@ -231,320 +1027,322 @@
       ]
     },
     {
-      "geometry": "rhombille",
-      "variants": [
-        {
-          "label": "rhombille-horizontal-a",
-          "selector": {"kind": "rhombus", "slot": "s0"},
-          "color": {"token": "toneLinen"}
-        },
-        {
-          "label": "rhombille-horizontal-b",
-          "selector": {"kind": "rhombus", "slot": "s3"},
-          "color": {"token": "toneLinen"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "rhombille-rising-a",
-          "selector": {"kind": "rhombus", "slot": "s1"},
-          "color": {"token": "toneTan"}
-        },
-        {
-          "label": "rhombille-rising-b",
-          "selector": {"kind": "rhombus", "slot": "s4"},
-          "color": {"token": "toneTan"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "rhombille-falling-a",
-          "selector": {"kind": "rhombus", "slot": "s2"},
-          "color": {"token": "toneClay"}
-        },
-        {
-          "label": "rhombille-falling-b",
-          "selector": {"kind": "rhombus", "slot": "s5"},
-          "color": {"token": "toneClay"},
-          "allowSharedDeadColor": true
-        }
-      ]
-    },
-    {
-      "geometry": "deltoidal-hexagonal",
-      "variants": [
-        {
-          "label": "deltoidal-hexagonal-k0",
-          "selector": {"kind": "kite", "slot": "k0"},
-          "color": {"token": "toneTan"}
-        },
-        {
-          "label": "deltoidal-hexagonal-k7",
-          "selector": {"kind": "kite", "slot": "k7"},
-          "color": {"token": "toneTan"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-hexagonal-k1",
-          "selector": {"kind": "kite", "slot": "k1"},
-          "color": {"token": "toneStone"}
-        },
-        {
-          "label": "deltoidal-hexagonal-k6",
-          "selector": {"kind": "kite", "slot": "k6"},
-          "color": {"token": "toneStone"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-hexagonal-k2",
-          "selector": {"kind": "kite", "slot": "k2"},
-          "color": {"token": "toneClay"}
-        },
-        {
-          "label": "deltoidal-hexagonal-k9",
-          "selector": {"kind": "kite", "slot": "k9"},
-          "color": {"token": "toneClay"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-hexagonal-k3",
-          "selector": {"kind": "kite", "slot": "k3"},
-          "color": {"token": "toneLinen"}
-        },
-        {
-          "label": "deltoidal-hexagonal-k8",
-          "selector": {"kind": "kite", "slot": "k8"},
-          "color": {"token": "toneLinen"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-hexagonal-k4",
-          "selector": {"kind": "kite", "slot": "k4"},
-          "color": {"token": "toneSand"}
-        },
-        {
-          "label": "deltoidal-hexagonal-k11",
-          "selector": {"kind": "kite", "slot": "k11"},
-          "color": {"token": "toneSand"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-hexagonal-k5",
-          "selector": {"kind": "kite", "slot": "k5"},
-          "color": {"token": "toneFlax"}
-        },
-        {
-          "label": "deltoidal-hexagonal-k10",
-          "selector": {"kind": "kite", "slot": "k10"},
-          "color": {"token": "toneFlax"},
-          "allowSharedDeadColor": true
-        }
-      ]
-    },
-    {
-      "geometry": "deltoidal-trihexagonal",
-      "variants": [
-        {
-          "label": "deltoidal-trihexagonal-s5",
-          "selector": {"kind": "kite", "slot": "s5"},
-          "color": {"token": "toneLinen"}
-        },
-        {
-          "label": "deltoidal-trihexagonal-s10",
-          "selector": {"kind": "kite", "slot": "s10"},
-          "color": {"token": "toneLinen"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-trihexagonal-s3",
-          "selector": {"kind": "kite", "slot": "s3"},
-          "color": {"token": "toneSand"}
-        },
-        {
-          "label": "deltoidal-trihexagonal-s8",
-          "selector": {"kind": "kite", "slot": "s8"},
-          "color": {"token": "toneSand"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-trihexagonal-s2",
-          "selector": {"kind": "kite", "slot": "s2"},
-          "color": {"token": "toneFlax"}
-        },
-        {
-          "label": "deltoidal-trihexagonal-s9",
-          "selector": {"kind": "kite", "slot": "s9"},
-          "color": {"token": "toneFlax"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-trihexagonal-s4",
-          "selector": {"kind": "kite", "slot": "s4"},
-          "color": {"token": "toneTan"}
-        },
-        {
-          "label": "deltoidal-trihexagonal-s11",
-          "selector": {"kind": "kite", "slot": "s11"},
-          "color": {"token": "toneTan"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-trihexagonal-s0",
-          "selector": {"kind": "kite", "slot": "s0"},
-          "color": {"token": "toneStone"}
-        },
-        {
-          "label": "deltoidal-trihexagonal-s6",
-          "selector": {"kind": "kite", "slot": "s6"},
-          "color": {"token": "toneStone"},
-          "allowSharedDeadColor": true
-        },
-        {
-          "label": "deltoidal-trihexagonal-s1",
-          "selector": {"kind": "kite", "slot": "s1"},
-          "color": {"token": "toneClay"}
-        },
-        {
-          "label": "deltoidal-trihexagonal-s7",
-          "selector": {"kind": "kite", "slot": "s7"},
-          "color": {"token": "toneClay"},
-          "allowSharedDeadColor": true
-        }
-      ]
-    },
-    {
-      "geometry": "tiltwork",
-      "variants": [
-        {"label": "tiltwork-diamond", "selector": {"kind": "diamond"}, "color": {"token": "toneStone"}},
-        {"label": "tiltwork-tri-s1", "selector": {"kind": "corner-triangle", "slot": "s1"}, "color": {"token": "toneCream"}},
-        {"label": "tiltwork-tri-s2", "selector": {"kind": "corner-triangle", "slot": "s2"}, "color": {"token": "toneSand"}},
-        {"label": "tiltwork-tri-s3", "selector": {"kind": "corner-triangle", "slot": "s3"}, "color": {"token": "toneTan"}},
-        {"label": "tiltwork-tri-s4", "selector": {"kind": "corner-triangle", "slot": "s4"}, "color": {"token": "toneClay"}}
-      ]
-    },
-    {
-      "geometry": "pythagorean",
-      "variants": [
-        {"label": "pythagorean-large-b0", "selector": {"kind": "pythagorean-large", "slot": "b0"}, "color": {"token": "toneStone"}},
-        {"label": "pythagorean-large-b1", "selector": {"kind": "pythagorean-large", "slot": "b1"}, "color": {"token": "toneTan"}},
-        {"label": "pythagorean-large-b2", "selector": {"kind": "pythagorean-large", "slot": "b2"}, "color": {"token": "toneClay"}},
-        {"label": "pythagorean-large-b3", "selector": {"kind": "pythagorean-large", "slot": "b3"}, "color": {"token": "toneSand"}},
-        {"label": "pythagorean-large-b4", "selector": {"kind": "pythagorean-large", "slot": "b4"}, "color": {"token": "toneLinen"}},
-        {"label": "pythagorean-small", "selector": {"kind": "pythagorean-small"}, "color": {"token": "toneCream"}}
-      ]
-    },
-    {
-      "geometry": "herringbone",
-      "variants": [
-        {"label": "herringbone-h0", "selector": {"kind": "herringbone-horizontal", "slot": "h0"}, "color": {"token": "toneClay"}},
-        {"label": "herringbone-h1", "selector": {"kind": "herringbone-horizontal", "slot": "h1"}, "color": {"token": "toneShadow"}},
-        {"label": "herringbone-v0", "selector": {"kind": "herringbone-vertical", "slot": "v0"}, "color": {"token": "toneCream"}},
-        {"label": "herringbone-v1", "selector": {"kind": "herringbone-vertical", "slot": "v1"}, "color": {"token": "toneTan"}},
-        {"label": "herringbone-v2", "selector": {"kind": "herringbone-vertical", "slot": "v2"}, "color": {"token": "toneLinen"}},
-        {"label": "herringbone-v3", "selector": {"kind": "herringbone-vertical", "slot": "v3"}, "color": {"token": "toneRose"}}
-      ]
-    },
-    {
-      "geometry": "triangular-square-2uniform",
-      "variants": [
-        {"label": "tri-sq-2u-square-sa", "selector": {"kind": "square", "slot": "sa"}, "color": {"token": "toneClay"}},
-        {"label": "tri-sq-2u-square-sb", "selector": {"kind": "square", "slot": "sb"}, "color": {"token": "toneShadow"}},
-        {"label": "tri-sq-2u-tri-ua", "selector": {"kind": "triangle", "slot": "ua"}, "color": {"token": "toneCream"}},
-        {"label": "tri-sq-2u-tri-ub", "selector": {"kind": "triangle", "slot": "ub"}, "color": {"token": "toneTan"}},
-        {"label": "tri-sq-2u-tri-da", "selector": {"kind": "triangle", "slot": "da"}, "color": {"token": "toneLinen"}},
-        {"label": "tri-sq-2u-tri-dleft", "selector": {"kind": "triangle", "slot": "dleft"}, "color": {"token": "toneRose"}},
-        {"label": "tri-sq-2u-tri-uc", "selector": {"kind": "triangle", "slot": "uc"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
-        {"label": "tri-sq-2u-tri-db", "selector": {"kind": "triangle", "slot": "db"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true},
-        {"label": "tri-sq-2u-tri-dc", "selector": {"kind": "triangle", "slot": "dc"}, "color": {"token": "toneLinen"}, "allowSharedDeadColor": true},
-        {"label": "tri-sq-2u-tri-uleftr2", "selector": {"kind": "triangle", "slot": "uleftr2"}, "color": {"token": "toneRose"}, "allowSharedDeadColor": true}
-      ]
-    },
-    {
-      "geometry": "basketweave",
-      "variants": [
-        {"label": "basketweave-h1", "selector": {"kind": "basketweave-brick", "slot": "h1"}, "color": {"token": "toneClay"}},
-        {"label": "basketweave-h2", "selector": {"kind": "basketweave-brick", "slot": "h2"}, "color": {"token": "toneShadow"}},
-        {"label": "basketweave-h3", "selector": {"kind": "basketweave-brick", "slot": "h3"}, "color": {"token": "toneShadow"}, "allowSharedDeadColor": true},
-        {"label": "basketweave-h4", "selector": {"kind": "basketweave-brick", "slot": "h4"}, "color": {"token": "toneClay"}, "allowSharedDeadColor": true},
-        {"label": "basketweave-v1", "selector": {"kind": "basketweave-brick", "slot": "v1"}, "color": {"token": "toneCream"}},
-        {"label": "basketweave-v2", "selector": {"kind": "basketweave-brick", "slot": "v2"}, "color": {"token": "toneTan"}},
-        {"label": "basketweave-v3", "selector": {"kind": "basketweave-brick", "slot": "v3"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
-        {"label": "basketweave-v4", "selector": {"kind": "basketweave-brick", "slot": "v4"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true}
-      ]
-    },
-    {
-      "geometry": "trihex-2uniform-3636-3366",
-      "variants": [
-        {"label": "trihex-2u-hex", "selector": {"kind": "hexagon"}, "color": {"token": "toneClay"}},
-        {"label": "trihex-2u-tl", "selector": {"kind": "triangle", "slot": "tl"}, "color": {"token": "toneCream"}},
-        {"label": "trihex-2u-tr", "selector": {"kind": "triangle", "slot": "tr"}, "color": {"token": "toneTan"}}
-      ]
-    },
-    {
-      "geometry": "stein-14-pentagonal",
-      "variants": [
-        {"label": "stein14-t0", "selector": {"kind": "stein14", "slot": "t0"}, "color": {"token": "toneClay"}},
-        {"label": "stein14-t1", "selector": {"kind": "stein14", "slot": "t1"}, "color": {"token": "toneShadow"}},
-        {"label": "stein14-t2", "selector": {"kind": "stein14", "slot": "t2"}, "color": {"token": "toneCream"}},
-        {"label": "stein14-t3", "selector": {"kind": "stein14", "slot": "t3"}, "color": {"token": "toneTan"}},
-        {"label": "stein14-t4", "selector": {"kind": "stein14", "slot": "t4"}, "color": {"token": "toneLinen"}},
-        {"label": "stein14-t5", "selector": {"kind": "stein14", "slot": "t5"}, "color": {"token": "toneRose"}}
-      ]
-    },
-    {
       "geometry": "spectre",
       "variants": [
-        {"label": "spectre-0", "selector": {"orientation_token": "0"}, "color": {"token": "toneCream"}},
-        {"label": "spectre-30", "selector": {"orientation_token": "30"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true},
-        {"label": "spectre-60", "selector": {"orientation_token": "60"}, "color": {"token": "toneSand"}},
-        {"label": "spectre-90", "selector": {"orientation_token": "90"}, "color": {"token": "toneSand"}, "allowSharedDeadColor": true},
-        {"label": "spectre-120", "selector": {"orientation_token": "120"}, "color": {"token": "toneTan"}},
-        {"label": "spectre-150", "selector": {"orientation_token": "150"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
-        {"label": "spectre-180", "selector": {"orientation_token": "180"}, "color": {"token": "toneStone"}},
-        {"label": "spectre-210", "selector": {"orientation_token": "210"}, "color": {"token": "toneStone"}, "allowSharedDeadColor": true},
-        {"label": "spectre-240", "selector": {"orientation_token": "240"}, "color": {"token": "toneClay"}},
-        {"label": "spectre-270", "selector": {"orientation_token": "270"}, "color": {"token": "toneClay"}, "allowSharedDeadColor": true},
-        {"label": "spectre-300", "selector": {"orientation_token": "300"}, "color": {"token": "toneLinen"}},
-        {"label": "spectre-330", "selector": {"orientation_token": "330"}, "color": {"token": "toneLinen"}, "allowSharedDeadColor": true}
+        {
+          "label": "spectre-0",
+          "selector": {
+            "orientation_token": "0"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "spectre-30",
+          "selector": {
+            "orientation_token": "30"
+          },
+          "color": {"token": "toneCream"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "spectre-60",
+          "selector": {
+            "orientation_token": "60"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "spectre-90",
+          "selector": {
+            "orientation_token": "90"
+          },
+          "color": {"token": "toneSand"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "spectre-120",
+          "selector": {
+            "orientation_token": "120"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "spectre-150",
+          "selector": {
+            "orientation_token": "150"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "spectre-180",
+          "selector": {
+            "orientation_token": "180"
+          },
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "spectre-210",
+          "selector": {
+            "orientation_token": "210"
+          },
+          "color": {"token": "toneStone"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "spectre-240",
+          "selector": {
+            "orientation_token": "240"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "spectre-270",
+          "selector": {
+            "orientation_token": "270"
+          },
+          "color": {"token": "toneClay"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "spectre-300",
+          "selector": {
+            "orientation_token": "300"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "spectre-330",
+          "selector": {
+            "orientation_token": "330"
+          },
+          "color": {"token": "toneLinen"},
+          "allowSharedDeadColor": true
+        }
       ]
     },
     {
       "geometry": "taylor-socolar",
       "variants": [
-        {"label": "taylor-left-0", "selector": {"chirality_token": "left", "orientation_token": "0"}, "color": {"token": "toneCream"}},
-        {"label": "taylor-left-60", "selector": {"chirality_token": "left", "orientation_token": "60"}, "color": {"token": "toneSand"}},
-        {"label": "taylor-left-120", "selector": {"chirality_token": "left", "orientation_token": "120"}, "color": {"token": "toneTan"}},
-        {"label": "taylor-left-180", "selector": {"chirality_token": "left", "orientation_token": "180"}, "color": {"token": "toneStone"}},
-        {"label": "taylor-left-240", "selector": {"chirality_token": "left", "orientation_token": "240"}, "color": {"token": "toneClay"}},
-        {"label": "taylor-left-300", "selector": {"chirality_token": "left", "orientation_token": "300"}, "color": {"token": "toneLinen"}},
-        {"label": "taylor-right-0", "selector": {"chirality_token": "right", "orientation_token": "0"}, "color": {"token": "toneLinen"}, "allowSharedDeadColor": true},
-        {"label": "taylor-right-60", "selector": {"chirality_token": "right", "orientation_token": "60"}, "color": {"token": "toneClay"}, "allowSharedDeadColor": true},
-        {"label": "taylor-right-120", "selector": {"chirality_token": "right", "orientation_token": "120"}, "color": {"token": "toneStone"}, "allowSharedDeadColor": true},
-        {"label": "taylor-right-180", "selector": {"chirality_token": "right", "orientation_token": "180"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
-        {"label": "taylor-right-240", "selector": {"chirality_token": "right", "orientation_token": "240"}, "color": {"token": "toneSand"}, "allowSharedDeadColor": true},
-        {"label": "taylor-right-300", "selector": {"chirality_token": "right", "orientation_token": "300"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true}
+        {
+          "label": "taylor-left-0",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "0"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "taylor-left-60",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "60"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "taylor-left-120",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "120"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "taylor-left-180",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "180"
+          },
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "taylor-left-240",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "240"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "taylor-left-300",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "300"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "taylor-right-0",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "0"
+          },
+          "color": {"token": "toneLinen"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "taylor-right-60",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "60"
+          },
+          "color": {"token": "toneClay"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "taylor-right-120",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "120"
+          },
+          "color": {"token": "toneStone"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "taylor-right-180",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "180"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "taylor-right-240",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "240"
+          },
+          "color": {"token": "toneSand"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "taylor-right-300",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "300"
+          },
+          "color": {"token": "toneCream"},
+          "allowSharedDeadColor": true
+        }
       ]
     },
     {
       "geometry": "sphinx",
       "variants": [
-        {"label": "sphinx-left-0", "selector": {"chirality_token": "left", "orientation_token": "0"}, "color": {"token": "toneCream"}},
-        {"label": "sphinx-left-60", "selector": {"chirality_token": "left", "orientation_token": "60"}, "color": {"token": "toneSand"}},
-        {"label": "sphinx-left-120", "selector": {"chirality_token": "left", "orientation_token": "120"}, "color": {"token": "toneTan"}},
-        {"label": "sphinx-left-180", "selector": {"chirality_token": "left", "orientation_token": "180"}, "color": {"token": "toneStone"}},
-        {"label": "sphinx-left-240", "selector": {"chirality_token": "left", "orientation_token": "240"}, "color": {"token": "toneClay"}},
-        {"label": "sphinx-left-300", "selector": {"chirality_token": "left", "orientation_token": "300"}, "color": {"token": "toneLinen"}},
-        {"label": "sphinx-right-0", "selector": {"chirality_token": "right", "orientation_token": "0"}, "color": {"token": "toneLinen"}, "allowSharedDeadColor": true},
-        {"label": "sphinx-right-60", "selector": {"chirality_token": "right", "orientation_token": "60"}, "color": {"token": "toneClay"}, "allowSharedDeadColor": true},
-        {"label": "sphinx-right-120", "selector": {"chirality_token": "right", "orientation_token": "120"}, "color": {"token": "toneStone"}, "allowSharedDeadColor": true},
-        {"label": "sphinx-right-180", "selector": {"chirality_token": "right", "orientation_token": "180"}, "color": {"token": "toneTan"}, "allowSharedDeadColor": true},
-        {"label": "sphinx-right-240", "selector": {"chirality_token": "right", "orientation_token": "240"}, "color": {"token": "toneSand"}, "allowSharedDeadColor": true},
-        {"label": "sphinx-right-300", "selector": {"chirality_token": "right", "orientation_token": "300"}, "color": {"token": "toneCream"}, "allowSharedDeadColor": true}
+        {
+          "label": "sphinx-left-0",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "0"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "sphinx-left-60",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "60"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "sphinx-left-120",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "120"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "sphinx-left-180",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "180"
+          },
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "sphinx-left-240",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "240"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "sphinx-left-300",
+          "selector": {
+            "chirality_token": "left",
+            "orientation_token": "300"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "sphinx-right-0",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "0"
+          },
+          "color": {"token": "toneLinen"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "sphinx-right-60",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "60"
+          },
+          "color": {"token": "toneClay"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "sphinx-right-120",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "120"
+          },
+          "color": {"token": "toneStone"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "sphinx-right-180",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "180"
+          },
+          "color": {"token": "toneTan"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "sphinx-right-240",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "240"
+          },
+          "color": {"token": "toneSand"},
+          "allowSharedDeadColor": true
+        },
+        {
+          "label": "sphinx-right-300",
+          "selector": {
+            "chirality_token": "right",
+            "orientation_token": "300"
+          },
+          "color": {"token": "toneCream"},
+          "allowSharedDeadColor": true
+        }
       ]
     },
     {
       "geometry": "tuebingen-triangle",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/tuebingen-triangle-depth-3.json",
-        "selectorFields": ["kind", "chirality_token"]
+        "selectorFields": [
+          "kind",
+          "chirality_token"
+        ]
       },
       "variants": [
         {
@@ -589,7 +1387,9 @@
       "geometry": "robinson-triangles",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/robinson-triangles-depth-3.json",
-        "selectorFields": ["kind"]
+        "selectorFields": [
+          "kind"
+        ]
       },
       "variants": [
         {
@@ -614,7 +1414,9 @@
       "geometry": "hat-monotile",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/hat-monotile-depth-3.json",
-        "selectorFields": ["chirality_token"]
+        "selectorFields": [
+          "chirality_token"
+        ]
       },
       "variants": [
         {
@@ -639,7 +1441,9 @@
       "geometry": "chair",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/chair-depth-3.json",
-        "selectorFields": ["orientation_token"]
+        "selectorFields": [
+          "orientation_token"
+        ]
       },
       "variants": [
         {
@@ -680,7 +1484,10 @@
       "geometry": "dodecagonal-square-triangle",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/dodecagonal-square-triangle-depth-3.json",
-        "selectorFields": ["kind", "chirality_token"]
+        "selectorFields": [
+          "kind",
+          "chirality_token"
+        ]
       },
       "variants": [
         {
@@ -752,7 +1559,9 @@
       "geometry": "pinwheel",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/pinwheel-depth-3.json",
-        "selectorFields": ["chirality_token"]
+        "selectorFields": [
+          "chirality_token"
+        ]
       },
       "variants": [
         {
@@ -777,7 +1586,9 @@
       "geometry": "pinwheel-2-1",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/pinwheel-2-1-depth-3.json",
-        "selectorFields": ["kind"]
+        "selectorFields": [
+          "kind"
+        ]
       },
       "variants": [
         {
@@ -802,7 +1613,9 @@
       "geometry": "shield",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/shield-depth-3.json",
-        "selectorFields": ["kind"]
+        "selectorFields": [
+          "kind"
+        ]
       },
       "variants": [
         {
@@ -811,9 +1624,7 @@
             "kind": "shield-shield",
             "tile_family": "shield"
           },
-          "color": {
-            "token": "deadAlt"
-          }
+          "color": {"token": "deadAlt"}
         },
         {
           "label": "shield-square",
@@ -821,9 +1632,7 @@
             "kind": "shield-square",
             "tile_family": "shield"
           },
-          "color": {
-            "token": "dead"
-          }
+          "color": {"token": "dead"}
         },
         {
           "label": "shield-triangle",
@@ -831,229 +1640,7 @@
             "kind": "shield-triangle",
             "tile_family": "shield"
           },
-          "color": {
-            "token": "accentStrong"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-2-10-36-3262",
-      "variants": [
-        {
-          "label": "uniform-2-10-hexagon",
-          "selector": {
-            "kind": "hexagon"
-          },
-          "color": {
-            "token": "toneTan"
-          }
-        },
-        {
-          "label": "uniform-2-10-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-2-18-36-33434",
-      "variants": [
-        {
-          "label": "uniform-2-18-square",
-          "selector": {
-            "kind": "square"
-          },
-          "color": {
-            "token": "toneStone"
-          }
-        },
-        {
-          "label": "uniform-2-18-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-2-12-3262-346",
-      "variants": [
-        {
-          "label": "uniform-2-12-hexagon",
-          "selector": {
-            "kind": "hexagon"
-          },
-          "color": {
-            "token": "toneCream"
-          }
-        },
-        {
-          "label": "uniform-2-12-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-2-13-36-32412",
-      "variants": [
-        {
-          "label": "uniform-2-13-dodecagon",
-          "selector": {
-            "kind": "dodecagon"
-          },
-          "color": {
-            "token": "toneCream"
-          }
-        },
-        {
-          "label": "uniform-2-13-square",
-          "selector": {
-            "kind": "square"
-          },
-          "color": {
-            "token": "toneStone"
-          }
-        },
-        {
-          "label": "uniform-2-13-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-3-4-6-12",
-      "variants": [
-        {
-          "label": "uniform-34612-dodecagon",
-          "selector": {
-            "kind": "dodecagon"
-          },
-          "color": {
-            "token": "toneCream"
-          }
-        },
-        {
-          "label": "uniform-34612-hexagon",
-          "selector": {
-            "kind": "hexagon"
-          },
-          "color": {
-            "token": "toneTan"
-          }
-        },
-        {
-          "label": "uniform-34612-square",
-          "selector": {
-            "kind": "square"
-          },
-          "color": {
-            "token": "toneStone"
-          }
-        },
-        {
-          "label": "uniform-34612-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-2-19-v1-36-346",
-      "variants": [
-        {
-          "label": "uniform-2-19-v1-36-346-hexagon",
-          "selector": {
-            "kind": "hexagon"
-          },
-          "color": {
-            "token": "toneCream"
-          }
-        },
-        {
-          "label": "uniform-2-19-v1-36-346-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-3-4-36-3262-63",
-      "variants": [
-        {
-          "label": "uniform-3-4-36-3262-63-hexagon",
-          "selector": {
-            "kind": "hexagon"
-          },
-          "color": {
-            "token": "toneCream"
-          }
-        },
-        {
-          "label": "uniform-3-4-36-3262-63-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
-        }
-      ]
-    },
-    {
-      "geometry": "uniform-2-2-3122-34312",
-      "variants": [
-        {
-          "label": "uniform-2-2-3122-34312-dodecagon",
-          "selector": {
-            "kind": "dodecagon"
-          },
-          "color": {
-            "token": "toneCream"
-          }
-        },
-        {
-          "label": "uniform-2-2-3122-34312-square",
-          "selector": {
-            "kind": "square"
-          },
-          "color": {
-            "token": "toneStone"
-          }
-        },
-        {
-          "label": "uniform-2-2-3122-34312-triangle",
-          "selector": {
-            "kind": "triangle"
-          },
-          "color": {
-            "token": "toneClay"
-          }
+          "color": {"token": "accentStrong"}
         }
       ]
     }

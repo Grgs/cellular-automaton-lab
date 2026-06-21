@@ -1,0 +1,43 @@
+{
+  "geometry": "archimedean-3-3-3-3-6",
+  "label": "Snub Trihexagonal (3.3.3.3.6)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 180,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 16,
+    "min": 14,
+    "max": 20
+  },
+  "default_rule": "kagome-life",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Snub_trihexagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "archimedean-3-3-3-3-6",
+    "variants": [
+      {
+        "label": "archimedean-3-3-3-3-6-hexagon",
+        "selector": {
+          "kind": "hexagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "archimedean-3-3-3-3-6-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneTan:48,4 54,15 60,4;toneTan:54,15 48,4 42,15;toneCream:60,4 72,4 78,15 72,25 60,25 54,15;toneTan:29,15 35,25 42,15;toneTan:42,15 48,25 54,15;toneTan:48,25 42,15 35,25;toneTan:60,25 54,15 48,25;toneTan:85,25 78,15 72,25;toneTan:48,25 54,36 60,25;toneTan:60,25 66,36 72,25;toneTan:72,25 78,36 85,25;toneTan:66,36 60,25 54,36;toneTan:78,36 72,25 66,36;toneTan:91,36 85,25 78,36;toneCream:35,25 48,25 54,36 48,47 35,47 29,36;toneTan:54,36 60,47 66,36;toneTan:78,36 85,47 91,36;toneTan:60,47 54,36 48,47;toneCream:66,36 78,36 85,47 78,57 66,57 60,47;toneTan:35,47 42,57 48,47;toneTan:48,47 54,57 60,47;toneTan:54,57 48,47 42,57;toneTan:66,57 60,47 54,57;toneTan:54,57 60,68 66,57"
+}

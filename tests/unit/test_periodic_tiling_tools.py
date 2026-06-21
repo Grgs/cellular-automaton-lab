@@ -6,10 +6,15 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from backend.simulation.periodic_face_catalog_data import (
+    load_periodic_face_catalog,
+    load_periodic_face_catalog_sources,
+)
 from backend.simulation.periodic_face_tilings import (
     PERIODIC_FACE_TILING_GEOMETRIES,
     _ordered_periodic_geometries,
 )
+from backend.simulation.topology_family_manifest import TOPOLOGY_FAMILY_MANIFEST
 from backend.simulation.topology_implementation_registry import get_topology_implementation
 from tools.add_periodic_tiling import (
     InstallMetadata,
@@ -90,21 +95,6 @@ class InspectTilingSvgTests(unittest.TestCase):
 
 class AddPeriodicTilingTests(unittest.TestCase):
     def _write_root_inputs(self, root: Path) -> Path:
-        manifest_path = root / "backend/simulation/topology_family_manifest.py"
-        manifest_path.parent.mkdir(parents=True)
-        manifest_path.write_text(
-            (ROOT / "backend/simulation/topology_family_manifest.py").read_text(encoding="utf-8"),
-            encoding="utf-8",
-        )
-        palette_path = root / "frontend/canvas/family-dead-palette-manifest.json"
-        palette_path.parent.mkdir(parents=True)
-        palette_path.write_text('{\n  "families": [\n  ]\n}\n', encoding="utf-8")
-        preview_path = root / "frontend/controls/tiling-preview-data.ts"
-        preview_path.parent.mkdir(parents=True)
-        preview_path.write_text(
-            "export const POLYGON_PREVIEW_DATA: Readonly<Record<string, string>> = {\n};\n",
-            encoding="utf-8",
-        )
         sketch_path = root / "candidate.py"
         sketch_path.write_text(
             """from typing import Any
@@ -141,29 +131,32 @@ FACES: list[dict[str, Any]] = [
             relative_paths,
             {
                 "backend/simulation/data/periodic_face_patterns/tool-test-square.json",
+                "backend/simulation/data/periodic_face_catalog/tool-test-square.json",
                 "backend/simulation/reference_specs/periodic/tool_test_square.py",
-                "backend/simulation/topology_family_manifest.py",
-                "frontend/canvas/family-dead-palette-manifest.json",
-                "frontend/controls/tiling-preview-data.ts",
                 "tools/sketch_examples/tool_test_square.py",
             },
         )
-        manifest = next(
-            write.content for write in writes if write.path.name == "topology_family_manifest.py"
+        catalog_metadata = json.loads(
+            next(
+                write.content
+                for write in writes
+                if write.path.parent.name == "periodic_face_catalog"
+            )
         )
-        palette = next(
+        self.assertEqual(catalog_metadata["geometry"], "tool-test-square")
+        self.assertEqual(catalog_metadata["picker_order"], 999)
+        self.assertEqual(catalog_metadata["sizing_policy"]["default"], 12)
+        self.assertGreaterEqual(len(catalog_metadata["preview_data"].split(";")), 4)
+        self.assertEqual(
+            catalog_metadata["palette"]["variants"][0]["color"]["token"],
+            "toneStone",
+        )
+        reference = next(
             write.content
             for write in writes
-            if write.path.name == "family-dead-palette-manifest.json"
+            if write.path.parent.name == "periodic" and write.path.suffix == ".py"
         )
-        preview = next(
-            write.content for write in writes if write.path.name == "tiling-preview-data.ts"
-        )
-        compile(manifest, "topology_family_manifest.py", "exec")
-        json.loads(palette)
-        self.assertIn("TOOL_TEST_SQUARE_GEOMETRY", manifest)
-        self.assertIn("picker_order=999", manifest)
-        self.assertIn("toneStone:", preview)
+        self.assertIn("https://example.org/square.svg", reference)
 
     def test_apply_plan_rolls_back_when_generation_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -211,14 +204,6 @@ FACES: list[dict[str, Any]] = [
                 write.path.parent.mkdir(parents=True, exist_ok=True)
                 write.path.write_text(write.content, encoding="utf-8")
 
-            manifest_path = root / "backend/simulation/topology_family_manifest.py"
-            manifest_path.write_text(
-                manifest_path.read_text(encoding="utf-8").replace(
-                    "TOOL_TEST_SQUARE_GEOMETRY",
-                    "LEGACY_TOOL_TEST_SQUARE_GEOMETRY",
-                ),
-                encoding="utf-8",
-            )
             reference_path = (
                 root / "backend/simulation/reference_specs/periodic/tool_test_square.py"
             )
@@ -243,18 +228,26 @@ FACES: list[dict[str, Any]] = [
             )
 
         contents = {write.path.relative_to(root).as_posix(): write.content for write in writes}
-        manifest = contents["backend/simulation/topology_family_manifest.py"]
-        palette = json.loads(contents["frontend/canvas/family-dead-palette-manifest.json"])
-        compile(manifest, "topology_family_manifest.py", "exec")
-        self.assertEqual(manifest.count("LEGACY_TOOL_TEST_SQUARE_GEOMETRY:"), 1)
-        self.assertNotIn("    TOOL_TEST_SQUARE_GEOMETRY:", manifest)
-        self.assertIn("picker_order=1001", manifest)
-        self.assertIn("CELL_SIZE_CONTROL, 14, 9, 22", manifest)
-        family = next(
-            item for item in palette["families"] if item["geometry"] == "tool-test-square"
+        catalog_metadata = json.loads(
+            contents["backend/simulation/data/periodic_face_catalog/tool-test-square.json"]
         )
-        self.assertEqual(len(family["variants"]), 1)
-        self.assertEqual(family["variants"][0]["color"]["token"], "toneCream")
+        self.assertEqual(catalog_metadata["picker_order"], 1001)
+        self.assertEqual(
+            catalog_metadata["sizing_policy"],
+            {"control": "cell_size", "default": 14, "min": 9, "max": 22},
+        )
+        self.assertEqual(catalog_metadata["default_rule"], "conway")
+        self.assertEqual(
+            catalog_metadata["source_urls"],
+            [
+                "https://example.org/square.svg",
+                "https://example.org/rebased-square.svg",
+            ],
+        )
+        self.assertEqual(
+            catalog_metadata["palette"]["variants"][0]["color"]["token"],
+            "toneCream",
+        )
         self.assertIn(
             "rebased-square.svg",
             contents["backend/simulation/reference_specs/periodic/legacy_square_reference.py"],
@@ -263,19 +256,44 @@ FACES: list[dict[str, Any]] = [
 
 class RegeneratePeriodicCatalogTests(unittest.TestCase):
     def test_discovers_all_descriptors_and_generated_sources(self) -> None:
-        inventory = discover_catalog_sources(ROOT)
+        metadata = discover_catalog_sources(ROOT)
+        descriptor_geometries = {
+            path.stem
+            for path in (ROOT / "backend/simulation/data/periodic_face_patterns").glob("*.json")
+        }
 
-        self.assertTrue(inventory.descriptor_geometries <= inventory.reference_geometries)
+        self.assertEqual(set(metadata), descriptor_geometries)
+        self.assertEqual(len(metadata), 36)
+        self.assertEqual(metadata["uniform-2-2-3122-34312"]["picker_order"], 253)
+
+    def test_authoritative_metadata_matches_aggregate_and_runtime_manifest(self) -> None:
+        sources = load_periodic_face_catalog_sources()
+        aggregate = load_periodic_face_catalog()
+
         self.assertEqual(
-            {source.geometry for source in inventory.sources},
-            {
-                "uniform-2-10-36-3262",
-                "uniform-2-12-3262-346",
-                "uniform-2-19-v1-36-346",
-                "uniform-2-2-3122-34312",
-                "uniform-3-4-36-3262-63",
-            },
+            list(aggregate),
+            sorted(
+                (
+                    {
+                        key: value
+                        for key, value in item.items()
+                        if key not in {"palette", "preview_data", "source_urls"}
+                    }
+                    for item in sources.values()
+                ),
+                key=lambda item: (int(item["picker_order"]), str(item["geometry"])),
+            ),
         )
+        for geometry, metadata in sources.items():
+            with self.subTest(geometry=geometry):
+                runtime = TOPOLOGY_FAMILY_MANIFEST[geometry]
+                sizing = metadata["sizing_policy"]
+                self.assertEqual(runtime.label, metadata["label"])
+                self.assertEqual(runtime.picker_order, metadata["picker_order"])
+                self.assertEqual(runtime.sizing_policy.default, sizing["default"])
+                self.assertEqual(runtime.sizing_policy.minimum, sizing["min"])
+                self.assertEqual(runtime.sizing_policy.maximum, sizing["max"])
+                self.assertEqual(runtime.variants[0].default_rule, metadata["default_rule"])
 
     def test_bootstrap_budget_only_grows_when_headroom_is_low(self) -> None:
         source = json.dumps(

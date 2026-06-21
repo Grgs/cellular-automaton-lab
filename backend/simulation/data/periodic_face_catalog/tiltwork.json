@@ -1,0 +1,72 @@
+{
+  "geometry": "tiltwork",
+  "label": "Tiltwork",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 235,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [],
+  "palette": {
+    "geometry": "tiltwork",
+    "variants": [
+      {
+        "label": "tiltwork-diamond",
+        "selector": {
+          "kind": "diamond"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "tiltwork-tri-s1",
+        "selector": {
+          "kind": "corner-triangle",
+          "slot": "s1"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "tiltwork-tri-s2",
+        "selector": {
+          "kind": "corner-triangle",
+          "slot": "s2"
+        },
+        "color": {
+          "token": "toneSand"
+        }
+      },
+      {
+        "label": "tiltwork-tri-s3",
+        "selector": {
+          "kind": "corner-triangle",
+          "slot": "s3"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "tiltwork-tri-s4",
+        "selector": {
+          "kind": "corner-triangle",
+          "slot": "s4"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneStone:24,0 60,36 24,72 -12,36;toneCream:-12,0 24,0 -12,36;toneSand:24,0 60,0 60,36;toneTan:60,36 60,72 24,72;toneClay:-12,36 24,72 -12,72;toneStone:96,0 132,36 96,72 60,36;toneCream:60,0 96,0 60,36;toneSand:96,0 132,0 132,36;toneTan:132,36 132,72 96,72;toneClay:60,36 96,72 60,72"
+}

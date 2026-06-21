@@ -28,7 +28,7 @@ import argparse
 import json
 import re
 import sys
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypedDict, cast
@@ -255,10 +255,14 @@ def _palette_fill_for_source(
     geometry: str | None,
     source: Mapping[str, Any] | object,
     fallback: str,
+    palette_variants: Sequence[PaletteVariant] | None = None,
 ) -> str:
     if not geometry:
         return fallback
-    for variant in _palette_variants_for_geometry(geometry):
+    variants = (
+        _palette_variants_for_geometry(geometry) if palette_variants is None else palette_variants
+    )
+    for variant in variants:
         if _variant_matches_source(source, variant):
             token = _color_token(variant["color"])
             if token:
@@ -272,6 +276,7 @@ def _generate_polygon_data(
     fill_count: int = 1,
     geometry: str | None = None,
     palette_tokens: Mapping[str, str] | None = None,
+    palette_variants: Sequence[PaletteVariant] | None = None,
 ) -> str:
     """Return the polygon data string for a tiling descriptor.
 
@@ -319,7 +324,12 @@ def _generate_polygon_data(
                     if palette_tokens and kind in palette_tokens:
                         fill_index = palette_tokens[kind]
                     else:
-                        fill_index = _palette_fill_for_source(geometry, face, fill_index)
+                        fill_index = _palette_fill_for_source(
+                            geometry,
+                            face,
+                            fill_index,
+                            palette_variants,
+                        )
                     polygons.append((fill_index, vpts))
 
     parts = []

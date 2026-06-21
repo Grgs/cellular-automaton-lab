@@ -10,7 +10,13 @@ class GeneratedCheckToolTests(unittest.TestCase):
     def test_parse_only_defaults_to_all_checks(self) -> None:
         self.assertEqual(
             _parse_only([]),
-            ("tools-docs", "bootstrap", "frontend-fixtures", "reference-fixtures"),
+            (
+                "tools-docs",
+                "periodic-catalog",
+                "bootstrap",
+                "frontend-fixtures",
+                "reference-fixtures",
+            ),
         )
 
     def test_parse_only_deduplicates_selected_checks(self) -> None:

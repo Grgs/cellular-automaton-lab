@@ -1,0 +1,129 @@
+{
+  "geometry": "triangular-square-2uniform",
+  "label": "2-uniform Triangle+Square (3^6; 3^3.4^2)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 239,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/List_of_k-uniform_tilings"
+  ],
+  "palette": {
+    "geometry": "triangular-square-2uniform",
+    "variants": [
+      {
+        "label": "tri-sq-2u-square-sa",
+        "selector": {
+          "kind": "square",
+          "slot": "sa"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      },
+      {
+        "label": "tri-sq-2u-square-sb",
+        "selector": {
+          "kind": "square",
+          "slot": "sb"
+        },
+        "color": {
+          "token": "toneShadow"
+        }
+      },
+      {
+        "label": "tri-sq-2u-tri-ua",
+        "selector": {
+          "kind": "triangle",
+          "slot": "ua"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "tri-sq-2u-tri-ub",
+        "selector": {
+          "kind": "triangle",
+          "slot": "ub"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "tri-sq-2u-tri-da",
+        "selector": {
+          "kind": "triangle",
+          "slot": "da"
+        },
+        "color": {
+          "token": "toneLinen"
+        }
+      },
+      {
+        "label": "tri-sq-2u-tri-dleft",
+        "selector": {
+          "kind": "triangle",
+          "slot": "dleft"
+        },
+        "color": {
+          "token": "toneRose"
+        }
+      },
+      {
+        "label": "tri-sq-2u-tri-uc",
+        "selector": {
+          "kind": "triangle",
+          "slot": "uc"
+        },
+        "color": {
+          "token": "toneTan"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "tri-sq-2u-tri-db",
+        "selector": {
+          "kind": "triangle",
+          "slot": "db"
+        },
+        "color": {
+          "token": "toneCream"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "tri-sq-2u-tri-dc",
+        "selector": {
+          "kind": "triangle",
+          "slot": "dc"
+        },
+        "color": {
+          "token": "toneLinen"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "tri-sq-2u-tri-uleftr2",
+        "selector": {
+          "kind": "triangle",
+          "slot": "uleftr2"
+        },
+        "color": {
+          "token": "toneRose"
+        },
+        "allowSharedDeadColor": true
+      }
+    ]
+  },
+  "preview_data": "toneShadow:-6,-13 20,-13 20,13 -6,13;toneTan:-6,13 20,13 7,36;toneLinen:-19,36 7,36 -6,13;toneTan:-19,36 7,36 -6,59;toneLinen:-6,59 20,59 7,36;toneShadow:-6,59 20,59 20,85 -6,85;toneClay:20,-13 47,-13 47,13 20,13;toneShadow:47,-13 73,-13 73,13 47,13;toneCream:20,13 47,13 34,36;toneTan:47,13 73,13 60,36;toneLinen:34,36 60,36 47,13;toneRose:7,36 34,36 20,13;toneTan:34,36 60,36 47,59;toneCream:20,59 47,59 34,36;toneLinen:47,59 73,59 60,36;toneRose:7,36 34,36 20,59;toneClay:20,59 47,59 47,85 20,85;toneShadow:47,59 73,59 73,85 47,85;toneClay:73,-13 100,-13 100,13 73,13;toneShadow:100,-13 126,-13 126,13 100,13;toneCream:73,13 100,13 86,36;toneTan:100,13 126,13 113,36;toneLinen:86,36 113,36 100,13;toneRose:60,36 86,36 73,13;toneTan:86,36 113,36 100,59;toneCream:73,59 100,59 86,36;toneLinen:100,59 126,59 113,36;toneRose:60,36 86,36 73,59;toneClay:73,59 100,59 100,85 73,85;toneShadow:100,59 126,59 126,85 100,85;toneRose:113,36 139,36 126,13;toneRose:113,36 139,36 126,59"
+}

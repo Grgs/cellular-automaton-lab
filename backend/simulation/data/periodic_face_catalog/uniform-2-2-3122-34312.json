@@ -1,0 +1,52 @@
+{
+  "geometry": "uniform-2-2-3122-34312",
+  "label": "2-uniform #2 (3.12^2; 3.4.3.12)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 253,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://commons.wikimedia.org/wiki/File:2-uniform_n2.svg"
+  ],
+  "palette": {
+    "geometry": "uniform-2-2-3122-34312",
+    "variants": [
+      {
+        "label": "uniform-2-2-3122-34312-dodecagon",
+        "selector": {
+          "kind": "dodecagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "uniform-2-2-3122-34312-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "uniform-2-2-3122-34312-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneClay:-12,36 5,46 -12,55;toneCream:50,19 41,36 24,46 5,46 -12,36 -22,19 -22,0 -12,-17 5,-26 24,-26 41,-17 50,0;toneStone:41,36 60,36 60,55 41,55;toneClay:41,36 50,19 60,36;toneClay:60,36 77,46 60,55;toneClay:60,55 50,72 41,55;toneClay:41,55 24,46 41,36;toneCream:50,91 41,108 24,118 5,118 -12,108 -22,91 -22,72 -12,55 5,46 24,46 41,55 50,72;toneCream:122,19 113,36 96,46 77,46 60,36 50,19 50,0 60,-17 77,-26 96,-26 113,-17 122,0;toneStone:113,36 132,36 132,55 113,55;toneClay:113,36 122,19 132,36;toneClay:132,55 122,72 113,55;toneClay:113,55 96,46 113,36;toneCream:122,91 113,108 96,118 77,118 60,108 50,91 50,72 60,55 77,46 96,46 113,55 122,72"
+}
