@@ -44,9 +44,9 @@ describe("canvas/render-style", () => {
         // Each Archimedean family registers its prototile kinds in the
         // family-dead palette manifest. Primary kinds use cream (the family
         // base), the second kind uses tan, and three-kind families add clay
-        // for the smallest shape. Kagome stays on the legacy deadAlt fallback
-        // because its triangle-up/triangle-down kinds aren't yet in the
-        // manifest's selector vocabulary.
+        // for the smallest shape. Kagome now registers its hexagon and the two
+        // triangle orientations in the manifest too, replacing the old
+        // hardcoded deadAlt special case.
         const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
             await import("./render-style.js");
         const colorLookup = buildStateColorLookup();
@@ -74,8 +74,9 @@ describe("canvas/render-style", () => {
             { geometry: ARCHIMEDEAN_33344_GEOMETRY, kind: "triangle", expected: colors.toneTan },
             { geometry: ARCHIMEDEAN_33336_GEOMETRY, kind: "hexagon", expected: colors.toneCream },
             { geometry: ARCHIMEDEAN_33336_GEOMETRY, kind: "triangle", expected: colors.toneTan },
-            { geometry: KAGOME_GEOMETRY, kind: "triangle-up", expected: "#d5bb8f" },
-            { geometry: KAGOME_GEOMETRY, kind: "triangle-down", expected: "#d5bb8f" },
+            { geometry: KAGOME_GEOMETRY, kind: "hexagon", expected: colors.toneCream },
+            { geometry: KAGOME_GEOMETRY, kind: "triangle-up", expected: colors.toneTan },
+            { geometry: KAGOME_GEOMETRY, kind: "triangle-down", expected: colors.toneStone },
         ];
 
         expectations.forEach(({ geometry, kind, expected }) => {

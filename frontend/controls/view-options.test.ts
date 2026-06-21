@@ -240,8 +240,10 @@ describe("controls/view-options tiling picker", () => {
         });
     });
 
-    it("matches Kagome's legacy canvas dead/deadAlt colors", () => {
-        expect(new Set(previewFills("trihexagonal-3-6-3-6"))).toEqual(new Set(["dead", "deadAlt"]));
+    it("matches Kagome's per-kind palette tones in the canvas and thumbnail", () => {
+        expect(new Set(previewFills("trihexagonal-3-6-3-6"))).toEqual(
+            new Set(["toneCream", "toneTan", "toneStone"]),
+        );
     });
 
     it("keeps Type 7 pentagonal thumbnails on the neutral single-prototile fill", () => {

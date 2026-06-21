@@ -16,6 +16,26 @@
       ]
     },
     {
+      "geometry": "trihexagonal-3-6-3-6",
+      "variants": [
+        {
+          "label": "kagome-hexagon",
+          "selector": {"kind": "hexagon"},
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "kagome-triangle-up",
+          "selector": {"kind": "triangle-up"},
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "kagome-triangle-down",
+          "selector": {"kind": "triangle-down"},
+          "color": {"token": "toneStone"}
+        }
+      ]
+    },
+    {
       "geometry": "archimedean-3-12-12",
       "variants": [
         {
