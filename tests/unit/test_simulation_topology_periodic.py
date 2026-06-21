@@ -35,6 +35,7 @@ try:
         UNIFORM_2_13_GEOMETRY,
         UNIFORM_2_18_GEOMETRY,
         UNIFORM_2_19_V1_36_346_GEOMETRY,
+        UNIFORM_3_4_36_3262_63_GEOMETRY,
         UNIFORM_34612_GEOMETRY,
     )
     from backend.simulation.topology_validation import validate_topology
@@ -70,6 +71,7 @@ except ModuleNotFoundError:
         UNIFORM_2_13_GEOMETRY,
         UNIFORM_2_18_GEOMETRY,
         UNIFORM_2_19_V1_36_346_GEOMETRY,
+        UNIFORM_3_4_36_3262_63_GEOMETRY,
         UNIFORM_34612_GEOMETRY,
     )
     from backend.simulation.topology_validation import validate_topology
@@ -321,6 +323,19 @@ class SimulationTopologyPeriodicTests(unittest.TestCase):
         self.assertEqual(
             Counter(cell.kind for cell in topology.cells),
             Counter({"triangle": 444, "hexagon": 46}),
+        )
+        validation = validate_topology(topology)
+        self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
+        self.assertFalse(validation.edge_multiplicity_issues)
+        self.assertEqual(validation.hole_count, 0)
+
+    def test_uniform_3_4_has_expected_face_mix_and_valid_interior(self) -> None:
+        topology = build_topology(UNIFORM_3_4_36_3262_63_GEOMETRY, 3, 3)
+
+        self.assertEqual(topology.cell_count, 348)
+        self.assertEqual(
+            Counter(cell.kind for cell in topology.cells),
+            Counter({"triangle": 228, "hexagon": 120}),
         )
         validation = validate_topology(topology)
         self.assertTrue(validation.is_valid, "\n".join(validation.summary_lines()))
