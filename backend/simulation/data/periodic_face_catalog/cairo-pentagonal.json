@@ -1,0 +1,65 @@
+{
+  "geometry": "cairo-pentagonal",
+  "label": "Cairo Pentagonal",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 190,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 10,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Cairo_pentagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "cairo-pentagonal",
+    "variants": [
+      {
+        "label": "cairo-pentagon-a",
+        "selector": {
+          "kind": "pentagon",
+          "slot": "a"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "cairo-pentagon-b",
+        "selector": {
+          "kind": "pentagon",
+          "slot": "b"
+        },
+        "color": {
+          "token": "toneLinen"
+        }
+      },
+      {
+        "label": "cairo-pentagon-c",
+        "selector": {
+          "kind": "pentagon",
+          "slot": "c"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "cairo-pentagon-d",
+        "selector": {
+          "kind": "pentagon",
+          "slot": "d"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneLinen:9,0 -12,36 -48,15 -48,-15 -12,-36;toneTan:96,15 60,36 39,0 60,-36 96,-15;toneStone:60,36 24,57 -12,36 9,0 39,0;toneTan:24,87 -12,108 -33,72 -12,36 24,57;toneLinen:153,0 132,36 96,15 96,-15 132,-36;toneCream:111,72 81,72 60,36 96,15 132,36;toneLinen:81,72 60,108 24,87 24,57 60,36;toneTan:168,87 132,108 111,72 132,36 168,57"
+}

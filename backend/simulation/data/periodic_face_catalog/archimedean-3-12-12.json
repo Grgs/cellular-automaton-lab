@@ -1,0 +1,43 @@
+{
+  "geometry": "archimedean-3-12-12",
+  "label": "Truncated Hexagonal (3.12.12)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 130,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 10,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "archlife-3-12-12",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Truncated_hexagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "archimedean-3-12-12",
+    "variants": [
+      {
+        "label": "archimedean-3-12-12-dodecagon",
+        "selector": {
+          "kind": "dodecagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "archimedean-3-12-12-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneTan:64,35 68,42 72,35;toneCream:52,15 52,23 56,30 64,35 72,35 79,30 83,23 83,15 79,8 72,4 64,4 56,8;toneTan:87,30 83,23 79,30;toneCream:83,15 83,23 87,30 94,35 102,35 109,30 113,23 113,15 109,8 102,4 94,4 87,8;toneTan:94,35 98,42 102,35;toneCream:68,42 68,50 72,57 79,61 87,61 94,57 98,50 98,42 94,35 87,30 79,30 72,35;toneTan:102,57 98,50 94,57;toneTan:79,61 83,68 87,61;toneTan:72,57 68,50 64,57;toneTan:48,61 52,68 56,61;toneTan:18,61 22,68 26,61;toneTan:41,57 37,50 33,57;toneCream:37,42 37,50 41,57 48,61 56,61 64,57 68,50 68,42 64,35 56,30 48,30 41,35;toneCream:7,42 7,50 11,57 18,61 26,61 33,57 37,50 37,42 33,35 26,30 18,30 11,35;toneTan:33,35 37,42 41,35;toneTan:26,30 22,23 18,30;toneCream:22,15 22,23 26,30 33,35 41,35 48,30 52,23 52,15 48,8 41,4 33,4 26,8;toneTan:56,30 52,23 48,30"
+}

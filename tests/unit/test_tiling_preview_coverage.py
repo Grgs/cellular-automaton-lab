@@ -118,12 +118,12 @@ class TilingPreviewCoverageTests(unittest.TestCase):
             f"Palette-backed tiling thumbnails must use named fill tokens: {offenders}",
         )
 
-    def test_kagome_preview_uses_legacy_dead_alt_tokens(self) -> None:
-        """Kagome is not in the palette manifest, but canvas renders its triangle
-        variants with the legacy deadAlt tone."""
+    def test_kagome_preview_uses_per_kind_palette_tones(self) -> None:
+        """Kagome registers its hexagon and two triangle orientations in the
+        catalog palette, so its preview uses those tones, not legacy dead/deadAlt."""
         fills = set(_polygon_fills(_preview_data_entries()["trihexagonal-3-6-3-6"]))
 
-        self.assertEqual(fills, {"dead", "deadAlt"})
+        self.assertEqual(fills, {"toneCream", "toneTan", "toneStone"})
 
 
 if __name__ == "__main__":

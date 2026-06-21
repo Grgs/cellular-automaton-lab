@@ -6,7 +6,15 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
+from backend.simulation.periodic_face_catalog_data import (
+    load_periodic_face_catalog,
+    load_periodic_face_catalog_sources,
+)
+from backend.simulation.periodic_face_tilings import (
+    PERIODIC_FACE_TILING_GEOMETRIES,
+    _ordered_periodic_geometries,
+)
+from backend.simulation.topology_family_manifest import TOPOLOGY_FAMILY_MANIFEST
 from backend.simulation.topology_implementation_registry import get_topology_implementation
 from tools.add_periodic_tiling import (
     InstallMetadata,
@@ -16,6 +24,10 @@ from tools.add_periodic_tiling import (
 )
 from tools.generate_tiling_preview import update_preview_source
 from tools.inspect_tiling_svg import inspect_svg, render_sketch_starter
+from tools.regenerate_periodic_catalog import (
+    discover_catalog_sources,
+    refresh_bootstrap_budget_source,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -28,6 +40,12 @@ class PeriodicRegistryDiscoveryTests(unittest.TestCase):
                 self.assertEqual(implementation.geometry_key, geometry)
                 self.assertEqual(implementation.builder_kind, "periodic_face")
                 self.assertEqual(implementation.render_kind, "polygon_periodic")
+
+    def test_orphan_descriptor_remains_importable_for_reconciliation(self) -> None:
+        ordered = _ordered_periodic_geometries(frozenset({"square", "orphan-periodic"}))
+
+        self.assertIn("orphan-periodic", ordered)
+        self.assertEqual(ordered[-1], "orphan-periodic")
 
 
 class PreviewSourceUpdateTests(unittest.TestCase):
@@ -77,21 +95,6 @@ class InspectTilingSvgTests(unittest.TestCase):
 
 class AddPeriodicTilingTests(unittest.TestCase):
     def _write_root_inputs(self, root: Path) -> Path:
-        manifest_path = root / "backend/simulation/topology_family_manifest.py"
-        manifest_path.parent.mkdir(parents=True)
-        manifest_path.write_text(
-            (ROOT / "backend/simulation/topology_family_manifest.py").read_text(encoding="utf-8"),
-            encoding="utf-8",
-        )
-        palette_path = root / "frontend/canvas/family-dead-palette-manifest.json"
-        palette_path.parent.mkdir(parents=True)
-        palette_path.write_text('{\n  "families": [\n  ]\n}\n', encoding="utf-8")
-        preview_path = root / "frontend/controls/tiling-preview-data.ts"
-        preview_path.parent.mkdir(parents=True)
-        preview_path.write_text(
-            "export const POLYGON_PREVIEW_DATA: Readonly<Record<string, string>> = {\n};\n",
-            encoding="utf-8",
-        )
         sketch_path = root / "candidate.py"
         sketch_path.write_text(
             """from typing import Any
@@ -128,29 +131,32 @@ FACES: list[dict[str, Any]] = [
             relative_paths,
             {
                 "backend/simulation/data/periodic_face_patterns/tool-test-square.json",
+                "backend/simulation/data/periodic_face_catalog/tool-test-square.json",
                 "backend/simulation/reference_specs/periodic/tool_test_square.py",
-                "backend/simulation/topology_family_manifest.py",
-                "frontend/canvas/family-dead-palette-manifest.json",
-                "frontend/controls/tiling-preview-data.ts",
                 "tools/sketch_examples/tool_test_square.py",
             },
         )
-        manifest = next(
-            write.content for write in writes if write.path.name == "topology_family_manifest.py"
+        catalog_metadata = json.loads(
+            next(
+                write.content
+                for write in writes
+                if write.path.parent.name == "periodic_face_catalog"
+            )
         )
-        palette = next(
+        self.assertEqual(catalog_metadata["geometry"], "tool-test-square")
+        self.assertEqual(catalog_metadata["picker_order"], 999)
+        self.assertEqual(catalog_metadata["sizing_policy"]["default"], 12)
+        self.assertGreaterEqual(len(catalog_metadata["preview_data"].split(";")), 4)
+        self.assertEqual(
+            catalog_metadata["palette"]["variants"][0]["color"]["token"],
+            "toneStone",
+        )
+        reference = next(
             write.content
             for write in writes
-            if write.path.name == "family-dead-palette-manifest.json"
+            if write.path.parent.name == "periodic" and write.path.suffix == ".py"
         )
-        preview = next(
-            write.content for write in writes if write.path.name == "tiling-preview-data.ts"
-        )
-        compile(manifest, "topology_family_manifest.py", "exec")
-        json.loads(palette)
-        self.assertIn("TOOL_TEST_SQUARE_GEOMETRY", manifest)
-        self.assertIn("picker_order=999", manifest)
-        self.assertIn("toneStone:", preview)
+        self.assertIn("https://example.org/square.svg", reference)
 
     def test_apply_plan_rolls_back_when_generation_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -175,6 +181,144 @@ FACES: list[dict[str, Any]] = [
             self.assertEqual(existing.read_text(encoding="utf-8"), "before")
             self.assertFalse(created.exists())
             self.assertEqual(bootstrap.read_text(encoding="utf-8"), "bootstrap-before")
+
+    def test_reconcile_upserts_an_existing_installation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            sketch_path = self._write_root_inputs(root)
+            original_metadata = InstallMetadata(
+                source_url="https://example.org/square.svg",
+                picker_order=999,
+                default_cell_size=12,
+                min_cell_size=8,
+                max_cell_size=20,
+                default_rule="life-b2-s23",
+                palette_tokens={"square": "toneStone"},
+            )
+            for write in build_install_plan(
+                sketch_path,
+                original_metadata,
+                root=root,
+                patch_size=3,
+            ):
+                write.path.parent.mkdir(parents=True, exist_ok=True)
+                write.path.write_text(write.content, encoding="utf-8")
+
+            reference_path = (
+                root / "backend/simulation/reference_specs/periodic/tool_test_square.py"
+            )
+            legacy_reference_path = reference_path.with_name("legacy_square_reference.py")
+            reference_path.rename(legacy_reference_path)
+
+            updated_metadata = InstallMetadata(
+                source_url="https://example.org/rebased-square.svg",
+                picker_order=1001,
+                default_cell_size=14,
+                min_cell_size=9,
+                max_cell_size=22,
+                default_rule="conway",
+                palette_tokens={"square": "toneCream"},
+            )
+            writes = build_install_plan(
+                sketch_path,
+                updated_metadata,
+                root=root,
+                patch_size=3,
+                reconcile=True,
+            )
+
+        contents = {write.path.relative_to(root).as_posix(): write.content for write in writes}
+        catalog_metadata = json.loads(
+            contents["backend/simulation/data/periodic_face_catalog/tool-test-square.json"]
+        )
+        self.assertEqual(catalog_metadata["picker_order"], 1001)
+        self.assertEqual(
+            catalog_metadata["sizing_policy"],
+            {"control": "cell_size", "default": 14, "min": 9, "max": 22},
+        )
+        self.assertEqual(catalog_metadata["default_rule"], "conway")
+        self.assertEqual(
+            catalog_metadata["source_urls"],
+            [
+                "https://example.org/square.svg",
+                "https://example.org/rebased-square.svg",
+            ],
+        )
+        self.assertEqual(
+            catalog_metadata["palette"]["variants"][0]["color"]["token"],
+            "toneCream",
+        )
+        self.assertIn(
+            "rebased-square.svg",
+            contents["backend/simulation/reference_specs/periodic/legacy_square_reference.py"],
+        )
+
+
+class RegeneratePeriodicCatalogTests(unittest.TestCase):
+    def test_discovers_all_descriptors_and_generated_sources(self) -> None:
+        metadata = discover_catalog_sources(ROOT)
+        descriptor_geometries = {
+            path.stem
+            for path in (ROOT / "backend/simulation/data/periodic_face_patterns").glob("*.json")
+        }
+
+        self.assertEqual(set(metadata), descriptor_geometries)
+        self.assertEqual(len(metadata), 36)
+        self.assertEqual(metadata["uniform-2-2-3122-34312"]["picker_order"], 253)
+
+    def test_authoritative_metadata_matches_aggregate_and_runtime_manifest(self) -> None:
+        sources = load_periodic_face_catalog_sources()
+        aggregate = load_periodic_face_catalog()
+
+        self.assertEqual(
+            list(aggregate),
+            sorted(
+                (
+                    {
+                        key: value
+                        for key, value in item.items()
+                        if key not in {"palette", "preview_data", "source_urls"}
+                    }
+                    for item in sources.values()
+                ),
+                key=lambda item: (int(item["picker_order"]), str(item["geometry"])),
+            ),
+        )
+        for geometry, metadata in sources.items():
+            with self.subTest(geometry=geometry):
+                runtime = TOPOLOGY_FAMILY_MANIFEST[geometry]
+                sizing = metadata["sizing_policy"]
+                self.assertEqual(runtime.label, metadata["label"])
+                self.assertEqual(runtime.picker_order, metadata["picker_order"])
+                self.assertEqual(runtime.sizing_policy.default, sizing["default"])
+                self.assertEqual(runtime.sizing_policy.minimum, sizing["min"])
+                self.assertEqual(runtime.sizing_policy.maximum, sizing["max"])
+                self.assertEqual(runtime.variants[0].default_rule, metadata["default_rule"])
+
+    def test_bootstrap_budget_only_grows_when_headroom_is_low(self) -> None:
+        source = json.dumps(
+            {
+                "categories": [
+                    {"name": "bootstrap-data", "raw": 100, "gzip": 20},
+                ]
+            }
+        )
+
+        refreshed = json.loads(refresh_bootstrap_budget_source(source, b"x" * 100))
+        category = refreshed["categories"][0]
+        self.assertGreaterEqual(category["raw"], 115)
+        self.assertGreaterEqual(category["gzip"], 20)
+
+        stable_source = json.dumps(
+            {
+                "categories": [
+                    {"name": "bootstrap-data", "raw": 10_000, "gzip": 1_000},
+                ]
+            }
+        )
+        stable = json.loads(refresh_bootstrap_budget_source(stable_source, b"small"))
+        self.assertEqual(stable["categories"][0]["raw"], 10_000)
+        self.assertEqual(stable["categories"][0]["gzip"], 1_000)
 
 
 if __name__ == "__main__":

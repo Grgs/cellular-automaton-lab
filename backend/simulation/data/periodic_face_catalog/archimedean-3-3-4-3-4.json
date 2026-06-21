@@ -1,0 +1,43 @@
+{
+  "geometry": "archimedean-3-3-4-3-4",
+  "label": "Snub Square (3.3.4.3.4)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 160,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 18,
+    "min": 12,
+    "max": 20
+  },
+  "default_rule": "archlife-3-3-4-3-4",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Snub_square_tiling"
+  ],
+  "palette": {
+    "geometry": "archimedean-3-3-4-3-4",
+    "variants": [
+      {
+        "label": "archimedean-3-3-4-3-4-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "archimedean-3-3-4-3-4-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneTan:56,13 64,27 73,13;toneCream:73,13 64,27 79,36 88,21;toneTan:64,45 79,36 64,27;toneCream:79,36 88,51 73,59 64,45;toneTan:56,59 64,45 73,59;toneCream:49,36 41,51 56,59 64,45;toneTan:32,36 41,51 49,36;toneTan:64,45 49,36 64,27;toneTan:32,36 41,21 49,36;toneCream:56,13 64,27 49,36 41,21;toneTan:41,21 56,13 41,4;toneTan:88,51 73,59 88,68"
+}

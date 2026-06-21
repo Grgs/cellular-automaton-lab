@@ -1,0 +1,52 @@
+{
+  "geometry": "trihexagonal-3-6-3-6",
+  "label": "Kagome / Trihexagonal (3.6.3.6)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 120,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 24
+  },
+  "default_rule": "kagome-life",
+  "minimum_grid_dimension": 3,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Trihexagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "trihexagonal-3-6-3-6",
+    "variants": [
+      {
+        "label": "kagome-hexagon",
+        "selector": {
+          "kind": "hexagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "kagome-triangle-up",
+        "selector": {
+          "kind": "triangle-up"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "kagome-triangle-down",
+        "selector": {
+          "kind": "triangle-down"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneCream:39,0 60,36 39,72 -2,72 -23,36 -2,0;toneStone:39,0 81,0 60,36;toneTan:60,36 39,72 81,72;toneCream:122,0 143,36 122,72 81,72 60,36 81,0"
+}

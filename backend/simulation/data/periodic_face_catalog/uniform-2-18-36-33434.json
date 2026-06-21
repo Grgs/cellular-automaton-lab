@@ -1,0 +1,44 @@
+{
+  "geometry": "uniform-2-18-36-33434",
+  "label": "2-uniform #18 (3^6; 3^2.4.3.4)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 246,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/List_of_k-uniform_tilings",
+    "https://commons.wikimedia.org/wiki/File:2-uniform_n18.svg"
+  ],
+  "palette": {
+    "geometry": "uniform-2-18-36-33434",
+    "variants": [
+      {
+        "label": "uniform-2-18-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "uniform-2-18-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneStone:11,23 24,0 47,13 34,36;toneStone:-16,23 11,23 11,49 -16,49;toneStone:34,36 47,59 24,72 11,49;toneClay:24,0 47,-13 47,13;toneClay:11,23 -2,0 24,0;toneClay:-16,23 -2,0 11,23;toneClay:34,36 47,13 60,36;toneClay:11,23 34,36 11,49;toneClay:34,36 60,36 47,59;toneClay:-16,49 11,49 -2,72;toneClay:11,49 24,72 -2,72;toneClay:24,72 47,59 47,85;toneStone:73,13 47,13 47,-13 73,-13;toneStone:109,23 86,36 73,13 96,0;toneStone:109,23 136,23 136,49 109,49;toneStone:109,49 96,72 73,59 86,36;toneClay:96,0 73,13 73,-13;toneClay:109,23 96,0 122,0;toneClay:109,23 122,0 136,23;toneClay:73,13 60,36 47,13;toneClay:86,36 60,36 73,13;toneClay:109,23 109,49 86,36;toneClay:86,36 73,59 60,36;toneClay:73,59 47,59 60,36;toneClay:109,49 136,49 122,72;toneClay:109,49 122,72 96,72;toneStone:73,85 47,85 47,59 73,59;toneClay:96,72 73,85 73,59"
+}

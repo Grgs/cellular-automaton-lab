@@ -1,0 +1,88 @@
+{
+  "geometry": "rhombille",
+  "label": "Rhombille",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 200,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 3,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Rhombille_tiling"
+  ],
+  "palette": {
+    "geometry": "rhombille",
+    "variants": [
+      {
+        "label": "rhombille-horizontal-a",
+        "selector": {
+          "kind": "rhombus",
+          "slot": "s0"
+        },
+        "color": {
+          "token": "toneLinen"
+        }
+      },
+      {
+        "label": "rhombille-horizontal-b",
+        "selector": {
+          "kind": "rhombus",
+          "slot": "s3"
+        },
+        "color": {
+          "token": "toneLinen"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "rhombille-rising-a",
+        "selector": {
+          "kind": "rhombus",
+          "slot": "s1"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "rhombille-rising-b",
+        "selector": {
+          "kind": "rhombus",
+          "slot": "s4"
+        },
+        "color": {
+          "token": "toneTan"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "rhombille-falling-a",
+        "selector": {
+          "kind": "rhombus",
+          "slot": "s2"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      },
+      {
+        "label": "rhombille-falling-b",
+        "selector": {
+          "kind": "rhombus",
+          "slot": "s5"
+        },
+        "color": {
+          "token": "toneClay"
+        },
+        "allowSharedDeadColor": true
+      }
+    ]
+  },
+  "preview_data": "toneLinen:-2,0 18,-12 39,0 18,12;toneTan:-2,0 18,12 18,36 -2,24;toneClay:18,12 39,0 39,24 18,36;toneLinen:-23,36 -2,24 18,36 -2,48;toneTan:-2,48 18,36 18,60 -2,72;toneClay:18,36 39,48 39,72 18,60;toneLinen:-2,72 18,60 39,72 18,84;toneLinen:39,0 60,-12 81,0 60,12;toneTan:39,0 60,12 60,36 39,24;toneClay:60,12 81,0 81,24 60,36;toneLinen:18,36 39,24 60,36 39,48;toneTan:39,48 60,36 60,60 39,72;toneClay:60,36 81,48 81,72 60,60;toneLinen:39,72 60,60 81,72 60,84;toneLinen:81,0 102,-12 122,0 102,12;toneTan:81,0 102,12 102,36 81,24;toneClay:102,12 122,0 122,24 102,36;toneLinen:60,36 81,24 102,36 81,48;toneTan:81,48 102,36 102,60 81,72;toneClay:102,36 122,48 122,72 102,60;toneLinen:81,72 102,60 122,72 102,84;toneLinen:102,36 122,24 143,36 122,48"
+}

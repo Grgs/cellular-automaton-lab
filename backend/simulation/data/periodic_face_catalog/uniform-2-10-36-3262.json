@@ -1,0 +1,44 @@
+{
+  "geometry": "uniform-2-10-36-3262",
+  "label": "2-uniform #10 (3^6; 3^2.6^2)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 249,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 10,
+    "min": 8,
+    "max": 18
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/List_of_k-uniform_tilings",
+    "https://commons.wikimedia.org/wiki/File:2-uniform_n10.svg"
+  ],
+  "palette": {
+    "geometry": "uniform-2-10-36-3262",
+    "variants": [
+      {
+        "label": "uniform-2-10-hexagon",
+        "selector": {
+          "kind": "hexagon"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "uniform-2-10-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneTan:12,24 5,36 -9,36 -16,24 -9,12 5,12;toneTan:12,48 5,60 -9,60 -16,48 -9,36 5,36;toneClay:-9,60 5,60 -2,72;toneClay:5,60 12,72 -2,72;toneClay:-2,0 5,12 -9,12;toneClay:-2,0 12,0 5,12;toneTan:32,12 25,24 12,24 5,12 12,0 25,0;toneTan:53,24 46,36 32,36 25,24 32,12 46,12;toneTan:53,48 46,60 32,60 25,48 32,36 46,36;toneTan:32,60 25,72 12,72 5,60 12,48 25,48;toneClay:12,24 18,36 5,36;toneClay:12,24 25,24 18,36;toneClay:25,24 32,36 18,36;toneClay:5,36 18,36 12,48;toneClay:18,36 25,48 12,48;toneClay:18,36 32,36 25,48;toneClay:32,60 39,72 25,72;toneClay:32,60 46,60 39,72;toneClay:46,60 53,72 39,72;toneClay:25,0 39,0 32,12;toneClay:39,0 46,12 32,12;toneClay:39,0 53,0 46,12;toneTan:74,12 67,24 53,24 46,12 53,0 67,0;toneTan:95,24 88,36 74,36 67,24 74,12 88,12;toneTan:95,48 88,60 74,60 67,48 74,36 88,36;toneTan:74,60 67,72 53,72 46,60 53,48 67,48;toneClay:53,24 60,36 46,36;toneClay:53,24 67,24 60,36;toneClay:67,24 74,36 60,36;toneClay:46,36 60,36 53,48;toneClay:60,36 67,48 53,48;toneClay:60,36 74,36 67,48;toneClay:74,60 81,72 67,72;toneClay:74,60 88,60 81,72;toneClay:88,60 95,72 81,72;toneClay:67,0 81,0 74,12;toneClay:81,0 88,12 74,12;toneClay:81,0 95,0 88,12;toneTan:115,12 108,24 95,24 88,12 95,0 108,0;toneTan:136,24 129,36 115,36 108,24 115,12 129,12;toneTan:136,48 129,60 115,60 108,48 115,36 129,36;toneTan:115,60 108,72 95,72 88,60 95,48 108,48;toneClay:95,24 102,36 88,36;toneClay:95,24 108,24 102,36;toneClay:108,24 115,36 102,36;toneClay:88,36 102,36 95,48;toneClay:102,36 108,48 95,48;toneClay:102,36 115,36 108,48;toneClay:115,60 122,72 108,72;toneClay:115,60 129,60 122,72;toneClay:108,0 122,0 115,12;toneClay:122,0 129,12 115,12"
+}

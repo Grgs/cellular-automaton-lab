@@ -10,9 +10,16 @@ from tools._common import ROOT_DIR
 from tools.tools_docs import TOOLS_DOC_PATH, render_tools_reference
 
 BOOTSTRAP_FIXTURE_PATH = ROOT_DIR / "frontend" / "test-fixtures" / "bootstrap-data.json"
-CheckName = Literal["tools-docs", "bootstrap", "frontend-fixtures", "reference-fixtures"]
+CheckName = Literal[
+    "tools-docs",
+    "periodic-catalog",
+    "bootstrap",
+    "frontend-fixtures",
+    "reference-fixtures",
+]
 ALL_CHECKS: tuple[CheckName, ...] = (
     "tools-docs",
+    "periodic-catalog",
     "bootstrap",
     "frontend-fixtures",
     "reference-fixtures",
@@ -63,6 +70,23 @@ def _check_bootstrap_fixture() -> GeneratedCheckResult:
     )
 
 
+def _check_periodic_catalog() -> GeneratedCheckResult:
+    from tools.regenerate_periodic_catalog import check_catalog
+
+    problems = check_catalog()
+    return GeneratedCheckResult(
+        "periodic-catalog",
+        not problems,
+        "periodic catalog surfaces are up to date"
+        if not problems
+        else (
+            "periodic catalog drift: "
+            + "; ".join(problems)
+            + "; run `python -m tools tilings regenerate-catalog`"
+        ),
+    )
+
+
 def _check_frontend_fixtures() -> GeneratedCheckResult:
     from tools.regenerate_frontend_topology_fixtures import (
         discover_fixture_targets,
@@ -109,6 +133,7 @@ def _check_reference_fixtures() -> GeneratedCheckResult:
 def run_selected_checks(selected: tuple[CheckName, ...]) -> tuple[GeneratedCheckResult, ...]:
     checks = {
         "tools-docs": _check_tools_docs,
+        "periodic-catalog": _check_periodic_catalog,
         "bootstrap": _check_bootstrap_fixture,
         "frontend-fixtures": _check_frontend_fixtures,
         "reference-fixtures": _check_reference_fixtures,

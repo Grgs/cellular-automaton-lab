@@ -1,20 +1,10 @@
 import { DEFAULT_GEOMETRY, normalizeGeometry } from "../layout.js";
-import { KAGOME_GEOMETRY } from "../topology.js";
 import { triangleOrientation } from "./geometry-triangle.js";
 import { resolveRegisteredFamilyDeadColor } from "./family-dead-palette-registry.js";
 import { DEFAULT_COLORS } from "./theme-colors.js";
 import type { CanvasColors } from "../types/rendering.js";
 import type { CellStateDefinition, TopologyCell } from "../types/domain.js";
 import type { PaintableCell } from "../types/editor.js";
-
-// Kagome stays here because the topology emits "triangle-up" / "triangle-down"
-// kinds (kagome's two triangle orientations) that the family-dead palette
-// manifest does not yet model; the manifest's selector vocabulary doesn't
-// include orientation tokens for kagome. The Archimedean families that
-// previously lived here (488, 31212, 4612) now have explicit manifest entries.
-const MIXED_DEAD_ALT_CELL_KINDS = new Map<string, ReadonlySet<string>>([
-    [KAGOME_GEOMETRY, new Set(["triangle-up", "triangle-down"])],
-]);
 
 export function resolveDeadCellColor(
     stateValue: number,
@@ -39,8 +29,20 @@ export function resolveDeadCellColor(
 
     const normalizedGeometry = normalizeGeometry(geometry);
     if (tileColorsEnabled) {
+        // Regular triangle grids carry no per-cell topology object, so derive the
+        // up/down orientation from the grid coordinates and attach it as an
+        // orientation token. The data-driven palette then assigns the tone, the
+        // same path every mixed/aperiodic family uses -- no hardcoded fill here.
+        const lookupCell =
+            normalizedGeometry === "triangle" &&
+            typeof x === "number" &&
+            typeof y === "number" &&
+            Number.isInteger(x) &&
+            Number.isInteger(y)
+                ? { ...(cell ?? {}), orientation_token: triangleOrientation(x, y) }
+                : cell;
         const registeredFamilyDeadColor = resolveRegisteredFamilyDeadColor(
-            (cell as TopologyCell | null | undefined) ?? null,
+            (lookupCell as TopologyCell | null | undefined) ?? null,
             fallbackColors,
             normalizedGeometry,
         );
@@ -49,24 +51,6 @@ export function resolveDeadCellColor(
         }
     }
 
-    const alternateMixedKinds = MIXED_DEAD_ALT_CELL_KINDS.get(normalizedGeometry);
-    if (
-        alternateMixedKinds &&
-        typeof cell?.kind === "string" &&
-        alternateMixedKinds.has(cell.kind)
-    ) {
-        return fallbackColors.deadAlt;
-    }
-    if (
-        normalizedGeometry === "triangle" &&
-        typeof x === "number" &&
-        typeof y === "number" &&
-        Number.isInteger(x) &&
-        Number.isInteger(y) &&
-        triangleOrientation(x, y) === "down"
-    ) {
-        return fallbackColors.deadAlt;
-    }
     return fallbackColors.dead;
 }
 

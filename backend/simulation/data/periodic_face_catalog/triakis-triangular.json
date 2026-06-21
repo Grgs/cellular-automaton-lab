@@ -1,0 +1,21 @@
+{
+  "geometry": "triakis-triangular",
+  "label": "Triakis Triangular",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 240,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Triakis_triangular_tiling"
+  ],
+  "palette": null,
+  "preview_data": "0:52,4 68,13 36,13;0:84,4 100,13 68,13;0:36,13 68,13 52,22;0:68,13 100,13 84,22;0:36,13 52,22 52,41;0:52,22 68,13 52,41;0:68,13 84,22 84,41;0:84,22 100,13 84,41;0:36,13 52,41 36,31;0:68,13 68,31 52,41;0:68,13 84,41 68,31;0:100,13 100,31 84,41;0:36,31 52,41 20,41;0:68,31 84,41 52,41;0:20,41 52,41 36,50;0:52,41 84,41 68,50;0:36,50 52,41 36,68;0:52,41 68,50 68,68;0:68,50 84,41 68,68;0:84,41 100,50 100,68;0:52,41 52,59 36,68;0:52,41 68,68 52,59;0:84,41 84,59 68,68;0:84,41 100,68 84,59"
+}

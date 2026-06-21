@@ -1,0 +1,85 @@
+{
+  "geometry": "stein-14-pentagonal",
+  "label": "Stein 14 Pentagonal",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 245,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 8,
+    "min": 6,
+    "max": 14
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Pentagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "stein-14-pentagonal",
+    "variants": [
+      {
+        "label": "stein14-t0",
+        "selector": {
+          "kind": "stein14",
+          "slot": "t0"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      },
+      {
+        "label": "stein14-t1",
+        "selector": {
+          "kind": "stein14",
+          "slot": "t1"
+        },
+        "color": {
+          "token": "toneShadow"
+        }
+      },
+      {
+        "label": "stein14-t2",
+        "selector": {
+          "kind": "stein14",
+          "slot": "t2"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "stein14-t3",
+        "selector": {
+          "kind": "stein14",
+          "slot": "t3"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "stein14-t4",
+        "selector": {
+          "kind": "stein14",
+          "slot": "t4"
+        },
+        "color": {
+          "token": "toneLinen"
+        }
+      },
+      {
+        "label": "stein14-t5",
+        "selector": {
+          "kind": "stein14",
+          "slot": "t5"
+        },
+        "color": {
+          "token": "toneRose"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneLinen:60,-36 48,6 36,16 25,-15 45,-40;toneRose:48,6 60,-36 72,-46 83,-16 64,10;toneClay:-12,41 29,27 45,32 25,57 -7,56;toneShadow:-12,41 29,27 39,14 8,6 -17,26;toneCream:80,0 39,14 29,27 60,36 85,16;toneTan:80,0 39,14 23,10 42,-16 75,-15;toneLinen:60,36 48,78 36,88 25,57 45,32;toneRose:48,78 60,36 72,26 83,56 64,82;toneTan:80,72 39,86 23,82 42,56 75,57;toneLinen:149,-36 137,6 125,16 115,-15 134,-40;toneClay:78,41 118,27 134,32 115,57 83,56;toneShadow:78,41 118,27 128,14 97,6 72,26;toneCream:169,0 128,14 118,27 149,36 174,16;toneTan:169,0 128,14 113,10 132,-16 164,-15;toneLinen:149,36 137,78 125,88 115,57 134,32;toneTan:169,72 128,86 113,82 132,56 164,57"
+}

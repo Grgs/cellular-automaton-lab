@@ -1,0 +1,109 @@
+{
+  "geometry": "basketweave",
+  "label": "Basketweave",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 242,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Basket_weave_(pattern)"
+  ],
+  "palette": {
+    "geometry": "basketweave",
+    "variants": [
+      {
+        "label": "basketweave-h1",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "h1"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      },
+      {
+        "label": "basketweave-h2",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "h2"
+        },
+        "color": {
+          "token": "toneShadow"
+        }
+      },
+      {
+        "label": "basketweave-h3",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "h3"
+        },
+        "color": {
+          "token": "toneShadow"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "basketweave-h4",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "h4"
+        },
+        "color": {
+          "token": "toneClay"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "basketweave-v1",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "v1"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "basketweave-v2",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "v2"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      },
+      {
+        "label": "basketweave-v3",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "v3"
+        },
+        "color": {
+          "token": "toneTan"
+        },
+        "allowSharedDeadColor": true
+      },
+      {
+        "label": "basketweave-v4",
+        "selector": {
+          "kind": "basketweave-brick",
+          "slot": "v4"
+        },
+        "color": {
+          "token": "toneCream"
+        },
+        "allowSharedDeadColor": true
+      }
+    ]
+  },
+  "preview_data": "toneClay:-12,0 6,0 24,0 24,18 -12,18;toneShadow:-12,18 24,18 24,36 6,36 -12,36;toneShadow:24,36 42,36 60,36 60,54 24,54;toneClay:24,54 60,54 60,72 42,72 24,72;toneCream:24,0 42,0 42,36 24,36 24,18;toneTan:42,0 60,0 60,18 60,36 42,36;toneTan:-12,36 6,36 6,72 -12,72 -12,54;toneCream:6,36 24,36 24,54 24,72 6,72;toneClay:60,0 78,0 96,0 96,18 60,18;toneShadow:60,18 96,18 96,36 78,36 60,36;toneShadow:96,36 114,36 132,36 132,54 96,54;toneClay:96,54 132,54 132,72 114,72 96,72;toneCream:96,0 114,0 114,36 96,36 96,18;toneTan:114,0 132,0 132,18 132,36 114,36;toneTan:60,36 78,36 78,72 60,72 60,54;toneCream:78,36 96,36 96,54 96,72 78,72"
+}

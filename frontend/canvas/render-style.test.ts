@@ -44,9 +44,9 @@ describe("canvas/render-style", () => {
         // Each Archimedean family registers its prototile kinds in the
         // family-dead palette manifest. Primary kinds use cream (the family
         // base), the second kind uses tan, and three-kind families add clay
-        // for the smallest shape. Kagome stays on the legacy deadAlt fallback
-        // because its triangle-up/triangle-down kinds aren't yet in the
-        // manifest's selector vocabulary.
+        // for the smallest shape. Kagome now registers its hexagon and the two
+        // triangle orientations in the manifest too, replacing the old
+        // hardcoded deadAlt special case.
         const { buildStateColorLookup, resolveDeadCellColor, resolveRenderedCellColor } =
             await import("./render-style.js");
         const colorLookup = buildStateColorLookup();
@@ -74,8 +74,9 @@ describe("canvas/render-style", () => {
             { geometry: ARCHIMEDEAN_33344_GEOMETRY, kind: "triangle", expected: colors.toneTan },
             { geometry: ARCHIMEDEAN_33336_GEOMETRY, kind: "hexagon", expected: colors.toneCream },
             { geometry: ARCHIMEDEAN_33336_GEOMETRY, kind: "triangle", expected: colors.toneTan },
-            { geometry: KAGOME_GEOMETRY, kind: "triangle-up", expected: "#d5bb8f" },
-            { geometry: KAGOME_GEOMETRY, kind: "triangle-down", expected: "#d5bb8f" },
+            { geometry: KAGOME_GEOMETRY, kind: "hexagon", expected: colors.toneCream },
+            { geometry: KAGOME_GEOMETRY, kind: "triangle-up", expected: colors.toneTan },
+            { geometry: KAGOME_GEOMETRY, kind: "triangle-down", expected: colors.toneStone },
         ];
 
         expectations.forEach(({ geometry, kind, expected }) => {
@@ -89,11 +90,10 @@ describe("canvas/render-style", () => {
 
     it("falls through to the default dead fill for geometries with no manifest entry", async () => {
         const { resolveDeadCellColor } = await import("./render-style.js");
-        // Single-prototile lattices that do not yet register family variants
-        // should fall through to the default dead color.
+        // Dense single-prototile lattices intentionally stay on the neutral dead
+        // fill: their tens of per-instance slots would make a multi-tone dead
+        // background noisy rather than legible, so they register no variants.
         const fallthroughGeometries = [
-            CAIRO_GEOMETRY,
-            TETRAKIS_SQUARE_GEOMETRY,
             TRIAKIS_TRIANGULAR_GEOMETRY,
             PRISMATIC_PENTAGONAL_GEOMETRY,
             FLORET_PENTAGONAL_GEOMETRY,
@@ -108,6 +108,45 @@ describe("canvas/render-style", () => {
                 }),
             ).toBe("#f8f1e5");
         });
+    });
+
+    it("applies slot-based dead fills to Cairo and Tetrakis orientations", async () => {
+        const { resolveDeadCellColor } = await import("./render-style.js");
+        const colors = readCanvasColorsForTests();
+        const cairo = [
+            { slot: "a", expected: colors.toneCream },
+            { slot: "b", expected: colors.toneLinen },
+            { slot: "c", expected: colors.toneTan },
+            { slot: "d", expected: colors.toneStone },
+        ];
+        cairo.forEach(({ slot, expected }) => {
+            const cell = { id: `cairo:${slot}`, state: 0, kind: "pentagon", slot };
+            expect(resolveDeadCellColor(0, { geometry: CAIRO_GEOMETRY, cell })).toBe(expected);
+        });
+        const tetrakis = [
+            { slot: "s0", expected: colors.toneCream },
+            { slot: "s1", expected: colors.toneLinen },
+            { slot: "s2", expected: colors.toneTan },
+            { slot: "s3", expected: colors.toneStone },
+        ];
+        tetrakis.forEach(({ slot, expected }) => {
+            const cell = { id: `tetrakis:${slot}`, state: 0, kind: "triangle", slot };
+            expect(resolveDeadCellColor(0, { geometry: TETRAKIS_SQUARE_GEOMETRY, cell })).toBe(
+                expected,
+            );
+        });
+    });
+
+    it("resolves the base triangle grid's up/down orientation through the palette", async () => {
+        const { resolveDeadCellColor } = await import("./render-style.js");
+        const colors = readCanvasColorsForTests();
+        // triangleOrientation: (x + y) even is up, odd is down. Both tones now
+        // come from the data-driven "triangle" palette family, not a hardcoded
+        // deadAlt branch.
+        expect(resolveDeadCellColor(0, { geometry: "triangle", x: 0, y: 0 })).toBe(colors.dead);
+        expect(resolveDeadCellColor(0, { geometry: "triangle", x: 2, y: 0 })).toBe(colors.dead);
+        expect(resolveDeadCellColor(0, { geometry: "triangle", x: 1, y: 0 })).toBe(colors.deadAlt);
+        expect(resolveDeadCellColor(0, { geometry: "triangle", x: 0, y: 1 })).toBe(colors.deadAlt);
     });
 
     it("applies slot-based dead fills to Deltoidal Hexagonal kites", async () => {

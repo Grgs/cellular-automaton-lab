@@ -1,0 +1,43 @@
+{
+  "geometry": "archimedean-4-8-8",
+  "label": "Square-Octagon (4.8.8)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 110,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 10,
+    "min": 8,
+    "max": 24
+  },
+  "default_rule": "archlife488",
+  "minimum_grid_dimension": 3,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Truncated_square_tiling"
+  ],
+  "palette": {
+    "geometry": "archimedean-4-8-8",
+    "variants": [
+      {
+        "label": "archimedean-4-8-8-octagon",
+        "selector": {
+          "kind": "octagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "archimedean-4-8-8-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneTan"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneCream:42,11 53,11 60,18 60,29 53,36 42,36 35,29 35,18;toneCream:67,11 78,11 85,18 85,29 78,36 67,36 60,29 60,18;toneCream:42,36 53,36 60,43 60,54 53,61 42,61 35,54 35,43;toneCream:67,36 78,36 85,43 85,54 78,61 67,61 60,54 60,43;toneTan:35,4 42,11 35,18 28,11;toneTan:60,4 67,11 60,18 53,11;toneTan:85,4 92,11 85,18 78,11;toneTan:35,29 42,36 35,43 28,36;toneTan:60,29 67,36 60,43 53,36;toneTan:85,29 92,36 85,43 78,36;toneTan:35,54 42,61 35,68 28,61;toneTan:60,54 67,61 60,68 53,61;toneTan:85,54 92,61 85,68 78,61"
+}

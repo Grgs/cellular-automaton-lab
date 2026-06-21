@@ -1,0 +1,19 @@
+{
+  "geometry": "pentagon-crosses",
+  "label": "Pentagon Crosses",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 243,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [],
+  "palette": null,
+  "preview_data": "0:66,-18 60,-36 42,-30 24,0 54,18;0:42,42 60,36 54,18 24,0 6,30;0:-18,18 -12,36 6,30 24,0 -6,-18;0:6,30 -12,36 -6,54 24,72 42,42;0:66,54 60,36 42,42 24,72 54,90;0:-18,90 -12,108 6,102 24,72 -6,54;0:138,-18 132,-36 114,-30 96,0 126,18;0:114,42 132,36 126,18 96,0 78,30;0:54,18 60,36 78,30 96,0 66,-18;0:78,30 60,36 66,54 96,72 114,42;0:138,54 132,36 114,42 96,72 126,90;0:54,90 60,108 78,102 96,72 66,54"
+}

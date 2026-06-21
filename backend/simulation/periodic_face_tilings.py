@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
@@ -11,23 +12,32 @@ from backend.simulation.periodic_face_pattern_data import load_periodic_face_pat
 from backend.simulation.topology_family_manifest import TOPOLOGY_FAMILY_MANIFEST
 
 _PERIODIC_FACE_PATTERN_KEYS = frozenset(load_periodic_face_pattern_payloads())
-_UNREGISTERED_PERIODIC_FACE_PATTERNS = sorted(
-    _PERIODIC_FACE_PATTERN_KEYS - TOPOLOGY_FAMILY_MANIFEST.keys()
-)
-if _UNREGISTERED_PERIODIC_FACE_PATTERNS:
-    raise ValueError(
-        "Periodic face descriptors missing topology manifest entries: "
-        f"{_UNREGISTERED_PERIODIC_FACE_PATTERNS}"
+
+
+def _ordered_periodic_geometries(
+    descriptor_keys: frozenset[str],
+) -> tuple[str, ...]:
+    """Order known descriptors without making recovery tools unimportable.
+
+    Catalog validation still rejects descriptors without manifest metadata.
+    Keeping module import tolerant lets ``add-periodic --reconcile`` repair
+    exactly that partially generated state.
+    """
+
+    return tuple(
+        sorted(
+            descriptor_keys,
+            key=lambda geometry: (
+                TOPOLOGY_FAMILY_MANIFEST[geometry].picker_order
+                if geometry in TOPOLOGY_FAMILY_MANIFEST
+                else sys.maxsize,
+                geometry,
+            ),
+        )
     )
-PERIODIC_FACE_TILING_GEOMETRIES = tuple(
-    sorted(
-        _PERIODIC_FACE_PATTERN_KEYS,
-        key=lambda geometry: (
-            TOPOLOGY_FAMILY_MANIFEST[geometry].picker_order,
-            geometry,
-        ),
-    )
-)
+
+
+PERIODIC_FACE_TILING_GEOMETRIES = _ordered_periodic_geometries(_PERIODIC_FACE_PATTERN_KEYS)
 
 _ANGLE_START = -3 * math.pi / 4
 

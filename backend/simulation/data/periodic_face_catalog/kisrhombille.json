@@ -1,0 +1,21 @@
+{
+  "geometry": "kisrhombille",
+  "label": "Kisrhombille",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 225,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 10,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Truncated_trihexagonal_tiling"
+  ],
+  "palette": null,
+  "preview_data": "0:29,18 39,0 -2,0;0:81,0 91,18 122,0;0:60,0 39,0 60,36;0:81,0 60,0 60,36;0:29,18 -2,0 18,36;0:29,18 39,0 60,36;0:81,0 91,18 60,36;0:91,18 102,36 122,0;0:-2,0 -2,36 18,36;0:29,18 60,36 18,36;0:91,18 60,36 102,36;0:60,36 29,54 18,36;0:60,36 102,36 91,54;0:-2,72 -2,36 18,36;0:-2,72 29,54 18,36;0:60,36 39,72 29,54;0:60,36 91,54 81,72;0:102,36 91,54 122,72;0:60,36 60,72 39,72;0:60,36 81,72 60,72;0:39,72 -2,72 29,54;0:91,54 81,72 122,72;0:102,36 122,0 122,36;0:102,36 122,72 122,36"
+}
