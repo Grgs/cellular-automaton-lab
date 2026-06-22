@@ -2,6 +2,8 @@
 
 Generated from the `python -m tools ...` command registry. Edit the CLI metadata, not this file by hand.
 
+Before hand-rolling a script for repo maintenance, prefer the commands below (run `python -m tools --help` to discover the full surface). They carry guardrails a bespoke script would bypass: transactional installs, the `generated-check` freshness gate, deterministic regeneration, and bundle-budget accounting. Regenerate generated artifacts (catalog aggregate, palette manifest, preview data, bootstrap fixture, this file) rather than editing them by hand.
+
 For npm convenience aliases, see the `scripts` block in [package.json](../package.json).
 
 ## Build
