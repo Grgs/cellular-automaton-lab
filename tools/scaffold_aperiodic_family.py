@@ -13,6 +13,14 @@ Files created:
   ReferenceFamilySpec.
 - ``tests/unit/test_aperiodic_<family>.py``: minimal test skeleton.
 
+The default generator skeleton targets the triangle-similarity
+``ExactSimilaritySubstitution`` framework. The repo also has the hat-style
+baked-metatile and affine-substitution frameworks; for those, pass
+``--wiring-only`` to get a framework-neutral generator stub (a single triangle
+that loads end-to-end) plus all the catalog wiring, and skip the
+triangle-coupled test skeleton. See ``docs/ADDING_TOPOLOGIES.md`` for choosing
+a framework.
+
 Files edited (surgical anchor-based inserts):
 
 - ``backend/simulation/aperiodic_family_manifest.py``: GEOMETRY + KIND +
@@ -46,6 +54,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -563,14 +572,68 @@ class PlannedWrite:
     is_new: bool
 
 
-def plan_writes(spec: ScaffoldSpec, repo_root: Path) -> list[PlannedWrite]:
+def render_neutral_generator_module(spec: ScaffoldSpec) -> str:
+    """Render a framework-neutral generator stub for ``--wiring-only``.
+
+    Unlike :func:`render_generator_module`, this does not assume the
+    triangle-similarity (:class:`ExactSimilaritySubstitution`) framework. It
+    emits a single trivial triangle through ``patch_from_records`` so the family
+    wires up and loads end-to-end, leaving the author free to drop in any
+    framework (baked metatile, affine substitution, exact similarity, ...).
+    """
+    source_line = (
+        f"\nSource: {spec.source_url}\n" if spec.source_url else "\nTODO: cite a source URL.\n"
+    )
+    first_kind_const = spec.kind_const(spec.kinds[0])
+    return f'''"""Generator for the {spec.label} aperiodic family.
+
+TODO: replace this framework-neutral placeholder with the real prototile
+geometry and substitution rule. It emits a single trivial triangle so the
+family loads end-to-end; choose whichever substitution framework fits (see
+docs/ADDING_TOPOLOGIES.md, "Choosing an aperiodic generator framework").
+{source_line}"""
+
+from __future__ import annotations
+
+from backend.simulation.aperiodic_family_manifest import (
+    {first_kind_const},
+    {spec.tile_family_const},
+)
+from backend.simulation.aperiodic_support import (
+    AperiodicPatch,
+    PatchRecord,
+    patch_from_records,
+)
+
+
+def {spec.builder_name}(patch_depth: int) -> AperiodicPatch:
+    # TODO: build the real depth-``patch_depth`` patch. Placeholder: one tile.
+    records: list[PatchRecord] = [
+        {{
+            "id": "{spec.family_id}:0",
+            "kind": {first_kind_const},
+            "center": (0.0, 0.0),
+            "vertices": ((0.0, 0.0), (1.0, 0.0), (0.0, 1.0)),
+            "tile_family": {spec.tile_family_const},
+        }}
+    ]
+    return patch_from_records(max(0, int(patch_depth)), records)
+'''
+
+
+def plan_writes(
+    spec: ScaffoldSpec, repo_root: Path, *, wiring_only: bool = False
+) -> list[PlannedWrite]:
     plans: list[PlannedWrite] = []
 
     # New files
     generator_path = repo_root / "backend" / "simulation" / f"{spec.generator_module}.py"
     if generator_path.exists():
         raise ScaffoldError(f"Generator already exists: {generator_path}")
-    plans.append(PlannedWrite(generator_path, render_generator_module(spec), is_new=True))
+    generator_source = (
+        render_neutral_generator_module(spec) if wiring_only else render_generator_module(spec)
+    )
+    plans.append(PlannedWrite(generator_path, generator_source, is_new=True))
 
     ref_spec_path = (
         repo_root / "backend" / "simulation" / "reference_specs" / "aperiodic" / f"{spec.snake}.py"
@@ -579,10 +642,15 @@ def plan_writes(spec: ScaffoldSpec, repo_root: Path) -> list[PlannedWrite]:
         raise ScaffoldError(f"Reference spec already exists: {ref_spec_path}")
     plans.append(PlannedWrite(ref_spec_path, render_reference_spec(spec), is_new=True))
 
-    test_path = repo_root / "tests" / "unit" / f"test_aperiodic_{spec.snake}.py"
-    if test_path.exists():
-        raise ScaffoldError(f"Test skeleton already exists: {test_path}")
-    plans.append(PlannedWrite(test_path, render_test_skeleton(spec), is_new=True))
+    # The default test skeleton imports the triangle-substitution generator's
+    # private API (_BASE_TRIANGLE / _subdivide / ...), so it only fits the
+    # ExactSimilaritySubstitution framework. In --wiring-only mode the author
+    # supplies their own generator and writes a focused test to match it.
+    if not wiring_only:
+        test_path = repo_root / "tests" / "unit" / f"test_aperiodic_{spec.snake}.py"
+        if test_path.exists():
+            raise ScaffoldError(f"Test skeleton already exists: {test_path}")
+        plans.append(PlannedWrite(test_path, render_test_skeleton(spec), is_new=True))
 
     # Edited files
     manifest_path = repo_root / "backend" / "simulation" / "aperiodic_family_manifest.py"
@@ -634,16 +702,50 @@ def apply_writes(plans: list[PlannedWrite]) -> None:
         write_text_lf(plan.path, plan.contents)
 
 
-def print_followups(spec: ScaffoldSpec) -> None:
+def format_generated_python(plans: list[PlannedWrite]) -> None:
+    """Run ruff import-fix + format on the touched Python files.
+
+    The rendered templates and the anchor-based import inserts are not
+    guaranteed to land in ruff's preferred import order, so without this the
+    scaffolded files would fail the ``ruff check`` / ``ruff format`` pre-commit
+    hooks until the author fixed them by hand. Best-effort: a missing ruff is
+    reported, not fatal.
+    """
+    python_files = [str(plan.path) for plan in plans if plan.path.suffix == ".py"]
+    if not python_files:
+        return
+    commands = (
+        [sys.executable, "-m", "ruff", "check", "--fix", "--quiet", *python_files],
+        [sys.executable, "-m", "ruff", "format", "--quiet", *python_files],
+    )
+    for command in commands:
+        try:
+            subprocess.run(command, check=False)
+        except FileNotFoundError:
+            print(
+                "  (ruff not found; run `ruff check --fix` and `ruff format` on the "
+                "generated files before committing)",
+                file=sys.stderr,
+            )
+            return
+
+
+def print_followups(spec: ScaffoldSpec, *, wiring_only: bool = False) -> None:
     print()
     print("Next steps (in order):")
     print(
         f"  1. Implement the substitution geometry in backend/simulation/{spec.generator_module}.py"
     )
-    print(
-        "     (replace the placeholder _BASE_TRIANGLE / _ALL_CHILDREN / "
-        "_ROOT_TRIANGLES / INFLATION_FACTOR)."
-    )
+    if wiring_only:
+        print(
+            "     (replace the framework-neutral single-triangle placeholder with your "
+            "real generator; see docs/ADDING_TOPOLOGIES.md for choosing a framework)."
+        )
+    else:
+        print(
+            "     (replace the placeholder _BASE_TRIANGLE / _ALL_CHILDREN / "
+            "_ROOT_TRIANGLES / INFLATION_FACTOR)."
+        )
     print(
         f"  2. Fill in real per-depth expectations in "
         f"backend/simulation/reference_specs/aperiodic/{spec.snake}.py"
@@ -665,7 +767,13 @@ def print_followups(spec: ScaffoldSpec) -> None:
     print("Then validate:")
     print("  python -m tools tilings validate")
     print("  python -m tools tilings verify")
-    print(f"  python -m pytest tests/unit/test_aperiodic_{spec.snake}.py")
+    if wiring_only:
+        print(
+            f"  (no test skeleton was generated; add a focused "
+            f"tests/unit/test_aperiodic_{spec.snake}.py for your generator)"
+        )
+    else:
+        print(f"  python -m pytest tests/unit/test_aperiodic_{spec.snake}.py")
     print()
     print("Inherited catalog-wide coverage (do not create duplicate per-family tests):")
     print("  - registration, implementation dispatch, topology structure, and graph validity")
@@ -715,6 +823,17 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--wiring-only",
+        action="store_true",
+        help=(
+            "Skip the triangle-substitution generator body and test skeleton: write a "
+            "framework-neutral generator stub (single triangle, loads end-to-end) plus all "
+            "the catalog/registry wiring. Use this when the family needs a different "
+            "substitution framework than ExactSimilaritySubstitution (e.g. the hat-style "
+            "baked metatile or affine substitution paths)."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print planned writes without modifying any files.",
@@ -734,7 +853,7 @@ def main(argv: list[str] | None = None) -> int:
             picker_order=args.picker_order,
             picker_group=args.picker_group,
         )
-        plans = plan_writes(spec, ROOT)
+        plans = plan_writes(spec, ROOT, wiring_only=args.wiring_only)
     except ScaffoldError as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
@@ -748,8 +867,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     apply_writes(plans)
+    format_generated_python(plans)
     print(f"\nScaffolded {spec.label!r} ({spec.family_id}).")
-    print_followups(spec)
+    print_followups(spec, wiring_only=args.wiring_only)
     return 0
 
 
