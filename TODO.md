@@ -65,7 +65,6 @@ Decisions already taken (so the steps are unambiguous):
 
 ## Later
 
-- Add `turtle-monotile` on top of the existing Hat-family support.
 - Add another verified substitution tiling family such as `socolar-12-fold`.
 - Revisit `pinwheel` verification with stronger substitution-matrix and direct local-patch invariants, now that its contiguity is derived from exact segment-overlap neighbors on the exact-affine path.
 - Explore larger-sample or quotient-surface periodic proofs if the current finite-sample verifier ever stops being discriminating enough for the catalog.
