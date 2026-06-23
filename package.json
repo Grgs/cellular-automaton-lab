@@ -38,7 +38,7 @@
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/node": "^25.9.3",
-        "@vitest/coverage-v8": "^4.1.8",
+        "@vitest/coverage-v8": "^4.1.9",
         "eslint": "^10.5.0",
         "eslint-config-prettier": "^10.1.8",
         "jsdom": "^29.1.1",
@@ -47,7 +47,7 @@
         "polygon-clipping": "^0.15.7",
         "prettier": "^3.8.4",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.61.0",
+        "typescript-eslint": "^8.61.1",
         "vite": "^8.0.16",
         "vitest": "^4.1.2"
     }

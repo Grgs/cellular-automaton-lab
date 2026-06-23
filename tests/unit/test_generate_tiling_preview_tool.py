@@ -1,20 +1,26 @@
 from __future__ import annotations
 
 import copy
+import io
 import sys
+import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools._common import write_text_lf
 from tools.generate_tiling_preview import (
     _APERIODIC_DEFAULT_DEPTHS,
     _aperiodic_polygon_data,
     _generate_polygon_data,
     _load_descriptors,
     _tiled_vertices,
+    main,
+    write_preview_entry,
 )
 
 
@@ -103,3 +109,32 @@ class GenerateTilingPreviewToolTests(unittest.TestCase):
 
         self.assertIn("toneCream:", generated)
         self.assertIn("toneTan:", generated)
+
+    def test_write_text_lf_emits_lf_even_for_crlf_or_native_content(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "sample.ts"
+            write_text_lf(path, "line one\nline two\n")
+            self.assertEqual(path.read_bytes().count(b"\r"), 0)
+
+    def test_write_preview_entry_appends_without_introducing_crlf(self) -> None:
+        # Regression: Path.write_text rewrites \n to \r\n on Windows, which
+        # flipped the whole generated file to CRLF and tripped the Prettier
+        # pre-commit hook. The writer must keep the file on LF.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "tiling-preview-data.ts"
+            write_text_lf(
+                path,
+                "export const POLYGON_PREVIEW_DATA: Readonly<Record<string, string>> = {\n};\n",
+            )
+            write_preview_entry("widget-monotile", "toneSand:0,0 1,0 1,1", output_path=path)
+            self.assertEqual(path.read_bytes().count(b"\r"), 0)
+            self.assertIn('"widget-monotile":', path.read_text(encoding="utf-8"))
+
+    def test_periodic_mode_points_aperiodic_geometry_to_aperiodic_flag(self) -> None:
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            exit_code = main(["--geometry", "spectre"])
+        self.assertEqual(exit_code, 1)
+        message = stderr.getvalue()
+        self.assertIn("--aperiodic", message)
+        self.assertIn("spectre", message)

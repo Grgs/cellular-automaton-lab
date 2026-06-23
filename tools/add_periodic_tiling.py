@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-from tools._common import ROOT_DIR
+from tools._common import ROOT_DIR, write_text_lf
 from tools.generate_tiling_preview import (
     PreviewDescriptor,
     _generate_polygon_data,
@@ -254,7 +254,7 @@ def apply_install_plan(writes: tuple[PlannedWrite, ...], *, root: Path = ROOT_DI
     try:
         for write in writes:
             write.path.parent.mkdir(parents=True, exist_ok=True)
-            write.path.write_text(write.content, encoding="utf-8")
+            write_text_lf(write.path, write.content)
         python_paths = [str(write.path) for write in writes if write.path.suffix == ".py"]
         if python_paths:
             _run([sys.executable, "-m", "ruff", "format", *python_paths], root=root)
