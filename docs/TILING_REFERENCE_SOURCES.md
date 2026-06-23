@@ -120,6 +120,14 @@ The order is intentional:
     per supercell from the underlying 3.12.12 layout. It scales without a
     depth limit and depends on no vendored data. It is not the canonical
     Schlottmann quasi-periodic tiling.
+- `socolar-12-fold`
+  - [Socolar](https://tilings.math.uni-bielefeld.de/substitution/socolar/)
+  - [Socolar, *Simple octagonal and dodecagonal quasicrystals*, Phys. Rev. B 39 (1989)](https://doi.org/10.1103/PhysRevB.39.10519)
+  - [Socolar tiling](https://en.wikipedia.org/wiki/Socolar_tiling)
+  - Shipped as the dodecagonal rhomb tiling (rhombus variant of the Socolar
+    tiling, MLD to `shield`) built by the de Bruijn generalized-dual multigrid,
+    not by the published marked substitution. See
+    [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)
 - `pinwheel`
