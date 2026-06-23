@@ -24,6 +24,7 @@ from backend.simulation.reference_verification.types import (
     _CanonicalPatchFixturePayload,
     _LocalReferenceAnchorPayload,
 )
+from tools._common import write_text_lf  # noqa: E402
 
 FixtureMode = Literal["local", "canonical", "both"]
 type LocalFixturePayload = dict[str, dict[str, dict[str, _LocalReferenceAnchorPayload]]]
@@ -67,7 +68,7 @@ def _write_fixture_json(
     path: Path,
     payload: LocalFixturePayload | CanonicalFixturePayload,
 ) -> None:
-    path.write_text(_format_fixture_json(payload), encoding="utf-8")
+    write_text_lf(path, _format_fixture_json(payload))
 
 
 def discover_local_fixture_targets(

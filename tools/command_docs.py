@@ -110,10 +110,13 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("tilings", "preview"),
         "tilings",
         "Generate preview polygon data for the tiling picker.",
-        "Supports periodic and aperiodic preview generation and discovery via `--list`.",
+        "Supports periodic and aperiodic preview generation and discovery via `--list`. "
+        "Aperiodic families require the `--aperiodic` flag (the default mode reads "
+        "periodic-face descriptors).",
         (
             "python -m tools tilings preview --list",
             "python -m tools tilings preview --geometry kisrhombille",
+            "python -m tools tilings preview --aperiodic --geometry hat-monotile --write",
         ),
     ),
     CommandDoc(

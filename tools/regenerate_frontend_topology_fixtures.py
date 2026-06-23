@@ -13,6 +13,7 @@ if str(ROOT) not in sys.path:
 
 from backend.simulation.topology import build_topology
 from backend.simulation.topology_types import topology_content_revision
+from tools._common import write_text_lf  # noqa: E402
 
 DEFAULT_FIXTURE_MANIFEST_PATH = (
     ROOT / "frontend" / "test-fixtures" / "topologies" / "fixture-manifest.json"
@@ -183,10 +184,7 @@ def write_regenerated_fixtures(
 ) -> None:
     for target in targets:
         target.path.parent.mkdir(parents=True, exist_ok=True)
-        target.path.write_text(
-            _format_fixture_json(regenerate_fixture_payload(target)),
-            encoding="utf-8",
-        )
+        write_text_lf(target.path, _format_fixture_json(regenerate_fixture_payload(target)))
 
 
 def build_parser() -> argparse.ArgumentParser:
