@@ -10,14 +10,14 @@ if str(ROOT) not in sys.path:
 
 from backend.simulation.aperiodic_support import edge_scaled_vertex_map
 from backend.simulation.aperiodic_support.patches import patch_from_cells
-from backend.simulation.aperiodic_support.types import AperiodicPatchCell
+from backend.simulation.aperiodic_support.types import AperiodicPatch, AperiodicPatchCell
 
 # Two unit squares sharing the edge (1,0)-(1,1).
 _LEFT = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
 _RIGHT = ((1.0, 0.0), (2.0, 0.0), (2.0, 1.0), (1.0, 1.0))
 
 
-def _two_square_patch() -> object:
+def _two_square_patch() -> AperiodicPatch:
     cells = (
         AperiodicPatchCell(
             id="left", kind="square", center=(0.5, 0.5), vertices=_LEFT, neighbors=("right",)
