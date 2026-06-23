@@ -10,6 +10,7 @@ if str(ROOT) not in sys.path:
 
 from backend.bootstrap_data import build_bootstrap_payload
 from backend.dev_server import APP_NAME
+from tools._common import write_text_lf  # noqa: E402
 
 
 def main() -> int:
@@ -19,7 +20,7 @@ def main() -> int:
     output_path = Path(sys.argv[1]).resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     payload = build_bootstrap_payload({"app_name": APP_NAME})
-    output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    write_text_lf(output_path, json.dumps(payload, indent=2))
     return 0
 
 

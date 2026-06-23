@@ -96,11 +96,12 @@ python -m tools tilings report --format detail
 
 Generate preview polygon data for the tiling picker.
 
-Supports periodic and aperiodic preview generation and discovery via `--list`.
+Supports periodic and aperiodic preview generation and discovery via `--list`. Aperiodic families require the `--aperiodic` flag (the default mode reads periodic-face descriptors).
 
 ```powershell
 python -m tools tilings preview --list
 python -m tools tilings preview --geometry kisrhombille
+python -m tools tilings preview --aperiodic --geometry hat-monotile --write
 ```
 
 ### `python -m tools tilings sketch`
@@ -153,10 +154,11 @@ python -m tools tilings regenerate-catalog --check
 
 Scaffold the boilerplate for a new aperiodic tiling family.
 
-Creates the generator skeleton, reference spec, tests, and registry/manifest inserts before real geometry is implemented.
+Creates the generator skeleton, reference spec, tests, and registry/manifest inserts before real geometry is implemented. The default skeleton targets the triangle-similarity framework; pass --wiring-only for a framework-neutral generator stub (no triangle-coupled test skeleton) when the family needs the baked-metatile or affine-substitution path instead.
 
 ```powershell
 python -m tools tilings scaffold-aperiodic --family-id widget-monotile --label "Widget Monotile" --kind widget --source-url https://example.org/widget
+python -m tools tilings scaffold-aperiodic --family-id widget-monotile --label "Widget Monotile" --kind widget --wiring-only
 ```
 
 ### `python -m tools tilings compare`

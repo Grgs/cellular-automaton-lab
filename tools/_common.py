@@ -10,6 +10,20 @@ from typing import Final
 ROOT_DIR: Final[Path] = Path(__file__).resolve().parents[1]
 
 
+def write_text_lf(path: Path, content: str) -> None:
+    """Write ``content`` to ``path`` with LF newlines on every platform.
+
+    ``Path.write_text`` opens in text mode with ``newline=None``, which on
+    Windows rewrites every ``\\n`` to ``\\r\\n``. Every generated artifact in
+    this repo is committed as LF (enforced by Prettier, ruff, and the
+    ``generated-check`` freshness gate), so a Windows contributor running a
+    regeneration tool would otherwise flip the whole file to CRLF and trip
+    those gates. Forcing ``newline="\\n"`` keeps generator output byte-for-byte
+    identical regardless of the host OS.
+    """
+    path.write_text(content, encoding="utf-8", newline="\n")
+
+
 def resolve_node_executable() -> str:
     return shutil.which("node") or shutil.which("node.exe") or "node"
 
