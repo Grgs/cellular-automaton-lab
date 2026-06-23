@@ -21,6 +21,7 @@ from backend.simulation.aperiodic_family_manifest import (
     SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
+    TURTLE_MONOTILE_GEOMETRY,
 )
 from backend.simulation.periodic_face_catalog_data import load_periodic_face_catalog
 from backend.simulation.topology_catalog_types import SizingPolicyDefinition
@@ -324,6 +325,10 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     HAT_MONOTILE_GEOMETRY: _translated_aperiodic_family(
         HAT_MONOTILE_GEOMETRY,
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 3),
+    ),
+    TURTLE_MONOTILE_GEOMETRY: _translated_aperiodic_family(
+        TURTLE_MONOTILE_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 3),
     ),
     CHAIR_GEOMETRY: _translated_aperiodic_family(

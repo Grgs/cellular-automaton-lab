@@ -97,6 +97,10 @@ The order is intentional:
 - `hat-monotile`
   - [An aperiodic monotile](https://arxiv.org/abs/2303.10798)
   - [Hat metatiles](https://tilings.math.uni-bielefeld.de/substitution/hat-metatiles/)
+- `turtle-monotile`
+  - [An aperiodic monotile](https://arxiv.org/abs/2303.10798) (the Turtle is the `Tile(sqrt(3), 1)` member of the hat continuum)
+  - [Hat metatiles](https://tilings.math.uni-bielefeld.de/substitution/hat-metatiles/)
+  - [christianp/aperiodic-monotile](https://github.com/christianp/aperiodic-monotile) (independent canonical Turtle outline used in congruence tests)
 - `taylor-socolar`
   - [Half-hex](https://tilings.math.uni-bielefeld.de/substitution/half-hex/)
   - [Lee and Moody 2013](https://www.mdpi.com/2073-8994/5/1/1)

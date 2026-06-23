@@ -296,6 +296,7 @@ dead/live alias checks cover the fixture-backed palette-heavy families:
 - `robinson-triangles`
 - `shield`
 - `tuebingen-triangle`
+- `turtle-monotile`
 
 Those browser checks are intentionally narrower than the unit-level palette
 invariants. Use the browser path when the question is “does the rendered canvas

@@ -107,6 +107,15 @@
       "height": 0,
       "patchDepth": 3,
       "cellSize": 12
+    },
+    {
+      "name": "turtle-monotile-depth-3",
+      "path": "turtle-monotile-depth-3.json",
+      "family": "turtle-monotile",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
     }
   ]
 }
