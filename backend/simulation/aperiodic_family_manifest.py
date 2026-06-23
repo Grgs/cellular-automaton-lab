@@ -23,6 +23,7 @@ SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
 SPHINX_GEOMETRY = "sphinx"
 HAT_MONOTILE_GEOMETRY = "hat-monotile"
+TURTLE_MONOTILE_GEOMETRY = "turtle-monotile"
 CHAIR_GEOMETRY = "chair"
 ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
 TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
@@ -49,6 +50,7 @@ TAYLOR_HALF_HEX_LEFT_KIND = "taylor-half-hex-left"
 TAYLOR_HALF_HEX_RIGHT_KIND = "taylor-half-hex-right"
 SPHINX_KIND = "sphinx"
 HAT_KIND = "hat"
+TURTLE_KIND = "turtle"
 CHAIR_KIND = "chair"
 ROBINSON_THICK_KIND = "robinson-thick"
 ROBINSON_THIN_KIND = "robinson-thin"
@@ -67,6 +69,7 @@ PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
 TUEBINGEN_TILE_FAMILY = "tuebingen"
 HAT_TILE_FAMILY = "hat"
+TURTLE_TILE_FAMILY = "turtle"
 DODECAGONAL_SQUARE_TRIANGLE_TILE_FAMILY = DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY
 SHIELD_TILE_FAMILY = "shield"
 PINWHEEL_TILE_FAMILY = "pinwheel"
@@ -221,6 +224,21 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         builder_kind="substitution_recipe",
         implementation_status="true_substitution",
         public_cell_kinds=(HAT_KIND,),
+    ),
+    TURTLE_MONOTILE_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=TURTLE_MONOTILE_GEOMETRY,
+        catalog_label="Turtle",
+        reference_label="Turtle",
+        picker_group="Aperiodic",
+        picker_order=255,
+        default_rule="life-b2-s23",
+        builder_kind="substitution_recipe",
+        # The Turtle is the Tile(sqrt(3), 1) member of the hat continuum and is
+        # realised as the exact per-edge-class deformation of the verified Hat
+        # tiling (Tile(1, sqrt(3))). It therefore inherits the Hat's true
+        # metatile substitution structure and adjacency at every depth.
+        implementation_status="true_substitution",
+        public_cell_kinds=(TURTLE_KIND,),
     ),
     TAYLOR_SOCOLAR_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=TAYLOR_SOCOLAR_GEOMETRY,

@@ -75,6 +75,10 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - representative patches should include opposite-chirality Hat adjacencies
   - reflected hats should appear in the characteristic three-neighbor opposite-chirality local pattern described by the Hat metatiles source
   - rooted local-reference fixtures now check a canonical neighborhood around that `H8`-rooted sample
+- `turtle-monotile`
+  - the Turtle is `Tile(sqrt(3), 1)` in the hat continuum, built as the exact per-edge-class deformation of the verified Hat tiling, so it shares the Hat's `H8`-rooted metatile substitution structure and adjacency at every depth
+  - representative patches should include opposite-chirality Turtle adjacencies, with reflected copies in the same three-neighbor opposite-chirality local pattern as the Hat
+  - each tile is additionally checked for congruence against the independent canonical Turtle outline (edge-length and turn-angle multisets)
 - `tuebingen-triangle`
   - chirality metadata is part of the expected output
   - direct canonical patch fixtures now pin both the first handed substitution patch and the representative depth-`3` sample

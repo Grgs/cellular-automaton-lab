@@ -15,7 +15,7 @@ from typing import Any
 from backend.simulation.periodic_face_catalog_data import (
     load_periodic_face_catalog_sources,
 )
-from tools._common import ROOT_DIR
+from tools._common import ROOT_DIR, write_text_lf
 from tools.add_periodic_tiling import PlannedWrite
 from tools.generate_tiling_preview import update_preview_source
 
@@ -194,7 +194,7 @@ def _write_with_backup(write: PlannedWrite, backups: dict[Path, bytes | None]) -
     if write.path not in backups:
         backups[write.path] = write.path.read_bytes() if write.path.exists() else None
     write.path.parent.mkdir(parents=True, exist_ok=True)
-    write.path.write_text(write.content, encoding="utf-8")
+    write_text_lf(write.path, write.content)
 
 
 def _planned_catalog_writes(root: Path) -> tuple[PlannedWrite, ...]:
@@ -229,11 +229,11 @@ def regenerate_catalog(root: Path = ROOT_DIR) -> tuple[Path, ...]:
             [sys.executable, "-m", "tools", "bootstrap", "export", str(_BOOTSTRAP_PATH)],
             root=root,
         )
-        budget_path.write_text(
+        write_text_lf(
+            budget_path,
             refresh_bootstrap_budget_source(
                 budget_path.read_text(encoding="utf-8"), bootstrap_path.read_bytes()
             ),
-            encoding="utf-8",
         )
         _run(
             ["npm", "exec", "prettier", "--", "--write", str(_PREVIEW_PATH)],

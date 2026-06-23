@@ -1551,6 +1551,33 @@
       ]
     },
     {
+      "geometry": "turtle-monotile",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/turtle-monotile-depth-3.json",
+        "selectorFields": [
+          "chirality_token"
+        ]
+      },
+      "variants": [
+        {
+          "label": "turtle-left",
+          "selector": {
+            "tile_family": "turtle",
+            "chirality_token": "left"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "turtle-right",
+          "selector": {
+            "tile_family": "turtle",
+            "chirality_token": "right"
+          },
+          "color": {"token": "toneStone"}
+        }
+      ]
+    },
+    {
       "geometry": "chair",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/chair-depth-3.json",
