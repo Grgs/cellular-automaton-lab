@@ -22,22 +22,25 @@ geometry:
 
 The re-integration is path independent because each edge class closes
 independently around every cell (the "balance" property of the family), so the
-Turtle vertex assigned to a shared Hat vertex is well defined. Because the
-deformation only rescales by edge class -- a rotation/reflection invariant --
-it commutes with the Hat's orientation and chirality structure, so those
-tokens and the Hat's neighbour graph carry over unchanged.
+Turtle vertex assigned to a shared Hat vertex is well defined. The walk itself
+is the shared :func:`edge_scaled_vertex_map` helper, which deforms any tiling by
+rescaling edges per length class; this module only supplies the Hat-specific
+classification. Because the deformation only rescales by edge class -- a
+rotation/reflection invariant -- it commutes with the Hat's orientation and
+chirality structure, so those tokens and the Hat's neighbour graph carry over
+unchanged.
 """
 
 from __future__ import annotations
 
 import math
-from collections import defaultdict, deque
 
 from backend.simulation.aperiodic_family_manifest import TURTLE_KIND, TURTLE_TILE_FAMILY
 from backend.simulation.aperiodic_hat import _OUTPUT_SCALE, build_hat_patch
 from backend.simulation.aperiodic_support import (
     AperiodicPatch,
     AperiodicPatchCell,
+    edge_scaled_vertex_map,
     patch_from_cells,
     polygon_centroid,
 )
@@ -67,10 +70,6 @@ _OUTPUT_PRECISION = 9
 _Point = tuple[float, float]
 
 
-def _vertex_key(point: _Point) -> tuple[float, float]:
-    return (round(point[0], _VERTEX_KEY_PRECISION), round(point[1], _VERTEX_KEY_PRECISION))
-
-
 def _edge_scale(start: _Point, end: _Point) -> float:
     length = math.hypot(end[0] - start[0], end[1] - start[1])
     tolerance = 1e-3 * max(1.0, length)
@@ -82,46 +81,6 @@ def _edge_scale(start: _Point, end: _Point) -> float:
         f"Hat edge length {length:.6f} is neither an a edge ({_A_SHORT:.6f}/{_A_LONG:.6f}) "
         f"nor a b edge ({_B_LENGTH:.6f}); cannot map it onto the Turtle continuum."
     )
-
-
-def _turtle_positions(patch: AperiodicPatch) -> dict[tuple[float, float], _Point]:
-    """Re-integrate Turtle vertex positions over the Hat shared-edge graph."""
-    adjacency: dict[tuple[float, float], set[tuple[float, float]]] = defaultdict(set)
-    hat_position: dict[tuple[float, float], _Point] = {}
-    for cell in patch.cells:
-        vertices = cell.vertices
-        count = len(vertices)
-        for index in range(count):
-            start = vertices[index]
-            end = vertices[(index + 1) % count]
-            start_key = _vertex_key(start)
-            end_key = _vertex_key(end)
-            hat_position[start_key] = start
-            hat_position[end_key] = end
-            adjacency[start_key].add(end_key)
-            adjacency[end_key].add(start_key)
-
-    turtle_position: dict[tuple[float, float], _Point] = {}
-    for root in adjacency:
-        if root in turtle_position:
-            continue
-        turtle_position[root] = (0.0, 0.0)
-        queue: deque[tuple[float, float]] = deque((root,))
-        while queue:
-            current = queue.popleft()
-            current_hat = hat_position[current]
-            current_turtle = turtle_position[current]
-            for neighbor in adjacency[current]:
-                if neighbor in turtle_position:
-                    continue
-                neighbor_hat = hat_position[neighbor]
-                scale = _edge_scale(current_hat, neighbor_hat)
-                turtle_position[neighbor] = (
-                    current_turtle[0] + scale * (neighbor_hat[0] - current_hat[0]),
-                    current_turtle[1] + scale * (neighbor_hat[1] - current_hat[1]),
-                )
-                queue.append(neighbor)
-    return turtle_position
 
 
 def _retag_id(hat_id: str) -> str:
@@ -138,16 +97,14 @@ def build_turtle_patch(patch_depth: int) -> AperiodicPatch:
     structure at every depth.
     """
     hat_patch = build_hat_patch(patch_depth)
-    turtle_position = _turtle_positions(hat_patch)
+    to_turtle = edge_scaled_vertex_map(hat_patch, _edge_scale, key_precision=_VERTEX_KEY_PRECISION)
 
     cells: list[AperiodicPatchCell] = []
     for cell in hat_patch.cells:
+        deformed = [to_turtle(vertex) for vertex in cell.vertices]
         vertices = tuple(
-            (
-                round(turtle_position[_vertex_key(vertex)][0], _OUTPUT_PRECISION),
-                round(turtle_position[_vertex_key(vertex)][1], _OUTPUT_PRECISION),
-            )
-            for vertex in cell.vertices
+            (round(point[0], _OUTPUT_PRECISION), round(point[1], _OUTPUT_PRECISION))
+            for point in deformed
         )
         centroid = polygon_centroid(tuple(_Vec(x, y) for x, y in vertices))
         cells.append(
