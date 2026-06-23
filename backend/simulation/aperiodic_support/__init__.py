@@ -30,6 +30,7 @@ from .affine import rotation as rotation
 from .affine import scale as scale
 from .affine import translation as translation
 from .affine import translation_to as translation_to
+from .continuum import edge_scaled_vertex_map as edge_scaled_vertex_map
 from .geometry import canonical_edge as canonical_edge
 from .geometry import compatibility_extent as compatibility_extent
 from .geometry import encode_float as encode_float

@@ -24,7 +24,7 @@ It is intended for comparing how familiar automata behave on different local nei
 
 ## Highlights
 
-- 46 shipped tiling families (3 regular grids, 27 periodic mixed tilings, 16 aperiodic patches including Penrose variants and monotiles)
+- 47 shipped tiling families (3 regular grids, 27 periodic mixed tilings, 17 aperiodic patches including Penrose variants and the Hat/Turtle/Spectre monotiles)
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
@@ -51,6 +51,7 @@ It is intended for comparing how familiar automata behave on different local nei
 - Start with Square + Conway, paint a few cells, use step/run, then export or copy the pattern to see the sparse `cells_by_id` format.
 - Switch to Kagome or `4.8.8`, choose the matching mixed-tiling Life rule, and open the inspector while painting to see the same editor workflow on non-square neighborhoods.
 - Switch to Penrose P3 Rhombs, Spectre, or Taylor-Socolar, adjust patch depth, and watch how a finite aperiodic patch remains editable and persistent.
+- Compare the `Hat` and `Turtle` monotiles, two members of the same `Tile(a, b)` continuum, to see the same aperiodic adjacency realized with the two edge lengths exchanged.
 - Compare `Penrose P1 Pentagon-Diamond (Distributed)` with `Penrose P1 Pentagon-Boat-Star` to see the difference between the distributed vertex-merge manifestation and the centered singular pentagrid patch.
 - Try the convex pentagonal periodic catalog with Cairo, Prismatic, Floret, Type 7, Stein 14, and Pentagon Crosses to compare how the same rule family behaves on distinct pentagon adjacencies.
 - Try Whirlpool or HexWhirlpool from the preset/showcase controls for a quick multi-state animation that exercises more than binary Life-like states.

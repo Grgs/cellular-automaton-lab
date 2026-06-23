@@ -6,6 +6,7 @@ from pathlib import Path
 
 from backend.bootstrap_data import build_bootstrap_payload
 from backend.dev_server import APP_NAME
+from tools._common import write_text_lf
 from tools.command_docs import command_doc
 
 
@@ -18,7 +19,7 @@ def _export_bootstrap(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     args.output_path.parent.mkdir(parents=True, exist_ok=True)
     payload = build_bootstrap_payload({"app_name": APP_NAME})
-    args.output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    write_text_lf(args.output_path, json.dumps(payload, indent=2))
     return 0
 
 
