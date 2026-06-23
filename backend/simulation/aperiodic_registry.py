@@ -25,6 +25,7 @@ from backend.simulation.aperiodic_family_manifest import (
     SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
+    TURTLE_MONOTILE_GEOMETRY,
 )
 from backend.simulation.aperiodic_hat import build_hat_patch
 from backend.simulation.aperiodic_penrose_p1 import build_penrose_p1_patch
@@ -39,6 +40,7 @@ from backend.simulation.aperiodic_sphinx import build_sphinx_patch
 from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.aperiodic_taylor_socolar import build_taylor_socolar_patch
 from backend.simulation.aperiodic_tuebingen_triangle import build_tuebingen_triangle_patch
+from backend.simulation.aperiodic_turtle import build_turtle_patch
 
 AperiodicPatchBuilder = Callable[[int], AperiodicPatch]
 
@@ -59,6 +61,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     TAYLOR_SOCOLAR_GEOMETRY: build_taylor_socolar_patch,
     SPHINX_GEOMETRY: build_sphinx_patch,
     HAT_MONOTILE_GEOMETRY: build_hat_patch,
+    TURTLE_MONOTILE_GEOMETRY: build_turtle_patch,
     CHAIR_GEOMETRY: build_chair_patch,
     ROBINSON_TRIANGLES_GEOMETRY: build_robinson_triangles_patch,
     TUEBINGEN_TRIANGLE_GEOMETRY: build_tuebingen_triangle_patch,

@@ -95,6 +95,7 @@ from backend.simulation.periodic_face_tilings import (  # noqa: E402
 from backend.simulation.reference_verification.periodic import (  # noqa: E402
     _periodic_face_interior_vertex_configuration_frequencies,
 )
+from tools._common import write_text_lf  # noqa: E402
 
 _COORD_PRECISION = 4  # decimals; matches backend's edge-key precision
 _OVERLAP_AREA_TOLERANCE = 1e-3
@@ -563,7 +564,7 @@ def render_svg(
             f'font-family="sans-serif" font-size="10">{kind}</text>'
         )
     lines.append("</svg>")
-    output_path.write_text("\n".join(lines), encoding="utf-8")
+    write_text_lf(output_path, "\n".join(lines))
 
 
 def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
@@ -835,13 +836,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\nSVG written: {args.svg}")
     if args.json_path:
         descriptor = emit_descriptor_json(input_data)
-        args.json_path.write_text(json.dumps(descriptor, indent=2) + "\n", encoding="utf-8")
+        write_text_lf(args.json_path, json.dumps(descriptor, indent=2) + "\n")
         print(f"JSON descriptor stub written: {args.json_path}")
     if args.reference_spec_path:
         spec_source = emit_reference_spec(
             input_data, report, patch_size=args.patch_size, source_url=args.source_url
         )
-        args.reference_spec_path.write_text(spec_source, encoding="utf-8")
+        write_text_lf(args.reference_spec_path, spec_source)
         print(f"Reference spec module written: {args.reference_spec_path}")
 
     return 0 if report.is_valid else 1

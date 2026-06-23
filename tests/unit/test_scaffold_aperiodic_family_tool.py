@@ -18,8 +18,10 @@ from tools.scaffold_aperiodic_family import (
     patch_reference_specs_init,
     patch_registry,
     patch_topology_family_manifest,
+    plan_writes,
     print_followups,
     render_generator_module,
+    render_neutral_generator_module,
     render_reference_spec,
     render_test_skeleton,
 )
@@ -166,6 +168,54 @@ class RenderingTests(unittest.TestCase):
         compile(rendered, "<scaffold-demo-tests>", "exec")
         self.assertIn("build_scaffold_demo_patch", rendered)
         self.assertIn("ScaffoldDemoGeneratorTests", rendered)
+
+    def test_neutral_generator_is_framework_agnostic(self) -> None:
+        spec = _demo_spec()
+        rendered = render_neutral_generator_module(spec)
+        compile(rendered, "<scaffold-demo-neutral>", "exec")
+        self.assertIn("def build_scaffold_demo_patch", rendered)
+        self.assertIn("patch_from_records", rendered)
+        # The neutral stub must not pull in the triangle-similarity framework.
+        self.assertNotIn("ExactSimilaritySubstitution", rendered)
+        self.assertNotIn("INFLATION_FACTOR", rendered)
+
+
+class PlanWritesTests(unittest.TestCase):
+    def test_default_plan_creates_triangle_generator_and_test_skeleton(self) -> None:
+        plans = plan_writes(_demo_spec(), ROOT)
+        created = {plan.path.name for plan in plans if plan.is_new}
+        self.assertIn("aperiodic_scaffold_demo.py", created)
+        self.assertIn("test_aperiodic_scaffold_demo.py", created)
+        generator = next(p for p in plans if p.path.name == "aperiodic_scaffold_demo.py")
+        self.assertIn("ExactSimilaritySubstitution", generator.contents)
+
+    def test_wiring_only_plan_skips_test_and_uses_neutral_generator(self) -> None:
+        plans = plan_writes(_demo_spec(), ROOT, wiring_only=True)
+        created = {plan.path.name for plan in plans if plan.is_new}
+        self.assertIn("aperiodic_scaffold_demo.py", created)
+        self.assertNotIn("test_aperiodic_scaffold_demo.py", created)
+        generator = next(p for p in plans if p.path.name == "aperiodic_scaffold_demo.py")
+        self.assertIn("patch_from_records", generator.contents)
+        self.assertNotIn("ExactSimilaritySubstitution", generator.contents)
+        # The catalog wiring inserts are still planned in both modes.
+        edited = {plan.path.name for plan in plans if not plan.is_new}
+        self.assertEqual(
+            edited,
+            {
+                "aperiodic_family_manifest.py",
+                "aperiodic_registry.py",
+                "topology_family_manifest.py",
+                "__init__.py",
+            },
+        )
+
+    def test_wiring_only_followups_describe_neutral_stub(self) -> None:
+        output = StringIO()
+        with redirect_stdout(output):
+            print_followups(_demo_spec(), wiring_only=True)
+        rendered = output.getvalue()
+        self.assertIn("framework-neutral", rendered)
+        self.assertIn("no test skeleton was generated", rendered)
 
 
 class PatchFunctionTests(unittest.TestCase):

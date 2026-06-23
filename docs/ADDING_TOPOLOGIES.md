@@ -56,6 +56,26 @@ After scaffolding, follow the printed checklist:
 3. Add a dead-palette entry under `frontend/canvas/family-dead-palette-manifest.json`.
 4. Regenerate the picker thumbnail, canonical fixtures, frontend topology fixtures, and bootstrap data using the tool invocations printed by the scaffold.
 
+### Choosing an aperiodic generator framework
+
+The scaffold wires the catalog the same way for every family, but the *generator* is yours to write, and the repo has three distinct frameworks. Pick the one that matches the family before you start, because the default generated skeleton only fits the first:
+
+- **Exact triangle similarity** — [`aperiodic_exact_similarity.py`](../backend/simulation/aperiodic_exact_similarity.py)'s `ExactSimilaritySubstitution`. Use it when the prototiles are triangles that subdivide into scaled copies of themselves with an exact (often irrational, kept as `Fraction`) similarity ratio. Examples: `pinwheel`, `pinwheel-2-1`. **This is what the default scaffold skeleton targets.**
+- **Affine label substitution** — [`aperiodic_substitution.py`](../backend/simulation/aperiodic_substitution.py)'s `build_substitution_patch` / `SubstitutionChild`. Use it when the family is a set of labelled prototiles placed by per-child affine transforms (the supertile-of-labels model). Examples: `spectre`, `sphinx`, `taylor-socolar`.
+- **Bespoke patch builder** — emit `PatchRecord`s yourself and call `patch_from_records` / `patch_from_exact_records` / `patch_from_cells` from [`aperiodic_support`](../backend/simulation/aperiodic_support/__init__.py). Use it when the family does not fit the two frameworks above — a hand-rolled metatile inflation, a de Bruijn/multigrid crop, an image-derived patch, or a deformation of another tiling. Examples: `hat-monotile`, `turtle-monotile`, `ammann-beenker`, `chair`, `robinson-triangles`, `shield`, `penrose-p2-kite-dart`.
+
+For the second and third frameworks, pass `--wiring-only` to the scaffold. That writes a framework-neutral generator stub (a single triangle through `patch_from_records` that loads end-to-end) plus all the catalog/registry wiring, and skips the triangle-substitution test skeleton so you can write a test that matches your generator:
+
+```powershell
+python -m tools tilings scaffold-aperiodic `
+    --family-id widget-monotile `
+    --label "Widget Monotile" `
+    --kind widget `
+    --wiring-only
+```
+
+The scaffold runs `ruff` over the Python it generates, so the new files are import-sorted and formatted before you start editing.
+
 The rest of this document is the manual reference. Use it for regular grids, non-substitution aperiodic families, or when you need to understand what the automation is doing.
 
 ## Decide The Topology Type
