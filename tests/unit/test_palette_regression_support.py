@@ -27,6 +27,7 @@ class PaletteRegressionSupportTests(unittest.TestCase):
                 "tuebingen-triangle",
                 "robinson-triangles",
                 "hat-monotile",
+                "turtle-monotile",
                 "chair",
                 "dodecagonal-square-triangle",
                 "pinwheel",

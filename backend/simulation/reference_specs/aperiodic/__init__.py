@@ -16,6 +16,7 @@ from . import (
     sphinx,
     taylor_socolar,
     tuebingen_triangle,
+    turtle_monotile,
 )
 
 APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
@@ -27,6 +28,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **chair.SPECS,
     **robinson_triangles.SPECS,
     **hat_monotile.SPECS,
+    **turtle_monotile.SPECS,
     **tuebingen_triangle.SPECS,
     **dodecagonal_square_triangle.SPECS,
     **shield.SPECS,
