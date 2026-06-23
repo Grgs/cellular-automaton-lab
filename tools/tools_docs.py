@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from tools._common import ROOT_DIR
+from tools._common import ROOT_DIR, write_text_lf
 from tools.command_docs import COMMANDS, GROUPS
 
 TOOLS_DOC_PATH = ROOT_DIR / "docs" / "TOOLS.md"
@@ -87,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if target_path is not None:
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        target_path.write_text(rendered, encoding="utf-8")
+        write_text_lf(target_path, rendered)
         return 0
     print(rendered, end="")
     return 0

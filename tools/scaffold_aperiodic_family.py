@@ -56,6 +56,7 @@ if str(ROOT) not in sys.path:
 
 # Imported lazily so this module is importable without the full backend.
 from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_MANIFEST
+from tools._common import write_text_lf  # noqa: E402
 
 _FAMILY_ID_PATTERN = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
 
@@ -630,7 +631,7 @@ def plan_writes(spec: ScaffoldSpec, repo_root: Path) -> list[PlannedWrite]:
 def apply_writes(plans: list[PlannedWrite]) -> None:
     for plan in plans:
         plan.path.parent.mkdir(parents=True, exist_ok=True)
-        plan.path.write_text(plan.contents, encoding="utf-8")
+        write_text_lf(plan.path, plan.contents)
 
 
 def print_followups(spec: ScaffoldSpec) -> None:
@@ -651,17 +652,15 @@ def print_followups(spec: ScaffoldSpec) -> None:
     print(f"     for kinds: {', '.join(spec.kinds)}")
     print()
     print("Then regenerate generated artifacts:")
-    print(f"  py -3 tools/generate_tiling_preview.py --aperiodic --geometry {spec.family_id}")
+    print(f"  python -m tools tilings preview --aperiodic --geometry {spec.family_id} --write")
     print(
-        f"  py -3 tools/regenerate_reference_fixtures.py --mode canonical --geometry {spec.family_id} --depth 1"
+        f"  python -m tools fixtures reference --mode canonical --geometry {spec.family_id} --depth 1"
     )
     print(
-        f"  py -3 tools/regenerate_reference_fixtures.py --mode canonical --geometry {spec.family_id} --depth 3"
+        f"  python -m tools fixtures reference --mode canonical --geometry {spec.family_id} --depth 3"
     )
-    print(
-        f"  py -3 tools/regenerate_frontend_topology_fixtures.py --fixture {spec.family_id}-depth-3"
-    )
-    print("  py -3 tools/export_bootstrap_data.py frontend/test-fixtures/bootstrap-data.json")
+    print(f"  python -m tools fixtures frontend --fixture {spec.family_id}-depth-3")
+    print("  python -m tools bootstrap export frontend/test-fixtures/bootstrap-data.json")
     print()
     print("Then validate:")
     print("  python -m tools tilings validate")

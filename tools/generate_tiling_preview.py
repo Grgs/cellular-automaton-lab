@@ -43,6 +43,7 @@ if str(ROOT) not in sys.path:
 from backend.simulation.periodic_face_pattern_data import (  # noqa: E402
     load_periodic_face_pattern_payloads,
 )
+from tools._common import write_text_lf  # noqa: E402
 
 _PALETTE_MANIFEST_PATH = ROOT / "frontend" / "canvas" / "family-dead-palette-manifest.json"
 _PREVIEW_DATA_PATH = ROOT / "frontend" / "controls" / "tiling-preview-data.ts"
@@ -135,7 +136,7 @@ def write_preview_entry(
     if check:
         return not changed
     if changed:
-        output_path.write_text(updated, encoding="utf-8")
+        write_text_lf(output_path, updated)
     return True
 
 
@@ -561,6 +562,16 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if key not in descriptors:
+        from backend.simulation.aperiodic_family_manifest import APERIODIC_FAMILY_IDS
+
+        if key in APERIODIC_FAMILY_IDS:
+            print(
+                f"Geometry '{key}' is an aperiodic family, not a periodic-face tiling.\n"
+                f"Rerun with --aperiodic, e.g. "
+                f"`python -m tools tilings preview --aperiodic --geometry {key}`.",
+                file=sys.stderr,
+            )
+            return 1
         available = ", ".join(sorted(descriptors))
         print(
             f"Geometry '{key}' has no periodic-face descriptor.\nAvailable: {available}",
