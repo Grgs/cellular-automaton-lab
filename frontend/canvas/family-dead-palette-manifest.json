@@ -1750,6 +1750,41 @@
       ]
     },
     {
+      "geometry": "socolar-12-fold",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/socolar-12-fold-depth-3.json",
+        "selectorFields": [
+          "kind"
+        ]
+      },
+      "variants": [
+        {
+          "label": "socolar-rhomb-30",
+          "selector": {
+            "tile_family": "socolar-12-fold",
+            "kind": "socolar-12-fold-rhomb-30"
+          },
+          "color": {"token": "toneLinen"}
+        },
+        {
+          "label": "socolar-rhomb-60",
+          "selector": {
+            "tile_family": "socolar-12-fold",
+            "kind": "socolar-12-fold-rhomb-60"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "socolar-square",
+          "selector": {
+            "tile_family": "socolar-12-fold",
+            "kind": "socolar-12-fold-square"
+          },
+          "color": {"token": "toneStone"}
+        }
+      ]
+    },
+    {
       "geometry": "shield",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/shield-depth-3.json",

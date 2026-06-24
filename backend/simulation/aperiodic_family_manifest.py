@@ -31,6 +31,7 @@ DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
 SHIELD_GEOMETRY = "shield"
 PINWHEEL_GEOMETRY = "pinwheel"
 PINWHEEL_2_1_GEOMETRY = "pinwheel-2-1"
+SOCOLAR_12_FOLD_GEOMETRY = "socolar-12-fold"
 
 THICK_RHOMB_KIND = "thick-rhomb"
 THIN_RHOMB_KIND = "thin-rhomb"
@@ -64,6 +65,9 @@ SHIELD_TRIANGLE_KIND = "shield-triangle"
 PINWHEEL_TRIANGLE_KIND = "pinwheel-triangle"
 PINWHEEL_2_1_SMALL_KIND = "pinwheel-2-1-small-triangle"
 PINWHEEL_2_1_LARGE_KIND = "pinwheel-2-1-large-triangle"
+SOCOLAR_12_FOLD_RHOMB_30_KIND = "socolar-12-fold-rhomb-30"
+SOCOLAR_12_FOLD_RHOMB_60_KIND = "socolar-12-fold-rhomb-60"
+SOCOLAR_12_FOLD_SQUARE_KIND = "socolar-12-fold-square"
 
 PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
@@ -74,6 +78,7 @@ DODECAGONAL_SQUARE_TRIANGLE_TILE_FAMILY = DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY
 SHIELD_TILE_FAMILY = "shield"
 PINWHEEL_TILE_FAMILY = "pinwheel"
 PINWHEEL_2_1_TILE_FAMILY = "pinwheel-2-1"
+SOCOLAR_12_FOLD_TILE_FAMILY = "socolar-12-fold"
 
 
 @dataclass(frozen=True)
@@ -368,6 +373,36 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # near-disconnected pieces at depth 3 specifically. See
         # docs/TILING_KNOWN_DEVIATIONS.md for the full rationale.
         polygon_surface_check=False,
+    ),
+    SOCOLAR_12_FOLD_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=SOCOLAR_12_FOLD_GEOMETRY,
+        catalog_label="Socolar 12-fold (rhombs)",
+        reference_label="Socolar 12-fold (rhombs)",
+        picker_group="Aperiodic",
+        picker_order=235,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
+        # Built by the de Bruijn generalized-dual (multigrid) construction in
+        # ``backend/simulation/aperiodic_socolar_12_fold.py`` over six line
+        # families spaced 30 degrees apart (a dodecagrid). The dual of that
+        # multigrid is the 12-fold dodecagonal rhomb tiling -- the rhombus
+        # variant of the Socolar tiling (Socolar 1989), which is mutually
+        # locally derivable from the already-shipped ``shield`` tiling. Cells
+        # are the three dodecagonal rhombi (30-degree, 60-degree, and the
+        # 90-degree square); like the Penrose multigrid families this is a
+        # bounding-box crop, so the depth-to-cell-count sequence is governed
+        # by the half-extent rather than a substitution eigenvalue. This is the
+        # dodecagonal *rhombus* tiling: the canonical Socolar tiling proper uses
+        # a different prototile set {30-degree rhomb, square, hexagon} (no
+        # 60-degree rhomb) with inflation factor 2 + sqrt(3) and an oriented
+        # center-inclusion substitution, which is not reproduced here. See
+        # docs/TILING_KNOWN_DEVIATIONS.md.
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            SOCOLAR_12_FOLD_RHOMB_30_KIND,
+            SOCOLAR_12_FOLD_RHOMB_60_KIND,
+            SOCOLAR_12_FOLD_SQUARE_KIND,
+        ),
     ),
 }
 

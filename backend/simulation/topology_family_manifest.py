@@ -17,6 +17,7 @@ from backend.simulation.aperiodic_family_manifest import (
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
+    SOCOLAR_12_FOLD_GEOMETRY,
     SPECTRE_GEOMETRY,
     SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
@@ -377,6 +378,12 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
     ),
     **_periodic_face_families(),
+    SOCOLAR_12_FOLD_GEOMETRY: _translated_aperiodic_family(
+        SOCOLAR_12_FOLD_GEOMETRY,
+        # Multigrid crop half-extent 1.0 * 1.55^d gives ~44/102/250/623/1450
+        # cells at depths 0..4. Default 2 is a snappy starting view; cap at 4.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
+    ),
 }
 
 GEOMETRY_MINIMUM_GRID_DIMENSIONS = {

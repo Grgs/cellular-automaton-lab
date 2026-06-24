@@ -166,11 +166,17 @@ def _de_bruijn_dual_vertex(
     symmetry: int,
     offsets: tuple[float, ...],
 ) -> tuple[float, float]:
-    """The dual map: ``dual(p) = sum_i floor(e_i . p - O_i) * e_i``."""
+    """The dual map: ``dual(p) = sum_i floor(e_i . p - O_i) * e_i``.
+
+    The number of line families is ``len(offsets)``; ``symmetry`` only sets the
+    angular period (each family ``i`` has normal direction ``2*pi*i/symmetry``).
+    For Penrose ``len(offsets) == symmetry``; a dodecagonal grid uses six
+    families at a 30-degree step (``len(offsets) == 6`` with ``symmetry == 12``).
+    """
     px, py = point
     xd = 0.0
     yd = 0.0
-    for i in range(symmetry):
+    for i in range(len(offsets)):
         cos_i = math.cos(2.0 * math.pi * i / symmetry)
         sin_i = math.sin(2.0 * math.pi * i / symmetry)
         projection = px * cos_i + py * sin_i
@@ -264,18 +270,27 @@ def build_multigrid_cells(
     meeting at the intersection. Returned cells are sorted by intersection
     point for determinism.
     """
-    if len(offsets) != symmetry:
-        raise ValueError(f"offsets must have length symmetry={symmetry}, got {len(offsets)}.")
+    family_count = len(offsets)
+    if family_count < 2:
+        raise ValueError(f"offsets must contain at least 2 families, got {family_count}.")
+    if family_count > symmetry:
+        raise ValueError(
+            f"offsets length {family_count} cannot exceed symmetry={symmetry} "
+            "(families would wrap past a full turn)."
+        )
 
     # Intersection grouping: for each pair of line families (i, j) with
     # i < j, walk all line index pairs whose intersection might land in the
-    # patch, and accumulate them into a quantised key -> [families] map.
+    # patch, and accumulate them into a quantised key -> [families] map. The
+    # family count is ``len(offsets)``; ``symmetry`` only sets the angular step
+    # (``2*pi*i/symmetry`` per family), so a dodecagonal grid uses six families
+    # at a 30-degree step via ``symmetry=12`` with six offsets.
     families_at_point: dict[tuple[int, int], set[int]] = defaultdict(set)
     representative_point: dict[tuple[int, int], tuple[float, float]] = {}
 
-    for family_i in range(symmetry):
+    for family_i in range(family_count):
         index_range_i = _line_index_range_in_patch(symmetry, offsets, family_i, half_extent)
-        for family_j in range(family_i + 1, symmetry):
+        for family_j in range(family_i + 1, family_count):
             index_range_j = _line_index_range_in_patch(symmetry, offsets, family_j, half_extent)
             for line_index_i in index_range_i:
                 for line_index_j in index_range_j:
