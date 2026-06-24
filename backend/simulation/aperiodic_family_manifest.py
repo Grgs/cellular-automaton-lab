@@ -376,8 +376,8 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
     ),
     SOCOLAR_12_FOLD_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=SOCOLAR_12_FOLD_GEOMETRY,
-        catalog_label="Socolar 12-fold",
-        reference_label="Socolar 12-fold",
+        catalog_label="Socolar 12-fold (rhombs)",
+        reference_label="Socolar 12-fold (rhombs)",
         picker_group="Aperiodic",
         picker_order=235,
         default_rule="life-b2-s23",
@@ -391,8 +391,11 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # are the three dodecagonal rhombi (30-degree, 60-degree, and the
         # 90-degree square); like the Penrose multigrid families this is a
         # bounding-box crop, so the depth-to-cell-count sequence is governed
-        # by the half-extent rather than a substitution eigenvalue. The exact
-        # marked substitution from Soc89 is not reproduced; see
+        # by the half-extent rather than a substitution eigenvalue. This is the
+        # dodecagonal *rhombus* tiling: the canonical Socolar tiling proper uses
+        # a different prototile set {30-degree rhomb, square, hexagon} (no
+        # 60-degree rhomb) with inflation factor 2 + sqrt(3) and an oriented
+        # center-inclusion substitution, which is not reproduced here. See
         # docs/TILING_KNOWN_DEVIATIONS.md.
         implementation_status="canonical_patch",
         public_cell_kinds=(

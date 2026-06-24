@@ -1179,7 +1179,7 @@
     },
     {
       "tiling_family": "socolar-12-fold",
-      "label": "Socolar 12-fold",
+      "label": "Socolar 12-fold (rhombs)",
       "picker_group": "Aperiodic",
       "picker_order": 235,
       "sizing_mode": "patch_depth",
@@ -2125,7 +2125,7 @@
     },
     {
       "tiling_family": "socolar-12-fold",
-      "label": "Socolar 12-fold",
+      "label": "Socolar 12-fold (rhombs)",
       "experimental": false,
       "implementation_status": "canonical_patch",
       "promotion_blocker": null,

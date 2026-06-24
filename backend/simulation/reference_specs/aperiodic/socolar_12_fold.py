@@ -39,6 +39,7 @@ SPECS = {
             "https://tilings.math.uni-bielefeld.de/substitution/socolar/",
             "https://doi.org/10.1103/PhysRevB.39.10519",
             "https://en.wikipedia.org/wiki/Socolar_tiling",
+            "https://bendwavy.org/klitzing/quasi/socolar.htm",
         ),
         canonical_root_seed_policy=(
             "de Bruijn dodecagrid crop: six line families 30 degrees apart with "
