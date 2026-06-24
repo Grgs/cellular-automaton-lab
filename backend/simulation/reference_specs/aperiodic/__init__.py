@@ -6,6 +6,7 @@ from . import (
     ammann_beenker,
     chair,
     dodecagonal_square_triangle,
+    enneagonal_9_fold,
     hat_monotile,
     penrose,
     pinwheel,
@@ -36,6 +37,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **pinwheel.SPECS,
     **pinwheel_2_1.SPECS,
     **socolar_12_fold.SPECS,
+    **enneagonal_9_fold.SPECS,
 }
 
 __all__ = ["APERIODIC_REFERENCE_FAMILY_SPECS"]

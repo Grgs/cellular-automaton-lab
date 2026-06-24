@@ -1818,6 +1818,49 @@
           "color": {"token": "accentStrong"}
         }
       ]
+    },
+    {
+      "geometry": "enneagonal-9-fold",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/enneagonal-9-fold-depth-3.json",
+        "selectorFields": [
+          "kind"
+        ]
+      },
+      "variants": [
+        {
+          "label": "enneagonal-rhomb-20",
+          "selector": {
+            "tile_family": "enneagonal-9-fold",
+            "kind": "enneagonal-9-fold-rhomb-20"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "enneagonal-rhomb-40",
+          "selector": {
+            "tile_family": "enneagonal-9-fold",
+            "kind": "enneagonal-9-fold-rhomb-40"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "enneagonal-rhomb-60",
+          "selector": {
+            "tile_family": "enneagonal-9-fold",
+            "kind": "enneagonal-9-fold-rhomb-60"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "enneagonal-rhomb-80",
+          "selector": {
+            "tile_family": "enneagonal-9-fold",
+            "kind": "enneagonal-9-fold-rhomb-80"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
     }
   ]
 }
