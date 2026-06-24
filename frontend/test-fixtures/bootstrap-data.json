@@ -1178,6 +1178,32 @@
       }
     },
     {
+      "tiling_family": "heptagonal-7-fold",
+      "label": "Heptagonal 7-fold (rhombs)",
+      "picker_group": "Aperiodic",
+      "picker_order": 236,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "heptagonal-7-fold"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
       "tiling_family": "spectre",
       "label": "Spectre",
       "picker_group": "Aperiodic",
@@ -2095,6 +2121,18 @@
       "public_cell_kinds": [
         "rhomb",
         "square"
+      ]
+    },
+    {
+      "tiling_family": "heptagonal-7-fold",
+      "label": "Heptagonal 7-fold (rhombs)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "heptagonal-7-fold-thin",
+        "heptagonal-7-fold-medium",
+        "heptagonal-7-fold-wide"
       ]
     },
     {

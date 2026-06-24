@@ -31,6 +31,7 @@ DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
 SHIELD_GEOMETRY = "shield"
 PINWHEEL_GEOMETRY = "pinwheel"
 PINWHEEL_2_1_GEOMETRY = "pinwheel-2-1"
+HEPTAGONAL_7_FOLD_GEOMETRY = "heptagonal-7-fold"
 
 THICK_RHOMB_KIND = "thick-rhomb"
 THIN_RHOMB_KIND = "thin-rhomb"
@@ -64,6 +65,11 @@ SHIELD_TRIANGLE_KIND = "shield-triangle"
 PINWHEEL_TRIANGLE_KIND = "pinwheel-triangle"
 PINWHEEL_2_1_SMALL_KIND = "pinwheel-2-1-small-triangle"
 PINWHEEL_2_1_LARGE_KIND = "pinwheel-2-1-large-triangle"
+# The three heptagonal-grid rhombi, named by their acute interior angle:
+# thin = pi/7 (~25.7 deg), medium = 2*pi/7 (~51.4 deg), wide = 3*pi/7 (~77.1 deg).
+HEPTAGONAL_7_FOLD_THIN_KIND = "heptagonal-7-fold-thin"
+HEPTAGONAL_7_FOLD_MEDIUM_KIND = "heptagonal-7-fold-medium"
+HEPTAGONAL_7_FOLD_WIDE_KIND = "heptagonal-7-fold-wide"
 
 PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
@@ -74,6 +80,7 @@ DODECAGONAL_SQUARE_TRIANGLE_TILE_FAMILY = DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY
 SHIELD_TILE_FAMILY = "shield"
 PINWHEEL_TILE_FAMILY = "pinwheel"
 PINWHEEL_2_1_TILE_FAMILY = "pinwheel-2-1"
+HEPTAGONAL_7_FOLD_TILE_FAMILY = "heptagonal-7-fold"
 
 
 @dataclass(frozen=True)
@@ -368,6 +375,34 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # near-disconnected pieces at depth 3 specifically. See
         # docs/TILING_KNOWN_DEVIATIONS.md for the full rationale.
         polygon_surface_check=False,
+    ),
+    HEPTAGONAL_7_FOLD_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=HEPTAGONAL_7_FOLD_GEOMETRY,
+        catalog_label="Heptagonal 7-fold (rhombs)",
+        reference_label="Heptagonal 7-fold (rhombs)",
+        picker_group="Aperiodic",
+        picker_order=236,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
+        # Built by the de Bruijn generalized-dual (multigrid) construction in
+        # ``backend/simulation/aperiodic_heptagonal_7_fold.py`` over seven line
+        # families spaced 2*pi/7 apart (a heptagrid). Seven is odd, so all
+        # seven families are used directly with no antiparallel-family
+        # degeneracy. The dual of that multigrid is the 7-fold rhomb tiling:
+        # every cell is one of the three heptagonal rhombi whose acute angles
+        # are pi/7 (thin), 2*pi/7 (medium), and 3*pi/7 (wide). Like the Penrose
+        # and Socolar multigrid families this is a bounding-box crop, so the
+        # depth-to-cell-count sequence is governed by the half-extent rather
+        # than a substitution eigenvalue. This is the de Bruijn heptagrid
+        # rhombus tiling; it is not the Goodman-Strauss 7-fold *substitution*
+        # tiling (a different, marked-prototile construction). See
+        # docs/TILING_KNOWN_DEVIATIONS.md.
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            HEPTAGONAL_7_FOLD_THIN_KIND,
+            HEPTAGONAL_7_FOLD_MEDIUM_KIND,
+            HEPTAGONAL_7_FOLD_WIDE_KIND,
+        ),
     ),
 }
 

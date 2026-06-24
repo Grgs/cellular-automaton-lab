@@ -24,12 +24,29 @@ from tools.regenerate_frontend_topology_fixtures import (
 
 class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
     def test_load_fixture_targets_reads_checked_in_manifest(self) -> None:
+        # Validate the manifest loads into well-formed targets without pinning a
+        # literal count or position (those forced a manual edit on every new
+        # fixture). The count is derived from the manifest itself so a silently
+        # dropped or duplicated entry still fails.
         targets = load_fixture_targets()
+        manifest = json.loads(DEFAULT_FIXTURE_MANIFEST_PATH.read_text(encoding="utf-8"))
 
         self.assertEqual(DEFAULT_FIXTURE_MANIFEST_PATH.name, "fixture-manifest.json")
-        self.assertEqual(targets[0].name, "archimedean-4-8-8-3x3")
-        self.assertEqual(targets[-1].name, "turtle-monotile-depth-3")
-        self.assertEqual(len(targets), 13)
+        self.assertEqual(len(targets), len(manifest["fixtures"]))
+
+        names = [target.name for target in targets]
+        self.assertEqual(len(names), len(set(names)), "fixture names must be unique")
+        # A representative entry is parsed (membership, not position).
+        self.assertIn("archimedean-4-8-8-3x3", names)
+
+        for target in targets:
+            with self.subTest(fixture=target.name):
+                self.assertTrue(target.name)
+                self.assertTrue(target.family)
+                self.assertTrue(
+                    target.path.is_file(),
+                    f"{target.name}: fixture file does not exist: {target.path}",
+                )
 
     def test_discover_fixture_targets_rejects_missing_selection(self) -> None:
         with self.assertRaises(ValueError):

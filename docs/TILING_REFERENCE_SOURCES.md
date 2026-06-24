@@ -120,6 +120,16 @@ The order is intentional:
     per supercell from the underlying 3.12.12 layout. It scales without a
     depth limit and depends on no vendored data. It is not the canonical
     Schlottmann quasi-periodic tiling.
+- `heptagonal-7-fold`
+  - [Goodman-Strauss 7-fold rhomb](https://tilings.math.uni-bielefeld.de/substitution/goodman-strauss-7-fold-rhomb/)
+  - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+  - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - Shipped as the de Bruijn **heptagrid rhombus** tiling (catalog label
+    "Heptagonal 7-fold (rhombs)"; prototiles {thin, medium, wide} rhombi with
+    acute angles pi/7, 2*pi/7, 3*pi/7), the 7-fold analogue of the Penrose and
+    Socolar multigrid rhomb tilings. This is a distinct construction from the
+    Goodman-Strauss 7-fold marked-prototile substitution; see
+    [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)
 - `pinwheel`

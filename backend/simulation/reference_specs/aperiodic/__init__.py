@@ -7,6 +7,7 @@ from . import (
     chair,
     dodecagonal_square_triangle,
     hat_monotile,
+    heptagonal_7_fold,
     penrose,
     pinwheel,
     pinwheel_2_1,
@@ -34,6 +35,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **shield.SPECS,
     **pinwheel.SPECS,
     **pinwheel_2_1.SPECS,
+    **heptagonal_7_fold.SPECS,
 }
 
 __all__ = ["APERIODIC_REFERENCE_FAMILY_SPECS"]
