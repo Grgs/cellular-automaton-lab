@@ -127,6 +127,15 @@
       "cellSize": 12
     },
     {
+      "name": "tridecagonal-13-fold-depth-3",
+      "path": "tridecagonal-13-fold-depth-3.json",
+      "family": "tridecagonal-13-fold",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
       "name": "tuebingen-triangle-depth-3",
       "path": "tuebingen-triangle-depth-3.json",
       "family": "tuebingen-triangle",

@@ -1230,6 +1230,32 @@
       }
     },
     {
+      "tiling_family": "tridecagonal-13-fold",
+      "label": "Tridecagonal 13-fold (rhombs)",
+      "picker_group": "Aperiodic",
+      "picker_order": 237,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "tridecagonal-13-fold"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
       "tiling_family": "enneagonal-9-fold",
       "label": "Enneagonal 9-fold (rhombs)",
       "picker_group": "Aperiodic",
@@ -2197,6 +2223,21 @@
         "heptagonal-7-fold-thin",
         "heptagonal-7-fold-medium",
         "heptagonal-7-fold-wide"
+      ]
+    },
+    {
+      "tiling_family": "tridecagonal-13-fold",
+      "label": "Tridecagonal 13-fold (rhombs)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "tridecagonal-13-fold-rhomb-1",
+        "tridecagonal-13-fold-rhomb-2",
+        "tridecagonal-13-fold-rhomb-3",
+        "tridecagonal-13-fold-rhomb-4",
+        "tridecagonal-13-fold-rhomb-5",
+        "tridecagonal-13-fold-rhomb-6"
       ]
     },
     {

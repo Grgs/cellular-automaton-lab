@@ -23,6 +23,7 @@ from backend.simulation.aperiodic_family_manifest import (
     SPECTRE_GEOMETRY,
     SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
+    TRIDECAGONAL_13_FOLD_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
     TURTLE_MONOTILE_GEOMETRY,
 )
@@ -382,6 +383,12 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     HEPTAGONAL_7_FOLD_GEOMETRY: _translated_aperiodic_family(
         HEPTAGONAL_7_FOLD_GEOMETRY,
         # Multigrid crop half-extent 1.0 * 1.5^d gives ~62/139/317/707 cells at
+        # depths 0..3. Default 2 is a snappy starting view; cap at 4.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
+    ),
+    TRIDECAGONAL_13_FOLD_GEOMETRY: _translated_aperiodic_family(
+        TRIDECAGONAL_13_FOLD_GEOMETRY,
+        # Multigrid crop half-extent 0.5 * 1.5^d gives ~64/124/271/575 cells at
         # depths 0..3. Default 2 is a snappy starting view; cap at 4.
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
     ),

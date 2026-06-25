@@ -18,6 +18,7 @@ from . import (
     spectre,
     sphinx,
     taylor_socolar,
+    tridecagonal_13_fold,
     tuebingen_triangle,
     turtle_monotile,
 )
@@ -40,6 +41,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **socolar_12_fold.SPECS,
     **enneagonal_9_fold.SPECS,
     **heptagonal_7_fold.SPECS,
+    **tridecagonal_13_fold.SPECS,
 }
 
 __all__ = ["APERIODIC_REFERENCE_FAMILY_SPECS"]
