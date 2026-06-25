@@ -885,6 +885,27 @@
       ]
     },
     {
+      "geometry": "house-pentagonal",
+      "variants": [
+        {
+          "label": "house-up",
+          "selector": {
+            "kind": "house-pentagon",
+            "slot": "up"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "house-down",
+          "selector": {
+            "kind": "house-pentagon",
+            "slot": "down"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
       "geometry": "uniform-2-18-36-33434",
       "variants": [
         {

@@ -68,6 +68,13 @@ The order is intentional:
 - `type-7-pentagonal`
   - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
   - [Type 7 pentagonal tiling](https://www.mathartroom.com/wallpaper/pentagon_tiling/type07/)
+- `house-pentagonal`
+  - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
+  - The "house" / home-plate pentagon (unit square + symmetric 45-degree roof;
+    angles 90/90/135/90/135) is the simplest Type 1 monohedral convex pentagon.
+    Shipped as an edge-to-edge tiling with rational coordinates on a skewed
+    two-tile lattice (`lattice_skew_x`); upright + inverted houses interlock so
+    inverted tops carry the next row shifted by half a cell.
 - `snub-square-dual`
   - [Snub square tiling](https://en.wikipedia.org/wiki/Snub_square_tiling)
   - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
