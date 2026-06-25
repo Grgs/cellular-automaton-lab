@@ -9,6 +9,7 @@ from backend.simulation.aperiodic_family_manifest import (
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     ENNEAGONAL_9_FOLD_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
+    HENDECAGONAL_11_FOLD_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
     PENROSE_GEOMETRY,
     PENROSE_P1_GEOMETRY,
@@ -402,6 +403,12 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ENNEAGONAL_9_FOLD_GEOMETRY: _translated_aperiodic_family(
         ENNEAGONAL_9_FOLD_GEOMETRY,
         # Multigrid crop half-extent 0.75 * 1.5^d gives ~62/137/292/641 cells at
+        # depths 0..3. Default 2 is a snappy starting view; cap at 4.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
+    ),
+    HENDECAGONAL_11_FOLD_GEOMETRY: _translated_aperiodic_family(
+        HENDECAGONAL_11_FOLD_GEOMETRY,
+        # Multigrid crop half-extent 0.6 * 1.5^d gives ~57/127/268/634 cells at
         # depths 0..3. Default 2 is a snappy starting view; cap at 4.
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
     ),

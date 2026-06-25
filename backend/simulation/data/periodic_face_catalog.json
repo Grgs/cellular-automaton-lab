@@ -400,6 +400,22 @@
     "minimum_grid_dimension": 1
   },
   {
+    "geometry": "house-pentagonal",
+    "label": "House Pentagonal",
+    "picker_group": "Periodic Mixed",
+    "picker_order": 246,
+    "family": "mixed",
+    "viewport_sync_mode": "backend-sync",
+    "sizing_policy": {
+      "control": "cell_size",
+      "default": 10,
+      "min": 6,
+      "max": 18
+    },
+    "default_rule": "life-b2-s23",
+    "minimum_grid_dimension": 1
+  },
+  {
     "geometry": "uniform-2-18-36-33434",
     "label": "2-uniform #18 (3^6; 3^2.4.3.4)",
     "picker_group": "Periodic Mixed",
