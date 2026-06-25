@@ -1256,6 +1256,32 @@
       }
     },
     {
+      "tiling_family": "hendecagonal-11-fold",
+      "label": "Hendecagonal 11-fold (rhombs)",
+      "picker_group": "Aperiodic",
+      "picker_order": 239,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "hendecagonal-11-fold"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
       "tiling_family": "spectre",
       "label": "Spectre",
       "picker_group": "Aperiodic",
@@ -2210,6 +2236,20 @@
         "enneagonal-9-fold-rhomb-40",
         "enneagonal-9-fold-rhomb-60",
         "enneagonal-9-fold-rhomb-80"
+      ]
+    },
+    {
+      "tiling_family": "hendecagonal-11-fold",
+      "label": "Hendecagonal 11-fold (rhombs)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "hendecagonal-11-fold-rhomb-1",
+        "hendecagonal-11-fold-rhomb-2",
+        "hendecagonal-11-fold-rhomb-3",
+        "hendecagonal-11-fold-rhomb-4",
+        "hendecagonal-11-fold-rhomb-5"
       ]
     },
     {

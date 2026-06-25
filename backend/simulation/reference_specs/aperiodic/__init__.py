@@ -8,6 +8,7 @@ from . import (
     dodecagonal_square_triangle,
     enneagonal_9_fold,
     hat_monotile,
+    hendecagonal_11_fold,
     heptagonal_7_fold,
     penrose,
     pinwheel,
@@ -40,6 +41,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **socolar_12_fold.SPECS,
     **enneagonal_9_fold.SPECS,
     **heptagonal_7_fold.SPECS,
+    **hendecagonal_11_fold.SPECS,
 }
 
 __all__ = ["APERIODIC_REFERENCE_FAMILY_SPECS"]
