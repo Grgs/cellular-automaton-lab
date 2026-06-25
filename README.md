@@ -24,7 +24,7 @@ It is intended for comparing how familiar automata behave on different local nei
 
 ## Highlights
 
-- 51 shipped tiling families (3 regular grids, 28 periodic mixed tilings, 20 aperiodic patches including Penrose variants, the Hat/Turtle/Spectre monotiles, and 7-/9-/12-fold quasicrystals)
+- 52 shipped tiling families (3 regular grids, 28 periodic mixed tilings, 21 aperiodic patches including Penrose variants, the Hat/Turtle/Spectre monotiles, and 7-/9-/11-/12-fold quasicrystals)
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export

@@ -16,6 +16,7 @@ from backend.simulation.aperiodic_family_manifest import (
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     ENNEAGONAL_9_FOLD_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
+    HENDECAGONAL_11_FOLD_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
@@ -32,6 +33,7 @@ from backend.simulation.aperiodic_family_manifest import (
     TURTLE_MONOTILE_GEOMETRY,
 )
 from backend.simulation.aperiodic_hat import build_hat_patch
+from backend.simulation.aperiodic_hendecagonal_11_fold import build_hendecagonal_11_fold_patch
 from backend.simulation.aperiodic_heptagonal_7_fold import build_heptagonal_7_fold_patch
 from backend.simulation.aperiodic_penrose_p1 import build_penrose_p1_patch
 from backend.simulation.aperiodic_penrose_p1_pbs import build_penrose_p1_pbs_patch
@@ -78,6 +80,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     SOCOLAR_12_FOLD_GEOMETRY: build_socolar_12_fold_patch,
     ENNEAGONAL_9_FOLD_GEOMETRY: build_enneagonal_9_fold_patch,
     HEPTAGONAL_7_FOLD_GEOMETRY: build_heptagonal_7_fold_patch,
+    HENDECAGONAL_11_FOLD_GEOMETRY: build_hendecagonal_11_fold_patch,
 }
 
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
