@@ -1861,6 +1861,41 @@
           "color": {"token": "toneClay"}
         }
       ]
+    },
+    {
+      "geometry": "heptagonal-7-fold",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/heptagonal-7-fold-depth-3.json",
+        "selectorFields": [
+          "kind"
+        ]
+      },
+      "variants": [
+        {
+          "label": "heptagonal-thin",
+          "selector": {
+            "tile_family": "heptagonal-7-fold",
+            "kind": "heptagonal-7-fold-thin"
+          },
+          "color": {"token": "toneFlax"}
+        },
+        {
+          "label": "heptagonal-medium",
+          "selector": {
+            "tile_family": "heptagonal-7-fold",
+            "kind": "heptagonal-7-fold-medium"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "heptagonal-wide",
+          "selector": {
+            "tile_family": "heptagonal-7-fold",
+            "kind": "heptagonal-7-fold-wide"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
     }
   ]
 }

@@ -9,6 +9,7 @@ from backend.simulation.aperiodic_family_manifest import (
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     ENNEAGONAL_9_FOLD_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
+    HEPTAGONAL_7_FOLD_GEOMETRY,
     PENROSE_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
@@ -377,6 +378,12 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         # 2 * 5^d). Depth 4 = 625 cells; same effective ceiling as the
         # original pinwheel.
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+    ),
+    HEPTAGONAL_7_FOLD_GEOMETRY: _translated_aperiodic_family(
+        HEPTAGONAL_7_FOLD_GEOMETRY,
+        # Multigrid crop half-extent 1.0 * 1.5^d gives ~62/139/317/707 cells at
+        # depths 0..3. Default 2 is a snappy starting view; cap at 4.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
     ),
     **_periodic_face_families(),
     SOCOLAR_12_FOLD_GEOMETRY: _translated_aperiodic_family(
