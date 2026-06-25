@@ -167,6 +167,16 @@ The order is intentional:
     multigrid rhomb tilings. Eleven is prime, so the eleven families are fully
     independent. This is a distinct construction from any marked-prototile
     substitution; see [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
+- `tridecagonal-13-fold`
+  - [Substitution tilings encyclopedia](https://tilings.math.uni-bielefeld.de/substitution/)
+  - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+  - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - Shipped as the de Bruijn **tridecagrid rhombus** tiling (catalog label
+    "Tridecagonal 13-fold (rhombs)"; six prototiles, rhombi with acute angles
+    `k * 180/13` for k = 1..6), the 13-fold analogue of the Penrose and Socolar
+    multigrid rhomb tilings. Thirteen is prime, so the thirteen families are
+    fully independent. This is a distinct construction from any marked-prototile
+    substitution; see [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)
 - `pinwheel`

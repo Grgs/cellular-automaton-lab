@@ -1968,6 +1968,65 @@
           "color": {"token": "toneClay"}
         }
       ]
+    },
+    {
+      "geometry": "tridecagonal-13-fold",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/tridecagonal-13-fold-depth-3.json",
+        "selectorFields": [
+          "kind"
+        ]
+      },
+      "variants": [
+        {
+          "label": "tridecagonal-rhomb-1",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-1"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "tridecagonal-rhomb-2",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-2"
+          },
+          "color": {"token": "toneFlax"}
+        },
+        {
+          "label": "tridecagonal-rhomb-3",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-3"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "tridecagonal-rhomb-4",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-4"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "tridecagonal-rhomb-5",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-5"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "tridecagonal-rhomb-6",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-6"
+          },
+          "color": {"token": "toneShadow"}
+        }
+      ]
     }
   ]
 }

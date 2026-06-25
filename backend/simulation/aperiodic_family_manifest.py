@@ -35,6 +35,7 @@ SOCOLAR_12_FOLD_GEOMETRY = "socolar-12-fold"
 ENNEAGONAL_9_FOLD_GEOMETRY = "enneagonal-9-fold"
 HEPTAGONAL_7_FOLD_GEOMETRY = "heptagonal-7-fold"
 HENDECAGONAL_11_FOLD_GEOMETRY = "hendecagonal-11-fold"
+TRIDECAGONAL_13_FOLD_GEOMETRY = "tridecagonal-13-fold"
 
 THICK_RHOMB_KIND = "thick-rhomb"
 THIN_RHOMB_KIND = "thin-rhomb"
@@ -91,6 +92,15 @@ HENDECAGONAL_11_FOLD_RHOMB_2_KIND = "hendecagonal-11-fold-rhomb-2"
 HENDECAGONAL_11_FOLD_RHOMB_3_KIND = "hendecagonal-11-fold-rhomb-3"
 HENDECAGONAL_11_FOLD_RHOMB_4_KIND = "hendecagonal-11-fold-rhomb-4"
 HENDECAGONAL_11_FOLD_RHOMB_5_KIND = "hendecagonal-11-fold-rhomb-5"
+# The six tridecagonal-grid rhombi, named by acute-angle index k (k = 1..6),
+# whose acute interior angle is k * 180/13 degrees (~13.8, ~27.7, ~41.5, ~55.4,
+# ~69.2, ~83.1 deg). The angles are not integers, so an index label is clearer.
+TRIDECAGONAL_13_FOLD_RHOMB_1_KIND = "tridecagonal-13-fold-rhomb-1"
+TRIDECAGONAL_13_FOLD_RHOMB_2_KIND = "tridecagonal-13-fold-rhomb-2"
+TRIDECAGONAL_13_FOLD_RHOMB_3_KIND = "tridecagonal-13-fold-rhomb-3"
+TRIDECAGONAL_13_FOLD_RHOMB_4_KIND = "tridecagonal-13-fold-rhomb-4"
+TRIDECAGONAL_13_FOLD_RHOMB_5_KIND = "tridecagonal-13-fold-rhomb-5"
+TRIDECAGONAL_13_FOLD_RHOMB_6_KIND = "tridecagonal-13-fold-rhomb-6"
 
 PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
@@ -105,6 +115,7 @@ SOCOLAR_12_FOLD_TILE_FAMILY = "socolar-12-fold"
 ENNEAGONAL_9_FOLD_TILE_FAMILY = "enneagonal-9-fold"
 HEPTAGONAL_7_FOLD_TILE_FAMILY = "heptagonal-7-fold"
 HENDECAGONAL_11_FOLD_TILE_FAMILY = "hendecagonal-11-fold"
+TRIDECAGONAL_13_FOLD_TILE_FAMILY = "tridecagonal-13-fold"
 
 
 @dataclass(frozen=True)
@@ -515,6 +526,37 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
             HENDECAGONAL_11_FOLD_RHOMB_3_KIND,
             HENDECAGONAL_11_FOLD_RHOMB_4_KIND,
             HENDECAGONAL_11_FOLD_RHOMB_5_KIND,
+        ),
+    ),
+    TRIDECAGONAL_13_FOLD_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=TRIDECAGONAL_13_FOLD_GEOMETRY,
+        catalog_label="Tridecagonal 13-fold (rhombs)",
+        reference_label="Tridecagonal 13-fold (rhombs)",
+        picker_group="Aperiodic",
+        picker_order=237,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
+        # Built by the de Bruijn generalized-dual (multigrid) construction in
+        # ``backend/simulation/aperiodic_tridecagonal_13_fold.py`` over thirteen
+        # line families spaced 2*pi/13 apart (a tridecagrid). Thirteen is prime
+        # (and odd), so all thirteen families are fully independent -- no
+        # antiparallel-family degeneracy and no sub-symmetry concurrences. The
+        # dual of that multigrid is the 13-fold rhomb tiling: every cell is one
+        # of the six tridecagonal rhombi whose acute angles are k * 180/13 for
+        # k = 1..6 (~13.8, ~27.7, ~41.5, ~55.4, ~69.2, ~83.1 degrees). Like the
+        # Penrose and Socolar multigrid families this is a bounding-box crop, so
+        # the depth-to-cell-count sequence is governed by the half-extent rather
+        # than a substitution eigenvalue. This is the de Bruijn tridecagrid
+        # rhombus tiling; it is not a marked-prototile *substitution* tiling.
+        # See docs/TILING_KNOWN_DEVIATIONS.md.
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            TRIDECAGONAL_13_FOLD_RHOMB_1_KIND,
+            TRIDECAGONAL_13_FOLD_RHOMB_2_KIND,
+            TRIDECAGONAL_13_FOLD_RHOMB_3_KIND,
+            TRIDECAGONAL_13_FOLD_RHOMB_4_KIND,
+            TRIDECAGONAL_13_FOLD_RHOMB_5_KIND,
+            TRIDECAGONAL_13_FOLD_RHOMB_6_KIND,
         ),
     ),
 }

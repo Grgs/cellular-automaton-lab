@@ -29,6 +29,7 @@ from backend.simulation.aperiodic_family_manifest import (
     SPECTRE_GEOMETRY,
     SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
+    TRIDECAGONAL_13_FOLD_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
     TURTLE_MONOTILE_GEOMETRY,
 )
@@ -47,6 +48,7 @@ from backend.simulation.aperiodic_spectre import build_spectre_patch
 from backend.simulation.aperiodic_sphinx import build_sphinx_patch
 from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.aperiodic_taylor_socolar import build_taylor_socolar_patch
+from backend.simulation.aperiodic_tridecagonal_13_fold import build_tridecagonal_13_fold_patch
 from backend.simulation.aperiodic_tuebingen_triangle import build_tuebingen_triangle_patch
 from backend.simulation.aperiodic_turtle import build_turtle_patch
 
@@ -81,6 +83,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     ENNEAGONAL_9_FOLD_GEOMETRY: build_enneagonal_9_fold_patch,
     HEPTAGONAL_7_FOLD_GEOMETRY: build_heptagonal_7_fold_patch,
     HENDECAGONAL_11_FOLD_GEOMETRY: build_hendecagonal_11_fold_patch,
+    TRIDECAGONAL_13_FOLD_GEOMETRY: build_tridecagonal_13_fold_patch,
 }
 
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
