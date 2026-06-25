@@ -6,6 +6,7 @@ from . import (
     ammann_beenker,
     chair,
     dodecagonal_square_triangle,
+    enneagonal_9_fold,
     hat_monotile,
     heptagonal_7_fold,
     penrose,
@@ -13,6 +14,7 @@ from . import (
     pinwheel_2_1,
     robinson_triangles,
     shield,
+    socolar_12_fold,
     spectre,
     sphinx,
     taylor_socolar,
@@ -35,6 +37,8 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **shield.SPECS,
     **pinwheel.SPECS,
     **pinwheel_2_1.SPECS,
+    **socolar_12_fold.SPECS,
+    **enneagonal_9_fold.SPECS,
     **heptagonal_7_fold.SPECS,
 }
 

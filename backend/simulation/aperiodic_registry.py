@@ -8,11 +8,13 @@ from backend.simulation.aperiodic_chair import build_chair_patch
 from backend.simulation.aperiodic_dodecagonal_square_triangle import (
     build_dodecagonal_square_triangle_patch,
 )
+from backend.simulation.aperiodic_enneagonal_9_fold import build_enneagonal_9_fold_patch
 from backend.simulation.aperiodic_family_manifest import (
     AMMANN_BEENKER_GEOMETRY,
     APERIODIC_FAMILY_MANIFEST,
     CHAIR_GEOMETRY,
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
+    ENNEAGONAL_9_FOLD_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
     PENROSE_P1_GEOMETRY,
@@ -22,6 +24,7 @@ from backend.simulation.aperiodic_family_manifest import (
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
+    SOCOLAR_12_FOLD_GEOMETRY,
     SPECTRE_GEOMETRY,
     SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
@@ -37,6 +40,7 @@ from backend.simulation.aperiodic_pinwheel import build_pinwheel_patch
 from backend.simulation.aperiodic_pinwheel_2_1 import build_pinwheel_2_1_patch
 from backend.simulation.aperiodic_robinson_triangles import build_robinson_triangles_patch
 from backend.simulation.aperiodic_shield import build_shield_patch
+from backend.simulation.aperiodic_socolar_12_fold import build_socolar_12_fold_patch
 from backend.simulation.aperiodic_spectre import build_spectre_patch
 from backend.simulation.aperiodic_sphinx import build_sphinx_patch
 from backend.simulation.aperiodic_support import AperiodicPatch
@@ -71,6 +75,8 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     SHIELD_GEOMETRY: build_shield_patch,
     PINWHEEL_GEOMETRY: build_pinwheel_patch,
     PINWHEEL_2_1_GEOMETRY: build_pinwheel_2_1_patch,
+    SOCOLAR_12_FOLD_GEOMETRY: build_socolar_12_fold_patch,
+    ENNEAGONAL_9_FOLD_GEOMETRY: build_enneagonal_9_fold_patch,
     HEPTAGONAL_7_FOLD_GEOMETRY: build_heptagonal_7_fold_patch,
 }
 

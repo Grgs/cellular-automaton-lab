@@ -7,6 +7,7 @@ from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_MANIFEST,
     CHAIR_GEOMETRY,
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
+    ENNEAGONAL_9_FOLD_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
     PENROSE_GEOMETRY,
@@ -18,6 +19,7 @@ from backend.simulation.aperiodic_family_manifest import (
     PINWHEEL_GEOMETRY,
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
+    SOCOLAR_12_FOLD_GEOMETRY,
     SPECTRE_GEOMETRY,
     SPHINX_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
@@ -384,6 +386,18 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
     ),
     **_periodic_face_families(),
+    SOCOLAR_12_FOLD_GEOMETRY: _translated_aperiodic_family(
+        SOCOLAR_12_FOLD_GEOMETRY,
+        # Multigrid crop half-extent 1.0 * 1.55^d gives ~44/102/250/623/1450
+        # cells at depths 0..4. Default 2 is a snappy starting view; cap at 4.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
+    ),
+    ENNEAGONAL_9_FOLD_GEOMETRY: _translated_aperiodic_family(
+        ENNEAGONAL_9_FOLD_GEOMETRY,
+        # Multigrid crop half-extent 0.75 * 1.5^d gives ~62/137/292/641 cells at
+        # depths 0..3. Default 2 is a snappy starting view; cap at 4.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
+    ),
 }
 
 GEOMETRY_MINIMUM_GRID_DIMENSIONS = {

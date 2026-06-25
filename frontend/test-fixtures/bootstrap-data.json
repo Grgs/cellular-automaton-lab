@@ -1178,6 +1178,32 @@
       }
     },
     {
+      "tiling_family": "socolar-12-fold",
+      "label": "Socolar 12-fold (rhombs)",
+      "picker_group": "Aperiodic",
+      "picker_order": 235,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "socolar-12-fold"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
       "tiling_family": "heptagonal-7-fold",
       "label": "Heptagonal 7-fold (rhombs)",
       "picker_group": "Aperiodic",
@@ -1195,6 +1221,32 @@
       },
       "geometry_keys": {
         "edge": "heptagonal-7-fold"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
+      "tiling_family": "enneagonal-9-fold",
+      "label": "Enneagonal 9-fold (rhombs)",
+      "picker_group": "Aperiodic",
+      "picker_order": 238,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "enneagonal-9-fold"
       },
       "sizing_policy": {
         "control": "patch_depth",
@@ -2124,6 +2176,18 @@
       ]
     },
     {
+      "tiling_family": "socolar-12-fold",
+      "label": "Socolar 12-fold (rhombs)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "socolar-12-fold-rhomb-30",
+        "socolar-12-fold-rhomb-60",
+        "socolar-12-fold-square"
+      ]
+    },
+    {
       "tiling_family": "heptagonal-7-fold",
       "label": "Heptagonal 7-fold (rhombs)",
       "experimental": false,
@@ -2133,6 +2197,19 @@
         "heptagonal-7-fold-thin",
         "heptagonal-7-fold-medium",
         "heptagonal-7-fold-wide"
+      ]
+    },
+    {
+      "tiling_family": "enneagonal-9-fold",
+      "label": "Enneagonal 9-fold (rhombs)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "enneagonal-9-fold-rhomb-20",
+        "enneagonal-9-fold-rhomb-40",
+        "enneagonal-9-fold-rhomb-60",
+        "enneagonal-9-fold-rhomb-80"
       ]
     },
     {

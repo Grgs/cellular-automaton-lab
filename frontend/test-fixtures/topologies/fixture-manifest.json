@@ -28,6 +28,15 @@
       "cellSize": 12
     },
     {
+      "name": "enneagonal-9-fold-depth-3",
+      "path": "enneagonal-9-fold-depth-3.json",
+      "family": "enneagonal-9-fold",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
       "name": "hat-monotile-depth-3",
       "path": "hat-monotile-depth-3.json",
       "family": "hat-monotile",
@@ -78,6 +87,15 @@
       "family": "shield",
       "width": 453,
       "height": 452,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
+      "name": "socolar-12-fold-depth-3",
+      "path": "socolar-12-fold-depth-3.json",
+      "family": "socolar-12-fold",
+      "width": 0,
+      "height": 0,
       "patchDepth": 3,
       "cellSize": 12
     },

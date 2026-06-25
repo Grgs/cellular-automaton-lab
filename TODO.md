@@ -65,7 +65,7 @@ Decisions already taken (so the steps are unambiguous):
 
 ## Later
 
-- Add another verified substitution tiling family such as `socolar-12-fold`.
+- `socolar-12-fold` now ships as the dodecagonal rhomb tiling via the de Bruijn multigrid (MLD to `shield`). If the exact Socolar (1989) marked substitution rule becomes available in a portable form, add it as the literal substitution; the current entry is a `canonical_patch` multigrid crop, not the marked-prototile substitution. See [docs/TILING_KNOWN_DEVIATIONS.md](docs/TILING_KNOWN_DEVIATIONS.md).
 - Revisit `pinwheel` verification with stronger substitution-matrix and direct local-patch invariants, now that its contiguity is derived from exact segment-overlap neighbors on the exact-affine path.
 - Explore larger-sample or quotient-surface periodic proofs if the current finite-sample verifier ever stops being discriminating enough for the catalog.
 - Extend Shield decoration rendering beyond the current dead-state accenting if decoration metadata becomes authoritative across more visual states.

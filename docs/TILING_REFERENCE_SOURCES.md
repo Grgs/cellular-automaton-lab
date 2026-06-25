@@ -120,6 +120,26 @@ The order is intentional:
     per supercell from the underlying 3.12.12 layout. It scales without a
     depth limit and depends on no vendored data. It is not the canonical
     Schlottmann quasi-periodic tiling.
+- `socolar-12-fold`
+  - [Socolar](https://tilings.math.uni-bielefeld.de/substitution/socolar/)
+  - [Socolar, *Simple octagonal and dodecagonal quasicrystals*, Phys. Rev. B 39 (1989)](https://doi.org/10.1103/PhysRevB.39.10519)
+  - [Socolar tiling](https://en.wikipedia.org/wiki/Socolar_tiling)
+  - [Klitzing, Socolar tiling (prototiles, inflation 2+sqrt(3), substitution matrix, A2xA2 cut-and-project)](https://bendwavy.org/klitzing/quasi/socolar.htm)
+  - Shipped as the dodecagonal **rhombus** tiling (catalog label "Socolar
+    12-fold (rhombs)"; prototiles {30° rhomb, 60° rhomb, square}), built by the
+    de Bruijn generalized-dual multigrid and MLD to `shield`. This is a distinct
+    prototile presentation from the canonical Socolar tiling {30° rhomb, square,
+    hexagon}; see [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
+- `enneagonal-9-fold`
+  - [Substitution tilings encyclopedia](https://tilings.math.uni-bielefeld.de/substitution/)
+  - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+  - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - Shipped as the de Bruijn **enneagrid rhombus** tiling (catalog label
+    "Enneagonal 9-fold (rhombs)"; four prototiles, rhombi with acute angles 20°,
+    40°, 60°, 80°), the 9-fold analogue of the Penrose and Socolar multigrid
+    rhomb tilings. This is a distinct construction from any Danzer-style 9-fold
+    marked-prototile substitution; see
+    [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
 - `heptagonal-7-fold`
   - [Goodman-Strauss 7-fold rhomb](https://tilings.math.uni-bielefeld.de/substitution/goodman-strauss-7-fold-rhomb/)
   - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
