@@ -1,0 +1,47 @@
+{
+  "geometry": "house-pentagonal",
+  "base_edge": 50,
+  "unit_width": 50,
+  "unit_height": 125,
+  "lattice_skew_x": 25,
+  "min_dimension": 1,
+  "min_x": 0,
+  "min_y": 0,
+  "max_x": 75,
+  "max_y": 125,
+  "cell_count_per_unit": 2,
+  "faces": [
+    {
+      "slot": "up",
+      "kind": "house-pentagon",
+      "prefix": "h",
+      "center": {
+        "x": 25,
+        "y": 35
+      },
+      "vertices": [
+        {"x": 0, "y": 0},
+        {"x": 50, "y": 0},
+        {"x": 50, "y": 50},
+        {"x": 25, "y": 75},
+        {"x": 0, "y": 50}
+      ]
+    },
+    {
+      "slot": "down",
+      "kind": "house-pentagon",
+      "prefix": "h",
+      "center": {
+        "x": 50,
+        "y": 90
+      },
+      "vertices": [
+        {"x": 50, "y": 50},
+        {"x": 75, "y": 75},
+        {"x": 75, "y": 125},
+        {"x": 25, "y": 125},
+        {"x": 25, "y": 75}
+      ]
+    }
+  ]
+}

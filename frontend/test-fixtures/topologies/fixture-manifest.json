@@ -46,6 +46,15 @@
       "cellSize": 12
     },
     {
+      "name": "hendecagonal-11-fold-depth-3",
+      "path": "hendecagonal-11-fold-depth-3.json",
+      "family": "hendecagonal-11-fold",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
       "name": "heptagonal-7-fold-depth-3",
       "path": "heptagonal-7-fold-depth-3.json",
       "family": "heptagonal-7-fold",
@@ -121,6 +130,15 @@
       "name": "taylor-socolar-depth-3",
       "path": "taylor-socolar-depth-3.json",
       "family": "taylor-socolar",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
+      "name": "tridecagonal-13-fold-depth-3",
+      "path": "tridecagonal-13-fold-depth-3.json",
+      "family": "tridecagonal-13-fold",
       "width": 0,
       "height": 0,
       "patchDepth": 3,

@@ -68,6 +68,13 @@ The order is intentional:
 - `type-7-pentagonal`
   - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
   - [Type 7 pentagonal tiling](https://www.mathartroom.com/wallpaper/pentagon_tiling/type07/)
+- `house-pentagonal`
+  - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
+  - The "house" / home-plate pentagon (unit square + symmetric 45-degree roof;
+    angles 90/90/135/90/135) is the simplest Type 1 monohedral convex pentagon.
+    Shipped as an edge-to-edge tiling with rational coordinates on a skewed
+    two-tile lattice (`lattice_skew_x`); upright + inverted houses interlock so
+    inverted tops carry the next row shifted by half a cell.
 - `snub-square-dual`
   - [Snub square tiling](https://en.wikipedia.org/wiki/Snub_square_tiling)
   - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
@@ -150,6 +157,26 @@ The order is intentional:
     Socolar multigrid rhomb tilings. This is a distinct construction from the
     Goodman-Strauss 7-fold marked-prototile substitution; see
     [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
+- `hendecagonal-11-fold`
+  - [Substitution tilings encyclopedia](https://tilings.math.uni-bielefeld.de/substitution/)
+  - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+  - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - Shipped as the de Bruijn **hendecagrid rhombus** tiling (catalog label
+    "Hendecagonal 11-fold (rhombs)"; five prototiles, rhombi with acute angles
+    `k * 180/11` for k = 1..5), the 11-fold analogue of the Penrose and Socolar
+    multigrid rhomb tilings. Eleven is prime, so the eleven families are fully
+    independent. This is a distinct construction from any marked-prototile
+    substitution; see [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
+- `tridecagonal-13-fold`
+  - [Substitution tilings encyclopedia](https://tilings.math.uni-bielefeld.de/substitution/)
+  - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+  - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - Shipped as the de Bruijn **tridecagrid rhombus** tiling (catalog label
+    "Tridecagonal 13-fold (rhombs)"; six prototiles, rhombi with acute angles
+    `k * 180/13` for k = 1..6), the 13-fold analogue of the Penrose and Socolar
+    multigrid rhomb tilings. Thirteen is prime, so the thirteen families are
+    fully independent. This is a distinct construction from any marked-prototile
+    substitution; see [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)
 - `pinwheel`

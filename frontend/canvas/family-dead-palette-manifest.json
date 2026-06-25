@@ -885,6 +885,27 @@
       ]
     },
     {
+      "geometry": "house-pentagonal",
+      "variants": [
+        {
+          "label": "house-up",
+          "selector": {
+            "kind": "house-pentagon",
+            "slot": "up"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "house-down",
+          "selector": {
+            "kind": "house-pentagon",
+            "slot": "down"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
       "geometry": "uniform-2-18-36-33434",
       "variants": [
         {
@@ -1894,6 +1915,116 @@
             "kind": "heptagonal-7-fold-wide"
           },
           "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "hendecagonal-11-fold",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/hendecagonal-11-fold-depth-3.json",
+        "selectorFields": [
+          "kind"
+        ]
+      },
+      "variants": [
+        {
+          "label": "hendecagonal-rhomb-1",
+          "selector": {
+            "tile_family": "hendecagonal-11-fold",
+            "kind": "hendecagonal-11-fold-rhomb-1"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "hendecagonal-rhomb-2",
+          "selector": {
+            "tile_family": "hendecagonal-11-fold",
+            "kind": "hendecagonal-11-fold-rhomb-2"
+          },
+          "color": {"token": "toneFlax"}
+        },
+        {
+          "label": "hendecagonal-rhomb-3",
+          "selector": {
+            "tile_family": "hendecagonal-11-fold",
+            "kind": "hendecagonal-11-fold-rhomb-3"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "hendecagonal-rhomb-4",
+          "selector": {
+            "tile_family": "hendecagonal-11-fold",
+            "kind": "hendecagonal-11-fold-rhomb-4"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "hendecagonal-rhomb-5",
+          "selector": {
+            "tile_family": "hendecagonal-11-fold",
+            "kind": "hendecagonal-11-fold-rhomb-5"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "tridecagonal-13-fold",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/tridecagonal-13-fold-depth-3.json",
+        "selectorFields": [
+          "kind"
+        ]
+      },
+      "variants": [
+        {
+          "label": "tridecagonal-rhomb-1",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-1"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "tridecagonal-rhomb-2",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-2"
+          },
+          "color": {"token": "toneFlax"}
+        },
+        {
+          "label": "tridecagonal-rhomb-3",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-3"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "tridecagonal-rhomb-4",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-4"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "tridecagonal-rhomb-5",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-5"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "tridecagonal-rhomb-6",
+          "selector": {
+            "tile_family": "tridecagonal-13-fold",
+            "kind": "tridecagonal-13-fold-rhomb-6"
+          },
+          "color": {"token": "toneShadow"}
         }
       ]
     }

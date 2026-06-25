@@ -785,6 +785,32 @@
       }
     },
     {
+      "tiling_family": "house-pentagonal",
+      "label": "House Pentagonal",
+      "picker_group": "Periodic Mixed",
+      "picker_order": 246,
+      "sizing_mode": "grid",
+      "family": "mixed",
+      "render_kind": "polygon_periodic",
+      "viewport_sync_mode": "backend-sync",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "house-pentagonal"
+      },
+      "sizing_policy": {
+        "control": "cell_size",
+        "default": 10,
+        "min": 6,
+        "max": 18
+      }
+    },
+    {
       "tiling_family": "uniform-3-4-6-12",
       "label": "2-uniform 3-4-6-12",
       "picker_group": "Periodic Mixed",
@@ -1230,6 +1256,32 @@
       }
     },
     {
+      "tiling_family": "tridecagonal-13-fold",
+      "label": "Tridecagonal 13-fold (rhombs)",
+      "picker_group": "Aperiodic",
+      "picker_order": 237,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "tridecagonal-13-fold"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
       "tiling_family": "enneagonal-9-fold",
       "label": "Enneagonal 9-fold (rhombs)",
       "picker_group": "Aperiodic",
@@ -1247,6 +1299,32 @@
       },
       "geometry_keys": {
         "edge": "enneagonal-9-fold"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 2,
+        "min": 0,
+        "max": 4
+      }
+    },
+    {
+      "tiling_family": "hendecagonal-11-fold",
+      "label": "Hendecagonal 11-fold (rhombs)",
+      "picker_group": "Aperiodic",
+      "picker_order": 239,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "hendecagonal-11-fold"
       },
       "sizing_policy": {
         "control": "patch_depth",
@@ -1947,6 +2025,22 @@
       "lattice_skew_x": -153.02078259
     },
     {
+      "geometry": "house-pentagonal",
+      "label": "House Pentagonal",
+      "metric_model": "pattern",
+      "base_edge": 50.0,
+      "unit_width": 50.0,
+      "unit_height": 125.0,
+      "min_dimension": 1,
+      "min_x": 0.0,
+      "min_y": 0.0,
+      "max_x": 75.0,
+      "max_y": 125.0,
+      "cell_count_per_unit": 2,
+      "row_offset_x": 0.0,
+      "lattice_skew_x": 25.0
+    },
+    {
       "geometry": "uniform-2-18-36-33434",
       "label": "2-uniform #18 (3^6; 3^2.4.3.4)",
       "metric_model": "pattern",
@@ -2200,6 +2294,21 @@
       ]
     },
     {
+      "tiling_family": "tridecagonal-13-fold",
+      "label": "Tridecagonal 13-fold (rhombs)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "tridecagonal-13-fold-rhomb-1",
+        "tridecagonal-13-fold-rhomb-2",
+        "tridecagonal-13-fold-rhomb-3",
+        "tridecagonal-13-fold-rhomb-4",
+        "tridecagonal-13-fold-rhomb-5",
+        "tridecagonal-13-fold-rhomb-6"
+      ]
+    },
+    {
       "tiling_family": "enneagonal-9-fold",
       "label": "Enneagonal 9-fold (rhombs)",
       "experimental": false,
@@ -2210,6 +2319,20 @@
         "enneagonal-9-fold-rhomb-40",
         "enneagonal-9-fold-rhomb-60",
         "enneagonal-9-fold-rhomb-80"
+      ]
+    },
+    {
+      "tiling_family": "hendecagonal-11-fold",
+      "label": "Hendecagonal 11-fold (rhombs)",
+      "experimental": false,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "hendecagonal-11-fold-rhomb-1",
+        "hendecagonal-11-fold-rhomb-2",
+        "hendecagonal-11-fold-rhomb-3",
+        "hendecagonal-11-fold-rhomb-4",
+        "hendecagonal-11-fold-rhomb-5"
       ]
     },
     {
