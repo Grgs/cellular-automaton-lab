@@ -8,11 +8,13 @@ from backend.simulation.aperiodic_chair import build_chair_patch
 from backend.simulation.aperiodic_dodecagonal_square_triangle import (
     build_dodecagonal_square_triangle_patch,
 )
+from backend.simulation.aperiodic_enneagonal_9_fold import build_enneagonal_9_fold_patch
 from backend.simulation.aperiodic_family_manifest import (
     AMMANN_BEENKER_GEOMETRY,
     APERIODIC_FAMILY_MANIFEST,
     CHAIR_GEOMETRY,
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
+    ENNEAGONAL_9_FOLD_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
@@ -72,6 +74,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     PINWHEEL_GEOMETRY: build_pinwheel_patch,
     PINWHEEL_2_1_GEOMETRY: build_pinwheel_2_1_patch,
     SOCOLAR_12_FOLD_GEOMETRY: build_socolar_12_fold_patch,
+    ENNEAGONAL_9_FOLD_GEOMETRY: build_enneagonal_9_fold_patch,
 }
 
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {

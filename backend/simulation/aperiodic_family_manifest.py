@@ -32,6 +32,7 @@ SHIELD_GEOMETRY = "shield"
 PINWHEEL_GEOMETRY = "pinwheel"
 PINWHEEL_2_1_GEOMETRY = "pinwheel-2-1"
 SOCOLAR_12_FOLD_GEOMETRY = "socolar-12-fold"
+ENNEAGONAL_9_FOLD_GEOMETRY = "enneagonal-9-fold"
 
 THICK_RHOMB_KIND = "thick-rhomb"
 THIN_RHOMB_KIND = "thin-rhomb"
@@ -68,6 +69,12 @@ PINWHEEL_2_1_LARGE_KIND = "pinwheel-2-1-large-triangle"
 SOCOLAR_12_FOLD_RHOMB_30_KIND = "socolar-12-fold-rhomb-30"
 SOCOLAR_12_FOLD_RHOMB_60_KIND = "socolar-12-fold-rhomb-60"
 SOCOLAR_12_FOLD_SQUARE_KIND = "socolar-12-fold-square"
+# The four enneagonal-grid rhombi, named by their acute interior angle:
+# 20 / 40 / 60 / 80 degrees (k * 180/9 for k = 1..4).
+ENNEAGONAL_9_FOLD_RHOMB_20_KIND = "enneagonal-9-fold-rhomb-20"
+ENNEAGONAL_9_FOLD_RHOMB_40_KIND = "enneagonal-9-fold-rhomb-40"
+ENNEAGONAL_9_FOLD_RHOMB_60_KIND = "enneagonal-9-fold-rhomb-60"
+ENNEAGONAL_9_FOLD_RHOMB_80_KIND = "enneagonal-9-fold-rhomb-80"
 
 PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
@@ -79,6 +86,7 @@ SHIELD_TILE_FAMILY = "shield"
 PINWHEEL_TILE_FAMILY = "pinwheel"
 PINWHEEL_2_1_TILE_FAMILY = "pinwheel-2-1"
 SOCOLAR_12_FOLD_TILE_FAMILY = "socolar-12-fold"
+ENNEAGONAL_9_FOLD_TILE_FAMILY = "enneagonal-9-fold"
 
 
 @dataclass(frozen=True)
@@ -402,6 +410,35 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
             SOCOLAR_12_FOLD_RHOMB_30_KIND,
             SOCOLAR_12_FOLD_RHOMB_60_KIND,
             SOCOLAR_12_FOLD_SQUARE_KIND,
+        ),
+    ),
+    ENNEAGONAL_9_FOLD_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=ENNEAGONAL_9_FOLD_GEOMETRY,
+        catalog_label="Enneagonal 9-fold (rhombs)",
+        reference_label="Enneagonal 9-fold (rhombs)",
+        picker_group="Aperiodic",
+        picker_order=238,
+        default_rule="life-b2-s23",
+        builder_kind="compatibility_patch",
+        # Built by the de Bruijn generalized-dual (multigrid) construction in
+        # ``backend/simulation/aperiodic_enneagonal_9_fold.py`` over nine line
+        # families spaced 2*pi/9 (20 degrees) apart (an enneagrid). Nine is odd,
+        # so all nine families are used directly with no antiparallel-family
+        # degeneracy. The dual of that multigrid is the 9-fold rhomb tiling:
+        # every cell is one of the four enneagonal rhombi whose acute angles are
+        # 20, 40, 60, and 80 degrees (k * 180/9 for k = 1..4). Like the Penrose
+        # and Socolar multigrid families this is a bounding-box crop, so the
+        # depth-to-cell-count sequence is governed by the half-extent rather
+        # than a substitution eigenvalue. This is the de Bruijn enneagrid
+        # rhombus tiling; it is not the Danzer-style 9-fold *substitution*
+        # tiling (a different, marked-prototile construction). See
+        # docs/TILING_KNOWN_DEVIATIONS.md.
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            ENNEAGONAL_9_FOLD_RHOMB_20_KIND,
+            ENNEAGONAL_9_FOLD_RHOMB_40_KIND,
+            ENNEAGONAL_9_FOLD_RHOMB_60_KIND,
+            ENNEAGONAL_9_FOLD_RHOMB_80_KIND,
         ),
     ),
 }

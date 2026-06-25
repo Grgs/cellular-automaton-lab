@@ -130,6 +130,16 @@ The order is intentional:
     de Bruijn generalized-dual multigrid and MLD to `shield`. This is a distinct
     prototile presentation from the canonical Socolar tiling {30° rhomb, square,
     hexagon}; see [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
+- `enneagonal-9-fold`
+  - [Substitution tilings encyclopedia](https://tilings.math.uni-bielefeld.de/substitution/)
+  - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+  - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - Shipped as the de Bruijn **enneagrid rhombus** tiling (catalog label
+    "Enneagonal 9-fold (rhombs)"; four prototiles, rhombi with acute angles 20°,
+    40°, 60°, 80°), the 9-fold analogue of the Penrose and Socolar multigrid
+    rhomb tilings. This is a distinct construction from any Danzer-style 9-fold
+    marked-prototile substitution; see
+    [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
 - `shield`
   - [Shield](https://tilings.math.uni-bielefeld.de/substitution/shield/)
 - `pinwheel`
