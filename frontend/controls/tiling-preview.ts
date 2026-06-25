@@ -1,5 +1,40 @@
-import { POLYGON_PREVIEW_DATA } from "./tiling-preview-data.js";
 import type { TopologyOption } from "../types/domain.js";
+
+// The polygon thumbnail strings are bulky (one entry per tiling family, and the
+// aperiodic rhombic families are especially large). They are only needed once the
+// tiling picker renders, never at initial page load, so the data module is loaded
+// lazily via dynamic import. This keeps it in its own async chunk instead of the
+// runtime bundle, so adding a tiling no longer grows app-runtime-*.js.
+type PolygonPreviewData = Readonly<Record<string, string>>;
+
+let polygonPreviewData: PolygonPreviewData | null = null;
+let polygonPreviewDataPromise: Promise<PolygonPreviewData> | null = null;
+const pendingPreviewThumbnails = new Set<{ svg: SVGSVGElement; option: TopologyOption }>();
+
+export function ensureTilingPreviewData(): Promise<PolygonPreviewData> {
+    if (polygonPreviewData) {
+        return Promise.resolve(polygonPreviewData);
+    }
+    if (!polygonPreviewDataPromise) {
+        polygonPreviewDataPromise = import("./tiling-preview-data.js").then((module) => {
+            polygonPreviewData = module.POLYGON_PREVIEW_DATA;
+            flushPendingPreviewThumbnails();
+            return polygonPreviewData;
+        });
+    }
+    return polygonPreviewDataPromise;
+}
+
+function flushPendingPreviewThumbnails(): void {
+    const pending = Array.from(pendingPreviewThumbnails);
+    pendingPreviewThumbnails.clear();
+    pending.forEach(({ svg, option }) => {
+        while (svg.firstChild) {
+            svg.removeChild(svg.firstChild);
+        }
+        renderPreviewGeometry(svg, option);
+    });
+}
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const PREVIEW_VIEW_BOX = "0 0 120 72";
@@ -178,7 +213,7 @@ function addPolygonDataPreview(svg: SVGSVGElement, payload: string): boolean {
     return rendered;
 }
 
-function addPreviewGeometry(svg: SVGSVGElement, option: TopologyOption): void {
+function renderPreviewGeometry(svg: SVGSVGElement, option: TopologyOption): void {
     if (option.previewKey === "square") {
         addSquarePreview(svg);
         return;
@@ -191,10 +226,18 @@ function addPreviewGeometry(svg: SVGSVGElement, option: TopologyOption): void {
         addTrianglePreview(svg);
         return;
     }
-    if (addPolygonDataPreview(svg, POLYGON_PREVIEW_DATA[option.previewKey] ?? "")) {
+    const payload = polygonPreviewData?.[option.previewKey] ?? "";
+    if (payload && addPolygonDataPreview(svg, payload)) {
         return;
     }
+    // Show a generic square placeholder until the lazily-loaded polygon data
+    // arrives, then re-render this thumbnail in place. Once the data has loaded,
+    // a missing key just keeps the square fallback (matching prior behaviour).
     addSquarePreview(svg);
+    if (!polygonPreviewData) {
+        pendingPreviewThumbnails.add({ svg, option });
+        void ensureTilingPreviewData();
+    }
 }
 
 export function createTilingPreviewThumbnail(
@@ -209,6 +252,6 @@ export function createTilingPreviewThumbnail(
     if (className !== "tiling-preview-svg") {
         svg.classList.add(className);
     }
-    addPreviewGeometry(svg, option);
+    renderPreviewGeometry(svg, option);
     return svg;
 }

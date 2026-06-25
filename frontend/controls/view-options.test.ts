@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import familyDeadPaletteManifest from "../canvas/family-dead-palette-manifest.json";
 import { populateRules, populateTilingFamilies, refreshRuleFilter } from "./view-options.js";
-import { createTilingPreviewThumbnail } from "./tiling-preview.js";
+import { createTilingPreviewThumbnail, ensureTilingPreviewData } from "./tiling-preview.js";
 import { POLYGON_PREVIEW_DATA } from "./tiling-preview-data.js";
 import type { TopologyOption } from "../types/domain.js";
 import type { DomElements } from "../types/dom.js";
@@ -163,7 +163,8 @@ describe("controls/view-options tiling picker", () => {
         expect(elements.tilingPickerCurrentLabel?.textContent).toBe("Penrose P3 Rhombs");
     });
 
-    it("renders sampled topology geometry for polygon tiling thumbnails", () => {
+    it("renders sampled topology geometry for polygon tiling thumbnails", async () => {
+        await ensureTilingPreviewData();
         const thumbnail = createTilingPreviewThumbnail({
             value: "archimedean-4-8-8",
             label: "Square-Octagon",
@@ -183,7 +184,8 @@ describe("controls/view-options tiling picker", () => {
         ).toBe(true);
     });
 
-    it("renders dodecagonal square-triangle thumbnails with sampled geometry and palette tokens", () => {
+    it("renders dodecagonal square-triangle thumbnails with sampled geometry and palette tokens", async () => {
+        await ensureTilingPreviewData();
         const thumbnail = createTilingPreviewThumbnail({
             value: "dodecagonal-square-triangle",
             label: "Dodecagonal Square-Triangle",
@@ -246,7 +248,8 @@ describe("controls/view-options tiling picker", () => {
         );
     });
 
-    it("keeps Type 7 pentagonal thumbnails on the neutral single-prototile fill", () => {
+    it("keeps Type 7 pentagonal thumbnails on the neutral single-prototile fill", async () => {
+        await ensureTilingPreviewData();
         const thumbnail = createTilingPreviewThumbnail({
             value: "type-7-pentagonal",
             label: "Type 7 Pentagonal",
