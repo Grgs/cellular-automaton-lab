@@ -18,6 +18,7 @@ from tools._common import write_text_lf  # noqa: E402
 DEFAULT_FIXTURE_MANIFEST_PATH = (
     ROOT / "frontend" / "test-fixtures" / "topologies" / "fixture-manifest.json"
 )
+DEFAULT_MAX_FIXTURE_BYTES = 4_000_000
 
 
 @dataclass(frozen=True)
@@ -177,6 +178,23 @@ def fixture_drift_lines(
         if current != regenerated:
             drift.append(target.name)
     return drift
+
+
+def fixture_size_violation_lines(
+    targets: tuple[FrontendTopologyFixtureTarget, ...],
+    *,
+    max_bytes: int = DEFAULT_MAX_FIXTURE_BYTES,
+) -> list[str]:
+    violations: list[str] = []
+    for target in targets:
+        try:
+            size_bytes = target.path.stat().st_size
+        except FileNotFoundError:
+            violations.append(f"{target.name} (missing)")
+            continue
+        if size_bytes > max_bytes:
+            violations.append(f"{target.name} ({size_bytes} bytes > {max_bytes} bytes)")
+    return violations
 
 
 def write_regenerated_fixtures(

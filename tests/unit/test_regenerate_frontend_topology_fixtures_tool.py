@@ -15,6 +15,7 @@ from tools.regenerate_frontend_topology_fixtures import (
     DEFAULT_FIXTURE_MANIFEST_PATH,
     discover_fixture_targets,
     fixture_drift_lines,
+    fixture_size_violation_lines,
     load_fixture_targets,
     main,
     regenerate_fixture_payload,
@@ -125,6 +126,55 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
             self.assertEqual(fixture_drift_lines(targets), ["pinwheel-depth-3"])
             write_regenerated_fixtures(targets)
             self.assertEqual(fixture_drift_lines(targets), [])
+
+    def test_fixture_size_violation_lines_reports_oversized_fixture(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="frontend-fixture-size-") as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            small_path = tmpdir_path / "small.json"
+            large_path = tmpdir_path / "large.json"
+            small_path.write_text("small\n", encoding="utf-8")
+            large_path.write_text("x" * 32, encoding="utf-8")
+            manifest_path = tmpdir_path / "fixture-manifest.json"
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "fixtures": [
+                            {
+                                "name": "small",
+                                "path": "small.json",
+                                "family": "square",
+                                "width": 1,
+                                "height": 1,
+                                "patchDepth": None,
+                                "cellSize": 12,
+                            },
+                            {
+                                "name": "large",
+                                "path": "large.json",
+                                "family": "square",
+                                "width": 1,
+                                "height": 1,
+                                "patchDepth": None,
+                                "cellSize": 12,
+                            },
+                        ]
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            targets = discover_fixture_targets(
+                manifest_path=manifest_path,
+                all_targets=True,
+                names=(),
+            )
+
+            self.assertEqual(
+                fixture_size_violation_lines(targets, max_bytes=16),
+                ["large (32 bytes > 16 bytes)"],
+            )
 
     def test_compute_content_revision_is_stable_and_ignores_existing_revision(self) -> None:
         base_payload = {

@@ -15,6 +15,7 @@ CheckName = Literal[
     "periodic-catalog",
     "bootstrap",
     "frontend-fixtures",
+    "frontend-fixture-size",
     "reference-fixtures",
 ]
 ALL_CHECKS: tuple[CheckName, ...] = (
@@ -22,6 +23,7 @@ ALL_CHECKS: tuple[CheckName, ...] = (
     "periodic-catalog",
     "bootstrap",
     "frontend-fixtures",
+    "frontend-fixture-size",
     "reference-fixtures",
 )
 
@@ -108,6 +110,28 @@ def _check_frontend_fixtures() -> GeneratedCheckResult:
     )
 
 
+def _check_frontend_fixture_size() -> GeneratedCheckResult:
+    from tools.regenerate_frontend_topology_fixtures import (
+        DEFAULT_MAX_FIXTURE_BYTES,
+        discover_fixture_targets,
+        fixture_size_violation_lines,
+    )
+
+    targets = discover_fixture_targets(all_targets=True, names=())
+    violations = fixture_size_violation_lines(targets)
+    return GeneratedCheckResult(
+        "frontend-fixture-size",
+        not violations,
+        f"frontend topology fixtures are within {DEFAULT_MAX_FIXTURE_BYTES} bytes each"
+        if not violations
+        else (
+            "oversized frontend topology fixtures: "
+            + ", ".join(violations)
+            + "; lower fixture depth/crop or intentionally raise DEFAULT_MAX_FIXTURE_BYTES"
+        ),
+    )
+
+
 def _check_reference_fixtures() -> GeneratedCheckResult:
     from tools.regenerate_reference_fixtures import check_fixture_drift
 
@@ -136,6 +160,7 @@ def run_selected_checks(selected: tuple[CheckName, ...]) -> tuple[GeneratedCheck
         "periodic-catalog": _check_periodic_catalog,
         "bootstrap": _check_bootstrap_fixture,
         "frontend-fixtures": _check_frontend_fixtures,
+        "frontend-fixture-size": _check_frontend_fixture_size,
         "reference-fixtures": _check_reference_fixtures,
     }
     return tuple(checks[name]() for name in selected)
