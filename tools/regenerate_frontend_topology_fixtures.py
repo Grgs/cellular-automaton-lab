@@ -246,10 +246,16 @@ def main(argv: list[str] | None = None) -> int:
         )
         if bool(args.check):
             drift = fixture_drift_lines(targets)
+            size_violations = fixture_size_violation_lines(targets)
             if drift:
                 print("Frontend topology fixture drift detected:")
                 for name in drift:
                     print(f"  {name}")
+            if size_violations:
+                print(f"Frontend topology fixtures exceed {DEFAULT_MAX_FIXTURE_BYTES} bytes:")
+                for line in size_violations:
+                    print(f"  {line}")
+            if drift or size_violations:
                 return 1
             print("Frontend topology fixtures are up to date.")
             return 0

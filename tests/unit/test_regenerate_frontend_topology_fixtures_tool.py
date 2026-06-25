@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from backend.simulation.topology_types import (
     CONTENT_REVISION_HASH_LENGTH,
@@ -242,6 +243,48 @@ class FrontendTopologyFixtureRegenerationToolTests(unittest.TestCase):
 
     def test_main_check_all_passes_for_checked_in_manifest(self) -> None:
         self.assertEqual(main(["--all", "--check"]), 0)
+
+    def test_main_check_fails_on_oversized_fixture(self) -> None:
+        # The size guard must run on the CI-enforced --check path, not only via
+        # the generated-check umbrella. Patch both line checks so size is the
+        # sole cause of the failure, and assert --check returns nonzero.
+        with tempfile.TemporaryDirectory(prefix="frontend-fixture-size-main-") as tmpdir:
+            manifest_path = Path(tmpdir) / "fixture-manifest.json"
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "fixtures": [
+                            {
+                                "name": "pinwheel-depth-3",
+                                "path": "pinwheel-depth-3.json",
+                                "family": "pinwheel",
+                                "width": 0,
+                                "height": 0,
+                                "patchDepth": 3,
+                                "cellSize": 12,
+                            }
+                        ]
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with (
+                patch(
+                    "tools.regenerate_frontend_topology_fixtures.fixture_drift_lines",
+                    return_value=[],
+                ),
+                patch(
+                    "tools.regenerate_frontend_topology_fixtures.fixture_size_violation_lines",
+                    return_value=["pinwheel-depth-3 (99 bytes > 16 bytes)"],
+                ),
+            ):
+                self.assertEqual(
+                    main(["--all", "--check", "--manifest", str(manifest_path)]),
+                    1,
+                )
 
 
 if __name__ == "__main__":
