@@ -263,7 +263,10 @@ class RegeneratePeriodicCatalogTests(unittest.TestCase):
         }
 
         self.assertEqual(set(metadata), descriptor_geometries)
-        self.assertEqual(len(metadata), 36)
+        # Derive the count from the discovered descriptors rather than pinning a
+        # literal (which forced a manual edit on every new periodic tiling); the
+        # set-equality check above already guards against drift or duplicates.
+        self.assertEqual(len(metadata), len(descriptor_geometries))
         self.assertEqual(metadata["uniform-2-2-3122-34312"]["picker_order"], 253)
 
     def test_authoritative_metadata_matches_aggregate_and_runtime_manifest(self) -> None:

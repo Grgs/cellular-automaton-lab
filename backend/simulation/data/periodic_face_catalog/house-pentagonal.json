@@ -1,0 +1,45 @@
+{
+  "geometry": "house-pentagonal",
+  "label": "House Pentagonal",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 246,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 10,
+    "min": 6,
+    "max": 18
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://en.wikipedia.org/wiki/Pentagonal_tiling"
+  ],
+  "palette": {
+    "geometry": "house-pentagonal",
+    "variants": [
+      {
+        "label": "house-up",
+        "selector": {
+          "kind": "house-pentagon",
+          "slot": "up"
+        },
+        "color": {
+          "token": "toneSand"
+        }
+      },
+      {
+        "label": "house-down",
+        "selector": {
+          "kind": "house-pentagon",
+          "slot": "down"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneSand:2,-7 31,-7 31,22 17,36 2,22;toneClay:31,22 46,36 46,65 17,65 17,36;toneSand:17,65 46,65 46,94 31,108 17,94;toneSand:31,-7 60,-7 60,22 46,36 31,22;toneClay:60,22 74,36 74,65 46,65 46,36;toneSand:46,65 74,65 74,94 60,108 46,94;toneSand:60,-7 89,-7 89,22 74,36 60,22;toneClay:89,22 103,36 103,65 74,65 74,36;toneSand:74,65 103,65 103,94 89,108 74,94;toneSand:89,-7 118,-7 118,22 103,36 89,22;toneClay:118,22 132,36 132,65 103,65 103,36;toneSand:103,65 132,65 132,94 118,108 103,94;toneSand:118,-7 146,-7 146,22 132,36 118,22"
+}
