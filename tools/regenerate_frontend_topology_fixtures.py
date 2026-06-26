@@ -18,6 +18,7 @@ from tools._common import write_text_lf  # noqa: E402
 DEFAULT_FIXTURE_MANIFEST_PATH = (
     ROOT / "frontend" / "test-fixtures" / "topologies" / "fixture-manifest.json"
 )
+DEFAULT_MAX_FIXTURE_BYTES = 4_000_000
 
 
 @dataclass(frozen=True)
@@ -179,6 +180,23 @@ def fixture_drift_lines(
     return drift
 
 
+def fixture_size_violation_lines(
+    targets: tuple[FrontendTopologyFixtureTarget, ...],
+    *,
+    max_bytes: int = DEFAULT_MAX_FIXTURE_BYTES,
+) -> list[str]:
+    violations: list[str] = []
+    for target in targets:
+        try:
+            size_bytes = target.path.stat().st_size
+        except FileNotFoundError:
+            violations.append(f"{target.name} (missing)")
+            continue
+        if size_bytes > max_bytes:
+            violations.append(f"{target.name} ({size_bytes} bytes > {max_bytes} bytes)")
+    return violations
+
+
 def write_regenerated_fixtures(
     targets: tuple[FrontendTopologyFixtureTarget, ...],
 ) -> None:
@@ -228,10 +246,16 @@ def main(argv: list[str] | None = None) -> int:
         )
         if bool(args.check):
             drift = fixture_drift_lines(targets)
+            size_violations = fixture_size_violation_lines(targets)
             if drift:
                 print("Frontend topology fixture drift detected:")
                 for name in drift:
                     print(f"  {name}")
+            if size_violations:
+                print(f"Frontend topology fixtures exceed {DEFAULT_MAX_FIXTURE_BYTES} bytes:")
+                for line in size_violations:
+                    print(f"  {line}")
+            if drift or size_violations:
                 return 1
             print("Frontend topology fixtures are up to date.")
             return 0

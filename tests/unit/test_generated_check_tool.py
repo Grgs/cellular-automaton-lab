@@ -15,6 +15,7 @@ class GeneratedCheckToolTests(unittest.TestCase):
                 "periodic-catalog",
                 "bootstrap",
                 "frontend-fixtures",
+                "frontend-fixture-size",
                 "reference-fixtures",
             ),
         )

@@ -171,7 +171,7 @@ Generated repo-owned files should be checked through the umbrella freshness comm
 python -m tools repo generated-check
 ```
 
-The command combines the focused freshness checks for `docs/TOOLS.md`, `frontend/test-fixtures/bootstrap-data.json`, frontend topology fixtures, and literature reference fixtures. Keep the focused commands available for targeted refresh work, but prefer the umbrella command when preparing maintenance or release-oriented changes.
+The command combines the focused freshness checks for `docs/TOOLS.md`, `frontend/test-fixtures/bootstrap-data.json`, frontend topology fixtures, the per-fixture frontend size ceiling, and literature reference fixtures. The size guard (`frontend-fixture-size`, also enforced by `python -m tools fixtures frontend --all --check`) fails when any checked-in frontend topology fixture exceeds `DEFAULT_MAX_FIXTURE_BYTES` (4 MB); shrink the fixture's depth/crop or intentionally raise the ceiling. Keep the focused commands available for targeted refresh work, but prefer the umbrella command when preparing maintenance or release-oriented changes.
 
 ## Tooling Ownership
 

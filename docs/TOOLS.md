@@ -192,7 +192,7 @@ python -m tools fixtures reference --mode canonical --geometry pinwheel --depth 
 
 Regenerate or check frontend representative topology fixtures.
 
-Supports `--check`, `--all`, targeted fixture names, and discovery with `--list-fixtures`.
+Supports `--check`, `--all`, targeted fixture names, and discovery with `--list-fixtures`. `--check` reports content drift and fails when any fixture exceeds the per-file size ceiling (`DEFAULT_MAX_FIXTURE_BYTES`, 4 MB); shrink the fixture's depth/crop or intentionally raise the ceiling. `repo generated-check` runs the same size guard as `frontend-fixture-size`.
 
 ```powershell
 python -m tools fixtures frontend --all --check
@@ -456,7 +456,7 @@ python -m tools repo tools-docs --write
 
 Run freshness checks for generated repo-owned files.
 
-Umbrella check for generated surfaces that otherwise require separate commands: tools docs, bootstrap test fixture data, frontend topology fixtures, and reference fixtures. Focused commands remain available for targeted refreshes.
+Umbrella check for generated surfaces that otherwise require separate commands: tools docs, bootstrap test fixture data, frontend topology fixtures, frontend fixture size limits, and reference fixtures. Focused commands remain available for targeted refreshes.
 
 ```powershell
 python -m tools repo generated-check

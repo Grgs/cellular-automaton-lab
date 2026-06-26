@@ -16,11 +16,16 @@ export function ensureTilingPreviewData(): Promise<PolygonPreviewData> {
         return Promise.resolve(polygonPreviewData);
     }
     if (!polygonPreviewDataPromise) {
-        polygonPreviewDataPromise = import("./tiling-preview-data.js").then((module) => {
-            polygonPreviewData = module.POLYGON_PREVIEW_DATA;
-            flushPendingPreviewThumbnails();
-            return polygonPreviewData;
-        });
+        polygonPreviewDataPromise = import("./tiling-preview-data.js")
+            .then((module) => {
+                polygonPreviewData = module.POLYGON_PREVIEW_DATA;
+                flushPendingPreviewThumbnails();
+                return polygonPreviewData;
+            })
+            .catch((error: unknown) => {
+                polygonPreviewDataPromise = null;
+                throw error;
+            });
     }
     return polygonPreviewDataPromise;
 }
@@ -236,7 +241,10 @@ function renderPreviewGeometry(svg: SVGSVGElement, option: TopologyOption): void
     addSquarePreview(svg);
     if (!polygonPreviewData) {
         pendingPreviewThumbnails.add({ svg, option });
-        void ensureTilingPreviewData();
+        void ensureTilingPreviewData().catch(() => {
+            // Keep the fallback thumbnail visible. A later picker render or
+            // explicit ensureTilingPreviewData() call will retry the chunk load.
+        });
     }
 }
 

@@ -34,6 +34,28 @@ const HEX_OPTION: TopologyOption = {
 };
 
 describe("controls/tiling-preview lazy polygon data", () => {
+    it("does not permanently cache a failed preview-data chunk load", async () => {
+        vi.doMock("./tiling-preview-data.js", () => {
+            return {
+                get POLYGON_PREVIEW_DATA(): Readonly<Record<string, string>> {
+                    throw new Error("preview chunk unavailable");
+                },
+            };
+        });
+        try {
+            const { ensureTilingPreviewData } = await freshPreviewModule();
+
+            const firstAttempt = ensureTilingPreviewData();
+            await expect(firstAttempt).rejects.toThrow("preview chunk unavailable");
+            const secondAttempt = ensureTilingPreviewData();
+
+            expect(secondAttempt).not.toBe(firstAttempt);
+            await expect(secondAttempt).rejects.toThrow("preview chunk unavailable");
+        } finally {
+            vi.doUnmock("./tiling-preview-data.js");
+        }
+    });
+
     it("shows a placeholder synchronously then re-renders the thumbnail in place once data loads", async () => {
         const { createTilingPreviewThumbnail, ensureTilingPreviewData } =
             await freshPreviewModule();
