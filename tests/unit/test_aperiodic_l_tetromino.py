@@ -59,7 +59,9 @@ def _base_points() -> list[Point]:
     return [(vertex.x, vertex.y) for vertex in _BASE_POLYGON]
 
 
-def _child_polygon_in_doubled_frame(matrix, translation) -> list[Point]:
+def _child_polygon_in_doubled_frame(
+    matrix: tuple[int, int, int, int], translation: tuple[int, int]
+) -> list[Point]:
     tx, ty = translation
     points = []
     for vertex in _BASE_POLYGON:
@@ -121,6 +123,7 @@ class LTetrominoRecordTests(unittest.TestCase):
             counts: dict[str, int] = {}
             for record in collect_l_tetromino_records(depth):
                 token = record["orientation_token"]
+                assert token is not None
                 counts[token] = counts.get(token, 0) + 1
             with self.subTest(depth=depth):
                 self.assertEqual(set(counts), {"0", "1", "2", "3"})
