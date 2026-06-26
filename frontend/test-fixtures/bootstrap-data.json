@@ -1490,6 +1490,32 @@
       }
     },
     {
+      "tiling_family": "l-tetromino",
+      "label": "L-Tetromino",
+      "picker_group": "Aperiodic",
+      "picker_order": 295,
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "l-tetromino"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 5
+      }
+    },
+    {
       "tiling_family": "robinson-triangles",
       "label": "Robinson Triangles",
       "picker_group": "Aperiodic",
@@ -2394,6 +2420,16 @@
       "promotion_blocker": null,
       "public_cell_kinds": [
         "chair"
+      ]
+    },
+    {
+      "tiling_family": "l-tetromino",
+      "label": "L-Tetromino",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
+      "public_cell_kinds": [
+        "l-tetromino"
       ]
     },
     {

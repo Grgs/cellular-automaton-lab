@@ -115,6 +115,13 @@ The order is intentional:
   - [Sphinx](https://tilings.math.uni-bielefeld.de/substitution/sphinx/)
 - `chair`
   - [Chair](https://tilings.math.uni-bielefeld.de/substitution/chair/)
+- `l-tetromino`
+  - [Rep-tile (L-tromino / L-tetromino / P-pentomino are rep-n^2)](https://en.wikipedia.org/wiki/Rep-tile)
+  - Shipped as the exact integer-lattice rep-4 substitution of the L-tetromino
+    (the tetromino analogue of the L-tromino `chair`). The rep-4 dissection is
+    geometrically exact and self-evident, so faithfulness needs no external
+    coordinate source; it is verified directly (area conservation, congruence to
+    the prototile, gap-free / overlap-free cover).
 - `robinson-triangles`
   - [Robinson triangle](https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/)
 - `tuebingen-triangle`

@@ -25,6 +25,7 @@ SPHINX_GEOMETRY = "sphinx"
 HAT_MONOTILE_GEOMETRY = "hat-monotile"
 TURTLE_MONOTILE_GEOMETRY = "turtle-monotile"
 CHAIR_GEOMETRY = "chair"
+L_TETROMINO_GEOMETRY = "l-tetromino"
 ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
 TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
 DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
@@ -57,6 +58,7 @@ SPHINX_KIND = "sphinx"
 HAT_KIND = "hat"
 TURTLE_KIND = "turtle"
 CHAIR_KIND = "chair"
+L_TETROMINO_KIND = "l-tetromino"
 ROBINSON_THICK_KIND = "robinson-thick"
 ROBINSON_THIN_KIND = "robinson-thin"
 TUEBINGEN_THICK_KIND = "tuebingen-thick"
@@ -116,6 +118,7 @@ ENNEAGONAL_9_FOLD_TILE_FAMILY = "enneagonal-9-fold"
 HEPTAGONAL_7_FOLD_TILE_FAMILY = "heptagonal-7-fold"
 HENDECAGONAL_11_FOLD_TILE_FAMILY = "hendecagonal-11-fold"
 TRIDECAGONAL_13_FOLD_TILE_FAMILY = "tridecagonal-13-fold"
+L_TETROMINO_TILE_FAMILY = "l-tetromino"
 
 
 @dataclass(frozen=True)
@@ -314,6 +317,23 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         builder_kind="substitution_recipe",
         implementation_status="true_substitution",
         public_cell_kinds=(CHAIR_KIND,),
+    ),
+    L_TETROMINO_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=L_TETROMINO_GEOMETRY,
+        catalog_label="L-Tetromino",
+        reference_label="L-Tetromino",
+        picker_group="Aperiodic",
+        picker_order=295,
+        default_rule="life-b2-s23",
+        builder_kind="substitution_recipe",
+        # The L-tetromino is a rep-4 rep-tile: four half-scale copies tile a
+        # double-scale copy. Iterating that exact integer-lattice dissection in
+        # ``backend/simulation/aperiodic_l_tetromino.py`` gives a self-similar
+        # (limit-periodic) substitution tiling, the tetromino analogue of the
+        # L-tromino ``chair``. The substitution closes over four orientations
+        # (the Klein four-group) with one child of each per tile.
+        implementation_status="true_substitution",
+        public_cell_kinds=(L_TETROMINO_KIND,),
     ),
     ROBINSON_TRIANGLES_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=ROBINSON_TRIANGLES_GEOMETRY,

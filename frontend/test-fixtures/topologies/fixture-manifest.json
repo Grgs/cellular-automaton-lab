@@ -64,6 +64,15 @@
       "cellSize": 12
     },
     {
+      "name": "l-tetromino-depth-3",
+      "path": "l-tetromino-depth-3.json",
+      "family": "l-tetromino",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
       "name": "pinwheel-2-1-depth-3",
       "path": "pinwheel-2-1-depth-3.json",
       "family": "pinwheel-2-1",
