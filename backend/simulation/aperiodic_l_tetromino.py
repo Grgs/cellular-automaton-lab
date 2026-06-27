@@ -10,6 +10,10 @@ cells {(0,0), (0,1), (0,2), (1,0)} -- a vertical three-bar plus a foot -- with
 outline ``_BASE_POLYGON``. The rep-4 dissection (``_CANONICAL_CHILDREN``) was
 found by exhaustive exact cover of the doubled tile and is verified by the unit
 tests (area conservation, congruence to the prototile, gap/overlap-free cover).
+The rendered representative patch starts from two reflected supertiles that
+form a compact 4-by-2 rectangle, then applies the same substitution to each
+root. That seed avoids a tall, sparse default view while preserving the exact
+prototile substitution.
 
 The substitution closes over exactly four orientations -- the Klein four-group
 {identity, 180 deg rotation, and the two diagonal reflections} -- and every
@@ -55,6 +59,13 @@ _ORIENTATIONS: dict[int, Matrix] = {
     3: (0, -1, -1, 0),  # reflection across y = -x
 }
 _ORIENTATION_TOKEN: dict[Matrix, int] = {matrix: token for token, matrix in _ORIENTATIONS.items()}
+
+# Two canonical L-tetromino supertiles arranged as a 4x2 horizontal rectangle.
+# Each root is substituted independently by the same rep-4 rule.
+_DEFAULT_ROOT_SEEDS: tuple[tuple[str, Matrix, float, float], ...] = (
+    ("root0", _ORIENTATIONS[2], 0.0, 0.0),
+    ("root1", _ORIENTATIONS[3], 4.0, 2.0),
+)
 
 # Canonical rep-4 children as (matrix, translation) in the doubled-tile frame.
 # Each child is matrix @ base_polygon + translation; halving the arrangement
@@ -139,6 +150,14 @@ def _collect_records(
 
 
 def collect_l_tetromino_records(patch_depth: int) -> list[PatchRecord]:
+    resolved_depth = max(0, int(patch_depth))
+    records: list[PatchRecord] = []
+    for path, matrix, offset_x, offset_y in _DEFAULT_ROOT_SEEDS:
+        _collect_records(resolved_depth, matrix, 1.0, offset_x, offset_y, path, records)
+    return records
+
+
+def _collect_canonical_l_tetromino_records(patch_depth: int) -> list[PatchRecord]:
     resolved_depth = max(0, int(patch_depth))
     records: list[PatchRecord] = []
     _collect_records(resolved_depth, _ORIENTATIONS[0], 1.0, 0.0, 0.0, "root", records)

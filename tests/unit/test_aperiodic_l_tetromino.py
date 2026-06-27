@@ -11,7 +11,9 @@ if str(ROOT) not in sys.path:
 from backend.simulation.aperiodic_l_tetromino import (
     _BASE_POLYGON,
     _CANONICAL_CHILDREN,
+    _DEFAULT_ROOT_SEEDS,
     _ORIENTATION_TOKEN,
+    _collect_canonical_l_tetromino_records,
     _matrix_apply,
     build_l_tetromino_patch,
     collect_l_tetromino_records,
@@ -124,10 +126,15 @@ class LTetrominoGeometryTests(unittest.TestCase):
 
 
 class LTetrominoRecordTests(unittest.TestCase):
-    def test_record_counts_grow_as_four_to_the_depth(self) -> None:
+    def test_canonical_record_counts_grow_as_four_to_the_depth(self) -> None:
         for depth in range(5):
             with self.subTest(depth=depth):
-                self.assertEqual(len(collect_l_tetromino_records(depth)), 4**depth)
+                self.assertEqual(len(_collect_canonical_l_tetromino_records(depth)), 4**depth)
+
+    def test_default_record_counts_use_wide_two_tile_seed(self) -> None:
+        for depth in range(5):
+            with self.subTest(depth=depth):
+                self.assertEqual(len(collect_l_tetromino_records(depth)), 2 * 4**depth)
 
     def test_orientation_tokens_are_evenly_split(self) -> None:
         for depth in range(1, 4):
@@ -138,12 +145,23 @@ class LTetrominoRecordTests(unittest.TestCase):
                 counts[token] = counts.get(token, 0) + 1
             with self.subTest(depth=depth):
                 self.assertEqual(set(counts), {"0", "1", "2", "3"})
-                self.assertEqual(set(counts.values()), {4 ** (depth - 1)})
+                self.assertEqual(set(counts.values()), {2 * 4 ** (depth - 1)})
 
-    def test_depth_zero_is_single_identity_tile(self) -> None:
-        records = collect_l_tetromino_records(0)
+    def test_canonical_depth_zero_is_single_identity_tile(self) -> None:
+        records = _collect_canonical_l_tetromino_records(0)
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["orientation_token"], "0")
+
+    def test_default_depth_zero_is_wide_rectangular_seed(self) -> None:
+        records = collect_l_tetromino_records(0)
+        self.assertEqual(len(records), len(_DEFAULT_ROOT_SEEDS))
+        self.assertEqual({record["orientation_token"] for record in records}, {"2", "3"})
+        covered_once: set[tuple[int, int]] = set()
+        for record in records:
+            cells = _covered_unit_cells([(x, y) for x, y in record["vertices"]])
+            self.assertTrue(covered_once.isdisjoint(cells))
+            covered_once.update(cells)
+        self.assertEqual(covered_once, {(x, y) for x in range(4) for y in range(2)})
 
     def test_record_ids_are_unique(self) -> None:
         ids = [record["id"] for record in collect_l_tetromino_records(3)]
@@ -158,8 +176,15 @@ class LTetrominoPatchTests(unittest.TestCase):
         for depth in range(4):
             with self.subTest(depth=depth):
                 patch = build_l_tetromino_patch(depth)
-                self.assertEqual(len(patch.cells), 4**depth)
+                self.assertEqual(len(patch.cells), 2 * 4**depth)
                 self.assertEqual(patch.patch_depth, depth)
+
+    def test_patch_uses_wide_rectangular_extent(self) -> None:
+        for depth in range(4):
+            with self.subTest(depth=depth):
+                patch = build_l_tetromino_patch(depth)
+                self.assertEqual(patch.width, 4)
+                self.assertEqual(patch.height, 2)
 
     def test_patch_is_connected_at_depth_two(self) -> None:
         patch = build_l_tetromino_patch(2)

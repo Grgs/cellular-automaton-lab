@@ -121,7 +121,9 @@ The order is intentional:
     (the tetromino analogue of the L-tromino `chair`). The rep-4 dissection is
     geometrically exact and self-evident, so faithfulness needs no external
     coordinate source; it is verified directly (area conservation, congruence to
-    the prototile, gap-free / overlap-free cover).
+    the prototile, gap-free / overlap-free cover). The representative app patch
+    uses two substituted supertiles arranged as a 4x2 rectangle so the default
+    view is wider without changing the underlying substitution rule.
 - `robinson-triangles`
   - [Robinson triangle](https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/)
 - `tuebingen-triangle`
