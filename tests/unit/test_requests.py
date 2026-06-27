@@ -212,6 +212,42 @@ class RequestParsingTests(unittest.TestCase):
                 "patch_depth": None,
             },
         )
+        self.assertEqual(
+            parse_topology_spec(
+                {
+                    "topology_spec": {
+                        "tiling_family": "penrose-p1-pentagon-diamond",
+                        "patch_depth": 3,
+                    }
+                }
+            ),
+            {
+                "tiling_family": "penrose-p1",
+                "adjacency_mode": "distributed",
+                "sizing_mode": "patch_depth",
+                "width": None,
+                "height": None,
+                "patch_depth": 3,
+            },
+        )
+        self.assertEqual(
+            parse_topology_spec(
+                {
+                    "topology_spec": {
+                        "tiling_family": "penrose-p1-pentagon-boat-star",
+                        "patch_depth": 3,
+                    }
+                }
+            ),
+            {
+                "tiling_family": "penrose-p1",
+                "adjacency_mode": "boat-star",
+                "sizing_mode": "patch_depth",
+                "width": None,
+                "height": None,
+                "patch_depth": 3,
+            },
+        )
         self.assertIsNone(parse_topology_spec({}))
 
         with self.assertRaises(RequestValidationError):

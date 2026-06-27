@@ -14,6 +14,7 @@ from backend.rules.constraints import normalize_rule_dimensions
 from backend.simulation.models import SimulationConfig, SimulationStateData, TopologySpec
 from backend.simulation.topology_catalog import (
     SUPPORTED_TOPOLOGY_FAMILIES,
+    canonicalize_topology_identity,
     geometry_uses_backend_viewport_sync,
     geometry_uses_patch_depth,
     normalize_adjacency_mode,
@@ -192,9 +193,13 @@ def _resolve_restore_topology_spec(payload: PersistedSimulationSnapshotInput) ->
     if not isinstance(topology_spec, dict):
         return TopologySpec()
     tiling_family = str(topology_spec.get("tiling_family") or DEFAULT_TILING_FAMILY)
+    tiling_family, adjacency_mode = canonicalize_topology_identity(
+        tiling_family,
+        topology_spec.get("adjacency_mode"),
+    )
     if tiling_family not in SUPPORTED_TOPOLOGY_FAMILIES:
         return TopologySpec()
-    adjacency_mode = normalize_adjacency_mode(tiling_family, topology_spec.get("adjacency_mode"))
+    adjacency_mode = normalize_adjacency_mode(tiling_family, adjacency_mode)
     return TopologySpec.from_values(
         tiling_family=tiling_family,
         adjacency_mode=adjacency_mode,

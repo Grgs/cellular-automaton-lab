@@ -8,6 +8,9 @@ from typing import Literal
 from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_MANIFEST,
     PENROSE_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     SPHINX_COMPACT_PAIR_GEOMETRY,
     SPHINX_GEOMETRY,
@@ -47,7 +50,7 @@ def _load_fixture_geometries(path: Path) -> set[str]:
 
 
 def _verification_modes(geometry: str) -> tuple[str, ...]:
-    reference_geometry = _contract_manifest_geometry(geometry)
+    reference_geometry = _contract_reference_geometry(geometry)
     spec = REFERENCE_FAMILY_SPECS[reference_geometry]
     modes: list[str] = []
     if spec.depth_expectations:
@@ -66,7 +69,7 @@ def _verification_modes(geometry: str) -> tuple[str, ...]:
 
 
 def _depth_semantics(geometry: str) -> str:
-    spec = REFERENCE_FAMILY_SPECS[_contract_manifest_geometry(geometry)]
+    spec = REFERENCE_FAMILY_SPECS[_contract_reference_geometry(geometry)]
     if spec.sample_mode == "grid":
         return "grid sample"
     manifest_geometry = _contract_manifest_geometry(geometry)
@@ -79,13 +82,23 @@ def _depth_semantics(geometry: str) -> str:
 def _contract_manifest_geometry(geometry: str) -> str:
     if geometry == PENROSE_VERTEX_GEOMETRY:
         return PENROSE_GEOMETRY
+    if geometry in {PENROSE_P1_DISTRIBUTED_GEOMETRY, PENROSE_P1_PBS_GEOMETRY}:
+        return PENROSE_P1_GEOMETRY
+    if geometry in {SPHINX_COMPACT_PAIR_GEOMETRY, SPHINX_WIDE_PAIR_GEOMETRY}:
+        return SPHINX_GEOMETRY
+    return geometry
+
+
+def _contract_reference_geometry(geometry: str) -> str:
+    if geometry == PENROSE_VERTEX_GEOMETRY:
+        return PENROSE_GEOMETRY
     if geometry in {SPHINX_COMPACT_PAIR_GEOMETRY, SPHINX_WIDE_PAIR_GEOMETRY}:
         return SPHINX_GEOMETRY
     return geometry
 
 
 def build_aperiodic_contract(geometry: str) -> AperiodicImplementationContract:
-    spec = REFERENCE_FAMILY_SPECS[_contract_manifest_geometry(geometry)]
+    spec = REFERENCE_FAMILY_SPECS[_contract_reference_geometry(geometry)]
     try:
         manifest_entry = APERIODIC_FAMILY_MANIFEST[_contract_manifest_geometry(geometry)]
     except KeyError as error:

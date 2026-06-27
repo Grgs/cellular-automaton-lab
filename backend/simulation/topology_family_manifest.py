@@ -13,6 +13,7 @@ from backend.simulation.aperiodic_family_manifest import (
     HEPTAGONAL_7_FOLD_GEOMETRY,
     L_TETROMINO_GEOMETRY,
     PENROSE_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -40,6 +41,8 @@ DEFAULT_TOPOLOGY_PATCH_DEPTH = 4
 
 EDGE_ADJACENCY = "edge"
 VERTEX_ADJACENCY = "vertex"
+PENROSE_P1_DISTRIBUTED_MODE = "distributed"
+PENROSE_P1_BOAT_STAR_MODE = "boat-star"
 COMPACT_SEED = "compact"
 WIDE_SEED = "wide"
 
@@ -304,10 +307,18 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         # Same depth range as P3 since both use a pentagrid bounded by
         # ``half_extent = base * phi^d``.
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
-    ),
-    PENROSE_P1_PBS_GEOMETRY: _translated_aperiodic_family(
-        PENROSE_P1_PBS_GEOMETRY,
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 6),
+        variants=(
+            _variant(
+                PENROSE_P1_DISTRIBUTED_GEOMETRY,
+                PENROSE_P1_DISTRIBUTED_MODE,
+                APERIODIC_FAMILY_MANIFEST[PENROSE_P1_GEOMETRY].default_rule,
+            ),
+            _variant(
+                PENROSE_P1_PBS_GEOMETRY,
+                PENROSE_P1_BOAT_STAR_MODE,
+                APERIODIC_FAMILY_MANIFEST[PENROSE_P1_GEOMETRY].default_rule,
+            ),
+        ),
     ),
     PENROSE_P2_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P2_GEOMETRY,

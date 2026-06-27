@@ -1071,8 +1071,8 @@
       }
     },
     {
-      "tiling_family": "penrose-p1-pentagon-diamond",
-      "label": "Penrose P1 Pentagon-Diamond (Distributed)",
+      "tiling_family": "penrose-p1",
+      "label": "Penrose P1",
       "picker_group": "Aperiodic",
       "picker_order": 205,
       "sizing_mode": "patch_depth",
@@ -1080,40 +1080,17 @@
       "render_kind": "polygon_aperiodic",
       "viewport_sync_mode": "presentation-only",
       "supported_adjacency_modes": [
-        "edge"
+        "distributed",
+        "boat-star"
       ],
-      "default_adjacency_mode": "edge",
+      "default_adjacency_mode": "distributed",
       "default_rules": {
-        "edge": "life-b2-s23"
+        "distributed": "life-b2-s23",
+        "boat-star": "life-b2-s23"
       },
       "geometry_keys": {
-        "edge": "penrose-p1-pentagon-diamond"
-      },
-      "sizing_policy": {
-        "control": "patch_depth",
-        "default": 4,
-        "min": 0,
-        "max": 6
-      }
-    },
-    {
-      "tiling_family": "penrose-p1-pentagon-boat-star",
-      "label": "Penrose P1 Pentagon-Boat-Star",
-      "picker_group": "Aperiodic",
-      "picker_order": 207,
-      "sizing_mode": "patch_depth",
-      "family": "aperiodic",
-      "render_kind": "polygon_aperiodic",
-      "viewport_sync_mode": "presentation-only",
-      "supported_adjacency_modes": [
-        "edge"
-      ],
-      "default_adjacency_mode": "edge",
-      "default_rules": {
-        "edge": "life-b2-s23"
-      },
-      "geometry_keys": {
-        "edge": "penrose-p1-pentagon-boat-star"
+        "distributed": "penrose-p1-pentagon-diamond",
+        "boat-star": "penrose-p1-pentagon-boat-star"
       },
       "sizing_policy": {
         "control": "patch_depth",
@@ -2241,27 +2218,14 @@
   ],
   "aperiodic_families": [
     {
-      "tiling_family": "penrose-p1-pentagon-diamond",
-      "label": "Penrose P1 Pentagon-Diamond (Distributed)",
+      "tiling_family": "penrose-p1",
+      "label": "Penrose P1",
       "experimental": false,
       "implementation_status": "canonical_patch",
       "promotion_blocker": null,
       "public_cell_kinds": [
         "p1-pentagon",
         "p1-pentagon-cluster",
-        "p1-diamond",
-        "p1-boat",
-        "p1-star"
-      ]
-    },
-    {
-      "tiling_family": "penrose-p1-pentagon-boat-star",
-      "label": "Penrose P1 Pentagon-Boat-Star",
-      "experimental": false,
-      "implementation_status": "canonical_patch",
-      "promotion_blocker": null,
-      "public_cell_kinds": [
-        "p1-pentagon",
         "p1-diamond",
         "p1-boat",
         "p1-star"

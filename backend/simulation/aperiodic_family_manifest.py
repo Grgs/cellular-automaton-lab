@@ -16,7 +16,8 @@ AperiodicPickerGroup = Literal["Aperiodic", "Experimental"]
 PENROSE_GEOMETRY = "penrose-p3-rhombs"
 PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
 PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
-PENROSE_P1_GEOMETRY = "penrose-p1-pentagon-diamond"
+PENROSE_P1_GEOMETRY = "penrose-p1"
+PENROSE_P1_DISTRIBUTED_GEOMETRY = "penrose-p1-pentagon-diamond"
 PENROSE_P1_PBS_GEOMETRY = "penrose-p1-pentagon-boat-star"
 AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
@@ -176,8 +177,8 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
     ),
     PENROSE_P1_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P1_GEOMETRY,
-        catalog_label="Penrose P1 Pentagon-Diamond (Distributed)",
-        reference_label="Penrose Pentagon-Diamond (Distributed)",
+        catalog_label="Penrose P1",
+        reference_label="Penrose P1",
         picker_group="Aperiodic",
         picker_order=205,
         default_rule="life-b2-s23",
@@ -200,22 +201,6 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         public_cell_kinds=(
             P1_PENTAGON_KIND,
             P1_PENTAGON_CLUSTER_KIND,
-            P1_DIAMOND_KIND,
-            P1_BOAT_KIND,
-            P1_STAR_KIND,
-        ),
-    ),
-    PENROSE_P1_PBS_GEOMETRY: AperiodicFamilyManifestEntry(
-        geometry=PENROSE_P1_PBS_GEOMETRY,
-        catalog_label="Penrose P1 Pentagon-Boat-Star",
-        reference_label="Penrose Pentagon Boat Star",
-        picker_group="Aperiodic",
-        picker_order=207,
-        default_rule="life-b2-s23",
-        builder_kind="compatibility_patch",
-        implementation_status="canonical_patch",
-        public_cell_kinds=(
-            P1_PENTAGON_KIND,
             P1_DIAMOND_KIND,
             P1_BOAT_KIND,
             P1_STAR_KIND,

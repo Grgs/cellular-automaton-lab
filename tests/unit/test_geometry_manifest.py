@@ -5,6 +5,9 @@ from backend.simulation.aperiodic_family_manifest import (
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
     HAT_MONOTILE_GEOMETRY,
     PENROSE_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     PINWHEEL_2_1_GEOMETRY,
     PINWHEEL_GEOMETRY,
@@ -17,6 +20,7 @@ from backend.simulation.aperiodic_family_manifest import (
     TAYLOR_SOCOLAR_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
 )
+from backend.simulation.models import TopologySpec
 from backend.simulation.topology_catalog import (
     GEOMETRY_DEFAULT_RULES,
     SUPPORTED_GEOMETRIES,
@@ -30,6 +34,8 @@ from backend.simulation.topology_catalog import (
     get_topology_variant_for_geometry,
     is_penrose_geometry,
     minimum_grid_dimension_for_geometry,
+    normalize_adjacency_mode,
+    resolve_geometry_key,
 )
 from backend.simulation.topology_family_manifest import (
     ARCHIMEDEAN_3464_GEOMETRY,
@@ -134,6 +140,56 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertFalse(geometry_uses_backend_viewport_sync(PENROSE_VERTEX_GEOMETRY))
         self.assertTrue(is_penrose_geometry(PENROSE_GEOMETRY))
         self.assertTrue(is_penrose_geometry(PENROSE_VERTEX_GEOMETRY))
+
+    def test_penrose_p1_modes_use_one_public_family(self) -> None:
+        definition = get_topology_definition(PENROSE_P1_GEOMETRY)
+
+        self.assertEqual(definition.label, "Penrose P1")
+        self.assertEqual(definition.supported_adjacency_modes, ("distributed", "boat-star"))
+        self.assertEqual(definition.default_adjacency_mode, "distributed")
+        self.assertEqual(
+            definition.geometry_keys,
+            {
+                "distributed": PENROSE_P1_DISTRIBUTED_GEOMETRY,
+                "boat-star": PENROSE_P1_PBS_GEOMETRY,
+            },
+        )
+        self.assertEqual(
+            get_topology_variant_for_geometry(PENROSE_P1_DISTRIBUTED_GEOMETRY).tiling_family,
+            PENROSE_P1_GEOMETRY,
+        )
+        self.assertEqual(
+            get_topology_variant_for_geometry(PENROSE_P1_PBS_GEOMETRY).tiling_family,
+            PENROSE_P1_GEOMETRY,
+        )
+        self.assertEqual(resolve_geometry_key(PENROSE_P1_GEOMETRY), PENROSE_P1_DISTRIBUTED_GEOMETRY)
+        self.assertEqual(
+            resolve_geometry_key(PENROSE_P1_GEOMETRY, "boat-star"),
+            PENROSE_P1_PBS_GEOMETRY,
+        )
+
+    def test_legacy_penrose_p1_family_ids_normalize_to_modes(self) -> None:
+        distributed = TopologySpec.from_values(
+            tiling_family=PENROSE_P1_DISTRIBUTED_GEOMETRY,
+            adjacency_mode="edge",
+            patch_depth=2,
+        )
+        boat_star = TopologySpec.from_values(
+            tiling_family=PENROSE_P1_PBS_GEOMETRY,
+            adjacency_mode="edge",
+            patch_depth=2,
+        )
+
+        self.assertEqual(distributed.tiling_family, PENROSE_P1_GEOMETRY)
+        self.assertEqual(distributed.adjacency_mode, "distributed")
+        self.assertEqual(distributed.geometry_key, PENROSE_P1_DISTRIBUTED_GEOMETRY)
+        self.assertEqual(boat_star.tiling_family, PENROSE_P1_GEOMETRY)
+        self.assertEqual(boat_star.adjacency_mode, "boat-star")
+        self.assertEqual(boat_star.geometry_key, PENROSE_P1_PBS_GEOMETRY)
+        self.assertEqual(
+            normalize_adjacency_mode(PENROSE_P1_PBS_GEOMETRY, "edge"),
+            "boat-star",
+        )
 
     def test_mixed_capability_helpers_match_manifest(self) -> None:
         self.assertTrue(geometry_uses_backend_viewport_sync("square"))

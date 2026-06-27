@@ -65,6 +65,40 @@ const TOPOLOGY_BY_FAMILY = new Map<string, TopologyDefinition>(
     FRONTEND_TOPOLOGY_CATALOG.map((definition) => [definition.tiling_family, definition]),
 );
 
+const PENROSE_P1_FAMILY = "penrose-p1";
+type TopologyFamilyAlias = Readonly<{
+    tiling_family: string;
+    adjacency_mode: string;
+}>;
+const LEGACY_TOPOLOGY_FAMILY_ALIASES: Readonly<Record<string, TopologyFamilyAlias>> = {
+    "penrose-p1-pentagon-diamond": Object.freeze({
+        tiling_family: PENROSE_P1_FAMILY,
+        adjacency_mode: "distributed",
+    }),
+    "penrose-p1-pentagon-boat-star": Object.freeze({
+        tiling_family: PENROSE_P1_FAMILY,
+        adjacency_mode: "boat-star",
+    }),
+};
+
+function canonicalizeTopologyIdentity(
+    tilingFamily: string | null | undefined,
+    adjacencyMode: string | null = null,
+): { tilingFamily: string; adjacencyMode: string | null } {
+    const normalizedFamily = String(tilingFamily || "");
+    const alias = LEGACY_TOPOLOGY_FAMILY_ALIASES[normalizedFamily];
+    if (!alias) {
+        return {
+            tilingFamily: normalizedFamily,
+            adjacencyMode,
+        };
+    }
+    return {
+        tilingFamily: alias.tiling_family,
+        adjacencyMode: alias.adjacency_mode,
+    };
+}
+
 function definitionFromSpecOrFamily(
     topologySpecOrFamily: string | Partial<TopologySpec> | null | undefined,
 ): TopologyDefinition | null {
@@ -81,7 +115,8 @@ export function listTopologyDefinitions(): readonly TopologyDefinition[] {
 export function getTopologyDefinition(
     tilingFamily: string | null | undefined,
 ): TopologyDefinition | null {
-    return TOPOLOGY_BY_FAMILY.get(String(tilingFamily)) ?? null;
+    const canonical = canonicalizeTopologyIdentity(tilingFamily);
+    return TOPOLOGY_BY_FAMILY.get(canonical.tilingFamily) ?? null;
 }
 
 export function getTopologySizingPolicy(
@@ -95,18 +130,20 @@ export function getTopologySizingPolicy(
 }
 
 export function isSupportedTopologyFamily(tilingFamily: string | null | undefined): boolean {
-    return TOPOLOGY_BY_FAMILY.has(String(tilingFamily));
+    const canonical = canonicalizeTopologyIdentity(tilingFamily);
+    return TOPOLOGY_BY_FAMILY.has(canonical.tilingFamily);
 }
 
 export function resolveAdjacencyMode(
     tilingFamily: string | null | undefined,
     adjacencyMode: string | null = null,
 ): string {
-    const definition = getTopologyDefinition(tilingFamily);
+    const canonical = canonicalizeTopologyIdentity(tilingFamily, adjacencyMode);
+    const definition = getTopologyDefinition(canonical.tilingFamily);
     if (!definition) {
         return "edge";
     }
-    const normalized = String(adjacencyMode ?? "");
+    const normalized = String(canonical.adjacencyMode ?? "");
     if (definition.supported_adjacency_modes.includes(normalized)) {
         return normalized;
     }
@@ -117,11 +154,15 @@ export function resolveTopologyVariantKey(
     tilingFamily: string | null | undefined,
     adjacencyMode: string | null = null,
 ): string {
-    const definition = getTopologyDefinition(tilingFamily);
+    const canonical = canonicalizeTopologyIdentity(tilingFamily, adjacencyMode);
+    const definition = getTopologyDefinition(canonical.tilingFamily);
     if (!definition) {
         return "square";
     }
-    const resolvedAdjacencyMode = resolveAdjacencyMode(tilingFamily, adjacencyMode);
+    const resolvedAdjacencyMode = resolveAdjacencyMode(
+        canonical.tilingFamily,
+        canonical.adjacencyMode,
+    );
     return (
         definition.geometry_keys[resolvedAdjacencyMode] ||
         definition.geometry_keys[definition.default_adjacency_mode] ||
@@ -130,8 +171,12 @@ export function resolveTopologyVariantKey(
 }
 
 export function describeTopologySpec(topologySpec: Partial<TopologySpec> = {}): TopologySpec {
-    const tilingFamily = String(topologySpec.tiling_family || "square");
-    const adjacencyMode = resolveAdjacencyMode(tilingFamily, topologySpec.adjacency_mode || null);
+    const canonical = canonicalizeTopologyIdentity(
+        topologySpec.tiling_family || "square",
+        topologySpec.adjacency_mode || null,
+    );
+    const tilingFamily = canonical.tilingFamily;
+    const adjacencyMode = resolveAdjacencyMode(tilingFamily, canonical.adjacencyMode);
     const definition = getTopologyDefinition(tilingFamily) || getTopologyDefinition("square");
     return {
         tiling_family: tilingFamily,
@@ -168,6 +213,10 @@ export function topologyVariantKeyFromSpec(topologySpec: Partial<TopologySpec> =
 }
 
 const TOPOLOGY_MODE_LABELS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+    "penrose-p1": {
+        distributed: "Distributed",
+        "boat-star": "Boat-Star",
+    },
     "penrose-p3-rhombs": {
         edge: "Edge adjacency",
         vertex: "Vertex adjacency",
@@ -324,11 +373,12 @@ const TILING_SEARCH_ALIASES: Readonly<Record<string, readonly string[]>> = {
     "prismatic-pentagonal": ["pentagon", "pentagons", "pentagonal", "prism"],
     "floret-pentagonal": ["pentagon", "pentagons", "pentagonal", "flower"],
     "type-7-pentagonal": ["pentagon", "pentagons", "pentagonal", "type 7"],
-    "penrose-p1-pentagon-diamond": [
+    "penrose-p1": [
         "penrose",
         "p1",
         "pentagon",
         "pentagons",
+        "distributed",
         "diamond",
         "diamonds",
         "boat",
@@ -337,17 +387,6 @@ const TILING_SEARCH_ALIASES: Readonly<Record<string, readonly string[]>> = {
         "stars",
         "sun",
         "decagon",
-    ],
-    "penrose-p1-pentagon-boat-star": [
-        "penrose",
-        "p1",
-        "pentagon",
-        "pentagons",
-        "boat",
-        "boats",
-        "star",
-        "stars",
-        "diamond",
     ],
     "penrose-p2-kite-dart": ["penrose", "p2", "kite", "kites", "dart", "darts"],
     "penrose-p3-rhombs": [
@@ -401,10 +440,14 @@ export function tilingFamilyOptions(): TopologyOption[] {
             const label = aperiodicMetadata?.experimental
                 ? `${definition.label} (Experimental)`
                 : definition.label;
-            const previewKey =
+            const defaultPreviewKey =
                 definition.geometry_keys[definition.default_adjacency_mode] ||
                 Object.values(definition.geometry_keys)[0] ||
                 definition.tiling_family;
+            const previewKey =
+                definition.tiling_family === PENROSE_P1_FAMILY
+                    ? definition.tiling_family
+                    : defaultPreviewKey;
             return {
                 value: definition.tiling_family,
                 label,

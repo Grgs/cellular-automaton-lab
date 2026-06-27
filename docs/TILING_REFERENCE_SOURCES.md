@@ -87,13 +87,14 @@ The order is intentional:
   - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
 - `penrose-p3-rhombs-vertex`
   - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
-- `penrose-p1-pentagon-diamond`
-  - [Penrose tiling: original pentagonal tiling (P1)](https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1))
-  - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
-  - [Pattern Collider](https://github.com/aatishb/patterncollider)
-- `penrose-p1-pentagon-boat-star`
-  - [Penrose Pentagon Boat Star](https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/)
-  - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+- `penrose-p1`
+  - `distributed` mode (`penrose-p1-pentagon-diamond` implementation geometry)
+    - [Penrose tiling: original pentagonal tiling (P1)](https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1))
+    - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+    - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - `boat-star` mode (`penrose-p1-pentagon-boat-star` implementation geometry)
+    - [Penrose Pentagon Boat Star](https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/)
+    - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
 - `penrose-p2-kite-dart`
   - [Penrose kite-dart](https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/)
 - `ammann-beenker`

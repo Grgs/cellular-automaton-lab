@@ -12,6 +12,10 @@ SHARED_APP_SHELL_BODY_PATH = ROOT_DIR / "frontend" / "shell" / "app-shell-body.h
 PICKER_GROUP_ORDER = ("Classic", "Periodic Mixed", "Aperiodic")
 UNRESOLVED_PLACEHOLDER_PATTERN = re.compile(r"__[A-Z0-9_]+__")
 TOPOLOGY_MODE_LABELS = {
+    "penrose-p1": {
+        "distributed": "Distributed",
+        "boat-star": "Boat-Star",
+    },
     "penrose-p3-rhombs": {
         "edge": "Edge adjacency",
         "vertex": "Vertex adjacency",

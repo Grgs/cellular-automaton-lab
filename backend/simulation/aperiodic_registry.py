@@ -19,6 +19,7 @@ from backend.simulation.aperiodic_family_manifest import (
     HENDECAGONAL_11_FOLD_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
     L_TETROMINO_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -71,7 +72,7 @@ class AperiodicFamilyDefinition:
 
 
 _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
-    PENROSE_P1_GEOMETRY: build_penrose_p1_patch,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY: build_penrose_p1_patch,
     PENROSE_P1_PBS_GEOMETRY: build_penrose_p1_pbs_patch,
     PENROSE_P2_GEOMETRY: build_penrose_p2_patch,
     AMMANN_BEENKER_GEOMETRY: build_ammann_beenker_patch,
@@ -101,7 +102,9 @@ _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
     geometry: AperiodicFamilyDefinition(
         geometry_key=geometry,
         builder_kind=APERIODIC_FAMILY_MANIFEST.get(
-            geometry,
+            PENROSE_P1_GEOMETRY
+            if geometry in {PENROSE_P1_DISTRIBUTED_GEOMETRY, PENROSE_P1_PBS_GEOMETRY}
+            else geometry,
             APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY],
         ).builder_kind,
         build_patch=build_patch,

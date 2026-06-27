@@ -28,6 +28,7 @@ from backend.simulation.topology import (
     SimulationBoard,
 )
 from backend.simulation.topology_catalog import (
+    canonicalize_topology_identity,
     get_topology_definition,
     get_topology_variant_for_geometry,
     maximum_patch_depth_for_tiling_family,
@@ -135,7 +136,10 @@ class TopologySpec:
         patch_depth: int = DEFAULT_PATCH_DEPTH,
         unsafe_size_override: bool = False,
     ) -> TopologySpec:
-        tiling_family_id = str(tiling_family)
+        tiling_family_id, adjacency_mode = canonicalize_topology_identity(
+            str(tiling_family),
+            adjacency_mode,
+        )
         definition = get_topology_definition(tiling_family_id)
         resolved_adjacency_mode = normalize_adjacency_mode(tiling_family_id, adjacency_mode)
         geometry_id = resolve_geometry_key(tiling_family_id, resolved_adjacency_mode)
