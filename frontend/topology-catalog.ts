@@ -167,6 +167,30 @@ export function topologyVariantKeyFromSpec(topologySpec: Partial<TopologySpec> =
     return resolveTopologyVariantKey(topologySpec.tiling_family, topologySpec.adjacency_mode);
 }
 
+const TOPOLOGY_MODE_LABELS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+    "penrose-p3-rhombs": {
+        edge: "Edge adjacency",
+        vertex: "Vertex adjacency",
+    },
+    sphinx: {
+        edge: "Balanced seed",
+        compact: "Compact seed",
+        wide: "Wide seed",
+    },
+};
+
+export function topologyModeLabel(
+    tilingFamily: string | null | undefined,
+    mode: string | null | undefined,
+): string {
+    const normalizedMode = String(mode || "edge");
+    const familyLabels = TOPOLOGY_MODE_LABELS[String(tilingFamily || "")];
+    if (familyLabels?.[normalizedMode]) {
+        return familyLabels[normalizedMode];
+    }
+    return `${normalizedMode.charAt(0).toUpperCase()}${normalizedMode.slice(1)} adjacency`;
+}
+
 // Search aliases favor terms a newcomer might try after recognizing shapes
 // in the picker preview, not just the formal catalog names.
 const TILING_SEARCH_ALIASES: Readonly<Record<string, readonly string[]>> = {
@@ -404,6 +428,6 @@ export function adjacencyModeOptions(
     }
     return definition.supported_adjacency_modes.map((mode) => ({
         value: mode,
-        label: mode.charAt(0).toUpperCase() + mode.slice(1),
+        label: topologyModeLabel(tilingFamily, mode),
     }));
 }

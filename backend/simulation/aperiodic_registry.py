@@ -28,7 +28,9 @@ from backend.simulation.aperiodic_family_manifest import (
     SHIELD_GEOMETRY,
     SOCOLAR_12_FOLD_GEOMETRY,
     SPECTRE_GEOMETRY,
+    SPHINX_COMPACT_PAIR_GEOMETRY,
     SPHINX_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TRIDECAGONAL_13_FOLD_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
@@ -47,7 +49,11 @@ from backend.simulation.aperiodic_robinson_triangles import build_robinson_trian
 from backend.simulation.aperiodic_shield import build_shield_patch
 from backend.simulation.aperiodic_socolar_12_fold import build_socolar_12_fold_patch
 from backend.simulation.aperiodic_spectre import build_spectre_patch
-from backend.simulation.aperiodic_sphinx import build_sphinx_patch
+from backend.simulation.aperiodic_sphinx import (
+    build_sphinx_compact_pair_patch,
+    build_sphinx_patch,
+    build_sphinx_wide_pair_patch,
+)
 from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.aperiodic_taylor_socolar import build_taylor_socolar_patch
 from backend.simulation.aperiodic_tridecagonal_13_fold import build_tridecagonal_13_fold_patch
@@ -72,6 +78,8 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     SPECTRE_GEOMETRY: build_spectre_patch,
     TAYLOR_SOCOLAR_GEOMETRY: build_taylor_socolar_patch,
     SPHINX_GEOMETRY: build_sphinx_patch,
+    SPHINX_COMPACT_PAIR_GEOMETRY: build_sphinx_compact_pair_patch,
+    SPHINX_WIDE_PAIR_GEOMETRY: build_sphinx_wide_pair_patch,
     HAT_MONOTILE_GEOMETRY: build_hat_patch,
     TURTLE_MONOTILE_GEOMETRY: build_turtle_patch,
     L_TETROMINO_GEOMETRY: build_l_tetromino_patch,
@@ -92,7 +100,10 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
     geometry: AperiodicFamilyDefinition(
         geometry_key=geometry,
-        builder_kind=APERIODIC_FAMILY_MANIFEST[geometry].builder_kind,
+        builder_kind=APERIODIC_FAMILY_MANIFEST.get(
+            geometry,
+            APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY],
+        ).builder_kind,
         build_patch=build_patch,
     )
     for geometry, build_patch in _APERIODIC_PATCH_BUILDERS.items()

@@ -23,7 +23,9 @@ from backend.simulation.aperiodic_family_manifest import (
     SHIELD_GEOMETRY,
     SOCOLAR_12_FOLD_GEOMETRY,
     SPECTRE_GEOMETRY,
+    SPHINX_COMPACT_PAIR_GEOMETRY,
     SPHINX_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TRIDECAGONAL_13_FOLD_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
@@ -38,6 +40,8 @@ DEFAULT_TOPOLOGY_PATCH_DEPTH = 4
 
 EDGE_ADJACENCY = "edge"
 VERTEX_ADJACENCY = "vertex"
+COMPACT_SEED = "compact"
+WIDE_SEED = "wide"
 
 CELL_SIZE_CONTROL = "cell_size"
 PATCH_DEPTH_CONTROL = "patch_depth"
@@ -352,6 +356,23 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     SPHINX_GEOMETRY: _translated_aperiodic_family(
         SPHINX_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+        variants=(
+            _variant(
+                SPHINX_GEOMETRY,
+                EDGE_ADJACENCY,
+                APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY].default_rule,
+            ),
+            _variant(
+                SPHINX_COMPACT_PAIR_GEOMETRY,
+                COMPACT_SEED,
+                APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY].default_rule,
+            ),
+            _variant(
+                SPHINX_WIDE_PAIR_GEOMETRY,
+                WIDE_SEED,
+                APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY].default_rule,
+            ),
+        ),
     ),
     ROBINSON_TRIANGLES_GEOMETRY: _translated_aperiodic_family(
         ROBINSON_TRIANGLES_GEOMETRY,

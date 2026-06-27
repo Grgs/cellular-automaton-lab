@@ -75,12 +75,53 @@ _SPHINX_ROOT_TRANSFORM = _placement_transform(
     ty=-math.sqrt(3),
 )
 
+_SPHINX_COMPACT_PAIR_ROOT_TRANSFORMS = (
+    _placement_transform(
+        reflected=False,
+        rotation_turns=2,
+        tx=1.0,
+        ty=0.0,
+    ),
+    _placement_transform(
+        reflected=True,
+        rotation_turns=5,
+        tx=-0.5,
+        ty=-math.sqrt(3) / 2,
+    ),
+)
+
+_SPHINX_WIDE_PAIR_ROOT_TRANSFORM = _placement_transform(
+    reflected=True,
+    rotation_turns=1,
+    tx=0.0,
+    ty=0.0,
+)
+
 
 def _sphinx_root_items(patch_depth: int) -> tuple[SubstitutionChild, ...]:
     root_scale = scale(2 ** int(patch_depth))
     return (
         SubstitutionChild("sphinx", root_scale),
         SubstitutionChild("sphinx", affine_multiply(root_scale, _SPHINX_ROOT_TRANSFORM)),
+    )
+
+
+def _sphinx_compact_pair_root_items(patch_depth: int) -> tuple[SubstitutionChild, ...]:
+    root_scale = scale(2 ** int(patch_depth))
+    return tuple(
+        SubstitutionChild("sphinx", affine_multiply(root_scale, transform))
+        for transform in _SPHINX_COMPACT_PAIR_ROOT_TRANSFORMS
+    )
+
+
+def _sphinx_wide_pair_root_items(patch_depth: int) -> tuple[SubstitutionChild, ...]:
+    root_scale = scale(2 ** int(patch_depth))
+    return (
+        SubstitutionChild("sphinx", root_scale),
+        SubstitutionChild(
+            "sphinx",
+            affine_multiply(root_scale, _SPHINX_WIDE_PAIR_ROOT_TRANSFORM),
+        ),
     )
 
 
@@ -117,6 +158,24 @@ def build_sphinx_patch(patch_depth: int) -> AperiodicPatch:
     return build_substitution_patch(
         patch_depth,
         root_items=_sphinx_root_items(patch_depth),
+        expand_children=_sphinx_children,
+        leaf_templates_for_label=_sphinx_leaf_templates,
+    )
+
+
+def build_sphinx_compact_pair_patch(patch_depth: int) -> AperiodicPatch:
+    return build_substitution_patch(
+        patch_depth,
+        root_items=_sphinx_compact_pair_root_items(patch_depth),
+        expand_children=_sphinx_children,
+        leaf_templates_for_label=_sphinx_leaf_templates,
+    )
+
+
+def build_sphinx_wide_pair_patch(patch_depth: int) -> AperiodicPatch:
+    return build_substitution_patch(
+        patch_depth,
+        root_items=_sphinx_wide_pair_root_items(patch_depth),
         expand_children=_sphinx_children,
         leaf_templates_for_label=_sphinx_leaf_templates,
     )

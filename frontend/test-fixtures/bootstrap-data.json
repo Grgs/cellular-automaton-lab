@@ -1447,14 +1447,20 @@
       "render_kind": "polygon_aperiodic",
       "viewport_sync_mode": "presentation-only",
       "supported_adjacency_modes": [
-        "edge"
+        "edge",
+        "compact",
+        "wide"
       ],
       "default_adjacency_mode": "edge",
       "default_rules": {
-        "edge": "life-b2-s23"
+        "edge": "life-b2-s23",
+        "compact": "life-b2-s23",
+        "wide": "life-b2-s23"
       },
       "geometry_keys": {
-        "edge": "sphinx"
+        "edge": "sphinx",
+        "compact": "sphinx-compact-pair",
+        "wide": "sphinx-wide-pair"
       },
       "sizing_policy": {
         "control": "patch_depth",

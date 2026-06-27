@@ -9,6 +9,9 @@ from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_MANIFEST,
     PENROSE_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    SPHINX_COMPACT_PAIR_GEOMETRY,
+    SPHINX_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
 )
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
@@ -44,15 +47,16 @@ def _load_fixture_geometries(path: Path) -> set[str]:
 
 
 def _verification_modes(geometry: str) -> tuple[str, ...]:
-    spec = REFERENCE_FAMILY_SPECS[geometry]
+    reference_geometry = _contract_manifest_geometry(geometry)
+    spec = REFERENCE_FAMILY_SPECS[reference_geometry]
     modes: list[str] = []
     if spec.depth_expectations:
         modes.append("depth-expectations")
     if spec.required_metadata:
         modes.append("metadata")
-    if geometry in _load_fixture_geometries(_LOCAL_REFERENCE_FIXTURE_PATH):
+    if reference_geometry in _load_fixture_geometries(_LOCAL_REFERENCE_FIXTURE_PATH):
         modes.append("local-reference")
-    if geometry in _load_fixture_geometries(_CANONICAL_REFERENCE_FIXTURE_PATH):
+    if reference_geometry in _load_fixture_geometries(_CANONICAL_REFERENCE_FIXTURE_PATH):
         modes.append("canonical-patch")
     if spec.exact_reference_mode is not None:
         modes.append(spec.exact_reference_mode)
@@ -62,7 +66,7 @@ def _verification_modes(geometry: str) -> tuple[str, ...]:
 
 
 def _depth_semantics(geometry: str) -> str:
-    spec = REFERENCE_FAMILY_SPECS[geometry]
+    spec = REFERENCE_FAMILY_SPECS[_contract_manifest_geometry(geometry)]
     if spec.sample_mode == "grid":
         return "grid sample"
     manifest_geometry = _contract_manifest_geometry(geometry)
@@ -75,11 +79,13 @@ def _depth_semantics(geometry: str) -> str:
 def _contract_manifest_geometry(geometry: str) -> str:
     if geometry == PENROSE_VERTEX_GEOMETRY:
         return PENROSE_GEOMETRY
+    if geometry in {SPHINX_COMPACT_PAIR_GEOMETRY, SPHINX_WIDE_PAIR_GEOMETRY}:
+        return SPHINX_GEOMETRY
     return geometry
 
 
 def build_aperiodic_contract(geometry: str) -> AperiodicImplementationContract:
-    spec = REFERENCE_FAMILY_SPECS[geometry]
+    spec = REFERENCE_FAMILY_SPECS[_contract_manifest_geometry(geometry)]
     try:
         manifest_entry = APERIODIC_FAMILY_MANIFEST[_contract_manifest_geometry(geometry)]
     except KeyError as error:

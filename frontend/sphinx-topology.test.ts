@@ -12,6 +12,7 @@ describe("sphinx topology", () => {
     it("appears in topology picker metadata with patch-depth sizing", async () => {
         const {
             getTopologyDefinition,
+            adjacencyModeOptions,
             resolveTopologyVariantKey,
             tilingFamilyOptions,
             topologyUsesPatchDepth,
@@ -20,7 +21,14 @@ describe("sphinx topology", () => {
 
         expect(new Set(tilingFamilyOptions().map((option) => option.value))).toContain("sphinx");
         expect(resolveTopologyVariantKey("sphinx", "edge")).toBe(sphinx.geometry_keys.edge);
+        expect(resolveTopologyVariantKey("sphinx", "compact")).toBe(sphinx.geometry_keys.compact);
+        expect(resolveTopologyVariantKey("sphinx", "wide")).toBe(sphinx.geometry_keys.wide);
         expect(getTopologyDefinition("sphinx")?.render_kind).toBe("polygon_aperiodic");
+        expect(adjacencyModeOptions("sphinx")).toEqual([
+            { value: "edge", label: "Balanced seed" },
+            { value: "compact", label: "Compact seed" },
+            { value: "wide", label: "Wide seed" },
+        ]);
         expect(topologyUsesPatchDepth("sphinx")).toBe(true);
     });
 

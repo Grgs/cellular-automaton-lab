@@ -11,6 +11,17 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 SHARED_APP_SHELL_BODY_PATH = ROOT_DIR / "frontend" / "shell" / "app-shell-body.html"
 PICKER_GROUP_ORDER = ("Classic", "Periodic Mixed", "Aperiodic")
 UNRESOLVED_PLACEHOLDER_PATTERN = re.compile(r"__[A-Z0-9_]+__")
+TOPOLOGY_MODE_LABELS = {
+    "penrose-p3-rhombs": {
+        "edge": "Edge adjacency",
+        "vertex": "Vertex adjacency",
+    },
+    "sphinx": {
+        "edge": "Balanced seed",
+        "compact": "Compact seed",
+        "wide": "Wide seed",
+    },
+}
 
 
 class AppShellRenderValues(TypedDict):
@@ -101,6 +112,10 @@ def _build_option(value: str, label: str, *, selected: bool = False) -> str:
     )
 
 
+def _topology_mode_label(tiling_family: str, mode: str) -> str:
+    return TOPOLOGY_MODE_LABELS.get(tiling_family, {}).get(mode, mode.capitalize())
+
+
 def _group_topologies(
     topology_catalog: list[TopologyCatalogEntryPayload],
 ) -> list[tuple[str, list[TopologyCatalogEntryPayload]]]:
@@ -163,7 +178,7 @@ def build_adjacency_mode_options_html(
         return "\n".join(
             _build_option(
                 str(adjacency_mode),
-                str(adjacency_mode).capitalize(),
+                _topology_mode_label(str(tiling_family), str(adjacency_mode)),
                 selected=str(adjacency_mode) == str(selected_adjacency_mode),
             )
             for adjacency_mode in supported_modes
@@ -203,12 +218,15 @@ def _render_shared_app_shell(render_values: AppShellRenderValues) -> str:
 
 def _default_adjacency_hidden_attribute(
     *,
+    topology_catalog: list[TopologyCatalogEntryPayload],
     tiling_family: str,
-    adjacency_mode: str,
 ) -> str:
-    if adjacency_mode == "edge" and tiling_family != "penrose-p3-rhombs":
-        return "hidden"
-    return ""
+    for topology in topology_catalog:
+        if str(topology["tiling_family"]) != str(tiling_family):
+            continue
+        if len(topology.get("supported_adjacency_modes", [])) > 1:
+            return ""
+    return "hidden"
 
 
 def render_server_app_shell(
@@ -240,8 +258,8 @@ def render_server_app_shell(
         "speed_value": speed_value,
         "speed_label": f"Target {speed_value} gen/s",
         "adjacency_field_hidden": _default_adjacency_hidden_attribute(
+            topology_catalog=topology_catalog,
             tiling_family=selected_tiling_family,
-            adjacency_mode=selected_adjacency_mode,
         ),
         "adjacency_mode_options": build_adjacency_mode_options_html(
             topology_catalog,

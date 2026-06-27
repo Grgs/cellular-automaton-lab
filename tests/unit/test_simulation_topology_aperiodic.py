@@ -21,7 +21,9 @@ try:
         SHIELD_SQUARE_KIND,
         SHIELD_TRIANGLE_KIND,
         SPECTRE_GEOMETRY,
+        SPHINX_COMPACT_PAIR_GEOMETRY,
         SPHINX_GEOMETRY,
+        SPHINX_WIDE_PAIR_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
     )
@@ -51,7 +53,9 @@ except ModuleNotFoundError:
         SHIELD_SQUARE_KIND,
         SHIELD_TRIANGLE_KIND,
         SPECTRE_GEOMETRY,
+        SPHINX_COMPACT_PAIR_GEOMETRY,
         SPHINX_GEOMETRY,
+        SPHINX_WIDE_PAIR_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
     )
@@ -178,6 +182,20 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
             for neighbor_id in cell.neighbors:
                 assert neighbor_id is not None
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
+
+    def test_sphinx_seed_variants_build_distinct_connected_topologies(self) -> None:
+        balanced = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
+        compact = build_topology(SPHINX_COMPACT_PAIR_GEOMETRY, 0, 0, patch_depth=3)
+        wide = build_topology(SPHINX_WIDE_PAIR_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertEqual(compact.cell_count, balanced.cell_count)
+        self.assertEqual(wide.cell_count, balanced.cell_count)
+        self.assertLess(compact.height, balanced.height)
+        self.assertGreater(wide.width / wide.height, balanced.width / balanced.height)
+        for topology in (compact, wide):
+            with self.subTest(geometry=topology.geometry):
+                for cell in topology.cells:
+                    self.assertGreater(len(cell.neighbors), 0)
 
     def test_chair_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
         seed = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=0)
