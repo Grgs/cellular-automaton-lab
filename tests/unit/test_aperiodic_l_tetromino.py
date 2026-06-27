@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 import sys
 import unittest
 from pathlib import Path
@@ -55,6 +54,19 @@ def _point_in_polygon(point: Point, polygon: list[Point]) -> bool:
     return inside
 
 
+def _covered_unit_cells(polygon: list[Point]) -> set[tuple[int, int]]:
+    min_x = int(min(x for x, _ in polygon))
+    max_x = int(max(x for x, _ in polygon))
+    min_y = int(min(y for _, y in polygon))
+    max_y = int(max(y for _, y in polygon))
+    covered: set[tuple[int, int]] = set()
+    for x in range(min_x, max_x):
+        for y in range(min_y, max_y):
+            if _point_in_polygon((x + 0.5, y + 0.5), polygon):
+                covered.add((x, y))
+    return covered
+
+
 def _base_points() -> list[Point]:
     return [(vertex.x, vertex.y) for vertex in _BASE_POLYGON]
 
@@ -94,22 +106,21 @@ class LTetrominoGeometryTests(unittest.TestCase):
 
     def test_children_cover_the_parent_without_overlap(self) -> None:
         doubled_parent = [(2.0 * x, 2.0 * y) for (x, y) in _base_points()]
-        children = [
+        parent_cells = _covered_unit_cells(doubled_parent)
+        covered_once: set[tuple[int, int]] = set()
+        child_cell_count = 0
+        for child in (
             _child_polygon_in_doubled_frame(matrix, translation)
             for matrix, translation in _CANONICAL_CHILDREN
-        ]
-        max_x = max(x for x, _ in doubled_parent)
-        max_y = max(y for _, y in doubled_parent)
-        rng = random.Random(1)
-        sampled = 0
-        for _ in range(8000):
-            point = (rng.uniform(0, max_x), rng.uniform(0, max_y))
-            if not _point_in_polygon(point, doubled_parent):
-                continue
-            sampled += 1
-            covering = sum(1 for child in children if _point_in_polygon(point, child))
-            self.assertEqual(covering, 1)
-        self.assertGreater(sampled, 1000)
+        ):
+            child_cells = _covered_unit_cells(child)
+            child_cell_count += len(child_cells)
+            self.assertTrue(child_cells <= parent_cells)
+            self.assertTrue(covered_once.isdisjoint(child_cells))
+            covered_once.update(child_cells)
+
+        self.assertEqual(covered_once, parent_cells)
+        self.assertEqual(child_cell_count, len(parent_cells))
 
 
 class LTetrominoRecordTests(unittest.TestCase):

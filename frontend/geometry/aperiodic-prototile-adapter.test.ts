@@ -9,6 +9,67 @@ describe("geometry/aperiodic-prototile-adapter", () => {
         installFrontendGlobals();
     });
 
+    it("scales L-Tetromino coordinates so the subdivided patch fills the canvas", async () => {
+        const { createAperiodicPrototileGeometryAdapter } =
+            await import("./aperiodic-prototile-adapter.js");
+        const adapter = createAperiodicPrototileGeometryAdapter("l-tetromino");
+        const topology = {
+            topology_spec: {
+                tiling_family: "l-tetromino",
+                adjacency_mode: "edge",
+                sizing_mode: "patch_depth",
+                width: 2,
+                height: 3,
+                patch_depth: 3,
+            },
+            topology_revision: "fixture-l-tetromino-adapter",
+            width: 2,
+            height: 3,
+            cells: [
+                {
+                    id: "l-tetromino:test",
+                    kind: "l-tetromino",
+                    neighbors: [],
+                    center: { x: 0.75, y: 1.25 },
+                    vertices: [
+                        { x: 0, y: 0 },
+                        { x: 2, y: 0 },
+                        { x: 2, y: 1 },
+                        { x: 1, y: 1 },
+                        { x: 1, y: 3 },
+                        { x: 0, y: 3 },
+                    ],
+                    tile_family: "l-tetromino",
+                    orientation_token: "0",
+                },
+            ],
+        };
+
+        if (!adapter.fitRenderCellSize) {
+            throw new Error("Aperiodic adapter must expose fitRenderCellSize.");
+        }
+        const fittedCellSize = adapter.fitRenderCellSize({
+            viewportWidth: 1200,
+            viewportHeight: 900,
+            width: 2,
+            height: 3,
+            topology,
+            fallbackCellSize: 12,
+        });
+        const metrics = adapter.buildMetrics({
+            width: 2,
+            height: 3,
+            cellSize: fittedCellSize,
+            topology,
+        });
+
+        expect(metrics.coordinateScale).toBe(12);
+        expect(metrics.cssWidth).toBeGreaterThan(450);
+        expect(metrics.cssWidth).toBeLessThanOrEqual(1200);
+        expect(metrics.cssHeight).toBeGreaterThan(700);
+        expect(metrics.cssHeight).toBeLessThanOrEqual(900);
+    });
+
     it("renders shield polygons edge-to-edge without an extra display shrink", async () => {
         const { createAperiodicPrototileGeometryAdapter } =
             await import("./aperiodic-prototile-adapter.js");
