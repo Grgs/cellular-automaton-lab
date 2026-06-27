@@ -16,18 +16,18 @@ SPECS = {
         geometry=SPHINX_GEOMETRY,
         display_name=_reference_label(SPHINX_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/sphinx/",),
-        canonical_root_seed_policy="single sphinx rep-tile seed",
+        canonical_root_seed_policy="two-sphinx compact representative seed",
         allowed_public_cell_kinds=_public_cell_kinds(SPHINX_GEOMETRY),
         required_metadata=(),
         depth_expectations={
-            0: ReferenceDepthExpectation(exact_total_cells=1, required_kinds=(SPHINX_KIND,)),
+            0: ReferenceDepthExpectation(exact_total_cells=2, required_kinds=(SPHINX_KIND,)),
             1: ReferenceDepthExpectation(
-                exact_total_cells=4,
+                exact_total_cells=8,
                 required_adjacency_pairs=((SPHINX_KIND, SPHINX_KIND),),
             ),
-            2: ReferenceDepthExpectation(exact_total_cells=16),
+            2: ReferenceDepthExpectation(exact_total_cells=32),
             3: ReferenceDepthExpectation(
-                exact_total_cells=64,
+                exact_total_cells=128,
                 canonical_patch_fixture_key="exact-depth-3",
             ),
         },
