@@ -1,7 +1,7 @@
 {
   "chair": {
     "3": {
-      "chair:root.child1.child0.child0:o0:sp125000:p500000:p500000": {
+      "chair:root1.child3.child0.child0:o0:sp125000:p1000000:p1000000": {
         "neighbors": [
           {
             "area": 0.046875,

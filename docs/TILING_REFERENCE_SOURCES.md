@@ -115,6 +115,9 @@ The order is intentional:
   - [Sphinx](https://tilings.math.uni-bielefeld.de/substitution/sphinx/)
 - `chair`
   - [Chair](https://tilings.math.uni-bielefeld.de/substitution/chair/)
+  - The app representative patch starts from two substituted chair supertiles
+    arranged as a 3x2 rectangle so the default view is wider while preserving
+    the same inflation-by-2 chair substitution.
 - `l-tetromino`
   - [Rep-tile (L-tromino / L-tetromino / P-pentomino are rep-n^2)](https://en.wikipedia.org/wiki/Rep-tile)
   - Shipped as the exact integer-lattice rep-4 substitution of the L-tetromino
