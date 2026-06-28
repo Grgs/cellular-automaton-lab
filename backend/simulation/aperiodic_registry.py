@@ -20,7 +20,6 @@ from backend.simulation.aperiodic_family_manifest import (
     HEPTAGONAL_7_FOLD_GEOMETRY,
     L_TETROMINO_GEOMETRY,
     PENROSE_P1_DISTRIBUTED_GEOMETRY,
-    PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
     PINWHEEL_2_1_GEOMETRY,
@@ -36,6 +35,7 @@ from backend.simulation.aperiodic_family_manifest import (
     TRIDECAGONAL_13_FOLD_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
     TURTLE_MONOTILE_GEOMETRY,
+    manifest_family_geometry,
 )
 from backend.simulation.aperiodic_hat import build_hat_patch
 from backend.simulation.aperiodic_hendecagonal_11_fold import build_hendecagonal_11_fold_patch
@@ -101,12 +101,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
     geometry: AperiodicFamilyDefinition(
         geometry_key=geometry,
-        builder_kind=APERIODIC_FAMILY_MANIFEST.get(
-            PENROSE_P1_GEOMETRY
-            if geometry in {PENROSE_P1_DISTRIBUTED_GEOMETRY, PENROSE_P1_PBS_GEOMETRY}
-            else geometry,
-            APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY],
-        ).builder_kind,
+        builder_kind=APERIODIC_FAMILY_MANIFEST[manifest_family_geometry(geometry)].builder_kind,
         build_patch=build_patch,
     )
     for geometry, build_patch in _APERIODIC_PATCH_BUILDERS.items()

@@ -8,13 +8,11 @@ from typing import Literal
 from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_MANIFEST,
     PENROSE_GEOMETRY,
-    PENROSE_P1_DISTRIBUTED_GEOMETRY,
-    PENROSE_P1_GEOMETRY,
-    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
     SPHINX_COMPACT_PAIR_GEOMETRY,
     SPHINX_GEOMETRY,
     SPHINX_WIDE_PAIR_GEOMETRY,
+    manifest_family_geometry,
 )
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
@@ -80,13 +78,7 @@ def _depth_semantics(geometry: str) -> str:
 
 
 def _contract_manifest_geometry(geometry: str) -> str:
-    if geometry == PENROSE_VERTEX_GEOMETRY:
-        return PENROSE_GEOMETRY
-    if geometry in {PENROSE_P1_DISTRIBUTED_GEOMETRY, PENROSE_P1_PBS_GEOMETRY}:
-        return PENROSE_P1_GEOMETRY
-    if geometry in {SPHINX_COMPACT_PAIR_GEOMETRY, SPHINX_WIDE_PAIR_GEOMETRY}:
-        return SPHINX_GEOMETRY
-    return geometry
+    return manifest_family_geometry(geometry)
 
 
 def _contract_reference_geometry(geometry: str) -> str:

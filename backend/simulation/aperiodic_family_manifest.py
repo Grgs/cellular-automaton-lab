@@ -582,6 +582,28 @@ EXPERIMENTAL_APERIODIC_FAMILY_IDS: tuple[str, ...] = tuple(
 )
 
 
+# Variant geometries render a distinct seed or construction of a base catalog
+# family and therefore share that family's manifest entry (builder kind, public
+# cell kinds, picker metadata). Map each variant back to the owning family.
+_VARIANT_GEOMETRY_FAMILY: dict[str, str] = {
+    PENROSE_VERTEX_GEOMETRY: PENROSE_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY: PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY: PENROSE_P1_GEOMETRY,
+    SPHINX_COMPACT_PAIR_GEOMETRY: SPHINX_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY: SPHINX_GEOMETRY,
+}
+
+
+def manifest_family_geometry(geometry: str) -> str:
+    """Return the catalog family geometry that owns ``geometry``'s manifest entry.
+
+    Most geometries own their own entry and map to themselves. Seed/construction
+    variant geometries (e.g. the Sphinx pair seeds, the Penrose P1 sub-modes)
+    map back to the base family that carries the shared manifest metadata.
+    """
+    return _VARIANT_GEOMETRY_FAMILY.get(geometry, geometry)
+
+
 def get_aperiodic_family_manifest_entry(geometry: str) -> AperiodicFamilyManifestEntry:
     try:
         return APERIODIC_FAMILY_MANIFEST[geometry]
