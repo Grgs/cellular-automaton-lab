@@ -26,6 +26,16 @@ def _find_available_port() -> int:
 
 
 class DevProcessesToolTests(unittest.TestCase):
+    def setUp(self) -> None:
+        # repo_processes_from_windows_payload() drops the current process via
+        # os.getpid(). These tests use small hardcoded payload PIDs (e.g. 100),
+        # which can collide with the real test-runner PID on some CI hosts and
+        # silently filter an expected process out. Pin getpid() to a sentinel
+        # that never matches a positive payload PID.
+        patcher = patch("tools.dev_processes.os.getpid", return_value=-1)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_classify_repo_process_matches_standalone_http_server(self) -> None:
         process = classify_repo_process(
             pid=123,
