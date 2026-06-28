@@ -51,12 +51,17 @@ def _required_preview_keys() -> frozenset[str]:
     """Return the picker preview key for every non-regular tiling family.
 
     Each topology family appears once in the picker. The preview key is the
-    geometry key for the family's default adjacency mode.
+    public family key when preview data exists for it, otherwise the geometry
+    key for the family's default adjacency mode.
     """
+    available = _preview_data_keys()
     return frozenset(
-        d.geometry_keys[d.default_adjacency_mode]
+        d.tiling_family
+        if d.tiling_family in available
+        else d.geometry_keys[d.default_adjacency_mode]
         for d in TOPOLOGY_CATALOG
-        if d.geometry_keys[d.default_adjacency_mode] not in _INLINE_PREVIEW_KEYS
+        if d.tiling_family not in _INLINE_PREVIEW_KEYS
+        and d.geometry_keys[d.default_adjacency_mode] not in _INLINE_PREVIEW_KEYS
     )
 
 
