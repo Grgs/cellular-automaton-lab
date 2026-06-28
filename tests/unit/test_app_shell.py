@@ -23,10 +23,11 @@ class AppShellTests(unittest.TestCase):
         self.assertIn('<option value="square" selected="selected">Square</option>', rendered)
         self.assertIn('value="12"', rendered)
         self.assertIn(">Target 7 gen/s<", rendered)
+        self.assertIn('id="adjacency-mode-label" class="top-control-label"', rendered)
         self.assertRegex(
             rendered,
             r'<select id="adjacency-mode-select">\s*'
-            r'<option value="edge" selected="selected">Edge</option>\s*</select>',
+            r'<option value="edge" selected="selected">Edge adjacency</option>\s*</select>',
         )
 
     def test_render_standalone_shell_cli_matches_generated_output(self) -> None:
