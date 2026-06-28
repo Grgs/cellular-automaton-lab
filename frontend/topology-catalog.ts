@@ -474,9 +474,3 @@ export function topologyModeOptions(
         label: topologyModeLabel(tilingFamily, mode),
     }));
 }
-
-export function adjacencyModeOptions(
-    tilingFamily: string | null | undefined,
-): AdjacencyModeOption[] {
-    return topologyModeOptions(tilingFamily);
-}

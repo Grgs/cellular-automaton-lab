@@ -11,11 +11,11 @@ describe("Penrose P1 topology", () => {
 
     it("appears as one picker family with construction modes", async () => {
         const {
-            adjacencyModeOptions,
             describeTopologySpec,
             resolveTopologyVariantKey,
             tilingFamilyOptions,
             topologyModeFieldLabel,
+            topologyModeOptions,
             topologyUsesPatchDepth,
         } = await import("./topology-catalog.js");
         const penroseP1 = getFixtureTopologyDefinition("penrose-p1");
@@ -29,7 +29,7 @@ describe("Penrose P1 topology", () => {
         expect(resolveTopologyVariantKey("penrose-p1", "boat-star")).toBe(
             penroseP1.geometry_keys["boat-star"],
         );
-        expect(adjacencyModeOptions("penrose-p1")).toEqual([
+        expect(topologyModeOptions("penrose-p1")).toEqual([
             { value: "distributed", label: "Distributed" },
             { value: "boat-star", label: "Boat-Star" },
         ]);
