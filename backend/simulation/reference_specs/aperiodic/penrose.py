@@ -30,7 +30,7 @@ SPECS = {
         geometry=PENROSE_GEOMETRY,
         display_name=_reference_label(PENROSE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
-        canonical_root_seed_policy="de Bruijn pentagrid crop at half-extent 0.85 * phi^d",
+        root_seed_policy="de Bruijn pentagrid crop at half-extent 0.85 * phi^d",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
         required_metadata=(),
         depth_expectations={
@@ -66,7 +66,7 @@ SPECS = {
         geometry=PENROSE_VERTEX_GEOMETRY,
         display_name="Penrose Rhombs (Vertex Adjacency)",
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/",),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "de Bruijn pentagrid crop at half-extent 0.85 * phi^d with vertex-neighbor topology"
         ),
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_GEOMETRY),
@@ -103,7 +103,7 @@ SPECS = {
             "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
             "https://github.com/aatishb/patterncollider",
         ),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "non-uniform pentagrid offsets (0.3, 0.4, 0.5, 0.6, 0.7) with "
             "vertex-merge post-pass: scattered sun, star, and boat vertices "
             "in the underlying P3 rhomb tiling are collapsed into Penrose's "
@@ -196,7 +196,7 @@ SPECS = {
             "https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/",
             "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
         ),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "singular pentagrid crop with all-zero offsets and half-extent 1.6 * phi^d"
         ),
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_GEOMETRY),
@@ -257,7 +257,7 @@ SPECS = {
         geometry=PENROSE_P2_GEOMETRY,
         display_name=_reference_label(PENROSE_P2_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/",),
-        canonical_root_seed_policy="five-kite sun seed",
+        root_seed_policy="five-kite sun seed",
         allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P2_GEOMETRY),
         required_metadata=(),
         depth_expectations={

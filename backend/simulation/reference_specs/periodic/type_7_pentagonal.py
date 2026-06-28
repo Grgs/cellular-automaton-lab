@@ -17,7 +17,7 @@ SPECS = {
             "https://en.wikipedia.org/wiki/Pentagonal_tiling",
             "https://www.mathartroom.com/wallpaper/pentagon_tiling/type07/",
         ),
-        canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
+        root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("pentagon",),
         required_metadata=(),
         sample_mode="grid",

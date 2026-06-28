@@ -49,7 +49,7 @@ SPECS = {
             "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
             "https://github.com/aatishb/patterncollider",
         ),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "de Bruijn tridecagrid crop: thirteen line families 2*pi/13 apart with "
             "generic offsets, cropped to a square of half-extent 0.5 * 1.5^d"
         ),

@@ -22,7 +22,7 @@ SPECS = {
             "https://arxiv.org/abs/1009.1419",
             "https://arxiv.org/abs/1210.3967",
         ),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "paired half-hex seed (one upper + one lower; both share chirality 'left' "
             "so the central pair forms one full chiral hexagon)"
         ),

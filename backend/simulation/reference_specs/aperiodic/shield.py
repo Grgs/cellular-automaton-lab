@@ -22,7 +22,7 @@ SPECS = {
             "https://tilings.math.uni-bielefeld.de/substitution/shield/",
             "https://www.math.uni-bielefeld.de/~gaehler/tilings/sh.ps",
         ),
-        canonical_root_seed_policy="single right-shield seed from Gahler's marked recursive PostScript rule",
+        root_seed_policy="single right-shield seed from Gahler's marked recursive PostScript rule",
         allowed_public_cell_kinds=_public_cell_kinds(SHIELD_GEOMETRY),
         required_metadata=(
             MetadataRequirement(

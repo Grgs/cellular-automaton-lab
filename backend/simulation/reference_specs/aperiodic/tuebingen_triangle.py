@@ -18,7 +18,7 @@ SPECS = {
         geometry=TUEBINGEN_TRIANGLE_GEOMETRY,
         display_name=_reference_label(TUEBINGEN_TRIANGLE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/",),
-        canonical_root_seed_policy="handed Robinson-triangle substitution patch",
+        root_seed_policy="handed Robinson-triangle substitution patch",
         allowed_public_cell_kinds=_public_cell_kinds(TUEBINGEN_TRIANGLE_GEOMETRY),
         required_metadata=(
             MetadataRequirement(

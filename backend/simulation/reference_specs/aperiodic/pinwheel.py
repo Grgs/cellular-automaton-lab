@@ -25,7 +25,7 @@ SPECS = {
             "https://annals.math.princeton.edu/1994/139-3/p05",
             "https://tilings.math.uni-bielefeld.de/substitution/pinwheel/",
         ),
-        canonical_root_seed_policy="paired right triangles forming a rectangle",
+        root_seed_policy="paired right triangles forming a rectangle",
         allowed_public_cell_kinds=_public_cell_kinds(PINWHEEL_GEOMETRY),
         required_metadata=(
             MetadataRequirement(

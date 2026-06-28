@@ -19,7 +19,7 @@ SPECS = {
             "https://tilings.math.uni-bielefeld.de/substitution/spectre/",
             "https://doi.org/10.5070/C64264241",
         ),
-        canonical_root_seed_policy="delta supertile seed",
+        root_seed_policy="delta supertile seed",
         allowed_public_cell_kinds=_public_cell_kinds(SPECTRE_GEOMETRY),
         required_metadata=(),
         depth_expectations={

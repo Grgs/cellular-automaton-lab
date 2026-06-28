@@ -14,7 +14,7 @@ SPECS = {
             "https://en.wikipedia.org/wiki/List_of_k-uniform_tilings",
             "https://commons.wikimedia.org/wiki/File:2-uniform_n13.svg",
         ),
-        canonical_root_seed_policy="descriptor-driven open-boundary 3x3 sample",
+        root_seed_policy="descriptor-driven open-boundary 3x3 sample",
         allowed_public_cell_kinds=("dodecagon", "square", "triangle"),
         required_metadata=(),
         sample_mode="grid",

@@ -25,7 +25,7 @@ SPECS = {
             "https://arxiv.org/abs/2303.10798",
             "https://tilings.math.uni-bielefeld.de/substitution/hat-metatiles/",
         ),
-        canonical_root_seed_policy="H8 metatile root seed (Tile(sqrt(3), 1) deformation)",
+        root_seed_policy="H8 metatile root seed (Tile(sqrt(3), 1) deformation)",
         allowed_public_cell_kinds=_public_cell_kinds(TURTLE_MONOTILE_GEOMETRY),
         required_metadata=(
             MetadataRequirement(
