@@ -15,6 +15,7 @@ describe("sphinx topology", () => {
             adjacencyModeOptions,
             resolveTopologyVariantKey,
             tilingFamilyOptions,
+            topologyModeFieldLabel,
             topologyUsesPatchDepth,
         } = await import("./topology-catalog.js");
         const sphinx = getFixtureTopologyDefinition("sphinx");
@@ -29,6 +30,7 @@ describe("sphinx topology", () => {
             { value: "compact", label: "Compact seed" },
             { value: "wide", label: "Wide seed" },
         ]);
+        expect(topologyModeFieldLabel("sphinx")).toBe("Seed");
         expect(topologyUsesPatchDepth("sphinx")).toBe(true);
     });
 

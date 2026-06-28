@@ -39,6 +39,9 @@ function normalizeTopologyDefinition(
         label: definition.label,
         picker_group: definition.picker_group,
         picker_order: definition.picker_order,
+        mode_type: definition.mode_type || "adjacency",
+        mode_label: definition.mode_label || "Mode",
+        mode_labels: Object.freeze({ ...(definition.mode_labels || {}) }),
         sizing_mode: definition.sizing_mode,
         family: definition.family,
         render_kind: definition.render_kind,
@@ -212,32 +215,29 @@ export function topologyVariantKeyFromSpec(topologySpec: Partial<TopologySpec> =
     return resolveTopologyVariantKey(topologySpec.tiling_family, topologySpec.adjacency_mode);
 }
 
-const TOPOLOGY_MODE_LABELS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
-    "penrose-p1": {
-        distributed: "Distributed",
-        "boat-star": "Boat-Star",
-    },
-    "penrose-p3-rhombs": {
-        edge: "Edge adjacency",
-        vertex: "Vertex adjacency",
-    },
-    sphinx: {
-        edge: "Balanced seed",
-        compact: "Compact seed",
-        wide: "Wide seed",
-    },
-};
+function fallbackTopologyModeLabel(definition: TopologyDefinition | null, mode: string): string {
+    const formattedMode = `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`;
+    if ((definition?.mode_type || "adjacency") === "adjacency") {
+        return `${formattedMode} adjacency`;
+    }
+    return formattedMode;
+}
 
 export function topologyModeLabel(
     tilingFamily: string | null | undefined,
     mode: string | null | undefined,
 ): string {
     const normalizedMode = String(mode || "edge");
-    const familyLabels = TOPOLOGY_MODE_LABELS[String(tilingFamily || "")];
-    if (familyLabels?.[normalizedMode]) {
-        return familyLabels[normalizedMode];
+    const definition = getTopologyDefinition(tilingFamily);
+    const catalogLabel = definition?.mode_labels?.[normalizedMode];
+    if (catalogLabel) {
+        return catalogLabel;
     }
-    return `${normalizedMode.charAt(0).toUpperCase()}${normalizedMode.slice(1)} adjacency`;
+    return fallbackTopologyModeLabel(definition, normalizedMode);
+}
+
+export function topologyModeFieldLabel(tilingFamily: string | null | undefined): string {
+    return getTopologyDefinition(tilingFamily)?.mode_label || "Mode";
 }
 
 // Search aliases favor terms a newcomer might try after recognizing shapes
@@ -462,7 +462,7 @@ export function tilingFamilyOptions(): TopologyOption[] {
         });
 }
 
-export function adjacencyModeOptions(
+export function topologyModeOptions(
     tilingFamily: string | null | undefined,
 ): AdjacencyModeOption[] {
     const definition = getTopologyDefinition(tilingFamily);
@@ -473,4 +473,10 @@ export function adjacencyModeOptions(
         value: mode,
         label: topologyModeLabel(tilingFamily, mode),
     }));
+}
+
+export function adjacencyModeOptions(
+    tilingFamily: string | null | undefined,
+): AdjacencyModeOption[] {
+    return topologyModeOptions(tilingFamily);
 }

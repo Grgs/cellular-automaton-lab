@@ -13,6 +13,9 @@ function topologyEntry(
         label: tilingFamily,
         picker_group: "Fixture",
         picker_order: 1,
+        mode_type: "adjacency",
+        mode_label: "Mode",
+        mode_labels: { edge: "Edge adjacency" },
         sizing_mode: renderKind === "polygon_aperiodic" ? "patch_depth" : "grid",
         family:
             renderKind === "regular_grid"

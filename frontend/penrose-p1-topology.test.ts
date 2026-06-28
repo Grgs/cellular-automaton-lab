@@ -15,6 +15,7 @@ describe("Penrose P1 topology", () => {
             describeTopologySpec,
             resolveTopologyVariantKey,
             tilingFamilyOptions,
+            topologyModeFieldLabel,
             topologyUsesPatchDepth,
         } = await import("./topology-catalog.js");
         const penroseP1 = getFixtureTopologyDefinition("penrose-p1");
@@ -32,6 +33,7 @@ describe("Penrose P1 topology", () => {
             { value: "distributed", label: "Distributed" },
             { value: "boat-star", label: "Boat-Star" },
         ]);
+        expect(topologyModeFieldLabel("penrose-p1")).toBe("Construction");
         expect(topologyUsesPatchDepth("penrose-p1")).toBe(true);
         expect(
             describeTopologySpec({ tiling_family: "penrose-p1-pentagon-diamond" }),

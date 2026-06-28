@@ -218,6 +218,9 @@ export function renderSimulationSections(
         elements.adjacencyModeSelect.hidden = !viewModel.adjacencyModeVisible;
         elements.adjacencyModeSelect.disabled = !viewModel.adjacencyModeVisible;
     }
+    if (elements.adjacencyModeLabel) {
+        elements.adjacencyModeLabel.textContent = viewModel.topologyModeLabel;
+    }
     if (elements.adjacencyModeField) {
         elements.adjacencyModeField.hidden = !viewModel.adjacencyModeVisible;
     }

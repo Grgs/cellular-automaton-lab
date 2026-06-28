@@ -54,6 +54,9 @@ class TopologyCatalogEntryPayload(TypedDict):
     label: str
     picker_group: str
     picker_order: int
+    mode_type: str
+    mode_label: str
+    mode_labels: dict[str, str]
     sizing_mode: str
     family: str
     render_kind: str

@@ -14,6 +14,9 @@ class TopologyVariantDefinition:
     geometry_key: str
     tiling_family: str
     adjacency_mode: str
+    mode_type: str
+    mode_label: str
+    mode_labels: dict[str, str]
     label: str
     picker_group: str
     picker_order: int
@@ -68,6 +71,9 @@ class TopologyDefinition:
     label: str
     picker_group: str
     picker_order: int
+    mode_type: str
+    mode_label: str
+    mode_labels: dict[str, str]
     sizing_mode: str
     family: str
     render_kind: str
@@ -84,6 +90,9 @@ class TopologyDefinition:
             "label": self.label,
             "picker_group": self.picker_group,
             "picker_order": self.picker_order,
+            "mode_type": self.mode_type,
+            "mode_label": self.mode_label,
+            "mode_labels": dict(self.mode_labels),
             "sizing_mode": self.sizing_mode,
             "family": self.family,
             "render_kind": self.render_kind,

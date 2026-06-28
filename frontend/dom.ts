@@ -64,6 +64,7 @@ export const elements: DomElements = {
     tilingPickerCurrentPreview: elementById("tiling-picker-current-preview"),
     tilingPickerCurrentLabel: elementById("tiling-picker-current-label"),
     adjacencyModeField: elementById("adjacency-mode-field"),
+    adjacencyModeLabel: elementById("adjacency-mode-label"),
     adjacencyModeSelect: elementById("adjacency-mode-select"),
     patchDepthField: elementById("patch-depth-field"),
     patchDepthInput: elementById("patch-depth-input"),

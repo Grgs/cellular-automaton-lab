@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from backend.simulation.aperiodic_family_manifest import (
     AMMANN_BEENKER_GEOMETRY,
@@ -176,6 +176,9 @@ class TopologyFamilyManifestEntry:
     viewport_sync_mode: str
     sizing_policy: SizingPolicyDefinition
     variants: tuple[TopologyFamilyVariantManifestEntry, ...]
+    mode_type: str = "adjacency"
+    mode_label: str = "Mode"
+    mode_labels: dict[str, str] = field(default_factory=dict)
     minimum_grid_dimension: int = DEFAULT_MIN_GRID_SIZE
 
 
@@ -222,6 +225,9 @@ def _translated_aperiodic_family(
     sizing_policy: SizingPolicyDefinition,
     *,
     variants: tuple[TopologyFamilyVariantManifestEntry, ...] | None = None,
+    mode_type: str = "adjacency",
+    mode_label: str = "Mode",
+    mode_labels: dict[str, str] | None = None,
 ) -> TopologyFamilyManifestEntry:
     metadata = APERIODIC_FAMILY_MANIFEST[tiling_family]
     return TopologyFamilyManifestEntry(
@@ -234,6 +240,9 @@ def _translated_aperiodic_family(
         viewport_sync_mode="presentation-only",
         sizing_policy=sizing_policy,
         variants=variants or (_variant(tiling_family, EDGE_ADJACENCY, metadata.default_rule),),
+        mode_type=mode_type,
+        mode_label=mode_label,
+        mode_labels=mode_labels or {},
     )
 
 
@@ -319,6 +328,12 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
                 APERIODIC_FAMILY_MANIFEST[PENROSE_P1_GEOMETRY].default_rule,
             ),
         ),
+        mode_type="construction",
+        mode_label="Construction",
+        mode_labels={
+            PENROSE_P1_DISTRIBUTED_MODE: "Distributed",
+            PENROSE_P1_BOAT_STAR_MODE: "Boat-Star",
+        },
     ),
     PENROSE_P2_GEOMETRY: _translated_aperiodic_family(
         PENROSE_P2_GEOMETRY,
@@ -335,6 +350,11 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
             ),
             _variant(PENROSE_VERTEX_GEOMETRY, VERTEX_ADJACENCY, DEFAULT_SQUARE_RULE),
         ),
+        mode_label="Adjacency",
+        mode_labels={
+            EDGE_ADJACENCY: "Edge adjacency",
+            VERTEX_ADJACENCY: "Vertex adjacency",
+        },
     ),
     AMMANN_BEENKER_GEOMETRY: _translated_aperiodic_family(
         AMMANN_BEENKER_GEOMETRY,
@@ -384,6 +404,13 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
                 APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY].default_rule,
             ),
         ),
+        mode_type="seed",
+        mode_label="Seed",
+        mode_labels={
+            EDGE_ADJACENCY: "Balanced seed",
+            COMPACT_SEED: "Compact seed",
+            WIDE_SEED: "Wide seed",
+        },
     ),
     ROBINSON_TRIANGLES_GEOMETRY: _translated_aperiodic_family(
         ROBINSON_TRIANGLES_GEOMETRY,

@@ -84,6 +84,9 @@ export interface BootstrappedTopologyDefinition {
     label: string;
     picker_group: string;
     picker_order: number;
+    mode_type: string;
+    mode_label: string;
+    mode_labels: Readonly<Record<string, string>>;
     sizing_mode: string;
     family: string;
     render_kind: string;

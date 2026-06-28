@@ -1,8 +1,15 @@
 # Adding Topologies
 
-Use this guide when adding a new tiling family, adjacency mode, or topology generator. Topology changes are higher risk than rule changes because they affect simulation state, persistence, rendering, tests, and the standalone bootstrap payload.
+Use this guide when adding a new tiling family, topology mode, or topology generator. Topology changes are higher risk than rule changes because they affect simulation state, persistence, rendering, tests, and the standalone bootstrap payload.
 
 For system context, start with [ARCHITECTURE.md](ARCHITECTURE.md), [CODE_MAP.md](CODE_MAP.md), and [TESTING_TILINGS.md](TESTING_TILINGS.md).
+
+## Vocabulary
+
+- **Tiling family**: the public picker identity, such as `penrose-p1` or `sphinx`.
+- **Topology mode**: a user-visible option within a family. A mode can be an adjacency choice, construction choice, seed choice, or another family-specific variant.
+- **Implementation geometry**: the internal geometry key that actually renders or builds cells for a mode.
+- **`adjacency_mode`**: the persisted/API field name for topology modes. Keep it for compatibility, but do not describe every mode as adjacency in UI or docs unless it really changes adjacency.
 
 ## Fast path: periodic face tilings
 

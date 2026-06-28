@@ -145,6 +145,12 @@ class GeometryManifestTests(unittest.TestCase):
         definition = get_topology_definition(PENROSE_P1_GEOMETRY)
 
         self.assertEqual(definition.label, "Penrose P1")
+        self.assertEqual(definition.mode_type, "construction")
+        self.assertEqual(definition.mode_label, "Construction")
+        self.assertEqual(
+            definition.mode_labels,
+            {"distributed": "Distributed", "boat-star": "Boat-Star"},
+        )
         self.assertEqual(definition.supported_adjacency_modes, ("distributed", "boat-star"))
         self.assertEqual(definition.default_adjacency_mode, "distributed")
         self.assertEqual(
@@ -328,6 +334,16 @@ class GeometryManifestTests(unittest.TestCase):
         self.assertEqual(definition.viewport_sync_mode, "presentation-only")
         self.assertEqual(definition.default_rule, "life-b2-s23")
         self.assertEqual(family_definition.render_kind, "polygon_aperiodic")
+        self.assertEqual(family_definition.mode_type, "seed")
+        self.assertEqual(family_definition.mode_label, "Seed")
+        self.assertEqual(
+            family_definition.mode_labels,
+            {
+                "edge": "Balanced seed",
+                "compact": "Compact seed",
+                "wide": "Wide seed",
+            },
+        )
         self.assertEqual(
             family_definition.supported_adjacency_modes,
             ("edge", "compact", "wide"),
