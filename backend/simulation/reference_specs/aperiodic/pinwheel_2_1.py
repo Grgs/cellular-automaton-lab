@@ -22,7 +22,7 @@ SPECS = {
         geometry=PINWHEEL_2_1_GEOMETRY,
         display_name=_reference_label(PINWHEEL_2_1_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/pinwheel-2-1/",),
-        canonical_root_seed_policy="paired right triangles forming a 4:1 rectangle",
+        root_seed_policy="paired right triangles forming a 4:1 rectangle",
         allowed_public_cell_kinds=_public_cell_kinds(PINWHEEL_2_1_GEOMETRY),
         required_metadata=(
             MetadataRequirement(

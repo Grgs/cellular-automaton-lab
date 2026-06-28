@@ -328,7 +328,7 @@ SPECS = {{
         geometry={spec.geometry_const},
         display_name=_reference_label({spec.geometry_const}),
         source_urls={source_tuple},
-        canonical_root_seed_policy="TODO: describe the seed",
+        root_seed_policy="TODO: describe the seed",
         allowed_public_cell_kinds=_public_cell_kinds({spec.geometry_const}),
         required_metadata=(
             {metadata_block},

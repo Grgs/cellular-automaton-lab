@@ -17,7 +17,7 @@ SPECS = {
         geometry=L_TETROMINO_GEOMETRY,
         display_name=_reference_label(L_TETROMINO_GEOMETRY),
         source_urls=("https://en.wikipedia.org/wiki/Rep-tile",),
-        canonical_root_seed_policy="two reflected L-tetromino roots forming a compact rectangle",
+        root_seed_policy="two reflected L-tetromino roots forming a compact rectangle",
         allowed_public_cell_kinds=_public_cell_kinds(L_TETROMINO_GEOMETRY),
         required_metadata=(
             MetadataRequirement(

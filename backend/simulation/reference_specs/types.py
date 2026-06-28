@@ -81,7 +81,7 @@ class ReferenceFamilySpec:
     geometry: str
     display_name: str
     source_urls: tuple[str, ...]
-    canonical_root_seed_policy: str
+    root_seed_policy: str
     allowed_public_cell_kinds: tuple[str, ...]
     required_metadata: tuple[MetadataRequirement, ...]
     sample_mode: Literal["patch_depth", "grid"] = "patch_depth"

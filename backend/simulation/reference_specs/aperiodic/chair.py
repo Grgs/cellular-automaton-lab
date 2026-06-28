@@ -17,7 +17,7 @@ SPECS = {
         geometry=CHAIR_GEOMETRY,
         display_name=_reference_label(CHAIR_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/chair/",),
-        canonical_root_seed_policy="two-chair rectangular representative seed",
+        root_seed_policy="two-chair rectangular representative seed",
         allowed_public_cell_kinds=_public_cell_kinds(CHAIR_GEOMETRY),
         required_metadata=(
             MetadataRequirement(

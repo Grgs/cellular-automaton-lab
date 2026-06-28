@@ -18,7 +18,7 @@ SPECS = {
         geometry=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
         display_name=_reference_label(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "decorated 3.12.12 Archimedean tiling: hexagonal lattice of regular "
             "dodecagonal supercells decomposed into six unit squares plus twelve "
             "unit equilateral triangles, with two bridging triangles per supercell "

@@ -41,7 +41,7 @@ SPECS = {
             "https://en.wikipedia.org/wiki/Socolar_tiling",
             "https://bendwavy.org/klitzing/quasi/socolar.htm",
         ),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "de Bruijn dodecagrid crop: six line families 30 degrees apart with "
             "generic offsets, cropped to a square of half-extent 1.0 * 1.55^d"
         ),

@@ -58,7 +58,7 @@ SPECS = {
             "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
             "https://github.com/aatishb/patterncollider",
         ),
-        canonical_root_seed_policy=(
+        root_seed_policy=(
             "de Bruijn enneagrid crop: nine line families 2*pi/9 (20 deg) apart "
             "with generic offsets, cropped to a square of half-extent 0.75 * 1.5^d"
         ),
