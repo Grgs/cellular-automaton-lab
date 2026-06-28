@@ -16,6 +16,7 @@ from backend.rules.base import AutomatonRule
 from backend.simulation.models import TopologySpec
 from backend.simulation.topology_catalog import (
     SUPPORTED_TOPOLOGY_FAMILIES,
+    canonicalize_topology_identity,
     get_topology_definition,
     normalize_adjacency_mode,
 )
@@ -167,12 +168,17 @@ def parse_topology_spec(
         supported = ", ".join(SUPPORTED_TOPOLOGY_FAMILIES)
         _raise_validation(f"'{key}.tiling_family' must be one of: {supported}.")
 
+    adjacency_mode_value = raw_topology_spec.get("adjacency_mode")
+    adjacency_mode = None if adjacency_mode_value in (None, "") else str(adjacency_mode_value)
+    tiling_family, adjacency_mode = canonicalize_topology_identity(
+        tiling_family,
+        adjacency_mode,
+    )
+
     if tiling_family not in SUPPORTED_TOPOLOGY_FAMILIES:
         supported = ", ".join(SUPPORTED_TOPOLOGY_FAMILIES)
         _raise_validation(f"'{key}.tiling_family' must be one of: {supported}.")
 
-    adjacency_mode_value = raw_topology_spec.get("adjacency_mode")
-    adjacency_mode = None if adjacency_mode_value in (None, "") else str(adjacency_mode_value)
     definition = get_topology_definition(tiling_family)
     unsafe_size_override = parse_optional_bool(raw_topology_spec, "unsafe_size_override")
 

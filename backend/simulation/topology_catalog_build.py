@@ -24,9 +24,7 @@ def build_topology_catalog(
 
     catalog: list[TopologyDefinition] = []
     for tiling_family, family_variants in grouped.items():
-        family_variants.sort(
-            key=lambda entry: (entry.adjacency_mode != "edge", entry.adjacency_mode)
-        )
+        family_variants.sort(key=lambda entry: _adjacency_mode_sort_key(entry.adjacency_mode))
         first = family_variants[0]
         catalog.append(
             TopologyDefinition(
@@ -34,6 +32,9 @@ def build_topology_catalog(
                 label=first.label,
                 picker_group=first.picker_group,
                 picker_order=first.picker_order,
+                mode_type=first.mode_type,
+                mode_label=first.mode_label,
+                mode_labels=dict(first.mode_labels),
                 sizing_mode=first.sizing_mode,
                 family=first.family,
                 render_kind=str(render_kind_for_geometry(first.geometry_key)),
@@ -59,3 +60,11 @@ def build_topology_catalog(
         )
     )
     return tuple(catalog)
+
+
+def _adjacency_mode_sort_key(adjacency_mode: str) -> tuple[int, str]:
+    priority = {
+        "edge": 0,
+        "distributed": 0,
+    }.get(adjacency_mode, 1)
+    return (priority, adjacency_mode)

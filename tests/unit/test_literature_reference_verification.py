@@ -6,6 +6,10 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from backend.simulation.aperiodic_family_manifest import (
+    SPHINX_COMPACT_PAIR_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
+)
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.literature_reference_verification import (
     observe_reference_patch,
@@ -18,9 +22,15 @@ from tools.verify_reference_tilings import main as verify_reference_main
 
 class LiteratureReferenceVerificationTests(unittest.TestCase):
     def test_reference_specs_cover_full_catalog(self) -> None:
+        directly_verified_geometry_keys = {
+            definition.geometry_key
+            for definition in TOPOLOGY_VARIANTS
+            if definition.geometry_key
+            not in {SPHINX_COMPACT_PAIR_GEOMETRY, SPHINX_WIDE_PAIR_GEOMETRY}
+        }
         self.assertEqual(
             set(REFERENCE_FAMILY_SPECS),
-            {definition.geometry_key for definition in TOPOLOGY_VARIANTS},
+            directly_verified_geometry_keys,
         )
         self.assertNotIn("not-a-geometry", REFERENCE_FAMILY_SPECS)
 

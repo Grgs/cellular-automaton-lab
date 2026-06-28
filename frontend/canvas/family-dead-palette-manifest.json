@@ -1642,6 +1642,49 @@
       ]
     },
     {
+      "geometry": "l-tetromino",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/l-tetromino-depth-3.json",
+        "selectorFields": [
+          "orientation_token"
+        ]
+      },
+      "variants": [
+        {
+          "label": "l-tetromino-0",
+          "selector": {
+            "kind": "l-tetromino",
+            "orientation_token": "0"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "l-tetromino-1",
+          "selector": {
+            "kind": "l-tetromino",
+            "orientation_token": "1"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "l-tetromino-2",
+          "selector": {
+            "kind": "l-tetromino",
+            "orientation_token": "2"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "l-tetromino-3",
+          "selector": {
+            "kind": "l-tetromino",
+            "orientation_token": "3"
+          },
+          "color": {"token": "toneRose"}
+        }
+      ]
+    },
+    {
       "geometry": "dodecagonal-square-triangle",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/dodecagonal-square-triangle-depth-3.json",

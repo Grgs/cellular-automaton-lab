@@ -28,6 +28,7 @@ class AppShellRenderValues(TypedDict):
     speed_value: str
     speed_label: str
     adjacency_field_hidden: str
+    topology_mode_label: str
     adjacency_mode_options: str
 
 
@@ -101,6 +102,30 @@ def _build_option(value: str, label: str, *, selected: bool = False) -> str:
     )
 
 
+def _fallback_topology_mode_label(topology: TopologyCatalogEntryPayload, mode: str) -> str:
+    formatted_mode = f"{mode[:1].upper()}{mode[1:]}" if mode else "Mode"
+    if str(topology.get("mode_type") or "adjacency") == "adjacency":
+        return f"{formatted_mode} adjacency"
+    return formatted_mode
+
+
+def _topology_mode_label(topology: TopologyCatalogEntryPayload, mode: str) -> str:
+    labels = topology.get("mode_labels", {})
+    if labels.get(mode):
+        return str(labels[mode])
+    return _fallback_topology_mode_label(topology, mode)
+
+
+def _topology_mode_field_label(
+    topology_catalog: list[TopologyCatalogEntryPayload],
+    tiling_family: str,
+) -> str:
+    for topology in topology_catalog:
+        if str(topology["tiling_family"]) == str(tiling_family):
+            return str(topology.get("mode_label") or "Mode")
+    return "Mode"
+
+
 def _group_topologies(
     topology_catalog: list[TopologyCatalogEntryPayload],
 ) -> list[tuple[str, list[TopologyCatalogEntryPayload]]]:
@@ -163,7 +188,7 @@ def build_adjacency_mode_options_html(
         return "\n".join(
             _build_option(
                 str(adjacency_mode),
-                str(adjacency_mode).capitalize(),
+                _topology_mode_label(topology, str(adjacency_mode)),
                 selected=str(adjacency_mode) == str(selected_adjacency_mode),
             )
             for adjacency_mode in supported_modes
@@ -189,6 +214,7 @@ def _render_shared_app_shell(render_values: AppShellRenderValues) -> str:
         "__SPEED_VALUE__": render_values["speed_value"],
         "__SPEED_LABEL__": render_values["speed_label"],
         "__ADJACENCY_FIELD_HIDDEN__": render_values["adjacency_field_hidden"],
+        "__TOPOLOGY_MODE_LABEL__": render_values["topology_mode_label"],
         "__ADJACENCY_MODE_OPTIONS__": render_values["adjacency_mode_options"],
     }
     for token, value in replacements.items():
@@ -203,12 +229,15 @@ def _render_shared_app_shell(render_values: AppShellRenderValues) -> str:
 
 def _default_adjacency_hidden_attribute(
     *,
+    topology_catalog: list[TopologyCatalogEntryPayload],
     tiling_family: str,
-    adjacency_mode: str,
 ) -> str:
-    if adjacency_mode == "edge" and tiling_family != "penrose-p3-rhombs":
-        return "hidden"
-    return ""
+    for topology in topology_catalog:
+        if str(topology["tiling_family"]) != str(tiling_family):
+            continue
+        if len(topology.get("supported_adjacency_modes", [])) > 1:
+            return ""
+    return "hidden"
 
 
 def render_server_app_shell(
@@ -240,8 +269,12 @@ def render_server_app_shell(
         "speed_value": speed_value,
         "speed_label": f"Target {speed_value} gen/s",
         "adjacency_field_hidden": _default_adjacency_hidden_attribute(
+            topology_catalog=topology_catalog,
             tiling_family=selected_tiling_family,
-            adjacency_mode=selected_adjacency_mode,
+        ),
+        "topology_mode_label": _topology_mode_field_label(
+            topology_catalog,
+            selected_tiling_family,
         ),
         "adjacency_mode_options": build_adjacency_mode_options_html(
             topology_catalog,
@@ -269,6 +302,7 @@ def render_standalone_app_shell() -> str:
         "speed_value": "5",
         "speed_label": "Target 5 gen/s",
         "adjacency_field_hidden": "hidden",
+        "topology_mode_label": "Mode",
         "adjacency_mode_options": "",
     }
     rendered = _render_shared_app_shell(render_values)

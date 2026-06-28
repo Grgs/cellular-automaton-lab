@@ -7,6 +7,7 @@ import {
     CHAIR_RENDER_MARGIN_SCALE,
     DEFAULT_APERIODIC_RENDER_MARGIN_MIN,
     DEFAULT_APERIODIC_RENDER_MARGIN_SCALE,
+    L_TETROMINO_RENDER_COORDINATE_SCALE,
     SHIELD_RENDER_COORDINATE_SCALE,
     SHIELD_RENDER_MARGIN_MIN,
     SHIELD_RENDER_MARGIN_SCALE,
@@ -42,7 +43,13 @@ interface AperiodicMetrics extends GridMetrics {
 }
 
 function displayCoordinateScale(geometry: string): number {
-    return geometry === "shield" ? SHIELD_RENDER_COORDINATE_SCALE : 1;
+    if (geometry === "shield") {
+        return SHIELD_RENDER_COORDINATE_SCALE;
+    }
+    if (geometry === "l-tetromino") {
+        return L_TETROMINO_RENDER_COORDINATE_SCALE;
+    }
+    return 1;
 }
 
 function buildAperiodicMetrics(

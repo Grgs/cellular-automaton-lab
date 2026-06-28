@@ -12,7 +12,12 @@ from backend.bootstrap_data import build_bootstrap_payload, describe_aperiodic_f
 from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_IDS,
     APERIODIC_FAMILY_MANIFEST,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    SPHINX_COMPACT_PAIR_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
 )
 from backend.simulation.literature_reference_specs import REFERENCE_FAMILY_SPECS
 from backend.simulation.topology_catalog import TOPOLOGY_VARIANTS
@@ -34,27 +39,7 @@ class AperiodicFamilyContractTests(unittest.TestCase):
             for kind, geometries in kind_to_geometries.items()
             if len(geometries) > 1
         }
-        self.assertEqual(
-            duplicate_kinds,
-            {
-                "p1-pentagon": (
-                    "penrose-p1-pentagon-diamond",
-                    "penrose-p1-pentagon-boat-star",
-                ),
-                "p1-diamond": (
-                    "penrose-p1-pentagon-diamond",
-                    "penrose-p1-pentagon-boat-star",
-                ),
-                "p1-boat": (
-                    "penrose-p1-pentagon-diamond",
-                    "penrose-p1-pentagon-boat-star",
-                ),
-                "p1-star": (
-                    "penrose-p1-pentagon-diamond",
-                    "penrose-p1-pentagon-boat-star",
-                ),
-            },
-        )
+        self.assertEqual(duplicate_kinds, {})
 
     def test_manifest_aligns_with_catalog_contracts_and_reference_specs(self) -> None:
         catalog_families = {
@@ -62,12 +47,23 @@ class AperiodicFamilyContractTests(unittest.TestCase):
             for variant in TOPOLOGY_VARIANTS
             if variant.family == "aperiodic" and variant.geometry_key != PENROSE_VERTEX_GEOMETRY
         }
-        reference_families = {
-            geometry for geometry in REFERENCE_FAMILY_SPECS if geometry in APERIODIC_FAMILY_IDS
+        catalog_geometries = {
+            variant.geometry_key
+            for variant in TOPOLOGY_VARIANTS
+            if variant.family == "aperiodic" and variant.geometry_key != PENROSE_VERTEX_GEOMETRY
         }
 
         self.assertEqual(catalog_families, set(APERIODIC_FAMILY_IDS))
-        self.assertEqual(reference_families, set(APERIODIC_FAMILY_IDS))
+        self.assertNotIn(PENROSE_P1_DISTRIBUTED_GEOMETRY, catalog_families)
+        self.assertNotIn(PENROSE_P1_PBS_GEOMETRY, catalog_families)
+        self.assertIn(PENROSE_P1_GEOMETRY, catalog_families)
+        direct_reference_geometries = catalog_geometries.difference(
+            {
+                SPHINX_COMPACT_PAIR_GEOMETRY,
+                SPHINX_WIDE_PAIR_GEOMETRY,
+            }
+        )
+        self.assertTrue(direct_reference_geometries.issubset(REFERENCE_FAMILY_SPECS))
 
     def test_bootstrap_aperiodic_families_match_manifest(self) -> None:
         expected = [

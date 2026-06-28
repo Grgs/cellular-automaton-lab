@@ -10,6 +10,7 @@ from backend.simulation.aperiodic_family_manifest import (
     P1_PENTAGON_KIND,
     P1_STAR_KIND,
     PENROSE_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -94,9 +95,9 @@ SPECS = {
             "with neighbour edges promoted to any pair of cells sharing a vertex.",
         ),
     ),
-    PENROSE_P1_GEOMETRY: ReferenceFamilySpec(
-        geometry=PENROSE_P1_GEOMETRY,
-        display_name=_reference_label(PENROSE_P1_GEOMETRY),
+    PENROSE_P1_DISTRIBUTED_GEOMETRY: ReferenceFamilySpec(
+        geometry=PENROSE_P1_DISTRIBUTED_GEOMETRY,
+        display_name="Penrose P1 Distributed",
         source_urls=(
             "https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1)",
             "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
@@ -190,7 +191,7 @@ SPECS = {
     ),
     PENROSE_P1_PBS_GEOMETRY: ReferenceFamilySpec(
         geometry=PENROSE_P1_PBS_GEOMETRY,
-        display_name=_reference_label(PENROSE_P1_PBS_GEOMETRY),
+        display_name="Penrose Pentagon Boat Star",
         source_urls=(
             "https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/",
             "https://www.math.brown.edu/reschwar/M272/pentagrid.pdf",
@@ -198,7 +199,7 @@ SPECS = {
         canonical_root_seed_policy=(
             "singular pentagrid crop with all-zero offsets and half-extent 1.6 * phi^d"
         ),
-        allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_PBS_GEOMETRY),
+        allowed_public_cell_kinds=_public_cell_kinds(PENROSE_P1_GEOMETRY),
         required_metadata=(),
         depth_expectations={
             0: ReferenceDepthExpectation(

@@ -53,11 +53,11 @@ class LiteratureReferenceVerificationAperiodicTests(unittest.TestCase):
         self.assertFalse(result.failures)
         self.assertEqual(
             [observation.total_cells for observation in result.observations],
-            [1, 4, 16, 64],
+            [2, 8, 32, 128],
         )
         self.assertEqual(
             result.observations[-1].orientation_token_counts,
-            (("0", 20), ("1", 16), ("2", 12), ("3", 16)),
+            (("0", 32), ("1", 32), ("2", 32), ("3", 32)),
         )
 
     def test_hat_reference_verifier_accepts_reflected_neighbor_pattern(self) -> None:

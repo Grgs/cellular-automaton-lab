@@ -18,6 +18,8 @@ from backend.simulation.aperiodic_family_manifest import (
     HAT_MONOTILE_GEOMETRY,
     HENDECAGONAL_11_FOLD_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
+    L_TETROMINO_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
     PENROSE_P1_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -27,7 +29,9 @@ from backend.simulation.aperiodic_family_manifest import (
     SHIELD_GEOMETRY,
     SOCOLAR_12_FOLD_GEOMETRY,
     SPECTRE_GEOMETRY,
+    SPHINX_COMPACT_PAIR_GEOMETRY,
     SPHINX_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
     TAYLOR_SOCOLAR_GEOMETRY,
     TRIDECAGONAL_13_FOLD_GEOMETRY,
     TUEBINGEN_TRIANGLE_GEOMETRY,
@@ -36,6 +40,7 @@ from backend.simulation.aperiodic_family_manifest import (
 from backend.simulation.aperiodic_hat import build_hat_patch
 from backend.simulation.aperiodic_hendecagonal_11_fold import build_hendecagonal_11_fold_patch
 from backend.simulation.aperiodic_heptagonal_7_fold import build_heptagonal_7_fold_patch
+from backend.simulation.aperiodic_l_tetromino import build_l_tetromino_patch
 from backend.simulation.aperiodic_penrose_p1 import build_penrose_p1_patch
 from backend.simulation.aperiodic_penrose_p1_pbs import build_penrose_p1_pbs_patch
 from backend.simulation.aperiodic_penrose_p2 import build_penrose_p2_patch
@@ -45,7 +50,11 @@ from backend.simulation.aperiodic_robinson_triangles import build_robinson_trian
 from backend.simulation.aperiodic_shield import build_shield_patch
 from backend.simulation.aperiodic_socolar_12_fold import build_socolar_12_fold_patch
 from backend.simulation.aperiodic_spectre import build_spectre_patch
-from backend.simulation.aperiodic_sphinx import build_sphinx_patch
+from backend.simulation.aperiodic_sphinx import (
+    build_sphinx_compact_pair_patch,
+    build_sphinx_patch,
+    build_sphinx_wide_pair_patch,
+)
 from backend.simulation.aperiodic_support import AperiodicPatch
 from backend.simulation.aperiodic_taylor_socolar import build_taylor_socolar_patch
 from backend.simulation.aperiodic_tridecagonal_13_fold import build_tridecagonal_13_fold_patch
@@ -63,15 +72,18 @@ class AperiodicFamilyDefinition:
 
 
 _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
-    PENROSE_P1_GEOMETRY: build_penrose_p1_patch,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY: build_penrose_p1_patch,
     PENROSE_P1_PBS_GEOMETRY: build_penrose_p1_pbs_patch,
     PENROSE_P2_GEOMETRY: build_penrose_p2_patch,
     AMMANN_BEENKER_GEOMETRY: build_ammann_beenker_patch,
     SPECTRE_GEOMETRY: build_spectre_patch,
     TAYLOR_SOCOLAR_GEOMETRY: build_taylor_socolar_patch,
     SPHINX_GEOMETRY: build_sphinx_patch,
+    SPHINX_COMPACT_PAIR_GEOMETRY: build_sphinx_compact_pair_patch,
+    SPHINX_WIDE_PAIR_GEOMETRY: build_sphinx_wide_pair_patch,
     HAT_MONOTILE_GEOMETRY: build_hat_patch,
     TURTLE_MONOTILE_GEOMETRY: build_turtle_patch,
+    L_TETROMINO_GEOMETRY: build_l_tetromino_patch,
     CHAIR_GEOMETRY: build_chair_patch,
     ROBINSON_TRIANGLES_GEOMETRY: build_robinson_triangles_patch,
     TUEBINGEN_TRIANGLE_GEOMETRY: build_tuebingen_triangle_patch,
@@ -89,7 +101,12 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
     geometry: AperiodicFamilyDefinition(
         geometry_key=geometry,
-        builder_kind=APERIODIC_FAMILY_MANIFEST[geometry].builder_kind,
+        builder_kind=APERIODIC_FAMILY_MANIFEST.get(
+            PENROSE_P1_GEOMETRY
+            if geometry in {PENROSE_P1_DISTRIBUTED_GEOMETRY, PENROSE_P1_PBS_GEOMETRY}
+            else geometry,
+            APERIODIC_FAMILY_MANIFEST[SPHINX_GEOMETRY],
+        ).builder_kind,
         build_patch=build_patch,
     )
     for geometry, build_patch in _APERIODIC_PATCH_BUILDERS.items()

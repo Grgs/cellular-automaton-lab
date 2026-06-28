@@ -121,6 +121,7 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         tilingPickerCurrentPreview: null,
         tilingPickerCurrentLabel: null,
         adjacencyModeField: null,
+        adjacencyModeLabel: null,
         adjacencyModeSelect: null,
         patchDepthField: null,
         patchDepthInput: null,

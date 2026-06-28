@@ -92,9 +92,9 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
 - `robinson-triangles`
   - direct canonical patch fixtures now pin both the first refined Robinson triangle patch and the representative depth-`3` sample
 - `chair`
-  - representative patches should follow the true inflation-by-2 chair substitution from a single chair seed
-  - low-depth samples should preserve exact substitution depth totals and orientation-token distributions
-  - rooted local-reference fixtures now pin a canonical depth-3 neighborhood inside the corrected substitution patch
+  - representative patches should follow the true inflation-by-2 chair substitution from a two-chair rectangular seed
+  - low-depth samples should preserve exact representative depth totals and orientation-token distributions
+  - rooted local-reference fixtures now pin a canonical depth-3 neighborhood inside the corrected rectangular substitution patch
 
 ## What Is Not Yet Proved
 

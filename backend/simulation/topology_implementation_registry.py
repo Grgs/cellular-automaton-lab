@@ -6,7 +6,12 @@ from typing import TYPE_CHECKING, Literal
 
 from backend.simulation.aperiodic_family_manifest import (
     APERIODIC_FAMILY_IDS,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
     PENROSE_VERTEX_GEOMETRY,
+    SPHINX_COMPACT_PAIR_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
 )
 from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMETRIES
 from backend.simulation.topology_family_manifest import (
@@ -133,7 +138,14 @@ def _build_aperiodic_geometry(
 
 _PERIODIC_FACE_GEOMETRIES = PERIODIC_FACE_TILING_GEOMETRIES
 
-_APERIODIC_GEOMETRIES = (PENROSE_VERTEX_GEOMETRY, *APERIODIC_FAMILY_IDS)
+_APERIODIC_GEOMETRIES = (
+    PENROSE_VERTEX_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
+    *(geometry for geometry in APERIODIC_FAMILY_IDS if geometry != PENROSE_P1_GEOMETRY),
+    SPHINX_COMPACT_PAIR_GEOMETRY,
+    SPHINX_WIDE_PAIR_GEOMETRY,
+)
 
 _IMPLEMENTATIONS = {
     SQUARE_GEOMETRY: TopologyImplementationDefinition(

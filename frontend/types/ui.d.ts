@@ -152,6 +152,7 @@ export interface DrawerTopologyViewModel {
     tilingFamilyOptions: TopologyOption[];
     tilingFamilyValue: string;
     adjacencyModeOptions: AdjacencyModeOption[];
+    topologyModeLabel: string;
     adjacencyModeValue: string;
     adjacencyModeVisible: boolean;
     speedValue: string;

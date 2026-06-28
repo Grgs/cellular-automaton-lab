@@ -1,4 +1,4 @@
-import { getTopologyDefinition } from "../topology-catalog.js";
+import { getTopologyDefinition, topologyModeLabel } from "../topology-catalog.js";
 import {
     buildRunToggleState,
     resolveViewportSizingState,
@@ -16,8 +16,6 @@ export function buildTopBarViewModel({
     const topologyDefinition = getTopologyDefinition(tilingFamily);
     const adjacencyModeValue = state.topologySpec?.adjacency_mode || "edge";
     const adjacencyModeVisible = (topologyDefinition?.supported_adjacency_modes?.length || 0) > 1;
-    const formatAdjacencyLabel = (mode: string): string =>
-        `${mode.charAt(0).toUpperCase()}${mode.slice(1)} adjacency`;
     const overlayVisibility = buildOverlayVisibilityState(state);
     return {
         statusText: state.isRunning ? "Running" : "Paused",
@@ -26,7 +24,7 @@ export function buildTopBarViewModel({
         ruleText: activeRule?.display_name || "",
         gridSizeText: sizingState.gridSizeText,
         canvasHudTilingText: topologyDefinition?.label || tilingFamily,
-        canvasHudAdjacencyText: formatAdjacencyLabel(adjacencyModeValue),
+        canvasHudAdjacencyText: topologyModeLabel(tilingFamily, adjacencyModeValue),
         canvasHudAdjacencyVisible: adjacencyModeVisible,
         hudVisible: overlayVisibility.hudVisible,
         runToggle: buildRunToggleState(state.isRunning, state.generation),

@@ -87,13 +87,14 @@ The order is intentional:
   - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
 - `penrose-p3-rhombs-vertex`
   - [Penrose rhomb](https://tilings.math.uni-bielefeld.de/substitution/penrose-rhomb/)
-- `penrose-p1-pentagon-diamond`
-  - [Penrose tiling: original pentagonal tiling (P1)](https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1))
-  - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
-  - [Pattern Collider](https://github.com/aatishb/patterncollider)
-- `penrose-p1-pentagon-boat-star`
-  - [Penrose Pentagon Boat Star](https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/)
-  - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+- `penrose-p1`
+  - `distributed` mode (`penrose-p1-pentagon-diamond` implementation geometry)
+    - [Penrose tiling: original pentagonal tiling (P1)](https://en.wikipedia.org/wiki/Penrose_tiling#Original_pentagonal_Penrose_tiling_(P1))
+    - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
+    - [Pattern Collider](https://github.com/aatishb/patterncollider)
+  - `boat-star` mode (`penrose-p1-pentagon-boat-star` implementation geometry)
+    - [Penrose Pentagon Boat Star](https://tilings.math.uni-bielefeld.de/substitution/penrose-pentagon-boat-star/)
+    - [Pentagrid and Penrose tilings](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
 - `penrose-p2-kite-dart`
   - [Penrose kite-dart](https://tilings.math.uni-bielefeld.de/substitution/penrose-kite-dart/)
 - `ammann-beenker`
@@ -115,6 +116,18 @@ The order is intentional:
   - [Sphinx](https://tilings.math.uni-bielefeld.de/substitution/sphinx/)
 - `chair`
   - [Chair](https://tilings.math.uni-bielefeld.de/substitution/chair/)
+  - The app representative patch starts from two substituted chair supertiles
+    arranged as a 3x2 rectangle so the default view is wider while preserving
+    the same inflation-by-2 chair substitution.
+- `l-tetromino`
+  - [Rep-tile (L-tromino / L-tetromino / P-pentomino are rep-n^2)](https://en.wikipedia.org/wiki/Rep-tile)
+  - Shipped as the exact integer-lattice rep-4 substitution of the L-tetromino
+    (the tetromino analogue of the L-tromino `chair`). The rep-4 dissection is
+    geometrically exact and self-evident, so faithfulness needs no external
+    coordinate source; it is verified directly (area conservation, congruence to
+    the prototile, gap-free / overlap-free cover). The representative app patch
+    uses two substituted supertiles arranged as a 4x2 rectangle so the default
+    view is wider without changing the underlying substitution rule.
 - `robinson-triangles`
   - [Robinson triangle](https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/)
 - `tuebingen-triangle`

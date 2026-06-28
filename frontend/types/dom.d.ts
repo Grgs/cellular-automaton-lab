@@ -58,6 +58,7 @@ export interface DomElements {
     tilingPickerCurrentPreview: HTMLElement | null;
     tilingPickerCurrentLabel: HTMLElement | null;
     adjacencyModeField: HTMLElement | null;
+    adjacencyModeLabel: HTMLElement | null;
     adjacencyModeSelect: HTMLSelectElement | null;
     patchDepthField: HTMLElement | null;
     patchDepthInput: HTMLInputElement | null;

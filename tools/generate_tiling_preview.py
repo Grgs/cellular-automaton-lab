@@ -73,8 +73,11 @@ _APERIODIC_DEFAULT_DEPTHS: dict[str, int] = {
     "dodecagonal-square-triangle": 1,
     "penrose-p3-rhombs": 1,
     "penrose-p2-kite-dart": 1,
-    "penrose-p1-pentagon-diamond": 0,
-    "penrose-p1-pentagon-boat-star": 0,
+    "penrose-p1": 0,
+}
+
+_APERIODIC_PREVIEW_GEOMETRY_ALIASES = {
+    "penrose-p1": "penrose-p1-pentagon-diamond",
 }
 
 
@@ -407,8 +410,9 @@ def _aperiodic_polygon_data(geometry: str, depth: int) -> tuple[str, int, int]:
     """
     from backend.simulation.topology import build_topology
 
-    patch = build_topology(geometry, 0, 0, depth)
-    selector_fields = _load_palette_selector_fields(geometry)
+    build_geometry = _APERIODIC_PREVIEW_GEOMETRY_ALIASES.get(geometry, geometry)
+    patch = build_topology(build_geometry, 0, 0, depth)
+    selector_fields = _load_palette_selector_fields(build_geometry)
 
     # Aperiodic cells always carry vertex polygons; narrow the optional type
     # so mypy stops complaining about ``None`` iteration on the bbox walk.
@@ -443,7 +447,7 @@ def _aperiodic_polygon_data(geometry: str, depth: int) -> tuple[str, int, int]:
     fills: set[str] = set()
     for cell in cells:
         fallback_index = str(_color_index_for_cell(cell, selector_fields, value_to_index))
-        fill = _palette_fill_for_source(geometry, cell, fallback_index)
+        fill = _palette_fill_for_source(build_geometry, cell, fallback_index)
         fills.add(fill)
         coords = " ".join(f"{x},{y}" for x, y in (tx(v[0], v[1]) for v in cell.vertices or ()))
         parts.append(f"{fill}:{coords}")

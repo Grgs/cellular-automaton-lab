@@ -16,15 +16,19 @@ AperiodicPickerGroup = Literal["Aperiodic", "Experimental"]
 PENROSE_GEOMETRY = "penrose-p3-rhombs"
 PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex"
 PENROSE_P2_GEOMETRY = "penrose-p2-kite-dart"
-PENROSE_P1_GEOMETRY = "penrose-p1-pentagon-diamond"
+PENROSE_P1_GEOMETRY = "penrose-p1"
+PENROSE_P1_DISTRIBUTED_GEOMETRY = "penrose-p1-pentagon-diamond"
 PENROSE_P1_PBS_GEOMETRY = "penrose-p1-pentagon-boat-star"
 AMMANN_BEENKER_GEOMETRY = "ammann-beenker"
 SPECTRE_GEOMETRY = "spectre"
 TAYLOR_SOCOLAR_GEOMETRY = "taylor-socolar"
 SPHINX_GEOMETRY = "sphinx"
+SPHINX_COMPACT_PAIR_GEOMETRY = "sphinx-compact-pair"
+SPHINX_WIDE_PAIR_GEOMETRY = "sphinx-wide-pair"
 HAT_MONOTILE_GEOMETRY = "hat-monotile"
 TURTLE_MONOTILE_GEOMETRY = "turtle-monotile"
 CHAIR_GEOMETRY = "chair"
+L_TETROMINO_GEOMETRY = "l-tetromino"
 ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
 TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
 DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
@@ -57,6 +61,7 @@ SPHINX_KIND = "sphinx"
 HAT_KIND = "hat"
 TURTLE_KIND = "turtle"
 CHAIR_KIND = "chair"
+L_TETROMINO_KIND = "l-tetromino"
 ROBINSON_THICK_KIND = "robinson-thick"
 ROBINSON_THIN_KIND = "robinson-thin"
 TUEBINGEN_THICK_KIND = "tuebingen-thick"
@@ -116,6 +121,7 @@ ENNEAGONAL_9_FOLD_TILE_FAMILY = "enneagonal-9-fold"
 HEPTAGONAL_7_FOLD_TILE_FAMILY = "heptagonal-7-fold"
 HENDECAGONAL_11_FOLD_TILE_FAMILY = "hendecagonal-11-fold"
 TRIDECAGONAL_13_FOLD_TILE_FAMILY = "tridecagonal-13-fold"
+L_TETROMINO_TILE_FAMILY = "l-tetromino"
 
 
 @dataclass(frozen=True)
@@ -171,8 +177,8 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
     ),
     PENROSE_P1_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=PENROSE_P1_GEOMETRY,
-        catalog_label="Penrose P1 Pentagon-Diamond (Distributed)",
-        reference_label="Penrose Pentagon-Diamond (Distributed)",
+        catalog_label="Penrose P1",
+        reference_label="Penrose P1",
         picker_group="Aperiodic",
         picker_order=205,
         default_rule="life-b2-s23",
@@ -195,22 +201,6 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         public_cell_kinds=(
             P1_PENTAGON_KIND,
             P1_PENTAGON_CLUSTER_KIND,
-            P1_DIAMOND_KIND,
-            P1_BOAT_KIND,
-            P1_STAR_KIND,
-        ),
-    ),
-    PENROSE_P1_PBS_GEOMETRY: AperiodicFamilyManifestEntry(
-        geometry=PENROSE_P1_PBS_GEOMETRY,
-        catalog_label="Penrose P1 Pentagon-Boat-Star",
-        reference_label="Penrose Pentagon Boat Star",
-        picker_group="Aperiodic",
-        picker_order=207,
-        default_rule="life-b2-s23",
-        builder_kind="compatibility_patch",
-        implementation_status="canonical_patch",
-        public_cell_kinds=(
-            P1_PENTAGON_KIND,
             P1_DIAMOND_KIND,
             P1_BOAT_KIND,
             P1_STAR_KIND,
@@ -314,6 +304,23 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         builder_kind="substitution_recipe",
         implementation_status="true_substitution",
         public_cell_kinds=(CHAIR_KIND,),
+    ),
+    L_TETROMINO_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=L_TETROMINO_GEOMETRY,
+        catalog_label="L-Tetromino",
+        reference_label="L-Tetromino",
+        picker_group="Aperiodic",
+        picker_order=295,
+        default_rule="life-b2-s23",
+        builder_kind="substitution_recipe",
+        # The L-tetromino is a rep-4 rep-tile: four half-scale copies tile a
+        # double-scale copy. Iterating that exact integer-lattice dissection in
+        # ``backend/simulation/aperiodic_l_tetromino.py`` gives a self-similar
+        # (limit-periodic) substitution tiling, the tetromino analogue of the
+        # L-tromino ``chair``. The substitution closes over four orientations
+        # (the Klein four-group) with one child of each per tile.
+        implementation_status="true_substitution",
+        public_cell_kinds=(L_TETROMINO_KIND,),
     ),
     ROBINSON_TRIANGLES_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=ROBINSON_TRIANGLES_GEOMETRY,

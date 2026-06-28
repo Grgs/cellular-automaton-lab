@@ -21,7 +21,9 @@ try:
         SHIELD_SQUARE_KIND,
         SHIELD_TRIANGLE_KIND,
         SPECTRE_GEOMETRY,
+        SPHINX_COMPACT_PAIR_GEOMETRY,
         SPHINX_GEOMETRY,
+        SPHINX_WIDE_PAIR_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
     )
@@ -51,7 +53,9 @@ except ModuleNotFoundError:
         SHIELD_SQUARE_KIND,
         SHIELD_TRIANGLE_KIND,
         SPECTRE_GEOMETRY,
+        SPHINX_COMPACT_PAIR_GEOMETRY,
         SPHINX_GEOMETRY,
+        SPHINX_WIDE_PAIR_GEOMETRY,
         TAYLOR_SOCOLAR_GEOMETRY,
         TUEBINGEN_TRIANGLE_GEOMETRY,
     )
@@ -155,10 +159,17 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
     def test_sphinx_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
+        seed = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=0)
         shallow = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=1)
+        medium = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=2)
         deep = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
         repeated = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
 
+        self.assertEqual(seed.cell_count, 2)
+        self.assertEqual(shallow.cell_count, 8)
+        self.assertEqual(medium.cell_count, 32)
+        self.assertEqual(deep.cell_count, 128)
+        self.assertEqual(deep.width, deep.height)
         self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "sphinx" for cell in deep.cells))
@@ -172,6 +183,20 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
                 assert neighbor_id is not None
                 self.assertIn(cell.id, deep.get_cell(neighbor_id).neighbors)
 
+    def test_sphinx_seed_variants_build_distinct_connected_topologies(self) -> None:
+        balanced = build_topology(SPHINX_GEOMETRY, 0, 0, patch_depth=3)
+        compact = build_topology(SPHINX_COMPACT_PAIR_GEOMETRY, 0, 0, patch_depth=3)
+        wide = build_topology(SPHINX_WIDE_PAIR_GEOMETRY, 0, 0, patch_depth=3)
+
+        self.assertEqual(compact.cell_count, balanced.cell_count)
+        self.assertEqual(wide.cell_count, balanced.cell_count)
+        self.assertLess(compact.height, balanced.height)
+        self.assertGreater(wide.width / wide.height, balanced.width / balanced.height)
+        for topology in (compact, wide):
+            with self.subTest(geometry=topology.geometry):
+                for cell in topology.cells:
+                    self.assertGreater(len(cell.neighbors), 0)
+
     def test_chair_topology_is_deterministic_and_depth_grows_monotonically(self) -> None:
         seed = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=0)
         shallow = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=1)
@@ -179,10 +204,10 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
         deep = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
         repeated = build_topology(CHAIR_GEOMETRY, 0, 0, patch_depth=3)
 
-        self.assertEqual(seed.cell_count, 1)
-        self.assertEqual(shallow.cell_count, 4)
-        self.assertEqual(medium.cell_count, 16)
-        self.assertEqual(deep.cell_count, 64)
+        self.assertEqual(seed.cell_count, 2)
+        self.assertEqual(shallow.cell_count, 8)
+        self.assertEqual(medium.cell_count, 32)
+        self.assertEqual(deep.cell_count, 128)
         self.assertEqual([cell.id for cell in deep.cells], [cell.id for cell in repeated.cells])
         self.assertGreater(deep.cell_count, shallow.cell_count)
         self.assertTrue(all(cell.kind == "chair" for cell in deep.cells))
@@ -193,7 +218,7 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
         self.assertTrue(all(cell.orientation_token is not None for cell in deep.cells))
         self.assertEqual(
             Counter(cell.orientation_token for cell in deep.cells),
-            Counter({"0": 20, "1": 16, "2": 12, "3": 16}),
+            Counter({"0": 32, "1": 32, "2": 32, "3": 32}),
         )
         for cell in deep.cells:
             self.assertEqual(len(cell.neighbors), len(set(cell.neighbors)))

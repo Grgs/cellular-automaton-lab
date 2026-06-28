@@ -1,0 +1,5506 @@
+{
+  "cellSize": 12,
+  "geometry": "l-tetromino",
+  "height": 0,
+  "patchDepth": 3,
+  "topology": {
+    "cells": [
+      {
+        "center": {
+          "x": 0.09375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child0.child0.child0:o0:sp125000:0:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child1:o2:sp125000:p250000:0",
+          "l-tetromino:root0.child0.child0.child3:o1:sp125000:p250000:p500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.25,
+            "y": 0.0
+          },
+          {
+            "x": 0.25,
+            "y": 0.125
+          },
+          {
+            "x": 0.125,
+            "y": 0.125
+          },
+          {
+            "x": 0.125,
+            "y": 0.375
+          },
+          {
+            "x": 0.0,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.40625,
+          "y": 0.09375
+        },
+        "id": "l-tetromino:root0.child0.child0.child1:o2:sp125000:p250000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child0:o0:sp125000:0:0",
+          "l-tetromino:root0.child0.child0.child2:o3:sp125000:p750000:p250000",
+          "l-tetromino:root0.child0.child0.child3:o1:sp125000:p250000:p500000",
+          "l-tetromino:root0.child0.child3.child2:o2:sp125000:p250000:p250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 0.0
+          },
+          {
+            "x": 0.25,
+            "y": 0.25
+          },
+          {
+            "x": 0.375,
+            "y": 0.25
+          },
+          {
+            "x": 0.375,
+            "y": 0.125
+          },
+          {
+            "x": 0.625,
+            "y": 0.125
+          },
+          {
+            "x": 0.625,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.59375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child0.child0.child2:o3:sp125000:p750000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child1:o2:sp125000:p250000:0",
+          "l-tetromino:root0.child0.child3.child1:o3:sp125000:p750000:p500000",
+          "l-tetromino:root0.child0.child3.child2:o2:sp125000:p250000:p250000",
+          "l-tetromino:root0.child0.child3.child3:o0:sp125000:p750000:0"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 0.25
+          },
+          {
+            "x": 0.75,
+            "y": 0.0
+          },
+          {
+            "x": 0.625,
+            "y": 0.0
+          },
+          {
+            "x": 0.625,
+            "y": 0.125
+          },
+          {
+            "x": 0.375,
+            "y": 0.125
+          },
+          {
+            "x": 0.375,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.15625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root0.child0.child0.child3:o1:sp125000:p250000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child0:o0:sp125000:0:0",
+          "l-tetromino:root0.child0.child0.child1:o2:sp125000:p250000:0",
+          "l-tetromino:root0.child0.child1.child0:o2:sp125000:0:p500000",
+          "l-tetromino:root0.child0.child3.child2:o2:sp125000:p250000:p250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 0.5
+          },
+          {
+            "x": 0.0,
+            "y": 0.5
+          },
+          {
+            "x": 0.0,
+            "y": 0.375
+          },
+          {
+            "x": 0.125,
+            "y": 0.375
+          },
+          {
+            "x": 0.125,
+            "y": 0.125
+          },
+          {
+            "x": 0.25,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.15625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root0.child0.child1.child0:o2:sp125000:0:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child3:o1:sp125000:p250000:p500000",
+          "l-tetromino:root0.child0.child1.child1:o0:sp125000:0:p750000",
+          "l-tetromino:root0.child0.child1.child3:o3:sp125000:p500000:p750000",
+          "l-tetromino:root0.child0.child3.child2:o2:sp125000:p250000:p250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.5
+          },
+          {
+            "x": 0.0,
+            "y": 0.75
+          },
+          {
+            "x": 0.125,
+            "y": 0.75
+          },
+          {
+            "x": 0.125,
+            "y": 0.625
+          },
+          {
+            "x": 0.375,
+            "y": 0.625
+          },
+          {
+            "x": 0.375,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.09375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root0.child0.child1.child1:o0:sp125000:0:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child1.child0:o2:sp125000:0:p500000",
+          "l-tetromino:root0.child0.child1.child2:o1:sp125000:p250000:p1250000",
+          "l-tetromino:root0.child0.child1.child3:o3:sp125000:p500000:p750000",
+          "l-tetromino:root0.child0.child2.child2:o0:sp125000:p250000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.75
+          },
+          {
+            "x": 0.25,
+            "y": 0.75
+          },
+          {
+            "x": 0.25,
+            "y": 0.875
+          },
+          {
+            "x": 0.125,
+            "y": 0.875
+          },
+          {
+            "x": 0.125,
+            "y": 1.125
+          },
+          {
+            "x": 0.0,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.15625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root0.child0.child1.child2:o1:sp125000:p250000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child1.child1:o0:sp125000:0:p750000",
+          "l-tetromino:root0.child0.child2.child1:o1:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child0.child2.child2:o0:sp125000:p250000:p750000",
+          "l-tetromino:root0.child0.child2.child3:o2:sp125000:0:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 1.25
+          },
+          {
+            "x": 0.0,
+            "y": 1.25
+          },
+          {
+            "x": 0.0,
+            "y": 1.125
+          },
+          {
+            "x": 0.125,
+            "y": 1.125
+          },
+          {
+            "x": 0.125,
+            "y": 0.875
+          },
+          {
+            "x": 0.25,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.34375,
+          "y": 0.65625
+        },
+        "id": "l-tetromino:root0.child0.child1.child3:o3:sp125000:p500000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child1.child0:o2:sp125000:0:p500000",
+          "l-tetromino:root0.child0.child1.child1:o0:sp125000:0:p750000",
+          "l-tetromino:root0.child0.child2.child2:o0:sp125000:p250000:p750000",
+          "l-tetromino:root0.child0.child3.child1:o3:sp125000:p750000:p500000",
+          "l-tetromino:root0.child3.child2.child0:o2:sp125000:p500000:p500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 0.75
+          },
+          {
+            "x": 0.5,
+            "y": 0.5
+          },
+          {
+            "x": 0.375,
+            "y": 0.5
+          },
+          {
+            "x": 0.375,
+            "y": 0.625
+          },
+          {
+            "x": 0.125,
+            "y": 0.625
+          },
+          {
+            "x": 0.125,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.34375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root0.child0.child2.child0:o3:sp125000:p500000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child2.child1:o1:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child0.child2.child3:o2:sp125000:0:p1250000",
+          "l-tetromino:root0.child3.child1.child3:o2:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child3.child0:o0:sp125000:0:p1500000",
+          "l-tetromino:root0.child3.child3.child1:o2:sp125000:p250000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.5
+          },
+          {
+            "x": 0.5,
+            "y": 1.25
+          },
+          {
+            "x": 0.375,
+            "y": 1.25
+          },
+          {
+            "x": 0.375,
+            "y": 1.375
+          },
+          {
+            "x": 0.125,
+            "y": 1.375
+          },
+          {
+            "x": 0.125,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.40625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root0.child0.child2.child1:o1:sp125000:p500000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child1.child2:o1:sp125000:p250000:p1250000",
+          "l-tetromino:root0.child0.child2.child0:o3:sp125000:p500000:p1500000",
+          "l-tetromino:root0.child0.child2.child2:o0:sp125000:p250000:p750000",
+          "l-tetromino:root0.child0.child2.child3:o2:sp125000:0:p1250000",
+          "l-tetromino:root0.child3.child2.child1:o0:sp125000:p500000:p750000",
+          "l-tetromino:root0.child3.child2.child2:o1:sp125000:p750000:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.25
+          },
+          {
+            "x": 0.25,
+            "y": 1.25
+          },
+          {
+            "x": 0.25,
+            "y": 1.125
+          },
+          {
+            "x": 0.375,
+            "y": 1.125
+          },
+          {
+            "x": 0.375,
+            "y": 0.875
+          },
+          {
+            "x": 0.5,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.34375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root0.child0.child2.child2:o0:sp125000:p250000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child1.child1:o0:sp125000:0:p750000",
+          "l-tetromino:root0.child0.child1.child2:o1:sp125000:p250000:p1250000",
+          "l-tetromino:root0.child0.child1.child3:o3:sp125000:p500000:p750000",
+          "l-tetromino:root0.child0.child2.child1:o1:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child2.child1:o0:sp125000:p500000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 0.75
+          },
+          {
+            "x": 0.5,
+            "y": 0.75
+          },
+          {
+            "x": 0.5,
+            "y": 0.875
+          },
+          {
+            "x": 0.375,
+            "y": 0.875
+          },
+          {
+            "x": 0.375,
+            "y": 1.125
+          },
+          {
+            "x": 0.25,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.15625,
+          "y": 1.34375
+        },
+        "id": "l-tetromino:root0.child0.child2.child3:o2:sp125000:0:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child1.child2:o1:sp125000:p250000:p1250000",
+          "l-tetromino:root0.child0.child2.child0:o3:sp125000:p500000:p1500000",
+          "l-tetromino:root0.child0.child2.child1:o1:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child3.child0:o0:sp125000:0:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 1.25
+          },
+          {
+            "x": 0.0,
+            "y": 1.5
+          },
+          {
+            "x": 0.125,
+            "y": 1.5
+          },
+          {
+            "x": 0.125,
+            "y": 1.375
+          },
+          {
+            "x": 0.375,
+            "y": 1.375
+          },
+          {
+            "x": 0.375,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.90625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root0.child0.child3.child0:o1:sp125000:p1000000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child3.child1:o3:sp125000:p750000:p500000",
+          "l-tetromino:root0.child0.child3.child3:o0:sp125000:p750000:0",
+          "l-tetromino:root0.child1.child0.child0:o2:sp125000:p1000000:0",
+          "l-tetromino:root0.child1.child0.child1:o0:sp125000:p1000000:p250000",
+          "l-tetromino:root0.child3.child2.child0:o2:sp125000:p500000:p500000",
+          "l-tetromino:root0.child3.child2.child3:o3:sp125000:p1000000:p750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.375
+          },
+          {
+            "x": 0.875,
+            "y": 0.375
+          },
+          {
+            "x": 0.875,
+            "y": 0.125
+          },
+          {
+            "x": 1.0,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.59375,
+          "y": 0.40625
+        },
+        "id": "l-tetromino:root0.child0.child3.child1:o3:sp125000:p750000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child2:o3:sp125000:p750000:p250000",
+          "l-tetromino:root0.child0.child1.child3:o3:sp125000:p500000:p750000",
+          "l-tetromino:root0.child0.child3.child0:o1:sp125000:p1000000:p500000",
+          "l-tetromino:root0.child0.child3.child2:o2:sp125000:p250000:p250000",
+          "l-tetromino:root0.child0.child3.child3:o0:sp125000:p750000:0",
+          "l-tetromino:root0.child3.child2.child0:o2:sp125000:p500000:p500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.25
+          },
+          {
+            "x": 0.625,
+            "y": 0.25
+          },
+          {
+            "x": 0.625,
+            "y": 0.375
+          },
+          {
+            "x": 0.375,
+            "y": 0.375
+          },
+          {
+            "x": 0.375,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.40625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root0.child0.child3.child2:o2:sp125000:p250000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child1:o2:sp125000:p250000:0",
+          "l-tetromino:root0.child0.child0.child2:o3:sp125000:p750000:p250000",
+          "l-tetromino:root0.child0.child0.child3:o1:sp125000:p250000:p500000",
+          "l-tetromino:root0.child0.child1.child0:o2:sp125000:0:p500000",
+          "l-tetromino:root0.child0.child3.child1:o3:sp125000:p750000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 0.25
+          },
+          {
+            "x": 0.25,
+            "y": 0.5
+          },
+          {
+            "x": 0.375,
+            "y": 0.5
+          },
+          {
+            "x": 0.375,
+            "y": 0.375
+          },
+          {
+            "x": 0.625,
+            "y": 0.375
+          },
+          {
+            "x": 0.625,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.84375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child0.child3.child3:o0:sp125000:p750000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child0.child2:o3:sp125000:p750000:p250000",
+          "l-tetromino:root0.child0.child3.child0:o1:sp125000:p1000000:p500000",
+          "l-tetromino:root0.child0.child3.child1:o3:sp125000:p750000:p500000",
+          "l-tetromino:root0.child1.child0.child0:o2:sp125000:p1000000:0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 0.0
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.0,
+            "y": 0.125
+          },
+          {
+            "x": 0.875,
+            "y": 0.125
+          },
+          {
+            "x": 0.875,
+            "y": 0.375
+          },
+          {
+            "x": 0.75,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.15625,
+          "y": 0.09375
+        },
+        "id": "l-tetromino:root0.child1.child0.child0:o2:sp125000:p1000000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child3.child0:o1:sp125000:p1000000:p500000",
+          "l-tetromino:root0.child0.child3.child3:o0:sp125000:p750000:0",
+          "l-tetromino:root0.child1.child0.child1:o0:sp125000:p1000000:p250000",
+          "l-tetromino:root0.child1.child0.child3:o3:sp125000:p1500000:p250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.0,
+            "y": 0.25
+          },
+          {
+            "x": 1.125,
+            "y": 0.25
+          },
+          {
+            "x": 1.125,
+            "y": 0.125
+          },
+          {
+            "x": 1.375,
+            "y": 0.125
+          },
+          {
+            "x": 1.375,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.09375,
+          "y": 0.40625
+        },
+        "id": "l-tetromino:root0.child1.child0.child1:o0:sp125000:p1000000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child3.child0:o1:sp125000:p1000000:p500000",
+          "l-tetromino:root0.child1.child0.child0:o2:sp125000:p1000000:0",
+          "l-tetromino:root0.child1.child0.child2:o1:sp125000:p1250000:p750000",
+          "l-tetromino:root0.child1.child0.child3:o3:sp125000:p1500000:p250000",
+          "l-tetromino:root0.child1.child3.child2:o0:sp125000:p1250000:p250000",
+          "l-tetromino:root0.child3.child2.child3:o3:sp125000:p1000000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.25
+          },
+          {
+            "x": 1.25,
+            "y": 0.25
+          },
+          {
+            "x": 1.25,
+            "y": 0.375
+          },
+          {
+            "x": 1.125,
+            "y": 0.375
+          },
+          {
+            "x": 1.125,
+            "y": 0.625
+          },
+          {
+            "x": 1.0,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.15625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root0.child1.child0.child2:o1:sp125000:p1250000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child0.child1:o0:sp125000:p1000000:p250000",
+          "l-tetromino:root0.child1.child3.child1:o1:sp125000:p1500000:p750000",
+          "l-tetromino:root0.child1.child3.child2:o0:sp125000:p1250000:p250000",
+          "l-tetromino:root0.child1.child3.child3:o2:sp125000:p1000000:p750000",
+          "l-tetromino:root0.child3.child2.child3:o3:sp125000:p1000000:p750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.25,
+            "y": 0.75
+          },
+          {
+            "x": 1.0,
+            "y": 0.75
+          },
+          {
+            "x": 1.0,
+            "y": 0.625
+          },
+          {
+            "x": 1.125,
+            "y": 0.625
+          },
+          {
+            "x": 1.125,
+            "y": 0.375
+          },
+          {
+            "x": 1.25,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.34375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child1.child0.child3:o3:sp125000:p1500000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child0.child0:o2:sp125000:p1000000:0",
+          "l-tetromino:root0.child1.child0.child1:o0:sp125000:p1000000:p250000",
+          "l-tetromino:root0.child1.child1.child0:o0:sp125000:p1500000:0",
+          "l-tetromino:root0.child1.child3.child2:o0:sp125000:p1250000:p250000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.25
+          },
+          {
+            "x": 1.5,
+            "y": 0.0
+          },
+          {
+            "x": 1.375,
+            "y": 0.0
+          },
+          {
+            "x": 1.375,
+            "y": 0.125
+          },
+          {
+            "x": 1.125,
+            "y": 0.125
+          },
+          {
+            "x": 1.125,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.59375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child1.child1.child0:o0:sp125000:p1500000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child0.child3:o3:sp125000:p1500000:p250000",
+          "l-tetromino:root0.child1.child1.child1:o2:sp125000:p1750000:0",
+          "l-tetromino:root0.child1.child1.child3:o1:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child1.child3.child2:o0:sp125000:p1250000:p250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.0
+          },
+          {
+            "x": 1.75,
+            "y": 0.0
+          },
+          {
+            "x": 1.75,
+            "y": 0.125
+          },
+          {
+            "x": 1.625,
+            "y": 0.125
+          },
+          {
+            "x": 1.625,
+            "y": 0.375
+          },
+          {
+            "x": 1.5,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 0.09375
+        },
+        "id": "l-tetromino:root0.child1.child1.child1:o2:sp125000:p1750000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child1.child0:o0:sp125000:p1500000:0",
+          "l-tetromino:root0.child1.child1.child2:o3:sp125000:p2250000:p250000",
+          "l-tetromino:root0.child1.child1.child3:o1:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child1.child2.child2:o2:sp125000:p1750000:p250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 0.0
+          },
+          {
+            "x": 1.75,
+            "y": 0.25
+          },
+          {
+            "x": 1.875,
+            "y": 0.25
+          },
+          {
+            "x": 1.875,
+            "y": 0.125
+          },
+          {
+            "x": 2.125,
+            "y": 0.125
+          },
+          {
+            "x": 2.125,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child1.child1.child2:o3:sp125000:p2250000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child1.child1:o2:sp125000:p1750000:0",
+          "l-tetromino:root0.child1.child2.child1:o3:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child1.child2.child2:o2:sp125000:p1750000:p250000",
+          "l-tetromino:root0.child1.child2.child3:o0:sp125000:p2250000:0"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 0.25
+          },
+          {
+            "x": 2.25,
+            "y": 0.0
+          },
+          {
+            "x": 2.125,
+            "y": 0.0
+          },
+          {
+            "x": 2.125,
+            "y": 0.125
+          },
+          {
+            "x": 1.875,
+            "y": 0.125
+          },
+          {
+            "x": 1.875,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.65625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root0.child1.child1.child3:o1:sp125000:p1750000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child1.child0:o0:sp125000:p1500000:0",
+          "l-tetromino:root0.child1.child1.child1:o2:sp125000:p1750000:0",
+          "l-tetromino:root0.child1.child2.child2:o2:sp125000:p1750000:p250000",
+          "l-tetromino:root0.child1.child3.child1:o1:sp125000:p1500000:p750000",
+          "l-tetromino:root0.child2.child2.child0:o0:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 0.5
+          },
+          {
+            "x": 1.5,
+            "y": 0.5
+          },
+          {
+            "x": 1.5,
+            "y": 0.375
+          },
+          {
+            "x": 1.625,
+            "y": 0.375
+          },
+          {
+            "x": 1.625,
+            "y": 0.125
+          },
+          {
+            "x": 1.75,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.40625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root0.child1.child2.child0:o1:sp125000:p2500000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child2.child1:o3:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child1.child2.child3:o0:sp125000:p2250000:0",
+          "l-tetromino:root0.child2.child1.child3:o0:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child3.child0:o2:sp125000:p2500000:0",
+          "l-tetromino:root0.child2.child3.child1:o0:sp125000:p2500000:p250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 0.5
+          },
+          {
+            "x": 2.25,
+            "y": 0.5
+          },
+          {
+            "x": 2.25,
+            "y": 0.375
+          },
+          {
+            "x": 2.375,
+            "y": 0.375
+          },
+          {
+            "x": 2.375,
+            "y": 0.125
+          },
+          {
+            "x": 2.5,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 0.40625
+        },
+        "id": "l-tetromino:root0.child1.child2.child1:o3:sp125000:p2250000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child1.child2:o3:sp125000:p2250000:p250000",
+          "l-tetromino:root0.child1.child2.child0:o1:sp125000:p2500000:p500000",
+          "l-tetromino:root0.child1.child2.child2:o2:sp125000:p1750000:p250000",
+          "l-tetromino:root0.child1.child2.child3:o0:sp125000:p2250000:0",
+          "l-tetromino:root0.child2.child2.child1:o2:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child2.child2.child2:o3:sp125000:p2250000:p750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 0.5
+          },
+          {
+            "x": 2.25,
+            "y": 0.25
+          },
+          {
+            "x": 2.125,
+            "y": 0.25
+          },
+          {
+            "x": 2.125,
+            "y": 0.375
+          },
+          {
+            "x": 1.875,
+            "y": 0.375
+          },
+          {
+            "x": 1.875,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root0.child1.child2.child2:o2:sp125000:p1750000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child1.child1:o2:sp125000:p1750000:0",
+          "l-tetromino:root0.child1.child1.child2:o3:sp125000:p2250000:p250000",
+          "l-tetromino:root0.child1.child1.child3:o1:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child1.child2.child1:o3:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child2.child1:o2:sp125000:p1750000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 0.25
+          },
+          {
+            "x": 1.75,
+            "y": 0.5
+          },
+          {
+            "x": 1.875,
+            "y": 0.5
+          },
+          {
+            "x": 1.875,
+            "y": 0.375
+          },
+          {
+            "x": 2.125,
+            "y": 0.375
+          },
+          {
+            "x": 2.125,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.34375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child1.child2.child3:o0:sp125000:p2250000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child1.child2:o3:sp125000:p2250000:p250000",
+          "l-tetromino:root0.child1.child2.child0:o1:sp125000:p2500000:p500000",
+          "l-tetromino:root0.child1.child2.child1:o3:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child3.child0:o2:sp125000:p2500000:0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 0.0
+          },
+          {
+            "x": 2.5,
+            "y": 0.0
+          },
+          {
+            "x": 2.5,
+            "y": 0.125
+          },
+          {
+            "x": 2.375,
+            "y": 0.125
+          },
+          {
+            "x": 2.375,
+            "y": 0.375
+          },
+          {
+            "x": 2.25,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.34375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root0.child1.child3.child0:o3:sp125000:p1500000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child3.child1:o1:sp125000:p1500000:p750000",
+          "l-tetromino:root0.child1.child3.child3:o2:sp125000:p1000000:p750000",
+          "l-tetromino:root0.child2.child2.child0:o0:sp125000:p1500000:p500000",
+          "l-tetromino:root0.child2.child2.child3:o1:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child0.child0:o2:sp125000:p1000000:p1000000",
+          "l-tetromino:root1.child2.child0.child3:o3:sp125000:p1500000:p1250000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.0
+          },
+          {
+            "x": 1.5,
+            "y": 0.75
+          },
+          {
+            "x": 1.375,
+            "y": 0.75
+          },
+          {
+            "x": 1.375,
+            "y": 0.875
+          },
+          {
+            "x": 1.125,
+            "y": 0.875
+          },
+          {
+            "x": 1.125,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.40625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root0.child1.child3.child1:o1:sp125000:p1500000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child0.child2:o1:sp125000:p1250000:p750000",
+          "l-tetromino:root0.child1.child1.child3:o1:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child1.child3.child0:o3:sp125000:p1500000:p1000000",
+          "l-tetromino:root0.child1.child3.child2:o0:sp125000:p1250000:p250000",
+          "l-tetromino:root0.child1.child3.child3:o2:sp125000:p1000000:p750000",
+          "l-tetromino:root0.child2.child2.child0:o0:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.75
+          },
+          {
+            "x": 1.25,
+            "y": 0.75
+          },
+          {
+            "x": 1.25,
+            "y": 0.625
+          },
+          {
+            "x": 1.375,
+            "y": 0.625
+          },
+          {
+            "x": 1.375,
+            "y": 0.375
+          },
+          {
+            "x": 1.5,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.34375,
+          "y": 0.40625
+        },
+        "id": "l-tetromino:root0.child1.child3.child2:o0:sp125000:p1250000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child0.child1:o0:sp125000:p1000000:p250000",
+          "l-tetromino:root0.child1.child0.child2:o1:sp125000:p1250000:p750000",
+          "l-tetromino:root0.child1.child0.child3:o3:sp125000:p1500000:p250000",
+          "l-tetromino:root0.child1.child1.child0:o0:sp125000:p1500000:0",
+          "l-tetromino:root0.child1.child3.child1:o1:sp125000:p1500000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.25,
+            "y": 0.25
+          },
+          {
+            "x": 1.5,
+            "y": 0.25
+          },
+          {
+            "x": 1.5,
+            "y": 0.375
+          },
+          {
+            "x": 1.375,
+            "y": 0.375
+          },
+          {
+            "x": 1.375,
+            "y": 0.625
+          },
+          {
+            "x": 1.25,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.15625,
+          "y": 0.84375
+        },
+        "id": "l-tetromino:root0.child1.child3.child3:o2:sp125000:p1000000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child0.child2:o1:sp125000:p1250000:p750000",
+          "l-tetromino:root0.child1.child3.child0:o3:sp125000:p1500000:p1000000",
+          "l-tetromino:root0.child1.child3.child1:o1:sp125000:p1500000:p750000",
+          "l-tetromino:root0.child3.child1.child1:o1:sp125000:p1000000:p1250000",
+          "l-tetromino:root0.child3.child1.child2:o0:sp125000:p750000:p750000",
+          "l-tetromino:root1.child2.child0.child0:o2:sp125000:p1000000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.75
+          },
+          {
+            "x": 1.0,
+            "y": 1.0
+          },
+          {
+            "x": 1.125,
+            "y": 1.0
+          },
+          {
+            "x": 1.125,
+            "y": 0.875
+          },
+          {
+            "x": 1.375,
+            "y": 0.875
+          },
+          {
+            "x": 1.375,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.84375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root0.child2.child0.child0:o3:sp125000:p3000000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child1:o1:sp125000:p3000000:p750000",
+          "l-tetromino:root0.child2.child0.child3:o2:sp125000:p2500000:p750000",
+          "l-tetromino:root1.child1.child3.child0:o2:sp125000:p2500000:p1000000",
+          "l-tetromino:root1.child1.child3.child3:o3:sp125000:p3000000:p1250000",
+          "l-tetromino:root1.child3.child1.child1:o0:sp125000:p3000000:p750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.0
+          },
+          {
+            "x": 3.0,
+            "y": 0.75
+          },
+          {
+            "x": 2.875,
+            "y": 0.75
+          },
+          {
+            "x": 2.875,
+            "y": 0.875
+          },
+          {
+            "x": 2.625,
+            "y": 0.875
+          },
+          {
+            "x": 2.625,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.90625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root0.child2.child0.child1:o1:sp125000:p3000000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child0:o3:sp125000:p3000000:p1000000",
+          "l-tetromino:root0.child2.child0.child2:o0:sp125000:p2750000:p250000",
+          "l-tetromino:root0.child2.child0.child3:o2:sp125000:p2500000:p750000",
+          "l-tetromino:root0.child2.child3.child2:o1:sp125000:p2750000:p750000",
+          "l-tetromino:root1.child3.child0.child3:o1:sp125000:p3250000:p500000",
+          "l-tetromino:root1.child3.child1.child0:o2:sp125000:p3000000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.75
+          },
+          {
+            "x": 2.75,
+            "y": 0.75
+          },
+          {
+            "x": 2.75,
+            "y": 0.625
+          },
+          {
+            "x": 2.875,
+            "y": 0.625
+          },
+          {
+            "x": 2.875,
+            "y": 0.375
+          },
+          {
+            "x": 3.0,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.84375,
+          "y": 0.40625
+        },
+        "id": "l-tetromino:root0.child2.child0.child2:o0:sp125000:p2750000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child1:o1:sp125000:p3000000:p750000",
+          "l-tetromino:root0.child2.child3.child1:o0:sp125000:p2500000:p250000",
+          "l-tetromino:root0.child2.child3.child2:o1:sp125000:p2750000:p750000",
+          "l-tetromino:root0.child2.child3.child3:o3:sp125000:p3000000:p250000",
+          "l-tetromino:root1.child3.child0.child0:o0:sp125000:p3000000:0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.75,
+            "y": 0.25
+          },
+          {
+            "x": 3.0,
+            "y": 0.25
+          },
+          {
+            "x": 3.0,
+            "y": 0.375
+          },
+          {
+            "x": 2.875,
+            "y": 0.375
+          },
+          {
+            "x": 2.875,
+            "y": 0.625
+          },
+          {
+            "x": 2.75,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.65625,
+          "y": 0.84375
+        },
+        "id": "l-tetromino:root0.child2.child0.child3:o2:sp125000:p2500000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child0:o3:sp125000:p3000000:p1000000",
+          "l-tetromino:root0.child2.child0.child1:o1:sp125000:p3000000:p750000",
+          "l-tetromino:root0.child2.child1.child0:o1:sp125000:p2500000:p1000000",
+          "l-tetromino:root0.child2.child3.child2:o1:sp125000:p2750000:p750000",
+          "l-tetromino:root1.child1.child3.child0:o2:sp125000:p2500000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 0.75
+          },
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.625,
+            "y": 1.0
+          },
+          {
+            "x": 2.625,
+            "y": 0.875
+          },
+          {
+            "x": 2.875,
+            "y": 0.875
+          },
+          {
+            "x": 2.875,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.40625,
+          "y": 0.84375
+        },
+        "id": "l-tetromino:root0.child2.child1.child0:o1:sp125000:p2500000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child3:o2:sp125000:p2500000:p750000",
+          "l-tetromino:root0.child2.child1.child1:o3:sp125000:p2250000:p1000000",
+          "l-tetromino:root0.child2.child1.child3:o0:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child3.child2:o1:sp125000:p2750000:p750000",
+          "l-tetromino:root1.child2.child2.child3:o0:sp125000:p2250000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.25,
+            "y": 1.0
+          },
+          {
+            "x": 2.25,
+            "y": 0.875
+          },
+          {
+            "x": 2.375,
+            "y": 0.875
+          },
+          {
+            "x": 2.375,
+            "y": 0.625
+          },
+          {
+            "x": 2.5,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root0.child2.child1.child1:o3:sp125000:p2250000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child1.child0:o1:sp125000:p2500000:p1000000",
+          "l-tetromino:root0.child2.child1.child2:o2:sp125000:p1750000:p750000",
+          "l-tetromino:root0.child2.child1.child3:o0:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child2.child2:o3:sp125000:p2250000:p750000",
+          "l-tetromino:root1.child2.child1.child1:o2:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child1.child2:o3:sp125000:p2250000:p1250000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 1.0
+          },
+          {
+            "x": 2.25,
+            "y": 0.75
+          },
+          {
+            "x": 2.125,
+            "y": 0.75
+          },
+          {
+            "x": 2.125,
+            "y": 0.875
+          },
+          {
+            "x": 1.875,
+            "y": 0.875
+          },
+          {
+            "x": 1.875,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 0.84375
+        },
+        "id": "l-tetromino:root0.child2.child1.child2:o2:sp125000:p1750000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child1.child1:o3:sp125000:p2250000:p1000000",
+          "l-tetromino:root0.child2.child2.child1:o2:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child2.child2.child2:o3:sp125000:p2250000:p750000",
+          "l-tetromino:root0.child2.child2.child3:o1:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child1.child1:o2:sp125000:p1750000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 0.75
+          },
+          {
+            "x": 1.75,
+            "y": 1.0
+          },
+          {
+            "x": 1.875,
+            "y": 1.0
+          },
+          {
+            "x": 1.875,
+            "y": 0.875
+          },
+          {
+            "x": 2.125,
+            "y": 0.875
+          },
+          {
+            "x": 2.125,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.34375,
+          "y": 0.65625
+        },
+        "id": "l-tetromino:root0.child2.child1.child3:o0:sp125000:p2250000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child2.child0:o1:sp125000:p2500000:p500000",
+          "l-tetromino:root0.child2.child1.child0:o1:sp125000:p2500000:p1000000",
+          "l-tetromino:root0.child2.child1.child1:o3:sp125000:p2250000:p1000000",
+          "l-tetromino:root0.child2.child2.child2:o3:sp125000:p2250000:p750000",
+          "l-tetromino:root0.child2.child3.child1:o0:sp125000:p2500000:p250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.625
+          },
+          {
+            "x": 2.375,
+            "y": 0.625
+          },
+          {
+            "x": 2.375,
+            "y": 0.875
+          },
+          {
+            "x": 2.25,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.59375,
+          "y": 0.65625
+        },
+        "id": "l-tetromino:root0.child2.child2.child0:o0:sp125000:p1500000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child1.child3:o1:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child1.child3.child0:o3:sp125000:p1500000:p1000000",
+          "l-tetromino:root0.child1.child3.child1:o1:sp125000:p1500000:p750000",
+          "l-tetromino:root0.child2.child2.child1:o2:sp125000:p1750000:p500000",
+          "l-tetromino:root0.child2.child2.child3:o1:sp125000:p1750000:p1000000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.5
+          },
+          {
+            "x": 1.75,
+            "y": 0.5
+          },
+          {
+            "x": 1.75,
+            "y": 0.625
+          },
+          {
+            "x": 1.625,
+            "y": 0.625
+          },
+          {
+            "x": 1.625,
+            "y": 0.875
+          },
+          {
+            "x": 1.5,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root0.child2.child2.child1:o2:sp125000:p1750000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child2.child1:o3:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child1.child2.child2:o2:sp125000:p1750000:p250000",
+          "l-tetromino:root0.child2.child1.child2:o2:sp125000:p1750000:p750000",
+          "l-tetromino:root0.child2.child2.child0:o0:sp125000:p1500000:p500000",
+          "l-tetromino:root0.child2.child2.child2:o3:sp125000:p2250000:p750000",
+          "l-tetromino:root0.child2.child2.child3:o1:sp125000:p1750000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 0.5
+          },
+          {
+            "x": 1.75,
+            "y": 0.75
+          },
+          {
+            "x": 1.875,
+            "y": 0.75
+          },
+          {
+            "x": 1.875,
+            "y": 0.625
+          },
+          {
+            "x": 2.125,
+            "y": 0.625
+          },
+          {
+            "x": 2.125,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 0.65625
+        },
+        "id": "l-tetromino:root0.child2.child2.child2:o3:sp125000:p2250000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child2.child1:o3:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child1.child1:o3:sp125000:p2250000:p1000000",
+          "l-tetromino:root0.child2.child1.child2:o2:sp125000:p1750000:p750000",
+          "l-tetromino:root0.child2.child1.child3:o0:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child2.child1:o2:sp125000:p1750000:p500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 0.75
+          },
+          {
+            "x": 2.25,
+            "y": 0.5
+          },
+          {
+            "x": 2.125,
+            "y": 0.5
+          },
+          {
+            "x": 2.125,
+            "y": 0.625
+          },
+          {
+            "x": 1.875,
+            "y": 0.625
+          },
+          {
+            "x": 1.875,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.65625,
+          "y": 0.84375
+        },
+        "id": "l-tetromino:root0.child2.child2.child3:o1:sp125000:p1750000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child3.child0:o3:sp125000:p1500000:p1000000",
+          "l-tetromino:root0.child2.child1.child2:o2:sp125000:p1750000:p750000",
+          "l-tetromino:root0.child2.child2.child0:o0:sp125000:p1500000:p500000",
+          "l-tetromino:root0.child2.child2.child1:o2:sp125000:p1750000:p500000",
+          "l-tetromino:root1.child2.child1.child0:o0:sp125000:p1500000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 1.0
+          },
+          {
+            "x": 1.5,
+            "y": 1.0
+          },
+          {
+            "x": 1.5,
+            "y": 0.875
+          },
+          {
+            "x": 1.625,
+            "y": 0.875
+          },
+          {
+            "x": 1.625,
+            "y": 0.625
+          },
+          {
+            "x": 1.75,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.65625,
+          "y": 0.09375
+        },
+        "id": "l-tetromino:root0.child2.child3.child0:o2:sp125000:p2500000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child2.child0:o1:sp125000:p2500000:p500000",
+          "l-tetromino:root0.child1.child2.child3:o0:sp125000:p2250000:0",
+          "l-tetromino:root0.child2.child3.child1:o0:sp125000:p2500000:p250000",
+          "l-tetromino:root0.child2.child3.child3:o3:sp125000:p3000000:p250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 0.0
+          },
+          {
+            "x": 2.5,
+            "y": 0.25
+          },
+          {
+            "x": 2.625,
+            "y": 0.25
+          },
+          {
+            "x": 2.625,
+            "y": 0.125
+          },
+          {
+            "x": 2.875,
+            "y": 0.125
+          },
+          {
+            "x": 2.875,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.59375,
+          "y": 0.40625
+        },
+        "id": "l-tetromino:root0.child2.child3.child1:o0:sp125000:p2500000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child2.child0:o1:sp125000:p2500000:p500000",
+          "l-tetromino:root0.child2.child0.child2:o0:sp125000:p2750000:p250000",
+          "l-tetromino:root0.child2.child1.child3:o0:sp125000:p2250000:p500000",
+          "l-tetromino:root0.child2.child3.child0:o2:sp125000:p2500000:0",
+          "l-tetromino:root0.child2.child3.child2:o1:sp125000:p2750000:p750000",
+          "l-tetromino:root0.child2.child3.child3:o3:sp125000:p3000000:p250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 0.25
+          },
+          {
+            "x": 2.75,
+            "y": 0.25
+          },
+          {
+            "x": 2.75,
+            "y": 0.375
+          },
+          {
+            "x": 2.625,
+            "y": 0.375
+          },
+          {
+            "x": 2.625,
+            "y": 0.625
+          },
+          {
+            "x": 2.5,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.65625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root0.child2.child3.child2:o1:sp125000:p2750000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child1:o1:sp125000:p3000000:p750000",
+          "l-tetromino:root0.child2.child0.child2:o0:sp125000:p2750000:p250000",
+          "l-tetromino:root0.child2.child0.child3:o2:sp125000:p2500000:p750000",
+          "l-tetromino:root0.child2.child1.child0:o1:sp125000:p2500000:p1000000",
+          "l-tetromino:root0.child2.child3.child1:o0:sp125000:p2500000:p250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.75,
+            "y": 0.75
+          },
+          {
+            "x": 2.5,
+            "y": 0.75
+          },
+          {
+            "x": 2.5,
+            "y": 0.625
+          },
+          {
+            "x": 2.625,
+            "y": 0.625
+          },
+          {
+            "x": 2.625,
+            "y": 0.375
+          },
+          {
+            "x": 2.75,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.84375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root0.child2.child3.child3:o3:sp125000:p3000000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child2:o0:sp125000:p2750000:p250000",
+          "l-tetromino:root0.child2.child3.child0:o2:sp125000:p2500000:0",
+          "l-tetromino:root0.child2.child3.child1:o0:sp125000:p2500000:p250000",
+          "l-tetromino:root1.child3.child0.child0:o0:sp125000:p3000000:0"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.25
+          },
+          {
+            "x": 3.0,
+            "y": 0.0
+          },
+          {
+            "x": 2.875,
+            "y": 0.0
+          },
+          {
+            "x": 2.875,
+            "y": 0.125
+          },
+          {
+            "x": 2.625,
+            "y": 0.125
+          },
+          {
+            "x": 2.625,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.90625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root0.child3.child0.child0:o1:sp125000:p1000000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child1:o3:sp125000:p750000:p2000000",
+          "l-tetromino:root0.child3.child0.child3:o0:sp125000:p750000:p1500000",
+          "l-tetromino:root1.child2.child0.child2:o1:sp125000:p1250000:p1750000",
+          "l-tetromino:root1.child2.child3.child3:o2:sp125000:p1000000:p1750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 2.0
+          },
+          {
+            "x": 0.75,
+            "y": 2.0
+          },
+          {
+            "x": 0.75,
+            "y": 1.875
+          },
+          {
+            "x": 0.875,
+            "y": 1.875
+          },
+          {
+            "x": 0.875,
+            "y": 1.625
+          },
+          {
+            "x": 1.0,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.59375,
+          "y": 1.90625
+        },
+        "id": "l-tetromino:root0.child3.child0.child1:o3:sp125000:p750000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child0:o1:sp125000:p1000000:p2000000",
+          "l-tetromino:root0.child3.child0.child2:o2:sp125000:p250000:p1750000",
+          "l-tetromino:root0.child3.child0.child3:o0:sp125000:p750000:p1500000",
+          "l-tetromino:root0.child3.child3.child2:o3:sp125000:p750000:p1750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 2.0
+          },
+          {
+            "x": 0.75,
+            "y": 1.75
+          },
+          {
+            "x": 0.625,
+            "y": 1.75
+          },
+          {
+            "x": 0.625,
+            "y": 1.875
+          },
+          {
+            "x": 0.375,
+            "y": 1.875
+          },
+          {
+            "x": 0.375,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.40625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root0.child3.child0.child2:o2:sp125000:p250000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child1:o3:sp125000:p750000:p2000000",
+          "l-tetromino:root0.child3.child3.child1:o2:sp125000:p250000:p1500000",
+          "l-tetromino:root0.child3.child3.child2:o3:sp125000:p750000:p1750000",
+          "l-tetromino:root0.child3.child3.child3:o1:sp125000:p250000:p2000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 1.75
+          },
+          {
+            "x": 0.25,
+            "y": 2.0
+          },
+          {
+            "x": 0.375,
+            "y": 2.0
+          },
+          {
+            "x": 0.375,
+            "y": 1.875
+          },
+          {
+            "x": 0.625,
+            "y": 1.875
+          },
+          {
+            "x": 0.625,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.84375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root0.child3.child0.child3:o0:sp125000:p750000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child0:o1:sp125000:p1000000:p2000000",
+          "l-tetromino:root0.child3.child0.child1:o3:sp125000:p750000:p2000000",
+          "l-tetromino:root0.child3.child1.child0:o3:sp125000:p1000000:p1500000",
+          "l-tetromino:root0.child3.child3.child2:o3:sp125000:p750000:p1750000",
+          "l-tetromino:root1.child2.child0.child1:o0:sp125000:p1000000:p1250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.625
+          },
+          {
+            "x": 0.875,
+            "y": 1.625
+          },
+          {
+            "x": 0.875,
+            "y": 1.875
+          },
+          {
+            "x": 0.75,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.84375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root0.child3.child1.child0:o3:sp125000:p1000000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child3:o0:sp125000:p750000:p1500000",
+          "l-tetromino:root0.child3.child1.child1:o1:sp125000:p1000000:p1250000",
+          "l-tetromino:root0.child3.child1.child3:o2:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child3.child2:o3:sp125000:p750000:p1750000",
+          "l-tetromino:root1.child2.child0.child1:o0:sp125000:p1000000:p1250000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 0.875,
+            "y": 1.25
+          },
+          {
+            "x": 0.875,
+            "y": 1.375
+          },
+          {
+            "x": 0.625,
+            "y": 1.375
+          },
+          {
+            "x": 0.625,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.90625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root0.child3.child1.child1:o1:sp125000:p1000000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child3.child3:o2:sp125000:p1000000:p750000",
+          "l-tetromino:root0.child3.child1.child0:o3:sp125000:p1000000:p1500000",
+          "l-tetromino:root0.child3.child1.child2:o0:sp125000:p750000:p750000",
+          "l-tetromino:root0.child3.child1.child3:o2:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child2.child2:o1:sp125000:p750000:p1250000",
+          "l-tetromino:root1.child2.child0.child0:o2:sp125000:p1000000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 0.75,
+            "y": 1.25
+          },
+          {
+            "x": 0.75,
+            "y": 1.125
+          },
+          {
+            "x": 0.875,
+            "y": 1.125
+          },
+          {
+            "x": 0.875,
+            "y": 0.875
+          },
+          {
+            "x": 1.0,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.84375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root0.child3.child1.child2:o0:sp125000:p750000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child3.child3:o2:sp125000:p1000000:p750000",
+          "l-tetromino:root0.child3.child1.child1:o1:sp125000:p1000000:p1250000",
+          "l-tetromino:root0.child3.child2.child1:o0:sp125000:p500000:p750000",
+          "l-tetromino:root0.child3.child2.child2:o1:sp125000:p750000:p1250000",
+          "l-tetromino:root0.child3.child2.child3:o3:sp125000:p1000000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 0.75
+          },
+          {
+            "x": 1.0,
+            "y": 0.75
+          },
+          {
+            "x": 1.0,
+            "y": 0.875
+          },
+          {
+            "x": 0.875,
+            "y": 0.875
+          },
+          {
+            "x": 0.875,
+            "y": 1.125
+          },
+          {
+            "x": 0.75,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.65625,
+          "y": 1.34375
+        },
+        "id": "l-tetromino:root0.child3.child1.child3:o2:sp125000:p500000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child2.child0:o3:sp125000:p500000:p1500000",
+          "l-tetromino:root0.child3.child1.child0:o3:sp125000:p1000000:p1500000",
+          "l-tetromino:root0.child3.child1.child1:o1:sp125000:p1000000:p1250000",
+          "l-tetromino:root0.child3.child2.child2:o1:sp125000:p750000:p1250000",
+          "l-tetromino:root0.child3.child3.child1:o2:sp125000:p250000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.25
+          },
+          {
+            "x": 0.5,
+            "y": 1.5
+          },
+          {
+            "x": 0.625,
+            "y": 1.5
+          },
+          {
+            "x": 0.625,
+            "y": 1.375
+          },
+          {
+            "x": 0.875,
+            "y": 1.375
+          },
+          {
+            "x": 0.875,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.65625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root0.child3.child2.child0:o2:sp125000:p500000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child1.child3:o3:sp125000:p500000:p750000",
+          "l-tetromino:root0.child0.child3.child0:o1:sp125000:p1000000:p500000",
+          "l-tetromino:root0.child0.child3.child1:o3:sp125000:p750000:p500000",
+          "l-tetromino:root0.child3.child2.child1:o0:sp125000:p500000:p750000",
+          "l-tetromino:root0.child3.child2.child3:o3:sp125000:p1000000:p750000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 0.5
+          },
+          {
+            "x": 0.5,
+            "y": 0.75
+          },
+          {
+            "x": 0.625,
+            "y": 0.75
+          },
+          {
+            "x": 0.625,
+            "y": 0.625
+          },
+          {
+            "x": 0.875,
+            "y": 0.625
+          },
+          {
+            "x": 0.875,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.59375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root0.child3.child2.child1:o0:sp125000:p500000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child2.child1:o1:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child0.child2.child2:o0:sp125000:p250000:p750000",
+          "l-tetromino:root0.child3.child1.child2:o0:sp125000:p750000:p750000",
+          "l-tetromino:root0.child3.child2.child0:o2:sp125000:p500000:p500000",
+          "l-tetromino:root0.child3.child2.child2:o1:sp125000:p750000:p1250000",
+          "l-tetromino:root0.child3.child2.child3:o3:sp125000:p1000000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 0.75
+          },
+          {
+            "x": 0.75,
+            "y": 0.75
+          },
+          {
+            "x": 0.75,
+            "y": 0.875
+          },
+          {
+            "x": 0.625,
+            "y": 0.875
+          },
+          {
+            "x": 0.625,
+            "y": 1.125
+          },
+          {
+            "x": 0.5,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.65625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root0.child3.child2.child2:o1:sp125000:p750000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child2.child1:o1:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child1.child1:o1:sp125000:p1000000:p1250000",
+          "l-tetromino:root0.child3.child1.child2:o0:sp125000:p750000:p750000",
+          "l-tetromino:root0.child3.child1.child3:o2:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child2.child1:o0:sp125000:p500000:p750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 1.25
+          },
+          {
+            "x": 0.5,
+            "y": 1.25
+          },
+          {
+            "x": 0.5,
+            "y": 1.125
+          },
+          {
+            "x": 0.625,
+            "y": 1.125
+          },
+          {
+            "x": 0.625,
+            "y": 0.875
+          },
+          {
+            "x": 0.75,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.84375,
+          "y": 0.65625
+        },
+        "id": "l-tetromino:root0.child3.child2.child3:o3:sp125000:p1000000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child3.child0:o1:sp125000:p1000000:p500000",
+          "l-tetromino:root0.child1.child0.child1:o0:sp125000:p1000000:p250000",
+          "l-tetromino:root0.child1.child0.child2:o1:sp125000:p1250000:p750000",
+          "l-tetromino:root0.child3.child1.child2:o0:sp125000:p750000:p750000",
+          "l-tetromino:root0.child3.child2.child0:o2:sp125000:p500000:p500000",
+          "l-tetromino:root0.child3.child2.child1:o0:sp125000:p500000:p750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.75
+          },
+          {
+            "x": 1.0,
+            "y": 0.5
+          },
+          {
+            "x": 0.875,
+            "y": 0.5
+          },
+          {
+            "x": 0.875,
+            "y": 0.625
+          },
+          {
+            "x": 0.625,
+            "y": 0.625
+          },
+          {
+            "x": 0.625,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.09375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root0.child3.child3.child0:o0:sp125000:0:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child2.child0:o3:sp125000:p500000:p1500000",
+          "l-tetromino:root0.child0.child2.child3:o2:sp125000:0:p1250000",
+          "l-tetromino:root0.child3.child3.child1:o2:sp125000:p250000:p1500000",
+          "l-tetromino:root0.child3.child3.child3:o1:sp125000:p250000:p2000000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 1.5
+          },
+          {
+            "x": 0.25,
+            "y": 1.5
+          },
+          {
+            "x": 0.25,
+            "y": 1.625
+          },
+          {
+            "x": 0.125,
+            "y": 1.625
+          },
+          {
+            "x": 0.125,
+            "y": 1.875
+          },
+          {
+            "x": 0.0,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.40625,
+          "y": 1.59375
+        },
+        "id": "l-tetromino:root0.child3.child3.child1:o2:sp125000:p250000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child0.child2.child0:o3:sp125000:p500000:p1500000",
+          "l-tetromino:root0.child3.child0.child2:o2:sp125000:p250000:p1750000",
+          "l-tetromino:root0.child3.child1.child3:o2:sp125000:p500000:p1250000",
+          "l-tetromino:root0.child3.child3.child0:o0:sp125000:0:p1500000",
+          "l-tetromino:root0.child3.child3.child2:o3:sp125000:p750000:p1750000",
+          "l-tetromino:root0.child3.child3.child3:o1:sp125000:p250000:p2000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 1.5
+          },
+          {
+            "x": 0.25,
+            "y": 1.75
+          },
+          {
+            "x": 0.375,
+            "y": 1.75
+          },
+          {
+            "x": 0.375,
+            "y": 1.625
+          },
+          {
+            "x": 0.625,
+            "y": 1.625
+          },
+          {
+            "x": 0.625,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.59375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root0.child3.child3.child2:o3:sp125000:p750000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child1:o3:sp125000:p750000:p2000000",
+          "l-tetromino:root0.child3.child0.child2:o2:sp125000:p250000:p1750000",
+          "l-tetromino:root0.child3.child0.child3:o0:sp125000:p750000:p1500000",
+          "l-tetromino:root0.child3.child1.child0:o3:sp125000:p1000000:p1500000",
+          "l-tetromino:root0.child3.child3.child1:o2:sp125000:p250000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 1.75
+          },
+          {
+            "x": 0.75,
+            "y": 1.5
+          },
+          {
+            "x": 0.625,
+            "y": 1.5
+          },
+          {
+            "x": 0.625,
+            "y": 1.625
+          },
+          {
+            "x": 0.375,
+            "y": 1.625
+          },
+          {
+            "x": 0.375,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.15625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root0.child3.child3.child3:o1:sp125000:p250000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child2:o2:sp125000:p250000:p1750000",
+          "l-tetromino:root0.child3.child3.child0:o0:sp125000:0:p1500000",
+          "l-tetromino:root0.child3.child3.child1:o2:sp125000:p250000:p1500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 2.0
+          },
+          {
+            "x": 0.0,
+            "y": 2.0
+          },
+          {
+            "x": 0.0,
+            "y": 1.875
+          },
+          {
+            "x": 0.125,
+            "y": 1.875
+          },
+          {
+            "x": 0.125,
+            "y": 1.625
+          },
+          {
+            "x": 0.25,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.90625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child0.child0.child0:o1:sp125000:p4000000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child1:o3:sp125000:p3750000:p2000000",
+          "l-tetromino:root1.child0.child0.child3:o0:sp125000:p3750000:p1500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 2.0
+          },
+          {
+            "x": 3.75,
+            "y": 2.0
+          },
+          {
+            "x": 3.75,
+            "y": 1.875
+          },
+          {
+            "x": 3.875,
+            "y": 1.875
+          },
+          {
+            "x": 3.875,
+            "y": 1.625
+          },
+          {
+            "x": 4.0,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.59375,
+          "y": 1.90625
+        },
+        "id": "l-tetromino:root1.child0.child0.child1:o3:sp125000:p3750000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child0:o1:sp125000:p4000000:p2000000",
+          "l-tetromino:root1.child0.child0.child2:o2:sp125000:p3250000:p1750000",
+          "l-tetromino:root1.child0.child0.child3:o0:sp125000:p3750000:p1500000",
+          "l-tetromino:root1.child0.child3.child2:o3:sp125000:p3750000:p1750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 2.0
+          },
+          {
+            "x": 3.75,
+            "y": 1.75
+          },
+          {
+            "x": 3.625,
+            "y": 1.75
+          },
+          {
+            "x": 3.625,
+            "y": 1.875
+          },
+          {
+            "x": 3.375,
+            "y": 1.875
+          },
+          {
+            "x": 3.375,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.40625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child0.child0.child2:o2:sp125000:p3250000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child1:o3:sp125000:p3750000:p2000000",
+          "l-tetromino:root1.child0.child3.child1:o2:sp125000:p3250000:p1500000",
+          "l-tetromino:root1.child0.child3.child2:o3:sp125000:p3750000:p1750000",
+          "l-tetromino:root1.child0.child3.child3:o1:sp125000:p3250000:p2000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 1.75
+          },
+          {
+            "x": 3.25,
+            "y": 2.0
+          },
+          {
+            "x": 3.375,
+            "y": 2.0
+          },
+          {
+            "x": 3.375,
+            "y": 1.875
+          },
+          {
+            "x": 3.625,
+            "y": 1.875
+          },
+          {
+            "x": 3.625,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.84375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root1.child0.child0.child3:o0:sp125000:p3750000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child0:o1:sp125000:p4000000:p2000000",
+          "l-tetromino:root1.child0.child0.child1:o3:sp125000:p3750000:p2000000",
+          "l-tetromino:root1.child0.child1.child0:o3:sp125000:p4000000:p1500000",
+          "l-tetromino:root1.child0.child3.child2:o3:sp125000:p3750000:p1750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 1.5
+          },
+          {
+            "x": 4.0,
+            "y": 1.5
+          },
+          {
+            "x": 4.0,
+            "y": 1.625
+          },
+          {
+            "x": 3.875,
+            "y": 1.625
+          },
+          {
+            "x": 3.875,
+            "y": 1.875
+          },
+          {
+            "x": 3.75,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.84375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root1.child0.child1.child0:o3:sp125000:p4000000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child3:o0:sp125000:p3750000:p1500000",
+          "l-tetromino:root1.child0.child1.child1:o1:sp125000:p4000000:p1250000",
+          "l-tetromino:root1.child0.child1.child3:o2:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child0.child3.child2:o3:sp125000:p3750000:p1750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.5
+          },
+          {
+            "x": 4.0,
+            "y": 1.25
+          },
+          {
+            "x": 3.875,
+            "y": 1.25
+          },
+          {
+            "x": 3.875,
+            "y": 1.375
+          },
+          {
+            "x": 3.625,
+            "y": 1.375
+          },
+          {
+            "x": 3.625,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.90625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root1.child0.child1.child1:o1:sp125000:p4000000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child1.child0:o3:sp125000:p4000000:p1500000",
+          "l-tetromino:root1.child0.child1.child2:o0:sp125000:p3750000:p750000",
+          "l-tetromino:root1.child0.child1.child3:o2:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child0.child2.child2:o1:sp125000:p3750000:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.25
+          },
+          {
+            "x": 3.75,
+            "y": 1.25
+          },
+          {
+            "x": 3.75,
+            "y": 1.125
+          },
+          {
+            "x": 3.875,
+            "y": 1.125
+          },
+          {
+            "x": 3.875,
+            "y": 0.875
+          },
+          {
+            "x": 4.0,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.84375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root1.child0.child1.child2:o0:sp125000:p3750000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child1.child1:o1:sp125000:p4000000:p1250000",
+          "l-tetromino:root1.child0.child2.child1:o0:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child0.child2.child2:o1:sp125000:p3750000:p1250000",
+          "l-tetromino:root1.child0.child2.child3:o3:sp125000:p4000000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 0.75
+          },
+          {
+            "x": 4.0,
+            "y": 0.75
+          },
+          {
+            "x": 4.0,
+            "y": 0.875
+          },
+          {
+            "x": 3.875,
+            "y": 0.875
+          },
+          {
+            "x": 3.875,
+            "y": 1.125
+          },
+          {
+            "x": 3.75,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.65625,
+          "y": 1.34375
+        },
+        "id": "l-tetromino:root1.child0.child1.child3:o2:sp125000:p3500000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child1.child0:o3:sp125000:p4000000:p1500000",
+          "l-tetromino:root1.child0.child1.child1:o1:sp125000:p4000000:p1250000",
+          "l-tetromino:root1.child0.child2.child2:o1:sp125000:p3750000:p1250000",
+          "l-tetromino:root1.child0.child3.child1:o2:sp125000:p3250000:p1500000",
+          "l-tetromino:root1.child3.child2.child0:o3:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.25
+          },
+          {
+            "x": 3.5,
+            "y": 1.5
+          },
+          {
+            "x": 3.625,
+            "y": 1.5
+          },
+          {
+            "x": 3.625,
+            "y": 1.375
+          },
+          {
+            "x": 3.875,
+            "y": 1.375
+          },
+          {
+            "x": 3.875,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.65625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root1.child0.child2.child0:o2:sp125000:p3500000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child2.child1:o0:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child0.child2.child3:o3:sp125000:p4000000:p750000",
+          "l-tetromino:root1.child3.child1.child3:o3:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child3.child0:o1:sp125000:p4000000:p500000",
+          "l-tetromino:root1.child3.child3.child1:o3:sp125000:p3750000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.5
+          },
+          {
+            "x": 3.5,
+            "y": 0.75
+          },
+          {
+            "x": 3.625,
+            "y": 0.75
+          },
+          {
+            "x": 3.625,
+            "y": 0.625
+          },
+          {
+            "x": 3.875,
+            "y": 0.625
+          },
+          {
+            "x": 3.875,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.59375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root1.child0.child2.child1:o0:sp125000:p3500000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child1.child2:o0:sp125000:p3750000:p750000",
+          "l-tetromino:root1.child0.child2.child0:o2:sp125000:p3500000:p500000",
+          "l-tetromino:root1.child0.child2.child2:o1:sp125000:p3750000:p1250000",
+          "l-tetromino:root1.child0.child2.child3:o3:sp125000:p4000000:p750000",
+          "l-tetromino:root1.child3.child2.child1:o1:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child3.child2.child2:o0:sp125000:p3250000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.75
+          },
+          {
+            "x": 3.75,
+            "y": 0.75
+          },
+          {
+            "x": 3.75,
+            "y": 0.875
+          },
+          {
+            "x": 3.625,
+            "y": 0.875
+          },
+          {
+            "x": 3.625,
+            "y": 1.125
+          },
+          {
+            "x": 3.5,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.65625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root1.child0.child2.child2:o1:sp125000:p3750000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child1.child1:o1:sp125000:p4000000:p1250000",
+          "l-tetromino:root1.child0.child1.child2:o0:sp125000:p3750000:p750000",
+          "l-tetromino:root1.child0.child1.child3:o2:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child0.child2.child1:o0:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child2.child1:o1:sp125000:p3500000:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 1.25
+          },
+          {
+            "x": 3.5,
+            "y": 1.25
+          },
+          {
+            "x": 3.5,
+            "y": 1.125
+          },
+          {
+            "x": 3.625,
+            "y": 1.125
+          },
+          {
+            "x": 3.625,
+            "y": 0.875
+          },
+          {
+            "x": 3.75,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.84375,
+          "y": 0.65625
+        },
+        "id": "l-tetromino:root1.child0.child2.child3:o3:sp125000:p4000000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child1.child2:o0:sp125000:p3750000:p750000",
+          "l-tetromino:root1.child0.child2.child0:o2:sp125000:p3500000:p500000",
+          "l-tetromino:root1.child0.child2.child1:o0:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child3.child0:o1:sp125000:p4000000:p500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 0.75
+          },
+          {
+            "x": 4.0,
+            "y": 0.5
+          },
+          {
+            "x": 3.875,
+            "y": 0.5
+          },
+          {
+            "x": 3.875,
+            "y": 0.625
+          },
+          {
+            "x": 3.625,
+            "y": 0.625
+          },
+          {
+            "x": 3.625,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.09375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root1.child0.child3.child0:o0:sp125000:p3000000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child3.child1:o2:sp125000:p3250000:p1500000",
+          "l-tetromino:root1.child0.child3.child3:o1:sp125000:p3250000:p2000000",
+          "l-tetromino:root1.child1.child0.child0:o3:sp125000:p3000000:p2000000",
+          "l-tetromino:root1.child1.child0.child1:o1:sp125000:p3000000:p1750000",
+          "l-tetromino:root1.child3.child2.child0:o3:sp125000:p3500000:p1500000",
+          "l-tetromino:root1.child3.child2.child3:o2:sp125000:p3000000:p1250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.5
+          },
+          {
+            "x": 3.25,
+            "y": 1.5
+          },
+          {
+            "x": 3.25,
+            "y": 1.625
+          },
+          {
+            "x": 3.125,
+            "y": 1.625
+          },
+          {
+            "x": 3.125,
+            "y": 1.875
+          },
+          {
+            "x": 3.0,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.40625,
+          "y": 1.59375
+        },
+        "id": "l-tetromino:root1.child0.child3.child1:o2:sp125000:p3250000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child2:o2:sp125000:p3250000:p1750000",
+          "l-tetromino:root1.child0.child1.child3:o2:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child0.child3.child0:o0:sp125000:p3000000:p1500000",
+          "l-tetromino:root1.child0.child3.child2:o3:sp125000:p3750000:p1750000",
+          "l-tetromino:root1.child0.child3.child3:o1:sp125000:p3250000:p2000000",
+          "l-tetromino:root1.child3.child2.child0:o3:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 1.5
+          },
+          {
+            "x": 3.25,
+            "y": 1.75
+          },
+          {
+            "x": 3.375,
+            "y": 1.75
+          },
+          {
+            "x": 3.375,
+            "y": 1.625
+          },
+          {
+            "x": 3.625,
+            "y": 1.625
+          },
+          {
+            "x": 3.625,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.59375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root1.child0.child3.child2:o3:sp125000:p3750000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child1:o3:sp125000:p3750000:p2000000",
+          "l-tetromino:root1.child0.child0.child2:o2:sp125000:p3250000:p1750000",
+          "l-tetromino:root1.child0.child0.child3:o0:sp125000:p3750000:p1500000",
+          "l-tetromino:root1.child0.child1.child0:o3:sp125000:p4000000:p1500000",
+          "l-tetromino:root1.child0.child3.child1:o2:sp125000:p3250000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 1.75
+          },
+          {
+            "x": 3.75,
+            "y": 1.5
+          },
+          {
+            "x": 3.625,
+            "y": 1.5
+          },
+          {
+            "x": 3.625,
+            "y": 1.625
+          },
+          {
+            "x": 3.375,
+            "y": 1.625
+          },
+          {
+            "x": 3.375,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.15625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child0.child3.child3:o1:sp125000:p3250000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child0.child2:o2:sp125000:p3250000:p1750000",
+          "l-tetromino:root1.child0.child3.child0:o0:sp125000:p3000000:p1500000",
+          "l-tetromino:root1.child0.child3.child1:o2:sp125000:p3250000:p1500000",
+          "l-tetromino:root1.child1.child0.child0:o3:sp125000:p3000000:p2000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 2.0
+          },
+          {
+            "x": 3.0,
+            "y": 2.0
+          },
+          {
+            "x": 3.0,
+            "y": 1.875
+          },
+          {
+            "x": 3.125,
+            "y": 1.875
+          },
+          {
+            "x": 3.125,
+            "y": 1.625
+          },
+          {
+            "x": 3.25,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.84375,
+          "y": 1.90625
+        },
+        "id": "l-tetromino:root1.child1.child0.child0:o3:sp125000:p3000000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child3.child0:o0:sp125000:p3000000:p1500000",
+          "l-tetromino:root1.child0.child3.child3:o1:sp125000:p3250000:p2000000",
+          "l-tetromino:root1.child1.child0.child1:o1:sp125000:p3000000:p1750000",
+          "l-tetromino:root1.child1.child0.child3:o2:sp125000:p2500000:p1750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 2.0
+          },
+          {
+            "x": 3.0,
+            "y": 1.75
+          },
+          {
+            "x": 2.875,
+            "y": 1.75
+          },
+          {
+            "x": 2.875,
+            "y": 1.875
+          },
+          {
+            "x": 2.625,
+            "y": 1.875
+          },
+          {
+            "x": 2.625,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.90625,
+          "y": 1.59375
+        },
+        "id": "l-tetromino:root1.child1.child0.child1:o1:sp125000:p3000000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child3.child0:o0:sp125000:p3000000:p1500000",
+          "l-tetromino:root1.child1.child0.child0:o3:sp125000:p3000000:p2000000",
+          "l-tetromino:root1.child1.child0.child2:o0:sp125000:p2750000:p1250000",
+          "l-tetromino:root1.child1.child0.child3:o2:sp125000:p2500000:p1750000",
+          "l-tetromino:root1.child1.child3.child2:o1:sp125000:p2750000:p1750000",
+          "l-tetromino:root1.child3.child2.child3:o2:sp125000:p3000000:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.75
+          },
+          {
+            "x": 2.75,
+            "y": 1.75
+          },
+          {
+            "x": 2.75,
+            "y": 1.625
+          },
+          {
+            "x": 2.875,
+            "y": 1.625
+          },
+          {
+            "x": 2.875,
+            "y": 1.375
+          },
+          {
+            "x": 3.0,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.84375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root1.child1.child0.child2:o0:sp125000:p2750000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child0.child1:o1:sp125000:p3000000:p1750000",
+          "l-tetromino:root1.child1.child3.child1:o0:sp125000:p2500000:p1250000",
+          "l-tetromino:root1.child1.child3.child2:o1:sp125000:p2750000:p1750000",
+          "l-tetromino:root1.child1.child3.child3:o3:sp125000:p3000000:p1250000",
+          "l-tetromino:root1.child3.child2.child3:o2:sp125000:p3000000:p1250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.75,
+            "y": 1.25
+          },
+          {
+            "x": 3.0,
+            "y": 1.25
+          },
+          {
+            "x": 3.0,
+            "y": 1.375
+          },
+          {
+            "x": 2.875,
+            "y": 1.375
+          },
+          {
+            "x": 2.875,
+            "y": 1.625
+          },
+          {
+            "x": 2.75,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.65625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child1.child0.child3:o2:sp125000:p2500000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child0.child0:o3:sp125000:p3000000:p2000000",
+          "l-tetromino:root1.child1.child0.child1:o1:sp125000:p3000000:p1750000",
+          "l-tetromino:root1.child1.child1.child0:o1:sp125000:p2500000:p2000000",
+          "l-tetromino:root1.child1.child3.child2:o1:sp125000:p2750000:p1750000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.75
+          },
+          {
+            "x": 2.5,
+            "y": 2.0
+          },
+          {
+            "x": 2.625,
+            "y": 2.0
+          },
+          {
+            "x": 2.625,
+            "y": 1.875
+          },
+          {
+            "x": 2.875,
+            "y": 1.875
+          },
+          {
+            "x": 2.875,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.40625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child1.child1.child0:o1:sp125000:p2500000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child0.child3:o2:sp125000:p2500000:p1750000",
+          "l-tetromino:root1.child1.child1.child1:o3:sp125000:p2250000:p2000000",
+          "l-tetromino:root1.child1.child1.child3:o0:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child1.child3.child2:o1:sp125000:p2750000:p1750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 2.0
+          },
+          {
+            "x": 2.25,
+            "y": 2.0
+          },
+          {
+            "x": 2.25,
+            "y": 1.875
+          },
+          {
+            "x": 2.375,
+            "y": 1.875
+          },
+          {
+            "x": 2.375,
+            "y": 1.625
+          },
+          {
+            "x": 2.5,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 1.90625
+        },
+        "id": "l-tetromino:root1.child1.child1.child1:o3:sp125000:p2250000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child1.child0:o1:sp125000:p2500000:p2000000",
+          "l-tetromino:root1.child1.child1.child2:o2:sp125000:p1750000:p1750000",
+          "l-tetromino:root1.child1.child1.child3:o0:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child1.child2.child2:o3:sp125000:p2250000:p1750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 2.0
+          },
+          {
+            "x": 2.25,
+            "y": 1.75
+          },
+          {
+            "x": 2.125,
+            "y": 1.75
+          },
+          {
+            "x": 2.125,
+            "y": 1.875
+          },
+          {
+            "x": 1.875,
+            "y": 1.875
+          },
+          {
+            "x": 1.875,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child1.child1.child2:o2:sp125000:p1750000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child1.child1:o3:sp125000:p2250000:p2000000",
+          "l-tetromino:root1.child1.child2.child1:o2:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child1.child2.child2:o3:sp125000:p2250000:p1750000",
+          "l-tetromino:root1.child1.child2.child3:o1:sp125000:p1750000:p2000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 1.75
+          },
+          {
+            "x": 1.75,
+            "y": 2.0
+          },
+          {
+            "x": 1.875,
+            "y": 2.0
+          },
+          {
+            "x": 1.875,
+            "y": 1.875
+          },
+          {
+            "x": 2.125,
+            "y": 1.875
+          },
+          {
+            "x": 2.125,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.34375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root1.child1.child1.child3:o0:sp125000:p2250000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child1.child0:o1:sp125000:p2500000:p2000000",
+          "l-tetromino:root1.child1.child1.child1:o3:sp125000:p2250000:p2000000",
+          "l-tetromino:root1.child1.child2.child2:o3:sp125000:p2250000:p1750000",
+          "l-tetromino:root1.child1.child3.child1:o0:sp125000:p2500000:p1250000",
+          "l-tetromino:root1.child2.child2.child0:o1:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.625
+          },
+          {
+            "x": 2.375,
+            "y": 1.625
+          },
+          {
+            "x": 2.375,
+            "y": 1.875
+          },
+          {
+            "x": 2.25,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.59375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root1.child1.child2.child0:o0:sp125000:p1500000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child2.child1:o2:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child1.child2.child3:o1:sp125000:p1750000:p2000000",
+          "l-tetromino:root1.child2.child1.child3:o1:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child3.child0:o3:sp125000:p1500000:p2000000",
+          "l-tetromino:root1.child2.child3.child1:o1:sp125000:p1500000:p1750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.5
+          },
+          {
+            "x": 1.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.75,
+            "y": 1.625
+          },
+          {
+            "x": 1.625,
+            "y": 1.625
+          },
+          {
+            "x": 1.625,
+            "y": 1.875
+          },
+          {
+            "x": 1.5,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 1.59375
+        },
+        "id": "l-tetromino:root1.child1.child2.child1:o2:sp125000:p1750000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child1.child2:o2:sp125000:p1750000:p1750000",
+          "l-tetromino:root1.child1.child2.child0:o0:sp125000:p1500000:p1500000",
+          "l-tetromino:root1.child1.child2.child2:o3:sp125000:p2250000:p1750000",
+          "l-tetromino:root1.child1.child2.child3:o1:sp125000:p1750000:p2000000",
+          "l-tetromino:root1.child2.child2.child1:o3:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child2.child2.child2:o2:sp125000:p1750000:p1250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.75,
+            "y": 1.75
+          },
+          {
+            "x": 1.875,
+            "y": 1.75
+          },
+          {
+            "x": 1.875,
+            "y": 1.625
+          },
+          {
+            "x": 2.125,
+            "y": 1.625
+          },
+          {
+            "x": 2.125,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 1.65625
+        },
+        "id": "l-tetromino:root1.child1.child2.child2:o3:sp125000:p2250000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child1.child1:o3:sp125000:p2250000:p2000000",
+          "l-tetromino:root1.child1.child1.child2:o2:sp125000:p1750000:p1750000",
+          "l-tetromino:root1.child1.child1.child3:o0:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child1.child2.child1:o2:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child2.child1:o3:sp125000:p2250000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 1.75
+          },
+          {
+            "x": 2.25,
+            "y": 1.5
+          },
+          {
+            "x": 2.125,
+            "y": 1.5
+          },
+          {
+            "x": 2.125,
+            "y": 1.625
+          },
+          {
+            "x": 1.875,
+            "y": 1.625
+          },
+          {
+            "x": 1.875,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.65625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child1.child2.child3:o1:sp125000:p1750000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child1.child2:o2:sp125000:p1750000:p1750000",
+          "l-tetromino:root1.child1.child2.child0:o0:sp125000:p1500000:p1500000",
+          "l-tetromino:root1.child1.child2.child1:o2:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child3.child0:o3:sp125000:p1500000:p2000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 2.0
+          },
+          {
+            "x": 1.5,
+            "y": 2.0
+          },
+          {
+            "x": 1.5,
+            "y": 1.875
+          },
+          {
+            "x": 1.625,
+            "y": 1.875
+          },
+          {
+            "x": 1.625,
+            "y": 1.625
+          },
+          {
+            "x": 1.75,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.65625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root1.child1.child3.child0:o2:sp125000:p2500000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child0:o3:sp125000:p3000000:p1000000",
+          "l-tetromino:root0.child2.child0.child3:o2:sp125000:p2500000:p750000",
+          "l-tetromino:root1.child1.child3.child1:o0:sp125000:p2500000:p1250000",
+          "l-tetromino:root1.child1.child3.child3:o3:sp125000:p3000000:p1250000",
+          "l-tetromino:root1.child2.child2.child0:o1:sp125000:p2500000:p1500000",
+          "l-tetromino:root1.child2.child2.child3:o0:sp125000:p2250000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.5,
+            "y": 1.25
+          },
+          {
+            "x": 2.625,
+            "y": 1.25
+          },
+          {
+            "x": 2.625,
+            "y": 1.125
+          },
+          {
+            "x": 2.875,
+            "y": 1.125
+          },
+          {
+            "x": 2.875,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.59375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root1.child1.child3.child1:o0:sp125000:p2500000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child0.child2:o0:sp125000:p2750000:p1250000",
+          "l-tetromino:root1.child1.child1.child3:o0:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child1.child3.child0:o2:sp125000:p2500000:p1000000",
+          "l-tetromino:root1.child1.child3.child2:o1:sp125000:p2750000:p1750000",
+          "l-tetromino:root1.child1.child3.child3:o3:sp125000:p3000000:p1250000",
+          "l-tetromino:root1.child2.child2.child0:o1:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.25
+          },
+          {
+            "x": 2.75,
+            "y": 1.25
+          },
+          {
+            "x": 2.75,
+            "y": 1.375
+          },
+          {
+            "x": 2.625,
+            "y": 1.375
+          },
+          {
+            "x": 2.625,
+            "y": 1.625
+          },
+          {
+            "x": 2.5,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.65625,
+          "y": 1.59375
+        },
+        "id": "l-tetromino:root1.child1.child3.child2:o1:sp125000:p2750000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child0.child1:o1:sp125000:p3000000:p1750000",
+          "l-tetromino:root1.child1.child0.child2:o0:sp125000:p2750000:p1250000",
+          "l-tetromino:root1.child1.child0.child3:o2:sp125000:p2500000:p1750000",
+          "l-tetromino:root1.child1.child1.child0:o1:sp125000:p2500000:p2000000",
+          "l-tetromino:root1.child1.child3.child1:o0:sp125000:p2500000:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.75,
+            "y": 1.75
+          },
+          {
+            "x": 2.5,
+            "y": 1.75
+          },
+          {
+            "x": 2.5,
+            "y": 1.625
+          },
+          {
+            "x": 2.625,
+            "y": 1.625
+          },
+          {
+            "x": 2.625,
+            "y": 1.375
+          },
+          {
+            "x": 2.75,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.84375,
+          "y": 1.15625
+        },
+        "id": "l-tetromino:root1.child1.child3.child3:o3:sp125000:p3000000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child0:o3:sp125000:p3000000:p1000000",
+          "l-tetromino:root1.child1.child0.child2:o0:sp125000:p2750000:p1250000",
+          "l-tetromino:root1.child1.child3.child0:o2:sp125000:p2500000:p1000000",
+          "l-tetromino:root1.child1.child3.child1:o0:sp125000:p2500000:p1250000",
+          "l-tetromino:root1.child3.child1.child1:o0:sp125000:p3000000:p750000",
+          "l-tetromino:root1.child3.child1.child2:o1:sp125000:p3250000:p1250000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.25
+          },
+          {
+            "x": 3.0,
+            "y": 1.0
+          },
+          {
+            "x": 2.875,
+            "y": 1.0
+          },
+          {
+            "x": 2.875,
+            "y": 1.125
+          },
+          {
+            "x": 2.625,
+            "y": 1.125
+          },
+          {
+            "x": 2.625,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.15625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root1.child2.child0.child0:o2:sp125000:p1000000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child3.child0:o3:sp125000:p1500000:p1000000",
+          "l-tetromino:root0.child1.child3.child3:o2:sp125000:p1000000:p750000",
+          "l-tetromino:root0.child3.child1.child1:o1:sp125000:p1000000:p1250000",
+          "l-tetromino:root1.child2.child0.child1:o0:sp125000:p1000000:p1250000",
+          "l-tetromino:root1.child2.child0.child3:o3:sp125000:p1500000:p1250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.0
+          },
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 1.125,
+            "y": 1.25
+          },
+          {
+            "x": 1.125,
+            "y": 1.125
+          },
+          {
+            "x": 1.375,
+            "y": 1.125
+          },
+          {
+            "x": 1.375,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.09375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root1.child2.child0.child1:o0:sp125000:p1000000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child3:o0:sp125000:p750000:p1500000",
+          "l-tetromino:root0.child3.child1.child0:o3:sp125000:p1000000:p1500000",
+          "l-tetromino:root1.child2.child0.child0:o2:sp125000:p1000000:p1000000",
+          "l-tetromino:root1.child2.child0.child2:o1:sp125000:p1250000:p1750000",
+          "l-tetromino:root1.child2.child0.child3:o3:sp125000:p1500000:p1250000",
+          "l-tetromino:root1.child2.child3.child2:o0:sp125000:p1250000:p1250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 1.25,
+            "y": 1.25
+          },
+          {
+            "x": 1.25,
+            "y": 1.375
+          },
+          {
+            "x": 1.125,
+            "y": 1.375
+          },
+          {
+            "x": 1.125,
+            "y": 1.625
+          },
+          {
+            "x": 1.0,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.15625,
+          "y": 1.59375
+        },
+        "id": "l-tetromino:root1.child2.child0.child2:o1:sp125000:p1250000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child0:o1:sp125000:p1000000:p2000000",
+          "l-tetromino:root1.child2.child0.child1:o0:sp125000:p1000000:p1250000",
+          "l-tetromino:root1.child2.child3.child1:o1:sp125000:p1500000:p1750000",
+          "l-tetromino:root1.child2.child3.child2:o0:sp125000:p1250000:p1250000",
+          "l-tetromino:root1.child2.child3.child3:o2:sp125000:p1000000:p1750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.25,
+            "y": 1.75
+          },
+          {
+            "x": 1.0,
+            "y": 1.75
+          },
+          {
+            "x": 1.0,
+            "y": 1.625
+          },
+          {
+            "x": 1.125,
+            "y": 1.625
+          },
+          {
+            "x": 1.125,
+            "y": 1.375
+          },
+          {
+            "x": 1.25,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.34375,
+          "y": 1.15625
+        },
+        "id": "l-tetromino:root1.child2.child0.child3:o3:sp125000:p1500000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child1.child3.child0:o3:sp125000:p1500000:p1000000",
+          "l-tetromino:root1.child2.child0.child0:o2:sp125000:p1000000:p1000000",
+          "l-tetromino:root1.child2.child0.child1:o0:sp125000:p1000000:p1250000",
+          "l-tetromino:root1.child2.child1.child0:o0:sp125000:p1500000:p1000000",
+          "l-tetromino:root1.child2.child3.child2:o0:sp125000:p1250000:p1250000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.25
+          },
+          {
+            "x": 1.5,
+            "y": 1.0
+          },
+          {
+            "x": 1.375,
+            "y": 1.0
+          },
+          {
+            "x": 1.375,
+            "y": 1.125
+          },
+          {
+            "x": 1.125,
+            "y": 1.125
+          },
+          {
+            "x": 1.125,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.59375,
+          "y": 1.15625
+        },
+        "id": "l-tetromino:root1.child2.child1.child0:o0:sp125000:p1500000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child2.child3:o1:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child0.child3:o3:sp125000:p1500000:p1250000",
+          "l-tetromino:root1.child2.child1.child1:o2:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child1.child3:o1:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child3.child2:o0:sp125000:p1250000:p1250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.0
+          },
+          {
+            "x": 1.75,
+            "y": 1.0
+          },
+          {
+            "x": 1.75,
+            "y": 1.125
+          },
+          {
+            "x": 1.625,
+            "y": 1.125
+          },
+          {
+            "x": 1.625,
+            "y": 1.375
+          },
+          {
+            "x": 1.5,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root1.child2.child1.child1:o2:sp125000:p1750000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child1.child1:o3:sp125000:p2250000:p1000000",
+          "l-tetromino:root0.child2.child1.child2:o2:sp125000:p1750000:p750000",
+          "l-tetromino:root1.child2.child1.child0:o0:sp125000:p1500000:p1000000",
+          "l-tetromino:root1.child2.child1.child2:o3:sp125000:p2250000:p1250000",
+          "l-tetromino:root1.child2.child1.child3:o1:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child2.child2:o2:sp125000:p1750000:p1250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 1.0
+          },
+          {
+            "x": 1.75,
+            "y": 1.25
+          },
+          {
+            "x": 1.875,
+            "y": 1.25
+          },
+          {
+            "x": 1.875,
+            "y": 1.125
+          },
+          {
+            "x": 2.125,
+            "y": 1.125
+          },
+          {
+            "x": 2.125,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 1.15625
+        },
+        "id": "l-tetromino:root1.child2.child1.child2:o3:sp125000:p2250000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child1.child1:o3:sp125000:p2250000:p1000000",
+          "l-tetromino:root1.child2.child1.child1:o2:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child2.child1:o3:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child2.child2.child2:o2:sp125000:p1750000:p1250000",
+          "l-tetromino:root1.child2.child2.child3:o0:sp125000:p2250000:p1000000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 1.25
+          },
+          {
+            "x": 2.25,
+            "y": 1.0
+          },
+          {
+            "x": 2.125,
+            "y": 1.0
+          },
+          {
+            "x": 2.125,
+            "y": 1.125
+          },
+          {
+            "x": 1.875,
+            "y": 1.125
+          },
+          {
+            "x": 1.875,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.65625,
+          "y": 1.34375
+        },
+        "id": "l-tetromino:root1.child2.child1.child3:o1:sp125000:p1750000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child2.child0:o0:sp125000:p1500000:p1500000",
+          "l-tetromino:root1.child2.child1.child0:o0:sp125000:p1500000:p1000000",
+          "l-tetromino:root1.child2.child1.child1:o2:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child2.child2:o2:sp125000:p1750000:p1250000",
+          "l-tetromino:root1.child2.child3.child1:o1:sp125000:p1500000:p1750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.5,
+            "y": 1.5
+          },
+          {
+            "x": 1.5,
+            "y": 1.375
+          },
+          {
+            "x": 1.625,
+            "y": 1.375
+          },
+          {
+            "x": 1.625,
+            "y": 1.125
+          },
+          {
+            "x": 1.75,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.40625,
+          "y": 1.34375
+        },
+        "id": "l-tetromino:root1.child2.child2.child0:o1:sp125000:p2500000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child1.child3:o0:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child1.child3.child0:o2:sp125000:p2500000:p1000000",
+          "l-tetromino:root1.child1.child3.child1:o0:sp125000:p2500000:p1250000",
+          "l-tetromino:root1.child2.child2.child1:o3:sp125000:p2250000:p1500000",
+          "l-tetromino:root1.child2.child2.child3:o0:sp125000:p2250000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.5
+          },
+          {
+            "x": 2.25,
+            "y": 1.5
+          },
+          {
+            "x": 2.25,
+            "y": 1.375
+          },
+          {
+            "x": 2.375,
+            "y": 1.375
+          },
+          {
+            "x": 2.375,
+            "y": 1.125
+          },
+          {
+            "x": 2.5,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.09375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root1.child2.child2.child1:o3:sp125000:p2250000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child2.child1:o2:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child1.child2.child2:o3:sp125000:p2250000:p1750000",
+          "l-tetromino:root1.child2.child1.child2:o3:sp125000:p2250000:p1250000",
+          "l-tetromino:root1.child2.child2.child0:o1:sp125000:p2500000:p1500000",
+          "l-tetromino:root1.child2.child2.child2:o2:sp125000:p1750000:p1250000",
+          "l-tetromino:root1.child2.child2.child3:o0:sp125000:p2250000:p1000000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 1.5
+          },
+          {
+            "x": 2.25,
+            "y": 1.25
+          },
+          {
+            "x": 2.125,
+            "y": 1.25
+          },
+          {
+            "x": 2.125,
+            "y": 1.375
+          },
+          {
+            "x": 1.875,
+            "y": 1.375
+          },
+          {
+            "x": 1.875,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.90625,
+          "y": 1.34375
+        },
+        "id": "l-tetromino:root1.child2.child2.child2:o2:sp125000:p1750000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child2.child1:o2:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child1.child1:o2:sp125000:p1750000:p1000000",
+          "l-tetromino:root1.child2.child1.child2:o3:sp125000:p2250000:p1250000",
+          "l-tetromino:root1.child2.child1.child3:o1:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child2.child1:o3:sp125000:p2250000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 1.25
+          },
+          {
+            "x": 1.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.875,
+            "y": 1.5
+          },
+          {
+            "x": 1.875,
+            "y": 1.375
+          },
+          {
+            "x": 2.125,
+            "y": 1.375
+          },
+          {
+            "x": 2.125,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.34375,
+          "y": 1.15625
+        },
+        "id": "l-tetromino:root1.child2.child2.child3:o0:sp125000:p2250000:p1000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child1.child0:o1:sp125000:p2500000:p1000000",
+          "l-tetromino:root1.child1.child3.child0:o2:sp125000:p2500000:p1000000",
+          "l-tetromino:root1.child2.child1.child2:o3:sp125000:p2250000:p1250000",
+          "l-tetromino:root1.child2.child2.child0:o1:sp125000:p2500000:p1500000",
+          "l-tetromino:root1.child2.child2.child1:o3:sp125000:p2250000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 1.0
+          },
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.5,
+            "y": 1.125
+          },
+          {
+            "x": 2.375,
+            "y": 1.125
+          },
+          {
+            "x": 2.375,
+            "y": 1.375
+          },
+          {
+            "x": 2.25,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.34375,
+          "y": 1.90625
+        },
+        "id": "l-tetromino:root1.child2.child3.child0:o3:sp125000:p1500000:p2000000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child2.child0:o0:sp125000:p1500000:p1500000",
+          "l-tetromino:root1.child1.child2.child3:o1:sp125000:p1750000:p2000000",
+          "l-tetromino:root1.child2.child3.child1:o1:sp125000:p1500000:p1750000",
+          "l-tetromino:root1.child2.child3.child3:o2:sp125000:p1000000:p1750000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 2.0
+          },
+          {
+            "x": 1.5,
+            "y": 1.75
+          },
+          {
+            "x": 1.375,
+            "y": 1.75
+          },
+          {
+            "x": 1.375,
+            "y": 1.875
+          },
+          {
+            "x": 1.125,
+            "y": 1.875
+          },
+          {
+            "x": 1.125,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.40625,
+          "y": 1.59375
+        },
+        "id": "l-tetromino:root1.child2.child3.child1:o1:sp125000:p1500000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child2.child0:o0:sp125000:p1500000:p1500000",
+          "l-tetromino:root1.child2.child0.child2:o1:sp125000:p1250000:p1750000",
+          "l-tetromino:root1.child2.child1.child3:o1:sp125000:p1750000:p1500000",
+          "l-tetromino:root1.child2.child3.child0:o3:sp125000:p1500000:p2000000",
+          "l-tetromino:root1.child2.child3.child2:o0:sp125000:p1250000:p1250000",
+          "l-tetromino:root1.child2.child3.child3:o2:sp125000:p1000000:p1750000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.75
+          },
+          {
+            "x": 1.25,
+            "y": 1.75
+          },
+          {
+            "x": 1.25,
+            "y": 1.625
+          },
+          {
+            "x": 1.375,
+            "y": 1.625
+          },
+          {
+            "x": 1.375,
+            "y": 1.375
+          },
+          {
+            "x": 1.5,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.34375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root1.child2.child3.child2:o0:sp125000:p1250000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child2.child0.child1:o0:sp125000:p1000000:p1250000",
+          "l-tetromino:root1.child2.child0.child2:o1:sp125000:p1250000:p1750000",
+          "l-tetromino:root1.child2.child0.child3:o3:sp125000:p1500000:p1250000",
+          "l-tetromino:root1.child2.child1.child0:o0:sp125000:p1500000:p1000000",
+          "l-tetromino:root1.child2.child3.child1:o1:sp125000:p1500000:p1750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.25,
+            "y": 1.25
+          },
+          {
+            "x": 1.5,
+            "y": 1.25
+          },
+          {
+            "x": 1.5,
+            "y": 1.375
+          },
+          {
+            "x": 1.375,
+            "y": 1.375
+          },
+          {
+            "x": 1.375,
+            "y": 1.625
+          },
+          {
+            "x": 1.25,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.15625,
+          "y": 1.84375
+        },
+        "id": "l-tetromino:root1.child2.child3.child3:o2:sp125000:p1000000:p1750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child3.child0.child0:o1:sp125000:p1000000:p2000000",
+          "l-tetromino:root1.child2.child0.child2:o1:sp125000:p1250000:p1750000",
+          "l-tetromino:root1.child2.child3.child0:o3:sp125000:p1500000:p2000000",
+          "l-tetromino:root1.child2.child3.child1:o1:sp125000:p1500000:p1750000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.75
+          },
+          {
+            "x": 1.0,
+            "y": 2.0
+          },
+          {
+            "x": 1.125,
+            "y": 2.0
+          },
+          {
+            "x": 1.125,
+            "y": 1.875
+          },
+          {
+            "x": 1.375,
+            "y": 1.875
+          },
+          {
+            "x": 1.375,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.09375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root1.child3.child0.child0:o0:sp125000:p3000000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child2:o0:sp125000:p2750000:p250000",
+          "l-tetromino:root0.child2.child3.child3:o3:sp125000:p3000000:p250000",
+          "l-tetromino:root1.child3.child0.child1:o2:sp125000:p3250000:0",
+          "l-tetromino:root1.child3.child0.child3:o1:sp125000:p3250000:p500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.0
+          },
+          {
+            "x": 3.25,
+            "y": 0.0
+          },
+          {
+            "x": 3.25,
+            "y": 0.125
+          },
+          {
+            "x": 3.125,
+            "y": 0.125
+          },
+          {
+            "x": 3.125,
+            "y": 0.375
+          },
+          {
+            "x": 3.0,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.40625,
+          "y": 0.09375
+        },
+        "id": "l-tetromino:root1.child3.child0.child1:o2:sp125000:p3250000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child3.child0.child0:o0:sp125000:p3000000:0",
+          "l-tetromino:root1.child3.child0.child2:o3:sp125000:p3750000:p250000",
+          "l-tetromino:root1.child3.child0.child3:o1:sp125000:p3250000:p500000",
+          "l-tetromino:root1.child3.child3.child2:o2:sp125000:p3250000:p250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 0.0
+          },
+          {
+            "x": 3.25,
+            "y": 0.25
+          },
+          {
+            "x": 3.375,
+            "y": 0.25
+          },
+          {
+            "x": 3.375,
+            "y": 0.125
+          },
+          {
+            "x": 3.625,
+            "y": 0.125
+          },
+          {
+            "x": 3.625,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.59375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root1.child3.child0.child2:o3:sp125000:p3750000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child3.child0.child1:o2:sp125000:p3250000:0",
+          "l-tetromino:root1.child3.child3.child1:o3:sp125000:p3750000:p500000",
+          "l-tetromino:root1.child3.child3.child2:o2:sp125000:p3250000:p250000",
+          "l-tetromino:root1.child3.child3.child3:o0:sp125000:p3750000:0"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 0.25
+          },
+          {
+            "x": 3.75,
+            "y": 0.0
+          },
+          {
+            "x": 3.625,
+            "y": 0.0
+          },
+          {
+            "x": 3.625,
+            "y": 0.125
+          },
+          {
+            "x": 3.375,
+            "y": 0.125
+          },
+          {
+            "x": 3.375,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.15625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root1.child3.child0.child3:o1:sp125000:p3250000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child1:o1:sp125000:p3000000:p750000",
+          "l-tetromino:root1.child3.child0.child0:o0:sp125000:p3000000:0",
+          "l-tetromino:root1.child3.child0.child1:o2:sp125000:p3250000:0",
+          "l-tetromino:root1.child3.child1.child0:o2:sp125000:p3000000:p500000",
+          "l-tetromino:root1.child3.child3.child2:o2:sp125000:p3250000:p250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 0.5
+          },
+          {
+            "x": 3.0,
+            "y": 0.5
+          },
+          {
+            "x": 3.0,
+            "y": 0.375
+          },
+          {
+            "x": 3.125,
+            "y": 0.375
+          },
+          {
+            "x": 3.125,
+            "y": 0.125
+          },
+          {
+            "x": 3.25,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.15625,
+          "y": 0.59375
+        },
+        "id": "l-tetromino:root1.child3.child1.child0:o2:sp125000:p3000000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child1:o1:sp125000:p3000000:p750000",
+          "l-tetromino:root1.child3.child0.child3:o1:sp125000:p3250000:p500000",
+          "l-tetromino:root1.child3.child1.child1:o0:sp125000:p3000000:p750000",
+          "l-tetromino:root1.child3.child1.child3:o3:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child3.child2:o2:sp125000:p3250000:p250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.5
+          },
+          {
+            "x": 3.0,
+            "y": 0.75
+          },
+          {
+            "x": 3.125,
+            "y": 0.75
+          },
+          {
+            "x": 3.125,
+            "y": 0.625
+          },
+          {
+            "x": 3.375,
+            "y": 0.625
+          },
+          {
+            "x": 3.375,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.09375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root1.child3.child1.child1:o0:sp125000:p3000000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root0.child2.child0.child0:o3:sp125000:p3000000:p1000000",
+          "l-tetromino:root1.child1.child3.child3:o3:sp125000:p3000000:p1250000",
+          "l-tetromino:root1.child3.child1.child0:o2:sp125000:p3000000:p500000",
+          "l-tetromino:root1.child3.child1.child2:o1:sp125000:p3250000:p1250000",
+          "l-tetromino:root1.child3.child1.child3:o3:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child2.child2:o0:sp125000:p3250000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.75
+          },
+          {
+            "x": 3.25,
+            "y": 0.75
+          },
+          {
+            "x": 3.25,
+            "y": 0.875
+          },
+          {
+            "x": 3.125,
+            "y": 0.875
+          },
+          {
+            "x": 3.125,
+            "y": 1.125
+          },
+          {
+            "x": 3.0,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.15625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root1.child3.child1.child2:o1:sp125000:p3250000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child1.child3.child3:o3:sp125000:p3000000:p1250000",
+          "l-tetromino:root1.child3.child1.child1:o0:sp125000:p3000000:p750000",
+          "l-tetromino:root1.child3.child2.child1:o1:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child3.child2.child2:o0:sp125000:p3250000:p750000",
+          "l-tetromino:root1.child3.child2.child3:o2:sp125000:p3000000:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 1.25
+          },
+          {
+            "x": 3.0,
+            "y": 1.25
+          },
+          {
+            "x": 3.0,
+            "y": 1.125
+          },
+          {
+            "x": 3.125,
+            "y": 1.125
+          },
+          {
+            "x": 3.125,
+            "y": 0.875
+          },
+          {
+            "x": 3.25,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.34375,
+          "y": 0.65625
+        },
+        "id": "l-tetromino:root1.child3.child1.child3:o3:sp125000:p3500000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child2.child0:o2:sp125000:p3500000:p500000",
+          "l-tetromino:root1.child3.child1.child0:o2:sp125000:p3000000:p500000",
+          "l-tetromino:root1.child3.child1.child1:o0:sp125000:p3000000:p750000",
+          "l-tetromino:root1.child3.child2.child2:o0:sp125000:p3250000:p750000",
+          "l-tetromino:root1.child3.child3.child1:o3:sp125000:p3750000:p500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.75
+          },
+          {
+            "x": 3.5,
+            "y": 0.5
+          },
+          {
+            "x": 3.375,
+            "y": 0.5
+          },
+          {
+            "x": 3.375,
+            "y": 0.625
+          },
+          {
+            "x": 3.125,
+            "y": 0.625
+          },
+          {
+            "x": 3.125,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.34375,
+          "y": 1.40625
+        },
+        "id": "l-tetromino:root1.child3.child2.child0:o3:sp125000:p3500000:p1500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child1.child3:o2:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child0.child3.child0:o0:sp125000:p3000000:p1500000",
+          "l-tetromino:root1.child0.child3.child1:o2:sp125000:p3250000:p1500000",
+          "l-tetromino:root1.child3.child2.child1:o1:sp125000:p3500000:p1250000",
+          "l-tetromino:root1.child3.child2.child3:o2:sp125000:p3000000:p1250000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.5
+          },
+          {
+            "x": 3.5,
+            "y": 1.25
+          },
+          {
+            "x": 3.375,
+            "y": 1.25
+          },
+          {
+            "x": 3.375,
+            "y": 1.375
+          },
+          {
+            "x": 3.125,
+            "y": 1.375
+          },
+          {
+            "x": 3.125,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.40625,
+          "y": 1.09375
+        },
+        "id": "l-tetromino:root1.child3.child2.child1:o1:sp125000:p3500000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child2.child1:o0:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child0.child2.child2:o1:sp125000:p3750000:p1250000",
+          "l-tetromino:root1.child3.child1.child2:o1:sp125000:p3250000:p1250000",
+          "l-tetromino:root1.child3.child2.child0:o3:sp125000:p3500000:p1500000",
+          "l-tetromino:root1.child3.child2.child2:o0:sp125000:p3250000:p750000",
+          "l-tetromino:root1.child3.child2.child3:o2:sp125000:p3000000:p1250000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.25
+          },
+          {
+            "x": 3.25,
+            "y": 1.25
+          },
+          {
+            "x": 3.25,
+            "y": 1.125
+          },
+          {
+            "x": 3.375,
+            "y": 1.125
+          },
+          {
+            "x": 3.375,
+            "y": 0.875
+          },
+          {
+            "x": 3.5,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.34375,
+          "y": 0.90625
+        },
+        "id": "l-tetromino:root1.child3.child2.child2:o0:sp125000:p3250000:p750000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child2.child1:o0:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child1.child1:o0:sp125000:p3000000:p750000",
+          "l-tetromino:root1.child3.child1.child2:o1:sp125000:p3250000:p1250000",
+          "l-tetromino:root1.child3.child1.child3:o3:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child2.child1:o1:sp125000:p3500000:p1250000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 0.75
+          },
+          {
+            "x": 3.5,
+            "y": 0.75
+          },
+          {
+            "x": 3.5,
+            "y": 0.875
+          },
+          {
+            "x": 3.375,
+            "y": 0.875
+          },
+          {
+            "x": 3.375,
+            "y": 1.125
+          },
+          {
+            "x": 3.25,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.15625,
+          "y": 1.34375
+        },
+        "id": "l-tetromino:root1.child3.child2.child3:o2:sp125000:p3000000:p1250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child3.child0:o0:sp125000:p3000000:p1500000",
+          "l-tetromino:root1.child1.child0.child1:o1:sp125000:p3000000:p1750000",
+          "l-tetromino:root1.child1.child0.child2:o0:sp125000:p2750000:p1250000",
+          "l-tetromino:root1.child3.child1.child2:o1:sp125000:p3250000:p1250000",
+          "l-tetromino:root1.child3.child2.child0:o3:sp125000:p3500000:p1500000",
+          "l-tetromino:root1.child3.child2.child1:o1:sp125000:p3500000:p1250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.25
+          },
+          {
+            "x": 3.0,
+            "y": 1.5
+          },
+          {
+            "x": 3.125,
+            "y": 1.5
+          },
+          {
+            "x": 3.125,
+            "y": 1.375
+          },
+          {
+            "x": 3.375,
+            "y": 1.375
+          },
+          {
+            "x": 3.375,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.90625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root1.child3.child3.child0:o1:sp125000:p4000000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child2.child0:o2:sp125000:p3500000:p500000",
+          "l-tetromino:root1.child0.child2.child3:o3:sp125000:p4000000:p750000",
+          "l-tetromino:root1.child3.child3.child1:o3:sp125000:p3750000:p500000",
+          "l-tetromino:root1.child3.child3.child3:o0:sp125000:p3750000:0"
+        ],
+        "orientation_token": "1",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 0.5
+          },
+          {
+            "x": 3.75,
+            "y": 0.5
+          },
+          {
+            "x": 3.75,
+            "y": 0.375
+          },
+          {
+            "x": 3.875,
+            "y": 0.375
+          },
+          {
+            "x": 3.875,
+            "y": 0.125
+          },
+          {
+            "x": 4.0,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.59375,
+          "y": 0.40625
+        },
+        "id": "l-tetromino:root1.child3.child3.child1:o3:sp125000:p3750000:p500000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child0.child2.child0:o2:sp125000:p3500000:p500000",
+          "l-tetromino:root1.child3.child0.child2:o3:sp125000:p3750000:p250000",
+          "l-tetromino:root1.child3.child1.child3:o3:sp125000:p3500000:p750000",
+          "l-tetromino:root1.child3.child3.child0:o1:sp125000:p4000000:p500000",
+          "l-tetromino:root1.child3.child3.child2:o2:sp125000:p3250000:p250000",
+          "l-tetromino:root1.child3.child3.child3:o0:sp125000:p3750000:0"
+        ],
+        "orientation_token": "3",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 0.5
+          },
+          {
+            "x": 3.75,
+            "y": 0.25
+          },
+          {
+            "x": 3.625,
+            "y": 0.25
+          },
+          {
+            "x": 3.625,
+            "y": 0.375
+          },
+          {
+            "x": 3.375,
+            "y": 0.375
+          },
+          {
+            "x": 3.375,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.40625,
+          "y": 0.34375
+        },
+        "id": "l-tetromino:root1.child3.child3.child2:o2:sp125000:p3250000:p250000",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child3.child0.child1:o2:sp125000:p3250000:0",
+          "l-tetromino:root1.child3.child0.child2:o3:sp125000:p3750000:p250000",
+          "l-tetromino:root1.child3.child0.child3:o1:sp125000:p3250000:p500000",
+          "l-tetromino:root1.child3.child1.child0:o2:sp125000:p3000000:p500000",
+          "l-tetromino:root1.child3.child3.child1:o3:sp125000:p3750000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 0.25
+          },
+          {
+            "x": 3.25,
+            "y": 0.5
+          },
+          {
+            "x": 3.375,
+            "y": 0.5
+          },
+          {
+            "x": 3.375,
+            "y": 0.375
+          },
+          {
+            "x": 3.625,
+            "y": 0.375
+          },
+          {
+            "x": 3.625,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.84375,
+          "y": 0.15625
+        },
+        "id": "l-tetromino:root1.child3.child3.child3:o0:sp125000:p3750000:0",
+        "kind": "l-tetromino",
+        "neighbors": [
+          "l-tetromino:root1.child3.child0.child2:o3:sp125000:p3750000:p250000",
+          "l-tetromino:root1.child3.child3.child0:o1:sp125000:p4000000:p500000",
+          "l-tetromino:root1.child3.child3.child1:o3:sp125000:p3750000:p500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "l-tetromino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 0.0
+          },
+          {
+            "x": 4.0,
+            "y": 0.0
+          },
+          {
+            "x": 4.0,
+            "y": 0.125
+          },
+          {
+            "x": 3.875,
+            "y": 0.125
+          },
+          {
+            "x": 3.875,
+            "y": 0.375
+          },
+          {
+            "x": 3.75,
+            "y": 0.375
+          }
+        ]
+      }
+    ],
+    "topology_revision": "a7f0de9c",
+    "topology_spec": {
+      "adjacency_mode": "edge",
+      "height": 2,
+      "patch_depth": 3,
+      "sizing_mode": "patch_depth",
+      "tiling_family": "l-tetromino",
+      "width": 4
+    }
+  },
+  "width": 0
+}

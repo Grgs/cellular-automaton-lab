@@ -5,7 +5,12 @@ from backend.payload_types import (
     TopologySpecPayload,
     TopologyVariantPayload,
 )
-from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
+from backend.simulation.aperiodic_family_manifest import (
+    PENROSE_GEOMETRY,
+    PENROSE_P1_DISTRIBUTED_GEOMETRY,
+    PENROSE_P1_GEOMETRY,
+    PENROSE_P1_PBS_GEOMETRY,
+)
 from backend.simulation.topology_catalog_build import build_topology_catalog
 from backend.simulation.topology_catalog_data import (
     TOPOLOGY_SIZING_POLICIES,
@@ -30,6 +35,8 @@ from backend.simulation.topology_family_manifest import (
     DEFAULT_TOPOLOGY_PATCH_DEPTH,
     GEOMETRY_MINIMUM_GRID_DIMENSIONS,
     PATCH_DEPTH_CONTROL,
+    PENROSE_P1_BOAT_STAR_MODE,
+    PENROSE_P1_DISTRIBUTED_MODE,
     PICKER_GROUP_ORDER,
 )
 from backend.simulation.topology_implementation_registry import render_kind_for_geometry
@@ -47,6 +54,7 @@ __all__ = [
     "TOPOLOGY_VARIANT_BY_GEOMETRY",
     "TopologyDefinition",
     "TopologyVariantDefinition",
+    "canonicalize_topology_identity",
     "default_patch_depth_for_tiling_family",
     "describe_topologies",
     "describe_topology_variants",
@@ -86,6 +94,17 @@ TOPOLOGY_DEFAULT_RULES = {
     definition.tiling_family: dict(definition.default_rules) for definition in TOPOLOGY_CATALOG
 }
 
+_LEGACY_TOPOLOGY_FAMILY_ALIASES = {
+    PENROSE_P1_DISTRIBUTED_GEOMETRY: (
+        PENROSE_P1_GEOMETRY,
+        PENROSE_P1_DISTRIBUTED_MODE,
+    ),
+    PENROSE_P1_PBS_GEOMETRY: (
+        PENROSE_P1_GEOMETRY,
+        PENROSE_P1_BOAT_STAR_MODE,
+    ),
+}
+
 
 def describe_topologies() -> list[TopologyCatalogEntryPayload]:
     return describe_topology_entries(TOPOLOGY_CATALOG)
@@ -111,16 +130,35 @@ def get_topology_variant_for_geometry(geometry_key: str) -> TopologyVariantDefin
     return TOPOLOGY_VARIANT_BY_GEOMETRY[geometry_key]
 
 
+def canonicalize_topology_identity(
+    tiling_family: str,
+    adjacency_mode: str | None = None,
+) -> tuple[str, str | None]:
+    alias = _LEGACY_TOPOLOGY_FAMILY_ALIASES.get(str(tiling_family))
+    if alias is None:
+        return str(tiling_family), adjacency_mode
+    return alias
+
+
 def normalize_adjacency_mode(tiling_family: str, adjacency_mode: str | None = None) -> str:
-    definition = get_topology_definition(tiling_family)
+    canonical_family, canonical_mode = canonicalize_topology_identity(
+        tiling_family,
+        adjacency_mode,
+    )
+    definition = get_topology_definition(canonical_family)
+    adjacency_mode = canonical_mode
     if adjacency_mode in definition.geometry_keys:
         return adjacency_mode
     return definition.default_adjacency_mode
 
 
 def resolve_geometry_key(tiling_family: str, adjacency_mode: str | None = None) -> str:
-    definition = get_topology_definition(tiling_family)
-    resolved_adjacency_mode = normalize_adjacency_mode(tiling_family, adjacency_mode)
+    canonical_family, canonical_mode = canonicalize_topology_identity(
+        tiling_family,
+        adjacency_mode,
+    )
+    definition = get_topology_definition(canonical_family)
+    resolved_adjacency_mode = normalize_adjacency_mode(canonical_family, canonical_mode)
     return definition.geometry_keys[resolved_adjacency_mode]
 
 

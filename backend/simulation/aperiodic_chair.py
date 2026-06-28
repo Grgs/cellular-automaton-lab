@@ -81,6 +81,11 @@ _CHAIR_SUBSTITUTION_RULES: dict[int, tuple[tuple[int, float, float], ...]] = {
     ),
 }
 
+_DEFAULT_ROOT_SEEDS: tuple[tuple[str, int, float, float], ...] = (
+    ("root0", 0, 0.0, 0.0),
+    ("root1", 2, 1.0, 0.0),
+)
+
 
 def _chair_id(
     path: str, orientation: int, scale_factor: float, anchor_x: float, anchor_y: float
@@ -151,18 +156,32 @@ def _collect_chair_records(
         )
 
 
-def build_chair_patch(patch_depth: int) -> AperiodicPatch:
+def collect_chair_records(patch_depth: int) -> list[PatchRecord]:
     resolved_depth = max(0, int(patch_depth))
     records: list[PatchRecord] = []
-    _collect_chair_records(
-        resolved_depth,
-        0,
-        1.0,
-        0.0,
-        0.0,
-        "root",
-        records,
-    )
+    for path, orientation, anchor_x, anchor_y in _DEFAULT_ROOT_SEEDS:
+        _collect_chair_records(
+            resolved_depth,
+            orientation,
+            1.0,
+            anchor_x,
+            anchor_y,
+            path,
+            records,
+        )
+    return records
+
+
+def _collect_canonical_chair_records(patch_depth: int) -> list[PatchRecord]:
+    resolved_depth = max(0, int(patch_depth))
+    records: list[PatchRecord] = []
+    _collect_chair_records(resolved_depth, 0, 1.0, 0.0, 0.0, "root", records)
+    return records
+
+
+def build_chair_patch(patch_depth: int) -> AperiodicPatch:
+    resolved_depth = max(0, int(patch_depth))
+    records = collect_chair_records(resolved_depth)
     return patch_from_records(
         resolved_depth,
         records,

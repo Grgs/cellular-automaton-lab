@@ -1,4 +1,8 @@
-import { adjacencyModeOptions, tilingFamilyOptions } from "../topology-catalog.js";
+import {
+    tilingFamilyOptions,
+    topologyModeFieldLabel,
+    topologyModeOptions,
+} from "../topology-catalog.js";
 import {
     buildCellSizeViewState,
     buildHiddenCellSizeViewState,
@@ -63,7 +67,7 @@ export function buildDrawerTopologyViewModel({
     syncState: ConfigSyncViewState;
 }): DrawerTopologyViewModel {
     const tilingFamily = state.topologySpec?.tiling_family || "square";
-    const adjacencyOptions = adjacencyModeOptions(tilingFamily);
+    const adjacencyOptions = topologyModeOptions(tilingFamily);
     const adjacencyModeVisible = adjacencyOptions.length > 1;
     const speedValue = resolveSpeedValue(state, syncState);
     const sizingState = resolveViewportSizingState(state);
@@ -77,6 +81,7 @@ export function buildDrawerTopologyViewModel({
         tilingFamilyOptions: tilingFamilyOptions(),
         tilingFamilyValue: tilingFamily,
         adjacencyModeOptions: adjacencyOptions,
+        topologyModeLabel: topologyModeFieldLabel(tilingFamily),
         adjacencyModeValue: state.topologySpec?.adjacency_mode || "edge",
         adjacencyModeVisible,
         speedValue: String(speedValue),

@@ -7,6 +7,154 @@
     "cells": [
       {
         "center": {
+          "x": -1.583333,
+          "y": -0.529238
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-0:p1000000:0:n2500000:0:p1000000:n866025",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:n2500000:0:n1000000:n866025",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n2598076",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:n2500000:p866025:n500000:n2598076"
+        ],
+        "orientation_token": "0",
+        "vertices": [
+          {
+            "x": -3.0,
+            "y": 0.0
+          },
+          {
+            "x": -2.0,
+            "y": 0.0
+          },
+          {
+            "x": -1.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.5,
+            "y": -0.866025
+          },
+          {
+            "x": -1.5,
+            "y": -0.866025
+          },
+          {
+            "x": -2.0,
+            "y": -1.732051
+          },
+          {
+            "x": -2.5,
+            "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.583333,
+          "y": -0.529238
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-0:p1000000:0:n5500000:0:p1000000:n866025",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:n2500000:0:n1000000:n866025",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n5500000:p866025:p500000:n2598076"
+        ],
+        "orientation_token": "0",
+        "vertices": [
+          {
+            "x": -6.0,
+            "y": 0.0
+          },
+          {
+            "x": -5.0,
+            "y": 0.0
+          },
+          {
+            "x": -4.0,
+            "y": 0.0
+          },
+          {
+            "x": -3.0,
+            "y": 0.0
+          },
+          {
+            "x": -3.5,
+            "y": -0.866025
+          },
+          {
+            "x": -4.5,
+            "y": -0.866025
+          },
+          {
+            "x": -5.0,
+            "y": -1.732051
+          },
+          {
+            "x": -5.5,
+            "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.416667,
+          "y": -10.921543
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-0:p1000000:0:p3500000:0:p1000000:n11258330",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n11258330",
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n9526279",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n11258330",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n10392305",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:p3500000:p866025:n500000:n12990381"
+        ],
+        "orientation_token": "0",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": -10.392305
+          },
+          {
+            "x": 4.0,
+            "y": -10.392305
+          },
+          {
+            "x": 5.0,
+            "y": -10.392305
+          },
+          {
+            "x": 6.0,
+            "y": -10.392305
+          },
+          {
+            "x": 5.5,
+            "y": -11.25833
+          },
+          {
+            "x": 4.5,
+            "y": -11.25833
+          },
+          {
+            "x": 4.0,
+            "y": -12.124356
+          },
+          {
+            "x": 3.5,
+            "y": -11.25833
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 5.416667,
           "y": -0.529238
         },
@@ -52,6 +200,106 @@
           {
             "x": 4.5,
             "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.416667,
+          "y": -10.921543
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n11258330",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n11258330",
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n9526279",
+          "sphinx:chirality-left:orientation-180:n1000000:0:p500000:0:n1000000:n9526279",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n12990381"
+        ],
+        "orientation_token": "0",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": -10.392305
+          },
+          {
+            "x": 1.0,
+            "y": -10.392305
+          },
+          {
+            "x": 2.0,
+            "y": -10.392305
+          },
+          {
+            "x": 3.0,
+            "y": -10.392305
+          },
+          {
+            "x": 2.5,
+            "y": -11.25833
+          },
+          {
+            "x": 1.5,
+            "y": -11.25833
+          },
+          {
+            "x": 1.0,
+            "y": -12.124356
+          },
+          {
+            "x": 0.5,
+            "y": -11.25833
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.416667,
+          "y": -9.189492
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n9526279",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n9526279",
+          "sphinx:chirality-left:orientation-180:n1000000:0:p500000:0:n1000000:n9526279",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n8660254",
+          "sphinx:chirality-right:orientation-120:n500000:n866025:p500000:n866025:p500000:n7794229"
+        ],
+        "orientation_token": "0",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": -8.660254
+          },
+          {
+            "x": 1.0,
+            "y": -8.660254
+          },
+          {
+            "x": 2.0,
+            "y": -8.660254
+          },
+          {
+            "x": 3.0,
+            "y": -8.660254
+          },
+          {
+            "x": 2.5,
+            "y": -9.526279
+          },
+          {
+            "x": 1.5,
+            "y": -9.526279
+          },
+          {
+            "x": 1.0,
+            "y": -10.392305
+          },
+          {
+            "x": 0.5,
+            "y": -9.526279
           }
         ]
       },
@@ -264,7 +512,8 @@
         "kind": "sphinx",
         "neighbors": [
           "sphinx:chirality-left:orientation-300:p500000:p866025:0:n866025:p500000:p1732051",
-          "sphinx:chirality-right:orientation-0:p1000000:0:p1500000:0:n1000000:n866025"
+          "sphinx:chirality-right:orientation-0:p1000000:0:p1500000:0:n1000000:n866025",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n2598076"
         ],
         "orientation_token": "120",
         "vertices": [
@@ -414,7 +663,9 @@
         "neighbors": [
           "sphinx:chirality-left:orientation-300:p500000:p866025:p3000000:n866025:p500000:n3464102",
           "sphinx:chirality-right:orientation-0:p1000000:0:p1500000:0:n1000000:n866025",
-          "sphinx:chirality-right:orientation-180:n1000000:0:p4500000:0:p1000000:n2598076"
+          "sphinx:chirality-right:orientation-180:n1000000:0:p4500000:0:p1000000:n2598076",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p2000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n2598076"
         ],
         "orientation_token": "120",
         "vertices": [
@@ -461,7 +712,9 @@
         "id": "sphinx:chirality-left:orientation-120:n500000:n866025:p4500000:p866025:n500000:n6062178",
         "kind": "sphinx",
         "neighbors": [
-          "sphinx:chirality-left:orientation-300:p500000:p866025:p3000000:n866025:p500000:n3464102"
+          "sphinx:chirality-left:orientation-300:p500000:p866025:p3000000:n866025:p500000:n3464102",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p2000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n7794229"
         ],
         "orientation_token": "120",
         "vertices": [
@@ -547,6 +800,405 @@
           {
             "x": 4.5,
             "y": 4.330127
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.75,
+          "y": -8.900817
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-120:n500000:n866025:p6500000:p866025:n500000:n9526279",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n11258330",
+          "sphinx:chirality-right:orientation-0:p1000000:0:p6500000:0:n1000000:n7794229",
+          "sphinx:chirality-right:orientation-180:n1000000:0:p6500000:0:p1000000:n7794229",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n10392305"
+        ],
+        "orientation_token": "120",
+        "vertices": [
+          {
+            "x": 6.0,
+            "y": -10.392305
+          },
+          {
+            "x": 5.5,
+            "y": -9.526279
+          },
+          {
+            "x": 5.0,
+            "y": -8.660254
+          },
+          {
+            "x": 4.5,
+            "y": -7.794229
+          },
+          {
+            "x": 5.5,
+            "y": -7.794229
+          },
+          {
+            "x": 6.0,
+            "y": -8.660254
+          },
+          {
+            "x": 7.0,
+            "y": -8.660254
+          },
+          {
+            "x": 6.5,
+            "y": -9.526279
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.416667,
+          "y": -1.202813
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-180:n1000000:0:n2500000:0:n1000000:n866025",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:n2500000:0:p1000000:n866025",
+          "sphinx:chirality-left:orientation-0:p1000000:0:n5500000:0:p1000000:n866025",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n4000000:n866025:n500000:n1732051",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:n2500000:p866025:n500000:n2598076"
+        ],
+        "orientation_token": "180",
+        "vertices": [
+          {
+            "x": -2.0,
+            "y": -1.732051
+          },
+          {
+            "x": -3.0,
+            "y": -1.732051
+          },
+          {
+            "x": -4.0,
+            "y": -1.732051
+          },
+          {
+            "x": -5.0,
+            "y": -1.732051
+          },
+          {
+            "x": -4.5,
+            "y": -0.866025
+          },
+          {
+            "x": -3.5,
+            "y": -0.866025
+          },
+          {
+            "x": -3.0,
+            "y": 0.0
+          },
+          {
+            "x": -2.5,
+            "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.583333,
+          "y": -11.595118
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n11258330",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p3500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n12124356",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:p3500000:p866025:n500000:n12990381"
+        ],
+        "orientation_token": "180",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": -12.124356
+          },
+          {
+            "x": 3.0,
+            "y": -12.124356
+          },
+          {
+            "x": 2.0,
+            "y": -12.124356
+          },
+          {
+            "x": 1.0,
+            "y": -12.124356
+          },
+          {
+            "x": 1.5,
+            "y": -11.25833
+          },
+          {
+            "x": 2.5,
+            "y": -11.25833
+          },
+          {
+            "x": 3.0,
+            "y": -10.392305
+          },
+          {
+            "x": 3.5,
+            "y": -11.25833
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.583333,
+          "y": -9.863067
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n9526279",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p3500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n9526279",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n7794229"
+        ],
+        "orientation_token": "180",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": -10.392305
+          },
+          {
+            "x": 3.0,
+            "y": -10.392305
+          },
+          {
+            "x": 2.0,
+            "y": -10.392305
+          },
+          {
+            "x": 1.0,
+            "y": -10.392305
+          },
+          {
+            "x": 1.5,
+            "y": -9.526279
+          },
+          {
+            "x": 2.5,
+            "y": -9.526279
+          },
+          {
+            "x": 3.0,
+            "y": -8.660254
+          },
+          {
+            "x": 3.5,
+            "y": -9.526279
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.416667,
+          "y": -9.863067
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-180:n1000000:0:p500000:0:n1000000:n9526279",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n9526279",
+          "sphinx:chirality-right:orientation-120:n500000:n866025:p500000:n866025:p500000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n10392305",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n7794229"
+        ],
+        "orientation_token": "180",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -10.392305
+          },
+          {
+            "x": 0.0,
+            "y": -10.392305
+          },
+          {
+            "x": -1.0,
+            "y": -10.392305
+          },
+          {
+            "x": -2.0,
+            "y": -10.392305
+          },
+          {
+            "x": -1.5,
+            "y": -9.526279
+          },
+          {
+            "x": -0.5,
+            "y": -9.526279
+          },
+          {
+            "x": 0.0,
+            "y": -8.660254
+          },
+          {
+            "x": 0.5,
+            "y": -9.526279
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.166667,
+          "y": -7.890454
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:n1000000:n866025:n500000:n6928203",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-right:orientation-120:n500000:n866025:p500000:n866025:p500000:n7794229",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n1000000:p866025:p500000:n6928203",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n7794229"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": -6.928203
+          },
+          {
+            "x": -0.5,
+            "y": -7.794229
+          },
+          {
+            "x": -1.0,
+            "y": -8.660254
+          },
+          {
+            "x": -1.5,
+            "y": -9.526279
+          },
+          {
+            "x": -2.0,
+            "y": -8.660254
+          },
+          {
+            "x": -1.5,
+            "y": -7.794229
+          },
+          {
+            "x": -2.0,
+            "y": -6.928203
+          },
+          {
+            "x": -1.0,
+            "y": -6.928203
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.166667,
+          "y": -2.694301
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:n4000000:n866025:n500000:n1732051",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:n2500000:0:n1000000:n866025",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n4000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n4330127",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n5500000:p866025:p500000:n2598076",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n5500000:n866025:n500000:n2598076"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": -3.0,
+            "y": -1.732051
+          },
+          {
+            "x": -3.5,
+            "y": -2.598076
+          },
+          {
+            "x": -4.0,
+            "y": -3.464102
+          },
+          {
+            "x": -4.5,
+            "y": -4.330127
+          },
+          {
+            "x": -5.0,
+            "y": -3.464102
+          },
+          {
+            "x": -4.5,
+            "y": -2.598076
+          },
+          {
+            "x": -5.0,
+            "y": -1.732051
+          },
+          {
+            "x": -4.0,
+            "y": -1.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 10.833333,
+          "y": -7.890454
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p11000000:n866025:n500000:n6928203",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p9500000:p866025:p500000:n9526279"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 12.0,
+            "y": -6.928203
+          },
+          {
+            "x": 11.5,
+            "y": -7.794229
+          },
+          {
+            "x": 11.0,
+            "y": -8.660254
+          },
+          {
+            "x": 10.5,
+            "y": -9.526279
+          },
+          {
+            "x": 10.0,
+            "y": -8.660254
+          },
+          {
+            "x": 10.5,
+            "y": -7.794229
+          },
+          {
+            "x": 10.0,
+            "y": -6.928203
+          },
+          {
+            "x": 11.0,
+            "y": -6.928203
           }
         ]
       },
@@ -649,6 +1301,108 @@
       },
       {
         "center": {
+          "x": 1.833333,
+          "y": -13.086606
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n12124356",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n11258330",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n15588457",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n12990381",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n12990381"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": -12.124356
+          },
+          {
+            "x": 2.5,
+            "y": -12.990381
+          },
+          {
+            "x": 2.0,
+            "y": -13.856406
+          },
+          {
+            "x": 1.5,
+            "y": -14.722432
+          },
+          {
+            "x": 1.0,
+            "y": -13.856406
+          },
+          {
+            "x": 1.5,
+            "y": -12.990381
+          },
+          {
+            "x": 1.0,
+            "y": -12.124356
+          },
+          {
+            "x": 2.0,
+            "y": -12.124356
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.833333,
+          "y": -6.158403
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n5196152",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n8660254",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p2000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n7794229",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n6062178",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n6062178"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": -5.196152
+          },
+          {
+            "x": 2.5,
+            "y": -6.062178
+          },
+          {
+            "x": 2.0,
+            "y": -6.928203
+          },
+          {
+            "x": 1.5,
+            "y": -7.794229
+          },
+          {
+            "x": 1.0,
+            "y": -6.928203
+          },
+          {
+            "x": 1.5,
+            "y": -6.062178
+          },
+          {
+            "x": 1.0,
+            "y": -5.196152
+          },
+          {
+            "x": 2.0,
+            "y": -5.196152
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 4.333333,
           "y": 1.635826
         },
@@ -695,6 +1449,55 @@
           {
             "x": 4.5,
             "y": 2.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.833333,
+          "y": -18.282759
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p5000000:n866025:n500000:n17320508",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n18186533",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n17320508",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n18186533"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 6.0,
+            "y": -17.320508
+          },
+          {
+            "x": 5.5,
+            "y": -18.186533
+          },
+          {
+            "x": 5.0,
+            "y": -19.052559
+          },
+          {
+            "x": 4.5,
+            "y": -19.918584
+          },
+          {
+            "x": 4.0,
+            "y": -19.052559
+          },
+          {
+            "x": 4.5,
+            "y": -18.186533
+          },
+          {
+            "x": 4.0,
+            "y": -17.320508
+          },
+          {
+            "x": 5.0,
+            "y": -17.320508
           }
         ]
       },
@@ -750,6 +1553,105 @@
       },
       {
         "center": {
+          "x": 6.333333,
+          "y": -12.220581
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n11258330",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p5000000:p866025:p500000:n13856406",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n11258330",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p8000000:p866025:p500000:n12124356"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 7.5,
+            "y": -11.25833
+          },
+          {
+            "x": 7.0,
+            "y": -12.124356
+          },
+          {
+            "x": 6.5,
+            "y": -12.990381
+          },
+          {
+            "x": 6.0,
+            "y": -13.856406
+          },
+          {
+            "x": 5.5,
+            "y": -12.990381
+          },
+          {
+            "x": 6.0,
+            "y": -12.124356
+          },
+          {
+            "x": 5.5,
+            "y": -11.25833
+          },
+          {
+            "x": 6.5,
+            "y": -11.25833
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.333333,
+          "y": -15.684682
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n14722432",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n17320508",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p5000000:n866025:n500000:n13856406"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 7.5,
+            "y": -14.722432
+          },
+          {
+            "x": 7.0,
+            "y": -15.588457
+          },
+          {
+            "x": 6.5,
+            "y": -16.454483
+          },
+          {
+            "x": 6.0,
+            "y": -17.320508
+          },
+          {
+            "x": 5.5,
+            "y": -16.454483
+          },
+          {
+            "x": 6.0,
+            "y": -15.588457
+          },
+          {
+            "x": 5.5,
+            "y": -14.722432
+          },
+          {
+            "x": 6.5,
+            "y": -14.722432
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 7.333333,
           "y": 3.367877
         },
@@ -795,6 +1697,103 @@
           {
             "x": 7.5,
             "y": 4.330127
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 7.833333,
+          "y": -13.086606
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p8000000:n866025:n500000:n12124356",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p8000000:p866025:p500000:n12124356"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 9.0,
+            "y": -12.124356
+          },
+          {
+            "x": 8.5,
+            "y": -12.990381
+          },
+          {
+            "x": 8.0,
+            "y": -13.856406
+          },
+          {
+            "x": 7.5,
+            "y": -14.722432
+          },
+          {
+            "x": 7.0,
+            "y": -13.856406
+          },
+          {
+            "x": 7.5,
+            "y": -12.990381
+          },
+          {
+            "x": 7.0,
+            "y": -12.124356
+          },
+          {
+            "x": 8.0,
+            "y": -12.124356
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 9.333333,
+          "y": -10.48853
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-240:n500000:p866025:p9500000:n866025:n500000:n9526279",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p9500000:p866025:p500000:n9526279",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p8000000:p866025:p500000:n12124356",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p8000000:n866025:n500000:n8660254"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 10.5,
+            "y": -9.526279
+          },
+          {
+            "x": 10.0,
+            "y": -10.392305
+          },
+          {
+            "x": 9.5,
+            "y": -11.25833
+          },
+          {
+            "x": 9.0,
+            "y": -12.124356
+          },
+          {
+            "x": 8.5,
+            "y": -11.25833
+          },
+          {
+            "x": 9.0,
+            "y": -10.392305
+          },
+          {
+            "x": 8.5,
+            "y": -9.526279
+          },
+          {
+            "x": 9.5,
+            "y": -9.526279
           }
         ]
       },
@@ -1203,6 +2202,107 @@
       },
       {
         "center": {
+          "x": -0.833333,
+          "y": -2.501851
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:n1000000:p866025:p500000:n3464102",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n2598076",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:n2500000:p866025:n500000:n2598076",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n3464102",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n2598076"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -2.0,
+            "y": -3.464102
+          },
+          {
+            "x": -1.5,
+            "y": -2.598076
+          },
+          {
+            "x": -1.0,
+            "y": -1.732051
+          },
+          {
+            "x": -0.5,
+            "y": -0.866025
+          },
+          {
+            "x": 0.0,
+            "y": -1.732051
+          },
+          {
+            "x": -0.5,
+            "y": -2.598076
+          },
+          {
+            "x": 0.0,
+            "y": -3.464102
+          },
+          {
+            "x": -1.0,
+            "y": -3.464102
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.833333,
+          "y": -4.233902
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:n4000000:p866025:p500000:n5196152",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n4000000:n866025:n500000:n1732051",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n4330127",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n4330127",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n4000000:n866025:n500000:n5196152",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n5500000:n866025:n500000:n2598076"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -5.0,
+            "y": -5.196152
+          },
+          {
+            "x": -4.5,
+            "y": -4.330127
+          },
+          {
+            "x": -4.0,
+            "y": -3.464102
+          },
+          {
+            "x": -3.5,
+            "y": -2.598076
+          },
+          {
+            "x": -3.0,
+            "y": -3.464102
+          },
+          {
+            "x": -3.5,
+            "y": -4.330127
+          },
+          {
+            "x": -3.0,
+            "y": -5.196152
+          },
+          {
+            "x": -4.0,
+            "y": -5.196152
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 16.666667,
           "y": 3.560327
         },
@@ -1248,6 +2348,108 @@
           {
             "x": 16.5,
             "y": 2.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.166667,
+          "y": -14.626207
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n15588457",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n12124356",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p2000000:n866025:n500000:n15588457",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n14722432",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n12990381"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -15.588457
+          },
+          {
+            "x": 1.5,
+            "y": -14.722432
+          },
+          {
+            "x": 2.0,
+            "y": -13.856406
+          },
+          {
+            "x": 2.5,
+            "y": -12.990381
+          },
+          {
+            "x": 3.0,
+            "y": -13.856406
+          },
+          {
+            "x": 2.5,
+            "y": -14.722432
+          },
+          {
+            "x": 3.0,
+            "y": -15.588457
+          },
+          {
+            "x": 2.0,
+            "y": -15.588457
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.166667,
+          "y": -7.698004
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n8660254",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n9526279",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n6062178"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -8.660254
+          },
+          {
+            "x": 1.5,
+            "y": -7.794229
+          },
+          {
+            "x": 2.0,
+            "y": -6.928203
+          },
+          {
+            "x": 2.5,
+            "y": -6.062178
+          },
+          {
+            "x": 3.0,
+            "y": -6.928203
+          },
+          {
+            "x": 2.5,
+            "y": -7.794229
+          },
+          {
+            "x": 3.0,
+            "y": -8.660254
+          },
+          {
+            "x": 2.0,
+            "y": -8.660254
           }
         ]
       },
@@ -1303,6 +2505,55 @@
       },
       {
         "center": {
+          "x": 5.166667,
+          "y": -12.894156
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:p5000000:p866025:p500000:n13856406",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n11258330",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:p3500000:p866025:n500000:n12990381",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p5000000:n866025:n500000:n13856406"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": -13.856406
+          },
+          {
+            "x": 4.5,
+            "y": -12.990381
+          },
+          {
+            "x": 5.0,
+            "y": -12.124356
+          },
+          {
+            "x": 5.5,
+            "y": -11.25833
+          },
+          {
+            "x": 6.0,
+            "y": -12.124356
+          },
+          {
+            "x": 5.5,
+            "y": -12.990381
+          },
+          {
+            "x": 6.0,
+            "y": -13.856406
+          },
+          {
+            "x": 5.0,
+            "y": -13.856406
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 6.166667,
           "y": 2.694301
         },
@@ -1348,6 +2599,107 @@
           {
             "x": 6.0,
             "y": 1.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.666667,
+          "y": -10.29608
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n11258330",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p3500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p6500000:p866025:n500000:n9526279",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n11258330",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p8000000:p866025:p500000:n12124356",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p8000000:n866025:n500000:n8660254"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 5.5,
+            "y": -11.25833
+          },
+          {
+            "x": 6.0,
+            "y": -10.392305
+          },
+          {
+            "x": 6.5,
+            "y": -9.526279
+          },
+          {
+            "x": 7.0,
+            "y": -8.660254
+          },
+          {
+            "x": 7.5,
+            "y": -9.526279
+          },
+          {
+            "x": 7.0,
+            "y": -10.392305
+          },
+          {
+            "x": 7.5,
+            "y": -11.25833
+          },
+          {
+            "x": 6.5,
+            "y": -11.25833
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.666667,
+          "y": -13.760181
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n14722432",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n11258330",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n14722432",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p8000000:n866025:n500000:n12124356",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p5000000:n866025:n500000:n13856406"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 5.5,
+            "y": -14.722432
+          },
+          {
+            "x": 6.0,
+            "y": -13.856406
+          },
+          {
+            "x": 6.5,
+            "y": -12.990381
+          },
+          {
+            "x": 7.0,
+            "y": -12.124356
+          },
+          {
+            "x": 7.5,
+            "y": -12.990381
+          },
+          {
+            "x": 7.0,
+            "y": -13.856406
+          },
+          {
+            "x": 7.5,
+            "y": -14.722432
+          },
+          {
+            "x": 6.5,
+            "y": -14.722432
           }
         ]
       },
@@ -1399,6 +2751,56 @@
           {
             "x": 7.5,
             "y": 4.330127
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 9.666667,
+          "y": -8.564029
+        },
+        "chirality_token": "left",
+        "id": "sphinx:chirality-left:orientation-60:p500000:n866025:p9500000:p866025:p500000:n9526279",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p11000000:n866025:n500000:n6928203",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p9500000:n866025:n500000:n9526279",
+          "sphinx:chirality-right:orientation-180:n1000000:0:p9500000:0:p1000000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p8000000:n866025:n500000:n8660254"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 8.5,
+            "y": -9.526279
+          },
+          {
+            "x": 9.0,
+            "y": -8.660254
+          },
+          {
+            "x": 9.5,
+            "y": -7.794229
+          },
+          {
+            "x": 10.0,
+            "y": -6.928203
+          },
+          {
+            "x": 10.5,
+            "y": -7.794229
+          },
+          {
+            "x": 10.0,
+            "y": -8.660254
+          },
+          {
+            "x": 10.5,
+            "y": -9.526279
+          },
+          {
+            "x": 9.5,
+            "y": -9.526279
           }
         ]
       },
@@ -2053,6 +3455,56 @@
       },
       {
         "center": {
+          "x": 7.416667,
+          "y": -8.131016
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-0:p1000000:0:p6500000:0:n1000000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p6500000:p866025:n500000:n9526279",
+          "sphinx:chirality-right:orientation-180:n1000000:0:p6500000:0:p1000000:n7794229",
+          "sphinx:chirality-right:orientation-180:n1000000:0:p9500000:0:p1000000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p8000000:n866025:n500000:n8660254"
+        ],
+        "orientation_token": "0",
+        "vertices": [
+          {
+            "x": 6.0,
+            "y": -8.660254
+          },
+          {
+            "x": 7.0,
+            "y": -8.660254
+          },
+          {
+            "x": 8.0,
+            "y": -8.660254
+          },
+          {
+            "x": 9.0,
+            "y": -8.660254
+          },
+          {
+            "x": 8.5,
+            "y": -7.794229
+          },
+          {
+            "x": 7.5,
+            "y": -7.794229
+          },
+          {
+            "x": 7.0,
+            "y": -6.928203
+          },
+          {
+            "x": 6.5,
+            "y": -7.794229
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 8.416667,
           "y": 0.529238
         },
@@ -2098,6 +3550,56 @@
           {
             "x": 7.5,
             "y": 0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.25,
+          "y": -8.419691
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-120:n500000:n866025:p500000:n866025:p500000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n9526279",
+          "sphinx:chirality-left:orientation-180:n1000000:0:p500000:0:n1000000:n9526279",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n1000000:n866025:n500000:n6928203",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n6062178"
+        ],
+        "orientation_token": "120",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": -6.928203
+          },
+          {
+            "x": -0.5,
+            "y": -7.794229
+          },
+          {
+            "x": -1.0,
+            "y": -8.660254
+          },
+          {
+            "x": -1.5,
+            "y": -9.526279
+          },
+          {
+            "x": -0.5,
+            "y": -9.526279
+          },
+          {
+            "x": 0.0,
+            "y": -8.660254
+          },
+          {
+            "x": 1.0,
+            "y": -8.660254
+          },
+          {
+            "x": 0.5,
+            "y": -7.794229
           }
         ]
       },
@@ -2844,6 +4346,55 @@
       },
       {
         "center": {
+          "x": 5.583333,
+          "y": -7.457441
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-180:n1000000:0:p6500000:0:p1000000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p6500000:p866025:n500000:n9526279",
+          "sphinx:chirality-right:orientation-0:p1000000:0:p6500000:0:n1000000:n7794229",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n7794229"
+        ],
+        "orientation_token": "180",
+        "vertices": [
+          {
+            "x": 7.0,
+            "y": -6.928203
+          },
+          {
+            "x": 6.0,
+            "y": -6.928203
+          },
+          {
+            "x": 5.0,
+            "y": -6.928203
+          },
+          {
+            "x": 4.0,
+            "y": -6.928203
+          },
+          {
+            "x": 4.5,
+            "y": -7.794229
+          },
+          {
+            "x": 5.5,
+            "y": -7.794229
+          },
+          {
+            "x": 6.0,
+            "y": -8.660254
+          },
+          {
+            "x": 6.5,
+            "y": -7.794229
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 6.583333,
           "y": 6.398965
         },
@@ -2942,6 +4493,758 @@
       },
       {
         "center": {
+          "x": 8.583333,
+          "y": -7.457441
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-180:n1000000:0:p9500000:0:p1000000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p9500000:p866025:p500000:n9526279",
+          "sphinx:chirality-right:orientation-0:p1000000:0:p6500000:0:n1000000:n7794229"
+        ],
+        "orientation_token": "180",
+        "vertices": [
+          {
+            "x": 10.0,
+            "y": -6.928203
+          },
+          {
+            "x": 9.0,
+            "y": -6.928203
+          },
+          {
+            "x": 8.0,
+            "y": -6.928203
+          },
+          {
+            "x": 7.0,
+            "y": -6.928203
+          },
+          {
+            "x": 7.5,
+            "y": -7.794229
+          },
+          {
+            "x": 8.5,
+            "y": -7.794229
+          },
+          {
+            "x": 9.0,
+            "y": -8.660254
+          },
+          {
+            "x": 9.5,
+            "y": -7.794229
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.166667,
+          "y": -5.965953
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:n1000000:p866025:p500000:n6928203",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n1000000:n866025:n500000:n6928203",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n3464102",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n4330127",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n6062178"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": -6.928203
+          },
+          {
+            "x": -0.5,
+            "y": -6.062178
+          },
+          {
+            "x": -1.0,
+            "y": -5.196152
+          },
+          {
+            "x": -1.5,
+            "y": -4.330127
+          },
+          {
+            "x": -2.0,
+            "y": -5.196152
+          },
+          {
+            "x": -1.5,
+            "y": -6.062178
+          },
+          {
+            "x": -2.0,
+            "y": -6.928203
+          },
+          {
+            "x": -1.0,
+            "y": -6.928203
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.666667,
+          "y": -3.367877
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n4330127",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n4000000:n866025:n500000:n1732051",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n4000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:n2500000:p866025:n500000:n2598076",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n3464102",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n4330127"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": -1.5,
+            "y": -4.330127
+          },
+          {
+            "x": -2.0,
+            "y": -3.464102
+          },
+          {
+            "x": -2.5,
+            "y": -2.598076
+          },
+          {
+            "x": -3.0,
+            "y": -1.732051
+          },
+          {
+            "x": -3.5,
+            "y": -2.598076
+          },
+          {
+            "x": -3.0,
+            "y": -3.464102
+          },
+          {
+            "x": -3.5,
+            "y": -4.330127
+          },
+          {
+            "x": -2.5,
+            "y": -4.330127
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.666667,
+          "y": -6.831978
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n1000000:n866025:n500000:n6928203",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n4330127",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n4000000:n866025:n500000:n5196152"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": -1.5,
+            "y": -7.794229
+          },
+          {
+            "x": -2.0,
+            "y": -6.928203
+          },
+          {
+            "x": -2.5,
+            "y": -6.062178
+          },
+          {
+            "x": -3.0,
+            "y": -5.196152
+          },
+          {
+            "x": -3.5,
+            "y": -6.062178
+          },
+          {
+            "x": -3.0,
+            "y": -6.928203
+          },
+          {
+            "x": -3.5,
+            "y": -7.794229
+          },
+          {
+            "x": -2.5,
+            "y": -7.794229
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.666667,
+          "y": -1.635826
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:n5500000:p866025:p500000:n2598076",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:n5500000:0:p1000000:n866025",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n4000000:n866025:n500000:n1732051",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n5500000:n866025:n500000:n2598076",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n7000000:n866025:n500000:0"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": -4.5,
+            "y": -2.598076
+          },
+          {
+            "x": -5.0,
+            "y": -1.732051
+          },
+          {
+            "x": -5.5,
+            "y": -0.866025
+          },
+          {
+            "x": -6.0,
+            "y": 0.0
+          },
+          {
+            "x": -6.5,
+            "y": -0.866025
+          },
+          {
+            "x": -6.0,
+            "y": -1.732051
+          },
+          {
+            "x": -6.5,
+            "y": -2.598076
+          },
+          {
+            "x": -5.5,
+            "y": -2.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.833333,
+          "y": -4.233902
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p2000000:p866025:p500000:n5196152",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p3000000:p866025:n500000:n3464102",
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p4500000:p866025:n500000:n6062178",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n5196152",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n2598076"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": -5.196152
+          },
+          {
+            "x": 2.5,
+            "y": -4.330127
+          },
+          {
+            "x": 2.0,
+            "y": -3.464102
+          },
+          {
+            "x": 1.5,
+            "y": -2.598076
+          },
+          {
+            "x": 1.0,
+            "y": -3.464102
+          },
+          {
+            "x": 1.5,
+            "y": -4.330127
+          },
+          {
+            "x": 1.0,
+            "y": -5.196152
+          },
+          {
+            "x": 2.0,
+            "y": -5.196152
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.333333,
+          "y": -13.760181
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n14722432",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n12124356",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n15588457",
+          "sphinx:chirality-right:orientation-300:p500000:p866025:p3500000:p866025:n500000:n12990381",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n14722432",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p5000000:n866025:n500000:n13856406"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": -14.722432
+          },
+          {
+            "x": 4.0,
+            "y": -13.856406
+          },
+          {
+            "x": 3.5,
+            "y": -12.990381
+          },
+          {
+            "x": 3.0,
+            "y": -12.124356
+          },
+          {
+            "x": 2.5,
+            "y": -12.990381
+          },
+          {
+            "x": 3.0,
+            "y": -13.856406
+          },
+          {
+            "x": 2.5,
+            "y": -14.722432
+          },
+          {
+            "x": 3.5,
+            "y": -14.722432
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.333333,
+          "y": -17.224283
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n18186533",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p5000000:n866025:n500000:n17320508",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p2000000:n866025:n500000:n15588457",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n14722432",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n18186533"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": -18.186533
+          },
+          {
+            "x": 4.0,
+            "y": -17.320508
+          },
+          {
+            "x": 3.5,
+            "y": -16.454483
+          },
+          {
+            "x": 3.0,
+            "y": -15.588457
+          },
+          {
+            "x": 2.5,
+            "y": -16.454483
+          },
+          {
+            "x": 3.0,
+            "y": -17.320508
+          },
+          {
+            "x": 2.5,
+            "y": -18.186533
+          },
+          {
+            "x": 3.5,
+            "y": -18.186533
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.333333,
+          "y": -6.831978
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p4500000:p866025:n500000:n6062178",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n5196152",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n8660254",
+          "sphinx:chirality-right:orientation-180:n1000000:0:p6500000:0:p1000000:n7794229",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n7794229"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": -7.794229
+          },
+          {
+            "x": 4.0,
+            "y": -6.928203
+          },
+          {
+            "x": 3.5,
+            "y": -6.062178
+          },
+          {
+            "x": 3.0,
+            "y": -5.196152
+          },
+          {
+            "x": 2.5,
+            "y": -6.062178
+          },
+          {
+            "x": 3.0,
+            "y": -6.928203
+          },
+          {
+            "x": 2.5,
+            "y": -7.794229
+          },
+          {
+            "x": 3.5,
+            "y": -7.794229
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.833333,
+          "y": -9.430054
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n10392305",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p3500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p6500000:p866025:n500000:n9526279",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n7794229"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 6.0,
+            "y": -10.392305
+          },
+          {
+            "x": 5.5,
+            "y": -9.526279
+          },
+          {
+            "x": 5.0,
+            "y": -8.660254
+          },
+          {
+            "x": 4.5,
+            "y": -7.794229
+          },
+          {
+            "x": 4.0,
+            "y": -8.660254
+          },
+          {
+            "x": 4.5,
+            "y": -9.526279
+          },
+          {
+            "x": 4.0,
+            "y": -10.392305
+          },
+          {
+            "x": 5.0,
+            "y": -10.392305
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.833333,
+          "y": -16.358258
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n17320508",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p5000000:n866025:n500000:n17320508",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n14722432",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n14722432",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p5000000:n866025:n500000:n13856406"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 6.0,
+            "y": -17.320508
+          },
+          {
+            "x": 5.5,
+            "y": -16.454483
+          },
+          {
+            "x": 5.0,
+            "y": -15.588457
+          },
+          {
+            "x": 4.5,
+            "y": -14.722432
+          },
+          {
+            "x": 4.0,
+            "y": -15.588457
+          },
+          {
+            "x": 4.5,
+            "y": -16.454483
+          },
+          {
+            "x": 4.0,
+            "y": -17.320508
+          },
+          {
+            "x": 5.0,
+            "y": -17.320508
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.333333,
+          "y": -12.028131
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n12990381",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n12124356",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n10392305",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n12990381"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": -12.990381
+          },
+          {
+            "x": 1.0,
+            "y": -12.124356
+          },
+          {
+            "x": 0.5,
+            "y": -11.25833
+          },
+          {
+            "x": 0.0,
+            "y": -10.392305
+          },
+          {
+            "x": -0.5,
+            "y": -11.25833
+          },
+          {
+            "x": 0.0,
+            "y": -12.124356
+          },
+          {
+            "x": -0.5,
+            "y": -12.990381
+          },
+          {
+            "x": 0.5,
+            "y": -12.990381
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.333333,
+          "y": -1.635826
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n2598076",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:n2500000:0:p1000000:n866025",
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p1500000:p866025:n500000:n866025",
+          "sphinx:chirality-left:orientation-120:n500000:n866025:p3000000:p866025:n500000:n3464102",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n1000000:p866025:p500000:n3464102",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n2598076"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": -2.598076
+          },
+          {
+            "x": 1.0,
+            "y": -1.732051
+          },
+          {
+            "x": 0.5,
+            "y": -0.866025
+          },
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.5,
+            "y": -0.866025
+          },
+          {
+            "x": 0.0,
+            "y": -1.732051
+          },
+          {
+            "x": -0.5,
+            "y": -2.598076
+          },
+          {
+            "x": 0.5,
+            "y": -2.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.333333,
+          "y": -5.099927
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n6062178",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n5196152",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n3464102",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n2598076",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n6062178"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": -6.062178
+          },
+          {
+            "x": 1.0,
+            "y": -5.196152
+          },
+          {
+            "x": 0.5,
+            "y": -4.330127
+          },
+          {
+            "x": 0.0,
+            "y": -3.464102
+          },
+          {
+            "x": -0.5,
+            "y": -4.330127
+          },
+          {
+            "x": 0.0,
+            "y": -5.196152
+          },
+          {
+            "x": -0.5,
+            "y": -6.062178
+          },
+          {
+            "x": 0.5,
+            "y": -6.062178
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 7.833333,
+          "y": -11.162105
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-240:n500000:p866025:p8000000:p866025:p500000:n12124356",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n11258330",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p8000000:n866025:n500000:n12124356",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p9500000:n866025:n500000:n9526279",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n11258330",
+          "sphinx:chirality-right:orientation-60:p500000:n866025:p8000000:n866025:n500000:n8660254"
+        ],
+        "orientation_token": "240",
+        "vertices": [
+          {
+            "x": 9.0,
+            "y": -12.124356
+          },
+          {
+            "x": 8.5,
+            "y": -11.25833
+          },
+          {
+            "x": 8.0,
+            "y": -10.392305
+          },
+          {
+            "x": 7.5,
+            "y": -9.526279
+          },
+          {
+            "x": 7.0,
+            "y": -10.392305
+          },
+          {
+            "x": 7.5,
+            "y": -11.25833
+          },
+          {
+            "x": 7.0,
+            "y": -12.124356
+          },
+          {
+            "x": 8.0,
+            "y": -12.124356
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 8.833333,
           "y": 4.426352
         },
@@ -2987,6 +5290,106 @@
           {
             "x": 9.0,
             "y": 3.464102
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.75,
+          "y": -1.972613
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-300:p500000:p866025:n2500000:p866025:n500000:n2598076",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:n2500000:0:p1000000:n866025",
+          "sphinx:chirality-left:orientation-180:n1000000:0:n2500000:0:n1000000:n866025",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n1000000:p866025:p500000:n3464102",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n4330127"
+        ],
+        "orientation_token": "300",
+        "vertices": [
+          {
+            "x": -2.0,
+            "y": -3.464102
+          },
+          {
+            "x": -1.5,
+            "y": -2.598076
+          },
+          {
+            "x": -1.0,
+            "y": -1.732051
+          },
+          {
+            "x": -0.5,
+            "y": -0.866025
+          },
+          {
+            "x": -1.5,
+            "y": -0.866025
+          },
+          {
+            "x": -2.0,
+            "y": -1.732051
+          },
+          {
+            "x": -3.0,
+            "y": -1.732051
+          },
+          {
+            "x": -2.5,
+            "y": -2.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.25,
+          "y": -12.364918
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-300:p500000:p866025:p3500000:p866025:n500000:n12990381",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-0:p1000000:0:p3500000:0:p1000000:n11258330",
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n11258330",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p5000000:p866025:p500000:n13856406",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n14722432"
+        ],
+        "orientation_token": "300",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": -13.856406
+          },
+          {
+            "x": 4.5,
+            "y": -12.990381
+          },
+          {
+            "x": 5.0,
+            "y": -12.124356
+          },
+          {
+            "x": 5.5,
+            "y": -11.25833
+          },
+          {
+            "x": 4.5,
+            "y": -11.25833
+          },
+          {
+            "x": 4.0,
+            "y": -12.124356
+          },
+          {
+            "x": 3.0,
+            "y": -12.124356
+          },
+          {
+            "x": 3.5,
+            "y": -12.990381
           }
         ]
       },
@@ -3089,6 +5492,347 @@
       },
       {
         "center": {
+          "x": -0.833333,
+          "y": -11.354555
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n10392305",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:p500000:0:n1000000:n9526279",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n12990381"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -2.0,
+            "y": -10.392305
+          },
+          {
+            "x": -1.5,
+            "y": -11.25833
+          },
+          {
+            "x": -1.0,
+            "y": -12.124356
+          },
+          {
+            "x": -0.5,
+            "y": -12.990381
+          },
+          {
+            "x": 0.0,
+            "y": -12.124356
+          },
+          {
+            "x": -0.5,
+            "y": -11.25833
+          },
+          {
+            "x": 0.0,
+            "y": -10.392305
+          },
+          {
+            "x": -1.0,
+            "y": -10.392305
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.833333,
+          "y": -4.426352
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:n1000000:n866025:n500000:n3464102",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n1000000:p866025:p500000:n3464102",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n1000000:p866025:p500000:n6928203",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n4330127",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n6062178"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -2.0,
+            "y": -3.464102
+          },
+          {
+            "x": -1.5,
+            "y": -4.330127
+          },
+          {
+            "x": -1.0,
+            "y": -5.196152
+          },
+          {
+            "x": -0.5,
+            "y": -6.062178
+          },
+          {
+            "x": 0.0,
+            "y": -5.196152
+          },
+          {
+            "x": -0.5,
+            "y": -4.330127
+          },
+          {
+            "x": 0.0,
+            "y": -3.464102
+          },
+          {
+            "x": -1.0,
+            "y": -3.464102
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.333333,
+          "y": -5.292377
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n4330127",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n4000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n1000000:p866025:p500000:n6928203",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n4330127",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n7794229"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -3.5,
+            "y": -4.330127
+          },
+          {
+            "x": -3.0,
+            "y": -5.196152
+          },
+          {
+            "x": -2.5,
+            "y": -6.062178
+          },
+          {
+            "x": -2.0,
+            "y": -6.928203
+          },
+          {
+            "x": -1.5,
+            "y": -6.062178
+          },
+          {
+            "x": -2.0,
+            "y": -5.196152
+          },
+          {
+            "x": -1.5,
+            "y": -4.330127
+          },
+          {
+            "x": -2.5,
+            "y": -4.330127
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.333333,
+          "y": -8.756479
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:n2500000:n866025:n500000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:p500000:0:n1000000:n9526279",
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n1000000:n866025:n500000:n6928203",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n7794229"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -3.5,
+            "y": -7.794229
+          },
+          {
+            "x": -3.0,
+            "y": -8.660254
+          },
+          {
+            "x": -2.5,
+            "y": -9.526279
+          },
+          {
+            "x": -2.0,
+            "y": -10.392305
+          },
+          {
+            "x": -1.5,
+            "y": -9.526279
+          },
+          {
+            "x": -2.0,
+            "y": -8.660254
+          },
+          {
+            "x": -1.5,
+            "y": -7.794229
+          },
+          {
+            "x": -2.5,
+            "y": -7.794229
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.833333,
+          "y": -6.158403
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:n4000000:n866025:n500000:n5196152",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n4000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n2500000:p866025:p500000:n7794229"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -5.0,
+            "y": -5.196152
+          },
+          {
+            "x": -4.5,
+            "y": -6.062178
+          },
+          {
+            "x": -4.0,
+            "y": -6.928203
+          },
+          {
+            "x": -3.5,
+            "y": -7.794229
+          },
+          {
+            "x": -3.0,
+            "y": -6.928203
+          },
+          {
+            "x": -3.5,
+            "y": -6.062178
+          },
+          {
+            "x": -3.0,
+            "y": -5.196152
+          },
+          {
+            "x": -4.0,
+            "y": -5.196152
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.333333,
+          "y": -3.560327
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:n5500000:n866025:n500000:n2598076",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:n4000000:n866025:n500000:n1732051",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n4000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n5500000:p866025:p500000:n2598076"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -6.5,
+            "y": -2.598076
+          },
+          {
+            "x": -6.0,
+            "y": -3.464102
+          },
+          {
+            "x": -5.5,
+            "y": -4.330127
+          },
+          {
+            "x": -5.0,
+            "y": -5.196152
+          },
+          {
+            "x": -4.5,
+            "y": -4.330127
+          },
+          {
+            "x": -5.0,
+            "y": -3.464102
+          },
+          {
+            "x": -4.5,
+            "y": -2.598076
+          },
+          {
+            "x": -5.5,
+            "y": -2.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -6.833333,
+          "y": -0.96225
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:n7000000:n866025:n500000:0",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n5500000:p866025:p500000:n2598076"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -8.0,
+            "y": 0.0
+          },
+          {
+            "x": -7.5,
+            "y": -0.866025
+          },
+          {
+            "x": -7.0,
+            "y": -1.732051
+          },
+          {
+            "x": -6.5,
+            "y": -2.598076
+          },
+          {
+            "x": -6.0,
+            "y": -1.732051
+          },
+          {
+            "x": -6.5,
+            "y": -0.866025
+          },
+          {
+            "x": -6.0,
+            "y": 0.0
+          },
+          {
+            "x": -7.0,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
           "x": 15.166667,
           "y": 2.501851
         },
@@ -3134,6 +5878,54 @@
           {
             "x": 15.0,
             "y": 3.464102
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.166667,
+          "y": -16.550708
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p2000000:n866025:n500000:n15588457",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n15588457",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n18186533"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -15.588457
+          },
+          {
+            "x": 1.5,
+            "y": -16.454483
+          },
+          {
+            "x": 2.0,
+            "y": -17.320508
+          },
+          {
+            "x": 2.5,
+            "y": -18.186533
+          },
+          {
+            "x": 3.0,
+            "y": -17.320508
+          },
+          {
+            "x": 2.5,
+            "y": -16.454483
+          },
+          {
+            "x": 3.0,
+            "y": -15.588457
+          },
+          {
+            "x": 2.0,
+            "y": -15.588457
           }
         ]
       },
@@ -3186,16 +5978,416 @@
             "y": 3.464102
           }
         ]
+      },
+      {
+        "center": {
+          "x": 3.666667,
+          "y": -15.684682
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n14722432",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n15588457",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n18186533",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n17320508"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": -14.722432
+          },
+          {
+            "x": 3.0,
+            "y": -15.588457
+          },
+          {
+            "x": 3.5,
+            "y": -16.454483
+          },
+          {
+            "x": 4.0,
+            "y": -17.320508
+          },
+          {
+            "x": 4.5,
+            "y": -16.454483
+          },
+          {
+            "x": 4.0,
+            "y": -15.588457
+          },
+          {
+            "x": 4.5,
+            "y": -14.722432
+          },
+          {
+            "x": 3.5,
+            "y": -14.722432
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.666667,
+          "y": -19.148784
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n18186533",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p5000000:n866025:n500000:n17320508",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n18186533"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": -18.186533
+          },
+          {
+            "x": 3.0,
+            "y": -19.052559
+          },
+          {
+            "x": 3.5,
+            "y": -19.918584
+          },
+          {
+            "x": 4.0,
+            "y": -20.78461
+          },
+          {
+            "x": 4.5,
+            "y": -19.918584
+          },
+          {
+            "x": 4.0,
+            "y": -19.052559
+          },
+          {
+            "x": 4.5,
+            "y": -18.186533
+          },
+          {
+            "x": 3.5,
+            "y": -18.186533
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.666667,
+          "y": -8.756479
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p3500000:n866025:n500000:n7794229",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-180:n1000000:0:p3500000:0:n1000000:n9526279",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n8660254",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n7794229",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n10392305"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": -7.794229
+          },
+          {
+            "x": 3.0,
+            "y": -8.660254
+          },
+          {
+            "x": 3.5,
+            "y": -9.526279
+          },
+          {
+            "x": 4.0,
+            "y": -10.392305
+          },
+          {
+            "x": 4.5,
+            "y": -9.526279
+          },
+          {
+            "x": 4.0,
+            "y": -8.660254
+          },
+          {
+            "x": 4.5,
+            "y": -7.794229
+          },
+          {
+            "x": 3.5,
+            "y": -7.794229
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.166667,
+          "y": -14.818657
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p5000000:n866025:n500000:n13856406",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p6500000:n866025:n500000:n14722432",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p5000000:p866025:p500000:n13856406",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p3500000:p866025:p500000:n14722432",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p5000000:p866025:p500000:n17320508"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": -13.856406
+          },
+          {
+            "x": 4.5,
+            "y": -14.722432
+          },
+          {
+            "x": 5.0,
+            "y": -15.588457
+          },
+          {
+            "x": 5.5,
+            "y": -16.454483
+          },
+          {
+            "x": 6.0,
+            "y": -15.588457
+          },
+          {
+            "x": 5.5,
+            "y": -14.722432
+          },
+          {
+            "x": 6.0,
+            "y": -13.856406
+          },
+          {
+            "x": 5.0,
+            "y": -13.856406
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.666667,
+          "y": -13.952632
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n12990381",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n12124356",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n15588457",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n12990381"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": -12.990381
+          },
+          {
+            "x": 0.0,
+            "y": -13.856406
+          },
+          {
+            "x": 0.5,
+            "y": -14.722432
+          },
+          {
+            "x": 1.0,
+            "y": -15.588457
+          },
+          {
+            "x": 1.5,
+            "y": -14.722432
+          },
+          {
+            "x": 1.0,
+            "y": -13.856406
+          },
+          {
+            "x": 1.5,
+            "y": -12.990381
+          },
+          {
+            "x": 0.5,
+            "y": -12.990381
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.666667,
+          "y": -3.560327
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n2598076",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-60:p500000:n866025:n1000000:p866025:p500000:n3464102",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p2000000:p866025:p500000:n5196152",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n2598076",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n6062178"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": -2.598076
+          },
+          {
+            "x": 0.0,
+            "y": -3.464102
+          },
+          {
+            "x": 0.5,
+            "y": -4.330127
+          },
+          {
+            "x": 1.0,
+            "y": -5.196152
+          },
+          {
+            "x": 1.5,
+            "y": -4.330127
+          },
+          {
+            "x": 1.0,
+            "y": -3.464102
+          },
+          {
+            "x": 1.5,
+            "y": -2.598076
+          },
+          {
+            "x": 0.5,
+            "y": -2.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.666667,
+          "y": -7.024428
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p500000:n866025:n500000:n6062178",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p2000000:n866025:n500000:n5196152",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p2000000:p866025:p500000:n8660254",
+          "sphinx:chirality-right:orientation-120:n500000:n866025:p500000:n866025:p500000:n7794229",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:n1000000:p866025:p500000:n6928203",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p500000:p866025:p500000:n6062178"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": -6.062178
+          },
+          {
+            "x": 0.0,
+            "y": -6.928203
+          },
+          {
+            "x": 0.5,
+            "y": -7.794229
+          },
+          {
+            "x": 1.0,
+            "y": -8.660254
+          },
+          {
+            "x": 1.5,
+            "y": -7.794229
+          },
+          {
+            "x": 1.0,
+            "y": -6.928203
+          },
+          {
+            "x": 1.5,
+            "y": -6.062178
+          },
+          {
+            "x": 0.5,
+            "y": -6.062178
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 8.166667,
+          "y": -9.622504
+        },
+        "chirality_token": "right",
+        "id": "sphinx:chirality-right:orientation-60:p500000:n866025:p8000000:n866025:n500000:n8660254",
+        "kind": "sphinx",
+        "neighbors": [
+          "sphinx:chirality-left:orientation-240:n500000:p866025:p9500000:n866025:n500000:n9526279",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p6500000:p866025:p500000:n11258330",
+          "sphinx:chirality-left:orientation-60:p500000:n866025:p9500000:p866025:p500000:n9526279",
+          "sphinx:chirality-right:orientation-0:p1000000:0:p6500000:0:n1000000:n7794229",
+          "sphinx:chirality-right:orientation-240:n500000:p866025:p8000000:p866025:p500000:n12124356"
+        ],
+        "orientation_token": "60",
+        "vertices": [
+          {
+            "x": 7.0,
+            "y": -8.660254
+          },
+          {
+            "x": 7.5,
+            "y": -9.526279
+          },
+          {
+            "x": 8.0,
+            "y": -10.392305
+          },
+          {
+            "x": 8.5,
+            "y": -11.25833
+          },
+          {
+            "x": 9.0,
+            "y": -10.392305
+          },
+          {
+            "x": 8.5,
+            "y": -9.526279
+          },
+          {
+            "x": 9.0,
+            "y": -8.660254
+          },
+          {
+            "x": 8.0,
+            "y": -8.660254
+          }
+        ]
       }
     ],
-    "topology_revision": "2fe269cc",
+    "topology_revision": "dbca2816",
     "topology_spec": {
       "adjacency_mode": "edge",
-      "height": 14,
+      "height": 28,
       "patch_depth": 3,
       "sizing_mode": "patch_depth",
       "tiling_family": "sphinx",
-      "width": 24
+      "width": 28
     }
   },
   "width": 0
