@@ -1685,6 +1685,81 @@
       ]
     },
     {
+      "geometry": "p-pentomino",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/p-pentomino-depth-3.json",
+        "selectorFields": [
+          "orientation_token"
+        ]
+      },
+      "variants": [
+        {
+          "label": "p-pentomino-0",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "0"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "p-pentomino-1",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "1"
+          },
+          "color": {"token": "toneTan"}
+        },
+        {
+          "label": "p-pentomino-2",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "2"
+          },
+          "color": {"token": "toneClay"}
+        },
+        {
+          "label": "p-pentomino-3",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "3"
+          },
+          "color": {"token": "toneRose"}
+        },
+        {
+          "label": "p-pentomino-4",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "4"
+          },
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "p-pentomino-5",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "5"
+          },
+          "color": {"token": "toneSand"}
+        },
+        {
+          "label": "p-pentomino-6",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "6"
+          },
+          "color": {"token": "toneFlax"}
+        },
+        {
+          "label": "p-pentomino-7",
+          "selector": {
+            "kind": "p-pentomino",
+            "orientation_token": "7"
+          },
+          "color": {"token": "toneLinen"}
+        }
+      ]
+    },
+    {
       "geometry": "dodecagonal-square-triangle",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/dodecagonal-square-triangle-depth-3.json",

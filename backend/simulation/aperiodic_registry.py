@@ -19,6 +19,7 @@ from backend.simulation.aperiodic_family_manifest import (
     HENDECAGONAL_11_FOLD_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
     L_TETROMINO_GEOMETRY,
+    P_PENTOMINO_GEOMETRY,
     PENROSE_P1_DISTRIBUTED_GEOMETRY,
     PENROSE_P1_PBS_GEOMETRY,
     PENROSE_P2_GEOMETRY,
@@ -41,6 +42,7 @@ from backend.simulation.aperiodic_hat import build_hat_patch
 from backend.simulation.aperiodic_hendecagonal_11_fold import build_hendecagonal_11_fold_patch
 from backend.simulation.aperiodic_heptagonal_7_fold import build_heptagonal_7_fold_patch
 from backend.simulation.aperiodic_l_tetromino import build_l_tetromino_patch
+from backend.simulation.aperiodic_p_pentomino import build_p_pentomino_patch
 from backend.simulation.aperiodic_penrose_p1 import build_penrose_p1_patch
 from backend.simulation.aperiodic_penrose_p1_pbs import build_penrose_p1_pbs_patch
 from backend.simulation.aperiodic_penrose_p2 import build_penrose_p2_patch
@@ -84,6 +86,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     HAT_MONOTILE_GEOMETRY: build_hat_patch,
     TURTLE_MONOTILE_GEOMETRY: build_turtle_patch,
     L_TETROMINO_GEOMETRY: build_l_tetromino_patch,
+    P_PENTOMINO_GEOMETRY: build_p_pentomino_patch,
     CHAIR_GEOMETRY: build_chair_patch,
     ROBINSON_TRIANGLES_GEOMETRY: build_robinson_triangles_patch,
     TUEBINGEN_TRIANGLE_GEOMETRY: build_tuebingen_triangle_patch,

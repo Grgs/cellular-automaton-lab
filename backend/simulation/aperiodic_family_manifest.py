@@ -29,6 +29,7 @@ HAT_MONOTILE_GEOMETRY = "hat-monotile"
 TURTLE_MONOTILE_GEOMETRY = "turtle-monotile"
 CHAIR_GEOMETRY = "chair"
 L_TETROMINO_GEOMETRY = "l-tetromino"
+P_PENTOMINO_GEOMETRY = "p-pentomino"
 ROBINSON_TRIANGLES_GEOMETRY = "robinson-triangles"
 TUEBINGEN_TRIANGLE_GEOMETRY = "tuebingen-triangle"
 DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY = "dodecagonal-square-triangle"
@@ -62,6 +63,7 @@ HAT_KIND = "hat"
 TURTLE_KIND = "turtle"
 CHAIR_KIND = "chair"
 L_TETROMINO_KIND = "l-tetromino"
+P_PENTOMINO_KIND = "p-pentomino"
 ROBINSON_THICK_KIND = "robinson-thick"
 ROBINSON_THIN_KIND = "robinson-thin"
 TUEBINGEN_THICK_KIND = "tuebingen-thick"
@@ -122,6 +124,7 @@ HEPTAGONAL_7_FOLD_TILE_FAMILY = "heptagonal-7-fold"
 HENDECAGONAL_11_FOLD_TILE_FAMILY = "hendecagonal-11-fold"
 TRIDECAGONAL_13_FOLD_TILE_FAMILY = "tridecagonal-13-fold"
 L_TETROMINO_TILE_FAMILY = "l-tetromino"
+P_PENTOMINO_TILE_FAMILY = "p-pentomino"
 
 
 @dataclass(frozen=True)
@@ -321,6 +324,25 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # (the Klein four-group) with one child of each per tile.
         implementation_status="true_substitution",
         public_cell_kinds=(L_TETROMINO_KIND,),
+    ),
+    P_PENTOMINO_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=P_PENTOMINO_GEOMETRY,
+        catalog_label="P-Pentomino",
+        reference_label="P-Pentomino",
+        picker_group="Aperiodic",
+        picker_order=297,
+        default_rule="life-b2-s23",
+        builder_kind="substitution_recipe",
+        # The P-pentomino is the unique rep-4 pentomino: four half-scale copies
+        # tile a double-scale copy (verified by exhaustive exact cover; all other
+        # pentominoes fail). Iterating that exact integer-lattice dissection in
+        # ``backend/simulation/aperiodic_p_pentomino.py`` gives a self-similar
+        # (limit-periodic) substitution tiling, the pentomino member of the
+        # rep-4 polyomino series alongside the L-tromino ``chair`` and
+        # ``l-tetromino``. Being chiral, its substitution closes over all eight
+        # dihedral (D4) orientations rather than a four-element subgroup.
+        implementation_status="true_substitution",
+        public_cell_kinds=(P_PENTOMINO_KIND,),
     ),
     ROBINSON_TRIANGLES_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=ROBINSON_TRIANGLES_GEOMETRY,

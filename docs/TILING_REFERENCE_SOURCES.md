@@ -128,6 +128,18 @@ The order is intentional:
     the prototile, gap-free / overlap-free cover). The representative app patch
     uses two substituted supertiles arranged as a 4x2 rectangle so the default
     view is wider without changing the underlying substitution rule.
+- `p-pentomino`
+  - [Rep-tile (L-tromino / L-tetromino / P-pentomino are rep-n^2)](https://en.wikipedia.org/wiki/Rep-tile)
+  - Shipped as the exact integer-lattice rep-4 substitution of the P-pentomino,
+    the *unique* rep-4 pentomino (every other pentomino fails rep-4, confirmed by
+    exhaustive exact cover of the doubled tile). As with the other rep-tiles the
+    dissection is geometrically exact, so faithfulness needs no external
+    coordinate source; it is verified directly (area conservation, congruence to
+    the prototile, gap-free / overlap-free cover). Being chiral, the substitution
+    closes over the full eight-element dihedral group D4 rather than a
+    four-element subgroup. The representative app patch uses two substituted
+    supertiles arranged as a 5x2 rectangle so the default view is wider without
+    changing the underlying substitution rule.
 - `robinson-triangles`
   - [Robinson triangle](https://tilings.math.uni-bielefeld.de/substitution/robinson-triangle/)
 - `tuebingen-triangle`

@@ -73,6 +73,15 @@
       "cellSize": 12
     },
     {
+      "name": "p-pentomino-depth-3",
+      "path": "p-pentomino-depth-3.json",
+      "family": "p-pentomino",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
       "name": "pinwheel-2-1-depth-3",
       "path": "pinwheel-2-1-depth-3.json",
       "family": "pinwheel-2-1",
