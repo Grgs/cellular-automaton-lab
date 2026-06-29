@@ -397,6 +397,7 @@ class TopologyFilmstrip:
     """
 
     geometry: str
+    label: str
     tiling_family: str
     family: str
     cell_count: int
@@ -410,6 +411,7 @@ class TopologyFilmstrip:
     def to_dict(self) -> dict[str, Any]:
         return {
             "geometry": self.geometry,
+            "label": self.label,
             "tiling_family": self.tiling_family,
             "family": self.family,
             "cell_count": self.cell_count,
@@ -490,6 +492,7 @@ def _run_single_filmstrip(
 
     return TopologyFilmstrip(
         geometry=geometry,
+        label=variant.label,
         tiling_family=variant.tiling_family,
         family=variant.family,
         cell_count=seeded.frame.cell_count,
@@ -570,6 +573,7 @@ def run_seed_filmstrip(
             variant = get_topology_variant_for_geometry(geometry)  # geometry validated above
             tiling = TopologyFilmstrip(
                 geometry=geometry,
+                label=variant.label,
                 tiling_family=variant.tiling_family,
                 family=variant.family,
                 cell_count=0,
