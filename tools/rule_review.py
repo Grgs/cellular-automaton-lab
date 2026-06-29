@@ -12,6 +12,7 @@ import json
 import math
 import sys
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -44,7 +45,17 @@ BACKGROUND = "#f8f1e5"
 MONTAGE_GAP = 16
 MONTAGE_BG = "#e4e8ec"
 
-WHIRLPOOL_PRESETS = frozenset(("anchored-source-vortex", "dual-source-vortex"))
+WHIRLPOOL_RULE_NAMES = frozenset(("whirlpool", "hexwhirlpool"))
+WHIRLPOOL_PRESETS = frozenset(
+    (
+        "anchored-source-vortex",
+        "dual-source-vortex",
+        "triple-source-rotor",
+        "centered-rotor",
+        "colliding-vortices",
+        "wide-spiral",
+    )
+)
 
 
 @dataclass(frozen=True)
@@ -123,7 +134,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--preset",
         choices=sorted(WHIRLPOOL_PRESETS),
         default=None,
-        help="Curated rule preset. Currently supports square Whirlpool presets.",
+        help="Curated Whirlpool preset for square or hex geometry.",
     )
     seed_group.add_argument(
         "--cells-json",
@@ -222,10 +233,12 @@ def _load_cells_json(path: Path) -> dict[str, int]:
 def _source_name_supported(args: argparse.Namespace) -> None:
     if args.preset is None:
         return
-    if args.rule != "whirlpool":
-        raise ValueError("--preset currently supports --rule whirlpool only")
-    if args.geometry != "square":
-        raise ValueError("--preset currently supports --geometry square only")
+    if args.rule not in WHIRLPOOL_RULE_NAMES:
+        raise ValueError("--preset currently supports Whirlpool rules only")
+    if args.geometry not in {"square", "hex"}:
+        raise ValueError("--preset currently supports square or hex geometry only")
+    if args.preset not in _whirlpool_preset_specs(args.geometry):
+        raise ValueError(f"preset {args.preset!r} is not available for {args.geometry}")
 
 
 def _seed_board(args: argparse.Namespace, rule: AutomatonRule) -> SimulationBoard:
@@ -243,7 +256,12 @@ def _seed_board(args: argparse.Namespace, rule: AutomatonRule) -> SimulationBoar
     if args.preset:
         cells_by_id = {
             f"c:{cell.x}:{cell.y}": cell.state
-            for cell in _build_whirlpool_preset(args.preset, args.width, args.height)
+            for cell in _build_whirlpool_preset(
+                args.preset,
+                args.width,
+                args.height,
+                geometry=args.geometry,
+            )
         }
     elif args.pattern:
         cells_by_id = place_pattern(frame, NAMED_PATTERNS[args.pattern])
@@ -445,60 +463,317 @@ def run_review(args: argparse.Namespace) -> dict[str, object]:
     }
 
 
-def _build_whirlpool_preset(name: str, width: int, height: int) -> list[CartesianSeedCell]:
-    if name == "anchored-source-vortex":
-        return _build_vortex_seed(
-            width,
-            height,
-            arms=[
-                {
-                    "angle_origin": -0.64,
-                    "twist": 1.58,
-                    "normalized_radii": [0.2, 0.26, 0.32, 0.39, 0.46, 0.53],
-                    "angular_offsets": [-1.08, -0.82, -0.55, -0.28, -0.02, 0.22, 0.49, 0.78],
-                    "gap_ranges": [(0.0, 0.34)],
-                }
-            ],
-            arcs=[
-                {
-                    "state": 3,
-                    "angle_origin": -0.64,
-                    "normalized_radii": [0.22, 0.26, 0.3],
-                    "angular_offsets": [0.52, 0.76, 0.98],
-                }
-            ],
-            sources=[
-                {"angle_origin": -0.64, "normalized_radius": 0.28, "angular_offset": 0.14},
-                {"angle_origin": -0.64, "normalized_radius": 0.52, "angular_offset": 0.62},
-            ],
-        )
-    if name == "dual-source-vortex":
-        return _build_vortex_seed(
-            width,
-            height,
-            arms=[
-                {
-                    "angle_origin": -0.58,
-                    "twist": 1.54,
-                    "normalized_radii": [0.2, 0.27, 0.34, 0.41, 0.49, 0.57],
-                    "angular_offsets": [-1.06, -0.78, -0.5, -0.22, 0.04, 0.31, 0.59, 0.88],
-                    "gap_ranges": [(0.08, 0.42)],
-                }
-            ],
-            arcs=[
-                {
-                    "state": 3,
-                    "angle_origin": -0.58,
-                    "normalized_radii": [0.24, 0.29],
-                    "angular_offsets": [0.56, 0.82, 1.05],
-                }
-            ],
-            sources=[
-                {"angle_origin": -0.58, "normalized_radius": 0.31, "angular_offset": 0.08},
-                {"angle_origin": 1.68, "normalized_radius": 0.43, "angular_offset": 0.0},
-            ],
-        )
-    raise ValueError(f"unknown Whirlpool preset: {name}")
+_SQUARE_WHIRLPOOL_PRESET_SPECS: dict[str, dict[str, list[dict[str, Any]]]] = {
+    "anchored-source-vortex": {
+        "arms": [
+            {
+                "angle_origin": -0.64,
+                "twist": 1.58,
+                "normalized_radii": [0.2, 0.26, 0.32, 0.39, 0.46, 0.53],
+                "angular_offsets": [-1.08, -0.82, -0.55, -0.28, -0.02, 0.22, 0.49, 0.78],
+                "gap_ranges": [(0.0, 0.34)],
+            }
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.64,
+                "normalized_radii": [0.22, 0.26, 0.3],
+                "angular_offsets": [0.52, 0.76, 0.98],
+            }
+        ],
+        "sources": [
+            {"angle_origin": -0.64, "normalized_radius": 0.28, "angular_offset": 0.14},
+            {"angle_origin": -0.64, "normalized_radius": 0.52, "angular_offset": 0.62},
+        ],
+    },
+    "dual-source-vortex": {
+        "arms": [
+            {
+                "angle_origin": -0.58,
+                "twist": 1.54,
+                "normalized_radii": [0.2, 0.27, 0.34, 0.41, 0.49, 0.57],
+                "angular_offsets": [-1.06, -0.78, -0.5, -0.22, 0.04, 0.31, 0.59, 0.88],
+                "gap_ranges": [(0.08, 0.42)],
+            }
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.58,
+                "normalized_radii": [0.24, 0.29],
+                "angular_offsets": [0.56, 0.82, 1.05],
+            }
+        ],
+        "sources": [
+            {"angle_origin": -0.58, "normalized_radius": 0.31, "angular_offset": 0.08},
+            {"angle_origin": 1.68, "normalized_radius": 0.43, "angular_offset": 0.0},
+        ],
+    },
+    "centered-rotor": {
+        "arms": [
+            {
+                "angle_origin": -0.28,
+                "twist": 2.05,
+                "normalized_radii": [0.16, 0.21, 0.27, 0.34, 0.42],
+                "angular_offsets": [-0.82, -0.55, -0.28, 0.0, 0.28, 0.56],
+                "gap_ranges": [(-0.06, 0.16)],
+            },
+            {
+                "angle_origin": 1.86,
+                "twist": 1.7,
+                "normalized_radii": [0.18, 0.25, 0.32, 0.4],
+                "angular_offsets": [-0.62, -0.34, -0.08, 0.2, 0.48],
+                "gap_ranges": [(0.1, 0.3)],
+            },
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.28,
+                "normalized_radii": [0.18, 0.23, 0.28],
+                "angular_offsets": [0.5, 0.78, 1.06],
+            },
+            {
+                "state": 2,
+                "angle_origin": 1.86,
+                "normalized_radii": [0.2, 0.26],
+                "angular_offsets": [0.42, 0.68, 0.94],
+            },
+        ],
+        "sources": [
+            {"angle_origin": -0.28, "normalized_radius": 0.15, "angular_offset": 0.1},
+            {"angle_origin": 1.86, "normalized_radius": 0.2, "angular_offset": 0.0},
+            {"angle_origin": -2.36, "normalized_radius": 0.26, "angular_offset": 0.0},
+        ],
+    },
+    "colliding-vortices": {
+        "arms": [
+            {
+                "angle_origin": -0.72,
+                "twist": 1.72,
+                "normalized_radii": [0.2, 0.28, 0.36, 0.45, 0.54],
+                "angular_offsets": [-0.92, -0.62, -0.32, -0.02, 0.28, 0.58],
+                "gap_ranges": [(0.02, 0.2)],
+            },
+            {
+                "angle_origin": 2.28,
+                "twist": 1.62,
+                "normalized_radii": [0.22, 0.3, 0.39, 0.48, 0.57],
+                "angular_offsets": [-0.78, -0.5, -0.22, 0.06, 0.34, 0.64],
+                "gap_ranges": [(-0.1, 0.08)],
+            },
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.72,
+                "normalized_radii": [0.24, 0.31],
+                "angular_offsets": [0.62, 0.9, 1.18],
+            },
+            {
+                "state": 3,
+                "angle_origin": 2.28,
+                "normalized_radii": [0.26, 0.34],
+                "angular_offsets": [0.52, 0.8, 1.08],
+            },
+        ],
+        "sources": [
+            {"angle_origin": -0.72, "normalized_radius": 0.28, "angular_offset": 0.12},
+            {"angle_origin": 2.28, "normalized_radius": 0.32, "angular_offset": 0.08},
+            {"angle_origin": 0.86, "normalized_radius": 0.48, "angular_offset": 0.0},
+        ],
+    },
+    "wide-spiral": {
+        "arms": [
+            {
+                "angle_origin": -0.42,
+                "twist": 2.18,
+                "normalized_radii": [0.2, 0.28, 0.36, 0.45, 0.55, 0.66, 0.76],
+                "angular_offsets": [-1.0, -0.72, -0.44, -0.16, 0.12, 0.4, 0.68, 0.96],
+                "gap_ranges": [(0.06, 0.3)],
+            }
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.42,
+                "normalized_radii": [0.3, 0.38, 0.46],
+                "angular_offsets": [0.7, 0.98, 1.26],
+            }
+        ],
+        "sources": [
+            {"angle_origin": -0.42, "normalized_radius": 0.24, "angular_offset": 0.1},
+            {"angle_origin": -0.42, "normalized_radius": 0.58, "angular_offset": 0.54},
+        ],
+    },
+}
+
+_HEX_WHIRLPOOL_PRESET_SPECS: dict[str, dict[str, list[dict[str, Any]]]] = {
+    "anchored-source-vortex": {
+        "arms": [
+            {
+                "angle_origin": -0.54,
+                "twist": 1.92,
+                "normalized_radii": [0.24, 0.3, 0.35, 0.41, 0.47],
+                "angular_offsets": [-1.02, -0.78, -0.49, -0.18, 0.12, 0.42, 0.74],
+                "gap_ranges": [(0.0, 0.28)],
+            }
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.54,
+                "normalized_radii": [0.18, 0.23, 0.28],
+                "angular_offsets": [0.54, 0.8],
+            }
+        ],
+        "sources": [
+            {"angle_origin": -0.54, "normalized_radius": 0.22, "angular_offset": 0.12},
+            {"angle_origin": -0.54, "normalized_radius": 0.31, "angular_offset": 0.36},
+        ],
+    },
+    "triple-source-rotor": {
+        "arms": [
+            {
+                "angle_origin": -0.44,
+                "twist": 1.98,
+                "normalized_radii": [0.24, 0.3, 0.36, 0.42],
+                "angular_offsets": [-0.96, -0.67, -0.37, -0.06, 0.26, 0.58],
+                "gap_ranges": [(0.04, 0.34)],
+            }
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.44,
+                "normalized_radii": [0.26, 0.31],
+                "angular_offsets": [0.68, 0.94, 1.2],
+            }
+        ],
+        "sources": [
+            {"angle_origin": -0.44, "normalized_radius": 0.26, "angular_offset": 0.14},
+            {"angle_origin": 1.72, "normalized_radius": 0.34, "angular_offset": 0.0},
+            {"angle_origin": -2.42, "normalized_radius": 0.42, "angular_offset": 0.0},
+        ],
+    },
+    "centered-rotor": {
+        "arms": [
+            {
+                "angle_origin": -0.24,
+                "twist": 2.22,
+                "normalized_radii": [0.18, 0.24, 0.31, 0.38, 0.46],
+                "angular_offsets": [-0.84, -0.56, -0.27, 0.02, 0.32, 0.62],
+                "gap_ranges": [(-0.04, 0.14)],
+            },
+            {
+                "angle_origin": 1.9,
+                "twist": 1.78,
+                "normalized_radii": [0.2, 0.27, 0.34, 0.42],
+                "angular_offsets": [-0.62, -0.34, -0.06, 0.22, 0.5],
+                "gap_ranges": [(0.1, 0.3)],
+            },
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.24,
+                "normalized_radii": [0.2, 0.26, 0.32],
+                "angular_offsets": [0.52, 0.8, 1.08],
+            }
+        ],
+        "sources": [
+            {"angle_origin": -0.24, "normalized_radius": 0.18, "angular_offset": 0.1},
+            {"angle_origin": 1.9, "normalized_radius": 0.24, "angular_offset": 0.0},
+            {"angle_origin": -2.28, "normalized_radius": 0.32, "angular_offset": 0.0},
+        ],
+    },
+    "colliding-vortices": {
+        "arms": [
+            {
+                "angle_origin": -0.68,
+                "twist": 1.94,
+                "normalized_radii": [0.22, 0.3, 0.38, 0.47, 0.56],
+                "angular_offsets": [-0.9, -0.6, -0.3, 0.0, 0.3, 0.6],
+                "gap_ranges": [(0.0, 0.2)],
+            },
+            {
+                "angle_origin": 2.34,
+                "twist": 1.7,
+                "normalized_radii": [0.24, 0.32, 0.41, 0.5, 0.58],
+                "angular_offsets": [-0.76, -0.48, -0.2, 0.08, 0.36, 0.64],
+                "gap_ranges": [(-0.08, 0.1)],
+            },
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.68,
+                "normalized_radii": [0.28, 0.35],
+                "angular_offsets": [0.66, 0.94, 1.22],
+            },
+            {
+                "state": 3,
+                "angle_origin": 2.34,
+                "normalized_radii": [0.3, 0.38],
+                "angular_offsets": [0.5, 0.78, 1.06],
+            },
+        ],
+        "sources": [
+            {"angle_origin": -0.68, "normalized_radius": 0.3, "angular_offset": 0.12},
+            {"angle_origin": 2.34, "normalized_radius": 0.34, "angular_offset": 0.08},
+            {"angle_origin": 0.92, "normalized_radius": 0.48, "angular_offset": 0.0},
+        ],
+    },
+    "wide-spiral": {
+        "arms": [
+            {
+                "angle_origin": -0.4,
+                "twist": 2.28,
+                "normalized_radii": [0.22, 0.3, 0.39, 0.49, 0.6, 0.72],
+                "angular_offsets": [-0.98, -0.7, -0.42, -0.14, 0.14, 0.42, 0.7, 0.98],
+                "gap_ranges": [(0.08, 0.32)],
+            }
+        ],
+        "arcs": [
+            {
+                "state": 3,
+                "angle_origin": -0.4,
+                "normalized_radii": [0.32, 0.4, 0.48],
+                "angular_offsets": [0.72, 1.0, 1.28],
+            }
+        ],
+        "sources": [
+            {"angle_origin": -0.4, "normalized_radius": 0.26, "angular_offset": 0.1},
+            {"angle_origin": -0.4, "normalized_radius": 0.58, "angular_offset": 0.54},
+        ],
+    },
+}
+
+
+def _whirlpool_preset_specs(geometry: str) -> dict[str, dict[str, list[dict[str, Any]]]]:
+    return _HEX_WHIRLPOOL_PRESET_SPECS if geometry == "hex" else _SQUARE_WHIRLPOOL_PRESET_SPECS
+
+
+def _build_whirlpool_preset(
+    name: str,
+    width: int,
+    height: int,
+    *,
+    geometry: str,
+) -> list[CartesianSeedCell]:
+    specs = _whirlpool_preset_specs(geometry)
+    if name not in specs:
+        raise ValueError(f"unknown Whirlpool preset for {geometry}: {name}")
+    spec = specs[name]
+    return _build_vortex_seed(
+        width,
+        height,
+        geometry=geometry,
+        arms=spec["arms"],
+        arcs=spec["arcs"],
+        sources=spec["sources"],
+    )
 
 
 def _square_grid_center(width: int, height: int) -> tuple[float, float]:
@@ -509,6 +784,60 @@ def _square_max_radius(width: int, height: int) -> float:
     cx, cy = _square_grid_center(width, height)
     corners = ((0.0, 0.0), (width - 1.0, 0.0), (0.0, height - 1.0), (width - 1.0, height - 1.0))
     return max(*(math.hypot(x - cx, y - cy) for x, y in corners), 1.0)
+
+
+_HEX_HEIGHT = 1.0
+_HEX_RADIUS = _HEX_HEIGHT / 2
+_HEX_WIDTH = math.sqrt(3) * _HEX_RADIUS
+_HEX_ROW_PITCH = 0.75
+
+
+def _pointy_hex_cell_center(x: int, y: int) -> tuple[float, float]:
+    return (x * _HEX_WIDTH + (y % 2) * (_HEX_WIDTH / 2), y * _HEX_ROW_PITCH)
+
+
+def _pointy_hex_grid_center(width: int, height: int) -> tuple[float, float]:
+    if width <= 0 or height <= 0:
+        return (0.0, 0.0)
+    max_center_x = (width - 1) * _HEX_WIDTH + (_HEX_WIDTH / 2 if height > 1 else 0.0)
+    max_center_y = (height - 1) * _HEX_ROW_PITCH
+    return (max_center_x / 2, max_center_y / 2)
+
+
+def _cell_center_for_geometry(geometry: str) -> Callable[[int, int], tuple[float, float]]:
+    if geometry == "hex":
+        return _pointy_hex_cell_center
+    return lambda x, y: (float(x), float(y))
+
+
+def _grid_center_for_geometry(geometry: str, width: int, height: int) -> tuple[float, float]:
+    if geometry == "hex":
+        return _pointy_hex_grid_center(width, height)
+    return _square_grid_center(width, height)
+
+
+def _radius_axes(
+    *,
+    width: int,
+    height: int,
+    center: tuple[float, float],
+    cell_center: Callable[[int, int], tuple[float, float]],
+) -> tuple[float, float]:
+    if width <= 0 or height <= 0:
+        return (1.0, 1.0)
+    min_x = min_y = math.inf
+    max_x = max_y = -math.inf
+    for y in range(height):
+        for x in range(width):
+            cx, cy = cell_center(x, y)
+            min_x = min(min_x, cx)
+            max_x = max(max_x, cx)
+            min_y = min(min_y, cy)
+            max_y = max(max_y, cy)
+    return (
+        max(1.0, min(center[0] - min_x, max_x - center[0])),
+        max(1.0, min(center[1] - min_y, max_y - center[1])),
+    )
 
 
 def _wrap_angle(angle: float) -> float:
@@ -527,6 +856,7 @@ def _nearest_untaken(
     width: int,
     height: int,
     taken: set[tuple[int, int]],
+    cell_center: Callable[[int, int], tuple[float, float]],
     target_x: float,
     target_y: float,
 ) -> tuple[int, int] | None:
@@ -535,7 +865,8 @@ def _nearest_untaken(
         for x in range(width):
             if (x, y) in taken:
                 continue
-            distance = (x - target_x) ** 2 + (y - target_y) ** 2
+            center_x, center_y = cell_center(x, y)
+            distance = (center_x - target_x) ** 2 + (center_y - target_y) ** 2
             if best is None or distance < best[0]:
                 best = (distance, x, y)
     if best is None:
@@ -548,7 +879,8 @@ def _place_polar_sample(
     width: int,
     height: int,
     center: tuple[float, float],
-    max_radius: float,
+    radius_axes: tuple[float, float],
+    cell_center: Callable[[int, int], tuple[float, float]],
     taken: set[tuple[int, int]],
     normalized_radius: float,
     angle_origin: float = 0.0,
@@ -556,9 +888,9 @@ def _place_polar_sample(
     state: int = 4,
 ) -> CartesianSeedCell | None:
     angle = angle_origin + angular_offset
-    target_x = center[0] + math.cos(angle) * max_radius * normalized_radius
-    target_y = center[1] + math.sin(angle) * max_radius * normalized_radius
-    nearest = _nearest_untaken(width, height, taken, target_x, target_y)
+    target_x = center[0] + math.cos(angle) * radius_axes[0] * normalized_radius
+    target_y = center[1] + math.sin(angle) * radius_axes[1] * normalized_radius
+    nearest = _nearest_untaken(width, height, taken, cell_center, target_x, target_y)
     if nearest is None:
         return None
     taken.add(nearest)
@@ -569,12 +901,19 @@ def _build_vortex_seed(
     width: int,
     height: int,
     *,
+    geometry: str,
     arms: list[dict[str, Any]],
     sources: list[dict[str, Any]],
     arcs: list[dict[str, Any]],
 ) -> list[CartesianSeedCell]:
-    center = _square_grid_center(width, height)
-    max_radius = _square_max_radius(width, height)
+    center = _grid_center_for_geometry(geometry, width, height)
+    cell_center = _cell_center_for_geometry(geometry)
+    radius_axes = _radius_axes(
+        width=width,
+        height=height,
+        center=center,
+        cell_center=cell_center,
+    )
     cells: list[CartesianSeedCell] = []
     taken: set[tuple[int, int]] = set()
 
@@ -590,16 +929,17 @@ def _build_vortex_seed(
         for normalized_radius in radial_samples:
             for angular_offset in angular_offsets:
                 angle = angle_origin + angular_offset
-                target_x = center[0] + math.cos(angle) * max_radius * normalized_radius
-                target_y = center[1] + math.sin(angle) * max_radius * normalized_radius
-                nearest = _nearest_untaken(width, height, taken, target_x, target_y)
+                target_x = center[0] + math.cos(angle) * radius_axes[0] * normalized_radius
+                target_y = center[1] + math.sin(angle) * radius_axes[1] * normalized_radius
+                nearest = _nearest_untaken(width, height, taken, cell_center, target_x, target_y)
                 if nearest is None:
                     continue
                 taken.add(nearest)
-                dx = nearest[0] - center[0]
-                dy = nearest[1] - center[1]
+                nearest_center = cell_center(*nearest)
+                dx = nearest_center[0] - center[0]
+                dy = nearest_center[1] - center[1]
                 phase = _wrap_angle(math.atan2(dy, dx) - angle_origin) + twist * (
-                    math.hypot(dx, dy) / max_radius
+                    math.hypot(dx / radius_axes[0], dy / radius_axes[1])
                 )
                 state = 1
                 if phase < -0.32:
@@ -615,7 +955,8 @@ def _build_vortex_seed(
                     width=width,
                     height=height,
                     center=center,
-                    max_radius=max_radius,
+                    radius_axes=radius_axes,
+                    cell_center=cell_center,
                     taken=taken,
                     normalized_radius=normalized_radius,
                     angle_origin=float(arc.get("angle_origin", 0.0)),
@@ -630,7 +971,8 @@ def _build_vortex_seed(
             width=width,
             height=height,
             center=center,
-            max_radius=max_radius,
+            radius_axes=radius_axes,
+            cell_center=cell_center,
             taken=taken,
             normalized_radius=float(source["normalized_radius"]),
             angle_origin=float(source.get("angle_origin", 0.0)),

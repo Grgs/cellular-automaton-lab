@@ -50,10 +50,11 @@ Render and inspect automaton rule evolution.
 
 Render selected generations for one rule, topology, and seed.
 
-Backend-only rule troubleshooting helper that writes per-generation PNG frames, a montage, and a JSON summary with state counts, changed-cell counts, and live-cell bounds. Supports binary seeds, named geometric patterns, cells-by-id JSON, and square Whirlpool presets.
+Backend-only rule troubleshooting helper that writes per-generation PNG frames, a montage, and a JSON summary with state counts, changed-cell counts, and live-cell bounds. Supports binary seeds, named geometric patterns, cells-by-id JSON, and square or hex Whirlpool presets.
 
 ```powershell
 python -m tools rules review --rule whirlpool --preset anchored-source-vortex --generations 0,5,15,30
+python -m tools rules review --rule hexwhirlpool --geometry hex --preset centered-rotor --generations 0,5,15,30
 python -m tools rules review --rule conway --pattern glider --width 40 --height 30
 ```
 
