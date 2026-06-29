@@ -14,7 +14,7 @@ Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://g
 
 **First time here?** [`docs/ONBOARDING.md`](docs/ONBOARDING.md) is a one-page decision tree -- find the row that matches what you want to do (run the app, add a tiling, use the topology library, etc.) and follow the link. The [`examples/`](examples/README.md) directory has short, runnable Python scripts for each major subsystem.
 
-![Compare results showing one acorn seed evaluated across representative tilings](docs/images/readme-compare-results-hero.png)
+![Synchronized side-by-side compare view: one excitable-medium seed evolving in lockstep across Square, Kagome, Penrose P3, and Hat tilings, with each wave front shaped by its own geometry](docs/images/readme-split-view-hero.png)
 
 ## Project Scope
 
@@ -66,6 +66,8 @@ The workspace has two run paths:
 
 - **Run comparison** returns a phase portrait plus a result table. Each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
 - **Play side by side** builds a synchronized filmstrip. Play, pause, step, reset, scrub, and speed controls operate one shared clock across all boards. Each board has an **Open gen N** action that loads its current generation into build mode.
+
+![Compare results: one acorn seed evaluated across representative tilings, with a phase portrait and per-tiling result table](docs/images/readme-compare-results-hero.png)
 
 Use **Copy run link** to create a `#/compare&run=v1.<base64url-json>` URL. Opening that link restores the compare setup without auto-running or auto-playing, so cold loads do not start surprise work. Use **Saved runs** and **Saved tiling sets** to keep named compare setups in browser `localStorage`; they work in both the Flask app and the standalone demo, but they are local to the current browser/device. Run links are the portable format.
 

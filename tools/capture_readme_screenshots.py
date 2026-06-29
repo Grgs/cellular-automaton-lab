@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import json
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -25,6 +27,43 @@ from tools.render_review.browser_support.render_review import (
 DEFAULT_OUTPUT_DIR = ROOT_DIR / "docs" / "images"
 VIEWPORT: ViewportSize = {"width": 1440, "height": 980}
 TIMEOUT_MS = 60_000
+
+# Hero capture for the synchronized side-by-side compare view: one excitable
+# Greenberg-Hastings rule and one compact central seed (R-pentomino) run in
+# lockstep across four deliberately distinct topologies -- an orthogonal grid, a
+# hex (Kagome) lattice, a 5-fold aperiodic rhomb tiling, and the Hat monotile.
+# The excitable wave front bends to each geometry (square fronts, hexagonal
+# rings, quasi-5-fold starbursts, organic crescents), which is exactly the
+# "same rule, different neighbourhood" story. An early generation is captured
+# because the wave has spread to fill every board there but burns out later.
+# Restored via a compare run link (#/compare&run=v1.<base64url(json)>) so the
+# setup is deterministic.
+SPLIT_VIEW_RUN_CONFIG: dict[str, object] = {
+    "seed": "",
+    "rule": "penrose-greenberg-hastings",
+    "traversal": "bfs",
+    "grid_size": 22,
+    "frames": 120,
+    "geometries": [
+        "square",
+        "trihexagonal-3-6-3-6",
+        "penrose-p3-rhombs",
+        "hat-monotile",
+    ],
+    "pattern": "r-pentomino",
+}
+# Generation to scrub to for the captured frame: early enough that the excitable
+# wave fronts have spread to fill all four boards before they burn out.
+SPLIT_VIEW_CAPTURE_GENERATION = 8
+
+
+def _compare_run_hash(config: dict[str, object]) -> str:
+    payload = (
+        base64.urlsafe_b64encode(json.dumps(config, separators=(",", ":")).encode("utf-8"))
+        .decode("ascii")
+        .rstrip("=")
+    )
+    return f"/compare&run=v1.{payload}"
 
 
 def _wait_ready(page: Page) -> None:
@@ -105,6 +144,56 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
     _save_locator_png(page, ".compare-dialog", output_dir / "readme-compare-results-hero.png")
 
 
+def _capture_split_view(page: Page, output_dir: Path) -> None:
+    # Restore the full compare setup deterministically via a run link, then
+    # trigger the live filmstrip and scrub to a representative frame.
+    # Setting the compare run-link hash auto-opens the full-page workspace and
+    # applies the configuration (rule, seed shape, and the four tilings).
+    page.evaluate(
+        "(hash) => { window.location.hash = hash; }", _compare_run_hash(SPLIT_VIEW_RUN_CONFIG)
+    )
+    play = page.locator("button.compare-run-secondary", has_text="Play side by side")
+    play.wait_for(state="visible", timeout=TIMEOUT_MS)
+    # Wait until the run link has actually been applied (rule restored) so the
+    # filmstrip runs the four configured tilings, not the default selection.
+    page.wait_for_function(
+        """(expected) => {
+            const rule = document.querySelector('select.compare-field');
+            return rule instanceof HTMLSelectElement && rule.value === expected;
+        }""",
+        arg=SPLIT_VIEW_RUN_CONFIG["rule"],
+        timeout=TIMEOUT_MS,
+    )
+    play.click(timeout=TIMEOUT_MS)
+
+    # Wait for all four boards and their rendered SVG thumbnails.
+    page.locator(".compare-filmstrip-board").nth(3).wait_for(state="visible", timeout=TIMEOUT_MS)
+    page.locator(".compare-filmstrip-slot svg").nth(3).wait_for(state="visible", timeout=TIMEOUT_MS)
+
+    # Pause any in-flight playback, then scrub to the representative frame.
+    page.evaluate(
+        """(generation) => {
+            const transport = document.querySelector('.compare-filmstrip-transport');
+            if (transport) {
+                for (const btn of transport.querySelectorAll('.compare-filmstrip-btn')) {
+                    if (/Pause/.test(btn.textContent || '')) {
+                        btn.click();
+                    }
+                }
+            }
+            const scrubber = document.querySelector('.compare-filmstrip-scrubber');
+            if (scrubber instanceof HTMLInputElement) {
+                const max = Number(scrubber.max) || 0;
+                scrubber.value = String(Math.max(0, Math.min(max, generation)));
+                scrubber.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }""",
+        SPLIT_VIEW_CAPTURE_GENERATION,
+    )
+    page.wait_for_timeout(400)
+    _save_locator_png(page, ".compare-filmstrip", output_dir / "readme-split-view-hero.png")
+
+
 def _capture_snub_workspace(page: Page, output_dir: Path) -> None:
     select_tiling_family(page, "archimedean-3-3-3-3-6", timeout_ms=TIMEOUT_MS)
     _wait_ready(page)
@@ -138,13 +227,21 @@ def _capture_picker_thumbnails(page: Page, output_dir: Path) -> None:
     _save_optimized_png(page, output_dir / "readme-tiling-picker-thumbnails.png")
 
 
-def capture_readme_screenshots(output_dir: Path) -> None:
+_SCENARIOS: dict[str, Callable[[Page, Path], None]] = {
+    "split-view": _capture_split_view,
+    "compare-results": _capture_compare_results,
+    "snub": _capture_snub_workspace,
+    "pinwheel": _capture_pinwheel_workspace,
+    "picker": _capture_picker_thumbnails,
+}
+
+
+def capture_readme_screenshots(output_dir: Path, only: str | None = None) -> None:
     ensure_current_standalone_build(str(ROOT_DIR))
+    if only is not None and only not in _SCENARIOS:
+        raise SystemExit(f"Unknown scenario {only!r}; choose from {', '.join(_SCENARIOS)}.")
     scenarios: tuple[Callable[[Page, Path], None], ...] = (
-        _capture_compare_results,
-        _capture_snub_workspace,
-        _capture_pinwheel_workspace,
-        _capture_picker_thumbnails,
+        (_SCENARIOS[only],) if only is not None else tuple(_SCENARIOS.values())
     )
     host = StandaloneRuntimeHost()
     host.start()
@@ -180,12 +277,17 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_OUTPUT_DIR,
         help=f"directory for captured PNGs (default: {DEFAULT_OUTPUT_DIR})",
     )
+    parser.add_argument(
+        "--scenario",
+        default=None,
+        help="capture only one scenario (split-view, compare-results, snub, pinwheel, picker)",
+    )
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    capture_readme_screenshots(args.output_dir)
+    capture_readme_screenshots(args.output_dir, only=args.scenario)
     return 0
 
 
