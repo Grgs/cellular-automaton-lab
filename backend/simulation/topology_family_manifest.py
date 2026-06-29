@@ -12,6 +12,7 @@ from backend.simulation.aperiodic_family_manifest import (
     HENDECAGONAL_11_FOLD_GEOMETRY,
     HEPTAGONAL_7_FOLD_GEOMETRY,
     L_TETROMINO_GEOMETRY,
+    P_PENTOMINO_GEOMETRY,
     PENROSE_GEOMETRY,
     PENROSE_P1_DISTRIBUTED_GEOMETRY,
     PENROSE_P1_GEOMETRY,
@@ -378,6 +379,10 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     L_TETROMINO_GEOMETRY: _translated_aperiodic_family(
         L_TETROMINO_GEOMETRY,
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
+    ),
+    P_PENTOMINO_GEOMETRY: _translated_aperiodic_family(
+        P_PENTOMINO_GEOMETRY,
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 5),
     ),
     TAYLOR_SOCOLAR_GEOMETRY: _translated_aperiodic_family(

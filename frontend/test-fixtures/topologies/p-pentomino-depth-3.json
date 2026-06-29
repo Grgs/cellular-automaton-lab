@@ -1,0 +1,5512 @@
+{
+  "cellSize": 12,
+  "geometry": "p-pentomino",
+  "height": 0,
+  "patchDepth": 3,
+  "topology": {
+    "cells": [
+      {
+        "center": {
+          "x": 4.0375,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child0.child0.child0:o6:sp125000:p3875000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child1:o6:sp125000:p3500000:0",
+          "p-pentomino:root0.child0.child0.child2:o2:sp125000:p4250000:p500000",
+          "p-pentomino:root0.child0.child0.child3:o5:sp125000:p3750000:p500000",
+          "p-pentomino:root0.child0.child1.child1:o6:sp125000:p4250000:0"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.875,
+            "y": 0.0
+          },
+          {
+            "x": 3.875,
+            "y": 0.25
+          },
+          {
+            "x": 4.125,
+            "y": 0.25
+          },
+          {
+            "x": 4.125,
+            "y": 0.125
+          },
+          {
+            "x": 4.25,
+            "y": 0.125
+          },
+          {
+            "x": 4.25,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.6625,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child0.child0.child1:o6:sp125000:p3500000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child0:o6:sp125000:p3875000:0",
+          "p-pentomino:root0.child0.child0.child3:o5:sp125000:p3750000:p500000",
+          "p-pentomino:root0.child0.child2.child1:o0:sp125000:p3500000:p250000",
+          "p-pentomino:root0.child1.child1.child0:o6:sp125000:p3125000:0",
+          "p-pentomino:root0.child1.child1.child2:o2:sp125000:p3500000:p500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.0
+          },
+          {
+            "x": 3.5,
+            "y": 0.25
+          },
+          {
+            "x": 3.75,
+            "y": 0.25
+          },
+          {
+            "x": 3.75,
+            "y": 0.125
+          },
+          {
+            "x": 3.875,
+            "y": 0.125
+          },
+          {
+            "x": 3.875,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.1375,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child0.child0.child2:o2:sp125000:p4250000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child0:o6:sp125000:p3875000:0",
+          "p-pentomino:root0.child0.child0.child3:o5:sp125000:p3750000:p500000",
+          "p-pentomino:root0.child0.child1.child1:o6:sp125000:p4250000:0",
+          "p-pentomino:root0.child0.child3.child1:o4:sp125000:p4500000:p250000",
+          "p-pentomino:root0.child0.child3.child3:o6:sp125000:p4000000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.25,
+            "y": 0.5
+          },
+          {
+            "x": 4.0,
+            "y": 0.5
+          },
+          {
+            "x": 4.0,
+            "y": 0.25
+          },
+          {
+            "x": 4.125,
+            "y": 0.25
+          },
+          {
+            "x": 4.125,
+            "y": 0.125
+          },
+          {
+            "x": 4.25,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.8625,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child0.child0.child3:o5:sp125000:p3750000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child0:o6:sp125000:p3875000:0",
+          "p-pentomino:root0.child0.child0.child1:o6:sp125000:p3500000:0",
+          "p-pentomino:root0.child0.child0.child2:o2:sp125000:p4250000:p500000",
+          "p-pentomino:root0.child0.child2.child1:o0:sp125000:p3500000:p250000",
+          "p-pentomino:root0.child0.child2.child3:o1:sp125000:p4000000:p500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.75,
+            "y": 0.5
+          },
+          {
+            "x": 4.0,
+            "y": 0.5
+          },
+          {
+            "x": 4.0,
+            "y": 0.25
+          },
+          {
+            "x": 3.875,
+            "y": 0.25
+          },
+          {
+            "x": 3.875,
+            "y": 0.125
+          },
+          {
+            "x": 3.75,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.7875,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child0.child1.child0:o6:sp125000:p4625000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child1.child1:o6:sp125000:p4250000:0",
+          "p-pentomino:root0.child0.child1.child2:o2:sp125000:p5000000:p500000",
+          "p-pentomino:root0.child0.child1.child3:o5:sp125000:p4500000:p500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.625,
+            "y": 0.0
+          },
+          {
+            "x": 4.625,
+            "y": 0.25
+          },
+          {
+            "x": 4.875,
+            "y": 0.25
+          },
+          {
+            "x": 4.875,
+            "y": 0.125
+          },
+          {
+            "x": 5.0,
+            "y": 0.125
+          },
+          {
+            "x": 5.0,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.4125,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child0.child1.child1:o6:sp125000:p4250000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child0:o6:sp125000:p3875000:0",
+          "p-pentomino:root0.child0.child0.child2:o2:sp125000:p4250000:p500000",
+          "p-pentomino:root0.child0.child1.child0:o6:sp125000:p4625000:0",
+          "p-pentomino:root0.child0.child1.child3:o5:sp125000:p4500000:p500000",
+          "p-pentomino:root0.child0.child3.child1:o4:sp125000:p4500000:p250000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.25,
+            "y": 0.0
+          },
+          {
+            "x": 4.25,
+            "y": 0.25
+          },
+          {
+            "x": 4.5,
+            "y": 0.25
+          },
+          {
+            "x": 4.5,
+            "y": 0.125
+          },
+          {
+            "x": 4.625,
+            "y": 0.125
+          },
+          {
+            "x": 4.625,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.8875,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child0.child1.child2:o2:sp125000:p5000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child1.child0:o6:sp125000:p4625000:0",
+          "p-pentomino:root0.child0.child1.child3:o5:sp125000:p4500000:p500000",
+          "p-pentomino:root0.child2.child1.child0:o2:sp125000:p5000000:p875000",
+          "p-pentomino:root0.child2.child1.child2:o6:sp125000:p4500000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 5.0,
+            "y": 0.5
+          },
+          {
+            "x": 4.75,
+            "y": 0.5
+          },
+          {
+            "x": 4.75,
+            "y": 0.25
+          },
+          {
+            "x": 4.875,
+            "y": 0.25
+          },
+          {
+            "x": 4.875,
+            "y": 0.125
+          },
+          {
+            "x": 5.0,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.6125,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child0.child1.child3:o5:sp125000:p4500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child1.child0:o6:sp125000:p4625000:0",
+          "p-pentomino:root0.child0.child1.child1:o6:sp125000:p4250000:0",
+          "p-pentomino:root0.child0.child1.child2:o2:sp125000:p5000000:p500000",
+          "p-pentomino:root0.child0.child3.child1:o4:sp125000:p4500000:p250000",
+          "p-pentomino:root0.child2.child1.child2:o6:sp125000:p4500000:p500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 0.5
+          },
+          {
+            "x": 4.75,
+            "y": 0.5
+          },
+          {
+            "x": 4.75,
+            "y": 0.25
+          },
+          {
+            "x": 4.625,
+            "y": 0.25
+          },
+          {
+            "x": 4.625,
+            "y": 0.125
+          },
+          {
+            "x": 4.5,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.6125,
+          "y": 0.7875
+        },
+        "id": "p-pentomino:root0.child0.child2.child0:o0:sp125000:p3500000:p625000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child2.child1:o0:sp125000:p3500000:p250000",
+          "p-pentomino:root0.child0.child2.child2:o7:sp125000:p4000000:p1000000",
+          "p-pentomino:root0.child0.child2.child3:o1:sp125000:p4000000:p500000",
+          "p-pentomino:root0.child3.child1.child2:o1:sp125000:p3500000:p500000",
+          "p-pentomino:root0.child3.child1.child3:o7:sp125000:p3500000:p1000000",
+          "p-pentomino:root0.child3.child3.child1:o6:sp125000:p3250000:p1000000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.625
+          },
+          {
+            "x": 3.75,
+            "y": 0.625
+          },
+          {
+            "x": 3.75,
+            "y": 0.875
+          },
+          {
+            "x": 3.625,
+            "y": 0.875
+          },
+          {
+            "x": 3.625,
+            "y": 1.0
+          },
+          {
+            "x": 3.5,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.6125,
+          "y": 0.4125
+        },
+        "id": "p-pentomino:root0.child0.child2.child1:o0:sp125000:p3500000:p250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child1:o6:sp125000:p3500000:0",
+          "p-pentomino:root0.child0.child0.child3:o5:sp125000:p3750000:p500000",
+          "p-pentomino:root0.child0.child2.child0:o0:sp125000:p3500000:p625000",
+          "p-pentomino:root0.child0.child2.child3:o1:sp125000:p4000000:p500000",
+          "p-pentomino:root0.child1.child1.child2:o2:sp125000:p3500000:p500000",
+          "p-pentomino:root0.child3.child1.child2:o1:sp125000:p3500000:p500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.25
+          },
+          {
+            "x": 3.75,
+            "y": 0.25
+          },
+          {
+            "x": 3.75,
+            "y": 0.5
+          },
+          {
+            "x": 3.625,
+            "y": 0.5
+          },
+          {
+            "x": 3.625,
+            "y": 0.625
+          },
+          {
+            "x": 3.5,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.8375,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root0.child0.child2.child2:o7:sp125000:p4000000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child2.child0:o0:sp125000:p3500000:p625000",
+          "p-pentomino:root0.child0.child2.child3:o1:sp125000:p4000000:p500000",
+          "p-pentomino:root0.child0.child3.child2:o3:sp125000:p4000000:p1000000",
+          "p-pentomino:root0.child3.child3.child0:o6:sp125000:p3625000:p1000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.0
+          },
+          {
+            "x": 4.0,
+            "y": 0.75
+          },
+          {
+            "x": 3.75,
+            "y": 0.75
+          },
+          {
+            "x": 3.75,
+            "y": 0.875
+          },
+          {
+            "x": 3.625,
+            "y": 0.875
+          },
+          {
+            "x": 3.625,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.8375,
+          "y": 0.6125
+        },
+        "id": "p-pentomino:root0.child0.child2.child3:o1:sp125000:p4000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child3:o5:sp125000:p3750000:p500000",
+          "p-pentomino:root0.child0.child2.child0:o0:sp125000:p3500000:p625000",
+          "p-pentomino:root0.child0.child2.child1:o0:sp125000:p3500000:p250000",
+          "p-pentomino:root0.child0.child2.child2:o7:sp125000:p4000000:p1000000",
+          "p-pentomino:root0.child0.child3.child3:o6:sp125000:p4000000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 0.5
+          },
+          {
+            "x": 4.0,
+            "y": 0.75
+          },
+          {
+            "x": 3.75,
+            "y": 0.75
+          },
+          {
+            "x": 3.75,
+            "y": 0.625
+          },
+          {
+            "x": 3.625,
+            "y": 0.625
+          },
+          {
+            "x": 3.625,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.3875,
+          "y": 0.7875
+        },
+        "id": "p-pentomino:root0.child0.child3.child0:o4:sp125000:p4500000:p625000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child3.child1:o4:sp125000:p4500000:p250000",
+          "p-pentomino:root0.child0.child3.child2:o3:sp125000:p4000000:p1000000",
+          "p-pentomino:root0.child0.child3.child3:o6:sp125000:p4000000:p500000",
+          "p-pentomino:root0.child2.child1.child2:o6:sp125000:p4500000:p500000",
+          "p-pentomino:root0.child2.child1.child3:o3:sp125000:p4500000:p1000000",
+          "p-pentomino:root0.child2.child3.child1:o1:sp125000:p4750000:p1000000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 0.625
+          },
+          {
+            "x": 4.25,
+            "y": 0.625
+          },
+          {
+            "x": 4.25,
+            "y": 0.875
+          },
+          {
+            "x": 4.375,
+            "y": 0.875
+          },
+          {
+            "x": 4.375,
+            "y": 1.0
+          },
+          {
+            "x": 4.5,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.3875,
+          "y": 0.4125
+        },
+        "id": "p-pentomino:root0.child0.child3.child1:o4:sp125000:p4500000:p250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child2:o2:sp125000:p4250000:p500000",
+          "p-pentomino:root0.child0.child1.child1:o6:sp125000:p4250000:0",
+          "p-pentomino:root0.child0.child1.child3:o5:sp125000:p4500000:p500000",
+          "p-pentomino:root0.child0.child3.child0:o4:sp125000:p4500000:p625000",
+          "p-pentomino:root0.child0.child3.child3:o6:sp125000:p4000000:p500000",
+          "p-pentomino:root0.child2.child1.child2:o6:sp125000:p4500000:p500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 0.25
+          },
+          {
+            "x": 4.25,
+            "y": 0.25
+          },
+          {
+            "x": 4.25,
+            "y": 0.5
+          },
+          {
+            "x": 4.375,
+            "y": 0.5
+          },
+          {
+            "x": 4.375,
+            "y": 0.625
+          },
+          {
+            "x": 4.5,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.1625,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root0.child0.child3.child2:o3:sp125000:p4000000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child2.child2:o7:sp125000:p4000000:p1000000",
+          "p-pentomino:root0.child0.child3.child0:o4:sp125000:p4500000:p625000",
+          "p-pentomino:root0.child0.child3.child3:o6:sp125000:p4000000:p500000",
+          "p-pentomino:root0.child2.child3.child0:o1:sp125000:p4375000:p1000000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.0
+          },
+          {
+            "x": 4.0,
+            "y": 0.75
+          },
+          {
+            "x": 4.25,
+            "y": 0.75
+          },
+          {
+            "x": 4.25,
+            "y": 0.875
+          },
+          {
+            "x": 4.375,
+            "y": 0.875
+          },
+          {
+            "x": 4.375,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.1625,
+          "y": 0.6125
+        },
+        "id": "p-pentomino:root0.child0.child3.child3:o6:sp125000:p4000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child2:o2:sp125000:p4250000:p500000",
+          "p-pentomino:root0.child0.child2.child3:o1:sp125000:p4000000:p500000",
+          "p-pentomino:root0.child0.child3.child0:o4:sp125000:p4500000:p625000",
+          "p-pentomino:root0.child0.child3.child1:o4:sp125000:p4500000:p250000",
+          "p-pentomino:root0.child0.child3.child2:o3:sp125000:p4000000:p1000000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 0.5
+          },
+          {
+            "x": 4.0,
+            "y": 0.75
+          },
+          {
+            "x": 4.25,
+            "y": 0.75
+          },
+          {
+            "x": 4.25,
+            "y": 0.625
+          },
+          {
+            "x": 4.375,
+            "y": 0.625
+          },
+          {
+            "x": 4.375,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.5375,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child1.child0.child0:o6:sp125000:p2375000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child1:o6:sp125000:p2000000:0",
+          "p-pentomino:root0.child1.child0.child2:o2:sp125000:p2750000:p500000",
+          "p-pentomino:root0.child1.child0.child3:o5:sp125000:p2250000:p500000",
+          "p-pentomino:root0.child1.child1.child1:o6:sp125000:p2750000:0"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.375,
+            "y": 0.0
+          },
+          {
+            "x": 2.375,
+            "y": 0.25
+          },
+          {
+            "x": 2.625,
+            "y": 0.25
+          },
+          {
+            "x": 2.625,
+            "y": 0.125
+          },
+          {
+            "x": 2.75,
+            "y": 0.125
+          },
+          {
+            "x": 2.75,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.1625,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child1.child0.child1:o6:sp125000:p2000000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child0:o6:sp125000:p2375000:0",
+          "p-pentomino:root0.child1.child0.child3:o5:sp125000:p2250000:p500000",
+          "p-pentomino:root0.child1.child2.child1:o0:sp125000:p2000000:p250000",
+          "p-pentomino:root1.child3.child0.child1:o4:sp125000:p2000000:0"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 0.0
+          },
+          {
+            "x": 2.0,
+            "y": 0.25
+          },
+          {
+            "x": 2.25,
+            "y": 0.25
+          },
+          {
+            "x": 2.25,
+            "y": 0.125
+          },
+          {
+            "x": 2.375,
+            "y": 0.125
+          },
+          {
+            "x": 2.375,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.6375,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child1.child0.child2:o2:sp125000:p2750000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child0:o6:sp125000:p2375000:0",
+          "p-pentomino:root0.child1.child0.child3:o5:sp125000:p2250000:p500000",
+          "p-pentomino:root0.child1.child1.child1:o6:sp125000:p2750000:0",
+          "p-pentomino:root0.child1.child3.child1:o4:sp125000:p3000000:p250000",
+          "p-pentomino:root0.child1.child3.child3:o6:sp125000:p2500000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.75,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.25
+          },
+          {
+            "x": 2.625,
+            "y": 0.25
+          },
+          {
+            "x": 2.625,
+            "y": 0.125
+          },
+          {
+            "x": 2.75,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.3625,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child1.child0.child3:o5:sp125000:p2250000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child0:o6:sp125000:p2375000:0",
+          "p-pentomino:root0.child1.child0.child1:o6:sp125000:p2000000:0",
+          "p-pentomino:root0.child1.child0.child2:o2:sp125000:p2750000:p500000",
+          "p-pentomino:root0.child1.child2.child1:o0:sp125000:p2000000:p250000",
+          "p-pentomino:root0.child1.child2.child3:o1:sp125000:p2500000:p500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.25
+          },
+          {
+            "x": 2.375,
+            "y": 0.25
+          },
+          {
+            "x": 2.375,
+            "y": 0.125
+          },
+          {
+            "x": 2.25,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.2875,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child1.child1.child0:o6:sp125000:p3125000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child1:o6:sp125000:p3500000:0",
+          "p-pentomino:root0.child1.child1.child1:o6:sp125000:p2750000:0",
+          "p-pentomino:root0.child1.child1.child2:o2:sp125000:p3500000:p500000",
+          "p-pentomino:root0.child1.child1.child3:o5:sp125000:p3000000:p500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.125,
+            "y": 0.0
+          },
+          {
+            "x": 3.125,
+            "y": 0.25
+          },
+          {
+            "x": 3.375,
+            "y": 0.25
+          },
+          {
+            "x": 3.375,
+            "y": 0.125
+          },
+          {
+            "x": 3.5,
+            "y": 0.125
+          },
+          {
+            "x": 3.5,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.9125,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root0.child1.child1.child1:o6:sp125000:p2750000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child0:o6:sp125000:p2375000:0",
+          "p-pentomino:root0.child1.child0.child2:o2:sp125000:p2750000:p500000",
+          "p-pentomino:root0.child1.child1.child0:o6:sp125000:p3125000:0",
+          "p-pentomino:root0.child1.child1.child3:o5:sp125000:p3000000:p500000",
+          "p-pentomino:root0.child1.child3.child1:o4:sp125000:p3000000:p250000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.75,
+            "y": 0.0
+          },
+          {
+            "x": 2.75,
+            "y": 0.25
+          },
+          {
+            "x": 3.0,
+            "y": 0.25
+          },
+          {
+            "x": 3.0,
+            "y": 0.125
+          },
+          {
+            "x": 3.125,
+            "y": 0.125
+          },
+          {
+            "x": 3.125,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.3875,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child1.child1.child2:o2:sp125000:p3500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child0.child1:o6:sp125000:p3500000:0",
+          "p-pentomino:root0.child0.child2.child1:o0:sp125000:p3500000:p250000",
+          "p-pentomino:root0.child1.child1.child0:o6:sp125000:p3125000:0",
+          "p-pentomino:root0.child1.child1.child3:o5:sp125000:p3000000:p500000",
+          "p-pentomino:root0.child3.child1.child2:o1:sp125000:p3500000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.5
+          },
+          {
+            "x": 3.25,
+            "y": 0.5
+          },
+          {
+            "x": 3.25,
+            "y": 0.25
+          },
+          {
+            "x": 3.375,
+            "y": 0.25
+          },
+          {
+            "x": 3.375,
+            "y": 0.125
+          },
+          {
+            "x": 3.5,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.1125,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root0.child1.child1.child3:o5:sp125000:p3000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child1.child0:o6:sp125000:p3125000:0",
+          "p-pentomino:root0.child1.child1.child1:o6:sp125000:p2750000:0",
+          "p-pentomino:root0.child1.child1.child2:o2:sp125000:p3500000:p500000",
+          "p-pentomino:root0.child1.child3.child1:o4:sp125000:p3000000:p250000",
+          "p-pentomino:root0.child3.child1.child0:o5:sp125000:p3000000:p875000",
+          "p-pentomino:root0.child3.child1.child2:o1:sp125000:p3500000:p500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.5
+          },
+          {
+            "x": 3.25,
+            "y": 0.5
+          },
+          {
+            "x": 3.25,
+            "y": 0.25
+          },
+          {
+            "x": 3.125,
+            "y": 0.25
+          },
+          {
+            "x": 3.125,
+            "y": 0.125
+          },
+          {
+            "x": 3.0,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.1125,
+          "y": 0.7875
+        },
+        "id": "p-pentomino:root0.child1.child2.child0:o0:sp125000:p2000000:p625000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child2.child1:o0:sp125000:p2000000:p250000",
+          "p-pentomino:root0.child1.child2.child2:o7:sp125000:p2500000:p1000000",
+          "p-pentomino:root0.child1.child2.child3:o1:sp125000:p2500000:p500000",
+          "p-pentomino:root1.child1.child3.child0:o5:sp125000:p2000000:p1375000",
+          "p-pentomino:root1.child3.child0.child0:o4:sp125000:p2000000:p375000",
+          "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 0.625
+          },
+          {
+            "x": 2.25,
+            "y": 0.625
+          },
+          {
+            "x": 2.25,
+            "y": 0.875
+          },
+          {
+            "x": 2.125,
+            "y": 0.875
+          },
+          {
+            "x": 2.125,
+            "y": 1.0
+          },
+          {
+            "x": 2.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.1125,
+          "y": 0.4125
+        },
+        "id": "p-pentomino:root0.child1.child2.child1:o0:sp125000:p2000000:p250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child1:o6:sp125000:p2000000:0",
+          "p-pentomino:root0.child1.child0.child3:o5:sp125000:p2250000:p500000",
+          "p-pentomino:root0.child1.child2.child0:o0:sp125000:p2000000:p625000",
+          "p-pentomino:root0.child1.child2.child3:o1:sp125000:p2500000:p500000",
+          "p-pentomino:root1.child3.child0.child0:o4:sp125000:p2000000:p375000",
+          "p-pentomino:root1.child3.child0.child1:o4:sp125000:p2000000:0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 0.25
+          },
+          {
+            "x": 2.25,
+            "y": 0.25
+          },
+          {
+            "x": 2.25,
+            "y": 0.5
+          },
+          {
+            "x": 2.125,
+            "y": 0.5
+          },
+          {
+            "x": 2.125,
+            "y": 0.625
+          },
+          {
+            "x": 2.0,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.3375,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root0.child1.child2.child2:o7:sp125000:p2500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child2.child0:o0:sp125000:p2000000:p625000",
+          "p-pentomino:root0.child1.child2.child3:o1:sp125000:p2500000:p500000",
+          "p-pentomino:root0.child1.child3.child2:o3:sp125000:p2500000:p1000000",
+          "p-pentomino:root1.child1.child3.child2:o1:sp125000:p2500000:p1000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.5,
+            "y": 0.75
+          },
+          {
+            "x": 2.25,
+            "y": 0.75
+          },
+          {
+            "x": 2.25,
+            "y": 0.875
+          },
+          {
+            "x": 2.125,
+            "y": 0.875
+          },
+          {
+            "x": 2.125,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.3375,
+          "y": 0.6125
+        },
+        "id": "p-pentomino:root0.child1.child2.child3:o1:sp125000:p2500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child3:o5:sp125000:p2250000:p500000",
+          "p-pentomino:root0.child1.child2.child0:o0:sp125000:p2000000:p625000",
+          "p-pentomino:root0.child1.child2.child1:o0:sp125000:p2000000:p250000",
+          "p-pentomino:root0.child1.child2.child2:o7:sp125000:p2500000:p1000000",
+          "p-pentomino:root0.child1.child3.child3:o6:sp125000:p2500000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.75
+          },
+          {
+            "x": 2.25,
+            "y": 0.75
+          },
+          {
+            "x": 2.25,
+            "y": 0.625
+          },
+          {
+            "x": 2.125,
+            "y": 0.625
+          },
+          {
+            "x": 2.125,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.8875,
+          "y": 0.7875
+        },
+        "id": "p-pentomino:root0.child1.child3.child0:o4:sp125000:p3000000:p625000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child3.child1:o4:sp125000:p3000000:p250000",
+          "p-pentomino:root0.child1.child3.child2:o3:sp125000:p2500000:p1000000",
+          "p-pentomino:root0.child1.child3.child3:o6:sp125000:p2500000:p500000",
+          "p-pentomino:root0.child3.child1.child0:o5:sp125000:p3000000:p875000",
+          "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+          "p-pentomino:root1.child1.child2.child0:o2:sp125000:p3000000:p1375000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.625
+          },
+          {
+            "x": 2.75,
+            "y": 0.625
+          },
+          {
+            "x": 2.75,
+            "y": 0.875
+          },
+          {
+            "x": 2.875,
+            "y": 0.875
+          },
+          {
+            "x": 2.875,
+            "y": 1.0
+          },
+          {
+            "x": 3.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.8875,
+          "y": 0.4125
+        },
+        "id": "p-pentomino:root0.child1.child3.child1:o4:sp125000:p3000000:p250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child2:o2:sp125000:p2750000:p500000",
+          "p-pentomino:root0.child1.child1.child1:o6:sp125000:p2750000:0",
+          "p-pentomino:root0.child1.child1.child3:o5:sp125000:p3000000:p500000",
+          "p-pentomino:root0.child1.child3.child0:o4:sp125000:p3000000:p625000",
+          "p-pentomino:root0.child1.child3.child3:o6:sp125000:p2500000:p500000",
+          "p-pentomino:root0.child3.child1.child0:o5:sp125000:p3000000:p875000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.25
+          },
+          {
+            "x": 2.75,
+            "y": 0.25
+          },
+          {
+            "x": 2.75,
+            "y": 0.5
+          },
+          {
+            "x": 2.875,
+            "y": 0.5
+          },
+          {
+            "x": 2.875,
+            "y": 0.625
+          },
+          {
+            "x": 3.0,
+            "y": 0.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.6625,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root0.child1.child3.child2:o3:sp125000:p2500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child2.child2:o7:sp125000:p2500000:p1000000",
+          "p-pentomino:root0.child1.child3.child0:o4:sp125000:p3000000:p625000",
+          "p-pentomino:root0.child1.child3.child3:o6:sp125000:p2500000:p500000",
+          "p-pentomino:root1.child1.child2.child2:o6:sp125000:p2500000:p1000000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.5,
+            "y": 0.75
+          },
+          {
+            "x": 2.75,
+            "y": 0.75
+          },
+          {
+            "x": 2.75,
+            "y": 0.875
+          },
+          {
+            "x": 2.875,
+            "y": 0.875
+          },
+          {
+            "x": 2.875,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.6625,
+          "y": 0.6125
+        },
+        "id": "p-pentomino:root0.child1.child3.child3:o6:sp125000:p2500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child2:o2:sp125000:p2750000:p500000",
+          "p-pentomino:root0.child1.child2.child3:o1:sp125000:p2500000:p500000",
+          "p-pentomino:root0.child1.child3.child0:o4:sp125000:p3000000:p625000",
+          "p-pentomino:root0.child1.child3.child1:o4:sp125000:p3000000:p250000",
+          "p-pentomino:root0.child1.child3.child2:o3:sp125000:p2500000:p1000000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 0.5
+          },
+          {
+            "x": 2.5,
+            "y": 0.75
+          },
+          {
+            "x": 2.75,
+            "y": 0.75
+          },
+          {
+            "x": 2.75,
+            "y": 0.625
+          },
+          {
+            "x": 2.875,
+            "y": 0.625
+          },
+          {
+            "x": 2.875,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.8875,
+          "y": 1.4625
+        },
+        "id": "p-pentomino:root0.child2.child0.child0:o2:sp125000:p5000000:p1625000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child1:o2:sp125000:p5000000:p2000000",
+          "p-pentomino:root0.child2.child0.child2:o6:sp125000:p4500000:p1250000",
+          "p-pentomino:root0.child2.child0.child3:o3:sp125000:p4500000:p1750000",
+          "p-pentomino:root0.child2.child1.child1:o2:sp125000:p5000000:p1250000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 5.0,
+            "y": 1.625
+          },
+          {
+            "x": 4.75,
+            "y": 1.625
+          },
+          {
+            "x": 4.75,
+            "y": 1.375
+          },
+          {
+            "x": 4.875,
+            "y": 1.375
+          },
+          {
+            "x": 4.875,
+            "y": 1.25
+          },
+          {
+            "x": 5.0,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.8875,
+          "y": 1.8375
+        },
+        "id": "p-pentomino:root0.child2.child0.child1:o2:sp125000:p5000000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child0:o2:sp125000:p5000000:p1625000",
+          "p-pentomino:root0.child2.child0.child3:o3:sp125000:p4500000:p1750000",
+          "p-pentomino:root0.child2.child2.child1:o7:sp125000:p4750000:p2000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 5.0,
+            "y": 2.0
+          },
+          {
+            "x": 4.75,
+            "y": 2.0
+          },
+          {
+            "x": 4.75,
+            "y": 1.75
+          },
+          {
+            "x": 4.875,
+            "y": 1.75
+          },
+          {
+            "x": 4.875,
+            "y": 1.625
+          },
+          {
+            "x": 5.0,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.6625,
+          "y": 1.3625
+        },
+        "id": "p-pentomino:root0.child2.child0.child2:o6:sp125000:p4500000:p1250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child0:o2:sp125000:p5000000:p1625000",
+          "p-pentomino:root0.child2.child0.child3:o3:sp125000:p4500000:p1750000",
+          "p-pentomino:root0.child2.child1.child1:o2:sp125000:p5000000:p1250000",
+          "p-pentomino:root0.child2.child3.child1:o1:sp125000:p4750000:p1000000",
+          "p-pentomino:root0.child2.child3.child3:o2:sp125000:p4500000:p1500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 1.25
+          },
+          {
+            "x": 4.5,
+            "y": 1.5
+          },
+          {
+            "x": 4.75,
+            "y": 1.5
+          },
+          {
+            "x": 4.75,
+            "y": 1.375
+          },
+          {
+            "x": 4.875,
+            "y": 1.375
+          },
+          {
+            "x": 4.875,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.6625,
+          "y": 1.6375
+        },
+        "id": "p-pentomino:root0.child2.child0.child3:o3:sp125000:p4500000:p1750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child0:o2:sp125000:p5000000:p1625000",
+          "p-pentomino:root0.child2.child0.child1:o2:sp125000:p5000000:p2000000",
+          "p-pentomino:root0.child2.child0.child2:o6:sp125000:p4500000:p1250000",
+          "p-pentomino:root0.child2.child2.child1:o7:sp125000:p4750000:p2000000",
+          "p-pentomino:root0.child2.child2.child3:o4:sp125000:p4500000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 1.75
+          },
+          {
+            "x": 4.5,
+            "y": 1.5
+          },
+          {
+            "x": 4.75,
+            "y": 1.5
+          },
+          {
+            "x": 4.75,
+            "y": 1.625
+          },
+          {
+            "x": 4.875,
+            "y": 1.625
+          },
+          {
+            "x": 4.875,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.8875,
+          "y": 0.7125
+        },
+        "id": "p-pentomino:root0.child2.child1.child0:o2:sp125000:p5000000:p875000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child1.child2:o2:sp125000:p5000000:p500000",
+          "p-pentomino:root0.child2.child1.child1:o2:sp125000:p5000000:p1250000",
+          "p-pentomino:root0.child2.child1.child2:o6:sp125000:p4500000:p500000",
+          "p-pentomino:root0.child2.child1.child3:o3:sp125000:p4500000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 5.0,
+            "y": 0.875
+          },
+          {
+            "x": 4.75,
+            "y": 0.875
+          },
+          {
+            "x": 4.75,
+            "y": 0.625
+          },
+          {
+            "x": 4.875,
+            "y": 0.625
+          },
+          {
+            "x": 4.875,
+            "y": 0.5
+          },
+          {
+            "x": 5.0,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.8875,
+          "y": 1.0875
+        },
+        "id": "p-pentomino:root0.child2.child1.child1:o2:sp125000:p5000000:p1250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child0:o2:sp125000:p5000000:p1625000",
+          "p-pentomino:root0.child2.child0.child2:o6:sp125000:p4500000:p1250000",
+          "p-pentomino:root0.child2.child1.child0:o2:sp125000:p5000000:p875000",
+          "p-pentomino:root0.child2.child1.child3:o3:sp125000:p4500000:p1000000",
+          "p-pentomino:root0.child2.child3.child1:o1:sp125000:p4750000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 5.0,
+            "y": 1.25
+          },
+          {
+            "x": 4.75,
+            "y": 1.25
+          },
+          {
+            "x": 4.75,
+            "y": 1.0
+          },
+          {
+            "x": 4.875,
+            "y": 1.0
+          },
+          {
+            "x": 4.875,
+            "y": 0.875
+          },
+          {
+            "x": 5.0,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.6625,
+          "y": 0.6125
+        },
+        "id": "p-pentomino:root0.child2.child1.child2:o6:sp125000:p4500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child1.child2:o2:sp125000:p5000000:p500000",
+          "p-pentomino:root0.child0.child1.child3:o5:sp125000:p4500000:p500000",
+          "p-pentomino:root0.child0.child3.child0:o4:sp125000:p4500000:p625000",
+          "p-pentomino:root0.child0.child3.child1:o4:sp125000:p4500000:p250000",
+          "p-pentomino:root0.child2.child1.child0:o2:sp125000:p5000000:p875000",
+          "p-pentomino:root0.child2.child1.child3:o3:sp125000:p4500000:p1000000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 0.5
+          },
+          {
+            "x": 4.5,
+            "y": 0.75
+          },
+          {
+            "x": 4.75,
+            "y": 0.75
+          },
+          {
+            "x": 4.75,
+            "y": 0.625
+          },
+          {
+            "x": 4.875,
+            "y": 0.625
+          },
+          {
+            "x": 4.875,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.6625,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root0.child2.child1.child3:o3:sp125000:p4500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child3.child0:o4:sp125000:p4500000:p625000",
+          "p-pentomino:root0.child2.child1.child0:o2:sp125000:p5000000:p875000",
+          "p-pentomino:root0.child2.child1.child1:o2:sp125000:p5000000:p1250000",
+          "p-pentomino:root0.child2.child1.child2:o6:sp125000:p4500000:p500000",
+          "p-pentomino:root0.child2.child3.child1:o1:sp125000:p4750000:p1000000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 1.0
+          },
+          {
+            "x": 4.5,
+            "y": 0.75
+          },
+          {
+            "x": 4.75,
+            "y": 0.75
+          },
+          {
+            "x": 4.75,
+            "y": 0.875
+          },
+          {
+            "x": 4.875,
+            "y": 0.875
+          },
+          {
+            "x": 4.875,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.2125,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root0.child2.child2.child0:o7:sp125000:p4375000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child2.child1:o7:sp125000:p4750000:p2000000",
+          "p-pentomino:root0.child2.child2.child2:o0:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child2.child2.child3:o4:sp125000:p4500000:p1500000",
+          "p-pentomino:root0.child3.child2.child0:o3:sp125000:p3625000:p2000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.375,
+            "y": 2.0
+          },
+          {
+            "x": 4.375,
+            "y": 1.75
+          },
+          {
+            "x": 4.125,
+            "y": 1.75
+          },
+          {
+            "x": 4.125,
+            "y": 1.875
+          },
+          {
+            "x": 4.0,
+            "y": 1.875
+          },
+          {
+            "x": 4.0,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.5875,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root0.child2.child2.child1:o7:sp125000:p4750000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child1:o2:sp125000:p5000000:p2000000",
+          "p-pentomino:root0.child2.child0.child3:o3:sp125000:p4500000:p1750000",
+          "p-pentomino:root0.child2.child2.child0:o7:sp125000:p4375000:p2000000",
+          "p-pentomino:root0.child2.child2.child3:o4:sp125000:p4500000:p1500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.75,
+            "y": 2.0
+          },
+          {
+            "x": 4.75,
+            "y": 1.75
+          },
+          {
+            "x": 4.5,
+            "y": 1.75
+          },
+          {
+            "x": 4.5,
+            "y": 1.875
+          },
+          {
+            "x": 4.375,
+            "y": 1.875
+          },
+          {
+            "x": 4.375,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.1125,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root0.child2.child2.child2:o0:sp125000:p4000000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child2.child0:o7:sp125000:p4375000:p2000000",
+          "p-pentomino:root0.child2.child2.child3:o4:sp125000:p4500000:p1500000",
+          "p-pentomino:root0.child2.child3.child2:o5:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child3.child2.child2:o4:sp125000:p4000000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.75
+          },
+          {
+            "x": 4.125,
+            "y": 1.75
+          },
+          {
+            "x": 4.125,
+            "y": 1.875
+          },
+          {
+            "x": 4.0,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.3875,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root0.child2.child2.child3:o4:sp125000:p4500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child3:o3:sp125000:p4500000:p1750000",
+          "p-pentomino:root0.child2.child2.child0:o7:sp125000:p4375000:p2000000",
+          "p-pentomino:root0.child2.child2.child1:o7:sp125000:p4750000:p2000000",
+          "p-pentomino:root0.child2.child2.child2:o0:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child2.child3.child3:o2:sp125000:p4500000:p1500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.75
+          },
+          {
+            "x": 4.375,
+            "y": 1.75
+          },
+          {
+            "x": 4.375,
+            "y": 1.875
+          },
+          {
+            "x": 4.5,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.2125,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root0.child2.child3.child0:o1:sp125000:p4375000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child3.child2:o3:sp125000:p4000000:p1000000",
+          "p-pentomino:root0.child2.child3.child1:o1:sp125000:p4750000:p1000000",
+          "p-pentomino:root0.child2.child3.child2:o5:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child2.child3.child3:o2:sp125000:p4500000:p1500000",
+          "p-pentomino:root0.child3.child3.child0:o6:sp125000:p3625000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.375,
+            "y": 1.0
+          },
+          {
+            "x": 4.375,
+            "y": 1.25
+          },
+          {
+            "x": 4.125,
+            "y": 1.25
+          },
+          {
+            "x": 4.125,
+            "y": 1.125
+          },
+          {
+            "x": 4.0,
+            "y": 1.125
+          },
+          {
+            "x": 4.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.5875,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root0.child2.child3.child1:o1:sp125000:p4750000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child3.child0:o4:sp125000:p4500000:p625000",
+          "p-pentomino:root0.child2.child0.child2:o6:sp125000:p4500000:p1250000",
+          "p-pentomino:root0.child2.child1.child1:o2:sp125000:p5000000:p1250000",
+          "p-pentomino:root0.child2.child1.child3:o3:sp125000:p4500000:p1000000",
+          "p-pentomino:root0.child2.child3.child0:o1:sp125000:p4375000:p1000000",
+          "p-pentomino:root0.child2.child3.child3:o2:sp125000:p4500000:p1500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.75,
+            "y": 1.0
+          },
+          {
+            "x": 4.75,
+            "y": 1.25
+          },
+          {
+            "x": 4.5,
+            "y": 1.25
+          },
+          {
+            "x": 4.5,
+            "y": 1.125
+          },
+          {
+            "x": 4.375,
+            "y": 1.125
+          },
+          {
+            "x": 4.375,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.1125,
+          "y": 1.3375
+        },
+        "id": "p-pentomino:root0.child2.child3.child2:o5:sp125000:p4000000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child2.child2:o0:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child2.child3.child0:o1:sp125000:p4375000:p1000000",
+          "p-pentomino:root0.child2.child3.child3:o2:sp125000:p4500000:p1500000",
+          "p-pentomino:root0.child3.child3.child2:o2:sp125000:p4000000:p1500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.25
+          },
+          {
+            "x": 4.125,
+            "y": 1.25
+          },
+          {
+            "x": 4.125,
+            "y": 1.125
+          },
+          {
+            "x": 4.0,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.3875,
+          "y": 1.3375
+        },
+        "id": "p-pentomino:root0.child2.child3.child3:o2:sp125000:p4500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child0.child2:o6:sp125000:p4500000:p1250000",
+          "p-pentomino:root0.child2.child2.child3:o4:sp125000:p4500000:p1500000",
+          "p-pentomino:root0.child2.child3.child0:o1:sp125000:p4375000:p1000000",
+          "p-pentomino:root0.child2.child3.child1:o1:sp125000:p4750000:p1000000",
+          "p-pentomino:root0.child2.child3.child2:o5:sp125000:p4000000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.5,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.5
+          },
+          {
+            "x": 4.25,
+            "y": 1.25
+          },
+          {
+            "x": 4.375,
+            "y": 1.25
+          },
+          {
+            "x": 4.375,
+            "y": 1.125
+          },
+          {
+            "x": 4.5,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.1125,
+          "y": 1.4625
+        },
+        "id": "p-pentomino:root0.child3.child0.child0:o5:sp125000:p3000000:p1625000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child1:o5:sp125000:p3000000:p2000000",
+          "p-pentomino:root0.child3.child0.child2:o1:sp125000:p3500000:p1250000",
+          "p-pentomino:root0.child3.child0.child3:o7:sp125000:p3500000:p1750000",
+          "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+          "p-pentomino:root1.child1.child2.child0:o2:sp125000:p3000000:p1375000",
+          "p-pentomino:root1.child1.child2.child1:o2:sp125000:p3000000:p1750000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.625
+          },
+          {
+            "x": 3.25,
+            "y": 1.625
+          },
+          {
+            "x": 3.25,
+            "y": 1.375
+          },
+          {
+            "x": 3.125,
+            "y": 1.375
+          },
+          {
+            "x": 3.125,
+            "y": 1.25
+          },
+          {
+            "x": 3.0,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.1125,
+          "y": 1.8375
+        },
+        "id": "p-pentomino:root0.child3.child0.child1:o5:sp125000:p3000000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child0:o5:sp125000:p3000000:p1625000",
+          "p-pentomino:root0.child3.child0.child3:o7:sp125000:p3500000:p1750000",
+          "p-pentomino:root0.child3.child2.child1:o3:sp125000:p3250000:p2000000",
+          "p-pentomino:root1.child1.child0.child1:o7:sp125000:p3000000:p2000000",
+          "p-pentomino:root1.child1.child2.child1:o2:sp125000:p3000000:p1750000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 2.0
+          },
+          {
+            "x": 3.25,
+            "y": 2.0
+          },
+          {
+            "x": 3.25,
+            "y": 1.75
+          },
+          {
+            "x": 3.125,
+            "y": 1.75
+          },
+          {
+            "x": 3.125,
+            "y": 1.625
+          },
+          {
+            "x": 3.0,
+            "y": 1.625
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.3375,
+          "y": 1.3625
+        },
+        "id": "p-pentomino:root0.child3.child0.child2:o1:sp125000:p3500000:p1250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child0:o5:sp125000:p3000000:p1625000",
+          "p-pentomino:root0.child3.child0.child3:o7:sp125000:p3500000:p1750000",
+          "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+          "p-pentomino:root0.child3.child3.child1:o6:sp125000:p3250000:p1000000",
+          "p-pentomino:root0.child3.child3.child3:o5:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.25
+          },
+          {
+            "x": 3.5,
+            "y": 1.5
+          },
+          {
+            "x": 3.25,
+            "y": 1.5
+          },
+          {
+            "x": 3.25,
+            "y": 1.375
+          },
+          {
+            "x": 3.125,
+            "y": 1.375
+          },
+          {
+            "x": 3.125,
+            "y": 1.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.3375,
+          "y": 1.6375
+        },
+        "id": "p-pentomino:root0.child3.child0.child3:o7:sp125000:p3500000:p1750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child0:o5:sp125000:p3000000:p1625000",
+          "p-pentomino:root0.child3.child0.child1:o5:sp125000:p3000000:p2000000",
+          "p-pentomino:root0.child3.child0.child2:o1:sp125000:p3500000:p1250000",
+          "p-pentomino:root0.child3.child2.child1:o3:sp125000:p3250000:p2000000",
+          "p-pentomino:root0.child3.child2.child3:o0:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.75
+          },
+          {
+            "x": 3.5,
+            "y": 1.5
+          },
+          {
+            "x": 3.25,
+            "y": 1.5
+          },
+          {
+            "x": 3.25,
+            "y": 1.625
+          },
+          {
+            "x": 3.125,
+            "y": 1.625
+          },
+          {
+            "x": 3.125,
+            "y": 1.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.1125,
+          "y": 0.7125
+        },
+        "id": "p-pentomino:root0.child3.child1.child0:o5:sp125000:p3000000:p875000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child1.child3:o5:sp125000:p3000000:p500000",
+          "p-pentomino:root0.child1.child3.child0:o4:sp125000:p3000000:p625000",
+          "p-pentomino:root0.child1.child3.child1:o4:sp125000:p3000000:p250000",
+          "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+          "p-pentomino:root0.child3.child1.child2:o1:sp125000:p3500000:p500000",
+          "p-pentomino:root0.child3.child1.child3:o7:sp125000:p3500000:p1000000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 0.875
+          },
+          {
+            "x": 3.25,
+            "y": 0.875
+          },
+          {
+            "x": 3.25,
+            "y": 0.625
+          },
+          {
+            "x": 3.125,
+            "y": 0.625
+          },
+          {
+            "x": 3.125,
+            "y": 0.5
+          },
+          {
+            "x": 3.0,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.1125,
+          "y": 1.0875
+        },
+        "id": "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child3.child0:o4:sp125000:p3000000:p625000",
+          "p-pentomino:root0.child3.child0.child0:o5:sp125000:p3000000:p1625000",
+          "p-pentomino:root0.child3.child0.child2:o1:sp125000:p3500000:p1250000",
+          "p-pentomino:root0.child3.child1.child0:o5:sp125000:p3000000:p875000",
+          "p-pentomino:root0.child3.child1.child3:o7:sp125000:p3500000:p1000000",
+          "p-pentomino:root0.child3.child3.child1:o6:sp125000:p3250000:p1000000",
+          "p-pentomino:root1.child1.child2.child0:o2:sp125000:p3000000:p1375000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.25
+          },
+          {
+            "x": 3.25,
+            "y": 1.25
+          },
+          {
+            "x": 3.25,
+            "y": 1.0
+          },
+          {
+            "x": 3.125,
+            "y": 1.0
+          },
+          {
+            "x": 3.125,
+            "y": 0.875
+          },
+          {
+            "x": 3.0,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.3375,
+          "y": 0.6125
+        },
+        "id": "p-pentomino:root0.child3.child1.child2:o1:sp125000:p3500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child2.child0:o0:sp125000:p3500000:p625000",
+          "p-pentomino:root0.child0.child2.child1:o0:sp125000:p3500000:p250000",
+          "p-pentomino:root0.child1.child1.child2:o2:sp125000:p3500000:p500000",
+          "p-pentomino:root0.child1.child1.child3:o5:sp125000:p3000000:p500000",
+          "p-pentomino:root0.child3.child1.child0:o5:sp125000:p3000000:p875000",
+          "p-pentomino:root0.child3.child1.child3:o7:sp125000:p3500000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 0.5
+          },
+          {
+            "x": 3.5,
+            "y": 0.75
+          },
+          {
+            "x": 3.25,
+            "y": 0.75
+          },
+          {
+            "x": 3.25,
+            "y": 0.625
+          },
+          {
+            "x": 3.125,
+            "y": 0.625
+          },
+          {
+            "x": 3.125,
+            "y": 0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.3375,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root0.child3.child1.child3:o7:sp125000:p3500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child2.child0:o0:sp125000:p3500000:p625000",
+          "p-pentomino:root0.child3.child1.child0:o5:sp125000:p3000000:p875000",
+          "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+          "p-pentomino:root0.child3.child1.child2:o1:sp125000:p3500000:p500000",
+          "p-pentomino:root0.child3.child3.child1:o6:sp125000:p3250000:p1000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.0
+          },
+          {
+            "x": 3.5,
+            "y": 0.75
+          },
+          {
+            "x": 3.25,
+            "y": 0.75
+          },
+          {
+            "x": 3.25,
+            "y": 0.875
+          },
+          {
+            "x": 3.125,
+            "y": 0.875
+          },
+          {
+            "x": 3.125,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.7875,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root0.child3.child2.child0:o3:sp125000:p3625000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child2.child0:o7:sp125000:p4375000:p2000000",
+          "p-pentomino:root0.child3.child2.child1:o3:sp125000:p3250000:p2000000",
+          "p-pentomino:root0.child3.child2.child2:o4:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child3.child2.child3:o0:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.625,
+            "y": 2.0
+          },
+          {
+            "x": 3.625,
+            "y": 1.75
+          },
+          {
+            "x": 3.875,
+            "y": 1.75
+          },
+          {
+            "x": 3.875,
+            "y": 1.875
+          },
+          {
+            "x": 4.0,
+            "y": 1.875
+          },
+          {
+            "x": 4.0,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.4125,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root0.child3.child2.child1:o3:sp125000:p3250000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child1:o5:sp125000:p3000000:p2000000",
+          "p-pentomino:root0.child3.child0.child3:o7:sp125000:p3500000:p1750000",
+          "p-pentomino:root0.child3.child2.child0:o3:sp125000:p3625000:p2000000",
+          "p-pentomino:root0.child3.child2.child3:o0:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 2.0
+          },
+          {
+            "x": 3.25,
+            "y": 1.75
+          },
+          {
+            "x": 3.5,
+            "y": 1.75
+          },
+          {
+            "x": 3.5,
+            "y": 1.875
+          },
+          {
+            "x": 3.625,
+            "y": 1.875
+          },
+          {
+            "x": 3.625,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.8875,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root0.child3.child2.child2:o4:sp125000:p4000000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child2.child2:o0:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child3.child2.child0:o3:sp125000:p3625000:p2000000",
+          "p-pentomino:root0.child3.child2.child3:o0:sp125000:p3500000:p1500000",
+          "p-pentomino:root0.child3.child3.child2:o2:sp125000:p4000000:p1500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.75
+          },
+          {
+            "x": 3.875,
+            "y": 1.75
+          },
+          {
+            "x": 3.875,
+            "y": 1.875
+          },
+          {
+            "x": 4.0,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.6125,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root0.child3.child2.child3:o0:sp125000:p3500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child3:o7:sp125000:p3500000:p1750000",
+          "p-pentomino:root0.child3.child2.child0:o3:sp125000:p3625000:p2000000",
+          "p-pentomino:root0.child3.child2.child1:o3:sp125000:p3250000:p2000000",
+          "p-pentomino:root0.child3.child2.child2:o4:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child3.child3.child3:o5:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.75
+          },
+          {
+            "x": 3.625,
+            "y": 1.75
+          },
+          {
+            "x": 3.625,
+            "y": 1.875
+          },
+          {
+            "x": 3.5,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.7875,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root0.child3.child3.child0:o6:sp125000:p3625000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child2.child2:o7:sp125000:p4000000:p1000000",
+          "p-pentomino:root0.child2.child3.child0:o1:sp125000:p4375000:p1000000",
+          "p-pentomino:root0.child3.child3.child1:o6:sp125000:p3250000:p1000000",
+          "p-pentomino:root0.child3.child3.child2:o2:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child3.child3.child3:o5:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.625,
+            "y": 1.0
+          },
+          {
+            "x": 3.625,
+            "y": 1.25
+          },
+          {
+            "x": 3.875,
+            "y": 1.25
+          },
+          {
+            "x": 3.875,
+            "y": 1.125
+          },
+          {
+            "x": 4.0,
+            "y": 1.125
+          },
+          {
+            "x": 4.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.4125,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root0.child3.child3.child1:o6:sp125000:p3250000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child0.child2.child0:o0:sp125000:p3500000:p625000",
+          "p-pentomino:root0.child3.child0.child2:o1:sp125000:p3500000:p1250000",
+          "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+          "p-pentomino:root0.child3.child1.child3:o7:sp125000:p3500000:p1000000",
+          "p-pentomino:root0.child3.child3.child0:o6:sp125000:p3625000:p1000000",
+          "p-pentomino:root0.child3.child3.child3:o5:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.25,
+            "y": 1.0
+          },
+          {
+            "x": 3.25,
+            "y": 1.25
+          },
+          {
+            "x": 3.5,
+            "y": 1.25
+          },
+          {
+            "x": 3.5,
+            "y": 1.125
+          },
+          {
+            "x": 3.625,
+            "y": 1.125
+          },
+          {
+            "x": 3.625,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.8875,
+          "y": 1.3375
+        },
+        "id": "p-pentomino:root0.child3.child3.child2:o2:sp125000:p4000000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child2.child3.child2:o5:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child3.child2.child2:o4:sp125000:p4000000:p1500000",
+          "p-pentomino:root0.child3.child3.child0:o6:sp125000:p3625000:p1000000",
+          "p-pentomino:root0.child3.child3.child3:o5:sp125000:p3500000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 4.0,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.25
+          },
+          {
+            "x": 3.875,
+            "y": 1.25
+          },
+          {
+            "x": 3.875,
+            "y": 1.125
+          },
+          {
+            "x": 4.0,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.6125,
+          "y": 1.3375
+        },
+        "id": "p-pentomino:root0.child3.child3.child3:o5:sp125000:p3500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child2:o1:sp125000:p3500000:p1250000",
+          "p-pentomino:root0.child3.child2.child3:o0:sp125000:p3500000:p1500000",
+          "p-pentomino:root0.child3.child3.child0:o6:sp125000:p3625000:p1000000",
+          "p-pentomino:root0.child3.child3.child1:o6:sp125000:p3250000:p1000000",
+          "p-pentomino:root0.child3.child3.child2:o2:sp125000:p4000000:p1500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.5,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.5
+          },
+          {
+            "x": 3.75,
+            "y": 1.25
+          },
+          {
+            "x": 3.625,
+            "y": 1.25
+          },
+          {
+            "x": 3.625,
+            "y": 1.125
+          },
+          {
+            "x": 3.5,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.9625,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child0.child0.child0:o7:sp125000:p1125000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child1:o7:sp125000:p1500000:p2000000",
+          "p-pentomino:root1.child0.child0.child2:o0:sp125000:p750000:p1500000",
+          "p-pentomino:root1.child0.child0.child3:o4:sp125000:p1250000:p1500000",
+          "p-pentomino:root1.child0.child1.child1:o7:sp125000:p750000:p2000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.125,
+            "y": 2.0
+          },
+          {
+            "x": 1.125,
+            "y": 1.75
+          },
+          {
+            "x": 0.875,
+            "y": 1.75
+          },
+          {
+            "x": 0.875,
+            "y": 1.875
+          },
+          {
+            "x": 0.75,
+            "y": 1.875
+          },
+          {
+            "x": 0.75,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.3375,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child0.child0.child1:o7:sp125000:p1500000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child0:o7:sp125000:p1125000:p2000000",
+          "p-pentomino:root1.child0.child0.child3:o4:sp125000:p1250000:p1500000",
+          "p-pentomino:root1.child0.child2.child1:o2:sp125000:p1500000:p1750000",
+          "p-pentomino:root1.child1.child1.child0:o7:sp125000:p1875000:p2000000",
+          "p-pentomino:root1.child1.child1.child2:o0:sp125000:p1500000:p1500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 2.0
+          },
+          {
+            "x": 1.5,
+            "y": 1.75
+          },
+          {
+            "x": 1.25,
+            "y": 1.75
+          },
+          {
+            "x": 1.25,
+            "y": 1.875
+          },
+          {
+            "x": 1.125,
+            "y": 1.875
+          },
+          {
+            "x": 1.125,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.8625,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child0.child0.child2:o0:sp125000:p750000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child0:o7:sp125000:p1125000:p2000000",
+          "p-pentomino:root1.child0.child0.child3:o4:sp125000:p1250000:p1500000",
+          "p-pentomino:root1.child0.child1.child1:o7:sp125000:p750000:p2000000",
+          "p-pentomino:root1.child0.child3.child1:o5:sp125000:p500000:p1750000",
+          "p-pentomino:root1.child0.child3.child3:o7:sp125000:p1000000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.75
+          },
+          {
+            "x": 0.875,
+            "y": 1.75
+          },
+          {
+            "x": 0.875,
+            "y": 1.875
+          },
+          {
+            "x": 0.75,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.1375,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child0.child0.child3:o4:sp125000:p1250000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child0:o7:sp125000:p1125000:p2000000",
+          "p-pentomino:root1.child0.child0.child1:o7:sp125000:p1500000:p2000000",
+          "p-pentomino:root1.child0.child0.child2:o0:sp125000:p750000:p1500000",
+          "p-pentomino:root1.child0.child2.child1:o2:sp125000:p1500000:p1750000",
+          "p-pentomino:root1.child0.child2.child3:o3:sp125000:p1000000:p1500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.25,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.75
+          },
+          {
+            "x": 1.125,
+            "y": 1.75
+          },
+          {
+            "x": 1.125,
+            "y": 1.875
+          },
+          {
+            "x": 1.25,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.2125,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child0.child1.child0:o7:sp125000:p375000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child1.child1:o7:sp125000:p750000:p2000000",
+          "p-pentomino:root1.child0.child1.child2:o0:sp125000:0:p1500000",
+          "p-pentomino:root1.child0.child1.child3:o4:sp125000:p500000:p1500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.375,
+            "y": 2.0
+          },
+          {
+            "x": 0.375,
+            "y": 1.75
+          },
+          {
+            "x": 0.125,
+            "y": 1.75
+          },
+          {
+            "x": 0.125,
+            "y": 1.875
+          },
+          {
+            "x": 0.0,
+            "y": 1.875
+          },
+          {
+            "x": 0.0,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.5875,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child0.child1.child1:o7:sp125000:p750000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child0:o7:sp125000:p1125000:p2000000",
+          "p-pentomino:root1.child0.child0.child2:o0:sp125000:p750000:p1500000",
+          "p-pentomino:root1.child0.child1.child0:o7:sp125000:p375000:p2000000",
+          "p-pentomino:root1.child0.child1.child3:o4:sp125000:p500000:p1500000",
+          "p-pentomino:root1.child0.child3.child1:o5:sp125000:p500000:p1750000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.75,
+            "y": 2.0
+          },
+          {
+            "x": 0.75,
+            "y": 1.75
+          },
+          {
+            "x": 0.5,
+            "y": 1.75
+          },
+          {
+            "x": 0.5,
+            "y": 1.875
+          },
+          {
+            "x": 0.375,
+            "y": 1.875
+          },
+          {
+            "x": 0.375,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.1125,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child0.child1.child2:o0:sp125000:0:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child1.child0:o7:sp125000:p375000:p2000000",
+          "p-pentomino:root1.child0.child1.child3:o4:sp125000:p500000:p1500000",
+          "p-pentomino:root1.child2.child1.child0:o0:sp125000:0:p1125000",
+          "p-pentomino:root1.child2.child1.child2:o7:sp125000:p500000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 1.5
+          },
+          {
+            "x": 0.25,
+            "y": 1.5
+          },
+          {
+            "x": 0.25,
+            "y": 1.75
+          },
+          {
+            "x": 0.125,
+            "y": 1.75
+          },
+          {
+            "x": 0.125,
+            "y": 1.875
+          },
+          {
+            "x": 0.0,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.3875,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child0.child1.child3:o4:sp125000:p500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child1.child0:o7:sp125000:p375000:p2000000",
+          "p-pentomino:root1.child0.child1.child1:o7:sp125000:p750000:p2000000",
+          "p-pentomino:root1.child0.child1.child2:o0:sp125000:0:p1500000",
+          "p-pentomino:root1.child0.child3.child1:o5:sp125000:p500000:p1750000",
+          "p-pentomino:root1.child2.child1.child2:o7:sp125000:p500000:p1500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.5
+          },
+          {
+            "x": 0.25,
+            "y": 1.5
+          },
+          {
+            "x": 0.25,
+            "y": 1.75
+          },
+          {
+            "x": 0.375,
+            "y": 1.75
+          },
+          {
+            "x": 0.375,
+            "y": 1.875
+          },
+          {
+            "x": 0.5,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.3875,
+          "y": 1.2125
+        },
+        "id": "p-pentomino:root1.child0.child2.child0:o2:sp125000:p1500000:p1375000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child2.child1:o2:sp125000:p1500000:p1750000",
+          "p-pentomino:root1.child0.child2.child2:o6:sp125000:p1000000:p1000000",
+          "p-pentomino:root1.child0.child2.child3:o3:sp125000:p1000000:p1500000",
+          "p-pentomino:root1.child3.child1.child2:o3:sp125000:p1500000:p1500000",
+          "p-pentomino:root1.child3.child1.child3:o6:sp125000:p1500000:p1000000",
+          "p-pentomino:root1.child3.child3.child1:o7:sp125000:p1750000:p1000000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.375
+          },
+          {
+            "x": 1.25,
+            "y": 1.375
+          },
+          {
+            "x": 1.25,
+            "y": 1.125
+          },
+          {
+            "x": 1.375,
+            "y": 1.125
+          },
+          {
+            "x": 1.375,
+            "y": 1.0
+          },
+          {
+            "x": 1.5,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.3875,
+          "y": 1.5875
+        },
+        "id": "p-pentomino:root1.child0.child2.child1:o2:sp125000:p1500000:p1750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child1:o7:sp125000:p1500000:p2000000",
+          "p-pentomino:root1.child0.child0.child3:o4:sp125000:p1250000:p1500000",
+          "p-pentomino:root1.child0.child2.child0:o2:sp125000:p1500000:p1375000",
+          "p-pentomino:root1.child0.child2.child3:o3:sp125000:p1000000:p1500000",
+          "p-pentomino:root1.child1.child1.child2:o0:sp125000:p1500000:p1500000",
+          "p-pentomino:root1.child3.child1.child2:o3:sp125000:p1500000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.75
+          },
+          {
+            "x": 1.25,
+            "y": 1.75
+          },
+          {
+            "x": 1.25,
+            "y": 1.5
+          },
+          {
+            "x": 1.375,
+            "y": 1.5
+          },
+          {
+            "x": 1.375,
+            "y": 1.375
+          },
+          {
+            "x": 1.5,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.1625,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root1.child0.child2.child2:o6:sp125000:p1000000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child2.child0:o2:sp125000:p1500000:p1375000",
+          "p-pentomino:root1.child0.child2.child3:o3:sp125000:p1000000:p1500000",
+          "p-pentomino:root1.child0.child3.child2:o1:sp125000:p1000000:p1000000",
+          "p-pentomino:root1.child3.child3.child0:o7:sp125000:p1375000:p1000000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.0
+          },
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 1.25,
+            "y": 1.25
+          },
+          {
+            "x": 1.25,
+            "y": 1.125
+          },
+          {
+            "x": 1.375,
+            "y": 1.125
+          },
+          {
+            "x": 1.375,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.1625,
+          "y": 1.3875
+        },
+        "id": "p-pentomino:root1.child0.child2.child3:o3:sp125000:p1000000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child3:o4:sp125000:p1250000:p1500000",
+          "p-pentomino:root1.child0.child2.child0:o2:sp125000:p1500000:p1375000",
+          "p-pentomino:root1.child0.child2.child1:o2:sp125000:p1500000:p1750000",
+          "p-pentomino:root1.child0.child2.child2:o6:sp125000:p1000000:p1000000",
+          "p-pentomino:root1.child0.child3.child3:o7:sp125000:p1000000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 1.25,
+            "y": 1.25
+          },
+          {
+            "x": 1.25,
+            "y": 1.375
+          },
+          {
+            "x": 1.375,
+            "y": 1.375
+          },
+          {
+            "x": 1.375,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.6125,
+          "y": 1.2125
+        },
+        "id": "p-pentomino:root1.child0.child3.child0:o5:sp125000:p500000:p1375000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child3.child1:o5:sp125000:p500000:p1750000",
+          "p-pentomino:root1.child0.child3.child2:o1:sp125000:p1000000:p1000000",
+          "p-pentomino:root1.child0.child3.child3:o7:sp125000:p1000000:p1500000",
+          "p-pentomino:root1.child2.child1.child2:o7:sp125000:p500000:p1500000",
+          "p-pentomino:root1.child2.child1.child3:o1:sp125000:p500000:p1000000",
+          "p-pentomino:root1.child2.child3.child1:o3:sp125000:p250000:p1000000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.375
+          },
+          {
+            "x": 0.75,
+            "y": 1.375
+          },
+          {
+            "x": 0.75,
+            "y": 1.125
+          },
+          {
+            "x": 0.625,
+            "y": 1.125
+          },
+          {
+            "x": 0.625,
+            "y": 1.0
+          },
+          {
+            "x": 0.5,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.6125,
+          "y": 1.5875
+        },
+        "id": "p-pentomino:root1.child0.child3.child1:o5:sp125000:p500000:p1750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child2:o0:sp125000:p750000:p1500000",
+          "p-pentomino:root1.child0.child1.child1:o7:sp125000:p750000:p2000000",
+          "p-pentomino:root1.child0.child1.child3:o4:sp125000:p500000:p1500000",
+          "p-pentomino:root1.child0.child3.child0:o5:sp125000:p500000:p1375000",
+          "p-pentomino:root1.child0.child3.child3:o7:sp125000:p1000000:p1500000",
+          "p-pentomino:root1.child2.child1.child2:o7:sp125000:p500000:p1500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.75
+          },
+          {
+            "x": 0.75,
+            "y": 1.75
+          },
+          {
+            "x": 0.75,
+            "y": 1.5
+          },
+          {
+            "x": 0.625,
+            "y": 1.5
+          },
+          {
+            "x": 0.625,
+            "y": 1.375
+          },
+          {
+            "x": 0.5,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.8375,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root1.child0.child3.child2:o1:sp125000:p1000000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child2.child2:o6:sp125000:p1000000:p1000000",
+          "p-pentomino:root1.child0.child3.child0:o5:sp125000:p500000:p1375000",
+          "p-pentomino:root1.child0.child3.child3:o7:sp125000:p1000000:p1500000",
+          "p-pentomino:root1.child2.child3.child0:o3:sp125000:p625000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.0
+          },
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 0.75,
+            "y": 1.25
+          },
+          {
+            "x": 0.75,
+            "y": 1.125
+          },
+          {
+            "x": 0.625,
+            "y": 1.125
+          },
+          {
+            "x": 0.625,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.8375,
+          "y": 1.3875
+        },
+        "id": "p-pentomino:root1.child0.child3.child3:o7:sp125000:p1000000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child2:o0:sp125000:p750000:p1500000",
+          "p-pentomino:root1.child0.child2.child3:o3:sp125000:p1000000:p1500000",
+          "p-pentomino:root1.child0.child3.child0:o5:sp125000:p500000:p1375000",
+          "p-pentomino:root1.child0.child3.child1:o5:sp125000:p500000:p1750000",
+          "p-pentomino:root1.child0.child3.child2:o1:sp125000:p1000000:p1000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 1.5
+          },
+          {
+            "x": 1.0,
+            "y": 1.25
+          },
+          {
+            "x": 0.75,
+            "y": 1.25
+          },
+          {
+            "x": 0.75,
+            "y": 1.375
+          },
+          {
+            "x": 0.625,
+            "y": 1.375
+          },
+          {
+            "x": 0.625,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.4625,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child1.child0.child0:o7:sp125000:p2625000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child0.child1:o7:sp125000:p3000000:p2000000",
+          "p-pentomino:root1.child1.child0.child2:o0:sp125000:p2250000:p1500000",
+          "p-pentomino:root1.child1.child0.child3:o4:sp125000:p2750000:p1500000",
+          "p-pentomino:root1.child1.child1.child1:o7:sp125000:p2250000:p2000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.625,
+            "y": 2.0
+          },
+          {
+            "x": 2.625,
+            "y": 1.75
+          },
+          {
+            "x": 2.375,
+            "y": 1.75
+          },
+          {
+            "x": 2.375,
+            "y": 1.875
+          },
+          {
+            "x": 2.25,
+            "y": 1.875
+          },
+          {
+            "x": 2.25,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.8375,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child1.child0.child1:o7:sp125000:p3000000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child1:o5:sp125000:p3000000:p2000000",
+          "p-pentomino:root1.child1.child0.child0:o7:sp125000:p2625000:p2000000",
+          "p-pentomino:root1.child1.child0.child3:o4:sp125000:p2750000:p1500000",
+          "p-pentomino:root1.child1.child2.child1:o2:sp125000:p3000000:p1750000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 2.0
+          },
+          {
+            "x": 3.0,
+            "y": 1.75
+          },
+          {
+            "x": 2.75,
+            "y": 1.75
+          },
+          {
+            "x": 2.75,
+            "y": 1.875
+          },
+          {
+            "x": 2.625,
+            "y": 1.875
+          },
+          {
+            "x": 2.625,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.3625,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child1.child0.child2:o0:sp125000:p2250000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child0.child0:o7:sp125000:p2625000:p2000000",
+          "p-pentomino:root1.child1.child0.child3:o4:sp125000:p2750000:p1500000",
+          "p-pentomino:root1.child1.child1.child1:o7:sp125000:p2250000:p2000000",
+          "p-pentomino:root1.child1.child3.child1:o5:sp125000:p2000000:p1750000",
+          "p-pentomino:root1.child1.child3.child3:o7:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.75
+          },
+          {
+            "x": 2.375,
+            "y": 1.75
+          },
+          {
+            "x": 2.375,
+            "y": 1.875
+          },
+          {
+            "x": 2.25,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.6375,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child1.child0.child3:o4:sp125000:p2750000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child0.child0:o7:sp125000:p2625000:p2000000",
+          "p-pentomino:root1.child1.child0.child1:o7:sp125000:p3000000:p2000000",
+          "p-pentomino:root1.child1.child0.child2:o0:sp125000:p2250000:p1500000",
+          "p-pentomino:root1.child1.child2.child1:o2:sp125000:p3000000:p1750000",
+          "p-pentomino:root1.child1.child2.child3:o3:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.75,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.75
+          },
+          {
+            "x": 2.625,
+            "y": 1.75
+          },
+          {
+            "x": 2.625,
+            "y": 1.875
+          },
+          {
+            "x": 2.75,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.7125,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child1.child1.child0:o7:sp125000:p1875000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child1:o7:sp125000:p1500000:p2000000",
+          "p-pentomino:root1.child1.child1.child1:o7:sp125000:p2250000:p2000000",
+          "p-pentomino:root1.child1.child1.child2:o0:sp125000:p1500000:p1500000",
+          "p-pentomino:root1.child1.child1.child3:o4:sp125000:p2000000:p1500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.875,
+            "y": 2.0
+          },
+          {
+            "x": 1.875,
+            "y": 1.75
+          },
+          {
+            "x": 1.625,
+            "y": 1.75
+          },
+          {
+            "x": 1.625,
+            "y": 1.875
+          },
+          {
+            "x": 1.5,
+            "y": 1.875
+          },
+          {
+            "x": 1.5,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.0875,
+          "y": 1.8875
+        },
+        "id": "p-pentomino:root1.child1.child1.child1:o7:sp125000:p2250000:p2000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child0.child0:o7:sp125000:p2625000:p2000000",
+          "p-pentomino:root1.child1.child0.child2:o0:sp125000:p2250000:p1500000",
+          "p-pentomino:root1.child1.child1.child0:o7:sp125000:p1875000:p2000000",
+          "p-pentomino:root1.child1.child1.child3:o4:sp125000:p2000000:p1500000",
+          "p-pentomino:root1.child1.child3.child1:o5:sp125000:p2000000:p1750000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.25,
+            "y": 2.0
+          },
+          {
+            "x": 2.25,
+            "y": 1.75
+          },
+          {
+            "x": 2.0,
+            "y": 1.75
+          },
+          {
+            "x": 2.0,
+            "y": 1.875
+          },
+          {
+            "x": 1.875,
+            "y": 1.875
+          },
+          {
+            "x": 1.875,
+            "y": 2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.6125,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child1.child1.child2:o0:sp125000:p1500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child0.child1:o7:sp125000:p1500000:p2000000",
+          "p-pentomino:root1.child0.child2.child1:o2:sp125000:p1500000:p1750000",
+          "p-pentomino:root1.child1.child1.child0:o7:sp125000:p1875000:p2000000",
+          "p-pentomino:root1.child1.child1.child3:o4:sp125000:p2000000:p1500000",
+          "p-pentomino:root1.child3.child1.child2:o3:sp125000:p1500000:p1500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.5
+          },
+          {
+            "x": 1.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.75,
+            "y": 1.75
+          },
+          {
+            "x": 1.625,
+            "y": 1.75
+          },
+          {
+            "x": 1.625,
+            "y": 1.875
+          },
+          {
+            "x": 1.5,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.8875,
+          "y": 1.6625
+        },
+        "id": "p-pentomino:root1.child1.child1.child3:o4:sp125000:p2000000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child1.child0:o7:sp125000:p1875000:p2000000",
+          "p-pentomino:root1.child1.child1.child1:o7:sp125000:p2250000:p2000000",
+          "p-pentomino:root1.child1.child1.child2:o0:sp125000:p1500000:p1500000",
+          "p-pentomino:root1.child1.child3.child1:o5:sp125000:p2000000:p1750000",
+          "p-pentomino:root1.child3.child1.child0:o4:sp125000:p2000000:p1125000",
+          "p-pentomino:root1.child3.child1.child2:o3:sp125000:p1500000:p1500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 1.5
+          },
+          {
+            "x": 1.75,
+            "y": 1.5
+          },
+          {
+            "x": 1.75,
+            "y": 1.75
+          },
+          {
+            "x": 1.875,
+            "y": 1.75
+          },
+          {
+            "x": 1.875,
+            "y": 1.875
+          },
+          {
+            "x": 2.0,
+            "y": 1.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.8875,
+          "y": 1.2125
+        },
+        "id": "p-pentomino:root1.child1.child2.child0:o2:sp125000:p3000000:p1375000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child3.child0:o4:sp125000:p3000000:p625000",
+          "p-pentomino:root0.child3.child0.child0:o5:sp125000:p3000000:p1625000",
+          "p-pentomino:root0.child3.child1.child1:o5:sp125000:p3000000:p1250000",
+          "p-pentomino:root1.child1.child2.child1:o2:sp125000:p3000000:p1750000",
+          "p-pentomino:root1.child1.child2.child2:o6:sp125000:p2500000:p1000000",
+          "p-pentomino:root1.child1.child2.child3:o3:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.375
+          },
+          {
+            "x": 2.75,
+            "y": 1.375
+          },
+          {
+            "x": 2.75,
+            "y": 1.125
+          },
+          {
+            "x": 2.875,
+            "y": 1.125
+          },
+          {
+            "x": 2.875,
+            "y": 1.0
+          },
+          {
+            "x": 3.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.8875,
+          "y": 1.5875
+        },
+        "id": "p-pentomino:root1.child1.child2.child1:o2:sp125000:p3000000:p1750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child3.child0.child0:o5:sp125000:p3000000:p1625000",
+          "p-pentomino:root0.child3.child0.child1:o5:sp125000:p3000000:p2000000",
+          "p-pentomino:root1.child1.child0.child1:o7:sp125000:p3000000:p2000000",
+          "p-pentomino:root1.child1.child0.child3:o4:sp125000:p2750000:p1500000",
+          "p-pentomino:root1.child1.child2.child0:o2:sp125000:p3000000:p1375000",
+          "p-pentomino:root1.child1.child2.child3:o3:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 3.0,
+            "y": 1.75
+          },
+          {
+            "x": 2.75,
+            "y": 1.75
+          },
+          {
+            "x": 2.75,
+            "y": 1.5
+          },
+          {
+            "x": 2.875,
+            "y": 1.5
+          },
+          {
+            "x": 2.875,
+            "y": 1.375
+          },
+          {
+            "x": 3.0,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.6625,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root1.child1.child2.child2:o6:sp125000:p2500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child3.child2:o3:sp125000:p2500000:p1000000",
+          "p-pentomino:root1.child1.child2.child0:o2:sp125000:p3000000:p1375000",
+          "p-pentomino:root1.child1.child2.child3:o3:sp125000:p2500000:p1500000",
+          "p-pentomino:root1.child1.child3.child2:o1:sp125000:p2500000:p1000000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.5,
+            "y": 1.25
+          },
+          {
+            "x": 2.75,
+            "y": 1.25
+          },
+          {
+            "x": 2.75,
+            "y": 1.125
+          },
+          {
+            "x": 2.875,
+            "y": 1.125
+          },
+          {
+            "x": 2.875,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.6625,
+          "y": 1.3875
+        },
+        "id": "p-pentomino:root1.child1.child2.child3:o3:sp125000:p2500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child0.child3:o4:sp125000:p2750000:p1500000",
+          "p-pentomino:root1.child1.child2.child0:o2:sp125000:p3000000:p1375000",
+          "p-pentomino:root1.child1.child2.child1:o2:sp125000:p3000000:p1750000",
+          "p-pentomino:root1.child1.child2.child2:o6:sp125000:p2500000:p1000000",
+          "p-pentomino:root1.child1.child3.child3:o7:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.25
+          },
+          {
+            "x": 2.75,
+            "y": 1.25
+          },
+          {
+            "x": 2.75,
+            "y": 1.375
+          },
+          {
+            "x": 2.875,
+            "y": 1.375
+          },
+          {
+            "x": 2.875,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.1125,
+          "y": 1.2125
+        },
+        "id": "p-pentomino:root1.child1.child3.child0:o5:sp125000:p2000000:p1375000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child2.child0:o0:sp125000:p2000000:p625000",
+          "p-pentomino:root1.child1.child3.child1:o5:sp125000:p2000000:p1750000",
+          "p-pentomino:root1.child1.child3.child2:o1:sp125000:p2500000:p1000000",
+          "p-pentomino:root1.child1.child3.child3:o7:sp125000:p2500000:p1500000",
+          "p-pentomino:root1.child3.child1.child0:o4:sp125000:p2000000:p1125000",
+          "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 1.375
+          },
+          {
+            "x": 2.25,
+            "y": 1.375
+          },
+          {
+            "x": 2.25,
+            "y": 1.125
+          },
+          {
+            "x": 2.125,
+            "y": 1.125
+          },
+          {
+            "x": 2.125,
+            "y": 1.0
+          },
+          {
+            "x": 2.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.1125,
+          "y": 1.5875
+        },
+        "id": "p-pentomino:root1.child1.child3.child1:o5:sp125000:p2000000:p1750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child0.child2:o0:sp125000:p2250000:p1500000",
+          "p-pentomino:root1.child1.child1.child1:o7:sp125000:p2250000:p2000000",
+          "p-pentomino:root1.child1.child1.child3:o4:sp125000:p2000000:p1500000",
+          "p-pentomino:root1.child1.child3.child0:o5:sp125000:p2000000:p1375000",
+          "p-pentomino:root1.child1.child3.child3:o7:sp125000:p2500000:p1500000",
+          "p-pentomino:root1.child3.child1.child0:o4:sp125000:p2000000:p1125000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 1.75
+          },
+          {
+            "x": 2.25,
+            "y": 1.75
+          },
+          {
+            "x": 2.25,
+            "y": 1.5
+          },
+          {
+            "x": 2.125,
+            "y": 1.5
+          },
+          {
+            "x": 2.125,
+            "y": 1.375
+          },
+          {
+            "x": 2.0,
+            "y": 1.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.3375,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root1.child1.child3.child2:o1:sp125000:p2500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child2.child2:o7:sp125000:p2500000:p1000000",
+          "p-pentomino:root1.child1.child2.child2:o6:sp125000:p2500000:p1000000",
+          "p-pentomino:root1.child1.child3.child0:o5:sp125000:p2000000:p1375000",
+          "p-pentomino:root1.child1.child3.child3:o7:sp125000:p2500000:p1500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.0
+          },
+          {
+            "x": 2.5,
+            "y": 1.25
+          },
+          {
+            "x": 2.25,
+            "y": 1.25
+          },
+          {
+            "x": 2.25,
+            "y": 1.125
+          },
+          {
+            "x": 2.125,
+            "y": 1.125
+          },
+          {
+            "x": 2.125,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.3375,
+          "y": 1.3875
+        },
+        "id": "p-pentomino:root1.child1.child3.child3:o7:sp125000:p2500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child0.child2:o0:sp125000:p2250000:p1500000",
+          "p-pentomino:root1.child1.child2.child3:o3:sp125000:p2500000:p1500000",
+          "p-pentomino:root1.child1.child3.child0:o5:sp125000:p2000000:p1375000",
+          "p-pentomino:root1.child1.child3.child1:o5:sp125000:p2000000:p1750000",
+          "p-pentomino:root1.child1.child3.child2:o1:sp125000:p2500000:p1000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.5,
+            "y": 1.5
+          },
+          {
+            "x": 2.5,
+            "y": 1.25
+          },
+          {
+            "x": 2.25,
+            "y": 1.25
+          },
+          {
+            "x": 2.25,
+            "y": 1.375
+          },
+          {
+            "x": 2.125,
+            "y": 1.375
+          },
+          {
+            "x": 2.125,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.1125,
+          "y": 0.5375
+        },
+        "id": "p-pentomino:root1.child2.child0.child0:o0:sp125000:0:p375000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child1:o0:sp125000:0:0",
+          "p-pentomino:root1.child2.child0.child2:o7:sp125000:p500000:p750000",
+          "p-pentomino:root1.child2.child0.child3:o1:sp125000:p500000:p250000",
+          "p-pentomino:root1.child2.child1.child1:o0:sp125000:0:p750000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.375
+          },
+          {
+            "x": 0.25,
+            "y": 0.375
+          },
+          {
+            "x": 0.25,
+            "y": 0.625
+          },
+          {
+            "x": 0.125,
+            "y": 0.625
+          },
+          {
+            "x": 0.125,
+            "y": 0.75
+          },
+          {
+            "x": 0.0,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.1125,
+          "y": 0.1625
+        },
+        "id": "p-pentomino:root1.child2.child0.child1:o0:sp125000:0:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child0:o0:sp125000:0:p375000",
+          "p-pentomino:root1.child2.child0.child3:o1:sp125000:p500000:p250000",
+          "p-pentomino:root1.child2.child2.child1:o6:sp125000:p250000:0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.25,
+            "y": 0.0
+          },
+          {
+            "x": 0.25,
+            "y": 0.25
+          },
+          {
+            "x": 0.125,
+            "y": 0.25
+          },
+          {
+            "x": 0.125,
+            "y": 0.375
+          },
+          {
+            "x": 0.0,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.3375,
+          "y": 0.6375
+        },
+        "id": "p-pentomino:root1.child2.child0.child2:o7:sp125000:p500000:p750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child0:o0:sp125000:0:p375000",
+          "p-pentomino:root1.child2.child0.child3:o1:sp125000:p500000:p250000",
+          "p-pentomino:root1.child2.child1.child1:o0:sp125000:0:p750000",
+          "p-pentomino:root1.child2.child3.child1:o3:sp125000:p250000:p1000000",
+          "p-pentomino:root1.child2.child3.child3:o0:sp125000:p500000:p500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 0.75
+          },
+          {
+            "x": 0.5,
+            "y": 0.5
+          },
+          {
+            "x": 0.25,
+            "y": 0.5
+          },
+          {
+            "x": 0.25,
+            "y": 0.625
+          },
+          {
+            "x": 0.125,
+            "y": 0.625
+          },
+          {
+            "x": 0.125,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.3375,
+          "y": 0.3625
+        },
+        "id": "p-pentomino:root1.child2.child0.child3:o1:sp125000:p500000:p250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child0:o0:sp125000:0:p375000",
+          "p-pentomino:root1.child2.child0.child1:o0:sp125000:0:0",
+          "p-pentomino:root1.child2.child0.child2:o7:sp125000:p500000:p750000",
+          "p-pentomino:root1.child2.child2.child1:o6:sp125000:p250000:0",
+          "p-pentomino:root1.child2.child2.child3:o5:sp125000:p500000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 0.25
+          },
+          {
+            "x": 0.5,
+            "y": 0.5
+          },
+          {
+            "x": 0.25,
+            "y": 0.5
+          },
+          {
+            "x": 0.25,
+            "y": 0.375
+          },
+          {
+            "x": 0.125,
+            "y": 0.375
+          },
+          {
+            "x": 0.125,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.1125,
+          "y": 1.2875
+        },
+        "id": "p-pentomino:root1.child2.child1.child0:o0:sp125000:0:p1125000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child1.child2:o0:sp125000:0:p1500000",
+          "p-pentomino:root1.child2.child1.child1:o0:sp125000:0:p750000",
+          "p-pentomino:root1.child2.child1.child2:o7:sp125000:p500000:p1500000",
+          "p-pentomino:root1.child2.child1.child3:o1:sp125000:p500000:p1000000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 1.125
+          },
+          {
+            "x": 0.25,
+            "y": 1.125
+          },
+          {
+            "x": 0.25,
+            "y": 1.375
+          },
+          {
+            "x": 0.125,
+            "y": 1.375
+          },
+          {
+            "x": 0.125,
+            "y": 1.5
+          },
+          {
+            "x": 0.0,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.1125,
+          "y": 0.9125
+        },
+        "id": "p-pentomino:root1.child2.child1.child1:o0:sp125000:0:p750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child0:o0:sp125000:0:p375000",
+          "p-pentomino:root1.child2.child0.child2:o7:sp125000:p500000:p750000",
+          "p-pentomino:root1.child2.child1.child0:o0:sp125000:0:p1125000",
+          "p-pentomino:root1.child2.child1.child3:o1:sp125000:p500000:p1000000",
+          "p-pentomino:root1.child2.child3.child1:o3:sp125000:p250000:p1000000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.75
+          },
+          {
+            "x": 0.25,
+            "y": 0.75
+          },
+          {
+            "x": 0.25,
+            "y": 1.0
+          },
+          {
+            "x": 0.125,
+            "y": 1.0
+          },
+          {
+            "x": 0.125,
+            "y": 1.125
+          },
+          {
+            "x": 0.0,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.3375,
+          "y": 1.3875
+        },
+        "id": "p-pentomino:root1.child2.child1.child2:o7:sp125000:p500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child1.child2:o0:sp125000:0:p1500000",
+          "p-pentomino:root1.child0.child1.child3:o4:sp125000:p500000:p1500000",
+          "p-pentomino:root1.child0.child3.child0:o5:sp125000:p500000:p1375000",
+          "p-pentomino:root1.child0.child3.child1:o5:sp125000:p500000:p1750000",
+          "p-pentomino:root1.child2.child1.child0:o0:sp125000:0:p1125000",
+          "p-pentomino:root1.child2.child1.child3:o1:sp125000:p500000:p1000000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.5
+          },
+          {
+            "x": 0.5,
+            "y": 1.25
+          },
+          {
+            "x": 0.25,
+            "y": 1.25
+          },
+          {
+            "x": 0.25,
+            "y": 1.375
+          },
+          {
+            "x": 0.125,
+            "y": 1.375
+          },
+          {
+            "x": 0.125,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.3375,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root1.child2.child1.child3:o1:sp125000:p500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child3.child0:o5:sp125000:p500000:p1375000",
+          "p-pentomino:root1.child2.child1.child0:o0:sp125000:0:p1125000",
+          "p-pentomino:root1.child2.child1.child1:o0:sp125000:0:p750000",
+          "p-pentomino:root1.child2.child1.child2:o7:sp125000:p500000:p1500000",
+          "p-pentomino:root1.child2.child3.child1:o3:sp125000:p250000:p1000000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 1.0
+          },
+          {
+            "x": 0.5,
+            "y": 1.25
+          },
+          {
+            "x": 0.25,
+            "y": 1.25
+          },
+          {
+            "x": 0.25,
+            "y": 1.125
+          },
+          {
+            "x": 0.125,
+            "y": 1.125
+          },
+          {
+            "x": 0.125,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.7875,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root1.child2.child2.child0:o6:sp125000:p625000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child2.child1:o6:sp125000:p250000:0",
+          "p-pentomino:root1.child2.child2.child2:o2:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child2.child2.child3:o5:sp125000:p500000:p500000",
+          "p-pentomino:root1.child3.child2.child0:o1:sp125000:p1375000:0"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.625,
+            "y": 0.0
+          },
+          {
+            "x": 0.625,
+            "y": 0.25
+          },
+          {
+            "x": 0.875,
+            "y": 0.25
+          },
+          {
+            "x": 0.875,
+            "y": 0.125
+          },
+          {
+            "x": 1.0,
+            "y": 0.125
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.4125,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root1.child2.child2.child1:o6:sp125000:p250000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child1:o0:sp125000:0:0",
+          "p-pentomino:root1.child2.child0.child3:o1:sp125000:p500000:p250000",
+          "p-pentomino:root1.child2.child2.child0:o6:sp125000:p625000:0",
+          "p-pentomino:root1.child2.child2.child3:o5:sp125000:p500000:p500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 0.0
+          },
+          {
+            "x": 0.25,
+            "y": 0.25
+          },
+          {
+            "x": 0.5,
+            "y": 0.25
+          },
+          {
+            "x": 0.5,
+            "y": 0.125
+          },
+          {
+            "x": 0.625,
+            "y": 0.125
+          },
+          {
+            "x": 0.625,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.8875,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root1.child2.child2.child2:o2:sp125000:p1000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child2.child0:o6:sp125000:p625000:0",
+          "p-pentomino:root1.child2.child2.child3:o5:sp125000:p500000:p500000",
+          "p-pentomino:root1.child2.child3.child2:o4:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child3.child2.child2:o5:sp125000:p1000000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.25
+          },
+          {
+            "x": 0.875,
+            "y": 0.25
+          },
+          {
+            "x": 0.875,
+            "y": 0.125
+          },
+          {
+            "x": 1.0,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.6125,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root1.child2.child2.child3:o5:sp125000:p500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child3:o1:sp125000:p500000:p250000",
+          "p-pentomino:root1.child2.child2.child0:o6:sp125000:p625000:0",
+          "p-pentomino:root1.child2.child2.child1:o6:sp125000:p250000:0",
+          "p-pentomino:root1.child2.child2.child2:o2:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child2.child3.child3:o0:sp125000:p500000:p500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.25
+          },
+          {
+            "x": 0.625,
+            "y": 0.25
+          },
+          {
+            "x": 0.625,
+            "y": 0.125
+          },
+          {
+            "x": 0.5,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.7875,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root1.child2.child3.child0:o3:sp125000:p625000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child3.child2:o1:sp125000:p1000000:p1000000",
+          "p-pentomino:root1.child2.child3.child1:o3:sp125000:p250000:p1000000",
+          "p-pentomino:root1.child2.child3.child2:o4:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child2.child3.child3:o0:sp125000:p500000:p500000",
+          "p-pentomino:root1.child3.child3.child0:o7:sp125000:p1375000:p1000000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.625,
+            "y": 1.0
+          },
+          {
+            "x": 0.625,
+            "y": 0.75
+          },
+          {
+            "x": 0.875,
+            "y": 0.75
+          },
+          {
+            "x": 0.875,
+            "y": 0.875
+          },
+          {
+            "x": 1.0,
+            "y": 0.875
+          },
+          {
+            "x": 1.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.4125,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root1.child2.child3.child1:o3:sp125000:p250000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child3.child0:o5:sp125000:p500000:p1375000",
+          "p-pentomino:root1.child2.child0.child2:o7:sp125000:p500000:p750000",
+          "p-pentomino:root1.child2.child1.child1:o0:sp125000:0:p750000",
+          "p-pentomino:root1.child2.child1.child3:o1:sp125000:p500000:p1000000",
+          "p-pentomino:root1.child2.child3.child0:o3:sp125000:p625000:p1000000",
+          "p-pentomino:root1.child2.child3.child3:o0:sp125000:p500000:p500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.25,
+            "y": 1.0
+          },
+          {
+            "x": 0.25,
+            "y": 0.75
+          },
+          {
+            "x": 0.5,
+            "y": 0.75
+          },
+          {
+            "x": 0.5,
+            "y": 0.875
+          },
+          {
+            "x": 0.625,
+            "y": 0.875
+          },
+          {
+            "x": 0.625,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.8875,
+          "y": 0.6625
+        },
+        "id": "p-pentomino:root1.child2.child3.child2:o4:sp125000:p1000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child2.child2:o2:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child2.child3.child0:o3:sp125000:p625000:p1000000",
+          "p-pentomino:root1.child2.child3.child3:o0:sp125000:p500000:p500000",
+          "p-pentomino:root1.child3.child3.child2:o0:sp125000:p1000000:p500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.75
+          },
+          {
+            "x": 0.875,
+            "y": 0.75
+          },
+          {
+            "x": 0.875,
+            "y": 0.875
+          },
+          {
+            "x": 1.0,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.6125,
+          "y": 0.6625
+        },
+        "id": "p-pentomino:root1.child2.child3.child3:o0:sp125000:p500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child0.child2:o7:sp125000:p500000:p750000",
+          "p-pentomino:root1.child2.child2.child3:o5:sp125000:p500000:p500000",
+          "p-pentomino:root1.child2.child3.child0:o3:sp125000:p625000:p1000000",
+          "p-pentomino:root1.child2.child3.child1:o3:sp125000:p250000:p1000000",
+          "p-pentomino:root1.child2.child3.child2:o4:sp125000:p1000000:p500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 0.5,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.5
+          },
+          {
+            "x": 0.75,
+            "y": 0.75
+          },
+          {
+            "x": 0.625,
+            "y": 0.75
+          },
+          {
+            "x": 0.625,
+            "y": 0.875
+          },
+          {
+            "x": 0.5,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.8875,
+          "y": 0.5375
+        },
+        "id": "p-pentomino:root1.child3.child0.child0:o4:sp125000:p2000000:p375000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child2.child0:o0:sp125000:p2000000:p625000",
+          "p-pentomino:root0.child1.child2.child1:o0:sp125000:p2000000:p250000",
+          "p-pentomino:root1.child3.child0.child1:o4:sp125000:p2000000:0",
+          "p-pentomino:root1.child3.child0.child2:o3:sp125000:p1500000:p750000",
+          "p-pentomino:root1.child3.child0.child3:o6:sp125000:p1500000:p250000",
+          "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 0.375
+          },
+          {
+            "x": 1.75,
+            "y": 0.375
+          },
+          {
+            "x": 1.75,
+            "y": 0.625
+          },
+          {
+            "x": 1.875,
+            "y": 0.625
+          },
+          {
+            "x": 1.875,
+            "y": 0.75
+          },
+          {
+            "x": 2.0,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.8875,
+          "y": 0.1625
+        },
+        "id": "p-pentomino:root1.child3.child0.child1:o4:sp125000:p2000000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child0.child1:o6:sp125000:p2000000:0",
+          "p-pentomino:root0.child1.child2.child1:o0:sp125000:p2000000:p250000",
+          "p-pentomino:root1.child3.child0.child0:o4:sp125000:p2000000:p375000",
+          "p-pentomino:root1.child3.child0.child3:o6:sp125000:p1500000:p250000",
+          "p-pentomino:root1.child3.child2.child1:o1:sp125000:p1750000:0"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.75,
+            "y": 0.0
+          },
+          {
+            "x": 1.75,
+            "y": 0.25
+          },
+          {
+            "x": 1.875,
+            "y": 0.25
+          },
+          {
+            "x": 1.875,
+            "y": 0.375
+          },
+          {
+            "x": 2.0,
+            "y": 0.375
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.6625,
+          "y": 0.6375
+        },
+        "id": "p-pentomino:root1.child3.child0.child2:o3:sp125000:p1500000:p750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child3.child0.child0:o4:sp125000:p2000000:p375000",
+          "p-pentomino:root1.child3.child0.child3:o6:sp125000:p1500000:p250000",
+          "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000",
+          "p-pentomino:root1.child3.child3.child1:o7:sp125000:p1750000:p1000000",
+          "p-pentomino:root1.child3.child3.child3:o4:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.75
+          },
+          {
+            "x": 1.5,
+            "y": 0.5
+          },
+          {
+            "x": 1.75,
+            "y": 0.5
+          },
+          {
+            "x": 1.75,
+            "y": 0.625
+          },
+          {
+            "x": 1.875,
+            "y": 0.625
+          },
+          {
+            "x": 1.875,
+            "y": 0.75
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.6625,
+          "y": 0.3625
+        },
+        "id": "p-pentomino:root1.child3.child0.child3:o6:sp125000:p1500000:p250000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child3.child0.child0:o4:sp125000:p2000000:p375000",
+          "p-pentomino:root1.child3.child0.child1:o4:sp125000:p2000000:0",
+          "p-pentomino:root1.child3.child0.child2:o3:sp125000:p1500000:p750000",
+          "p-pentomino:root1.child3.child2.child1:o1:sp125000:p1750000:0",
+          "p-pentomino:root1.child3.child2.child3:o2:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.25
+          },
+          {
+            "x": 1.5,
+            "y": 0.5
+          },
+          {
+            "x": 1.75,
+            "y": 0.5
+          },
+          {
+            "x": 1.75,
+            "y": 0.375
+          },
+          {
+            "x": 1.875,
+            "y": 0.375
+          },
+          {
+            "x": 1.875,
+            "y": 0.25
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.8875,
+          "y": 1.2875
+        },
+        "id": "p-pentomino:root1.child3.child1.child0:o4:sp125000:p2000000:p1125000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child1.child1.child3:o4:sp125000:p2000000:p1500000",
+          "p-pentomino:root1.child1.child3.child0:o5:sp125000:p2000000:p1375000",
+          "p-pentomino:root1.child1.child3.child1:o5:sp125000:p2000000:p1750000",
+          "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000",
+          "p-pentomino:root1.child3.child1.child2:o3:sp125000:p1500000:p1500000",
+          "p-pentomino:root1.child3.child1.child3:o6:sp125000:p1500000:p1000000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 1.125
+          },
+          {
+            "x": 1.75,
+            "y": 1.125
+          },
+          {
+            "x": 1.75,
+            "y": 1.375
+          },
+          {
+            "x": 1.875,
+            "y": 1.375
+          },
+          {
+            "x": 1.875,
+            "y": 1.5
+          },
+          {
+            "x": 2.0,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.8875,
+          "y": 0.9125
+        },
+        "id": "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root0.child1.child2.child0:o0:sp125000:p2000000:p625000",
+          "p-pentomino:root1.child1.child3.child0:o5:sp125000:p2000000:p1375000",
+          "p-pentomino:root1.child3.child0.child0:o4:sp125000:p2000000:p375000",
+          "p-pentomino:root1.child3.child0.child2:o3:sp125000:p1500000:p750000",
+          "p-pentomino:root1.child3.child1.child0:o4:sp125000:p2000000:p1125000",
+          "p-pentomino:root1.child3.child1.child3:o6:sp125000:p1500000:p1000000",
+          "p-pentomino:root1.child3.child3.child1:o7:sp125000:p1750000:p1000000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 2.0,
+            "y": 0.75
+          },
+          {
+            "x": 1.75,
+            "y": 0.75
+          },
+          {
+            "x": 1.75,
+            "y": 1.0
+          },
+          {
+            "x": 1.875,
+            "y": 1.0
+          },
+          {
+            "x": 1.875,
+            "y": 1.125
+          },
+          {
+            "x": 2.0,
+            "y": 1.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.6625,
+          "y": 1.3875
+        },
+        "id": "p-pentomino:root1.child3.child1.child2:o3:sp125000:p1500000:p1500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child2.child0:o2:sp125000:p1500000:p1375000",
+          "p-pentomino:root1.child0.child2.child1:o2:sp125000:p1500000:p1750000",
+          "p-pentomino:root1.child1.child1.child2:o0:sp125000:p1500000:p1500000",
+          "p-pentomino:root1.child1.child1.child3:o4:sp125000:p2000000:p1500000",
+          "p-pentomino:root1.child3.child1.child0:o4:sp125000:p2000000:p1125000",
+          "p-pentomino:root1.child3.child1.child3:o6:sp125000:p1500000:p1000000"
+        ],
+        "orientation_token": "3",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.5
+          },
+          {
+            "x": 1.5,
+            "y": 1.25
+          },
+          {
+            "x": 1.75,
+            "y": 1.25
+          },
+          {
+            "x": 1.75,
+            "y": 1.375
+          },
+          {
+            "x": 1.875,
+            "y": 1.375
+          },
+          {
+            "x": 1.875,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.6625,
+          "y": 1.1125
+        },
+        "id": "p-pentomino:root1.child3.child1.child3:o6:sp125000:p1500000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child2.child0:o2:sp125000:p1500000:p1375000",
+          "p-pentomino:root1.child3.child1.child0:o4:sp125000:p2000000:p1125000",
+          "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000",
+          "p-pentomino:root1.child3.child1.child2:o3:sp125000:p1500000:p1500000",
+          "p-pentomino:root1.child3.child3.child1:o7:sp125000:p1750000:p1000000"
+        ],
+        "orientation_token": "6",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.0
+          },
+          {
+            "x": 1.5,
+            "y": 1.25
+          },
+          {
+            "x": 1.75,
+            "y": 1.25
+          },
+          {
+            "x": 1.75,
+            "y": 1.125
+          },
+          {
+            "x": 1.875,
+            "y": 1.125
+          },
+          {
+            "x": 1.875,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.2125,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root1.child3.child2.child0:o1:sp125000:p1375000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child2.child0:o6:sp125000:p625000:0",
+          "p-pentomino:root1.child3.child2.child1:o1:sp125000:p1750000:0",
+          "p-pentomino:root1.child3.child2.child2:o5:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child3.child2.child3:o2:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.375,
+            "y": 0.0
+          },
+          {
+            "x": 1.375,
+            "y": 0.25
+          },
+          {
+            "x": 1.125,
+            "y": 0.25
+          },
+          {
+            "x": 1.125,
+            "y": 0.125
+          },
+          {
+            "x": 1.0,
+            "y": 0.125
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.5875,
+          "y": 0.1125
+        },
+        "id": "p-pentomino:root1.child3.child2.child1:o1:sp125000:p1750000:0",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child3.child0.child1:o4:sp125000:p2000000:0",
+          "p-pentomino:root1.child3.child0.child3:o6:sp125000:p1500000:p250000",
+          "p-pentomino:root1.child3.child2.child0:o1:sp125000:p1375000:0",
+          "p-pentomino:root1.child3.child2.child3:o2:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "1",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 0.0
+          },
+          {
+            "x": 1.75,
+            "y": 0.25
+          },
+          {
+            "x": 1.5,
+            "y": 0.25
+          },
+          {
+            "x": 1.5,
+            "y": 0.125
+          },
+          {
+            "x": 1.375,
+            "y": 0.125
+          },
+          {
+            "x": 1.375,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.1125,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root1.child3.child2.child2:o5:sp125000:p1000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child2.child2:o2:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child3.child2.child0:o1:sp125000:p1375000:0",
+          "p-pentomino:root1.child3.child2.child3:o2:sp125000:p1500000:p500000",
+          "p-pentomino:root1.child3.child3.child2:o0:sp125000:p1000000:p500000"
+        ],
+        "orientation_token": "5",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.25
+          },
+          {
+            "x": 1.125,
+            "y": 0.25
+          },
+          {
+            "x": 1.125,
+            "y": 0.125
+          },
+          {
+            "x": 1.0,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.3875,
+          "y": 0.3375
+        },
+        "id": "p-pentomino:root1.child3.child2.child3:o2:sp125000:p1500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child3.child0.child3:o6:sp125000:p1500000:p250000",
+          "p-pentomino:root1.child3.child2.child0:o1:sp125000:p1375000:0",
+          "p-pentomino:root1.child3.child2.child1:o1:sp125000:p1750000:0",
+          "p-pentomino:root1.child3.child2.child2:o5:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child3.child3.child3:o4:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "2",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.25
+          },
+          {
+            "x": 1.375,
+            "y": 0.25
+          },
+          {
+            "x": 1.375,
+            "y": 0.125
+          },
+          {
+            "x": 1.5,
+            "y": 0.125
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.2125,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root1.child3.child3.child0:o7:sp125000:p1375000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child2.child2:o6:sp125000:p1000000:p1000000",
+          "p-pentomino:root1.child2.child3.child0:o3:sp125000:p625000:p1000000",
+          "p-pentomino:root1.child3.child3.child1:o7:sp125000:p1750000:p1000000",
+          "p-pentomino:root1.child3.child3.child2:o0:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child3.child3.child3:o4:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.375,
+            "y": 1.0
+          },
+          {
+            "x": 1.375,
+            "y": 0.75
+          },
+          {
+            "x": 1.125,
+            "y": 0.75
+          },
+          {
+            "x": 1.125,
+            "y": 0.875
+          },
+          {
+            "x": 1.0,
+            "y": 0.875
+          },
+          {
+            "x": 1.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.5875,
+          "y": 0.8875
+        },
+        "id": "p-pentomino:root1.child3.child3.child1:o7:sp125000:p1750000:p1000000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child0.child2.child0:o2:sp125000:p1500000:p1375000",
+          "p-pentomino:root1.child3.child0.child2:o3:sp125000:p1500000:p750000",
+          "p-pentomino:root1.child3.child1.child1:o4:sp125000:p2000000:p750000",
+          "p-pentomino:root1.child3.child1.child3:o6:sp125000:p1500000:p1000000",
+          "p-pentomino:root1.child3.child3.child0:o7:sp125000:p1375000:p1000000",
+          "p-pentomino:root1.child3.child3.child3:o4:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "7",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.75,
+            "y": 1.0
+          },
+          {
+            "x": 1.75,
+            "y": 0.75
+          },
+          {
+            "x": 1.5,
+            "y": 0.75
+          },
+          {
+            "x": 1.5,
+            "y": 0.875
+          },
+          {
+            "x": 1.375,
+            "y": 0.875
+          },
+          {
+            "x": 1.375,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.1125,
+          "y": 0.6625
+        },
+        "id": "p-pentomino:root1.child3.child3.child2:o0:sp125000:p1000000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child2.child3.child2:o4:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child3.child2.child2:o5:sp125000:p1000000:p500000",
+          "p-pentomino:root1.child3.child3.child0:o7:sp125000:p1375000:p1000000",
+          "p-pentomino:root1.child3.child3.child3:o4:sp125000:p1500000:p500000"
+        ],
+        "orientation_token": "0",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.75
+          },
+          {
+            "x": 1.125,
+            "y": 0.75
+          },
+          {
+            "x": 1.125,
+            "y": 0.875
+          },
+          {
+            "x": 1.0,
+            "y": 0.875
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.3875,
+          "y": 0.6625
+        },
+        "id": "p-pentomino:root1.child3.child3.child3:o4:sp125000:p1500000:p500000",
+        "kind": "p-pentomino",
+        "neighbors": [
+          "p-pentomino:root1.child3.child0.child2:o3:sp125000:p1500000:p750000",
+          "p-pentomino:root1.child3.child2.child3:o2:sp125000:p1500000:p500000",
+          "p-pentomino:root1.child3.child3.child0:o7:sp125000:p1375000:p1000000",
+          "p-pentomino:root1.child3.child3.child1:o7:sp125000:p1750000:p1000000",
+          "p-pentomino:root1.child3.child3.child2:o0:sp125000:p1000000:p500000"
+        ],
+        "orientation_token": "4",
+        "tile_family": "p-pentomino",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.5
+          },
+          {
+            "x": 1.25,
+            "y": 0.75
+          },
+          {
+            "x": 1.375,
+            "y": 0.75
+          },
+          {
+            "x": 1.375,
+            "y": 0.875
+          },
+          {
+            "x": 1.5,
+            "y": 0.875
+          }
+        ]
+      }
+    ],
+    "topology_revision": "9b7779b8",
+    "topology_spec": {
+      "adjacency_mode": "edge",
+      "height": 2,
+      "patch_depth": 3,
+      "sizing_mode": "patch_depth",
+      "tiling_family": "p-pentomino",
+      "width": 5
+    }
+  },
+  "width": 0
+}

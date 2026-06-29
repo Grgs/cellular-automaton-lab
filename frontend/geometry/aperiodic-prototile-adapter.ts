@@ -8,6 +8,7 @@ import {
     DEFAULT_APERIODIC_RENDER_MARGIN_MIN,
     DEFAULT_APERIODIC_RENDER_MARGIN_SCALE,
     L_TETROMINO_RENDER_COORDINATE_SCALE,
+    P_PENTOMINO_RENDER_COORDINATE_SCALE,
     SHIELD_RENDER_COORDINATE_SCALE,
     SHIELD_RENDER_MARGIN_MIN,
     SHIELD_RENDER_MARGIN_SCALE,
@@ -48,6 +49,9 @@ function displayCoordinateScale(geometry: string): number {
     }
     if (geometry === "l-tetromino") {
         return L_TETROMINO_RENDER_COORDINATE_SCALE;
+    }
+    if (geometry === "p-pentomino") {
+        return P_PENTOMINO_RENDER_COORDINATE_SCALE;
     }
     return 1;
 }
