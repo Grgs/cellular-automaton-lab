@@ -44,6 +44,7 @@ function squarePreview(): TopologyPreview {
 function tiling(geometry: string, frames: Record<string, number>[]): TopologyFilmstrip {
     return {
         geometry,
+        label: `${geometry} label`,
         tiling_family: "square",
         family: "regular",
         cell_count: 4,
@@ -179,6 +180,19 @@ describe("createFilmstripView", () => {
                 .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[title="Play / pause"]')
                 ?.getAttribute("aria-label"),
         ).toBe("Play / pause");
+    });
+
+    it("labels each board with the friendly catalog name, not the geometry key", async () => {
+        const backend = stubBackend(async () => squarePreview());
+        const clock = manualScheduler();
+        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
+        document.body.append(view.element);
+
+        await view.load(filmstrip([tiling("square", [{ a: 1 }])], 1));
+
+        expect(view.element.querySelector(".compare-filmstrip-label")?.textContent).toBe(
+            "square label",
+        );
     });
 
     it("advances every board in lockstep on each clock tick while playing", async () => {

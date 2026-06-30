@@ -208,7 +208,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         const svg = buildBoardThumbnailSvg(preview, cellsById, {
             size: thumbSize,
             liveColor: getLiveColor(),
-            label: `${entry.tiling.geometry} generation ${index}`,
+            label: `${entry.tiling.label || entry.tiling.geometry} generation ${index}`,
         });
         entry.slot.replaceChildren(svg);
         const liveCells = Object.keys(cellsById).length;
@@ -218,7 +218,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         if (entry.openButton) {
             entry.openButton.disabled = false;
             entry.openButton.textContent = `Open gen ${index}`;
-            entry.openButton.title = `Load ${entry.tiling.geometry} generation ${index} into build mode`;
+            entry.openButton.title = `Load ${entry.tiling.label || entry.tiling.geometry} generation ${index} into build mode`;
         }
     }
 
@@ -264,14 +264,14 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         boardsArea.replaceChildren();
         boards = filmstrip.tilings.map((tiling) => {
             const slot = el("div", "compare-filmstrip-slot", "…");
-            const label = el("div", "compare-filmstrip-label", tiling.geometry);
+            const label = el("div", "compare-filmstrip-label", tiling.label || tiling.geometry);
             const countLabel = el("div", "compare-filmstrip-count");
             const cell = el("div", "compare-filmstrip-board");
             cell.setAttribute("role", "listitem");
             const openButton = options.onOpenFrame
                 ? linkButton(
                       "Open gen 0",
-                      `Load ${tiling.geometry} generation 0 into build mode`,
+                      `Load ${tiling.label || tiling.geometry} generation 0 into build mode`,
                       () => options.onOpenFrame?.(tiling, player.index),
                   )
                 : undefined;

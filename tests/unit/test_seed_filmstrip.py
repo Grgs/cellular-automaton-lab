@@ -54,6 +54,24 @@ class SeedFilmstripEngineTests(unittest.TestCase):
         self.assertTrue(tiling.topology["cells"])
         self.assertEqual(tiling.topology_spec["tiling_family"], "square")
 
+    def test_filmstrip_carries_friendly_catalog_label(self) -> None:
+        from backend.simulation.topology_catalog import get_topology_variant_for_geometry
+
+        filmstrip = run_seed_filmstrip(
+            seed="1",
+            rule_name="conway",
+            geometries=("penrose-p3-rhombs",),
+            frame_count=2,
+            grid_size=8,
+        )
+        tiling = filmstrip.tilings[0]
+        expected = get_topology_variant_for_geometry("penrose-p3-rhombs").label
+        # The friendly label is distinct from the raw geometry key and flows into
+        # the serialized payload the side-by-side view renders.
+        self.assertEqual(tiling.label, expected)
+        self.assertNotEqual(tiling.label, tiling.geometry)
+        self.assertEqual(tiling.to_dict()["label"], expected)
+
     def test_single_live_cell_goes_extinct_deterministically(self) -> None:
         filmstrip = run_seed_filmstrip(
             seed="1",

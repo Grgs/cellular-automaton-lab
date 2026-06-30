@@ -646,6 +646,7 @@ describe("mountComparePanel", () => {
                 tilings: [
                     {
                         geometry: "square",
+                        label: "Square",
                         tiling_family: "square",
                         family: "regular",
                         cell_count: 100,

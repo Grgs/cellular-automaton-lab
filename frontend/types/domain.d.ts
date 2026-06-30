@@ -246,6 +246,8 @@ export interface FilmstripRequest {
 
 export interface TopologyFilmstrip {
     geometry: string;
+    /** Friendly catalog label (e.g. "Penrose P3 Rhombs"), shown on the board. */
+    label: string;
     tiling_family: string;
     family: string;
     cell_count: number;
