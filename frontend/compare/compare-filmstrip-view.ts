@@ -52,10 +52,18 @@ export interface FilmstripViewOptions {
     scheduler?: IntervalScheduler;
 }
 
+/** Optional playback overrides applied right after a filmstrip is loaded. */
+export interface FilmstripLoadOptions {
+    /** Start playing immediately instead of waiting on the seed frame. */
+    autoplay?: boolean;
+    /** Seek to this generation after loading (e.g. a lively frame when paused). */
+    initialFrame?: number;
+}
+
 export interface FilmstripViewController {
     element: HTMLElement;
     /** Render a filmstrip and reset playback to the seed frame (paused). */
-    load(filmstrip: SeedFilmstripResult): Promise<void>;
+    load(filmstrip: SeedFilmstripResult, options?: FilmstripLoadOptions): Promise<void>;
     dispose(): void;
 }
 
@@ -257,7 +265,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         lastRenderedIndex = -1;
     }
 
-    async function load(filmstrip: SeedFilmstripResult): Promise<void> {
+    async function load(
+        filmstrip: SeedFilmstripResult,
+        loadOptions?: FilmstripLoadOptions,
+    ): Promise<void> {
         teardownRun();
         player = new FilmstripPlayer(filmstrip.frame_count, { loop: options.loop ?? false });
 
@@ -306,6 +317,14 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 renderBoard(entry, player.index);
             }),
         );
+
+        // Optional post-load playback overrides (used by the featured demo).
+        if (loadOptions?.initialFrame !== undefined) {
+            player.seek(loadOptions.initialFrame);
+        }
+        if (loadOptions?.autoplay) {
+            player.play();
+        }
     }
 
     return {

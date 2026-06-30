@@ -1,3 +1,5 @@
+import type { CompareRunConfig } from "./compare-run-link.js";
+
 export interface TraversalOption {
     value: string;
     label: string;
@@ -29,3 +31,24 @@ export const SEED_SHAPE_OPTIONS: readonly SeedShapeOption[] = [
     { value: "toad", label: "Shape: toad" },
     { value: "acorn", label: "Shape: acorn" },
 ];
+
+/**
+ * Curated one-click "Watch tilings compare" demo. An excitable Greenberg-Hastings
+ * seed run across four deliberately distinct topologies, with a short frame count
+ * so the looping filmstrip replays only the lively wave bloom (not a long dead
+ * tail). The wave front bends to each geometry -- the clearest one-glance
+ * statement of what the app does. Tuned empirically; revisit the rule/length once
+ * the loop cadence has been reviewed.
+ */
+export const FEATURED_COMPARE_DEMO: CompareRunConfig = {
+    seed: "",
+    rule: "penrose-greenberg-hastings",
+    traversal: "bfs",
+    grid_size: 22,
+    frames: 22,
+    geometries: ["square", "trihexagonal-3-6-3-6", "penrose-p3-rhombs", "hat-monotile"],
+    pattern: "r-pentomino",
+};
+
+/** A lively generation to rest on when reduced-motion disables autoplay. */
+export const FEATURED_COMPARE_DEMO_STILL_FRAME = 8;

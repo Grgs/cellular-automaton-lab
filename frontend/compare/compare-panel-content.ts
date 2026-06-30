@@ -27,12 +27,20 @@ import type {
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
 import { buildCompareRunUrl, type CompareRunConfig } from "./compare-run-link.js";
-import { SEED_SHAPE_OPTIONS, TRAVERSAL_OPTIONS } from "./compare-options.js";
+import {
+    FEATURED_COMPARE_DEMO_STILL_FRAME,
+    SEED_SHAPE_OPTIONS,
+    TRAVERSAL_OPTIONS,
+} from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
 import { createSeedPreview } from "./compare-seed-preview.js";
-import { createFilmstripView, type FilmstripViewController } from "./compare-filmstrip-view.js";
+import {
+    createFilmstripView,
+    type FilmstripLoadOptions,
+    type FilmstripViewController,
+} from "./compare-filmstrip-view.js";
 import {
     deleteSavedCompareRun,
     deleteSavedTilingSet,
@@ -116,6 +124,8 @@ export interface ComparePanelContentHandle {
     activate(): void;
     /** Populate the workspace from a decoded run link without running it. */
     applyRunConfig(config: CompareRunConfig): Promise<void>;
+    /** Apply a config, build the live filmstrip, and start looping playback. */
+    runFeaturedDemo(config: CompareRunConfig): Promise<void>;
     /** Show a run-link load problem in the status line (e.g. an unreadable link). */
     reportRunLinkError(message: string): void;
     /** Let an open action menu consume Escape; returns true when it did. */
@@ -1036,6 +1046,19 @@ export function createComparePanelContent(
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
+    async function runFeaturedDemo(config: CompareRunConfig): Promise<void> {
+        await applyRunConfig(config);
+        const prefersReducedMotion =
+            typeof window !== "undefined" &&
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        // Reduced motion: rest on a lively frame instead of animating.
+        const playback: FilmstripLoadOptions = prefersReducedMotion
+            ? { initialFrame: FEATURED_COMPARE_DEMO_STILL_FRAME }
+            : { autoplay: true };
+        await runFilmstrip(playback);
+    }
+
     function highlightGeometry(geometry: string | null): void {
         resultsArea.querySelectorAll<SVGElement>("[data-geometry]").forEach((node) => {
             node.classList.toggle(
@@ -1078,7 +1101,7 @@ export function createComparePanelContent(
         }
     }
 
-    async function runFilmstrip(): Promise<void> {
+    async function runFilmstrip(playback?: FilmstripLoadOptions): Promise<void> {
         if (running) {
             return;
         }
@@ -1118,7 +1141,7 @@ export function createComparePanelContent(
                 filmstripArea.append(filmstripView.element);
             }
             filmstripArea.hidden = false;
-            await filmstripView.load(filmstrip);
+            await filmstripView.load(filmstrip, playback);
             liveStateLine.textContent = `Live filmstrip ready with ${filmstrip.tilings.length} tilings and ${filmstrip.frame_count} generations.`;
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
@@ -1464,6 +1487,7 @@ export function createComparePanelContent(
             highlightGeometry(null);
         },
         applyRunConfig,
+        runFeaturedDemo,
         reportRunLinkError(message: string): void {
             statusLine.textContent = message;
         },
