@@ -65,8 +65,51 @@ class RuleReviewToolTests(unittest.TestCase):
                 "anchored-source-vortex",
             ]
         )
-        with self.assertRaisesRegex(ValueError, "whirlpool"):
+        with self.assertRaisesRegex(ValueError, "Whirlpool"):
             rule_review.run_review(args)
+
+    def test_whirlpool_preset_stays_inside_rectangular_board(self) -> None:
+        cells = rule_review._build_whirlpool_preset(
+            "anchored-source-vortex",
+            80,
+            50,
+            geometry="square",
+        )
+
+        self.assertGreater(min(cell.y for cell in cells), 0)
+        self.assertLess(max(cell.y for cell in cells), 49)
+
+    def test_hex_whirlpool_preset_renders(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_dir = Path(tmpdir)
+            exit_code = rule_review.main(
+                [
+                    "--rule",
+                    "hexwhirlpool",
+                    "--geometry",
+                    "hex",
+                    "--width",
+                    "18",
+                    "--height",
+                    "14",
+                    "--preset",
+                    "centered-rotor",
+                    "--generations",
+                    "0,1",
+                    "--output-dir",
+                    str(output_dir),
+                    "--prefix",
+                    "hex-whirlpool-review",
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            summary = json.loads(
+                (output_dir / "hex-whirlpool-review-summary.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(summary["rule"], "whirlpool")
+            self.assertEqual(summary["geometry"], "hex")
+            self.assertEqual(len(summary["frames"]), 2)
 
 
 if __name__ == "__main__":
