@@ -315,11 +315,16 @@ export function createComparePanelContent(
     traversalSelect.addEventListener("change", refreshPreview);
     gridInput.addEventListener("change", refreshPreview);
 
-    const runButton = el("button", { class: "compare-run", type: "button" }, ["Run comparison"]);
+    // "Play side by side" is the showcase action, so it is the primary button;
+    // the analytical "Run comparison" is secondary and lives in the analysis
+    // section below the live boards.
+    const runButton = el("button", { class: "compare-run compare-run-secondary", type: "button" }, [
+        "Run comparison",
+    ]);
     const playButton = el(
         "button",
         {
-            class: "compare-run compare-run-secondary",
+            class: "compare-run",
             type: "button",
             title: "Run every selected tiling on a shared clock and play them side by side",
         },
@@ -453,10 +458,21 @@ export function createComparePanelContent(
         seedWorkspace,
         el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
         savedCompareControls(),
-        el("div", { class: "compare-actions" }, [runButton, playButton, copyRunButton, statusLine]),
+        el("div", { class: "compare-actions" }, [playButton, copyRunButton, statusLine]),
         liveStateLine,
+        // Side-by-side first; the cross-tiling analysis (phase portrait + table)
+        // lives below it and only computes when Run comparison is pressed.
         filmstripArea,
-        resultsArea,
+        el("div", { class: "compare-analysis" }, [
+            el("div", { class: "compare-section-title", textContent: "Cross-tiling analysis" }),
+            el("p", {
+                class: "compare-intro",
+                textContent:
+                    "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
+            }),
+            runButton,
+            resultsArea,
+        ]),
     ]);
 
     renderTilingChecklist();
