@@ -1334,6 +1334,15 @@ button.theme-toggle .theme-icon-moon {
     white-space: nowrap;
 }
 
+.live-compare-tiling-control {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.live-compare-tiling-search,
 .live-compare-tiling-select {
     min-width: 0;
     width: 100%;
@@ -1344,6 +1353,14 @@ button.theme-toggle .theme-icon-moon {
     font: inherit;
     font-size: 0.82rem;
     padding: 7px 8px;
+}
+
+.live-compare-tiling-search-status {
+    grid-column: 1 / -1;
+    min-height: 1em;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.1;
 }
 
 .live-compare-pane-actions {
@@ -2432,6 +2449,10 @@ button.theme-toggle .theme-icon-moon {
 
     .live-compare-pane-header {
         grid-template-columns: 1fr;
+    }
+
+    .live-compare-tiling-control {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .live-compare-pane-actions {
