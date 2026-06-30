@@ -6,6 +6,11 @@ const DEFAULT_VORTEX_ANGLES = Object.freeze([-0.98, -0.78, -0.52, -0.24, 0.08, 0
 const SOURCE_STATE = 4;
 const REFRACTORY_STATE = 3;
 
+interface RadiusAxes {
+    x: number;
+    y: number;
+}
+
 function wrapAngle(angle: number): number {
     let wrappedAngle = angle;
     while (wrappedAngle <= -Math.PI) {
@@ -57,6 +62,43 @@ function offsetIsInsideAnyRange(
     return ranges.some(([minOffset, maxOffset]) => offset >= minOffset && offset <= maxOffset);
 }
 
+function resolveRadiusAxes({
+    width,
+    height,
+    gridCenter,
+    getCellCenter,
+    fallbackRadius,
+}: {
+    width: number;
+    height: number;
+    gridCenter: { x: number; y: number };
+    getCellCenter: VortexSeedOptions["getCellCenter"];
+    fallbackRadius: number;
+}): RadiusAxes {
+    if (width <= 0 || height <= 0) {
+        return { x: fallbackRadius, y: fallbackRadius };
+    }
+
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+            const center = getCellCenter(x, y);
+            minX = Math.min(minX, center.x);
+            maxX = Math.max(maxX, center.x);
+            minY = Math.min(minY, center.y);
+            maxY = Math.max(maxY, center.y);
+        }
+    }
+
+    return {
+        x: Math.max(1, Math.min(gridCenter.x - minX, maxX - gridCenter.x)),
+        y: Math.max(1, Math.min(gridCenter.y - minY, maxY - gridCenter.y)),
+    };
+}
+
 function resolvedAngleOrigin(spec: { angleOrigin?: number }, fallback = -0.58): number {
     return spec.angleOrigin ?? fallback;
 }
@@ -65,7 +107,7 @@ function placePolarSample({
     width,
     height,
     gridCenter,
-    maxRadius,
+    radiusAxes,
     getCellCenter,
     takenCells,
     normalizedRadius,
@@ -76,7 +118,7 @@ function placePolarSample({
     width: number;
     height: number;
     gridCenter: { x: number; y: number };
-    maxRadius: number;
+    radiusAxes: RadiusAxes;
     getCellCenter: VortexSeedOptions["getCellCenter"];
     takenCells: Set<string>;
     normalizedRadius: number;
@@ -85,8 +127,8 @@ function placePolarSample({
     state: number;
 }): CartesianSeedCell | null {
     const angle = angleOrigin + angularOffset;
-    const targetX = gridCenter.x + Math.cos(angle) * maxRadius * normalizedRadius;
-    const targetY = gridCenter.y + Math.sin(angle) * maxRadius * normalizedRadius;
+    const targetX = gridCenter.x + Math.cos(angle) * radiusAxes.x * normalizedRadius;
+    const targetY = gridCenter.y + Math.sin(angle) * radiusAxes.y * normalizedRadius;
     const nearestCell = findNearestUntakenCell(
         width,
         height,
@@ -108,7 +150,7 @@ function placePolarArc({
     width,
     height,
     gridCenter,
-    maxRadius,
+    radiusAxes,
     getCellCenter,
     takenCells,
     arc,
@@ -117,7 +159,7 @@ function placePolarArc({
     width: number;
     height: number;
     gridCenter: { x: number; y: number };
-    maxRadius: number;
+    radiusAxes: RadiusAxes;
     getCellCenter: VortexSeedOptions["getCellCenter"];
     takenCells: Set<string>;
     arc: PolarArcSpec;
@@ -134,7 +176,7 @@ function placePolarArc({
                 width,
                 height,
                 gridCenter,
-                maxRadius,
+                radiusAxes,
                 getCellCenter,
                 takenCells,
                 normalizedRadius,
@@ -164,7 +206,14 @@ export function buildVortexSeed({
     refractoryPhaseCutoff = -0.32,
 }: VortexSeedOptions): CartesianSeedCell[] {
     const gridCenter = getGridCenter(width, height);
-    const maxRadius = getMaxRadius(width, height);
+    const fallbackRadius = Math.max(1, getMaxRadius(width, height));
+    const radiusAxes = resolveRadiusAxes({
+        width,
+        height,
+        gridCenter,
+        getCellCenter,
+        fallbackRadius,
+    });
     const cells: CartesianSeedCell[] = [];
     const takenCells = new Set<string>();
 
@@ -179,8 +228,8 @@ export function buildVortexSeed({
         radialSamples.forEach((normalizedRadius) => {
             angularOffsets.forEach((angularOffset) => {
                 const angle = angleOrigin + angularOffset;
-                const targetX = gridCenter.x + Math.cos(angle) * maxRadius * normalizedRadius;
-                const targetY = gridCenter.y + Math.sin(angle) * maxRadius * normalizedRadius;
+                const targetX = gridCenter.x + Math.cos(angle) * radiusAxes.x * normalizedRadius;
+                const targetY = gridCenter.y + Math.sin(angle) * radiusAxes.y * normalizedRadius;
                 const nearestCell = findNearestUntakenCell(
                     width,
                     height,
@@ -200,7 +249,7 @@ export function buildVortexSeed({
                 const dx = nearestCell.center.x - gridCenter.x;
                 const dy = nearestCell.center.y - gridCenter.y;
                 const actualAngle = Math.atan2(dy, dx);
-                const actualRadius = Math.hypot(dx, dy) / maxRadius;
+                const actualRadius = Math.hypot(dx / radiusAxes.x, dy / radiusAxes.y);
                 const phase = wrapAngle(actualAngle - angleOrigin) + twist * actualRadius;
 
                 let state = 1;
@@ -221,7 +270,7 @@ export function buildVortexSeed({
                 width,
                 height,
                 gridCenter,
-                maxRadius,
+                radiusAxes,
                 getCellCenter,
                 takenCells,
                 arc,
@@ -234,7 +283,7 @@ export function buildVortexSeed({
             width,
             height,
             gridCenter,
-            maxRadius,
+            radiusAxes,
             getCellCenter,
             takenCells,
             normalizedRadius: source.normalizedRadius,

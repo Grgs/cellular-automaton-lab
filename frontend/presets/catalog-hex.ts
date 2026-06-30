@@ -261,5 +261,141 @@ export const HEX_PRESET_REGISTRY: PresetRegistry = Object.freeze({
                     ],
                 }),
         },
+        {
+            id: "centered-rotor",
+            label: "Centered Rotor",
+            description:
+                "A compact three-source hex eye with staggered wake bands that keeps the center visibly cycling.",
+            supportedGeometry: HEX_GEOMETRY,
+            minWidth: 14,
+            minHeight: 12,
+            build: ({ width, height }: PresetBuildContext) =>
+                buildVortexSeed({
+                    width,
+                    height,
+                    getGridCenter: pointyHexGridCenter,
+                    getMaxRadius: pointyHexMaxRadius,
+                    getCellCenter: pointyHexCellCenter,
+                    arms: [
+                        {
+                            angleOrigin: -0.24,
+                            twist: 2.22,
+                            normalizedRadii: [0.18, 0.24, 0.31, 0.38, 0.46],
+                            angularOffsets: [-0.84, -0.56, -0.27, 0.02, 0.32, 0.62],
+                            gapRanges: [[-0.04, 0.14]],
+                        },
+                        {
+                            angleOrigin: 1.9,
+                            twist: 1.78,
+                            normalizedRadii: [0.2, 0.27, 0.34, 0.42],
+                            angularOffsets: [-0.62, -0.34, -0.06, 0.22, 0.5],
+                            gapRanges: [[0.1, 0.3]],
+                        },
+                    ],
+                    arcs: [
+                        {
+                            state: 3,
+                            angleOrigin: -0.24,
+                            normalizedRadii: [0.2, 0.26, 0.32],
+                            angularOffsets: [0.52, 0.8, 1.08],
+                        },
+                    ],
+                    sources: [
+                        { angleOrigin: -0.24, normalizedRadius: 0.18, angularOffset: 0.1 },
+                        { angleOrigin: 1.9, normalizedRadius: 0.24, angularOffset: 0.0 },
+                        { angleOrigin: -2.28, normalizedRadius: 0.32, angularOffset: 0.0 },
+                    ],
+                }),
+        },
+        {
+            id: "colliding-vortices",
+            label: "Colliding Vortices",
+            description:
+                "Two opposed hex curls collide near the center before one clockwise front dominates.",
+            supportedGeometry: HEX_GEOMETRY,
+            minWidth: 18,
+            minHeight: 14,
+            build: ({ width, height }: PresetBuildContext) =>
+                buildVortexSeed({
+                    width,
+                    height,
+                    getGridCenter: pointyHexGridCenter,
+                    getMaxRadius: pointyHexMaxRadius,
+                    getCellCenter: pointyHexCellCenter,
+                    arms: [
+                        {
+                            angleOrigin: -0.68,
+                            twist: 1.94,
+                            normalizedRadii: [0.22, 0.3, 0.38, 0.47, 0.56],
+                            angularOffsets: [-0.9, -0.6, -0.3, 0.0, 0.3, 0.6],
+                            gapRanges: [[0.0, 0.2]],
+                        },
+                        {
+                            angleOrigin: 2.34,
+                            twist: 1.7,
+                            normalizedRadii: [0.24, 0.32, 0.41, 0.5, 0.58],
+                            angularOffsets: [-0.76, -0.48, -0.2, 0.08, 0.36, 0.64],
+                            gapRanges: [[-0.08, 0.1]],
+                        },
+                    ],
+                    arcs: [
+                        {
+                            state: 3,
+                            angleOrigin: -0.68,
+                            normalizedRadii: [0.28, 0.35],
+                            angularOffsets: [0.66, 0.94, 1.22],
+                        },
+                        {
+                            state: 3,
+                            angleOrigin: 2.34,
+                            normalizedRadii: [0.3, 0.38],
+                            angularOffsets: [0.5, 0.78, 1.06],
+                        },
+                    ],
+                    sources: [
+                        { angleOrigin: -0.68, normalizedRadius: 0.3, angularOffset: 0.12 },
+                        { angleOrigin: 2.34, normalizedRadius: 0.34, angularOffset: 0.08 },
+                        { angleOrigin: 0.92, normalizedRadius: 0.48, angularOffset: 0.0 },
+                    ],
+                }),
+        },
+        {
+            id: "wide-spiral",
+            label: "Wide Spiral",
+            description:
+                "A longer hex arm starts farther from the eye so the front sweeps across more of the board.",
+            supportedGeometry: HEX_GEOMETRY,
+            minWidth: 20,
+            minHeight: 12,
+            build: ({ width, height }: PresetBuildContext) =>
+                buildVortexSeed({
+                    width,
+                    height,
+                    getGridCenter: pointyHexGridCenter,
+                    getMaxRadius: pointyHexMaxRadius,
+                    getCellCenter: pointyHexCellCenter,
+                    arms: [
+                        {
+                            angleOrigin: -0.4,
+                            twist: 2.28,
+                            normalizedRadii: [0.22, 0.3, 0.39, 0.49, 0.6, 0.72],
+                            angularOffsets: [-0.98, -0.7, -0.42, -0.14, 0.14, 0.42, 0.7, 0.98],
+                            gapRanges: [[0.08, 0.32]],
+                        },
+                    ],
+                    arcs: [
+                        {
+                            state: 3,
+                            angleOrigin: -0.4,
+                            normalizedRadii: [0.32, 0.4, 0.48],
+                            angularOffsets: [0.72, 1.0, 1.28],
+                        },
+                    ],
+                    sources: [
+                        { angleOrigin: -0.4, normalizedRadius: 0.26, angularOffset: 0.1 },
+                        { angleOrigin: -0.4, normalizedRadius: 0.58, angularOffset: 0.54 },
+                    ],
+                }),
+        },
     ]),
 });

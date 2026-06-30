@@ -332,6 +332,60 @@ describe("live compare workspace", () => {
         expect(trigger.textContent).toBe("Single View");
     });
 
+    it("filters split pane tiling choices with the pane search", async () => {
+        const trigger = document.createElement("button");
+        const gridPanel = document.createElement("section");
+        document.body.append(trigger, gridPanel);
+        const backends = new Map<string, FakeBackend>();
+
+        mountLiveCompareWorkspace({
+            trigger,
+            gridPanel,
+            bootstrapData,
+            baseSessionId: "s-search",
+            backendFactory: (sessionId) => {
+                const backend = new FakeBackend(sessionId);
+                backends.set(sessionId, backend);
+                return backend;
+            },
+            createGridView,
+            storage: null,
+        });
+
+        trigger.click();
+        await vi.waitFor(() => {
+            expect(gridPanel.querySelectorAll(".live-compare-pane")).toHaveLength(2);
+        });
+
+        const leftPane = gridPanel.querySelector('.live-compare-pane[data-pane="left"]')!;
+        const search = leftPane.querySelector<HTMLInputElement>(".live-compare-tiling-search")!;
+        const select = leftPane.querySelector<HTMLSelectElement>(".live-compare-tiling-select")!;
+        const status = leftPane.querySelector<HTMLElement>(".live-compare-tiling-search-status")!;
+
+        search.value = "kagome";
+        search.dispatchEvent(new Event("input", { bubbles: true }));
+
+        expect(select.querySelector<HTMLOptionElement>("option[value='square']")?.hidden).toBe(
+            false,
+        );
+        expect(select.querySelector<HTMLOptionElement>("option[value='hex']")?.hidden).toBe(true);
+        expect(
+            select.querySelector<HTMLOptionElement>("option[value='archimedean-3-3-3-3-6']")
+                ?.hidden,
+        ).toBe(false);
+        expect(status.textContent).toBe("Showing 1 / 4 tilings");
+
+        select.value = "archimedean-3-3-3-3-6";
+        select.dispatchEvent(new Event("change"));
+
+        await vi.waitFor(() => {
+            expect(backends.get("s-search-left")?.state.topology_spec.tiling_family).toBe(
+                "archimedean-3-3-3-3-6",
+            );
+        });
+        expect(backends.get("s-search-right")?.state.topology_spec.tiling_family).toBe("hex");
+    });
+
     it("disposes and recreates pane backends on close when configured", async () => {
         const trigger = document.createElement("button");
         const gridPanel = document.createElement("section");
