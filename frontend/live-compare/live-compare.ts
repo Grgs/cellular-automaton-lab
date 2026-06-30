@@ -22,6 +22,7 @@ import type {
 } from "../types/domain.js";
 import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
 import type { AppState } from "../types/state.js";
+import { matchTilingSearchItems, tilingSearchTextFromTerms } from "../controls/tiling-search.js";
 
 const STORAGE_KEY = "cellular-automaton-lab.live-compare.v1";
 const POLL_INTERVAL_MS = 250;
@@ -106,6 +107,8 @@ interface PaneElements {
     canvas: HTMLCanvasElement;
     status: HTMLElement;
     generation: HTMLElement;
+    tilingSearchInput: HTMLInputElement;
+    tilingSearchStatus: HTMLElement;
     tilingSelect: HTMLSelectElement;
     runButton: HTMLButtonElement;
     stepButton: HTMLButtonElement;
@@ -258,6 +261,52 @@ function topologyLabel(
     );
 }
 
+function searchTextForTopologyDefinition(definition: BootstrappedTopologyDefinition): string {
+    return tilingSearchTextFromTerms([
+        definition.label,
+        definition.tiling_family,
+        definition.picker_group,
+        definition.family,
+        definition.sizing_policy.control === "patch_depth"
+            ? "patch depth substitution"
+            : "grid cell size",
+        definition.render_kind,
+        definition.sizing_mode,
+        ...definition.supported_adjacency_modes,
+        ...Object.values(definition.mode_labels),
+        ...Object.values(definition.default_rules),
+        ...Object.values(definition.geometry_keys),
+    ]);
+}
+
+function syncPaneTilingFilter(elements: PaneElements): void {
+    const select = elements.tilingSelect;
+    const selectedValue = select.value;
+    const options = Array.from(select.options);
+    const matchedOptions = matchTilingSearchItems(
+        options,
+        elements.tilingSearchInput.value,
+        (option) => option.dataset.searchText ?? "",
+    );
+    let visibleCount = 0;
+    for (const option of options) {
+        const matches = matchedOptions.has(option);
+        option.hidden = !matches && option.value !== selectedValue;
+        if (matches) {
+            visibleCount += 1;
+        }
+    }
+    const query = elements.tilingSearchInput.value.trim();
+    if (!query) {
+        elements.tilingSearchStatus.textContent = "";
+        return;
+    }
+    elements.tilingSearchStatus.textContent =
+        visibleCount === 0
+            ? `No tilings match "${query}".`
+            : `Showing ${visibleCount} / ${options.length} tilings`;
+}
+
 function createPaneElements(
     paneId: PaneId,
     title: string,
@@ -274,14 +323,26 @@ function createPaneElements(
     const meta = element("div", "live-compare-pane-meta");
     meta.append(status, generation);
 
+    const tilingControl = element("label", "live-compare-tiling-control");
+    const tilingSearchLabel = element("span", "sr-only", `Search ${title} tilings`);
+    const tilingSearchInput = element("input", "live-compare-tiling-search");
+    tilingSearchInput.type = "search";
+    tilingSearchInput.placeholder = "Search tilings";
+    tilingSearchInput.autocomplete = "off";
+    tilingSearchInput.setAttribute("aria-label", `Search ${title} tilings`);
+
     const tilingSelect = element("select", "live-compare-tiling-select");
     tilingSelect.setAttribute("aria-label", `${title} tiling`);
     for (const definition of definitions) {
         const option = document.createElement("option");
         option.value = definition.tiling_family;
         option.textContent = definition.label;
+        option.dataset.searchText = searchTextForTopologyDefinition(definition);
         tilingSelect.append(option);
     }
+    const tilingSearchStatus = element("span", "live-compare-tiling-search-status");
+    tilingSearchStatus.setAttribute("aria-live", "polite");
+    tilingControl.append(tilingSearchLabel, tilingSearchInput, tilingSelect, tilingSearchStatus);
 
     const runButton = element("button", "live-compare-pane-action", "Run");
     runButton.type = "button";
@@ -291,7 +352,7 @@ function createPaneElements(
     resetButton.type = "button";
     const actions = element("div", "live-compare-pane-actions");
     actions.append(runButton, stepButton, resetButton);
-    header.append(titleNode, meta, tilingSelect, actions);
+    header.append(titleNode, meta, tilingControl, actions);
 
     const viewport = element("div", "live-compare-pane-viewport");
     const canvas = element("canvas", "grid-canvas live-compare-canvas");
@@ -305,6 +366,8 @@ function createPaneElements(
         canvas,
         status,
         generation,
+        tilingSearchInput,
+        tilingSearchStatus,
         tilingSelect,
         runButton,
         stepButton,
@@ -473,6 +536,7 @@ function renderPane(
     pane.elements.generation.textContent = `Gen ${snapshot.generation}`;
     pane.elements.runButton.textContent = snapshot.running ? "Pause" : "Run";
     pane.elements.tilingSelect.value = snapshot.topology_spec.tiling_family;
+    syncPaneTilingFilter(pane.elements);
     pane.elements.root.dataset.running = snapshot.running ? "true" : "false";
     pane.elements.root.dataset.tilingLabel = topologyLabel(
         definitions,
@@ -1126,12 +1190,16 @@ export function mountLiveCompareWorkspace({
         });
         pane.elements.tilingSelect.addEventListener("change", () => {
             setActivePane(pane);
+            syncPaneTilingFilter(pane.elements);
             const definition = definitions.find(
                 (candidate) => candidate.tiling_family === pane.elements.tilingSelect.value,
             );
             if (definition) {
                 void resetPaneToTopology(pane, definition).catch(onError);
             }
+        });
+        pane.elements.tilingSearchInput.addEventListener("input", () => {
+            syncPaneTilingFilter(pane.elements);
         });
         pane.elements.runButton.addEventListener("click", () => {
             setActivePane(pane);

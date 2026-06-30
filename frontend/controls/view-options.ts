@@ -3,6 +3,7 @@ import { matchSorter, rankings } from "match-sorter";
 import type { AdjacencyModeOption, PresetMetadata, TopologyOption } from "../types/domain.js";
 import type { DomElements } from "../types/dom.js";
 import type { RuleSelectOption } from "../types/ui.js";
+import { tilingSearchText } from "./tiling-search.js";
 import { createTilingPreviewThumbnail } from "./tiling-preview.js";
 
 interface RuleSelectRenderState {
@@ -236,39 +237,6 @@ function tilingOptionsSignature(families: readonly TopologyOption[]): string {
             ].join(":"),
         )
         .join("|");
-}
-
-function normalizeTilingSearchText(value: string): string {
-    return value
-        .normalize("NFKD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/&/g, " and ")
-        .replace(/[^a-z0-9]+/g, " ")
-        .trim();
-}
-
-function tilingSearchForms(value: string): string[] {
-    const normalized = normalizeTilingSearchText(value);
-    if (!normalized) {
-        return [];
-    }
-    const compact = normalized.replace(/\s+/g, "");
-    return compact === normalized ? [normalized] : [normalized, compact];
-}
-
-function tilingSearchText(optionData: TopologyOption): string {
-    const terms = [
-        optionData.label,
-        optionData.value,
-        optionData.group,
-        optionData.family,
-        optionData.sizingMode === "patch_depth" ? "patch depth substitution" : "grid cell size",
-        optionData.renderKind,
-        optionData.previewKey,
-        ...optionData.searchAliases,
-    ];
-    return [...new Set(terms.flatMap(tilingSearchForms))].join(" ");
 }
 
 function buildTilingPreviewCard(optionData: TopologyOption): HTMLButtonElement {

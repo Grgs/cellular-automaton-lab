@@ -1,7 +1,6 @@
-import { matchSorter, rankings } from "match-sorter";
-
 import type { AppActionSet } from "../types/actions.js";
 import type { DomElements } from "../types/dom.js";
+import { matchTilingSearchItems } from "./tiling-search.js";
 
 function setTilingPickerOpen(elements: DomElements, open: boolean): void {
     if (elements.tilingPickerMenu) {
@@ -69,33 +68,12 @@ function tilingPickerSearchInput(menu: HTMLElement): HTMLInputElement | null {
     return menu.querySelector<HTMLInputElement>(".tiling-picker-search");
 }
 
-function tilingSearchQueryForms(value: string): string[] {
-    const normalized = value
-        .normalize("NFKD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/&/g, " and ")
-        .replace(/[^a-z0-9]+/g, " ")
-        .trim();
-    if (!normalized) {
-        return [];
-    }
-    const compact = normalized.replace(/\s+/g, "");
-    return compact !== normalized && compact.length <= 5 ? [normalized, compact] : [normalized];
-}
-
 function filterTilingPreviewCards(menu: HTMLElement, rawQuery: string): void {
-    const queries = tilingSearchQueryForms(rawQuery);
     const cards = Array.from(menu.querySelectorAll<HTMLButtonElement>(".tiling-preview-card"));
-    const matchedCards = new Set(
-        queries.length === 0
-            ? cards
-            : queries.flatMap((query) =>
-                  matchSorter(cards, query, {
-                      keys: [(card) => card.dataset.searchText ?? ""],
-                      threshold: rankings.CONTAINS,
-                  }),
-              ),
+    const matchedCards = matchTilingSearchItems(
+        cards,
+        rawQuery,
+        (card) => card.dataset.searchText ?? "",
     );
     let hasMatches = false;
     menu.querySelectorAll<HTMLElement>(".tiling-preview-group").forEach((group) => {
