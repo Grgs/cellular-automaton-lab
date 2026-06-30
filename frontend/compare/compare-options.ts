@@ -45,10 +45,20 @@ export const FEATURED_COMPARE_DEMO: CompareRunConfig = {
     rule: "penrose-greenberg-hastings",
     traversal: "bfs",
     grid_size: 22,
-    frames: 22,
+    // Only run as far as the wave bloom stays alive on all four boards; the loop
+    // then replays the lively sub-window below rather than a long dead tail.
+    frames: 12,
     geometries: ["square", "trihexagonal-3-6-3-6", "penrose-p3-rhombs", "hat-monotile"],
     pattern: "r-pentomino",
 };
+
+/**
+ * Loop the demo over [loopStart, frames-1] only -- skipping the sparse seed
+ * lead-in so the looping playback stays full on every board. Paired with a
+ * slower speed so each cycle lasts a couple of seconds.
+ */
+export const FEATURED_COMPARE_DEMO_LOOP_START = 4;
+export const FEATURED_COMPARE_DEMO_SPEED = 0.5;
 
 /** A lively generation to rest on when reduced-motion disables autoplay. */
 export const FEATURED_COMPARE_DEMO_STILL_FRAME = 8;

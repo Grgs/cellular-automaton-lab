@@ -58,6 +58,10 @@ export interface FilmstripLoadOptions {
     autoplay?: boolean;
     /** Seek to this generation after loading (e.g. a lively frame when paused). */
     initialFrame?: number;
+    /** Frame the loop wraps back to, so playback replays only a lively sub-window. */
+    loopStart?: number;
+    /** Transport speed multiplier to apply (must match a speed-selector option). */
+    speedMultiplier?: number;
 }
 
 export interface FilmstripViewController {
@@ -270,7 +274,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         loadOptions?: FilmstripLoadOptions,
     ): Promise<void> {
         teardownRun();
-        player = new FilmstripPlayer(filmstrip.frame_count, { loop: options.loop ?? false });
+        player = new FilmstripPlayer(filmstrip.frame_count, {
+            loop: options.loop ?? false,
+            ...(loadOptions?.loopStart === undefined ? {} : { loopStart: loadOptions.loopStart }),
+        });
 
         boardsArea.replaceChildren();
         boards = filmstrip.tilings.map((tiling) => {
@@ -319,6 +326,12 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         );
 
         // Optional post-load playback overrides (used by the featured demo).
+        if (loadOptions?.speedMultiplier !== undefined) {
+            const speedValue = String(loadOptions.speedMultiplier);
+            if (SPEED_OPTIONS.some((option) => String(option.value) === speedValue)) {
+                speedSelect.value = speedValue;
+            }
+        }
         if (loadOptions?.initialFrame !== undefined) {
             player.seek(loadOptions.initialFrame);
         }

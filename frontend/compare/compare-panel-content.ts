@@ -28,6 +28,8 @@ import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
 import { buildCompareRunUrl, type CompareRunConfig } from "./compare-run-link.js";
 import {
+    FEATURED_COMPARE_DEMO_LOOP_START,
+    FEATURED_COMPARE_DEMO_SPEED,
     FEATURED_COMPARE_DEMO_STILL_FRAME,
     SEED_SHAPE_OPTIONS,
     TRAVERSAL_OPTIONS,
@@ -1052,10 +1054,16 @@ export function createComparePanelContent(
             typeof window !== "undefined" &&
             typeof window.matchMedia === "function" &&
             window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        // Reduced motion: rest on a lively frame instead of animating.
+        // Reduced motion: rest on a lively frame instead of animating. Otherwise
+        // autoplay and loop only the lively sub-window at a calmer speed.
         const playback: FilmstripLoadOptions = prefersReducedMotion
             ? { initialFrame: FEATURED_COMPARE_DEMO_STILL_FRAME }
-            : { autoplay: true };
+            : {
+                  autoplay: true,
+                  initialFrame: FEATURED_COMPARE_DEMO_LOOP_START,
+                  loopStart: FEATURED_COMPARE_DEMO_LOOP_START,
+                  speedMultiplier: FEATURED_COMPARE_DEMO_SPEED,
+              };
         await runFilmstrip(playback);
     }
 
