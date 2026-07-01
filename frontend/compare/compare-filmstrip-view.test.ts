@@ -230,6 +230,56 @@ describe("createFilmstripView", () => {
         expect(clock.active()).toBe(1); // still playing
     });
 
+    it("autoplays after load when the autoplay option is set", async () => {
+        const backend = stubBackend(async () => squarePreview());
+        const clock = manualScheduler();
+        const view = createFilmstripView({ backend, scheduler: clock.scheduler, loop: true });
+        document.body.append(view.element);
+
+        await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }])], 2), {
+            autoplay: true,
+        });
+
+        expect(clock.active()).toBe(1); // playing without a manual click
+        expect(transportButton(view, "Play / pause").textContent).toBe("⏸ Pause");
+    });
+
+    it("rests on the requested initial frame, paused, when given initialFrame", async () => {
+        const backend = stubBackend(async () => squarePreview());
+        const clock = manualScheduler();
+        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
+        document.body.append(view.element);
+
+        await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3), {
+            initialFrame: 2,
+        });
+
+        expect(clock.active()).toBe(0); // paused
+        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
+            "gen 2 / 2",
+        );
+    });
+
+    it("loops a sub-window back to loopStart instead of the seed", async () => {
+        const backend = stubBackend(async () => squarePreview());
+        const clock = manualScheduler();
+        const view = createFilmstripView({ backend, scheduler: clock.scheduler, loop: true });
+        document.body.append(view.element);
+
+        await view.load(
+            filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }, { d: 1 }])], 4),
+            { autoplay: true, initialFrame: 1, loopStart: 1 },
+        );
+
+        clock.tick(); // -> gen 2
+        clock.tick(); // -> gen 3 (last)
+        clock.tick(); // wraps to loopStart (gen 1), skipping the seed
+        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
+            "gen 1 / 3",
+        );
+        expect(clock.active()).toBe(1); // still playing
+    });
+
     it("supports manual step, seek and reset which pause playback", async () => {
         const backend = stubBackend(async () => squarePreview());
         const clock = manualScheduler();

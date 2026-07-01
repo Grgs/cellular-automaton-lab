@@ -27,12 +27,22 @@ import type {
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
 import { buildCompareRunUrl, type CompareRunConfig } from "./compare-run-link.js";
-import { SEED_SHAPE_OPTIONS, TRAVERSAL_OPTIONS } from "./compare-options.js";
+import {
+    FEATURED_COMPARE_DEMO_LOOP_START,
+    FEATURED_COMPARE_DEMO_SPEED,
+    FEATURED_COMPARE_DEMO_STILL_FRAME,
+    SEED_SHAPE_OPTIONS,
+    TRAVERSAL_OPTIONS,
+} from "./compare-options.js";
 import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
 import { createSeedPreview } from "./compare-seed-preview.js";
-import { createFilmstripView, type FilmstripViewController } from "./compare-filmstrip-view.js";
+import {
+    createFilmstripView,
+    type FilmstripLoadOptions,
+    type FilmstripViewController,
+} from "./compare-filmstrip-view.js";
 import {
     deleteSavedCompareRun,
     deleteSavedTilingSet,
@@ -100,6 +110,14 @@ function openPatternInTab(pattern: PatternPayload): void {
     window.open(buildShareUrl(pattern, window.location.href), "_blank", "noopener");
 }
 
+function prefersReducedMotion(): boolean {
+    return (
+        typeof window !== "undefined" &&
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+}
+
 export interface ComparePanelContentOptions {
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
@@ -116,6 +134,8 @@ export interface ComparePanelContentHandle {
     activate(): void;
     /** Populate the workspace from a decoded run link without running it. */
     applyRunConfig(config: CompareRunConfig): Promise<void>;
+    /** Apply a config, build the live filmstrip, and start looping playback. */
+    runFeaturedDemo(config: CompareRunConfig): Promise<void>;
     /** Show a run-link load problem in the status line (e.g. an unreadable link). */
     reportRunLinkError(message: string): void;
     /** Let an open action menu consume Escape; returns true when it did. */
@@ -303,11 +323,16 @@ export function createComparePanelContent(
     traversalSelect.addEventListener("change", refreshPreview);
     gridInput.addEventListener("change", refreshPreview);
 
-    const runButton = el("button", { class: "compare-run", type: "button" }, ["Run comparison"]);
+    // "Play side by side" is the showcase action, so it is the primary button;
+    // the analytical "Run comparison" is secondary and lives in the analysis
+    // section below the live boards.
+    const runButton = el("button", { class: "compare-run compare-run-secondary", type: "button" }, [
+        "Run comparison",
+    ]);
     const playButton = el(
         "button",
         {
-            class: "compare-run compare-run-secondary",
+            class: "compare-run",
             type: "button",
             title: "Run every selected tiling on a shared clock and play them side by side",
         },
@@ -440,11 +465,24 @@ export function createComparePanelContent(
         ]),
         seedWorkspace,
         el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
-        savedCompareControls(),
-        el("div", { class: "compare-actions" }, [runButton, playButton, copyRunButton, statusLine]),
+        el("div", { class: "compare-actions" }, [playButton, copyRunButton, statusLine]),
         liveStateLine,
+        // Side-by-side first; the cross-tiling analysis (phase portrait + table)
+        // lives below it and only computes when Run comparison is pressed.
         filmstripArea,
-        resultsArea,
+        el("div", { class: "compare-analysis" }, [
+            el("div", { class: "compare-section-title", textContent: "Cross-tiling analysis" }),
+            el("p", {
+                class: "compare-intro",
+                textContent:
+                    "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
+            }),
+            runButton,
+            resultsArea,
+        ]),
+        // Saved runs / tiling sets are a manage-your-setups aside, so they sit
+        // below the live output rather than pushing it down the page.
+        savedCompareControls(),
     ]);
 
     renderTilingChecklist();
@@ -1036,6 +1074,21 @@ export function createComparePanelContent(
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
+    async function runFeaturedDemo(config: CompareRunConfig): Promise<void> {
+        await applyRunConfig(config);
+        // Reduced motion: rest on a lively frame instead of animating. Otherwise
+        // autoplay and loop only the lively sub-window at a calmer speed.
+        const playback: FilmstripLoadOptions = prefersReducedMotion()
+            ? { initialFrame: FEATURED_COMPARE_DEMO_STILL_FRAME }
+            : {
+                  autoplay: true,
+                  initialFrame: FEATURED_COMPARE_DEMO_LOOP_START,
+                  loopStart: FEATURED_COMPARE_DEMO_LOOP_START,
+                  speedMultiplier: FEATURED_COMPARE_DEMO_SPEED,
+              };
+        await runFilmstrip(playback);
+    }
+
     function highlightGeometry(geometry: string | null): void {
         resultsArea.querySelectorAll<SVGElement>("[data-geometry]").forEach((node) => {
             node.classList.toggle(
@@ -1078,7 +1131,7 @@ export function createComparePanelContent(
         }
     }
 
-    async function runFilmstrip(): Promise<void> {
+    async function runFilmstrip(playback?: FilmstripLoadOptions): Promise<void> {
         if (running) {
             return;
         }
@@ -1118,7 +1171,15 @@ export function createComparePanelContent(
                 filmstripArea.append(filmstripView.element);
             }
             filmstripArea.hidden = false;
-            await filmstripView.load(filmstrip);
+            await filmstripView.load(filmstrip, playback);
+            // Land the user on the live boards rather than the configuration above
+            // them -- especially for the one-click featured demo.
+            if (typeof filmstripArea.scrollIntoView === "function") {
+                filmstripArea.scrollIntoView({
+                    block: "start",
+                    behavior: prefersReducedMotion() ? "auto" : "smooth",
+                });
+            }
             liveStateLine.textContent = `Live filmstrip ready with ${filmstrip.tilings.length} tilings and ${filmstrip.frame_count} generations.`;
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
@@ -1464,6 +1525,7 @@ export function createComparePanelContent(
             highlightGeometry(null);
         },
         applyRunConfig,
+        runFeaturedDemo,
         reportRunLinkError(message: string): void {
             statusLine.textContent = message;
         },

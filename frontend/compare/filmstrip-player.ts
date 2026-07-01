@@ -20,6 +20,11 @@ export interface FilmstripPlayerState {
 export interface FilmstripPlayerOptions {
     /** Loop back to the first frame after the last instead of stopping. */
     loop?: boolean;
+    /**
+     * Frame the loop wraps back to (default 0). Lets a looping run replay only a
+     * sub-window (e.g. skip a sparse seed lead-in), so the loop stays lively.
+     */
+    loopStart?: number;
 }
 
 export type FilmstripPlayerListener = (state: FilmstripPlayerState) => void;
@@ -42,11 +47,13 @@ export class FilmstripPlayer {
     private playingValue = false;
     private frameCountValue: number;
     private readonly loop: boolean;
+    private readonly loopStart: number;
     private readonly listeners = new Set<FilmstripPlayerListener>();
 
     constructor(frameCount: number, options: FilmstripPlayerOptions = {}) {
         this.frameCountValue = Math.max(0, Math.trunc(frameCount));
         this.loop = options.loop ?? false;
+        this.loopStart = Math.max(0, Math.trunc(options.loopStart ?? 0));
     }
 
     get index(): number {
@@ -128,7 +135,8 @@ export class FilmstripPlayer {
             return;
         }
         if (this.loop) {
-            this.update(0, true);
+            // Wrap to the loop start (clamped) so a sub-window replays cleanly.
+            this.update(clampIndex(this.loopStart, this.frameCountValue), true);
             return;
         }
         // Reached the end of a non-looping filmstrip: stop on the last frame.
