@@ -499,6 +499,13 @@ describe("mountComparePanel", () => {
         ).toBeTruthy();
         expect(analysis!.contains(run ?? null)).toBe(true);
         expect(analysis!.querySelector(".compare-results")).not.toBeNull();
+
+        // Saved runs/sets are demoted below the live output, not above it.
+        const saved = document.querySelector(".compare-saved");
+        expect(saved).not.toBeNull();
+        expect(
+            filmstrip!.compareDocumentPosition(saved!) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
     });
 
     it("limits compare tilings to the selected rule's compatible families", async () => {

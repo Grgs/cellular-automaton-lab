@@ -110,6 +110,14 @@ function openPatternInTab(pattern: PatternPayload): void {
     window.open(buildShareUrl(pattern, window.location.href), "_blank", "noopener");
 }
 
+function prefersReducedMotion(): boolean {
+    return (
+        typeof window !== "undefined" &&
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+}
+
 export interface ComparePanelContentOptions {
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
@@ -457,7 +465,6 @@ export function createComparePanelContent(
         ]),
         seedWorkspace,
         el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
-        savedCompareControls(),
         el("div", { class: "compare-actions" }, [playButton, copyRunButton, statusLine]),
         liveStateLine,
         // Side-by-side first; the cross-tiling analysis (phase portrait + table)
@@ -473,6 +480,9 @@ export function createComparePanelContent(
             runButton,
             resultsArea,
         ]),
+        // Saved runs / tiling sets are a manage-your-setups aside, so they sit
+        // below the live output rather than pushing it down the page.
+        savedCompareControls(),
     ]);
 
     renderTilingChecklist();
@@ -1066,13 +1076,9 @@ export function createComparePanelContent(
 
     async function runFeaturedDemo(config: CompareRunConfig): Promise<void> {
         await applyRunConfig(config);
-        const prefersReducedMotion =
-            typeof window !== "undefined" &&
-            typeof window.matchMedia === "function" &&
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         // Reduced motion: rest on a lively frame instead of animating. Otherwise
         // autoplay and loop only the lively sub-window at a calmer speed.
-        const playback: FilmstripLoadOptions = prefersReducedMotion
+        const playback: FilmstripLoadOptions = prefersReducedMotion()
             ? { initialFrame: FEATURED_COMPARE_DEMO_STILL_FRAME }
             : {
                   autoplay: true,
@@ -1166,6 +1172,14 @@ export function createComparePanelContent(
             }
             filmstripArea.hidden = false;
             await filmstripView.load(filmstrip, playback);
+            // Land the user on the live boards rather than the configuration above
+            // them -- especially for the one-click featured demo.
+            if (typeof filmstripArea.scrollIntoView === "function") {
+                filmstripArea.scrollIntoView({
+                    block: "start",
+                    behavior: prefersReducedMotion() ? "auto" : "smooth",
+                });
+            }
             liveStateLine.textContent = `Live filmstrip ready with ${filmstrip.tilings.length} tilings and ${filmstrip.frame_count} generations.`;
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
