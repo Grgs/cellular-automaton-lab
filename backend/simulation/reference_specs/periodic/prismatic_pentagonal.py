@@ -43,6 +43,7 @@ SPECS = {
             expected_dual_candidate_geometries=(
                 "archimedean-3-3-3-4-4",
                 "archimedean-3-3-4-3-4",
+                "uniform-2-16-v1-33344-33434",
             ),
             expected_dual_structure_signature=((3, 60), (4, 25)),
         ),

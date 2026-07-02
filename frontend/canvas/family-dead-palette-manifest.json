@@ -1046,6 +1046,36 @@
       ]
     },
     {
+      "geometry": "uniform-2-4-v1-44-33344",
+      "variants": [
+        {
+          "label": "uniform-2-4-v1-44-33344-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "uniform-2-4-v1-44-33344-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
+      "geometry": "uniform-2-16-v1-33344-33434",
+      "variants": [
+        {
+          "label": "uniform-2-16-v1-33344-33434-square",
+          "selector": {"kind": "square"},
+          "color": {"token": "toneStone"}
+        },
+        {
+          "label": "uniform-2-16-v1-33344-33434-triangle",
+          "selector": {"kind": "triangle"},
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
       "geometry": "penrose-p1-pentagon-diamond",
       "variants": [
         {
