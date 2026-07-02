@@ -42,9 +42,21 @@ class AperiodicRegistryTests(unittest.TestCase):
                 self.assertTrue(contract.verification_modes)
 
     def test_experimental_aperiodics_keep_explicit_promotion_blockers(self) -> None:
-        for geometry in ("dodecagonal-square-triangle",):
+        from backend.simulation.aperiodic_family_manifest import (
+            EXPERIMENTAL_APERIODIC_FAMILY_IDS,
+        )
+
+        # Every family currently in the Experimental picker group must state
+        # why. The group is empty right now; the invariant stays enforced for
+        # future experimental additions.
+        for geometry in EXPERIMENTAL_APERIODIC_FAMILY_IDS:
             with self.subTest(geometry=geometry):
                 self.assertIsNotNone(APERIODIC_IMPLEMENTATION_CONTRACTS[geometry].promotion_blocker)
+
+    def test_dodecagonal_square_triangle_no_longer_has_a_promotion_blocker(self) -> None:
+        self.assertIsNone(
+            APERIODIC_IMPLEMENTATION_CONTRACTS["dodecagonal-square-triangle"].promotion_blocker
+        )
 
     def test_pinwheel_no_longer_has_a_promotion_blocker(self) -> None:
         self.assertIsNone(APERIODIC_IMPLEMENTATION_CONTRACTS["pinwheel"].promotion_blocker)

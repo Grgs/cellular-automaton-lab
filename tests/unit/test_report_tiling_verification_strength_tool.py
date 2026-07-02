@@ -159,13 +159,13 @@ class ReportTilingVerificationStrengthToolTests(unittest.TestCase):
             "\n\n", maxsplit=1
         )[0]
         self.assertNotIn("promotion_blocker:", pinwheel_2_1_block)
-        # dodecagonal-square-triangle is now the only experimental aperiodic family,
-        # so it is where the detail output still surfaces a promotion blocker.
-        self.assertIn("dodecagonal-square-triangle (Dodecagonal Square-Triangle)", output)
+        # dodecagonal-square-triangle was promoted out of Experimental on
+        # July 2, 2026; no shipped family surfaces a promotion blocker now.
+        self.assertIn("dodecagonal-square-triangle (Schlottmann Square-Triangle)", output)
         dodecagonal_block = output.split(
-            "dodecagonal-square-triangle (Dodecagonal Square-Triangle)", maxsplit=1
+            "dodecagonal-square-triangle (Schlottmann Square-Triangle)", maxsplit=1
         )[1].split("\n\n", maxsplit=1)[0]
-        self.assertIn("promotion_blocker:", dodecagonal_block)
+        self.assertNotIn("promotion_blocker:", dodecagonal_block)
         self.assertIn("exact_reference_mode: pinwheel_exact", output)
         self.assertIn("robinson-triangles (Robinson Triangles)", output)
         self.assertIn("tuebingen-triangle (Tuebingen Triangle)", output)
