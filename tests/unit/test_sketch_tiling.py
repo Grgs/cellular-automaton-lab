@@ -19,6 +19,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 EXAMPLE_PATH = ROOT_DIR / "tools" / "sketch_examples" / "triangular_square_2uniform.py"
 UNIFORM_2_10_PATH = ROOT_DIR / "tools" / "sketch_examples" / "uniform_2_10.py"
 UNIFORM_2_2_PATH = ROOT_DIR / "tools" / "sketch_examples" / "uniform_2_2_3122_34312.py"
+UNIFORM_2_4_PATH = ROOT_DIR / "tools" / "sketch_examples" / "uniform_2_4_v1_44_33344.py"
 
 
 class SketchTilingTests(unittest.TestCase):
@@ -30,6 +31,30 @@ class SketchTilingTests(unittest.TestCase):
         self.assertFalse(_is_interior_edge(((-2.0, 3.0), (-2.0, 4.0)), bounds))
         self.assertFalse(_is_interior_edge(((12.0, 3.0), (12.0, 4.0)), bounds))
         self.assertTrue(_is_interior_edge(((2.0, 3.0), (2.0, 4.0)), bounds))
+
+    def test_skew_lattice_edges_outside_parallelogram_are_boundary_edges(self) -> None:
+        from tools.sketch_tiling import _is_interior_edge
+
+        bounds = (0.0, 0.0, 10.0, 10.0)
+
+        self.assertFalse(
+            _is_interior_edge(
+                ((0.0, 5.0), (1.0, 5.0)),
+                bounds,
+                cell_width=10.0,
+                cell_height=10.0,
+                lattice_skew_x=5.0,
+            )
+        )
+        self.assertTrue(
+            _is_interior_edge(
+                ((5.0, 5.0), (6.0, 5.0)),
+                bounds,
+                cell_width=10.0,
+                cell_height=10.0,
+                lattice_skew_x=5.0,
+            )
+        )
 
     def test_example_sketch_is_valid_and_matches_backend(self) -> None:
         from tools.sketch_tiling import load_sketch, sketch
@@ -86,6 +111,24 @@ class SketchTilingTests(unittest.TestCase):
                 ("dodecagon", "triangle", "square", "triangle"): 64,
             },
         )
+        self.assertTrue(report.is_valid)
+
+    def test_uniform_2_4_skew_package_is_valid(self) -> None:
+        from tools.sketch_tiling import load_sketch, sketch
+
+        report = sketch(load_sketch(UNIFORM_2_4_PATH), patch_size=4)
+
+        self.assertEqual(
+            set(report.interior_vertex_kinds),
+            {
+                ("square", "square", "square", "square"),
+                ("square", "square", "triangle", "triangle", "triangle"),
+            },
+        )
+        self.assertEqual(report.overlaps, ())
+        self.assertEqual(report.unmatched_edges, ())
+        self.assertEqual(report.t_junctions, ())
+        self.assertEqual(report.invalid_interior_vertices, ())
         self.assertTrue(report.is_valid)
 
     def test_missing_face_is_flagged_as_invalid(self) -> None:
