@@ -43,6 +43,9 @@ The order is intentional:
 - `uniform-2-2-3122-34312`
   - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
   - [2-uniform #2 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n2.svg)
+- `uniform-2-16-v1-33344-33434`
+  - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
+  - [2-uniform #16 variant 1 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n16.svg)
 - `uniform-2-4-v1-44-33344`
   - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
   - [2-uniform #4 variant 1 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n4.svg)

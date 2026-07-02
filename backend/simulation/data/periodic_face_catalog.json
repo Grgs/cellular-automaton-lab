@@ -576,6 +576,22 @@
     "minimum_grid_dimension": 1
   },
   {
+    "geometry": "uniform-2-16-v1-33344-33434",
+    "label": "2-uniform #16 variant 1 (3^3.4^2; 3^2.4.3.4)",
+    "picker_group": "Periodic Mixed",
+    "picker_order": 255,
+    "family": "mixed",
+    "viewport_sync_mode": "backend-sync",
+    "sizing_policy": {
+      "control": "cell_size",
+      "default": 12,
+      "min": 8,
+      "max": 20
+    },
+    "default_rule": "life-b2-s23",
+    "minimum_grid_dimension": 1
+  },
+  {
     "geometry": "floret-pentagonal",
     "label": "Floret Pentagonal",
     "picker_group": "Periodic Mixed",
