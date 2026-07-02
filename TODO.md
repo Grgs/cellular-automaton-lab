@@ -53,14 +53,13 @@ Decisions already taken (so the steps are unambiguous):
 
 ## Now
 
-- For `dodecagonal-square-triangle`, the runtime is now a decorated 3.12.12 Archimedean generator: hexagonal lattice of regular dodecagonal supercells decomposed into six unit squares plus twelve unit equilateral triangles, with two bridging triangles per supercell. It tiles the plane exactly, scales without depth limit, and uses no vendored data. It is not the canonical Schlottmann quasi-periodic tiling (which would require marked prototiles); the supercell layout is locally 6-fold symmetric and the global tiling is periodic at the supercell scale.
+- For `dodecagonal-square-triangle` (catalog label "Schlottmann Square-Triangle"), the runtime is now the genuine Schlottmann quasi-periodic square-triangle pseudo substitution (inflation `2 + sqrt(3)`, five marked prototiles, interlocking supertiles deduplicated in the exact `Z[zeta12]` module). The rule was extracted from the Tilings Encyclopedia figure and verified tile-for-tile against the encyclopedia's 4999-cell literature patch. It scales without depth limit and uses no vendored data. Manual visual review accepted the rendered field on July 2, 2026 and the family was promoted to the main `Aperiodic` group, leaving the Experimental group empty.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
 
 ## Next
 
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The direct canonical fixture layer now covers shallow and representative depths for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, plus depth-`3` fixtures for `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
-- If a faithful canonical Schlottmann marked-prototile substitution becomes available (e.g. via Hermisson, Richard, Baake 1997 or an open-source reference implementation), swap the decorated-3.12.12 runtime for it. The current generator is structurally correct as a square-triangle tiling but is periodic, not quasi-periodic.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
 
 ## Later

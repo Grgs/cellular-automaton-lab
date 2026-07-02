@@ -1822,6 +1822,36 @@
       }
     },
     {
+      "tiling_family": "dodecagonal-square-triangle",
+      "label": "Schlottmann Square-Triangle",
+      "picker_group": "Aperiodic",
+      "picker_order": 320,
+      "mode_type": "adjacency",
+      "mode_label": "Mode",
+      "mode_labels": {},
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "dodecagonal-square-triangle"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 6,
+        "unsafe_max": 60
+      }
+    },
+    {
       "tiling_family": "shield",
       "label": "Shield",
       "picker_group": "Aperiodic",
@@ -1906,36 +1936,6 @@
         "default": 3,
         "min": 0,
         "max": 4
-      }
-    },
-    {
-      "tiling_family": "dodecagonal-square-triangle",
-      "label": "Dodecagonal Square-Triangle",
-      "picker_group": "Experimental",
-      "picker_order": 320,
-      "mode_type": "adjacency",
-      "mode_label": "Mode",
-      "mode_labels": {},
-      "sizing_mode": "patch_depth",
-      "family": "aperiodic",
-      "render_kind": "polygon_aperiodic",
-      "viewport_sync_mode": "presentation-only",
-      "supported_adjacency_modes": [
-        "edge"
-      ],
-      "default_adjacency_mode": "edge",
-      "default_rules": {
-        "edge": "life-b2-s23"
-      },
-      "geometry_keys": {
-        "edge": "dodecagonal-square-triangle"
-      },
-      "sizing_policy": {
-        "control": "patch_depth",
-        "default": 3,
-        "min": 0,
-        "max": 6,
-        "unsafe_max": 60
       }
     }
   ],
@@ -2750,10 +2750,10 @@
     },
     {
       "tiling_family": "dodecagonal-square-triangle",
-      "label": "Dodecagonal Square-Triangle",
-      "experimental": true,
-      "implementation_status": "canonical_patch",
-      "promotion_blocker": "Experimental until a recursive marked substitution replaces the finite Bielefeld crop; strict topology validation is currently proven through depth 11.",
+      "label": "Schlottmann Square-Triangle",
+      "experimental": false,
+      "implementation_status": "true_substitution",
+      "promotion_blocker": null,
       "public_cell_kinds": [
         "dodecagonal-square-triangle-square",
         "dodecagonal-square-triangle-triangle"

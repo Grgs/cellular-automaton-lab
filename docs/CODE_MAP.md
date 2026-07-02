@@ -387,7 +387,7 @@ A self-contained overlay that runs one seed under one rule across many tilings a
 - [backend/simulation/aperiodic_dodecagonal_square_triangle.py](../backend/simulation/aperiodic_dodecagonal_square_triangle.py)
 - [backend/simulation/aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
 - [backend/simulation/aperiodic_pinwheel.py](../backend/simulation/aperiodic_pinwheel.py)
-  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Dodecagonal Square-Triangle, Shield, and Pinwheel. Pinwheel uses the exact-record helper path in `aperiodic_support.patches` (via the new `ExactSimilaritySubstitution` shared helper); the other rebuilt families still emit the standard polygon patch format.
+  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Schlottmann Square-Triangle, Shield, and Pinwheel. Pinwheel uses the exact-record helper path in `aperiodic_support.patches` (via the new `ExactSimilaritySubstitution` shared helper); the other rebuilt families still emit the standard polygon patch format.
 
 ### Rules
 

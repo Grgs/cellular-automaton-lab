@@ -19,10 +19,12 @@ SPECS = {
         display_name=_reference_label(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         source_urls=("https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",),
         root_seed_policy=(
-            "decorated 3.12.12 Archimedean tiling: hexagonal lattice of regular "
-            "dodecagonal supercells decomposed into six unit squares plus twelve "
-            "unit equilateral triangles, with two bridging triangles per supercell "
-            "from the underlying 3.12.12 Archimedean layout"
+            "Schlottmann marked square-triangle pseudo substitution (inflation "
+            "factor 2 + sqrt(3), five marked prototiles: red/yellow/blue "
+            "triangles plus plain/marked squares); the runtime iterates the "
+            "blue triangle's interior identity self-slot so patches converge "
+            "around a fixed anchor tile, then BFS-crops from the square "
+            "nearest the anchor"
         ),
         allowed_public_cell_kinds=_public_cell_kinds(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY),
         required_metadata=(
@@ -55,7 +57,7 @@ SPECS = {
                 ),
                 expected_degree_histogram=((1, 4), (4, 1)),
                 min_unique_orientation_tokens=3,
-                min_unique_chirality_tokens=2,
+                min_unique_chirality_tokens=3,
                 canonical_patch_fixture_key="dense-depth-1",
             ),
             3: ReferenceDepthExpectation(
@@ -80,21 +82,27 @@ SPECS = {
                     ),
                 ),
                 expected_degree_histogram=((1, 6), (2, 6), (3, 8), (4, 5)),
-                min_unique_orientation_tokens=8,
+                min_unique_orientation_tokens=4,
                 min_unique_chirality_tokens=3,
                 canonical_patch_fixture_key="dense-depth-3",
             ),
         },
         notes=(
-            "The runtime is a periodic decorated 3.12.12 Archimedean tiling. Each "
-            "regular-dodecagonal supercell is decomposed into the canonical six unit "
-            "squares plus twelve unit equilateral triangles (a 6-fold-symmetric layout), "
-            "and the bridging triangles between supercells are partitioned so that "
-            "each plane triangle is owned by exactly one supercell.",
-            "The result is locally 12-fold flavoured inside every former-dodecagon "
-            "region, has both kinds in the expected 7:3 triangle/square asymptotic "
-            "ratio, and tiles the plane exactly without any vendored data dependency. "
-            "It is not the canonical Schlottmann quasi-periodic square-triangle tiling.",
+            "The runtime is the Schlottmann quasi-periodic square-triangle "
+            "pseudo substitution with inflation factor 2 + sqrt(3): five marked "
+            "prototiles (three marked unit triangles exposed as red/yellow/blue "
+            "chirality tokens plus two marked unit squares collapsed to the "
+            "public square kind). Supertiles interlock, so boundary children "
+            "are emitted by both adjacent supertiles and deduplicated by exact "
+            "Z[zeta12]-module geometry.",
+            "The child placements were extracted from the Tilings Encyclopedia "
+            "substitution-rule figure and verified against the encyclopedia's "
+            "4999-cell literature patch: a two-level supertile decomposition "
+            "pins every child pose, re-expanding the decomposed coarse "
+            "configuration reproduces the literature patch tile-for-tile "
+            "(marking colors included), sigma^2 supertile patches are gap- and "
+            "overlap-free, and the triangle:square census converges to the "
+            "canonical 4/sqrt(3).",
         ),
     ),
 }

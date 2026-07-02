@@ -189,9 +189,10 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
             citation_label="Square-triangle",
             primary_source_url="https://tilings.math.uni-bielefeld.de/substitution/square-triangle/",
             review_note=(
-                "Compare the finite literature-cropped square-triangle mix for dodecagonal "
-                "structure and the overall balance of square and triangle regions; strict "
-                "topology validation is currently proven through depth 11."
+                "Compare against the Bielefeld square-triangle patch: the runtime is now "
+                "the Schlottmann marked pseudo substitution, so the rendered field should "
+                "match the literature texture (quasi-periodic, no repeating supercell "
+                "lattice) with the same square/triangle mix."
             ),
             cache_filename="dodecagonal-square-triangle-reference.png",
         ),
@@ -199,12 +200,12 @@ RENDER_REVIEW_PROFILES: dict[str, RenderReviewProfile] = {
             ReviewChecklistItem(
                 id="dodecagonal-structure",
                 label="Dodecagonal structure is visible",
-                guidance="Check that the central field reads as a 12-fold square-triangle construction rather than an arbitrary dense polygon patch.",
+                guidance="Check that the central field reads as a 12-fold square-triangle construction rather than an arbitrary dense polygon patch, and that no periodic supercell lattice repeats across the window.",
             ),
             ReviewChecklistItem(
                 id="square-triangle-balance",
                 label="Square and triangle regions stay balanced",
-                guidance="Check that neither squares nor triangles visually swamp the other across the representative window.",
+                guidance="Check that neither squares nor triangles visually swamp the other across the representative window (the asymptotic triangle:square ratio is 4/sqrt(3), about 2.31).",
             ),
             ReviewChecklistItem(
                 id="central-density",

@@ -149,7 +149,7 @@ This release does not publish an npm package or a PyPI package. The repository i
 ## Preview Status And Known Limitations
 
 - `pinwheel` and `pinwheel-2-1` both ship in the main `Aperiodic` group: `pinwheel` was promoted on June 12, 2026 after correcting its subdivision shear, and `pinwheel-2-1` on June 13, 2026 after a visual review against the published Bielefeld patch (its exact-`Fraction` `1:4:sqrt(17)` tiles are congruence-verified at every depth).
-- `dodecagonal-square-triangle` is currently implemented as a decorated `3.12.12` Archimedean generator rather than the canonical Schlottmann quasi-periodic square-triangle tiling.
+- `dodecagonal-square-triangle` (catalog label "Schlottmann Square-Triangle") now runs the canonical Schlottmann quasi-periodic square-triangle substitution, verified tile-for-tile against the Tilings Encyclopedia's literature patch, and was promoted to the main `Aperiodic` group on July 2, 2026 — leaving no experimental aperiodic families.
 - The standalone GitHub Pages demo targets static hosting with network access and still loads Pyodide from a CDN rather than bundling it for offline use.
 
 The canonical list of known mathematical and rendering deviations lives in [docs/TILING_KNOWN_DEVIATIONS.md](docs/TILING_KNOWN_DEVIATIONS.md). Active follow-up work lives in [TODO.md](TODO.md).
