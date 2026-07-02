@@ -374,14 +374,19 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         picker_order=320,
         default_rule="life-b2-s23",
         builder_kind="compatibility_patch",
-        implementation_status="canonical_patch",
+        # Schlottmann's marked square-triangle pseudo substitution (inflation
+        # 2 + sqrt(3)), extracted from the Tilings Encyclopedia rule figure
+        # and verified tile-for-tile against the encyclopedia's 4999-cell
+        # literature patch; presented through the same BFS-cropped
+        # compatibility-patch surface as before.
+        implementation_status="true_substitution",
         public_cell_kinds=(
             DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
             DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
         ),
         promotion_blocker=(
-            "Experimental until a recursive marked substitution replaces the finite Bielefeld crop; "
-            "strict topology validation is currently proven through depth 11."
+            "Experimental until manual visual review accepts the rendered "
+            "Schlottmann quasi-periodic square-triangle substitution field."
         ),
     ),
     SHIELD_GEOMETRY: AperiodicFamilyManifestEntry(

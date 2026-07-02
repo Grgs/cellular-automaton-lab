@@ -4,108 +4,108 @@
       "cells": [
         {
           "center": [
-            1.366025,
-            1.366026
+            1.183012,
+            1.183012
           ],
           "chirality_token": null,
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-square",
-          "orientation_token": "0",
+          "orientation_token": "330",
           "vertices": [
             [
-              0.866025,
-              1.866026
+              0.5,
+              1.0
+            ],
+            [
+              1.366025,
+              0.5
             ],
             [
               1.866025,
-              1.866026
+              1.366025
             ],
             [
-              1.866025,
-              0.866026
-            ],
-            [
-              0.866025,
-              0.866026
+              1.0,
+              1.866025
             ]
           ]
         },
         {
           "center": [
-            1.366025,
-            0.577351
+            1.866025,
+            0.788675
+          ],
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.366025,
+              0.5
+            ],
+            [
+              2.366025,
+              0.5
+            ],
+            [
+              1.866025,
+              1.366025
+            ]
+          ]
+        },
+        {
+          "center": [
+            0.788675,
+            0.5
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "0",
+          "orientation_token": "30",
           "vertices": [
             [
-              0.866025,
-              0.866026
-            ],
-            [
-              1.866025,
-              0.866026
-            ],
-            [
-              1.366025,
+              0.5,
               0.0
-            ]
-          ]
-        },
-        {
-          "center": [
-            1.366025,
-            2.154701
-          ],
-          "chirality_token": "red",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "240",
-          "vertices": [
+            ],
             [
               1.366025,
-              2.732051
+              0.5
             ],
             [
-              0.866025,
-              1.866026
-            ],
-            [
-              1.866025,
-              1.866026
+              0.5,
+              1.0
             ]
           ]
         },
         {
           "center": [
-            0.57735,
-            1.366026
+            0.5,
+            1.57735
           ],
-          "chirality_token": "red",
+          "chirality_token": "blue",
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "270",
+          "orientation_token": "300",
           "vertices": [
-            [
-              0.866025,
-              1.866026
-            ],
-            [
-              0.866025,
-              0.866026
-            ],
             [
               0.0,
-              1.366026
+              1.866025
+            ],
+            [
+              0.5,
+              1.0
+            ],
+            [
+              1.0,
+              1.866025
             ]
           ]
         },
         {
           "center": [
-            2.1547,
-            1.366026
+            1.57735,
+            1.866025
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
@@ -113,16 +113,16 @@
           "orientation_token": "330",
           "vertices": [
             [
-              1.866025,
-              1.866026
-            ],
-            [
-              2.73205,
-              1.366026
+              1.0,
+              1.866025
             ],
             [
               1.866025,
-              0.866026
+              1.366025
+            ],
+            [
+              1.866025,
+              2.366025
             ]
           ]
         }
@@ -134,8 +134,8 @@
       "cells": [
         {
           "center": [
-            2.366025,
-            2.366026
+            1.366026,
+            1.866026
           ],
           "chirality_token": null,
           "decoration_tokens": null,
@@ -143,139 +143,55 @@
           "orientation_token": "0",
           "vertices": [
             [
-              1.866025,
-              2.866026
+              0.866026,
+              1.366026
             ],
             [
-              2.866025,
-              2.866026
+              1.866026,
+              1.366026
             ],
             [
-              2.866025,
-              1.866026
+              1.866026,
+              2.366026
             ],
             [
-              1.866025,
-              1.866026
+              0.866026,
+              2.366026
             ]
           ]
         },
         {
           "center": [
-            1.683012,
+            1.866026,
+            3.732051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.366026,
+              3.232051
+            ],
+            [
+              2.366026,
+              3.232051
+            ],
+            [
+              2.366026,
+              4.232051
+            ],
+            [
+              1.366026,
+              4.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.549038,
             1.183013
-          ],
-          "chirality_token": null,
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-square",
-          "orientation_token": "120",
-          "vertices": [
-            [
-              1.5,
-              0.5
-            ],
-            [
-              1.0,
-              1.366026
-            ],
-            [
-              1.866025,
-              1.866026
-            ],
-            [
-              2.366025,
-              1.0
-            ]
-          ]
-        },
-        {
-          "center": [
-            0.5,
-            1.866026
-          ],
-          "chirality_token": null,
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-square",
-          "orientation_token": "180",
-          "vertices": [
-            [
-              1.0,
-              1.366026
-            ],
-            [
-              0.0,
-              1.366026
-            ],
-            [
-              0.0,
-              2.366026
-            ],
-            [
-              1.0,
-              2.366026
-            ]
-          ]
-        },
-        {
-          "center": [
-            4.23205,
-            1.866026
-          ],
-          "chirality_token": null,
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-square",
-          "orientation_token": "180",
-          "vertices": [
-            [
-              4.73205,
-              1.366026
-            ],
-            [
-              3.73205,
-              1.366026
-            ],
-            [
-              3.73205,
-              2.366026
-            ],
-            [
-              4.73205,
-              2.366026
-            ]
-          ]
-        },
-        {
-          "center": [
-            3.049038,
-            1.183013
-          ],
-          "chirality_token": null,
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-square",
-          "orientation_token": "240",
-          "vertices": [
-            [
-              3.73205,
-              1.366026
-            ],
-            [
-              3.23205,
-              0.5
-            ],
-            [
-              2.366025,
-              1.0
-            ],
-            [
-              2.866025,
-              1.866026
-            ]
-          ]
-        },
-        {
-          "center": [
-            1.183012,
-            3.049038
           ],
           "chirality_token": null,
           "decoration_tokens": null,
@@ -283,391 +199,451 @@
           "orientation_token": "300",
           "vertices": [
             [
-              1.366025,
-              3.732051
+              1.866026,
+              1.366026
             ],
             [
-              1.866025,
-              2.866026
+              2.366026,
+              0.5
             ],
             [
-              1.0,
+              3.232051,
+              1.0
+            ],
+            [
+              2.732051,
+              1.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.915064,
+            2.549038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-square",
+          "orientation_token": "300",
+          "vertices": [
+            [
+              3.232051,
+              2.732051
+            ],
+            [
+              3.732051,
+              1.866026
+            ],
+            [
+              4.598076,
               2.366026
             ],
             [
-              0.5,
+              4.098076,
               3.232051
             ]
           ]
         },
         {
           "center": [
-            3.549038,
+            0.683013,
             3.049038
           ],
           "chirality_token": null,
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-square",
-          "orientation_token": "60",
+          "orientation_token": "330",
           "vertices": [
             [
-              2.866025,
+              0.0,
               2.866026
             ],
             [
-              3.366025,
-              3.732051
+              0.866026,
+              2.366026
             ],
             [
-              4.23205,
+              1.366026,
               3.232051
             ],
             [
-              3.73205,
-              2.366026
+              0.5,
+              3.732051
             ]
           ]
         },
         {
           "center": [
-            1.0,
-            0.788675
+            2.549038,
+            2.549038
           ],
-          "chirality_token": "yellow",
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-square",
+          "orientation_token": "330",
+          "vertices": [
+            [
+              1.866026,
+              2.366026
+            ],
+            [
+              2.732051,
+              1.866026
+            ],
+            [
+              3.232051,
+              2.732051
+            ],
+            [
+              2.366026,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.915064,
+            1.183013
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-square",
+          "orientation_token": "330",
+          "vertices": [
+            [
+              3.232051,
+              1.0
+            ],
+            [
+              4.098076,
+              0.5
+            ],
+            [
+              4.598076,
+              1.366026
+            ],
+            [
+              3.732051,
+              1.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.366026,
+            2.654701
+          ],
+          "chirality_token": "blue",
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "0",
           "vertices": [
             [
-              0.5,
+              0.866026,
+              2.366026
+            ],
+            [
+              1.866026,
+              2.366026
+            ],
+            [
+              1.366026,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.866026,
+            4.520726
+          ],
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.366026,
+              4.232051
+            ],
+            [
+              2.366026,
+              4.232051
+            ],
+            [
+              1.866026,
+              5.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.232051,
+            2.154701
+          ],
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              2.732051,
+              1.866026
+            ],
+            [
+              3.732051,
+              1.866026
+            ],
+            [
+              3.232051,
+              2.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.866026,
+            0.788675
+          ],
+          "chirality_token": "red",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.366026,
               0.5
             ],
             [
-              1.5,
+              2.366026,
               0.5
             ],
             [
-              1.0,
+              1.866026,
               1.366026
             ]
           ]
         },
         {
           "center": [
-            2.366025,
+            2.654701,
+            3.732051
+          ],
+          "chirality_token": "red",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.366026,
+              3.232051
+            ],
+            [
+              3.232051,
+              3.732051
+            ],
+            [
+              2.366026,
+              4.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.520726,
+            3.232051
+          ],
+          "chirality_token": "red",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              3.232051,
+              2.732051
+            ],
+            [
+              4.098076,
+              3.232051
+            ],
+            [
+              3.232051,
+              3.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.154701,
+            1.866026
+          ],
+          "chirality_token": "yellow",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              1.866026,
+              1.366026
+            ],
+            [
+              2.732051,
+              1.866026
+            ],
+            [
+              1.866026,
+              2.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.866026,
+            2.943376
+          ],
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "300",
+          "vertices": [
+            [
+              1.366026,
+              3.232051
+            ],
+            [
+              1.866026,
+              2.366026
+            ],
+            [
+              2.366026,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.232051,
             1.577351
           ],
-          "chirality_token": "yellow",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "0",
-          "vertices": [
-            [
-              1.866025,
-              1.866026
-            ],
-            [
-              2.866025,
-              1.866026
-            ],
-            [
-              2.366025,
-              1.0
-            ]
-          ]
-        },
-        {
-          "center": [
-            2.866025,
-            4.020726
-          ],
-          "chirality_token": "yellow",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "0",
-          "vertices": [
-            [
-              2.366025,
-              3.732051
-            ],
-            [
-              3.366025,
-              3.732051
-            ],
-            [
-              2.866025,
-              4.598076
-            ]
-          ]
-        },
-        {
-          "center": [
-            1.866025,
-            4.020726
-          ],
           "chirality_token": "blue",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "120",
-          "vertices": [
-            [
-              2.366025,
-              3.732051
-            ],
-            [
-              1.866025,
-              4.598076
-            ],
-            [
-              1.366025,
-              3.732051
-            ]
-          ]
-        },
-        {
-          "center": [
-            3.73205,
-            0.788675
-          ],
-          "chirality_token": "blue",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "120",
-          "vertices": [
-            [
-              4.23205,
-              0.5
-            ],
-            [
-              3.73205,
-              1.366026
-            ],
-            [
-              3.23205,
-              0.5
-            ]
-          ]
-        },
-        {
-          "center": [
-            3.443375,
-            1.866026
-          ],
-          "chirality_token": "blue",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "150",
-          "vertices": [
-            [
-              3.73205,
-              1.366026
-            ],
-            [
-              2.866025,
-              1.866026
-            ],
-            [
-              3.73205,
-              2.366026
-            ]
-          ]
-        },
-        {
-          "center": [
-            1.866025,
-            3.443376
-          ],
-          "chirality_token": "red",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "180",
-          "vertices": [
-            [
-              2.366025,
-              3.732051
-            ],
-            [
-              1.366025,
-              3.732051
-            ],
-            [
-              1.866025,
-              2.866026
-            ]
-          ]
-        },
-        {
-          "center": [
-            0.788675,
-            3.732051
-          ],
-          "chirality_token": "red",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "210",
-          "vertices": [
-            [
-              1.366025,
-              3.732051
-            ],
-            [
-              0.5,
-              3.232051
-            ],
-            [
-              0.5,
-              4.232051
-            ]
-          ]
-        },
-        {
-          "center": [
-            2.6547,
-            0.5
-          ],
-          "chirality_token": "red",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "210",
-          "vertices": [
-            [
-              3.23205,
-              0.5
-            ],
-            [
-              2.366025,
-              0.0
-            ],
-            [
-              2.366025,
-              1.0
-            ]
-          ]
-        },
-        {
-          "center": [
-            2.366025,
-            3.154701
-          ],
-          "chirality_token": "red",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "240",
-          "vertices": [
-            [
-              2.366025,
-              3.732051
-            ],
-            [
-              1.866025,
-              2.866026
-            ],
-            [
-              2.866025,
-              2.866026
-            ]
-          ]
-        },
-        {
-          "center": [
-            1.57735,
-            2.366026
-          ],
-          "chirality_token": "red",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "270",
-          "vertices": [
-            [
-              1.866025,
-              2.866026
-            ],
-            [
-              1.866025,
-              1.866026
-            ],
-            [
-              1.0,
-              2.366026
-            ]
-          ]
-        },
-        {
-          "center": [
-            2.07735,
-            0.5
-          ],
-          "chirality_token": "yellow",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "30",
-          "vertices": [
-            [
-              1.5,
-              0.5
-            ],
-            [
-              2.366025,
-              1.0
-            ],
-            [
-              2.366025,
-              0.0
-            ]
-          ]
-        },
-        {
-          "center": [
-            3.943375,
-            3.732051
-          ],
-          "chirality_token": "yellow",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "30",
-          "vertices": [
-            [
-              3.366025,
-              3.732051
-            ],
-            [
-              4.23205,
-              4.232051
-            ],
-            [
-              4.23205,
-              3.232051
-            ]
-          ]
-        },
-        {
-          "center": [
-            2.866025,
-            3.443376
-          ],
-          "chirality_token": "yellow",
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-triangle",
           "orientation_token": "300",
           "vertices": [
             [
-              2.366025,
-              3.732051
+              2.732051,
+              1.866026
             ],
             [
-              2.866025,
-              2.866026
+              3.232051,
+              1.0
             ],
             [
-              3.366025,
-              3.732051
+              3.732051,
+              1.866026
             ]
           ]
         },
         {
           "center": [
-            3.1547,
-            2.366026
+            4.598076,
+            2.943376
+          ],
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "300",
+          "vertices": [
+            [
+              4.098076,
+              3.232051
+            ],
+            [
+              4.598076,
+              2.366026
+            ],
+            [
+              5.098076,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.366026,
+            1.077351
+          ],
+          "chirality_token": "red",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "300",
+          "vertices": [
+            [
+              0.866026,
+              1.366026
+            ],
+            [
+              1.366026,
+              0.5
+            ],
+            [
+              1.866026,
+              1.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            0.577351,
+            1.866026
+          ],
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "330",
+          "vertices": [
+            [
+              0.0,
+              1.866026
+            ],
+            [
+              0.866026,
+              1.366026
+            ],
+            [
+              0.866026,
+              2.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.943376,
+            0.5
+          ],
+          "chirality_token": "blue",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "330",
+          "vertices": [
+            [
+              2.366026,
+              0.5
+            ],
+            [
+              3.232051,
+              0.0
+            ],
+            [
+              3.232051,
+              1.0
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.943376,
+            3.232051
           ],
           "chirality_token": "red",
           "decoration_tokens": null,
@@ -675,88 +651,112 @@
           "orientation_token": "330",
           "vertices": [
             [
-              2.866025,
-              2.866026
+              2.366026,
+              3.232051
             ],
             [
-              3.73205,
-              2.366026
+              3.232051,
+              2.732051
             ],
             [
-              2.866025,
-              1.866026
+              3.232051,
+              3.732051
             ]
           ]
         },
         {
           "center": [
-            0.5,
-            2.654701
+            2.943376,
+            4.232051
+          ],
+          "chirality_token": "red",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "330",
+          "vertices": [
+            [
+              2.366026,
+              4.232051
+            ],
+            [
+              3.232051,
+              3.732051
+            ],
+            [
+              3.232051,
+              4.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.809401,
+            3.732051
+          ],
+          "chirality_token": "red",
+          "decoration_tokens": null,
+          "kind": "dodecagonal-square-triangle-triangle",
+          "orientation_token": "330",
+          "vertices": [
+            [
+              3.232051,
+              3.732051
+            ],
+            [
+              4.098076,
+              3.232051
+            ],
+            [
+              4.098076,
+              4.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.077351,
+            3.732051
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "60",
+          "orientation_token": "330",
           "vertices": [
-            [
-              0.0,
-              2.366026
-            ],
             [
               0.5,
+              3.732051
+            ],
+            [
+              1.366026,
               3.232051
             ],
             [
-              1.0,
-              2.366026
+              1.366026,
+              4.232051
             ]
           ]
         },
         {
           "center": [
-            4.23205,
-            2.654701
+            4.309401,
+            1.866026
           ],
           "chirality_token": "yellow",
           "decoration_tokens": null,
           "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "60",
+          "orientation_token": "330",
           "vertices": [
             [
-              3.73205,
-              2.366026
+              3.732051,
+              1.866026
             ],
             [
-              4.23205,
-              3.232051
-            ],
-            [
-              4.73205,
-              2.366026
-            ]
-          ]
-        },
-        {
-          "center": [
-            1.288675,
-            1.866026
-          ],
-          "chirality_token": "blue",
-          "decoration_tokens": null,
-          "kind": "dodecagonal-square-triangle-triangle",
-          "orientation_token": "90",
-          "vertices": [
-            [
-              1.0,
+              4.598076,
               1.366026
             ],
             [
-              1.0,
+              4.598076,
               2.366026
-            ],
-            [
-              1.866025,
-              1.866026
             ]
           ]
         }

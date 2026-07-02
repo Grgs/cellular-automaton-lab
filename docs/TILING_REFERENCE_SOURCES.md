@@ -145,13 +145,17 @@ The order is intentional:
 - `tuebingen-triangle`
   - [Tuebingen Triangle](https://tilings.math.uni-bielefeld.de/substitution/tuebingen-triangle/)
 - `dodecagonal-square-triangle`
-  - [Square-triangle](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
-  - The runtime is a decorated 3.12.12 Archimedean tiling: hexagonal lattice of
-    regular dodecagonal supercells, each decomposed into the canonical six unit
-    squares plus twelve unit equilateral triangles, with two bridging triangles
-    per supercell from the underlying 3.12.12 layout. It scales without a
-    depth limit and depends on no vendored data. It is not the canonical
-    Schlottmann quasi-periodic tiling.
+  - [Square-triangle (Schlottmann)](https://tilings.math.uni-bielefeld.de/substitution/square-triangle/)
+  - The runtime is the canonical Schlottmann quasi-periodic square-triangle
+    pseudo substitution: inflation factor `2 + sqrt(3)`, five marked prototiles
+    (red/yellow/blue marked unit triangles plus plain/marked unit squares),
+    interlocking supertiles with exact `Z[zeta12]`-module deduplication of the
+    boundary-shared children. The child placements were extracted from the
+    encyclopedia's substitution-rule figure and validated against the
+    encyclopedia's 4999-cell finite patch by a two-level supertile
+    decomposition that pins every child pose and reproduces the literature
+    patch tile-for-tile (marking colours included). It scales without a depth
+    limit and depends on no vendored data.
 - `socolar-12-fold`
   - [Socolar](https://tilings.math.uni-bielefeld.de/substitution/socolar/)
   - [Socolar, *Simple octagonal and dodecagonal quasicrystals*, Phys. Rev. B 39 (1989)](https://doi.org/10.1103/PhysRevB.39.10519)

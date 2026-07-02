@@ -2663,8 +2663,8 @@
       "tiling_family": "dodecagonal-square-triangle",
       "label": "Dodecagonal Square-Triangle",
       "experimental": true,
-      "implementation_status": "canonical_patch",
-      "promotion_blocker": "Experimental until a recursive marked substitution replaces the finite Bielefeld crop; strict topology validation is currently proven through depth 11.",
+      "implementation_status": "true_substitution",
+      "promotion_blocker": "Experimental until manual visual review accepts the rendered Schlottmann quasi-periodic square-triangle substitution field.",
       "public_cell_kinds": [
         "dodecagonal-square-triangle-square",
         "dodecagonal-square-triangle-triangle"
