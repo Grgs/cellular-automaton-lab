@@ -48,10 +48,7 @@ export interface ServerMetaPayload {
 }
 
 export type AperiodicImplementationStatus =
-    | "true_substitution"
-    | "exact_affine"
-    | "canonical_patch"
-    | "known_deviation";
+    "true_substitution" | "exact_affine" | "canonical_patch" | "known_deviation";
 
 export interface BootstrappedAperiodicFamilyDefinition {
     tiling_family: string;

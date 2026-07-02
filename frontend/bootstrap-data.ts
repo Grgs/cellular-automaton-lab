@@ -27,14 +27,11 @@ function parseBootstrapData(payload: unknown): AppBootstrapData {
     const root = requirePlainObject(payload, "Bootstrap payload is invalid.");
     const defaults = root.app_defaults as BootstrappedFrontendDefaults | undefined;
     const topologies = root.topology_catalog as
-        | ReadonlyArray<BootstrappedTopologyDefinition>
-        | undefined;
+        ReadonlyArray<BootstrappedTopologyDefinition> | undefined;
     const periodicFaceTilings = root.periodic_face_tilings as
-        | ReadonlyArray<PeriodicFaceTilingDescriptor>
-        | undefined;
+        ReadonlyArray<PeriodicFaceTilingDescriptor> | undefined;
     const aperiodicFamilies = root.aperiodic_families as
-        | ReadonlyArray<BootstrappedAperiodicFamilyDefinition>
-        | undefined;
+        ReadonlyArray<BootstrappedAperiodicFamilyDefinition> | undefined;
     const serverMeta = root.server_meta as { app_name?: string } | undefined;
     const snapshotVersion = Number(root.snapshot_version);
     if (

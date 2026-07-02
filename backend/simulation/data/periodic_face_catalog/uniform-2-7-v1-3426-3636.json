@@ -1,0 +1,52 @@
+{
+  "geometry": "uniform-2-7-v1-3426-3636",
+  "label": "2-uniform #7 variant 1 (3.4^2.6; 3.6.3.6)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 254,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://commons.wikimedia.org/wiki/File:2-uniform_n7.svg"
+  ],
+  "palette": {
+    "geometry": "uniform-2-7-v1-3426-3636",
+    "variants": [
+      {
+        "label": "uniform-2-7-v1-3426-3636-hexagon",
+        "selector": {
+          "kind": "hexagon"
+        },
+        "color": {
+          "token": "toneCream"
+        }
+      },
+      {
+        "label": "uniform-2-7-v1-3426-3636-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "uniform-2-7-v1-3426-3636-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneClay:-6,0 7,0 1,11;toneClay:-6,23 1,11 7,23;toneClay:-6,36 7,36 1,47;toneClay:20,0 34,0 27,11;toneClay:1,47 7,59 -6,59;toneClay:20,23 27,11 34,23;toneClay:20,36 34,36 27,47;toneClay:47,0 60,0 53,11;toneClay:20,59 27,47 34,59;toneClay:47,23 53,11 60,23;toneClay:60,36 53,47 47,36;toneClay:53,47 60,59 47,59;toneStone:-6,23 7,23 7,36 -6,36;toneStone:20,23 34,23 34,36 20,36;toneStone:7,59 7,72 -6,72 -6,59;toneStone:34,72 20,72 20,59 34,59;toneStone:60,36 47,36 47,23 60,23;toneStone:47,59 60,59 60,72 47,72;toneStone:7,23 20,23 20,36 7,36;toneStone:7,59 20,59 20,72 7,72;toneStone:34,23 47,23 47,36 34,36;toneStone:47,59 47,72 34,72 34,59;toneStone:73,23 73,36 60,36 60,23;toneStone:60,59 73,59 73,72 60,72;toneCream:-26,11 -19,0 -6,0 1,11 -6,23 -19,23;toneCream:-19,36 -6,36 1,47 -6,59 -19,59 -26,47;toneCream:1,11 7,0 20,0 27,11 20,23 7,23;toneCream:1,47 7,36 20,36 27,47 20,59 7,59;toneCream:27,11 34,0 47,0 53,11 47,23 34,23;toneCream:53,47 47,59 34,59 27,47 34,36 47,36;toneClay:73,0 86,0 80,11;toneClay:80,11 86,23 73,23;toneClay:100,0 113,0 106,11;toneClay:100,23 106,11 113,23;toneClay:86,36 80,47 73,36;toneClay:100,36 113,36 106,47;toneClay:80,47 86,59 73,59;toneClay:106,47 113,59 100,59;toneStone:86,23 86,36 73,36 73,23;toneStone:100,23 113,23 113,36 100,36;toneStone:73,59 86,59 86,72 73,72;toneStone:113,59 113,72 100,72 100,59;toneStone:86,23 100,23 100,36 86,36;toneStone:113,23 126,23 126,36 113,36;toneStone:86,59 100,59 100,72 86,72;toneStone:113,59 126,59 126,72 113,72;toneCream:80,11 86,0 100,0 106,11 100,23 86,23;toneCream:86,36 100,36 106,47 100,59 86,59 80,47;toneCream:106,11 113,0 126,0 132,11 126,23 113,23;toneCream:106,47 113,36 126,36 132,47 126,59 113,59;toneCream:73,23 60,23 53,11 60,0 73,0 80,11;toneCream:60,36 73,36 80,47 73,59 60,59 53,47"
+}

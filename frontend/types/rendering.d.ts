@@ -164,12 +164,7 @@ export interface RenderedCellArgs {
     colorLookup: Map<number, string>;
     renderStyle?: CanvasRenderStyle;
     renderLayer?:
-        | "committed"
-        | "hover"
-        | "selected"
-        | "preview"
-        | "gesture-paint"
-        | "gesture-erase";
+        "committed" | "hover" | "selected" | "preview" | "gesture-paint" | "gesture-erase";
     resolveRenderedCellColor: (
         stateValue: number,
         colorLookup: Map<number, string>,

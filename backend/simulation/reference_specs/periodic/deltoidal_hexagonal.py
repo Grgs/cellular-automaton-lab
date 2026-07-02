@@ -42,7 +42,10 @@ SPECS = {
                 (("kite", "kite", "kite", "kite"), 43),
                 (("kite", "kite", "kite", "kite", "kite", "kite"), 12),
             ),
-            expected_dual_candidate_geometries=("archimedean-3-4-6-4",),
+            expected_dual_candidate_geometries=(
+                "archimedean-3-4-6-4",
+                "uniform-2-7-v1-3426-3636",
+            ),
             expected_dual_structure_signature=((3, 30), (4, 43), (6, 12)),
         ),
     ),
