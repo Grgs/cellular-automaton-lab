@@ -1,7 +1,8 @@
-# Dodecagonal Square-Triangle Generator
+# Schlottmann Square-Triangle Generator
 
 This file documents the runtime generator for the public
-`dodecagonal-square-triangle` family.
+`dodecagonal-square-triangle` family (catalog label "Schlottmann
+Square-Triangle").
 
 The implementation lives in
 `backend/simulation/aperiodic_dodecagonal_square_triangle.py`. There is no
@@ -78,5 +79,6 @@ At every patch depth the runtime patch must remain:
 - The two marked square prototiles are distinguished internally (they have
   different substitution rules and `square-marked` is chiral) but share the
   public square kind.
-- The family remains in the `Experimental` picker group until manual visual
-  review accepts the rendered field.
+- Manual visual review accepted the rendered quasi-periodic field against the
+  Bielefeld reference on July 2, 2026; the family ships in the main
+  `Aperiodic` picker group.

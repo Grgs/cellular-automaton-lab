@@ -368,9 +368,9 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
     ),
     DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: AperiodicFamilyManifestEntry(
         geometry=DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY,
-        catalog_label="Dodecagonal Square-Triangle",
-        reference_label="Dodecagonal Square-Triangle",
-        picker_group="Experimental",
+        catalog_label="Schlottmann Square-Triangle",
+        reference_label="Schlottmann Square-Triangle",
+        picker_group="Aperiodic",
         picker_order=320,
         default_rule="life-b2-s23",
         builder_kind="compatibility_patch",
@@ -378,15 +378,13 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
         # 2 + sqrt(3)), extracted from the Tilings Encyclopedia rule figure
         # and verified tile-for-tile against the encyclopedia's 4999-cell
         # literature patch; presented through the same BFS-cropped
-        # compatibility-patch surface as before.
+        # compatibility-patch surface as before. Manual visual review accepted
+        # the rendered quasi-periodic field against the Bielefeld reference on
+        # July 2, 2026, promoting the family out of Experimental.
         implementation_status="true_substitution",
         public_cell_kinds=(
             DODECAGONAL_SQUARE_TRIANGLE_SQUARE_KIND,
             DODECAGONAL_SQUARE_TRIANGLE_TRIANGLE_KIND,
-        ),
-        promotion_blocker=(
-            "Experimental until manual visual review accepts the rendered "
-            "Schlottmann quasi-periodic square-triangle substitution field."
         ),
     ),
     SHIELD_GEOMETRY: AperiodicFamilyManifestEntry(

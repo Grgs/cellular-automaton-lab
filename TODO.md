@@ -53,7 +53,7 @@ Decisions already taken (so the steps are unambiguous):
 
 ## Now
 
-- For `dodecagonal-square-triangle`, the runtime is now the genuine Schlottmann quasi-periodic square-triangle pseudo substitution (inflation `2 + sqrt(3)`, five marked prototiles, interlocking supertiles deduplicated in the exact `Z[zeta12]` module). The rule was extracted from the Tilings Encyclopedia figure and verified tile-for-tile against the encyclopedia's 4999-cell literature patch. It scales without depth limit and uses no vendored data. Remaining gate: manual visual review, then promotion out of `Experimental` (the last experimental aperiodic family).
+- For `dodecagonal-square-triangle` (catalog label "Schlottmann Square-Triangle"), the runtime is now the genuine Schlottmann quasi-periodic square-triangle pseudo substitution (inflation `2 + sqrt(3)`, five marked prototiles, interlocking supertiles deduplicated in the exact `Z[zeta12]` module). The rule was extracted from the Tilings Encyclopedia figure and verified tile-for-tile against the encyclopedia's 4999-cell literature patch. It scales without depth limit and uses no vendored data. Manual visual review accepted the rendered field on July 2, 2026 and the family was promoted to the main `Aperiodic` group, leaving the Experimental group empty.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
 
 ## Next

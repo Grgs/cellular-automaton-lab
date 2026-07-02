@@ -17,16 +17,43 @@ describe("aperiodic-family-registry", () => {
 
         expect(listAperiodicFamilyMetadata().length).toBeGreaterThan(0);
         expect(getAperiodicFamilyMetadata("penrose-p3-rhombs")?.label).toBe("Penrose P3 Rhombs");
+        expect(getAperiodicFamilyMetadata("dodecagonal-square-triangle")?.label).toBe(
+            "Schlottmann Square-Triangle",
+        );
         expect(
             getAperiodicFamilyMetadata("dodecagonal-square-triangle")?.promotion_blocker,
-        ).toContain("Experimental until");
-        expect(isExperimentalAperiodicFamily("dodecagonal-square-triangle")).toBe(true);
+        ).toBeFalsy();
+        expect(isExperimentalAperiodicFamily("dodecagonal-square-triangle")).toBe(false);
         expect(isExperimentalAperiodicFamily("pinwheel-2-1")).toBe(false);
         expect(isExperimentalAperiodicFamily("pinwheel")).toBe(false);
         expect(isExperimentalAperiodicFamily("penrose-p3-rhombs")).toBe(false);
-        expect(describeAperiodicFamilyStatus("dodecagonal-square-triangle")?.tone).toBe("warning");
+        expect(describeAperiodicFamilyStatus("dodecagonal-square-triangle")?.tone).toBe("info");
         expect(describeAperiodicFamilyStatus("pinwheel-2-1")?.tone).toBe("info");
         expect(describeAperiodicFamilyStatus("pinwheel")?.tone).toBe("info");
         expect(describeAperiodicFamilyStatus("penrose-p3-rhombs")?.tone).toBe("info");
+    });
+
+    it("surfaces the warning status path for an experimental family", async () => {
+        // No shipped family is experimental right now; keep the warning path
+        // covered with a synthetic bootstrapped definition.
+        window.APP_APERIODIC_FAMILIES = [
+            ...(window.APP_APERIODIC_FAMILIES ?? []),
+            {
+                tiling_family: "fixture-experimental",
+                label: "Fixture Experimental",
+                experimental: true,
+                implementation_status: "canonical_patch",
+                promotion_blocker: "Experimental until the fixture review passes.",
+                public_cell_kinds: ["fixture-cell"],
+            },
+        ];
+        const { describeAperiodicFamilyStatus, isExperimentalAperiodicFamily } =
+            await import("./aperiodic-family-registry.js");
+
+        expect(isExperimentalAperiodicFamily("fixture-experimental")).toBe(true);
+        const status = describeAperiodicFamilyStatus("fixture-experimental");
+        expect(status?.tone).toBe("warning");
+        expect(status?.label).toContain("Experimental");
+        expect(status?.detail).toContain("Experimental until");
     });
 });
