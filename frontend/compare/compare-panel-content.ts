@@ -27,6 +27,7 @@ import type {
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
 import { buildCompareRunUrl, type CompareRunConfig } from "./compare-run-link.js";
+import { hashWithFocus, hashWithoutFocus, readFocusFromHash } from "./compare-route.js";
 import {
     FEATURED_COMPARE_DEMO_LOOP_START,
     FEATURED_COMPARE_DEMO_SPEED,
@@ -141,6 +142,8 @@ export interface ComparePanelContentHandle {
     reportRunLinkError(message: string): void;
     /** Let an open action menu consume Escape; returns true when it did. */
     handleEscape(): boolean;
+    /** Return from speaker view to the gallery if a board is focused; true when it did. */
+    exitFocusIfAny(): boolean;
     /** Handle a playback shortcut (space/arrows) once a filmstrip is live; true if consumed. */
     handlePlaybackKey(event: KeyboardEvent): boolean;
     dispose(): void;
@@ -433,6 +436,35 @@ export function createComparePanelContent(
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     let activeFilmstrip: SeedFilmstripResult | null = null;
+    let currentFocusGeometry: string | null = null;
+
+    // The focused board is mirrored into the hash (`&focus=<geometry>`) so speaker
+    // view is shareable and the browser back button returns to the gallery.
+    function mirrorFocusToHash(geometry: string | null): void {
+        currentFocusGeometry = geometry;
+        const current = window.location.hash;
+        const next =
+            geometry === null ? hashWithoutFocus(current) : hashWithFocus(current, geometry);
+        if (next === current) {
+            return;
+        }
+        if (next === "") {
+            window.history.replaceState(
+                null,
+                "",
+                `${window.location.pathname}${window.location.search}`,
+            );
+        } else {
+            window.location.hash = next;
+        }
+    }
+
+    function applyFocusFromHash(): void {
+        if (!filmstripView || !activeFilmstrip) {
+            return;
+        }
+        filmstripView.focus(readFocusFromHash(window.location.hash));
+    }
 
     function showStageHero(): void {
         stageHero.hidden = false;
@@ -1217,11 +1249,14 @@ export function createComparePanelContent(
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
                     onOpenFrame: openFilmstripFrame,
+                    onFocusChange: mirrorFocusToHash,
                 });
                 filmstripArea.append(filmstripView.element);
             }
             showStageBoards();
             await filmstripView.load(filmstrip, playback);
+            // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
+            applyFocusFromHash();
             // Land the user on the live boards rather than the configuration above
             // them -- especially for the one-click featured demo.
             if (typeof filmstripArea.scrollIntoView === "function") {
@@ -1562,10 +1597,16 @@ export function createComparePanelContent(
         }
     }
 
+    // Back/forward (or an external hash edit) re-applies the focused board.
+    function onHashChangeFocus(): void {
+        applyFocusFromHash();
+    }
+
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
     copyRunButton.addEventListener("click", copyRunLink);
     document.addEventListener("pointerdown", onDocumentPointerDown);
+    window.addEventListener("hashchange", onHashChangeFocus);
 
     return {
         element: root,
@@ -1583,6 +1624,13 @@ export function createComparePanelContent(
             const openMenu = root.querySelector(".compare-action-menu[open]");
             if (openMenu) {
                 openMenu.removeAttribute("open");
+                return true;
+            }
+            return false;
+        },
+        exitFocusIfAny(): boolean {
+            if (currentFocusGeometry !== null && filmstripView) {
+                filmstripView.focus(null);
                 return true;
             }
             return false;
@@ -1616,6 +1664,7 @@ export function createComparePanelContent(
         },
         dispose(): void {
             document.removeEventListener("pointerdown", onDocumentPointerDown);
+            window.removeEventListener("hashchange", onHashChangeFocus);
             seedPad.dispose();
             seedPreview.dispose();
             filmstripView?.dispose();

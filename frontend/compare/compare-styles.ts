@@ -571,6 +571,66 @@ export const COMPARE_PANEL_STYLES = `
     height: auto;
 }
 .compare-filmstrip-board { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.compare-filmstrip-board-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+}
+.compare-filmstrip-focus {
+    flex: 0 0 auto;
+    min-width: 24px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    color: var(--ink, #1f2430);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+}
+.compare-filmstrip-focus:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
+.compare-filmstrip-focus[aria-pressed="true"] {
+    border-color: var(--accent, #bf5a36);
+    background: color-mix(in srgb, var(--accent, #bf5a36) 18%, var(--btn-soft-bg, rgba(0, 0, 0, 0.06)));
+}
+.compare-filmstrip-focus:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+/* Speaker view: the focused board becomes the hero, the rest a wrapping strip. */
+.compare-filmstrip--speaker .compare-filmstrip-boards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 12px 16px;
+}
+.compare-filmstrip--speaker .compare-filmstrip-board.is-hero {
+    flex: 1 1 100%;
+    order: -1;
+}
+/* Let the hero's slot span the row so the thumb's percentage width can grow. */
+.compare-filmstrip--speaker .compare-filmstrip-board.is-hero .compare-filmstrip-slot {
+    width: 100%;
+}
+.compare-filmstrip--speaker .compare-filmstrip-board.is-hero .compare-thumb {
+    width: min(100%, 560px);
+    height: auto;
+}
+.compare-filmstrip--speaker .compare-filmstrip-board.is-strip {
+    flex: 0 0 auto;
+    cursor: pointer;
+}
+.compare-filmstrip--speaker .compare-filmstrip-board.is-strip .compare-thumb {
+    width: 120px;
+    height: auto;
+}
+.compare-filmstrip--speaker .compare-filmstrip-board.is-strip .compare-filmstrip-count,
+.compare-filmstrip--speaker .compare-filmstrip-board.is-strip .compare-filmstrip-open {
+    display: none;
+}
 .compare-filmstrip-label {
     font-size: 11px;
     color: var(--muted, #6d756f);

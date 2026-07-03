@@ -1004,6 +1004,72 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("focuses a board into speaker view and lets Escape peel back before closing", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const twoBoard = (geometry: string) => ({
+            geometry,
+            tiling_family: geometry,
+            family: "regular",
+            cell_count: 100,
+            topology: {} as never,
+            topology_spec: {
+                tiling_family: geometry,
+                adjacency_mode: "edge",
+                sizing_mode: "grid",
+                width: 16,
+                height: 16,
+                patch_depth: 0,
+            },
+            frames: [{ "c:1:1": 1 }, { "c:2:1": 1 }],
+            extinction_step: null,
+            period: null,
+            note: null,
+        });
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => ({
+                rule_name: "conway",
+                seed: "111",
+                traversal: "bfs",
+                frame_count: 2,
+                grid_size: 16,
+                tilings: [twoBoard("square"), twoBoard("hex")],
+            }),
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        const filmstrip = () => document.querySelector<HTMLElement>(".compare-filmstrip");
+        const backdrop = () => document.querySelector<HTMLElement>(".compare-backdrop");
+
+        // Focus the first board -> speaker view, mirrored into the hash.
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        expect(window.location.hash).toContain("focus=square");
+
+        // Escape returns to the gallery (and clears the focus slot) without closing.
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        expect(window.location.hash).not.toContain("focus=");
+        expect(backdrop()?.hidden).toBe(false);
+
+        // A second Escape closes the workspace.
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        expect(backdrop()?.hidden).toBe(true);
+        handle.dispose();
+    });
+
     it("drives the docked transport with space and arrow keys once a filmstrip is live", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
