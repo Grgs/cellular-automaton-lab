@@ -1378,6 +1378,119 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("pauses playback and disposes the live focus pane when the wall closes", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const focusDispose = vi.fn();
+        const focusBackend: SimulationBackend = {
+            ...backend,
+            getState: async () => forkSnapshot(),
+            postControl: (async () =>
+                forkSnapshot()) as unknown as SimulationBackend["postControl"],
+            setCells: (async () => forkSnapshot()) as unknown as SimulationBackend["setCells"],
+            dispose: focusDispose,
+        };
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: "sess",
+            backendFactory: () => focusBackend,
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            focusPaneServices,
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "⑂ Fork this board live")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-focus-pane")).not.toBeNull();
+        });
+
+        const playPause = document.querySelector<HTMLButtonElement>(
+            '.compare-filmstrip-btn[title="Play / pause"]',
+        );
+        playPause?.click();
+        expect(playPause?.textContent).toBe("⏸ Pause");
+
+        document.querySelector<HTMLButtonElement>(".compare-back")?.click();
+
+        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+        expect(playPause?.textContent).toBe("▶ Play");
+        expect(document.querySelector(".compare-focus-pane")).toBeNull();
+        expect(focusDispose).toHaveBeenCalledTimes(1);
+        handle.dispose();
+    });
+
+    it("disposes a pending live fork when focus changes before it attaches", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const focusDispose = vi.fn();
+        const focusBackend: SimulationBackend = {
+            ...backend,
+            getState: async () => forkSnapshot(),
+            postControl: (async () =>
+                forkSnapshot()) as unknown as SimulationBackend["postControl"],
+            setCells: (async () => forkSnapshot()) as unknown as SimulationBackend["setCells"],
+            dispose: focusDispose,
+        };
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: "sess",
+            backendFactory: () => focusBackend,
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            focusPaneServices,
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "⑂ Fork this board live")
+            ?.click();
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+
+        await vi.waitFor(() => {
+            expect(focusDispose).toHaveBeenCalledTimes(1);
+        });
+        expect(document.querySelector(".compare-focus-pane")).toBeNull();
+        expect(
+            document.querySelector<HTMLElement>(".compare-status")?.textContent ?? "",
+        ).not.toContain("Fork failed");
+        handle.dispose();
+    });
+
     it("forks the focused board into the Lab when no live session is available", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();

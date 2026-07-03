@@ -132,6 +132,21 @@ describe("createFilmstripTransport", () => {
         expect(counterText(transport)).toBe("—");
     });
 
+    it("pauses playback without detaching the active player", () => {
+        const clock = manualScheduler();
+        const transport = createFilmstripTransport({ scheduler: clock.scheduler });
+        transport.attach(new FilmstripPlayer(3));
+        control(transport, "Play / pause").click();
+        expect(clock.active()).toBe(1);
+
+        transport.pause();
+
+        expect(clock.active()).toBe(0);
+        expect(control(transport, "Play / pause").disabled).toBe(false);
+        expect(control(transport, "Play / pause").textContent).toBe("▶ Play");
+        expect(counterText(transport)).toBe("gen 0 / 2");
+    });
+
     it("drives the attached player through toggle and step (keyboard idioms)", () => {
         const clock = manualScheduler();
         const transport = createFilmstripTransport({ scheduler: clock.scheduler });

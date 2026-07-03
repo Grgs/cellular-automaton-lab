@@ -138,6 +138,8 @@ export interface ComparePanelContentHandle {
     element: HTMLElement;
     /** Call when the content becomes visible: load rules and refresh previews. */
     activate(): void;
+    /** Call when the content is hidden so background work can be suspended. */
+    deactivate(): void;
     /** Populate the workspace from a decoded run link without running it. */
     applyRunConfig(config: CompareRunConfig): Promise<void>;
     /** Apply a config, build the live filmstrip, and start looping playback. */
@@ -503,6 +505,14 @@ export function createComparePanelContent(
         filmstripView?.setHeroOverlay(null);
     }
 
+    function reportFocusPaneError(error: unknown): void {
+        statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
+    }
+
+    function disposeDetachedBackend(backend: SimulationBackend): void {
+        void Promise.resolve(backend.dispose()).catch(reportFocusPaneError);
+    }
+
     async function forkFocusedBoardLive(): Promise<void> {
         const geometry = currentFocusGeometry;
         if (!filmstripView || !activeFilmstrip || !geometry) {
@@ -525,10 +535,19 @@ export function createComparePanelContent(
             return;
         }
         disposeFocusPane();
+        let backend: SimulationBackend | null = null;
         try {
-            const backend = services.backendFactory(paneSessionId(services.baseSessionId, "focus"));
+            backend = services.backendFactory(paneSessionId(services.baseSessionId, "focus"));
             const { mountFocusPane } = await import("./compare-focus-pane.js");
-            focusPane = mountFocusPane({
+
+            if (!filmstripView || currentFocusGeometry !== geometry) {
+                disposeDetachedBackend(backend);
+                backend = null;
+                return;
+            }
+
+            let nextFocusPane: FocusPaneHandle | null = null;
+            nextFocusPane = mountFocusPane({
                 geometry: tiling.geometry,
                 frameIndex,
                 pattern,
@@ -538,16 +557,29 @@ export function createComparePanelContent(
                 buildEditorToolCells: services.buildEditorToolCells,
                 ...(services.resolveCellSize ? { resolveCellSize: services.resolveCellSize } : {}),
                 onDiscard: () => {
-                    focusPane = null;
+                    if (focusPane === nextFocusPane) {
+                        focusPane = null;
+                    }
                     filmstripView?.setHeroOverlay(null);
                 },
-                onError: (error) => {
-                    statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
-                },
+                onError: reportFocusPaneError,
             });
-            filmstripView.setHeroOverlay(focusPane.element);
+            backend = null;
+
+            if (
+                currentFocusGeometry !== geometry ||
+                !filmstripView ||
+                !filmstripView.setHeroOverlay(nextFocusPane.element)
+            ) {
+                nextFocusPane.dispose();
+                return;
+            }
+            focusPane = nextFocusPane;
         } catch (error) {
-            statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
+            if (backend) {
+                disposeDetachedBackend(backend);
+            }
+            reportFocusPaneError(error);
         }
     }
 
@@ -1750,6 +1782,11 @@ export function createComparePanelContent(
             void ensureRules();
             refreshPreview();
             highlightGeometry(null);
+        },
+        deactivate(): void {
+            filmstripTransport.pause();
+            disposeFocusPane();
+            root.querySelector(".compare-action-menu[open]")?.removeAttribute("open");
         },
         applyRunConfig,
         runFeaturedDemo,

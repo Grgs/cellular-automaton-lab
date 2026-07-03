@@ -135,6 +135,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         if (backdrop.hidden) {
             return;
         }
+        content.deactivate();
         backdrop.hidden = true;
         lastFocus?.focus();
         options.onClose?.();
