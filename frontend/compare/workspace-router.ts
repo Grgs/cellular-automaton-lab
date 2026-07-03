@@ -62,6 +62,8 @@ export interface MountWorkspaceRouterOptions {
     wallTrigger?: HTMLButtonElement | null;
     /** Server-only seams for the wall's live focus pane. */
     focusPaneServices?: FocusPaneServices;
+    /** The Lab rule active when the wall is opened; used for the default wall setup. */
+    getInitialRuleName?: () => string | null | undefined;
 }
 
 export interface WorkspaceRouterHandle {
@@ -207,6 +209,9 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
                 ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
                 ...(options.focusPaneServices
                     ? { focusPaneServices: options.focusPaneServices }
+                    : {}),
+                ...(options.getInitialRuleName
+                    ? { getInitialRuleName: options.getInitialRuleName }
                     : {}),
                 openOnMount: true,
                 onOpen: () => writeHash(hashWithoutLabRoute(window.location.hash)),

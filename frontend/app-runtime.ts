@@ -105,6 +105,10 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             bootstrapData,
             wallTrigger: elements.wallViewBtn,
             focusPaneServices,
+            getInitialRuleName: () => {
+                const state = controller.getState();
+                return state.editorRuleName ?? state.activeRule?.name ?? null;
+            },
             onOpenPattern: (payload) => {
                 void controller.loadPattern(payload);
             },

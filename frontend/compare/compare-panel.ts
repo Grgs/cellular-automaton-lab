@@ -33,6 +33,8 @@ interface MountComparePanelOptions {
     onClose?: () => void;
     /** Server-only seams for the live focus pane (absent on the standalone build). */
     focusPaneServices?: FocusPaneServices;
+    /** The Lab rule active when the wall is opened; used for the default wall setup. */
+    getInitialRuleName?: () => string | null | undefined;
 }
 
 export interface ComparePanelHandle {
@@ -79,6 +81,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         bootstrapData: options.bootstrapData,
         ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
         ...(options.focusPaneServices ? { focusPaneServices: options.focusPaneServices } : {}),
+        ...(options.getInitialRuleName ? { getInitialRuleName: options.getInitialRuleName } : {}),
         onRequestClose: () => close(),
     });
 

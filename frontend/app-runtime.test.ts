@@ -150,7 +150,10 @@ describe("app runtime", () => {
             applyCellSize: vi.fn(),
             applyPaintState: vi.fn(),
             loadPattern: vi.fn(),
-            getState: vi.fn(),
+            getState: vi.fn(() => ({
+                editorRuleName: "life",
+                activeRule: null,
+            })),
             getInteractions: vi.fn(),
             getViewportController: vi.fn(),
             getConfigSyncController: vi.fn(),
@@ -193,9 +196,11 @@ describe("app runtime", () => {
         expect(firstCall).toBeDefined();
         const routerOptions = firstCall![0] as {
             focusPaneServices?: { baseSessionId?: string | null };
+            getInitialRuleName?: () => string | null | undefined;
             wallTrigger?: HTMLButtonElement | null;
         };
         expect(routerOptions.focusPaneServices?.baseSessionId).toBe("s-runtime");
+        expect(routerOptions.getInitialRuleName?.()).toBe("life");
         expect(routerOptions.wallTrigger).toBe(document.getElementById("wall-view-btn"));
     });
 });

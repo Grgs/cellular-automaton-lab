@@ -131,6 +131,8 @@ export interface ComparePanelContentOptions {
     onRequestClose?: () => void;
     /** Server-only seams for the live focus pane; absent/null baseSessionId = fork to the Lab. */
     focusPaneServices?: FocusPaneServices;
+    /** The Lab rule active when the wall is opened; used for the default wall setup. */
+    getInitialRuleName?: () => string | null | undefined;
 }
 
 export interface ComparePanelContentHandle {
@@ -1069,6 +1071,11 @@ export function createComparePanelContent(
         return allTilings.filter((option) => tilingCompatibleWithSelectedRule(option));
     }
 
+    function preferredInitialRuleName(): string | null {
+        const candidate = options.getInitialRuleName?.();
+        return typeof candidate === "string" && candidate.length > 0 ? candidate : null;
+    }
+
     function pruneSelectionForSelectedRule({ selectAllIfEmpty = false } = {}): void {
         const compatibleTilings = compatibleTilingsForSelectedRule();
         const compatibleGeometries = new Set(compatibleTilings.map((option) => option.geometry));
@@ -1259,8 +1266,11 @@ export function createComparePanelContent(
                 el("option", { value: rule.name, textContent: rule.display_name ?? rule.name }),
             ),
         );
+        const preferredRuleName = preferredInitialRuleName();
         const conway = rules.find((rule) => rule.name === "conway");
-        if (conway) {
+        if (preferredRuleName && selectHasValue(ruleSelect, preferredRuleName)) {
+            ruleSelect.value = preferredRuleName;
+        } else if (conway) {
             ruleSelect.value = "conway";
         }
         ruleSelect.addEventListener("change", () => {
@@ -1268,7 +1278,7 @@ export function createComparePanelContent(
             renderTilingChecklist();
             refreshPreview();
         });
-        pruneSelectionForSelectedRule();
+        pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
         renderTilingChecklist();
     }
 

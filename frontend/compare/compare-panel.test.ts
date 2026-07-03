@@ -685,6 +685,26 @@ describe("mountComparePanel", () => {
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["kagome"]);
     });
 
+    it("uses the active Lab rule for the default wall tiling list", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+            getInitialRuleName: () => "kagome-life",
+        });
+
+        await vi.waitFor(() => {
+            expect(checkedTilingLabels()).toEqual(["Kagome"]);
+        });
+        const ruleSelect = [
+            ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
+        ].find((select) => [...select.options].some((option) => option.value === "kagome-life"));
+        expect(ruleSelect?.value).toBe("kagome-life");
+        expect(summaryText()).toBe("1 / 1 selected · Mixed 1");
+    });
+
     it("runs a comparison and renders the portrait and grid", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
