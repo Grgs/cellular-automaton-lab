@@ -78,14 +78,35 @@ class SharedUiFlowHelpers:
         return cast(SharedUiFlowCase, self)
 
     def initialize_shared_ui_flow(self) -> None:
+        # Land directly in the Lab (#/lab): the bare URL is the comparison wall,
+        # which overlays the editor and autoplays the featured demo on a first
+        # visit — the shared editor-centric flows below need the editor.
         case = self._case()
-        case.goto_page(f"{case.host.base_url}/", wait_until="load")
+        case.goto_page(f"{case.host.base_url}/#/lab", wait_until="load")
         if case.api is not None:
             session_id = case.page.evaluate("() => window.APP_SESSION_ID || null")
             if session_id is not None and not isinstance(session_id, str):
                 raise AssertionError(f"browser session id was invalid: {session_id!r}")
             case.api = case.api.with_session(session_id)
         self._ensure_drawer_open()
+
+    def _mark_compare_demo_seen(self) -> None:
+        # Pre-seed the first-visit flag so navigating to the wall does not
+        # autoplay the featured demo (its filmstrip build is real compute).
+        case = self._case()
+        case.page.evaluate(
+            """() => {
+                const key = "cellular-automaton-lab.compare.v1";
+                let state = { runs: [], tilingSets: [] };
+                try {
+                    state = JSON.parse(window.localStorage.getItem(key)) || state;
+                } catch {
+                    // Fall back to the empty state for malformed payloads.
+                }
+                state.demoSeenAt = state.demoSeenAt || Date.now();
+                window.localStorage.setItem(key, JSON.stringify(state));
+            }"""
+        )
 
     def _expect(self, selector: str) -> Any:
         case = self._case()

@@ -2,11 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import {
     hashHasCompareRoute,
+    hashHasLabRoute,
     hashWithCompareRoute,
-    hashWithoutCompareRoute,
     hashWithFocus,
+    hashWithLabRoute,
+    hashWithoutCompareRoute,
     hashWithoutFocus,
+    hashWithoutLabRoute,
     readFocusFromHash,
+    resolveShellRoute,
 } from "./compare-route.js";
 
 describe("hashHasCompareRoute", () => {
@@ -44,6 +48,45 @@ describe("hashWithoutCompareRoute", () => {
         expect(hashWithoutCompareRoute("#share=v1.abc")).toBe("#share=v1.abc");
         expect(hashWithoutCompareRoute("#/compare&share=v1.abc")).toBe("#share=v1.abc");
         expect(hashWithoutCompareRoute("#share=v1.abc&/compare")).toBe("#share=v1.abc");
+    });
+});
+
+describe("lab route", () => {
+    it("detects, adds and removes the /lab segment while preserving other slots", () => {
+        expect(hashHasLabRoute("#/lab")).toBe(true);
+        expect(hashHasLabRoute("#/lab&share=v1.abc")).toBe(true);
+        expect(hashHasLabRoute("")).toBe(false);
+        expect(hashHasLabRoute("#/compare")).toBe(false);
+
+        expect(hashWithLabRoute("")).toBe("#/lab");
+        expect(hashWithLabRoute("#share=v1.abc")).toBe("#/lab&share=v1.abc");
+        expect(hashWithLabRoute("#/lab")).toBe("#/lab");
+
+        expect(hashWithoutLabRoute("#/lab")).toBe("");
+        expect(hashWithoutLabRoute("#/lab&share=v1.abc")).toBe("#share=v1.abc");
+        expect(hashWithoutLabRoute("#share=v1.abc")).toBe("#share=v1.abc");
+    });
+});
+
+describe("resolveShellRoute", () => {
+    it("defaults to the wall for a bare or run-only hash", () => {
+        expect(resolveShellRoute("")).toBe("wall");
+        expect(resolveShellRoute("#")).toBe("wall");
+        expect(resolveShellRoute("#run=v1.abc")).toBe("wall");
+        expect(resolveShellRoute("#focus=square")).toBe("wall");
+    });
+
+    it("resolves the Lab for /lab and for bare share links", () => {
+        expect(resolveShellRoute("#/lab")).toBe("lab");
+        expect(resolveShellRoute("#/lab&run=v1.abc")).toBe("lab");
+        expect(resolveShellRoute("#share=v1.abc")).toBe("lab");
+        expect(resolveShellRoute("#/lab&share=v1.abc")).toBe("lab");
+    });
+
+    it("keeps the legacy /compare alias on the wall, even with a share slot", () => {
+        expect(resolveShellRoute("#/compare")).toBe("wall");
+        expect(resolveShellRoute("#/compare&run=v1.abc")).toBe("wall");
+        expect(resolveShellRoute("#/compare&share=v1.abc")).toBe("wall");
     });
 });
 

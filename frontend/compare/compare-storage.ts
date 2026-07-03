@@ -19,6 +19,8 @@ export interface SavedTilingSet {
 interface CompareStorageState {
     runs: SavedCompareRun[];
     tilingSets: SavedTilingSet[];
+    /** When the first-visit featured demo was last shown (absent = never). */
+    demoSeenAt?: number;
 }
 
 function emptyState(): CompareStorageState {
@@ -47,6 +49,7 @@ function readRawState(storage: Storage | null = safeStorage()): CompareStorageSt
             tilingSets: Array.isArray(parsed.tilingSets)
                 ? parsed.tilingSets.filter(isSavedTilingSet)
                 : [],
+            ...(typeof parsed.demoSeenAt === "number" ? { demoSeenAt: parsed.demoSeenAt } : {}),
         };
     } catch {
         return emptyState();
@@ -166,5 +169,17 @@ export function saveTilingSet(
 export function deleteSavedTilingSet(id: string, storage?: Storage | null): void {
     const state = readRawState(storage);
     state.tilingSets = state.tilingSets.filter((set) => set.id !== id);
+    writeRawState(state, storage);
+}
+
+/** True when the first-visit featured demo has already been shown on this device. */
+export function isCompareDemoSeen(storage?: Storage | null): boolean {
+    return readRawState(storage).demoSeenAt !== undefined;
+}
+
+/** Record that the first-visit featured demo has been shown. */
+export function markCompareDemoSeen(storage?: Storage | null): void {
+    const state = readRawState(storage);
+    state.demoSeenAt = Date.now();
     writeRawState(state, storage);
 }

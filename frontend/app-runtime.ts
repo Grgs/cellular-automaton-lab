@@ -4,7 +4,7 @@ import { bootstrapDataFromWindow } from "./bootstrap-data.js";
 import { elements } from "./dom.js";
 import { buildEditorToolCells } from "./editor-operations.js";
 import { createAppController } from "./app-controller.js";
-import { mountCompareLauncher, type CompareLauncherHandle } from "./compare/compare-launcher.js";
+import { mountWorkspaceRouter, type WorkspaceRouterHandle } from "./compare/workspace-router.js";
 import { getGeometryAdapter } from "./geometry/registry.js";
 import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
@@ -34,7 +34,7 @@ function handleAppError(error: unknown): void {
 
 let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
-let compareLauncher: CompareLauncherHandle | null = null;
+let workspaceRouter: WorkspaceRouterHandle | null = null;
 let liveCompareWorkspace: LiveCompareWorkspaceHandle | null = null;
 
 function mountLazyLiveCompareWorkspace(
@@ -133,8 +133,8 @@ function mountLazyLiveCompareWorkspace(
 export function disposeApp(): void {
     liveCompareWorkspace?.dispose();
     liveCompareWorkspace = null;
-    compareLauncher?.dispose();
-    compareLauncher = null;
+    workspaceRouter?.dispose();
+    workspaceRouter = null;
     disposeReviewApi?.();
     disposeReviewApi = null;
     activeController?.dispose();
@@ -161,9 +161,10 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
     disposeReviewApi = installReviewApi({ controller, gridView, elements });
     try {
         const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
-        compareLauncher = mountCompareLauncher({
+        workspaceRouter = mountWorkspaceRouter({
             backend,
             bootstrapData,
+            wallTrigger: elements.wallViewBtn,
             onOpenPattern: (payload) => {
                 void controller.loadPattern(payload);
             },

@@ -358,10 +358,55 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self._expect("#rule-select").to_have_value("highlife")
 
         self.host.restart()
-        self.goto_page(f"{self.host.base_url}/", wait_until="load")
+        self.goto_page(f"{self.host.base_url}/#/lab", wait_until="load")
 
         self._expect("#rule-select").to_have_value("highlife")
         self.assertEqual(self.api.get_state()["rule"]["name"], "highlife")
+
+    def test_bare_url_lands_on_wall_and_autoplays_demo_once(self) -> None:
+        # The comparison wall is the landing view; a first visit autoplays the
+        # curated featured demo, and the demo-seen flag makes it a one-time event.
+        self.goto_page(f"{self.host.base_url}/", wait_until="load")
+
+        self._expect(".compare-dialog--workspace").to_be_visible()
+        # The featured demo builds the live side-by-side (four curated tilings);
+        # the aperiodic boards take a few seconds to construct.
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        demo_seen = self.page.evaluate(
+            """() => {
+                try {
+                    const raw = window.localStorage.getItem("cellular-automaton-lab.compare.v1");
+                    return typeof JSON.parse(raw).demoSeenAt === "number";
+                } catch {
+                    return false;
+                }
+            }"""
+        )
+        self.assertTrue(demo_seen)
+
+        # A second landing stays on the wall but rests on the empty-state hero
+        # instead of re-running the demo.
+        self.reload_page(wait_until="load")
+        self._expect(".compare-dialog--workspace").to_be_visible()
+        self._expect(".compare-stage-hero").to_be_visible()
+
+    def test_lab_deep_link_shows_editor_without_the_wall(self) -> None:
+        self.goto_page(f"{self.host.base_url}/#/lab", wait_until="load")
+
+        self._expect("#grid").to_be_visible()
+        self.page.wait_for_function(
+            """() => document.querySelector(".compare-backdrop") === null"""
+        )
+
+    def test_wall_button_navigates_from_lab_to_wall(self) -> None:
+        # setUp landed in the Lab; the top-bar Wall button is the way back.
+        self._mark_compare_demo_seen()
+        self.page.click("#wall-view-btn")
+
+        self._expect(".compare-dialog--workspace").to_be_visible()
+        # Leaving via Open the Lab writes the /lab route back.
+        self.page.click(".compare-back")
+        self.page.wait_for_function("() => window.location.hash === '#/lab'")
 
 
 class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
@@ -428,11 +473,15 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
     def test_saved_compare_run_persists_across_reload_in_standalone(self) -> None:
         # C3 parity: saving a run writes to localStorage in the Pyodide build and
-        # the run is still listed after a full reload.
-        self.page.click(".compare-toggle")
+        # the run is still listed after a full reload. setUp lands in the Lab;
+        # the top-bar Wall button is the navigation to the wall.
+        self._mark_compare_demo_seen()
+        self.page.click("#wall-view-btn")
         self._expect(".compare-backdrop").to_be_visible()
 
         run_name = "Standalone smoke run"
+        # Saved-run controls live in a collapsed disclosure below the stage.
+        self.page.locator(".compare-config-saved").evaluate("(section) => { section.open = true; }")
         self.page.fill('input[aria-label="Saved run name"]', run_name)
         self.page.get_by_role("button", name="Save run", exact=True).click()
         self._expect(".compare-status").to_contain_text("Saved run")
@@ -454,8 +503,9 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
         self.reload_page(wait_until="load")
 
-        # The persisted #/compare route reopens the workspace after reload.
+        # The wall is the landing view, so the reload lands straight back on it.
         self._expect(".compare-backdrop").to_be_visible()
+        self.page.locator(".compare-config-saved").evaluate("(section) => { section.open = true; }")
         self._expect('select[aria-label="Saved compare runs"]').to_contain_text(run_name)
 
 

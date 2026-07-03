@@ -1,9 +1,10 @@
 /**
- * The presentational shell for the compare panel. It owns the floating toggle,
- * the full-page workspace chrome, focus handling, and dismissal, and delegates
- * all of the actual panel UI and behaviour to `createComparePanelContent`.
+ * The presentational shell for the comparison wall. It owns the full-page
+ * workspace chrome, focus handling, and dismissal, and delegates all of the
+ * actual panel UI and behaviour to `createComparePanelContent`. The workspace
+ * router opens and closes it; this shell renders no trigger of its own.
  *
- * The workspace fills the viewport and offers a "Back to build" affordance. It
+ * The workspace fills the viewport and offers an "Open the Lab" affordance. It
  * has no "outside" to click, so it dismisses via that affordance or Escape;
  * Space and the arrow keys drive the docked filmstrip transport.
  */
@@ -23,12 +24,6 @@ interface MountComparePanelOptions {
     host?: HTMLElement;
     /** When provided, begin/end open into the current board instead of a new tab. */
     onOpenPattern?: (pattern: PatternPayload) => void;
-    /**
-     * Pre-existing toggle button to bind to (used by the lazy launcher so the
-     * toggle can render before this module loads). When omitted the panel
-     * creates and appends its own toggle.
-     */
-    trigger?: HTMLButtonElement;
     /** Open the dialog immediately after mounting (e.g. right after a lazy load). */
     openOnMount?: boolean;
     /** Fired when the dialog becomes visible (used to mirror the route into the hash). */
@@ -76,15 +71,6 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     const host = options.host ?? document.body;
     let lastFocus: HTMLElement | null = null;
 
-    const ownsToggle = options.trigger === undefined;
-    const toggleButton =
-        options.trigger ??
-        el(
-            "button",
-            { class: "compare-toggle", type: "button", title: "Compare a seed across tilings" },
-            ["⊞ Compare tilings"],
-        );
-
     const content: ComparePanelContentHandle = createComparePanelContent({
         backend: options.backend,
         bootstrapData: options.bootstrapData,
@@ -92,9 +78,15 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         onRequestClose: () => close(),
     });
 
-    const closeButton = el("button", { class: "compare-close compare-back", type: "button" }, [
-        "← Back to build",
-    ]);
+    const closeButton = el(
+        "button",
+        {
+            class: "compare-close compare-back",
+            type: "button",
+            title: "Open the single-board editor",
+        },
+        ["Open the Lab →"],
+    );
 
     const dialog = el(
         "div",
@@ -122,11 +114,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         [dialog],
     );
 
-    if (ownsToggle) {
-        host.append(toggleButton, backdrop);
-    } else {
-        host.append(backdrop);
-    }
+    host.append(backdrop);
 
     function open(): void {
         if (!backdrop.hidden) {
@@ -170,10 +158,9 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         }
     }
 
-    toggleButton.addEventListener("click", open);
     closeButton.addEventListener("click", close);
     // The full-page workspace has no "outside" to click, so a backdrop click is
-    // not a dismissal; use the Back affordance or Escape instead.
+    // not a dismissal; use the Lab affordance or Escape instead.
     document.addEventListener("keydown", onKeydown);
 
     if (options.openOnMount) {
@@ -190,9 +177,6 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             content.dispose();
-            if (ownsToggle) {
-                toggleButton.remove();
-            }
             backdrop.remove();
         },
     };

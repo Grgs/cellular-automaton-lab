@@ -3,8 +3,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
     deleteSavedCompareRun,
     deleteSavedTilingSet,
+    isCompareDemoSeen,
     listSavedCompareRuns,
     listSavedTilingSets,
+    markCompareDemoSeen,
     saveCompareRun,
     saveTilingSet,
 } from "./compare-storage.js";
@@ -88,5 +90,19 @@ describe("compare-storage", () => {
 
         expect(listSavedCompareRuns(storage)).toEqual([]);
         expect(listSavedTilingSets(storage)).toEqual([]);
+        expect(isCompareDemoSeen(storage)).toBe(false);
+    });
+
+    it("round-trips the demo-seen flag and preserves it across other writes", () => {
+        const storage = memoryStorage();
+        expect(isCompareDemoSeen(storage)).toBe(false);
+
+        markCompareDemoSeen(storage);
+        expect(isCompareDemoSeen(storage)).toBe(true);
+
+        // Saving and deleting runs must not drop the flag.
+        const saved = saveCompareRun("Daily sweep", config(), storage);
+        deleteSavedCompareRun(saved.id, storage);
+        expect(isCompareDemoSeen(storage)).toBe(true);
     });
 });

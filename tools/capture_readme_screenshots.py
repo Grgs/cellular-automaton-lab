@@ -32,8 +32,8 @@ def _wait_ready(page: Page) -> None:
     wait_for_patch_render_complete(page, timeout_ms=TIMEOUT_MS)
 
 
-def _open_fresh_page(host: StandaloneRuntimeHost, page: Page) -> None:
-    page.goto(f"{host.base_url}/", wait_until="load")
+def _open_fresh_page(host: StandaloneRuntimeHost, page: Page, *, route: str = "") -> None:
+    page.goto(f"{host.base_url}/{route}", wait_until="load")
     _wait_ready(page)
 
 
@@ -63,8 +63,8 @@ def _click(page: Page, selector: str) -> None:
 
 
 def _capture_compare_results(page: Page, output_dir: Path) -> None:
-    _click(page, ".compare-toggle")
-    page.locator(".compare-dialog").wait_for(state="visible", timeout=TIMEOUT_MS)
+    # The bare URL lands on the wall workspace; no toggle click is needed.
+    page.locator(".compare-dialog--workspace").wait_for(state="visible", timeout=TIMEOUT_MS)
     selects = page.locator("select.compare-field")
     selects.nth(1).select_option("acorn", timeout=TIMEOUT_MS)
     page.locator("input.compare-field").evaluate_all(
@@ -84,7 +84,9 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
             }
         }"""
     )
-    _click(page, ".compare-run")
+    # The analytical run lives in a collapsed disclosure below the stage.
+    page.locator(".compare-config-analysis").evaluate("(section) => { section.open = true; }")
+    page.get_by_role("button", name="Run comparison", exact=True).click(timeout=TIMEOUT_MS)
     page.locator(".compare-grid tbody tr").nth(0).wait_for(state="visible", timeout=TIMEOUT_MS)
     page.add_style_tag(
         content="""
@@ -97,12 +99,23 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
                 max-height: none !important;
                 overflow: visible !important;
             }
-            .compare-actions {
+            .compare-dock {
                 position: static !important;
             }
         """
     )
     _save_locator_png(page, ".compare-dialog", output_dir / "readme-compare-results-hero.png")
+
+
+def _capture_wall_hero(page: Page, output_dir: Path) -> None:
+    # A first visit autoplays the featured demo; the reduced-motion context makes
+    # it rest, paused, on a lively frame — a deterministic hero shot.
+    page.locator(".compare-dialog--workspace").wait_for(state="visible", timeout=TIMEOUT_MS)
+    page.locator(".compare-filmstrip-board").nth(3).wait_for(state="visible", timeout=TIMEOUT_MS)
+    page.locator(".compare-filmstrip-board .compare-thumb").nth(3).wait_for(
+        state="visible", timeout=TIMEOUT_MS
+    )
+    _save_locator_png(page, ".compare-dialog", output_dir / "readme-wall-hero.png")
 
 
 def _capture_snub_workspace(page: Page, output_dir: Path) -> None:
@@ -138,13 +151,26 @@ def _capture_picker_thumbnails(page: Page, output_dir: Path) -> None:
     _save_optimized_png(page, output_dir / "readme-tiling-picker-thumbnails.png")
 
 
+DEMO_SEEN_INIT_SCRIPT = """
+window.localStorage.setItem(
+    "cellular-automaton-lab.compare.v1",
+    JSON.stringify({ runs: [], tilingSets: [], demoSeenAt: 1 })
+);
+"""
+
+
 def capture_readme_screenshots(output_dir: Path) -> None:
     ensure_current_standalone_build(str(ROOT_DIR))
-    scenarios: tuple[Callable[[Page, Path], None], ...] = (
-        _capture_compare_results,
-        _capture_snub_workspace,
-        _capture_pinwheel_workspace,
-        _capture_picker_thumbnails,
+    # Each scenario: (capture, route, seed_demo_seen). Editor scenarios open the
+    # Lab route; wall scenarios land on the bare URL. Pre-seeding the demo flag
+    # keeps the featured demo from racing a scripted setup — only the wall hero
+    # wants the demo (reduced motion parks it on a lively still frame).
+    scenarios: tuple[tuple[Callable[[Page, Path], None], str, bool], ...] = (
+        (_capture_wall_hero, "", False),
+        (_capture_compare_results, "", True),
+        (_capture_snub_workspace, "#/lab", True),
+        (_capture_pinwheel_workspace, "#/lab", True),
+        (_capture_picker_thumbnails, "#/lab", True),
     )
     host = StandaloneRuntimeHost()
     host.start()
@@ -152,17 +178,19 @@ def capture_readme_screenshots(output_dir: Path) -> None:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             try:
-                for scenario in scenarios:
+                for scenario, route, seed_demo_seen in scenarios:
                     context = browser.new_context(
                         viewport=VIEWPORT,
                         device_scale_factor=1,
                         reduced_motion="reduce",
                     )
                     try:
+                        if seed_demo_seen:
+                            context.add_init_script(DEMO_SEEN_INIT_SCRIPT)
                         page = context.new_page()
                         page.set_default_timeout(TIMEOUT_MS)
                         page.set_default_navigation_timeout(TIMEOUT_MS)
-                        _open_fresh_page(host, page)
+                        _open_fresh_page(host, page, route=route)
                         scenario(page, output_dir)
                     finally:
                         context.close()
