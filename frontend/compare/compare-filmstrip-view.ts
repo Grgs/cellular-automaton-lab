@@ -64,7 +64,6 @@ interface BoardEntry {
     cell: HTMLElement;
     slot: HTMLElement;
     countLabel: HTMLElement;
-    focusButton: HTMLButtonElement;
     openButton?: HTMLButtonElement;
     preview?: TopologyPreview;
     error?: string;
@@ -88,21 +87,6 @@ function linkButton(label: string, title: string, onClick: () => void): HTMLButt
     node.title = title;
     node.setAttribute("aria-label", title);
     node.addEventListener("click", onClick);
-    return node;
-}
-
-function iconButton(label: string, title: string, onClick: () => void): HTMLButtonElement {
-    const node = document.createElement("button");
-    node.type = "button";
-    node.className = "compare-filmstrip-focus";
-    node.textContent = label;
-    node.title = title;
-    node.setAttribute("aria-label", title);
-    node.setAttribute("aria-pressed", "false");
-    node.addEventListener("click", (event) => {
-        event.stopPropagation();
-        onClick();
-    });
     return node;
 }
 
@@ -135,11 +119,12 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const isHero = speaker && entry.tiling.geometry === focusedGeometry;
             entry.cell.classList.toggle("is-hero", isHero);
             entry.cell.classList.toggle("is-strip", speaker && !isHero);
-            entry.focusButton.setAttribute("aria-pressed", isHero ? "true" : "false");
-            entry.focusButton.title = isHero ? "Back to the gallery" : "Focus this board";
-            entry.focusButton.setAttribute(
+            entry.cell.title = isHero ? "Back to the gallery" : "Focus this board";
+            entry.cell.setAttribute(
                 "aria-label",
-                isHero ? "Back to the gallery" : `Focus ${entry.tiling.geometry}`,
+                isHero
+                    ? `${entry.tiling.geometry}: back to the gallery`
+                    : `${entry.tiling.geometry}: focus this board`,
             );
         }
     }
@@ -243,9 +228,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const countLabel = el("div", "compare-filmstrip-count");
             const cell = el("div", "compare-filmstrip-board");
             cell.setAttribute("role", "listitem");
-            const focusButton = iconButton("⤢", `Focus ${tiling.geometry}`, () => {
-                focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
-            });
+            cell.tabIndex = 0;
             const openButton = options.onOpenFrame
                 ? linkButton(
                       "Fork gen 0 →",
@@ -254,19 +237,29 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                   )
                 : undefined;
             const header = el("div", "compare-filmstrip-board-head");
-            header.append(label, focusButton);
+            header.append(label);
             cell.append(header, slot, countLabel);
             if (openButton) {
                 cell.append(openButton);
             }
-            // In speaker view a strip thumbnail is a click target to swap focus;
-            // clicks on its buttons are handled by those buttons (stopPropagation).
+            const toggleFocus = () => {
+                focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
+            };
+            // The board tile itself behaves like a video-call participant: click
+            // to focus it, click the focused hero to return to the gallery.
             cell.addEventListener("click", (event) => {
                 if (event.target instanceof Element && event.target.closest("button")) {
                     return;
                 }
-                if (focusedGeometry !== null && focusedGeometry !== tiling.geometry) {
-                    focus(tiling.geometry);
+                toggleFocus();
+            });
+            cell.addEventListener("keydown", (event) => {
+                if (event.target !== cell) {
+                    return;
+                }
+                if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+                    event.preventDefault();
+                    toggleFocus();
                 }
             });
             boardsArea.append(cell);
@@ -275,7 +268,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 cell,
                 slot,
                 countLabel,
-                focusButton,
                 ...(openButton ? { openButton } : {}),
             };
         });
