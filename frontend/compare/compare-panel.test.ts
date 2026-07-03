@@ -4,6 +4,7 @@ import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type {
     AppBootstrapData,
     SeedComparisonResult,
+    SeedFilmstripResult,
     SimulationSnapshot,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
@@ -161,6 +162,36 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
         }),
     };
     return { backend, compareSeed };
+}
+
+function twoBoardFilmstrip(): SeedFilmstripResult {
+    const board = (geometry: string) => ({
+        geometry,
+        tiling_family: geometry,
+        family: "regular",
+        cell_count: 100,
+        topology: {} as never,
+        topology_spec: {
+            tiling_family: geometry,
+            adjacency_mode: "edge",
+            sizing_mode: "grid",
+            width: 16,
+            height: 16,
+            patch_depth: 0,
+        },
+        frames: [{ "c:1:1": 1 }, { "c:2:1": 1 }],
+        extinction_step: null,
+        period: null,
+        note: null,
+    });
+    return {
+        rule_name: "conway",
+        seed: "111",
+        traversal: "bfs",
+        frame_count: 2,
+        grid_size: 16,
+        tilings: [board("square"), board("hex")],
+    };
 }
 
 function memoryStorage(): Storage {
@@ -1127,6 +1158,84 @@ describe("mountComparePanel", () => {
         // A second Escape closes the workspace.
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
         expect(backdrop()?.hidden).toBe(true);
+        handle.dispose();
+    });
+
+    it("moves the seed workspace into the speaker-view rail and back to Configure on exit", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        const rail = () => document.querySelector<HTMLElement>(".compare-seed-rail");
+        const seedInConfigure = () =>
+            document.querySelector(".compare-config-run .compare-seed-workspace");
+        const seedInRail = () =>
+            document.querySelector(".compare-seed-rail .compare-seed-workspace");
+
+        // Gallery: the seed workspace lives in the Configure disclosure, rail hidden.
+        expect(seedInConfigure()).not.toBeNull();
+        expect(seedInRail()).toBeNull();
+        expect(rail()?.hidden).toBe(true);
+
+        // Focus a board: the seed workspace reparents into the rail beside the hero.
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        expect(rail()?.hidden).toBe(false);
+        expect(seedInRail()).not.toBeNull();
+        expect(seedInConfigure()).toBeNull();
+        expect(document.querySelector(".compare-seed-rail-hint")?.textContent).toContain(
+            "fork into the Lab",
+        );
+
+        // Escape back to the gallery: the seed workspace returns to Configure.
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        expect(rail()?.hidden).toBe(true);
+        expect(seedInConfigure()).not.toBeNull();
+        expect(seedInRail()).toBeNull();
+        handle.dispose();
+    });
+
+    it("re-runs the wall from the seed rail's Re-run action", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const filmstripBackend: SimulationBackend = { ...backend, requestFilmstrip };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        const playSideButton = () =>
+            [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
+                (button) => button.textContent === "▶ Play side by side",
+            );
+        playSideButton()?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        // Wait for the run to finish (the primary button re-enables) so the second
+        // runFilmstrip is not swallowed by the in-progress guard.
+        await vi.waitFor(() => expect(playSideButton()?.disabled).toBe(false));
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        const rerun = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
+            (button) => button.textContent === "Re-run wall from this seed",
+        );
+        expect(rerun).toBeTruthy();
+        rerun?.click();
+
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         handle.dispose();
     });
 
