@@ -95,13 +95,13 @@ function snapshot(): SimulationSnapshot {
     };
 }
 
-function installAppShell(): HTMLButtonElement {
+function installAppShell(): void {
     document.body.innerHTML = `
         <main id="main-stage">
             <section id="grid-panel">
                 <canvas id="grid"></canvas>
             </section>
-            <button id="split-view-toggle-btn" type="button">Split View</button>
+            <button id="wall-view-btn" type="button">Wall</button>
             <button id="run-toggle-btn" type="button">Run</button>
             <button id="step-btn" type="button">Step</button>
             <button id="reset-btn" type="button">Reset</button>
@@ -114,11 +114,6 @@ function installAppShell(): HTMLButtonElement {
             <span id="generation-text"></span>
         </main>
     `;
-    const trigger = document.getElementById("split-view-toggle-btn");
-    if (!(trigger instanceof HTMLButtonElement)) {
-        throw new Error("missing split trigger");
-    }
-    return trigger;
 }
 
 function fakeBackend() {
@@ -143,8 +138,8 @@ afterEach(() => {
 });
 
 describe("app runtime", () => {
-    it("loads the live split workspace only after the split trigger is clicked", async () => {
-        const trigger = installAppShell();
+    it("mounts the workspace router with focus-pane services wired to the base session", async () => {
+        installAppShell();
         const backend = fakeBackend();
         const controller = {
             init: vi.fn(async () => {}),
@@ -161,11 +156,7 @@ describe("app runtime", () => {
             getConfigSyncController: vi.fn(),
             getUiSessionController: vi.fn(),
         };
-        let liveCompareModuleLoaded = false;
-        const mountLiveCompareWorkspace = vi.fn(() => ({
-            dispose: vi.fn(),
-            isOpen: vi.fn(() => false),
-        }));
+        const mountWorkspaceRouter = vi.fn((_options: unknown) => ({ dispose: vi.fn() }));
 
         vi.doMock("./canvas-view.js", () => ({
             createCanvasGridView: vi.fn(() => ({})),
@@ -182,41 +173,29 @@ describe("app runtime", () => {
         vi.doMock("./app-controller.js", () => ({
             createAppController: vi.fn(() => controller),
         }));
-        vi.doMock("./compare/workspace-router.js", () => ({
-            mountWorkspaceRouter: vi.fn(() => ({ dispose: vi.fn() })),
-        }));
+        vi.doMock("./compare/workspace-router.js", () => ({ mountWorkspaceRouter }));
         vi.doMock("./geometry/registry.js", () => ({
             getGeometryAdapter: vi.fn(() => ({})),
         }));
         vi.doMock("./review-api.js", () => ({
             installReviewApi: vi.fn(() => vi.fn()),
         }));
-        vi.doMock("./live-compare/live-compare.js", () => {
-            liveCompareModuleLoaded = true;
-            return { mountLiveCompareWorkspace };
-        });
 
         const { initApp } = await import("./app-runtime.js");
         await initApp({
             backend,
             bootstrapData,
-            liveCompareBaseSessionId: "s-runtime",
+            paneBaseSessionId: "s-runtime",
         });
 
-        expect(liveCompareModuleLoaded).toBe(false);
-        expect(mountLiveCompareWorkspace).not.toHaveBeenCalled();
-
-        trigger.click();
-
-        await vi.waitFor(() => {
-            expect(liveCompareModuleLoaded).toBe(true);
-            expect(mountLiveCompareWorkspace).toHaveBeenCalledOnce();
-        });
-        expect(mountLiveCompareWorkspace).toHaveBeenCalledWith(
-            expect.objectContaining({
-                baseSessionId: "s-runtime",
-                disposeBackendsOnClose: false,
-            }),
-        );
+        expect(mountWorkspaceRouter).toHaveBeenCalledOnce();
+        const firstCall = mountWorkspaceRouter.mock.calls[0];
+        expect(firstCall).toBeDefined();
+        const routerOptions = firstCall![0] as {
+            focusPaneServices?: { baseSessionId?: string | null };
+            wallTrigger?: HTMLButtonElement | null;
+        };
+        expect(routerOptions.focusPaneServices?.baseSessionId).toBe("s-runtime");
+        expect(routerOptions.wallTrigger).toBe(document.getElementById("wall-view-btn"));
     });
 });

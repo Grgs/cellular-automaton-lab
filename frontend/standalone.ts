@@ -102,7 +102,7 @@ function installPageLifecycleDisposal(): void {
     );
 }
 
-function createStandaloneSplitBackendFactory(
+function createStandalonePaneBackendFactory(
     bootstrapData: AppBootstrapData,
 ): (sessionId: string) => SimulationBackend {
     return () => {
@@ -112,7 +112,7 @@ function createStandaloneSplitBackendFactory(
 
         async function resolveBackend(): Promise<SimulationBackend> {
             if (disposed) {
-                throw new Error("Standalone split runtime was disposed.");
+                throw new Error("Standalone pane runtime was disposed.");
             }
             if (!environmentPromise) {
                 environmentPromise = createStandaloneEnvironment(bootstrapData, {
@@ -120,7 +120,7 @@ function createStandaloneSplitBackendFactory(
                 }).then((environment) => {
                     if (disposed) {
                         void environment.backend.dispose();
-                        throw new Error("Standalone split runtime was disposed.");
+                        throw new Error("Standalone pane runtime was disposed.");
                     }
                     backend = environment.backend;
                     return environment.backend;
@@ -176,9 +176,10 @@ export async function startStandaloneApp(): Promise<void> {
     await initApp({
         backend: environment.backend,
         bootstrapData: environment.bootstrapData,
-        liveCompareBaseSessionId: "standalone",
-        liveCompareBackendFactory: createStandaloneSplitBackendFactory(environment.bootstrapData),
-        liveCompareDisposeBackendsOnClose: true,
+        // The wall's live focus pane forks into its own persist-free Pyodide
+        // environment; there are no server sessions in the standalone build.
+        paneBaseSessionId: "standalone",
+        paneBackendFactory: createStandalonePaneBackendFactory(environment.bootstrapData),
     });
     hideStartupOverlay();
     installPageLifecycleDisposal();

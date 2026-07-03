@@ -53,7 +53,7 @@ Any multi-line shell step that pipes a command whose exit code matters (`pytest 
 
 ## Public Release Process
 
-The first clean public release line started at `v0.1.0` and continues as an ongoing preview series; `v0.5.0` is the current shipped tag. The public release surface is:
+The first clean public release line started at `v0.1.0` and continues as an ongoing preview series; `v0.5.0` is the current shipped tag. The wall-first UI overhaul (comparison wall as the landing view, `#/lab` editor, live focus-pane fork, Split View retired) targets `v0.6.0`; it is unreleased on the tagged demo, so its route and layout changes ship as "new in 0.6.0" rather than breaking changes — only `#share=` board links predate it and stay working. The public release surface is:
 
 - a tagged GitHub source release
 - the GitHub Pages standalone demo
