@@ -1,11 +1,11 @@
 /**
  * The presentational shell for the compare panel. It owns the floating toggle,
- * the backdrop/dialog chrome, focus handling, and dismissal, and delegates all
- * of the actual panel UI and behaviour to `createComparePanelContent`.
+ * the full-page workspace chrome, focus handling, and dismissal, and delegates
+ * all of the actual panel UI and behaviour to `createComparePanelContent`.
  *
- * Two presentations share this shell: the default centred `modal`, and the
- * full-page `workspace` (used by the `#/compare` route) which fills the viewport
- * and offers a "Back to build" affordance instead of a corner close button.
+ * The workspace fills the viewport and offers a "Back to build" affordance. It
+ * has no "outside" to click, so it dismisses via that affordance or Escape;
+ * Space and the arrow keys drive the docked filmstrip transport.
  */
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
@@ -35,8 +35,6 @@ interface MountComparePanelOptions {
     onOpen?: () => void;
     /** Fired when the dialog is dismissed (used to clear the route from the hash). */
     onClose?: () => void;
-    /** "modal" (default) centres a card; "workspace" fills the viewport as a page. */
-    presentation?: "modal" | "workspace";
 }
 
 export interface ComparePanelHandle {
@@ -76,7 +74,6 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export function mountComparePanel(options: MountComparePanelOptions): ComparePanelHandle {
     ensureComparePanelStyles();
     const host = options.host ?? document.body;
-    const isWorkspace = options.presentation === "workspace";
     let lastFocus: HTMLElement | null = null;
 
     const ownsToggle = options.trigger === undefined;
@@ -95,16 +92,15 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         onRequestClose: () => close(),
     });
 
-    const closeButton = isWorkspace
-        ? el("button", { class: "compare-close compare-back", type: "button" }, ["← Back to build"])
-        : el("button", { class: "compare-close", type: "button", "aria-label": "Close" }, ["×"]);
+    const closeButton = el("button", { class: "compare-close compare-back", type: "button" }, [
+        "← Back to build",
+    ]);
 
     const dialog = el(
         "div",
         {
-            class: isWorkspace ? "compare-dialog compare-dialog--workspace" : "compare-dialog",
+            class: "compare-dialog compare-dialog--workspace",
             role: "dialog",
-            "aria-modal": isWorkspace ? null : "true",
             "aria-label": "Compare tilings",
             tabindex: "-1",
         },
@@ -120,9 +116,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     const backdrop = el(
         "div",
         {
-            class: isWorkspace
-                ? "compare-backdrop compare-backdrop--workspace"
-                : "compare-backdrop",
+            class: "compare-backdrop compare-backdrop--workspace",
             hidden: true,
         },
         [dialog],
@@ -155,27 +149,28 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     function onKeydown(event: KeyboardEvent): void {
-        if (event.key === "Escape" && !backdrop.hidden) {
+        if (backdrop.hidden) {
+            return;
+        }
+        if (event.key === "Escape") {
             // Let an open action menu swallow Escape first; only close the dialog
             // when no menu consumed it.
             if (content.handleEscape()) {
                 return;
             }
             close();
+            return;
+        }
+        // Space/arrows drive the docked transport once a filmstrip is live.
+        if (content.handlePlaybackKey(event)) {
+            event.preventDefault();
         }
     }
 
     toggleButton.addEventListener("click", open);
     closeButton.addEventListener("click", close);
-    // The full-page workspace has no "outside" to click; only the modal dismisses
-    // on a backdrop click.
-    if (!isWorkspace) {
-        backdrop.addEventListener("click", (event) => {
-            if (event.target === backdrop) {
-                close();
-            }
-        });
-    }
+    // The full-page workspace has no "outside" to click, so a backdrop click is
+    // not a dismissal; use the Back affordance or Escape instead.
     document.addEventListener("keydown", onKeydown);
 
     if (options.openOnMount) {

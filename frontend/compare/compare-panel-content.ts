@@ -43,6 +43,7 @@ import {
     type FilmstripLoadOptions,
     type FilmstripViewController,
 } from "./compare-filmstrip-view.js";
+import { createFilmstripTransport } from "./compare-transport.js";
 import {
     deleteSavedCompareRun,
     deleteSavedTilingSet,
@@ -140,6 +141,8 @@ export interface ComparePanelContentHandle {
     reportRunLinkError(message: string): void;
     /** Let an open action menu consume Escape; returns true when it did. */
     handleEscape(): boolean;
+    /** Handle a playback shortcut (space/arrows) once a filmstrip is live; true if consumed. */
+    handlePlaybackKey(event: KeyboardEvent): boolean;
     dispose(): void;
 }
 
@@ -413,10 +416,37 @@ export function createComparePanelContent(
         textContent:
             "No live filmstrip yet. Select at least two tilings, then choose Play side by side.",
     });
-    const filmstripArea = el("div", { class: "compare-filmstrip-area", hidden: true });
+    const stageHero = el("div", { class: "compare-stage-hero" }, [
+        el("div", { class: "compare-stage-hero-glyph", "aria-hidden": "true", textContent: "▦" }),
+        el("div", {
+            class: "compare-stage-hero-title",
+            textContent: "Watch one seed evolve across every tiling",
+        }),
+        el("p", {
+            class: "compare-stage-hero-blurb",
+            textContent:
+                "Pick a rule and tilings below, then press Play side by side to run them on one shared clock.",
+        }),
+    ]);
+    const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [stageHero]);
+    const filmstripTransport = createFilmstripTransport();
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     let activeFilmstrip: SeedFilmstripResult | null = null;
+
+    function showStageHero(): void {
+        stageHero.hidden = false;
+        if (filmstripView) {
+            filmstripView.element.hidden = true;
+        }
+    }
+
+    function showStageBoards(): void {
+        stageHero.hidden = true;
+        if (filmstripView) {
+            filmstripView.element.hidden = false;
+        }
+    }
 
     const seedPadBlock = el("div", { class: "compare-seedpad-block" }, [
         el("div", {
@@ -451,38 +481,42 @@ export function createComparePanelContent(
     });
 
     const root = el("div", { class: "compare-content" }, [
-        el("p", {
-            class: "compare-intro",
-            textContent:
-                "Map one seed onto each tiling through a canonical traversal, run the same rule, and compare how topology shapes the outcome.",
-        }),
-        el("div", { class: "compare-form" }, [
-            labeledField("Rule", ruleSelect),
-            labeledField("Seed source", shapeSelect),
-            labeledField("Traversal", traversalSelect),
-            labeledField("Steps", stepsInput),
-            labeledField("Grid size", gridInput),
+        // The synchronized side-by-side is the point of the page, so the stage
+        // leads and the video-style transport is docked directly beneath it.
+        el("div", { class: "compare-stage" }, [filmstripArea, liveStateLine]),
+        el("div", { class: "compare-dock" }, [
+            filmstripTransport.element,
+            el("div", { class: "compare-actions" }, [playButton, copyRunButton, statusLine]),
         ]),
-        seedWorkspace,
-        el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
-        el("div", { class: "compare-actions" }, [playButton, copyRunButton, statusLine]),
-        liveStateLine,
-        // Side-by-side first; the cross-tiling analysis (phase portrait + table)
-        // lives below it and only computes when Run comparison is pressed.
-        filmstripArea,
-        el("div", { class: "compare-analysis" }, [
-            el("div", { class: "compare-section-title", textContent: "Cross-tiling analysis" }),
-            el("p", {
-                class: "compare-intro",
-                textContent:
-                    "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
-            }),
-            runButton,
-            resultsArea,
+        // Configuration and data wait quietly below the experience, collapsed
+        // into disclosures the reader opens only when they want to tune a run.
+        configSection("Configure the run", "compare-config-run", true, [
+            el("div", { class: "compare-form" }, [
+                labeledField("Rule", ruleSelect),
+                labeledField("Seed source", shapeSelect),
+                labeledField("Traversal", traversalSelect),
+                labeledField("Steps", stepsInput),
+                labeledField("Grid size", gridInput),
+            ]),
+            seedWorkspace,
         ]),
-        // Saved runs / tiling sets are a manage-your-setups aside, so they sit
-        // below the live output rather than pushing it down the page.
-        savedCompareControls(),
+        configSection("Tilings", "compare-config-tilings", true, [
+            el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
+        ]),
+        configSection("Cross-tiling analysis", "compare-config-analysis", false, [
+            el("div", { class: "compare-analysis" }, [
+                el("p", {
+                    class: "compare-intro",
+                    textContent:
+                        "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
+                }),
+                runButton,
+                resultsArea,
+            ]),
+        ]),
+        configSection("Saved runs and tiling sets", "compare-config-saved", false, [
+            savedCompareControls(),
+        ]),
     ]);
 
     renderTilingChecklist();
@@ -490,6 +524,22 @@ export function createComparePanelContent(
 
     function labeledField(label: string, field: HTMLElement): HTMLLabelElement {
         return el("label", { class: "compare-label" }, [el("span", { textContent: label }), field]);
+    }
+
+    function configSection(
+        title: string,
+        className: string,
+        open: boolean,
+        children: Array<Node | string>,
+    ): HTMLDetailsElement {
+        return el(
+            "details",
+            { class: `compare-config ${className}`, ...(open ? { open: true } : {}) },
+            [
+                el("summary", { class: "compare-config-summary", textContent: title }),
+                el("div", { class: "compare-config-body" }, children),
+            ],
+        );
     }
 
     function tilingControlsBar(): HTMLElement {
@@ -1067,7 +1117,7 @@ export function createComparePanelContent(
         renderTilingChecklist();
         refreshPreview();
         resultsArea.replaceChildren();
-        filmstripArea.hidden = true;
+        showStageHero();
         activeFilmstrip = null;
         liveStateLine.textContent =
             "Run link loaded. Choose Play side by side when you are ready to build the live filmstrip.";
@@ -1139,13 +1189,12 @@ export function createComparePanelContent(
             statusLine.textContent = "Select at least two tilings to play side by side.";
             liveStateLine.textContent =
                 "The live filmstrip needs two or more selected tilings for comparison.";
-            filmstripArea.hidden = true;
+            showStageHero();
             return;
         }
         setRunning(true);
         statusLine.textContent = `Building filmstrip for ${selected.size} tilings…`;
         liveStateLine.textContent = "Building live side-by-side filmstrip…";
-        filmstripArea.hidden = false;
 
         const request: FilmstripRequest = {
             seed: seedInput.value,
@@ -1164,13 +1213,14 @@ export function createComparePanelContent(
             if (!filmstripView) {
                 filmstripView = createFilmstripView({
                     backend: options.backend,
+                    transport: filmstripTransport,
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
                     onOpenFrame: openFilmstripFrame,
                 });
                 filmstripArea.append(filmstripView.element);
             }
-            filmstripArea.hidden = false;
+            showStageBoards();
             await filmstripView.load(filmstrip, playback);
             // Land the user on the live boards rather than the configuration above
             // them -- especially for the one-click featured demo.
@@ -1186,7 +1236,7 @@ export function createComparePanelContent(
             const message = error instanceof Error ? error.message : String(error);
             liveStateLine.textContent = `Live filmstrip failed: ${message}`;
             statusLine.textContent = `Error: ${message}`;
-            filmstripArea.hidden = true;
+            showStageHero();
         } finally {
             setRunning(false);
         }
@@ -1533,6 +1583,33 @@ export function createComparePanelContent(
             const openMenu = root.querySelector(".compare-action-menu[open]");
             if (openMenu) {
                 openMenu.removeAttribute("open");
+                return true;
+            }
+            return false;
+        },
+        handlePlaybackKey(event: KeyboardEvent): boolean {
+            // Only claim playback keys once a live filmstrip exists, so typing in
+            // the config fields (and plain Space) behaves normally until then.
+            if (!activeFilmstrip) {
+                return false;
+            }
+            const target = event.target;
+            if (
+                target instanceof HTMLElement &&
+                (target.isContentEditable || /^(input|select|textarea)$/i.test(target.tagName))
+            ) {
+                return false;
+            }
+            if (event.key === " " || event.key === "Spacebar") {
+                filmstripTransport.toggle();
+                return true;
+            }
+            if (event.key === "ArrowLeft") {
+                filmstripTransport.step(-1);
+                return true;
+            }
+            if (event.key === "ArrowRight") {
+                filmstripTransport.step(1);
                 return true;
             }
             return false;
