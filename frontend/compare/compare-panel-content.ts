@@ -45,6 +45,8 @@ import {
     type FilmstripViewController,
 } from "./compare-filmstrip-view.js";
 import { createFilmstripTransport } from "./compare-transport.js";
+import { paneSessionId, type FocusPaneServices } from "../pane/pane-core.js";
+import type { FocusPaneHandle } from "./compare-focus-pane.js";
 import {
     deleteSavedCompareRun,
     deleteSavedTilingSet,
@@ -127,6 +129,8 @@ export interface ComparePanelContentOptions {
     onOpenPattern?: (pattern: PatternPayload) => void;
     /** The content asks its host to dismiss it (e.g. after loading in place). */
     onRequestClose?: () => void;
+    /** Server-only seams for the live focus pane; absent/null baseSessionId = fork to the Lab. */
+    focusPaneServices?: FocusPaneServices;
 }
 
 export interface ComparePanelContentHandle {
@@ -437,6 +441,10 @@ export function createComparePanelContent(
     let filmstripView: FilmstripViewController | null = null;
     let activeFilmstrip: SeedFilmstripResult | null = null;
     let currentFocusGeometry: string | null = null;
+    let focusPane: FocusPaneHandle | null = null;
+    // Live in-place forking needs an independent server session; standalone
+    // (no baseSessionId) forks into the Lab instead.
+    const focusLiveEnabled = Boolean(options.focusPaneServices?.baseSessionId);
 
     // The focused board is mirrored into the hash (`&focus=<geometry>`) so speaker
     // view is shareable and the browser back button returns to the gallery.
@@ -481,8 +489,66 @@ export function createComparePanelContent(
     }
 
     function handleFocusChanged(geometry: string | null): void {
+        // A focus change (swap or exit) invalidates any live fork on the old hero.
+        disposeFocusPane();
         mirrorFocusToHash(geometry);
         updateSeedRail(geometry);
+    }
+
+    function disposeFocusPane(): void {
+        if (focusPane) {
+            focusPane.dispose();
+            focusPane = null;
+        }
+        filmstripView?.setHeroOverlay(null);
+    }
+
+    async function forkFocusedBoardLive(): Promise<void> {
+        const geometry = currentFocusGeometry;
+        if (!filmstripView || !activeFilmstrip || !geometry) {
+            return;
+        }
+        const tiling = activeFilmstrip.tilings.find((candidate) => candidate.geometry === geometry);
+        if (!tiling) {
+            return;
+        }
+        const frameIndex = filmstripView.currentFrameIndex();
+        const pattern = buildFilmstripFramePattern(activeFilmstrip, tiling, frameIndex);
+        if (!pattern) {
+            statusLine.textContent = "This generation cannot be forked.";
+            return;
+        }
+        const services = options.focusPaneServices;
+        // Standalone (no server session): fork into the Lab instead of in place.
+        if (!services?.baseSessionId) {
+            openPattern(pattern);
+            return;
+        }
+        disposeFocusPane();
+        try {
+            const backend = services.backendFactory(paneSessionId(services.baseSessionId, "focus"));
+            const { mountFocusPane } = await import("./compare-focus-pane.js");
+            focusPane = mountFocusPane({
+                geometry: tiling.geometry,
+                frameIndex,
+                pattern,
+                backend,
+                bootstrapData: options.bootstrapData,
+                createGridView: services.createGridView,
+                buildEditorToolCells: services.buildEditorToolCells,
+                ...(services.resolveCellSize ? { resolveCellSize: services.resolveCellSize } : {}),
+                onDiscard: () => {
+                    focusPane = null;
+                    filmstripView?.setHeroOverlay(null);
+                },
+                onError: (error) => {
+                    statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
+                },
+            });
+            filmstripView.setHeroOverlay(focusPane.element);
+        } catch (error) {
+            statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
+        }
     }
 
     function showStageHero(): void {
@@ -539,13 +605,27 @@ export function createComparePanelContent(
         ["Re-run wall from this seed"],
     );
     const seedRailBody = el("div", { class: "compare-seed-rail-body" });
+    const railForkButton = el(
+        "button",
+        {
+            class: "compare-run compare-run-secondary compare-seed-rail-fork",
+            type: "button",
+            title: focusLiveEnabled
+                ? "Fork this generation into a live, editable board on the wall"
+                : "Fork this generation into the single-board Lab",
+        },
+        [focusLiveEnabled ? "⑂ Fork this board live" : "⑂ Fork this board in the Lab"],
+    );
     const seedRail = el("div", { class: "compare-seed-rail", hidden: true }, [
         el("div", { class: "compare-seed-rail-title", textContent: "Edit the shared seed" }),
         seedRailBody,
         railRerunButton,
+        railForkButton,
         el("p", {
             class: "compare-seed-rail-hint",
-            textContent: "Seed edits re-run every board. Board edits fork into the Lab.",
+            textContent: focusLiveEnabled
+                ? "Seed edits re-run every board. Fork a board to edit it live while the others keep looping."
+                : "Seed edits re-run every board. Board edits fork into the Lab.",
         }),
     ]);
 
@@ -883,6 +963,7 @@ export function createComparePanelContent(
                 : "Run every selected tiling on a shared clock and play them side by side";
         copyRunButton.disabled = disabled;
         railRerunButton.disabled = running || selected.size < 2;
+        railForkButton.disabled = running;
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -1268,6 +1349,8 @@ export function createComparePanelContent(
         if (running) {
             return;
         }
+        // A fresh run rebuilds every board, so any live fork is torn down first.
+        disposeFocusPane();
         if (selected.size < 2) {
             statusLine.textContent = "Select at least two tilings to play side by side.";
             liveStateLine.textContent =
@@ -1656,6 +1739,7 @@ export function createComparePanelContent(
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
     railRerunButton.addEventListener("click", () => void runFilmstrip());
+    railForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     copyRunButton.addEventListener("click", copyRunLink);
     document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);
@@ -1717,6 +1801,7 @@ export function createComparePanelContent(
         dispose(): void {
             document.removeEventListener("pointerdown", onDocumentPointerDown);
             window.removeEventListener("hashchange", onHashChangeFocus);
+            disposeFocusPane();
             seedPad.dispose();
             seedPreview.dispose();
             filmstripView?.dispose();

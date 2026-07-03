@@ -15,13 +15,23 @@ import type { GridView, ViewportDimensions } from "../types/controller-view.js";
 import type {
     AppBootstrapData,
     BootstrappedTopologyDefinition,
-    IndexedTopologyCell,
     SimulationSnapshot,
-    TopologyIndex,
     TopologySpec,
 } from "../types/domain.js";
 import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
-import type { AppState } from "../types/state.js";
+import {
+    element,
+    fitCanvasElementToViewport,
+    findPaneCellById,
+    geometryForSpec,
+    indexPaneTopology,
+    paneEditorState,
+    paneSessionId,
+    resolvePanePaintState,
+    type PaneCellSizeOptions,
+    type PaneEditorCellsBuilder,
+    type PaneViewportDimensionsOptions,
+} from "../pane/pane-core.js";
 import { matchTilingSearchItems, tilingSearchTextFromTerms } from "../controls/tiling-search.js";
 
 const STORAGE_KEY = "cellular-automaton-lab.live-compare.v1";
@@ -55,33 +65,10 @@ export interface LiveCompareWorkspaceOptions {
     onError?: (error: unknown) => void;
 }
 
-export interface LiveCompareViewportDimensionsOptions {
-    viewportWidth: number;
-    viewportHeight: number;
-    geometry: string;
-    cellSize: number;
-    fallbackDimensions: ViewportDimensions;
-    maxCellCount?: number;
-}
-
-export interface LiveCompareCellSizeOptions {
-    viewportWidth: number;
-    viewportHeight: number;
-    width: number;
-    height: number;
-    topology: SimulationSnapshot["topology"];
-    geometry: string;
-    fallbackCellSize: number;
-}
-
-export type LiveCompareEditorCellsBuilder = (
-    state: AppState,
-    tool: string,
-    startCell: PaintableCell,
-    endCell: PaintableCell | null | undefined,
-    paintState: number,
-    brushSize: number,
-) => PreviewPaintCell[];
+// Shared with the wall's live focus pane; canonical definitions live in pane-core.
+export type LiveCompareViewportDimensionsOptions = PaneViewportDimensionsOptions;
+export type LiveCompareCellSizeOptions = PaneCellSizeOptions;
+export type LiveCompareEditorCellsBuilder = PaneEditorCellsBuilder;
 
 export interface LiveCompareControlElements {
     statusText?: HTMLElement | null;
@@ -159,41 +146,8 @@ function writeStorage(storage: Storage | null | undefined, state: LiveCompareSto
     }
 }
 
-function element<K extends keyof HTMLElementTagNameMap>(
-    tag: K,
-    className = "",
-    text = "",
-): HTMLElementTagNameMap[K] {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text) {
-        node.textContent = text;
-    }
-    return node;
-}
-
-function validSessionIdPart(value: string): string {
-    return value.replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 68) || "split";
-}
-
-function paneSessionId(baseSessionId: string, paneId: PaneId): string {
-    return `${validSessionIdPart(baseSessionId)}-${paneId}`;
-}
-
 function topologyGeometry(definition: BootstrappedTopologyDefinition): string {
     return definition.geometry_keys[definition.default_adjacency_mode] || definition.tiling_family;
-}
-
-function geometryForSpec(
-    definitions: readonly BootstrappedTopologyDefinition[],
-    spec: TopologySpec,
-): string {
-    const definition = definitions.find(
-        (candidate) => candidate.tiling_family === spec.tiling_family,
-    );
-    return definition?.geometry_keys[spec.adjacency_mode] ?? spec.tiling_family;
 }
 
 function resetSpecForTopology(
@@ -373,123 +327,6 @@ function createPaneElements(
         stepButton,
         resetButton,
     };
-}
-
-function paneEditorState(
-    snapshot: SimulationSnapshot,
-    renderCellSize: number,
-    selectedEditorTool: EditorTool,
-    brushSize: number,
-    selectedPaintState: number,
-): AppState {
-    return {
-        topology: snapshot.topology,
-        topologyIndex: indexPaneTopology(snapshot),
-        topologySpec: snapshot.topology_spec,
-        width: snapshot.topology.width ?? snapshot.topology_spec.width,
-        height: snapshot.topology.height ?? snapshot.topology_spec.height,
-        cellStates: snapshot.cell_states,
-        cellSize: renderCellSize,
-        renderCellSize,
-        activeRule: snapshot.rule,
-        rules: [snapshot.rule],
-        editorRuleName: snapshot.rule.name,
-        ruleSelectionOrigin: "default",
-        selectedEditorTool,
-        brushSize,
-        selectedPaintState,
-        selectedPresetIdsByRule: {},
-        undoStack: [],
-        redoStack: [],
-        pollTimer: null,
-        isRunning: snapshot.running,
-        generation: snapshot.generation,
-        speed: snapshot.speed,
-        measuredSpeed: null,
-        measuredSpeedSample: null,
-        patchDepth: snapshot.topology_spec.patch_depth,
-        pendingPatchDepth: null,
-        patchDepthByTilingFamily: {},
-        unsafeSizingEnabled: false,
-        tileColorsEnabled: true,
-        topologyRevision: snapshot.topology_revision,
-        previewTopology: null,
-        previewTopologyRevision: null,
-        previewCellStatesById: null,
-        cellSizeByTilingFamily: {},
-        drawerOpen: false,
-        overlaysDismissed: false,
-        inspectorTemporarilyHidden: false,
-        overlayRunPending: false,
-        runningOverlayRestoreActive: false,
-        inspectorOccludesGrid: false,
-        editArmed: true,
-        editCueVisible: false,
-        firstRunHintDismissed: true,
-        blockingActivityKind: null,
-        blockingActivityMessage: "",
-        blockingActivityDetail: "",
-        blockingActivityVisible: false,
-        blockingActivityStartedAt: null,
-        patternStatus: { message: "", tone: "" },
-    };
-}
-
-function resolvePanePaintState(snapshot: SimulationSnapshot, selectedPaintState: number): number {
-    const paintableStates = snapshot.rule.states.filter((state) => state.paintable !== false);
-    if (paintableStates.some((state) => state.value === selectedPaintState)) {
-        return selectedPaintState;
-    }
-    return (
-        paintableStates.find((state) => state.value === snapshot.rule.default_paint_state)?.value ??
-        paintableStates.find((state) => state.value !== 0)?.value ??
-        paintableStates[0]?.value ??
-        1
-    );
-}
-
-function cssPixelValue(value: string): number {
-    const parsed = Number.parseFloat(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function fitCanvasElementToViewport(canvas: HTMLCanvasElement, viewport: HTMLElement): void {
-    const canvasWidth = Number.parseFloat(canvas.style.width) || canvas.width;
-    const canvasHeight = Number.parseFloat(canvas.style.height) || canvas.height;
-    if (canvasWidth <= 0 || canvasHeight <= 0) {
-        return;
-    }
-    const viewportStyle = window.getComputedStyle(viewport);
-    const availableWidth = Math.max(
-        1,
-        viewport.clientWidth -
-            cssPixelValue(viewportStyle.paddingLeft) -
-            cssPixelValue(viewportStyle.paddingRight),
-    );
-    const availableHeight = Math.max(
-        1,
-        viewport.clientHeight -
-            cssPixelValue(viewportStyle.paddingTop) -
-            cssPixelValue(viewportStyle.paddingBottom),
-    );
-    const scale = Math.min(1, availableWidth / canvasWidth, availableHeight / canvasHeight);
-    canvas.style.width = `${canvasWidth * scale}px`;
-    canvas.style.height = `${canvasHeight * scale}px`;
-}
-
-function indexPaneTopology(snapshot: SimulationSnapshot): TopologyIndex {
-    const byId = new Map<string, IndexedTopologyCell>();
-    snapshot.topology.cells.forEach((cell, index) => {
-        byId.set(cell.id, { ...cell, index });
-    });
-    return { byId };
-}
-
-function findPaneCellById(
-    topologyIndex: TopologyIndex,
-    cellId: string,
-): IndexedTopologyCell | null {
-    return topologyIndex.byId.get(cellId) ?? null;
 }
 
 function renderPane(

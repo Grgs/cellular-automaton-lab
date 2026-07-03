@@ -31,6 +31,7 @@ import {
 } from "./compare-route.js";
 import { clearShareFragment } from "../share-link.js";
 import { isCompareDemoSeen, markCompareDemoSeen } from "./compare-storage.js";
+import type { FocusPaneServices } from "../pane/pane-core.js";
 
 const ROUTER_STYLE_ID = "workspace-router-styles";
 
@@ -59,6 +60,8 @@ export interface MountWorkspaceRouterOptions {
     onOpenPattern?: (pattern: PatternPayload) => void;
     /** Top-bar button in the Lab that navigates back to the wall. */
     wallTrigger?: HTMLButtonElement | null;
+    /** Server-only seams for the wall's live focus pane. */
+    focusPaneServices?: FocusPaneServices;
 }
 
 export interface WorkspaceRouterHandle {
@@ -202,6 +205,9 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
                 bootstrapData: options.bootstrapData,
                 host,
                 ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
+                ...(options.focusPaneServices
+                    ? { focusPaneServices: options.focusPaneServices }
+                    : {}),
                 openOnMount: true,
                 onOpen: () => writeHash(hashWithoutLabRoute(window.location.hash)),
                 onClose: () => navigateTo("lab"),
