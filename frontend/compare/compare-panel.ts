@@ -43,6 +43,7 @@ export interface ComparePanelHandle {
     isOpen(): boolean;
     applyRunConfig(config: CompareRunConfig): Promise<void>;
     runFeaturedDemo(config: CompareRunConfig): Promise<void>;
+    runDefaultFilmstrip(config: CompareRunConfig): Promise<void>;
     reportRunLinkError(message: string): void;
     dispose(): void;
 }
@@ -181,6 +182,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         isOpen: () => !backdrop.hidden,
         applyRunConfig: (config) => content.applyRunConfig(config),
         runFeaturedDemo: (config) => content.runFeaturedDemo(config),
+        runDefaultFilmstrip: (config) => content.runDefaultFilmstrip(config),
         reportRunLinkError: (message) => content.reportRunLinkError(message),
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);

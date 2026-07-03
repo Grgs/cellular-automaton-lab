@@ -384,11 +384,12 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         )
         self.assertTrue(demo_seen)
 
-        # A second landing stays on the wall but rests on the empty-state hero
-        # instead of re-running the demo.
+        # A second landing stays on the wall with the same participants loaded,
+        # but paused instead of autoplaying over the user again.
         self.reload_page(wait_until="load")
         self._expect(".compare-dialog--workspace").to_be_visible()
-        self._expect(".compare-stage-hero").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        self._expect('.compare-filmstrip-btn[title="Play / pause"]').to_contain_text("Play")
 
     def test_lab_deep_link_shows_editor_without_the_wall(self) -> None:
         self.goto_page(f"{self.host.base_url}/#/lab", wait_until="load")

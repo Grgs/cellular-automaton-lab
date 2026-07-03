@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type {
     AppBootstrapData,
+    FilmstripRequest,
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
@@ -685,24 +686,37 @@ describe("mountComparePanel", () => {
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["kagome"]);
     });
 
-    it("uses the active Lab rule for the default wall tiling list", async () => {
+    it("keeps default filmstrip tilings when the active Lab rule is too narrow", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
-        mountComparePanel({
+        const filmstripRequests: FilmstripRequest[] = [];
+        const requestFilmstrip: SimulationBackend["requestFilmstrip"] = async (request) => {
+            filmstripRequests.push(request);
+            return twoBoardFilmstrip();
+        };
+        const handle = mountComparePanel({
             openOnMount: true,
-            backend,
+            backend: { ...backend, requestFilmstrip },
             bootstrapData: bootstrapData(),
             getInitialRuleName: () => "kagome-life",
         });
 
-        await vi.waitFor(() => {
-            expect(checkedTilingLabels()).toEqual(["Kagome"]);
+        await handle.runDefaultFilmstrip({
+            seed: "",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["square", "hex"],
+            pattern: "r-pentomino",
         });
-        const ruleSelect = [
-            ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
-        ].find((select) => [...select.options].some((option) => option.value === "kagome-life"));
-        expect(ruleSelect?.value).toBe("kagome-life");
-        expect(summaryText()).toBe("1 / 1 selected · Mixed 1");
+
+        expect(filmstripRequests).toHaveLength(1);
+        expect(filmstripRequests[0]?.rule).toBe("conway");
+        expect(filmstripRequests[0]?.geometries).toEqual(["square", "hex"]);
+        expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
+        expect(summaryText()).toBe("2 / 6 selected · Regular 2");
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
     });
 
     it("runs a comparison and renders the portrait and grid", async () => {

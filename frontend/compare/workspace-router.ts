@@ -160,8 +160,8 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
         writeHash(clearShareFragment(hashWithoutLabRoute(current)));
     }
 
-    /** First visit only: autoplay the curated demo so the landing is alive. */
-    async function maybeRunFeaturedDemo(): Promise<void> {
+    /** Keep the wall populated; first visit autoplays, later visits load paused. */
+    async function maybeRunDefaultFilmstrip(): Promise<void> {
         if (demoConsidered || disposed || !panel) {
             return;
         }
@@ -175,6 +175,7 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
             return;
         }
         if (isCompareDemoSeen()) {
+            await panel.runDefaultFilmstrip(FEATURED_COMPARE_DEMO);
             return;
         }
         // Mark seen before running so a failing demo never becomes a reload loop.
@@ -189,7 +190,7 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
         if (panel) {
             panel.open();
             await applyRunFromHashIfPresent();
-            await maybeRunFeaturedDemo();
+            await maybeRunDefaultFilmstrip();
             return;
         }
         if (loading) {
@@ -218,7 +219,7 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
                 onClose: () => navigateTo("lab"),
             });
             await applyRunFromHashIfPresent();
-            await maybeRunFeaturedDemo();
+            await maybeRunDefaultFilmstrip();
         } finally {
             loading = false;
             loadingVeil.hidden = true;
