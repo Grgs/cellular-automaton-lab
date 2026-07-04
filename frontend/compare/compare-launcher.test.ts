@@ -138,6 +138,25 @@ describe("mountCompareLauncher", () => {
         expect(document.querySelectorAll(".compare-toggle")).toHaveLength(1);
     });
 
+    it("renders the watch-demo banner eagerly", async () => {
+        await mount();
+
+        expect(document.querySelector(".compare-watch-banner")).not.toBeNull();
+        expect(document.querySelector(".compare-backdrop")).toBeNull();
+    });
+
+    it("opens the workspace from the watch-demo banner", async () => {
+        await mount();
+
+        document.querySelector<HTMLButtonElement>(".compare-watch-banner")?.click();
+
+        await vi.waitFor(() => {
+            const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
+            expect(backdrop).not.toBeNull();
+            expect(backdrop?.hidden).toBe(false);
+        });
+    });
+
     it("disposes the lazily-mounted panel and removes the toggle", async () => {
         await mount();
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();

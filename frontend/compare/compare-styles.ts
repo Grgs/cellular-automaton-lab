@@ -302,16 +302,17 @@ export const COMPARE_PANEL_STYLES = `
     line-height: 1.35;
 }
 .compare-actions {
-    position: sticky;
-    bottom: -20px;
-    z-index: 2;
     display: flex;
     align-items: center;
     gap: 14px;
-    margin: 16px -22px -20px;
-    padding: 12px 22px 16px;
+    margin: 16px 0;
+    padding-top: 12px;
     border-top: 1px solid var(--line, rgba(0, 0, 0, 0.1));
-    background: var(--panel-strong, #fff);
+}
+.compare-analysis {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line, rgba(0, 0, 0, 0.1));
 }
 .compare-run {
     flex: 0 0 auto;

@@ -7,6 +7,7 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import { FEATURED_COMPARE_DEMO } from "./compare-options.js";
 import {
     CompareRunLinkDecodeError,
     decodeCompareRunFragment,
@@ -41,6 +42,24 @@ const TOGGLE_STYLES = `
 }
 .compare-toggle:hover { background: var(--btn-primary-hover, #a44928); }
 .compare-toggle[disabled] { cursor: progress; opacity: 0.85; }
+.compare-watch-banner {
+    position: fixed;
+    right: 16px;
+    bottom: 60px;
+    z-index: 60;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--btn-primary-line, rgba(0, 0, 0, 0.2));
+    background: var(--accent-strong, #2f6f6f);
+    color: var(--btn-primary-text, #fff);
+    font-family: var(--sans, sans-serif);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow, 0 8px 24px rgba(0, 0, 0, 0.2));
+}
+.compare-watch-banner:hover { filter: brightness(1.06); }
+.compare-watch-banner[disabled] { cursor: progress; opacity: 0.85; }
 `;
 
 export interface MountCompareLauncherOptions {
@@ -51,6 +70,8 @@ export interface MountCompareLauncherOptions {
 }
 
 export interface CompareLauncherHandle {
+    /** Open the workspace and start the curated, looping featured comparison. */
+    openFeaturedDemo(): Promise<void>;
     dispose(): void;
 }
 
@@ -74,6 +95,13 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
     toggle.title = "Compare a seed across tilings";
     toggle.textContent = "⊞ Compare tilings";
     host.append(toggle);
+
+    const watchBanner = document.createElement("button");
+    watchBanner.className = "compare-watch-banner";
+    watchBanner.type = "button";
+    watchBanner.title = "Watch one seed evolve in lockstep across four tilings";
+    watchBanner.textContent = "▶ Watch tilings compare";
+    host.append(watchBanner);
 
     let panel: ComparePanelHandle | null = null;
     let loading = false;
@@ -178,20 +206,35 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
         panel?.close();
     }
 
+    async function openFeaturedDemo(): Promise<void> {
+        watchBanner.disabled = true;
+        try {
+            await loadAndOpen();
+            if (!disposed) {
+                await panel?.runFeaturedDemo(FEATURED_COMPARE_DEMO);
+            }
+        } finally {
+            watchBanner.disabled = false;
+        }
+    }
+
     // Kept (not {once}) so a failed first lazy load can be retried and later
     // clicks reopen the workspace through the same route-aware path.
     toggle.addEventListener("click", () => void loadAndOpen());
+    watchBanner.addEventListener("click", () => void openFeaturedDemo());
     window.addEventListener("hashchange", syncFromHash);
     // Honour a deep link (e.g. #/compare) present on first load.
     syncFromHash();
 
     return {
+        openFeaturedDemo,
         dispose(): void {
             disposed = true;
             window.removeEventListener("hashchange", syncFromHash);
             panel?.dispose();
             panel = null;
             toggle.remove();
+            watchBanner.remove();
         },
     };
 }

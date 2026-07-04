@@ -52,10 +52,22 @@ export interface FilmstripViewOptions {
     scheduler?: IntervalScheduler;
 }
 
+/** Optional playback overrides applied right after a filmstrip is loaded. */
+export interface FilmstripLoadOptions {
+    /** Start playing immediately instead of waiting on the seed frame. */
+    autoplay?: boolean;
+    /** Seek to this generation after loading (e.g. a lively frame when paused). */
+    initialFrame?: number;
+    /** Frame the loop wraps back to, so playback replays only a lively sub-window. */
+    loopStart?: number;
+    /** Transport speed multiplier to apply (must match a speed-selector option). */
+    speedMultiplier?: number;
+}
+
 export interface FilmstripViewController {
     element: HTMLElement;
     /** Render a filmstrip and reset playback to the seed frame (paused). */
-    load(filmstrip: SeedFilmstripResult): Promise<void>;
+    load(filmstrip: SeedFilmstripResult, options?: FilmstripLoadOptions): Promise<void>;
     dispose(): void;
 }
 
@@ -257,9 +269,15 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         lastRenderedIndex = -1;
     }
 
-    async function load(filmstrip: SeedFilmstripResult): Promise<void> {
+    async function load(
+        filmstrip: SeedFilmstripResult,
+        loadOptions?: FilmstripLoadOptions,
+    ): Promise<void> {
         teardownRun();
-        player = new FilmstripPlayer(filmstrip.frame_count, { loop: options.loop ?? false });
+        player = new FilmstripPlayer(filmstrip.frame_count, {
+            loop: options.loop ?? false,
+            ...(loadOptions?.loopStart === undefined ? {} : { loopStart: loadOptions.loopStart }),
+        });
 
         boardsArea.replaceChildren();
         boards = filmstrip.tilings.map((tiling) => {
@@ -306,6 +324,20 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 renderBoard(entry, player.index);
             }),
         );
+
+        // Optional post-load playback overrides (used by the featured demo).
+        if (loadOptions?.speedMultiplier !== undefined) {
+            const speedValue = String(loadOptions.speedMultiplier);
+            if (SPEED_OPTIONS.some((option) => String(option.value) === speedValue)) {
+                speedSelect.value = speedValue;
+            }
+        }
+        if (loadOptions?.initialFrame !== undefined) {
+            player.seek(loadOptions.initialFrame);
+        }
+        if (loadOptions?.autoplay) {
+            player.play();
+        }
     }
 
     return {

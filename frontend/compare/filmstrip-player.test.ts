@@ -44,6 +44,15 @@ describe("FilmstripPlayer", () => {
         expect(player.playing).toBe(true);
     });
 
+    it("wraps to loopStart instead of frame 0 when a sub-window loop is set", () => {
+        const player = new FilmstripPlayer(5, { loop: true, loopStart: 2 });
+        player.seek(4);
+        player.play();
+        player.advance(); // at last frame -> wraps to loopStart
+        expect(player.index).toBe(2);
+        expect(player.playing).toBe(true);
+    });
+
     it("replays from the start when played after reaching the end", () => {
         const player = new FilmstripPlayer(3);
         player.seek(2);

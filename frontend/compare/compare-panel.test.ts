@@ -191,6 +191,16 @@ function openCompareDialog(): void {
     document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
 }
 
+function clickRunComparison(): void {
+    const button = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
+        (candidate) => candidate.textContent === "Run comparison",
+    );
+    if (!button) {
+        throw new Error("missing Run comparison button");
+    }
+    button.click();
+}
+
 function setTilingSearch(query: string): void {
     const search = document.querySelector<HTMLInputElement>(".compare-tilings-search");
     if (!search) {
@@ -459,9 +469,43 @@ describe("mountComparePanel", () => {
         setTilingSearch("Penrose");
         expect(tilingLabels()).toEqual(["Penrose"]);
 
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["square", "hex"]);
+    });
+
+    it("leads with the side-by-side and demotes the analysis below it", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        mountComparePanel({ backend, bootstrapData: bootstrapData() });
+        openCompareDialog();
+
+        const runButtons = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")];
+        const play = runButtons.find((b) => b.textContent === "▶ Play side by side");
+        const run = runButtons.find((b) => b.textContent === "Run comparison");
+
+        // Play is the primary action; Run comparison is secondary.
+        expect(play?.classList.contains("compare-run-secondary")).toBe(false);
+        expect(run?.classList.contains("compare-run-secondary")).toBe(true);
+
+        // The live filmstrip appears above the analysis section in document order,
+        // and the Run button + results live inside that (scroll-down) section.
+        const filmstrip = document.querySelector(".compare-filmstrip-area");
+        const analysis = document.querySelector(".compare-analysis");
+        expect(filmstrip).not.toBeNull();
+        expect(analysis).not.toBeNull();
+        expect(
+            filmstrip!.compareDocumentPosition(analysis!) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
+        expect(analysis!.contains(run ?? null)).toBe(true);
+        expect(analysis!.querySelector(".compare-results")).not.toBeNull();
+
+        // Saved runs/sets are demoted below the live output, not above it.
+        const saved = document.querySelector(".compare-saved");
+        expect(saved).not.toBeNull();
+        expect(
+            filmstrip!.compareDocumentPosition(saved!) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
     });
 
     it("limits compare tilings to the selected rule's compatible families", async () => {
@@ -497,7 +541,7 @@ describe("mountComparePanel", () => {
         ]);
         expect(summaryText()).toBe("1 / 1 selected · Mixed 1");
 
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.rule).toBe("kagome-life");
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["kagome"]);
@@ -509,7 +553,7 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
 
         await vi.waitFor(() => {
             expect(compareSeed).toHaveBeenCalledTimes(1);
@@ -529,7 +573,7 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -551,7 +595,7 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
         });
@@ -580,7 +624,7 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -611,7 +655,7 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData(), onOpenPattern });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -782,7 +826,7 @@ describe("mountComparePanel", () => {
         const padBlock = document.querySelector<HTMLElement>(".compare-seedpad-block");
         expect(padBlock?.style.display).toBe("none");
 
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.pattern).toBe("glider");
     });
@@ -899,7 +943,7 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend, bootstrapData: bootstrapData() });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -971,7 +1015,7 @@ describe("mountComparePanel", () => {
         mountComparePanel({ backend: wideBackend, bootstrapData: bootstrapData() });
 
         document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
-        document.querySelector<HTMLButtonElement>(".compare-run")?.click();
+        clickRunComparison();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
