@@ -61,10 +61,11 @@ def _module_name(geometry: str) -> str:
 
 
 def _existing_reference_path(root: Path, geometry: str) -> Path | None:
+    spec_key = re.compile(rf'"{re.escape(geometry)}"\s*:\s*ReferenceFamilySpec\(')
     matches = [
         path
         for path in sorted((root / _REFERENCE_DIR).glob("*.py"))
-        if f'"{geometry}"' in path.read_text(encoding="utf-8")
+        if spec_key.search(path.read_text(encoding="utf-8"))
     ]
     if len(matches) > 1:
         raise ValueError(f"Multiple reference modules already define '{geometry}'.")

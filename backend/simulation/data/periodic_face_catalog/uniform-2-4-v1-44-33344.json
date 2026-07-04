@@ -1,0 +1,43 @@
+{
+  "geometry": "uniform-2-4-v1-44-33344",
+  "label": "2-uniform #4 variant 1 (4^4; 3^3.4^2)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 254,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://commons.wikimedia.org/wiki/File:2-uniform_n4.svg"
+  ],
+  "palette": {
+    "geometry": "uniform-2-4-v1-44-33344",
+    "variants": [
+      {
+        "label": "uniform-2-4-v1-44-33344-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "uniform-2-4-v1-44-33344-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneStone:-3,-14 22,-14 22,11 -3,11;toneClay:10,36 22,58 -3,58;toneClay:-15,36 10,36 -3,58;toneStone:-3,58 22,58 22,83 -3,83;toneStone:-15,11 10,11 10,36 -15,36;toneStone:47,-14 73,-14 73,11 47,11;toneStone:22,-14 47,-14 47,11 22,11;toneClay:60,36 73,58 47,58;toneClay:35,36 47,58 22,58;toneClay:35,36 60,36 47,58;toneClay:10,36 35,36 22,58;toneStone:47,58 73,58 73,83 47,83;toneStone:22,58 47,58 47,83 22,83;toneStone:35,11 60,11 60,36 35,36;toneStone:10,11 35,11 35,36 10,36;toneStone:98,-14 123,-14 123,11 98,11;toneStone:73,-14 98,-14 98,11 73,11;toneClay:110,36 123,58 98,58;toneClay:85,36 98,58 73,58;toneClay:85,36 110,36 98,58;toneClay:60,36 85,36 73,58;toneStone:98,58 123,58 123,83 98,83;toneStone:73,58 98,58 98,83 73,83;toneStone:85,11 110,11 110,36 85,36;toneStone:60,11 85,11 85,36 60,36;toneClay:110,36 135,36 123,58;toneStone:110,11 135,11 135,36 110,36"
+}

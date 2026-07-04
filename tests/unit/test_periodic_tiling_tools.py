@@ -19,6 +19,7 @@ from backend.simulation.topology_implementation_registry import get_topology_imp
 from tools.add_periodic_tiling import (
     InstallMetadata,
     PlannedWrite,
+    _existing_reference_path,
     apply_install_plan,
     build_install_plan,
 )
@@ -91,6 +92,20 @@ class InspectTilingSvgTests(unittest.TestCase):
         self.assertIn('GEOMETRY = "replace-me"', starter)
         self.assertIn("Reduce this sampled patch", starter)
         compile(starter, "starter.py", "exec")
+
+    def test_supports_relative_path_polygons(self) -> None:
+        svg = """<svg xmlns="http://www.w3.org/2000/svg">
+          <path d="m 0,0 1,0 0,1 -1,0 z"/>
+          <path d="m 2,0 1,0 0,1 -1,0 z"/>
+          <path d="m 4,0 1,0 0,1 -1,0 z"/>
+        </svg>"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "relative.svg"
+            path.write_text(svg, encoding="utf-8")
+            inspection = inspect_svg(path)
+
+        self.assertEqual(inspection.kind_counts, {"square": 3})
+        self.assertIn((2.0, 0.0, 2), inspection.candidate_translations)
 
 
 class AddPeriodicTilingTests(unittest.TestCase):
@@ -252,6 +267,25 @@ FACES: list[dict[str, Any]] = [
             "rebased-square.svg",
             contents["backend/simulation/reference_specs/periodic/legacy_square_reference.py"],
         )
+
+    def test_existing_reference_path_ignores_dual_candidate_mentions(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            reference_dir = root / "backend/simulation/reference_specs/periodic"
+            reference_dir.mkdir(parents=True)
+            (reference_dir / "candidate_reference.py").write_text(
+                'SPECS = {"other": ReferenceFamilySpec(geometry="other", '
+                "periodic_descriptor=PeriodicDescriptorExpectation("
+                'expected_dual_candidate_geometries=("tool-test-square",)))}\n',
+                encoding="utf-8",
+            )
+            actual = reference_dir / "tool_test_square.py"
+            actual.write_text(
+                'SPECS = {"tool-test-square": ReferenceFamilySpec(geometry="tool-test-square")}\n',
+                encoding="utf-8",
+            )
+
+            self.assertEqual(_existing_reference_path(root, "tool-test-square"), actual)
 
 
 class RegeneratePeriodicCatalogTests(unittest.TestCase):

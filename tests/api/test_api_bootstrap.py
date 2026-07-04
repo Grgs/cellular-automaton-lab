@@ -31,7 +31,9 @@ class ApiBootstrapTests(ApiTestCase):
                 for entry in payload["aperiodic_families"]
             )
         )
-        self.assertTrue(any(entry["experimental"] for entry in payload["aperiodic_families"]))
+        # No shipped family is experimental right now; the payload must still
+        # carry the flag on every entry.
+        self.assertTrue(all("experimental" in entry for entry in payload["aperiodic_families"]))
         self.assertTrue(
             all("implementation_status" in entry for entry in payload["aperiodic_families"])
         )

@@ -46,11 +46,10 @@ Next action:
 
 ### 2. Aperiodic Implementation Status
 
-The repo now exposes per-family implementation contracts, but some family status remains intentionally provisional.
+The repo now exposes per-family implementation contracts. `dodecagonal-square-triangle` (catalog label "Schlottmann Square-Triangle") now runs the canonical Schlottmann marked-prototile substitution and was promoted to the main `Aperiodic` group on July 2, 2026, so no family status remains provisional.
 
 Next action:
 
-- Keep `dodecagonal-square-triangle` documented as a decorated periodic `3.12.12` square-triangle generator unless a faithful canonical Schlottmann marked-prototile implementation replaces it.
 - Keep product status, verification status, and known-deviation docs aligned in the same change.
 
 ### 3. Verification Report Consumption
@@ -88,7 +87,6 @@ The following roadmap items are considered done and should not be reopened witho
 
 ## Do Not Do Yet
 
-- Do not promote `dodecagonal-square-triangle` until its implementation blocker (a canonical Schlottmann marked-prototile substitution) is resolved.
 - Do not centralize all constants into one global config file.
 - Do not rewrite the app controller stack without a concrete ownership problem that the existing splits cannot handle.
 - Do not replace Playwright coverage with unit tests for flows that genuinely require DOM, canvas, browser storage, or standalone worker execution.

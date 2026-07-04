@@ -11,7 +11,7 @@ async function freshPreviewModule() {
 
 const DODECAGONAL_OPTION: TopologyOption = {
     value: "dodecagonal-square-triangle",
-    label: "Dodecagonal Square-Triangle",
+    label: "Schlottmann Square-Triangle",
     group: "Aperiodic",
     order: 270,
     family: "aperiodic",

@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 _NUMBER = re.compile(r"-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+_PATH_TOKEN = re.compile(r"[A-Za-z]|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
 _KIND_BY_SIDES = {
     3: "triangle",
     4: "square",
@@ -48,9 +49,7 @@ def _points_from_element(element: ET.Element) -> tuple[tuple[float, float], ...]
     if raw is None:
         return None
     if tag == "path":
-        commands = re.findall(r"[A-Za-z]", raw)
-        if any(command not in {"M", "L", "Z"} for command in commands):
-            return None
+        return _points_from_path(raw)
     numbers = [float(value) for value in _NUMBER.findall(raw)]
     if len(numbers) < 6 or len(numbers) % 2:
         return None
@@ -58,6 +57,45 @@ def _points_from_element(element: ET.Element) -> tuple[tuple[float, float], ...]
     if len(points) > 3 and points[0] == points[-1]:
         points = points[:-1]
     return points
+
+
+def _points_from_path(raw: str) -> tuple[tuple[float, float], ...] | None:
+    tokens = _PATH_TOKEN.findall(raw)
+    if not tokens:
+        return None
+
+    points: list[tuple[float, float]] = []
+    index = 0
+    command: str | None = None
+    cursor = (0.0, 0.0)
+    while index < len(tokens):
+        token = tokens[index]
+        if re.fullmatch(r"[A-Za-z]", token):
+            command = token
+            index += 1
+            if command in {"Z", "z"}:
+                continue
+            if command not in {"M", "m", "L", "l"}:
+                return None
+        if command is None or index + 1 >= len(tokens):
+            return None
+
+        x = float(tokens[index])
+        y = float(tokens[index + 1])
+        index += 2
+        if command in {"m", "l"}:
+            cursor = (cursor[0] + x, cursor[1] + y)
+        else:
+            cursor = (x, y)
+        points.append(cursor)
+        if command in {"M", "m"}:
+            command = "L" if command == "M" else "l"
+
+    if len(points) < 3:
+        return None
+    if len(points) > 3 and points[0] == points[-1]:
+        points = points[:-1]
+    return tuple(points)
 
 
 def _edge_lengths(vertices: tuple[tuple[float, float], ...]) -> tuple[float, ...]:

@@ -105,6 +105,42 @@ describe("controls-model/drawer selection inspector", () => {
     });
 
     it("surfaces backend-owned experimental blocker text for aperiodic families", async () => {
+        // No shipped family is experimental right now; cover the blocker
+        // surface with a synthetic bootstrapped definition.
+        window.APP_APERIODIC_FAMILIES = [
+            ...(window.APP_APERIODIC_FAMILIES ?? []),
+            {
+                tiling_family: "fixture-experimental",
+                label: "Fixture Experimental",
+                experimental: true,
+                implementation_status: "canonical_patch",
+                promotion_blocker: "Experimental until the fixture review passes.",
+                public_cell_kinds: ["fixture-cell"],
+            },
+        ];
+        const { buildControlsViewModel } = await import("../controls-model.js");
+        const state = await buildControlsModelState();
+        state.topologySpec = {
+            ...state.topologySpec,
+            tiling_family: "fixture-experimental",
+            sizing_mode: "patch_depth",
+            patch_depth: 3,
+        };
+
+        const viewModel = buildControlsViewModel({
+            state,
+            syncState: EMPTY_SYNC_STATE,
+            theme: "light",
+            selectionInspectorSource: { selectedCells: [] },
+        });
+
+        expect(viewModel.topologyStatusVisible).toBe(true);
+        expect(viewModel.topologyStatusTone).toBe("warning");
+        expect(viewModel.topologyStatusLabel).toContain("Experimental");
+        expect(viewModel.topologyStatusDetail).toContain("Experimental until");
+    });
+
+    it("shows an info status for the promoted Schlottmann square-triangle family", async () => {
         const { buildControlsViewModel } = await import("../controls-model.js");
         const state = await buildControlsModelState();
         state.topologySpec = {
@@ -121,9 +157,7 @@ describe("controls-model/drawer selection inspector", () => {
             selectionInspectorSource: { selectedCells: [] },
         });
 
-        expect(viewModel.topologyStatusVisible).toBe(true);
-        expect(viewModel.topologyStatusTone).toBe("warning");
-        expect(viewModel.topologyStatusLabel).toContain("Experimental");
-        expect(viewModel.topologyStatusDetail).toContain("Experimental until");
+        expect(viewModel.topologyStatusTone).toBe("info");
+        expect(viewModel.topologyStatusLabel).toContain("True substitution");
     });
 });

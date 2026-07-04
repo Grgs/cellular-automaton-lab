@@ -340,8 +340,8 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
             [cell.id for cell in depth_forty.cells],
             [cell.id for cell in repeated_depth_forty.cells],
         )
-        # The new decorated 3.12.12 generator has no intrinsic depth cap; deeper
-        # patches just keep growing.
+        # The substitution generator has no intrinsic depth cap; deeper
+        # patches just keep growing around the fixed anchor tile.
         self.assertEqual(depth_one_hundred.patch_depth, 100)
         self.assertGreater(depth_one_hundred.cell_count, depth_forty.cell_count)
         self.assertTrue(all(cell.orientation_token is not None for cell in depth_eleven.cells))
@@ -353,12 +353,12 @@ class SimulationTopologyAperiodicTests(unittest.TestCase):
             )
         )
 
-    def test_dodecagonal_square_triangle_runtime_emits_decorated_supercell_ids(
+    def test_dodecagonal_square_triangle_runtime_emits_substitution_ids(
         self,
     ) -> None:
         topology = build_topology(DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY, 0, 0, patch_depth=3)
 
-        self.assertTrue(all(cell.id.startswith("dst:dec:") for cell in topology.cells))
+        self.assertTrue(all(cell.id.startswith("dst:st:") for cell in topology.cells))
 
     def test_shield_topology_uses_exact_symbolic_substitution_depth(self) -> None:
         depth_zero = build_topology(SHIELD_GEOMETRY, 0, 0, patch_depth=0)

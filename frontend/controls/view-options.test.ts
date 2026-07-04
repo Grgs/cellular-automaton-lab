@@ -184,11 +184,11 @@ describe("controls/view-options tiling picker", () => {
         ).toBe(true);
     });
 
-    it("renders dodecagonal square-triangle thumbnails with sampled geometry and palette tokens", async () => {
+    it("renders schlottmann square-triangle thumbnails with sampled geometry and palette tokens", async () => {
         await ensureTilingPreviewData();
         const thumbnail = createTilingPreviewThumbnail({
             value: "dodecagonal-square-triangle",
-            label: "Dodecagonal Square-Triangle",
+            label: "Schlottmann Square-Triangle",
             group: "Aperiodic",
             order: 270,
             family: "aperiodic",
