@@ -419,18 +419,18 @@ describe("mountComparePanel", () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const handle = mountComparePanel({ backend, bootstrapData: bootstrapData() });
-        const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
+        const page = document.querySelector<HTMLElement>(".wall-page");
         // The workspace router owns opening; the panel renders no toggle button.
         expect(document.querySelector(".compare-toggle")).toBeNull();
-        expect(backdrop?.hidden).toBe(true);
+        expect(page?.hidden).toBe(true);
         // Default representative selection: both regular grids + one per other family.
         expect(document.querySelectorAll(".compare-tiling input:checked")).toHaveLength(5);
         expect(activePresetLabels()).toEqual(["Representative"]);
 
         handle.open();
-        expect(backdrop?.hidden).toBe(false);
+        expect(page?.hidden).toBe(false);
         handle.dispose();
-        expect(document.querySelector(".compare-backdrop")).toBeNull();
+        expect(document.querySelector(".wall-page")).toBeNull();
     });
 
     it("shows empty saved-state hints and disables unavailable saved actions", async () => {
@@ -853,11 +853,11 @@ describe("mountComparePanel", () => {
         expect(openSpy).not.toHaveBeenCalled();
         const loaded = onOpenPattern.mock.calls.at(0)?.[0] as { cells_by_id?: unknown };
         expect(loaded?.cells_by_id).toBeDefined();
-        // dialog closes after loading in place
-        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+        // the wall closes after loading in place
+        expect(document.querySelector<HTMLElement>(".wall-page")?.hidden).toBe(true);
     });
 
-    it("loads the live filmstrip's current generation into the board", async () => {
+    it("forks the focused board's current generation into the Lab", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
         const onOpenPattern = vi.fn();
@@ -899,26 +899,28 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
             onOpenPattern,
         });
-        const playSideBySide = [
-            ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
-        ].find((button) => button.textContent === "▶ Play side by side");
-        playSideBySide?.click();
-
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
+
+        // Focus the board (speaker view), step to gen 1, then fork it into the Lab.
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         document
             .querySelector<HTMLButtonElement>(
                 '.compare-filmstrip-btn[title="Step forward one generation"]',
             )
             ?.click();
-        document.querySelector<HTMLButtonElement>(".compare-filmstrip-open")?.click();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "⑂ Fork this board in the Lab")
+            ?.click();
 
         expect(onOpenPattern).toHaveBeenCalledTimes(1);
         expect(openSpy).not.toHaveBeenCalled();
         const loaded = onOpenPattern.mock.calls.at(0)?.[0] as { cells_by_id?: unknown };
         expect(loaded?.cells_by_id).toEqual({ "c:2:1": 1 });
-        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
     });
 
     it("explains why live side-by-side playback is unavailable with one tiling", async () => {
@@ -937,12 +939,15 @@ describe("mountComparePanel", () => {
         ].find((button) => button.textContent === "▶ Play side by side");
         expect(playSideBySide?.disabled).toBe(true);
         expect(playSideBySide?.title).toBe("Select at least two tilings to play them side by side");
-        expect(document.querySelector<HTMLElement>(".compare-live-state")?.textContent).toBe(
-            "No live filmstrip yet. Select at least two tilings, then choose Play side by side.",
+        // The dock's idle play button shares the same gate.
+        const dockPlay = document.querySelector<HTMLButtonElement>(
+            '.compare-dock .compare-filmstrip-btn[title="Run every selected tiling on a shared clock and play them side by side"]',
         );
+        expect(dockPlay?.textContent).toBe("▶ Play side by side");
+        expect(dockPlay?.disabled).toBe(true);
     });
 
-    it("reports live filmstrip build failures in the live-view state", async () => {
+    it("reports live filmstrip build failures in the status line", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const failingBackend: SimulationBackend = {
@@ -963,8 +968,8 @@ describe("mountComparePanel", () => {
         playSideBySide?.click();
 
         await vi.waitFor(() => {
-            expect(document.querySelector<HTMLElement>(".compare-live-state")?.textContent).toBe(
-                "Live filmstrip failed: filmstrip boom",
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
+                "Error: filmstrip boom",
             );
         });
         // A failed build falls back to the empty-state hero on the stage.
@@ -1035,9 +1040,9 @@ describe("mountComparePanel", () => {
             backend,
             bootstrapData: bootstrapData(),
         });
-        const copyRunButton = [
-            ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
-        ].find((button) => button.textContent === "Copy run link");
+        const copyRunButton = document.querySelector<HTMLButtonElement>(
+            '.compare-dock-icon[aria-label="Copy run link"]',
+        );
         copyRunButton?.click();
 
         await vi.waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
@@ -1183,7 +1188,7 @@ describe("mountComparePanel", () => {
         expect(document.querySelector(".compare-detail")).toBeNull();
     });
 
-    it("renders as a full-page workspace that does not dismiss on backdrop click", async () => {
+    it("renders as a full-page wall, not a dialog", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const handle = mountComparePanel({
@@ -1192,26 +1197,28 @@ describe("mountComparePanel", () => {
             openOnMount: true,
         });
 
-        const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
-        const dialog = document.querySelector<HTMLElement>(".compare-dialog");
-        // The panel is workspace-only now; the modal presentation was retired.
-        expect(backdrop?.classList.contains("compare-backdrop--workspace")).toBe(true);
-        expect(dialog?.classList.contains("compare-dialog--workspace")).toBe(true);
-        expect(dialog?.getAttribute("aria-modal")).toBeNull();
+        const page = document.querySelector<HTMLElement>(".wall-page");
+        // The wall is the page: a landmark region, not a modal dialog.
+        expect(page).not.toBeNull();
+        expect(page?.getAttribute("role")).toBe("region");
+        expect(page?.getAttribute("aria-modal")).toBeNull();
+        expect(document.querySelector(".compare-backdrop")).toBeNull();
+        expect(document.querySelector(".compare-dialog")).toBeNull();
+        expect(document.querySelector(".wall-brand")?.textContent).toBe("Cellular Automaton Lab");
         expect(document.querySelector(".compare-back")?.textContent).toBe("Open the Lab →");
-        expect(backdrop?.hidden).toBe(false);
+        expect(page?.hidden).toBe(false);
 
-        // The workspace has no "outside": a backdrop click must not close it.
-        backdrop?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(backdrop?.hidden).toBe(false);
+        // The wall has no "outside": clicking its own surface must not close it.
+        page?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(page?.hidden).toBe(false);
 
-        // The Back affordance still closes it.
+        // "Open the Lab" is the only exit.
         document.querySelector<HTMLButtonElement>(".compare-back")?.click();
-        expect(backdrop?.hidden).toBe(true);
+        expect(page?.hidden).toBe(true);
         handle.dispose();
     });
 
-    it("focuses a board into speaker view and lets Escape peel back before closing", async () => {
+    it("focuses a board into speaker view and lets Escape peel back to the gallery", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const twoBoard = (geometry: string) => ({
@@ -1253,11 +1260,11 @@ describe("mountComparePanel", () => {
             .find((button) => button.textContent === "▶ Play side by side")
             ?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         const filmstrip = () => document.querySelector<HTMLElement>(".compare-filmstrip");
-        const backdrop = () => document.querySelector<HTMLElement>(".compare-backdrop");
+        const page = () => document.querySelector<HTMLElement>(".wall-page");
 
         // Focus the first board -> speaker view, mirrored into the hash.
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
@@ -1268,11 +1275,11 @@ describe("mountComparePanel", () => {
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
         expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
         expect(window.location.hash).not.toContain("focus=");
-        expect(backdrop()?.hidden).toBe(false);
+        expect(page()?.hidden).toBe(false);
 
-        // A second Escape closes the workspace.
+        // The wall is the page: a further Escape does not leave it.
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-        expect(backdrop()?.hidden).toBe(true);
+        expect(page()?.hidden).toBe(false);
         handle.dispose();
     });
 
@@ -1292,7 +1299,7 @@ describe("mountComparePanel", () => {
             .find((button) => button.textContent === "▶ Play side by side")
             ?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         const rail = () => document.querySelector<HTMLElement>(".compare-seed-rail");
@@ -1388,7 +1395,7 @@ describe("mountComparePanel", () => {
             .find((button) => button.textContent === "▶ Play side by side")
             ?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
@@ -1446,7 +1453,7 @@ describe("mountComparePanel", () => {
             .find((button) => button.textContent === "▶ Play side by side")
             ?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
@@ -1465,7 +1472,7 @@ describe("mountComparePanel", () => {
 
         document.querySelector<HTMLButtonElement>(".compare-back")?.click();
 
-        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+        expect(document.querySelector<HTMLElement>(".wall-page")?.hidden).toBe(true);
         expect(playPause?.textContent).toBe("▶ Play");
         expect(document.querySelector(".compare-focus-pane")).toBeNull();
         expect(focusDispose).toHaveBeenCalledTimes(1);
@@ -1506,7 +1513,7 @@ describe("mountComparePanel", () => {
             .find((button) => button.textContent === "▶ Play side by side")
             ?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
@@ -1543,7 +1550,7 @@ describe("mountComparePanel", () => {
             .find((button) => button.textContent === "▶ Play side by side")
             ?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
@@ -1603,7 +1610,7 @@ describe("mountComparePanel", () => {
         ].find((button) => button.textContent === "▶ Play side by side");
         playSideBySide?.click();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         const counter = () =>

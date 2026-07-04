@@ -10,55 +10,30 @@ export const COMPARE_PANEL_STYLES = `
     outline: 2px solid var(--focus, #7aa7ff);
     outline-offset: 2px;
 }
-.compare-backdrop {
+/* The wall is the page: a fixed full-viewport surface (slim header over a
+   scrollable stage/dock/config body), not a dialog floating on a backdrop. */
+.wall-page {
     position: fixed;
     inset: 0;
     z-index: 70;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: rgba(20, 18, 12, 0.45);
-}
-.compare-backdrop[hidden] { display: none; }
-.compare-backdrop--workspace {
-    padding: 0;
-    background: var(--panel-strong, #fff);
-    align-items: stretch;
-    justify-content: stretch;
-}
-.compare-dialog {
-    width: min(880px, 96vw);
-    max-height: 92vh;
-    overflow: auto;
+    flex-direction: column;
     background: var(--panel-strong, #fff);
     color: var(--ink, #1f2430);
-    border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
-    border-radius: var(--radius, 16px);
-    box-shadow: var(--shadow, 0 18px 40px rgba(0, 0, 0, 0.25));
-    padding: 20px 22px;
     font-family: var(--sans, sans-serif);
-    scrollbar-gutter: stable;
 }
-.compare-dialog--workspace {
-    width: 100%;
-    max-width: none;
-    height: 100vh;
-    max-height: 100vh;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    /* Fill the viewport but keep the content readable by centring it. */
-    padding: 18px max(22px, calc((100vw - 1040px) / 2));
+.wall-page[hidden] { display: none; }
+.wall-page:focus { outline: none; }
+.wall-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
 }
-.compare-dialog--workspace .compare-actions {
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 0;
-    padding-right: 0;
-}
-.compare-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.compare-title { font-size: 18px; margin: 0; }
+.wall-brand { font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
 .compare-close {
     border: none;
     background: transparent;
@@ -79,11 +54,34 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-close.compare-back:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
-.compare-content { display: contents; }
+/* The body scrolls under the fixed header; the first screen fills the viewport,
+   configuration waits below the fold. */
+.compare-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.wall-screen {
+    min-height: 100%;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+}
 .compare-intro { color: var(--muted, #6d756f); font-size: 13px; margin: 6px 0 14px; }
-/* Stage-first: the synchronized side-by-side leads the page. */
-.compare-stage { min-width: 0; }
-.compare-stage-main { min-width: 0; }
+/* Stage-first: the synchronized side-by-side fills the first screen. */
+.compare-stage {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    padding: 12px 18px;
+}
+.compare-stage-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+}
 /* Speaker view splits the stage into the seed rail and the hero board. */
 .compare-stage-main.is-speaker {
     display: flex;
@@ -136,20 +134,44 @@ export const COMPARE_PANEL_STYLES = `
 .compare-stage-hero-glyph { font-size: 30px; line-height: 1; opacity: 0.5; }
 .compare-stage-hero-title { font-size: 15px; color: var(--ink, #1f2430); }
 .compare-stage-hero-blurb { font-size: 12px; margin: 0; max-width: 360px; line-height: 1.4; }
-/* The transport + primary actions dock beneath the stage and stay reachable
-   while the configuration disclosures scroll underneath. */
+/* One dock: the transport plus the config/copy icons and the status line on a
+   single row, pinned to the bottom of the first screen and reachable while the
+   configuration disclosures scroll underneath. */
 .compare-dock {
     position: sticky;
     bottom: 0;
     z-index: 5;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
-    padding: 10px 0 12px;
+    align-items: center;
+    gap: 8px 10px;
+    flex-wrap: wrap;
+    padding: 10px 18px 12px;
     background: var(--panel-strong, #fff);
     border-top: 1px solid var(--line, rgba(0, 0, 0, 0.12));
 }
+.compare-dock .compare-filmstrip-transport { flex: 1 1 420px; }
+.compare-dock-icon {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 16px;
+    border-radius: 7px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    color: var(--ink, #1f2430);
+    cursor: pointer;
+}
+.compare-dock-icon:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
+.compare-dock-icon:disabled { opacity: 0.5; cursor: default; }
+.compare-dock-icon:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+.compare-config-actions { margin-bottom: 12px; }
 .compare-config {
     margin-top: 12px;
     border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
@@ -380,12 +402,6 @@ export const COMPARE_PANEL_STYLES = `
     font-size: 11px;
     line-height: 1.35;
 }
-.compare-actions {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-}
 .compare-analysis {
     margin-top: 4px;
 }
@@ -406,17 +422,16 @@ export const COMPARE_PANEL_STYLES = `
     border-color: var(--btn-soft-line, rgba(0, 0, 0, 0.12));
 }
 .compare-run-secondary:hover:not(:disabled) { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
-.compare-status { flex: 1 1 auto; min-width: 140px; font-size: 12px; color: var(--muted, #6d756f); }
-.compare-live-state {
-    margin-top: 10px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
-    background: var(--help-bg, rgba(0, 0, 0, 0.03));
-    color: var(--muted, #6d756f);
+.compare-status {
+    flex: 1 1 200px;
+    min-width: 0;
     font-size: 12px;
+    text-align: right;
+    color: var(--muted, #6d756f);
 }
+.compare-status:empty { display: none; }
 .compare-filmstrip-area[hidden] { display: none; }
+.compare-filmstrip-area { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; }
 .compare-results { margin-top: 16px; padding-bottom: 8px; }
 .compare-section-title { font-size: 13px; font-weight: 600; margin: 16px 0 8px; }
 .compare-warning {
@@ -534,7 +549,7 @@ export const COMPARE_PANEL_STYLES = `
     border-radius: 8px;
     background: var(--field-bg, #fff);
 }
-.compare-filmstrip { margin-top: 4px; }
+.compare-filmstrip { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
 .compare-filmstrip[hidden] { display: none; }
 .compare-filmstrip-transport {
     display: flex;
@@ -575,38 +590,71 @@ export const COMPARE_PANEL_STYLES = `
     color: var(--field-text, #1f2430);
     font-size: 12px;
 }
+/* Gallery: boards auto-fit to fill the stage like video-call participants. */
 .compare-filmstrip-boards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 14px 16px;
-    align-items: start;
-}
-.compare-dialog--workspace .compare-filmstrip-boards {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-.compare-dialog--workspace .compare-filmstrip-slot .compare-thumb {
-    width: min(100%, 220px);
-    height: auto;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 42%), 1fr));
+    grid-auto-rows: 1fr;
+    gap: 10px 12px;
+    align-content: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 .compare-filmstrip-board {
+    position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
-    border-radius: 8px;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 6px;
+    border-radius: 10px;
+    background: var(--help-bg, rgba(0, 0, 0, 0.03));
     cursor: pointer;
 }
 .compare-filmstrip-board:focus-visible {
     outline: 2px solid var(--focus, #7aa7ff);
-    outline-offset: 4px;
+    outline-offset: 2px;
 }
-.compare-filmstrip-board-head {
+/* In the gallery the board slot and its SVG fill the tile (the thumbnail is
+   vector, so it scales without loss). */
+.compare-filmstrip:not(.compare-filmstrip--speaker) .compare-filmstrip-slot {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+.compare-filmstrip:not(.compare-filmstrip--speaker) .compare-thumb {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+/* Board chrome (name, live count, an expand affordance) overlays the board and
+   appears on hover/focus -- and always on the focused hero -- so a resting
+   gallery reads as a clean wall of tilings. */
+.compare-filmstrip-board-chrome {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
+    gap: 8px;
+    padding: 4px 9px;
+    border-radius: 7px;
+    background: var(--chrome-bg, rgba(16, 20, 24, 0.72));
+    color: #f2ede0;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    pointer-events: none;
 }
+.compare-filmstrip-board:hover .compare-filmstrip-board-chrome,
+.compare-filmstrip-board:focus-visible .compare-filmstrip-board-chrome,
+.compare-filmstrip-board.is-hero .compare-filmstrip-board-chrome {
+    opacity: 1;
+}
+.compare-filmstrip-expand { margin-left: auto; font-size: 13px; opacity: 0.85; }
 /* Speaker view: the focused board becomes the hero, the rest a wrapping strip. */
 .compare-filmstrip--speaker .compare-filmstrip-boards {
     display: flex;
@@ -614,6 +662,7 @@ export const COMPARE_PANEL_STYLES = `
     justify-content: center;
     align-items: flex-start;
     gap: 12px 16px;
+    grid-auto-rows: initial;
 }
 .compare-filmstrip--speaker .compare-filmstrip-board.is-hero {
     flex: 1 1 100%;
@@ -634,13 +683,8 @@ export const COMPARE_PANEL_STYLES = `
     width: 120px;
     height: auto;
 }
-.compare-filmstrip--speaker .compare-filmstrip-board.is-strip .compare-filmstrip-count,
-.compare-filmstrip--speaker .compare-filmstrip-board.is-strip .compare-filmstrip-open {
-    display: none;
-}
 .compare-filmstrip-label {
     font-size: 11px;
-    color: var(--muted, #6d756f);
     font-family: var(--mono, monospace);
     max-width: 100%;
     overflow: hidden;
@@ -656,7 +700,7 @@ export const COMPARE_PANEL_STYLES = `
     font-size: 11px;
     color: var(--muted, #6d756f);
 }
-.compare-filmstrip-count { font-size: 11px; color: var(--muted, #6d756f); font-family: var(--mono, monospace); }
+.compare-filmstrip-count { font-size: 11px; font-family: var(--mono, monospace); opacity: 0.85; }
 /* Live focus pane: a forked, editable board that replaces the hero SVG. */
 .compare-focus-pane {
     display: flex;
@@ -731,13 +775,9 @@ export const COMPARE_PANEL_STYLES = `
 .compare-focus-pane-canvas { touch-action: none; }
 .compare-seed-rail-fork { width: 100%; margin-top: 8px; }
 @media (max-width: 640px) {
-    .compare-backdrop { align-items: stretch; padding: 8px; }
-    .compare-dialog {
-        width: calc(100vw - 16px);
-        max-height: calc(100vh - 16px);
-        padding: 16px;
-    }
-    .compare-header { align-items: flex-start; }
+    .wall-header { align-items: center; }
+    /* On a phone the boards want a full column and the stage can scroll. */
+    .compare-filmstrip-boards { grid-template-columns: 1fr; grid-auto-rows: minmax(200px, 1fr); }
     .compare-form { grid-template-columns: 1fr; }
     .compare-seed-workspace { grid-template-columns: 1fr; }
     .compare-seedpreview { gap: 10px; }
@@ -747,12 +787,8 @@ export const COMPARE_PANEL_STYLES = `
     .compare-tilings { grid-template-columns: 1fr; max-height: 240px; }
     .compare-saved { grid-template-columns: 1fr; }
     .compare-saved-row { grid-template-columns: 1fr; }
-    .compare-actions {
-        align-items: stretch;
-        gap: 10px;
-    }
     .compare-run { min-width: 136px; }
-    .compare-status { min-width: 0; }
+    .compare-status { flex-basis: 100%; text-align: left; }
     .compare-grid { min-width: 680px; }
 }
 `;

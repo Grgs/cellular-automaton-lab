@@ -1,11 +1,13 @@
 /**
  * The presentational shell for the comparison wall. It owns the full-page
- * workspace chrome, focus handling, and dismissal, and delegates all of the
- * actual panel UI and behaviour to `createComparePanelContent`. The workspace
- * router opens and closes it; this shell renders no trigger of its own.
+ * chrome (a slim header over the stage/dock/config body) and focus handling, and
+ * delegates all of the actual panel UI and behaviour to
+ * `createComparePanelContent`. The workspace router shows and hides it; this
+ * shell renders no trigger of its own.
  *
- * The workspace fills the viewport and offers an "Open the Lab" affordance. It
- * has no "outside" to click, so it dismisses via that affordance or Escape;
+ * The wall is the page, not a dialog: it fills the viewport and offers an
+ * "Open the Lab" affordance to reach the single-board editor. Escape peels back
+ * one in-page layer (an open menu, then speaker view) but never leaves the wall;
  * Space and the arrow keys drive the docked filmstrip transport.
  */
 
@@ -25,11 +27,11 @@ interface MountComparePanelOptions {
     host?: HTMLElement;
     /** When provided, begin/end open into the current board instead of a new tab. */
     onOpenPattern?: (pattern: PatternPayload) => void;
-    /** Open the dialog immediately after mounting (e.g. right after a lazy load). */
+    /** Show the wall immediately after mounting (e.g. right after a lazy load). */
     openOnMount?: boolean;
-    /** Fired when the dialog becomes visible (used to mirror the route into the hash). */
+    /** Fired when the wall becomes visible (used to mirror the route into the hash). */
     onOpen?: () => void;
-    /** Fired when the dialog is dismissed (used to clear the route from the hash). */
+    /** Fired when the wall is hidden (used to clear the route from the hash). */
     onClose?: () => void;
     /** Server-only seams for the live focus pane (absent on the standalone build). */
     focusPaneServices?: FocusPaneServices;
@@ -86,7 +88,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         onRequestClose: () => close(),
     });
 
-    const closeButton = el(
+    const backButton = el(
         "button",
         {
             class: "compare-close compare-back",
@@ -96,69 +98,59 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         ["Open the Lab →"],
     );
 
-    const dialog = el(
+    const wallPage = el(
         "div",
         {
-            class: "compare-dialog compare-dialog--workspace",
-            role: "dialog",
-            "aria-label": "Compare tilings",
+            class: "wall-page",
+            role: "region",
+            "aria-label": "Comparison wall",
             tabindex: "-1",
+            hidden: true,
         },
         [
-            el("div", { class: "compare-header" }, [
-                el("h2", { class: "compare-title", textContent: "Compare seed across tilings" }),
-                closeButton,
+            el("div", { class: "wall-header" }, [
+                el("div", { class: "wall-brand", textContent: "Cellular Automaton Lab" }),
+                backButton,
             ]),
             content.element,
         ],
     );
 
-    const backdrop = el(
-        "div",
-        {
-            class: "compare-backdrop compare-backdrop--workspace",
-            hidden: true,
-        },
-        [dialog],
-    );
-
-    host.append(backdrop);
+    host.append(wallPage);
 
     function open(): void {
-        if (!backdrop.hidden) {
+        if (!wallPage.hidden) {
             return;
         }
         lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-        backdrop.hidden = false;
+        wallPage.hidden = false;
         content.activate();
-        dialog.focus();
+        wallPage.focus();
         options.onOpen?.();
     }
 
     function close(): void {
-        if (backdrop.hidden) {
+        if (wallPage.hidden) {
             return;
         }
         content.deactivate();
-        backdrop.hidden = true;
+        wallPage.hidden = true;
         lastFocus?.focus();
         options.onClose?.();
     }
 
     function onKeydown(event: KeyboardEvent): void {
-        if (backdrop.hidden) {
+        if (wallPage.hidden) {
             return;
         }
         if (event.key === "Escape") {
-            // Escape peels back one layer at a time: an open action menu first,
-            // then speaker view (back to the gallery), then the dialog itself.
+            // Escape peels back one in-page layer at a time: an open action menu
+            // first, then speaker view (back to the gallery). It never leaves the
+            // wall -- the wall is the page, so "Open the Lab" is the only exit.
             if (content.handleEscape()) {
                 return;
             }
-            if (content.exitFocusIfAny()) {
-                return;
-            }
-            close();
+            content.exitFocusIfAny();
             return;
         }
         // Space/arrows drive the docked transport once a filmstrip is live.
@@ -167,9 +159,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         }
     }
 
-    closeButton.addEventListener("click", close);
-    // The full-page workspace has no "outside" to click, so a backdrop click is
-    // not a dismissal; use the Lab affordance or Escape instead.
+    backButton.addEventListener("click", close);
     document.addEventListener("keydown", onKeydown);
 
     if (options.openOnMount) {
@@ -179,7 +169,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     return {
         open,
         close,
-        isOpen: () => !backdrop.hidden,
+        isOpen: () => !wallPage.hidden,
         applyRunConfig: (config) => content.applyRunConfig(config),
         runFeaturedDemo: (config) => content.runFeaturedDemo(config),
         runDefaultFilmstrip: (config) => content.runDefaultFilmstrip(config),
@@ -187,7 +177,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             content.dispose();
-            backdrop.remove();
+            wallPage.remove();
         },
     };
 }

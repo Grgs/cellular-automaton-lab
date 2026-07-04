@@ -155,7 +155,7 @@ function markDemoSeenInStorage(): void {
 }
 
 function backdrop(): HTMLElement | null {
-    return document.querySelector<HTMLElement>(".compare-backdrop");
+    return document.querySelector<HTMLElement>(".wall-page");
 }
 
 describe("mountWorkspaceRouter", () => {
@@ -205,7 +205,7 @@ describe("mountWorkspaceRouter", () => {
             expect(backdrop()).not.toBeNull();
             expect(backdrop()?.hidden).toBe(false);
         });
-        expect(document.querySelector(".compare-dialog--workspace")).not.toBeNull();
+        expect(document.querySelector(".wall-page")).not.toBeNull();
         // The wall never renders a floating toggle or watch banner.
         expect(document.querySelector(".compare-toggle")).toBeNull();
         expect(document.querySelector(".compare-watch-banner")).toBeNull();
@@ -216,7 +216,7 @@ describe("mountWorkspaceRouter", () => {
         await mount();
 
         // The panel chunk is never loaded for a Lab landing.
-        expect(document.querySelector(".compare-backdrop")).toBeNull();
+        expect(document.querySelector(".wall-page")).toBeNull();
         expect(document.querySelector<HTMLElement>(".wall-loading-veil")?.hidden).toBe(true);
     });
 
@@ -224,7 +224,7 @@ describe("mountWorkspaceRouter", () => {
         window.location.hash = "#share=v1.abc";
         await mount();
 
-        expect(document.querySelector(".compare-backdrop")).toBeNull();
+        expect(document.querySelector(".wall-page")).toBeNull();
     });
 
     it("opens the wall for the legacy #/compare alias", async () => {
@@ -266,7 +266,7 @@ describe("mountWorkspaceRouter", () => {
         document.body.append(wallTrigger);
         await mount({ wallTrigger });
 
-        expect(document.querySelector(".compare-backdrop")).toBeNull();
+        expect(document.querySelector(".wall-page")).toBeNull();
 
         // No manual hashchange: entering the wall strips the hash to empty via
         // replaceState (which fires no event), so the trigger must resolve the
@@ -379,11 +379,11 @@ describe("mountWorkspaceRouter", () => {
     it("disposes the panel and the loading veil", async () => {
         await mount();
         await vi.waitFor(() => {
-            expect(document.querySelector(".compare-backdrop")).not.toBeNull();
+            expect(document.querySelector(".wall-page")).not.toBeNull();
         });
 
         handles.pop()?.dispose();
-        expect(document.querySelector(".compare-backdrop")).toBeNull();
+        expect(document.querySelector(".wall-page")).toBeNull();
         expect(document.querySelector(".wall-loading-veil")).toBeNull();
     });
 });

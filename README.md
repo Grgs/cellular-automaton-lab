@@ -65,7 +65,7 @@ The wall is the landing view: a bare URL opens it, and on a first visit it autop
 Two layout states share one persistent transport (play, pause, step, scrub, speed on one clock):
 
 - **Gallery** shows every selected board at once, evolving in lockstep.
-- **Speaker view** (click a board, or `&focus=<geometry>`) enlarges one board as the hero with the others as a thumbnail strip. A seed rail beside the hero edits the shared seed (**Re-run wall from this seed**), and **⑂ Fork this board live** turns the hero into a real editable board on its own session — you can paint, step, and run it while the other boards keep looping — with **Discard** to restore it. Escape peels back one layer at a time.
+- **Speaker view** (click a board, or `&focus=<geometry>`) enlarges one board as the hero with the others as a thumbnail strip. A seed rail beside the hero edits the shared seed (**Re-run wall from this seed**), and **⑂ Fork this board live** turns the hero into a real editable board on its own session — you can paint, step, and run it while the other boards keep looping — with **Discard** to restore it. Escape returns speaker view to the gallery.
 
 The **Cross-tiling analysis** disclosure computes a phase portrait plus a result table on demand; each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
 

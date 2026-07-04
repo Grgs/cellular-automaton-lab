@@ -368,7 +368,7 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         # curated featured demo, and the demo-seen flag makes it a one-time event.
         self.goto_page(f"{self.host.base_url}/", wait_until="load")
 
-        self._expect(".compare-dialog--workspace").to_be_visible()
+        self._expect(".wall-page").to_be_visible()
         # The featured demo builds the live side-by-side (four curated tilings);
         # the aperiodic boards take a few seconds to construct.
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
@@ -387,7 +387,7 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         # A second landing stays on the wall with the same participants loaded,
         # but paused instead of autoplaying over the user again.
         self.reload_page(wait_until="load")
-        self._expect(".compare-dialog--workspace").to_be_visible()
+        self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
         self._expect('.compare-filmstrip-btn[title="Play / pause"]').to_contain_text("Play")
 
@@ -395,16 +395,14 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self.goto_page(f"{self.host.base_url}/#/lab", wait_until="load")
 
         self._expect("#grid").to_be_visible()
-        self.page.wait_for_function(
-            """() => document.querySelector(".compare-backdrop") === null"""
-        )
+        self.page.wait_for_function("""() => document.querySelector(".wall-page") === null""")
 
     def test_wall_button_navigates_from_lab_to_wall(self) -> None:
         # setUp landed in the Lab; the top-bar Wall button is the way back.
         self._mark_compare_demo_seen()
         self.page.click("#wall-view-btn")
 
-        self._expect(".compare-dialog--workspace").to_be_visible()
+        self._expect(".wall-page").to_be_visible()
         # Leaving via Open the Lab writes the /lab route back.
         self.page.click(".compare-back")
         self.page.wait_for_function("() => window.location.hash === '#/lab'")
@@ -466,7 +464,7 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         )
         self.page.evaluate("(hash) => { window.location.hash = hash; }", f"#/compare&{fragment}")
 
-        self._expect(".compare-dialog--workspace").to_be_visible()
+        self._expect(".wall-page").to_be_visible()
         self._expect(".compare-seedbits input.compare-field").to_have_value("101")
         self._expect(".compare-status").to_contain_text("Loaded run link")
         # Reconstruct-and-wait: the link must not have started a comparison.
@@ -478,7 +476,7 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         # the top-bar Wall button is the navigation to the wall.
         self._mark_compare_demo_seen()
         self.page.click("#wall-view-btn")
-        self._expect(".compare-backdrop").to_be_visible()
+        self._expect(".wall-page").to_be_visible()
 
         run_name = "Standalone smoke run"
         # Saved-run controls live in a collapsed disclosure below the stage.
@@ -505,7 +503,7 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self.reload_page(wait_until="load")
 
         # The wall is the landing view, so the reload lands straight back on it.
-        self._expect(".compare-backdrop").to_be_visible()
+        self._expect(".wall-page").to_be_visible()
         self.page.locator(".compare-config-saved").evaluate("(section) => { section.open = true; }")
         self._expect('select[aria-label="Saved compare runs"]').to_contain_text(run_name)
 

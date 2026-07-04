@@ -28,8 +28,6 @@ export interface FilmstripViewOptions {
     thumbSize?: number;
     /** Loop back to the seed frame after the last instead of stopping. */
     loop?: boolean;
-    /** Called when the user wants to load one board's current generation into build mode. */
-    onOpenFrame?: (tiling: TopologyFilmstrip, frameIndex: number) => void;
     /** Called when the focused board changes (null = gallery), e.g. to mirror the hash. */
     onFocusChange?: (geometry: string | null) => void;
 }
@@ -64,7 +62,6 @@ interface BoardEntry {
     cell: HTMLElement;
     slot: HTMLElement;
     countLabel: HTMLElement;
-    openButton?: HTMLButtonElement;
     preview?: TopologyPreview;
     error?: string;
     overlaid?: boolean;
@@ -76,17 +73,6 @@ function el(tag: string, className: string, text?: string): HTMLElement {
     if (text !== undefined) {
         node.textContent = text;
     }
-    return node;
-}
-
-function linkButton(label: string, title: string, onClick: () => void): HTMLButtonElement {
-    const node = document.createElement("button");
-    node.type = "button";
-    node.className = "compare-link compare-filmstrip-open";
-    node.textContent = label;
-    node.title = title;
-    node.setAttribute("aria-label", title);
-    node.addEventListener("click", onClick);
     return node;
 }
 
@@ -151,19 +137,11 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         if (entry.error) {
             entry.slot.textContent = entry.error.includes("limit") ? "too large" : "unavailable";
             entry.countLabel.textContent = "";
-            if (entry.openButton) {
-                entry.openButton.disabled = true;
-                entry.openButton.title = "This board is unavailable.";
-            }
             return;
         }
         const preview = entry.preview;
         if (!preview) {
             entry.slot.textContent = "…";
-            if (entry.openButton) {
-                entry.openButton.disabled = true;
-                entry.openButton.title = "Load the board preview before opening this generation.";
-            }
             return;
         }
         const cellsById = frame;
@@ -177,11 +155,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         const extinct =
             entry.tiling.extinction_step !== null && index >= entry.tiling.extinction_step;
         entry.countLabel.textContent = extinct ? "extinct" : `${liveCells} live`;
-        if (entry.openButton) {
-            entry.openButton.disabled = false;
-            entry.openButton.textContent = `Fork gen ${index} →`;
-            entry.openButton.title = `Fork ${entry.tiling.geometry} generation ${index} into the Lab as an editable board`;
-        }
     }
 
     function renderAllBoards(index: number): void {
@@ -229,19 +202,14 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const cell = el("div", "compare-filmstrip-board");
             cell.setAttribute("role", "listitem");
             cell.tabIndex = 0;
-            const openButton = options.onOpenFrame
-                ? linkButton(
-                      "Fork gen 0 →",
-                      `Fork ${tiling.geometry} generation 0 into the Lab as an editable board`,
-                      () => options.onOpenFrame?.(tiling, player.index),
-                  )
-                : undefined;
-            const header = el("div", "compare-filmstrip-board-head");
-            header.append(label);
-            cell.append(header, slot, countLabel);
-            if (openButton) {
-                cell.append(openButton);
-            }
+            // Board chrome (name, live count, an expand affordance) overlays the
+            // board and appears on hover/focus, so a resting gallery reads as a
+            // clean wall of tilings rather than a grid of labels and buttons.
+            const expandGlyph = el("span", "compare-filmstrip-expand", "⤢");
+            expandGlyph.setAttribute("aria-hidden", "true");
+            const chrome = el("div", "compare-filmstrip-board-chrome");
+            chrome.append(label, countLabel, expandGlyph);
+            cell.append(slot, chrome);
             const toggleFocus = () => {
                 focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
             };
@@ -268,7 +236,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 cell,
                 slot,
                 countLabel,
-                ...(openButton ? { openButton } : {}),
             };
         });
 
