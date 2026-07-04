@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createFilmstripView, type IntervalScheduler } from "./compare-filmstrip-view.js";
+import { createFilmstripView, type FilmstripViewController } from "./compare-filmstrip-view.js";
+import {
+    createFilmstripTransport,
+    type FilmstripTransportController,
+    type IntervalScheduler,
+} from "./compare-transport.js";
 import type { SimulationBackend } from "../types/controller.js";
 import type {
     SeedFilmstripResult,
@@ -121,12 +126,43 @@ function stubBackend(previewTopology: SimulationBackend["previewTopology"]): Sim
     };
 }
 
-function liveCount(view: { element: HTMLElement }): number {
+interface Harness {
+    view: FilmstripViewController;
+    transport: FilmstripTransportController;
+    clock: ReturnType<typeof manualScheduler>;
+}
+
+/** Build a view wired to a real transport (both mounted so controls are queryable). */
+function mountView(
+    options: {
+        loop?: boolean;
+        onOpenFrame?: (tiling: TopologyFilmstrip, frameIndex: number) => void;
+        previewTopology?: SimulationBackend["previewTopology"];
+    } = {},
+): Harness {
+    const backend = stubBackend(options.previewTopology ?? (async () => squarePreview()));
+    const clock = manualScheduler();
+    const transport = createFilmstripTransport({ scheduler: clock.scheduler });
+    const view = createFilmstripView({
+        backend,
+        transport,
+        ...(options.loop === undefined ? {} : { loop: options.loop }),
+        ...(options.onOpenFrame ? { onOpenFrame: options.onOpenFrame } : {}),
+    });
+    document.body.append(transport.element, view.element);
+    return { view, transport, clock };
+}
+
+function liveCount(view: FilmstripViewController): number {
     return view.element.querySelectorAll(".compare-filmstrip-slot polygon.is-live").length;
 }
 
-function transportButton(view: { element: HTMLElement }, title: string): HTMLButtonElement {
-    const button = view.element.querySelector<HTMLButtonElement>(
+function counterText(): string | null {
+    return document.querySelector(".compare-filmstrip-counter")?.textContent ?? null;
+}
+
+function transportButton(title: string): HTMLButtonElement {
+    const button = document.querySelector<HTMLButtonElement>(
         `.compare-filmstrip-btn[title="${title}"]`,
     );
     if (!button) {
@@ -141,33 +177,24 @@ describe("createFilmstripView", () => {
     });
 
     it("renders one board per tiling showing the seed frame", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view } = mountView();
 
         await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }, { c: 1 }, {}])], 3));
 
         expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(1);
         expect(liveCount(view)).toBe(2); // frame 0: a, b
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 0 / 2",
-        );
+        expect(counterText()).toBe("gen 0 / 2");
     });
 
     it("labels the transport and board list for assistive technology", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view, transport } = mountView();
 
         await view.load(filmstrip([tiling("square", [{ a: 1 }])], 1));
 
         expect(view.element.getAttribute("role")).toBe("region");
         expect(view.element.getAttribute("aria-label")).toBe("Synchronized side-by-side filmstrip");
-        expect(
-            view.element.querySelector(".compare-filmstrip-transport")?.getAttribute("role"),
-        ).toBe("group");
+        expect(transport.element.getAttribute("role")).toBe("group");
+        expect(transport.element.getAttribute("aria-label")).toBe("Filmstrip playback controls");
         expect(view.element.querySelector(".compare-filmstrip-boards")?.getAttribute("role")).toBe(
             "list",
         );
@@ -175,17 +202,14 @@ describe("createFilmstripView", () => {
             "listitem",
         );
         expect(
-            view.element
+            transport.element
                 .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[title="Play / pause"]')
                 ?.getAttribute("aria-label"),
         ).toBe("Play / pause");
     });
 
     it("advances every board in lockstep on each clock tick while playing", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view, clock } = mountView();
         await view.load(
             filmstrip(
                 [
@@ -197,15 +221,13 @@ describe("createFilmstripView", () => {
         );
 
         expect(clock.active()).toBe(0); // starts paused
-        transportButton(view, "Play / pause").click();
+        transportButton("Play / pause").click();
         expect(clock.active()).toBe(1);
 
         clock.tick(); // -> gen 1
         // square: c (1 live); hex: b,c,d (3 live) => 4 total
         expect(liveCount(view)).toBe(4);
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 1 / 2",
-        );
+        expect(counterText()).toBe("gen 1 / 2");
 
         clock.tick(); // -> gen 2 (last, all extinct)
         expect(liveCount(view)).toBe(0);
@@ -215,56 +237,40 @@ describe("createFilmstripView", () => {
     });
 
     it("loops back to the seed frame instead of stopping when loop is set", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler, loop: true });
-        document.body.append(view.element);
+        const { view, clock } = mountView({ loop: true });
         await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }, { c: 1 }])], 2));
 
-        transportButton(view, "Play / pause").click();
+        transportButton("Play / pause").click();
         clock.tick(); // -> gen 1
         clock.tick(); // wraps -> gen 0
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 0 / 1",
-        );
+        expect(counterText()).toBe("gen 0 / 1");
         expect(clock.active()).toBe(1); // still playing
     });
 
     it("autoplays after load when the autoplay option is set", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler, loop: true });
-        document.body.append(view.element);
+        const { view, clock } = mountView({ loop: true });
 
         await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }])], 2), {
             autoplay: true,
         });
 
         expect(clock.active()).toBe(1); // playing without a manual click
-        expect(transportButton(view, "Play / pause").textContent).toBe("⏸ Pause");
+        expect(transportButton("Play / pause").textContent).toBe("⏸ Pause");
     });
 
     it("rests on the requested initial frame, paused, when given initialFrame", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view, clock } = mountView();
 
         await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3), {
             initialFrame: 2,
         });
 
         expect(clock.active()).toBe(0); // paused
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 2 / 2",
-        );
+        expect(counterText()).toBe("gen 2 / 2");
     });
 
     it("loops a sub-window back to loopStart instead of the seed", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler, loop: true });
-        document.body.append(view.element);
+        const { view, clock } = mountView({ loop: true });
 
         await view.load(
             filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }, { d: 1 }])], 4),
@@ -274,59 +280,43 @@ describe("createFilmstripView", () => {
         clock.tick(); // -> gen 2
         clock.tick(); // -> gen 3 (last)
         clock.tick(); // wraps to loopStart (gen 1), skipping the seed
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 1 / 3",
-        );
+        expect(counterText()).toBe("gen 1 / 3");
         expect(clock.active()).toBe(1); // still playing
     });
 
     it("supports manual step, seek and reset which pause playback", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view, clock } = mountView();
         await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }, { c: 1 }, { d: 1 }])], 3));
 
-        transportButton(view, "Play / pause").click();
+        transportButton("Play / pause").click();
         expect(clock.active()).toBe(1);
-        transportButton(view, "Step forward one generation").click();
+        transportButton("Step forward one generation").click();
         expect(clock.active()).toBe(0); // manual control pauses
         expect(liveCount(view)).toBe(1); // gen 1: c
 
-        const scrubber = view.element.querySelector<HTMLInputElement>(
-            ".compare-filmstrip-scrubber",
-        );
+        const scrubber = document.querySelector<HTMLInputElement>(".compare-filmstrip-scrubber");
         if (!scrubber) {
             throw new Error("missing scrubber");
         }
         scrubber.value = "2";
         scrubber.dispatchEvent(new Event("input"));
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 2 / 2",
-        );
+        expect(counterText()).toBe("gen 2 / 2");
 
-        transportButton(view, "Back to the seed").click();
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 0 / 2",
-        );
+        transportButton("Back to the seed").click();
+        expect(counterText()).toBe("gen 0 / 2");
         expect(liveCount(view)).toBe(2);
     });
 
     it("opens the current generation for a board when requested", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
         const opened: Array<{ geometry: string; frameIndex: number }> = [];
-        const view = createFilmstripView({
-            backend,
-            scheduler: clock.scheduler,
+        const { view } = mountView({
             onOpenFrame: (tiling, frameIndex) => {
                 opened.push({ geometry: tiling.geometry, frameIndex });
             },
         });
-        document.body.append(view.element);
         await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3));
 
-        transportButton(view, "Step forward one generation").click();
+        transportButton("Step forward one generation").click();
         const openButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-open");
         expect(openButton?.textContent).toBe("Open gen 1");
         openButton?.click();
@@ -335,25 +325,19 @@ describe("createFilmstripView", () => {
     });
 
     it("omits open-generation actions when no callback is provided", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view } = mountView();
         await view.load(filmstrip([tiling("square", [{ a: 1 }])], 1));
 
         expect(view.element.querySelector(".compare-filmstrip-open")).toBeNull();
     });
 
     it("re-times the running clock when the speed changes", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view, clock } = mountView();
         await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3));
 
-        transportButton(view, "Play / pause").click();
+        transportButton("Play / pause").click();
         expect(clock.active()).toBe(1);
-        const speed = view.element.querySelector<HTMLSelectElement>(".compare-filmstrip-speed");
+        const speed = document.querySelector<HTMLSelectElement>(".compare-filmstrip-speed");
         if (!speed) {
             throw new Error("missing speed select");
         }
@@ -363,25 +347,21 @@ describe("createFilmstripView", () => {
     });
 
     it("disables playback for a single-frame filmstrip", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view, clock } = mountView();
         await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }])], 1));
 
-        const play = transportButton(view, "Play / pause");
+        const play = transportButton("Play / pause");
         expect(play.disabled).toBe(true);
         play.click();
         expect(clock.active()).toBe(0);
     });
 
     it("shows a fallback when a board's geometry fails to load", async () => {
-        const backend = stubBackend(async () => {
-            throw new Error("preview boom");
+        const { view } = mountView({
+            previewTopology: async () => {
+                throw new Error("preview boom");
+            },
         });
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
         await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }])], 2));
 
         expect(view.element.querySelector(".compare-filmstrip-slot")?.textContent).toBe(
@@ -390,13 +370,10 @@ describe("createFilmstripView", () => {
     });
 
     it("stops the clock and detaches on dispose", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view, clock } = mountView();
         await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3));
 
-        transportButton(view, "Play / pause").click();
+        transportButton("Play / pause").click();
         expect(clock.active()).toBe(1);
         view.dispose();
         expect(clock.active()).toBe(0);
@@ -404,24 +381,15 @@ describe("createFilmstripView", () => {
     });
 
     it("re-clamps and rebuilds boards when a shorter filmstrip is loaded", async () => {
-        const backend = stubBackend(async () => squarePreview());
-        const clock = manualScheduler();
-        const view = createFilmstripView({ backend, scheduler: clock.scheduler });
-        document.body.append(view.element);
+        const { view } = mountView();
         await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }, { d: 1 }])], 4));
-        const scrubber = view.element.querySelector<HTMLInputElement>(
-            ".compare-filmstrip-scrubber",
-        );
+        const scrubber = document.querySelector<HTMLInputElement>(".compare-filmstrip-scrubber");
         scrubber!.value = "3";
         scrubber!.dispatchEvent(new Event("input"));
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 3 / 3",
-        );
+        expect(counterText()).toBe("gen 3 / 3");
 
         await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }])], 1));
         expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(1);
-        expect(view.element.querySelector(".compare-filmstrip-counter")?.textContent).toBe(
-            "gen 0 / 0",
-        );
+        expect(counterText()).toBe("gen 0 / 0");
     });
 });

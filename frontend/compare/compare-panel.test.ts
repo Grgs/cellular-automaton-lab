@@ -781,7 +781,8 @@ describe("mountComparePanel", () => {
                 "Live filmstrip failed: filmstrip boom",
             );
         });
-        expect(document.querySelector<HTMLElement>(".compare-filmstrip-area")?.hidden).toBe(true);
+        // A failed build falls back to the empty-state hero on the stage.
+        expect(document.querySelector<HTMLElement>(".compare-stage-hero")?.hidden).toBe(false);
     });
 
     it("renders a seed pad wired to the seed field", async () => {
@@ -975,20 +976,21 @@ describe("mountComparePanel", () => {
         expect(document.querySelector(".compare-detail")).toBeNull();
     });
 
-    it("renders a full-page workspace presentation that does not dismiss on backdrop click", async () => {
+    it("renders as a full-page workspace that does not dismiss on backdrop click", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const handle = mountComparePanel({
             backend,
             bootstrapData: bootstrapData(),
-            presentation: "workspace",
             openOnMount: true,
         });
 
         const backdrop = document.querySelector<HTMLElement>(".compare-backdrop");
         const dialog = document.querySelector<HTMLElement>(".compare-dialog");
+        // The panel is workspace-only now; the modal presentation was retired.
         expect(backdrop?.classList.contains("compare-backdrop--workspace")).toBe(true);
         expect(dialog?.classList.contains("compare-dialog--workspace")).toBe(true);
+        expect(dialog?.getAttribute("aria-modal")).toBeNull();
         expect(document.querySelector(".compare-back")?.textContent).toBe("← Back to build");
         expect(backdrop?.hidden).toBe(false);
 
@@ -999,6 +1001,73 @@ describe("mountComparePanel", () => {
         // The Back affordance still closes it.
         document.querySelector<HTMLButtonElement>(".compare-back")?.click();
         expect(backdrop?.hidden).toBe(true);
+        handle.dispose();
+    });
+
+    it("drives the docked transport with space and arrow keys once a filmstrip is live", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => ({
+                rule_name: "conway",
+                seed: "111",
+                traversal: "bfs",
+                frame_count: 2,
+                grid_size: 16,
+                tilings: [
+                    {
+                        geometry: "square",
+                        tiling_family: "square",
+                        family: "regular",
+                        cell_count: 100,
+                        topology: {} as never,
+                        topology_spec: {
+                            tiling_family: "square",
+                            adjacency_mode: "edge",
+                            sizing_mode: "grid",
+                            width: 16,
+                            height: 16,
+                            patch_depth: 0,
+                        },
+                        frames: [{ "c:1:1": 1 }, { "c:2:1": 1 }],
+                        extinction_step: null,
+                        period: null,
+                        note: null,
+                    },
+                ],
+            }),
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-toggle")?.click();
+        const playSideBySide = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
+        ].find((button) => button.textContent === "▶ Play side by side");
+        playSideBySide?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        const counter = () =>
+            document.querySelector<HTMLElement>(".compare-filmstrip-counter")?.textContent;
+        expect(counter()).toBe("gen 0 / 1");
+
+        // Arrow keys step the shared clock; Space toggles play/pause.
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+        expect(counter()).toBe("gen 1 / 1");
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+        expect(counter()).toBe("gen 0 / 1");
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+        expect(
+            document.querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[title="Play / pause"]',
+            )?.textContent,
+        ).toBe("⏸ Pause");
+
         handle.dispose();
     });
 
