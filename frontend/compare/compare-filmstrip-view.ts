@@ -52,6 +52,10 @@ export interface FilmstripViewController {
     load(filmstrip: SeedFilmstripResult, options?: FilmstripLoadOptions): Promise<void>;
     /** Enlarge one board (speaker view) or return to the gallery (null). */
     focus(geometry: string | null): void;
+    /** The shared clock's current generation index. */
+    currentFrameIndex(): number;
+    /** Overlay a node onto the focused board's slot (live fork), or restore its SVG (null). */
+    setHeroOverlay(node: HTMLElement | null): boolean;
     dispose(): void;
 }
 
@@ -64,6 +68,7 @@ interface BoardEntry {
     openButton?: HTMLButtonElement;
     preview?: TopologyPreview;
     error?: string;
+    overlaid?: boolean;
 }
 
 function el(tag: string, className: string, text?: string): HTMLElement {
@@ -120,6 +125,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let boards: BoardEntry[] = [];
     let lastRenderedIndex = -1;
     let focusedGeometry: string | null = null;
+    let overlayEntry: BoardEntry | null = null;
 
     /** Toggle gallery/speaker classes and per-board focus affordances (no re-render). */
     function applyFocusLayout(): void {
@@ -152,6 +158,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     }
 
     function renderBoard(entry: BoardEntry, index: number): void {
+        // A live fork owns this board's slot; leave its canvas untouched.
+        if (entry.overlaid) {
+            return;
+        }
         const frame = entry.tiling.frames[index] ?? {};
         if (entry.error) {
             entry.slot.textContent = entry.error.includes("limit") ? "too large" : "unavailable";
@@ -210,6 +220,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         unsubscribe = null;
         boards = [];
         lastRenderedIndex = -1;
+        overlayEntry = null;
         // A fresh run starts in the gallery; silent so it doesn't fire onFocusChange.
         focusedGeometry = null;
         root.classList.remove("compare-filmstrip--speaker");
@@ -311,6 +322,27 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         element: root,
         load,
         focus,
+        currentFrameIndex: () => player.index,
+        setHeroOverlay(node: HTMLElement | null): boolean {
+            if (node) {
+                const entry = boards.find(
+                    (candidate) => candidate.tiling.geometry === focusedGeometry,
+                );
+                if (!entry) {
+                    return false;
+                }
+                overlayEntry = entry;
+                entry.overlaid = true;
+                entry.slot.replaceChildren(node);
+                return true;
+            }
+            if (overlayEntry) {
+                overlayEntry.overlaid = false;
+                renderBoard(overlayEntry, player.index);
+                overlayEntry = null;
+            }
+            return true;
+        },
         dispose(): void {
             teardownRun();
             root.remove();

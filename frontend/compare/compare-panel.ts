@@ -11,6 +11,7 @@
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import type { FocusPaneServices } from "../pane/pane-core.js";
 import type { CompareRunConfig } from "./compare-run-link.js";
 import {
     createComparePanelContent,
@@ -30,6 +31,8 @@ interface MountComparePanelOptions {
     onOpen?: () => void;
     /** Fired when the dialog is dismissed (used to clear the route from the hash). */
     onClose?: () => void;
+    /** Server-only seams for the live focus pane (absent on the standalone build). */
+    focusPaneServices?: FocusPaneServices;
 }
 
 export interface ComparePanelHandle {
@@ -75,6 +78,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         backend: options.backend,
         bootstrapData: options.bootstrapData,
         ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
+        ...(options.focusPaneServices ? { focusPaneServices: options.focusPaneServices } : {}),
         onRequestClose: () => close(),
     });
 

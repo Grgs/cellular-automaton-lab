@@ -8,6 +8,8 @@ import type {
     SimulationSnapshot,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
+import type { GridView } from "../types/controller-view.js";
+import type { FocusPaneServices } from "../pane/pane-core.js";
 
 function bootstrapData(): AppBootstrapData {
     const topology = (
@@ -33,7 +35,28 @@ function bootstrapData(): AppBootstrapData {
         sizing_policy: { control: "cell_size", default: 16, min: 2, max: 64 },
     });
     return {
-        app_defaults: {} as AppBootstrapData["app_defaults"],
+        app_defaults: {
+            simulation: {
+                topology_spec: {
+                    tiling_family: "square",
+                    adjacency_mode: "edge",
+                    sizing_mode: "grid",
+                    width: 16,
+                    height: 16,
+                    patch_depth: 0,
+                },
+                speed: 5,
+                rule: "conway",
+                min_grid_size: 2,
+                max_grid_size: 64,
+                min_patch_depth: 0,
+                max_patch_depth: 6,
+                min_speed: 1,
+                max_speed: 30,
+            },
+            ui: { cell_size: 12, min_cell_size: 8, max_cell_size: 24, storage_key: "ui" },
+            theme: { default: "light", storage_key: "theme" },
+        },
         topology_catalog: [
             topology("Square", "square", "regular"),
             topology("Hex", "hex", "regular"),
@@ -191,6 +214,64 @@ function twoBoardFilmstrip(): SeedFilmstripResult {
         frame_count: 2,
         grid_size: 16,
         tilings: [board("square"), board("hex")],
+    };
+}
+
+function fakeGridView(): GridView {
+    return {
+        render: vi.fn(),
+        getCellFromPointerEvent: () => null,
+        setPreviewCells: vi.fn(),
+        clearPreview: vi.fn(),
+        setHoveredCell: vi.fn(),
+        setSelectedCells: vi.fn(),
+        getSelectedCells: () => [],
+        setGestureOutline: vi.fn(),
+        flashGestureOutline: vi.fn(),
+        clearGestureOutline: vi.fn(),
+    };
+}
+
+function forkSnapshot(): SimulationSnapshot {
+    return {
+        topology_spec: {
+            tiling_family: "square",
+            adjacency_mode: "edge",
+            sizing_mode: "grid",
+            width: 16,
+            height: 16,
+            patch_depth: 0,
+        },
+        speed: 5,
+        running: false,
+        generation: 9,
+        rule: {
+            name: "conway",
+            display_name: "Conway",
+            description: "",
+            default_paint_state: 1,
+            supports_randomize: true,
+            states: [{ value: 1, label: "Live", color: "#000", paintable: true }],
+            rule_protocol: "universal-v1",
+            supports_all_topologies: true,
+            compatible_tiling_families: null,
+        },
+        topology_revision: "rev",
+        topology: {
+            topology_revision: "rev",
+            topology_spec: {
+                tiling_family: "square",
+                adjacency_mode: "edge",
+                sizing_mode: "grid",
+                width: 16,
+                height: 16,
+                patch_depth: 0,
+            },
+            width: 16,
+            height: 16,
+            cells: [{ id: "c:1:1", kind: "square", neighbors: [] }],
+        },
+        cell_states: [0],
     };
 }
 
@@ -1236,6 +1317,98 @@ describe("mountComparePanel", () => {
         rerun?.click();
 
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        handle.dispose();
+    });
+
+    it("forks the focused board into a live pane on the wall when a session is available", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const focusBackend: SimulationBackend = {
+            ...backend,
+            getState: async () => forkSnapshot(),
+            postControl: (async () =>
+                forkSnapshot()) as unknown as SimulationBackend["postControl"],
+            setCells: (async () => forkSnapshot()) as unknown as SimulationBackend["setCells"],
+            dispose: vi.fn(),
+        };
+        const backendFactory = vi.fn(() => focusBackend);
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: "sess",
+            backendFactory,
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            focusPaneServices,
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        const forkLive = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
+            (button) => button.textContent === "⑂ Fork this board live",
+        );
+        expect(forkLive, "fork-live button present in speaker view").toBeTruthy();
+        forkLive?.click();
+
+        await vi.waitFor(() => {
+            expect(
+                document.querySelector<HTMLElement>(".compare-status")?.textContent ?? "",
+            ).not.toContain("Fork failed");
+            expect(document.querySelector(".compare-focus-pane")).not.toBeNull();
+        });
+        // The fork runs on a derived child session, and the hero SVG is replaced.
+        expect(backendFactory).toHaveBeenCalledWith("sess-focus");
+        expect(
+            document.querySelector(".compare-filmstrip-board.is-hero .compare-focus-pane"),
+        ).not.toBeNull();
+        handle.dispose();
+    });
+
+    it("forks the focused board into the Lab when no live session is available", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const onOpenPattern = vi.fn();
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            onOpenPattern,
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        const fork = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
+            (button) => button.textContent === "⑂ Fork this board in the Lab",
+        );
+        expect(fork).toBeTruthy();
+        fork?.click();
+
+        // No live session: the fork opens the frame in the Lab instead.
+        expect(onOpenPattern).toHaveBeenCalledTimes(1);
+        expect(document.querySelector(".compare-focus-pane")).toBeNull();
         handle.dispose();
     });
 

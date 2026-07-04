@@ -5,6 +5,11 @@ import { elements } from "./dom.js";
 import { buildEditorToolCells } from "./editor-operations.js";
 import { createAppController } from "./app-controller.js";
 import { mountWorkspaceRouter, type WorkspaceRouterHandle } from "./compare/workspace-router.js";
+import type {
+    FocusPaneServices,
+    PaneCellSizeOptions,
+    PaneViewportDimensionsOptions,
+} from "./pane/pane-core.js";
 import { getGeometryAdapter } from "./geometry/registry.js";
 import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
@@ -161,16 +166,51 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
     disposeReviewApi = installReviewApi({ controller, gridView, elements });
     try {
         const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
+        const liveCompareBaseSessionId =
+            options.liveCompareBaseSessionId ?? window.APP_SESSION_ID ?? null;
+
+        // Shared pane seams: the same geometry/canvas/session wiring drives Split
+        // View's panes and the wall's live focus pane.
+        const paneBackendFactory =
+            options.liveCompareBackendFactory ??
+            ((sessionId: string) => createHttpSimulationBackend({ sessionId }));
+        const createPaneGridView = (canvas: HTMLCanvasElement) => createCanvasGridView({ canvas });
+        const resolvePaneViewportDimensions = (paneOptions: PaneViewportDimensionsOptions) => {
+            const adapter = getGeometryAdapter(paneOptions.geometry) as FitRenderCellSizeAdapter;
+            const fitOptions = {
+                viewportWidth: paneOptions.viewportWidth,
+                viewportHeight: paneOptions.viewportHeight,
+                cellSize: paneOptions.cellSize,
+                fallbackDimensions: paneOptions.fallbackDimensions,
+                ...(paneOptions.maxCellCount !== undefined
+                    ? { maxCellCount: paneOptions.maxCellCount }
+                    : {}),
+            };
+            return adapter.fitViewport?.(fitOptions) ?? paneOptions.fallbackDimensions;
+        };
+        const resolvePaneCellSize = (paneOptions: PaneCellSizeOptions) => {
+            const adapter = getGeometryAdapter(paneOptions.geometry) as FitRenderCellSizeAdapter;
+            return adapter.fitRenderCellSize?.(paneOptions) ?? paneOptions.fallbackCellSize;
+        };
+
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: liveCompareBaseSessionId,
+            backendFactory: paneBackendFactory,
+            createGridView: createPaneGridView,
+            buildEditorToolCells,
+            resolveCellSize: resolvePaneCellSize,
+            resolveViewportDimensions: resolvePaneViewportDimensions,
+        };
+
         workspaceRouter = mountWorkspaceRouter({
             backend,
             bootstrapData,
             wallTrigger: elements.wallViewBtn,
+            focusPaneServices,
             onOpenPattern: (payload) => {
                 void controller.loadPattern(payload);
             },
         });
-        const liveCompareBaseSessionId =
-            options.liveCompareBaseSessionId ?? window.APP_SESSION_ID ?? null;
         liveCompareWorkspace = mountLazyLiveCompareWorkspace({
             trigger: elements.splitViewToggleBtn,
             gridPanel: elements.gridPanel,
@@ -178,9 +218,7 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             baseSessionId: liveCompareBaseSessionId,
             mainBackend: backend,
             disposeBackendsOnClose: options.liveCompareDisposeBackendsOnClose ?? false,
-            ...(options.liveCompareBackendFactory
-                ? { backendFactory: options.liveCompareBackendFactory }
-                : {}),
+            backendFactory: paneBackendFactory,
             controls: {
                 statusText: elements.statusText,
                 generationText: elements.generationText,
@@ -194,25 +232,10 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
                 tilingPickerCurrentLabel: elements.tilingPickerCurrentLabel,
             },
             onReturnToSingleView: () => controller.refreshState(),
-            createGridView: (canvas) => createCanvasGridView({ canvas }),
+            createGridView: createPaneGridView,
             buildEditorToolCells,
-            resolveViewportDimensions: (options) => {
-                const adapter = getGeometryAdapter(options.geometry) as FitRenderCellSizeAdapter;
-                const fitOptions = {
-                    viewportWidth: options.viewportWidth,
-                    viewportHeight: options.viewportHeight,
-                    cellSize: options.cellSize,
-                    fallbackDimensions: options.fallbackDimensions,
-                    ...(options.maxCellCount !== undefined
-                        ? { maxCellCount: options.maxCellCount }
-                        : {}),
-                };
-                return adapter.fitViewport?.(fitOptions) ?? options.fallbackDimensions;
-            },
-            resolveCellSize: (options) => {
-                const adapter = getGeometryAdapter(options.geometry) as FitRenderCellSizeAdapter;
-                return adapter.fitRenderCellSize?.(options) ?? options.fallbackCellSize;
-            },
+            resolveViewportDimensions: resolvePaneViewportDimensions,
+            resolveCellSize: resolvePaneCellSize,
         });
     } catch (error) {
         handleAppError(error);

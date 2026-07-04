@@ -668,6 +668,79 @@ export const COMPARE_PANEL_STYLES = `
     color: var(--muted, #6d756f);
 }
 .compare-filmstrip-count { font-size: 11px; color: var(--muted, #6d756f); font-family: var(--mono, monospace); }
+/* Live focus pane: a forked, editable board that replaces the hero SVG. */
+.compare-focus-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+.compare-focus-pane-chip {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-warning, #d8a657);
+    border-radius: 9px;
+    background: var(--bg-warning, rgba(216, 166, 87, 0.16));
+}
+.compare-focus-pane-info { font-size: 12px; font-weight: 600; color: var(--ink, #1f2430); }
+.compare-focus-pane-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--panel-strong, #fff);
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+    color: var(--muted, #6d756f);
+}
+.compare-focus-pane-palette { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.compare-focus-pane-swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 7px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--panel-strong, #fff);
+    color: var(--ink, #1f2430);
+    cursor: pointer;
+}
+.compare-focus-pane-swatch.is-selected { border-color: var(--accent, #bf5a36); }
+.compare-focus-pane-swatch-color {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.2));
+}
+.compare-focus-pane-actions { display: inline-flex; gap: 6px; margin-left: auto; }
+.compare-focus-pane-action {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--panel-strong, #fff);
+    color: var(--ink, #1f2430);
+    cursor: pointer;
+}
+.compare-focus-pane-action:hover { background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06)); }
+.compare-focus-pane-discard {
+    border-color: var(--border-danger, #d08a8a);
+    color: var(--text-danger, #a3352d);
+}
+.compare-focus-pane-viewport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    padding: 6px;
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+    border-radius: 10px;
+    background: var(--field-bg, #fff);
+}
+.compare-focus-pane-canvas { touch-action: none; }
+.compare-seed-rail-fork { width: 100%; margin-top: 8px; }
 @media (max-width: 640px) {
     .compare-backdrop { align-items: stretch; padding: 8px; }
     .compare-dialog {
