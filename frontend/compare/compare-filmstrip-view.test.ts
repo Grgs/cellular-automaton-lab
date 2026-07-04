@@ -220,6 +220,14 @@ describe("createFilmstripView", () => {
         expect(view.element.querySelector(".compare-filmstrip-board")?.getAttribute("role")).toBe(
             "listitem",
         );
+        expect(view.element.querySelector<HTMLElement>(".compare-filmstrip-board")?.tabIndex).toBe(
+            0,
+        );
+        expect(
+            view.element
+                .querySelector<HTMLElement>(".compare-filmstrip-board")
+                ?.getAttribute("aria-label"),
+        ).toBe("square: focus this board");
         expect(
             transport.element
                 .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[title="Play / pause"]')
@@ -413,30 +421,42 @@ describe("createFilmstripView", () => {
         expect(counterText()).toBe("gen 0 / 0");
     });
 
-    it("enlarges a focused board into speaker view and returns to the gallery", async () => {
+    it("enlarges a clicked board into speaker view and returns to the gallery", async () => {
         const focusEvents: Array<string | null> = [];
         const { view } = mountView({ onFocusChange: (geometry) => focusEvents.push(geometry) });
         await view.load(twoBoardFilmstrip());
 
         expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        expect(view.element.querySelector(".compare-filmstrip-focus")).toBeNull();
 
-        view.element
-            .querySelector<HTMLButtonElement>(
-                '.compare-filmstrip-board .compare-filmstrip-focus[aria-label="Focus square"]',
-            )
-            ?.click();
+        boardFor(view, "square").click();
 
         expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(true);
         expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
         expect(boardFor(view, "hex").classList.contains("is-strip")).toBe(true);
+        expect(boardFor(view, "square").getAttribute("aria-label")).toBe(
+            "square: back to the gallery",
+        );
         expect(focusEvents).toEqual(["square"]);
 
-        // Clicking the hero's focus control (now "Back to the gallery") exits speaker view.
-        boardFor(view, "square")
-            .querySelector<HTMLButtonElement>(".compare-filmstrip-focus")
-            ?.click();
+        // Clicking the hero exits speaker view.
+        boardFor(view, "square").click();
         expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
         expect(focusEvents).toEqual(["square", null]);
+    });
+
+    it("focuses a board from the keyboard", async () => {
+        const focusEvents: Array<string | null> = [];
+        const { view } = mountView({ onFocusChange: (geometry) => focusEvents.push(geometry) });
+        await view.load(twoBoardFilmstrip());
+
+        boardFor(view, "hex").dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+        );
+
+        expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        expect(boardFor(view, "hex").classList.contains("is-hero")).toBe(true);
+        expect(focusEvents).toEqual(["hex"]);
     });
 
     it("swaps focus when a strip board is clicked in speaker view", async () => {

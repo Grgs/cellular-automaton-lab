@@ -28,7 +28,7 @@ It is intended for comparing how familiar automata behave on different local nei
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
-- compare workspace that runs one shared seed across many tilings, charts topology-sensitive outcomes, plays synchronized side-by-side filmstrips, saves named runs locally, and opens any result generation back into build mode (also scriptable via `python -m tools tilings compare`)
+- wall-first UI: the app lands on the comparison wall (one seed and rule playing in lockstep across many tilings), zooms any board into a speaker view, forks a generation into a live editable board, and treats the single-board editor as the routed `#/lab` (also scriptable via `python -m tools tilings compare`)
 - sparse pattern persistence keyed by stable topology cell IDs
 - TypeScript frontend in `frontend/` with Vitest unit tests and Playwright browser coverage
 
@@ -55,21 +55,23 @@ It is intended for comparing how familiar automata behave on different local nei
 - Switch to Penrose P1 and compare the `Distributed` and `Boat-Star` construction modes to see the difference between the distributed vertex-merge manifestation and the centered singular pentagrid patch.
 - Try the convex pentagonal periodic catalog with Cairo, Prismatic, Floret, Type 7, Stein 14, and Pentagon Crosses to compare how the same rule family behaves on distinct pentagon adjacencies.
 - Try Whirlpool or HexWhirlpool from the preset/showcase controls for a quick multi-state animation that exercises more than binary Life-like states.
-- Open `#/compare` or use the floating compare button to compare one seed across tilings. Use **Run comparison** for the phase portrait/table, **Play side by side** for synchronized boards, and **Open gen N** on a live board to bring that generation back into build mode.
+- Open the app on the comparison wall, press **Play side by side** to watch one seed evolve across the selected tilings, click a board to zoom into speaker view, and use **⑂ Fork this board live** to keep editing that generation while the others keep looping. Press **⊞ Wall** in the Lab to return, or open `#/lab` for the single-board editor directly.
 - Reload the standalone GitHub Pages demo after changing topology or state to check browser persistence without the Flask server.
 
-## Compare Workspace
+## The Comparison Wall
 
-Compare mode is available from the floating **Compare tilings** button or directly at `#/compare`. It uses a shared seed, rule, traversal, frame count, and grid size so each selected tiling starts from comparable conditions. The tiling checklist and presets define the side-by-side panes; unsupported rule/tiling combinations are disabled in the picker and rejected by the backend if submitted directly.
+The wall is the landing view: a bare URL opens it, and on a first visit it autoplays a curated demo so you meet something alive in one click. It runs one shared seed, rule, traversal, frame count, and grid size so each selected tiling starts from comparable conditions. The tiling checklist and presets define the boards; unsupported rule/tiling combinations are disabled in the picker and rejected by the backend if submitted directly. Configuration and analysis wait in disclosures below the stage.
 
-The workspace has two run paths:
+Two layout states share one persistent transport (play, pause, step, scrub, speed on one clock):
 
-- **Run comparison** returns a phase portrait plus a result table. Each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
-- **Play side by side** builds a synchronized filmstrip. Play, pause, step, reset, scrub, and speed controls operate one shared clock across all boards. Each board has an **Open gen N** action that loads its current generation into build mode.
+- **Gallery** shows every selected board at once, evolving in lockstep.
+- **Speaker view** (click a board, or `&focus=<geometry>`) enlarges one board as the hero with the others as a thumbnail strip. A seed rail beside the hero edits the shared seed (**Re-run wall from this seed**), and **⑂ Fork this board live** turns the hero into a real editable board on its own session — you can paint, step, and run it while the other boards keep looping — with **Discard** to restore it. Escape peels back one layer at a time.
 
-Use **Copy run link** to create a `#/compare&run=v1.<base64url-json>` URL. Opening that link restores the compare setup without auto-running or auto-playing, so cold loads do not start surprise work. Use **Saved runs** and **Saved tiling sets** to keep named compare setups in browser `localStorage`; they work in both the Flask app and the standalone demo, but they are local to the current browser/device. Run links are the portable format.
+The **Cross-tiling analysis** disclosure computes a phase portrait plus a result table on demand; each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
 
-Current limits are intentional for interactive use: live filmstrips are bounded to a small selected set of tilings and a capped frame count by the backend, and compare mode is designed around one shared seed/rule configuration rather than independent per-pane rules.
+Use **Copy run link** to create a `#/compare&run=v1.<base64url-json>` URL. Opening that link restores the setup without auto-running or auto-playing, so cold loads do not start surprise work. Use **Saved runs** and **Saved tiling sets** to keep named setups in browser `localStorage`; they work in both the Flask app and the standalone demo, but they are local to the current browser/device. Run links are the portable format.
+
+Routing is hash-based and back-compatible: a bare URL is the wall, `#/lab` is the single-board editor (a bare `#share=` board link also opens the Lab), and the legacy `#/compare` still opens the wall. Current limits are intentional for interactive use: live filmstrips are bounded to a small selected set of tilings and a capped frame count by the backend, and the wall is designed around one shared seed/rule configuration rather than independent per-board rules. The live focus pane runs one fork at a time.
 
 ## How It Works
 

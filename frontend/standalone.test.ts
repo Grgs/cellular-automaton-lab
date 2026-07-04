@@ -183,9 +183,8 @@ describe("standalone startup", () => {
             expect.objectContaining({
                 backend: {},
                 bootstrapData,
-                liveCompareBaseSessionId: "standalone",
-                liveCompareBackendFactory: expect.any(Function),
-                liveCompareDisposeBackendsOnClose: true,
+                paneBaseSessionId: "standalone",
+                paneBackendFactory: expect.any(Function),
             }),
         );
         expect(startupMessage().textContent).toBe("Starting Python runtime");

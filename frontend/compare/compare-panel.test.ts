@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type {
     AppBootstrapData,
+    FilmstripRequest,
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
@@ -685,6 +686,39 @@ describe("mountComparePanel", () => {
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["kagome"]);
     });
 
+    it("keeps default filmstrip tilings when the active Lab rule is too narrow", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripRequests: FilmstripRequest[] = [];
+        const requestFilmstrip: SimulationBackend["requestFilmstrip"] = async (request) => {
+            filmstripRequests.push(request);
+            return twoBoardFilmstrip();
+        };
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+            getInitialRuleName: () => "kagome-life",
+        });
+
+        await handle.runDefaultFilmstrip({
+            seed: "",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["square", "hex"],
+            pattern: "r-pentomino",
+        });
+
+        expect(filmstripRequests).toHaveLength(1);
+        expect(filmstripRequests[0]?.rule).toBe("conway");
+        expect(filmstripRequests[0]?.geometries).toEqual(["square", "hex"]);
+        expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
+        expect(summaryText()).toBe("2 / 6 selected · Regular 2");
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+    });
+
     it("runs a comparison and renders the portrait and grid", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
@@ -1226,7 +1260,7 @@ describe("mountComparePanel", () => {
         const backdrop = () => document.querySelector<HTMLElement>(".compare-backdrop");
 
         // Focus the first board -> speaker view, mirrored into the hash.
-        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(true);
         expect(window.location.hash).toContain("focus=square");
 
@@ -1273,7 +1307,7 @@ describe("mountComparePanel", () => {
         expect(rail()?.hidden).toBe(true);
 
         // Focus a board: the seed workspace reparents into the rail beside the hero.
-        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         expect(rail()?.hidden).toBe(false);
         expect(seedInRail()).not.toBeNull();
         expect(seedInConfigure()).toBeNull();
@@ -1309,7 +1343,7 @@ describe("mountComparePanel", () => {
         // runFilmstrip is not swallowed by the in-progress guard.
         await vi.waitFor(() => expect(playSideButton()?.disabled).toBe(false));
 
-        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         const rerun = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
             (button) => button.textContent === "Re-run wall from this seed",
         );
@@ -1357,7 +1391,7 @@ describe("mountComparePanel", () => {
             expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
         });
 
-        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         const forkLive = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
             (button) => button.textContent === "⑂ Fork this board live",
         );
@@ -1375,6 +1409,119 @@ describe("mountComparePanel", () => {
         expect(
             document.querySelector(".compare-filmstrip-board.is-hero .compare-focus-pane"),
         ).not.toBeNull();
+        handle.dispose();
+    });
+
+    it("pauses playback and disposes the live focus pane when the wall closes", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const focusDispose = vi.fn();
+        const focusBackend: SimulationBackend = {
+            ...backend,
+            getState: async () => forkSnapshot(),
+            postControl: (async () =>
+                forkSnapshot()) as unknown as SimulationBackend["postControl"],
+            setCells: (async () => forkSnapshot()) as unknown as SimulationBackend["setCells"],
+            dispose: focusDispose,
+        };
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: "sess",
+            backendFactory: () => focusBackend,
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            focusPaneServices,
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "⑂ Fork this board live")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-focus-pane")).not.toBeNull();
+        });
+
+        const playPause = document.querySelector<HTMLButtonElement>(
+            '.compare-filmstrip-btn[title="Play / pause"]',
+        );
+        playPause?.click();
+        expect(playPause?.textContent).toBe("⏸ Pause");
+
+        document.querySelector<HTMLButtonElement>(".compare-back")?.click();
+
+        expect(document.querySelector<HTMLElement>(".compare-backdrop")?.hidden).toBe(true);
+        expect(playPause?.textContent).toBe("▶ Play");
+        expect(document.querySelector(".compare-focus-pane")).toBeNull();
+        expect(focusDispose).toHaveBeenCalledTimes(1);
+        handle.dispose();
+    });
+
+    it("disposes a pending live fork when focus changes before it attaches", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const focusDispose = vi.fn();
+        const focusBackend: SimulationBackend = {
+            ...backend,
+            getState: async () => forkSnapshot(),
+            postControl: (async () =>
+                forkSnapshot()) as unknown as SimulationBackend["postControl"],
+            setCells: (async () => forkSnapshot()) as unknown as SimulationBackend["setCells"],
+            dispose: focusDispose,
+        };
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: "sess",
+            backendFactory: () => focusBackend,
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            focusPaneServices,
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "⑂ Fork this board live")
+            ?.click();
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+
+        await vi.waitFor(() => {
+            expect(focusDispose).toHaveBeenCalledTimes(1);
+        });
+        expect(document.querySelector(".compare-focus-pane")).toBeNull();
+        expect(
+            document.querySelector<HTMLElement>(".compare-status")?.textContent ?? "",
+        ).not.toContain("Fork failed");
         handle.dispose();
     });
 
@@ -1399,7 +1546,7 @@ describe("mountComparePanel", () => {
             expect(document.querySelector(".compare-filmstrip-open")).not.toBeNull();
         });
 
-        document.querySelector<HTMLButtonElement>(".compare-filmstrip-focus")?.click();
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         const fork = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
             (button) => button.textContent === "⑂ Fork this board in the Lab",
         );

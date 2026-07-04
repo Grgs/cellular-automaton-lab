@@ -131,6 +131,8 @@ export interface ComparePanelContentOptions {
     onRequestClose?: () => void;
     /** Server-only seams for the live focus pane; absent/null baseSessionId = fork to the Lab. */
     focusPaneServices?: FocusPaneServices;
+    /** The Lab rule active when the wall is opened; used for the default wall setup. */
+    getInitialRuleName?: () => string | null | undefined;
 }
 
 export interface ComparePanelContentHandle {
@@ -138,10 +140,14 @@ export interface ComparePanelContentHandle {
     element: HTMLElement;
     /** Call when the content becomes visible: load rules and refresh previews. */
     activate(): void;
+    /** Call when the content is hidden so background work can be suspended. */
+    deactivate(): void;
     /** Populate the workspace from a decoded run link without running it. */
     applyRunConfig(config: CompareRunConfig): Promise<void>;
     /** Apply a config, build the live filmstrip, and start looping playback. */
     runFeaturedDemo(config: CompareRunConfig): Promise<void>;
+    /** Apply a default wall config and build the filmstrip without autoplaying. */
+    runDefaultFilmstrip(config: CompareRunConfig): Promise<void>;
     /** Show a run-link load problem in the status line (e.g. an unreadable link). */
     reportRunLinkError(message: string): void;
     /** Let an open action menu consume Escape; returns true when it did. */
@@ -503,6 +509,14 @@ export function createComparePanelContent(
         filmstripView?.setHeroOverlay(null);
     }
 
+    function reportFocusPaneError(error: unknown): void {
+        statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
+    }
+
+    function disposeDetachedBackend(backend: SimulationBackend): void {
+        void Promise.resolve(backend.dispose()).catch(reportFocusPaneError);
+    }
+
     async function forkFocusedBoardLive(): Promise<void> {
         const geometry = currentFocusGeometry;
         if (!filmstripView || !activeFilmstrip || !geometry) {
@@ -525,10 +539,19 @@ export function createComparePanelContent(
             return;
         }
         disposeFocusPane();
+        let backend: SimulationBackend | null = null;
         try {
-            const backend = services.backendFactory(paneSessionId(services.baseSessionId, "focus"));
+            backend = services.backendFactory(paneSessionId(services.baseSessionId, "focus"));
             const { mountFocusPane } = await import("./compare-focus-pane.js");
-            focusPane = mountFocusPane({
+
+            if (!filmstripView || currentFocusGeometry !== geometry) {
+                disposeDetachedBackend(backend);
+                backend = null;
+                return;
+            }
+
+            let nextFocusPane: FocusPaneHandle | null = null;
+            nextFocusPane = mountFocusPane({
                 geometry: tiling.geometry,
                 frameIndex,
                 pattern,
@@ -538,16 +561,29 @@ export function createComparePanelContent(
                 buildEditorToolCells: services.buildEditorToolCells,
                 ...(services.resolveCellSize ? { resolveCellSize: services.resolveCellSize } : {}),
                 onDiscard: () => {
-                    focusPane = null;
+                    if (focusPane === nextFocusPane) {
+                        focusPane = null;
+                    }
                     filmstripView?.setHeroOverlay(null);
                 },
-                onError: (error) => {
-                    statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
-                },
+                onError: reportFocusPaneError,
             });
-            filmstripView.setHeroOverlay(focusPane.element);
+            backend = null;
+
+            if (
+                currentFocusGeometry !== geometry ||
+                !filmstripView ||
+                !filmstripView.setHeroOverlay(nextFocusPane.element)
+            ) {
+                nextFocusPane.dispose();
+                return;
+            }
+            focusPane = nextFocusPane;
         } catch (error) {
-            statusLine.textContent = `Fork failed: ${error instanceof Error ? error.message : String(error)}`;
+            if (backend) {
+                disposeDetachedBackend(backend);
+            }
+            reportFocusPaneError(error);
         }
     }
 
@@ -1029,12 +1065,51 @@ export function createComparePanelContent(
         return rules.find((rule) => rule.name === selectedRuleName()) ?? null;
     }
 
+    function ruleByName(ruleName: string): RuleDefinition | null {
+        return rules.find((rule) => rule.name === ruleName) ?? null;
+    }
+
+    function tilingCompatibleWithRule(
+        rule: RuleDefinition | null | undefined,
+        option: TilingOption,
+    ): boolean {
+        return ruleSupportsTilingFamily(rule, option.tilingFamily);
+    }
+
     function tilingCompatibleWithSelectedRule(option: TilingOption): boolean {
-        return ruleSupportsTilingFamily(selectedRule(), option.tilingFamily);
+        return tilingCompatibleWithRule(selectedRule(), option);
     }
 
     function compatibleTilingsForSelectedRule(): TilingOption[] {
         return allTilings.filter((option) => tilingCompatibleWithSelectedRule(option));
+    }
+
+    function preferredInitialRuleName(): string | null {
+        const candidate = options.getInitialRuleName?.();
+        return typeof candidate === "string" && candidate.length > 0 ? candidate : null;
+    }
+
+    function ruleSupportsEveryGeometry(ruleName: string, geometries: readonly string[]): boolean {
+        const rule = ruleByName(ruleName);
+        if (!rule) {
+            return false;
+        }
+        return geometries.every((geometry) => {
+            const option = allTilings.find((tiling) => tiling.geometry === geometry);
+            return option ? tilingCompatibleWithRule(rule, option) : false;
+        });
+    }
+
+    function defaultFilmstripConfig(config: CompareRunConfig): CompareRunConfig {
+        const preferredRuleName = preferredInitialRuleName();
+        if (
+            preferredRuleName &&
+            selectHasValue(ruleSelect, preferredRuleName) &&
+            ruleSupportsEveryGeometry(preferredRuleName, config.geometries)
+        ) {
+            return { ...config, rule: preferredRuleName };
+        }
+        return config;
     }
 
     function pruneSelectionForSelectedRule({ selectAllIfEmpty = false } = {}): void {
@@ -1227,8 +1302,11 @@ export function createComparePanelContent(
                 el("option", { value: rule.name, textContent: rule.display_name ?? rule.name }),
             ),
         );
+        const preferredRuleName = preferredInitialRuleName();
         const conway = rules.find((rule) => rule.name === "conway");
-        if (conway) {
+        if (preferredRuleName && selectHasValue(ruleSelect, preferredRuleName)) {
+            ruleSelect.value = preferredRuleName;
+        } else if (conway) {
             ruleSelect.value = "conway";
         }
         ruleSelect.addEventListener("change", () => {
@@ -1236,7 +1314,7 @@ export function createComparePanelContent(
             renderTilingChecklist();
             refreshPreview();
         });
-        pruneSelectionForSelectedRule();
+        pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
         renderTilingChecklist();
     }
 
@@ -1289,7 +1367,8 @@ export function createComparePanelContent(
     }
 
     async function runFeaturedDemo(config: CompareRunConfig): Promise<void> {
-        await applyRunConfig(config);
+        await ensureRules();
+        await applyRunConfig(defaultFilmstripConfig(config));
         // Reduced motion: rest on a lively frame instead of animating. Otherwise
         // autoplay and loop only the lively sub-window at a calmer speed.
         const playback: FilmstripLoadOptions = prefersReducedMotion()
@@ -1301,6 +1380,12 @@ export function createComparePanelContent(
                   speedMultiplier: FEATURED_COMPARE_DEMO_SPEED,
               };
         await runFilmstrip(playback);
+    }
+
+    async function runDefaultFilmstrip(config: CompareRunConfig): Promise<void> {
+        await ensureRules();
+        await applyRunConfig(defaultFilmstripConfig(config));
+        await runFilmstrip({ initialFrame: FEATURED_COMPARE_DEMO_STILL_FRAME });
     }
 
     function highlightGeometry(geometry: string | null): void {
@@ -1751,8 +1836,14 @@ export function createComparePanelContent(
             refreshPreview();
             highlightGeometry(null);
         },
+        deactivate(): void {
+            filmstripTransport.pause();
+            disposeFocusPane();
+            root.querySelector(".compare-action-menu[open]")?.removeAttribute("open");
+        },
         applyRunConfig,
         runFeaturedDemo,
+        runDefaultFilmstrip,
         reportRunLinkError(message: string): void {
             statusLine.textContent = message;
         },

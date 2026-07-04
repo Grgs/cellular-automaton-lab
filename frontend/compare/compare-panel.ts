@@ -33,6 +33,8 @@ interface MountComparePanelOptions {
     onClose?: () => void;
     /** Server-only seams for the live focus pane (absent on the standalone build). */
     focusPaneServices?: FocusPaneServices;
+    /** The Lab rule active when the wall is opened; used for the default wall setup. */
+    getInitialRuleName?: () => string | null | undefined;
 }
 
 export interface ComparePanelHandle {
@@ -41,6 +43,7 @@ export interface ComparePanelHandle {
     isOpen(): boolean;
     applyRunConfig(config: CompareRunConfig): Promise<void>;
     runFeaturedDemo(config: CompareRunConfig): Promise<void>;
+    runDefaultFilmstrip(config: CompareRunConfig): Promise<void>;
     reportRunLinkError(message: string): void;
     dispose(): void;
 }
@@ -79,6 +82,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         bootstrapData: options.bootstrapData,
         ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
         ...(options.focusPaneServices ? { focusPaneServices: options.focusPaneServices } : {}),
+        ...(options.getInitialRuleName ? { getInitialRuleName: options.getInitialRuleName } : {}),
         onRequestClose: () => close(),
     });
 
@@ -135,6 +139,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         if (backdrop.hidden) {
             return;
         }
+        content.deactivate();
         backdrop.hidden = true;
         lastFocus?.focus();
         options.onClose?.();
@@ -177,6 +182,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         isOpen: () => !backdrop.hidden,
         applyRunConfig: (config) => content.applyRunConfig(config),
         runFeaturedDemo: (config) => content.runFeaturedDemo(config),
+        runDefaultFilmstrip: (config) => content.runDefaultFilmstrip(config),
         reportRunLinkError: (message) => content.reportRunLinkError(message),
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);

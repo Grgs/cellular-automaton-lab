@@ -13,11 +13,6 @@ import type {
 import { getGeometryAdapter } from "./geometry/registry.js";
 import { installReviewApi } from "./review-api.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
-import type {
-    LiveCompareCellSizeOptions,
-    LiveCompareWorkspaceHandle,
-    LiveCompareWorkspaceOptions,
-} from "./live-compare/live-compare.js";
 
 interface FitRenderCellSizeAdapter {
     fitViewport?: (options: {
@@ -30,7 +25,7 @@ interface FitRenderCellSizeAdapter {
         width: number;
         height: number;
     };
-    fitRenderCellSize?: (options: LiveCompareCellSizeOptions) => number;
+    fitRenderCellSize?: (options: PaneCellSizeOptions) => number;
 }
 
 function handleAppError(error: unknown): void {
@@ -40,104 +35,8 @@ function handleAppError(error: unknown): void {
 let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
 let workspaceRouter: WorkspaceRouterHandle | null = null;
-let liveCompareWorkspace: LiveCompareWorkspaceHandle | null = null;
-
-function mountLazyLiveCompareWorkspace(
-    options: LiveCompareWorkspaceOptions,
-): LiveCompareWorkspaceHandle {
-    const trigger = options.trigger;
-    if (!trigger || !options.gridPanel) {
-        return { dispose() {}, isOpen: () => false };
-    }
-    const triggerButton = trigger;
-    if (!options.baseSessionId || options.bootstrapData.topology_catalog.length === 0) {
-        triggerButton.disabled = true;
-        triggerButton.title = "Live split view requires independent server sessions.";
-        return { dispose() {}, isOpen: () => false };
-    }
-
-    let disposed = false;
-    let workspace: LiveCompareWorkspaceHandle | null = null;
-    let loading: Promise<LiveCompareWorkspaceHandle | null> | null = null;
-    const initialText = triggerButton.textContent;
-    const initialDisabled = triggerButton.disabled;
-    const initialAriaBusy = triggerButton.getAttribute("aria-busy");
-
-    function restoreTriggerLoadingState(): void {
-        triggerButton.disabled = initialDisabled;
-        if (initialAriaBusy === null) {
-            triggerButton.removeAttribute("aria-busy");
-        } else {
-            triggerButton.setAttribute("aria-busy", initialAriaBusy);
-        }
-        if (!workspace) {
-            triggerButton.textContent = initialText;
-        }
-    }
-
-    async function loadWorkspace(): Promise<LiveCompareWorkspaceHandle | null> {
-        if (workspace) {
-            return workspace;
-        }
-        loading ??= import("./live-compare/live-compare.js")
-            .then(({ mountLiveCompareWorkspace }) => {
-                if (disposed) {
-                    return null;
-                }
-                workspace = mountLiveCompareWorkspace(options);
-                return workspace;
-            })
-            .finally(() => {
-                loading = null;
-                if (!disposed) {
-                    restoreTriggerLoadingState();
-                }
-            });
-        return loading;
-    }
-
-    const handleClick = (event: MouseEvent): void => {
-        if (workspace || disposed) {
-            return;
-        }
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        triggerButton.disabled = true;
-        triggerButton.setAttribute("aria-busy", "true");
-        triggerButton.textContent = "Loading Split";
-        void loadWorkspace()
-            .then((loadedWorkspace) => {
-                if (!disposed && loadedWorkspace && !loadedWorkspace.isOpen()) {
-                    triggerButton.click();
-                }
-            })
-            .catch((error) => {
-                restoreTriggerLoadingState();
-                (options.onError ?? handleAppError)(error);
-            });
-    };
-
-    triggerButton.setAttribute("aria-pressed", "false");
-    triggerButton.textContent = "Split View";
-    triggerButton.addEventListener("click", handleClick, { capture: true });
-
-    return {
-        dispose(): void {
-            disposed = true;
-            triggerButton.removeEventListener("click", handleClick, true);
-            workspace?.dispose();
-            workspace = null;
-            restoreTriggerLoadingState();
-            triggerButton.textContent = "Split View";
-            triggerButton.setAttribute("aria-pressed", "false");
-        },
-        isOpen: () => workspace?.isOpen() ?? false,
-    };
-}
 
 export function disposeApp(): void {
-    liveCompareWorkspace?.dispose();
-    liveCompareWorkspace = null;
     workspaceRouter?.dispose();
     workspaceRouter = null;
     disposeReviewApi?.();
@@ -166,13 +65,12 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
     disposeReviewApi = installReviewApi({ controller, gridView, elements });
     try {
         const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
-        const liveCompareBaseSessionId =
-            options.liveCompareBaseSessionId ?? window.APP_SESSION_ID ?? null;
+        const paneBaseSessionId = options.paneBaseSessionId ?? window.APP_SESSION_ID ?? null;
 
-        // Shared pane seams: the same geometry/canvas/session wiring drives Split
-        // View's panes and the wall's live focus pane.
+        // Seams for the wall's live focus pane: an independent backend session, a
+        // canvas grid view, and the editor geometry helpers.
         const paneBackendFactory =
-            options.liveCompareBackendFactory ??
+            options.paneBackendFactory ??
             ((sessionId: string) => createHttpSimulationBackend({ sessionId }));
         const createPaneGridView = (canvas: HTMLCanvasElement) => createCanvasGridView({ canvas });
         const resolvePaneViewportDimensions = (paneOptions: PaneViewportDimensionsOptions) => {
@@ -194,7 +92,7 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
         };
 
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: liveCompareBaseSessionId,
+            baseSessionId: paneBaseSessionId,
             backendFactory: paneBackendFactory,
             createGridView: createPaneGridView,
             buildEditorToolCells,
@@ -207,35 +105,13 @@ export async function initApp(options: InitAppOptions = {}): Promise<AppControll
             bootstrapData,
             wallTrigger: elements.wallViewBtn,
             focusPaneServices,
+            getInitialRuleName: () => {
+                const state = controller.getState();
+                return state.editorRuleName ?? state.activeRule?.name ?? null;
+            },
             onOpenPattern: (payload) => {
                 void controller.loadPattern(payload);
             },
-        });
-        liveCompareWorkspace = mountLazyLiveCompareWorkspace({
-            trigger: elements.splitViewToggleBtn,
-            gridPanel: elements.gridPanel,
-            bootstrapData,
-            baseSessionId: liveCompareBaseSessionId,
-            mainBackend: backend,
-            disposeBackendsOnClose: options.liveCompareDisposeBackendsOnClose ?? false,
-            backendFactory: paneBackendFactory,
-            controls: {
-                statusText: elements.statusText,
-                generationText: elements.generationText,
-                runToggleBtn: elements.runToggleBtn,
-                stepBtn: elements.stepBtn,
-                resetBtn: elements.resetBtn,
-                randomBtn: elements.randomBtn,
-                tilingFamilySelect: elements.tilingFamilySelect,
-                tilingPickerMenu: elements.tilingPickerMenu,
-                tilingPickerToggle: elements.tilingPickerToggle,
-                tilingPickerCurrentLabel: elements.tilingPickerCurrentLabel,
-            },
-            onReturnToSingleView: () => controller.refreshState(),
-            createGridView: createPaneGridView,
-            buildEditorToolCells,
-            resolveViewportDimensions: resolvePaneViewportDimensions,
-            resolveCellSize: resolvePaneCellSize,
         });
     } catch (error) {
         handleAppError(error);

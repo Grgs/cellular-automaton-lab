@@ -43,7 +43,8 @@ export function createPatternPresetActionSet(
         confirmImportFn?: ((message: string) => boolean) | undefined;
         buildPatternPayloadFn?: typeof import("./pattern-io.js").buildPatternPayload | undefined;
         serializePatternPayloadFn?:
-            typeof import("./pattern-io.js").serializePatternPayload | undefined;
+            | typeof import("./pattern-io.js").serializePatternPayload
+            | undefined;
         buildPatternFilenameFn?: typeof import("./pattern-io.js").buildPatternFilename | undefined;
         downloadPatternFileFn?: typeof import("./pattern-io.js").downloadPatternFile | undefined;
         readPatternFileFn?: typeof import("./pattern-io.js").readPatternFile | undefined;

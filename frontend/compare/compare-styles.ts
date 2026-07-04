@@ -588,34 +588,24 @@ export const COMPARE_PANEL_STYLES = `
     width: min(100%, 220px);
     height: auto;
 }
-.compare-filmstrip-board { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.compare-filmstrip-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.compare-filmstrip-board:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 4px;
+}
 .compare-filmstrip-board-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 6px;
     width: 100%;
-}
-.compare-filmstrip-focus {
-    flex: 0 0 auto;
-    min-width: 24px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
-    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
-    color: var(--ink, #1f2430);
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-}
-.compare-filmstrip-focus:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
-.compare-filmstrip-focus[aria-pressed="true"] {
-    border-color: var(--accent, #bf5a36);
-    background: color-mix(in srgb, var(--accent, #bf5a36) 18%, var(--btn-soft-bg, rgba(0, 0, 0, 0.06)));
-}
-.compare-filmstrip-focus:focus-visible {
-    outline: 2px solid var(--focus, #7aa7ff);
-    outline-offset: 2px;
 }
 /* Speaker view: the focused board becomes the hero, the rest a wrapping strip. */
 .compare-filmstrip--speaker .compare-filmstrip-boards {
@@ -639,7 +629,6 @@ export const COMPARE_PANEL_STYLES = `
 }
 .compare-filmstrip--speaker .compare-filmstrip-board.is-strip {
     flex: 0 0 auto;
-    cursor: pointer;
 }
 .compare-filmstrip--speaker .compare-filmstrip-board.is-strip .compare-thumb {
     width: 120px;

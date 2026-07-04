@@ -111,7 +111,8 @@ export interface SetCellsRequestFunction {
 export interface InitAppOptions {
     backend?: SimulationBackend;
     bootstrapData?: AppBootstrapData | null;
-    liveCompareBaseSessionId?: string | null;
-    liveCompareBackendFactory?: (sessionId: string) => SimulationBackend;
-    liveCompareDisposeBackendsOnClose?: boolean;
+    /** Base session id the wall's live focus pane derives its child session from. */
+    paneBaseSessionId?: string | null;
+    /** Factory for the focus pane's independent backend session. */
+    paneBackendFactory?: (sessionId: string) => SimulationBackend;
 }

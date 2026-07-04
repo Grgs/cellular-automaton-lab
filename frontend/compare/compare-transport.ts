@@ -45,6 +45,8 @@ export interface FilmstripTransportController {
     attach(player: FilmstripPlayer): void;
     /** Unbind: stop the clock, unsubscribe, and return the controls to idle. */
     detach(): void;
+    /** Pause playback without detaching the current player. */
+    pause(): void;
     /** Set the playback speed multiplier (must match a speed-selector option). */
     setSpeed(multiplier: number): void;
     /** Toggle play/pause on the attached player (used by keyboard idioms). */
@@ -200,6 +202,9 @@ export function createFilmstripTransport(
             unsubscribe = null;
             currentPlayer = null;
             setIdle();
+        },
+        pause(): void {
+            currentPlayer?.pause();
         },
         setSpeed(multiplier: number): void {
             const value = String(multiplier);

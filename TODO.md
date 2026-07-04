@@ -17,41 +17,31 @@ The `v0.4.0` public preview has been released (after `v0.1.0`, `v0.2.0`, and `v0
 - Add an automated post-deploy GitHub Pages smoke check if the preview release cadence becomes regular; the manual smoke routine and pre/post release publication guard now live in [docs/MAINTENANCE.md](docs/MAINTENANCE.md#public-release-process).
 - Revisit whether the verification-strength JSON report should become a CI artifact once there is a concrete consumer for it.
 
-## Compare workspace & synchronized side-by-side
+## Comparison wall (wall-first UI) — done
 
-Roadmap to "complete" for the compare-as-a-first-class-workspace feature. The
-synchronized side-by-side engine, the live N-board view, the panel/modal
-decoupling, the `#/compare` hash route, and the full-page workspace presentation
-are done (see [CHANGELOG.md](CHANGELOG.md); routing + full-page land via the
-open compare PRs). What remains, sequenced, one reviewable PR per step.
+The compare-as-a-first-class-workspace feature shipped and then became the app's
+landing experience via the wall-first overhaul (targets `v0.6.0`; see
+[CHANGELOG.md](CHANGELOG.md)). Delivered: the synchronized side-by-side engine
+and live N-board view; the stage-first workspace with a docked transport on one
+shared clock; gallery ↔ speaker view with a deep-linkable `&focus=` slot; the
+wall as the bare-URL landing with a first-visit autoplaying demo; the editor as
+the routed `#/lab`; a speaker-view seed rail; per-board live forking into an
+independent editable pane (reusable `frontend/pane/` primitive); and the
+retirement of the two-editable-pane Split View.
 
-Decisions already taken (so the steps are unambiguous):
+Decisions that held throughout:
 
-- **Persistence is client-side** (`localStorage`), namespaced. Keeps the server
-  and standalone Pyodide builds symmetric; cross-device transfer is handled by
-  run links, not a server store.
-- **Run links reconstruct-and-wait**: opening a run link populates the workspace
-  and selects the tilings but does not auto-run or auto-play, to avoid surprise
-  compute on cold load.
-- **Navigation is wall-first** (decision reversed by the wall-first overhaul):
-  the comparison wall is the landing view at the bare URL, the editor is the
-  routed `#/lab`, and the floating compare toggle is gone. `#/compare` stays
-  parsed forever as a legacy alias for the wall.
-- **Standalone parity is mandatory** for every step: hash/`localStorage` only, no
-  server-only state.
+- **Persistence is client-side** (`localStorage`), namespaced. Server and
+  standalone Pyodide builds stay symmetric; cross-device transfer is run links.
+- **Run links reconstruct-and-wait**: a run link populates the wall and selects
+  tilings but does not auto-run or auto-play, to avoid surprise cold-load compute.
+- **Navigation is wall-first**: bare URL → wall, `#share=` → Lab (`#/lab`); the
+  legacy `#/compare` stays parsed forever as an alias for the wall.
+- **Standalone parity**: hash/`localStorage` only; the live focus pane forks into
+  its own persist-free Pyodide environment (no server sessions in standalone).
 
-### Closeout — definition of done
-
-- Standalone smoke coverage: **done** — the Playwright standalone suite now
-  exercises the run-link deep link (C1) and saved-run persistence across reload
-  (C3) against the Pyodide build. C2's open-in-build reuses the host
-  `onOpenPattern`/`loadPattern` path (no standalone-specific surface) and is
-  covered by the frontend vitest suite.
-- The feature is complete when, in **both** the server and standalone builds, you
-  can: open `#/compare`, build a side-by-side run, play it synchronized, open a
-  frame into build, save the run, reload and restore it, and open a copied run
-  link in a fresh tab — with green CI and updated docs. The only remaining gate is
-  merging the open compare PR into `main`.
+Possible follow-ups (not scheduled): allow more than one live fork at a time; a
+history-gated demo prominence; true code-split of the analytics charts.
 
 ## Now
 

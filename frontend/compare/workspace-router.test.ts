@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
-import type { AppBootstrapData, SimulationSnapshot } from "../types/domain.js";
+import type {
+    AppBootstrapData,
+    FilmstripRequest,
+    SeedFilmstripResult,
+    SimulationSnapshot,
+    TopologySpec,
+} from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 
 function bootstrapData(): AppBootstrapData {
@@ -29,7 +35,12 @@ function bootstrapData(): AppBootstrapData {
     });
     return {
         app_defaults: {} as AppBootstrapData["app_defaults"],
-        topology_catalog: [topology("Square", "square", "regular")],
+        topology_catalog: [
+            topology("Square", "square", "regular"),
+            topology("Trihexagonal 3.6.3.6", "trihexagonal-3-6-3-6", "periodic"),
+            topology("Penrose P3", "penrose-p3-rhombs", "aperiodic"),
+            topology("Hat monotile", "hat-monotile", "aperiodic"),
+        ],
         periodic_face_tilings: [],
         aperiodic_families: [],
         server_meta: { app_name: "test" },
@@ -57,14 +68,41 @@ function fakeBackend(): SimulationBackend {
             degenerate: false,
             results: [],
         }),
-        requestFilmstrip: async () => ({
-            rule_name: "conway",
-            seed: "",
-            traversal: "bfs",
-            frame_count: 0,
-            grid_size: 12,
-            tilings: [],
-        }),
+        requestFilmstrip: vi.fn(
+            async (request: FilmstripRequest): Promise<SeedFilmstripResult> => ({
+                rule_name: request.rule ?? "conway",
+                seed: request.seed,
+                traversal: request.traversal ?? "bfs",
+                frame_count: request.frames ?? 12,
+                grid_size: request.grid_size ?? 12,
+                tilings: request.geometries.map((geometry) => {
+                    const topologySpec: TopologySpec = {
+                        tiling_family: geometry,
+                        adjacency_mode: "edge",
+                        sizing_mode: "grid",
+                        width: 2,
+                        height: 2,
+                        patch_depth: 0,
+                    };
+                    return {
+                        geometry,
+                        tiling_family: geometry,
+                        family: "regular",
+                        cell_count: 4,
+                        topology: {
+                            topology_revision: "t",
+                            topology_spec: topologySpec,
+                            cells: [],
+                        },
+                        topology_spec: topologySpec,
+                        frames: [{ "c:0:0": 1 }, { "c:1:0": 1 }],
+                        extinction_step: null,
+                        period: null,
+                        note: null,
+                    };
+                }),
+            }),
+        ),
         previewTopology: async () => ({
             topology_revision: "t",
             topology_spec: {
@@ -296,7 +334,7 @@ describe("mountWorkspaceRouter", () => {
         expect(typeof JSON.parse(raw).demoSeenAt).toBe("number");
     });
 
-    it("does not autoplay the demo when it was already seen", async () => {
+    it("loads the default filmstrip without autoplay when the demo was already seen", async () => {
         await mount();
 
         await vi.waitFor(() => {
@@ -305,8 +343,15 @@ describe("mountWorkspaceRouter", () => {
         const shapeSelect = [
             ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
         ].find((select) => [...select.options].some((option) => option.value === "r-pentomino"));
-        // Bit-seed mode is the untouched default; the demo did not apply its config.
-        expect(shapeSelect?.value).toBe("");
+        expect(shapeSelect?.value).toBe("r-pentomino");
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(4);
+        });
+        expect(
+            document.querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[title="Play / pause"]',
+            )?.textContent,
+        ).toBe("▶ Play");
     });
 
     it("does not autoplay the demo over a run link, even on a first visit", async () => {
