@@ -9,6 +9,7 @@
  */
 
 const COMPARE_ROUTE_SEGMENT = "/compare";
+const FOCUS_SLOT_PREFIX = "focus=";
 
 function splitHash(hash: string): string[] {
     const trimmed = hash.startsWith("#") ? hash.slice(1) : hash;
@@ -39,4 +40,30 @@ export function hashWithCompareRoute(hash: string): string {
 /** Remove the compare route from a hash, preserving any other slots (idempotent). */
 export function hashWithoutCompareRoute(hash: string): string {
     return joinHash(splitHash(hash).filter((segment) => segment !== COMPARE_ROUTE_SEGMENT));
+}
+
+/** The focused board's geometry key, when the hash addresses speaker view. */
+export function readFocusFromHash(hash: string): string | null {
+    const segment = splitHash(hash).find((slot) => slot.startsWith(FOCUS_SLOT_PREFIX));
+    if (!segment) {
+        return null;
+    }
+    const value = segment.slice(FOCUS_SLOT_PREFIX.length);
+    try {
+        return decodeURIComponent(value) || null;
+    } catch {
+        return value || null;
+    }
+}
+
+/** Set the focused geometry slot, replacing any existing one (preserves other slots). */
+export function hashWithFocus(hash: string, geometry: string): string {
+    const segments = splitHash(hash).filter((slot) => !slot.startsWith(FOCUS_SLOT_PREFIX));
+    segments.push(`${FOCUS_SLOT_PREFIX}${encodeURIComponent(geometry)}`);
+    return joinHash(segments);
+}
+
+/** Remove the focus slot, returning to gallery view (idempotent). */
+export function hashWithoutFocus(hash: string): string {
+    return joinHash(splitHash(hash).filter((slot) => !slot.startsWith(FOCUS_SLOT_PREFIX)));
 }

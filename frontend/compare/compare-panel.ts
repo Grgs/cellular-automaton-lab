@@ -153,9 +153,12 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             return;
         }
         if (event.key === "Escape") {
-            // Let an open action menu swallow Escape first; only close the dialog
-            // when no menu consumed it.
+            // Escape peels back one layer at a time: an open action menu first,
+            // then speaker view (back to the gallery), then the dialog itself.
             if (content.handleEscape()) {
+                return;
+            }
+            if (content.exitFocusIfAny()) {
                 return;
             }
             close();

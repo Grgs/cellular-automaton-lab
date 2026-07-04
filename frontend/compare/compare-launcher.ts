@@ -18,6 +18,7 @@ import {
     hashHasCompareRoute,
     hashWithCompareRoute,
     hashWithoutCompareRoute,
+    hashWithoutFocus,
 } from "./compare-route.js";
 
 const TOGGLE_STYLE_ID = "compare-toggle-styles";
@@ -141,7 +142,10 @@ export function mountCompareLauncher(options: MountCompareLauncherOptions): Comp
     // the route into the hash; a hashchange (e.g. the back button) drives the panel.
     function navigateCompare(toCompare: boolean): void {
         const current = window.location.hash;
-        const next = toCompare ? hashWithCompareRoute(current) : hashWithoutCompareRoute(current);
+        // Leaving compare also drops the focus slot; it is meaningless without it.
+        const next = toCompare
+            ? hashWithCompareRoute(current)
+            : hashWithoutFocus(hashWithoutCompareRoute(current));
         if (next === current) {
             return;
         }

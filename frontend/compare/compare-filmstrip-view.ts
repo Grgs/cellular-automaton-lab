@@ -30,6 +30,8 @@ export interface FilmstripViewOptions {
     loop?: boolean;
     /** Called when the user wants to load one board's current generation into build mode. */
     onOpenFrame?: (tiling: TopologyFilmstrip, frameIndex: number) => void;
+    /** Called when the focused board changes (null = gallery), e.g. to mirror the hash. */
+    onFocusChange?: (geometry: string | null) => void;
 }
 
 /** Optional playback overrides applied right after a filmstrip is loaded. */
@@ -48,13 +50,17 @@ export interface FilmstripViewController {
     element: HTMLElement;
     /** Render a filmstrip and reset playback to the seed frame (paused). */
     load(filmstrip: SeedFilmstripResult, options?: FilmstripLoadOptions): Promise<void>;
+    /** Enlarge one board (speaker view) or return to the gallery (null). */
+    focus(geometry: string | null): void;
     dispose(): void;
 }
 
 interface BoardEntry {
     tiling: TopologyFilmstrip;
+    cell: HTMLElement;
     slot: HTMLElement;
     countLabel: HTMLElement;
+    focusButton: HTMLButtonElement;
     openButton?: HTMLButtonElement;
     preview?: TopologyPreview;
     error?: string;
@@ -80,6 +86,21 @@ function linkButton(label: string, title: string, onClick: () => void): HTMLButt
     return node;
 }
 
+function iconButton(label: string, title: string, onClick: () => void): HTMLButtonElement {
+    const node = document.createElement("button");
+    node.type = "button";
+    node.className = "compare-filmstrip-focus";
+    node.textContent = label;
+    node.title = title;
+    node.setAttribute("aria-label", title);
+    node.setAttribute("aria-pressed", "false");
+    node.addEventListener("click", (event) => {
+        event.stopPropagation();
+        onClick();
+    });
+    return node;
+}
+
 export function createFilmstripView(options: FilmstripViewOptions): FilmstripViewController {
     const thumbSize = options.thumbSize ?? DEFAULT_THUMB_SIZE;
     const getLiveColor = options.getLiveColor ?? (() => () => "var(--live, #1f2430)");
@@ -98,6 +119,37 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let unsubscribe: (() => void) | null = null;
     let boards: BoardEntry[] = [];
     let lastRenderedIndex = -1;
+    let focusedGeometry: string | null = null;
+
+    /** Toggle gallery/speaker classes and per-board focus affordances (no re-render). */
+    function applyFocusLayout(): void {
+        const speaker = focusedGeometry !== null;
+        root.classList.toggle("compare-filmstrip--speaker", speaker);
+        for (const entry of boards) {
+            const isHero = speaker && entry.tiling.geometry === focusedGeometry;
+            entry.cell.classList.toggle("is-hero", isHero);
+            entry.cell.classList.toggle("is-strip", speaker && !isHero);
+            entry.focusButton.setAttribute("aria-pressed", isHero ? "true" : "false");
+            entry.focusButton.title = isHero ? "Back to the gallery" : "Focus this board";
+            entry.focusButton.setAttribute(
+                "aria-label",
+                isHero ? "Back to the gallery" : `Focus ${entry.tiling.geometry}`,
+            );
+        }
+    }
+
+    function focus(geometry: string | null): void {
+        const next =
+            geometry !== null && boards.some((entry) => entry.tiling.geometry === geometry)
+                ? geometry
+                : null;
+        if (next === focusedGeometry) {
+            return;
+        }
+        focusedGeometry = next;
+        applyFocusLayout();
+        options.onFocusChange?.(focusedGeometry);
+    }
 
     function renderBoard(entry: BoardEntry, index: number): void {
         const frame = entry.tiling.frames[index] ?? {};
@@ -158,6 +210,9 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         unsubscribe = null;
         boards = [];
         lastRenderedIndex = -1;
+        // A fresh run starts in the gallery; silent so it doesn't fire onFocusChange.
+        focusedGeometry = null;
+        root.classList.remove("compare-filmstrip--speaker");
     }
 
     async function load(
@@ -177,6 +232,9 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const countLabel = el("div", "compare-filmstrip-count");
             const cell = el("div", "compare-filmstrip-board");
             cell.setAttribute("role", "listitem");
+            const focusButton = iconButton("⤢", `Focus ${tiling.geometry}`, () => {
+                focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
+            });
             const openButton = options.onOpenFrame
                 ? linkButton(
                       "Open gen 0",
@@ -184,18 +242,38 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                       () => options.onOpenFrame?.(tiling, player.index),
                   )
                 : undefined;
-            cell.append(label, slot, countLabel);
+            const header = el("div", "compare-filmstrip-board-head");
+            header.append(label, focusButton);
+            cell.append(header, slot, countLabel);
             if (openButton) {
                 cell.append(openButton);
             }
+            // In speaker view a strip thumbnail is a click target to swap focus;
+            // clicks on its buttons are handled by those buttons (stopPropagation).
+            cell.addEventListener("click", (event) => {
+                if (event.target instanceof Element && event.target.closest("button")) {
+                    return;
+                }
+                if (focusedGeometry !== null && focusedGeometry !== tiling.geometry) {
+                    focus(tiling.geometry);
+                }
+            });
             boardsArea.append(cell);
-            return { tiling, slot, countLabel, ...(openButton ? { openButton } : {}) };
+            return {
+                tiling,
+                cell,
+                slot,
+                countLabel,
+                focusButton,
+                ...(openButton ? { openButton } : {}),
+            };
         });
 
         unsubscribe = player.subscribe(onPlayerIndex);
         transport.attach(player);
         // Prime the (still "…") board skeletons before previews load.
         onPlayerIndex(player.state);
+        applyFocusLayout();
 
         await Promise.all(
             boards.map(async (entry) => {
@@ -232,6 +310,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     return {
         element: root,
         load,
+        focus,
         dispose(): void {
             teardownRun();
             root.remove();

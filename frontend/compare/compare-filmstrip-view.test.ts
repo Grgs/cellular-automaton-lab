@@ -137,6 +137,7 @@ function mountView(
     options: {
         loop?: boolean;
         onOpenFrame?: (tiling: TopologyFilmstrip, frameIndex: number) => void;
+        onFocusChange?: (geometry: string | null) => void;
         previewTopology?: SimulationBackend["previewTopology"];
     } = {},
 ): Harness {
@@ -148,9 +149,27 @@ function mountView(
         transport,
         ...(options.loop === undefined ? {} : { loop: options.loop }),
         ...(options.onOpenFrame ? { onOpenFrame: options.onOpenFrame } : {}),
+        ...(options.onFocusChange ? { onFocusChange: options.onFocusChange } : {}),
     });
     document.body.append(transport.element, view.element);
     return { view, transport, clock };
+}
+
+function twoBoardFilmstrip(): SeedFilmstripResult {
+    return filmstrip(
+        [tiling("square", [{ a: 1 }, { b: 1 }]), tiling("hex", [{ a: 1 }, { c: 1 }])],
+        2,
+    );
+}
+
+function boardFor(view: FilmstripViewController, geometry: string): HTMLElement {
+    const board = [...view.element.querySelectorAll<HTMLElement>(".compare-filmstrip-board")].find(
+        (node) => node.querySelector(".compare-filmstrip-label")?.textContent === geometry,
+    );
+    if (!board) {
+        throw new Error(`missing board: ${geometry}`);
+    }
+    return board;
 }
 
 function liveCount(view: FilmstripViewController): number {
@@ -391,5 +410,52 @@ describe("createFilmstripView", () => {
         await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }])], 1));
         expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(1);
         expect(counterText()).toBe("gen 0 / 0");
+    });
+
+    it("enlarges a focused board into speaker view and returns to the gallery", async () => {
+        const focusEvents: Array<string | null> = [];
+        const { view } = mountView({ onFocusChange: (geometry) => focusEvents.push(geometry) });
+        await view.load(twoBoardFilmstrip());
+
+        expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
+
+        view.element
+            .querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-board .compare-filmstrip-focus[aria-label="Focus square"]',
+            )
+            ?.click();
+
+        expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
+        expect(boardFor(view, "hex").classList.contains("is-strip")).toBe(true);
+        expect(focusEvents).toEqual(["square"]);
+
+        // Clicking the hero's focus control (now "Back to the gallery") exits speaker view.
+        boardFor(view, "square")
+            .querySelector<HTMLButtonElement>(".compare-filmstrip-focus")
+            ?.click();
+        expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        expect(focusEvents).toEqual(["square", null]);
+    });
+
+    it("swaps focus when a strip board is clicked in speaker view", async () => {
+        const { view } = mountView();
+        await view.load(twoBoardFilmstrip());
+        view.focus("square");
+        expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
+
+        boardFor(view, "hex").click();
+        expect(boardFor(view, "hex").classList.contains("is-hero")).toBe(true);
+        expect(boardFor(view, "square").classList.contains("is-strip")).toBe(true);
+    });
+
+    it("ignores a focus request for an unknown geometry", async () => {
+        const focusEvents: Array<string | null> = [];
+        const { view } = mountView({ onFocusChange: (geometry) => focusEvents.push(geometry) });
+        await view.load(twoBoardFilmstrip());
+
+        view.focus("not-a-tiling");
+        expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        expect(focusEvents).toEqual([]);
     });
 });
