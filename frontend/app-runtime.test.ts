@@ -182,8 +182,8 @@ describe("app runtime", () => {
         vi.doMock("./app-controller.js", () => ({
             createAppController: vi.fn(() => controller),
         }));
-        vi.doMock("./compare/compare-launcher.js", () => ({
-            mountCompareLauncher: vi.fn(() => ({ dispose: vi.fn() })),
+        vi.doMock("./compare/workspace-router.js", () => ({
+            mountWorkspaceRouter: vi.fn(() => ({ dispose: vi.fn() })),
         }));
         vi.doMock("./geometry/registry.js", () => ({
             getGeometryAdapter: vi.fn(() => ({})),

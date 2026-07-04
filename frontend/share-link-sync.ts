@@ -5,6 +5,11 @@
  * `buildPatternPayload` helper, which means the URL is only updated once the
  * topology and rule are populated. Before that we silently no-op.
  *
+ * The board mirror only runs while the hash addresses the Lab: the wall owns
+ * its own hash slots (`run=`, `focus=`), and a `share=` slot written under the
+ * wall would re-route the next reload into the Lab. The editor keeps running
+ * beneath the wall, so this guard is what keeps the two URL vocabularies apart.
+ *
  * Updates use `history.replaceState` so the user's history stack is not
  * polluted with a new entry per generation.
  */
@@ -12,6 +17,7 @@
 import { buildPatternPayload } from "./pattern-io.js";
 import { PatternValidationError } from "./parsers/pattern.js";
 import { buildHashFragmentForReplaceState } from "./share-link.js";
+import { resolveShellRoute } from "./compare/compare-route.js";
 import type { AppState } from "./types/state.js";
 
 export interface ShareLinkSyncOptions {
@@ -27,6 +33,9 @@ export function syncShareLinkUrlFromState(
     }: ShareLinkSyncOptions = {},
 ): void {
     if (!historyApi || !locationApi) {
+        return;
+    }
+    if (resolveShellRoute(locationApi.hash) !== "lab") {
         return;
     }
     let payload;

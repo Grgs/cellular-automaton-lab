@@ -1,21 +1,4 @@
 export const COMPARE_PANEL_STYLES = `
-.compare-toggle {
-    position: fixed;
-    right: 16px;
-    bottom: 16px;
-    z-index: 60;
-    padding: 10px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--btn-primary-line, rgba(0, 0, 0, 0.2));
-    background: var(--btn-primary-bg, #bf5a36);
-    color: var(--btn-primary-text, #fff);
-    font-family: var(--sans, sans-serif);
-    font-size: 13px;
-    cursor: pointer;
-    box-shadow: var(--shadow, 0 8px 24px rgba(0, 0, 0, 0.2));
-}
-.compare-toggle:hover { background: var(--btn-primary-hover, #a44928); }
-.compare-toggle:focus-visible,
 .compare-close:focus-visible,
 .compare-thumb-link:focus-visible,
 .compare-field:focus-visible,

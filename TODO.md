@@ -33,8 +33,10 @@ Decisions already taken (so the steps are unambiguous):
 - **Run links reconstruct-and-wait**: opening a run link populates the workspace
   and selects the tilings but does not auto-run or auto-play, to avoid surprise
   compute on cold load.
-- **Navigation stays the floating toggle + in-workspace "Back to build"**; header
-  Build/Compare tabs are deferred (see Maybe) to avoid an app-shell rewrite.
+- **Navigation is wall-first** (decision reversed by the wall-first overhaul):
+  the comparison wall is the landing view at the bare URL, the editor is the
+  routed `#/lab`, and the floating compare toggle is gone. `#/compare` stays
+  parsed forever as a legacy alias for the wall.
 - **Standalone parity is mandatory** for every step: hash/`localStorage` only, no
   server-only state.
 
@@ -71,7 +73,7 @@ Decisions already taken (so the steps are unambiguous):
 
 ## Maybe
 
-- Replace the floating compare toggle with explicit Build/Compare header tabs once the compare workspace is established, if the floating entry point feels secondary to its first-class status; deferred from the compare-workspace roadmap to avoid an app-shell rewrite.
+- ~~Replace the floating compare toggle with explicit Build/Compare header tabs~~ — superseded by the wall-first overhaul: the wall is the landing view, the Lab is `#/lab`, and the floating toggle is removed.
 - Extend browser-visible rendering-bounds verification from geometry-level sanity into richer layout regression checks.
 - Revisit polygon/regular geometry sharing only if square, hex, and triangle adapters start duplicating overlay or hit-test policy; keep their local math unless a shared path is clearly simpler.
 

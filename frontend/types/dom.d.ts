@@ -72,6 +72,7 @@ export interface DomElements {
     resetBtn: HTMLButtonElement | null;
     randomBtn: HTMLButtonElement | null;
     splitViewToggleBtn: HTMLButtonElement | null;
+    wallViewBtn: HTMLButtonElement | null;
     resetAllSettingsBtn: HTMLButtonElement | null;
     presetSeedControls: HTMLElement | null;
     presetSeedSelect: HTMLSelectElement | null;
