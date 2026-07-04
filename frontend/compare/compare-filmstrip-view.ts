@@ -184,8 +184,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         entry.countLabel.textContent = extinct ? "extinct" : `${liveCells} live`;
         if (entry.openButton) {
             entry.openButton.disabled = false;
-            entry.openButton.textContent = `Open gen ${index}`;
-            entry.openButton.title = `Load ${entry.tiling.geometry} generation ${index} into build mode`;
+            entry.openButton.textContent = `Fork gen ${index} →`;
+            entry.openButton.title = `Fork ${entry.tiling.geometry} generation ${index} into the Lab as an editable board`;
         }
     }
 
@@ -237,8 +237,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             });
             const openButton = options.onOpenFrame
                 ? linkButton(
-                      "Open gen 0",
-                      `Load ${tiling.geometry} generation 0 into build mode`,
+                      "Fork gen 0 →",
+                      `Fork ${tiling.geometry} generation 0 into the Lab as an editable board`,
                       () => options.onOpenFrame?.(tiling, player.index),
                   )
                 : undefined;

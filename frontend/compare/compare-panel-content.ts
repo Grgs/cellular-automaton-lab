@@ -466,6 +466,25 @@ export function createComparePanelContent(
         filmstripView.focus(readFocusFromHash(window.location.hash));
     }
 
+    // Speaker view moves the seed workspace into the rail beside the hero; the
+    // gallery returns it to the Configure disclosure.
+    function updateSeedRail(geometry: string | null): void {
+        const speaker = geometry !== null;
+        stageMain.classList.toggle("is-speaker", speaker);
+        if (speaker) {
+            seedRailBody.append(seedWorkspace);
+            seedRail.hidden = false;
+        } else {
+            seedHome?.append(seedWorkspace);
+            seedRail.hidden = true;
+        }
+    }
+
+    function handleFocusChanged(geometry: string | null): void {
+        mirrorFocusToHash(geometry);
+        updateSeedRail(geometry);
+    }
+
     function showStageHero(): void {
         stageHero.hidden = false;
         if (filmstripView) {
@@ -506,6 +525,32 @@ export function createComparePanelContent(
         seedPreviewBlock,
     ]);
 
+    // In speaker view the seed workspace is reparented into this rail beside the
+    // hero so the shared seed stays editable without leaving the wall. The seed is
+    // tiling-agnostic, so editing it re-runs every board; a per-board edit is a
+    // one-way fork into the Lab instead (the fork buttons on each board).
+    const railRerunButton = el(
+        "button",
+        {
+            class: "compare-run compare-run-secondary compare-seed-rail-rerun",
+            type: "button",
+            title: "Re-run every board from the edited seed",
+        },
+        ["Re-run wall from this seed"],
+    );
+    const seedRailBody = el("div", { class: "compare-seed-rail-body" });
+    const seedRail = el("div", { class: "compare-seed-rail", hidden: true }, [
+        el("div", { class: "compare-seed-rail-title", textContent: "Edit the shared seed" }),
+        seedRailBody,
+        railRerunButton,
+        el("p", {
+            class: "compare-seed-rail-hint",
+            textContent: "Seed edits re-run every board. Board edits fork into the Lab.",
+        }),
+    ]);
+
+    const stageMain = el("div", { class: "compare-stage-main" }, [seedRail, filmstripArea]);
+
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
     shapeSelect.addEventListener("change", () => {
         syncShapeMode();
@@ -514,8 +559,9 @@ export function createComparePanelContent(
 
     const root = el("div", { class: "compare-content" }, [
         // The synchronized side-by-side is the point of the page, so the stage
-        // leads and the video-style transport is docked directly beneath it.
-        el("div", { class: "compare-stage" }, [filmstripArea, liveStateLine]),
+        // leads and the video-style transport is docked directly beneath it. In
+        // speaker view the seed rail sits beside the hero within the stage.
+        el("div", { class: "compare-stage" }, [stageMain, liveStateLine]),
         el("div", { class: "compare-dock" }, [
             filmstripTransport.element,
             el("div", { class: "compare-actions" }, [playButton, copyRunButton, statusLine]),
@@ -550,6 +596,10 @@ export function createComparePanelContent(
             savedCompareControls(),
         ]),
     ]);
+
+    // The seed workspace's gallery home is the Configure disclosure; it shuttles
+    // between there and the speaker-view rail as focus changes.
+    const seedHome = seedWorkspace.parentElement;
 
     renderTilingChecklist();
     refreshSavedControls();
@@ -832,6 +882,7 @@ export function createComparePanelContent(
                 ? "Select at least two tilings to play them side by side"
                 : "Run every selected tiling on a shared clock and play them side by side";
         copyRunButton.disabled = disabled;
+        railRerunButton.disabled = running || selected.size < 2;
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -1249,7 +1300,7 @@ export function createComparePanelContent(
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
                     onOpenFrame: openFilmstripFrame,
-                    onFocusChange: mirrorFocusToHash,
+                    onFocusChange: handleFocusChanged,
                 });
                 filmstripArea.append(filmstripView.element);
             }
@@ -1604,6 +1655,7 @@ export function createComparePanelContent(
 
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
+    railRerunButton.addEventListener("click", () => void runFilmstrip());
     copyRunButton.addEventListener("click", copyRunLink);
     document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);

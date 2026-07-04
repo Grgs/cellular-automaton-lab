@@ -83,6 +83,41 @@ export const COMPARE_PANEL_STYLES = `
 .compare-intro { color: var(--muted, #6d756f); font-size: 13px; margin: 6px 0 14px; }
 /* Stage-first: the synchronized side-by-side leads the page. */
 .compare-stage { min-width: 0; }
+.compare-stage-main { min-width: 0; }
+/* Speaker view splits the stage into the seed rail and the hero board. */
+.compare-stage-main.is-speaker {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.compare-stage-main.is-speaker .compare-filmstrip-area {
+    flex: 1 1 480px;
+    min-width: 0;
+}
+.compare-seed-rail {
+    flex: 0 1 260px;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+    border-radius: 10px;
+    background: var(--help-bg, rgba(0, 0, 0, 0.03));
+}
+.compare-seed-rail[hidden] { display: none; }
+.compare-seed-rail-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.compare-seed-rail .compare-seed-workspace {
+    grid-template-columns: 1fr;
+    margin-top: 0;
+    gap: 12px;
+}
+.compare-seed-rail .compare-seedbits { max-width: none; }
+.compare-seed-rail-rerun { width: 100%; margin-top: 12px; }
+.compare-seed-rail-hint {
+    margin: 10px 0 0;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--muted, #6d756f);
+}
 .compare-stage-hero {
     display: flex;
     flex-direction: column;

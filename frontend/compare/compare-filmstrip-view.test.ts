@@ -337,7 +337,8 @@ describe("createFilmstripView", () => {
 
         transportButton("Step forward one generation").click();
         const openButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-open");
-        expect(openButton?.textContent).toBe("Open gen 1");
+        expect(openButton?.textContent).toBe("Fork gen 1 →");
+        expect(openButton?.title).toContain("into the Lab");
         openButton?.click();
 
         expect(opened).toEqual([{ geometry: "square", frameIndex: 1 }]);
