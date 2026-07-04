@@ -152,6 +152,8 @@ export interface ComparePanelContentHandle {
     reportRunLinkError(message: string): void;
     /** Let an open action menu consume Escape; returns true when it did. */
     handleEscape(): boolean;
+    /** Close the configuration sheet if it is open; returns true when it did. */
+    closeConfigIfOpen(): boolean;
     /** Return from speaker view to the gallery if a board is focused; true when it did. */
     exitFocusIfAny(): boolean;
     /** Handle a playback shortcut (space/arrows) once a filmstrip is live; true if consumed. */
@@ -376,6 +378,16 @@ export function createComparePanelContent(
             "aria-label": "Configure the run",
         },
         ["⚙"],
+    );
+    const configSheetCloseButton = el(
+        "button",
+        {
+            class: "compare-close compare-config-sheet-close",
+            type: "button",
+            title: "Close configuration",
+            "aria-label": "Close configuration",
+        },
+        ["✕"],
     );
     const savedRunNameInput = el("input", {
         class: "compare-field compare-saved-name",
@@ -644,7 +656,8 @@ export function createComparePanelContent(
     // In speaker view the seed workspace is reparented into this rail beside the
     // hero so the shared seed stays editable without leaving the wall. The seed is
     // tiling-agnostic, so editing it re-runs every board; a per-board edit is a
-    // one-way fork into the Lab instead (the fork buttons on each board).
+    // one-way fork, offered on the hero itself (see the hero toolbelt below), so
+    // the rail carries only the shared-seed controls.
     const railRerunButton = el(
         "button",
         {
@@ -655,28 +668,46 @@ export function createComparePanelContent(
         ["Re-run wall from this seed"],
     );
     const seedRailBody = el("div", { class: "compare-seed-rail-body" });
-    const railForkButton = el(
+    const seedRail = el("div", { class: "compare-seed-rail", hidden: true }, [
+        el("div", { class: "compare-seed-rail-title", textContent: "Edit the shared seed" }),
+        seedRailBody,
+        railRerunButton,
+        el("p", {
+            class: "compare-seed-rail-hint",
+            textContent: focusLiveEnabled
+                ? "Seed edits re-run every board. Fork the hero to edit it live while the others keep looping."
+                : "Seed edits re-run every board. Fork the hero to edit it in the Lab.",
+        }),
+    ]);
+
+    // The hero's toolbelt overlays the focused board: return to the gallery, and
+    // the single fork affordance in the app (live on the wall, or into the Lab on
+    // standalone). It is handed to the filmstrip view, which parks it on whichever
+    // board is the hero.
+    const heroBackButton = el(
         "button",
         {
-            class: "compare-run compare-run-secondary compare-seed-rail-fork",
+            class: "compare-hero-tool compare-hero-back",
+            type: "button",
+            title: "Back to the gallery",
+            "aria-label": "Back to the gallery",
+        },
+        ["← Gallery"],
+    );
+    const heroForkButton = el(
+        "button",
+        {
+            class: "compare-hero-tool compare-hero-fork",
             type: "button",
             title: focusLiveEnabled
                 ? "Fork this generation into a live, editable board on the wall"
                 : "Fork this generation into the single-board Lab",
         },
-        [focusLiveEnabled ? "⑂ Fork this board live" : "⑂ Fork this board in the Lab"],
+        [focusLiveEnabled ? "⑂ Fork live" : "⑂ Fork in Lab"],
     );
-    const seedRail = el("div", { class: "compare-seed-rail", hidden: true }, [
-        el("div", { class: "compare-seed-rail-title", textContent: "Edit the shared seed" }),
-        seedRailBody,
-        railRerunButton,
-        railForkButton,
-        el("p", {
-            class: "compare-seed-rail-hint",
-            textContent: focusLiveEnabled
-                ? "Seed edits re-run every board. Fork a board to edit it live while the others keep looping."
-                : "Seed edits re-run every board. Board edits fork into the Lab.",
-        }),
+    const heroToolbelt = el("div", { class: "compare-hero-toolbelt" }, [
+        heroBackButton,
+        heroForkButton,
     ]);
 
     const stageMain = el("div", { class: "compare-stage-main" }, [seedRail, filmstripArea]);
@@ -687,12 +718,51 @@ export function createComparePanelContent(
         seedPreview.refresh();
     });
 
+    // Configuration and data live in a bottom sheet the dock's gear slides up,
+    // closed by default, so the stage owns the whole first screen. The four
+    // disclosures inside keep their own open/closed persistence.
+    const configSheet = el("div", { class: "compare-config-sheet", inert: true }, [
+        el("div", { class: "compare-config-sheet-header" }, [
+            el("div", { class: "compare-config-sheet-title", textContent: "Set up the run" }),
+            configSheetCloseButton,
+        ]),
+        el("div", { class: "compare-config-sheet-body" }, [
+            configSection("Configure the run", "compare-config-run", true, [
+                el("div", { class: "compare-config-actions" }, [playButton]),
+                el("div", { class: "compare-form" }, [
+                    labeledField("Rule", ruleSelect),
+                    labeledField("Seed source", shapeSelect),
+                    labeledField("Traversal", traversalSelect),
+                    labeledField("Steps", stepsInput),
+                    labeledField("Grid size", gridInput),
+                ]),
+                seedWorkspace,
+            ]),
+            configSection("Tilings", "compare-config-tilings", true, [
+                el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
+            ]),
+            configSection("Cross-tiling analysis", "compare-config-analysis", false, [
+                el("div", { class: "compare-analysis" }, [
+                    el("p", {
+                        class: "compare-intro",
+                        textContent:
+                            "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
+                    }),
+                    runButton,
+                    resultsArea,
+                ]),
+            ]),
+            configSection("Saved runs and tiling sets", "compare-config-saved", false, [
+                savedCompareControls(),
+            ]),
+        ]),
+    ]);
+
     const root = el("div", { class: "compare-content" }, [
-        // The first screen is the stage plus its docked transport, sized to fill
-        // the viewport; configuration waits below the fold. The synchronized
-        // side-by-side is the point of the page, so it leads and the video-style
-        // transport docks directly beneath it. In speaker view the seed rail sits
-        // beside the hero within the stage.
+        // The stage plus its docked transport fill the viewport; the config sheet
+        // overlays from the bottom on demand. The synchronized side-by-side is the
+        // point of the page, so it leads and the video-style transport docks
+        // directly beneath it. In speaker view the seed rail sits beside the hero.
         el("div", { class: "wall-screen" }, [
             el("div", { class: "compare-stage" }, [stageMain]),
             el("div", { class: "compare-dock" }, [
@@ -702,36 +772,7 @@ export function createComparePanelContent(
                 statusLine,
             ]),
         ]),
-        // Configuration and data wait quietly below the experience, collapsed
-        // into disclosures the reader opens only when they want to tune a run.
-        configSection("Configure the run", "compare-config-run", false, [
-            el("div", { class: "compare-config-actions" }, [playButton]),
-            el("div", { class: "compare-form" }, [
-                labeledField("Rule", ruleSelect),
-                labeledField("Seed source", shapeSelect),
-                labeledField("Traversal", traversalSelect),
-                labeledField("Steps", stepsInput),
-                labeledField("Grid size", gridInput),
-            ]),
-            seedWorkspace,
-        ]),
-        configSection("Tilings", "compare-config-tilings", true, [
-            el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
-        ]),
-        configSection("Cross-tiling analysis", "compare-config-analysis", false, [
-            el("div", { class: "compare-analysis" }, [
-                el("p", {
-                    class: "compare-intro",
-                    textContent:
-                        "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
-                }),
-                runButton,
-                resultsArea,
-            ]),
-        ]),
-        configSection("Saved runs and tiling sets", "compare-config-saved", false, [
-            savedCompareControls(),
-        ]),
+        configSheet,
     ]);
 
     // The seed workspace's gallery home is the Configure disclosure; it shuttles
@@ -1023,7 +1064,7 @@ export function createComparePanelContent(
         filmstripTransport.setIdleRunEnabled(canPlay);
         copyRunButton.disabled = disabled;
         railRerunButton.disabled = running || selected.size < 2;
-        railForkButton.disabled = running;
+        heroForkButton.disabled = running;
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -1488,6 +1529,7 @@ export function createComparePanelContent(
                     loop: true,
                     onFocusChange: handleFocusChanged,
                 });
+                filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripArea.append(filmstripView.element);
             }
             showStageBoards();
@@ -1825,28 +1867,33 @@ export function createComparePanelContent(
         applyFocusFromHash();
     }
 
-    // The gear reveals the Configure disclosure below the fold and brings it into
-    // view (it becomes a proper sheet in a later phase).
-    function openConfig(): void {
-        const section = root.querySelector<HTMLDetailsElement>(".compare-config-run");
-        if (!section) {
+    // The gear slides the configuration sheet up over the stage; the sheet's own
+    // close button or Escape slides it back down. `inert` keeps the closed sheet
+    // out of the tab order and off assistive tech.
+    function openConfigSheet(): void {
+        if (configSheet.classList.contains("is-open")) {
             return;
         }
-        section.open = true;
-        if (typeof section.scrollIntoView === "function") {
-            section.scrollIntoView({
-                block: "start",
-                behavior: prefersReducedMotion() ? "auto" : "smooth",
-            });
+        configSheet.removeAttribute("inert");
+        configSheet.classList.add("is-open");
+    }
+    function closeConfigIfOpen(): boolean {
+        if (!configSheet.classList.contains("is-open")) {
+            return false;
         }
+        configSheet.classList.remove("is-open");
+        configSheet.setAttribute("inert", "");
+        return true;
     }
 
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
     railRerunButton.addEventListener("click", () => void runFilmstrip());
-    railForkButton.addEventListener("click", () => void forkFocusedBoardLive());
+    heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
+    heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
     copyRunButton.addEventListener("click", copyRunLink);
-    configButton.addEventListener("click", openConfig);
+    configButton.addEventListener("click", openConfigSheet);
+    configSheetCloseButton.addEventListener("click", () => closeConfigIfOpen());
     document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);
 
@@ -1876,6 +1923,7 @@ export function createComparePanelContent(
             }
             return false;
         },
+        closeConfigIfOpen,
         exitFocusIfAny(): boolean {
             if (currentFocusGeometry !== null && filmstripView) {
                 filmstripView.focus(null);

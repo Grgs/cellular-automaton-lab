@@ -144,10 +144,14 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             return;
         }
         if (event.key === "Escape") {
-            // Escape peels back one in-page layer at a time: an open action menu
-            // first, then speaker view (back to the gallery). It never leaves the
-            // wall -- the wall is the page, so "Open the Lab" is the only exit.
+            // Escape peels back one in-page layer at a time: an open action menu,
+            // then the config sheet, then speaker view (back to the gallery). It
+            // never leaves the wall -- the wall is the page, so "Open the Lab" is
+            // the only exit.
             if (content.handleEscape()) {
+                return;
+            }
+            if (content.closeConfigIfOpen()) {
                 return;
             }
             content.exitFocusIfAny();

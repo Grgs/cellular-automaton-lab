@@ -65,7 +65,8 @@ def _click(page: Page, selector: str) -> None:
 def _capture_compare_results(page: Page, output_dir: Path) -> None:
     # The bare URL lands on the wall page; no toggle click is needed.
     page.locator(".wall-page").wait_for(state="visible", timeout=TIMEOUT_MS)
-    # Configuration fields live in a collapsed disclosure below the stage.
+    # Configuration lives in a bottom sheet the dock gear slides up.
+    page.locator('.compare-dock-icon[aria-label="Configure the run"]').click(timeout=TIMEOUT_MS)
     page.locator(".compare-config-run").evaluate("(section) => { section.open = true; }")
     selects = page.locator("select.compare-field")
     selects.nth(1).select_option("acorn", timeout=TIMEOUT_MS)
@@ -90,26 +91,21 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
     page.locator(".compare-config-analysis").evaluate("(section) => { section.open = true; }")
     page.get_by_role("button", name="Run comparison", exact=True).click(timeout=TIMEOUT_MS)
     page.locator(".compare-grid tbody tr").nth(0).wait_for(state="visible", timeout=TIMEOUT_MS)
-    # Unpin the fixed full-page wall so a full-height capture includes the
-    # below-the-fold analysis results.
+    # Flatten the fixed config sheet so a full-height capture includes the whole
+    # analysis section, which now lives inside it.
     page.add_style_tag(
         content="""
-            .wall-page {
+            .compare-config-sheet {
                 position: absolute !important;
-                height: auto !important;
+                transform: none !important;
+                max-height: none !important;
             }
-            .compare-content {
+            .compare-config-sheet-body {
                 overflow: visible !important;
-            }
-            .wall-screen {
-                min-height: 0 !important;
-            }
-            .compare-dock {
-                position: static !important;
             }
         """
     )
-    _save_locator_png(page, ".wall-page", output_dir / "readme-compare-results-hero.png")
+    _save_locator_png(page, ".compare-config-sheet", output_dir / "readme-compare-results-hero.png")
 
 
 def _capture_wall_hero(page: Page, output_dir: Path) -> None:

@@ -446,6 +446,29 @@ describe("createFilmstripView", () => {
         expect(focusEvents).toEqual(["hex"]);
     });
 
+    it("parks the hero toolbelt on the focused board and detaches it in the gallery", async () => {
+        const { view } = mountView();
+        await view.load(twoBoardFilmstrip());
+        const toolbelt = document.createElement("div");
+        toolbelt.className = "compare-hero-toolbelt";
+        view.setHeroToolbelt(toolbelt);
+
+        // Gallery: the toolbelt is not mounted on any board.
+        expect(toolbelt.isConnected).toBe(false);
+
+        view.focus("square");
+        expect(boardFor(view, "square").contains(toolbelt)).toBe(true);
+
+        // Swapping the hero moves the toolbelt to the new hero.
+        view.focus("hex");
+        expect(boardFor(view, "hex").contains(toolbelt)).toBe(true);
+        expect(boardFor(view, "square").contains(toolbelt)).toBe(false);
+
+        // Back to the gallery detaches it.
+        view.focus(null);
+        expect(toolbelt.isConnected).toBe(false);
+    });
+
     it("swaps focus when a strip board is clicked in speaker view", async () => {
         const { view } = mountView();
         await view.load(twoBoardFilmstrip());

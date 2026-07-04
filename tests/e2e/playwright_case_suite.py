@@ -479,7 +479,9 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self._expect(".wall-page").to_be_visible()
 
         run_name = "Standalone smoke run"
-        # Saved-run controls live in a collapsed disclosure below the stage.
+        # Configuration lives in a bottom sheet the dock gear opens; the saved-run
+        # controls are a collapsed disclosure inside it.
+        self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self.page.locator(".compare-config-saved").evaluate("(section) => { section.open = true; }")
         self.page.fill('input[aria-label="Saved run name"]', run_name)
         self.page.get_by_role("button", name="Save run", exact=True).click()
@@ -504,6 +506,7 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
         # The wall is the landing view, so the reload lands straight back on it.
         self._expect(".wall-page").to_be_visible()
+        self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self.page.locator(".compare-config-saved").evaluate("(section) => { section.open = true; }")
         self._expect('select[aria-label="Saved compare runs"]').to_contain_text(run_name)
 
