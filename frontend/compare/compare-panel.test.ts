@@ -913,9 +913,7 @@ describe("mountComparePanel", () => {
                 '.compare-filmstrip-btn[title="Step forward one generation"]',
             )
             ?.click();
-        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "⑂ Fork this board in the Lab")
-            ?.click();
+        document.querySelector<HTMLButtonElement>(".compare-hero-fork")?.click();
 
         expect(onOpenPattern).toHaveBeenCalledTimes(1);
         expect(openSpy).not.toHaveBeenCalled();
@@ -1218,6 +1216,102 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("opens and closes the configuration sheet from the dock gear", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+        const sheet = () => document.querySelector<HTMLElement>(".compare-config-sheet");
+        // Closed by default: inert and not open.
+        expect(sheet()?.classList.contains("is-open")).toBe(false);
+        expect(sheet()?.hasAttribute("inert")).toBe(true);
+
+        document
+            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
+            ?.click();
+        expect(sheet()?.classList.contains("is-open")).toBe(true);
+        expect(sheet()?.hasAttribute("inert")).toBe(false);
+
+        document.querySelector<HTMLButtonElement>(".compare-config-sheet-close")?.click();
+        expect(sheet()?.classList.contains("is-open")).toBe(false);
+        expect(sheet()?.hasAttribute("inert")).toBe(true);
+        handle.dispose();
+    });
+
+    it("Escape closes the config sheet before it exits speaker view", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+        });
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+
+        const filmstrip = () => document.querySelector<HTMLElement>(".compare-filmstrip");
+        const sheet = () => document.querySelector<HTMLElement>(".compare-config-sheet");
+
+        // Enter speaker view, then open the config sheet over it.
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        document
+            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
+            ?.click();
+        expect(sheet()?.classList.contains("is-open")).toBe(true);
+
+        // First Escape closes the sheet but stays in speaker view.
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        expect(sheet()?.classList.contains("is-open")).toBe(false);
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(true);
+
+        // Second Escape returns to the gallery.
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        handle.dispose();
+    });
+
+    it("returns to the gallery from the hero's back button", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripBackend: SimulationBackend = {
+            ...backend,
+            requestFilmstrip: async () => twoBoardFilmstrip(),
+        };
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+        });
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+        const filmstrip = () => document.querySelector<HTMLElement>(".compare-filmstrip");
+
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        // The hero toolbelt's back button exits speaker view.
+        const back = document.querySelector<HTMLButtonElement>(".compare-hero-back");
+        expect(back).toBeTruthy();
+        back?.click();
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        handle.dispose();
+    });
+
     it("focuses a board into speaker view and lets Escape peel back to the gallery", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -1319,7 +1413,7 @@ describe("mountComparePanel", () => {
         expect(seedInRail()).not.toBeNull();
         expect(seedInConfigure()).toBeNull();
         expect(document.querySelector(".compare-seed-rail-hint")?.textContent).toContain(
-            "fork into the Lab",
+            "Fork the hero",
         );
 
         // Escape back to the gallery: the seed workspace returns to Configure.
@@ -1399,10 +1493,9 @@ describe("mountComparePanel", () => {
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
-        const forkLive = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
-            (button) => button.textContent === "⑂ Fork this board live",
-        );
+        const forkLive = document.querySelector<HTMLButtonElement>(".compare-hero-fork");
         expect(forkLive, "fork-live button present in speaker view").toBeTruthy();
+        expect(forkLive?.textContent).toBe("⑂ Fork live");
         forkLive?.click();
 
         await vi.waitFor(() => {
@@ -1457,9 +1550,7 @@ describe("mountComparePanel", () => {
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
-        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "⑂ Fork this board live")
-            ?.click();
+        document.querySelector<HTMLButtonElement>(".compare-hero-fork")?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-focus-pane")).not.toBeNull();
         });
@@ -1517,9 +1608,7 @@ describe("mountComparePanel", () => {
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
-        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "⑂ Fork this board live")
-            ?.click();
+        document.querySelector<HTMLButtonElement>(".compare-hero-fork")?.click();
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
 
         await vi.waitFor(() => {
@@ -1554,10 +1643,9 @@ describe("mountComparePanel", () => {
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
-        const fork = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
-            (button) => button.textContent === "⑂ Fork this board in the Lab",
-        );
+        const fork = document.querySelector<HTMLButtonElement>(".compare-hero-fork");
         expect(fork).toBeTruthy();
+        expect(fork?.textContent).toBe("⑂ Fork in Lab");
         fork?.click();
 
         // No live session: the fork opens the frame in the Lab instead.

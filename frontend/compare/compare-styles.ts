@@ -54,17 +54,19 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-close.compare-back:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
-/* The body scrolls under the fixed header; the first screen fills the viewport,
-   configuration waits below the fold. */
+/* The body under the fixed header is exactly one screen: the stage fills it and
+   the docked transport pins beneath. Configuration overlays from the bottom
+   sheet rather than scrolling below the fold, so nothing here scrolls. */
 .compare-content {
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 .wall-screen {
-    min-height: 100%;
+    height: 100%;
+    min-height: 0;
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
 }
@@ -82,24 +84,38 @@ export const COMPARE_PANEL_STYLES = `
     min-height: 0;
     display: flex;
 }
-/* Speaker view splits the stage into the seed rail and the hero board. */
+/* Speaker view splits the stage into the seed rail and the hero board. Nowrap
+   keeps the row's height bound to the stage, so the hero fills rather than
+   overflowing; narrow screens stack the rail above the hero instead. */
 .compare-stage-main.is-speaker {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 16px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    min-height: 0;
 }
 .compare-stage-main.is-speaker .compare-filmstrip-area {
     flex: 1 1 480px;
     min-width: 0;
+    min-height: 0;
 }
 .compare-seed-rail {
-    flex: 0 1 260px;
+    flex: 0 0 260px;
     min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
     padding: 12px;
     border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
     border-radius: 10px;
     background: var(--help-bg, rgba(0, 0, 0, 0.03));
+}
+@media (max-width: 860px) {
+    .compare-stage-main.is-speaker {
+        flex-direction: column;
+    }
+    .compare-seed-rail {
+        flex: 0 0 auto;
+    }
 }
 .compare-seed-rail[hidden] { display: none; }
 .compare-seed-rail-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
@@ -172,6 +188,42 @@ export const COMPARE_PANEL_STYLES = `
     outline-offset: 2px;
 }
 .compare-config-actions { margin-bottom: 12px; }
+/* Configuration lives in a bottom sheet the dock gear slides up over the stage. */
+.compare-config-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    max-height: 82dvh;
+    background: var(--panel-strong, #fff);
+    border-top: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+    box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.28);
+    transform: translateY(100%);
+    transition: transform 0.24s ease;
+}
+.compare-config-sheet.is-open { transform: translateY(0); }
+.compare-config-sheet-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+}
+.compare-config-sheet-title { font-size: 14px; font-weight: 600; }
+.compare-config-sheet-close { font-size: 18px; }
+.compare-config-sheet-body {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 18px 18px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .compare-config-sheet { transition: none; }
+}
 .compare-config {
     margin-top: 12px;
     border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
@@ -590,10 +642,11 @@ export const COMPARE_PANEL_STYLES = `
     color: var(--field-text, #1f2430);
     font-size: 12px;
 }
-/* Gallery: boards auto-fit to fill the stage like video-call participants. */
+/* Gallery: boards auto-fit to fill the stage like video-call participants. The
+   min keeps ~2 columns at common desktop widths, so four boards read as a 2x2. */
 .compare-filmstrip-boards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(320px, 42%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(46%, 480px), 1fr));
     grid-auto-rows: 1fr;
     gap: 10px 12px;
     align-content: stretch;
@@ -655,33 +708,72 @@ export const COMPARE_PANEL_STYLES = `
     opacity: 1;
 }
 .compare-filmstrip-expand { margin-left: auto; font-size: 13px; opacity: 0.85; }
-/* Speaker view: the focused board becomes the hero, the rest a wrapping strip. */
-.compare-filmstrip--speaker .compare-filmstrip-boards {
+/* The hero's toolbelt overlays the top of the focused board: back to the gallery
+   on the left, the single fork affordance on the right. */
+.compare-hero-toolbelt {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    z-index: 3;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    pointer-events: none;
+}
+.compare-hero-tool {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    border: 1px solid rgba(242, 237, 224, 0.28);
+    background: rgba(16, 20, 24, 0.78);
+    color: #f2ede0;
+    font-family: var(--sans, sans-serif);
+    font-size: 12px;
+    cursor: pointer;
+}
+.compare-hero-tool:hover { background: rgba(16, 20, 24, 0.95); }
+.compare-hero-tool:disabled { opacity: 0.5; cursor: default; }
+.compare-hero-tool:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+/* Speaker view: the hero fills the stage; the others form a bottom strip. The
+   hero spans every column of row 1; the strip boards flow across row 2 as
+   uniform tiles, centred, with collapsible empty columns. */
+.compare-filmstrip--speaker .compare-filmstrip-boards {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-columns: repeat(auto-fill, 108px);
     justify-content: center;
-    align-items: flex-start;
-    gap: 12px 16px;
-    grid-auto-rows: initial;
+    align-items: stretch;
+    gap: 10px 12px;
+    min-height: 0;
 }
 .compare-filmstrip--speaker .compare-filmstrip-board.is-hero {
-    flex: 1 1 100%;
-    order: -1;
-}
-/* Let the hero's slot span the row so the thumb's percentage width can grow. */
-.compare-filmstrip--speaker .compare-filmstrip-board.is-hero .compare-filmstrip-slot {
-    width: 100%;
-}
-.compare-filmstrip--speaker .compare-filmstrip-board.is-hero .compare-thumb {
-    width: min(100%, 560px);
-    height: auto;
+    grid-row: 1;
+    grid-column: 1 / -1;
+    min-height: 0;
 }
 .compare-filmstrip--speaker .compare-filmstrip-board.is-strip {
-    flex: 0 0 auto;
+    grid-row: 2;
+    height: 96px;
 }
-.compare-filmstrip--speaker .compare-filmstrip-board.is-strip .compare-thumb {
-    width: 120px;
-    height: auto;
+.compare-filmstrip--speaker .compare-filmstrip-slot {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+.compare-filmstrip--speaker .compare-thumb {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 .compare-filmstrip-label {
     font-size: 11px;
@@ -773,7 +865,6 @@ export const COMPARE_PANEL_STYLES = `
     background: var(--field-bg, #fff);
 }
 .compare-focus-pane-canvas { touch-action: none; }
-.compare-seed-rail-fork { width: 100%; margin-top: 8px; }
 @media (max-width: 640px) {
     .wall-header { align-items: center; }
     /* On a phone the boards want a full column and the stage can scroll. */

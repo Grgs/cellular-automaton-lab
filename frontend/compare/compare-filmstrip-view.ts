@@ -54,6 +54,8 @@ export interface FilmstripViewController {
     currentFrameIndex(): number;
     /** Overlay a node onto the focused board's slot (live fork), or restore its SVG (null). */
     setHeroOverlay(node: HTMLElement | null): boolean;
+    /** Persistent toolbelt overlaid on the hero in speaker view (null to clear). */
+    setHeroToolbelt(node: HTMLElement | null): void;
     dispose(): void;
 }
 
@@ -96,6 +98,23 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let lastRenderedIndex = -1;
     let focusedGeometry: string | null = null;
     let overlayEntry: BoardEntry | null = null;
+    let heroToolbelt: HTMLElement | null = null;
+
+    /** Move the (panel-owned) toolbelt onto the current hero, or detach it. */
+    function placeHeroToolbelt(): void {
+        if (!heroToolbelt) {
+            return;
+        }
+        const hero =
+            focusedGeometry !== null
+                ? boards.find((entry) => entry.tiling.geometry === focusedGeometry)
+                : undefined;
+        if (hero) {
+            hero.cell.append(heroToolbelt);
+        } else {
+            heroToolbelt.remove();
+        }
+    }
 
     /** Toggle gallery/speaker classes and per-board focus affordances (no re-render). */
     function applyFocusLayout(): void {
@@ -113,6 +132,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                     : `${entry.tiling.geometry}: focus this board`,
             );
         }
+        placeHeroToolbelt();
     }
 
     function focus(geometry: string | null): void {
@@ -301,6 +321,13 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 overlayEntry = null;
             }
             return true;
+        },
+        setHeroToolbelt(node: HTMLElement | null): void {
+            if (heroToolbelt && heroToolbelt !== node) {
+                heroToolbelt.remove();
+            }
+            heroToolbelt = node;
+            placeHeroToolbelt();
         },
         dispose(): void {
             teardownRun();
