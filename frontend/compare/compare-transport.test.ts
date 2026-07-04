@@ -68,6 +68,35 @@ describe("createFilmstripTransport", () => {
         expect(counterText(transport)).toBe("—");
     });
 
+    it("runs the comparison from the idle play button when a run action is provided", () => {
+        const clock = manualScheduler();
+        const runs: number[] = [];
+        const transport = createFilmstripTransport({
+            scheduler: clock.scheduler,
+            onRun: () => runs.push(1),
+        });
+        // Idle, the play button is the primary "play side by side" run action.
+        const play = control(
+            transport,
+            "Run every selected tiling on a shared clock and play them side by side",
+        );
+        expect(play.textContent).toBe("▶ Play side by side");
+        expect(play.disabled).toBe(true);
+        play.click();
+        expect(runs).toEqual([]); // gated until the run is enabled
+
+        transport.setIdleRunEnabled(true);
+        expect(play.disabled).toBe(false);
+        play.click();
+        expect(runs).toEqual([1]);
+
+        // Once a player attaches, the same button toggles playback, not the run.
+        transport.attach(new FilmstripPlayer(3));
+        control(transport, "Play / pause").click();
+        expect(clock.active()).toBe(1);
+        expect(runs).toEqual([1]);
+    });
+
     it("primes and enables the controls when a multi-frame player attaches", () => {
         const clock = manualScheduler();
         const transport = createFilmstripTransport({ scheduler: clock.scheduler });

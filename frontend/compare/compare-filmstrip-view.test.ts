@@ -136,7 +136,6 @@ interface Harness {
 function mountView(
     options: {
         loop?: boolean;
-        onOpenFrame?: (tiling: TopologyFilmstrip, frameIndex: number) => void;
         onFocusChange?: (geometry: string | null) => void;
         previewTopology?: SimulationBackend["previewTopology"];
     } = {},
@@ -148,7 +147,6 @@ function mountView(
         backend,
         transport,
         ...(options.loop === undefined ? {} : { loop: options.loop }),
-        ...(options.onOpenFrame ? { onOpenFrame: options.onOpenFrame } : {}),
         ...(options.onFocusChange ? { onFocusChange: options.onFocusChange } : {}),
     });
     document.body.append(transport.element, view.element);
@@ -334,29 +332,18 @@ describe("createFilmstripView", () => {
         expect(liveCount(view)).toBe(2);
     });
 
-    it("opens the current generation for a board when requested", async () => {
-        const opened: Array<{ geometry: string; frameIndex: number }> = [];
-        const { view } = mountView({
-            onOpenFrame: (tiling, frameIndex) => {
-                opened.push({ geometry: tiling.geometry, frameIndex });
-            },
-        });
-        await view.load(filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3));
-
-        transportButton("Step forward one generation").click();
-        const openButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-open");
-        expect(openButton?.textContent).toBe("Fork gen 1 →");
-        expect(openButton?.title).toContain("into the Lab");
-        openButton?.click();
-
-        expect(opened).toEqual([{ geometry: "square", frameIndex: 1 }]);
-    });
-
-    it("omits open-generation actions when no callback is provided", async () => {
+    it("shows board chrome (name and live count) and no per-tile fork button", async () => {
         const { view } = mountView();
-        await view.load(filmstrip([tiling("square", [{ a: 1 }])], 1));
+        await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }, { c: 1 }])], 2));
 
+        const board = boardFor(view, "square");
+        const chrome = board.querySelector(".compare-filmstrip-board-chrome");
+        expect(chrome).not.toBeNull();
+        expect(chrome?.querySelector(".compare-filmstrip-label")?.textContent).toBe("square");
+        expect(board.querySelector(".compare-filmstrip-count")?.textContent).toBe("2 live");
+        // Forking now lives in speaker view, not on every gallery tile.
         expect(view.element.querySelector(".compare-filmstrip-open")).toBeNull();
+        expect(board.querySelector("button")).toBeNull();
     });
 
     it("re-times the running clock when the speed changes", async () => {

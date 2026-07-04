@@ -63,8 +63,10 @@ def _click(page: Page, selector: str) -> None:
 
 
 def _capture_compare_results(page: Page, output_dir: Path) -> None:
-    # The bare URL lands on the wall workspace; no toggle click is needed.
-    page.locator(".compare-dialog--workspace").wait_for(state="visible", timeout=TIMEOUT_MS)
+    # The bare URL lands on the wall page; no toggle click is needed.
+    page.locator(".wall-page").wait_for(state="visible", timeout=TIMEOUT_MS)
+    # Configuration fields live in a collapsed disclosure below the stage.
+    page.locator(".compare-config-run").evaluate("(section) => { section.open = true; }")
     selects = page.locator("select.compare-field")
     selects.nth(1).select_option("acorn", timeout=TIMEOUT_MS)
     page.locator("input.compare-field").evaluate_all(
@@ -88,34 +90,37 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
     page.locator(".compare-config-analysis").evaluate("(section) => { section.open = true; }")
     page.get_by_role("button", name="Run comparison", exact=True).click(timeout=TIMEOUT_MS)
     page.locator(".compare-grid tbody tr").nth(0).wait_for(state="visible", timeout=TIMEOUT_MS)
+    # Unpin the fixed full-page wall so a full-height capture includes the
+    # below-the-fold analysis results.
     page.add_style_tag(
         content="""
-            .compare-backdrop {
+            .wall-page {
                 position: absolute !important;
-                align-items: flex-start !important;
-                padding-top: 22px !important;
+                height: auto !important;
             }
-            .compare-dialog {
-                max-height: none !important;
+            .compare-content {
                 overflow: visible !important;
+            }
+            .wall-screen {
+                min-height: 0 !important;
             }
             .compare-dock {
                 position: static !important;
             }
         """
     )
-    _save_locator_png(page, ".compare-dialog", output_dir / "readme-compare-results-hero.png")
+    _save_locator_png(page, ".wall-page", output_dir / "readme-compare-results-hero.png")
 
 
 def _capture_wall_hero(page: Page, output_dir: Path) -> None:
     # A first visit autoplays the featured demo; the reduced-motion context makes
     # it rest, paused, on a lively frame — a deterministic hero shot.
-    page.locator(".compare-dialog--workspace").wait_for(state="visible", timeout=TIMEOUT_MS)
+    page.locator(".wall-page").wait_for(state="visible", timeout=TIMEOUT_MS)
     page.locator(".compare-filmstrip-board").nth(3).wait_for(state="visible", timeout=TIMEOUT_MS)
     page.locator(".compare-filmstrip-board .compare-thumb").nth(3).wait_for(
         state="visible", timeout=TIMEOUT_MS
     )
-    _save_locator_png(page, ".compare-dialog", output_dir / "readme-wall-hero.png")
+    _save_locator_png(page, ".wall-page", output_dir / "readme-wall-hero.png")
 
 
 def _capture_snub_workspace(page: Page, output_dir: Path) -> None:

@@ -37,6 +37,13 @@ export interface FilmstripTransportOptions {
     fps?: number;
     /** Overridable clock; defaults to `window.setInterval`. */
     scheduler?: IntervalScheduler;
+    /**
+     * Before any run is attached, the play button doubles as the primary
+     * "play side by side" action so the dock carries a single control instead of
+     * a transport plus a separate run button. Once a player attaches it reverts
+     * to play/pause.
+     */
+    onRun?: () => void;
 }
 
 export interface FilmstripTransportController {
@@ -53,6 +60,8 @@ export interface FilmstripTransportController {
     toggle(): void;
     /** Step the attached player by `delta` frames (used by keyboard idioms). */
     step(delta: number): void;
+    /** Enable/disable the idle "play side by side" run action (needs `onRun`). */
+    setIdleRunEnabled(enabled: boolean): void;
 }
 
 function el(tag: string, className: string, text?: string): HTMLElement {
@@ -80,16 +89,26 @@ export function createFilmstripTransport(
 ): FilmstripTransportController {
     const fps = options.fps ?? DEFAULT_FPS;
     const scheduler = options.scheduler ?? WINDOW_SCHEDULER;
+    const onRun = options.onRun;
 
     let currentPlayer: FilmstripPlayer | null = null;
     let unsubscribe: (() => void) | null = null;
     let tickHandle: number | null = null;
+    let idleRunEnabled = false;
 
     const transport = el("div", "compare-filmstrip-transport");
     transport.setAttribute("role", "group");
     transport.setAttribute("aria-label", "Filmstrip playback controls");
 
-    const playButton = button("▶ Play", "Play / pause", () => currentPlayer?.toggle());
+    // Idle (no attached player) the play button runs the comparison; once a
+    // player attaches the same button toggles playback.
+    const playButton = button("▶ Play", "Play / pause", () => {
+        if (currentPlayer) {
+            currentPlayer.toggle();
+        } else if (onRun && idleRunEnabled) {
+            onRun();
+        }
+    });
     const stepBackButton = button("⏮", "Step back one generation", () => currentPlayer?.step(-1));
     const stepForwardButton = button("⏭", "Step forward one generation", () =>
         currentPlayer?.step(1),
@@ -153,8 +172,7 @@ export function createFilmstripTransport(
     }
 
     function setIdle(): void {
-        playButton.textContent = "▶ Play";
-        for (const control of [playButton, stepBackButton, stepForwardButton, resetButton]) {
+        for (const control of [stepBackButton, stepForwardButton, resetButton]) {
             control.disabled = true;
         }
         scrubber.disabled = true;
@@ -162,10 +180,23 @@ export function createFilmstripTransport(
         scrubber.value = "0";
         speedSelect.disabled = true;
         counter.textContent = "—";
+        // With a run action wired, the idle play button is the primary
+        // "play side by side" control rather than a dead play/pause.
+        if (onRun) {
+            playButton.textContent = "▶ Play side by side";
+            playButton.title =
+                "Run every selected tiling on a shared clock and play them side by side";
+            playButton.disabled = !idleRunEnabled;
+        } else {
+            playButton.textContent = "▶ Play";
+            playButton.title = "Play / pause";
+            playButton.disabled = true;
+        }
     }
 
     function onState(state: FilmstripPlayerState): void {
         playButton.textContent = state.playing ? "⏸ Pause" : "▶ Play";
+        playButton.title = "Play / pause";
         const playable = state.frameCount > 1;
         playButton.disabled = !playable;
         scrubber.disabled = !playable;
@@ -221,6 +252,14 @@ export function createFilmstripTransport(
         },
         step(delta: number): void {
             currentPlayer?.step(delta);
+        },
+        setIdleRunEnabled(enabled: boolean): void {
+            idleRunEnabled = enabled;
+            // Only the idle state exposes the run action; a live player owns the
+            // button otherwise.
+            if (!currentPlayer && onRun) {
+                playButton.disabled = !enabled;
+            }
         },
     };
 }

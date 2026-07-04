@@ -339,9 +339,10 @@ export function createComparePanelContent(
     traversalSelect.addEventListener("change", refreshPreview);
     gridInput.addEventListener("change", refreshPreview);
 
-    // "Play side by side" is the showcase action, so it is the primary button;
-    // the analytical "Run comparison" is secondary and lives in the analysis
-    // section below the live boards.
+    // "Play side by side" builds (or rebuilds) the live run. The dock's play
+    // button triggers it before a run exists; this primary button in Configure
+    // rebuilds after the seed, rule, or tiling set is edited. The analytical
+    // "Run comparison" is secondary and lives in the analysis section.
     const runButton = el("button", { class: "compare-run compare-run-secondary", type: "button" }, [
         "Run comparison",
     ]);
@@ -354,14 +355,27 @@ export function createComparePanelContent(
         },
         ["▶ Play side by side"],
     );
+    // Copy-link and configure collapse into compact dock icons rather than
+    // labelled buttons competing with the transport.
     const copyRunButton = el(
         "button",
         {
-            class: "compare-run compare-run-secondary",
+            class: "compare-dock-icon",
             type: "button",
             title: "Copy a link that restores this compare run setup",
+            "aria-label": "Copy run link",
         },
-        ["Copy run link"],
+        ["⧉"],
+    );
+    const configButton = el(
+        "button",
+        {
+            class: "compare-dock-icon",
+            type: "button",
+            title: "Configure the run",
+            "aria-label": "Configure the run",
+        },
+        ["⚙"],
     );
     const savedRunNameInput = el("input", {
         class: "compare-field compare-saved-name",
@@ -421,13 +435,10 @@ export function createComparePanelContent(
         class: "compare-saved-empty",
         id: "compare-saved-tilings-hint",
     });
-    const statusLine = el("div", { class: "compare-status", role: "status" });
-    const liveStateLine = el("div", {
-        class: "compare-live-state",
+    const statusLine = el("div", {
+        class: "compare-status",
         role: "status",
         "aria-live": "polite",
-        textContent:
-            "No live filmstrip yet. Select at least two tilings, then choose Play side by side.",
     });
     const stageHero = el("div", { class: "compare-stage-hero" }, [
         el("div", { class: "compare-stage-hero-glyph", "aria-hidden": "true", textContent: "▦" }),
@@ -442,7 +453,10 @@ export function createComparePanelContent(
         }),
     ]);
     const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [stageHero]);
-    const filmstripTransport = createFilmstripTransport();
+    // The dock's play button doubles as "play side by side" before any run is
+    // attached, so the transport owns the primary action rather than a separate
+    // button sitting beside it.
+    const filmstripTransport = createFilmstripTransport({ onRun: () => void runFilmstrip() });
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     let activeFilmstrip: SeedFilmstripResult | null = null;
@@ -674,17 +688,24 @@ export function createComparePanelContent(
     });
 
     const root = el("div", { class: "compare-content" }, [
-        // The synchronized side-by-side is the point of the page, so the stage
-        // leads and the video-style transport is docked directly beneath it. In
-        // speaker view the seed rail sits beside the hero within the stage.
-        el("div", { class: "compare-stage" }, [stageMain, liveStateLine]),
-        el("div", { class: "compare-dock" }, [
-            filmstripTransport.element,
-            el("div", { class: "compare-actions" }, [playButton, copyRunButton, statusLine]),
+        // The first screen is the stage plus its docked transport, sized to fill
+        // the viewport; configuration waits below the fold. The synchronized
+        // side-by-side is the point of the page, so it leads and the video-style
+        // transport docks directly beneath it. In speaker view the seed rail sits
+        // beside the hero within the stage.
+        el("div", { class: "wall-screen" }, [
+            el("div", { class: "compare-stage" }, [stageMain]),
+            el("div", { class: "compare-dock" }, [
+                filmstripTransport.element,
+                configButton,
+                copyRunButton,
+                statusLine,
+            ]),
         ]),
         // Configuration and data wait quietly below the experience, collapsed
         // into disclosures the reader opens only when they want to tune a run.
-        configSection("Configure the run", "compare-config-run", true, [
+        configSection("Configure the run", "compare-config-run", false, [
+            el("div", { class: "compare-config-actions" }, [playButton]),
             el("div", { class: "compare-form" }, [
                 labeledField("Rule", ruleSelect),
                 labeledField("Seed source", shapeSelect),
@@ -991,12 +1012,15 @@ export function createComparePanelContent(
         updateFamilyCountLabels();
         updatePresetButtons();
         const disabled = running || selected.size === 0;
+        const canPlay = !running && selected.size >= 2;
         runButton.disabled = disabled;
-        playButton.disabled = running || selected.size < 2;
+        playButton.disabled = !canPlay;
         playButton.title =
             selected.size < 2
                 ? "Select at least two tilings to play them side by side"
                 : "Run every selected tiling on a shared clock and play them side by side";
+        // The dock's idle play button shares the same gate as the Configure one.
+        filmstripTransport.setIdleRunEnabled(canPlay);
         copyRunButton.disabled = disabled;
         railRerunButton.disabled = running || selected.size < 2;
         railForkButton.disabled = running;
@@ -1361,8 +1385,6 @@ export function createComparePanelContent(
         resultsArea.replaceChildren();
         showStageHero();
         activeFilmstrip = null;
-        liveStateLine.textContent =
-            "Run link loaded. Choose Play side by side when you are ready to build the live filmstrip.";
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
@@ -1438,14 +1460,11 @@ export function createComparePanelContent(
         disposeFocusPane();
         if (selected.size < 2) {
             statusLine.textContent = "Select at least two tilings to play side by side.";
-            liveStateLine.textContent =
-                "The live filmstrip needs two or more selected tilings for comparison.";
             showStageHero();
             return;
         }
         setRunning(true);
         statusLine.textContent = `Building filmstrip for ${selected.size} tilings…`;
-        liveStateLine.textContent = "Building live side-by-side filmstrip…";
 
         const request: FilmstripRequest = {
             seed: seedInput.value,
@@ -1467,7 +1486,6 @@ export function createComparePanelContent(
                     transport: filmstripTransport,
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
-                    onOpenFrame: openFilmstripFrame,
                     onFocusChange: handleFocusChanged,
                 });
                 filmstripArea.append(filmstripView.element);
@@ -1484,28 +1502,14 @@ export function createComparePanelContent(
                     behavior: prefersReducedMotion() ? "auto" : "smooth",
                 });
             }
-            liveStateLine.textContent = `Live filmstrip ready with ${filmstrip.tilings.length} tilings and ${filmstrip.frame_count} generations.`;
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            liveStateLine.textContent = `Live filmstrip failed: ${message}`;
             statusLine.textContent = `Error: ${message}`;
             showStageHero();
         } finally {
             setRunning(false);
         }
-    }
-
-    function openFilmstripFrame(tiling: TopologyFilmstrip, frameIndex: number): void {
-        if (!activeFilmstrip) {
-            return;
-        }
-        const pattern = buildFilmstripFramePattern(activeFilmstrip, tiling, frameIndex);
-        if (!pattern) {
-            statusLine.textContent = "This generation cannot be opened in build mode.";
-            return;
-        }
-        openPattern(pattern);
     }
 
     function renderResults(comparison: Parameters<typeof buildPhasePortraitSvg>[0]): void {
@@ -1821,11 +1825,28 @@ export function createComparePanelContent(
         applyFocusFromHash();
     }
 
+    // The gear reveals the Configure disclosure below the fold and brings it into
+    // view (it becomes a proper sheet in a later phase).
+    function openConfig(): void {
+        const section = root.querySelector<HTMLDetailsElement>(".compare-config-run");
+        if (!section) {
+            return;
+        }
+        section.open = true;
+        if (typeof section.scrollIntoView === "function") {
+            section.scrollIntoView({
+                block: "start",
+                behavior: prefersReducedMotion() ? "auto" : "smooth",
+            });
+        }
+    }
+
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
     railRerunButton.addEventListener("click", () => void runFilmstrip());
     railForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     copyRunButton.addEventListener("click", copyRunLink);
+    configButton.addEventListener("click", openConfig);
     document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);
 
