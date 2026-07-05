@@ -54,7 +54,7 @@ For maintenance workflows and repo-owned guardrails, see [MAINTENANCE.md](./MAIN
 1. [frontend/server-entry.ts](../frontend/server-entry.ts)
    Canonical server host entrypoint.
 2. [frontend/app-runtime.ts](../frontend/app-runtime.ts)
-   `initApp(...)` creates the top-level controller and marks the app ready.
+   `initApp(...)` mounts the wall⇄Lab workspace router into the shared shell and marks the app ready once the landing route settles; the editor controller boots lazily on first entry to `#/lab`.
 3. [frontend/app-controller.ts](../frontend/app-controller.ts)
    `createAppController(...)` composes state, view, actions, sync, and interactions.
 4. [frontend/app-controller-startup.ts](../frontend/app-controller-startup.ts)

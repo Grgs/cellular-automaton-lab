@@ -14,7 +14,7 @@ Live standalone demo: [https://grgs.github.io/cellular-automaton-lab/](https://g
 
 **First time here?** [`docs/ONBOARDING.md`](docs/ONBOARDING.md) is a one-page decision tree -- find the row that matches what you want to do (run the app, add a tiling, use the topology library, etc.) and follow the link. The [`examples/`](examples/README.md) directory has short, runnable Python scripts for each major subsystem.
 
-![Compare results showing one acorn seed evaluated across representative tilings](docs/images/readme-compare-results-hero.png)
+![The comparison wall: one seed and rule playing in lockstep across four tilings](docs/images/readme-wall-hero.png)
 
 ## Project Scope
 
@@ -28,13 +28,17 @@ It is intended for comparing how familiar automata behave on different local nei
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
-- wall-first UI: the app lands on the comparison wall (one seed and rule playing in lockstep across many tilings), zooms any board into a speaker view, forks a generation into a live editable board, and treats the single-board editor as the routed `#/lab` (also scriptable via `python -m tools tilings compare`)
+- wall-first UI in one shell: the app lands on the comparison wall (one seed and rule playing in lockstep across many tilings), zooms any board into a speaker view, and forks a generation into a live editable board; the single-board editor is the routed `#/lab` inside the same header/stage/dock shell and boots lazily (also scriptable via `python -m tools tilings compare`)
 - sparse pattern persistence keyed by stable topology cell IDs
 - TypeScript frontend in `frontend/` with Vitest unit tests and Playwright browser coverage
 
 ## Screenshots
 
-### Snub Trihexagonal mixed-tiling board with the inspector open
+### Analytical compare run with per-tiling metrics
+
+![Compare results showing one acorn seed evaluated across representative tilings](docs/images/readme-compare-results-hero.png)
+
+### Snub Trihexagonal mixed-tiling board in the Lab
 
 ![Snub Trihexagonal mixed Life](docs/images/readme-snub-trihexagonal-overview.png)
 
@@ -55,7 +59,7 @@ It is intended for comparing how familiar automata behave on different local nei
 - Switch to Penrose P1 and compare the `Distributed` and `Boat-Star` construction modes to see the difference between the distributed vertex-merge manifestation and the centered singular pentagrid patch.
 - Try the convex pentagonal periodic catalog with Cairo, Prismatic, Floret, Type 7, Stein 14, and Pentagon Crosses to compare how the same rule family behaves on distinct pentagon adjacencies.
 - Try Whirlpool or HexWhirlpool from the preset/showcase controls for a quick multi-state animation that exercises more than binary Life-like states.
-- Open the app on the comparison wall, press **Play side by side** to watch one seed evolve across the selected tilings, click a board to zoom into speaker view, and use **⑂ Fork this board live** to keep editing that generation while the others keep looping. Press **⊞ Wall** in the Lab to return, or open `#/lab` for the single-board editor directly.
+- Open the app on the comparison wall, press **Play side by side** to watch one seed evolve across the selected tilings, click a board to zoom into speaker view, and use the hero's **⑂ Fork live** to keep editing that generation while the others keep looping. Use the header's **Open the Lab →** / **⊞ Wall** to move between the wall and the single-board editor (`#/lab`).
 - Reload the standalone GitHub Pages demo after changing topology or state to check browser persistence without the Flask server.
 
 ## The Comparison Wall
