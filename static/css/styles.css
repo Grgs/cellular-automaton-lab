@@ -458,12 +458,15 @@ h1.wall-brand {
     min-height: 28px;
 }
 
-/* The picker menu opens upward from the dock. */
-.lab-dock .tiling-picker-menu {
-    top: auto;
-    bottom: calc(100% + 8px);
-    left: auto;
-    right: 12px;
+/* The picker menu opens upward from the dock; on narrow screens the mobile
+   full-screen menu rule (below) must win instead. */
+@media (min-width: 861px) {
+    .lab-dock .tiling-picker-menu {
+        top: auto;
+        bottom: calc(100% + 8px);
+        left: auto;
+        right: 12px;
+    }
 }
 
 .canvas-shell {
@@ -484,68 +487,6 @@ h1.wall-brand {
 
 :root[data-theme="dark"] .control-drawer {
     background: rgba(17, 23, 32, 0.98);
-}
-
-.top-bar {
-    padding: 10px 12px;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    width: 100%;
-    max-width: 100%;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-    z-index: 50;
-}
-
-.top-bar.is-tiling-picker-open {
-    z-index: 61;
-}
-
-.top-bar > * {
-    min-width: 0;
-}
-
-.top-bar-brand {
-    display: grid;
-    gap: 2px;
-    min-width: 148px;
-    flex: 0 0 auto;
-    align-content: center;
-}
-
-.eyebrow {
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--accent-dark);
-    font-family: var(--mono);
-    font-size: 0.62rem;
-}
-
-h1 {
-    margin: 0;
-    font-size: clamp(1.02rem, 1.4vw, 1.45rem);
-    line-height: 1.05;
-}
-
-.top-bar-strip {
-    min-width: 0;
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.top-bar-summary {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 6px;
-    align-items: stretch;
-    flex: 0 0 auto;
-    min-width: 0;
 }
 
 .summary-chip,
@@ -588,48 +529,6 @@ h1 {
     letter-spacing: 0.02em;
 }
 
-.top-bar-controls {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-    align-items: center;
-    justify-content: flex-end;
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.top-bar-control-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-left: 10px;
-    border-left: 1px solid var(--status-tile-line);
-}
-
-.top-bar-control-group:first-child {
-    padding-left: 0;
-    border-left: 0;
-}
-
-.top-bar-topology-group {
-    flex: 0 0 clamp(220px, 20vw, 300px);
-    min-width: 0;
-}
-
-.top-bar-tiling-control {
-    z-index: 8;
-}
-
-.top-bar-actions-group {
-    flex: 0 0 auto;
-    margin-left: auto;
-    gap: 4px;
-    padding: 4px;
-    border: 1px solid var(--status-tile-line);
-    border-radius: 16px;
-    background: var(--status-tile-bg);
-}
-
 .top-control {
     display: grid;
     gap: 4px;
@@ -639,11 +538,6 @@ h1 {
 
 .compact-select {
     min-width: 138px;
-}
-
-.top-bar-tiling-control {
-    width: 100%;
-    min-width: 0;
 }
 
 .top-control-label {
@@ -1110,14 +1004,6 @@ button.primary-action {
 
 button.primary-action:hover:not(:disabled) {
     background-color: var(--btn-primary-hover);
-}
-
-.top-bar-action {
-    min-width: 58px;
-    padding: 5px 10px;
-    border-radius: 10px;
-    box-shadow: none;
-    white-space: nowrap;
 }
 
 button.is-running {
@@ -2406,93 +2292,7 @@ button.theme-toggle .theme-icon-moon {
     }
 }
 
-@media (max-width: 1200px) {
-    .top-bar {
-        gap: 10px;
-    }
-
-    .top-bar-strip {
-        align-items: stretch;
-        flex-wrap: wrap;
-    }
-
-    .top-bar-controls {
-        width: 100%;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .top-bar-control-group {
-        flex-wrap: wrap;
-    }
-
-    .top-bar-actions-group {
-        margin-left: 0;
-    }
-
-    .top-bar-brand {
-        min-width: 132px;
-    }
-
-    .top-bar-tiling-control {
-        min-width: 0;
-    }
-}
-
 @media (max-width: 860px) {
-    .app-frame {
-        width: min(1400px, calc(100vw - 16px));
-        height: 100dvh;
-        min-height: 100dvh;
-        padding: 6px 0;
-        gap: 8px;
-    }
-
-    .top-bar {
-        padding: 12px;
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .top-bar-brand,
-    .top-bar-strip,
-    .top-bar-summary,
-    .top-bar-controls {
-        flex-basis: 100%;
-        min-width: 0;
-    }
-
-    .top-bar-strip {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 10px;
-    }
-
-    .top-bar-summary,
-    .top-bar-controls {
-        width: 100%;
-        max-width: 100%;
-        flex-wrap: wrap;
-    }
-
-    .top-bar-controls {
-        min-width: 0;
-        justify-content: flex-start;
-    }
-
-    .top-bar-control-group {
-        width: 100%;
-        min-width: 0;
-        padding-left: 0;
-        border-left: 0;
-        flex-wrap: wrap;
-    }
-
-    .top-bar-tiling-control {
-        width: 100%;
-        min-width: 0;
-    }
-
     .tiling-picker-control {
         grid-template-columns: minmax(0, 1fr);
         width: 100%;
@@ -2558,14 +2358,6 @@ button.theme-toggle .theme-icon-moon {
 
     .sync-pill {
         width: 100%;
-    }
-
-    .main-stage,
-    .main-stage.is-drawer-open {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        height: 100%;
-        min-height: 0;
     }
 
     .canvas-shell {

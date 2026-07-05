@@ -37,7 +37,7 @@ The public release line is a preview series: tagged GitHub source release plus t
 - `SimulationBackend` now includes `dispose()`.
 - The HTTP backend implements disposal as a no-op.
 - The standalone backend terminates the worker, removes its listeners, and rejects pending requests during disposal.
-- `AppController` now exposes `dispose()`, and `initApp()` returns the created controller.
+- `AppController` now exposes `dispose()`; `initApp()` resolves once the landing route is interactive (the editor controller itself boots lazily on first entry to `#/lab`).
 - Both server and standalone entrypoints install `pagehide` cleanup so browser teardown and Playwright tests can release the active controller explicitly.
 
 ## Build Commands

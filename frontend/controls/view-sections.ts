@@ -150,9 +150,6 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
     if (elements.ruleSummaryText) {
         elements.ruleSummaryText.textContent = viewModel.ruleSummaryText;
     }
-    if (elements.mainStage) {
-        elements.mainStage.classList.toggle("is-drawer-open", Boolean(viewModel.drawerVisible));
-    }
     if (elements.controlDrawer) {
         elements.controlDrawer.dataset.open = String(Boolean(viewModel.drawerVisible));
         elements.controlDrawer.setAttribute(

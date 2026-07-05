@@ -26,8 +26,11 @@ and live N-board view; the stage-first workspace with a docked transport on one
 shared clock; gallery ↔ speaker view with a deep-linkable `&focus=` slot; the
 wall as the bare-URL landing with a first-visit autoplaying demo; the editor as
 the routed `#/lab`; a speaker-view seed rail; per-board live forking into an
-independent editable pane (reusable `frontend/pane/` primitive); and the
-retirement of the two-editable-pane Split View.
+independent editable pane (reusable `frontend/pane/` primitive); the retirement
+of the two-editable-pane Split View; and the one-shell redesign that dissolved
+the Lab into the wall's page (one static header with a wall⇄Lab toggle, one
+bottom-dock idiom, the inspector drawer as a bottom sheet, and a lazily booted
+editor controller so wall landings never spin up the single-board editor).
 
 Decisions that held throughout:
 
