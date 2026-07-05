@@ -355,7 +355,9 @@ def save_canvas_png(page: Page, path: Path) -> None:
 
 
 def wait_for_page_bootstrapped(page: Page, *, timeout_ms: int = 30_000) -> None:
-    page.wait_for_selector("#grid", timeout=timeout_ms)
+    # Attached, not visible: on wall routes the Lab root (and its canvas) is
+    # hidden inside the one-shell layout, but the shell is still bootstrapped.
+    page.wait_for_selector("#grid", state="attached", timeout=timeout_ms)
     page.wait_for_function("() => document.readyState === 'complete'", timeout=timeout_ms)
     page.wait_for_function(
         """() => {

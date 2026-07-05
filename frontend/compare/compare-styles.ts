@@ -1,5 +1,4 @@
 export const COMPARE_PANEL_STYLES = `
-.compare-close:focus-visible,
 .compare-thumb-link:focus-visible,
 .compare-field:focus-visible,
 .compare-seedpad-width:focus-visible,
@@ -10,12 +9,11 @@ export const COMPARE_PANEL_STYLES = `
     outline: 2px solid var(--focus, #7aa7ff);
     outline-offset: 2px;
 }
-/* The wall is the page: a fixed full-viewport surface (slim header over a
-   scrollable stage/dock/config body), not a dialog floating on a backdrop. */
+/* The wall fills the shared shell's content slot beneath the static header;
+   the shell (styles.css) owns the header and the dock idiom. */
 .wall-page {
-    position: fixed;
-    inset: 0;
-    z-index: 70;
+    height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     background: var(--panel-strong, #fff);
@@ -24,36 +22,6 @@ export const COMPARE_PANEL_STYLES = `
 }
 .wall-page[hidden] { display: none; }
 .wall-page:focus { outline: none; }
-.wall-header {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 18px;
-    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
-}
-.wall-brand { font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
-.compare-close {
-    border: none;
-    background: transparent;
-    font-size: 24px;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--muted, #6d756f);
-}
-.compare-close.compare-back {
-    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
-    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
-    color: var(--ink, #1f2430);
-    font-family: var(--sans, sans-serif);
-    font-size: 13px;
-    line-height: 1;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-.compare-close.compare-back:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
 /* The body under the fixed header is exactly one screen: the stage fills it and
    the docked transport pins beneath. Configuration overlays from the bottom
    sheet rather than scrolling below the fold, so nothing here scrolls. */
@@ -153,40 +121,9 @@ export const COMPARE_PANEL_STYLES = `
 /* One dock: the transport plus the config/copy icons and the status line on a
    single row, pinned to the bottom of the first screen and reachable while the
    configuration disclosures scroll underneath. */
-.compare-dock {
-    position: sticky;
-    bottom: 0;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    gap: 8px 10px;
-    flex-wrap: wrap;
-    padding: 10px 18px 12px;
-    background: var(--panel-strong, #fff);
-    border-top: 1px solid var(--line, rgba(0, 0, 0, 0.12));
-}
+/* The dock idiom itself lives in styles.css (shared with the Lab dock); only
+   the wall-specific composition remains here. */
 .compare-dock .compare-filmstrip-transport { flex: 1 1 420px; }
-.compare-dock-icon {
-    flex: 0 0 auto;
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    font-size: 16px;
-    border-radius: 7px;
-    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
-    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
-    color: var(--ink, #1f2430);
-    cursor: pointer;
-}
-.compare-dock-icon:hover { background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12)); }
-.compare-dock-icon:disabled { opacity: 0.5; cursor: default; }
-.compare-dock-icon:focus-visible {
-    outline: 2px solid var(--focus, #7aa7ff);
-    outline-offset: 2px;
-}
 .compare-config-actions { margin-bottom: 12px; }
 /* Configuration lives in a bottom sheet the dock gear slides up over the stage. */
 .compare-config-sheet {

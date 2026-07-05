@@ -6,7 +6,7 @@ function setTilingPickerOpen(elements: DomElements, open: boolean): void {
     if (elements.tilingPickerMenu) {
         elements.tilingPickerMenu.hidden = !open;
     }
-    elements.topBar?.classList.toggle("is-tiling-picker-open", open);
+    elements.labDock?.classList.toggle("is-tiling-picker-open", open);
     if (elements.tilingPickerToggle) {
         elements.tilingPickerToggle.setAttribute("aria-expanded", open ? "true" : "false");
     }

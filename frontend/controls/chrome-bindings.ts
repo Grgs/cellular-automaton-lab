@@ -13,9 +13,9 @@ export function bindChromeControls(elements: DomElements, actions: AppActionSet)
         });
     }
 
-    if (elements.topBar && actions.handleTopBarEmptyClick) {
-        elements.topBar.addEventListener("click", (event) => {
-            if (isInteractiveChromeClick(event, elements.topBar)) {
+    if (elements.labDock && actions.handleTopBarEmptyClick) {
+        elements.labDock.addEventListener("click", (event) => {
+            if (isInteractiveChromeClick(event, elements.labDock)) {
                 return;
             }
             void actions.handleTopBarEmptyClick();

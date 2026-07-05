@@ -46,76 +46,106 @@ export function disposeApp(): void {
     window.__appReady = false;
 }
 
-export async function initApp(options: InitAppOptions = {}): Promise<AppController> {
+/**
+ * Boot the shell. The editor controller is lazy: a wall landing never runs
+ * `controller.init()` — the router asks for it (via `ensureLabReady`) the
+ * first time the hash resolves to the Lab. `window.__appReady` flips true only
+ * after the initial route has settled, which on a `#/lab` or `#share=` landing
+ * includes the controller boot so the Lab's bindings exist before tests and
+ * tools start clicking.
+ */
+export async function initApp(options: InitAppOptions = {}): Promise<void> {
     window.__appReady = false;
     if (!elements.grid) {
         throw new Error("Missing grid canvas element.");
     }
     disposeApp();
-    const gridView = createCanvasGridView({ canvas: elements.grid });
     const backend = options.backend ?? createHttpSimulationBackend();
-    const controller = createAppController({
-        elements,
-        gridView,
-        backend,
-        onError: handleAppError,
-    });
-    await controller.init();
-    activeController = controller;
-    disposeReviewApi = installReviewApi({ controller, gridView, elements });
-    try {
-        const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
-        const paneBaseSessionId = options.paneBaseSessionId ?? window.APP_SESSION_ID ?? null;
+    const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
+    const paneBaseSessionId = options.paneBaseSessionId ?? window.APP_SESSION_ID ?? null;
 
-        // Seams for the wall's live focus pane: an independent backend session, a
-        // canvas grid view, and the editor geometry helpers.
-        const paneBackendFactory =
-            options.paneBackendFactory ??
-            ((sessionId: string) => createHttpSimulationBackend({ sessionId }));
-        const createPaneGridView = (canvas: HTMLCanvasElement) => createCanvasGridView({ canvas });
-        const resolvePaneViewportDimensions = (paneOptions: PaneViewportDimensionsOptions) => {
-            const adapter = getGeometryAdapter(paneOptions.geometry) as FitRenderCellSizeAdapter;
-            const fitOptions = {
-                viewportWidth: paneOptions.viewportWidth,
-                viewportHeight: paneOptions.viewportHeight,
-                cellSize: paneOptions.cellSize,
-                fallbackDimensions: paneOptions.fallbackDimensions,
-                ...(paneOptions.maxCellCount !== undefined
-                    ? { maxCellCount: paneOptions.maxCellCount }
-                    : {}),
-            };
-            return adapter.fitViewport?.(fitOptions) ?? paneOptions.fallbackDimensions;
-        };
-        const resolvePaneCellSize = (paneOptions: PaneCellSizeOptions) => {
-            const adapter = getGeometryAdapter(paneOptions.geometry) as FitRenderCellSizeAdapter;
-            return adapter.fitRenderCellSize?.(paneOptions) ?? paneOptions.fallbackCellSize;
-        };
-
-        const focusPaneServices: FocusPaneServices = {
-            baseSessionId: paneBaseSessionId,
-            backendFactory: paneBackendFactory,
-            createGridView: createPaneGridView,
-            buildEditorToolCells,
-            resolveCellSize: resolvePaneCellSize,
-            resolveViewportDimensions: resolvePaneViewportDimensions,
-        };
-
-        workspaceRouter = mountWorkspaceRouter({
-            backend,
-            bootstrapData,
-            wallTrigger: elements.wallViewBtn,
-            focusPaneServices,
-            getInitialRuleName: () => {
-                const state = controller.getState();
-                return state.editorRuleName ?? state.activeRule?.name ?? null;
-            },
-            onOpenPattern: (payload) => {
-                void controller.loadPattern(payload);
-            },
-        });
-    } catch (error) {
-        handleAppError(error);
+    let controllerPromise: Promise<AppController> | null = null;
+    function ensureController(): Promise<AppController> {
+        if (!controllerPromise) {
+            controllerPromise = (async () => {
+                const gridView = createCanvasGridView({ canvas: elements.grid! });
+                const controller = createAppController({
+                    elements,
+                    gridView,
+                    backend,
+                    onError: handleAppError,
+                });
+                await controller.init();
+                activeController = controller;
+                disposeReviewApi = installReviewApi({ controller, gridView, elements });
+                return controller;
+            })();
+        }
+        return controllerPromise;
     }
+
+    // Seams for the wall's live focus pane: an independent backend session, a
+    // canvas grid view, and the editor geometry helpers.
+    const paneBackendFactory =
+        options.paneBackendFactory ??
+        ((sessionId: string) => createHttpSimulationBackend({ sessionId }));
+    const createPaneGridView = (canvas: HTMLCanvasElement) => createCanvasGridView({ canvas });
+    const resolvePaneViewportDimensions = (paneOptions: PaneViewportDimensionsOptions) => {
+        const adapter = getGeometryAdapter(paneOptions.geometry) as FitRenderCellSizeAdapter;
+        const fitOptions = {
+            viewportWidth: paneOptions.viewportWidth,
+            viewportHeight: paneOptions.viewportHeight,
+            cellSize: paneOptions.cellSize,
+            fallbackDimensions: paneOptions.fallbackDimensions,
+            ...(paneOptions.maxCellCount !== undefined
+                ? { maxCellCount: paneOptions.maxCellCount }
+                : {}),
+        };
+        return adapter.fitViewport?.(fitOptions) ?? paneOptions.fallbackDimensions;
+    };
+    const resolvePaneCellSize = (paneOptions: PaneCellSizeOptions) => {
+        const adapter = getGeometryAdapter(paneOptions.geometry) as FitRenderCellSizeAdapter;
+        return adapter.fitRenderCellSize?.(paneOptions) ?? paneOptions.fallbackCellSize;
+    };
+
+    const focusPaneServices: FocusPaneServices = {
+        baseSessionId: paneBaseSessionId,
+        backendFactory: paneBackendFactory,
+        createGridView: createPaneGridView,
+        buildEditorToolCells,
+        resolveCellSize: resolvePaneCellSize,
+        resolveViewportDimensions: resolvePaneViewportDimensions,
+    };
+
+    workspaceRouter = mountWorkspaceRouter({
+        backend,
+        bootstrapData,
+        wallHost: elements.wallRoot,
+        labRoot: elements.labRoot,
+        wallTrigger: elements.wallViewBtn,
+        labTrigger: elements.openLabBtn,
+        ensureLabReady: async () => {
+            await ensureController();
+        },
+        focusPaneServices,
+        getInitialRuleName: () => {
+            if (!activeController) {
+                return null;
+            }
+            const state = activeController.getState();
+            return state.editorRuleName ?? state.activeRule?.name ?? null;
+        },
+        onOpenPattern: (payload) => {
+            void (async () => {
+                try {
+                    const controller = await ensureController();
+                    await controller.loadPattern(payload);
+                } catch (error) {
+                    handleAppError(error);
+                }
+            })();
+        },
+    });
+    await workspaceRouter.initialRouteSettled();
     window.__appReady = true;
-    return controller;
 }

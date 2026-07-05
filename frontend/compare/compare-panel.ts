@@ -1,14 +1,13 @@
 /**
- * The presentational shell for the comparison wall. It owns the full-page
- * chrome (a slim header over the stage/dock/config body) and focus handling, and
- * delegates all of the actual panel UI and behaviour to
- * `createComparePanelContent`. The workspace router shows and hides it; this
- * shell renders no trigger of its own.
+ * The presentational surface for the comparison wall. It fills the shared
+ * shell's content slot (the static header and its "Open the Lab" affordance
+ * belong to the shell, not to this module) and delegates all of the actual
+ * panel UI and behaviour to `createComparePanelContent`. The workspace router
+ * shows and hides it; this surface renders no trigger of its own.
  *
- * The wall is the page, not a dialog: it fills the viewport and offers an
- * "Open the Lab" affordance to reach the single-board editor. Escape peels back
- * one in-page layer (an open menu, then speaker view) but never leaves the wall;
- * Space and the arrow keys drive the docked filmstrip transport.
+ * The wall is the page, not a dialog. Escape peels back one in-page layer (an
+ * open menu, then the config sheet, then speaker view) but never leaves the
+ * wall; Space and the arrow keys drive the docked filmstrip transport.
  */
 
 import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
@@ -88,16 +87,6 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         onRequestClose: () => close(),
     });
 
-    const backButton = el(
-        "button",
-        {
-            class: "compare-close compare-back",
-            type: "button",
-            title: "Open the single-board editor",
-        },
-        ["Open the Lab →"],
-    );
-
     const wallPage = el(
         "div",
         {
@@ -107,13 +96,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
             tabindex: "-1",
             hidden: true,
         },
-        [
-            el("div", { class: "wall-header" }, [
-                el("div", { class: "wall-brand", textContent: "Cellular Automaton Lab" }),
-                backButton,
-            ]),
-            content.element,
-        ],
+        [content.element],
     );
 
     host.append(wallPage);
@@ -146,7 +129,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         if (event.key === "Escape") {
             // Escape peels back one in-page layer at a time: an open action menu,
             // then the config sheet, then speaker view (back to the gallery). It
-            // never leaves the wall -- the wall is the page, so "Open the Lab" is
+            // never leaves the wall -- the shell header's "Open the Lab" is
             // the only exit.
             if (content.handleEscape()) {
                 return;
@@ -163,7 +146,6 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         }
     }
 
-    backButton.addEventListener("click", close);
     document.addEventListener("keydown", onKeydown);
 
     if (options.openOnMount) {

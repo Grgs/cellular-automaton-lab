@@ -63,7 +63,10 @@ function buildSnapshot(
 function buildElements(canvas: HTMLCanvasElement): DomElements {
     return {
         appFrame: null,
-        topBar: null,
+        labRoot: null,
+        wallRoot: null,
+        labDock: null,
+        openLabBtn: null,
         mainStage: null,
         controlDrawer: null,
         drawerNav: null,

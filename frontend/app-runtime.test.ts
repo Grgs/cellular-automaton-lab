@@ -97,21 +97,31 @@ function snapshot(): SimulationSnapshot {
 
 function installAppShell(): void {
     document.body.innerHTML = `
-        <main id="main-stage">
-            <section id="grid-panel">
-                <canvas id="grid"></canvas>
+        <main id="app-frame">
+            <header id="shell-header">
+                <button id="open-lab-btn" type="button" hidden>Open the Lab</button>
+                <button id="wall-view-btn" type="button" hidden>Wall</button>
+            </header>
+            <section id="lab-root">
+                <section id="main-stage">
+                    <section id="grid-panel">
+                        <canvas id="grid"></canvas>
+                    </section>
+                </section>
+                <div id="lab-dock">
+                    <button id="run-toggle-btn" type="button">Run</button>
+                    <button id="step-btn" type="button">Step</button>
+                    <button id="reset-btn" type="button">Reset</button>
+                    <button id="random-btn" type="button">Random</button>
+                    <select id="tiling-family-select"></select>
+                    <button id="tiling-picker-toggle" type="button"></button>
+                    <div id="tiling-picker-menu"></div>
+                    <span id="tiling-picker-current-label"></span>
+                    <span id="status-text"></span>
+                    <span id="generation-text"></span>
+                </div>
             </section>
-            <button id="wall-view-btn" type="button">Wall</button>
-            <button id="run-toggle-btn" type="button">Run</button>
-            <button id="step-btn" type="button">Step</button>
-            <button id="reset-btn" type="button">Reset</button>
-            <button id="random-btn" type="button">Random</button>
-            <select id="tiling-family-select"></select>
-            <button id="tiling-picker-toggle" type="button"></button>
-            <div id="tiling-picker-menu"></div>
-            <span id="tiling-picker-current-label"></span>
-            <span id="status-text"></span>
-            <span id="generation-text"></span>
+            <section id="wall-root" hidden></section>
         </main>
     `;
 }
@@ -138,7 +148,7 @@ afterEach(() => {
 });
 
 describe("app runtime", () => {
-    it("mounts the workspace router with focus-pane services wired to the base session", async () => {
+    it("mounts the router eagerly and boots the editor controller lazily", async () => {
         installAppShell();
         const backend = fakeBackend();
         const controller = {
@@ -159,7 +169,12 @@ describe("app runtime", () => {
             getConfigSyncController: vi.fn(),
             getUiSessionController: vi.fn(),
         };
-        const mountWorkspaceRouter = vi.fn((_options: unknown) => ({ dispose: vi.fn() }));
+        const createAppController = vi.fn(() => controller);
+        const installReviewApi = vi.fn(() => vi.fn());
+        const mountWorkspaceRouter = vi.fn((_options: unknown) => ({
+            initialRouteSettled: () => Promise.resolve(),
+            dispose: vi.fn(),
+        }));
 
         vi.doMock("./canvas-view.js", () => ({
             createCanvasGridView: vi.fn(() => ({})),
@@ -173,16 +188,12 @@ describe("app runtime", () => {
         vi.doMock("./editor-operations.js", () => ({
             buildEditorToolCells: vi.fn(),
         }));
-        vi.doMock("./app-controller.js", () => ({
-            createAppController: vi.fn(() => controller),
-        }));
+        vi.doMock("./app-controller.js", () => ({ createAppController }));
         vi.doMock("./compare/workspace-router.js", () => ({ mountWorkspaceRouter }));
         vi.doMock("./geometry/registry.js", () => ({
             getGeometryAdapter: vi.fn(() => ({})),
         }));
-        vi.doMock("./review-api.js", () => ({
-            installReviewApi: vi.fn(() => vi.fn()),
-        }));
+        vi.doMock("./review-api.js", () => ({ installReviewApi }));
 
         const { initApp } = await import("./app-runtime.js");
         await initApp({
@@ -198,9 +209,28 @@ describe("app runtime", () => {
             focusPaneServices?: { baseSessionId?: string | null };
             getInitialRuleName?: () => string | null | undefined;
             wallTrigger?: HTMLButtonElement | null;
+            labTrigger?: HTMLButtonElement | null;
+            labRoot?: HTMLElement | null;
+            wallHost?: HTMLElement | null;
+            ensureLabReady?: () => Promise<void>;
         };
         expect(routerOptions.focusPaneServices?.baseSessionId).toBe("s-runtime");
-        expect(routerOptions.getInitialRuleName?.()).toBe("life");
         expect(routerOptions.wallTrigger).toBe(document.getElementById("wall-view-btn"));
+        expect(routerOptions.labTrigger).toBe(document.getElementById("open-lab-btn"));
+        expect(routerOptions.labRoot).toBe(document.getElementById("lab-root"));
+        expect(routerOptions.wallHost).toBe(document.getElementById("wall-root"));
+        expect(window.__appReady).toBe(true);
+
+        // The editor controller has not booted: the router never asked for it.
+        expect(createAppController).not.toHaveBeenCalled();
+        expect(routerOptions.getInitialRuleName?.()).toBeNull();
+
+        // ensureLabReady boots the controller exactly once and wires review-api.
+        await routerOptions.ensureLabReady?.();
+        await routerOptions.ensureLabReady?.();
+        expect(createAppController).toHaveBeenCalledOnce();
+        expect(controller.init).toHaveBeenCalledOnce();
+        expect(installReviewApi).toHaveBeenCalledOnce();
+        expect(routerOptions.getInitialRuleName?.()).toBe("life");
     });
 });

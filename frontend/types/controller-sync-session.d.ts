@@ -1,7 +1,7 @@
 import type { EditorTool } from "../editor-tools.js";
 import type { ConfigSyncBody } from "./controller-api.js";
 import type { SimulationSnapshot } from "./domain.js";
-import type { MatchMediaResult, UiDisclosureId, UiSessionStorage } from "./session.js";
+import type { UiDisclosureId, UiSessionStorage } from "./session.js";
 
 export interface ConfigSyncViewState {
     pendingRuleName: string | null;
@@ -49,10 +49,6 @@ export interface UiSessionController {
 export interface RuleSyncRequestOptions {
     running?: boolean;
     body?: ConfigSyncBody;
-}
-
-export interface MatchMediaFunction {
-    (query: string): MatchMediaResult;
 }
 
 export interface CreateUiSessionStorageFunction {

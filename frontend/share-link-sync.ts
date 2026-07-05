@@ -7,8 +7,9 @@
  *
  * The board mirror only runs while the hash addresses the Lab: the wall owns
  * its own hash slots (`run=`, `focus=`), and a `share=` slot written under the
- * wall would re-route the next reload into the Lab. The editor keeps running
- * beneath the wall, so this guard is what keeps the two URL vocabularies apart.
+ * wall would re-route the next reload into the Lab. Once booted, the editor
+ * controller keeps applying snapshots even after the user returns to the wall,
+ * so this guard is what keeps the two URL vocabularies apart.
  *
  * Updates use `history.replaceState` so the user's history stack is not
  * polluted with a new entry per generation.
