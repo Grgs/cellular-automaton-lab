@@ -21,6 +21,7 @@ export const MAX_SPEED = FRONTEND_DEFAULTS.simulation.max_speed;
 export const DEFAULT_PATCH_DEPTH = DEFAULT_TOPOLOGY_SPEC.patch_depth;
 export const MIN_PATCH_DEPTH = FRONTEND_DEFAULTS.simulation.min_patch_depth;
 export const MAX_PATCH_DEPTH = FRONTEND_DEFAULTS.simulation.max_patch_depth;
-export const DEFAULT_DRAWER_OPEN = true;
+// The inspector is a bottom sheet over the canvas; it waits closed until asked.
+export const DEFAULT_DRAWER_OPEN = false;
 export const RULE_SELECTION_ORIGIN_DEFAULT: RuleSelectionOrigin = "default";
 export const RULE_SELECTION_ORIGIN_USER: RuleSelectionOrigin = "user";

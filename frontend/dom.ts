@@ -6,7 +6,10 @@ function elementById<T extends HTMLElement>(id: string): T | null {
 
 export const elements: DomElements = {
     appFrame: elementById("app-frame"),
-    topBar: elementById("top-bar"),
+    labRoot: elementById("lab-root"),
+    wallRoot: elementById("wall-root"),
+    labDock: elementById("lab-dock"),
+    openLabBtn: elementById("open-lab-btn"),
     mainStage: elementById("main-stage"),
     controlDrawer: elementById("control-drawer"),
     drawerNav: elementById("drawer-nav"),

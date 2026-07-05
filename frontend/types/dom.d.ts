@@ -1,6 +1,9 @@
 export interface DomElements {
     appFrame: HTMLElement | null;
-    topBar: HTMLElement | null;
+    labRoot: HTMLElement | null;
+    wallRoot: HTMLElement | null;
+    labDock: HTMLElement | null;
+    openLabBtn: HTMLButtonElement | null;
     mainStage: HTMLElement | null;
     controlDrawer: HTMLElement | null;
     drawerNav: HTMLElement | null;

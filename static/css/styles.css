@@ -218,7 +218,7 @@ body {
     gap: 4px;
 }
 
-.app-frame.standalone-startup-pending .top-bar-controls,
+.app-frame.standalone-startup-pending .lab-dock,
 .app-frame.standalone-startup-pending .control-drawer {
     opacity: 0.72;
 }
@@ -275,18 +275,197 @@ select {
     border: 0;
 }
 
+/* One shell: a slim static header over a content area that hosts either the
+   comparison wall or the Lab, with a shared bottom-dock idiom. The shell fills
+   the viewport; both routes render inside the same skeleton. */
 .app-frame {
-    width: min(1680px, calc(100vw - 20px));
+    width: 100%;
     height: 100dvh;
-    margin: 0 auto;
-    padding: 6px 0 8px;
+    margin: 0;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
-    gap: 8px;
     position: relative;
+    background: var(--panel-strong);
 }
 
-.top-bar,
+.wall-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+    /* Above the drawer backdrop, like the old top bar, so navigation stays
+       reachable while the inspector sheet is open. */
+    position: relative;
+    z-index: 50;
+}
+
+h1.wall-brand {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+}
+
+.wall-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.compare-close {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--muted, #6d756f);
+}
+
+.compare-close.shell-header-btn {
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    color: var(--ink, #1f2430);
+    font-family: var(--sans, sans-serif);
+    font-size: 13px;
+    line-height: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.compare-close.shell-header-btn:hover {
+    background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12));
+}
+
+.compare-close:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+
+.shell-content {
+    min-height: 0;
+    min-width: 0;
+    display: grid;
+}
+
+.lab-root,
+.wall-root {
+    grid-area: 1 / 1;
+    min-height: 0;
+    min-width: 0;
+}
+
+.lab-root {
+    display: flex;
+    flex-direction: column;
+}
+
+/* The shared dock idiom: one bottom bar per route (the wall's transport dock
+   and the Lab's control dock both use it). */
+.compare-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px 10px;
+    flex-wrap: wrap;
+    padding: 10px 18px 12px;
+    background: var(--panel-strong, #fff);
+    border-top: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+}
+
+.compare-dock-icon {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 16px;
+    border-radius: 7px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    color: var(--ink, #1f2430);
+    cursor: pointer;
+}
+
+.compare-dock-icon:hover {
+    background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12));
+}
+
+.compare-dock-icon:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.compare-dock-icon:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+
+.lab-dock {
+    justify-content: flex-start;
+    /* Above the drawer backdrop, like the old top bar's controls, so the run
+       controls and tiling picker stay reachable while the sheet is open. */
+    z-index: 50;
+}
+
+.lab-dock.is-tiling-picker-open {
+    z-index: 61;
+}
+
+.lab-dock-summary {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    min-width: 0;
+}
+
+.lab-dock-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lab-dock-action {
+    min-width: 58px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    box-shadow: none;
+    white-space: nowrap;
+}
+
+.lab-dock-tiling {
+    flex: 1 1 220px;
+    min-width: 180px;
+    max-width: 340px;
+    margin-left: auto;
+}
+
+.lab-dock .tiling-picker-toggle {
+    min-height: 36px;
+    grid-template-columns: 40px minmax(0, 1fr) 14px;
+}
+
+.lab-dock .tiling-selected-preview {
+    width: 40px;
+    height: 28px;
+    min-height: 28px;
+}
+
+/* The picker menu opens upward from the dock. */
+.lab-dock .tiling-picker-menu {
+    top: auto;
+    bottom: calc(100% + 8px);
+    left: auto;
+    right: 12px;
+}
+
 .canvas-shell {
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -297,9 +476,10 @@ select {
 
 .control-drawer {
     border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
     background: rgba(255, 249, 241, 0.98);
-    box-shadow: var(--shadow);
+    box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.28);
 }
 
 :root[data-theme="dark"] .control-drawer {
@@ -1003,7 +1183,7 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .main-stage {
-    height: 100%;
+    flex: 1 1 auto;
     min-height: 0;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -1011,10 +1191,7 @@ button.theme-toggle .theme-icon-moon {
     column-gap: 0;
     position: relative;
     overflow: hidden;
-}
-
-.main-stage.is-drawer-open {
-    grid-template-columns: minmax(0, 1fr);
+    padding: 12px 18px;
 }
 
 .canvas-shell {
@@ -1237,13 +1414,18 @@ button.theme-toggle .theme-icon-moon {
     line-height: 1.35;
 }
 
+/* The inspector is a bottom sheet: same idiom as the wall's config sheet
+   (slides up over the canvas, closed by default). It anchors to the stage
+   bottom so the Lab dock below stays reachable while it is open. Visibility
+   keeps the existing data-open contract driven by the controller. */
 .control-drawer {
     position: absolute;
-    top: 0;
+    left: 0;
     right: 0;
     bottom: 0;
-    width: clamp(320px, 30vw, 360px);
-    max-width: calc(100vw - 24px);
+    top: auto;
+    /* Keep the board's center visible (and clickable) while the sheet is open. */
+    max-height: 46%;
     z-index: 40;
     min-width: 0;
     min-height: 0;
@@ -1251,7 +1433,7 @@ button.theme-toggle .theme-icon-moon {
     display: flex;
     flex-direction: column;
     opacity: 1;
-    transform: translateX(calc(100% + 14px));
+    transform: translateY(100%);
     transition:
         opacity 180ms ease,
         transform 180ms ease;
@@ -1260,22 +1442,34 @@ button.theme-toggle .theme-icon-moon {
 .control-drawer[data-open="false"] {
     opacity: 0;
     pointer-events: none;
-    transform: translateX(calc(100% + 14px));
+    transform: translateY(100%);
 }
 
 .control-drawer[data-open="true"] {
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(0);
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .control-drawer {
+        transition: none;
+    }
 }
 
 .control-drawer-inner {
-    height: 100%;
-    padding: 12px;
+    min-height: 0;
+    padding: 14px 18px 18px;
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     align-content: start;
-    gap: 8px;
+    align-items: start;
+    gap: 12px 18px;
     overflow: auto;
+}
+
+.control-drawer-inner .drawer-sticky-summary {
+    grid-column: 1 / -1;
 }
 
 .drawer-sticky-summary {

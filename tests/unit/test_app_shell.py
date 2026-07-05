@@ -51,9 +51,7 @@ class AppShellTests(unittest.TestCase):
 
         grid_viewport_index = rendered.index('<div id="grid-viewport" class="grid-viewport">')
         startup_index = rendered.index('id="standalone-startup-overlay"')
-        canvas_index = rendered.index(
-            '<canvas id="grid" class="grid-canvas" aria-label="Cellular automaton grid"></canvas>'
-        )
+        canvas_index = rendered.index('id="grid"')
 
         self.assertLess(grid_viewport_index, startup_index)
         self.assertLess(startup_index, canvas_index)

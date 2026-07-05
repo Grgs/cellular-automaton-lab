@@ -34,7 +34,20 @@ def _wait_ready(page: Page) -> None:
 
 def _open_fresh_page(host: StandaloneRuntimeHost, page: Page, *, route: str = "") -> None:
     page.goto(f"{host.base_url}/{route}", wait_until="load")
-    _wait_ready(page)
+    if "/lab" in route:
+        # Editor readiness (review-api diagnostics) exists only once the Lab
+        # has booted; wall scenarios wait on their own wall selectors instead.
+        _wait_ready(page)
+    else:
+        page.locator(".wall-page").wait_for(state="visible", timeout=TIMEOUT_MS)
+
+
+def _open_inspector_sheet(page: Page) -> None:
+    # The Lab's inspector is a bottom sheet, closed (and inert) by default;
+    # controls like the rule picker live inside it.
+    if page.locator("#control-drawer").get_attribute("data-open") != "true":
+        page.locator("#drawer-toggle-btn").click(timeout=TIMEOUT_MS)
+        page.locator('#control-drawer[data-open="true"]').wait_for(timeout=TIMEOUT_MS)
 
 
 def _save_optimized_png(page: Page, path: Path, *, full_page: bool = False) -> None:
@@ -122,8 +135,11 @@ def _capture_wall_hero(page: Page, output_dir: Path) -> None:
 def _capture_snub_workspace(page: Page, output_dir: Path) -> None:
     select_tiling_family(page, "archimedean-3-3-3-3-6", timeout_ms=TIMEOUT_MS)
     _wait_ready(page)
+    _open_inspector_sheet(page)
     _select_native_value(page, "#rule-select", "kagome-life")
     _wait_ready(page)
+    # Close the sheet so the captured workspace shows the full board.
+    _click(page, "#drawer-toggle-btn")
     _click(page, "#random-btn")
     _wait_ready(page)
     for _ in range(12):

@@ -74,11 +74,11 @@ function createElements(): DomElements {
     toggle.type = "button";
     toggle.setAttribute("aria-expanded", "false");
 
-    const topBar = document.createElement("header");
-    topBar.append(toggle, menu);
-    document.body.replaceChildren(topBar);
+    const labDock = document.createElement("div");
+    labDock.append(toggle, menu);
+    document.body.replaceChildren(labDock);
     const elements: Partial<DomElements> = {
-        topBar,
+        labDock,
         tilingFamilySelect: select,
         tilingPickerMenu: menu,
         tilingPickerToggle: toggle,
@@ -104,7 +104,7 @@ describe("controls/tiling-picker-bindings", () => {
 
         expect(elements.tilingPickerMenu?.hidden).toBe(false);
         expect(elements.tilingPickerToggle?.getAttribute("aria-expanded")).toBe("true");
-        expect(elements.topBar?.classList.contains("is-tiling-picker-open")).toBe(true);
+        expect(elements.labDock?.classList.contains("is-tiling-picker-open")).toBe(true);
 
         elements.tilingPickerMenu
             ?.querySelector<HTMLButtonElement>("[data-tiling-family='hex']")
@@ -113,7 +113,7 @@ describe("controls/tiling-picker-bindings", () => {
         expect(elements.tilingFamilySelect?.value).toBe("hex");
         expect(elements.tilingPickerMenu?.hidden).toBe(true);
         expect(elements.tilingPickerToggle?.getAttribute("aria-expanded")).toBe("false");
-        expect(elements.topBar?.classList.contains("is-tiling-picker-open")).toBe(false);
+        expect(elements.labDock?.classList.contains("is-tiling-picker-open")).toBe(false);
         expect(changeTilingFamily).toHaveBeenCalledWith("hex");
     });
 

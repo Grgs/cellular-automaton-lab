@@ -85,21 +85,23 @@ export function createAppView({
             return;
         }
 
+        // The inspector is a bottom sheet: it occludes the grid when its height
+        // eats into the canvas rather than fitting the letterbox gutter below.
         const stageRect = mainStage.getBoundingClientRect();
         const gridRect = grid.getBoundingClientRect();
         const drawerRect = controlDrawer.getBoundingClientRect();
-        const drawerWidth = drawerRect.width;
+        const drawerHeight = drawerRect.height;
 
-        if (stageRect.width <= 0 || gridRect.width <= 0 || drawerWidth <= 0) {
+        if (stageRect.height <= 0 || gridRect.height <= 0 || drawerHeight <= 0) {
             applyOverlayIntent(state, OVERLAY_INTENT_LAYOUT_OCCLUSION_CHANGED, {
                 inspectorOccludesGrid: true,
             });
             return;
         }
 
-        const availableRightGutter = Math.max(0, stageRect.right - gridRect.right);
+        const availableBottomGutter = Math.max(0, stageRect.bottom - gridRect.bottom);
         applyOverlayIntent(state, OVERLAY_INTENT_LAYOUT_OCCLUSION_CHANGED, {
-            inspectorOccludesGrid: drawerWidth > availableRightGutter + 2,
+            inspectorOccludesGrid: drawerHeight > availableBottomGutter + 2,
         });
     }
 

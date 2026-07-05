@@ -159,6 +159,9 @@ export function renderControlShell(elements: DomElements, viewModel: ControlsVie
             "aria-hidden",
             viewModel.drawerVisible ? "false" : "true",
         );
+        // The inspector is a bottom sheet; keep the closed sheet out of the tab
+        // order and hit-testing, matching the wall's config sheet idiom.
+        elements.controlDrawer.inert = !viewModel.drawerVisible;
     }
     if (elements.drawerBackdrop) {
         elements.drawerBackdrop.hidden = !viewModel.backdropVisible;

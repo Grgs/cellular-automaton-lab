@@ -161,13 +161,23 @@ function backdrop(): HTMLElement | null {
 describe("mountWorkspaceRouter", () => {
     const handles: Array<{ dispose(): void }> = [];
 
-    async function mount(options: { wallTrigger?: HTMLButtonElement } = {}): Promise<void> {
+    async function mount(
+        options: {
+            wallTrigger?: HTMLButtonElement;
+            labTrigger?: HTMLButtonElement;
+            labRoot?: HTMLElement;
+            ensureLabReady?: () => Promise<void>;
+        } = {},
+    ): Promise<void> {
         const { mountWorkspaceRouter } = await import("./workspace-router.js");
         handles.push(
             mountWorkspaceRouter({
                 backend: fakeBackend(),
                 bootstrapData: bootstrapData(),
                 ...(options.wallTrigger ? { wallTrigger: options.wallTrigger } : {}),
+                ...(options.labTrigger ? { labTrigger: options.labTrigger } : {}),
+                ...(options.labRoot ? { labRoot: options.labRoot } : {}),
+                ...(options.ensureLabReady ? { ensureLabReady: options.ensureLabReady } : {}),
             }),
         );
     }
@@ -236,16 +246,57 @@ describe("mountWorkspaceRouter", () => {
         });
     });
 
-    it("writes #/lab when the wall is left via Open the Lab", async () => {
-        await mount();
+    it("writes #/lab when the wall is left via the header's Open the Lab", async () => {
+        const labTrigger = document.createElement("button");
+        document.body.append(labTrigger);
+        await mount({ labTrigger });
         await vi.waitFor(() => {
             expect(backdrop()?.hidden).toBe(false);
         });
 
-        document.querySelector<HTMLButtonElement>(".compare-back")?.click();
+        labTrigger.click();
 
         expect(backdrop()?.hidden).toBe(true);
         expect(window.location.hash).toBe("#/lab");
+    });
+
+    it("toggles the shell roots and header buttons per route", async () => {
+        const labRoot = document.createElement("section");
+        const labTrigger = document.createElement("button");
+        const wallTrigger = document.createElement("button");
+        document.body.append(labRoot, labTrigger, wallTrigger);
+        const ensureLabReady = vi.fn(async () => {});
+        await mount({ labRoot, labTrigger, wallTrigger, ensureLabReady });
+
+        // Wall landing: the Lab world is hidden, its trigger shows in the header,
+        // and the editor controller is never booted.
+        await vi.waitFor(() => {
+            expect(backdrop()?.hidden).toBe(false);
+        });
+        expect(labRoot.hidden).toBe(true);
+        expect(labTrigger.hidden).toBe(false);
+        expect(wallTrigger.hidden).toBe(true);
+        expect(ensureLabReady).not.toHaveBeenCalled();
+
+        // Entering the Lab boots the controller (once) and flips the shell.
+        labTrigger.click();
+        await vi.waitFor(() => {
+            expect(labRoot.hidden).toBe(false);
+        });
+        expect(labTrigger.hidden).toBe(true);
+        expect(wallTrigger.hidden).toBe(false);
+        expect(ensureLabReady).toHaveBeenCalledTimes(1);
+
+        // Returning to the wall and back does not boot the controller again.
+        wallTrigger.click();
+        await vi.waitFor(() => {
+            expect(labRoot.hidden).toBe(true);
+        });
+        labTrigger.click();
+        await vi.waitFor(() => {
+            expect(labRoot.hidden).toBe(false);
+        });
+        expect(ensureLabReady).toHaveBeenCalledTimes(1);
     });
 
     it("closes the wall when the hash navigates to the Lab", async () => {

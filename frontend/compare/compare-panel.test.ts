@@ -1202,16 +1202,18 @@ describe("mountComparePanel", () => {
         expect(page?.getAttribute("aria-modal")).toBeNull();
         expect(document.querySelector(".compare-backdrop")).toBeNull();
         expect(document.querySelector(".compare-dialog")).toBeNull();
-        expect(document.querySelector(".wall-brand")?.textContent).toBe("Cellular Automaton Lab");
-        expect(document.querySelector(".compare-back")?.textContent).toBe("Open the Lab →");
+        // The shell owns the header (brand + route buttons); the panel renders
+        // no header or exit affordance of its own.
+        expect(page?.querySelector(".wall-header")).toBeNull();
+        expect(page?.querySelector(".compare-back")).toBeNull();
         expect(page?.hidden).toBe(false);
 
         // The wall has no "outside": clicking its own surface must not close it.
         page?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         expect(page?.hidden).toBe(false);
 
-        // "Open the Lab" is the only exit.
-        document.querySelector<HTMLButtonElement>(".compare-back")?.click();
+        // The router (via the shell header) is the only exit.
+        handle.close();
         expect(page?.hidden).toBe(true);
         handle.dispose();
     });
@@ -1561,7 +1563,7 @@ describe("mountComparePanel", () => {
         playPause?.click();
         expect(playPause?.textContent).toBe("⏸ Pause");
 
-        document.querySelector<HTMLButtonElement>(".compare-back")?.click();
+        handle.close();
 
         expect(document.querySelector<HTMLElement>(".wall-page")?.hidden).toBe(true);
         expect(playPause?.textContent).toBe("▶ Play");

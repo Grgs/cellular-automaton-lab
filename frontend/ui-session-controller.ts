@@ -18,11 +18,8 @@ import { setDrawerOpen } from "./state/overlay-state.js";
 import { currentEditorRule } from "./state/selectors.js";
 import { applyDisclosureState, createUiSessionStorage, DISCLOSURE_IDS } from "./ui-session.js";
 import type { DomElements } from "./types/dom.js";
-import type {
-    CreateUiSessionStorageFunction,
-    MatchMediaFunction,
-    UiSessionController,
-} from "./types/controller.js";
+import { DEFAULT_DRAWER_OPEN } from "./state/constants.js";
+import type { CreateUiSessionStorageFunction, UiSessionController } from "./types/controller.js";
 import type { AppState } from "./types/state.js";
 import type { UiDisclosureId, UiSessionStorage } from "./types/session.js";
 import type { EditorTool } from "./editor-tools.js";
@@ -50,12 +47,6 @@ export function createUiSessionController({
     createUiSessionStorage: createUiSessionStorageFn = createUiSessionStorage,
     applyDisclosureStateFn = applyDisclosureState,
     currentEditorRuleFn = currentEditorRule,
-    matchMediaFn = (query) => {
-        if (typeof window.matchMedia === "function") {
-            return window.matchMedia(query);
-        }
-        return { matches: true };
-    },
     setBrushSizeFn = setBrushSize,
     setCellSizeFn = setCellSize,
     setCellSizeMemoryMapFn = setCellSizeMemoryMap,
@@ -72,7 +63,6 @@ export function createUiSessionController({
     createUiSessionStorage?: CreateUiSessionStorageFunction;
     applyDisclosureStateFn?: typeof applyDisclosureState;
     currentEditorRuleFn?: typeof currentEditorRule;
-    matchMediaFn?: MatchMediaFunction;
     setBrushSizeFn?: typeof setBrushSize;
     setCellSizeFn?: typeof setCellSize;
     setCellSizeMemoryMapFn?: typeof setCellSizeMemoryMap;
@@ -119,7 +109,10 @@ export function createUiSessionController({
     function restoreDrawerState(): void {
         const storedDrawerOpen = storage.getDrawerOpen();
         if (storedDrawerOpen === null || storedDrawerOpen === undefined) {
-            setDrawerOpenFn(state, Boolean(matchMediaFn("(min-width: 861px)")?.matches));
+            // The inspector is a bottom sheet over the canvas: closed until
+            // asked, on every viewport (the old wide-screen side-drawer
+            // heuristic opened it by default).
+            setDrawerOpenFn(state, DEFAULT_DRAWER_OPEN);
             return;
         }
         setDrawerOpenFn(state, storedDrawerOpen);
@@ -226,7 +219,7 @@ export function createUiSessionController({
                     0,
             );
         }
-        setDrawerOpenFn(state, Boolean(matchMediaFn("(min-width: 861px)")?.matches));
+        setDrawerOpenFn(state, DEFAULT_DRAWER_OPEN);
         DISCLOSURE_IDS.forEach((id) => {
             const disclosure = elements[id];
             if (disclosure) {

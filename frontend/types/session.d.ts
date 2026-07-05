@@ -40,7 +40,3 @@ export interface UiSessionStorage {
     getDisclosureStates(): Partial<Record<UiDisclosureId, boolean>>;
     setDisclosureState(id: UiDisclosureId, open: boolean): UiSessionState;
 }
-
-export interface MatchMediaResult {
-    matches: boolean;
-}
