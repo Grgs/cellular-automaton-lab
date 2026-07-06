@@ -393,7 +393,10 @@ class TopologyFilmstrip:
     ``topology`` is the full geometry payload (cells/vertices) sent once so the
     client can render the board; ``frames`` is one sparse live-cell map per
     generation (``frames[0]`` is the seed), all tilings sharing the same frame
-    count so a single client clock keeps them synchronised.
+    count so a single client clock keeps them synchronised. ``seed_order`` is
+    the traversal's cell ordering for this board: bit ``i`` of a bit-string
+    seed lands on ``seed_order[i]``, so a client can pull a frame-0 cell edit
+    back to the shared seed without re-deriving the traversal.
     """
 
     geometry: str
@@ -406,6 +409,7 @@ class TopologyFilmstrip:
     extinction_step: int | None
     period: int | None
     note: str | None = None
+    seed_order: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -419,6 +423,7 @@ class TopologyFilmstrip:
             "extinction_step": self.extinction_step,
             "period": self.period,
             "note": self.note,
+            "seed_order": self.seed_order,
         }
 
 
@@ -506,6 +511,7 @@ def _run_single_filmstrip(
         extinction_step=extinction_step,
         period=period,
         note=seeded.note,
+        seed_order=TRAVERSALS[traversal](seeded.frame),
     )
 
 

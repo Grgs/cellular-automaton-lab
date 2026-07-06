@@ -11,6 +11,7 @@ import type {
 import type { SimulationBackend } from "../types/controller.js";
 import type { GridView } from "../types/controller-view.js";
 import type { FocusPaneServices } from "../pane/pane-core.js";
+import type { ComparePanelHandle } from "./compare-panel.js";
 
 function bootstrapData(): AppBootstrapData {
     const topology = (
@@ -207,6 +208,8 @@ function twoBoardFilmstrip(): SeedFilmstripResult {
         extinction_step: null,
         period: null,
         note: null,
+        // Pull-back map for edit mode: bit i of the seed lands on seed_order[i].
+        seed_order: ["c:1:1", "c:2:1"],
     });
     return {
         rule_name: "conway",
@@ -1215,6 +1218,156 @@ describe("mountComparePanel", () => {
         // The router (via the shell header) is the only exit.
         handle.close();
         expect(page?.hidden).toBe(true);
+        handle.dispose();
+    });
+
+    async function mountWithLoadedFilmstrip(): Promise<{
+        handle: ComparePanelHandle;
+        filmstripRequest: ReturnType<typeof vi.fn>;
+        seedField: HTMLInputElement;
+        editToggle: HTMLButtonElement;
+    }> {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripRequest = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip: filmstripRequest },
+            bootstrapData: bootstrapData(),
+        });
+        const seedField = [
+            ...document.querySelectorAll<HTMLInputElement>('input.compare-field[type="text"]'),
+        ].find((input) => /^[01\s,]*$/.test(input.value));
+        if (!seedField) {
+            throw new Error("seed field not found");
+        }
+        seedField.value = "101";
+        seedField.dispatchEvent(new Event("input", { bubbles: true }));
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+        const editToggle = document.querySelector<HTMLButtonElement>(".compare-edit-toggle");
+        if (!editToggle) {
+            throw new Error("edit toggle not found");
+        }
+        return { handle, filmstripRequest, seedField, editToggle };
+    }
+
+    function paintCell(cellId: string): void {
+        const polygon = document.querySelector(
+            `.compare-filmstrip-board [data-cell-id="${cellId}"]`,
+        );
+        expect(polygon).not.toBeNull();
+        polygon?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    }
+
+    it("edit mode paints the shared seed at gen 0 and re-runs the wall", async () => {
+        const { handle, filmstripRequest, seedField, editToggle } =
+            await mountWithLoadedFilmstrip();
+
+        // The toggle waits for a loaded run, then arms edit mode.
+        expect(editToggle.disabled).toBe(false);
+        expect(editToggle.getAttribute("aria-pressed")).toBe("false");
+        editToggle.click();
+        expect(editToggle.getAttribute("aria-pressed")).toBe("true");
+        expect(document.querySelector(".compare-filmstrip.is-editing")).not.toBeNull();
+
+        // Painting c:1:1 (bit 0 of "101") clears that bit; the board is not
+        // zoomed by the click.
+        paintCell("c:1:1");
+        expect(seedField.value).toBe("001");
+        expect(document.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
+
+        // Generation 0 re-projects immediately on every board (the painted cell
+        // goes dead), and the authoritative re-run is debounced behind it.
+        await vi.waitFor(() => {
+            const polygons = document.querySelectorAll('[data-cell-id="c:1:1"]');
+            expect(polygons.length).toBeGreaterThan(0);
+            for (const polygon of polygons) {
+                expect(polygon.classList.contains("is-live")).toBe(false);
+            }
+        });
+        await vi.waitFor(
+            () => {
+                expect(filmstripRequest).toHaveBeenCalledTimes(2);
+            },
+            { timeout: 3000 },
+        );
+        handle.dispose();
+    });
+
+    it("edit mode leaves zooming to the expand glyph", async () => {
+        const { handle, editToggle } = await mountWithLoadedFilmstrip();
+        editToggle.click();
+
+        const expand = document.querySelector<HTMLElement>(
+            ".compare-filmstrip-board .compare-filmstrip-expand",
+        );
+        expand?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(document.querySelector(".compare-filmstrip-board.is-hero")).not.toBeNull();
+
+        expand?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(document.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
+        handle.dispose();
+    });
+
+    it("hints instead of painting away from generation 0", async () => {
+        const { handle, filmstripRequest, seedField, editToggle } =
+            await mountWithLoadedFilmstrip();
+        editToggle.click();
+
+        document
+            .querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[title="Step forward one generation"]',
+            )
+            ?.click();
+        paintCell("c:1:1");
+
+        expect(seedField.value).toBe("101");
+        expect(document.querySelector(".compare-status")?.textContent).toContain("gen 0");
+        expect(filmstripRequest).toHaveBeenCalledTimes(1);
+        handle.dispose();
+    });
+
+    it("converts a shape seed to an editable bit-string on first paint", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const filmstripRequest = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip: filmstripRequest },
+            bootstrapData: bootstrapData(),
+        });
+        const shapeSelect = [
+            ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
+        ].find((select) => [...select.options].some((option) => option.value === "r-pentomino"));
+        if (!shapeSelect) {
+            throw new Error("shape select not found");
+        }
+        shapeSelect.value = "r-pentomino";
+        shapeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-edit-toggle")?.click();
+        const polygon = document.querySelector('.compare-filmstrip-board [data-cell-id="c:1:1"]');
+        polygon?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+        // frames[0] = {c:1:1} pulls back to "1"; painting that cell toggles it
+        // off, leaving the converted, editable seed "0" and no shape selection.
+        expect(shapeSelect.value).toBe("");
+        const seedField = [
+            ...document.querySelectorAll<HTMLInputElement>('input.compare-field[type="text"]'),
+        ].find((input) => /^[01\s,]*$/.test(input.value) && !input.disabled);
+        expect(seedField?.value).toBe("0");
+        expect(document.querySelector(".compare-status")?.textContent).toContain("converted");
         handle.dispose();
     });
 

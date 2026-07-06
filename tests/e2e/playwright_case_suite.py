@@ -305,6 +305,38 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.assertEqual(exported_payload["rule"], "highlife")
         case.assertEqual(exported_payload["cells_by_id"], payload["cells_by_id"])
 
+    def test_wall_edit_mode_paints_the_seed_at_gen_zero(self) -> None:
+        # The wall's edit mode: the dock's ✎ arms painting, a board click at
+        # gen 0 pulls the cell back to a seed bit (converting the shape demo to
+        # an editable bit-string on first paint), and the wall re-runs from it.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        self._expect(".compare-edit-toggle").to_be_enabled()
+        case.page.click(".compare-edit-toggle")
+        self._expect(".compare-edit-toggle").to_have_attribute("aria-pressed", "true")
+
+        # The default filmstrip rests on a lively frame; seed edits happen at
+        # gen 0, so step back to the seed first.
+        case.page.click('.compare-filmstrip-btn[title="Back to the seed"]')
+        board = case.page.locator(".compare-filmstrip-board").first
+        board.locator("[data-cell-id]").first.click()
+
+        # Painting must not zoom the board, and the shape demo converts to an
+        # editable bit seed the debounced re-run then replays everywhere.
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(0)
+        case.page.wait_for_function(
+            """() => {
+                const field = [...document.querySelectorAll('input.compare-field[type="text"]')]
+                    .find((input) => !input.disabled && /^[01]+$/.test(input.value));
+                return Boolean(field);
+            }"""
+        )
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+
     def test_copy_and_paste_pattern_roundtrip(self) -> None:
         case = self._case()
         self._paint_canvas_center()

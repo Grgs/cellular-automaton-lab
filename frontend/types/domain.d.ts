@@ -257,6 +257,13 @@ export interface TopologyFilmstrip {
     extinction_step: number | null;
     period: number | null;
     note: string | null;
+    /**
+     * The traversal's cell ordering for this board: bit i of a bit-string seed
+     * lands on seed_order[i], so a frame-0 cell edit pulls back to the shared
+     * seed without re-deriving the traversal. Empty on build errors (and absent
+     * from payloads produced before this field shipped).
+     */
+    seed_order?: string[];
 }
 
 export interface SeedFilmstripResult {

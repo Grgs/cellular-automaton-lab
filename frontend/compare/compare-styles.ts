@@ -124,6 +124,11 @@ export const COMPARE_PANEL_STYLES = `
 /* The dock idiom itself lives in styles.css (shared with the Lab dock); only
    the wall-specific composition remains here. */
 .compare-dock .compare-filmstrip-transport { flex: 1 1 420px; }
+.compare-edit-toggle.is-active {
+    background: var(--btn-primary-bg, #bf5a36);
+    border-color: var(--btn-primary-line, rgba(0, 0, 0, 0.2));
+    color: var(--btn-primary-text, #fff);
+}
 .compare-config-actions { margin-bottom: 12px; }
 /* Configuration lives in a bottom sheet the dock gear slides up over the stage. */
 .compare-config-sheet {
@@ -645,6 +650,22 @@ export const COMPARE_PANEL_STYLES = `
     opacity: 1;
 }
 .compare-filmstrip-expand { margin-left: auto; font-size: 13px; opacity: 0.85; }
+/* Edit mode: the pointer paints cells, so the cursor says so, hovered cells
+   light up, and the chrome becomes interactive so its ⤢ glyph can stay the one
+   zoom affordance. */
+.compare-filmstrip.is-editing .compare-filmstrip-board { cursor: crosshair; }
+.compare-filmstrip.is-editing .compare-thumb polygon:hover {
+    stroke: var(--focus, #7aa7ff);
+    stroke-width: 0.08;
+}
+.compare-filmstrip.is-editing .compare-filmstrip-board-chrome {
+    pointer-events: auto;
+    cursor: default;
+}
+.compare-filmstrip.is-editing .compare-filmstrip-expand {
+    cursor: pointer;
+    opacity: 1;
+}
 /* The hero's toolbelt overlays the top of the focused board: back to the gallery
    on the left, the single fork affordance on the right. */
 .compare-hero-toolbelt {
