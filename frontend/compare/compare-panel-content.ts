@@ -389,6 +389,20 @@ export function createComparePanelContent(
         },
         ["✕"],
     );
+    // Edit mode: board clicks paint the shared seed (at gen 0) instead of
+    // zooming; the ⤢ glyph stays the one zoom affordance while it is on.
+    const editModeButton = el(
+        "button",
+        {
+            class: "compare-dock-icon compare-edit-toggle",
+            type: "button",
+            title: "Edit the seed by painting boards",
+            "aria-label": "Toggle edit mode",
+            "aria-pressed": "false",
+            disabled: true,
+        },
+        ["✎"],
+    );
     const savedRunNameInput = el("input", {
         class: "compare-field compare-saved-name",
         type: "text",
@@ -505,6 +519,147 @@ export function createComparePanelContent(
         }
         filmstripView.focus(readFocusFromHash(window.location.hash));
     }
+
+    // ------ Edit mode: paint the shared seed by clicking board cells (gen 0) ------
+    //
+    // A frame-0 cell pulls back to a bit through the board's `seed_order`
+    // (bit i of the seed lands on seed_order[i]), so a paint toggles that bit,
+    // re-projects generation 0 onto every board immediately (exact, not an
+    // approximation), and debounces the authoritative re-run that recomputes
+    // the evolution frames. Mid-timeline edits have no seed representation --
+    // they will fork the board live in a later phase; for now they hint.
+    const PAINT_RERUN_DELAY_MS = 800;
+    let editMode = false;
+    let paintRerunTimer: number | null = null;
+
+    function normalizedSeedBits(): string {
+        return seedInput.value.replace(/[^01]/g, "");
+    }
+
+    /** Pull a board's frame 0 back to the shortest seed that reproduces it. */
+    function reconstructSeedBits(order: string[], frame0: Record<string, number>): string {
+        const indexOf = new Map(order.map((cellId, index) => [cellId, index]));
+        let maxIndex = -1;
+        for (const cellId of Object.keys(frame0)) {
+            const index = indexOf.get(cellId);
+            if (index !== undefined && index > maxIndex) {
+                maxIndex = index;
+            }
+        }
+        if (maxIndex < 0) {
+            return "0";
+        }
+        let bits = "";
+        for (let index = 0; index <= maxIndex; index += 1) {
+            bits += frame0[order[index]!] ? "1" : "0";
+        }
+        return bits;
+    }
+
+    /** Re-project the seed onto every board's generation 0 and re-render them. */
+    function projectSeedOntoFrameZero(bits: string): void {
+        if (!activeFilmstrip || !filmstripView) {
+            return;
+        }
+        for (const tiling of activeFilmstrip.tilings) {
+            const order = tiling.seed_order;
+            if (!order || order.length === 0 || tiling.frames.length === 0) {
+                continue;
+            }
+            const frame: Record<string, number> = {};
+            for (let index = 0; index < bits.length && index < order.length; index += 1) {
+                if (bits[index] === "1") {
+                    frame[order[index]!] = 1;
+                }
+            }
+            tiling.frames[0] = frame;
+            filmstripView.refreshBoard(tiling.geometry);
+        }
+    }
+
+    function schedulePaintRerun(): void {
+        if (paintRerunTimer !== null) {
+            window.clearTimeout(paintRerunTimer);
+        }
+        paintRerunTimer = window.setTimeout(() => {
+            paintRerunTimer = null;
+            if (running) {
+                // A run is already in flight; try again once it settles.
+                schedulePaintRerun();
+                return;
+            }
+            void runFilmstrip();
+        }, PAINT_RERUN_DELAY_MS);
+    }
+
+    function setEditMode(next: boolean): void {
+        if (editMode === next) {
+            return;
+        }
+        editMode = next;
+        editModeButton.setAttribute("aria-pressed", next ? "true" : "false");
+        editModeButton.classList.toggle("is-active", next);
+        filmstripView?.setEditMode(next);
+        if (next) {
+            statusLine.textContent =
+                filmstripView?.currentFrameIndex() === 0
+                    ? "Edit mode — click cells to edit the shared seed."
+                    : "Edit mode — press ⏮ to gen 0 to edit the shared seed.";
+        } else {
+            statusLine.textContent = "";
+        }
+    }
+
+    function handlePaintCell(geometry: string, cellId: string): void {
+        if (!activeFilmstrip || !filmstripView || running) {
+            return;
+        }
+        const tiling = activeFilmstrip.tilings.find((entry) => entry.geometry === geometry);
+        const order = tiling?.seed_order;
+        if (!tiling || !order || order.length === 0) {
+            statusLine.textContent = "This board cannot edit the seed.";
+            return;
+        }
+        if (filmstripView.currentFrameIndex() !== 0) {
+            // A mid-timeline state has no seed representation; a later phase
+            // forks the board live here instead.
+            statusLine.textContent = "Seed edits happen at gen 0 — press ⏮ first.";
+            return;
+        }
+        const bitIndex = order.indexOf(cellId);
+        if (bitIndex < 0) {
+            return;
+        }
+
+        // A named-shape seed has no bit-string; convert it on first paint by
+        // pulling this board's generation 0 back through its traversal. The
+        // conversion is geometry-specific, so the other boards re-project from
+        // the bits (a visible one-time reflow -- see the Gate 0 findings).
+        let converted = false;
+        if (isShapeMode()) {
+            seedInput.value = reconstructSeedBits(order, tiling.frames[0] ?? {});
+            shapeSelect.value = "";
+            syncShapeMode();
+            converted = true;
+        }
+
+        const bits = normalizedSeedBits().padEnd(bitIndex + 1, "0");
+        const toggled =
+            bits.slice(0, bitIndex) +
+            (bits[bitIndex] === "1" ? "0" : "1") +
+            bits.slice(bitIndex + 1);
+        seedInput.value = toggled;
+        seedPad.syncFromSeed();
+        redrawPreview();
+
+        projectSeedOntoFrameZero(toggled);
+        statusLine.textContent = converted
+            ? "Shape converted to an editable seed — every board now runs from it."
+            : "Seed updated — re-running the wall…";
+        schedulePaintRerun();
+    }
+
+    editModeButton.addEventListener("click", () => setEditMode(!editMode));
 
     // Speaker view moves the seed workspace into the rail beside the hero; the
     // gallery returns it to the Configure disclosure.
@@ -767,6 +922,7 @@ export function createComparePanelContent(
             el("div", { class: "compare-stage" }, [stageMain]),
             el("div", { class: "compare-dock" }, [
                 filmstripTransport.element,
+                editModeButton,
                 configButton,
                 copyRunButton,
                 statusLine,
@@ -1065,6 +1221,8 @@ export function createComparePanelContent(
         copyRunButton.disabled = disabled;
         railRerunButton.disabled = running || selected.size < 2;
         heroForkButton.disabled = running;
+        // Painting needs boards on the stage; the toggle waits for a run.
+        editModeButton.disabled = running || !activeFilmstrip;
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -1528,8 +1686,10 @@ export function createComparePanelContent(
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
                     onFocusChange: handleFocusChanged,
+                    onPaintCell: handlePaintCell,
                 });
                 filmstripView.setHeroToolbelt(heroToolbelt);
+                filmstripView.setEditMode(editMode);
                 filmstripArea.append(filmstripView.element);
             }
             showStageBoards();
@@ -1959,6 +2119,10 @@ export function createComparePanelContent(
             return false;
         },
         dispose(): void {
+            if (paintRerunTimer !== null) {
+                window.clearTimeout(paintRerunTimer);
+                paintRerunTimer = null;
+            }
             document.removeEventListener("pointerdown", onDocumentPointerDown);
             window.removeEventListener("hashchange", onHashChangeFocus);
             disposeFocusPane();

@@ -106,6 +106,9 @@ export function buildBoardThumbnailSvg(
             fill: state !== 0 ? liveColor(state) : deadFill,
             stroke,
             "stroke-width": "0.02",
+            // Hit-testing hook: the wall's edit mode resolves pointer events to
+            // a cell through this attribute.
+            "data-cell-id": cell.id,
         });
         if (state !== 0) {
             polygon.classList.add("is-live");

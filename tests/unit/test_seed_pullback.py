@@ -21,7 +21,11 @@ from pathlib import Path
 
 try:
     from backend.simulation.rule_context_frames import TopologyFrame, topology_frame_for
-    from backend.simulation.seeding.comparison import board_size_for, compare_seed
+    from backend.simulation.seeding.comparison import (
+        board_size_for,
+        compare_seed,
+        run_seed_filmstrip,
+    )
     from backend.simulation.seeding.shapes import NAMED_PATTERNS, place_pattern
     from backend.simulation.seeding.traversal import TRAVERSALS, paint_bits
     from backend.simulation.topology import empty_board
@@ -29,7 +33,11 @@ try:
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.simulation.rule_context_frames import TopologyFrame, topology_frame_for
-    from backend.simulation.seeding.comparison import board_size_for, compare_seed
+    from backend.simulation.seeding.comparison import (
+        board_size_for,
+        compare_seed,
+        run_seed_filmstrip,
+    )
     from backend.simulation.seeding.shapes import NAMED_PATTERNS, place_pattern
     from backend.simulation.seeding.traversal import TRAVERSALS, paint_bits
     from backend.simulation.topology import empty_board
@@ -118,6 +126,42 @@ class SeedPullbackTests(unittest.TestCase):
                 self.assertTrue(shape_cells)
                 shape_bits = _reconstruct_bits(order, shape_cells)
                 self.assertEqual(set(paint_bits(order, shape_bits)), shape_cells)
+
+    def test_filmstrip_payload_carries_the_pullback_order(self) -> None:
+        # The wall's edit mode pulls a painted frame-0 cell back to a seed bit
+        # via the filmstrip payload's seed_order; it must equal the traversal's
+        # ordering and be consistent with frame 0 for both seeding policies.
+        filmstrip = run_seed_filmstrip(
+            seed=BIT_SEED,
+            rule_name="conway",
+            geometries=("square", "trihexagonal-3-6-3-6"),
+            traversal=TRAVERSAL,
+            frame_count=2,
+            grid_size=GRID_SIZE,
+        )
+        for tiling in filmstrip.tilings:
+            with self.subTest(geometry=tiling.geometry):
+                order, _ = _order_and_frame(tiling.geometry)
+                self.assertEqual(tiling.seed_order, order)
+                self.assertEqual(
+                    set(tiling.frames[0]),
+                    set(paint_bits(tiling.seed_order, BIT_SEED)),
+                )
+                self.assertEqual(tiling.to_dict()["seed_order"], order)
+
+        # Shape-seeded runs carry the same order (the pull-back target for the
+        # convert-on-first-paint policy).
+        shaped = run_seed_filmstrip(
+            seed="",
+            rule_name="conway",
+            geometries=("square",),
+            traversal=TRAVERSAL,
+            frame_count=2,
+            grid_size=GRID_SIZE,
+            pattern="r-pentomino",
+        )
+        order, _ = _order_and_frame("square")
+        self.assertEqual(shaped.tilings[0].seed_order, order)
 
     def test_named_shape_bitstring_diverges_across_geometries(self) -> None:
         # PR E UX gate: converting a shape seed on one geometry and applying the
