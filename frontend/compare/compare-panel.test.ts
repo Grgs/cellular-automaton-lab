@@ -1611,7 +1611,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("moves the seed workspace into the speaker-view rail and back to Configure on exit", async () => {
+    it("keeps the seed workspace in Configure during speaker view (no seed rail)", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const filmstripBackend: SimulationBackend = {
@@ -1630,62 +1630,18 @@ describe("mountComparePanel", () => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
-        const rail = () => document.querySelector<HTMLElement>(".compare-seed-rail");
-        const seedInConfigure = () =>
-            document.querySelector(".compare-config-run .compare-seed-workspace");
-        const seedInRail = () =>
-            document.querySelector(".compare-seed-rail .compare-seed-workspace");
-
-        // Gallery: the seed workspace lives in the Configure disclosure, rail hidden.
-        expect(seedInConfigure()).not.toBeNull();
-        expect(seedInRail()).toBeNull();
-        expect(rail()?.hidden).toBe(true);
-
-        // Focus a board: the seed workspace reparents into the rail beside the hero.
+        // Focusing a board changes the stage layout only. Seed editing is edit
+        // mode's job in either layout (paint gen 0 for the shared seed), so
+        // the old reparenting rail is gone and the seed pad stays in the
+        // config sheet for bit-level control.
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
-        expect(rail()?.hidden).toBe(false);
-        expect(seedInRail()).not.toBeNull();
-        expect(seedInConfigure()).toBeNull();
-        expect(document.querySelector(".compare-seed-rail-hint")?.textContent).toContain(
-            "Fork the hero",
-        );
-
-        // Escape back to the gallery: the seed workspace returns to Configure.
-        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-        expect(rail()?.hidden).toBe(true);
-        expect(seedInConfigure()).not.toBeNull();
-        expect(seedInRail()).toBeNull();
-        handle.dispose();
-    });
-
-    it("re-runs the wall from the seed rail's Re-run action", async () => {
-        const { mountComparePanel } = await import("./compare-panel.js");
-        const { backend } = fakeBackend();
-        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
-        const filmstripBackend: SimulationBackend = { ...backend, requestFilmstrip };
-        const handle = mountComparePanel({
-            backend: filmstripBackend,
-            bootstrapData: bootstrapData(),
-        });
-        handle.open();
-        const playSideButton = () =>
-            [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
-                (button) => button.textContent === "▶ Play side by side",
-            );
-        playSideButton()?.click();
-        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
-        // Wait for the run to finish (the primary button re-enables) so the second
-        // runFilmstrip is not swallowed by the in-progress guard.
-        await vi.waitFor(() => expect(playSideButton()?.disabled).toBe(false));
-
-        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
-        const rerun = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
-            (button) => button.textContent === "Re-run wall from this seed",
-        );
-        expect(rerun).toBeTruthy();
-        rerun?.click();
-
-        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(
+            document.querySelector(".compare-stage-main")?.classList.contains("is-speaker"),
+        ).toBe(true);
+        expect(document.querySelector(".compare-seed-rail")).toBeNull();
+        expect(
+            document.querySelector(".compare-config-run .compare-seed-workspace"),
+        ).not.toBeNull();
         handle.dispose();
     });
 

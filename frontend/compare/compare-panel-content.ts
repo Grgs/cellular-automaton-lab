@@ -678,26 +678,16 @@ export function createComparePanelContent(
 
     editModeButton.addEventListener("click", () => setEditMode(!editMode));
 
-    // Speaker view moves the seed workspace into the rail beside the hero; the
-    // gallery returns it to the Configure disclosure.
-    function updateSeedRail(geometry: string | null): void {
-        const speaker = geometry !== null;
-        stageMain.classList.toggle("is-speaker", speaker);
-        if (speaker) {
-            seedRailBody.append(seedWorkspace);
-            seedRail.hidden = false;
-        } else {
-            seedHome?.append(seedWorkspace);
-            seedRail.hidden = true;
-        }
-    }
-
     function handleFocusChanged(geometry: string | null): void {
         // Forks are per-board and outlive a focus change: leaving a forked
         // board keeps it running as a live tile in the gallery instead of
         // tearing it down.
         mirrorFocusToHash(geometry);
-        updateSeedRail(geometry);
+        // Seed editing is edit mode's job in either layout (paint gen 0 for
+        // the shared seed, any later gen to fork the board live), so speaker
+        // view only changes the stage layout -- the seed pad stays in the
+        // config sheet for bit-level control.
+        stageMain.classList.toggle("is-speaker", geometry !== null);
         updateSummary();
     }
 
@@ -879,33 +869,6 @@ export function createComparePanelContent(
         seedPreviewBlock,
     ]);
 
-    // In speaker view the seed workspace is reparented into this rail beside the
-    // hero so the shared seed stays editable without leaving the wall. The seed is
-    // tiling-agnostic, so editing it re-runs every board; a per-board edit is a
-    // one-way fork, offered on the hero itself (see the hero toolbelt below), so
-    // the rail carries only the shared-seed controls.
-    const railRerunButton = el(
-        "button",
-        {
-            class: "compare-run compare-run-secondary compare-seed-rail-rerun",
-            type: "button",
-            title: "Re-run every board from the edited seed",
-        },
-        ["Re-run wall from this seed"],
-    );
-    const seedRailBody = el("div", { class: "compare-seed-rail-body" });
-    const seedRail = el("div", { class: "compare-seed-rail", hidden: true }, [
-        el("div", { class: "compare-seed-rail-title", textContent: "Edit the shared seed" }),
-        seedRailBody,
-        railRerunButton,
-        el("p", {
-            class: "compare-seed-rail-hint",
-            textContent: focusLiveEnabled
-                ? "Seed edits re-run every board. Fork the hero to edit it live while the others keep looping."
-                : "Seed edits re-run every board. Fork the hero to edit it in the Lab.",
-        }),
-    ]);
-
     // The hero's toolbelt overlays the focused board: return to the gallery, and
     // the single fork affordance in the app (live on the wall, or into the Lab on
     // standalone). It is handed to the filmstrip view, which parks it on whichever
@@ -936,7 +899,7 @@ export function createComparePanelContent(
         heroForkButton,
     ]);
 
-    const stageMain = el("div", { class: "compare-stage-main" }, [seedRail, filmstripArea]);
+    const stageMain = el("div", { class: "compare-stage-main" }, [filmstripArea]);
 
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
     shapeSelect.addEventListener("change", () => {
@@ -988,7 +951,7 @@ export function createComparePanelContent(
         // The stage plus its docked transport fill the viewport; the config sheet
         // overlays from the bottom on demand. The synchronized side-by-side is the
         // point of the page, so it leads and the video-style transport docks
-        // directly beneath it. In speaker view the seed rail sits beside the hero.
+        // directly beneath it.
         el("div", { class: "wall-screen" }, [
             el("div", { class: "compare-stage" }, [stageMain]),
             el("div", { class: "compare-dock" }, [
@@ -1001,10 +964,6 @@ export function createComparePanelContent(
         ]),
         configSheet,
     ]);
-
-    // The seed workspace's gallery home is the Configure disclosure; it shuttles
-    // between there and the speaker-view rail as focus changes.
-    const seedHome = seedWorkspace.parentElement;
 
     renderTilingChecklist();
     refreshSavedControls();
@@ -1290,7 +1249,6 @@ export function createComparePanelContent(
         // The dock's idle play button shares the same gate as the Configure one.
         filmstripTransport.setIdleRunEnabled(canPlay);
         copyRunButton.disabled = disabled;
-        railRerunButton.disabled = running || selected.size < 2;
         // Already-forked hero: Discard (in the pane's own chip) is the way to
         // undo it, so the toolbelt's fork button hides rather than offering a
         // confusing second fork.
@@ -2124,7 +2082,6 @@ export function createComparePanelContent(
 
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
-    railRerunButton.addEventListener("click", () => void runFilmstrip());
     heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
     copyRunButton.addEventListener("click", copyRunLink);
