@@ -1706,6 +1706,67 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("re-runs the whole wall from a fork's current state as the new shared seed", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => twoBoardFilmstrip());
+        const filmstripBackend: SimulationBackend = { ...backend, requestFilmstrip };
+        // The fork's live state: c:1:1 (bit 0 of the shared seed) is alive.
+        const liveForkSnapshot = () => ({ ...forkSnapshot(), cell_states: [1] });
+        const focusBackend: SimulationBackend = {
+            ...backend,
+            getState: async () => liveForkSnapshot(),
+            postControl: (async () =>
+                liveForkSnapshot()) as unknown as SimulationBackend["postControl"],
+            setCells: (async () => liveForkSnapshot()) as unknown as SimulationBackend["setCells"],
+            dispose: vi.fn(),
+        };
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: "sess",
+            backendFactory: () => focusBackend,
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
+        const handle = mountComparePanel({
+            backend: filmstripBackend,
+            bootstrapData: bootstrapData(),
+            focusPaneServices,
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-hero-fork")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-focus-pane")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-focus-pane-rejoin")?.click();
+
+        // The fork's live cells pull back through the board's seed_order
+        // (c:1:1 alive -> bit 0 -> "1"), become the shared seed, and the wall
+        // re-runs from it -- which also disposes the fork.
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        const seedField = [
+            ...document.querySelectorAll<HTMLInputElement>('input.compare-field[type="text"]'),
+        ].find((input) => /^[01\s,]*$/.test(input.value) && !input.disabled);
+        expect(seedField?.value).toBe("1");
+        expect(requestFilmstrip.mock.calls.at(1)?.[0]).toMatchObject({ seed: "1" });
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-focus-pane")).toBeNull();
+        });
+        expect(focusBackend.dispose).toHaveBeenCalled();
+        handle.dispose();
+    });
+
     it("keeps a live fork running after leaving its board (persists across views)", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
