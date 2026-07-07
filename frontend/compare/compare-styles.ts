@@ -52,9 +52,9 @@ export const COMPARE_PANEL_STYLES = `
     min-height: 0;
     display: flex;
 }
-/* Speaker view splits the stage into the seed rail and the hero board. Nowrap
-   keeps the row's height bound to the stage, so the hero fills rather than
-   overflowing; narrow screens stack the rail above the hero instead. */
+/* Speaker view keeps the hero board bound to the stage's height (nowrap), so
+   it fills rather than overflowing. Seed editing is edit mode's job in either
+   layout, so the stage is the hero area alone. */
 .compare-stage-main.is-speaker {
     display: flex;
     align-items: stretch;
@@ -66,39 +66,6 @@ export const COMPARE_PANEL_STYLES = `
     flex: 1 1 480px;
     min-width: 0;
     min-height: 0;
-}
-.compare-seed-rail {
-    flex: 0 0 260px;
-    min-width: 0;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 12px;
-    border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
-    border-radius: 10px;
-    background: var(--help-bg, rgba(0, 0, 0, 0.03));
-}
-@media (max-width: 860px) {
-    .compare-stage-main.is-speaker {
-        flex-direction: column;
-    }
-    .compare-seed-rail {
-        flex: 0 0 auto;
-    }
-}
-.compare-seed-rail[hidden] { display: none; }
-.compare-seed-rail-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-.compare-seed-rail .compare-seed-workspace {
-    grid-template-columns: 1fr;
-    margin-top: 0;
-    gap: 12px;
-}
-.compare-seed-rail .compare-seedbits { max-width: none; }
-.compare-seed-rail-rerun { width: 100%; margin-top: 12px; }
-.compare-seed-rail-hint {
-    margin: 10px 0 0;
-    font-size: 11px;
-    line-height: 1.4;
-    color: var(--muted, #6d756f);
 }
 .compare-stage-hero {
     display: flex;

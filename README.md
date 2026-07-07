@@ -69,13 +69,15 @@ The wall is the landing view: a bare URL opens it, and on a first visit it autop
 Two layout states share one persistent transport (play, pause, step, scrub, speed on one clock):
 
 - **Gallery** shows every selected board at once, evolving in lockstep.
-- **Speaker view** (click a board, or `&focus=<geometry>`) enlarges one board as the hero with the others as a thumbnail strip. A seed rail beside the hero edits the shared seed (**Re-run wall from this seed**), and **⑂ Fork this board live** turns the hero into a real editable board on its own session — you can paint, step, and run it while the other boards keep looping — with **Discard** to restore it. Escape returns speaker view to the gallery.
+- **Speaker view** (click a board, or `&focus=<geometry>`) enlarges one board as the hero with the others as a thumbnail strip. **⑂ Fork this board live** turns the hero into a real editable board on its own session — you can paint, step, and run it while the other boards keep looping — with **Discard** to restore it. Escape returns speaker view to the gallery.
+
+**Edit mode** (the dock's ✎) makes board cells clickable in either layout: painting at generation 0 edits the shared seed directly (generation 0 re-projects onto every board instantly, then a debounced re-run replays the evolution everywhere), while painting at any later generation auto-forks that board live from its current frame and carries the stroke over as the fork's first edit. The seed pad in the config sheet remains for bit-level control.
 
 The **Cross-tiling analysis** disclosure computes a phase portrait plus a result table on demand; each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
 
 Use **Copy run link** to create a `#/compare&run=v1.<base64url-json>` URL. Opening that link restores the setup without auto-running or auto-playing, so cold loads do not start surprise work. Use **Saved runs** and **Saved tiling sets** to keep named setups in browser `localStorage`; they work in both the Flask app and the standalone demo, but they are local to the current browser/device. Run links are the portable format.
 
-Routing is hash-based and back-compatible: a bare URL is the wall, `#/lab` is the single-board editor (a bare `#share=` board link also opens the Lab), and the legacy `#/compare` still opens the wall. Current limits are intentional for interactive use: live filmstrips are bounded to a small selected set of tilings and a capped frame count by the backend, and the wall is designed around one shared seed/rule configuration rather than independent per-board rules. The live focus pane runs one fork at a time.
+Routing is hash-based and back-compatible: a bare URL is the wall, `#/lab` is the single-board editor (a bare `#share=` board link also opens the Lab), and the legacy `#/compare` still opens the wall. Current limits are intentional for interactive use: live filmstrips are bounded to a small selected set of tilings and a capped frame count by the backend, and the wall is designed around one shared seed/rule configuration rather than independent per-board rules. Live forks persist across the gallery and speaker view as compact live tiles, and multiple boards can be forked at once (the standalone demo caps concurrent forks at 2, since each one boots its own Python runtime).
 
 ## How It Works
 
