@@ -278,6 +278,16 @@ export interface EditablePaneHandle {
      * seeded, e.g. an auto-fork triggered by that same stroke.
      */
     applyCellEdit(cellId: string, state: number): Promise<void>;
+    /**
+     * Undo/redo committed paints as per-cell diffs: undo restores exactly the
+     * cells a paint overwrote (their pre-paint values), even if the sim has
+     * stepped since — cell-level history, not a board-wide rewind. A reseed
+     * clears both stacks.
+     */
+    undo(): Promise<void>;
+    redo(): Promise<void>;
+    canUndo(): boolean;
+    canRedo(): boolean;
     step(): Promise<void>;
     runToggle(): Promise<void>;
     dispose(): void;
@@ -429,23 +439,20 @@ export function createEditablePane(options: EditablePaneOptions): EditablePaneHa
         gridView.clearGestureOutline();
     }
 
-    async function commitCells(cells: PreviewPaintCell[]): Promise<void> {
-        const current = snapshot ?? (await backend.getState());
-        const topologyIndex = indexPaneTopology(current);
-        const updates = cells.flatMap((cell) => {
-            const resolved = findPaneCellById(topologyIndex, cell.id);
-            if (!resolved) {
-                return [];
-            }
-            const state = Number(cell.state);
-            if (Number(current.cell_states[resolved.index] ?? 0) === state) {
-                return [];
-            }
-            return [{ id: resolved.id, state }];
-        });
-        if (updates.length === 0) {
-            return;
-        }
+    // Edit history: one entry per committed paint (a stroke, a programmatic
+    // edit), as per-cell diffs so undo can restore exactly what the paint
+    // overwrote. Undoing after the sim has stepped still restores those
+    // cells' pre-paint values — cell-level, not a board-wide rewind.
+    interface PaneCellDiff {
+        id: string;
+        prevState: number;
+        nextState: number;
+    }
+    const undoStack: PaneCellDiff[][] = [];
+    const redoStack: PaneCellDiff[][] = [];
+
+    /** Write cell states, pausing around the write when the sim is running. */
+    async function pushCellStates(updates: { id: string; state: number }[]): Promise<void> {
         const wasRunning = Boolean(snapshot?.running);
         if (wasRunning) {
             applySnapshot(await backend.postControl("/api/control/pause"));
@@ -453,6 +460,37 @@ export function createEditablePane(options: EditablePaneOptions): EditablePaneHa
         applySnapshot(await backend.setCells(updates));
         if (wasRunning) {
             applySnapshot(await backend.postControl("/api/control/resume"));
+        }
+    }
+
+    async function commitCells(cells: PreviewPaintCell[]): Promise<void> {
+        const current = snapshot ?? (await backend.getState());
+        const topologyIndex = indexPaneTopology(current);
+        const diffs = cells.flatMap((cell) => {
+            const resolved = findPaneCellById(topologyIndex, cell.id);
+            if (!resolved) {
+                return [];
+            }
+            const nextState = Number(cell.state);
+            const prevState = Number(current.cell_states[resolved.index] ?? 0);
+            if (prevState === nextState) {
+                return [];
+            }
+            return [{ id: resolved.id, prevState, nextState }];
+        });
+        if (diffs.length === 0) {
+            return;
+        }
+        // Record before writing: the write's own snapshot notification is
+        // where chrome refreshes its undo/redo enabled states, so the stacks
+        // must already reflect this commit when it fires.
+        undoStack.push(diffs);
+        redoStack.length = 0;
+        try {
+            await pushCellStates(diffs.map(({ id, nextState }) => ({ id, state: nextState })));
+        } catch (error) {
+            undoStack.pop();
+            throw error;
         }
     }
 
@@ -602,10 +640,47 @@ export function createEditablePane(options: EditablePaneOptions): EditablePaneHa
                 id,
                 state: Number(state),
             }));
+            // A reseed is a fresh board; edits made before it are not
+            // meaningful history against the new state.
+            undoStack.length = 0;
+            redoStack.length = 0;
             applySnapshot(updates.length > 0 ? await backend.setCells(updates) : reset);
         },
         applyCellEdit(cellId: string, state: number): Promise<void> {
             return commitCells([{ id: cellId, state }]);
+        },
+        canUndo: () => undoStack.length > 0,
+        canRedo: () => redoStack.length > 0,
+        async undo(): Promise<void> {
+            const diffs = undoStack.pop();
+            if (!diffs) {
+                return;
+            }
+            // Move between stacks before the write: the write's snapshot is
+            // where chrome refreshes its undo/redo enabled states, so the
+            // stacks must already reflect this operation when it fires.
+            redoStack.push(diffs);
+            try {
+                await pushCellStates(diffs.map(({ id, prevState }) => ({ id, state: prevState })));
+            } catch (error) {
+                redoStack.pop();
+                undoStack.push(diffs);
+                throw error;
+            }
+        },
+        async redo(): Promise<void> {
+            const diffs = redoStack.pop();
+            if (!diffs) {
+                return;
+            }
+            undoStack.push(diffs);
+            try {
+                await pushCellStates(diffs.map(({ id, nextState }) => ({ id, state: nextState })));
+            } catch (error) {
+                undoStack.pop();
+                redoStack.push(diffs);
+                throw error;
+            }
         },
         async step(): Promise<void> {
             applySnapshot(await backend.postControl("/api/control/step"));

@@ -9,7 +9,7 @@
  * stays out of the landing chunk.
  */
 
-import { EDITOR_TOOL_BRUSH } from "../editor-tools.js";
+import { EDITOR_TOOL_BRUSH, MAX_BRUSH_SIZE } from "../editor-tools.js";
 import {
     createEditablePane,
     element,
@@ -75,6 +75,31 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
     const badge = element("span", "compare-focus-pane-badge", `live · gen ${frameIndex}`);
     const palette = element("div", "compare-focus-pane-palette");
     const actions = element("div", "compare-focus-pane-actions");
+    // Wider strokes: cycle through the editor's brush sizes (1 -> 2 -> 3)
+    // instead of hosting the Lab's three-button row in the small chip.
+    let brushSize = 1;
+    const brushButton = element("button", "compare-focus-pane-action compare-focus-pane-brush");
+    brushButton.type = "button";
+    brushButton.title = "Brush size — paints a wider dot (cycles 1, 2, 3)";
+    const renderBrushButton = (): void => {
+        brushButton.textContent = `Brush ${brushSize}`;
+        brushButton.setAttribute("aria-label", `Brush size ${brushSize} of ${MAX_BRUSH_SIZE}`);
+    };
+    renderBrushButton();
+    brushButton.addEventListener("click", () => {
+        brushSize = brushSize >= MAX_BRUSH_SIZE ? 1 : brushSize + 1;
+        renderBrushButton();
+    });
+    const undoButton = element("button", "compare-focus-pane-action compare-focus-pane-undo", "↶");
+    undoButton.type = "button";
+    undoButton.title = "Undo the last paint";
+    undoButton.setAttribute("aria-label", "Undo the last paint");
+    undoButton.disabled = true;
+    const redoButton = element("button", "compare-focus-pane-action compare-focus-pane-redo", "↷");
+    redoButton.type = "button";
+    redoButton.title = "Redo the undone paint";
+    redoButton.setAttribute("aria-label", "Redo the undone paint");
+    redoButton.disabled = true;
     const stepButton = element("button", "compare-focus-pane-action", "Step");
     stepButton.type = "button";
     const runButton = element("button", "compare-focus-pane-action", "Run");
@@ -85,7 +110,7 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         "Discard",
     );
     discardButton.type = "button";
-    actions.append(stepButton, runButton, discardButton);
+    actions.append(brushButton, undoButton, redoButton, stepButton, runButton, discardButton);
     // The way back to the shared clock: hand the fork's current cells to the
     // host as the wall's new generation 0. Only offered when the host can
     // rebuild the shared seed from them, and only once the fork has actually
@@ -162,6 +187,7 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         bootstrapData,
         definitions,
         getTool: () => EDITOR_TOOL_BRUSH,
+        getBrushSize: () => brushSize,
         getPaintState: () => paintState,
         ...(options.resolveCellSize ? { resolveCellSize: options.resolveCellSize } : {}),
         buildEditorToolCells: options.buildEditorToolCells,
@@ -173,6 +199,10 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
             if (rejoinButton) {
                 rejoinButton.disabled = false;
             }
+            // Every history mutation lands a snapshot, so this is the one
+            // place the ↶/↷ enabled states need refreshing.
+            undoButton.disabled = !pane.canUndo();
+            redoButton.disabled = !pane.canRedo();
             renderPalette();
         },
         onError,
@@ -180,6 +210,8 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
 
     stepButton.addEventListener("click", () => void pane.step().catch(onError));
     runButton.addEventListener("click", () => void pane.runToggle().catch(onError));
+    undoButton.addEventListener("click", () => void pane.undo().catch(onError));
+    redoButton.addEventListener("click", () => void pane.redo().catch(onError));
 
     // The pane only re-fits its canvas when a new snapshot arrives (a poll
     // tick or an action). Moving between the gallery and speaker view resizes
