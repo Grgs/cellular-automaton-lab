@@ -162,6 +162,7 @@ function mount(
     fake: ReturnType<typeof fakeBackend>,
     onDiscard = vi.fn(),
     initialPaint?: { cellId: string; state: number },
+    onRunWallFromHere?: (cellsById: Record<string, number>) => void,
 ) {
     const handle = mountFocusPane({
         geometry: "square",
@@ -175,6 +176,7 @@ function mount(
         ],
         onDiscard,
         ...(initialPaint ? { initialPaint } : {}),
+        ...(onRunWallFromHere ? { onRunWallFromHere } : {}),
     });
     document.body.append(handle.element);
     return handle;
@@ -240,6 +242,27 @@ describe("mountFocusPane", () => {
         await handle.applyCellEdit("b", 1);
 
         expect(fake.setCells).toHaveBeenLastCalledWith([{ id: "b", state: 1 }]);
+    });
+
+    it("offers the way back to the shared clock only when the host provides one", async () => {
+        const fake = fakeBackend();
+        mount(fake);
+        await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalled());
+
+        expect(document.querySelector(".compare-focus-pane-rejoin")).toBeNull();
+    });
+
+    it("hands the fork's current live cells to onRunWallFromHere", async () => {
+        // Cell "a" is live in the fork's current snapshot; "b" is dead and
+        // must not appear in the sparse map handed back.
+        const fake = fakeBackend(snapshot({ cell_states: [1, 0] }));
+        const onRunWallFromHere = vi.fn();
+        mount(fake, vi.fn(), undefined, onRunWallFromHere);
+        await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalled());
+
+        chipButton("▶ Run wall from here").click();
+
+        expect(onRunWallFromHere).toHaveBeenCalledWith({ a: 1 });
     });
 
     it("steps and runs the fork through the chip controls", async () => {

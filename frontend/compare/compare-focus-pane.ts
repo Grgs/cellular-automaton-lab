@@ -36,6 +36,13 @@ export interface FocusPaneMountOptions {
      * paint stroke that triggered an auto-fork at a generation past 0.
      */
     initialPaint?: { cellId: string; state: number };
+    /**
+     * Offer a way back to the shared clock: called with the fork's current
+     * live cells (sparse, nonzero states only) so the host can make them the
+     * wall's new shared seed and re-run every board from generation 0. The
+     * chip only shows the action when this is provided.
+     */
+    onRunWallFromHere?: (cellsById: Record<string, number>) => void;
     /** Called when the user discards the fork (the pane and its session are gone). */
     onDiscard: () => void;
     onError?: (error: unknown) => void;
@@ -79,6 +86,38 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
     );
     discardButton.type = "button";
     actions.append(stepButton, runButton, discardButton);
+    // The way back to the shared clock: hand the fork's current cells to the
+    // host as the wall's new generation 0. Only offered when the host can
+    // rebuild the shared seed from them, and only once the fork has actually
+    // seeded (until the first snapshot there is no state to hand back — on
+    // standalone that boot takes seconds).
+    const { onRunWallFromHere } = options;
+    let rejoinButton: HTMLButtonElement | null = null;
+    if (onRunWallFromHere) {
+        rejoinButton = element(
+            "button",
+            "compare-focus-pane-action compare-focus-pane-rejoin",
+            "▶ Run wall from here",
+        );
+        rejoinButton.type = "button";
+        rejoinButton.disabled = true;
+        rejoinButton.title =
+            "Make this board's current state the shared seed (generation 0) and re-run every board from it";
+        rejoinButton.addEventListener("click", () => {
+            if (!currentSnapshot) {
+                return;
+            }
+            const cellsById: Record<string, number> = {};
+            currentSnapshot.topology.cells.forEach((cell, index) => {
+                const state = Number(currentSnapshot?.cell_states[index] ?? 0);
+                if (state !== 0) {
+                    cellsById[cell.id] = state;
+                }
+            });
+            onRunWallFromHere(cellsById);
+        });
+        actions.append(rejoinButton);
+    }
     chip.append(info, badge, palette, actions);
 
     const viewport = element("div", "compare-focus-pane-viewport");
@@ -131,6 +170,9 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
             runButton.textContent = snapshot.running ? "Pause" : "Run";
             info.textContent = `⑂ Forked from ${geometry} gen ${frameIndex} · now gen ${snapshot.generation}`;
             badge.textContent = `live · gen ${snapshot.generation}`;
+            if (rejoinButton) {
+                rejoinButton.disabled = false;
+            }
             renderPalette();
         },
         onError,

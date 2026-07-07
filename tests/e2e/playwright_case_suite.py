@@ -374,6 +374,28 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click(".compare-focus-pane-discard")
         self._expect(".compare-focus-pane").to_have_count(0)
 
+    def test_wall_fork_rejoins_the_wall_as_the_new_shared_seed(self) -> None:
+        # A fork detaches from the shared clock; "Run wall from here" is the
+        # way back: the fork's current state pulls back through the board's
+        # traversal to become the shared seed, and every board re-runs from it
+        # as generation 0 (the re-run also disposes the fork).
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.locator(".compare-filmstrip-board").first.click()
+        case.page.click(".compare-hero-fork")
+        self._expect(".compare-filmstrip-board.is-hero .compare-focus-pane").to_be_visible(
+            timeout=30_000
+        )
+
+        case.page.click(".compare-focus-pane-rejoin")
+        self._expect(".compare-focus-pane").to_have_count(0)
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        self._expect(".compare-filmstrip-board").to_have_count(4)
+
     def test_wall_edit_mode_auto_forks_a_mid_timeline_paint(self) -> None:
         # A mid-timeline state has no seed representation, so painting one (in
         # edit mode, away from gen 0) forks that board live from its current

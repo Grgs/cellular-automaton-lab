@@ -678,6 +678,36 @@ export function createComparePanelContent(
 
     editModeButton.addEventListener("click", () => setEditMode(!editMode));
 
+    /**
+     * Rejoin the shared clock: pull a fork's current live cells back to a
+     * bit-string through the board's traversal (same pull-back as a gen-0
+     * paint), make that the shared seed, and re-run the wall — every board
+     * restarts from this state as its generation 0, and the re-run disposes
+     * the fork it came from. Multi-state cells collapse to alive (the shared
+     * seed is binary); generation numbering restarts by design.
+     */
+    function adoptForkStateAsSeed(geometry: string, cellsById: Record<string, number>): void {
+        if (!activeFilmstrip || running) {
+            return;
+        }
+        const order = activeFilmstrip.tilings.find(
+            (entry) => entry.geometry === geometry,
+        )?.seed_order;
+        if (!order || order.length === 0) {
+            statusLine.textContent = "This board cannot rebuild the shared seed.";
+            return;
+        }
+        if (isShapeMode()) {
+            shapeSelect.value = "";
+            syncShapeMode();
+        }
+        seedInput.value = reconstructSeedBits(order, cellsById);
+        seedPad.syncFromSeed();
+        redrawPreview();
+        statusLine.textContent = "Re-running every board from the forked state…";
+        void runFilmstrip();
+    }
+
     function handleFocusChanged(geometry: string | null): void {
         // Forks are per-board and outlive a focus change: leaving a forked
         // board keeps it running as a live tile in the gallery instead of
@@ -796,6 +826,7 @@ export function createComparePanelContent(
                 buildEditorToolCells: services.buildEditorToolCells,
                 ...(services.resolveCellSize ? { resolveCellSize: services.resolveCellSize } : {}),
                 ...(initialPaint ? { initialPaint } : {}),
+                onRunWallFromHere: (cellsById) => adoptForkStateAsSeed(geometry, cellsById),
                 onDiscard: () => {
                     if (forkedBoards.get(geometry) === nextPane) {
                         forkedBoards.delete(geometry);

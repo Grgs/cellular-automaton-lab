@@ -69,7 +69,7 @@ The wall is the landing view: a bare URL opens it, and on a first visit it autop
 Two layout states share one persistent transport (play, pause, step, scrub, speed on one clock):
 
 - **Gallery** shows every selected board at once, evolving in lockstep.
-- **Speaker view** (click a board, or `&focus=<geometry>`) enlarges one board as the hero with the others as a thumbnail strip. **⑂ Fork this board live** turns the hero into a real editable board on its own session — you can paint, step, and run it while the other boards keep looping — with **Discard** to restore it. Escape returns speaker view to the gallery.
+- **Speaker view** (click a board, or `&focus=<geometry>`) enlarges one board as the hero with the others as a thumbnail strip. **⑂ Fork this board live** turns the hero into a real editable board on its own session — you can paint, step, and run it while the other boards keep looping — with **Discard** to restore it, or **▶ Run wall from here** to make the fork's current state the shared seed and re-run every board from it as generation 0. Escape returns speaker view to the gallery.
 
 **Edit mode** (the dock's ✎) makes board cells clickable in either layout: painting at generation 0 edits the shared seed directly (generation 0 re-projects onto every board instantly, then a debounced re-run replays the evolution everywhere), while painting at any later generation auto-forks that board live from its current frame and carries the stroke over as the fork's first edit. The seed pad in the config sheet remains for bit-level control.
 
