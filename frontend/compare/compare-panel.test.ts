@@ -221,6 +221,13 @@ function twoBoardFilmstrip(): SeedFilmstripResult {
     };
 }
 
+/** Three boards: above the two-board minimum, so per-board removal is offered. */
+function threeBoardFilmstrip(): SeedFilmstripResult {
+    const base = twoBoardFilmstrip();
+    const third = { ...base.tilings[0]!, geometry: "tri", tiling_family: "tri" };
+    return { ...base, tilings: [...base.tilings, third] };
+}
+
 function fakeGridView(): GridView {
     return {
         render: vi.fn(),
@@ -1642,6 +1649,58 @@ describe("mountComparePanel", () => {
         expect(
             document.querySelector(".compare-config-run .compare-seed-workspace"),
         ).not.toBeNull();
+        handle.dispose();
+    });
+
+    it("removes a board from the wall via its ✕ chrome and re-runs without it", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "▶ Play side by side")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        const firstRequest = requestFilmstrip.mock.calls.at(0)?.[0];
+        expect(firstRequest?.geometries).toContain("square");
+
+        document
+            .querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
+            ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+        expect(document.querySelector(".compare-status")?.textContent).toContain("Removed");
+        // Removals coalesce into one debounced re-run that drops the geometry.
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2), {
+            timeout: 3000,
+        });
+        expect(requestFilmstrip.mock.calls.at(1)?.[0]?.geometries).not.toContain("square");
+        handle.dispose();
+    });
+
+    it("opens the tiling checklist with search focused from the dock's ⊞ button", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+
+        document.querySelector<HTMLButtonElement>(".compare-tilings-open")?.click();
+
+        expect(document.querySelector(".compare-config-sheet")?.classList.contains("is-open")).toBe(
+            true,
+        );
+        expect(document.querySelector<HTMLDetailsElement>(".compare-config-tilings")?.open).toBe(
+            true,
+        );
+        expect(document.activeElement?.className).toContain("compare-tilings-search");
         handle.dispose();
     });
 

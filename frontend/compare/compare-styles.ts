@@ -617,6 +617,49 @@ export const COMPARE_PANEL_STYLES = `
     opacity: 1;
 }
 .compare-filmstrip-expand { margin-left: auto; font-size: 13px; opacity: 0.85; }
+/* The chrome's ✕ drops this board from the run. The chrome itself ignores the
+   pointer, so the button opts back in -- but only while the chrome is visible,
+   so an invisible ✕ never eats a board click. */
+.compare-filmstrip-remove {
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: 12px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+.compare-filmstrip-remove:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.16);
+}
+.compare-filmstrip-board:hover .compare-filmstrip-remove,
+.compare-filmstrip-board:focus-visible .compare-filmstrip-remove,
+.compare-filmstrip-board.is-hero .compare-filmstrip-remove {
+    pointer-events: auto;
+}
+/* The gallery's trailing ghost tile opens the tiling picker. Speaker view is
+   about one board, so the tile only lives in the gallery grid. */
+.compare-filmstrip-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    border: 1px dashed var(--line, rgba(0, 0, 0, 0.22));
+    border-radius: 10px;
+    background: none;
+    color: var(--muted, #6d756f);
+    font-size: 13px;
+    cursor: pointer;
+}
+.compare-filmstrip-add:hover {
+    color: inherit;
+    border-color: var(--focus, #7aa7ff);
+}
+.compare-filmstrip--speaker .compare-filmstrip-add { display: none; }
 /* Edit mode: the pointer paints cells, so the cursor says so, hovered cells
    light up, and the chrome becomes interactive so its ⤢ glyph can stay the one
    zoom affordance. */

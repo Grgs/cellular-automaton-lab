@@ -137,6 +137,8 @@ function mountView(
     options: {
         loop?: boolean;
         onFocusChange?: (geometry: string | null) => void;
+        onRemoveBoard?: (geometry: string) => void;
+        onAddTiling?: () => void;
         previewTopology?: SimulationBackend["previewTopology"];
     } = {},
 ): Harness {
@@ -148,6 +150,8 @@ function mountView(
         transport,
         ...(options.loop === undefined ? {} : { loop: options.loop }),
         ...(options.onFocusChange ? { onFocusChange: options.onFocusChange } : {}),
+        ...(options.onRemoveBoard ? { onRemoveBoard: options.onRemoveBoard } : {}),
+        ...(options.onAddTiling ? { onAddTiling: options.onAddTiling } : {}),
     });
     document.body.append(transport.element, view.element);
     return { view, transport, clock };
@@ -231,6 +235,74 @@ describe("createFilmstripView", () => {
                 .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[title="Play / pause"]')
                 ?.getAttribute("aria-label"),
         ).toBe("Play / pause");
+    });
+
+    it("labels boards with the friendly catalog label, geometry key as fallback", async () => {
+        const { view } = mountView();
+
+        await view.load(
+            filmstrip(
+                [
+                    { ...tiling("penrose-p3-rhombs", [{ a: 1 }]), label: "Penrose P3 Rhombs" },
+                    tiling("hex", [{ a: 1 }]),
+                ],
+                1,
+            ),
+        );
+
+        const labels = [...view.element.querySelectorAll(".compare-filmstrip-label")].map(
+            (node) => node.textContent,
+        );
+        expect(labels).toEqual(["Penrose P3 Rhombs", "hex"]);
+        expect(
+            view.element
+                .querySelector<HTMLElement>(".compare-filmstrip-board")
+                ?.getAttribute("aria-label"),
+        ).toBe("Penrose P3 Rhombs: focus this board");
+    });
+
+    it("offers a remove affordance per board only above the two-board minimum", async () => {
+        const removed: string[] = [];
+        const { view } = mountView({ onRemoveBoard: (geometry) => removed.push(geometry) });
+
+        await view.load(
+            filmstrip(
+                [
+                    tiling("square", [{ a: 1 }]),
+                    tiling("hex", [{ a: 1 }]),
+                    tiling("tri", [{ a: 1 }]),
+                ],
+                1,
+            ),
+        );
+        expect(view.element.querySelectorAll(".compare-filmstrip-remove")).toHaveLength(3);
+
+        view.element
+            .querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
+            ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(removed).toEqual(["square"]);
+        // The ✕ is a button, so the board click handler ignored it (no zoom).
+        expect(view.element.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
+
+        // At the backend's two-board minimum the affordance disappears.
+        await view.load(twoBoardFilmstrip());
+        expect(view.element.querySelectorAll(".compare-filmstrip-remove")).toHaveLength(0);
+    });
+
+    it("renders a trailing add-tiling tile only when the host wires one", async () => {
+        const added: number[] = [];
+        const { view } = mountView({ onAddTiling: () => added.push(1) });
+
+        await view.load(twoBoardFilmstrip());
+
+        const addTile = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+        expect(addTile).not.toBeNull();
+        addTile?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(added).toHaveLength(1);
+
+        const { view: plainView } = mountView();
+        await plainView.load(twoBoardFilmstrip());
+        expect(plainView.element.querySelector(".compare-filmstrip-add")).toBeNull();
     });
 
     it("advances every board in lockstep on each clock tick while playing", async () => {

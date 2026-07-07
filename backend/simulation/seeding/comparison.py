@@ -410,12 +410,15 @@ class TopologyFilmstrip:
     period: int | None
     note: str | None = None
     seed_order: list[str] = field(default_factory=list)
+    # Friendly catalog label (e.g. "Penrose P3 Rhombs"), shown on the board.
+    label: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "geometry": self.geometry,
             "tiling_family": self.tiling_family,
             "family": self.family,
+            "label": self.label,
             "cell_count": self.cell_count,
             "topology": self.topology,
             "topology_spec": self.topology_spec,
@@ -497,6 +500,7 @@ def _run_single_filmstrip(
         geometry=geometry,
         tiling_family=variant.tiling_family,
         family=variant.family,
+        label=variant.label,
         cell_count=seeded.frame.cell_count,
         topology=dict(board.topology.to_dict()),
         topology_spec=dict(
@@ -578,6 +582,7 @@ def run_seed_filmstrip(
                 geometry=geometry,
                 tiling_family=variant.tiling_family,
                 family=variant.family,
+                label=variant.label,
                 cell_count=0,
                 topology={},
                 topology_spec={},

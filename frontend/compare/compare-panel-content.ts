@@ -379,6 +379,18 @@ export function createComparePanelContent(
         },
         ["⚙"],
     );
+    // One click from the wall to the searchable tiling checklist: opens the
+    // config sheet with the Tilings disclosure expanded and search focused.
+    const tilingsButton = el(
+        "button",
+        {
+            class: "compare-dock-icon compare-tilings-open",
+            type: "button",
+            title: "Choose the tilings on the wall",
+            "aria-label": "Choose tilings",
+        },
+        ["⊞"],
+    );
     const configSheetCloseButton = el(
         "button",
         {
@@ -583,7 +595,9 @@ export function createComparePanelContent(
         }
     }
 
-    function schedulePaintRerun(): void {
+    // Debounce the authoritative wall re-run so a burst of small changes (a
+    // paint stroke, removing a couple of boards) coalesces into one rebuild.
+    function scheduleWallRerun(): void {
         if (paintRerunTimer !== null) {
             window.clearTimeout(paintRerunTimer);
         }
@@ -591,7 +605,7 @@ export function createComparePanelContent(
             paintRerunTimer = null;
             if (running) {
                 // A run is already in flight; try again once it settles.
-                schedulePaintRerun();
+                scheduleWallRerun();
                 return;
             }
             void runFilmstrip();
@@ -673,7 +687,22 @@ export function createComparePanelContent(
         statusLine.textContent = converted
             ? "Shape converted to an editable seed — every board now runs from it."
             : "Seed updated — re-running the wall…";
-        schedulePaintRerun();
+        scheduleWallRerun();
+    }
+
+    // Selection editing from the wall itself: a board's ✕ chrome drops that
+    // tiling from the run (the filmstrip view only offers it while more than
+    // two boards remain), with removals coalescing into one debounced re-run.
+    function removeBoardFromWall(geometry: string): void {
+        if (running || !selected.has(geometry)) {
+            return;
+        }
+        selected.delete(geometry);
+        const tiling = activeFilmstrip?.tilings.find((entry) => entry.geometry === geometry);
+        statusLine.textContent = `Removed ${tiling?.label || geometry} — updating the wall…`;
+        renderTilingChecklist();
+        refreshPreview();
+        scheduleWallRerun();
     }
 
     editModeButton.addEventListener("click", () => setEditMode(!editMode));
@@ -817,7 +846,8 @@ export function createComparePanelContent(
 
             let nextPane: FocusPaneHandle | null = null;
             nextPane = mountFocusPane({
-                geometry: tiling.geometry,
+                // Display-only: the chip and canvas aria name the board.
+                geometry: tiling.label || tiling.geometry,
                 frameIndex,
                 pattern,
                 backend,
@@ -941,6 +971,9 @@ export function createComparePanelContent(
     // Configuration and data live in a bottom sheet the dock's gear slides up,
     // closed by default, so the stage owns the whole first screen. The four
     // disclosures inside keep their own open/closed persistence.
+    const tilingsSection = configSection("Tilings", "compare-config-tilings", true, [
+        el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
+    ]);
     const configSheet = el("div", { class: "compare-config-sheet", inert: true }, [
         el("div", { class: "compare-config-sheet-header" }, [
             el("div", { class: "compare-config-sheet-title", textContent: "Set up the run" }),
@@ -958,9 +991,7 @@ export function createComparePanelContent(
                 ]),
                 seedWorkspace,
             ]),
-            configSection("Tilings", "compare-config-tilings", true, [
-                el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
-            ]),
+            tilingsSection,
             configSection("Cross-tiling analysis", "compare-config-analysis", false, [
                 el("div", { class: "compare-analysis" }, [
                     el("p", {
@@ -988,6 +1019,7 @@ export function createComparePanelContent(
             el("div", { class: "compare-dock" }, [
                 filmstripTransport.element,
                 editModeButton,
+                tilingsButton,
                 configButton,
                 copyRunButton,
                 statusLine,
@@ -1752,6 +1784,8 @@ export function createComparePanelContent(
                     loop: true,
                     onFocusChange: handleFocusChanged,
                     onPaintCell: handlePaintCell,
+                    onRemoveBoard: removeBoardFromWall,
+                    onAddTiling: openTilingsSheet,
                 });
                 filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripView.setEditMode(editMode);
@@ -2111,12 +2145,22 @@ export function createComparePanelContent(
         return true;
     }
 
+    // The tilings shortcut lands ready to type: sheet open, Tilings disclosure
+    // expanded, search focused.
+    function openTilingsSheet(): void {
+        openConfigSheet();
+        tilingsSection.open = true;
+        tilingSearchInput.focus();
+        tilingSearchInput.select();
+    }
+
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
     heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
     copyRunButton.addEventListener("click", copyRunLink);
     configButton.addEventListener("click", openConfigSheet);
+    tilingsButton.addEventListener("click", openTilingsSheet);
     configSheetCloseButton.addEventListener("click", () => closeConfigIfOpen());
     document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);

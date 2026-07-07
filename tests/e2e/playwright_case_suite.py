@@ -396,6 +396,36 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         self._expect(".compare-filmstrip-board").to_have_count(4)
 
+    def test_wall_names_boards_and_edits_the_selection_in_place(self) -> None:
+        # Boards carry their friendly catalog label (not the raw geometry
+        # key), the dock's ⊞ jumps straight to the searchable tiling
+        # checklist, and a board's hover ✕ drops it from the run with one
+        # debounced re-run.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        self._expect(".compare-filmstrip-label >> nth=0").to_have_text("Square")
+        self._expect(".compare-filmstrip-label >> nth=2").to_have_text("Penrose P3 Rhombs")
+
+        # ⊞ lands ready to type: sheet open, Tilings section expanded, search
+        # focused.
+        case.page.click(".compare-tilings-open")
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
+        self._expect(".compare-tilings-search").to_be_focused()
+        case.page.click(".compare-config-sheet-close")
+
+        # The hover ✕ removes the board and re-runs the wall without it.
+        case.page.locator(".compare-filmstrip-board").first.hover()
+        case.page.click(".compare-filmstrip-remove >> nth=0")
+        self._expect(".compare-status").to_contain_text("Removed Square")
+        self._expect(".compare-filmstrip-board").to_have_count(3, timeout=60_000)
+        self._expect(".compare-filmstrip-label >> nth=0").to_have_text(
+            "Kagome / Trihexagonal (3.6.3.6)"
+        )
+
     def test_wall_edit_mode_auto_forks_a_mid_timeline_paint(self) -> None:
         # A mid-timeline state has no seed representation, so painting one (in
         # edit mode, away from gen 0) forks that board live from its current

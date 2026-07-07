@@ -32,6 +32,14 @@ export interface FilmstripViewOptions {
     onFocusChange?: (geometry: string | null) => void;
     /** Called when a board cell is clicked while edit mode is on. */
     onPaintCell?: (geometry: string, cellId: string) => void;
+    /**
+     * Called when a board's ✕ chrome is clicked. The affordance only renders
+     * when this is provided and more than two boards are on the wall (the
+     * backend needs at least two to compare).
+     */
+    onRemoveBoard?: (geometry: string) => void;
+    /** Called by the gallery's trailing "+ Add tiling" tile. */
+    onAddTiling?: () => void;
 }
 
 /** Optional playback overrides applied right after a filmstrip is loaded. */
@@ -141,15 +149,15 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             entry.cell.classList.toggle("is-strip", speaker && !isHero);
             if (editMode) {
                 entry.cell.title = "Paint cells (⤢ zooms)";
-                entry.cell.setAttribute("aria-label", `${entry.tiling.geometry}: paint cells`);
+                entry.cell.setAttribute("aria-label", `${boardName(entry.tiling)}: paint cells`);
                 continue;
             }
             entry.cell.title = isHero ? "Back to the gallery" : "Focus this board";
             entry.cell.setAttribute(
                 "aria-label",
                 isHero
-                    ? `${entry.tiling.geometry}: back to the gallery`
-                    : `${entry.tiling.geometry}: focus this board`,
+                    ? `${boardName(entry.tiling)}: back to the gallery`
+                    : `${boardName(entry.tiling)}: focus this board`,
             );
         }
         placeHeroToolbelt();
@@ -157,6 +165,11 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
 
     function entryFor(geometry: string): BoardEntry | undefined {
         return boards.find((entry) => entry.tiling.geometry === geometry);
+    }
+
+    /** The board's display name: friendly catalog label, geometry key fallback. */
+    function boardName(tiling: TopologyFilmstrip): string {
+        return tiling.label || tiling.geometry;
     }
 
     function focus(geometry: string | null): void {
@@ -192,7 +205,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         const svg = buildBoardThumbnailSvg(preview, cellsById, {
             size: thumbSize,
             liveColor: getLiveColor(),
-            label: `${entry.tiling.geometry} generation ${index}`,
+            label: `${boardName(entry.tiling)} generation ${index}`,
         });
         entry.slot.replaceChildren(svg);
         const liveCells = Object.keys(cellsById).length;
@@ -238,9 +251,12 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         });
 
         boardsArea.replaceChildren();
+        // Removing a board only makes sense while the backend can still
+        // compare what remains (two boards minimum).
+        const removable = Boolean(options.onRemoveBoard) && filmstrip.tilings.length > 2;
         boards = filmstrip.tilings.map((tiling) => {
             const slot = el("div", "compare-filmstrip-slot", "…");
-            const label = el("div", "compare-filmstrip-label", tiling.geometry);
+            const label = el("div", "compare-filmstrip-label", boardName(tiling));
             const countLabel = el("div", "compare-filmstrip-count");
             const cell = el("div", "compare-filmstrip-board");
             cell.setAttribute("role", "listitem");
@@ -252,6 +268,21 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             expandGlyph.setAttribute("aria-hidden", "true");
             const chrome = el("div", "compare-filmstrip-board-chrome");
             chrome.append(label, countLabel, expandGlyph);
+            if (removable) {
+                // A real <button> so the cell's click handler ignores it (its
+                // early-return on buttons), in edit mode included.
+                const removeButton = el("button", "compare-filmstrip-remove", "✕");
+                removeButton.setAttribute("type", "button");
+                removeButton.title = "Remove from the wall";
+                removeButton.setAttribute(
+                    "aria-label",
+                    `Remove ${boardName(tiling)} from the wall`,
+                );
+                removeButton.addEventListener("click", () => {
+                    options.onRemoveBoard?.(tiling.geometry);
+                });
+                chrome.append(removeButton);
+            }
             cell.append(slot, chrome);
             const toggleFocus = () => {
                 focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
@@ -294,6 +325,15 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 countLabel,
             };
         });
+        if (options.onAddTiling) {
+            // A trailing ghost tile keeps "what's on the wall" editable from
+            // the wall itself; speaker view hides it (see compare-styles.ts).
+            const addTile = el("button", "compare-filmstrip-add", "+ Add tiling");
+            addTile.setAttribute("type", "button");
+            addTile.title = "Choose the tilings on the wall";
+            addTile.addEventListener("click", () => options.onAddTiling?.());
+            boardsArea.append(addTile);
+        }
 
         unsubscribe = player.subscribe(onPlayerIndex);
         transport.attach(player);
