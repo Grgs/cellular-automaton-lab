@@ -230,8 +230,11 @@ export function paneEditorState(
 /**
  * The app-runtime-owned seams the wall needs to spin up a live focus pane: an
  * independent backend session, a canvas grid view, and the editor geometry
- * helpers. `baseSessionId` is null on the standalone build (no server sessions),
- * which the wall reads as "fork into the Lab instead".
+ * helpers. `baseSessionId` is null when no host session exists at all, which
+ * the wall reads as "fork into the Lab instead". Both hosts that do provide
+ * one differ in cost: a server fork is just another lightweight backend
+ * session, but a standalone fork boots its own persist-free Pyodide runtime
+ * from scratch, so `forkCapacity` caps how many can run at once there.
  */
 export interface FocusPaneServices {
     baseSessionId: string | null;
@@ -240,6 +243,8 @@ export interface FocusPaneServices {
     buildEditorToolCells: PaneEditorCellsBuilder;
     resolveCellSize?: (options: PaneCellSizeOptions) => number;
     resolveViewportDimensions?: (options: PaneViewportDimensionsOptions) => ViewportDimensions;
+    /** Maximum concurrent live forks; undefined means unlimited. */
+    forkCapacity?: number;
 }
 
 export interface EditablePaneOptions {

@@ -54,7 +54,11 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         "compare-focus-pane-info",
         `⑂ Forked from ${geometry} gen ${frameIndex}`,
     );
-    const badge = element("span", "compare-focus-pane-badge", "detached from the shared clock");
+    // In the gallery (or the speaker-view strip) this pane collapses to just
+    // this badge over the canvas -- see the `:not(.is-hero)` compact styling
+    // in compare-styles.ts -- so it carries the generation on its own; the
+    // full chip's `info` line already explains "detached" for the hero.
+    const badge = element("span", "compare-focus-pane-badge", `live · gen ${frameIndex}`);
     const palette = element("div", "compare-focus-pane-palette");
     const actions = element("div", "compare-focus-pane-actions");
     const stepButton = element("button", "compare-focus-pane-action", "Step");
@@ -119,6 +123,7 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
             currentSnapshot = snapshot;
             runButton.textContent = snapshot.running ? "Pause" : "Run";
             info.textContent = `⑂ Forked from ${geometry} gen ${frameIndex} · now gen ${snapshot.generation}`;
+            badge.textContent = `live · gen ${snapshot.generation}`;
             renderPalette();
         },
         onError,
@@ -127,12 +132,21 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
     stepButton.addEventListener("click", () => void pane.step().catch(onError));
     runButton.addEventListener("click", () => void pane.runToggle().catch(onError));
 
+    // The pane only re-fits its canvas when a new snapshot arrives (a poll
+    // tick or an action). Moving between the gallery and speaker view resizes
+    // this container purely via CSS -- no snapshot involved -- so a paused
+    // fork would otherwise stay stuck at its old size until the next action.
+    const resizeObserver =
+        typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => pane.render());
+    resizeObserver?.observe(viewport);
+
     let disposed = false;
     function dispose(): void {
         if (disposed) {
             return;
         }
         disposed = true;
+        resizeObserver?.disconnect();
         pane.dispose();
         void Promise.resolve(backend.dispose()).catch(onError);
     }

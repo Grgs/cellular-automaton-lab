@@ -30,6 +30,8 @@ export interface FilmstripViewOptions {
     loop?: boolean;
     /** Called when the focused board changes (null = gallery), e.g. to mirror the hash. */
     onFocusChange?: (geometry: string | null) => void;
+    /** Called when a board cell is clicked while edit mode is on. */
+    onPaintCell?: (geometry: string, cellId: string) => void;
 }
 
 /** Optional playback overrides applied right after a filmstrip is loaded. */
@@ -50,10 +52,23 @@ export interface FilmstripViewController {
     load(filmstrip: SeedFilmstripResult, options?: FilmstripLoadOptions): Promise<void>;
     /** Enlarge one board (speaker view) or return to the gallery (null). */
     focus(geometry: string | null): void;
+    /**
+     * Toggle edit mode: board clicks paint cells (via `onPaintCell`) instead of
+     * focusing; the expand glyph becomes the only zoom affordance.
+     */
+    setEditMode(enabled: boolean): void;
+    /** Re-render one board's current frame (e.g. after an optimistic seed edit). */
+    refreshBoard(geometry: string): void;
     /** The shared clock's current generation index. */
     currentFrameIndex(): number;
-    /** Overlay a node onto the focused board's slot (live fork), or restore its SVG (null). */
-    setHeroOverlay(node: HTMLElement | null): boolean;
+    /**
+     * Overlay a node onto a board's slot (a live fork), or restore its SVG
+     * rendering (null). Targets the board by geometry, not by focus, so a fork
+     * keeps rendering in its own slot whether that board is the hero, part of
+     * the speaker-view strip, or back in the gallery. Returns false if the
+     * board no longer exists in the current filmstrip.
+     */
+    setBoardOverlay(geometry: string, node: HTMLElement | null): boolean;
     /** Persistent toolbelt overlaid on the hero in speaker view (null to clear). */
     setHeroToolbelt(node: HTMLElement | null): void;
     dispose(): void;
@@ -97,8 +112,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let boards: BoardEntry[] = [];
     let lastRenderedIndex = -1;
     let focusedGeometry: string | null = null;
-    let overlayEntry: BoardEntry | null = null;
     let heroToolbelt: HTMLElement | null = null;
+    let editMode = false;
 
     /** Move the (panel-owned) toolbelt onto the current hero, or detach it. */
     function placeHeroToolbelt(): void {
@@ -124,6 +139,11 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const isHero = speaker && entry.tiling.geometry === focusedGeometry;
             entry.cell.classList.toggle("is-hero", isHero);
             entry.cell.classList.toggle("is-strip", speaker && !isHero);
+            if (editMode) {
+                entry.cell.title = "Paint cells (⤢ zooms)";
+                entry.cell.setAttribute("aria-label", `${entry.tiling.geometry}: paint cells`);
+                continue;
+            }
             entry.cell.title = isHero ? "Back to the gallery" : "Focus this board";
             entry.cell.setAttribute(
                 "aria-label",
@@ -133,6 +153,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             );
         }
         placeHeroToolbelt();
+    }
+
+    function entryFor(geometry: string): BoardEntry | undefined {
+        return boards.find((entry) => entry.tiling.geometry === geometry);
     }
 
     function focus(geometry: string | null): void {
@@ -198,7 +222,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         unsubscribe = null;
         boards = [];
         lastRenderedIndex = -1;
-        overlayEntry = null;
         // A fresh run starts in the gallery; silent so it doesn't fire onFocusChange.
         focusedGeometry = null;
         root.classList.remove("compare-filmstrip--speaker");
@@ -234,9 +257,22 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
             };
             // The board tile itself behaves like a video-call participant: click
-            // to focus it, click the focused hero to return to the gallery.
+            // to focus it, click the focused hero to return to the gallery. In
+            // edit mode clicks paint instead, and only the ⤢ glyph zooms.
             cell.addEventListener("click", (event) => {
-                if (event.target instanceof Element && event.target.closest("button")) {
+                const target = event.target instanceof Element ? event.target : null;
+                if (target?.closest("button")) {
+                    return;
+                }
+                if (editMode) {
+                    if (target?.closest(".compare-filmstrip-expand")) {
+                        toggleFocus();
+                        return;
+                    }
+                    const cellId = target?.closest("[data-cell-id]")?.getAttribute("data-cell-id");
+                    if (cellId && !entryFor(tiling.geometry)?.overlaid) {
+                        options.onPaintCell?.(tiling.geometry, cellId);
+                    }
                     return;
                 }
                 toggleFocus();
@@ -301,24 +337,34 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         element: root,
         load,
         focus,
+        setEditMode(enabled: boolean): void {
+            if (editMode === enabled) {
+                return;
+            }
+            editMode = enabled;
+            root.classList.toggle("is-editing", editMode);
+            applyFocusLayout();
+        },
+        refreshBoard(geometry: string): void {
+            const entry = entryFor(geometry);
+            if (entry) {
+                renderBoard(entry, player.index);
+            }
+        },
         currentFrameIndex: () => player.index,
-        setHeroOverlay(node: HTMLElement | null): boolean {
+        setBoardOverlay(geometry: string, node: HTMLElement | null): boolean {
+            const entry = entryFor(geometry);
+            if (!entry) {
+                return false;
+            }
             if (node) {
-                const entry = boards.find(
-                    (candidate) => candidate.tiling.geometry === focusedGeometry,
-                );
-                if (!entry) {
-                    return false;
-                }
-                overlayEntry = entry;
                 entry.overlaid = true;
                 entry.slot.replaceChildren(node);
                 return true;
             }
-            if (overlayEntry) {
-                overlayEntry.overlaid = false;
-                renderBoard(overlayEntry, player.index);
-                overlayEntry = null;
+            if (entry.overlaid) {
+                entry.overlaid = false;
+                renderBoard(entry, player.index);
             }
             return true;
         },

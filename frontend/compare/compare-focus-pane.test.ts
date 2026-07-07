@@ -198,8 +198,10 @@ describe("mountFocusPane", () => {
         expect(document.querySelector(".compare-focus-pane-info")?.textContent).toContain(
             "Forked from square gen 9",
         );
+        // Doubles as the compact gallery-tile label once this board is no
+        // longer the hero, so it carries the generation, not a static string.
         expect(document.querySelector(".compare-focus-pane-badge")?.textContent).toBe(
-            "detached from the shared clock",
+            "live · gen 9",
         );
         await vi.waitFor(() =>
             expect(fake.postControl).toHaveBeenCalledWith("/api/control/reset", {
@@ -227,6 +229,76 @@ describe("mountFocusPane", () => {
         chipButton("Run").click();
         await vi.waitFor(() =>
             expect(fake.postControl).toHaveBeenLastCalledWith("/api/control/start"),
+        );
+    });
+
+    it("carries the fork's own generation in its badge as it steps", async () => {
+        // The badge doubles as the compact gallery-tile label, so it must track
+        // this pane's own (detached) generation, not the seed frame it forked from.
+        const stepped = snapshot({ generation: 1 });
+        const initial = snapshot();
+        const postControl = vi.fn(async (path: string) =>
+            path === "/api/control/step" ? stepped : initial,
+        );
+        const backend: SimulationBackend = {
+            getState: async () => initial,
+            getRules: async () => ({ rules: [] }),
+            dispose: vi.fn(),
+            postControl: postControl as unknown as SimulationBackend["postControl"],
+            toggleCell: async () => initial,
+            setCell: async () => initial,
+            setCells: async () => initial,
+            compareSeed: async () => ({
+                rule_name: "conway",
+                seed: "",
+                seed_bits: 0,
+                traversal: "bfs",
+                steps: 1,
+                grid_size: 16,
+                degenerate: false,
+                results: [],
+            }),
+            requestFilmstrip: async () => ({
+                rule_name: "conway",
+                seed: "",
+                traversal: "bfs",
+                frame_count: 0,
+                grid_size: 12,
+                tilings: [],
+            }),
+            previewTopology: async () => ({
+                topology_revision: "rev",
+                topology_spec: topologySpec(),
+                cells: [],
+            }),
+        };
+        const handle = mountFocusPane({
+            geometry: "square",
+            frameIndex: 9,
+            pattern,
+            backend,
+            bootstrapData: bootstrapData(),
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+            onDiscard: vi.fn(),
+        });
+        document.body.append(handle.element);
+        // The seed lands at generation 0 (the pane's own detached clock),
+        // overwriting the pre-seed placeholder that named the forked-from frame.
+        await vi.waitFor(() =>
+            expect(document.querySelector(".compare-focus-pane-badge")?.textContent).toBe(
+                "live · gen 0",
+            ),
+        );
+
+        chipButton("Step").click();
+
+        await vi.waitFor(() =>
+            expect(document.querySelector(".compare-focus-pane-badge")?.textContent).toBe(
+                "live · gen 1",
+            ),
         );
     });
 
