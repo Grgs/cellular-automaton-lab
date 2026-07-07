@@ -53,6 +53,10 @@ class SeedFilmstripEngineTests(unittest.TestCase):
         self.assertTrue(all(state != 0 for state in tiling.frames[0].values()))
         self.assertTrue(tiling.topology["cells"])
         self.assertEqual(tiling.topology_spec["tiling_family"], "square")
+        # The friendly catalog label rides along so the client can name the
+        # board without re-deriving it from the geometry key.
+        self.assertEqual(tiling.label, "Square")
+        self.assertEqual(tiling.to_dict()["label"], "Square")
 
     def test_single_live_cell_goes_extinct_deterministically(self) -> None:
         filmstrip = run_seed_filmstrip(

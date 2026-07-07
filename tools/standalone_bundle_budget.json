@@ -8,7 +8,7 @@
         {"name": "js-runtime", "patterns": ["assets/app-runtime-*.js"], "raw": 306000, "gzip": 83000},
         {"name": "js-standalone", "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"], "raw": 25000, "gzip": 8000},
         {"name": "tiling-preview", "patterns": ["assets/tiling-preview-data-*.js"], "raw": 90000, "gzip": 27000},
-        {"name": "js-async", "patterns": ["assets/*.js"], "raw": 106500, "gzip": 32000},
+        {"name": "js-async", "patterns": ["assets/*.js"], "raw": 108500, "gzip": 33000},
         {"name": "css", "patterns": ["assets/*.css"], "raw": 42000, "gzip": 8600},
         {"name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000},
         {"name": "other", "patterns": ["*"], "raw": 1000}

@@ -248,6 +248,12 @@ export interface TopologyFilmstrip {
     geometry: string;
     tiling_family: string;
     family: string;
+    /**
+     * Friendly catalog label (e.g. "Penrose P3 Rhombs"), shown on the board.
+     * Absent from payloads produced before this field shipped, so render with
+     * a `label || geometry` fallback.
+     */
+    label?: string;
     cell_count: number;
     /** Full geometry, sent once so the client can render the board. */
     topology: TopologyPayload;
