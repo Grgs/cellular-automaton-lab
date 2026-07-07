@@ -751,12 +751,19 @@ export const COMPARE_PANEL_STYLES = `
     color: var(--muted, #6d756f);
 }
 .compare-filmstrip-count { font-size: 11px; font-family: var(--mono, monospace); opacity: 0.85; }
-/* Live focus pane: a forked, editable board that replaces the hero SVG. */
+/* Live focus pane: a forked, editable board that replaces the hero SVG. Sized
+   entirely from its slot (height: 100%, not content), so the canvas it
+   contains can never grow the box that in turn bounds the canvas's own fit --
+   that circularity was a real bug: a ResizeObserver-driven re-fit (see
+   compare-focus-pane.ts) feeding a content-sized container back into itself
+   made the pane's size (and hit-testing) jitter indefinitely. */
 .compare-focus-pane {
     display: flex;
     flex-direction: column;
     gap: 8px;
     width: 100%;
+    height: 100%;
+    min-height: 0;
 }
 .compare-focus-pane-chip {
     display: flex;
@@ -816,13 +823,59 @@ export const COMPARE_PANEL_STYLES = `
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 260px;
+    /* Fills whatever height remains under the chip -- not content-sized, see
+       the .compare-focus-pane comment above. */
+    flex: 1 1 auto;
+    min-height: 220px;
     padding: 6px;
     border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
     border-radius: 10px;
     background: var(--field-bg, #fff);
 }
 .compare-focus-pane-canvas { touch-action: none; }
+/* Forked boards render their own live canvas in place of the vector thumbnail.
+   Once the board isn't the hero (the gallery, or the speaker-view strip) that
+   collapses to a compact tile -- just a "live · gen N" badge over the canvas,
+   so it still reads like any other tile at a glance. The full chip (palette,
+   step/run, discard) only appears once the board is focused as the hero. */
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane {
+    position: absolute;
+    inset: 0;
+    gap: 0;
+}
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane-chip {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 2;
+    padding: 0;
+    border: none;
+    background: none;
+    flex-wrap: nowrap;
+}
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane-info,
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane-palette,
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane-actions {
+    display: none;
+}
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane-badge {
+    background: var(--chrome-bg, rgba(16, 20, 24, 0.72));
+    color: #f2ede0;
+    border: none;
+}
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane-viewport {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+}
+.compare-filmstrip-board:not(.is-hero) .compare-focus-pane-canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
 @media (max-width: 640px) {
     .wall-header { align-items: center; }
     /* On a phone the boards want a full column and the stage can scroll. */

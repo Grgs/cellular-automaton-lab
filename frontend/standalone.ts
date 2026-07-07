@@ -5,6 +5,10 @@ import type { AppBootstrapData } from "./types/domain.js";
 
 let disposeStandaloneApp = (): void => {};
 
+// Each standalone fork boots its own persist-free Pyodide runtime from
+// scratch; two concurrent forks is already a meaningful memory/CPU cost.
+const STANDALONE_FORK_CAPACITY = 2;
+
 interface StartupStage {
     message: string;
     detail: string;
@@ -178,8 +182,10 @@ export async function startStandaloneApp(): Promise<void> {
         bootstrapData: environment.bootstrapData,
         // The wall's live focus pane forks into its own persist-free Pyodide
         // environment; there are no server sessions in the standalone build.
+        // Each fork boots a full Pyodide runtime, so concurrent forks are capped.
         paneBaseSessionId: "standalone",
         paneBackendFactory: createStandalonePaneBackendFactory(environment.bootstrapData),
+        paneForkCapacity: STANDALONE_FORK_CAPACITY,
     });
     hideStartupOverlay();
     installPageLifecycleDisposal();
