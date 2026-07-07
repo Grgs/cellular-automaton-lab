@@ -61,8 +61,14 @@ export interface FilmstripViewController {
     refreshBoard(geometry: string): void;
     /** The shared clock's current generation index. */
     currentFrameIndex(): number;
-    /** Overlay a node onto the focused board's slot (live fork), or restore its SVG (null). */
-    setHeroOverlay(node: HTMLElement | null): boolean;
+    /**
+     * Overlay a node onto a board's slot (a live fork), or restore its SVG
+     * rendering (null). Targets the board by geometry, not by focus, so a fork
+     * keeps rendering in its own slot whether that board is the hero, part of
+     * the speaker-view strip, or back in the gallery. Returns false if the
+     * board no longer exists in the current filmstrip.
+     */
+    setBoardOverlay(geometry: string, node: HTMLElement | null): boolean;
     /** Persistent toolbelt overlaid on the hero in speaker view (null to clear). */
     setHeroToolbelt(node: HTMLElement | null): void;
     dispose(): void;
@@ -106,7 +112,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let boards: BoardEntry[] = [];
     let lastRenderedIndex = -1;
     let focusedGeometry: string | null = null;
-    let overlayEntry: BoardEntry | null = null;
     let heroToolbelt: HTMLElement | null = null;
     let editMode = false;
 
@@ -217,7 +222,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         unsubscribe = null;
         boards = [];
         lastRenderedIndex = -1;
-        overlayEntry = null;
         // A fresh run starts in the gallery; silent so it doesn't fire onFocusChange.
         focusedGeometry = null;
         root.classList.remove("compare-filmstrip--speaker");
@@ -348,23 +352,19 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             }
         },
         currentFrameIndex: () => player.index,
-        setHeroOverlay(node: HTMLElement | null): boolean {
+        setBoardOverlay(geometry: string, node: HTMLElement | null): boolean {
+            const entry = entryFor(geometry);
+            if (!entry) {
+                return false;
+            }
             if (node) {
-                const entry = boards.find(
-                    (candidate) => candidate.tiling.geometry === focusedGeometry,
-                );
-                if (!entry) {
-                    return false;
-                }
-                overlayEntry = entry;
                 entry.overlaid = true;
                 entry.slot.replaceChildren(node);
                 return true;
             }
-            if (overlayEntry) {
-                overlayEntry.overlaid = false;
-                renderBoard(overlayEntry, player.index);
-                overlayEntry = null;
+            if (entry.overlaid) {
+                entry.overlaid = false;
+                renderBoard(entry, player.index);
             }
             return true;
         },

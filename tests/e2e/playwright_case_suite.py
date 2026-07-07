@@ -337,6 +337,43 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         )
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
 
+    def test_wall_fork_persists_across_gallery_and_speaker_view(self) -> None:
+        # Forking a board leaves the shared clock for its own live session; that
+        # fork must survive leaving the board (it keeps running as a compact
+        # live tile in the gallery) rather than being torn down by the focus
+        # change, and re-focusing the same board must reuse it, not re-fork it.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        board = case.page.locator(".compare-filmstrip-board").first
+        board.click()
+        self._expect(".compare-hero-fork").to_have_text("⑂ Fork live")
+        case.page.click(".compare-hero-fork")
+        self._expect(".compare-filmstrip-board.is-hero .compare-focus-pane").to_be_visible(
+            timeout=30_000
+        )
+
+        # Leave the board: the fork is not disposed, and it keeps rendering
+        # (compactly -- no chip actions) in its own, now non-hero, tile.
+        case.page.click(".compare-hero-back")
+        self._expect(".compare-focus-pane").to_have_count(1)
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(0)
+        self._expect(".compare-focus-pane-actions").not_to_be_visible()
+
+        # Re-entering the same board shows the same live pane as the hero again
+        # (no second fork), so the toolbelt's fork button hides.
+        board.click()
+        self._expect(".compare-filmstrip-board.is-hero .compare-focus-pane").to_be_visible()
+        self._expect(".compare-focus-pane").to_have_count(1)
+        self._expect(".compare-hero-fork").to_be_hidden()
+
+        # Discard tears it down.
+        case.page.click(".compare-focus-pane-discard")
+        self._expect(".compare-focus-pane").to_have_count(0)
+
     def test_copy_and_paste_pattern_roundtrip(self) -> None:
         case = self._case()
         self._paint_canvas_center()

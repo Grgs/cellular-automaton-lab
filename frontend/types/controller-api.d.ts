@@ -115,4 +115,6 @@ export interface InitAppOptions {
     paneBaseSessionId?: string | null;
     /** Factory for the focus pane's independent backend session. */
     paneBackendFactory?: (sessionId: string) => SimulationBackend;
+    /** Maximum concurrent live forks; undefined means unlimited. */
+    paneForkCapacity?: number;
 }

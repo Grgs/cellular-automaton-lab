@@ -487,9 +487,15 @@ export function createComparePanelContent(
     let filmstripView: FilmstripViewController | null = null;
     let activeFilmstrip: SeedFilmstripResult | null = null;
     let currentFocusGeometry: string | null = null;
-    let focusPane: FocusPaneHandle | null = null;
+    // Live forks are per-board (keyed by geometry) and outlive a focus change:
+    // a forked board keeps running as a live tile in the gallery, and speaker
+    // view of it is just this same pane shown at hero size (see the
+    // `:not(.is-hero)` compact styling in compare-styles.ts).
+    const forkedBoards = new Map<string, FocusPaneHandle>();
     // Live in-place forking needs an independent server session; standalone
-    // (no baseSessionId) forks into the Lab instead.
+    // (no baseSessionId) forks into the Lab instead. A host may also cap
+    // concurrent forks (undefined means unlimited) -- see the check in
+    // forkFocusedBoardLive below.
     const focusLiveEnabled = Boolean(options.focusPaneServices?.baseSessionId);
 
     // The focused board is mirrored into the hash (`&focus=<geometry>`) so speaker
@@ -676,18 +682,28 @@ export function createComparePanelContent(
     }
 
     function handleFocusChanged(geometry: string | null): void {
-        // A focus change (swap or exit) invalidates any live fork on the old hero.
-        disposeFocusPane();
+        // Forks are per-board and outlive a focus change: leaving a forked
+        // board keeps it running as a live tile in the gallery instead of
+        // tearing it down.
         mirrorFocusToHash(geometry);
         updateSeedRail(geometry);
+        updateSummary();
     }
 
-    function disposeFocusPane(): void {
-        if (focusPane) {
-            focusPane.dispose();
-            focusPane = null;
+    function disposeForkedBoard(geometry: string): void {
+        const pane = forkedBoards.get(geometry);
+        if (!pane) {
+            return;
         }
-        filmstripView?.setHeroOverlay(null);
+        forkedBoards.delete(geometry);
+        pane.dispose();
+        filmstripView?.setBoardOverlay(geometry, null);
+    }
+
+    function disposeAllForkedBoards(): void {
+        for (const geometry of [...forkedBoards.keys()]) {
+            disposeForkedBoard(geometry);
+        }
     }
 
     function reportFocusPaneError(error: unknown): void {
@@ -701,6 +717,11 @@ export function createComparePanelContent(
     async function forkFocusedBoardLive(): Promise<void> {
         const geometry = currentFocusGeometry;
         if (!filmstripView || !activeFilmstrip || !geometry) {
+            return;
+        }
+        // Already forked: the pane's own chip (Discard) is the way to undo it,
+        // not a second fork attempt.
+        if (forkedBoards.has(geometry)) {
             return;
         }
         const tiling = activeFilmstrip.tilings.find((candidate) => candidate.geometry === geometry);
@@ -719,20 +740,29 @@ export function createComparePanelContent(
             openPattern(pattern);
             return;
         }
-        disposeFocusPane();
+        if (services.forkCapacity !== undefined && forkedBoards.size >= services.forkCapacity) {
+            statusLine.textContent = `Only ${services.forkCapacity} live forks at a time here — discard one first.`;
+            return;
+        }
         let backend: SimulationBackend | null = null;
         try {
-            backend = services.backendFactory(paneSessionId(services.baseSessionId, "focus"));
+            backend = services.backendFactory(
+                paneSessionId(services.baseSessionId, `focus-${geometry}`),
+            );
             const { mountFocusPane } = await import("./compare-focus-pane.js");
 
-            if (!filmstripView || currentFocusGeometry !== geometry) {
+            if (
+                !filmstripView ||
+                forkedBoards.has(geometry) ||
+                !activeFilmstrip.tilings.some((candidate) => candidate.geometry === geometry)
+            ) {
                 disposeDetachedBackend(backend);
                 backend = null;
                 return;
             }
 
-            let nextFocusPane: FocusPaneHandle | null = null;
-            nextFocusPane = mountFocusPane({
+            let nextPane: FocusPaneHandle | null = null;
+            nextPane = mountFocusPane({
                 geometry: tiling.geometry,
                 frameIndex,
                 pattern,
@@ -742,24 +772,22 @@ export function createComparePanelContent(
                 buildEditorToolCells: services.buildEditorToolCells,
                 ...(services.resolveCellSize ? { resolveCellSize: services.resolveCellSize } : {}),
                 onDiscard: () => {
-                    if (focusPane === nextFocusPane) {
-                        focusPane = null;
+                    if (forkedBoards.get(geometry) === nextPane) {
+                        forkedBoards.delete(geometry);
                     }
-                    filmstripView?.setHeroOverlay(null);
+                    filmstripView?.setBoardOverlay(geometry, null);
+                    updateSummary();
                 },
                 onError: reportFocusPaneError,
             });
             backend = null;
 
-            if (
-                currentFocusGeometry !== geometry ||
-                !filmstripView ||
-                !filmstripView.setHeroOverlay(nextFocusPane.element)
-            ) {
-                nextFocusPane.dispose();
+            if (!filmstripView.setBoardOverlay(geometry, nextPane.element)) {
+                nextPane.dispose();
                 return;
             }
-            focusPane = nextFocusPane;
+            forkedBoards.set(geometry, nextPane);
+            updateSummary();
         } catch (error) {
             if (backend) {
                 disposeDetachedBackend(backend);
@@ -1220,6 +1248,11 @@ export function createComparePanelContent(
         filmstripTransport.setIdleRunEnabled(canPlay);
         copyRunButton.disabled = disabled;
         railRerunButton.disabled = running || selected.size < 2;
+        // Already-forked hero: Discard (in the pane's own chip) is the way to
+        // undo it, so the toolbelt's fork button hides rather than offering a
+        // confusing second fork.
+        heroForkButton.hidden =
+            currentFocusGeometry !== null && forkedBoards.has(currentFocusGeometry);
         heroForkButton.disabled = running;
         // Painting needs boards on the stage; the toggle waits for a run.
         editModeButton.disabled = running || !activeFilmstrip;
@@ -1655,8 +1688,8 @@ export function createComparePanelContent(
         if (running) {
             return;
         }
-        // A fresh run rebuilds every board, so any live fork is torn down first.
-        disposeFocusPane();
+        // A fresh run rebuilds every board, so any live forks are torn down first.
+        disposeAllForkedBoards();
         if (selected.size < 2) {
             statusLine.textContent = "Select at least two tilings to play side by side.";
             showStageHero();
@@ -2066,7 +2099,7 @@ export function createComparePanelContent(
         },
         deactivate(): void {
             filmstripTransport.pause();
-            disposeFocusPane();
+            disposeAllForkedBoards();
             root.querySelector(".compare-action-menu[open]")?.removeAttribute("open");
         },
         applyRunConfig,
@@ -2125,7 +2158,7 @@ export function createComparePanelContent(
             }
             document.removeEventListener("pointerdown", onDocumentPointerDown);
             window.removeEventListener("hashchange", onHashChangeFocus);
-            disposeFocusPane();
+            disposeAllForkedBoards();
             seedPad.dispose();
             seedPreview.dispose();
             filmstripView?.dispose();

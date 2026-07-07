@@ -115,6 +115,9 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
         buildEditorToolCells,
         resolveCellSize: resolvePaneCellSize,
         resolveViewportDimensions: resolvePaneViewportDimensions,
+        ...(options.paneForkCapacity === undefined
+            ? {}
+            : { forkCapacity: options.paneForkCapacity }),
     };
 
     workspaceRouter = mountWorkspaceRouter({
