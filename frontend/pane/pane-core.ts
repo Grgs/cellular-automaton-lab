@@ -272,6 +272,12 @@ export interface EditablePaneHandle {
     render(): void;
     /** Reconstruct the board from a pattern (topology spec + rule + sparse cells). */
     seedFromPattern(pattern: PatternPayload, speed: number): Promise<void>;
+    /**
+     * Apply one cell edit directly (no pointer, no preview gesture) — for
+     * carrying a paint stroke over into a board that was just programmatically
+     * seeded, e.g. an auto-fork triggered by that same stroke.
+     */
+    applyCellEdit(cellId: string, state: number): Promise<void>;
     step(): Promise<void>;
     runToggle(): Promise<void>;
     dispose(): void;
@@ -597,6 +603,9 @@ export function createEditablePane(options: EditablePaneOptions): EditablePaneHa
                 state: Number(state),
             }));
             applySnapshot(updates.length > 0 ? await backend.setCells(updates) : reset);
+        },
+        applyCellEdit(cellId: string, state: number): Promise<void> {
+            return commitCells([{ id: cellId, state }]);
         },
         async step(): Promise<void> {
             applySnapshot(await backend.postControl("/api/control/step"));

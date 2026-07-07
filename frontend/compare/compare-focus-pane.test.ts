@@ -158,7 +158,11 @@ const pattern: PatternPayload = {
     cells_by_id: { a: 1 },
 };
 
-function mount(fake: ReturnType<typeof fakeBackend>, onDiscard = vi.fn()) {
+function mount(
+    fake: ReturnType<typeof fakeBackend>,
+    onDiscard = vi.fn(),
+    initialPaint?: { cellId: string; state: number },
+) {
     const handle = mountFocusPane({
         geometry: "square",
         frameIndex: 9,
@@ -170,6 +174,7 @@ function mount(fake: ReturnType<typeof fakeBackend>, onDiscard = vi.fn()) {
             { ...startCell, state: paintState },
         ],
         onDiscard,
+        ...(initialPaint ? { initialPaint } : {}),
     });
     document.body.append(handle.element);
     return handle;
@@ -214,6 +219,27 @@ describe("mountFocusPane", () => {
         await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalledWith([{ id: "a", state: 1 }]));
         // The rule's paintable states render as a palette.
         expect(document.querySelectorAll(".compare-focus-pane-swatch")).toHaveLength(2);
+    });
+
+    it("applies an initial paint right after seeding (an auto-fork's triggering stroke)", async () => {
+        const fake = fakeBackend();
+        mount(fake, vi.fn(), { cellId: "b", state: 1 });
+
+        // The seed's own cell write ("a") happens first, then the carried-
+        // over paint ("b") lands as a second, separate edit.
+        await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalledWith([{ id: "a", state: 1 }]));
+        await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalledWith([{ id: "b", state: 1 }]));
+        expect(fake.setCells).toHaveBeenCalledTimes(2);
+    });
+
+    it("applies an initial paint via applyCellEdit on the handle too", async () => {
+        const fake = fakeBackend();
+        const handle = mount(fake);
+        await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalled());
+
+        await handle.applyCellEdit("b", 1);
+
+        expect(fake.setCells).toHaveBeenLastCalledWith([{ id: "b", state: 1 }]);
     });
 
     it("steps and runs the fork through the chip controls", async () => {

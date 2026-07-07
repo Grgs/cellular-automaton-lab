@@ -283,6 +283,26 @@ describe("createEditablePane", () => {
         await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalledWith([{ id: "b", state: 1 }]));
     });
 
+    it("applies a programmatic cell edit without a pointer gesture", async () => {
+        const fake = fakeBackend();
+        const { pane } = mountPane(fake);
+        pane.applySnapshot(snapshot());
+
+        await pane.applyCellEdit("b", 1);
+
+        expect(fake.setCells).toHaveBeenCalledWith([{ id: "b", state: 1 }]);
+    });
+
+    it("no-ops a programmatic cell edit that matches the current state", async () => {
+        const fake = fakeBackend();
+        const { pane } = mountPane(fake);
+        pane.applySnapshot(snapshot({ cell_states: [0, 1, 0, 0] }));
+
+        await pane.applyCellEdit("b", 1);
+
+        expect(fake.setCells).not.toHaveBeenCalled();
+    });
+
     it("stops responding to canvas clicks after dispose", async () => {
         const fake = fakeBackend();
         const { pane, canvas } = mountPane(fake, fakeGridView({ id: "b" }));
