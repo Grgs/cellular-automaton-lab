@@ -824,7 +824,20 @@ export const COMPARE_PANEL_STYLES = `
     color: var(--ink, #1f2430);
     cursor: pointer;
 }
-.compare-focus-pane-action:hover { background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06)); }
+.compare-focus-pane-action:hover:not(:disabled) {
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+}
+.compare-focus-pane-action:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+/* The ↶/↷ history buttons carry only a glyph, so they read as square icons. */
+.compare-focus-pane-undo,
+.compare-focus-pane-redo {
+    padding: 4px 8px;
+    font-size: 13px;
+    line-height: 1;
+}
 .compare-focus-pane-discard {
     border-color: var(--border-danger, #d08a8a);
     color: var(--text-danger, #a3352d);

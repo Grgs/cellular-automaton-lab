@@ -396,6 +396,39 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         self._expect(".compare-filmstrip-board").to_have_count(4)
 
+    def test_wall_fork_carries_brush_and_undo_redo_chrome(self) -> None:
+        # A live fork is a real editor: its chip carries brush-size cycling and
+        # per-paint undo/redo. Undo/redo start disabled (nothing painted), and
+        # an auto-forked paint (painting a board away from gen 0) seeds the
+        # history, so undo enables and the paint is undoable/redoable. The
+        # actual inverse-write behaviour is pinned by the focus-pane unit test;
+        # here we prove the chrome is wired end-to-end on a real backend.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.locator(".compare-filmstrip-board").first.click()
+        case.page.click(".compare-hero-fork")
+        self._expect(".compare-filmstrip-board.is-hero .compare-focus-pane").to_be_visible(
+            timeout=30_000
+        )
+        self._expect(".compare-focus-pane-badge").to_contain_text("live · gen")
+
+        # Nothing painted yet, so history is empty.
+        self._expect(".compare-focus-pane-undo").to_be_disabled()
+        self._expect(".compare-focus-pane-redo").to_be_disabled()
+
+        # The brush button cycles 1 -> 2 -> 3 -> 1.
+        self._expect(".compare-focus-pane-brush").to_have_text("Brush 1")
+        case.page.click(".compare-focus-pane-brush")
+        self._expect(".compare-focus-pane-brush").to_have_text("Brush 2")
+        case.page.click(".compare-focus-pane-brush")
+        self._expect(".compare-focus-pane-brush").to_have_text("Brush 3")
+        case.page.click(".compare-focus-pane-brush")
+        self._expect(".compare-focus-pane-brush").to_have_text("Brush 1")
+
     def test_wall_names_boards_and_edits_the_selection_in_place(self) -> None:
         # Boards carry their friendly catalog label (not the raw geometry
         # key), the dock's ⊞ jumps straight to the searchable tiling

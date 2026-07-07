@@ -265,6 +265,46 @@ describe("mountFocusPane", () => {
         expect(onRunWallFromHere).toHaveBeenCalledWith({ a: 1 });
     });
 
+    it("cycles the brush size 1 -> 2 -> 3 -> 1 on the chip button", async () => {
+        const fake = fakeBackend();
+        mount(fake);
+        await vi.waitFor(() => expect(fake.setCells).toHaveBeenCalled());
+
+        const brush = document.querySelector<HTMLButtonElement>(".compare-focus-pane-brush");
+        expect(brush?.textContent).toBe("Brush 1");
+        brush?.click();
+        expect(brush?.textContent).toBe("Brush 2");
+        brush?.click();
+        expect(brush?.textContent).toBe("Brush 3");
+        brush?.click();
+        expect(brush?.textContent).toBe("Brush 1");
+    });
+
+    it("enables undo after a paint and redo after an undo, driving inverse writes", async () => {
+        const fake = fakeBackend();
+        // The initial paint carried into the fork lands as a committed edit,
+        // so it seeds the undo history.
+        mount(fake, vi.fn(), { cellId: "b", state: 1 });
+        const undo = document.querySelector<HTMLButtonElement>(".compare-focus-pane-undo");
+        const redo = document.querySelector<HTMLButtonElement>(".compare-focus-pane-redo");
+
+        await vi.waitFor(() => expect(undo?.disabled).toBe(false));
+        expect(redo?.disabled).toBe(true);
+
+        undo?.click();
+        await vi.waitFor(() =>
+            expect(fake.setCells).toHaveBeenLastCalledWith([{ id: "b", state: 0 }]),
+        );
+        await vi.waitFor(() => expect(redo?.disabled).toBe(false));
+        expect(undo?.disabled).toBe(true);
+
+        redo?.click();
+        await vi.waitFor(() =>
+            expect(fake.setCells).toHaveBeenLastCalledWith([{ id: "b", state: 1 }]),
+        );
+        await vi.waitFor(() => expect(undo?.disabled).toBe(false));
+    });
+
     it("steps and runs the fork through the chip controls", async () => {
         const fake = fakeBackend();
         mount(fake);

@@ -303,6 +303,68 @@ describe("createEditablePane", () => {
         expect(fake.setCells).not.toHaveBeenCalled();
     });
 
+    it("undoes and redoes a committed paint as inverse cell writes", async () => {
+        const fake = fakeBackend();
+        const { pane } = mountPane(fake);
+        pane.applySnapshot(snapshot());
+
+        expect(pane.canUndo()).toBe(false);
+        await pane.applyCellEdit("b", 1);
+        expect(fake.setCells).toHaveBeenLastCalledWith([{ id: "b", state: 1 }]);
+        expect(pane.canUndo()).toBe(true);
+        expect(pane.canRedo()).toBe(false);
+
+        // Undo restores b's pre-paint state (0), not a board-wide rewind.
+        await pane.undo();
+        expect(fake.setCells).toHaveBeenLastCalledWith([{ id: "b", state: 0 }]);
+        expect(pane.canUndo()).toBe(false);
+        expect(pane.canRedo()).toBe(true);
+
+        // Redo re-applies the paint.
+        await pane.redo();
+        expect(fake.setCells).toHaveBeenLastCalledWith([{ id: "b", state: 1 }]);
+        expect(pane.canUndo()).toBe(true);
+        expect(pane.canRedo()).toBe(false);
+    });
+
+    it("clears the redo stack when a new paint is committed", async () => {
+        const fake = fakeBackend();
+        const { pane } = mountPane(fake);
+        pane.applySnapshot(snapshot());
+
+        await pane.applyCellEdit("b", 1);
+        await pane.undo();
+        expect(pane.canRedo()).toBe(true);
+
+        // A fresh paint invalidates the redo branch.
+        await pane.applyCellEdit("c", 1);
+        expect(pane.canRedo()).toBe(false);
+        expect(pane.canUndo()).toBe(true);
+    });
+
+    it("clears both history stacks on reseed", async () => {
+        const fake = fakeBackend();
+        const { pane } = mountPane(fake);
+        pane.applySnapshot(snapshot());
+        await pane.applyCellEdit("b", 1);
+        await pane.undo();
+        expect(pane.canRedo()).toBe(true);
+
+        await pane.seedFromPattern(
+            {
+                format: "cellular-automaton-lab-pattern",
+                version: 5,
+                topology_spec: snapshot().topology_spec,
+                rule: "conway",
+                cells_by_id: { a: 1 },
+            },
+            7,
+        );
+
+        expect(pane.canUndo()).toBe(false);
+        expect(pane.canRedo()).toBe(false);
+    });
+
     it("stops responding to canvas clicks after dispose", async () => {
         const fake = fakeBackend();
         const { pane, canvas } = mountPane(fake, fakeGridView({ id: "b" }));
