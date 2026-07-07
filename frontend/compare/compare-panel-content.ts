@@ -610,7 +610,7 @@ export function createComparePanelContent(
             statusLine.textContent =
                 filmstripView?.currentFrameIndex() === 0
                     ? "Edit mode — click cells to edit the shared seed."
-                    : "Edit mode — press ⏮ to gen 0 to edit the shared seed.";
+                    : "Edit mode — click a cell to fork this board live from here and paint it.";
         } else {
             statusLine.textContent = "";
         }
@@ -621,15 +621,26 @@ export function createComparePanelContent(
             return;
         }
         const tiling = activeFilmstrip.tilings.find((entry) => entry.geometry === geometry);
-        const order = tiling?.seed_order;
-        if (!tiling || !order || order.length === 0) {
+        if (!tiling) {
             statusLine.textContent = "This board cannot edit the seed.";
             return;
         }
-        if (filmstripView.currentFrameIndex() !== 0) {
-            // A mid-timeline state has no seed representation; a later phase
-            // forks the board live here instead.
-            statusLine.textContent = "Seed edits happen at gen 0 — press ⏮ first.";
+        const frameIndex = filmstripView.currentFrameIndex();
+        if (frameIndex !== 0) {
+            // A mid-timeline state has no seed representation, so a paint here
+            // forks this board live from its current frame instead (or, if
+            // it's already forked, lands straight on that live pane) and
+            // carries the stroke over as the fork's first edit.
+            const currentState = tiling.frames[frameIndex]?.[cellId] ?? 0;
+            void forkBoardLive(geometry, frameIndex, {
+                cellId,
+                state: currentState === 0 ? 1 : 0,
+            }).catch(reportFocusPaneError);
+            return;
+        }
+        const order = tiling.seed_order;
+        if (!order || order.length === 0) {
+            statusLine.textContent = "This board cannot edit the seed.";
             return;
         }
         const bitIndex = order.indexOf(cellId);
@@ -714,30 +725,53 @@ export function createComparePanelContent(
         void Promise.resolve(backend.dispose()).catch(reportFocusPaneError);
     }
 
-    async function forkFocusedBoardLive(): Promise<void> {
-        const geometry = currentFocusGeometry;
-        if (!filmstripView || !activeFilmstrip || !geometry) {
+    /**
+     * Fork a board live at a given frame, or -- if it's already forked --
+     * apply `initialPaint` straight to that live pane instead of a second
+     * fork attempt (the pane's own chip, Discard, is the way to undo a fork).
+     * `initialPaint` carries over the paint stroke that triggered an
+     * auto-fork from a mid-timeline edit; the explicit hero fork button calls
+     * this with no paint.
+     */
+    async function forkBoardLive(
+        geometry: string,
+        frameIndex: number,
+        initialPaint?: { cellId: string; state: number },
+    ): Promise<void> {
+        if (!filmstripView || !activeFilmstrip) {
             return;
         }
-        // Already forked: the pane's own chip (Discard) is the way to undo it,
-        // not a second fork attempt.
-        if (forkedBoards.has(geometry)) {
+        const existing = forkedBoards.get(geometry);
+        if (existing) {
+            if (initialPaint) {
+                await existing.applyCellEdit(initialPaint.cellId, initialPaint.state);
+            }
             return;
         }
         const tiling = activeFilmstrip.tilings.find((candidate) => candidate.geometry === geometry);
         if (!tiling) {
             return;
         }
-        const frameIndex = filmstripView.currentFrameIndex();
         const pattern = buildFilmstripFramePattern(activeFilmstrip, tiling, frameIndex);
         if (!pattern) {
             statusLine.textContent = "This generation cannot be forked.";
             return;
         }
         const services = options.focusPaneServices;
-        // Standalone (no server session): fork into the Lab instead of in place.
+        // Standalone (no server session): fork into the Lab instead of in
+        // place, folding the paint into the pattern so it isn't dropped.
         if (!services?.baseSessionId) {
-            openPattern(pattern);
+            openPattern(
+                initialPaint
+                    ? {
+                          ...pattern,
+                          cells_by_id: {
+                              ...pattern.cells_by_id,
+                              [initialPaint.cellId]: initialPaint.state,
+                          },
+                      }
+                    : pattern,
+            );
             return;
         }
         if (services.forkCapacity !== undefined && forkedBoards.size >= services.forkCapacity) {
@@ -771,6 +805,7 @@ export function createComparePanelContent(
                 createGridView: services.createGridView,
                 buildEditorToolCells: services.buildEditorToolCells,
                 ...(services.resolveCellSize ? { resolveCellSize: services.resolveCellSize } : {}),
+                ...(initialPaint ? { initialPaint } : {}),
                 onDiscard: () => {
                     if (forkedBoards.get(geometry) === nextPane) {
                         forkedBoards.delete(geometry);
@@ -794,6 +829,14 @@ export function createComparePanelContent(
             }
             reportFocusPaneError(error);
         }
+    }
+
+    async function forkFocusedBoardLive(): Promise<void> {
+        const geometry = currentFocusGeometry;
+        if (!filmstripView || !geometry) {
+            return;
+        }
+        await forkBoardLive(geometry, filmstripView.currentFrameIndex());
     }
 
     function showStageHero(): void {

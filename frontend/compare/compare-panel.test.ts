@@ -1243,7 +1243,10 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    async function mountWithLoadedFilmstrip(): Promise<{
+    async function mountWithLoadedFilmstrip(overrides?: {
+        onOpenPattern?: (pattern: unknown) => void;
+        focusPaneServices?: FocusPaneServices;
+    }): Promise<{
         handle: ComparePanelHandle;
         filmstripRequest: ReturnType<typeof vi.fn>;
         seedField: HTMLInputElement;
@@ -1256,6 +1259,10 @@ describe("mountComparePanel", () => {
             openOnMount: true,
             backend: { ...backend, requestFilmstrip: filmstripRequest },
             bootstrapData: bootstrapData(),
+            ...(overrides?.onOpenPattern ? { onOpenPattern: overrides.onOpenPattern } : {}),
+            ...(overrides?.focusPaneServices
+                ? { focusPaneServices: overrides.focusPaneServices }
+                : {}),
         });
         const seedField = [
             ...document.querySelectorAll<HTMLInputElement>('input.compare-field[type="text"]'),
@@ -1336,9 +1343,11 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("hints instead of painting away from generation 0", async () => {
-        const { handle, filmstripRequest, seedField, editToggle } =
-            await mountWithLoadedFilmstrip();
+    it("opens the board in the Lab when painting away from gen 0 with no live session available", async () => {
+        const onOpenPattern = vi.fn();
+        const { handle, filmstripRequest, seedField, editToggle } = await mountWithLoadedFilmstrip({
+            onOpenPattern,
+        });
         editToggle.click();
 
         document
@@ -1348,9 +1357,57 @@ describe("mountComparePanel", () => {
             ?.click();
         paintCell("c:1:1");
 
+        // No focusPaneServices (no session to fork on): the paint's board and
+        // frame open into the Lab instead, with the stroke folded into the
+        // pattern so it isn't dropped. The shared seed is untouched.
         expect(seedField.value).toBe("101");
-        expect(document.querySelector(".compare-status")?.textContent).toContain("gen 0");
+        expect(onOpenPattern).toHaveBeenCalledTimes(1);
+        const opened = onOpenPattern.mock.calls.at(0)?.[0] as {
+            cells_by_id?: Record<string, number>;
+        };
+        expect(opened.cells_by_id).toEqual({ "c:2:1": 1, "c:1:1": 1 });
         expect(filmstripRequest).toHaveBeenCalledTimes(1);
+        handle.dispose();
+    });
+
+    it("auto-forks a board live from a mid-timeline paint when a session is available", async () => {
+        const { backend } = fakeBackend();
+        const setCells = vi.fn(async () => forkSnapshot());
+        const focusBackend: SimulationBackend = {
+            ...backend,
+            getState: async () => forkSnapshot(),
+            postControl: (async () =>
+                forkSnapshot()) as unknown as SimulationBackend["postControl"],
+            setCells: setCells as unknown as SimulationBackend["setCells"],
+            dispose: vi.fn(),
+        };
+        const backendFactory = vi.fn(() => focusBackend);
+        const focusPaneServices: FocusPaneServices = {
+            baseSessionId: "sess",
+            backendFactory,
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
+        const { handle, editToggle } = await mountWithLoadedFilmstrip({ focusPaneServices });
+        editToggle.click();
+
+        document
+            .querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[title="Step forward one generation"]',
+            )
+            ?.click();
+        paintCell("c:1:1");
+
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-focus-pane")).not.toBeNull();
+        });
+        expect(backendFactory).toHaveBeenCalledWith("sess-focus-square");
+        expect(setCells).toHaveBeenCalledWith([{ id: "c:1:1", state: 1 }]);
+        // The board is not zoomed by the paint (only the fork chip appears in
+        // its now-live gallery tile).
+        expect(document.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
         handle.dispose();
     });
 

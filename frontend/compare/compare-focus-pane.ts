@@ -31,6 +31,11 @@ export interface FocusPaneMountOptions {
     createGridView: (canvas: HTMLCanvasElement) => GridView;
     buildEditorToolCells: PaneEditorCellsBuilder;
     resolveCellSize?: (options: PaneCellSizeOptions) => number;
+    /**
+     * A cell edit to apply right after the fork is seeded — carries over the
+     * paint stroke that triggered an auto-fork at a generation past 0.
+     */
+    initialPaint?: { cellId: string; state: number };
     /** Called when the user discards the fork (the pane and its session are gone). */
     onDiscard: () => void;
     onError?: (error: unknown) => void;
@@ -40,6 +45,8 @@ export interface FocusPaneHandle {
     element: HTMLElement;
     /** Tear down the pane and dispose its backend session. */
     dispose(): void;
+    /** Apply one cell edit to the already-forked live pane (see `initialPaint`). */
+    applyCellEdit(cellId: string, state: number): Promise<void>;
 }
 
 export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle {
@@ -155,8 +162,21 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         options.onDiscard();
     });
 
-    // Reconstruct the board from the forked frame; the pane renders once seeded.
-    void pane.seedFromPattern(pattern, bootstrapData.app_defaults.simulation.speed).catch(onError);
+    // Reconstruct the board from the forked frame; the pane renders once
+    // seeded. An initial paint (an auto-fork's triggering stroke) applies
+    // right after, so it lands on the freshly-seeded session rather than
+    // racing the seed itself.
+    const { initialPaint } = options;
+    void pane
+        .seedFromPattern(pattern, bootstrapData.app_defaults.simulation.speed)
+        .then(() =>
+            initialPaint ? pane.applyCellEdit(initialPaint.cellId, initialPaint.state) : undefined,
+        )
+        .catch(onError);
 
-    return { element: root, dispose };
+    return {
+        element: root,
+        dispose,
+        applyCellEdit: (cellId, state) => pane.applyCellEdit(cellId, state),
+    };
 }
