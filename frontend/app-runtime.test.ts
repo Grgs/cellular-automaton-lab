@@ -99,8 +99,8 @@ function installAppShell(): void {
     document.body.innerHTML = `
         <main id="app-frame">
             <header id="shell-header">
-                <button id="open-lab-btn" type="button" hidden>Open the Lab</button>
-                <button id="wall-view-btn" type="button" hidden>Wall</button>
+                <button id="wall-view-btn" type="button">Compare</button>
+                <button id="open-lab-btn" type="button">Lab</button>
             </header>
             <section id="lab-root">
                 <section id="main-stage">

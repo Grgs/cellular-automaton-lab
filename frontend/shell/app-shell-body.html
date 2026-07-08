@@ -2,26 +2,24 @@
 <main id="app-frame" class="app-frame">
     <header id="shell-header" class="wall-header">
         <h1 class="wall-brand">Cellular Automaton Lab</h1>
-        <div class="wall-header-actions">
-            <button
-                id="open-lab-btn"
-                class="compare-close shell-header-btn compare-back"
-                type="button"
-                hidden
-                title="Open the single-board editor"
-            >
-                Open the Lab →
-            </button>
+        <nav class="shell-route-switcher" aria-label="Workspace">
             <button
                 id="wall-view-btn"
-                class="compare-close shell-header-btn"
+                class="shell-route-tab"
                 type="button"
-                hidden
                 title="Watch one seed evolve across many tilings on the comparison wall"
             >
-                ⊞ Wall
+                Compare
             </button>
-        </div>
+            <button
+                id="open-lab-btn"
+                class="shell-route-tab"
+                type="button"
+                title="Open the single-board editor"
+            >
+                Lab
+            </button>
+        </nav>
     </header>
 
     <div id="shell-content" class="shell-content">

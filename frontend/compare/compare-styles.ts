@@ -5,6 +5,7 @@ export const COMPARE_PANEL_STYLES = `
 .compare-seedpad-cell:focus-visible,
 .compare-mini:focus-visible,
 .compare-run:focus-visible,
+.compare-config-tab:focus-visible,
 .compare-link:focus-visible {
     outline: 2px solid var(--focus, #7aa7ff);
     outline-offset: 2px;
@@ -113,6 +114,21 @@ export const COMPARE_PANEL_STYLES = `
     background: rgba(255, 255, 255, 0.055);
     border: 1px solid rgba(197, 215, 224, 0.1);
 }
+.compare-setup-action {
+    appearance: none;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    color: inherit;
+}
+.compare-setup-action:hover {
+    background: rgba(255, 255, 255, 0.085);
+    border-color: rgba(197, 215, 224, 0.22);
+}
+.compare-setup-action:focus-visible {
+    outline: 2px solid var(--focus, #5cc8ff);
+    outline-offset: 2px;
+}
 .compare-setup-label {
     color: var(--compare-muted);
     font-size: 10px;
@@ -197,6 +213,12 @@ export const COMPARE_PANEL_STYLES = `
     font-size: 13px;
     font-weight: 700;
 }
+.compare-explainer-body {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 .compare-explainer-item {
     display: grid;
     gap: 3px;
@@ -221,6 +243,31 @@ export const COMPARE_PANEL_STYLES = `
     padding-top: 10px;
     border-top: 1px solid var(--compare-line);
 }
+.compare-filmstrip-area {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+}
+.compare-wall-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    background: rgba(13, 20, 28, 0.48);
+    color: var(--compare-text);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+.compare-wall-loading[hidden] { display: none; }
+.compare-filmstrip-area.is-loading .compare-filmstrip {
+    filter: saturate(0.7) brightness(0.72);
+}
 /* One dock: the transport plus the config/copy icons and the status line on a
    single row, pinned to the bottom of the first screen and reachable while the
    configuration disclosures scroll underneath. */
@@ -232,7 +279,6 @@ export const COMPARE_PANEL_STYLES = `
     border-color: var(--btn-primary-line, rgba(0, 0, 0, 0.2));
     color: var(--btn-primary-text, #fff);
 }
-.compare-config-actions { margin-bottom: 12px; }
 /* Configuration lives in a bottom sheet the dock gear slides up over the stage. */
 .compare-config-sheet {
     position: fixed;
@@ -261,41 +307,45 @@ export const COMPARE_PANEL_STYLES = `
 }
 .compare-config-sheet-title { font-size: 14px; font-weight: 600; }
 .compare-config-sheet-close { font-size: 18px; }
+.compare-config-tabs {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+    overflow-x: auto;
+}
+.compare-config-tab {
+    flex: 0 0 auto;
+    min-width: 82px;
+    padding: 7px 11px;
+    border-radius: 8px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    color: var(--muted, #6d756f);
+    font-family: var(--sans, sans-serif);
+    font-size: 13px;
+    cursor: pointer;
+}
+.compare-config-tab:hover {
+    color: var(--ink, #1f2430);
+    background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12));
+}
+.compare-config-tab.is-active {
+    color: var(--btn-primary-text, #111820);
+    border-color: var(--btn-primary-line, rgba(255, 122, 89, 0.58));
+    background: var(--btn-primary-bg, #ff7a59);
+}
 .compare-config-sheet-body {
     min-height: 0;
     overflow-y: auto;
-    padding: 8px 18px 18px;
+    padding: 14px 18px 18px;
 }
 @media (prefers-reduced-motion: reduce) {
     .compare-config-sheet { transition: none; }
 }
-.compare-config {
-    margin-top: 12px;
-    border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
-    border-radius: 10px;
-    background: var(--help-bg, rgba(0, 0, 0, 0.02));
-}
-.compare-config-summary {
-    cursor: pointer;
-    padding: 10px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink, #1f2430);
-    list-style: none;
-}
-.compare-config-summary::-webkit-details-marker { display: none; }
-.compare-config-summary::before {
-    content: "▸";
-    margin-right: 8px;
-    font-size: 10px;
-    color: var(--muted, #6d756f);
-}
-.compare-config[open] > .compare-config-summary::before { content: "▾"; }
-.compare-config-summary:focus-visible {
-    outline: 2px solid var(--focus, #7aa7ff);
-    outline-offset: -2px;
-}
-.compare-config-body { padding: 4px 12px 14px; }
+.compare-config-panel[hidden] { display: none; }
 .compare-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -703,15 +753,18 @@ export const COMPARE_PANEL_STYLES = `
 .compare-filmstrip-board {
     position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     min-width: 0;
     min-height: 0;
-    padding: 6px;
+    padding: 7px;
     border-radius: 10px;
     background: var(--compare-surface, var(--help-bg, rgba(0, 0, 0, 0.03)));
     border: 1px solid var(--compare-line, transparent);
     cursor: pointer;
+    overflow: hidden;
 }
 .compare-filmstrip-board:focus-visible {
     outline: 2px solid var(--focus, #7aa7ff);
@@ -720,8 +773,8 @@ export const COMPARE_PANEL_STYLES = `
 /* In the gallery the board slot and its SVG fill the tile (the thumbnail is
    vector, so it scales without loss). */
 .compare-filmstrip:not(.compare-filmstrip--speaker) .compare-filmstrip-slot {
+    flex: 1 1 auto;
     width: 100%;
-    height: 100%;
     min-width: 0;
     min-height: 0;
 }
@@ -731,20 +784,20 @@ export const COMPARE_PANEL_STYLES = `
     max-width: 100%;
     max-height: 100%;
 }
-/* Board chrome (name, live count, an expand affordance) overlays the board and
-   stays visible so a resting wall explains which tilings are being compared. */
+/* Board chrome is a caption row outside the simulation area, so labels stay
+   visible without covering the cells. */
 .compare-filmstrip-board-chrome {
-    position: absolute;
-    left: 6px;
-    right: 6px;
-    bottom: 6px;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 4px 9px;
-    border-radius: 7px;
-    background: var(--chrome-bg, rgba(16, 20, 24, 0.72));
-    color: var(--compare-text, #f2ede0);
+    min-height: 18px;
+    padding: 0 2px;
+    border-radius: 0;
+    background: transparent;
+    color: var(--compare-muted, #9fb2bf);
     opacity: 1;
     pointer-events: none;
 }
@@ -776,26 +829,6 @@ export const COMPARE_PANEL_STYLES = `
     pointer-events: auto;
 }
 .compare-filmstrip-board .compare-filmstrip-remove:hover { opacity: 1; }
-/* The gallery's trailing ghost tile opens the tiling picker. Speaker view is
-   about one board, so the tile only lives in the gallery grid. */
-.compare-filmstrip-add {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 0;
-    min-height: 0;
-    border: 1px dashed var(--line, rgba(0, 0, 0, 0.22));
-    border-radius: 10px;
-    background: none;
-    color: var(--muted, #6d756f);
-    font-size: 13px;
-    cursor: pointer;
-}
-.compare-filmstrip-add:hover {
-    color: inherit;
-    border-color: var(--focus, #7aa7ff);
-}
-.compare-filmstrip--speaker .compare-filmstrip-add { display: none; }
 /* Edit mode: the pointer paints cells, so the cursor says so, hovered cells
    light up, and the chrome becomes interactive so its ⤢ glyph can stay the one
    zoom affordance. */
@@ -866,11 +899,11 @@ export const COMPARE_PANEL_STYLES = `
 }
 .compare-filmstrip--speaker .compare-filmstrip-board.is-strip {
     grid-row: 2;
-    height: 96px;
+    height: 116px;
 }
 .compare-filmstrip--speaker .compare-filmstrip-slot {
+    flex: 1 1 auto;
     width: 100%;
-    height: 100%;
     min-width: 0;
     min-height: 0;
 }
@@ -889,9 +922,13 @@ export const COMPARE_PANEL_STYLES = `
     white-space: nowrap;
 }
 .compare-filmstrip-slot {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1 1 auto;
+    overflow: hidden;
+    width: 100%;
     min-width: 96px;
     min-height: 96px;
     font-size: 11px;

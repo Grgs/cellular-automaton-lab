@@ -1,6 +1,6 @@
 /**
  * The presentational surface for the comparison wall. It fills the shared
- * shell's content slot (the static header and its "Open the Lab" affordance
+ * shell's content slot (the static header and its route switcher
  * belong to the shell, not to this module) and delegates all of the actual
  * panel UI and behaviour to `createComparePanelContent`. The workspace router
  * shows and hides it; this surface renders no trigger of its own.
@@ -129,7 +129,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         if (event.key === "Escape") {
             // Escape peels back one in-page layer at a time: an open action menu,
             // then the config sheet, then speaker view (back to the gallery). It
-            // never leaves the wall -- the shell header's "Open the Lab" is
+            // never leaves the wall -- the shell header's Lab route tab is
             // the only exit.
             if (content.handleEscape()) {
                 return;

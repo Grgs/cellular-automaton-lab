@@ -228,6 +228,16 @@ function threeBoardFilmstrip(): SeedFilmstripResult {
     return { ...base, tilings: [...base.tilings, third] };
 }
 
+function fourBoardFilmstrip(): SeedFilmstripResult {
+    const base = twoBoardFilmstrip();
+    const extra = ["kagome", "periodic-face"].map((geometry) => ({
+        ...base.tilings[0]!,
+        geometry,
+        tiling_family: geometry,
+    }));
+    return { ...base, tilings: [...base.tilings, ...extra] };
+}
+
 function fakeGridView(): GridView {
     return {
         render: vi.fn(),
@@ -691,6 +701,108 @@ describe("mountComparePanel", () => {
 
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        handle.dispose();
+    });
+
+    it("renders four board tiles cleanly without an add-tiling tile", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => fourBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(4);
+        });
+        expect(document.querySelector(".compare-filmstrip-add")).toBeNull();
+        expect(document.querySelectorAll(".compare-filmstrip-label")).toHaveLength(4);
+        expect(document.querySelectorAll(".compare-filmstrip-count")).toHaveLength(4);
+        handle.dispose();
+    });
+
+    it("shows building and updating states while filmstrip requests are in flight", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const resolvers: Array<(filmstrip: SeedFilmstripResult) => void> = [];
+        const requestFilmstrip = vi.fn(
+            () =>
+                new Promise<SeedFilmstripResult>((resolve) => {
+                    resolvers.push(resolve);
+                }),
+        );
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        const run = document.querySelector<HTMLButtonElement>(".compare-setup-run");
+        run?.click();
+
+        await vi.waitFor(() => {
+            expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(
+                false,
+            );
+        });
+        expect(document.querySelector(".compare-wall-loading")?.textContent).toContain(
+            "Building comparison...",
+        );
+
+        resolvers.shift()?.(twoBoardFilmstrip());
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+            expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(true);
+        });
+
+        run?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-wall-loading")?.textContent).toContain(
+                "Updating comparison...",
+            );
+        });
+        expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(false);
+        resolvers.shift()?.(twoBoardFilmstrip());
+        await vi.waitFor(() => {
+            expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(true);
+        });
+        handle.dispose();
+    });
+
+    it("uses config tabs and keeps Run comparison out of the sheet", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+        await vi.waitFor(() => {
+            expect(
+                document.querySelector<HTMLElement>(".compare-setup-strip")?.textContent,
+            ).toContain("Conway");
+        });
+
+        document
+            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
+            ?.click();
+
+        const sheet = document.querySelector<HTMLElement>(".compare-config-sheet");
+        expect(sheet?.classList.contains("is-open")).toBe(true);
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-setup")?.hidden).toBe(
+            false,
+        );
+        expect(sheet?.textContent).not.toContain("Run comparison");
+
+        document.querySelector<HTMLButtonElement>("#compare-config-tab-analysis")?.click();
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-analysis")?.hidden).toBe(
+            false,
+        );
+        document.querySelector<HTMLButtonElement>(".compare-run-secondary")?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         handle.dispose();
     });
 
@@ -1679,8 +1791,37 @@ describe("mountComparePanel", () => {
         ).toBe(true);
         expect(document.querySelector(".compare-seed-rail")).toBeNull();
         expect(
-            document.querySelector(".compare-config-run .compare-seed-workspace"),
+            document.querySelector(".compare-config-panel-setup .compare-seed-workspace"),
         ).not.toBeNull();
+        handle.dispose();
+    });
+
+    it("replaces the wall explainer with focused-board context in speaker view", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip: async () => twoBoardFilmstrip() },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+
+        const explainer = document.querySelector<HTMLElement>(".compare-explainer");
+        expect(explainer?.textContent).toContain("Focused board");
+        expect(explainer?.textContent).toContain("Board");
+        expect(explainer?.textContent).toContain("Generation");
+        expect(explainer?.textContent).toContain("Live count");
+        expect(explainer?.textContent).toContain("Current tiling");
+        expect(explainer?.textContent).toContain("Open in Lab");
+        expect(explainer?.textContent).not.toContain("Same seed");
         handle.dispose();
     });
 
@@ -1729,8 +1870,38 @@ describe("mountComparePanel", () => {
         expect(document.querySelector(".compare-config-sheet")?.classList.contains("is-open")).toBe(
             true,
         );
-        expect(document.querySelector<HTMLDetailsElement>(".compare-config-tilings")?.open).toBe(
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-tilings")?.hidden).toBe(
+            false,
+        );
+        expect(
+            document
+                .querySelector<HTMLButtonElement>("#compare-config-tab-tilings")
+                ?.classList.contains("is-active"),
+        ).toBe(true);
+        expect(document.activeElement?.className).toContain("compare-tilings-search");
+        handle.dispose();
+    });
+
+    it("opens the tiling tab from the setup strip Tilings item", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+
+        document
+            .querySelector<HTMLButtonElement>(
+                '.compare-setup-action[aria-label="Choose tilings on the wall"]',
+            )
+            ?.click();
+
+        expect(document.querySelector(".compare-config-sheet")?.classList.contains("is-open")).toBe(
             true,
+        );
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-tilings")?.hidden).toBe(
+            false,
         );
         expect(document.activeElement?.className).toContain("compare-tilings-search");
         handle.dispose();

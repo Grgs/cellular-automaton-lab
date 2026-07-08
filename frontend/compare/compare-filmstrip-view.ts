@@ -38,8 +38,8 @@ export interface FilmstripViewOptions {
      * backend needs at least two to compare).
      */
     onRemoveBoard?: (geometry: string) => void;
-    /** Called by the gallery's trailing "+ Add tiling" tile. */
-    onAddTiling?: () => void;
+    /** Called after the shared generation index changes. */
+    onFrameChange?: (frameIndex: number) => void;
 }
 
 /** Optional playback overrides applied right after a filmstrip is loaded. */
@@ -227,6 +227,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         if (state.index !== lastRenderedIndex) {
             renderAllBoards(state.index);
         }
+        options.onFrameChange?.(state.index);
     }
 
     function teardownRun(): void {
@@ -324,16 +325,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 countLabel,
             };
         });
-        if (options.onAddTiling) {
-            // A trailing ghost tile keeps "what's on the wall" editable from
-            // the wall itself; speaker view hides it (see compare-styles.ts).
-            const addTile = el("button", "compare-filmstrip-add", "+ Add tiling");
-            addTile.setAttribute("type", "button");
-            addTile.title = "Choose the tilings on the wall";
-            addTile.addEventListener("click", () => options.onAddTiling?.());
-            boardsArea.append(addTile);
-        }
-
         unsubscribe = player.subscribe(onPlayerIndex);
         transport.attach(player);
         // Prime the (still "…") board skeletons before previews load.

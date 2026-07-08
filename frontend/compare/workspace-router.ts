@@ -2,7 +2,7 @@
  * Lightweight, eagerly-loaded router between the app's two destinations: the
  * comparison wall (the landing view) and the Lab (the single-board editor).
  * Both render inside the same static shell (header + content + dock); this
- * router owns which root is visible and which header affordance shows.
+ * router owns which root is visible and which header route tab is active.
  *
  * The URL hash is the source of truth. A bare hash resolves to the wall, so a
  * newcomer lands on the synchronized side-by-side; `#/lab` (or a bare board
@@ -64,9 +64,9 @@ export interface MountWorkspaceRouterOptions {
     /** The static shell root that contains the Lab (editor) world. */
     labRoot?: HTMLElement | null;
     onOpenPattern?: (pattern: PatternPayload) => void;
-    /** Header button that navigates to the wall; shown while in the Lab. */
+    /** Header button that navigates to the wall. */
     wallTrigger?: HTMLButtonElement | null;
-    /** Header button that navigates to the Lab; shown while on the wall. */
+    /** Header button that navigates to the Lab. */
     labTrigger?: HTMLButtonElement | null;
     /** Boot the editor controller; awaited before the Lab is interactive. */
     ensureLabReady?: () => Promise<void>;
@@ -181,10 +181,24 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
             wallHost.hidden = route !== "wall";
         }
         if (options.labTrigger) {
-            options.labTrigger.hidden = route !== "wall";
+            options.labTrigger.hidden = false;
+            options.labTrigger.classList.toggle("is-active", route === "lab");
+            options.labTrigger.setAttribute("aria-pressed", route === "lab" ? "true" : "false");
+            if (route === "lab") {
+                options.labTrigger.setAttribute("aria-current", "page");
+            } else {
+                options.labTrigger.removeAttribute("aria-current");
+            }
         }
         if (options.wallTrigger) {
-            options.wallTrigger.hidden = route !== "lab";
+            options.wallTrigger.hidden = false;
+            options.wallTrigger.classList.toggle("is-active", route === "wall");
+            options.wallTrigger.setAttribute("aria-pressed", route === "wall" ? "true" : "false");
+            if (route === "wall") {
+                options.wallTrigger.setAttribute("aria-current", "page");
+            } else {
+                options.wallTrigger.removeAttribute("aria-current");
+            }
         }
     }
 

@@ -169,6 +169,7 @@ interface TilingOption {
 }
 
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
+type ConfigTab = "setup" | "tilings" | "analysis" | "saved";
 
 interface ActionMenuItem {
     label: string;
@@ -342,21 +343,12 @@ export function createComparePanelContent(
     traversalSelect.addEventListener("change", refreshPreview);
     gridInput.addEventListener("change", refreshPreview);
 
-    // "Run comparison" builds (or rebuilds) the live wall. The setup strip,
-    // dock, and Configure sheet all share this action. The analytical table is
-    // a deeper workflow and is named separately as "Run analysis".
+    // "Run comparison" builds (or rebuilds) the live wall from the setup strip
+    // and idle dock transport. The analytical table is a deeper workflow and
+    // is named separately as "Run analysis".
     const runButton = el("button", { class: "compare-run compare-run-secondary", type: "button" }, [
         "Run analysis",
     ]);
-    const playButton = el(
-        "button",
-        {
-            class: "compare-run",
-            type: "button",
-            title: "Run every selected tiling on a shared clock",
-        },
-        ["Run comparison"],
-    );
     // Copy-link and configure collapse into compact dock icons rather than
     // labelled buttons competing with the transport.
     const copyRunButton = el(
@@ -367,7 +359,7 @@ export function createComparePanelContent(
             title: "Copy a link that restores this compare run setup",
             "aria-label": "Copy run link",
         },
-        ["⧉"],
+        [dockGlyph("⧉"), dockLabel("Copy link")],
     );
     const configButton = el(
         "button",
@@ -377,7 +369,7 @@ export function createComparePanelContent(
             title: "Configure the run",
             "aria-label": "Configure the run",
         },
-        ["⚙"],
+        [dockGlyph("⚙"), dockLabel("Setup")],
     );
     // One click from the wall to the searchable tiling checklist: opens the
     // config sheet with the Tilings disclosure expanded and search focused.
@@ -389,7 +381,7 @@ export function createComparePanelContent(
             title: "Choose the tilings on the wall",
             "aria-label": "Choose tilings",
         },
-        ["⊞"],
+        [dockGlyph("⊞"), dockLabel("Tilings")],
     );
     const configSheetCloseButton = el(
         "button",
@@ -413,7 +405,7 @@ export function createComparePanelContent(
             "aria-pressed": "false",
             disabled: true,
         },
-        ["✎"],
+        [dockGlyph("✎"), dockLabel("Edit seed")],
     );
     const savedRunNameInput = el("input", {
         class: "compare-field compare-saved-name",
@@ -499,13 +491,23 @@ export function createComparePanelContent(
         },
         ["Run comparison"],
     );
+    const setupTilingsItem = el(
+        "button",
+        {
+            class: "compare-setup-item compare-setup-action",
+            type: "button",
+            title: "Choose the tilings on the wall",
+            "aria-label": "Choose tilings on the wall",
+        },
+        [el("span", { class: "compare-setup-label", textContent: "Tilings" }), setupTilingsValue],
+    );
     const setupStrip = el(
         "section",
         { class: "compare-setup-strip", "aria-label": "Comparison setup" },
         [
             setupItem("Seed", setupSeedValue),
             setupItem("Rule", setupRuleValue),
-            setupItem("Tilings", setupTilingsValue),
+            setupTilingsItem,
             setupRunButton,
         ],
     );
@@ -520,7 +522,20 @@ export function createComparePanelContent(
             textContent: "Pick a rule and tilings, then run every board on one shared clock.",
         }),
     ]);
-    const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [stageHero]);
+    const wallLoadingOverlay = el(
+        "div",
+        {
+            class: "compare-wall-loading",
+            role: "status",
+            "aria-live": "polite",
+            hidden: true,
+        },
+        [el("span", { class: "compare-wall-loading-text", textContent: "Building comparison..." })],
+    );
+    const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [
+        stageHero,
+        wallLoadingOverlay,
+    ]);
     // The dock's play button doubles as "Run comparison" before any run is
     // attached, so the transport owns the primary action rather than a separate
     // button sitting beside it.
@@ -955,6 +970,17 @@ export function createComparePanelContent(
         }
     }
 
+    function setWallLoading(message: string | null): void {
+        if (message) {
+            wallLoadingOverlay.querySelector(".compare-wall-loading-text")!.textContent = message;
+            wallLoadingOverlay.hidden = false;
+            filmstripArea.classList.add("is-loading");
+            return;
+        }
+        wallLoadingOverlay.hidden = true;
+        filmstripArea.classList.remove("is-loading");
+    }
+
     const seedPadBlock = el("div", { class: "compare-seedpad-block" }, [
         el("div", {
             class: "compare-seedpad-title",
@@ -1021,28 +1047,15 @@ export function createComparePanelContent(
     ]);
 
     const stageMain = el("div", { class: "compare-stage-main" }, [filmstripArea]);
+    const explainerTitle = el("div", {
+        class: "compare-explainer-title",
+        textContent: "What you are seeing",
+    });
+    const explainerBody = el("div", { class: "compare-explainer-body" });
     const explainerPanel = el(
         "aside",
         { class: "compare-explainer", "aria-label": "How the comparison works" },
-        [
-            el("div", { class: "compare-explainer-title", textContent: "What you are seeing" }),
-            explainerItem(
-                "Same seed",
-                "One starting pattern is projected onto every selected board.",
-            ),
-            explainerItem(
-                "Same rule",
-                "Each board runs the selected rule on the same generation clock.",
-            ),
-            explainerItem(
-                "Different tilings",
-                "Topology changes the neighbors, so outcomes can diverge.",
-            ),
-            el("div", {
-                class: "compare-explainer-hint",
-                textContent: "Click a board to focus it. Use Open in Lab to continue from a frame.",
-            }),
-        ],
+        [explainerTitle, explainerBody],
     );
     const stageFrame = el("div", { class: "compare-stage-frame" }, [
         setupStrip,
@@ -1055,46 +1068,59 @@ export function createComparePanelContent(
         seedPreview.refresh();
     });
 
-    // Configuration and data live in a bottom sheet the dock's gear slides up,
-    // closed by default, so the stage owns the whole first screen. The four
-    // disclosures inside keep their own open/closed persistence.
-    const tilingsSection = configSection("Tilings", "compare-config-tilings", true, [
+    // Configuration and data live in a tabbed bottom sheet the dock's gear
+    // slides up, closed by default, so the stage owns the whole first screen.
+    const configTabButtons = new Map<ConfigTab, HTMLButtonElement>();
+    const configTabPanels = new Map<ConfigTab, HTMLElement>();
+    const configTabs = el(
+        "div",
+        { class: "compare-config-tabs", role: "tablist", "aria-label": "Configuration sections" },
+        [
+            configTabButton("setup", "Setup"),
+            configTabButton("tilings", "Tilings"),
+            configTabButton("analysis", "Analysis"),
+            configTabButton("saved", "Saved"),
+        ],
+    );
+    const setupConfigPanel = configPanel("setup", [
+        el("div", { class: "compare-form" }, [
+            labeledField("Rule", ruleSelect),
+            labeledField("Seed source", shapeSelect),
+            labeledField("Traversal", traversalSelect),
+            labeledField("Steps", stepsInput),
+            labeledField("Grid size", gridInput),
+        ]),
+        seedWorkspace,
+    ]);
+    const tilingsConfigPanel = configPanel("tilings", [
         el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
     ]);
-    const configSheet = el("div", { class: "compare-config-sheet", inert: true }, [
-        el("div", { class: "compare-config-sheet-header" }, [
-            el("div", { class: "compare-config-sheet-title", textContent: "Set up the run" }),
-            configSheetCloseButton,
-        ]),
-        el("div", { class: "compare-config-sheet-body" }, [
-            configSection("Configure the run", "compare-config-run", true, [
-                el("div", { class: "compare-config-actions" }, [playButton]),
-                el("div", { class: "compare-form" }, [
-                    labeledField("Rule", ruleSelect),
-                    labeledField("Seed source", shapeSelect),
-                    labeledField("Traversal", traversalSelect),
-                    labeledField("Steps", stepsInput),
-                    labeledField("Grid size", gridInput),
-                ]),
-                seedWorkspace,
-            ]),
-            tilingsSection,
-            configSection("Cross-tiling analysis", "compare-config-analysis", false, [
-                el("div", { class: "compare-analysis" }, [
-                    el("p", {
-                        class: "compare-intro",
-                        textContent:
-                            "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
-                    }),
-                    runButton,
-                    resultsArea,
-                ]),
-            ]),
-            configSection("Saved runs and tiling sets", "compare-config-saved", false, [
-                savedCompareControls(),
-            ]),
+    const analysisConfigPanel = configPanel("analysis", [
+        el("div", { class: "compare-analysis" }, [
+            el("p", {
+                class: "compare-intro",
+                textContent:
+                    "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
+            }),
+            runButton,
+            resultsArea,
         ]),
     ]);
+    const savedConfigPanel = configPanel("saved", [savedCompareControls()]);
+    const configSheet = el("div", { class: "compare-config-sheet", inert: true }, [
+        el("div", { class: "compare-config-sheet-header" }, [
+            el("div", { class: "compare-config-sheet-title", textContent: "Configure comparison" }),
+            configSheetCloseButton,
+        ]),
+        configTabs,
+        el("div", { class: "compare-config-sheet-body" }, [
+            setupConfigPanel,
+            tilingsConfigPanel,
+            analysisConfigPanel,
+            savedConfigPanel,
+        ]),
+    ]);
+    activateConfigTab("setup");
 
     const root = el("div", { class: "compare-content" }, [
         // The stage plus its docked transport fill the viewport; the config sheet
@@ -1129,6 +1155,18 @@ export function createComparePanelContent(
         ]);
     }
 
+    function dockGlyph(text: string): HTMLElement {
+        return el("span", {
+            class: "compare-dock-glyph",
+            "aria-hidden": "true",
+            textContent: text,
+        });
+    }
+
+    function dockLabel(text: string): HTMLElement {
+        return el("span", { class: "compare-dock-label", textContent: text });
+    }
+
     function explainerItem(title: string, body: string): HTMLElement {
         return el("div", { class: "compare-explainer-item" }, [
             el("span", { class: "compare-explainer-key", textContent: title }),
@@ -1136,20 +1174,74 @@ export function createComparePanelContent(
         ]);
     }
 
-    function configSection(
-        title: string,
-        className: string,
-        open: boolean,
-        children: Array<Node | string>,
-    ): HTMLDetailsElement {
-        return el(
-            "details",
-            { class: `compare-config ${className}`, ...(open ? { open: true } : {}) },
-            [
-                el("summary", { class: "compare-config-summary", textContent: title }),
-                el("div", { class: "compare-config-body" }, children),
-            ],
+    function configTabButton(tab: ConfigTab, label: string): HTMLButtonElement {
+        const button = el("button", {
+            class: "compare-config-tab",
+            type: "button",
+            role: "tab",
+            id: `compare-config-tab-${tab}`,
+            "aria-controls": `compare-config-panel-${tab}`,
+            "aria-selected": "false",
+            tabindex: "-1",
+            textContent: label,
+        });
+        button.addEventListener("click", () => activateConfigTab(tab, { focus: true }));
+        button.addEventListener("keydown", handleConfigTabKeydown);
+        configTabButtons.set(tab, button);
+        return button;
+    }
+
+    function configPanel(tab: ConfigTab, children: Array<Node | string>): HTMLElement {
+        const panel = el(
+            "section",
+            {
+                class: `compare-config-panel compare-config-panel-${tab}`,
+                role: "tabpanel",
+                id: `compare-config-panel-${tab}`,
+                "aria-labelledby": `compare-config-tab-${tab}`,
+                hidden: true,
+            },
+            children,
         );
+        configTabPanels.set(tab, panel);
+        return panel;
+    }
+
+    function activateConfigTab(tab: ConfigTab, options: { focus?: boolean } = {}): void {
+        for (const [candidate, button] of configTabButtons) {
+            const active = candidate === tab;
+            button.classList.toggle("is-active", active);
+            button.setAttribute("aria-selected", active ? "true" : "false");
+            button.tabIndex = active ? 0 : -1;
+            configTabPanels.get(candidate)!.hidden = !active;
+        }
+        if (options.focus) {
+            configTabButtons.get(tab)?.focus();
+        }
+    }
+
+    function handleConfigTabKeydown(event: KeyboardEvent): void {
+        const tabs: ConfigTab[] = ["setup", "tilings", "analysis", "saved"];
+        const activeIndex = tabs.findIndex(
+            (tab) => configTabButtons.get(tab) === document.activeElement,
+        );
+        if (activeIndex < 0) {
+            return;
+        }
+        let nextIndex: number;
+        if (event.key === "ArrowLeft") {
+            nextIndex = (activeIndex + tabs.length - 1) % tabs.length;
+        } else if (event.key === "ArrowRight") {
+            nextIndex = (activeIndex + 1) % tabs.length;
+        } else if (event.key === "Home") {
+            nextIndex = 0;
+        } else if (event.key === "End") {
+            nextIndex = tabs.length - 1;
+        } else {
+            return;
+        }
+        event.preventDefault();
+        activateConfigTab(tabs[nextIndex]!, { focus: true });
     }
 
     function tilingControlsBar(): HTMLElement {
@@ -1406,13 +1498,11 @@ export function createComparePanelContent(
         const canPlay = !running && selected.size >= 2;
         runButton.disabled = disabled;
         setupRunButton.disabled = !canPlay;
-        playButton.disabled = !canPlay;
         const playTitle =
             selected.size < 2
                 ? "Select at least two tilings to run a comparison"
                 : "Run every selected tiling on a shared clock";
         setupRunButton.title = playTitle;
-        playButton.title = playTitle;
         // The dock's idle play button shares the same gate as the Configure one.
         filmstripTransport.setIdleRunEnabled(canPlay);
         copyRunButton.disabled = disabled;
@@ -1426,6 +1516,7 @@ export function createComparePanelContent(
         // Painting needs boards on the stage; the toggle waits for a run.
         editModeButton.disabled = running || !activeFilmstrip;
         updateSetupSummary();
+        updateExplainer();
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -1502,6 +1593,65 @@ export function createComparePanelContent(
         setupRuleValue.textContent = ruleLabel;
         setupTilingsValue.textContent = tilingLabel;
         setupTilingsValue.title = summaryText();
+    }
+
+    function updateExplainer(): void {
+        if (currentFocusGeometry && activeFilmstrip) {
+            const tiling = activeFilmstrip.tilings.find(
+                (candidate) => candidate.geometry === currentFocusGeometry,
+            );
+            if (tiling) {
+                const frameIndex = filmstripView?.currentFrameIndex() ?? 0;
+                const frame = tiling.frames[frameIndex] ?? {};
+                const liveCells = Object.values(frame).filter((state) => state !== 0).length;
+                const catalog = allTilings.find(
+                    (candidate) => candidate.geometry === tiling.geometry,
+                );
+                const family = catalog?.family ? catalog.family.replace(/-/g, " ") : "tiling";
+                explainerTitle.textContent = "Focused board";
+                explainerBody.replaceChildren(
+                    explainerItem("Board", tiling.label || tiling.geometry),
+                    explainerItem(
+                        "Generation",
+                        `${frameIndex} of ${Math.max(activeFilmstrip.frame_count - 1, 0)}`,
+                    ),
+                    explainerItem("Live count", `${liveCells} live cells`),
+                    explainerItem("Current tiling", `${family} · ${tiling.geometry}`),
+                    explainerItem(
+                        "Open in Lab",
+                        "Loads this exact generation into the single-board editor.",
+                    ),
+                    ...(focusLiveEnabled
+                        ? [
+                              explainerItem(
+                                  "Edit live",
+                                  "Forks this generation into an editable board that stays on the wall.",
+                              ),
+                          ]
+                        : []),
+                );
+                return;
+            }
+        }
+        explainerTitle.textContent = "What you are seeing";
+        explainerBody.replaceChildren(
+            explainerItem(
+                "Same seed",
+                "One starting pattern is projected onto every selected board.",
+            ),
+            explainerItem(
+                "Same rule",
+                "Each board runs the selected rule on the same generation clock.",
+            ),
+            explainerItem(
+                "Different tilings",
+                "Topology changes the neighbors, so outcomes can diverge.",
+            ),
+            el("div", {
+                class: "compare-explainer-hint",
+                textContent: "Click a board to focus it. Use Open in Lab to continue from a frame.",
+            }),
+        );
     }
 
     function selectedOptionLabel(select: HTMLSelectElement): string {
@@ -1765,7 +1915,6 @@ export function createComparePanelContent(
         running = next;
         runButton.textContent = next ? "Running…" : "Run analysis";
         setupRunButton.textContent = next ? "Running…" : "Run comparison";
-        playButton.textContent = next ? "Running…" : "Run comparison";
         updateSummary();
     }
 
@@ -1806,7 +1955,11 @@ export function createComparePanelContent(
         refreshPreview();
         resultsArea.replaceChildren();
         showStageHero();
+        stageMain.classList.remove("is-speaker");
         activeFilmstrip = null;
+        currentFocusGeometry = null;
+        setWallLoading(null);
+        updateExplainer();
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
@@ -1883,10 +2036,14 @@ export function createComparePanelContent(
         if (selected.size < 2) {
             statusLine.textContent = "Select at least two tilings to run a comparison.";
             showStageHero();
+            setWallLoading(null);
             return;
         }
+        const hadFilmstrip = activeFilmstrip !== null;
+        const loadingMessage = hadFilmstrip ? "Updating comparison..." : "Building comparison...";
         setRunning(true);
-        statusLine.textContent = `Building filmstrip for ${selected.size} tilings…`;
+        statusLine.textContent = `${loadingMessage} ${selected.size} tilings…`;
+        setWallLoading(loadingMessage);
 
         const request: FilmstripRequest = {
             seed: seedInput.value,
@@ -1909,9 +2066,9 @@ export function createComparePanelContent(
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
                     onFocusChange: handleFocusChanged,
+                    onFrameChange: () => updateExplainer(),
                     onPaintCell: handlePaintCell,
                     onRemoveBoard: removeBoardFromWall,
-                    onAddTiling: openTilingsSheet,
                 });
                 filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripView.setEditMode(editMode);
@@ -1925,8 +2082,13 @@ export function createComparePanelContent(
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             statusLine.textContent = `Error: ${message}`;
-            showStageHero();
+            if (hadFilmstrip) {
+                showStageBoards();
+            } else {
+                showStageHero();
+            }
         } finally {
+            setWallLoading(null);
             setRunning(false);
         }
     }
@@ -2247,12 +2409,12 @@ export function createComparePanelContent(
     // The gear slides the configuration sheet up over the stage; the sheet's own
     // close button or Escape slides it back down. `inert` keeps the closed sheet
     // out of the tab order and off assistive tech.
-    function openConfigSheet(): void {
-        if (configSheet.classList.contains("is-open")) {
-            return;
+    function openConfigSheet(tab: ConfigTab = "setup"): void {
+        activateConfigTab(tab);
+        if (!configSheet.classList.contains("is-open")) {
+            configSheet.removeAttribute("inert");
+            configSheet.classList.add("is-open");
         }
-        configSheet.removeAttribute("inert");
-        configSheet.classList.add("is-open");
     }
     function closeConfigIfOpen(): boolean {
         if (!configSheet.classList.contains("is-open")) {
@@ -2266,20 +2428,19 @@ export function createComparePanelContent(
     // The tilings shortcut lands ready to type: sheet open, Tilings disclosure
     // expanded, search focused.
     function openTilingsSheet(): void {
-        openConfigSheet();
-        tilingsSection.open = true;
+        openConfigSheet("tilings");
         tilingSearchInput.focus();
         tilingSearchInput.select();
     }
 
     runButton.addEventListener("click", () => void runComparison());
-    playButton.addEventListener("click", () => void runFilmstrip());
     setupRunButton.addEventListener("click", () => void runFilmstrip());
     heroOpenLabButton.addEventListener("click", openFocusedBoardInLab);
     heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
     copyRunButton.addEventListener("click", copyRunLink);
-    configButton.addEventListener("click", openConfigSheet);
+    configButton.addEventListener("click", () => openConfigSheet("setup"));
+    setupTilingsItem.addEventListener("click", openTilingsSheet);
     tilingsButton.addEventListener("click", openTilingsSheet);
     configSheetCloseButton.addEventListener("click", () => closeConfigIfOpen());
     document.addEventListener("pointerdown", onDocumentPointerDown);

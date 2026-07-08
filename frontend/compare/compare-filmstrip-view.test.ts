@@ -138,7 +138,6 @@ function mountView(
         loop?: boolean;
         onFocusChange?: (geometry: string | null) => void;
         onRemoveBoard?: (geometry: string) => void;
-        onAddTiling?: () => void;
         previewTopology?: SimulationBackend["previewTopology"];
     } = {},
 ): Harness {
@@ -151,7 +150,6 @@ function mountView(
         ...(options.loop === undefined ? {} : { loop: options.loop }),
         ...(options.onFocusChange ? { onFocusChange: options.onFocusChange } : {}),
         ...(options.onRemoveBoard ? { onRemoveBoard: options.onRemoveBoard } : {}),
-        ...(options.onAddTiling ? { onAddTiling: options.onAddTiling } : {}),
     });
     document.body.append(transport.element, view.element);
     return { view, transport, clock };
@@ -289,16 +287,13 @@ describe("createFilmstripView", () => {
         expect(view.element.querySelectorAll(".compare-filmstrip-remove")).toHaveLength(0);
     });
 
-    it("renders a trailing add-tiling tile only when the host wires one", async () => {
-        const added: number[] = [];
-        const { view } = mountView({ onAddTiling: () => added.push(1) });
+    it("keeps add-tiling out of the board grid", async () => {
+        const { view } = mountView();
 
         await view.load(twoBoardFilmstrip());
 
         const addTile = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
-        expect(addTile).not.toBeNull();
-        addTile?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(added).toHaveLength(1);
+        expect(addTile).toBeNull();
 
         const { view: plainView } = mountView();
         await plainView.load(twoBoardFilmstrip());

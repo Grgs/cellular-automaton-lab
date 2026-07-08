@@ -246,7 +246,7 @@ describe("mountWorkspaceRouter", () => {
         });
     });
 
-    it("writes #/lab when the wall is left via the header's Open the Lab", async () => {
+    it("writes #/lab when the wall is left via the header's Lab switcher", async () => {
         const labTrigger = document.createElement("button");
         document.body.append(labTrigger);
         await mount({ labTrigger });
@@ -260,7 +260,7 @@ describe("mountWorkspaceRouter", () => {
         expect(window.location.hash).toBe("#/lab");
     });
 
-    it("toggles the shell roots and header buttons per route", async () => {
+    it("toggles the shell roots and active header route tabs per route", async () => {
         const labRoot = document.createElement("section");
         const labTrigger = document.createElement("button");
         const wallTrigger = document.createElement("button");
@@ -268,14 +268,17 @@ describe("mountWorkspaceRouter", () => {
         const ensureLabReady = vi.fn(async () => {});
         await mount({ labRoot, labTrigger, wallTrigger, ensureLabReady });
 
-        // Wall landing: the Lab world is hidden, its trigger shows in the header,
-        // and the editor controller is never booted.
+        // Wall landing: the Lab world is hidden, the route switcher stays
+        // visible, and the editor controller is never booted.
         await vi.waitFor(() => {
             expect(backdrop()?.hidden).toBe(false);
         });
         expect(labRoot.hidden).toBe(true);
         expect(labTrigger.hidden).toBe(false);
-        expect(wallTrigger.hidden).toBe(true);
+        expect(wallTrigger.hidden).toBe(false);
+        expect(wallTrigger.classList.contains("is-active")).toBe(true);
+        expect(wallTrigger.getAttribute("aria-current")).toBe("page");
+        expect(labTrigger.classList.contains("is-active")).toBe(false);
         expect(ensureLabReady).not.toHaveBeenCalled();
 
         // Entering the Lab boots the controller (once) and flips the shell.
@@ -283,8 +286,11 @@ describe("mountWorkspaceRouter", () => {
         await vi.waitFor(() => {
             expect(labRoot.hidden).toBe(false);
         });
-        expect(labTrigger.hidden).toBe(true);
+        expect(labTrigger.hidden).toBe(false);
         expect(wallTrigger.hidden).toBe(false);
+        expect(labTrigger.classList.contains("is-active")).toBe(true);
+        expect(labTrigger.getAttribute("aria-current")).toBe("page");
+        expect(wallTrigger.classList.contains("is-active")).toBe(false);
         expect(ensureLabReady).toHaveBeenCalledTimes(1);
 
         // Returning to the wall and back does not boot the controller again.
