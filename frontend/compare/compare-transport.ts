@@ -39,7 +39,7 @@ export interface FilmstripTransportOptions {
     scheduler?: IntervalScheduler;
     /**
      * Before any run is attached, the play button doubles as the primary
-     * "play side by side" action so the dock carries a single control instead of
+     * "Run comparison" action so the dock carries a single control instead of
      * a transport plus a separate run button. Once a player attaches it reverts
      * to play/pause.
      */
@@ -60,7 +60,7 @@ export interface FilmstripTransportController {
     toggle(): void;
     /** Step the attached player by `delta` frames (used by keyboard idioms). */
     step(delta: number): void;
-    /** Enable/disable the idle "play side by side" run action (needs `onRun`). */
+    /** Enable/disable the idle "Run comparison" action (needs `onRun`). */
     setIdleRunEnabled(enabled: boolean): void;
 }
 
@@ -181,15 +181,16 @@ export function createFilmstripTransport(
         speedSelect.disabled = true;
         counter.textContent = "—";
         // With a run action wired, the idle play button is the primary
-        // "play side by side" control rather than a dead play/pause.
+        // "run comparison" control rather than a dead play/pause.
         if (onRun) {
-            playButton.textContent = "▶ Play side by side";
-            playButton.title =
-                "Run every selected tiling on a shared clock and play them side by side";
+            playButton.textContent = "Run comparison";
+            playButton.title = "Run every selected tiling on a shared clock";
+            playButton.setAttribute("aria-label", "Run comparison");
             playButton.disabled = !idleRunEnabled;
         } else {
             playButton.textContent = "▶ Play";
             playButton.title = "Play / pause";
+            playButton.setAttribute("aria-label", "Play / pause");
             playButton.disabled = true;
         }
     }
@@ -197,6 +198,7 @@ export function createFilmstripTransport(
     function onState(state: FilmstripPlayerState): void {
         playButton.textContent = state.playing ? "⏸ Pause" : "▶ Play";
         playButton.title = "Play / pause";
+        playButton.setAttribute("aria-label", "Play / pause");
         const playable = state.frameCount > 1;
         playButton.disabled = !playable;
         scrubber.disabled = !playable;

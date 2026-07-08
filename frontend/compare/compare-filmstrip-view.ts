@@ -152,11 +152,11 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 entry.cell.setAttribute("aria-label", `${boardName(entry.tiling)}: paint cells`);
                 continue;
             }
-            entry.cell.title = isHero ? "Back to the gallery" : "Focus this board";
+            entry.cell.title = isHero ? "Back to the wall" : "Focus this board";
             entry.cell.setAttribute(
                 "aria-label",
                 isHero
-                    ? `${boardName(entry.tiling)}: back to the gallery`
+                    ? `${boardName(entry.tiling)}: back to the wall`
                     : `${boardName(entry.tiling)}: focus this board`,
             );
         }
@@ -262,8 +262,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             cell.setAttribute("role", "listitem");
             cell.tabIndex = 0;
             // Board chrome (name, live count, an expand affordance) overlays the
-            // board and appears on hover/focus, so a resting gallery reads as a
-            // clean wall of tilings rather than a grid of labels and buttons.
+            // board; labels stay visible so the wall explains itself at rest.
             const expandGlyph = el("span", "compare-filmstrip-expand", "⤢");
             expandGlyph.setAttribute("aria-hidden", "true");
             const chrome = el("div", "compare-filmstrip-board-chrome");

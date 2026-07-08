@@ -337,25 +337,25 @@ export function createComparePanelContent(
     seedInput.addEventListener("input", () => {
         seedPad.syncFromSeed();
         redrawPreview();
+        updateSetupSummary();
     });
     traversalSelect.addEventListener("change", refreshPreview);
     gridInput.addEventListener("change", refreshPreview);
 
-    // "Play side by side" builds (or rebuilds) the live run. The dock's play
-    // button triggers it before a run exists; this primary button in Configure
-    // rebuilds after the seed, rule, or tiling set is edited. The analytical
-    // "Run comparison" is secondary and lives in the analysis section.
+    // "Run comparison" builds (or rebuilds) the live wall. The setup strip,
+    // dock, and Configure sheet all share this action. The analytical table is
+    // a deeper workflow and is named separately as "Run analysis".
     const runButton = el("button", { class: "compare-run compare-run-secondary", type: "button" }, [
-        "Run comparison",
+        "Run analysis",
     ]);
     const playButton = el(
         "button",
         {
             class: "compare-run",
             type: "button",
-            title: "Run every selected tiling on a shared clock and play them side by side",
+            title: "Run every selected tiling on a shared clock",
         },
-        ["▶ Play side by side"],
+        ["Run comparison"],
     );
     // Copy-link and configure collapse into compact dock icons rather than
     // labelled buttons competing with the transport.
@@ -478,6 +478,37 @@ export function createComparePanelContent(
         role: "status",
         "aria-live": "polite",
     });
+    const setupSeedValue = el("strong", {
+        class: "compare-setup-value",
+        textContent: "Loading",
+    });
+    const setupRuleValue = el("strong", {
+        class: "compare-setup-value",
+        textContent: "Loading",
+    });
+    const setupTilingsValue = el("strong", {
+        class: "compare-setup-value",
+        textContent: "Loading",
+    });
+    const setupRunButton = el(
+        "button",
+        {
+            class: "compare-run compare-setup-run",
+            type: "button",
+            title: "Run every selected tiling on a shared clock",
+        },
+        ["Run comparison"],
+    );
+    const setupStrip = el(
+        "section",
+        { class: "compare-setup-strip", "aria-label": "Comparison setup" },
+        [
+            setupItem("Seed", setupSeedValue),
+            setupItem("Rule", setupRuleValue),
+            setupItem("Tilings", setupTilingsValue),
+            setupRunButton,
+        ],
+    );
     const stageHero = el("div", { class: "compare-stage-hero" }, [
         el("div", { class: "compare-stage-hero-glyph", "aria-hidden": "true", textContent: "▦" }),
         el("div", {
@@ -486,12 +517,11 @@ export function createComparePanelContent(
         }),
         el("p", {
             class: "compare-stage-hero-blurb",
-            textContent:
-                "Pick a rule and tilings below, then press Play side by side to run them on one shared clock.",
+            textContent: "Pick a rule and tilings, then run every board on one shared clock.",
         }),
     ]);
     const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [stageHero]);
-    // The dock's play button doubles as "play side by side" before any run is
+    // The dock's play button doubles as "Run comparison" before any run is
     // attached, so the transport owns the primary action rather than a separate
     // button sitting beside it.
     const filmstripTransport = createFilmstripTransport({ onRun: () => void runFilmstrip() });
@@ -890,6 +920,27 @@ export function createComparePanelContent(
         await forkBoardLive(geometry, filmstripView.currentFrameIndex());
     }
 
+    function openFocusedBoardInLab(): void {
+        const geometry = currentFocusGeometry;
+        if (!filmstripView || !activeFilmstrip || !geometry) {
+            return;
+        }
+        const tiling = activeFilmstrip.tilings.find((candidate) => candidate.geometry === geometry);
+        if (!tiling) {
+            return;
+        }
+        const pattern = buildFilmstripFramePattern(
+            activeFilmstrip,
+            tiling,
+            filmstripView.currentFrameIndex(),
+        );
+        if (!pattern) {
+            statusLine.textContent = "This generation cannot be opened in the Lab.";
+            return;
+        }
+        openPattern(pattern);
+    }
+
     function showStageHero(): void {
         stageHero.hidden = false;
         if (filmstripView) {
@@ -930,37 +981,73 @@ export function createComparePanelContent(
         seedPreviewBlock,
     ]);
 
-    // The hero's toolbelt overlays the focused board: return to the gallery, and
-    // the single fork affordance in the app (live on the wall, or into the Lab on
-    // standalone). It is handed to the filmstrip view, which parks it on whichever
-    // board is the hero.
+    // The hero's toolbelt overlays the focused board: return to the wall, open
+    // the current frame in the Lab, and -- when the host supports it -- edit the
+    // focused frame live in place. It is handed to the filmstrip view, which
+    // parks it on whichever board is the hero.
     const heroBackButton = el(
         "button",
         {
             class: "compare-hero-tool compare-hero-back",
             type: "button",
-            title: "Back to the gallery",
-            "aria-label": "Back to the gallery",
+            title: "Back to the wall",
+            "aria-label": "Back to the wall",
         },
-        ["← Gallery"],
+        ["Back to wall"],
+    );
+    const heroOpenLabButton = el(
+        "button",
+        {
+            class: "compare-hero-tool compare-hero-open-lab",
+            type: "button",
+            title: "Open this generation in the Lab",
+            "aria-label": "Open this generation in the Lab",
+        },
+        ["Open in Lab"],
     );
     const heroForkButton = el(
         "button",
         {
             class: "compare-hero-tool compare-hero-fork",
             type: "button",
-            title: focusLiveEnabled
-                ? "Fork this generation into a live, editable board on the wall"
-                : "Fork this generation into the single-board Lab",
+            title: "Fork this generation into a live, editable board on the wall",
         },
-        [focusLiveEnabled ? "⑂ Fork live" : "⑂ Fork in Lab"],
+        ["Edit live"],
     );
     const heroToolbelt = el("div", { class: "compare-hero-toolbelt" }, [
         heroBackButton,
-        heroForkButton,
+        heroOpenLabButton,
+        ...(focusLiveEnabled ? [heroForkButton] : []),
     ]);
 
     const stageMain = el("div", { class: "compare-stage-main" }, [filmstripArea]);
+    const explainerPanel = el(
+        "aside",
+        { class: "compare-explainer", "aria-label": "How the comparison works" },
+        [
+            el("div", { class: "compare-explainer-title", textContent: "What you are seeing" }),
+            explainerItem(
+                "Same seed",
+                "One starting pattern is projected onto every selected board.",
+            ),
+            explainerItem(
+                "Same rule",
+                "Each board runs the selected rule on the same generation clock.",
+            ),
+            explainerItem(
+                "Different tilings",
+                "Topology changes the neighbors, so outcomes can diverge.",
+            ),
+            el("div", {
+                class: "compare-explainer-hint",
+                textContent: "Click a board to focus it. Use Open in Lab to continue from a frame.",
+            }),
+        ],
+    );
+    const stageFrame = el("div", { class: "compare-stage-frame" }, [
+        setupStrip,
+        el("div", { class: "compare-stage-body" }, [stageMain, explainerPanel]),
+    ]);
 
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
     shapeSelect.addEventListener("change", () => {
@@ -1015,7 +1102,7 @@ export function createComparePanelContent(
         // point of the page, so it leads and the video-style transport docks
         // directly beneath it.
         el("div", { class: "wall-screen" }, [
-            el("div", { class: "compare-stage" }, [stageMain]),
+            el("div", { class: "compare-stage" }, [stageFrame]),
             el("div", { class: "compare-dock" }, [
                 filmstripTransport.element,
                 editModeButton,
@@ -1033,6 +1120,20 @@ export function createComparePanelContent(
 
     function labeledField(label: string, field: HTMLElement): HTMLLabelElement {
         return el("label", { class: "compare-label" }, [el("span", { textContent: label }), field]);
+    }
+
+    function setupItem(label: string, value: HTMLElement): HTMLElement {
+        return el("div", { class: "compare-setup-item" }, [
+            el("span", { class: "compare-setup-label", textContent: label }),
+            value,
+        ]);
+    }
+
+    function explainerItem(title: string, body: string): HTMLElement {
+        return el("div", { class: "compare-explainer-item" }, [
+            el("span", { class: "compare-explainer-key", textContent: title }),
+            el("span", { class: "compare-explainer-copy", textContent: body }),
+        ]);
     }
 
     function configSection(
@@ -1304,11 +1405,14 @@ export function createComparePanelContent(
         const disabled = running || selected.size === 0;
         const canPlay = !running && selected.size >= 2;
         runButton.disabled = disabled;
+        setupRunButton.disabled = !canPlay;
         playButton.disabled = !canPlay;
-        playButton.title =
+        const playTitle =
             selected.size < 2
-                ? "Select at least two tilings to play them side by side"
-                : "Run every selected tiling on a shared clock and play them side by side";
+                ? "Select at least two tilings to run a comparison"
+                : "Run every selected tiling on a shared clock";
+        setupRunButton.title = playTitle;
+        playButton.title = playTitle;
         // The dock's idle play button shares the same gate as the Configure one.
         filmstripTransport.setIdleRunEnabled(canPlay);
         copyRunButton.disabled = disabled;
@@ -1318,8 +1422,10 @@ export function createComparePanelContent(
         heroForkButton.hidden =
             currentFocusGeometry !== null && forkedBoards.has(currentFocusGeometry);
         heroForkButton.disabled = running;
+        heroOpenLabButton.disabled = running || currentFocusGeometry === null;
         // Painting needs boards on the stage; the toggle waits for a run.
         editModeButton.disabled = running || !activeFilmstrip;
+        updateSetupSummary();
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -1383,6 +1489,23 @@ export function createComparePanelContent(
 
     function selectedRule(): RuleDefinition | null {
         return rules.find((rule) => rule.name === selectedRuleName()) ?? null;
+    }
+
+    function updateSetupSummary(): void {
+        const seedBits = normalizedSeedBits().length;
+        const seedLabel = isShapeMode()
+            ? selectedOptionLabel(shapeSelect) || "Shape"
+            : `${seedBits} bit${seedBits === 1 ? "" : "s"}`;
+        const ruleLabel = selectedRule()?.display_name ?? selectedRuleName();
+        const tilingLabel = `${selected.size} selected`;
+        setupSeedValue.textContent = seedLabel;
+        setupRuleValue.textContent = ruleLabel;
+        setupTilingsValue.textContent = tilingLabel;
+        setupTilingsValue.title = summaryText();
+    }
+
+    function selectedOptionLabel(select: HTMLSelectElement): string {
+        return select.selectedOptions[0]?.textContent?.trim() || select.value;
     }
 
     function ruleByName(ruleName: string): RuleDefinition | null {
@@ -1640,7 +1763,9 @@ export function createComparePanelContent(
 
     function setRunning(next: boolean): void {
         running = next;
-        runButton.textContent = next ? "Running…" : "Run comparison";
+        runButton.textContent = next ? "Running…" : "Run analysis";
+        setupRunButton.textContent = next ? "Running…" : "Run comparison";
+        playButton.textContent = next ? "Running…" : "Run comparison";
         updateSummary();
     }
 
@@ -1653,6 +1778,7 @@ export function createComparePanelContent(
         seedWorkspace.classList.toggle("is-shape-mode", shapeMode);
         seedPadBlock.style.display = shapeMode ? "none" : "";
         seedInput.disabled = shapeMode;
+        updateSetupSummary();
     }
 
     async function applyRunConfig(config: CompareRunConfig): Promise<void> {
@@ -1755,7 +1881,7 @@ export function createComparePanelContent(
         // A fresh run rebuilds every board, so any live forks are torn down first.
         disposeAllForkedBoards();
         if (selected.size < 2) {
-            statusLine.textContent = "Select at least two tilings to play side by side.";
+            statusLine.textContent = "Select at least two tilings to run a comparison.";
             showStageHero();
             return;
         }
@@ -1795,14 +1921,6 @@ export function createComparePanelContent(
             await filmstripView.load(filmstrip, playback);
             // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
             applyFocusFromHash();
-            // Land the user on the live boards rather than the configuration above
-            // them -- especially for the one-click featured demo.
-            if (typeof filmstripArea.scrollIntoView === "function") {
-                filmstripArea.scrollIntoView({
-                    block: "start",
-                    behavior: prefersReducedMotion() ? "auto" : "smooth",
-                });
-            }
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
@@ -1944,7 +2062,7 @@ export function createComparePanelContent(
         for (const definition of rule?.states ?? []) {
             colorByValue.set(definition.value, definition.color);
         }
-        return (state) => colorByValue.get(state) ?? "var(--live, #1f2430)";
+        return (state) => colorByValue.get(state) ?? "var(--compare-live, var(--live, #2dd4bf))";
     }
 
     function thumbnailBlock(
@@ -2156,6 +2274,8 @@ export function createComparePanelContent(
 
     runButton.addEventListener("click", () => void runComparison());
     playButton.addEventListener("click", () => void runFilmstrip());
+    setupRunButton.addEventListener("click", () => void runFilmstrip());
+    heroOpenLabButton.addEventListener("click", openFocusedBoardInLab);
     heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
     copyRunButton.addEventListener("click", copyRunLink);

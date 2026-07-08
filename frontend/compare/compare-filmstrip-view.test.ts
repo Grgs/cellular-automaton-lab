@@ -494,7 +494,7 @@ describe("createFilmstripView", () => {
         expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
         expect(boardFor(view, "hex").classList.contains("is-strip")).toBe(true);
         expect(boardFor(view, "square").getAttribute("aria-label")).toBe(
-            "square: back to the gallery",
+            "square: back to the wall",
         );
         expect(focusEvents).toEqual(["square"]);
 

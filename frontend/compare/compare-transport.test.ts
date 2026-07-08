@@ -75,12 +75,9 @@ describe("createFilmstripTransport", () => {
             scheduler: clock.scheduler,
             onRun: () => runs.push(1),
         });
-        // Idle, the play button is the primary "play side by side" run action.
-        const play = control(
-            transport,
-            "Run every selected tiling on a shared clock and play them side by side",
-        );
-        expect(play.textContent).toBe("▶ Play side by side");
+        // Idle, the play button is the primary "Run comparison" action.
+        const play = control(transport, "Run every selected tiling on a shared clock");
+        expect(play.textContent).toBe("Run comparison");
         expect(play.disabled).toBe(true);
         play.click();
         expect(runs).toEqual([]); // gated until the run is enabled

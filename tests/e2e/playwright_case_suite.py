@@ -350,7 +350,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         board = case.page.locator(".compare-filmstrip-board").first
         board.click()
-        self._expect(".compare-hero-fork").to_have_text("⑂ Fork live")
+        self._expect(".compare-hero-fork").to_have_text("Edit live")
         case.page.click(".compare-hero-fork")
         self._expect(".compare-filmstrip-board.is-hero .compare-focus-pane").to_be_visible(
             timeout=30_000

@@ -310,12 +310,12 @@ function memoryStorage(): Storage {
     };
 }
 
-function clickRunComparison(): void {
+function clickRunAnalysis(): void {
     const button = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
-        (candidate) => candidate.textContent === "Run comparison",
+        (candidate) => candidate.textContent === "Run analysis",
     );
     if (!button) {
-        throw new Error("missing Run comparison button");
+        throw new Error("missing Run analysis button");
     }
     button.click();
 }
@@ -618,7 +618,7 @@ describe("mountComparePanel", () => {
         setTilingSearch("Penrose");
         expect(tilingLabels()).toEqual(["Penrose"]);
 
-        clickRunComparison();
+        clickRunAnalysis();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["square", "hex"]);
         handle.dispose();
@@ -633,11 +633,26 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
 
-        const runButtons = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")];
-        const play = runButtons.find((b) => b.textContent === "▶ Play side by side");
-        const run = runButtons.find((b) => b.textContent === "Run comparison");
+        await vi.waitFor(() => {
+            expect(
+                document.querySelector<HTMLElement>(".compare-setup-strip")?.textContent,
+            ).toContain("Conway");
+        });
+        const setupStrip = document.querySelector<HTMLElement>(".compare-setup-strip");
+        expect(setupStrip?.textContent).toContain("Seed");
+        expect(setupStrip?.textContent).toContain("Rule");
+        expect(setupStrip?.textContent).toContain("Tilings");
+        expect(setupStrip?.textContent).toContain("Run comparison");
+        const explainer = document.querySelector<HTMLElement>(".compare-explainer");
+        expect(explainer?.textContent).toContain("Same seed");
+        expect(explainer?.textContent).toContain("Same rule");
+        expect(explainer?.textContent).toContain("Different tilings");
 
-        // Play is the primary action; Run comparison is secondary.
+        const runButtons = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")];
+        const play = runButtons.find((b) => b.textContent === "Run comparison");
+        const run = runButtons.find((b) => b.textContent === "Run analysis");
+
+        // Run comparison is the primary wall action; Run analysis is secondary.
         expect(play?.classList.contains("compare-run-secondary")).toBe(false);
         expect(run?.classList.contains("compare-run-secondary")).toBe(true);
 
@@ -659,6 +674,23 @@ describe("mountComparePanel", () => {
         expect(
             filmstrip!.compareDocumentPosition(saved!) & Node.DOCUMENT_POSITION_FOLLOWING,
         ).toBeTruthy();
+        handle.dispose();
+    });
+
+    it("runs the filmstrip from the setup strip primary action", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
         handle.dispose();
     });
 
@@ -697,7 +729,7 @@ describe("mountComparePanel", () => {
         ]);
         expect(summaryText()).toBe("1 / 1 selected · Mixed 1");
 
-        clickRunComparison();
+        clickRunAnalysis();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.rule).toBe("kagome-life");
         expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["kagome"]);
@@ -746,7 +778,7 @@ describe("mountComparePanel", () => {
             backend,
             bootstrapData: bootstrapData(),
         });
-        clickRunComparison();
+        clickRunAnalysis();
 
         await vi.waitFor(() => {
             expect(compareSeed).toHaveBeenCalledTimes(1);
@@ -769,7 +801,7 @@ describe("mountComparePanel", () => {
             backend,
             bootstrapData: bootstrapData(),
         });
-        clickRunComparison();
+        clickRunAnalysis();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -794,7 +826,7 @@ describe("mountComparePanel", () => {
             backend,
             bootstrapData: bootstrapData(),
         });
-        clickRunComparison();
+        clickRunAnalysis();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
         });
@@ -826,7 +858,7 @@ describe("mountComparePanel", () => {
             backend,
             bootstrapData: bootstrapData(),
         });
-        clickRunComparison();
+        clickRunAnalysis();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -861,7 +893,7 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
             onOpenPattern,
         });
-        clickRunComparison();
+        clickRunAnalysis();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -924,20 +956,20 @@ describe("mountComparePanel", () => {
             onOpenPattern,
         });
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
-        // Focus the board (speaker view), step to gen 1, then fork it into the Lab.
+        // Focus the board (speaker view), step to gen 1, then open it in the Lab.
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         document
             .querySelector<HTMLButtonElement>(
                 '.compare-filmstrip-btn[title="Step forward one generation"]',
             )
             ?.click();
-        document.querySelector<HTMLButtonElement>(".compare-hero-fork")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-hero-open-lab")?.click();
 
         expect(onOpenPattern).toHaveBeenCalledTimes(1);
         expect(openSpy).not.toHaveBeenCalled();
@@ -959,14 +991,14 @@ describe("mountComparePanel", () => {
 
         const playSideBySide = [
             ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
-        ].find((button) => button.textContent === "▶ Play side by side");
+        ].find((button) => button.textContent === "Run comparison");
         expect(playSideBySide?.disabled).toBe(true);
-        expect(playSideBySide?.title).toBe("Select at least two tilings to play them side by side");
+        expect(playSideBySide?.title).toBe("Select at least two tilings to run a comparison");
         // The dock's idle play button shares the same gate.
         const dockPlay = document.querySelector<HTMLButtonElement>(
-            '.compare-dock .compare-filmstrip-btn[title="Run every selected tiling on a shared clock and play them side by side"]',
+            '.compare-dock .compare-filmstrip-btn[title="Run every selected tiling on a shared clock"]',
         );
-        expect(dockPlay?.textContent).toBe("▶ Play side by side");
+        expect(dockPlay?.textContent).toBe("Run comparison");
         expect(dockPlay?.disabled).toBe(true);
         handle.dispose();
     });
@@ -988,7 +1020,7 @@ describe("mountComparePanel", () => {
         clickPreset("Regular");
         const playSideBySide = [
             ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
-        ].find((button) => button.textContent === "▶ Play side by side");
+        ].find((button) => button.textContent === "Run comparison");
         playSideBySide?.click();
 
         await vi.waitFor(() => {
@@ -1051,7 +1083,7 @@ describe("mountComparePanel", () => {
         const padBlock = document.querySelector<HTMLElement>(".compare-seedpad-block");
         expect(padBlock?.style.display).toBe("none");
 
-        clickRunComparison();
+        clickRunAnalysis();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]?.pattern).toBe("glider");
         handle.dispose();
@@ -1185,7 +1217,7 @@ describe("mountComparePanel", () => {
             backend,
             bootstrapData: bootstrapData(),
         });
-        clickRunComparison();
+        clickRunAnalysis();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();
@@ -1280,7 +1312,7 @@ describe("mountComparePanel", () => {
         seedField.value = "101";
         seedField.dispatchEvent(new Event("input", { bubbles: true }));
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
@@ -1436,7 +1468,7 @@ describe("mountComparePanel", () => {
         shapeSelect.value = "r-pentomino";
         shapeSelect.dispatchEvent(new Event("change", { bubbles: true }));
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
@@ -1495,7 +1527,7 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -1536,7 +1568,7 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -1592,7 +1624,7 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -1631,7 +1663,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -1662,7 +1694,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
@@ -1735,7 +1767,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -1744,7 +1776,7 @@ describe("mountComparePanel", () => {
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         const forkLive = document.querySelector<HTMLButtonElement>(".compare-hero-fork");
         expect(forkLive, "fork-live button present in speaker view").toBeTruthy();
-        expect(forkLive?.textContent).toBe("⑂ Fork live");
+        expect(forkLive?.textContent).toBe("Edit live");
         forkLive?.click();
 
         await vi.waitFor(() => {
@@ -1795,7 +1827,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -1856,7 +1888,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
@@ -1922,7 +1954,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
@@ -1988,7 +2020,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
@@ -2042,7 +2074,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -2100,7 +2132,7 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -2141,19 +2173,20 @@ describe("mountComparePanel", () => {
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "▶ Play side by side")
+            .find((button) => button.textContent === "Run comparison")
             ?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
         });
 
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
-        const fork = document.querySelector<HTMLButtonElement>(".compare-hero-fork");
-        expect(fork).toBeTruthy();
-        expect(fork?.textContent).toBe("⑂ Fork in Lab");
-        fork?.click();
+        expect(document.querySelector(".compare-hero-fork")).toBeNull();
+        const openInLab = document.querySelector<HTMLButtonElement>(".compare-hero-open-lab");
+        expect(openInLab).toBeTruthy();
+        expect(openInLab?.textContent).toBe("Open in Lab");
+        openInLab?.click();
 
-        // No live session: the fork opens the frame in the Lab instead.
+        // No live session: the explicit Lab action opens the frame in the Lab.
         expect(onOpenPattern).toHaveBeenCalledTimes(1);
         expect(document.querySelector(".compare-focus-pane")).toBeNull();
         handle.dispose();
@@ -2200,7 +2233,7 @@ describe("mountComparePanel", () => {
         });
         const playSideBySide = [
             ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
-        ].find((button) => button.textContent === "▶ Play side by side");
+        ].find((button) => button.textContent === "Run comparison");
         playSideBySide?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
@@ -2240,7 +2273,7 @@ describe("mountComparePanel", () => {
             backend: wideBackend,
             bootstrapData: bootstrapData(),
         });
-        clickRunComparison();
+        clickRunAnalysis();
 
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-row-actions")).not.toBeNull();

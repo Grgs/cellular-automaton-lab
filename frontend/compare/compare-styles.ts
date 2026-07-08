@@ -12,12 +12,48 @@ export const COMPARE_PANEL_STYLES = `
 /* The wall fills the shared shell's content slot beneath the static header;
    the shell (styles.css) owns the header and the dock idiom. */
 .wall-page {
+    --compare-bg: #101820;
+    --compare-panel: #182431;
+    --compare-panel-strong: #20303d;
+    --compare-surface: #0d141c;
+    --compare-text: #edf5f7;
+    --compare-muted: #9fb2bf;
+    --compare-line: rgba(197, 215, 224, 0.18);
+    --compare-live: #2ec4b6;
+    --compare-coral: #ff7a59;
+    --compare-coral-hover: #ff8d70;
+    --compare-coral-line: rgba(255, 122, 89, 0.58);
+    --panel-strong: var(--compare-bg);
+    --panel: var(--compare-panel);
+    --ink: var(--compare-text);
+    --muted: var(--compare-muted);
+    --line: var(--compare-line);
+    --help-bg: rgba(255, 255, 255, 0.055);
+    --field-bg: #0d141c;
+    --field-text: var(--compare-text);
+    --field-border: rgba(197, 215, 224, 0.2);
+    --cell-dead: #eef4f6;
+    --accent: var(--compare-coral);
+    --accent-dark: #d65f43;
+    --focus: #5cc8ff;
+    --btn-primary-bg: var(--compare-coral);
+    --btn-primary-line: var(--compare-coral-line);
+    --btn-primary-text: #111820;
+    --btn-soft-bg: rgba(255, 255, 255, 0.075);
+    --btn-soft-hover: rgba(255, 255, 255, 0.13);
+    --btn-soft-line: rgba(197, 215, 224, 0.2);
+    --btn-disabled-bg: rgba(197, 215, 224, 0.11);
+    --btn-disabled-text: rgba(237, 245, 247, 0.45);
+    --btn-disabled-line: rgba(197, 215, 224, 0.11);
+    --chrome-bg: rgba(8, 13, 18, 0.84);
+    --border-warning: rgba(255, 122, 89, 0.56);
+    --bg-warning: rgba(255, 122, 89, 0.12);
     height: 100%;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    background: var(--panel-strong, #fff);
-    color: var(--ink, #1f2430);
+    background: var(--compare-bg);
+    color: var(--compare-text);
     font-family: var(--sans, sans-serif);
 }
 .wall-page[hidden] { display: none; }
@@ -45,6 +81,64 @@ export const COMPARE_PANEL_STYLES = `
     min-height: 0;
     display: flex;
     padding: 12px 18px;
+}
+.compare-stage-frame {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+}
+.compare-setup-strip {
+    min-width: 0;
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--compare-line);
+    border-radius: 10px;
+    background: var(--compare-panel);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+.compare-setup-item {
+    flex: 1 1 0;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 9px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(197, 215, 224, 0.1);
+}
+.compare-setup-label {
+    color: var(--compare-muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.compare-setup-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--compare-text);
+    font-size: 14px;
+    line-height: 1.25;
+}
+.compare-setup-run {
+    align-self: stretch;
+    min-width: 158px;
+}
+.compare-stage-body {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(228px, 286px);
+    gap: 12px;
 }
 .compare-stage-main {
     flex: 1 1 auto;
@@ -85,6 +179,48 @@ export const COMPARE_PANEL_STYLES = `
 .compare-stage-hero-glyph { font-size: 30px; line-height: 1; opacity: 0.5; }
 .compare-stage-hero-title { font-size: 15px; color: var(--ink, #1f2430); }
 .compare-stage-hero-blurb { font-size: 12px; margin: 0; max-width: 360px; line-height: 1.4; }
+.compare-explainer {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--compare-line);
+    border-radius: 10px;
+    background: var(--compare-panel);
+    color: var(--compare-muted);
+    overflow: auto;
+}
+.compare-explainer-title {
+    color: var(--compare-text);
+    font-size: 13px;
+    font-weight: 700;
+}
+.compare-explainer-item {
+    display: grid;
+    gap: 3px;
+    padding: 9px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(197, 215, 224, 0.09);
+}
+.compare-explainer-key {
+    color: var(--compare-text);
+    font-size: 12px;
+    font-weight: 700;
+}
+.compare-explainer-copy,
+.compare-explainer-hint {
+    color: var(--compare-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.compare-explainer-hint {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--compare-line);
+}
 /* One dock: the transport plus the config/copy icons and the status line on a
    single row, pinned to the bottom of the first screen and reachable while the
    configuration disclosures scroll underneath. */
@@ -399,8 +535,8 @@ export const COMPARE_PANEL_STYLES = `
     margin-top: 12px;
     padding: 10px 12px;
     border-radius: 9px;
-    border: 1px solid #d8a657;
-    background: rgba(216, 166, 87, 0.16);
+    border: 1px solid var(--border-warning, rgba(255, 122, 89, 0.56));
+    background: var(--bg-warning, rgba(255, 122, 89, 0.12));
     font-size: 12px;
 }
 .compare-portrait { width: 100%; height: auto; background: var(--field-bg, #fff); border: 1px solid var(--line, rgba(0, 0, 0, 0.1)); border-radius: 10px; }
@@ -544,6 +680,8 @@ export const COMPARE_PANEL_STYLES = `
     min-width: 92px;
 }
 .compare-filmstrip-speed {
+    flex: 0 0 auto;
+    width: auto;
     padding: 4px 6px;
     border-radius: 6px;
     border: 1px solid var(--field-border, rgba(0, 0, 0, 0.15));
@@ -571,7 +709,8 @@ export const COMPARE_PANEL_STYLES = `
     min-height: 0;
     padding: 6px;
     border-radius: 10px;
-    background: var(--help-bg, rgba(0, 0, 0, 0.03));
+    background: var(--compare-surface, var(--help-bg, rgba(0, 0, 0, 0.03)));
+    border: 1px solid var(--compare-line, transparent);
     cursor: pointer;
 }
 .compare-filmstrip-board:focus-visible {
@@ -593,8 +732,7 @@ export const COMPARE_PANEL_STYLES = `
     max-height: 100%;
 }
 /* Board chrome (name, live count, an expand affordance) overlays the board and
-   appears on hover/focus -- and always on the focused hero -- so a resting
-   gallery reads as a clean wall of tilings. */
+   stays visible so a resting wall explains which tilings are being compared. */
 .compare-filmstrip-board-chrome {
     position: absolute;
     left: 6px;
@@ -606,15 +744,9 @@ export const COMPARE_PANEL_STYLES = `
     padding: 4px 9px;
     border-radius: 7px;
     background: var(--chrome-bg, rgba(16, 20, 24, 0.72));
-    color: #f2ede0;
-    opacity: 0;
-    transition: opacity 0.12s ease;
-    pointer-events: none;
-}
-.compare-filmstrip-board:hover .compare-filmstrip-board-chrome,
-.compare-filmstrip-board:focus-visible .compare-filmstrip-board-chrome,
-.compare-filmstrip-board.is-hero .compare-filmstrip-board-chrome {
+    color: var(--compare-text, #f2ede0);
     opacity: 1;
+    pointer-events: none;
 }
 .compare-filmstrip-expand { margin-left: auto; font-size: 13px; opacity: 0.85; }
 /* The chrome's ✕ drops this board from the run. The chrome itself ignores the
@@ -629,7 +761,9 @@ export const COMPARE_PANEL_STYLES = `
     padding: 2px 4px;
     border-radius: 4px;
     cursor: pointer;
-    opacity: 0.7;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
 }
 .compare-filmstrip-remove:hover {
     opacity: 1;
@@ -638,8 +772,10 @@ export const COMPARE_PANEL_STYLES = `
 .compare-filmstrip-board:hover .compare-filmstrip-remove,
 .compare-filmstrip-board:focus-visible .compare-filmstrip-remove,
 .compare-filmstrip-board.is-hero .compare-filmstrip-remove {
+    opacity: 0.7;
     pointer-events: auto;
 }
+.compare-filmstrip-board .compare-filmstrip-remove:hover { opacity: 1; }
 /* The gallery's trailing ghost tile opens the tiling picker. Speaker view is
    about one board, so the tile only lives in the gallery grid. */
 .compare-filmstrip-add {
@@ -676,8 +812,8 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
     opacity: 1;
 }
-/* The hero's toolbelt overlays the top of the focused board: back to the gallery
-   on the left, the single fork affordance on the right. */
+/* The hero's toolbelt overlays the top of the focused board: back to the wall,
+   Open in Lab, and the optional live edit affordance. */
 .compare-hero-toolbelt {
     position: absolute;
     top: 8px;
@@ -686,10 +822,11 @@ export const COMPARE_PANEL_STYLES = `
     z-index: 3;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 8px;
     pointer-events: none;
 }
+.compare-hero-open-lab { margin-left: auto; }
 .compare-hero-tool {
     pointer-events: auto;
     display: inline-flex;
@@ -697,9 +834,9 @@ export const COMPARE_PANEL_STYLES = `
     gap: 5px;
     padding: 5px 11px;
     border-radius: 8px;
-    border: 1px solid rgba(242, 237, 224, 0.28);
+    border: 1px solid rgba(237, 245, 247, 0.28);
     background: rgba(16, 20, 24, 0.78);
-    color: #f2ede0;
+    color: var(--compare-text, #f2ede0);
     font-family: var(--sans, sans-serif);
     font-size: 12px;
     cursor: pointer;
@@ -899,9 +1036,51 @@ export const COMPARE_PANEL_STYLES = `
     max-width: 100%;
     max-height: 100%;
 }
+@media (max-width: 960px) {
+    .compare-stage {
+        padding: 10px;
+        overflow: auto;
+    }
+    .compare-stage-frame {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+    }
+    .compare-stage-body {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .compare-stage-main { min-height: 360px; }
+    .compare-setup-strip {
+        flex-wrap: wrap;
+    }
+    .compare-setup-item {
+        flex: 1 1 150px;
+    }
+    .compare-setup-run {
+        min-height: 42px;
+        margin-left: auto;
+    }
+    .compare-explainer {
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+    .compare-dock .compare-filmstrip-transport {
+        flex: 1 1 100%;
+    }
+}
 @media (max-width: 640px) {
     .wall-header { align-items: center; }
     /* On a phone the boards want a full column and the stage can scroll. */
+    .compare-stage { padding: 8px; }
+    .compare-setup-item { flex-basis: calc(50% - 8px); }
+    .compare-setup-run {
+        width: 100%;
+        min-width: 0;
+    }
+    .compare-stage-main { min-height: 320px; }
     .compare-filmstrip-boards { grid-template-columns: 1fr; grid-auto-rows: minmax(200px, 1fr); }
     .compare-form { grid-template-columns: 1fr; }
     .compare-seed-workspace { grid-template-columns: 1fr; }
@@ -913,6 +1092,7 @@ export const COMPARE_PANEL_STYLES = `
     .compare-saved { grid-template-columns: 1fr; }
     .compare-saved-row { grid-template-columns: 1fr; }
     .compare-run { min-width: 136px; }
+    .compare-filmstrip-btn { min-height: 34px; }
     .compare-status { flex-basis: 100%; text-align: left; }
     .compare-grid { min-width: 680px; }
 }
