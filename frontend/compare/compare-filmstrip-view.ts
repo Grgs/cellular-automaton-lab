@@ -11,7 +11,12 @@
  */
 
 import type { SimulationBackend } from "../types/controller.js";
-import type { SeedFilmstripResult, TopologyFilmstrip, TopologyPreview } from "../types/domain.js";
+import type {
+    SeedFilmstripResult,
+    TopologyFilmstrip,
+    TopologyPreview,
+    TopologySpec,
+} from "../types/domain.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { FilmstripPlayer, type FilmstripPlayerState } from "./filmstrip-player.js";
 import type { FilmstripTransportController } from "./compare-transport.js";
@@ -52,6 +57,8 @@ export interface FilmstripLoadOptions {
     loopStart?: number;
     /** Transport speed multiplier to apply (must match a speed-selector option). */
     speedMultiplier?: number;
+    /** Reuse existing board DOM when the incoming tiling set is unchanged. */
+    preserveBoards?: boolean;
 }
 
 export interface FilmstripViewController {
@@ -86,6 +93,7 @@ interface BoardEntry {
     tiling: TopologyFilmstrip;
     cell: HTMLElement;
     slot: HTMLElement;
+    label: HTMLElement;
     countLabel: HTMLElement;
     preview?: TopologyPreview;
     error?: string;
@@ -99,6 +107,17 @@ function el(tag: string, className: string, text?: string): HTMLElement {
         node.textContent = text;
     }
     return node;
+}
+
+function sameTopologySpec(left: TopologySpec, right: TopologySpec): boolean {
+    return (
+        left.tiling_family === right.tiling_family &&
+        left.adjacency_mode === right.adjacency_mode &&
+        left.sizing_mode === right.sizing_mode &&
+        left.width === right.width &&
+        left.height === right.height &&
+        left.patch_depth === right.patch_depth
+    );
 }
 
 export function createFilmstripView(options: FilmstripViewOptions): FilmstripViewController {
@@ -165,6 +184,20 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
 
     function entryFor(geometry: string): BoardEntry | undefined {
         return boards.find((entry) => entry.tiling.geometry === geometry);
+    }
+
+    function canReuseBoards(filmstrip: SeedFilmstripResult): boolean {
+        if (boards.length === 0 || boards.length !== filmstrip.tilings.length) {
+            return false;
+        }
+        return filmstrip.tilings.every((tiling, index) => {
+            const current = boards[index]?.tiling;
+            return (
+                current !== undefined &&
+                current.geometry === tiling.geometry &&
+                sameTopologySpec(current.topology_spec, tiling.topology_spec)
+            );
+        });
     }
 
     /** The board's display name: friendly catalog label, geometry key fallback. */
@@ -241,115 +274,142 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         root.classList.remove("compare-filmstrip--speaker");
     }
 
+    function detachPlayer(): void {
+        transport.detach();
+        unsubscribe?.();
+        unsubscribe = null;
+        lastRenderedIndex = -1;
+    }
+
+    function createBoardEntry(tiling: TopologyFilmstrip, removable: boolean): BoardEntry {
+        const slot = el("div", "compare-filmstrip-slot", "…");
+        const label = el("div", "compare-filmstrip-label", boardName(tiling));
+        const countLabel = el("div", "compare-filmstrip-count");
+        const cell = el("div", "compare-filmstrip-board");
+        cell.setAttribute("role", "listitem");
+        cell.tabIndex = 0;
+        // Board chrome (name, live count, an expand affordance) overlays the
+        // board; labels stay visible so the wall explains itself at rest.
+        const expandGlyph = el("span", "compare-filmstrip-expand", "⤢");
+        expandGlyph.setAttribute("aria-hidden", "true");
+        const chrome = el("div", "compare-filmstrip-board-chrome");
+        chrome.append(label, countLabel, expandGlyph);
+        if (removable) {
+            // A real <button> so the cell's click handler ignores it (its
+            // early-return on buttons), in edit mode included.
+            const removeButton = el("button", "compare-filmstrip-remove", "✕");
+            removeButton.setAttribute("type", "button");
+            removeButton.title = "Remove from the wall";
+            removeButton.setAttribute("aria-label", `Remove ${boardName(tiling)} from the wall`);
+            removeButton.addEventListener("click", () => {
+                options.onRemoveBoard?.(tiling.geometry);
+            });
+            chrome.append(removeButton);
+        }
+        cell.append(slot, chrome);
+        const toggleFocus = () => {
+            focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
+        };
+        // The board tile itself behaves like a video-call participant: click
+        // to focus it, click the focused hero to return to the gallery. In
+        // edit mode clicks paint instead, and only the ⤢ glyph zooms.
+        cell.addEventListener("click", (event) => {
+            const target = event.target instanceof Element ? event.target : null;
+            if (target?.closest("button")) {
+                return;
+            }
+            if (editMode) {
+                if (target?.closest(".compare-filmstrip-expand")) {
+                    toggleFocus();
+                    return;
+                }
+                const cellId = target?.closest("[data-cell-id]")?.getAttribute("data-cell-id");
+                if (cellId && !entryFor(tiling.geometry)?.overlaid) {
+                    options.onPaintCell?.(tiling.geometry, cellId);
+                }
+                return;
+            }
+            toggleFocus();
+        });
+        cell.addEventListener("keydown", (event) => {
+            if (event.target !== cell) {
+                return;
+            }
+            if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+                event.preventDefault();
+                toggleFocus();
+            }
+        });
+        boardsArea.append(cell);
+        return {
+            tiling,
+            cell,
+            slot,
+            label,
+            countLabel,
+        };
+    }
+
+    function syncReusedBoards(filmstrip: SeedFilmstripResult): void {
+        for (const [index, entry] of boards.entries()) {
+            const tiling = filmstrip.tilings[index]!;
+            entry.tiling = tiling;
+            entry.label.textContent = boardName(tiling);
+            entry.overlaid = false;
+            if (entry.preview) {
+                delete entry.error;
+            }
+        }
+    }
+
+    async function ensurePreview(entry: BoardEntry): Promise<void> {
+        if (entry.preview && !entry.error) {
+            renderBoard(entry, player.index);
+            return;
+        }
+        const spec = entry.tiling.topology_spec;
+        try {
+            entry.preview = await options.backend.previewTopology({
+                geometry: entry.tiling.geometry,
+                width: spec.width,
+                height: spec.height,
+                ...(spec.patch_depth === undefined ? {} : { patch_depth: spec.patch_depth }),
+            });
+            delete entry.error;
+        } catch (error) {
+            entry.error = error instanceof Error ? error.message : String(error);
+        }
+        renderBoard(entry, player.index);
+    }
+
     async function load(
         filmstrip: SeedFilmstripResult,
         loadOptions?: FilmstripLoadOptions,
     ): Promise<void> {
-        teardownRun();
+        const reuseBoards = Boolean(loadOptions?.preserveBoards) && canReuseBoards(filmstrip);
+        if (reuseBoards) {
+            detachPlayer();
+            syncReusedBoards(filmstrip);
+        } else {
+            teardownRun();
+            boardsArea.replaceChildren();
+            // Removing a board only makes sense while the backend can still
+            // compare what remains (two boards minimum).
+            const removable = Boolean(options.onRemoveBoard) && filmstrip.tilings.length > 2;
+            boards = filmstrip.tilings.map((tiling) => createBoardEntry(tiling, removable));
+        }
         player = new FilmstripPlayer(filmstrip.frame_count, {
             loop: options.loop ?? false,
             ...(loadOptions?.loopStart === undefined ? {} : { loopStart: loadOptions.loopStart }),
         });
 
-        boardsArea.replaceChildren();
-        // Removing a board only makes sense while the backend can still
-        // compare what remains (two boards minimum).
-        const removable = Boolean(options.onRemoveBoard) && filmstrip.tilings.length > 2;
-        boards = filmstrip.tilings.map((tiling) => {
-            const slot = el("div", "compare-filmstrip-slot", "…");
-            const label = el("div", "compare-filmstrip-label", boardName(tiling));
-            const countLabel = el("div", "compare-filmstrip-count");
-            const cell = el("div", "compare-filmstrip-board");
-            cell.setAttribute("role", "listitem");
-            cell.tabIndex = 0;
-            // Board chrome (name, live count, an expand affordance) overlays the
-            // board; labels stay visible so the wall explains itself at rest.
-            const expandGlyph = el("span", "compare-filmstrip-expand", "⤢");
-            expandGlyph.setAttribute("aria-hidden", "true");
-            const chrome = el("div", "compare-filmstrip-board-chrome");
-            chrome.append(label, countLabel, expandGlyph);
-            if (removable) {
-                // A real <button> so the cell's click handler ignores it (its
-                // early-return on buttons), in edit mode included.
-                const removeButton = el("button", "compare-filmstrip-remove", "✕");
-                removeButton.setAttribute("type", "button");
-                removeButton.title = "Remove from the wall";
-                removeButton.setAttribute(
-                    "aria-label",
-                    `Remove ${boardName(tiling)} from the wall`,
-                );
-                removeButton.addEventListener("click", () => {
-                    options.onRemoveBoard?.(tiling.geometry);
-                });
-                chrome.append(removeButton);
-            }
-            cell.append(slot, chrome);
-            const toggleFocus = () => {
-                focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
-            };
-            // The board tile itself behaves like a video-call participant: click
-            // to focus it, click the focused hero to return to the gallery. In
-            // edit mode clicks paint instead, and only the ⤢ glyph zooms.
-            cell.addEventListener("click", (event) => {
-                const target = event.target instanceof Element ? event.target : null;
-                if (target?.closest("button")) {
-                    return;
-                }
-                if (editMode) {
-                    if (target?.closest(".compare-filmstrip-expand")) {
-                        toggleFocus();
-                        return;
-                    }
-                    const cellId = target?.closest("[data-cell-id]")?.getAttribute("data-cell-id");
-                    if (cellId && !entryFor(tiling.geometry)?.overlaid) {
-                        options.onPaintCell?.(tiling.geometry, cellId);
-                    }
-                    return;
-                }
-                toggleFocus();
-            });
-            cell.addEventListener("keydown", (event) => {
-                if (event.target !== cell) {
-                    return;
-                }
-                if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
-                    event.preventDefault();
-                    toggleFocus();
-                }
-            });
-            boardsArea.append(cell);
-            return {
-                tiling,
-                cell,
-                slot,
-                countLabel,
-            };
-        });
         unsubscribe = player.subscribe(onPlayerIndex);
         transport.attach(player);
         // Prime the (still "…") board skeletons before previews load.
         onPlayerIndex(player.state);
         applyFocusLayout();
 
-        await Promise.all(
-            boards.map(async (entry) => {
-                const spec = entry.tiling.topology_spec;
-                try {
-                    entry.preview = await options.backend.previewTopology({
-                        geometry: entry.tiling.geometry,
-                        width: spec.width,
-                        height: spec.height,
-                        ...(spec.patch_depth === undefined
-                            ? {}
-                            : { patch_depth: spec.patch_depth }),
-                    });
-                    delete entry.error;
-                } catch (error) {
-                    entry.error = error instanceof Error ? error.message : String(error);
-                }
-                renderBoard(entry, player.index);
-            }),
-        );
+        await Promise.all(boards.map((entry) => ensurePreview(entry)));
 
         // Optional post-load playback overrides (used by the featured demo).
         if (loadOptions?.speedMultiplier !== undefined) {

@@ -72,6 +72,11 @@ const PATTERN_VERSION = 5;
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
 
+interface RunFilmstripOptions {
+    /** Suppress the full-wall loading veil for debounced edits that can refresh in place. */
+    quietUpdate?: boolean;
+}
+
 /** Build a shareable board pattern for a result's begin or end state, if states were returned. */
 function buildStatePattern(
     comparison: SeedComparisonResult,
@@ -641,7 +646,7 @@ export function createComparePanelContent(
     }
 
     // Debounce the authoritative wall re-run so a burst of small changes (a
-    // paint stroke, removing a couple of boards) coalesces into one rebuild.
+    // paint stroke, removing a couple of boards) coalesces into one refresh.
     function scheduleWallRerun(): void {
         if (paintRerunTimer !== null) {
             window.clearTimeout(paintRerunTimer);
@@ -653,7 +658,7 @@ export function createComparePanelContent(
                 scheduleWallRerun();
                 return;
             }
-            void runFilmstrip();
+            void runFilmstrip(undefined, { quietUpdate: true });
         }, PAINT_RERUN_DELAY_MS);
     }
 
@@ -2022,11 +2027,14 @@ export function createComparePanelContent(
         }
     }
 
-    async function runFilmstrip(playback?: FilmstripLoadOptions): Promise<void> {
+    async function runFilmstrip(
+        playback?: FilmstripLoadOptions,
+        runOptions: RunFilmstripOptions = {},
+    ): Promise<void> {
         if (running) {
             return;
         }
-        // A fresh run rebuilds every board, so any live forks are torn down first.
+        // The authoritative result owns each board slot, so any live forks are torn down first.
         disposeAllForkedBoards();
         if (selected.size < 2) {
             statusLine.textContent = "Select at least two tilings to run a comparison.";
@@ -2036,9 +2044,12 @@ export function createComparePanelContent(
         }
         const hadFilmstrip = activeFilmstrip !== null;
         const loadingMessage = hadFilmstrip ? "Updating comparison..." : "Building comparison...";
+        const showLoadingOverlay = !runOptions.quietUpdate || !hadFilmstrip;
         setRunning(true);
         statusLine.textContent = `${loadingMessage} ${selected.size} tilings…`;
-        setWallLoading(loadingMessage);
+        if (showLoadingOverlay) {
+            setWallLoading(loadingMessage);
+        }
 
         const request: FilmstripRequest = {
             seed: seedInput.value,
@@ -2070,7 +2081,10 @@ export function createComparePanelContent(
                 filmstripArea.append(filmstripView.element);
             }
             showStageBoards();
-            await filmstripView.load(filmstrip, playback);
+            await filmstripView.load(filmstrip, {
+                ...(playback ?? {}),
+                ...(hadFilmstrip ? { preserveBoards: true } : {}),
+            });
             // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
             applyFocusFromHash();
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;

@@ -1454,6 +1454,9 @@ describe("mountComparePanel", () => {
         editToggle.click();
         expect(editToggle.getAttribute("aria-pressed")).toBe("true");
         expect(document.querySelector(".compare-filmstrip.is-editing")).not.toBeNull();
+        const boardsBefore = [
+            ...document.querySelectorAll<HTMLElement>(".compare-filmstrip-board"),
+        ];
 
         // Painting c:1:1 (bit 0 of "101") clears that bit; the board is not
         // zoomed by the click.
@@ -1476,6 +1479,62 @@ describe("mountComparePanel", () => {
             },
             { timeout: 3000 },
         );
+        const boardsAfter = [...document.querySelectorAll<HTMLElement>(".compare-filmstrip-board")];
+        expect(boardsAfter).toHaveLength(2);
+        expect(boardsAfter[0]).toBe(boardsBefore[0]);
+        expect(boardsAfter[1]).toBe(boardsBefore[1]);
+        expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(true);
+        handle.dispose();
+    });
+
+    it("keeps edit-triggered reruns quiet while the existing wall stays mounted", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const resolvers: Array<(filmstrip: SeedFilmstripResult) => void> = [];
+        const requestFilmstrip = vi.fn(
+            () =>
+                new Promise<SeedFilmstripResult>((resolve) => {
+                    resolvers.push(resolve);
+                }),
+        );
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        resolvers.shift()?.(twoBoardFilmstrip());
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+        const firstBoard = document.querySelector<HTMLElement>(".compare-filmstrip-board");
+        expect(firstBoard).not.toBeNull();
+
+        document.querySelector<HTMLButtonElement>(".compare-edit-toggle")?.click();
+        paintCell("c:1:1");
+        await vi.waitFor(
+            () => {
+                expect(requestFilmstrip).toHaveBeenCalledTimes(2);
+            },
+            { timeout: 3000 },
+        );
+
+        expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(true);
+        expect(
+            document
+                .querySelector<HTMLElement>(".compare-filmstrip-area")
+                ?.classList.contains("is-loading"),
+        ).toBe(false);
+        expect(document.querySelector<HTMLElement>(".compare-filmstrip-board")).toBe(firstBoard);
+
+        resolvers.shift()?.(twoBoardFilmstrip());
+        await vi.waitFor(() => {
+            expect(document.querySelector<HTMLElement>(".compare-filmstrip-board")).toBe(
+                firstBoard,
+            );
+        });
         handle.dispose();
     });
 

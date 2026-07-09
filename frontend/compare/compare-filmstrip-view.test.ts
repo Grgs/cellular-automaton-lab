@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createFilmstripView, type FilmstripViewController } from "./compare-filmstrip-view.js";
 import {
@@ -473,6 +473,30 @@ describe("createFilmstripView", () => {
         await view.load(filmstrip([tiling("square", [{ a: 1, b: 1 }])], 1));
         expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(1);
         expect(counterText()).toBe("gen 0 / 0");
+    });
+
+    it("preserves matching board DOM and previews when requested", async () => {
+        const previewTopology = vi.fn(async () => squarePreview());
+        const { view } = mountView({ previewTopology });
+        await view.load(twoBoardFilmstrip());
+        const squareBoard = boardFor(view, "square");
+        const hexBoard = boardFor(view, "hex");
+        expect(previewTopology).toHaveBeenCalledTimes(2);
+
+        await view.load(
+            filmstrip([tiling("square", [{ b: 1 }]), tiling("hex", [{ c: 1, d: 1 }])], 1),
+            { preserveBoards: true },
+        );
+
+        expect(boardFor(view, "square")).toBe(squareBoard);
+        expect(boardFor(view, "hex")).toBe(hexBoard);
+        expect(previewTopology).toHaveBeenCalledTimes(2);
+        expect(
+            boardFor(view, "square").querySelector(".compare-filmstrip-count")?.textContent,
+        ).toBe("1 live");
+        expect(boardFor(view, "hex").querySelector(".compare-filmstrip-count")?.textContent).toBe(
+            "2 live",
+        );
     });
 
     it("enlarges a clicked board into speaker view and returns to the gallery", async () => {
