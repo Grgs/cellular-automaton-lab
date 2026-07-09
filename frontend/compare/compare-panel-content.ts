@@ -664,12 +664,16 @@ export function createComparePanelContent(
         editMode = next;
         editModeButton.setAttribute("aria-pressed", next ? "true" : "false");
         editModeButton.classList.toggle("is-active", next);
+        const rewoundToSeed =
+            next && filmstripView !== null && filmstripView.currentFrameIndex() !== 0;
+        if (rewoundToSeed) {
+            filmstripTransport.reset();
+        }
         filmstripView?.setEditMode(next);
         if (next) {
-            statusLine.textContent =
-                filmstripView?.currentFrameIndex() === 0
-                    ? "Edit mode — click cells to edit the shared seed."
-                    : "Edit mode — click a cell to fork this board live from here and paint it.";
+            statusLine.textContent = rewoundToSeed
+                ? "Edit mode — returned to generation 0 so paints update the shared seed."
+                : "Edit mode — click cells to edit the shared seed.";
         } else {
             statusLine.textContent = "";
         }
@@ -686,16 +690,7 @@ export function createComparePanelContent(
         }
         const frameIndex = filmstripView.currentFrameIndex();
         if (frameIndex !== 0) {
-            // A mid-timeline state has no seed representation, so a paint here
-            // forks this board live from its current frame instead (or, if
-            // it's already forked, lands straight on that live pane) and
-            // carries the stroke over as the fork's first edit.
-            const currentState = tiling.frames[frameIndex]?.[cellId] ?? 0;
-            void forkBoardLive(geometry, frameIndex, {
-                cellId,
-                state: currentState === 0 ? 1 : 0,
-            }).catch(reportFocusPaneError);
-            return;
+            filmstripTransport.reset();
         }
         const order = tiling.seed_order;
         if (!order || order.length === 0) {

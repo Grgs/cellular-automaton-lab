@@ -1494,7 +1494,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("opens the board in the Lab when painting away from gen 0 with no live session available", async () => {
+    it("rewinds to the seed frame when edit mode paints away from gen 0", async () => {
         const onOpenPattern = vi.fn();
         const { handle, filmstripRequest, seedField, editToggle } = await mountWithLoadedFilmstrip({
             onOpenPattern,
@@ -1508,20 +1508,22 @@ describe("mountComparePanel", () => {
             ?.click();
         paintCell("c:1:1");
 
-        // No focusPaneServices (no session to fork on): the paint's board and
-        // frame open into the Lab instead, with the stroke folded into the
-        // pattern so it isn't dropped. The shared seed is untouched.
-        expect(seedField.value).toBe("101");
-        expect(onOpenPattern).toHaveBeenCalledTimes(1);
-        const opened = onOpenPattern.mock.calls.at(0)?.[0] as {
-            cells_by_id?: Record<string, number>;
-        };
-        expect(opened.cells_by_id).toEqual({ "c:2:1": 1, "c:1:1": 1 });
-        expect(filmstripRequest).toHaveBeenCalledTimes(1);
+        // Edit seed always edits the shared generation-0 seed. It should not
+        // open the board in the Lab or detach it from the shared wall clock.
+        expect(seedField.value).toBe("001");
+        expect(onOpenPattern).not.toHaveBeenCalled();
+        expect(document.querySelector(".compare-filmstrip-counter")?.textContent).toBe("gen 0 / 1");
+        expect(document.querySelector(".compare-focus-pane")).toBeNull();
+        await vi.waitFor(
+            () => {
+                expect(filmstripRequest).toHaveBeenCalledTimes(2);
+            },
+            { timeout: 3000 },
+        );
         handle.dispose();
     });
 
-    it("auto-forks a board live from a mid-timeline paint when a session is available", async () => {
+    it("keeps edit-mode paints on the shared seed even when live fork support exists", async () => {
         const { backend } = fakeBackend();
         const setCells = vi.fn(async () => forkSnapshot());
         const focusBackend: SimulationBackend = {
@@ -1541,7 +1543,9 @@ describe("mountComparePanel", () => {
                 { ...startCell, state: paintState },
             ],
         };
-        const { handle, editToggle } = await mountWithLoadedFilmstrip({ focusPaneServices });
+        const { handle, filmstripRequest, seedField, editToggle } = await mountWithLoadedFilmstrip({
+            focusPaneServices,
+        });
         editToggle.click();
 
         document
@@ -1551,14 +1555,17 @@ describe("mountComparePanel", () => {
             ?.click();
         paintCell("c:1:1");
 
-        await vi.waitFor(() => {
-            expect(document.querySelector(".compare-focus-pane")).not.toBeNull();
-        });
-        expect(backendFactory).toHaveBeenCalledWith("sess-focus-square");
-        expect(setCells).toHaveBeenCalledWith([{ id: "c:1:1", state: 1 }]);
-        // The board is not zoomed by the paint (only the fork chip appears in
-        // its now-live gallery tile).
+        expect(seedField.value).toBe("001");
+        expect(backendFactory).not.toHaveBeenCalled();
+        expect(setCells).not.toHaveBeenCalled();
+        expect(document.querySelector(".compare-focus-pane")).toBeNull();
         expect(document.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
+        await vi.waitFor(
+            () => {
+                expect(filmstripRequest).toHaveBeenCalledTimes(2);
+            },
+            { timeout: 3000 },
+        );
         handle.dispose();
     });
 

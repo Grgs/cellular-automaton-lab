@@ -459,11 +459,11 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             "Kagome / Trihexagonal (3.6.3.6)"
         )
 
-    def test_wall_edit_mode_auto_forks_a_mid_timeline_paint(self) -> None:
-        # A mid-timeline state has no seed representation, so painting one (in
-        # edit mode, away from gen 0) forks that board live from its current
-        # frame instead of hinting -- and carries the stroke over as the
-        # fork's first edit, without zooming or disturbing the other boards.
+    def test_wall_edit_mode_rewinds_mid_timeline_paint_to_shared_seed(self) -> None:
+        # Edit seed should keep the edited board on the shared wall clock. If
+        # the wall is resting on a lively later frame, arming edit mode rewinds
+        # to generation 0 before paint, then the debounced rerun rebuilds every
+        # board from that shared seed.
         case = self._case()
         self._mark_compare_demo_seen()
         case.page.click("#wall-view-btn")
@@ -473,18 +473,19 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-edit-toggle").to_be_enabled()
         case.page.click(".compare-edit-toggle")
         self._expect(".compare-edit-toggle").to_have_attribute("aria-pressed", "true")
+        self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 /")
 
-        # Stay on the default (lively, gen > 0) frame -- do not step back to
-        # the seed -- and paint a cell on the first board.
         board = case.page.locator(".compare-filmstrip-board").first
         board.locator("[data-cell-id]").first.click()
 
         self._expect(".compare-filmstrip-board.is-hero").to_have_count(0)
-        self._expect(".compare-focus-pane").to_be_visible(timeout=30_000)
+        self._expect(".compare-focus-pane").to_have_count(0)
         self._expect(".compare-status").not_to_contain_text("Fork failed")
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
 
-        # The other boards are untouched -- exactly one fork exists.
-        self._expect(".compare-focus-pane").to_have_count(1)
+        case.page.click('.compare-filmstrip-btn[title="Play / pause"]')
+        self._expect('.compare-filmstrip-btn[title="Play / pause"]').to_contain_text("Pause")
+        self._expect(".compare-focus-pane").to_have_count(0)
 
     def test_copy_and_paste_pattern_roundtrip(self) -> None:
         case = self._case()

@@ -60,6 +60,8 @@ export interface FilmstripTransportController {
     toggle(): void;
     /** Step the attached player by `delta` frames (used by keyboard idioms). */
     step(delta: number): void;
+    /** Return to generation 0 and pause playback. */
+    reset(): void;
     /** Enable/disable the idle "Run comparison" action (needs `onRun`). */
     setIdleRunEnabled(enabled: boolean): void;
 }
@@ -254,6 +256,9 @@ export function createFilmstripTransport(
         },
         step(delta: number): void {
             currentPlayer?.step(delta);
+        },
+        reset(): void {
+            currentPlayer?.reset();
         },
         setIdleRunEnabled(enabled: boolean): void {
             idleRunEnabled = enabled;
