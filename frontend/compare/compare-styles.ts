@@ -114,16 +114,23 @@ export const COMPARE_PANEL_STYLES = `
     background: rgba(255, 255, 255, 0.055);
     border: 1px solid rgba(197, 215, 224, 0.1);
 }
+.compare-setup-status {
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(197, 215, 224, 0.06);
+}
 .compare-setup-action {
     appearance: none;
+    position: relative;
     text-align: left;
     font-family: inherit;
     cursor: pointer;
     color: inherit;
+    background: rgba(45, 212, 191, 0.08);
+    border-color: rgba(45, 212, 191, 0.24);
 }
 .compare-setup-action:hover {
-    background: rgba(255, 255, 255, 0.085);
-    border-color: rgba(197, 215, 224, 0.22);
+    background: rgba(45, 212, 191, 0.13);
+    border-color: rgba(45, 212, 191, 0.42);
 }
 .compare-setup-action:focus-visible {
     outline: 2px solid var(--focus, #5cc8ff);
@@ -145,9 +152,31 @@ export const COMPARE_PANEL_STYLES = `
     font-size: 14px;
     line-height: 1.25;
 }
+.compare-setup-action-row {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.compare-setup-action-text {
+    flex: 0 0 auto;
+    color: var(--compare-teal);
+    font-size: 12px;
+    font-weight: 800;
+}
 .compare-setup-run {
     align-self: stretch;
     min-width: 158px;
+}
+.compare-setup-run.is-current {
+    color: var(--compare-muted);
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(197, 215, 224, 0.14);
+    box-shadow: none;
+}
+.compare-setup-run.is-stale {
+    box-shadow: 0 0 0 1px rgba(251, 113, 80, 0.22), 0 14px 28px rgba(251, 113, 80, 0.2);
 }
 .compare-stage-body {
     min-width: 0;
@@ -563,6 +592,13 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-run:disabled { background: var(--btn-disabled-bg, #ccc); color: var(--btn-disabled-text, #777); cursor: default; border-color: var(--btn-disabled-line, #bbb); }
+.compare-setup-run.is-current:disabled {
+    color: var(--compare-muted);
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(197, 215, 224, 0.14);
+    box-shadow: none;
+    opacity: 1;
+}
 .compare-run-secondary {
     background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
     color: var(--ink, #1f2430);

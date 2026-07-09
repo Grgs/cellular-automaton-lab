@@ -653,6 +653,10 @@ describe("mountComparePanel", () => {
         expect(setupStrip?.textContent).toContain("Rule");
         expect(setupStrip?.textContent).toContain("Tilings");
         expect(setupStrip?.textContent).toContain("Run comparison");
+        expect(setupStrip?.querySelectorAll(".compare-setup-status")).toHaveLength(2);
+        expect(
+            setupStrip?.querySelector<HTMLButtonElement>(".compare-setup-action")?.textContent,
+        ).toContain("Edit");
         const explainer = document.querySelector<HTMLElement>(".compare-explainer");
         expect(explainer?.textContent).toContain("Same seed");
         expect(explainer?.textContent).toContain("Same rule");
@@ -701,6 +705,40 @@ describe("mountComparePanel", () => {
 
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        const setupRun = document.querySelector<HTMLButtonElement>(".compare-setup-run");
+        await vi.waitFor(() => expect(setupRun?.textContent).toBe("Up to date"));
+        expect(setupRun?.disabled).toBe(true);
+        handle.dispose();
+    });
+
+    it("only highlights the setup run action when the wall is stale", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        const setupRun = document.querySelector<HTMLButtonElement>(".compare-setup-run");
+        setupRun?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await vi.waitFor(() => expect(setupRun?.textContent).toBe("Up to date"));
+        expect(setupRun?.classList.contains("is-current")).toBe(true);
+        expect(setupRun?.disabled).toBe(true);
+
+        const seedField = document.querySelector<HTMLInputElement>(
+            'input.compare-field[type="text"]',
+        );
+        seedField!.value = "10101";
+        seedField!.dispatchEvent(new Event("input", { bubbles: true }));
+
+        expect(setupRun?.textContent).toBe("Update comparison");
+        expect(setupRun?.classList.contains("is-stale")).toBe(true);
+        expect(setupRun?.disabled).toBe(false);
+        setupRun?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        await vi.waitFor(() => expect(setupRun?.textContent).toBe("Up to date"));
         handle.dispose();
     });
 
@@ -758,6 +796,12 @@ describe("mountComparePanel", () => {
             expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(true);
         });
 
+        const seedField = document.querySelector<HTMLInputElement>(
+            'input.compare-field[type="text"]',
+        );
+        seedField!.value = "1110";
+        seedField!.dispatchEvent(new Event("input", { bubbles: true }));
+        expect(run?.textContent).toBe("Update comparison");
         run?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-wall-loading")?.textContent).toContain(

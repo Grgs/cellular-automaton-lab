@@ -330,6 +330,7 @@ export function createComparePanelContent(
         onSeedChange: (formatted) => {
             seedInput.value = formatted;
             redrawPreview();
+            updateSummary();
         },
     });
     // The live preview applies to both seed sources: a bit string placed by
@@ -343,10 +344,19 @@ export function createComparePanelContent(
     seedInput.addEventListener("input", () => {
         seedPad.syncFromSeed();
         redrawPreview();
-        updateSetupSummary();
+        updateSummary();
     });
-    traversalSelect.addEventListener("change", refreshPreview);
-    gridInput.addEventListener("change", refreshPreview);
+    traversalSelect.addEventListener("change", () => {
+        refreshPreview();
+        updateSummary();
+    });
+    stepsInput.addEventListener("input", updateSummary);
+    stepsInput.addEventListener("change", updateSummary);
+    gridInput.addEventListener("input", updateSummary);
+    gridInput.addEventListener("change", () => {
+        refreshPreview();
+        updateSummary();
+    });
 
     // "Run comparison" builds (or rebuilds) the live wall from the setup strip
     // and idle dock transport. The analytical table is a deeper workflow and
@@ -504,7 +514,13 @@ export function createComparePanelContent(
             title: "Choose the tilings on the wall",
             "aria-label": "Choose tilings on the wall",
         },
-        [el("span", { class: "compare-setup-label", textContent: "Tilings" }), setupTilingsValue],
+        [
+            el("span", { class: "compare-setup-label", textContent: "Tilings" }),
+            el("span", { class: "compare-setup-action-row" }, [
+                setupTilingsValue,
+                el("span", { class: "compare-setup-action-text", textContent: "Edit" }),
+            ]),
+        ],
     );
     const setupStrip = el(
         "section",
@@ -548,6 +564,7 @@ export function createComparePanelContent(
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     let activeFilmstrip: SeedFilmstripResult | null = null;
+    let activeFilmstripRunKey: string | null = null;
     let currentFocusGeometry: string | null = null;
     // Live forks are per-board (keyed by geometry) and outlive a focus change:
     // a forked board keeps running as a live tile in the gallery, and speaker
@@ -727,6 +744,7 @@ export function createComparePanelContent(
         seedInput.value = toggled;
         seedPad.syncFromSeed();
         redrawPreview();
+        updateSummary();
 
         projectSeedOntoFrameZero(toggled);
         statusLine.textContent = converted
@@ -778,6 +796,7 @@ export function createComparePanelContent(
         seedInput.value = reconstructSeedBits(order, cellsById);
         seedPad.syncFromSeed();
         redrawPreview();
+        updateSummary();
         statusLine.textContent = "Re-running every board from the forked state…";
         void runFilmstrip();
     }
@@ -1066,6 +1085,7 @@ export function createComparePanelContent(
     shapeSelect.addEventListener("change", () => {
         syncShapeMode();
         seedPreview.refresh();
+        updateSummary();
     });
 
     // Configuration and data live in a tabbed bottom sheet the dock's gear
@@ -1149,7 +1169,7 @@ export function createComparePanelContent(
     }
 
     function setupItem(label: string, value: HTMLElement): HTMLElement {
-        return el("div", { class: "compare-setup-item" }, [
+        return el("div", { class: "compare-setup-item compare-setup-status" }, [
             el("span", { class: "compare-setup-label", textContent: label }),
             value,
         ]);
@@ -1496,12 +1516,31 @@ export function createComparePanelContent(
         updatePresetButtons();
         const disabled = running || selected.size === 0;
         const canPlay = !running && selected.size >= 2;
+        const current = isFilmstripCurrent();
+        const stale = activeFilmstrip !== null && !current && selected.size >= 2;
         runButton.disabled = disabled;
-        setupRunButton.disabled = !canPlay;
-        const playTitle =
-            selected.size < 2
-                ? "Select at least two tilings to run a comparison"
-                : "Run every selected tiling on a shared clock";
+        setupRunButton.disabled = !canPlay || current;
+        setupRunButton.classList.toggle("is-current", current && !running);
+        setupRunButton.classList.toggle("is-stale", stale && !running);
+        setupRunButton.textContent = running
+            ? "Running..."
+            : current
+              ? "Up to date"
+              : stale
+                ? "Update comparison"
+                : "Run comparison";
+        const playTitle = (() => {
+            if (selected.size < 2) {
+                return "Select at least two tilings to run a comparison";
+            }
+            if (current) {
+                return "The wall already matches this setup";
+            }
+            if (stale) {
+                return "Update the wall with the changed setup";
+            }
+            return "Run every selected tiling on a shared clock";
+        })();
         setupRunButton.title = playTitle;
         // The dock's idle play button shares the same gate as the Configure one.
         filmstripTransport.setIdleRunEnabled(canPlay);
@@ -1743,6 +1782,18 @@ export function createComparePanelContent(
         return config;
     }
 
+    function runConfigKey(config: CompareRunConfig): string {
+        return JSON.stringify(config);
+    }
+
+    function isFilmstripCurrent(): boolean {
+        return (
+            activeFilmstrip !== null &&
+            activeFilmstripRunKey !== null &&
+            activeFilmstripRunKey === runConfigKey(currentRunConfig())
+        );
+    }
+
     function compareRunUrl(): string {
         return buildCompareRunUrl(currentRunConfig(), window.location.href);
     }
@@ -1914,7 +1965,6 @@ export function createComparePanelContent(
     function setRunning(next: boolean): void {
         running = next;
         runButton.textContent = next ? "Running…" : "Run analysis";
-        setupRunButton.textContent = next ? "Running…" : "Run comparison";
         updateSummary();
     }
 
@@ -1957,6 +2007,7 @@ export function createComparePanelContent(
         showStageHero();
         stageMain.classList.remove("is-speaker");
         activeFilmstrip = null;
+        activeFilmstripRunKey = null;
         currentFocusGeometry = null;
         setWallLoading(null);
         updateExplainer();
@@ -2051,20 +2102,23 @@ export function createComparePanelContent(
             setWallLoading(loadingMessage);
         }
 
+        const runConfig = currentRunConfig();
+        const requestKey = runConfigKey(runConfig);
         const request: FilmstripRequest = {
-            seed: seedInput.value,
-            rule: selectedRuleName(),
-            traversal: traversalSelect.value,
+            seed: runConfig.seed,
+            rule: runConfig.rule,
+            traversal: runConfig.traversal,
             // The backend further clamps frames to its filmstrip ceiling.
-            frames: clampNumber(stepsInput.value, 1, 500, 50),
-            grid_size: clampNumber(gridInput.value, 2, 64, 16),
-            geometries: [...selected],
-            ...(isShapeMode() ? { pattern: shapeSelect.value } : {}),
+            frames: runConfig.frames,
+            grid_size: runConfig.grid_size,
+            geometries: runConfig.geometries,
+            ...(runConfig.pattern === undefined ? {} : { pattern: runConfig.pattern }),
         };
 
         try {
             const filmstrip = await options.backend.requestFilmstrip(request);
             activeFilmstrip = filmstrip;
+            activeFilmstripRunKey = requestKey;
             if (!filmstripView) {
                 filmstripView = createFilmstripView({
                     backend: options.backend,
@@ -2443,7 +2497,14 @@ export function createComparePanelContent(
     }
 
     runButton.addEventListener("click", () => void runComparison());
-    setupRunButton.addEventListener("click", () => void runFilmstrip());
+    setupRunButton.addEventListener("click", () => {
+        if (isFilmstripCurrent()) {
+            statusLine.textContent = "The comparison is already up to date.";
+            updateSummary();
+            return;
+        }
+        void runFilmstrip();
+    });
     heroOpenLabButton.addEventListener("click", openFocusedBoardInLab);
     heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
