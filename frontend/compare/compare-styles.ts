@@ -466,6 +466,67 @@ export const COMPARE_PANEL_STYLES = `
 }
 .compare-tilings-search { max-width: 180px; }
 .compare-tilings-presets { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+.compare-selected-tilings {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    min-height: 38px;
+    margin-bottom: 8px;
+    padding: 7px 9px;
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--help-bg, rgba(0, 0, 0, 0.03)) 80%, transparent);
+}
+.compare-selected-tilings.is-empty {
+    min-height: 0;
+}
+.compare-selected-label {
+    color: var(--muted, #6d756f);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.compare-selected-empty {
+    color: var(--muted, #6d756f);
+    font-size: 12px;
+}
+.compare-selected-chip {
+    max-width: 210px;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border: 1px solid rgba(45, 212, 191, 0.28);
+    border-radius: 999px;
+    background: rgba(45, 212, 191, 0.1);
+    color: var(--ink, #1f2430);
+    font-family: var(--sans, sans-serif);
+    font-size: 12px;
+    cursor: pointer;
+}
+.compare-selected-chip:hover {
+    border-color: rgba(45, 212, 191, 0.48);
+    background: rgba(45, 212, 191, 0.16);
+}
+.compare-selected-chip:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+.compare-selected-chip-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.compare-selected-chip-remove {
+    flex: 0 0 auto;
+    color: var(--muted, #6d756f);
+    font-size: 14px;
+    line-height: 1;
+}
 .compare-mini {
     font-size: 12px;
     padding: 4px 10px;
@@ -520,6 +581,9 @@ export const COMPARE_PANEL_STYLES = `
     cursor: pointer;
 }
 .compare-tiling:hover { background: var(--btn-soft-bg, rgba(0, 0, 0, 0.05)); }
+.compare-tiling.is-selected {
+    background: rgba(45, 212, 191, 0.08);
+}
 .compare-tiling.is-disabled {
     color: var(--muted, #6d756f);
     cursor: not-allowed;
@@ -1146,21 +1210,92 @@ export const COMPARE_PANEL_STYLES = `
 }
 @media (max-width: 640px) {
     .wall-header { align-items: center; }
-    /* On a phone the boards want a full column and the stage can scroll. */
+    /* Keep the wall comparative on phones: setup is compact and the gallery
+       stays two-up until a board is focused. */
     .compare-stage { padding: 8px; }
-    .compare-setup-item { flex-basis: calc(50% - 8px); }
+    .compare-setup-strip {
+        gap: 8px;
+        padding: 8px;
+    }
+    .compare-setup-item {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 0;
+        padding: 7px 8px;
+    }
+    .compare-setup-value {
+        font-size: 13px;
+    }
     .compare-setup-run {
+        flex: 1 1 100%;
         width: 100%;
         min-width: 0;
+        min-height: 40px;
     }
-    .compare-stage-main { min-height: 320px; }
-    .compare-filmstrip-boards { grid-template-columns: 1fr; grid-auto-rows: minmax(200px, 1fr); }
+    .compare-stage-main { min-height: 0; }
+    .compare-filmstrip:not(.compare-filmstrip--speaker) .compare-filmstrip-boards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: minmax(166px, auto);
+        gap: 8px;
+    }
+    .compare-filmstrip-board {
+        gap: 4px;
+        padding: 5px;
+    }
+    .compare-filmstrip-board-chrome {
+        gap: 5px;
+        min-height: 30px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        font-size: 11px;
+        line-height: 1.25;
+    }
+    .compare-filmstrip-label {
+        flex: 1 1 100%;
+    }
+    .compare-filmstrip-count {
+        flex: 1 1 auto;
+    }
+    .compare-filmstrip-expand {
+        flex: 0 0 auto;
+    }
+    .compare-filmstrip--speaker .compare-filmstrip-boards {
+        grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+        grid-template-rows: minmax(280px, auto) auto;
+    }
+    .compare-filmstrip--speaker .compare-filmstrip-board.is-strip {
+        height: 104px;
+    }
     .compare-form { grid-template-columns: 1fr; }
     .compare-seed-workspace { grid-template-columns: 1fr; }
     .compare-seedpreview { gap: 10px; }
-    .compare-tilings-tools { justify-content: flex-start; flex-basis: 100%; }
-    .compare-tilings-search { max-width: none; }
-    .compare-tilings-presets { justify-content: flex-start; }
+    .compare-tilings-controls {
+        align-items: stretch;
+    }
+    .compare-tilings-tools {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-content: stretch;
+        flex-basis: 100%;
+    }
+    .compare-tilings-search {
+        width: 100%;
+        max-width: none;
+    }
+    .compare-tilings-presets {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+    }
+    .compare-tilings-presets .compare-mini {
+        width: 100%;
+    }
+    .compare-selected-tilings {
+        max-height: 84px;
+        overflow: auto;
+    }
+    .compare-selected-chip {
+        max-width: 100%;
+    }
     .compare-tilings { grid-template-columns: 1fr; max-height: 240px; }
     .compare-saved { grid-template-columns: 1fr; }
     .compare-saved-row { grid-template-columns: 1fr; }

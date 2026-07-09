@@ -295,6 +295,10 @@ export function createComparePanelContent(
     );
 
     const tilingList = el("div", { class: "compare-tilings" });
+    const selectedTilingsList = el("div", {
+        class: "compare-selected-tilings",
+        "aria-label": "Selected tilings",
+    });
     const tilingSearchInput = el("input", {
         class: "compare-field compare-tilings-search",
         type: "search",
@@ -1113,7 +1117,11 @@ export function createComparePanelContent(
         seedWorkspace,
     ]);
     const tilingsConfigPanel = configPanel("tilings", [
-        el("div", { class: "compare-tilings-block" }, [tilingControlsBar(), tilingList]),
+        el("div", { class: "compare-tilings-block" }, [
+            tilingControlsBar(),
+            selectedTilingsList,
+            tilingList,
+        ]),
     ]);
     const analysisConfigPanel = configPanel("analysis", [
         el("div", { class: "compare-analysis" }, [
@@ -1412,7 +1420,13 @@ export function createComparePanelContent(
                     el(
                         "label",
                         {
-                            class: compatible ? "compare-tiling" : "compare-tiling is-disabled",
+                            class: [
+                                "compare-tiling",
+                                compatible ? "" : "is-disabled",
+                                compatible && selected.has(option.geometry) ? "is-selected" : "",
+                            ]
+                                .filter(Boolean)
+                                .join(" "),
                             title: compatible ? "" : "Unsupported for the selected rule",
                         },
                         [checkbox, el("span", { textContent: option.label })],
@@ -1422,6 +1436,53 @@ export function createComparePanelContent(
             tilingList.append(group);
         }
         updateSummary();
+    }
+
+    function selectedTilingOptions(): TilingOption[] {
+        return allTilings.filter((option) => selected.has(option.geometry));
+    }
+
+    function renderSelectedTilings(): void {
+        selectedTilingsList.replaceChildren();
+        const selectedOptions = selectedTilingOptions();
+        selectedTilingsList.classList.toggle("is-empty", selectedOptions.length === 0);
+        if (selectedOptions.length === 0) {
+            selectedTilingsList.append(
+                el("span", {
+                    class: "compare-selected-empty",
+                    textContent: "No tilings selected.",
+                }),
+            );
+            return;
+        }
+        selectedTilingsList.append(
+            el("span", { class: "compare-selected-label", textContent: "Selected" }),
+        );
+        for (const option of selectedOptions) {
+            const chip = el(
+                "button",
+                {
+                    class: "compare-selected-chip",
+                    type: "button",
+                    title: `Remove ${option.label} from the comparison`,
+                    "aria-label": `Remove ${option.label} from the comparison`,
+                },
+                [
+                    el("span", { class: "compare-selected-chip-label", textContent: option.label }),
+                    el("span", {
+                        class: "compare-selected-chip-remove",
+                        "aria-hidden": "true",
+                        textContent: "×",
+                    }),
+                ],
+            );
+            chip.addEventListener("click", () => {
+                selected.delete(option.geometry);
+                renderTilingChecklist();
+                refreshPreview();
+            });
+            selectedTilingsList.append(chip);
+        }
     }
 
     function matchesTilingSearch(option: TilingOption): boolean {
@@ -1512,6 +1573,7 @@ export function createComparePanelContent(
         if (summary) {
             summary.textContent = summaryText();
         }
+        renderSelectedTilings();
         updateFamilyCountLabels();
         updatePresetButtons();
         const disabled = running || selected.size === 0;

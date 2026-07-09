@@ -383,6 +383,22 @@ function disabledTilingLabels(): string[] {
         .map((label) => label.querySelector("span")?.textContent ?? "");
 }
 
+function selectedChipLabels(): string[] {
+    return [...document.querySelectorAll<HTMLElement>(".compare-selected-chip-label")].map(
+        (node) => node.textContent ?? "",
+    );
+}
+
+function removeSelectedChip(label: string): void {
+    const chip = [...document.querySelectorAll<HTMLButtonElement>(".compare-selected-chip")].find(
+        (candidate) => candidate.textContent?.includes(label),
+    );
+    if (!chip) {
+        throw new Error(`missing selected chip ${label}`);
+    }
+    chip.click();
+}
+
 function summaryText(): string {
     return document.querySelector<HTMLElement>(".compare-tilings-summary")?.textContent ?? "";
 }
@@ -494,6 +510,13 @@ describe("mountComparePanel", () => {
         });
 
         expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
+        expect(selectedChipLabels()).toEqual([
+            "Square",
+            "Hex",
+            "Kagome",
+            "Periodic Face",
+            "Spectre",
+        ]);
         expect(familyHeaderTexts()).toEqual([
             "regular 2/2",
             "mixed 1/1",
@@ -504,11 +527,34 @@ describe("mountComparePanel", () => {
         setTilingSearch("Penrose");
         expect(tilingLabels()).toEqual(["Penrose"]);
         expect(checkedTilingLabels()).toEqual([]);
+        expect(selectedChipLabels()).toContain("Square");
+        expect(selectedChipLabels()).toContain("Spectre");
         expect(summaryText()).toBe("5 / 6 selected · Regular 2 · Mixed 2 · Aperiodic 1");
         expect(familyHeaderTexts()).toEqual(["aperiodic 1/2"]);
 
         setTilingSearch("aperiodic");
         expect(tilingLabels()).toEqual(["Spectre", "Penrose"]);
+        handle.dispose();
+    });
+
+    it("removes selected tilings from the persistent chip row", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+
+        setTilingSearch("Penrose");
+        expect(tilingLabels()).toEqual(["Penrose"]);
+        removeSelectedChip("Square");
+
+        expect(selectedChipLabels()).not.toContain("Square");
+        expect(summaryText()).toBe("4 / 6 selected · Regular 1 · Mixed 2 · Aperiodic 1");
+        setTilingSearch("");
+        expect(checkedTilingLabels()).toEqual(["Hex", "Kagome", "Periodic Face", "Spectre"]);
+        expect(activePresetLabels()).toEqual([]);
         handle.dispose();
     });
 
