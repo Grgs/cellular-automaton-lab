@@ -171,8 +171,8 @@ export const COMPARE_PANEL_STYLES = `
 }
 .compare-setup-run.is-current {
     color: var(--compare-muted);
-    background: rgba(255, 255, 255, 0.055);
-    border-color: rgba(197, 215, 224, 0.14);
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(197, 215, 224, 0.08);
     box-shadow: none;
 }
 .compare-setup-run.is-stale {
@@ -283,9 +283,10 @@ export const COMPARE_PANEL_STYLES = `
     position: absolute;
     inset: 0;
     z-index: 8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 16px;
     pointer-events: none;
     background: rgba(13, 20, 28, 0.48);
     color: var(--compare-text);
@@ -294,6 +295,26 @@ export const COMPARE_PANEL_STYLES = `
     letter-spacing: 0;
 }
 .compare-wall-loading[hidden] { display: none; }
+.compare-wall-loading-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(104px, 170px));
+    gap: 10px;
+    width: min(460px, calc(100% - 40px));
+}
+.compare-wall-loading-card {
+    min-height: 94px;
+    border: 1px solid rgba(197, 215, 224, 0.18);
+    border-radius: 9px;
+    background:
+        linear-gradient(
+            110deg,
+            rgba(255, 255, 255, 0.05),
+            rgba(255, 255, 255, 0.11),
+            rgba(255, 255, 255, 0.05)
+        ),
+        rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 0 0 1px rgba(13, 20, 28, 0.28);
+}
 .compare-filmstrip-area.is-loading .compare-filmstrip {
     filter: saturate(0.7) brightness(0.72);
 }
@@ -467,6 +488,9 @@ export const COMPARE_PANEL_STYLES = `
 .compare-tilings-search { max-width: 180px; }
 .compare-tilings-presets { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
 .compare-selected-tilings {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 7px;
@@ -658,10 +682,10 @@ export const COMPARE_PANEL_STYLES = `
 .compare-run:disabled { background: var(--btn-disabled-bg, #ccc); color: var(--btn-disabled-text, #777); cursor: default; border-color: var(--btn-disabled-line, #bbb); }
 .compare-setup-run.is-current:disabled {
     color: var(--compare-muted);
-    background: rgba(255, 255, 255, 0.055);
-    border-color: rgba(197, 215, 224, 0.14);
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(197, 215, 224, 0.08);
     box-shadow: none;
-    opacity: 1;
+    opacity: 0.82;
 }
 .compare-run-secondary {
     background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
@@ -1214,22 +1238,34 @@ export const COMPARE_PANEL_STYLES = `
        stays two-up until a board is focused. */
     .compare-stage { padding: 8px; }
     .compare-setup-strip {
-        gap: 8px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
         padding: 8px;
     }
     .compare-setup-item {
-        flex: 1 1 calc(50% - 4px);
         min-width: 0;
-        padding: 7px 8px;
+        min-height: 48px;
+        padding: 6px 7px;
     }
+    .compare-setup-label { font-size: 9px; }
     .compare-setup-value {
-        font-size: 13px;
+        font-size: 12px;
     }
+    .compare-setup-action-row { gap: 4px; }
+    .compare-setup-action-text { font-size: 10px; }
     .compare-setup-run {
-        flex: 1 1 100%;
+        grid-column: 1 / -1;
         width: 100%;
         min-width: 0;
-        min-height: 40px;
+        min-height: 34px;
+        padding-block: 6px;
+    }
+    .compare-setup-run.is-current {
+        min-height: 28px;
+        color: var(--compare-muted);
+        background: transparent;
+        border-color: transparent;
     }
     .compare-stage-main { min-height: 0; }
     .compare-filmstrip:not(.compare-filmstrip--speaker) .compare-filmstrip-boards {
@@ -1261,6 +1297,31 @@ export const COMPARE_PANEL_STYLES = `
     .compare-filmstrip--speaker .compare-filmstrip-boards {
         grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
         grid-template-rows: minmax(280px, auto) auto;
+    }
+    .compare-filmstrip--speaker .compare-filmstrip-board.is-hero {
+        gap: 6px;
+    }
+    .compare-filmstrip--speaker .compare-hero-toolbelt {
+        position: static;
+        order: -1;
+        inset: auto;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 6px;
+        padding: 0;
+        pointer-events: auto;
+    }
+    .compare-filmstrip--speaker .compare-hero-open-lab {
+        justify-self: end;
+        margin-left: 0;
+    }
+    .compare-filmstrip--speaker .compare-hero-tool {
+        justify-content: center;
+        min-height: 34px;
+        padding: 5px 8px;
+        border-color: var(--btn-soft-line);
+        background: var(--btn-soft-bg);
+        color: var(--compare-text);
     }
     .compare-filmstrip--speaker .compare-filmstrip-board.is-strip {
         height: 104px;

@@ -555,7 +555,18 @@ export function createComparePanelContent(
             "aria-live": "polite",
             hidden: true,
         },
-        [el("span", { class: "compare-wall-loading-text", textContent: "Building comparison..." })],
+        [
+            el("span", {
+                class: "compare-wall-loading-text",
+                textContent: "Building comparison...",
+            }),
+            el("div", { class: "compare-wall-loading-grid", "aria-hidden": "true" }, [
+                el("span", { class: "compare-wall-loading-card" }),
+                el("span", { class: "compare-wall-loading-card" }),
+                el("span", { class: "compare-wall-loading-card" }),
+                el("span", { class: "compare-wall-loading-card" }),
+            ]),
+        ],
     );
     const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [
         stageHero,

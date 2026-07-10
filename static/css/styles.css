@@ -688,7 +688,11 @@ h1.wall-brand {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
-    color: var(--muted);
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--status-tile-bg);
+    color: var(--ink);
     font-size: 0.74rem;
     font-weight: 700;
     text-overflow: ellipsis;
@@ -780,6 +784,7 @@ button.tiling-preview-card:focus-visible {
 button.tiling-preview-card.is-selected {
     border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 15%, var(--panel-strong));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 .tiling-preview-card-thumb {
@@ -1123,38 +1128,30 @@ button.theme-toggle .theme-icon-moon {
     height: 100%;
     min-height: 0;
     position: relative;
+    gap: 8px;
 }
 
 .canvas-hud {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    z-index: 5;
+    flex: 0 0 auto;
     display: grid;
+    grid-template-columns: minmax(160px, 0.8fr) minmax(0, 1.4fr);
     gap: 8px;
-    width: min(460px, calc(100% - 28px));
-    pointer-events: none;
+    min-width: 0;
 }
 
 .canvas-edit-cue {
-    position: absolute;
-    left: 50%;
-    bottom: 18px;
-    z-index: 6;
-    transform: translateX(-50%);
-    min-width: min(320px, calc(100% - 40px));
-    max-width: calc(100% - 40px);
-    padding: 10px 14px;
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+    padding: 8px 12px;
     border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 999px;
+    border-radius: 10px;
     background: rgba(255, 251, 245, 0.94);
     box-shadow: 0 12px 24px rgba(15, 22, 34, 0.1);
     color: var(--ink);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.01em;
-    text-align: center;
-    pointer-events: none;
 }
 
 .canvas-first-action-hint {
@@ -1200,12 +1197,13 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-hud-row {
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 16px;
+    border-radius: 12px;
     background: rgba(255, 251, 245, 0.92);
     box-shadow: 0 12px 24px rgba(15, 22, 34, 0.08);
 }
@@ -1215,11 +1213,12 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-hud-context-row {
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: stretch;
 }
 
 .canvas-hud-context-block {
+    flex: 1 1 0;
     min-width: 0;
     display: grid;
     gap: 4px;
@@ -1256,6 +1255,7 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .grid-viewport {
+    order: 2;
     flex: 1 1 auto;
     height: 100%;
     width: 100%;
@@ -1264,6 +1264,8 @@ button.theme-toggle .theme-icon-moon {
     overflow: auto;
     border-radius: 18px;
     position: relative;
+    display: grid;
+    place-items: center;
 }
 
 .grid-canvas {
@@ -1272,6 +1274,8 @@ button.theme-toggle .theme-icon-moon {
     touch-action: none;
     cursor: default;
     background: transparent;
+    max-width: none;
+    max-height: none;
 }
 
 .grid-canvas[data-edit-mode="armed"] {
@@ -1329,17 +1333,14 @@ button.theme-toggle .theme-icon-moon {
     line-height: 1.35;
 }
 
-/* The inspector is a bottom sheet: same idiom as the wall's config sheet
-   (slides up over the canvas, closed by default). It anchors to the stage
-   bottom so the Lab dock below stays reachable while it is open. Visibility
-   keeps the existing data-open contract driven by the controller. */
+/* The inspector keeps the existing data-open contract but changes shape by
+   breakpoint: a side rail on desktop and a full-height sheet on phones. */
 .control-drawer {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
     top: auto;
-    /* Keep the board's center visible (and clickable) while the sheet is open. */
     max-height: 46%;
     z-index: 40;
     min-width: 0;
@@ -1385,6 +1386,72 @@ button.theme-toggle .theme-icon-moon {
 
 .control-drawer-inner .drawer-sticky-summary {
     grid-column: 1 / -1;
+}
+
+@media (min-width: 861px) {
+    .main-stage {
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+        gap: 12px;
+    }
+
+    .main-stage:has(.control-drawer[data-open="false"]) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .control-drawer {
+        position: relative;
+        inset: auto;
+        grid-column: 2;
+        grid-row: 1;
+        width: auto;
+        height: 100%;
+        max-height: none;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        transform: translateX(16px);
+    }
+
+    .control-drawer[data-open="true"] {
+        transform: translateX(0);
+    }
+
+    .control-drawer[data-open="false"] {
+        display: none;
+    }
+
+    .control-drawer-inner {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .control-drawer-inner .drawer-sticky-summary {
+        position: sticky;
+        top: -12px;
+        z-index: 5;
+        margin: -12px -12px 0;
+        padding: 12px 12px 10px;
+        background: var(--panel-strong);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .control-drawer .drawer-nav {
+        top: -1px;
+        margin: 0;
+        padding: 8px 0 0;
+        border-top: 0;
+        border-bottom: 0;
+        background: transparent;
+    }
+
+    .control-drawer .drawer-section {
+        scroll-margin-top: 160px;
+    }
+
+    .drawer-backdrop:not([hidden]) {
+        display: none;
+    }
 }
 
 .drawer-sticky-summary {
@@ -2022,10 +2089,8 @@ button.theme-toggle .theme-icon-moon {
 }
 
 .canvas-toolbar {
-    position: absolute;
-    bottom: 14px;
-    left: 14px;
-    z-index: 6;
+    order: 3;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -2034,8 +2099,7 @@ button.theme-toggle .theme-icon-moon {
     border-radius: 999px;
     background: rgba(255, 251, 245, 0.94);
     box-shadow: 0 12px 24px rgba(15, 22, 34, 0.1);
-    pointer-events: all;
-    max-width: calc(100% - 28px);
+    max-width: 100%;
 }
 
 .canvas-toolbar[data-edit-mode="armed"] {
@@ -2410,23 +2474,26 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .control-drawer {
-        top: 8px;
-        right: 8px;
-        bottom: 8px;
-        width: min(380px, calc(100vw - 16px));
-        max-width: calc(100vw - 16px);
-        border-radius: 20px;
-        box-shadow: 0 20px 44px rgba(15, 22, 34, 0.2);
-        transform: translateX(calc(100% + 16px));
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        bottom: 192px;
+        width: auto;
+        max-width: none;
+        max-height: none;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -20px 44px rgba(15, 22, 34, 0.28);
+        transform: translateY(calc(100% + 16px));
     }
 
     .control-drawer[data-open="true"] {
-        transform: translateX(0);
+        transform: translateY(0);
         pointer-events: auto;
     }
 
     .control-drawer[data-open="false"] {
-        transform: translateX(calc(100% + 16px));
+        transform: translateY(calc(100% + 16px));
     }
 
     .control-drawer-inner {
@@ -2482,9 +2549,18 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .canvas-hud {
-        width: min(100%, calc(100% - 24px));
-        top: 12px;
-        left: 12px;
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .canvas-hud-row {
+        padding: 8px 9px;
+    }
+
+    .canvas-hud-context-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
     }
 
     .canvas-first-action-hint {
@@ -2499,9 +2575,7 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .canvas-toolbar {
-        bottom: 12px;
-        left: 12px;
-        right: 12px;
+        order: 3;
         max-width: none;
         padding: 7px;
         border-radius: 18px;
@@ -2604,9 +2678,10 @@ button.theme-toggle .theme-icon-moon {
     }
 
     .canvas-edit-cue {
-        bottom: 74px;
-        min-width: min(300px, calc(100% - 28px));
-        max-width: calc(100% - 28px);
+        order: 4;
+        min-width: 0;
+        max-width: 100%;
+        border-radius: 12px;
     }
 
     .drawer-backdrop {
