@@ -1993,7 +1993,8 @@
         "control": "patch_depth",
         "default": 3,
         "min": 0,
-        "max": 4
+        "max": 8,
+        "unsafe_max": 60
       }
     }
   ],

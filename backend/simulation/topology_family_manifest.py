@@ -484,8 +484,11 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     SOCOLAR_HEXAGONAL_GEOMETRY: _translated_aperiodic_family(
         SOCOLAR_HEXAGONAL_GEOMETRY,
-        # TODO: tune patch depth ceiling once cell-count growth is known.
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
+        # Cut-and-project ball radius 4 + 0.75*d gives linear cell growth
+        # (~41/108/275 cells at depths 0/3/8). Depth 60 is ~6.3k cells and
+        # builds in a few seconds, so the unsafe ceiling matches the
+        # dodecagonal family's.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 8, unsafe_maximum=60),
     ),
 }
 
