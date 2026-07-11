@@ -604,6 +604,10 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
     def test_reload_restores_browser_persisted_state(self) -> None:
         self.page.select_option("#rule-select", "highlife")
         self._expect("#rule-select").to_have_value("highlife")
+        self._wait_for_standalone_persisted_snapshot(
+            expected_rule="highlife",
+            expected_cells_by_id={},
+        )
 
         self._paint_canvas_center()
         persisted_before_reload = self._export_pattern_payload()

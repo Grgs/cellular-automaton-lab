@@ -1108,6 +1108,12 @@ export const COMPARE_PANEL_STYLES = `
     height: 100%;
     min-height: 0;
 }
+/* The hero toolbelt is absolutely positioned over a focused board. Reserve its
+   row for a live pane so it cannot cover actions such as “Run wall from here”. */
+.compare-filmstrip-board.is-hero:has(.compare-focus-pane) .compare-focus-pane {
+    box-sizing: border-box;
+    padding-top: 44px;
+}
 .compare-focus-pane-chip {
     display: flex;
     align-items: center;
@@ -1364,6 +1370,9 @@ export const COMPARE_PANEL_STYLES = `
         gap: 6px;
         padding: 0;
         pointer-events: auto;
+    }
+    .compare-filmstrip-board.is-hero:has(.compare-focus-pane) .compare-focus-pane {
+        padding-top: 0;
     }
     .compare-filmstrip--speaker .compare-hero-open-lab {
         justify-self: end;

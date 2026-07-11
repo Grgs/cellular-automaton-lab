@@ -83,6 +83,46 @@ describe("interactions/editor-session", () => {
         expect(clearGestureOutline).toHaveBeenCalled();
     });
 
+    it("commits the anchor cell for an armed brush click", async () => {
+        const clickCells = [{ id: "c:0:0", x: 0, y: 0, state: 1 }];
+        const commitEditorCells = vi.fn(async () => null as SimulationSnapshot | null);
+
+        vi.doMock("../editor-operations.js", () => ({
+            buildBrushCells: vi.fn(() => clickCells),
+            buildEditorToolCells: vi.fn(() => clickCells),
+        }));
+        vi.doMock("./editor-session-commit.js", () => ({
+            createEditorCommitRuntime: () => ({
+                ensurePausedForEditing: vi.fn(async () => true),
+                commitEditorCells,
+            }),
+        }));
+
+        const { createEditorSessionController } = await import("./editor-session.js");
+        const controller = createEditorSessionController({
+            state: editorStateStub(),
+            getPaintState: () => 1,
+            getEditorTool: () => "brush",
+            getBrushSize: () => 1,
+            previewPaintCells: vi.fn(),
+            clearPreview: vi.fn(),
+            setGestureOutline: vi.fn(),
+            flashGestureOutline: vi.fn(),
+            clearGestureOutline: vi.fn(),
+            setCellsRequest: vi.fn(),
+            postControl: vi.fn(),
+            renderControlPanel: vi.fn(),
+            setPointerCapture: vi.fn(),
+            releasePointerCapture: vi.fn(),
+            runStateMutation: vi.fn(async (task: () => Promise<SimulationSnapshot>) => task()),
+        });
+
+        await controller.beginPointerSession({ id: "c:0:0", x: 0, y: 0 }, 1);
+        await controller.handlePointerUp();
+
+        expect(commitEditorCells).toHaveBeenCalledWith(clickCells);
+    });
+
     it("shows and flashes a paint outline for armed line drags", async () => {
         const previewCells = [
             { id: "c:0:0", x: 0, y: 0, state: 1 },

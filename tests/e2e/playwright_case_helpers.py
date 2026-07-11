@@ -159,6 +159,12 @@ class SharedUiFlowHelpers:
         canvas.click(position={"x": target_x, "y": target_y})
 
     def _paint_canvas_center(self) -> None:
+        # The Lab presents editing as an explicit mode. Arm it before painting
+        # so this helper exercises the same visible interaction on both the
+        # server and standalone runtimes.
+        arm_button = self._case().page.locator("#canvas-toolbar-arm-btn")
+        if arm_button.is_visible():
+            arm_button.click()
         self._click_canvas_center()
         self._expect("#canvas-toolbar-undo-btn").to_be_enabled()
 

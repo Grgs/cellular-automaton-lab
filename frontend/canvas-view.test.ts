@@ -451,7 +451,7 @@ describe("canvas-view", () => {
         ).toBe("c:1:1");
     });
 
-    it("centers presentation-only canvases inside larger viewports without centering backend-synced grids", async () => {
+    it("delegates canvas centering to the grid viewport", async () => {
         const resize = vi.fn(() => ({ ...BASE_METRICS, cssWidth: 120, cssHeight: 60 }));
 
         vi.doMock("./canvas/surface.js", () => ({
@@ -480,18 +480,6 @@ describe("canvas-view", () => {
         vi.doMock("./canvas/cache.js", () => ({
             resolveGeometryCache: () => ({ cacheKey: "cache", geometryCache: null }),
         }));
-        vi.doMock("./topology-catalog.js", async () => {
-            const actual =
-                await vi.importActual<typeof import("./topology-catalog.js")>(
-                    "./topology-catalog.js",
-                );
-            return {
-                ...actual,
-                topologyUsesBackendViewportSync: (
-                    spec: { tiling_family?: string } | null | undefined,
-                ) => String(spec?.tiling_family) === "square",
-            };
-        });
         vi.doMock("./canvas/render-style.js", () => ({
             DEFAULT_COLORS: {
                 line: "rgba(31, 36, 48, 0.16)",
@@ -582,7 +570,7 @@ describe("canvas-view", () => {
             "pinwheel",
         );
 
-        expect(canvas.style.margin).toBe("50px");
+        expect(canvas.style.margin).toBe("0px");
 
         view.render(
             {
