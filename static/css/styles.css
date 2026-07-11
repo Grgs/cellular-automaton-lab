@@ -1390,7 +1390,7 @@ button.theme-toggle .theme-icon-moon {
 
 @media (min-width: 861px) {
     .main-stage {
-        grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+        grid-template-columns: minmax(0, 1fr) auto;
         gap: 12px;
     }
 
@@ -1403,9 +1403,12 @@ button.theme-toggle .theme-icon-moon {
         inset: auto;
         grid-column: 2;
         grid-row: 1;
-        width: auto;
+        width: clamp(300px, 28vw, 380px);
+        max-width: 42vw;
         height: 100%;
         max-height: none;
+        resize: horizontal;
+        overflow: auto;
         border: 1px solid var(--line);
         border-radius: 16px;
         box-shadow: var(--shadow);
@@ -2386,6 +2389,23 @@ button.theme-toggle .theme-icon-moon {
 }
 
 @media (max-width: 860px) {
+    .wall-header {
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    h1.wall-brand {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .shell-route-tab {
+        min-width: 62px;
+        padding-inline: 8px;
+    }
+
     .compare-dock-icon {
         width: 34px;
         min-width: 34px;

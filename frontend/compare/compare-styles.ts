@@ -59,9 +59,8 @@ export const COMPARE_PANEL_STYLES = `
 }
 .wall-page[hidden] { display: none; }
 .wall-page:focus { outline: none; }
-/* The body under the fixed header is exactly one screen: the stage fills it and
-   the docked transport pins beneath. Configuration overlays from the bottom
-   sheet rather than scrolling below the fold, so nothing here scrolls. */
+/* Desktop keeps the wall inside the shared shell. Compact layouts opt into a
+   contained vertical scroll below so boards and controls never get clipped. */
 .compare-content {
     flex: 1 1 auto;
     min-height: 0;
@@ -182,7 +181,7 @@ export const COMPARE_PANEL_STYLES = `
     min-width: 0;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(228px, 286px);
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
 }
 .compare-stage-main {
@@ -225,23 +224,59 @@ export const COMPARE_PANEL_STYLES = `
 .compare-stage-hero-title { font-size: 15px; color: var(--ink, #1f2430); }
 .compare-stage-hero-blurb { font-size: 12px; margin: 0; max-width: 360px; line-height: 1.4; }
 .compare-explainer {
+    width: 132px;
     min-width: 0;
     min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px;
+    align-self: start;
+    padding: 0;
     border: 1px solid var(--compare-line);
     border-radius: 10px;
     background: var(--compare-panel);
     color: var(--compare-muted);
     overflow: auto;
 }
+.compare-explainer[open] {
+    width: min(286px, 24vw);
+    max-height: 100%;
+    padding: 12px;
+}
 .compare-explainer-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 11px 12px;
     color: var(--compare-text);
     font-size: 13px;
     font-weight: 700;
+    cursor: pointer;
+    list-style: none;
 }
+.compare-explainer-title::-webkit-details-marker { display: none; }
+.compare-explainer-title::after {
+    content: "i";
+    display: inline-grid;
+    place-items: center;
+    width: 17px;
+    height: 17px;
+    flex: 0 0 auto;
+    border: 1px solid var(--compare-line);
+    border-radius: 999px;
+    color: var(--compare-muted);
+    font-family: var(--serif, serif);
+    font-size: 12px;
+    font-style: italic;
+}
+.compare-explainer[open] .compare-explainer-title {
+    padding: 0 0 10px;
+    border-bottom: 1px solid var(--compare-line);
+}
+.compare-explainer[open] .compare-explainer-title::after {
+    content: "−";
+    font-family: inherit;
+    font-style: normal;
+}
+.compare-explainer:not([open]) .compare-explainer-body { display: none; }
 .compare-explainer-body {
     min-height: 0;
     display: flex;
@@ -1198,9 +1233,19 @@ export const COMPARE_PANEL_STYLES = `
     max-height: 100%;
 }
 @media (max-width: 960px) {
+    .compare-content {
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+    .wall-screen {
+        height: auto;
+        min-height: 100%;
+        grid-template-rows: auto auto;
+    }
     .compare-stage {
         padding: 10px;
-        overflow: auto;
+        overflow: visible;
     }
     .compare-stage-frame {
         display: flex;
@@ -1226,16 +1271,21 @@ export const COMPARE_PANEL_STYLES = `
     }
     .compare-explainer {
         flex: 0 0 auto;
+        width: 100%;
         overflow: visible;
+    }
+    .compare-explainer[open] {
+        width: 100%;
+        max-height: none;
     }
     .compare-dock .compare-filmstrip-transport {
         flex: 1 1 100%;
     }
 }
 @media (max-width: 640px) {
-    .wall-header { align-items: center; }
     /* Keep the wall comparative on phones: setup is compact and the gallery
        stays two-up until a board is focused. */
+    .compare-explainer { display: none; }
     .compare-stage { padding: 8px; }
     .compare-setup-strip {
         display: grid;
@@ -1251,6 +1301,10 @@ export const COMPARE_PANEL_STYLES = `
     .compare-setup-label { font-size: 9px; }
     .compare-setup-value {
         font-size: 12px;
+        overflow: visible;
+        text-overflow: clip;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
     .compare-setup-action-row { gap: 4px; }
     .compare-setup-action-text { font-size: 10px; }
