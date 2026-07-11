@@ -57,7 +57,9 @@ import {
     type SavedCompareRun,
     type SavedTilingSet,
 } from "./compare-storage.js";
-import { COMPARE_PANEL_STYLES } from "./compare-styles.js";
+// `?inline` keeps the stylesheet inside this chunk (not an emitted .css asset)
+// while letting Vite's CSS minifier strip the comments and whitespace.
+import COMPARE_PANEL_STYLES from "./compare-panel.css?inline";
 import { ruleSupportsTilingFamily } from "../rule-compatibility.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
@@ -587,7 +589,7 @@ export function createComparePanelContent(
     // Live forks are per-board (keyed by geometry) and outlive a focus change:
     // a forked board keeps running as a live tile in the gallery, and speaker
     // view of it is just this same pane shown at hero size (see the
-    // `:not(.is-hero)` compact styling in compare-styles.ts).
+    // `:not(.is-hero)` compact styling in compare-panel.css).
     const forkedBoards = new Map<string, FocusPaneHandle>();
     // Live in-place forking needs an independent server session; standalone
     // (no baseSessionId) forks into the Lab instead. A host may also cap

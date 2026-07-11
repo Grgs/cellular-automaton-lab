@@ -60,6 +60,10 @@ export default defineConfig(({ mode }) => {
         test: {
             environment: "jsdom",
             include: ["frontend/**/*.test.ts"],
+            // Without this, Vitest stubs CSS imports to empty strings and the
+            // `?inline`-imported compare-panel stylesheet would inject an empty
+            // <style> tag in jsdom tests.
+            css: true,
             coverage: {
                 provider: "v8",
                 include: ["frontend/**/*.ts"],
