@@ -70,7 +70,7 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
     );
     // In the gallery (or the speaker-view strip) this pane collapses to just
     // this badge over the canvas -- see the `:not(.is-hero)` compact styling
-    // in compare-styles.ts -- so it carries the generation on its own; the
+    // in compare-panel.css -- so it carries the generation on its own; the
     // full chip's `info` line already explains "detached" for the hero.
     const badge = element("span", "compare-focus-pane-badge", `live · gen ${frameIndex}`);
     const palette = element("div", "compare-focus-pane-palette");
