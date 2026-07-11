@@ -59,7 +59,7 @@ history-gated demo prominence; true code-split of the analytics charts.
 
 ## Later
 
-- `socolar-12-fold` now ships as the dodecagonal rhomb tiling via the de Bruijn multigrid (MLD to `shield`). If the exact Socolar (1989) marked substitution rule becomes available in a portable form, add it as the literal substitution; the current entry is a `canonical_patch` multigrid crop, not the marked-prototile substitution. See [docs/TILING_KNOWN_DEVIATIONS.md](docs/TILING_KNOWN_DEVIATIONS.md).
+- `socolar-12-fold` now ships as the dodecagonal rhomb tiling via the de Bruijn multigrid (MLD to `shield`), and the canonical hexagon-bearing Socolar now ships separately as `socolar-hexagonal` via Socolar's cut-and-project scheme, verified tile-for-tile against the Tilings Encyclopedia patch (see docs/contracts/socolar-hexagonal-generator/README.md). The undecorated marked substitution was extracted during that work but is inherently non-deterministic (Conway-worm pillow phases), so the projection construction is the canonical generator. `socolar-hexagonal` awaits manual visual review before promotion out of Experimental.
 - Revisit `pinwheel` verification with stronger substitution-matrix and direct local-patch invariants, now that its contiguity is derived from exact segment-overlap neighbors on the exact-affine path.
 - Explore larger-sample or quotient-surface periodic proofs if the current finite-sample verifier ever stops being discriminating enough for the catalog.
 - Extend Shield decoration rendering beyond the current dead-state accenting if decoration metadata becomes authoritative across more visual states.

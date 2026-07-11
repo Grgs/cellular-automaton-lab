@@ -24,6 +24,7 @@ from backend.simulation.aperiodic_family_manifest import (
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
     SOCOLAR_12_FOLD_GEOMETRY,
+    SOCOLAR_HEXAGONAL_GEOMETRY,
     SPECTRE_GEOMETRY,
     SPHINX_COMPACT_PAIR_GEOMETRY,
     SPHINX_GEOMETRY,
@@ -480,6 +481,11 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
         # Multigrid crop half-extent 0.6 * 1.5^d gives ~57/127/268/634 cells at
         # depths 0..3. Default 2 is a snappy starting view; cap at 4.
         SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 4),
+    ),
+    SOCOLAR_HEXAGONAL_GEOMETRY: _translated_aperiodic_family(
+        SOCOLAR_HEXAGONAL_GEOMETRY,
+        # TODO: tune patch depth ceiling once cell-count growth is known.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 4),
     ),
 }
 

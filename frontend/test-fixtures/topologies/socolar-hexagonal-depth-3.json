@@ -1,0 +1,3860 @@
+{
+  "cellSize": 12,
+  "geometry": "socolar-hexagonal",
+  "height": 0,
+  "patchDepth": 3,
+  "topology": {
+    "cells": [
+      {
+        "center": {
+          "x": -1.366025,
+          "y": 1.366025
+        },
+        "id": "sxh:hx:-2:-2:2:2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-1:-3:1:1",
+          "sxh:rh:-1:0:1:1",
+          "sxh:rh:-2:-3:3:4",
+          "sxh:sq:-1:-1:1:0",
+          "sxh:sq:-2:-1:3:3",
+          "sxh:sq:-3:-4:2:3"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.366025,
+            "y": 0.366025
+          },
+          {
+            "x": -0.5,
+            "y": 0.866025
+          },
+          {
+            "x": -0.5,
+            "y": 1.866025
+          },
+          {
+            "x": -1.366025,
+            "y": 2.366025
+          },
+          {
+            "x": -2.232051,
+            "y": 1.866025
+          },
+          {
+            "x": -2.232051,
+            "y": 0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.366025,
+          "y": 5.098076
+        },
+        "id": "sxh:hx:-2:-2:6:6",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-3:-1:8:6",
+          "sxh:rh:-3:-2:5:5",
+          "sxh:rh:0:-1:5:6",
+          "sxh:sq:-1:-1:7:6",
+          "sxh:sq:-1:-2:4:5",
+          "sxh:sq:-4:-3:7:7"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": 4.232051
+          },
+          {
+            "x": 0.133975,
+            "y": 4.232051
+          },
+          {
+            "x": 0.633975,
+            "y": 5.098076
+          },
+          {
+            "x": 0.133975,
+            "y": 5.964102
+          },
+          {
+            "x": -0.866025,
+            "y": 5.964102
+          },
+          {
+            "x": -1.366025,
+            "y": 5.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.732051,
+          "y": 0.0
+        },
+        "id": "sxh:hx:-2:-4:0:2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-1:-3:1:1",
+          "sxh:rh:-1:-5:-2:2",
+          "sxh:rh:-4:-5:1:2",
+          "sxh:sq:-3:-4:2:3",
+          "sxh:sq:-3:-5:-1:2",
+          "sxh:sq:0:-3:-1:1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.232051,
+            "y": -0.866025
+          },
+          {
+            "x": -2.232051,
+            "y": -0.866025
+          },
+          {
+            "x": -1.732051,
+            "y": 0.0
+          },
+          {
+            "x": -2.232051,
+            "y": 0.866025
+          },
+          {
+            "x": -3.232051,
+            "y": 0.866025
+          },
+          {
+            "x": -3.732051,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.732051,
+          "y": 2.732051
+        },
+        "id": "sxh:hx:-4:-4:4:4",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-2:-3:3:4",
+          "sxh:rh:-5:-5:3:5",
+          "sxh:rh:-5:-5:6:5",
+          "sxh:sq:-3:-3:5:4",
+          "sxh:sq:-3:-4:2:3",
+          "sxh:sq:-6:-5:5:5"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.232051,
+            "y": 1.866025
+          },
+          {
+            "x": -2.232051,
+            "y": 1.866025
+          },
+          {
+            "x": -1.732051,
+            "y": 2.732051
+          },
+          {
+            "x": -2.232051,
+            "y": 3.598076
+          },
+          {
+            "x": -3.232051,
+            "y": 3.598076
+          },
+          {
+            "x": -3.732051,
+            "y": 2.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.232051,
+          "y": 4.598076
+        },
+        "id": "sxh:hx:-4:-4:6:6",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-3:-2:5:5",
+          "sxh:rh:-5:-5:6:5",
+          "sxh:rh:-5:-5:6:8",
+          "sxh:sq:-3:-3:5:4",
+          "sxh:sq:-4:-3:7:7",
+          "sxh:sq:-5:-6:6:7"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -2.232051,
+            "y": 3.598076
+          },
+          {
+            "x": -1.366025,
+            "y": 4.098076
+          },
+          {
+            "x": -1.366025,
+            "y": 5.098076
+          },
+          {
+            "x": -2.232051,
+            "y": 5.598076
+          },
+          {
+            "x": -3.098076,
+            "y": 5.098076
+          },
+          {
+            "x": -3.098076,
+            "y": 4.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.098076,
+          "y": 1.366025
+        },
+        "id": "sxh:hx:-4:-6:2:4",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-4:-5:1:2",
+          "sxh:rh:-4:-8:1:5",
+          "sxh:rh:-5:-5:3:5",
+          "sxh:sq:-3:-4:2:3",
+          "sxh:sq:-4:-7:1:3",
+          "sxh:sq:-5:-7:3:6"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.098076,
+            "y": 0.366025
+          },
+          {
+            "x": -3.232051,
+            "y": 0.866025
+          },
+          {
+            "x": -3.232051,
+            "y": 1.866025
+          },
+          {
+            "x": -4.098076,
+            "y": 2.366025
+          },
+          {
+            "x": -4.964102,
+            "y": 1.866025
+          },
+          {
+            "x": -4.964102,
+            "y": 0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.964102,
+          "y": 1.866025
+        },
+        "id": "sxh:hx:-6:-8:2:6",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-4:-8:1:5",
+          "sxh:sq:-5:-7:3:6",
+          "sxh:sq:-5:-8:0:5"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -6.464102,
+            "y": 1.0
+          },
+          {
+            "x": -5.464102,
+            "y": 1.0
+          },
+          {
+            "x": -4.964102,
+            "y": 1.866025
+          },
+          {
+            "x": -5.464102,
+            "y": 2.732051
+          },
+          {
+            "x": -6.464102,
+            "y": 2.732051
+          },
+          {
+            "x": -6.964102,
+            "y": 1.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.232051,
+          "y": -1.866025
+        },
+        "id": "sxh:hx:0:-4:-2:0",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-1:-5:-2:-1",
+          "sxh:rh:-1:-5:-2:2",
+          "sxh:rh:0:-2:-1:-1",
+          "sxh:sq:-1:-6:-2:1",
+          "sxh:sq:0:-3:-1:1",
+          "sxh:sq:1:-3:-3:-2"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -2.232051,
+            "y": -2.866025
+          },
+          {
+            "x": -1.366025,
+            "y": -2.366025
+          },
+          {
+            "x": -1.366025,
+            "y": -1.366025
+          },
+          {
+            "x": -2.232051,
+            "y": -0.866025
+          },
+          {
+            "x": -3.098076,
+            "y": -1.366025
+          },
+          {
+            "x": -3.098076,
+            "y": -2.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.732051,
+          "y": -3.732051
+        },
+        "id": "sxh:hx:0:-4:-4:-2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-1:-5:-2:-1",
+          "sxh:rh:-1:-5:-5:-1",
+          "sxh:rh:2:-4:-5:-3",
+          "sxh:sq:-2:-5:-3:-1",
+          "sxh:sq:1:-3:-3:-2",
+          "sxh:sq:1:-4:-6:-3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.232051,
+            "y": -4.598076
+          },
+          {
+            "x": -2.232051,
+            "y": -4.598076
+          },
+          {
+            "x": -1.732051,
+            "y": -3.732051
+          },
+          {
+            "x": -2.232051,
+            "y": -2.866025
+          },
+          {
+            "x": -3.232051,
+            "y": -2.866025
+          },
+          {
+            "x": -3.732051,
+            "y": -3.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.5,
+          "y": 1.866025
+        },
+        "id": "sxh:hx:0:0:2:2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-1:-1:4:3",
+          "sxh:rh:-1:0:1:1",
+          "sxh:rh:2:0:1:1",
+          "sxh:sq:-2:-1:3:3",
+          "sxh:sq:1:0:0:1",
+          "sxh:sq:1:1:3:2"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 1.0
+          },
+          {
+            "x": 1.0,
+            "y": 1.0
+          },
+          {
+            "x": 1.5,
+            "y": 1.866025
+          },
+          {
+            "x": 1.0,
+            "y": 2.732051
+          },
+          {
+            "x": 0.0,
+            "y": 2.732051
+          },
+          {
+            "x": -0.5,
+            "y": 1.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.0,
+          "y": 3.732051
+        },
+        "id": "sxh:hx:0:0:4:4",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:-1:-1:4:3",
+          "sxh:rh:0:-1:5:6",
+          "sxh:rh:0:2:5:3",
+          "sxh:sq:-1:-2:4:5",
+          "sxh:sq:0:1:5:5",
+          "sxh:sq:1:1:3:2"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 2.732051
+          },
+          {
+            "x": 1.866025,
+            "y": 3.232051
+          },
+          {
+            "x": 1.866025,
+            "y": 4.232051
+          },
+          {
+            "x": 1.0,
+            "y": 4.732051
+          },
+          {
+            "x": 0.133975,
+            "y": 4.232051
+          },
+          {
+            "x": 0.133975,
+            "y": 3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.366025,
+          "y": -2.366025
+        },
+        "id": "sxh:hx:2:-2:-2:-2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:0:-2:-1:-1",
+          "sxh:rh:3:-1:-4:-3",
+          "sxh:rh:3:-2:-1:-1",
+          "sxh:sq:1:-2:0:-1",
+          "sxh:sq:1:-3:-3:-2",
+          "sxh:sq:4:-1:-3:-3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": -3.232051
+          },
+          {
+            "x": 0.133975,
+            "y": -3.232051
+          },
+          {
+            "x": 0.633975,
+            "y": -2.366025
+          },
+          {
+            "x": 0.133975,
+            "y": -1.5
+          },
+          {
+            "x": -0.866025,
+            "y": -1.5
+          },
+          {
+            "x": -1.366025,
+            "y": -2.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.866025,
+          "y": -4.232051
+        },
+        "id": "sxh:hx:2:-2:-4:-4",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:2:-1:-5:-6",
+          "sxh:rh:2:-4:-5:-3",
+          "sxh:rh:3:-1:-4:-3",
+          "sxh:sq:1:-3:-3:-2",
+          "sxh:sq:2:-3:-5:-5",
+          "sxh:sq:3:0:-4:-5"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": -5.232051
+          },
+          {
+            "x": 0.0,
+            "y": -4.732051
+          },
+          {
+            "x": 0.0,
+            "y": -3.732051
+          },
+          {
+            "x": -0.866025,
+            "y": -3.232051
+          },
+          {
+            "x": -1.732051,
+            "y": -3.732051
+          },
+          {
+            "x": -1.732051,
+            "y": -4.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.366025,
+          "y": 1.366025
+        },
+        "id": "sxh:hx:2:2:2:0",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:2:0:1:1",
+          "sxh:rh:3:3:2:-2",
+          "sxh:rh:3:3:2:1",
+          "sxh:sq:1:1:3:2",
+          "sxh:sq:2:1:1:-1",
+          "sxh:sq:3:4:2:-1"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": 0.366025
+          },
+          {
+            "x": 3.232051,
+            "y": 0.866025
+          },
+          {
+            "x": 3.232051,
+            "y": 1.866025
+          },
+          {
+            "x": 2.366025,
+            "y": 2.366025
+          },
+          {
+            "x": 1.5,
+            "y": 1.866025
+          },
+          {
+            "x": 1.5,
+            "y": 0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.866025,
+          "y": 3.232051
+        },
+        "id": "sxh:hx:2:2:4:2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:0:2:5:3",
+          "sxh:rh:3:3:2:1",
+          "sxh:rh:3:3:5:1",
+          "sxh:sq:1:1:3:2",
+          "sxh:sq:1:2:6:3",
+          "sxh:sq:4:3:3:1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": 2.366025
+          },
+          {
+            "x": 3.366025,
+            "y": 2.366025
+          },
+          {
+            "x": 3.866025,
+            "y": 3.232051
+          },
+          {
+            "x": 3.366025,
+            "y": 4.098076
+          },
+          {
+            "x": 2.366025,
+            "y": 4.098076
+          },
+          {
+            "x": 1.866025,
+            "y": 3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.232051,
+          "y": 4.598076
+        },
+        "id": "sxh:hx:2:4:6:2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:3:3:5:1",
+          "sxh:sq:1:2:6:3",
+          "sxh:sq:3:5:5:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.232051,
+            "y": 3.598076
+          },
+          {
+            "x": 5.098076,
+            "y": 4.098076
+          },
+          {
+            "x": 5.098076,
+            "y": 5.098076
+          },
+          {
+            "x": 4.232051,
+            "y": 5.598076
+          },
+          {
+            "x": 3.366025,
+            "y": 5.098076
+          },
+          {
+            "x": 3.366025,
+            "y": 4.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.5,
+          "y": -1.866025
+        },
+        "id": "sxh:hx:4:0:-2:-2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:3:-2:-1:-1",
+          "sxh:rh:3:1:-1:-1",
+          "sxh:rh:4:1:-3:-4",
+          "sxh:sq:3:-1:-1:0",
+          "sxh:sq:4:-1:-3:-3",
+          "sxh:sq:5:2:-2:-3"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": -2.866025
+          },
+          {
+            "x": 2.366025,
+            "y": -2.366025
+          },
+          {
+            "x": 2.366025,
+            "y": -1.366025
+          },
+          {
+            "x": 1.5,
+            "y": -0.866025
+          },
+          {
+            "x": 0.633975,
+            "y": -1.366025
+          },
+          {
+            "x": 0.633975,
+            "y": -2.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.5,
+          "y": -5.598076
+        },
+        "id": "sxh:hx:4:0:-6:-6",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:2:-1:-5:-6",
+          "sxh:rh:5:0:-5:-5",
+          "sxh:sq:3:0:-4:-5"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": -6.464102
+          },
+          {
+            "x": 1.0,
+            "y": -6.464102
+          },
+          {
+            "x": 1.5,
+            "y": -5.598076
+          },
+          {
+            "x": 1.0,
+            "y": -4.732051
+          },
+          {
+            "x": 0.0,
+            "y": -4.732051
+          },
+          {
+            "x": -0.5,
+            "y": -5.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.866025,
+          "y": -0.5
+        },
+        "id": "sxh:hx:4:2:0:-2",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:3:1:-1:-1",
+          "sxh:rh:3:3:2:-2",
+          "sxh:rh:6:3:-1:-2",
+          "sxh:sq:2:1:1:-1",
+          "sxh:sq:5:2:-2:-3",
+          "sxh:sq:5:3:1:-2"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": -1.366025
+          },
+          {
+            "x": 3.366025,
+            "y": -1.366025
+          },
+          {
+            "x": 3.866025,
+            "y": -0.5
+          },
+          {
+            "x": 3.366025,
+            "y": 0.366025
+          },
+          {
+            "x": 2.366025,
+            "y": 0.366025
+          },
+          {
+            "x": 1.866025,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.866025,
+          "y": -3.232051
+        },
+        "id": "sxh:hx:6:2:-4:-4",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:4:1:-3:-4",
+          "sxh:rh:7:3:-3:-5",
+          "sxh:rh:7:3:-6:-5",
+          "sxh:sq:5:1:-5:-4",
+          "sxh:sq:5:2:-2:-3",
+          "sxh:sq:8:3:-5:-5"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": -4.098076
+          },
+          {
+            "x": 3.366025,
+            "y": -4.098076
+          },
+          {
+            "x": 3.866025,
+            "y": -3.232051
+          },
+          {
+            "x": 3.366025,
+            "y": -2.366025
+          },
+          {
+            "x": 2.366025,
+            "y": -2.366025
+          },
+          {
+            "x": 1.866025,
+            "y": -3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.366025,
+          "y": -5.098076
+        },
+        "id": "sxh:hx:6:2:-6:-6",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:5:0:-5:-5",
+          "sxh:rh:7:3:-6:-5",
+          "sxh:sq:5:1:-5:-4"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": -6.098076
+          },
+          {
+            "x": 3.232051,
+            "y": -5.598076
+          },
+          {
+            "x": 3.232051,
+            "y": -4.598076
+          },
+          {
+            "x": 2.366025,
+            "y": -4.098076
+          },
+          {
+            "x": 1.5,
+            "y": -4.598076
+          },
+          {
+            "x": 1.5,
+            "y": -5.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.232051,
+          "y": -1.866025
+        },
+        "id": "sxh:hx:6:4:-2:-4",
+        "kind": "socolar-hexagonal-hexagon",
+        "neighbors": [
+          "sxh:rh:6:3:-1:-2",
+          "sxh:rh:6:6:-1:-5",
+          "sxh:rh:7:3:-3:-5",
+          "sxh:sq:5:2:-2:-3",
+          "sxh:sq:6:5:-1:-3",
+          "sxh:sq:7:5:-3:-6"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.232051,
+            "y": -2.866025
+          },
+          {
+            "x": 5.098076,
+            "y": -2.366025
+          },
+          {
+            "x": 5.098076,
+            "y": -1.366025
+          },
+          {
+            "x": 4.232051,
+            "y": -0.866025
+          },
+          {
+            "x": 3.366025,
+            "y": -1.366025
+          },
+          {
+            "x": 3.366025,
+            "y": -2.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.066987,
+          "y": 2.982051
+        },
+        "id": "sxh:rh:-1:-1:4:3",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:0:0:2:2",
+          "sxh:hx:0:0:4:4",
+          "sxh:sq:-1:-2:4:5",
+          "sxh:sq:-2:-1:3:3"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 2.732051
+          },
+          {
+            "x": 0.133975,
+            "y": 3.232051
+          },
+          {
+            "x": -0.866025,
+            "y": 3.232051
+          },
+          {
+            "x": 0.0,
+            "y": 2.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.549038,
+          "y": 0.183012
+        },
+        "id": "sxh:rh:-1:-3:1:1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-2:2:2",
+          "sxh:hx:-2:-4:0:2",
+          "sxh:sq:-1:-1:1:0",
+          "sxh:sq:0:-3:-1:1"
+        ],
+        "orientation_token": "120",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": -0.5
+          },
+          {
+            "x": -1.366025,
+            "y": 0.366025
+          },
+          {
+            "x": -2.232051,
+            "y": 0.866025
+          },
+          {
+            "x": -1.732051,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.165064,
+          "y": -2.616025
+        },
+        "id": "sxh:rh:-1:-5:-2:-1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:0:-4:-2:0",
+          "sxh:hx:0:-4:-4:-2",
+          "sxh:sq:-1:-6:-2:1",
+          "sxh:sq:-2:-5:-3:-1"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -2.232051,
+            "y": -2.866025
+          },
+          {
+            "x": -3.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -4.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -3.232051,
+            "y": -2.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.165064,
+          "y": -1.116025
+        },
+        "id": "sxh:rh:-1:-5:-2:2",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-4:0:2",
+          "sxh:hx:0:-4:-2:0",
+          "sxh:sq:-1:-6:-2:1",
+          "sxh:sq:-3:-5:-1:2"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.098076,
+            "y": -1.366025
+          },
+          {
+            "x": -3.098076,
+            "y": -1.366025
+          },
+          {
+            "x": -2.232051,
+            "y": -0.866025
+          },
+          {
+            "x": -3.232051,
+            "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.915063,
+          "y": -3.915063
+        },
+        "id": "sxh:rh:-1:-5:-5:-1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:0:-4:-4:-2",
+          "sxh:sq:-1:-7:-5:0",
+          "sxh:sq:-2:-5:-3:-1"
+        ],
+        "orientation_token": "120",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.232051,
+            "y": -4.598076
+          },
+          {
+            "x": -3.732051,
+            "y": -3.732051
+          },
+          {
+            "x": -4.598076,
+            "y": -3.232051
+          },
+          {
+            "x": -4.098076,
+            "y": -4.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.25,
+          "y": 0.933012
+        },
+        "id": "sxh:rh:-1:0:1:1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-2:2:2",
+          "sxh:hx:0:0:2:2",
+          "sxh:sq:-1:-1:1:0",
+          "sxh:sq:1:0:0:1"
+        ],
+        "orientation_token": "90",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.0,
+            "y": 1.0
+          },
+          {
+            "x": -0.5,
+            "y": 1.866025
+          },
+          {
+            "x": -0.5,
+            "y": 0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.683012,
+          "y": 5.781089
+        },
+        "id": "sxh:rh:-1:1:7:5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:-1:-1:7:6",
+          "sxh:sq:0:1:5:5"
+        ],
+        "orientation_token": "120",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": 5.098076
+          },
+          {
+            "x": 1.866025,
+            "y": 5.964102
+          },
+          {
+            "x": 1.0,
+            "y": 6.464102
+          },
+          {
+            "x": 1.5,
+            "y": 5.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.549038,
+          "y": 2.549038
+        },
+        "id": "sxh:rh:-2:-3:3:4",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-2:2:2",
+          "sxh:hx:-4:-4:4:4",
+          "sxh:sq:-2:-1:3:3",
+          "sxh:sq:-3:-3:5:4"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -2.232051,
+            "y": 1.866025
+          },
+          {
+            "x": -1.366025,
+            "y": 2.366025
+          },
+          {
+            "x": -0.866025,
+            "y": 3.232051
+          },
+          {
+            "x": -1.732051,
+            "y": 2.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.781089,
+          "y": -3.049038
+        },
+        "id": "sxh:rh:-2:-7:-3:0",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:-1:-7:-5:0",
+          "sxh:sq:-2:-5:-3:-1",
+          "sxh:sq:-3:-7:-1:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -5.464102,
+            "y": -3.732051
+          },
+          {
+            "x": -4.598076,
+            "y": -3.232051
+          },
+          {
+            "x": -4.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -4.964102,
+            "y": -2.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.066988,
+          "y": 6.214102
+        },
+        "id": "sxh:rh:-3:-1:8:6",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-2:6:6",
+          "sxh:sq:-1:-1:7:6"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": 5.964102
+          },
+          {
+            "x": 0.133975,
+            "y": 5.964102
+          },
+          {
+            "x": 1.0,
+            "y": 6.464102
+          },
+          {
+            "x": 0.0,
+            "y": 6.464102
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.116025,
+          "y": 4.165063
+        },
+        "id": "sxh:rh:-3:-2:5:5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-2:6:6",
+          "sxh:hx:-4:-4:6:6",
+          "sxh:sq:-1:-2:4:5",
+          "sxh:sq:-3:-3:5:4"
+        ],
+        "orientation_token": "90",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": 3.232051
+          },
+          {
+            "x": -0.866025,
+            "y": 4.232051
+          },
+          {
+            "x": -1.366025,
+            "y": 5.098076
+          },
+          {
+            "x": -1.366025,
+            "y": 4.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.348076,
+          "y": -1.433012
+        },
+        "id": "sxh:rh:-3:-6:-1:1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:-1:-6:-2:1",
+          "sxh:sq:-3:-5:-1:2",
+          "sxh:sq:-3:-7:-1:0",
+          "sxh:sq:-5:-6:0:1"
+        ],
+        "orientation_token": "90",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -4.098076,
+            "y": -1.366025
+          },
+          {
+            "x": -4.598076,
+            "y": -0.5
+          },
+          {
+            "x": -4.598076,
+            "y": -1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.915063,
+          "y": 0.183013
+        },
+        "id": "sxh:rh:-4:-5:1:2",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-4:0:2",
+          "sxh:hx:-4:-6:2:4",
+          "sxh:sq:-3:-5:-1:2",
+          "sxh:sq:-4:-7:1:3"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.598076,
+            "y": -0.5
+          },
+          {
+            "x": -3.732051,
+            "y": 0.0
+          },
+          {
+            "x": -3.232051,
+            "y": 0.866025
+          },
+          {
+            "x": -4.098076,
+            "y": 0.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.214102,
+          "y": 0.933012
+        },
+        "id": "sxh:rh:-4:-8:1:5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-4:-6:2:4",
+          "sxh:hx:-6:-8:2:6",
+          "sxh:sq:-4:-7:1:3",
+          "sxh:sq:-5:-8:0:5"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -5.464102,
+            "y": 0.0
+          },
+          {
+            "x": -4.964102,
+            "y": 0.866025
+          },
+          {
+            "x": -4.964102,
+            "y": 1.866025
+          },
+          {
+            "x": -5.464102,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.915063,
+          "y": 2.549038
+        },
+        "id": "sxh:rh:-5:-5:3:5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-4:-4:4:4",
+          "sxh:hx:-4:-6:2:4",
+          "sxh:sq:-5:-7:3:6",
+          "sxh:sq:-6:-5:5:5"
+        ],
+        "orientation_token": "120",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.232051,
+            "y": 1.866025
+          },
+          {
+            "x": -3.732051,
+            "y": 2.732051
+          },
+          {
+            "x": -4.598076,
+            "y": 3.232051
+          },
+          {
+            "x": -4.098076,
+            "y": 2.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.165063,
+          "y": 3.848076
+        },
+        "id": "sxh:rh:-5:-5:6:5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-4:-4:4:4",
+          "sxh:hx:-4:-4:6:6",
+          "sxh:sq:-5:-6:6:7",
+          "sxh:sq:-6:-5:5:5"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -2.232051,
+            "y": 3.598076
+          },
+          {
+            "x": -3.098076,
+            "y": 4.098076
+          },
+          {
+            "x": -4.098076,
+            "y": 4.098076
+          },
+          {
+            "x": -3.232051,
+            "y": 3.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.165064,
+          "y": 5.348076
+        },
+        "id": "sxh:rh:-5:-5:6:8",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-4:-4:6:6",
+          "sxh:sq:-5:-6:6:7"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.098076,
+            "y": 5.098076
+          },
+          {
+            "x": -3.098076,
+            "y": 5.098076
+          },
+          {
+            "x": -2.232051,
+            "y": 5.598076
+          },
+          {
+            "x": -3.232051,
+            "y": 5.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.531089,
+          "y": -1.75
+        },
+        "id": "sxh:rh:-5:-7:0:0",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:-3:-7:-1:0",
+          "sxh:sq:-5:-6:0:1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -6.464102,
+            "y": -2.0
+          },
+          {
+            "x": -5.464102,
+            "y": -2.0
+          },
+          {
+            "x": -4.598076,
+            "y": -1.5
+          },
+          {
+            "x": -5.598076,
+            "y": -1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.531089,
+          "y": -0.25
+        },
+        "id": "sxh:rh:-5:-7:0:3",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:-4:-7:1:3",
+          "sxh:sq:-5:-6:0:1",
+          "sxh:sq:-5:-8:0:5"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.598076,
+            "y": -0.5
+          },
+          {
+            "x": -5.464102,
+            "y": 0.0
+          },
+          {
+            "x": -6.464102,
+            "y": 0.0
+          },
+          {
+            "x": -5.598076,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.348076,
+          "y": 4.165063
+        },
+        "id": "sxh:rh:-6:-6:5:7",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:-5:-6:6:7",
+          "sxh:sq:-6:-5:5:5"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.598076,
+            "y": 3.232051
+          },
+          {
+            "x": -4.098076,
+            "y": 4.098076
+          },
+          {
+            "x": -4.098076,
+            "y": 5.098076
+          },
+          {
+            "x": -4.598076,
+            "y": 4.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.816987,
+          "y": 4.915063
+        },
+        "id": "sxh:rh:0:-1:5:6",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:-2:-2:6:6",
+          "sxh:hx:0:0:4:4",
+          "sxh:sq:-1:-1:7:6",
+          "sxh:sq:0:1:5:5"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.133975,
+            "y": 4.232051
+          },
+          {
+            "x": 1.0,
+            "y": 4.732051
+          },
+          {
+            "x": 1.5,
+            "y": 5.598076
+          },
+          {
+            "x": 0.633975,
+            "y": 5.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.116025,
+          "y": -1.433013
+        },
+        "id": "sxh:rh:0:-2:-1:-1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:0:-4:-2:0",
+          "sxh:hx:2:-2:-2:-2",
+          "sxh:sq:0:-3:-1:1",
+          "sxh:sq:1:-2:0:-1"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.366025,
+            "y": -2.366025
+          },
+          {
+            "x": -0.866025,
+            "y": -1.5
+          },
+          {
+            "x": -0.866025,
+            "y": -0.5
+          },
+          {
+            "x": -1.366025,
+            "y": -1.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.116025,
+          "y": 4.165064
+        },
+        "id": "sxh:rh:0:2:5:3",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:0:0:4:4",
+          "sxh:hx:2:2:4:2",
+          "sxh:sq:0:1:5:5",
+          "sxh:sq:1:2:6:3"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.866025,
+            "y": 3.232051
+          },
+          {
+            "x": 2.366025,
+            "y": 4.098076
+          },
+          {
+            "x": 2.366025,
+            "y": 5.098076
+          },
+          {
+            "x": 1.866025,
+            "y": 4.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.066987,
+          "y": -0.25
+        },
+        "id": "sxh:rh:1:-1:0:0",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:-1:-1:1:0",
+          "sxh:sq:1:-2:0:-1",
+          "sxh:sq:1:0:0:1",
+          "sxh:sq:3:-1:-1:0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": -0.5
+          },
+          {
+            "x": 0.133975,
+            "y": -0.5
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.0,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.683012,
+          "y": -5.415063
+        },
+        "id": "sxh:rh:2:-1:-5:-6",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:2:-2:-4:-4",
+          "sxh:hx:4:0:-6:-6",
+          "sxh:sq:2:-3:-5:-5"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.366025,
+            "y": -6.098076
+          },
+          {
+            "x": -0.5,
+            "y": -5.598076
+          },
+          {
+            "x": 0.0,
+            "y": -4.732051
+          },
+          {
+            "x": -0.866025,
+            "y": -5.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.982051,
+          "y": -4.665063
+        },
+        "id": "sxh:rh:2:-4:-5:-3",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:0:-4:-4:-2",
+          "sxh:hx:2:-2:-4:-4",
+          "sxh:sq:1:-4:-6:-3",
+          "sxh:sq:2:-3:-5:-5"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -2.232051,
+            "y": -5.598076
+          },
+          {
+            "x": -1.732051,
+            "y": -4.732051
+          },
+          {
+            "x": -1.732051,
+            "y": -3.732051
+          },
+          {
+            "x": -2.232051,
+            "y": -4.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.25,
+          "y": 0.933013
+        },
+        "id": "sxh:rh:2:0:1:1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:0:0:2:2",
+          "sxh:hx:2:2:2:0",
+          "sxh:sq:1:0:0:1",
+          "sxh:sq:2:1:1:-1"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.5,
+            "y": 0.866025
+          },
+          {
+            "x": 1.5,
+            "y": 1.866025
+          },
+          {
+            "x": 1.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.066988,
+          "y": -3.482051
+        },
+        "id": "sxh:rh:3:-1:-4:-3",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:2:-2:-2:-2",
+          "sxh:hx:2:-2:-4:-4",
+          "sxh:sq:3:0:-4:-5",
+          "sxh:sq:4:-1:-3:-3"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -3.732051
+          },
+          {
+            "x": 0.133975,
+            "y": -3.232051
+          },
+          {
+            "x": -0.866025,
+            "y": -3.232051
+          },
+          {
+            "x": 0.0,
+            "y": -3.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.383975,
+          "y": -1.433013
+        },
+        "id": "sxh:rh:3:-2:-1:-1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:2:-2:-2:-2",
+          "sxh:hx:4:0:-2:-2",
+          "sxh:sq:1:-2:0:-1",
+          "sxh:sq:3:-1:-1:0"
+        ],
+        "orientation_token": "90",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.633975,
+            "y": -2.366025
+          },
+          {
+            "x": 0.633975,
+            "y": -1.366025
+          },
+          {
+            "x": 0.133975,
+            "y": -0.5
+          },
+          {
+            "x": 0.133975,
+            "y": -1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.683013,
+          "y": -0.683013
+        },
+        "id": "sxh:rh:3:1:-1:-1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:4:0:-2:-2",
+          "sxh:hx:4:2:0:-2",
+          "sxh:sq:2:1:1:-1",
+          "sxh:sq:3:-1:-1:0"
+        ],
+        "orientation_token": "120",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": -1.366025
+          },
+          {
+            "x": 1.866025,
+            "y": -0.5
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.5,
+            "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.299038,
+          "y": 0.616025
+        },
+        "id": "sxh:rh:3:3:2:-2",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:2:2:2:0",
+          "sxh:hx:4:2:0:-2",
+          "sxh:sq:3:4:2:-1",
+          "sxh:sq:5:3:1:-2"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": 0.366025
+          },
+          {
+            "x": 3.366025,
+            "y": 0.366025
+          },
+          {
+            "x": 4.232051,
+            "y": 0.866025
+          },
+          {
+            "x": 3.232051,
+            "y": 0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.299038,
+          "y": 2.116025
+        },
+        "id": "sxh:rh:3:3:2:1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:2:2:2:0",
+          "sxh:hx:2:2:4:2",
+          "sxh:sq:3:4:2:-1",
+          "sxh:sq:4:3:3:1"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.232051,
+            "y": 1.866025
+          },
+          {
+            "x": 3.366025,
+            "y": 2.366025
+          },
+          {
+            "x": 2.366025,
+            "y": 2.366025
+          },
+          {
+            "x": 3.232051,
+            "y": 1.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.049038,
+          "y": 3.415064
+        },
+        "id": "sxh:rh:3:3:5:1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:2:2:4:2",
+          "sxh:hx:2:4:6:2",
+          "sxh:sq:3:5:5:0",
+          "sxh:sq:4:3:3:1"
+        ],
+        "orientation_token": "120",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": 2.732051
+          },
+          {
+            "x": 4.232051,
+            "y": 3.598076
+          },
+          {
+            "x": 3.366025,
+            "y": 4.098076
+          },
+          {
+            "x": 3.866025,
+            "y": 3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.683012,
+          "y": -3.049038
+        },
+        "id": "sxh:rh:4:1:-3:-4",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:4:0:-2:-2",
+          "sxh:hx:6:2:-4:-4",
+          "sxh:sq:4:-1:-3:-3",
+          "sxh:sq:5:1:-5:-4"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -3.732051
+          },
+          {
+            "x": 1.866025,
+            "y": -3.232051
+          },
+          {
+            "x": 2.366025,
+            "y": -2.366025
+          },
+          {
+            "x": 1.5,
+            "y": -2.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.915064,
+          "y": 2.549038
+        },
+        "id": "sxh:rh:4:5:3:0",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:3:5:5:0",
+          "sxh:sq:4:3:3:1",
+          "sxh:sq:5:5:1:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.232051,
+            "y": 1.866025
+          },
+          {
+            "x": 5.098076,
+            "y": 2.366025
+          },
+          {
+            "x": 5.598076,
+            "y": 3.232051
+          },
+          {
+            "x": 4.732051,
+            "y": 2.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.25,
+          "y": -4.665064
+        },
+        "id": "sxh:rh:5:0:-5:-5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:4:0:-6:-6",
+          "sxh:hx:6:2:-6:-6",
+          "sxh:sq:3:0:-4:-5",
+          "sxh:sq:5:1:-5:-4"
+        ],
+        "orientation_token": "90",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": -5.598076
+          },
+          {
+            "x": 1.5,
+            "y": -4.598076
+          },
+          {
+            "x": 1.0,
+            "y": -3.732051
+          },
+          {
+            "x": 1.0,
+            "y": -4.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.482051,
+          "y": 0.933013
+        },
+        "id": "sxh:rh:5:4:1:-1",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:3:4:2:-1",
+          "sxh:sq:5:3:1:-2",
+          "sxh:sq:5:5:1:0",
+          "sxh:sq:7:4:0:-1"
+        ],
+        "orientation_token": "90",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": 0.0
+          },
+          {
+            "x": 4.732051,
+            "y": 1.0
+          },
+          {
+            "x": 4.232051,
+            "y": 1.866025
+          },
+          {
+            "x": 4.232051,
+            "y": 0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.049038,
+          "y": -0.683012
+        },
+        "id": "sxh:rh:6:3:-1:-2",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:4:2:0:-2",
+          "sxh:hx:6:4:-2:-4",
+          "sxh:sq:5:3:1:-2",
+          "sxh:sq:6:5:-1:-3"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 3.366025,
+            "y": -1.366025
+          },
+          {
+            "x": 4.232051,
+            "y": -0.866025
+          },
+          {
+            "x": 4.732051,
+            "y": 0.0
+          },
+          {
+            "x": 3.866025,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.348076,
+          "y": -1.433013
+        },
+        "id": "sxh:rh:6:6:-1:-5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:6:4:-2:-4",
+          "sxh:sq:6:5:-1:-3",
+          "sxh:sq:7:6:0:-5"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 5.098076,
+            "y": -2.366025
+          },
+          {
+            "x": 5.598076,
+            "y": -1.5
+          },
+          {
+            "x": 5.598076,
+            "y": -0.5
+          },
+          {
+            "x": 5.098076,
+            "y": -1.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.049038,
+          "y": -3.049038
+        },
+        "id": "sxh:rh:7:3:-3:-5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:6:2:-4:-4",
+          "sxh:hx:6:4:-2:-4",
+          "sxh:sq:7:5:-3:-6",
+          "sxh:sq:8:3:-5:-5"
+        ],
+        "orientation_token": "120",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": -3.732051
+          },
+          {
+            "x": 4.232051,
+            "y": -2.866025
+          },
+          {
+            "x": 3.366025,
+            "y": -2.366025
+          },
+          {
+            "x": 3.866025,
+            "y": -3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.299038,
+          "y": -4.348076
+        },
+        "id": "sxh:rh:7:3:-6:-5",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:hx:6:2:-4:-4",
+          "sxh:hx:6:2:-6:-6",
+          "sxh:sq:8:3:-5:-5"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.232051,
+            "y": -4.598076
+          },
+          {
+            "x": 3.366025,
+            "y": -4.098076
+          },
+          {
+            "x": 2.366025,
+            "y": -4.098076
+          },
+          {
+            "x": 3.232051,
+            "y": -4.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.665063,
+          "y": -0.25
+        },
+        "id": "sxh:rh:7:5:0:-3",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:6:5:-1:-3",
+          "sxh:sq:7:4:0:-1",
+          "sxh:sq:7:6:0:-5"
+        ],
+        "orientation_token": "150",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 6.598076,
+            "y": -0.5
+          },
+          {
+            "x": 5.732051,
+            "y": 0.0
+          },
+          {
+            "x": 4.732051,
+            "y": 0.0
+          },
+          {
+            "x": 5.598076,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.665063,
+          "y": 1.25
+        },
+        "id": "sxh:rh:7:5:0:0",
+        "kind": "socolar-hexagonal-rhomb",
+        "neighbors": [
+          "sxh:sq:5:5:1:0",
+          "sxh:sq:7:4:0:-1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": 1.0
+          },
+          {
+            "x": 5.732051,
+            "y": 1.0
+          },
+          {
+            "x": 6.598076,
+            "y": 1.5
+          },
+          {
+            "x": 5.598076,
+            "y": 1.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.683013,
+          "y": 0.183013
+        },
+        "id": "sxh:sq:-1:-1:1:0",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-2:2:2",
+          "sxh:rh:-1:-3:1:1",
+          "sxh:rh:-1:0:1:1",
+          "sxh:rh:1:-1:0:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": -0.5
+          },
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": -0.5,
+            "y": 0.866025
+          },
+          {
+            "x": -1.366025,
+            "y": 0.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.816988,
+          "y": 5.781089
+        },
+        "id": "sxh:sq:-1:-1:7:6",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-2:6:6",
+          "sxh:rh:-1:1:7:5",
+          "sxh:rh:-3:-1:8:6",
+          "sxh:rh:0:-1:5:6"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.633975,
+            "y": 5.098076
+          },
+          {
+            "x": 1.5,
+            "y": 5.598076
+          },
+          {
+            "x": 1.0,
+            "y": 6.464102
+          },
+          {
+            "x": 0.133975,
+            "y": 5.964102
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.366025,
+          "y": 3.732051
+        },
+        "id": "sxh:sq:-1:-2:4:5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-2:6:6",
+          "sxh:hx:0:0:4:4",
+          "sxh:rh:-1:-1:4:3",
+          "sxh:rh:-3:-2:5:5"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": 3.232051
+          },
+          {
+            "x": 0.133975,
+            "y": 3.232051
+          },
+          {
+            "x": 0.133975,
+            "y": 4.232051
+          },
+          {
+            "x": -0.866025,
+            "y": 4.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.598076,
+          "y": -1.866025
+        },
+        "id": "sxh:sq:-1:-6:-2:1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:0:-4:-2:0",
+          "sxh:rh:-1:-5:-2:-1",
+          "sxh:rh:-1:-5:-2:2",
+          "sxh:rh:-3:-6:-1:1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -3.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -3.098076,
+            "y": -1.366025
+          },
+          {
+            "x": -4.098076,
+            "y": -1.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.781089,
+          "y": -3.915064
+        },
+        "id": "sxh:sq:-1:-7:-5:0",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:rh:-1:-5:-5:-1",
+          "sxh:rh:-2:-7:-3:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.964102,
+            "y": -4.598076
+          },
+          {
+            "x": -4.098076,
+            "y": -4.098076
+          },
+          {
+            "x": -4.598076,
+            "y": -3.232051
+          },
+          {
+            "x": -5.464102,
+            "y": -3.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.683012,
+          "y": 2.549038
+        },
+        "id": "sxh:sq:-2:-1:3:3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-2:2:2",
+          "sxh:hx:0:0:2:2",
+          "sxh:rh:-1:-1:4:3",
+          "sxh:rh:-2:-3:3:4"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.5,
+            "y": 1.866025
+          },
+          {
+            "x": 0.0,
+            "y": 2.732051
+          },
+          {
+            "x": -0.866025,
+            "y": 3.232051
+          },
+          {
+            "x": -1.366025,
+            "y": 2.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.915064,
+          "y": -3.049038
+        },
+        "id": "sxh:sq:-2:-5:-3:-1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:0:-4:-4:-2",
+          "sxh:rh:-1:-5:-2:-1",
+          "sxh:rh:-1:-5:-5:-1",
+          "sxh:rh:-2:-7:-3:0"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.732051,
+            "y": -3.732051
+          },
+          {
+            "x": -3.232051,
+            "y": -2.866025
+          },
+          {
+            "x": -4.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -4.598076,
+            "y": -3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.549038,
+          "y": 3.415063
+        },
+        "id": "sxh:sq:-3:-3:5:4",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-4:-4:4:4",
+          "sxh:hx:-4:-4:6:6",
+          "sxh:rh:-2:-3:3:4",
+          "sxh:rh:-3:-2:5:5"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.732051,
+            "y": 2.732051
+          },
+          {
+            "x": -0.866025,
+            "y": 3.232051
+          },
+          {
+            "x": -1.366025,
+            "y": 4.098076
+          },
+          {
+            "x": -2.232051,
+            "y": 3.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.732051,
+          "y": 1.366025
+        },
+        "id": "sxh:sq:-3:-4:2:3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-2:2:2",
+          "sxh:hx:-2:-4:0:2",
+          "sxh:hx:-4:-4:4:4",
+          "sxh:hx:-4:-6:2:4"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.232051,
+            "y": 0.866025
+          },
+          {
+            "x": -2.232051,
+            "y": 0.866025
+          },
+          {
+            "x": -2.232051,
+            "y": 1.866025
+          },
+          {
+            "x": -3.232051,
+            "y": 1.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.915063,
+          "y": -0.683013
+        },
+        "id": "sxh:sq:-3:-5:-1:2",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-4:0:2",
+          "sxh:rh:-1:-5:-2:2",
+          "sxh:rh:-3:-6:-1:1",
+          "sxh:rh:-4:-5:1:2"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.098076,
+            "y": -1.366025
+          },
+          {
+            "x": -3.232051,
+            "y": -0.866025
+          },
+          {
+            "x": -3.732051,
+            "y": 0.0
+          },
+          {
+            "x": -4.598076,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.781089,
+          "y": -2.183012
+        },
+        "id": "sxh:sq:-3:-7:-1:0",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:rh:-2:-7:-3:0",
+          "sxh:rh:-3:-6:-1:1",
+          "sxh:rh:-5:-7:0:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.964102,
+            "y": -2.866025
+          },
+          {
+            "x": -4.098076,
+            "y": -2.366025
+          },
+          {
+            "x": -4.598076,
+            "y": -1.5
+          },
+          {
+            "x": -5.464102,
+            "y": -2.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.549038,
+          "y": 5.781089
+        },
+        "id": "sxh:sq:-4:-3:7:7",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-2:6:6",
+          "sxh:hx:-4:-4:6:6"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.366025,
+            "y": 5.098076
+          },
+          {
+            "x": -0.866025,
+            "y": 5.964102
+          },
+          {
+            "x": -1.732051,
+            "y": 6.464102
+          },
+          {
+            "x": -2.232051,
+            "y": 5.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.781089,
+          "y": 0.183013
+        },
+        "id": "sxh:sq:-4:-7:1:3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-4:-6:2:4",
+          "sxh:rh:-4:-5:1:2",
+          "sxh:rh:-4:-8:1:5",
+          "sxh:rh:-5:-7:0:3"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.598076,
+            "y": -0.5
+          },
+          {
+            "x": -4.098076,
+            "y": 0.366025
+          },
+          {
+            "x": -4.964102,
+            "y": 0.866025
+          },
+          {
+            "x": -5.464102,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.098076,
+          "y": -1.0
+        },
+        "id": "sxh:sq:-5:-6:0:1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:rh:-3:-6:-1:1",
+          "sxh:rh:-5:-7:0:0",
+          "sxh:rh:-5:-7:0:3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -5.598076,
+            "y": -1.5
+          },
+          {
+            "x": -4.598076,
+            "y": -1.5
+          },
+          {
+            "x": -4.598076,
+            "y": -0.5
+          },
+          {
+            "x": -5.598076,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.598076,
+          "y": 4.598076
+        },
+        "id": "sxh:sq:-5:-6:6:7",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-4:-4:6:6",
+          "sxh:rh:-5:-5:6:5",
+          "sxh:rh:-5:-5:6:8",
+          "sxh:rh:-6:-6:5:7"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.098076,
+            "y": 4.098076
+          },
+          {
+            "x": -3.098076,
+            "y": 4.098076
+          },
+          {
+            "x": -3.098076,
+            "y": 5.098076
+          },
+          {
+            "x": -4.098076,
+            "y": 5.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -4.781089,
+          "y": 2.549038
+        },
+        "id": "sxh:sq:-5:-7:3:6",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-4:-6:2:4",
+          "sxh:hx:-6:-8:2:6",
+          "sxh:rh:-5:-5:3:5"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -4.964102,
+            "y": 1.866025
+          },
+          {
+            "x": -4.098076,
+            "y": 2.366025
+          },
+          {
+            "x": -4.598076,
+            "y": 3.232051
+          },
+          {
+            "x": -5.464102,
+            "y": 2.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -5.964102,
+          "y": 0.5
+        },
+        "id": "sxh:sq:-5:-8:0:5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-6:-8:2:6",
+          "sxh:rh:-4:-8:1:5",
+          "sxh:rh:-5:-7:0:3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -6.464102,
+            "y": 0.0
+          },
+          {
+            "x": -5.464102,
+            "y": 0.0
+          },
+          {
+            "x": -5.464102,
+            "y": 1.0
+          },
+          {
+            "x": -6.464102,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -3.915063,
+          "y": 3.415063
+        },
+        "id": "sxh:sq:-6:-5:5:5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-4:-4:4:4",
+          "sxh:rh:-5:-5:3:5",
+          "sxh:rh:-5:-5:6:5",
+          "sxh:rh:-6:-6:5:7"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.732051,
+            "y": 2.732051
+          },
+          {
+            "x": -3.232051,
+            "y": 3.598076
+          },
+          {
+            "x": -4.098076,
+            "y": 4.098076
+          },
+          {
+            "x": -4.598076,
+            "y": 3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.549038,
+          "y": -0.683012
+        },
+        "id": "sxh:sq:0:-3:-1:1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:-2:-4:0:2",
+          "sxh:hx:0:-4:-2:0",
+          "sxh:rh:-1:-3:1:1",
+          "sxh:rh:0:-2:-1:-1"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.366025,
+            "y": -1.366025
+          },
+          {
+            "x": -0.866025,
+            "y": -0.5
+          },
+          {
+            "x": -1.732051,
+            "y": 0.0
+          },
+          {
+            "x": -2.232051,
+            "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.683012,
+          "y": 4.915063
+        },
+        "id": "sxh:sq:0:1:5:5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:0:0:4:4",
+          "sxh:rh:-1:1:7:5",
+          "sxh:rh:0:-1:5:6",
+          "sxh:rh:0:2:5:3"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.866025,
+            "y": 4.232051
+          },
+          {
+            "x": 2.366025,
+            "y": 5.098076
+          },
+          {
+            "x": 1.5,
+            "y": 5.598076
+          },
+          {
+            "x": 1.0,
+            "y": 4.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -0.366025,
+          "y": -1.0
+        },
+        "id": "sxh:sq:1:-2:0:-1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:-2:-2:-2",
+          "sxh:rh:0:-2:-1:-1",
+          "sxh:rh:1:-1:0:0",
+          "sxh:rh:3:-2:-1:-1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -0.866025,
+            "y": -1.5
+          },
+          {
+            "x": 0.133975,
+            "y": -1.5
+          },
+          {
+            "x": 0.133975,
+            "y": -0.5
+          },
+          {
+            "x": -0.866025,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.549038,
+          "y": -3.049038
+        },
+        "id": "sxh:sq:1:-3:-3:-2",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:0:-4:-2:0",
+          "sxh:hx:0:-4:-4:-2",
+          "sxh:hx:2:-2:-2:-2",
+          "sxh:hx:2:-2:-4:-4"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.732051,
+            "y": -3.732051
+          },
+          {
+            "x": -0.866025,
+            "y": -3.232051
+          },
+          {
+            "x": -1.366025,
+            "y": -2.366025
+          },
+          {
+            "x": -2.232051,
+            "y": -2.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -2.732051,
+          "y": -5.098076
+        },
+        "id": "sxh:sq:1:-4:-6:-3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:0:-4:-4:-2",
+          "sxh:rh:2:-4:-5:-3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -3.232051,
+            "y": -5.598076
+          },
+          {
+            "x": -2.232051,
+            "y": -5.598076
+          },
+          {
+            "x": -2.232051,
+            "y": -4.598076
+          },
+          {
+            "x": -3.232051,
+            "y": -4.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "id": "sxh:sq:1:0:0:1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:0:0:2:2",
+          "sxh:rh:-1:0:1:1",
+          "sxh:rh:1:-1:0:0",
+          "sxh:rh:2:0:1:1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          },
+          {
+            "x": 1.0,
+            "y": 1.0
+          },
+          {
+            "x": 0.0,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.683013,
+          "y": 2.549038
+        },
+        "id": "sxh:sq:1:1:3:2",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:0:0:2:2",
+          "sxh:hx:0:0:4:4",
+          "sxh:hx:2:2:2:0",
+          "sxh:hx:2:2:4:2"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": 1.866025
+          },
+          {
+            "x": 2.366025,
+            "y": 2.366025
+          },
+          {
+            "x": 1.866025,
+            "y": 3.232051
+          },
+          {
+            "x": 1.0,
+            "y": 2.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.866025,
+          "y": 4.598076
+        },
+        "id": "sxh:sq:1:2:6:3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:2:4:2",
+          "sxh:hx:2:4:6:2",
+          "sxh:rh:0:2:5:3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": 4.098076
+          },
+          {
+            "x": 3.366025,
+            "y": 4.098076
+          },
+          {
+            "x": 3.366025,
+            "y": 5.098076
+          },
+          {
+            "x": 2.366025,
+            "y": 5.098076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": -1.549038,
+          "y": -5.415064
+        },
+        "id": "sxh:sq:2:-3:-5:-5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:-2:-4:-4",
+          "sxh:rh:2:-1:-5:-6",
+          "sxh:rh:2:-4:-5:-3"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": -1.366025,
+            "y": -6.098076
+          },
+          {
+            "x": -0.866025,
+            "y": -5.232051
+          },
+          {
+            "x": -1.732051,
+            "y": -4.732051
+          },
+          {
+            "x": -2.232051,
+            "y": -5.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.683013,
+          "y": 0.183013
+        },
+        "id": "sxh:sq:2:1:1:-1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:2:2:0",
+          "sxh:hx:4:2:0:-2",
+          "sxh:rh:2:0:1:1",
+          "sxh:rh:3:1:-1:-1"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.866025,
+            "y": -0.5
+          },
+          {
+            "x": 2.366025,
+            "y": 0.366025
+          },
+          {
+            "x": 1.5,
+            "y": 0.866025
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.816987,
+          "y": -0.683013
+        },
+        "id": "sxh:sq:3:-1:-1:0",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:4:0:-2:-2",
+          "sxh:rh:1:-1:0:0",
+          "sxh:rh:3:-2:-1:-1",
+          "sxh:rh:3:1:-1:-1"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.633975,
+            "y": -1.366025
+          },
+          {
+            "x": 1.5,
+            "y": -0.866025
+          },
+          {
+            "x": 1.0,
+            "y": 0.0
+          },
+          {
+            "x": 0.133975,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.5,
+          "y": -4.232051
+        },
+        "id": "sxh:sq:3:0:-4:-5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:-2:-4:-4",
+          "sxh:hx:4:0:-6:-6",
+          "sxh:rh:3:-1:-4:-3",
+          "sxh:rh:5:0:-5:-5"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 0.0,
+            "y": -4.732051
+          },
+          {
+            "x": 1.0,
+            "y": -4.732051
+          },
+          {
+            "x": 1.0,
+            "y": -3.732051
+          },
+          {
+            "x": 0.0,
+            "y": -3.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 3.732051,
+          "y": 1.366025
+        },
+        "id": "sxh:sq:3:4:2:-1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:2:2:0",
+          "sxh:rh:3:3:2:-2",
+          "sxh:rh:3:3:2:1",
+          "sxh:rh:5:4:1:-1"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 3.232051,
+            "y": 0.866025
+          },
+          {
+            "x": 4.232051,
+            "y": 0.866025
+          },
+          {
+            "x": 4.232051,
+            "y": 1.866025
+          },
+          {
+            "x": 3.232051,
+            "y": 1.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.915063,
+          "y": 3.415063
+        },
+        "id": "sxh:sq:3:5:5:0",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:4:6:2",
+          "sxh:rh:3:3:5:1",
+          "sxh:rh:4:5:3:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": 2.732051
+          },
+          {
+            "x": 5.598076,
+            "y": 3.232051
+          },
+          {
+            "x": 5.098076,
+            "y": 4.098076
+          },
+          {
+            "x": 4.232051,
+            "y": 3.598076
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 0.816987,
+          "y": -3.049038
+        },
+        "id": "sxh:sq:4:-1:-3:-3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:-2:-2:-2",
+          "sxh:hx:4:0:-2:-2",
+          "sxh:rh:3:-1:-4:-3",
+          "sxh:rh:4:1:-3:-4"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.0,
+            "y": -3.732051
+          },
+          {
+            "x": 1.5,
+            "y": -2.866025
+          },
+          {
+            "x": 0.633975,
+            "y": -2.366025
+          },
+          {
+            "x": 0.133975,
+            "y": -3.232051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.049038,
+          "y": 2.549038
+        },
+        "id": "sxh:sq:4:3:3:1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:2:2:4:2",
+          "sxh:rh:3:3:2:1",
+          "sxh:rh:3:3:5:1",
+          "sxh:rh:4:5:3:0"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.232051,
+            "y": 1.866025
+          },
+          {
+            "x": 4.732051,
+            "y": 2.732051
+          },
+          {
+            "x": 3.866025,
+            "y": 3.232051
+          },
+          {
+            "x": 3.366025,
+            "y": 2.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 1.683013,
+          "y": -3.915064
+        },
+        "id": "sxh:sq:5:1:-5:-4",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:6:2:-4:-4",
+          "sxh:hx:6:2:-6:-6",
+          "sxh:rh:4:1:-3:-4",
+          "sxh:rh:5:0:-5:-5"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 1.5,
+            "y": -4.598076
+          },
+          {
+            "x": 2.366025,
+            "y": -4.098076
+          },
+          {
+            "x": 1.866025,
+            "y": -3.232051
+          },
+          {
+            "x": 1.0,
+            "y": -3.732051
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 2.866025,
+          "y": -1.866025
+        },
+        "id": "sxh:sq:5:2:-2:-3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:4:0:-2:-2",
+          "sxh:hx:4:2:0:-2",
+          "sxh:hx:6:2:-4:-4",
+          "sxh:hx:6:4:-2:-4"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 2.366025,
+            "y": -2.366025
+          },
+          {
+            "x": 3.366025,
+            "y": -2.366025
+          },
+          {
+            "x": 3.366025,
+            "y": -1.366025
+          },
+          {
+            "x": 2.366025,
+            "y": -1.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.049038,
+          "y": 0.183013
+        },
+        "id": "sxh:sq:5:3:1:-2",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:4:2:0:-2",
+          "sxh:rh:3:3:2:-2",
+          "sxh:rh:5:4:1:-1",
+          "sxh:rh:6:3:-1:-2"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 3.866025,
+            "y": -0.5
+          },
+          {
+            "x": 4.732051,
+            "y": 0.0
+          },
+          {
+            "x": 4.232051,
+            "y": 0.866025
+          },
+          {
+            "x": 3.366025,
+            "y": 0.366025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.915064,
+          "y": 1.683012
+        },
+        "id": "sxh:sq:5:5:1:0",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:rh:4:5:3:0",
+          "sxh:rh:5:4:1:-1",
+          "sxh:rh:7:5:0:0"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": 1.0
+          },
+          {
+            "x": 5.598076,
+            "y": 1.5
+          },
+          {
+            "x": 5.098076,
+            "y": 2.366025
+          },
+          {
+            "x": 4.232051,
+            "y": 1.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.915064,
+          "y": -0.683012
+        },
+        "id": "sxh:sq:6:5:-1:-3",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:6:4:-2:-4",
+          "sxh:rh:6:3:-1:-2",
+          "sxh:rh:6:6:-1:-5",
+          "sxh:rh:7:5:0:-3"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 5.098076,
+            "y": -1.366025
+          },
+          {
+            "x": 5.598076,
+            "y": -0.5
+          },
+          {
+            "x": 4.732051,
+            "y": 0.0
+          },
+          {
+            "x": 4.232051,
+            "y": -0.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 5.232051,
+          "y": 0.5
+        },
+        "id": "sxh:sq:7:4:0:-1",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:rh:5:4:1:-1",
+          "sxh:rh:7:5:0:-3",
+          "sxh:rh:7:5:0:0"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": 0.0
+          },
+          {
+            "x": 5.732051,
+            "y": 0.0
+          },
+          {
+            "x": 5.732051,
+            "y": 1.0
+          },
+          {
+            "x": 4.732051,
+            "y": 1.0
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.915064,
+          "y": -3.049038
+        },
+        "id": "sxh:sq:7:5:-3:-6",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:6:4:-2:-4",
+          "sxh:rh:7:3:-3:-5"
+        ],
+        "orientation_token": "30",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.732051,
+            "y": -3.732051
+          },
+          {
+            "x": 5.598076,
+            "y": -3.232051
+          },
+          {
+            "x": 5.098076,
+            "y": -2.366025
+          },
+          {
+            "x": 4.232051,
+            "y": -2.866025
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 6.098076,
+          "y": -1.0
+        },
+        "id": "sxh:sq:7:6:0:-5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:rh:6:6:-1:-5",
+          "sxh:rh:7:5:0:-3"
+        ],
+        "orientation_token": "0",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 5.598076,
+            "y": -1.5
+          },
+          {
+            "x": 6.598076,
+            "y": -1.5
+          },
+          {
+            "x": 6.598076,
+            "y": -0.5
+          },
+          {
+            "x": 5.598076,
+            "y": -0.5
+          }
+        ]
+      },
+      {
+        "center": {
+          "x": 4.049038,
+          "y": -3.915063
+        },
+        "id": "sxh:sq:8:3:-5:-5",
+        "kind": "socolar-hexagonal-square",
+        "neighbors": [
+          "sxh:hx:6:2:-4:-4",
+          "sxh:rh:7:3:-3:-5",
+          "sxh:rh:7:3:-6:-5"
+        ],
+        "orientation_token": "60",
+        "tile_family": "socolar-hexagonal",
+        "vertices": [
+          {
+            "x": 4.232051,
+            "y": -4.598076
+          },
+          {
+            "x": 4.732051,
+            "y": -3.732051
+          },
+          {
+            "x": 3.866025,
+            "y": -3.232051
+          },
+          {
+            "x": 3.366025,
+            "y": -4.098076
+          }
+        ]
+      }
+    ],
+    "topology_revision": "5d575086",
+    "topology_spec": {
+      "adjacency_mode": "edge",
+      "height": 13,
+      "patch_depth": 3,
+      "sizing_mode": "patch_depth",
+      "tiling_family": "socolar-hexagonal",
+      "width": 14
+    }
+  },
+  "width": 0
+}

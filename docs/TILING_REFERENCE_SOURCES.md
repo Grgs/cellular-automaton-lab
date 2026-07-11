@@ -174,7 +174,28 @@ The order is intentional:
     12-fold (rhombs)"; prototiles {30° rhomb, 60° rhomb, square}), built by the
     de Bruijn generalized-dual multigrid and MLD to `shield`. This is a distinct
     prototile presentation from the canonical Socolar tiling {30° rhomb, square,
-    hexagon}; see [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
+    hexagon}, which now ships separately as `socolar-hexagonal`; see
+    [TILING_KNOWN_DEVIATIONS.md](TILING_KNOWN_DEVIATIONS.md).
+- `socolar-hexagonal`
+  - [Socolar](https://tilings.math.uni-bielefeld.de/substitution/socolar/)
+  - [Socolar, *Simple octagonal and dodecagonal quasicrystals*, Phys. Rev. B 39 (1989)](https://doi.org/10.1103/PhysRevB.39.10519)
+  - [Klitzing, Socolar tiling (prototiles, inflation 2+sqrt(3), substitution matrix, A2xA2 cut-and-project)](https://bendwavy.org/klitzing/quasi/socolar.htm)
+  - [Socolar tiling](https://en.wikipedia.org/wiki/Socolar_tiling)
+  - The **canonical** Socolar tiling: prototiles {regular hexagon, square, 30°
+    rhomb}, implemented as Socolar's cut-and-project construction (A2xA2 root
+    lattice; Galois star map `zeta -> zeta^5` on `Z[zeta12]`) with exact
+    `Q(sqrt(3))` acceptance windows for 13 tile classes (2 hexagon orientation
+    families x 2 deep-hole subtypes with equilateral-triangle windows, 6 rhomb
+    orientations with parallelogram windows, 3 square orientations with square
+    windows). The windows were extracted from the Tilings Encyclopedia's
+    published Socolar patch (2353 tiles exact-snapped to the module) and
+    verified in exact arithmetic: regenerating the patch region reproduces the
+    encyclopedia patch tile-for-tile, and every module coset point is
+    classified correctly. A 338-tile literature sample is vendored at
+    `backend/simulation/data/socolar_hexagonal_literature_sample.json` and
+    diffed tile-for-tile by `tests/unit/test_aperiodic_socolar_hexagonal.py`.
+    See `docs/contracts/socolar-hexagonal-generator/README.md` for the full
+    provenance and verification chain.
 - `enneagonal-9-fold`
   - [Substitution tilings encyclopedia](https://tilings.math.uni-bielefeld.de/substitution/)
   - [Pentagrid and Penrose tilings (de Bruijn generalized-dual method)](https://www.math.brown.edu/reschwar/M272/pentagrid.pdf)
