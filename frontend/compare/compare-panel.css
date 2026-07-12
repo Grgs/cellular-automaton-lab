@@ -163,10 +163,15 @@
     padding: 0;
     border: 0;
     background: transparent;
+    color-scheme: dark;
     font-family: inherit;
     font-weight: 700;
     cursor: pointer;
     appearance: auto;
+}
+.compare-setup-select option {
+    background: var(--compare-surface);
+    color: var(--compare-text);
 }
 .compare-setup-select:hover {
     color: var(--compare-teal);
