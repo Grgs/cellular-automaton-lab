@@ -22,6 +22,7 @@ import type {
     SeedFilmstripResult,
     TopologyComparisonResultPayload,
     TopologyFilmstrip,
+    TopologyOption,
     TopologyPreview,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
@@ -173,10 +174,14 @@ interface TilingOption {
     tilingFamily: string;
     label: string;
     family: string;
+    group: string;
+    order: number;
+    renderKind: string;
+    sizingMode: string;
 }
 
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
-type ConfigTab = "setup" | "tilings" | "analysis" | "saved";
+type ConfigTab = "setup" | "tilings" | "analysis" | "help" | "saved";
 
 interface ActionMenuItem {
     label: string;
@@ -215,8 +220,26 @@ function tilingOptions(bootstrapData: AppBootstrapData): TilingOption[] {
             tilingFamily: definition.tiling_family,
             label: definition.label,
             family: definition.family,
+            group: definition.picker_group,
+            order: definition.picker_order,
+            renderKind: definition.render_kind,
+            sizingMode: definition.sizing_mode,
         }))
         .filter((option): option is TilingOption => option.geometry.length > 0);
+}
+
+function wallTilingPickerOptions(options: readonly TilingOption[]): TopologyOption[] {
+    return options.map((option) => ({
+        value: option.geometry,
+        label: option.label,
+        group: option.group,
+        order: option.order,
+        family: option.family,
+        previewKey: option.geometry,
+        renderKind: option.renderKind,
+        sizingMode: option.sizingMode,
+        searchAliases: [],
+    }));
 }
 
 /** All regular grids plus one representative per other family: a fast default sweep. */
@@ -788,6 +811,22 @@ export function createComparePanelContent(
         scheduleWallRerun();
     }
 
+    function replaceBoardOnWall(previousGeometry: string, nextGeometry: string): void {
+        if (running || previousGeometry === nextGeometry || !selected.has(previousGeometry)) {
+            return;
+        }
+        const next = allTilings.find((tiling) => tiling.geometry === nextGeometry);
+        if (!next || selected.has(nextGeometry) || !tilingCompatibleWithSelectedRule(next)) {
+            return;
+        }
+        selected.delete(previousGeometry);
+        selected.add(nextGeometry);
+        statusLine.textContent = `Replaced a board with ${next.label} — updating the wall…`;
+        renderTilingChecklist();
+        refreshPreview();
+        void runFilmstrip();
+    }
+
     editModeButton.addEventListener("click", () => setEditMode(!editMode));
 
     /**
@@ -1119,6 +1158,7 @@ export function createComparePanelContent(
             configTabButton("setup", "Setup"),
             configTabButton("tilings", "Tilings"),
             configTabButton("analysis", "Analysis"),
+            configTabButton("help", "Help"),
             configTabButton("saved", "Saved"),
         ],
     );
@@ -1150,6 +1190,9 @@ export function createComparePanelContent(
             resultsArea,
         ]),
     ]);
+    const helpConfigPanel = configPanel("help", [
+        el("div", { class: "compare-help" }, comparisonHelpContent()),
+    ]);
     const savedConfigPanel = configPanel("saved", [savedCompareControls()]);
     const configSheet = el("div", { class: "compare-config-sheet", inert: true }, [
         el("div", { class: "compare-config-sheet-header" }, [
@@ -1161,6 +1204,7 @@ export function createComparePanelContent(
             setupConfigPanel,
             tilingsConfigPanel,
             analysisConfigPanel,
+            helpConfigPanel,
             savedConfigPanel,
         ]),
     ]);
@@ -1218,6 +1262,28 @@ export function createComparePanelContent(
         ]);
     }
 
+    function comparisonHelpContent(): HTMLElement[] {
+        return [
+            el("div", { class: "compare-help-title", textContent: "How the comparison works" }),
+            explainerItem(
+                "Same seed",
+                "One starting pattern is projected onto every selected board.",
+            ),
+            explainerItem(
+                "Same rule",
+                "Each board runs the selected rule on the same generation clock.",
+            ),
+            explainerItem(
+                "Different tilings",
+                "Topology changes the neighbors, so outcomes can diverge.",
+            ),
+            el("div", {
+                class: "compare-explainer-hint",
+                textContent: "Click a board to focus it. Use Open in Lab to continue from a frame.",
+            }),
+        ];
+    }
+
     function configTabButton(tab: ConfigTab, label: string): HTMLButtonElement {
         const button = el("button", {
             class: "compare-config-tab",
@@ -1265,7 +1331,7 @@ export function createComparePanelContent(
     }
 
     function handleConfigTabKeydown(event: KeyboardEvent): void {
-        const tabs: ConfigTab[] = ["setup", "tilings", "analysis", "saved"];
+        const tabs: ConfigTab[] = ["setup", "tilings", "analysis", "help", "saved"];
         const activeIndex = tabs.findIndex(
             (tab) => configTabButtons.get(tab) === document.activeElement,
         );
@@ -2209,6 +2275,16 @@ export function createComparePanelContent(
                     onFrameChange: () => updateExplainer(),
                     onPaintCell: handlePaintCell,
                     onRemoveBoard: removeBoardFromWall,
+                    tilingOptions: wallTilingPickerOptions(allTilings),
+                    onReplaceBoard: replaceBoardOnWall,
+                    isTilingAvailable: (geometry) =>
+                        Boolean(
+                            allTilings.find(
+                                (tiling) =>
+                                    tiling.geometry === geometry &&
+                                    tilingCompatibleWithSelectedRule(tiling),
+                            ),
+                        ),
                 });
                 filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripView.setEditMode(editMode);
@@ -2615,6 +2691,9 @@ export function createComparePanelContent(
             statusLine.textContent = message;
         },
         handleEscape(): boolean {
+            if (filmstripView?.closeTilingPicker()) {
+                return true;
+            }
             const openMenu = root.querySelector(".compare-action-menu[open]");
             if (openMenu) {
                 openMenu.removeAttribute("open");

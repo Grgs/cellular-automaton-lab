@@ -410,7 +410,9 @@ describe("createFilmstripView", () => {
         expect(board.querySelector(".compare-filmstrip-count")?.textContent).toBe("2 live");
         // Forking now lives in speaker view, not on every gallery tile.
         expect(view.element.querySelector(".compare-filmstrip-open")).toBeNull();
-        expect(board.querySelector("button")).toBeNull();
+        expect(board.querySelector(".compare-filmstrip-label")?.getAttribute("aria-label")).toBe(
+            "Replace square",
+        );
     });
 
     it("re-times the running clock when the speed changes", async () => {

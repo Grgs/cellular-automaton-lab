@@ -14,12 +14,14 @@ import type { SimulationBackend } from "../types/controller.js";
 import type {
     SeedFilmstripResult,
     TopologyFilmstrip,
+    TopologyOption,
     TopologyPreview,
     TopologySpec,
 } from "../types/domain.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { FilmstripPlayer, type FilmstripPlayerState } from "./filmstrip-player.js";
 import type { FilmstripTransportController } from "./compare-transport.js";
+import { createTilingPreviewThumbnail } from "../controls/tiling-preview.js";
 
 const DEFAULT_THUMB_SIZE = 180;
 
@@ -43,6 +45,12 @@ export interface FilmstripViewOptions {
      * backend needs at least two to compare).
      */
     onRemoveBoard?: (geometry: string) => void;
+    /** Tiling catalog used by the per-board replacement picker. */
+    tilingOptions?: readonly TopologyOption[];
+    /** Replace a board's tiling from its caption picker. */
+    onReplaceBoard?: (previousGeometry: string, nextGeometry: string) => void;
+    /** Whether a catalog tiling supports the currently selected rule. */
+    isTilingAvailable?: (geometry: string) => boolean;
     /** Called after the shared generation index changes. */
     onFrameChange?: (frameIndex: number) => void;
 }
@@ -86,6 +94,8 @@ export interface FilmstripViewController {
     setBoardOverlay(geometry: string, node: HTMLElement | null): boolean;
     /** Persistent toolbelt overlaid on the hero in speaker view (null to clear). */
     setHeroToolbelt(node: HTMLElement | null): void;
+    /** Close an open board tiling picker; returns whether one was open. */
+    closeTilingPicker(): boolean;
     dispose(): void;
 }
 
@@ -106,6 +116,20 @@ function el(tag: string, className: string, text?: string): HTMLElement {
     if (text !== undefined) {
         node.textContent = text;
     }
+    return node;
+}
+
+function element<K extends keyof HTMLElementTagNameMap>(
+    tag: K,
+    attrs: Record<string, string> = {},
+    children: Node[] = [],
+): HTMLElementTagNameMap[K] {
+    const node = document.createElement(tag);
+    for (const [name, value] of Object.entries(attrs)) {
+        if (name === "textContent") node.textContent = value;
+        else node.setAttribute(name, value);
+    }
+    node.append(...children);
     return node;
 }
 
@@ -141,6 +165,14 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let focusedGeometry: string | null = null;
     let heroToolbelt: HTMLElement | null = null;
     let editMode = false;
+    let openTilingPicker: HTMLElement | null = null;
+
+    function closeTilingPicker(): boolean {
+        if (!openTilingPicker) return false;
+        openTilingPicker.remove();
+        openTilingPicker = null;
+        return true;
+    }
 
     /** Move the (panel-owned) toolbelt onto the current hero, or detach it. */
     function placeHeroToolbelt(): void {
@@ -283,7 +315,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
 
     function createBoardEntry(tiling: TopologyFilmstrip, removable: boolean): BoardEntry {
         const slot = el("div", "compare-filmstrip-slot", "…");
-        const label = el("div", "compare-filmstrip-label", boardName(tiling));
+        const label = el("button", "compare-filmstrip-label", boardName(tiling));
+        label.setAttribute("type", "button");
+        label.title = `Replace ${boardName(tiling)}`;
+        label.setAttribute("aria-label", `Replace ${boardName(tiling)}`);
         const countLabel = el("div", "compare-filmstrip-count");
         const cell = el("div", "compare-filmstrip-board");
         cell.setAttribute("role", "listitem");
@@ -307,6 +342,84 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             chrome.append(removeButton);
         }
         cell.append(slot, chrome);
+        label.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (!options.tilingOptions || !options.onReplaceBoard) return;
+            if (openTilingPicker?.dataset.geometry === tiling.geometry) {
+                closeTilingPicker();
+                return;
+            }
+            closeTilingPicker();
+            const picker = element("div", {
+                class: "compare-board-tiling-picker",
+                role: "dialog",
+                "aria-label": `Replace ${boardName(tiling)}`,
+            });
+            picker.dataset.geometry = tiling.geometry;
+            const close = element("button", {
+                class: "compare-board-tiling-picker-close",
+                type: "button",
+                textContent: "×",
+                "aria-label": "Close tiling picker",
+            });
+            const header = element("div", { class: "compare-board-tiling-picker-header" }, [
+                element("strong", { textContent: "Replace tiling" }),
+                close,
+            ]);
+            const search = element("input", {
+                class: "compare-board-tiling-picker-search",
+                type: "search",
+                placeholder: "Search tilings",
+                "aria-label": "Search tilings",
+            });
+            const list = element("div", { class: "compare-board-tiling-picker-list" });
+            const renderChoices = (): void => {
+                const query = search.value.trim().toLowerCase();
+                list.replaceChildren();
+                for (const option of options.tilingOptions ?? []) {
+                    if (
+                        query &&
+                        !`${option.label} ${option.value} ${option.group}`
+                            .toLowerCase()
+                            .includes(query)
+                    )
+                        continue;
+                    const choice = element("button", {
+                        class: "compare-board-tiling-choice",
+                        type: "button",
+                    });
+                    choice.disabled =
+                        (option.value !== tiling.geometry &&
+                            boards.some((board) => board.tiling.geometry === option.value)) ||
+                        options.isTilingAvailable?.(option.value) === false;
+                    choice.classList.toggle("is-current", option.value === tiling.geometry);
+                    choice.append(
+                        element(
+                            "span",
+                            { class: "compare-board-tiling-choice-thumb", "aria-hidden": "true" },
+                            [createTilingPreviewThumbnail(option)],
+                        ),
+                        element("span", { class: "compare-board-tiling-choice-copy" }, [
+                            element("span", { textContent: option.label }),
+                            element("small", { textContent: option.group }),
+                        ]),
+                    );
+                    choice.addEventListener("click", () => {
+                        if (option.value !== tiling.geometry)
+                            options.onReplaceBoard?.(tiling.geometry, option.value);
+                        closeTilingPicker();
+                    });
+                    list.append(choice);
+                }
+            };
+            close.addEventListener("click", closeTilingPicker);
+            search.addEventListener("input", renderChoices);
+            picker.append(header, search, list);
+            cell.append(picker);
+            openTilingPicker = picker;
+            renderChoices();
+            search.focus();
+        });
         const toggleFocus = () => {
             focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
         };
@@ -355,6 +468,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const tiling = filmstrip.tilings[index]!;
             entry.tiling = tiling;
             entry.label.textContent = boardName(tiling);
+            entry.label.title = `Replace ${boardName(tiling)}`;
+            entry.label.setAttribute("aria-label", `Replace ${boardName(tiling)}`);
             entry.overlaid = false;
             if (entry.preview) {
                 delete entry.error;
@@ -465,7 +580,9 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             heroToolbelt = node;
             placeHeroToolbelt();
         },
+        closeTilingPicker,
         dispose(): void {
+            closeTilingPicker();
             teardownRun();
             root.remove();
         },

@@ -864,6 +864,15 @@
 .compare-analysis {
     margin-top: 4px;
 }
+.compare-help {
+    display: grid;
+    gap: 10px;
+}
+.compare-help-title {
+    color: var(--ink, #1f2430);
+    font-size: 15px;
+    font-weight: 700;
+}
 .compare-run {
     flex: 0 0 auto;
     padding: 9px 18px;
@@ -1362,12 +1371,123 @@
     max-height: 100%;
 }
 .compare-filmstrip-label {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    pointer-events: auto;
     font-size: 11px;
     font-family: var(--mono, monospace);
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.compare-filmstrip-label:hover,
+.compare-filmstrip-label:focus-visible {
+    color: var(--compare-text, #f2ede0);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.compare-board-tiling-picker {
+    position: absolute;
+    z-index: 8;
+    left: 8px;
+    right: 8px;
+    bottom: 34px;
+    max-height: min(420px, calc(100% - 48px));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    overflow: hidden;
+    border: 1px solid var(--compare-line, rgba(237, 245, 247, 0.28));
+    border-radius: 10px;
+    background: var(--compare-surface-strong, #182025);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.32);
+    color: var(--compare-text, #f2ede0);
+    pointer-events: auto;
+}
+.compare-board-tiling-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+}
+.compare-board-tiling-picker-close {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+.compare-board-tiling-picker-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--compare-line, rgba(237, 245, 247, 0.28));
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: inherit;
+}
+.compare-board-tiling-picker-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+    gap: 6px;
+    overflow: auto;
+    padding-right: 2px;
+}
+.compare-board-tiling-choice {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    padding: 5px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.05);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.compare-board-tiling-choice:hover,
+.compare-board-tiling-choice:focus-visible,
+.compare-board-tiling-choice.is-current {
+    border-color: var(--focus, #7aa7ff);
+    background: rgba(122, 167, 255, 0.16);
+}
+.compare-board-tiling-choice:disabled {
+    opacity: 0.42;
+    cursor: default;
+}
+.compare-board-tiling-choice-thumb {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 30px;
+}
+.compare-board-tiling-choice-thumb svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.compare-board-tiling-choice-copy {
+    display: grid;
+    min-width: 0;
+    font-size: 11px;
+}
+.compare-board-tiling-choice-copy span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.compare-board-tiling-choice-copy small {
+    opacity: 0.7;
+    font-size: 10px;
 }
 .compare-filmstrip-slot {
     position: relative;
@@ -1604,6 +1724,14 @@
        stays two-up until a board is focused. */
     .compare-explainer {
         display: none;
+    }
+    /* Touch devices cannot reveal the hover-only remove control. Keep it
+       visible with a comfortable target while three or more boards are shown. */
+    .compare-filmstrip-remove {
+        min-width: 24px;
+        min-height: 24px;
+        opacity: 0.78;
+        pointer-events: auto;
     }
     .compare-stage {
         padding: 8px;
