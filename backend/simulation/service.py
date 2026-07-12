@@ -76,16 +76,17 @@ class SimulationService:
                 board=clone_service_board(next_state.board),
             )
 
-    def start(self) -> None:
+    def start(self) -> SimulationSnapshot:
         with self._lock:
             self._state.running = True
+            return snapshot_state(self._state)
 
     def pause(self) -> None:
         with self._lock:
             self._state.running = False
 
-    def resume(self) -> None:
-        self.start()
+    def resume(self) -> SimulationSnapshot:
+        return self.start()
 
     def step(self) -> None:
         with self._lock:

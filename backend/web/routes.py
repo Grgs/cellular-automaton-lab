@@ -171,8 +171,8 @@ def topology_preview(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
 @api_bp.post("/control/start")
 @session_api_bp.post("/control/start")
 def start(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    simulation_coordinator(session_id).start()
-    return state_response(session_id)
+    snapshot = simulation_coordinator(session_id).start()
+    return jsonify(snapshot.to_dict())
 
 
 @api_bp.post("/control/pause")
@@ -185,8 +185,8 @@ def pause(session_id: str = DEFAULT_SESSION_ID) -> Response:
 @api_bp.post("/control/resume")
 @session_api_bp.post("/control/resume")
 def resume(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    simulation_coordinator(session_id).resume()
-    return state_response(session_id)
+    snapshot = simulation_coordinator(session_id).resume()
+    return jsonify(snapshot.to_dict())
 
 
 @api_bp.post("/control/step")

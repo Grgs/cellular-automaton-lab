@@ -124,14 +124,14 @@ class SimulationCoordinator:
     def get_rule(self) -> AutomatonRule:
         return self.service.state.rule
 
-    def start(self) -> None:
-        self.service.start()
+    def start(self) -> SimulationSnapshot:
+        return self.service.start()
 
     def pause(self) -> None:
         self._run_immediate_mutation(self.service.pause)
 
-    def resume(self) -> None:
-        self.service.resume()
+    def resume(self) -> SimulationSnapshot:
+        return self.service.resume()
 
     def step(self) -> None:
         self._run_immediate_mutation(self.service.step)

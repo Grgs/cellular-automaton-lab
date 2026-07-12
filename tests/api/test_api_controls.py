@@ -94,6 +94,9 @@ class ApiControlTests(ApiTestCase):
         resumed = self.client.post("/api/control/resume")
         stepped = self.client.post("/api/control/step")
 
+        self.assertTrue(started.get_json()["running"])
+        self.assertTrue(resumed.get_json()["running"])
+
         for response in (started, paused, resumed, stepped):
             self.assertEqual(response.status_code, 200)
             payload = response.get_json()
