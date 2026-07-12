@@ -18,6 +18,7 @@ from . import (
     robinson_triangles,
     shield,
     socolar_12_fold,
+    socolar_hexagonal,
     spectre,
     sphinx,
     taylor_socolar,
@@ -48,6 +49,7 @@ APERIODIC_REFERENCE_FAMILY_SPECS: dict[str, ReferenceFamilySpec] = {
     **heptagonal_7_fold.SPECS,
     **hendecagonal_11_fold.SPECS,
     **tridecagonal_13_fold.SPECS,
+    **socolar_hexagonal.SPECS,
 }
 
 __all__ = ["APERIODIC_REFERENCE_FAMILY_SPECS"]

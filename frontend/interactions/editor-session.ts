@@ -211,18 +211,22 @@ export function createEditorSessionController({
                 }
                 releasePointerCapture(session.pointerId);
                 clearGestureOutline();
+                const paintedCells =
+                    session.moved && session.paintedCells.size > 0
+                        ? Array.from(session.paintedCells.values())
+                        : buildBrushCells(
+                              runtimeState,
+                              session.anchorCell,
+                              getPaintState(),
+                              getBrushSize(),
+                          );
+                if (paintedCells.length > 0) {
+                    // Pointer-up owns the edit for both clicks and drags. The
+                    // browser's follow-up click must not submit it a second time.
+                    pointerState.enableClickSuppression();
+                }
                 return commitRuntime
-                    .commitEditorCells(
-                        !session.moved || session.paintedCells.size === 0
-                            ? []
-                            : Array.from(session.paintedCells.values()),
-                    )
-                    .then((result) => {
-                        if (session.moved && session.paintedCells.size > 0) {
-                            pointerState.enableClickSuppression();
-                        }
-                        return result;
-                    })
+                    .commitEditorCells(paintedCells)
                     .catch(() => null)
                     .finally(() => {
                         clearPreview();

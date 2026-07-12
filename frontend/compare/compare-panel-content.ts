@@ -494,14 +494,17 @@ export function createComparePanelContent(
     const setupSeedValue = el("strong", {
         class: "compare-setup-value",
         textContent: "Loading",
+        title: "Loading",
     });
     const setupRuleValue = el("strong", {
         class: "compare-setup-value",
         textContent: "Loading",
+        title: "Loading",
     });
     const setupTilingsValue = el("strong", {
         class: "compare-setup-value",
         textContent: "Loading",
+        title: "Loading",
     });
     const setupRunButton = el(
         "button",
@@ -1083,13 +1086,13 @@ export function createComparePanelContent(
     ]);
 
     const stageMain = el("div", { class: "compare-stage-main" }, [filmstripArea]);
-    const explainerTitle = el("div", {
+    const explainerTitle = el("summary", {
         class: "compare-explainer-title",
         textContent: "What you are seeing",
     });
     const explainerBody = el("div", { class: "compare-explainer-body" });
     const explainerPanel = el(
-        "aside",
+        "details",
         { class: "compare-explainer", "aria-label": "How the comparison works" },
         [explainerTitle, explainerBody],
     );
@@ -1602,7 +1605,7 @@ export function createComparePanelContent(
             : current
               ? "Up to date"
               : stale
-                ? "Update comparison"
+                ? "Run changes"
                 : "Run comparison";
         const playTitle = (() => {
             if (selected.size < 2) {
@@ -1706,6 +1709,8 @@ export function createComparePanelContent(
         setupSeedValue.textContent = seedLabel;
         setupRuleValue.textContent = ruleLabel;
         setupTilingsValue.textContent = tilingLabel;
+        setupSeedValue.title = seedLabel;
+        setupRuleValue.title = ruleLabel;
         setupTilingsValue.title = summaryText();
     }
 

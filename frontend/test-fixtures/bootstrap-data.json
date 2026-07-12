@@ -1966,6 +1966,36 @@
         "min": 0,
         "max": 4
       }
+    },
+    {
+      "tiling_family": "socolar-hexagonal",
+      "label": "Socolar (hexagon-square-rhomb)",
+      "picker_group": "Experimental",
+      "picker_order": 350,
+      "mode_type": "adjacency",
+      "mode_label": "Mode",
+      "mode_labels": {},
+      "sizing_mode": "patch_depth",
+      "family": "aperiodic",
+      "render_kind": "polygon_aperiodic",
+      "viewport_sync_mode": "presentation-only",
+      "supported_adjacency_modes": [
+        "edge"
+      ],
+      "default_adjacency_mode": "edge",
+      "default_rules": {
+        "edge": "life-b2-s23"
+      },
+      "geometry_keys": {
+        "edge": "socolar-hexagonal"
+      },
+      "sizing_policy": {
+        "control": "patch_depth",
+        "default": 3,
+        "min": 0,
+        "max": 8,
+        "unsafe_max": 60
+      }
     }
   ],
   "periodic_face_tilings": [
@@ -2834,6 +2864,18 @@
       "public_cell_kinds": [
         "pinwheel-2-1-small-triangle",
         "pinwheel-2-1-large-triangle"
+      ]
+    },
+    {
+      "tiling_family": "socolar-hexagonal",
+      "label": "Socolar (hexagon-square-rhomb)",
+      "experimental": true,
+      "implementation_status": "canonical_patch",
+      "promotion_blocker": "Experimental until Socolar (hexagon-square-rhomb) geometry is implemented and visually reviewed.",
+      "public_cell_kinds": [
+        "socolar-hexagonal-hexagon",
+        "socolar-hexagonal-square",
+        "socolar-hexagonal-rhomb"
       ]
     }
   ],

@@ -1974,6 +1974,41 @@
       ]
     },
     {
+      "geometry": "socolar-hexagonal",
+      "browserAliasCoverage": {
+        "fixturePath": "frontend/test-fixtures/topologies/socolar-hexagonal-depth-3.json",
+        "selectorFields": [
+          "kind"
+        ]
+      },
+      "variants": [
+        {
+          "label": "socolar-hexagonal-hexagon",
+          "selector": {
+            "tile_family": "socolar-hexagonal",
+            "kind": "socolar-hexagonal-hexagon"
+          },
+          "color": {"token": "toneShadow"}
+        },
+        {
+          "label": "socolar-hexagonal-square",
+          "selector": {
+            "tile_family": "socolar-hexagonal",
+            "kind": "socolar-hexagonal-square"
+          },
+          "color": {"token": "toneCream"}
+        },
+        {
+          "label": "socolar-hexagonal-rhomb",
+          "selector": {
+            "tile_family": "socolar-hexagonal",
+            "kind": "socolar-hexagonal-rhomb"
+          },
+          "color": {"token": "toneClay"}
+        }
+      ]
+    },
+    {
       "geometry": "shield",
       "browserAliasCoverage": {
         "fixturePath": "frontend/test-fixtures/topologies/shield-depth-3.json",

@@ -24249,6 +24249,4972 @@
       "include_id": false
     }
   },
+  "socolar-hexagonal": {
+    "window-depth-1": {
+      "cells": [
+        {
+          "center": [
+            2.232051,
+            1.5
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.732051,
+              0.633975
+            ],
+            [
+              2.732051,
+              0.633975
+            ],
+            [
+              3.232051,
+              1.5
+            ],
+            [
+              2.732051,
+              2.366026
+            ],
+            [
+              1.732051,
+              2.366026
+            ],
+            [
+              1.232051,
+              1.5
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.232051,
+            5.232051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.732051,
+              4.366026
+            ],
+            [
+              2.732051,
+              4.366026
+            ],
+            [
+              3.232051,
+              5.232051
+            ],
+            [
+              2.732051,
+              6.098076
+            ],
+            [
+              1.732051,
+              6.098076
+            ],
+            [
+              1.232051,
+              5.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.232051,
+            7.964102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.732051,
+              7.098076
+            ],
+            [
+              2.732051,
+              7.098076
+            ],
+            [
+              3.232051,
+              7.964102
+            ],
+            [
+              2.732051,
+              8.830127
+            ],
+            [
+              1.732051,
+              8.830127
+            ],
+            [
+              1.232051,
+              7.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.598077,
+            2.866026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              4.098077,
+              2.0
+            ],
+            [
+              5.098077,
+              2.0
+            ],
+            [
+              5.598077,
+              2.866026
+            ],
+            [
+              5.098077,
+              3.732051
+            ],
+            [
+              4.098077,
+              3.732051
+            ],
+            [
+              3.598077,
+              2.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.464102,
+            7.098076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              4.964102,
+              6.232051
+            ],
+            [
+              5.964102,
+              6.232051
+            ],
+            [
+              6.464102,
+              7.098076
+            ],
+            [
+              5.964102,
+              7.964102
+            ],
+            [
+              4.964102,
+              7.964102
+            ],
+            [
+              4.464102,
+              7.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.830127,
+            2.0
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              7.330127,
+              1.133975
+            ],
+            [
+              8.330127,
+              1.133975
+            ],
+            [
+              8.830127,
+              2.0
+            ],
+            [
+              8.330127,
+              2.866026
+            ],
+            [
+              7.330127,
+              2.866026
+            ],
+            [
+              6.830127,
+              2.0
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.830127,
+            4.732051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              7.330127,
+              3.866026
+            ],
+            [
+              8.330127,
+              3.866026
+            ],
+            [
+              8.830127,
+              4.732051
+            ],
+            [
+              8.330127,
+              5.598076
+            ],
+            [
+              7.330127,
+              5.598076
+            ],
+            [
+              6.830127,
+              4.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.830127,
+            8.464102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              7.330127,
+              7.598076
+            ],
+            [
+              8.330127,
+              7.598076
+            ],
+            [
+              8.830127,
+              8.464102
+            ],
+            [
+              8.330127,
+              9.330127
+            ],
+            [
+              7.330127,
+              9.330127
+            ],
+            [
+              6.830127,
+              8.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            0.866026,
+            6.598076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              0.866026,
+              5.598076
+            ],
+            [
+              1.732051,
+              6.098076
+            ],
+            [
+              1.732051,
+              7.098076
+            ],
+            [
+              0.866026,
+              7.598076
+            ],
+            [
+              0.0,
+              7.098076
+            ],
+            [
+              0.0,
+              6.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.732051,
+            3.366026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.732051,
+              2.366026
+            ],
+            [
+              3.598077,
+              2.866026
+            ],
+            [
+              3.598077,
+              3.866026
+            ],
+            [
+              2.732051,
+              4.366026
+            ],
+            [
+              1.866026,
+              3.866026
+            ],
+            [
+              1.866026,
+              2.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.598077,
+            6.598076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              3.598077,
+              5.598076
+            ],
+            [
+              4.464102,
+              6.098076
+            ],
+            [
+              4.464102,
+              7.098076
+            ],
+            [
+              3.598077,
+              7.598076
+            ],
+            [
+              2.732051,
+              7.098076
+            ],
+            [
+              2.732051,
+              6.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.098077,
+            1.0
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              4.098077,
+              0.0
+            ],
+            [
+              4.964102,
+              0.5
+            ],
+            [
+              4.964102,
+              1.5
+            ],
+            [
+              4.098077,
+              2.0
+            ],
+            [
+              3.232051,
+              1.5
+            ],
+            [
+              3.232051,
+              0.5
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.964102,
+            8.964102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              5.964102,
+              7.964102
+            ],
+            [
+              6.830127,
+              8.464102
+            ],
+            [
+              6.830127,
+              9.464102
+            ],
+            [
+              5.964102,
+              9.964102
+            ],
+            [
+              5.098077,
+              9.464102
+            ],
+            [
+              5.098077,
+              8.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.464102,
+            3.366026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              6.464102,
+              2.366026
+            ],
+            [
+              7.330127,
+              2.866026
+            ],
+            [
+              7.330127,
+              3.866026
+            ],
+            [
+              6.464102,
+              4.366026
+            ],
+            [
+              5.598077,
+              3.866026
+            ],
+            [
+              5.598077,
+              2.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.330127,
+            6.598076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              7.330127,
+              5.598076
+            ],
+            [
+              8.196153,
+              6.098076
+            ],
+            [
+              8.196153,
+              7.098076
+            ],
+            [
+              7.330127,
+              7.598076
+            ],
+            [
+              6.464102,
+              7.098076
+            ],
+            [
+              6.464102,
+              6.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.196153,
+            3.366026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              9.196153,
+              2.366026
+            ],
+            [
+              10.062178,
+              2.866026
+            ],
+            [
+              10.062178,
+              3.866026
+            ],
+            [
+              9.196153,
+              4.366026
+            ],
+            [
+              8.330127,
+              3.866026
+            ],
+            [
+              8.330127,
+              2.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.799038,
+            4.116026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              0.866026,
+              3.866026
+            ],
+            [
+              1.866026,
+              3.866026
+            ],
+            [
+              2.732051,
+              4.366026
+            ],
+            [
+              1.732051,
+              4.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.031089,
+            4.982051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              4.098077,
+              4.732051
+            ],
+            [
+              5.098077,
+              4.732051
+            ],
+            [
+              5.964102,
+              5.232051
+            ],
+            [
+              4.964102,
+              5.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.26314,
+            5.848076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              7.330127,
+              5.598076
+            ],
+            [
+              8.330127,
+              5.598076
+            ],
+            [
+              9.196153,
+              6.098076
+            ],
+            [
+              8.196153,
+              6.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.049039,
+            7.781089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              1.732051,
+              7.098076
+            ],
+            [
+              1.232051,
+              7.964102
+            ],
+            [
+              0.366026,
+              8.464102
+            ],
+            [
+              0.866026,
+              7.598076
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.415064,
+            5.415063
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              4.098077,
+              4.732051
+            ],
+            [
+              3.598077,
+              5.598076
+            ],
+            [
+              2.732051,
+              6.098076
+            ],
+            [
+              3.232051,
+              5.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.647115,
+            4.549038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              7.330127,
+              3.866026
+            ],
+            [
+              6.830127,
+              4.732051
+            ],
+            [
+              5.964102,
+              5.232051
+            ],
+            [
+              6.464102,
+              4.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.799038,
+            2.616026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              2.732051,
+              2.366026
+            ],
+            [
+              1.866026,
+              2.866026
+            ],
+            [
+              0.866026,
+              2.866026
+            ],
+            [
+              1.732051,
+              2.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.031089,
+            8.214102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              5.964102,
+              7.964102
+            ],
+            [
+              5.098077,
+              8.464102
+            ],
+            [
+              4.098077,
+              8.464102
+            ],
+            [
+              4.964102,
+              7.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.03109,
+            1.75
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              5.964102,
+              1.5
+            ],
+            [
+              5.098077,
+              2.0
+            ],
+            [
+              4.098077,
+              2.0
+            ],
+            [
+              4.964102,
+              1.5
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.26314,
+            7.348076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              9.196153,
+              7.098076
+            ],
+            [
+              8.330127,
+              7.598076
+            ],
+            [
+              7.330127,
+              7.598076
+            ],
+            [
+              8.196153,
+              7.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.049039,
+            5.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              0.366026,
+              4.732051
+            ],
+            [
+              1.232051,
+              5.232051
+            ],
+            [
+              1.732051,
+              6.098076
+            ],
+            [
+              0.866026,
+              5.598076
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.415064,
+            7.781089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.732051,
+              7.098076
+            ],
+            [
+              3.598077,
+              7.598076
+            ],
+            [
+              4.098077,
+              8.464102
+            ],
+            [
+              3.232051,
+              7.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.647114,
+            2.183013
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              5.964102,
+              1.5
+            ],
+            [
+              6.830127,
+              2.0
+            ],
+            [
+              7.330127,
+              2.866026
+            ],
+            [
+              6.464102,
+              2.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.01314,
+            4.549039
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              8.330127,
+              3.866026
+            ],
+            [
+              9.196153,
+              4.366026
+            ],
+            [
+              9.696153,
+              5.232051
+            ],
+            [
+              8.830127,
+              4.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.848077,
+            3.799038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              3.598077,
+              2.866026
+            ],
+            [
+              4.098077,
+              3.732051
+            ],
+            [
+              4.098077,
+              4.732051
+            ],
+            [
+              3.598077,
+              3.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.214102,
+            6.165064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              5.964102,
+              5.232051
+            ],
+            [
+              6.464102,
+              6.098076
+            ],
+            [
+              6.464102,
+              7.098076
+            ],
+            [
+              5.964102,
+              6.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.080127,
+            9.397115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              6.830127,
+              8.464102
+            ],
+            [
+              7.330127,
+              9.330127
+            ],
+            [
+              7.330127,
+              10.330127
+            ],
+            [
+              6.830127,
+              9.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            0.616026,
+            3.799039
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              0.866026,
+              2.866026
+            ],
+            [
+              0.866026,
+              3.866026
+            ],
+            [
+              0.366026,
+              4.732051
+            ],
+            [
+              0.366026,
+              3.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.848077,
+            9.397114
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              4.098077,
+              8.464102
+            ],
+            [
+              4.098077,
+              9.464102
+            ],
+            [
+              3.598077,
+              10.330127
+            ],
+            [
+              3.598077,
+              9.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.714102,
+            6.165063
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              4.964102,
+              5.232051
+            ],
+            [
+              4.964102,
+              6.232051
+            ],
+            [
+              4.464102,
+              7.098076
+            ],
+            [
+              4.464102,
+              6.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.348077,
+            3.799038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              5.598077,
+              2.866026
+            ],
+            [
+              5.598077,
+              3.866026
+            ],
+            [
+              5.098077,
+              4.732051
+            ],
+            [
+              5.098077,
+              3.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.446153,
+            6.165064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              9.696153,
+              5.232051
+            ],
+            [
+              9.696153,
+              6.232051
+            ],
+            [
+              9.196153,
+              7.098076
+            ],
+            [
+              9.196153,
+              6.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.366026,
+            3.366026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              0.866026,
+              2.866026
+            ],
+            [
+              1.866026,
+              2.866026
+            ],
+            [
+              1.866026,
+              3.866026
+            ],
+            [
+              0.866026,
+              3.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.232051,
+            6.598076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.732051,
+              6.098076
+            ],
+            [
+              2.732051,
+              6.098076
+            ],
+            [
+              2.732051,
+              7.098076
+            ],
+            [
+              1.732051,
+              7.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.598077,
+            4.232051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              4.098077,
+              3.732051
+            ],
+            [
+              5.098077,
+              3.732051
+            ],
+            [
+              5.098077,
+              4.732051
+            ],
+            [
+              4.098077,
+              4.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.598077,
+            8.964102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              4.098077,
+              8.464102
+            ],
+            [
+              5.098077,
+              8.464102
+            ],
+            [
+              5.098077,
+              9.464102
+            ],
+            [
+              4.098077,
+              9.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.464102,
+            1.0
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              4.964102,
+              0.5
+            ],
+            [
+              5.964102,
+              0.5
+            ],
+            [
+              5.964102,
+              1.5
+            ],
+            [
+              4.964102,
+              1.5
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.464102,
+            5.732051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              4.964102,
+              5.232051
+            ],
+            [
+              5.964102,
+              5.232051
+            ],
+            [
+              5.964102,
+              6.232051
+            ],
+            [
+              4.964102,
+              6.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.830127,
+            3.366026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              7.330127,
+              2.866026
+            ],
+            [
+              8.330127,
+              2.866026
+            ],
+            [
+              8.330127,
+              3.866026
+            ],
+            [
+              7.330127,
+              3.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.696153,
+            6.598076
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              8.196153,
+              6.098076
+            ],
+            [
+              9.196153,
+              6.098076
+            ],
+            [
+              9.196153,
+              7.098076
+            ],
+            [
+              8.196153,
+              7.098076
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.049039,
+            4.549038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              0.866026,
+              3.866026
+            ],
+            [
+              1.732051,
+              4.366026
+            ],
+            [
+              1.232051,
+              5.232051
+            ],
+            [
+              0.366026,
+              4.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.415064,
+            2.183013
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              3.232051,
+              1.5
+            ],
+            [
+              4.098077,
+              2.0
+            ],
+            [
+              3.598077,
+              2.866026
+            ],
+            [
+              2.732051,
+              2.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.415064,
+            8.647114
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              3.232051,
+              7.964102
+            ],
+            [
+              4.098077,
+              8.464102
+            ],
+            [
+              3.598077,
+              9.330127
+            ],
+            [
+              2.732051,
+              8.830127
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.281089,
+            5.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              4.098077,
+              4.732051
+            ],
+            [
+              4.964102,
+              5.232051
+            ],
+            [
+              4.464102,
+              6.098076
+            ],
+            [
+              3.598077,
+              5.598076
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.781089,
+            4.549038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              5.598077,
+              3.866026
+            ],
+            [
+              6.464102,
+              4.366026
+            ],
+            [
+              5.964102,
+              5.232051
+            ],
+            [
+              5.098077,
+              4.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.647115,
+            1.316987
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              6.464102,
+              0.633975
+            ],
+            [
+              7.330127,
+              1.133975
+            ],
+            [
+              6.830127,
+              2.0
+            ],
+            [
+              5.964102,
+              1.5
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.647115,
+            7.781089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              6.464102,
+              7.098076
+            ],
+            [
+              7.330127,
+              7.598076
+            ],
+            [
+              6.830127,
+              8.464102
+            ],
+            [
+              5.964102,
+              7.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.01314,
+            5.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              8.830127,
+              4.732051
+            ],
+            [
+              9.696153,
+              5.232051
+            ],
+            [
+              9.196153,
+              6.098076
+            ],
+            [
+              8.330127,
+              5.598076
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.415064,
+            4.549039
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              3.598077,
+              3.866026
+            ],
+            [
+              4.098077,
+              4.732051
+            ],
+            [
+              3.232051,
+              5.232051
+            ],
+            [
+              2.732051,
+              4.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.28109,
+            7.781089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              4.464102,
+              7.098076
+            ],
+            [
+              4.964102,
+              7.964102
+            ],
+            [
+              4.098077,
+              8.464102
+            ],
+            [
+              3.598077,
+              7.598076
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.781089,
+            2.183013
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              5.964102,
+              1.5
+            ],
+            [
+              6.464102,
+              2.366026
+            ],
+            [
+              5.598077,
+              2.866026
+            ],
+            [
+              5.098077,
+              2.0
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.647115,
+            5.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              6.830127,
+              4.732051
+            ],
+            [
+              7.330127,
+              5.598076
+            ],
+            [
+              6.464102,
+              6.098076
+            ],
+            [
+              5.964102,
+              5.232051
+            ]
+          ]
+        }
+      ],
+      "depth": 1,
+      "include_id": false
+    },
+    "window-depth-3": {
+      "cells": [
+        {
+          "center": [
+            1.0,
+            8.330127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              0.5,
+              7.464102
+            ],
+            [
+              1.5,
+              7.464102
+            ],
+            [
+              2.0,
+              8.330127
+            ],
+            [
+              1.5,
+              9.196153
+            ],
+            [
+              0.5,
+              9.196153
+            ],
+            [
+              0.0,
+              8.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.232051,
+            2.732051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              3.732051,
+              1.866026
+            ],
+            [
+              4.732051,
+              1.866026
+            ],
+            [
+              5.232051,
+              2.732051
+            ],
+            [
+              4.732051,
+              3.598077
+            ],
+            [
+              3.732051,
+              3.598077
+            ],
+            [
+              3.232051,
+              2.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.232051,
+            6.464102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              3.732051,
+              5.598077
+            ],
+            [
+              4.732051,
+              5.598077
+            ],
+            [
+              5.232051,
+              6.464102
+            ],
+            [
+              4.732051,
+              7.330127
+            ],
+            [
+              3.732051,
+              7.330127
+            ],
+            [
+              3.232051,
+              6.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.232051,
+            9.196153
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              3.732051,
+              8.330127
+            ],
+            [
+              4.732051,
+              8.330127
+            ],
+            [
+              5.232051,
+              9.196153
+            ],
+            [
+              4.732051,
+              10.062178
+            ],
+            [
+              3.732051,
+              10.062178
+            ],
+            [
+              3.232051,
+              9.196153
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.598077,
+            4.098077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.098077,
+              3.232051
+            ],
+            [
+              7.098077,
+              3.232051
+            ],
+            [
+              7.598077,
+              4.098077
+            ],
+            [
+              7.098077,
+              4.964102
+            ],
+            [
+              6.098077,
+              4.964102
+            ],
+            [
+              5.598077,
+              4.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.598077,
+            11.562178
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.098077,
+              10.696153
+            ],
+            [
+              7.098077,
+              10.696153
+            ],
+            [
+              7.598077,
+              11.562178
+            ],
+            [
+              7.098077,
+              12.428204
+            ],
+            [
+              6.098077,
+              12.428204
+            ],
+            [
+              5.598077,
+              11.562178
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.464102,
+            0.866026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.964102,
+              0.0
+            ],
+            [
+              7.964102,
+              0.0
+            ],
+            [
+              8.464102,
+              0.866026
+            ],
+            [
+              7.964102,
+              1.732051
+            ],
+            [
+              6.964102,
+              1.732051
+            ],
+            [
+              6.464102,
+              0.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.464102,
+            8.330127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.964102,
+              7.464102
+            ],
+            [
+              7.964102,
+              7.464102
+            ],
+            [
+              8.464102,
+              8.330127
+            ],
+            [
+              7.964102,
+              9.196153
+            ],
+            [
+              6.964102,
+              9.196153
+            ],
+            [
+              6.464102,
+              8.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.830127,
+            3.232051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              9.330127,
+              2.366026
+            ],
+            [
+              10.330127,
+              2.366026
+            ],
+            [
+              10.830127,
+              3.232051
+            ],
+            [
+              10.330127,
+              4.098077
+            ],
+            [
+              9.330127,
+              4.098077
+            ],
+            [
+              8.830127,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.830127,
+            5.964102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              9.330127,
+              5.098077
+            ],
+            [
+              10.330127,
+              5.098077
+            ],
+            [
+              10.830127,
+              5.964102
+            ],
+            [
+              10.330127,
+              6.830127
+            ],
+            [
+              9.330127,
+              6.830127
+            ],
+            [
+              8.830127,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.830127,
+            9.696153
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              9.330127,
+              8.830127
+            ],
+            [
+              10.330127,
+              8.830127
+            ],
+            [
+              10.830127,
+              9.696153
+            ],
+            [
+              10.330127,
+              10.562178
+            ],
+            [
+              9.330127,
+              10.562178
+            ],
+            [
+              8.830127,
+              9.696153
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.866026,
+            7.830127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.866026,
+              6.830127
+            ],
+            [
+              3.732051,
+              7.330127
+            ],
+            [
+              3.732051,
+              8.330127
+            ],
+            [
+              2.866026,
+              8.830127
+            ],
+            [
+              2.0,
+              8.330127
+            ],
+            [
+              2.0,
+              7.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.732051,
+            4.598077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              4.732051,
+              3.598077
+            ],
+            [
+              5.598077,
+              4.098077
+            ],
+            [
+              5.598077,
+              5.098077
+            ],
+            [
+              4.732051,
+              5.598077
+            ],
+            [
+              3.866026,
+              5.098077
+            ],
+            [
+              3.866026,
+              4.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.732051,
+            11.062178
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              4.732051,
+              10.062178
+            ],
+            [
+              5.598077,
+              10.562178
+            ],
+            [
+              5.598077,
+              11.562178
+            ],
+            [
+              4.732051,
+              12.062178
+            ],
+            [
+              3.866026,
+              11.562178
+            ],
+            [
+              3.866026,
+              10.562178
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.598077,
+            7.830127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              5.598077,
+              6.830127
+            ],
+            [
+              6.464102,
+              7.330127
+            ],
+            [
+              6.464102,
+              8.330127
+            ],
+            [
+              5.598077,
+              8.830127
+            ],
+            [
+              4.732051,
+              8.330127
+            ],
+            [
+              4.732051,
+              7.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.098077,
+            2.232051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              6.098077,
+              1.232051
+            ],
+            [
+              6.964102,
+              1.732051
+            ],
+            [
+              6.964102,
+              2.732051
+            ],
+            [
+              6.098077,
+              3.232051
+            ],
+            [
+              5.232051,
+              2.732051
+            ],
+            [
+              5.232051,
+              1.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.964102,
+            10.196153
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              7.964102,
+              9.196153
+            ],
+            [
+              8.830127,
+              9.696153
+            ],
+            [
+              8.830127,
+              10.696153
+            ],
+            [
+              7.964102,
+              11.196153
+            ],
+            [
+              7.098077,
+              10.696153
+            ],
+            [
+              7.098077,
+              9.696153
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.464102,
+            4.598077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              8.464102,
+              3.598077
+            ],
+            [
+              9.330127,
+              4.098077
+            ],
+            [
+              9.330127,
+              5.098077
+            ],
+            [
+              8.464102,
+              5.598077
+            ],
+            [
+              7.598077,
+              5.098077
+            ],
+            [
+              7.598077,
+              4.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.330127,
+            1.366026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              9.330127,
+              0.366026
+            ],
+            [
+              10.196153,
+              0.866026
+            ],
+            [
+              10.196153,
+              1.866026
+            ],
+            [
+              9.330127,
+              2.366026
+            ],
+            [
+              8.464102,
+              1.866026
+            ],
+            [
+              8.464102,
+              0.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.330127,
+            7.830127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              9.330127,
+              6.830127
+            ],
+            [
+              10.196153,
+              7.330127
+            ],
+            [
+              10.196153,
+              8.330127
+            ],
+            [
+              9.330127,
+              8.830127
+            ],
+            [
+              8.464102,
+              8.330127
+            ],
+            [
+              8.464102,
+              7.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.196153,
+            4.598077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              11.196153,
+              3.598077
+            ],
+            [
+              12.062178,
+              4.098077
+            ],
+            [
+              12.062178,
+              5.098077
+            ],
+            [
+              11.196153,
+              5.598077
+            ],
+            [
+              10.330127,
+              5.098077
+            ],
+            [
+              10.330127,
+              4.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.196153,
+            11.062178
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-hexagon",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              11.196153,
+              10.062178
+            ],
+            [
+              12.062178,
+              10.562178
+            ],
+            [
+              12.062178,
+              11.562178
+            ],
+            [
+              11.196153,
+              12.062178
+            ],
+            [
+              10.330127,
+              11.562178
+            ],
+            [
+              10.330127,
+              10.562178
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.433013,
+            4.714102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              0.5,
+              4.464102
+            ],
+            [
+              1.5,
+              4.464102
+            ],
+            [
+              2.366026,
+              4.964102
+            ],
+            [
+              1.366026,
+              4.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.799038,
+            5.348077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              2.866026,
+              5.098077
+            ],
+            [
+              3.866026,
+              5.098077
+            ],
+            [
+              4.732051,
+              5.598077
+            ],
+            [
+              3.732051,
+              5.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.799038,
+            11.812178
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              2.866026,
+              11.562178
+            ],
+            [
+              3.866026,
+              11.562178
+            ],
+            [
+              4.732051,
+              12.062178
+            ],
+            [
+              3.732051,
+              12.062178
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.031089,
+            6.214102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.098077,
+              5.964102
+            ],
+            [
+              7.098077,
+              5.964102
+            ],
+            [
+              7.964102,
+              6.464102
+            ],
+            [
+              6.964102,
+              6.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.03109,
+            12.678204
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.098077,
+              12.428204
+            ],
+            [
+              7.098077,
+              12.428204
+            ],
+            [
+              7.964102,
+              12.928204
+            ],
+            [
+              6.964102,
+              12.928204
+            ]
+          ]
+        },
+        {
+          "center": [
+            10.26314,
+            7.080127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              9.330127,
+              6.830127
+            ],
+            [
+              10.330127,
+              6.830127
+            ],
+            [
+              11.196153,
+              7.330127
+            ],
+            [
+              10.196153,
+              7.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            12.629165,
+            7.714102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              11.696153,
+              7.464102
+            ],
+            [
+              12.696153,
+              7.464102
+            ],
+            [
+              13.562178,
+              7.964102
+            ],
+            [
+              12.562178,
+              7.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.049039,
+            2.549039
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              3.732051,
+              1.866026
+            ],
+            [
+              3.232051,
+              2.732051
+            ],
+            [
+              2.366026,
+              3.232051
+            ],
+            [
+              2.866026,
+              2.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.049039,
+            9.01314
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              3.732051,
+              8.330127
+            ],
+            [
+              3.232051,
+              9.196153
+            ],
+            [
+              2.366026,
+              9.696153
+            ],
+            [
+              2.866026,
+              8.830127
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.415064,
+            6.647114
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              6.098077,
+              5.964102
+            ],
+            [
+              5.598077,
+              6.830127
+            ],
+            [
+              4.732051,
+              7.330127
+            ],
+            [
+              5.232051,
+              6.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.647114,
+            12.245191
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              9.330127,
+              11.562178
+            ],
+            [
+              8.830127,
+              12.428204
+            ],
+            [
+              7.964102,
+              12.928204
+            ],
+            [
+              8.464102,
+              12.062178
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.647115,
+            5.781089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              9.330127,
+              5.098077
+            ],
+            [
+              8.830127,
+              5.964102
+            ],
+            [
+              7.964102,
+              6.464102
+            ],
+            [
+              8.464102,
+              5.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.01314,
+            3.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              11.696153,
+              2.732051
+            ],
+            [
+              11.196153,
+              3.598077
+            ],
+            [
+              10.330127,
+              4.098077
+            ],
+            [
+              10.830127,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.01314,
+            9.879166
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "120",
+          "vertices": [
+            [
+              11.696153,
+              9.196153
+            ],
+            [
+              11.196153,
+              10.062178
+            ],
+            [
+              10.330127,
+              10.562178
+            ],
+            [
+              10.830127,
+              9.696153
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.433013,
+            6.214102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              2.366026,
+              5.964102
+            ],
+            [
+              1.5,
+              6.464102
+            ],
+            [
+              0.5,
+              6.464102
+            ],
+            [
+              1.366026,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.799038,
+            3.848077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              4.732051,
+              3.598077
+            ],
+            [
+              3.866026,
+              4.098077
+            ],
+            [
+              2.866026,
+              4.098077
+            ],
+            [
+              3.732051,
+              3.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.799039,
+            10.312178
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              4.732051,
+              10.062178
+            ],
+            [
+              3.866026,
+              10.562178
+            ],
+            [
+              2.866026,
+              10.562178
+            ],
+            [
+              3.732051,
+              10.062178
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.031089,
+            9.446153
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              7.964102,
+              9.196153
+            ],
+            [
+              7.098077,
+              9.696153
+            ],
+            [
+              6.098077,
+              9.696153
+            ],
+            [
+              6.964102,
+              9.196153
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.03109,
+            2.982051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              7.964102,
+              2.732051
+            ],
+            [
+              7.098077,
+              3.232051
+            ],
+            [
+              6.098077,
+              3.232051
+            ],
+            [
+              6.964102,
+              2.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            10.26314,
+            2.116026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              11.196153,
+              1.866026
+            ],
+            [
+              10.330127,
+              2.366026
+            ],
+            [
+              9.330127,
+              2.366026
+            ],
+            [
+              10.196153,
+              1.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            10.26314,
+            8.580127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              11.196153,
+              8.330127
+            ],
+            [
+              10.330127,
+              8.830127
+            ],
+            [
+              9.330127,
+              8.830127
+            ],
+            [
+              10.196153,
+              8.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            12.629165,
+            6.214102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "150",
+          "vertices": [
+            [
+              13.562178,
+              5.964102
+            ],
+            [
+              12.696153,
+              6.464102
+            ],
+            [
+              11.696153,
+              6.464102
+            ],
+            [
+              12.562178,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.183013,
+            3.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              1.5,
+              2.732051
+            ],
+            [
+              2.366026,
+              3.232051
+            ],
+            [
+              2.866026,
+              4.098077
+            ],
+            [
+              2.0,
+              3.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.049039,
+            6.647115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.366026,
+              5.964102
+            ],
+            [
+              3.232051,
+              6.464102
+            ],
+            [
+              3.732051,
+              7.330127
+            ],
+            [
+              2.866026,
+              6.830127
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.415064,
+            9.01314
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              4.732051,
+              8.330127
+            ],
+            [
+              5.598077,
+              8.830127
+            ],
+            [
+              6.098077,
+              9.696153
+            ],
+            [
+              5.232051,
+              9.196153
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.28109,
+            1.049039
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              5.598077,
+              0.366026
+            ],
+            [
+              6.464102,
+              0.866026
+            ],
+            [
+              6.964102,
+              1.732051
+            ],
+            [
+              6.098077,
+              1.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.781089,
+            11.379165
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              7.098077,
+              10.696153
+            ],
+            [
+              7.964102,
+              11.196153
+            ],
+            [
+              8.464102,
+              12.062178
+            ],
+            [
+              7.598077,
+              11.562178
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.647114,
+            3.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              7.964102,
+              2.732051
+            ],
+            [
+              8.830127,
+              3.232051
+            ],
+            [
+              9.330127,
+              4.098077
+            ],
+            [
+              8.464102,
+              3.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.01314,
+            5.78109
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              10.330127,
+              5.098077
+            ],
+            [
+              11.196153,
+              5.598077
+            ],
+            [
+              11.696153,
+              6.464102
+            ],
+            [
+              10.830127,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.879166,
+            9.01314
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              11.196153,
+              8.330127
+            ],
+            [
+              12.062178,
+              8.830127
+            ],
+            [
+              12.562178,
+              9.696153
+            ],
+            [
+              11.696153,
+              9.196153
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.75,
+            7.397114
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              1.5,
+              6.464102
+            ],
+            [
+              2.0,
+              7.330127
+            ],
+            [
+              2.0,
+              8.330127
+            ],
+            [
+              1.5,
+              7.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.616026,
+            10.629165
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              2.366026,
+              9.696153
+            ],
+            [
+              2.866026,
+              10.562178
+            ],
+            [
+              2.866026,
+              11.562178
+            ],
+            [
+              2.366026,
+              10.696153
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.982051,
+            1.799039
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              4.732051,
+              0.866026
+            ],
+            [
+              5.232051,
+              1.732051
+            ],
+            [
+              5.232051,
+              2.732051
+            ],
+            [
+              4.732051,
+              1.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.848077,
+            5.031089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              5.598077,
+              4.098077
+            ],
+            [
+              6.098077,
+              4.964102
+            ],
+            [
+              6.098077,
+              5.964102
+            ],
+            [
+              5.598077,
+              5.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.214102,
+            7.397115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              7.964102,
+              6.464102
+            ],
+            [
+              8.464102,
+              7.330127
+            ],
+            [
+              8.464102,
+              8.330127
+            ],
+            [
+              7.964102,
+              7.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.080127,
+            10.629166
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              8.830127,
+              9.696153
+            ],
+            [
+              9.330127,
+              10.562178
+            ],
+            [
+              9.330127,
+              11.562178
+            ],
+            [
+              8.830127,
+              10.696153
+            ]
+          ]
+        },
+        {
+          "center": [
+            12.312178,
+            5.031089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              12.062178,
+              4.098077
+            ],
+            [
+              12.562178,
+              4.964102
+            ],
+            [
+              12.562178,
+              5.964102
+            ],
+            [
+              12.062178,
+              5.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.616026,
+            5.03109
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              2.866026,
+              4.098077
+            ],
+            [
+              2.866026,
+              5.098077
+            ],
+            [
+              2.366026,
+              5.964102
+            ],
+            [
+              2.366026,
+              4.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.848077,
+            10.629165
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              6.098077,
+              9.696153
+            ],
+            [
+              6.098077,
+              10.696153
+            ],
+            [
+              5.598077,
+              11.562178
+            ],
+            [
+              5.598077,
+              10.562178
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.714102,
+            7.397114
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              6.964102,
+              6.464102
+            ],
+            [
+              6.964102,
+              7.464102
+            ],
+            [
+              6.464102,
+              8.330127
+            ],
+            [
+              6.464102,
+              7.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.348077,
+            5.031089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              7.598077,
+              4.098077
+            ],
+            [
+              7.598077,
+              5.098077
+            ],
+            [
+              7.098077,
+              5.964102
+            ],
+            [
+              7.098077,
+              4.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.214102,
+            1.799038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              8.464102,
+              0.866026
+            ],
+            [
+              8.464102,
+              1.866026
+            ],
+            [
+              7.964102,
+              2.732051
+            ],
+            [
+              7.964102,
+              1.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.446153,
+            7.397115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-rhomb",
+          "orientation_token": "90",
+          "vertices": [
+            [
+              11.696153,
+              6.464102
+            ],
+            [
+              11.696153,
+              7.464102
+            ],
+            [
+              11.196153,
+              8.330127
+            ],
+            [
+              11.196153,
+              7.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.0,
+            6.964102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              0.5,
+              6.464102
+            ],
+            [
+              1.5,
+              6.464102
+            ],
+            [
+              1.5,
+              7.464102
+            ],
+            [
+              0.5,
+              7.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            1.866026,
+            5.464102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              1.366026,
+              4.964102
+            ],
+            [
+              2.366026,
+              4.964102
+            ],
+            [
+              2.366026,
+              5.964102
+            ],
+            [
+              1.366026,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.366026,
+            4.598077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              2.866026,
+              4.098077
+            ],
+            [
+              3.866026,
+              4.098077
+            ],
+            [
+              3.866026,
+              5.098077
+            ],
+            [
+              2.866026,
+              5.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.366026,
+            11.062178
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              2.866026,
+              10.562178
+            ],
+            [
+              3.866026,
+              10.562178
+            ],
+            [
+              3.866026,
+              11.562178
+            ],
+            [
+              2.866026,
+              11.562178
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.232051,
+            1.366026
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              3.732051,
+              0.866026
+            ],
+            [
+              4.732051,
+              0.866026
+            ],
+            [
+              4.732051,
+              1.866026
+            ],
+            [
+              3.732051,
+              1.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            4.232051,
+            7.830127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              3.732051,
+              7.330127
+            ],
+            [
+              4.732051,
+              7.330127
+            ],
+            [
+              4.732051,
+              8.330127
+            ],
+            [
+              3.732051,
+              8.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.598077,
+            5.464102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.098077,
+              4.964102
+            ],
+            [
+              7.098077,
+              4.964102
+            ],
+            [
+              7.098077,
+              5.964102
+            ],
+            [
+              6.098077,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.598077,
+            10.196153
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.098077,
+              9.696153
+            ],
+            [
+              7.098077,
+              9.696153
+            ],
+            [
+              7.098077,
+              10.696153
+            ],
+            [
+              6.098077,
+              10.696153
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.464102,
+            2.232051
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.964102,
+              1.732051
+            ],
+            [
+              7.964102,
+              1.732051
+            ],
+            [
+              7.964102,
+              2.732051
+            ],
+            [
+              6.964102,
+              2.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.464102,
+            6.964102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              6.964102,
+              6.464102
+            ],
+            [
+              7.964102,
+              6.464102
+            ],
+            [
+              7.964102,
+              7.464102
+            ],
+            [
+              6.964102,
+              7.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.830127,
+            4.598077
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              9.330127,
+              4.098077
+            ],
+            [
+              10.330127,
+              4.098077
+            ],
+            [
+              10.330127,
+              5.098077
+            ],
+            [
+              9.330127,
+              5.098077
+            ]
+          ]
+        },
+        {
+          "center": [
+            9.830127,
+            11.062178
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              9.330127,
+              10.562178
+            ],
+            [
+              10.330127,
+              10.562178
+            ],
+            [
+              10.330127,
+              11.562178
+            ],
+            [
+              9.330127,
+              11.562178
+            ]
+          ]
+        },
+        {
+          "center": [
+            10.696153,
+            7.830127
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              10.196153,
+              7.330127
+            ],
+            [
+              11.196153,
+              7.330127
+            ],
+            [
+              11.196153,
+              8.330127
+            ],
+            [
+              10.196153,
+              8.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            12.196153,
+            6.964102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              11.696153,
+              6.464102
+            ],
+            [
+              12.696153,
+              6.464102
+            ],
+            [
+              12.696153,
+              7.464102
+            ],
+            [
+              11.696153,
+              7.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            13.062178,
+            5.464102
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "0",
+          "vertices": [
+            [
+              12.562178,
+              4.964102
+            ],
+            [
+              13.562178,
+              4.964102
+            ],
+            [
+              13.562178,
+              5.964102
+            ],
+            [
+              12.562178,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.183013,
+            2.549038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.0,
+              1.866026
+            ],
+            [
+              2.866026,
+              2.366026
+            ],
+            [
+              2.366026,
+              3.232051
+            ],
+            [
+              1.5,
+              2.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.183013,
+            4.28109
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.0,
+              3.598077
+            ],
+            [
+              2.866026,
+              4.098077
+            ],
+            [
+              2.366026,
+              4.964102
+            ],
+            [
+              1.5,
+              4.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.183013,
+            9.01314
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.0,
+              8.330127
+            ],
+            [
+              2.866026,
+              8.830127
+            ],
+            [
+              2.366026,
+              9.696153
+            ],
+            [
+              1.5,
+              9.196153
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.049039,
+            5.781089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              2.866026,
+              5.098077
+            ],
+            [
+              3.732051,
+              5.598077
+            ],
+            [
+              3.232051,
+              6.464102
+            ],
+            [
+              2.366026,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.415064,
+            3.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              5.232051,
+              2.732051
+            ],
+            [
+              6.098077,
+              3.232051
+            ],
+            [
+              5.598077,
+              4.098077
+            ],
+            [
+              4.732051,
+              3.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.415064,
+            9.879165
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              5.232051,
+              9.196153
+            ],
+            [
+              6.098077,
+              9.696153
+            ],
+            [
+              5.598077,
+              10.562178
+            ],
+            [
+              4.732051,
+              10.062178
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.281089,
+            6.647115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              6.098077,
+              5.964102
+            ],
+            [
+              6.964102,
+              6.464102
+            ],
+            [
+              6.464102,
+              7.330127
+            ],
+            [
+              5.598077,
+              6.830127
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.781089,
+            5.781089
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              7.598077,
+              5.098077
+            ],
+            [
+              8.464102,
+              5.598077
+            ],
+            [
+              7.964102,
+              6.464102
+            ],
+            [
+              7.098077,
+              5.964102
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.78109,
+            12.245191
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              7.598077,
+              11.562178
+            ],
+            [
+              8.464102,
+              12.062178
+            ],
+            [
+              7.964102,
+              12.928204
+            ],
+            [
+              7.098077,
+              12.428204
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.647115,
+            2.549038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              8.464102,
+              1.866026
+            ],
+            [
+              9.330127,
+              2.366026
+            ],
+            [
+              8.830127,
+              3.232051
+            ],
+            [
+              7.964102,
+              2.732051
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.647115,
+            9.01314
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              8.464102,
+              8.330127
+            ],
+            [
+              9.330127,
+              8.830127
+            ],
+            [
+              8.830127,
+              9.696153
+            ],
+            [
+              7.964102,
+              9.196153
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.01314,
+            6.647115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              10.830127,
+              5.964102
+            ],
+            [
+              11.696153,
+              6.464102
+            ],
+            [
+              11.196153,
+              7.330127
+            ],
+            [
+              10.330127,
+              6.830127
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.879165,
+            9.879165
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              11.696153,
+              9.196153
+            ],
+            [
+              12.562178,
+              9.696153
+            ],
+            [
+              12.062178,
+              10.562178
+            ],
+            [
+              11.196153,
+              10.062178
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.879166,
+            3.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              11.696153,
+              2.732051
+            ],
+            [
+              12.562178,
+              3.232051
+            ],
+            [
+              12.062178,
+              4.098077
+            ],
+            [
+              11.196153,
+              3.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.879166,
+            8.147114
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "30",
+          "vertices": [
+            [
+              11.696153,
+              7.464102
+            ],
+            [
+              12.562178,
+              7.964102
+            ],
+            [
+              12.062178,
+              8.830127
+            ],
+            [
+              11.196153,
+              8.330127
+            ]
+          ]
+        },
+        {
+          "center": [
+            2.183013,
+            6.647115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              2.366026,
+              5.964102
+            ],
+            [
+              2.866026,
+              6.830127
+            ],
+            [
+              2.0,
+              7.330127
+            ],
+            [
+              1.5,
+              6.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.049038,
+            3.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              3.232051,
+              2.732051
+            ],
+            [
+              3.732051,
+              3.598077
+            ],
+            [
+              2.866026,
+              4.098077
+            ],
+            [
+              2.366026,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            3.049039,
+            9.879165
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              3.232051,
+              9.196153
+            ],
+            [
+              3.732051,
+              10.062178
+            ],
+            [
+              2.866026,
+              10.562178
+            ],
+            [
+              2.366026,
+              9.696153
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.415064,
+            1.049038
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              5.598077,
+              0.366026
+            ],
+            [
+              6.098077,
+              1.232051
+            ],
+            [
+              5.232051,
+              1.732051
+            ],
+            [
+              4.732051,
+              0.866026
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.415064,
+            5.78109
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              5.598077,
+              5.098077
+            ],
+            [
+              6.098077,
+              5.964102
+            ],
+            [
+              5.232051,
+              6.464102
+            ],
+            [
+              4.732051,
+              5.598077
+            ]
+          ]
+        },
+        {
+          "center": [
+            5.415064,
+            12.245191
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              5.598077,
+              11.562178
+            ],
+            [
+              6.098077,
+              12.428204
+            ],
+            [
+              5.232051,
+              12.928204
+            ],
+            [
+              4.732051,
+              12.062178
+            ]
+          ]
+        },
+        {
+          "center": [
+            6.28109,
+            9.01314
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              6.464102,
+              8.330127
+            ],
+            [
+              6.964102,
+              9.196153
+            ],
+            [
+              6.098077,
+              9.696153
+            ],
+            [
+              5.598077,
+              8.830127
+            ]
+          ]
+        },
+        {
+          "center": [
+            7.781089,
+            3.415064
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              7.964102,
+              2.732051
+            ],
+            [
+              8.464102,
+              3.598077
+            ],
+            [
+              7.598077,
+              4.098077
+            ],
+            [
+              7.098077,
+              3.232051
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.647114,
+            11.379165
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              8.830127,
+              10.696153
+            ],
+            [
+              9.330127,
+              11.562178
+            ],
+            [
+              8.464102,
+              12.062178
+            ],
+            [
+              7.964102,
+              11.196153
+            ]
+          ]
+        },
+        {
+          "center": [
+            8.647115,
+            6.647115
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              8.830127,
+              5.964102
+            ],
+            [
+              9.330127,
+              6.830127
+            ],
+            [
+              8.464102,
+              7.330127
+            ],
+            [
+              7.964102,
+              6.464102
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.01314,
+            2.549039
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              11.196153,
+              1.866026
+            ],
+            [
+              11.696153,
+              2.732051
+            ],
+            [
+              10.830127,
+              3.232051
+            ],
+            [
+              10.330127,
+              2.366026
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.01314,
+            9.01314
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              11.196153,
+              8.330127
+            ],
+            [
+              11.696153,
+              9.196153
+            ],
+            [
+              10.830127,
+              9.696153
+            ],
+            [
+              10.330127,
+              8.830127
+            ]
+          ]
+        },
+        {
+          "center": [
+            11.879166,
+            5.78109
+          ],
+          "chirality_token": null,
+          "decoration_tokens": null,
+          "kind": "socolar-hexagonal-square",
+          "orientation_token": "60",
+          "vertices": [
+            [
+              12.062178,
+              5.098077
+            ],
+            [
+              12.562178,
+              5.964102
+            ],
+            [
+              11.696153,
+              6.464102
+            ],
+            [
+              11.196153,
+              5.598077
+            ]
+          ]
+        }
+      ],
+      "depth": 3,
+      "include_id": false
+    }
+  },
   "spectre": {
     "exact-depth-3": {
       "cells": [

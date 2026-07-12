@@ -2,7 +2,6 @@ import { DEFAULT_GEOMETRY, gridMetrics, normalizeGeometry } from "../layout.js";
 import { resolveCellFromCanvasOffset as resolveGeometryCellFromOffset } from "../geometry-adapters.js";
 import { getGeometryAdapter } from "../geometry/registry.js";
 import { topologyHeight, topologyWidth } from "../topology.js";
-import { topologyUsesBackendViewportSync } from "../topology-catalog.js";
 import { resolveGeometryCache } from "./cache.js";
 import { drawCommittedLayer } from "./render-layers.js";
 import {
@@ -114,19 +113,11 @@ export function createCanvasCommittedRenderer({
         dpr: 1,
     };
 
-    function syncCanvasViewportAlignment(nextMetrics: CanvasSurfaceMetrics): void {
-        const viewport = canvas.parentElement;
-        if (!(viewport instanceof HTMLElement)) {
-            return;
-        }
-        if (topologyUsesBackendViewportSync(topology?.topology_spec)) {
-            canvas.style.margin = "0";
-            return;
-        }
-
-        const horizontalInset = Math.max(0, (viewport.clientWidth - nextMetrics.cssWidth) / 2);
-        const verticalInset = Math.max(0, (viewport.clientHeight - nextMetrics.cssHeight) / 2);
-        canvas.style.margin = `${verticalInset}px ${horizontalInset}px`;
+    function syncCanvasViewportAlignment(): void {
+        // `.grid-viewport` is a CSS grid with `place-items: center`. Applying
+        // renderer-computed margins as well double-counts the inset for
+        // presentation-only (especially aperiodic) boards.
+        canvas.style.margin = "0";
     }
 
     function drawCommittedGrid(): void {
@@ -184,7 +175,7 @@ export function createCanvasCommittedRenderer({
         const dpr = Math.max(1, getDevicePixelRatio());
         canvas.dataset.renderCellSize = String(cellSize);
         metrics = surface.resize(nextMetrics, dpr, canvasBorderRadius(nextMetrics.gap));
-        syncCanvasViewportAlignment(metrics);
+        syncCanvasViewportAlignment();
         metrics = {
             ...metrics,
             width,

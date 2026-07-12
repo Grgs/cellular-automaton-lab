@@ -41,6 +41,7 @@ ENNEAGONAL_9_FOLD_GEOMETRY = "enneagonal-9-fold"
 HEPTAGONAL_7_FOLD_GEOMETRY = "heptagonal-7-fold"
 HENDECAGONAL_11_FOLD_GEOMETRY = "hendecagonal-11-fold"
 TRIDECAGONAL_13_FOLD_GEOMETRY = "tridecagonal-13-fold"
+SOCOLAR_HEXAGONAL_GEOMETRY = "socolar-hexagonal"
 
 THICK_RHOMB_KIND = "thick-rhomb"
 THIN_RHOMB_KIND = "thin-rhomb"
@@ -108,6 +109,9 @@ TRIDECAGONAL_13_FOLD_RHOMB_3_KIND = "tridecagonal-13-fold-rhomb-3"
 TRIDECAGONAL_13_FOLD_RHOMB_4_KIND = "tridecagonal-13-fold-rhomb-4"
 TRIDECAGONAL_13_FOLD_RHOMB_5_KIND = "tridecagonal-13-fold-rhomb-5"
 TRIDECAGONAL_13_FOLD_RHOMB_6_KIND = "tridecagonal-13-fold-rhomb-6"
+SOCOLAR_HEXAGONAL_HEXAGON_KIND = "socolar-hexagonal-hexagon"
+SOCOLAR_HEXAGONAL_SQUARE_KIND = "socolar-hexagonal-square"
+SOCOLAR_HEXAGONAL_RHOMB_KIND = "socolar-hexagonal-rhomb"
 
 PENROSE_P1_TILE_FAMILY = "penrose-p1"
 ROBINSON_TILE_FAMILY = "robinson"
@@ -125,6 +129,7 @@ HENDECAGONAL_11_FOLD_TILE_FAMILY = "hendecagonal-11-fold"
 TRIDECAGONAL_13_FOLD_TILE_FAMILY = "tridecagonal-13-fold"
 L_TETROMINO_TILE_FAMILY = "l-tetromino"
 P_PENTOMINO_TILE_FAMILY = "p-pentomino"
+SOCOLAR_HEXAGONAL_TILE_FAMILY = "socolar-hexagonal"
 
 
 @dataclass(frozen=True)
@@ -589,6 +594,27 @@ APERIODIC_FAMILY_MANIFEST: dict[str, AperiodicFamilyManifestEntry] = {
             TRIDECAGONAL_13_FOLD_RHOMB_4_KIND,
             TRIDECAGONAL_13_FOLD_RHOMB_5_KIND,
             TRIDECAGONAL_13_FOLD_RHOMB_6_KIND,
+        ),
+    ),
+    SOCOLAR_HEXAGONAL_GEOMETRY: AperiodicFamilyManifestEntry(
+        geometry=SOCOLAR_HEXAGONAL_GEOMETRY,
+        catalog_label="Socolar (hexagon-square-rhomb)",
+        reference_label="Socolar (hexagon-square-rhomb)",
+        picker_group="Experimental",
+        picker_order=350,
+        default_rule="life-b2-s23",
+        builder_kind="substitution_recipe",
+        # TODO: switch implementation_status to true_substitution / exact_affine
+        # once the geometry is finalized; leave as canonical_patch for the
+        # placeholder skeleton so verifier doesn't gate on partial work.
+        implementation_status="canonical_patch",
+        public_cell_kinds=(
+            SOCOLAR_HEXAGONAL_HEXAGON_KIND,
+            SOCOLAR_HEXAGONAL_SQUARE_KIND,
+            SOCOLAR_HEXAGONAL_RHOMB_KIND,
+        ),
+        promotion_blocker=(
+            "Experimental until Socolar (hexagon-square-rhomb) geometry is implemented and visually reviewed."
         ),
     ),
 }

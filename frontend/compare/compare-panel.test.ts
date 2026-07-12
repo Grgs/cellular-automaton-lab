@@ -779,7 +779,7 @@ describe("mountComparePanel", () => {
         seedField!.value = "10101";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
 
-        expect(setupRun?.textContent).toBe("Update comparison");
+        expect(setupRun?.textContent).toBe("Run changes");
         expect(setupRun?.classList.contains("is-stale")).toBe(true);
         expect(setupRun?.disabled).toBe(false);
         setupRun?.click();
@@ -847,7 +847,7 @@ describe("mountComparePanel", () => {
         );
         seedField!.value = "1110";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
-        expect(run?.textContent).toBe("Update comparison");
+        expect(run?.textContent).toBe("Run changes");
         run?.click();
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-wall-loading")?.textContent).toContain(

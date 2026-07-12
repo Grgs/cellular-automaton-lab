@@ -127,6 +127,15 @@
       "cellSize": 12
     },
     {
+      "name": "socolar-hexagonal-depth-3",
+      "path": "socolar-hexagonal-depth-3.json",
+      "family": "socolar-hexagonal",
+      "width": 0,
+      "height": 0,
+      "patchDepth": 3,
+      "cellSize": 12
+    },
+    {
       "name": "spectre-depth-3",
       "path": "spectre-depth-3.json",
       "family": "spectre",

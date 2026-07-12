@@ -28,6 +28,7 @@ from backend.simulation.aperiodic_family_manifest import (
     ROBINSON_TRIANGLES_GEOMETRY,
     SHIELD_GEOMETRY,
     SOCOLAR_12_FOLD_GEOMETRY,
+    SOCOLAR_HEXAGONAL_GEOMETRY,
     SPECTRE_GEOMETRY,
     SPHINX_COMPACT_PAIR_GEOMETRY,
     SPHINX_GEOMETRY,
@@ -51,6 +52,7 @@ from backend.simulation.aperiodic_pinwheel_2_1 import build_pinwheel_2_1_patch
 from backend.simulation.aperiodic_robinson_triangles import build_robinson_triangles_patch
 from backend.simulation.aperiodic_shield import build_shield_patch
 from backend.simulation.aperiodic_socolar_12_fold import build_socolar_12_fold_patch
+from backend.simulation.aperiodic_socolar_hexagonal import build_socolar_hexagonal_patch
 from backend.simulation.aperiodic_spectre import build_spectre_patch
 from backend.simulation.aperiodic_sphinx import (
     build_sphinx_compact_pair_patch,
@@ -99,6 +101,7 @@ _APERIODIC_PATCH_BUILDERS: dict[str, AperiodicPatchBuilder] = {
     HEPTAGONAL_7_FOLD_GEOMETRY: build_heptagonal_7_fold_patch,
     HENDECAGONAL_11_FOLD_GEOMETRY: build_hendecagonal_11_fold_patch,
     TRIDECAGONAL_13_FOLD_GEOMETRY: build_tridecagonal_13_fold_patch,
+    SOCOLAR_HEXAGONAL_GEOMETRY: build_socolar_hexagonal_patch,
 }
 
 _APERIODIC_FAMILIES: dict[str, AperiodicFamilyDefinition] = {
