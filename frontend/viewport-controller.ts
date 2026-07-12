@@ -19,12 +19,6 @@ export function createViewportController({
     sameDimensions,
     setTimeoutFn = (callback, delay) => window.setTimeout(callback, delay),
     clearTimeoutFn = (timerId) => window.clearTimeout(timerId),
-    createResizeObserver = (callback) => {
-        if (typeof ResizeObserver === "undefined") {
-            return null;
-        }
-        return new ResizeObserver(callback);
-    },
     addWindowResizeListener = (listener) => {
         window.addEventListener("resize", listener);
         return () => window.removeEventListener("resize", listener);
@@ -33,12 +27,10 @@ export function createViewportController({
 }: ViewportControllerDependencies & {
     setTimeoutFn?: BrowserSetTimeout;
     clearTimeoutFn?: BrowserClearTimeout;
-    createResizeObserver?: (callback: ResizeObserverCallback) => ResizeObserver | null;
     addWindowResizeListener?: (listener: () => void) => (() => void) | null;
 }): ViewportController {
     let viewportSyncTimer: BrowserTimerId | null = null;
     let pendingViewportDimensions: ViewportDimensions | null = null;
-    let resizeObserver: ResizeObserver | null = null;
     let removeWindowResizeListener: (() => void) | null = null;
     let suppressAutoSyncUntil = 0;
     let lastObservedViewportDimensions: ViewportDimensions | null = null;
@@ -191,10 +183,11 @@ export function createViewportController({
             schedule({ desiredDimensions });
         };
 
-        resizeObserver = createResizeObserver(onResize);
-        if (resizeObserver && viewportElement) {
-            resizeObserver.observe(viewportElement);
-        }
+        // Internal chrome changes (arming the editor, hiding the inspector when
+        // a run starts) also resize the viewport element. Those must only
+        // change canvas presentation, not rebuild the simulation topology.
+        // A real browser resize remains the explicit auto-sizing trigger.
+        void viewportElement;
         removeWindowResizeListener = addWindowResizeListener(onResize);
     }
 
@@ -202,9 +195,6 @@ export function createViewportController({
         if (viewportSyncTimer !== null) {
             clearTimeoutFn(viewportSyncTimer);
             viewportSyncTimer = null;
-        }
-        if (resizeObserver && typeof resizeObserver.disconnect === "function") {
-            resizeObserver.disconnect();
         }
         if (typeof removeWindowResizeListener === "function") {
             removeWindowResizeListener();
