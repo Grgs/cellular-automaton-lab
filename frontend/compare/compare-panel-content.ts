@@ -22,6 +22,7 @@ import type {
     SeedFilmstripResult,
     TopologyComparisonResultPayload,
     TopologyFilmstrip,
+    TopologyOption,
     TopologyPreview,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
@@ -173,6 +174,10 @@ interface TilingOption {
     tilingFamily: string;
     label: string;
     family: string;
+    group: string;
+    order: number;
+    renderKind: string;
+    sizingMode: string;
 }
 
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
@@ -215,8 +220,26 @@ function tilingOptions(bootstrapData: AppBootstrapData): TilingOption[] {
             tilingFamily: definition.tiling_family,
             label: definition.label,
             family: definition.family,
+            group: definition.picker_group,
+            order: definition.picker_order,
+            renderKind: definition.render_kind,
+            sizingMode: definition.sizing_mode,
         }))
         .filter((option): option is TilingOption => option.geometry.length > 0);
+}
+
+function wallTilingPickerOptions(options: readonly TilingOption[]): TopologyOption[] {
+    return options.map((option) => ({
+        value: option.geometry,
+        label: option.label,
+        group: option.group,
+        order: option.order,
+        family: option.family,
+        previewKey: option.geometry,
+        renderKind: option.renderKind,
+        sizingMode: option.sizingMode,
+        searchAliases: [],
+    }));
 }
 
 /** All regular grids plus one representative per other family: a fast default sweep. */
@@ -786,6 +809,22 @@ export function createComparePanelContent(
         renderTilingChecklist();
         refreshPreview();
         scheduleWallRerun();
+    }
+
+    function replaceBoardOnWall(previousGeometry: string, nextGeometry: string): void {
+        if (running || previousGeometry === nextGeometry || !selected.has(previousGeometry)) {
+            return;
+        }
+        const next = allTilings.find((tiling) => tiling.geometry === nextGeometry);
+        if (!next || selected.has(nextGeometry) || !tilingCompatibleWithSelectedRule(next)) {
+            return;
+        }
+        selected.delete(previousGeometry);
+        selected.add(nextGeometry);
+        statusLine.textContent = `Replaced a board with ${next.label} — updating the wall…`;
+        renderTilingChecklist();
+        refreshPreview();
+        void runFilmstrip();
     }
 
     editModeButton.addEventListener("click", () => setEditMode(!editMode));
@@ -2236,6 +2275,16 @@ export function createComparePanelContent(
                     onFrameChange: () => updateExplainer(),
                     onPaintCell: handlePaintCell,
                     onRemoveBoard: removeBoardFromWall,
+                    tilingOptions: wallTilingPickerOptions(allTilings),
+                    onReplaceBoard: replaceBoardOnWall,
+                    isTilingAvailable: (geometry) =>
+                        Boolean(
+                            allTilings.find(
+                                (tiling) =>
+                                    tiling.geometry === geometry &&
+                                    tilingCompatibleWithSelectedRule(tiling),
+                            ),
+                        ),
                 });
                 filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripView.setEditMode(editMode);
@@ -2642,6 +2691,9 @@ export function createComparePanelContent(
             statusLine.textContent = message;
         },
         handleEscape(): boolean {
+            if (filmstripView?.closeTilingPicker()) {
+                return true;
+            }
             const openMenu = root.querySelector(".compare-action-menu[open]");
             if (openMenu) {
                 openMenu.removeAttribute("open");
