@@ -24,7 +24,7 @@ It is intended for comparing how familiar automata behave on different local nei
 
 ## Highlights
 
-- 55 shipped tiling families (3 regular grids, 28 periodic mixed tilings, 24 aperiodic patches including Penrose variants, the Hat/Turtle/Spectre monotiles, the chair/L-tetromino/P-pentomino rep-tiles, and 7-/9-/11-/12-/13-fold quasicrystals)
+- 56 shipped tiling families (3 regular grids, 29 periodic mixed tilings, 24 aperiodic patches including Penrose variants, the Hat/Turtle/Spectre monotiles, the chair/L-tetromino/P-pentomino rep-tiles, and 7-/9-/11-/12-/13-fold quasicrystals)
 - 16 built-in rules spanning Life-like, mixed-tiling, excitable, and signal systems
 - one shared `next_state(ctx)` rule protocol across all shipped topologies
 - canvas-first editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
@@ -38,9 +38,9 @@ It is intended for comparing how familiar automata behave on different local nei
 
 ![Compare results showing one acorn seed evaluated across representative tilings](docs/images/readme-compare-results-hero.png)
 
-### Snub Trihexagonal mixed-tiling board in the Lab
+### 2-uniform #3 square-triangle board in the Lab
 
-![Snub Trihexagonal mixed Life](docs/images/readme-snub-trihexagonal-overview.png)
+![2-uniform #3 square-triangle Life](docs/images/readme-uniform-2-3-overview.png)
 
 ### Pinwheel aperiodic patch with depth controls
 
