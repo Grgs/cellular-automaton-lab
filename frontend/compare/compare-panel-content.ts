@@ -176,7 +176,7 @@ interface TilingOption {
 }
 
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
-type ConfigTab = "setup" | "tilings" | "analysis" | "saved";
+type ConfigTab = "setup" | "tilings" | "analysis" | "help" | "saved";
 
 interface ActionMenuItem {
     label: string;
@@ -1119,6 +1119,7 @@ export function createComparePanelContent(
             configTabButton("setup", "Setup"),
             configTabButton("tilings", "Tilings"),
             configTabButton("analysis", "Analysis"),
+            configTabButton("help", "Help"),
             configTabButton("saved", "Saved"),
         ],
     );
@@ -1150,6 +1151,9 @@ export function createComparePanelContent(
             resultsArea,
         ]),
     ]);
+    const helpConfigPanel = configPanel("help", [
+        el("div", { class: "compare-help" }, comparisonHelpContent()),
+    ]);
     const savedConfigPanel = configPanel("saved", [savedCompareControls()]);
     const configSheet = el("div", { class: "compare-config-sheet", inert: true }, [
         el("div", { class: "compare-config-sheet-header" }, [
@@ -1161,6 +1165,7 @@ export function createComparePanelContent(
             setupConfigPanel,
             tilingsConfigPanel,
             analysisConfigPanel,
+            helpConfigPanel,
             savedConfigPanel,
         ]),
     ]);
@@ -1218,6 +1223,28 @@ export function createComparePanelContent(
         ]);
     }
 
+    function comparisonHelpContent(): HTMLElement[] {
+        return [
+            el("div", { class: "compare-help-title", textContent: "How the comparison works" }),
+            explainerItem(
+                "Same seed",
+                "One starting pattern is projected onto every selected board.",
+            ),
+            explainerItem(
+                "Same rule",
+                "Each board runs the selected rule on the same generation clock.",
+            ),
+            explainerItem(
+                "Different tilings",
+                "Topology changes the neighbors, so outcomes can diverge.",
+            ),
+            el("div", {
+                class: "compare-explainer-hint",
+                textContent: "Click a board to focus it. Use Open in Lab to continue from a frame.",
+            }),
+        ];
+    }
+
     function configTabButton(tab: ConfigTab, label: string): HTMLButtonElement {
         const button = el("button", {
             class: "compare-config-tab",
@@ -1265,7 +1292,7 @@ export function createComparePanelContent(
     }
 
     function handleConfigTabKeydown(event: KeyboardEvent): void {
-        const tabs: ConfigTab[] = ["setup", "tilings", "analysis", "saved"];
+        const tabs: ConfigTab[] = ["setup", "tilings", "analysis", "help", "saved"];
         const activeIndex = tabs.findIndex(
             (tab) => configTabButtons.get(tab) === document.activeElement,
         );

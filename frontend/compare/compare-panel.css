@@ -864,6 +864,15 @@
 .compare-analysis {
     margin-top: 4px;
 }
+.compare-help {
+    display: grid;
+    gap: 10px;
+}
+.compare-help-title {
+    color: var(--ink, #1f2430);
+    font-size: 15px;
+    font-weight: 700;
+}
 .compare-run {
     flex: 0 0 auto;
     padding: 9px 18px;
@@ -1604,6 +1613,14 @@
        stays two-up until a board is focused. */
     .compare-explainer {
         display: none;
+    }
+    /* Touch devices cannot reveal the hover-only remove control. Keep it
+       visible with a comfortable target while three or more boards are shown. */
+    .compare-filmstrip-remove {
+        min-width: 24px;
+        min-height: 24px;
+        opacity: 0.78;
+        pointer-events: auto;
     }
     .compare-stage {
         padding: 8px;

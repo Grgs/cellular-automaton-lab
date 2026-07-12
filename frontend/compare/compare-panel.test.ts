@@ -891,6 +891,11 @@ describe("mountComparePanel", () => {
         expect(document.querySelector<HTMLElement>("#compare-config-panel-analysis")?.hidden).toBe(
             false,
         );
+        document.querySelector<HTMLButtonElement>("#compare-config-tab-help")?.click();
+        const helpPanel = document.querySelector<HTMLElement>("#compare-config-panel-help");
+        expect(helpPanel?.hidden).toBe(false);
+        expect(helpPanel?.textContent).toContain("Same seed");
+        expect(helpPanel?.textContent).toContain("Different tilings");
         document.querySelector<HTMLButtonElement>(".compare-run-secondary")?.click();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         handle.dispose();
