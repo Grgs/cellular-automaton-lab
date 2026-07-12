@@ -234,6 +234,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_run_toggle_advances_generation_and_pauses(self) -> None:
         case = self._case()
+        self._paint_canvas_center()
         initial_generation = self._read_generation()
 
         case.page.click("#run-toggle-btn")

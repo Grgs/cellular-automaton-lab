@@ -1,0 +1,43 @@
+{
+  "geometry": "uniform-2-3-44-33344",
+  "label": "2-uniform #3 (4^4; 3^3.4^2)",
+  "picker_group": "Periodic Mixed",
+  "picker_order": 254,
+  "family": "mixed",
+  "viewport_sync_mode": "backend-sync",
+  "sizing_policy": {
+    "control": "cell_size",
+    "default": 12,
+    "min": 8,
+    "max": 20
+  },
+  "default_rule": "life-b2-s23",
+  "minimum_grid_dimension": 1,
+  "source_urls": [
+    "https://commons.wikimedia.org/wiki/File:2-uniform_n3.svg"
+  ],
+  "palette": {
+    "geometry": "uniform-2-3-44-33344",
+    "variants": [
+      {
+        "label": "uniform-2-3-44-33344-square",
+        "selector": {
+          "kind": "square"
+        },
+        "color": {
+          "token": "toneStone"
+        }
+      },
+      {
+        "label": "uniform-2-3-44-33344-triangle",
+        "selector": {
+          "kind": "triangle"
+        },
+        "color": {
+          "token": "toneClay"
+        }
+      }
+    ]
+  },
+  "preview_data": "toneClay:4,8 9,0 13,8;toneClay:4,8 -5,8 -1,0;toneClay:4,8 -1,0 9,0;toneClay:13,8 18,0 23,8;toneClay:13,8 9,0 18,0;toneClay:4,36 -1,44 -5,36;toneClay:4,36 13,36 9,44;toneClay:4,36 9,44 -1,44;toneClay:23,8 27,0 32,8;toneClay:23,8 18,0 27,0;toneClay:13,36 23,36 18,44;toneClay:13,36 18,44 9,44;toneClay:32,8 37,0 41,8;toneClay:32,8 27,0 37,0;toneClay:23,36 32,36 27,44;toneClay:23,36 27,44 18,44;toneClay:41,8 46,0 51,8;toneClay:41,8 37,0 46,0;toneClay:32,36 41,36 37,44;toneClay:32,36 37,44 27,44;toneClay:51,8 55,0 60,8;toneClay:51,8 46,0 55,0;toneClay:41,36 51,36 46,44;toneClay:41,36 46,44 37,44;toneClay:60,8 55,0 65,0;toneClay:51,36 60,36 55,44;toneClay:51,36 55,44 46,44;toneClay:65,44 55,44 60,36;toneStone:4,17 4,8 13,8 13,17;toneStone:4,17 -5,17 -5,8 4,8;toneStone:13,17 13,8 23,8 23,17;toneStone:4,27 4,36 -5,36 -5,27;toneStone:4,27 13,27 13,36 4,36;toneStone:23,17 23,8 32,8 32,17;toneStone:13,27 23,27 23,36 13,36;toneStone:32,17 32,8 41,8 41,17;toneStone:23,27 32,27 32,36 23,36;toneStone:9,44 18,44 18,53 9,53;toneStone:9,44 9,53 -1,53 -1,44;toneStone:41,17 41,8 51,8 51,17;toneStone:32,27 41,27 41,36 32,36;toneStone:18,44 27,44 27,53 18,53;toneStone:51,17 51,8 60,8 60,17;toneStone:41,27 51,27 51,36 41,36;toneStone:27,44 37,44 37,53 27,53;toneStone:51,27 60,27 60,36 51,36;toneStone:37,44 46,44 46,53 37,53;toneStone:55,53 46,53 46,44 55,44;toneStone:65,44 65,53 55,53 55,44;toneStone:4,17 4,27 -5,27 -5,17;toneStone:13,17 23,17 23,27 13,27;toneStone:23,17 32,17 32,27 23,27;toneStone:32,17 41,17 41,27 32,27;toneStone:41,17 51,17 51,27 41,27;toneStone:9,53 18,53 18,63 9,63;toneStone:9,53 9,63 -1,63 -1,53;toneStone:51,17 60,17 60,27 51,27;toneStone:18,53 27,53 27,63 18,63;toneStone:27,53 37,53 37,63 27,63;toneStone:46,63 37,63 37,53 46,53;toneStone:55,53 55,63 46,63 46,53;toneStone:55,53 65,53 65,63 55,63;toneStone:4,17 13,17 13,27 4,27;toneStone:-1,72 -1,63 9,63 9,72;toneStone:9,72 9,63 18,63 18,72;toneStone:18,72 18,63 27,63 27,72;toneStone:27,72 27,63 37,63 37,72;toneStone:37,72 37,63 46,63 46,72;toneStone:46,72 46,63 55,63 55,72;toneStone:65,63 65,72 55,72 55,63;toneClay:88,8 93,0 97,8;toneClay:88,8 79,8 83,0;toneClay:88,8 83,0 93,0;toneClay:97,8 102,0 107,8;toneClay:97,8 93,0 102,0;toneClay:88,36 83,44 79,36;toneClay:88,36 97,36 93,44;toneClay:88,36 93,44 83,44;toneClay:79,8 69,8 74,0;toneClay:79,8 74,0 83,0;toneClay:107,8 111,0 116,8;toneClay:107,8 102,0 111,0;toneClay:97,36 107,36 102,44;toneClay:97,36 102,44 93,44;toneClay:79,36 74,44 69,36;toneClay:79,36 83,44 74,44;toneClay:69,8 60,8 65,0;toneClay:69,8 65,0 74,0;toneClay:116,8 121,0 125,8;toneClay:116,8 111,0 121,0;toneClay:107,36 116,36 111,44;toneClay:107,36 111,44 102,44;toneClay:69,36 65,44 60,36;toneClay:69,36 74,44 65,44;toneClay:116,36 125,36 121,44;toneClay:116,36 121,44 111,44;toneStone:88,17 88,8 97,8 97,17;toneStone:88,17 79,17 79,8 88,8;toneStone:97,17 97,8 107,8 107,17;toneStone:88,27 88,36 79,36 79,27;toneStone:88,27 97,27 97,36 88,36;toneStone:79,17 69,17 69,8 79,8;toneStone:107,17 107,8 116,8 116,17;toneStone:97,27 107,27 107,36 97,36;toneStone:79,27 79,36 69,36 69,27;toneStone:69,17 60,17 60,8 69,8;toneStone:116,17 116,8 125,8 125,17;toneStone:107,27 116,27 116,36 107,36;toneStone:69,27 69,36 60,36 60,27;toneStone:93,44 102,44 102,53 93,53;toneStone:93,44 93,53 83,53 83,44;toneStone:83,44 83,53 74,53 74,44;toneStone:116,27 125,27 125,36 116,36;toneStone:102,44 111,44 111,53 102,53;toneStone:74,44 74,53 65,53 65,44;toneStone:111,44 121,44 121,53 111,53;toneStone:88,17 88,27 79,27 79,17;toneStone:97,17 107,17 107,27 97,27;toneStone:79,17 79,27 69,27 69,17;toneStone:107,17 116,17 116,27 107,27;toneStone:69,17 69,27 60,27 60,17;toneStone:116,17 125,17 125,27 116,27;toneStone:93,53 102,53 102,63 93,63;toneStone:93,53 93,63 83,63 83,53;toneStone:83,53 83,63 74,63 74,53;toneStone:102,53 111,53 111,63 102,63;toneStone:74,53 74,63 65,63 65,53;toneStone:111,53 121,53 121,63 111,63;toneStone:88,17 97,17 97,27 88,27;toneStone:83,72 74,72 74,63 83,63;toneStone:83,72 83,63 93,63 93,72;toneStone:93,72 93,63 102,63 102,72;toneStone:102,72 102,63 111,63 111,72;toneStone:74,72 65,72 65,63 74,63;toneStone:111,72 111,63 121,63 121,72"
+}
