@@ -59,12 +59,12 @@ It is intended for comparing how familiar automata behave on different local nei
 - Switch to Penrose P1 and compare the `Distributed` and `Boat-Star` construction modes to see the difference between the distributed vertex-merge manifestation and the centered singular pentagrid patch.
 - Try the convex pentagonal periodic catalog with Cairo, Prismatic, Floret, Type 7, Stein 14, and Pentagon Crosses to compare how the same rule family behaves on distinct pentagon adjacencies.
 - Try Whirlpool or HexWhirlpool from the preset/showcase controls for a quick multi-state animation that exercises more than binary Life-like states.
-- Open the app on the comparison wall, press **Play side by side** to watch one seed evolve across the selected tilings, click a board to zoom into speaker view, and use the hero's **⑂ Fork live** to keep editing that generation while the others keep looping. Use the header's **Open the Lab →** / **⊞ Wall** to move between the wall and the single-board editor (`#/lab`).
+- Open the app on the comparison wall, press **Run comparison** to watch one seed evolve across the selected tilings, click a board to zoom into speaker view, and use the hero's **⑂ Fork live** action to keep editing that generation while the others keep looping. Use the header's **Compare** / **Lab** switch to move between the wall and the single-board editor (`#/lab`).
 - Reload the standalone GitHub Pages demo after changing topology or state to check browser persistence without the Flask server.
 
 ## The Comparison Wall
 
-The wall is the landing view: a bare URL opens it, and on a first visit it autoplays a curated demo so you meet something alive in one click. It runs one shared seed, rule, traversal, frame count, and grid size so each selected tiling starts from comparable conditions. The tiling checklist and presets define the boards; unsupported rule/tiling combinations are disabled in the picker and rejected by the backend if submitted directly. Configuration and analysis wait in disclosures below the stage.
+The wall is the landing view: a bare URL opens it, and on a first visit it autoplays a curated demo so you meet something alive in one click. It runs one shared seed, rule, traversal, frame count, and grid size so each selected tiling starts from comparable conditions. The tiling checklist and presets define the boards; unsupported rule/tiling combinations are disabled in the picker and rejected by the backend if submitted directly. Setup, tiling selection, analysis, help, and saved runs live in the tabbed configuration sheet opened from the dock.
 
 Two layout states share one persistent transport (play, pause, step, scrub, speed on one clock):
 
@@ -73,7 +73,7 @@ Two layout states share one persistent transport (play, pause, step, scrub, spee
 
 **Edit mode** (the dock's ✎) makes board cells clickable in either layout: painting at generation 0 edits the shared seed directly (generation 0 re-projects onto every board instantly, then a debounced re-run replays the evolution everywhere), while painting at any later generation auto-forks that board live from its current frame and carries the stroke over as the fork's first edit. The seed pad in the config sheet remains for bit-level control.
 
-The **Cross-tiling analysis** disclosure computes a phase portrait plus a result table on demand; each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
+The configuration sheet's **Analysis** tab computes a phase portrait plus a result table on demand; each row can open or copy the begin/end board state as a normal `#share=v1...` board link.
 
 Use **Copy run link** to create a `#/compare&run=v1.<base64url-json>` URL. Opening that link restores the setup without auto-running or auto-playing, so cold loads do not start surprise work. Use **Saved runs** and **Saved tiling sets** to keep named setups in browser `localStorage`; they work in both the Flask app and the standalone demo, but they are local to the current browser/device. Run links are the portable format.
 
