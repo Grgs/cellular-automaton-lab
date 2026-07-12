@@ -158,6 +158,24 @@
     font-size: 14px;
     line-height: 1.25;
 }
+.compare-setup-select {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    appearance: auto;
+}
+.compare-setup-select:hover {
+    color: var(--compare-teal);
+}
+.compare-setup-select:focus-visible {
+    outline: 2px solid var(--focus, #5cc8ff);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
 .compare-setup-action-row {
     min-width: 0;
     display: flex;
