@@ -80,10 +80,10 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
     page.locator(".wall-page").wait_for(state="visible", timeout=TIMEOUT_MS)
     # Configuration lives in a bottom sheet the dock gear slides up.
     page.locator('.compare-dock-icon[aria-label="Configure the run"]').click(timeout=TIMEOUT_MS)
-    page.locator(".compare-config-run").evaluate("(section) => { section.open = true; }")
-    selects = page.locator("select.compare-field")
+    setup_panel = page.locator("#compare-config-panel-setup")
+    selects = setup_panel.locator("select.compare-field")
     selects.nth(1).select_option("acorn", timeout=TIMEOUT_MS)
-    page.locator("input.compare-field").evaluate_all(
+    setup_panel.locator("input.compare-field").evaluate_all(
         """(inputs) => {
             const numberInputs = inputs.filter((input) => input instanceof HTMLInputElement && input.type === "number");
             const steps = numberInputs[0];
@@ -100,25 +100,44 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
             }
         }"""
     )
-    # The analytical run lives in a collapsed disclosure below the stage.
-    page.locator(".compare-config-analysis").evaluate("(section) => { section.open = true; }")
-    page.get_by_role("button", name="Run comparison", exact=True).click(timeout=TIMEOUT_MS)
+    page.locator("#compare-config-tab-analysis").click(timeout=TIMEOUT_MS)
+    analysis_panel = page.locator("#compare-config-panel-analysis")
+    analysis_panel.wait_for(state="visible", timeout=TIMEOUT_MS)
+    analysis_panel.get_by_role("button", name="Run analysis", exact=True).click(timeout=TIMEOUT_MS)
     page.locator(".compare-grid tbody tr").nth(0).wait_for(state="visible", timeout=TIMEOUT_MS)
-    # Flatten the fixed config sheet so a full-height capture includes the whole
-    # analysis section, which now lives inside it.
     page.add_style_tag(
         content="""
             .compare-config-sheet {
-                position: absolute !important;
+                position: static !important;
                 transform: none !important;
                 max-height: none !important;
+                height: auto !important;
             }
-            .compare-config-sheet-body {
+            .compare-config-sheet-body,
+            .compare-config-panel-analysis {
                 overflow: visible !important;
+                max-height: none !important;
+            }
+            .wall-screen,
+            .compare-config-sheet-header,
+            .compare-config-tabs,
+            .compare-intro,
+            .compare-run-secondary {
+                display: none !important;
+            }
+            html,
+            body,
+            .compare-content {
+                overflow: visible !important;
+                height: auto !important;
             }
         """
     )
-    _save_locator_png(page, ".compare-config-sheet", output_dir / "readme-compare-results-hero.png")
+    _save_optimized_png(
+        page,
+        output_dir / "readme-compare-results-hero.png",
+        full_page=True,
+    )
 
 
 def _capture_wall_hero(page: Page, output_dir: Path) -> None:
@@ -129,23 +148,19 @@ def _capture_wall_hero(page: Page, output_dir: Path) -> None:
     page.locator(".compare-filmstrip-board .compare-thumb").nth(3).wait_for(
         state="visible", timeout=TIMEOUT_MS
     )
-    _save_locator_png(page, ".wall-page", output_dir / "readme-wall-hero.png")
+    _save_optimized_png(page, output_dir / "readme-wall-hero.png")
 
 
-def _capture_snub_workspace(page: Page, output_dir: Path) -> None:
-    select_tiling_family(page, "archimedean-3-3-3-3-6", timeout_ms=TIMEOUT_MS)
+def _capture_uniform_2_3_workspace(page: Page, output_dir: Path) -> None:
+    select_tiling_family(page, "uniform-2-3-44-33344", timeout_ms=TIMEOUT_MS)
     _wait_ready(page)
-    _open_inspector_sheet(page)
-    _select_native_value(page, "#rule-select", "kagome-life")
-    _wait_ready(page)
-    # Close the sheet so the captured workspace shows the full board.
-    _click(page, "#drawer-toggle-btn")
     _click(page, "#random-btn")
     _wait_ready(page)
     for _ in range(12):
         _click(page, "#step-btn")
         _wait_ready(page)
-    _save_optimized_png(page, output_dir / "readme-snub-trihexagonal-overview.png")
+    page.evaluate("window.scrollTo(0, 0)")
+    _save_optimized_png(page, output_dir / "readme-uniform-2-3-overview.png")
 
 
 def _capture_pinwheel_workspace(page: Page, output_dir: Path) -> None:
@@ -153,6 +168,7 @@ def _capture_pinwheel_workspace(page: Page, output_dir: Path) -> None:
     _wait_ready(page)
     set_patch_depth(page, 3, timeout_ms=TIMEOUT_MS)
     _wait_ready(page)
+    page.evaluate("window.scrollTo(0, 0)")
     _save_optimized_png(page, output_dir / "readme-pinwheel-overview.png")
 
 
@@ -165,6 +181,7 @@ def _capture_picker_thumbnails(page: Page, output_dir: Path) -> None:
         state="visible",
         timeout=TIMEOUT_MS,
     )
+    page.evaluate("window.scrollTo(0, 0)")
     _save_optimized_png(page, output_dir / "readme-tiling-picker-thumbnails.png")
 
 
@@ -185,7 +202,7 @@ def capture_readme_screenshots(output_dir: Path) -> None:
     scenarios: tuple[tuple[Callable[[Page, Path], None], str, bool], ...] = (
         (_capture_wall_hero, "", False),
         (_capture_compare_results, "", True),
-        (_capture_snub_workspace, "#/lab", True),
+        (_capture_uniform_2_3_workspace, "#/lab", True),
         (_capture_pinwheel_workspace, "#/lab", True),
         (_capture_picker_thumbnails, "#/lab", True),
     )
