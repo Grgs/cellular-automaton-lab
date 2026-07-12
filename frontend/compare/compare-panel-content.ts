@@ -514,15 +514,14 @@ export function createComparePanelContent(
         role: "status",
         "aria-live": "polite",
     });
-    const setupSeedValue = el("strong", {
-        class: "compare-setup-value",
-        textContent: "Loading",
-        title: "Loading",
-    });
-    const setupRuleValue = el("strong", {
-        class: "compare-setup-value",
-        textContent: "Loading",
-        title: "Loading",
+    const setupSeedValue = shapeSelect.cloneNode(true) as HTMLSelectElement;
+    setupSeedValue.className = "compare-setup-value compare-setup-select";
+    setupSeedValue.setAttribute("aria-label", "Comparison seed");
+    setupSeedValue.title = "Choose the shared seed";
+    const setupRuleValue = el("select", {
+        class: "compare-setup-value compare-setup-select",
+        "aria-label": "Comparison rule",
+        title: "Choose the comparison rule",
     });
     const setupTilingsValue = el("strong", {
         class: "compare-setup-value",
@@ -564,6 +563,17 @@ export function createComparePanelContent(
             setupRunButton,
         ],
     );
+    setupSeedValue.addEventListener("change", () => {
+        shapeSelect.value = setupSeedValue.value;
+        shapeSelect.dispatchEvent(new Event("change"));
+    });
+    setupRuleValue.addEventListener("change", () => {
+        if (!selectHasValue(ruleSelect, setupRuleValue.value)) {
+            return;
+        }
+        ruleSelect.value = setupRuleValue.value;
+        ruleSelect.dispatchEvent(new Event("change"));
+    });
     const stageHero = el("div", { class: "compare-stage-hero" }, [
         el("div", { class: "compare-stage-hero-glyph", "aria-hidden": "true", textContent: "▦" }),
         el("div", {
@@ -1766,16 +1776,13 @@ export function createComparePanelContent(
     }
 
     function updateSetupSummary(): void {
-        const seedBits = normalizedSeedBits().length;
-        const seedLabel = isShapeMode()
-            ? selectedOptionLabel(shapeSelect) || "Shape"
-            : `${seedBits} bit${seedBits === 1 ? "" : "s"}`;
         const ruleLabel = selectedRule()?.display_name ?? selectedRuleName();
         const tilingLabel = `${selected.size} selected`;
-        setupSeedValue.textContent = seedLabel;
-        setupRuleValue.textContent = ruleLabel;
         setupTilingsValue.textContent = tilingLabel;
-        setupSeedValue.title = seedLabel;
+        setupSeedValue.value = shapeSelect.value;
+        if (selectHasValue(setupRuleValue, ruleSelect.value)) {
+            setupRuleValue.value = ruleSelect.value;
+        }
         setupRuleValue.title = ruleLabel;
         setupTilingsValue.title = summaryText();
     }
@@ -1837,10 +1844,6 @@ export function createComparePanelContent(
                 textContent: "Click a board to focus it. Use Open in Lab to continue from a frame.",
             }),
         );
-    }
-
-    function selectedOptionLabel(select: HTMLSelectElement): string {
-        return select.selectedOptions[0]?.textContent?.trim() || select.value;
     }
 
     function ruleByName(ruleName: string): RuleDefinition | null {
@@ -2092,6 +2095,11 @@ export function createComparePanelContent(
                 el("option", { value: rule.name, textContent: rule.display_name ?? rule.name }),
             ),
         );
+        setupRuleValue.replaceChildren(
+            ...rules.map((rule) =>
+                el("option", { value: rule.name, textContent: rule.display_name ?? rule.name }),
+            ),
+        );
         const preferredRuleName = preferredInitialRuleName();
         const conway = rules.find((rule) => rule.name === "conway");
         if (preferredRuleName && selectHasValue(ruleSelect, preferredRuleName)) {
@@ -2103,6 +2111,7 @@ export function createComparePanelContent(
             pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
             renderTilingChecklist();
             refreshPreview();
+            updateSummary();
         });
         pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
         renderTilingChecklist();

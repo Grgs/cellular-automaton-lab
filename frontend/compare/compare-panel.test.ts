@@ -737,6 +737,43 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("edits the comparison seed and rule from the setup strip", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-setup-select")).toHaveLength(2);
+        });
+        const [seedSelect, ruleSelect] = [
+            ...document.querySelectorAll<HTMLSelectElement>(".compare-setup-select"),
+        ];
+        if (!seedSelect || !ruleSelect) {
+            throw new Error("missing setup strip selects");
+        }
+
+        seedSelect.value = "glider";
+        seedSelect.dispatchEvent(new Event("change"));
+        ruleSelect.value = "kagome-life";
+        ruleSelect.dispatchEvent(new Event("change"));
+
+        const analysisRun = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
+            (button) => button.textContent === "Run analysis",
+        );
+        analysisRun?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
+        expect(compareSeed.mock.calls.at(0)?.[0]).toMatchObject({
+            pattern: "glider",
+            rule: "kagome-life",
+            geometries: ["kagome"],
+        });
+        handle.dispose();
+    });
+
     it("runs the filmstrip from the setup strip primary action", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();

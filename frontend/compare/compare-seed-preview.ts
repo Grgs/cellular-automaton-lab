@@ -76,9 +76,12 @@ function thumbnailLink(href: string, label: string, thumbnail: SVGSVGElement): H
     anchor.href = href;
     anchor.target = "_blank";
     anchor.rel = "noopener";
-    anchor.title = `Open ${label} seed placement in a new tab`;
-    anchor.setAttribute("aria-label", `Open ${label} seed placement in a new tab`);
-    anchor.append(thumbnail);
+    anchor.title = `Edit ${label} seed placement in the Lab (opens in a new tab)`;
+    anchor.setAttribute(
+        "aria-label",
+        `Edit ${label} seed placement in the Lab (opens in a new tab)`,
+    );
+    anchor.append(thumbnail, el("span", "compare-thumb-link-action", "Edit in Lab ↗"));
     return anchor;
 }
 

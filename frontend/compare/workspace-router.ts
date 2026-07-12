@@ -174,6 +174,12 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
     }
 
     function showRoute(route: ShellRoute): void {
+        const routeContext = document.getElementById("shell-route-context");
+        const sharedBoardOpen = route === "lab" && window.location.hash.includes("share=");
+        if (routeContext) {
+            routeContext.hidden = !sharedBoardOpen;
+            routeContext.textContent = sharedBoardOpen ? "Shared board" : "";
+        }
         if (labRoot) {
             labRoot.hidden = route !== "lab";
         }
