@@ -232,9 +232,14 @@ describe("mountWorkspaceRouter", () => {
 
     it("keeps the wall closed for a bare share link (share implies Lab)", async () => {
         window.location.hash = "#share=v1.abc";
+        const routeContext = document.createElement("span");
+        routeContext.id = "shell-route-context";
+        document.body.append(routeContext);
         await mount();
 
         expect(document.querySelector(".wall-page")).toBeNull();
+        expect(routeContext.hidden).toBe(false);
+        expect(routeContext.textContent).toBe("Shared board");
     });
 
     it("opens the wall for the legacy #/compare alias", async () => {
