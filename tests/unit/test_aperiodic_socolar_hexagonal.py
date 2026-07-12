@@ -36,9 +36,9 @@ _KIND_EDGE_COUNT = {
 }
 
 
-def _exact_generated_tiles(radius_units: float) -> dict[tuple, str]:
+def _exact_generated_tiles(radius_units: float) -> dict[tuple[tuple[int, int, int, int], ...], str]:
     """Exact x2-module tile map (sorted verts -> internal kind) at radius."""
-    out: dict[tuple, str] = {}
+    out: dict[tuple[tuple[int, int, int, int], ...], str] = {}
     for spec in _CLASSES:
         if "reduced_base" not in spec:
             spec["reduced_base"] = _reduced_base(spec)

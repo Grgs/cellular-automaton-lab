@@ -38,6 +38,7 @@ from __future__ import annotations
 import math
 from collections import deque
 from fractions import Fraction
+from typing import Any
 
 from backend.simulation.aperiodic_family_manifest import (
     SOCOLAR_HEXAGONAL_HEXAGON_KIND,
@@ -177,7 +178,7 @@ def _q3_leq(p: int, q: int, rp: int, rq: int) -> bool:
 # i.e. window test: dot30_q3_times4(star(c), k) <= (p, q).
 # ---------------------------------------------------------------------------
 
-_CLASSES: tuple[dict, ...] = (
+_CLASSES: tuple[dict[str, Any], ...] = (
     # hexagons: family 0 (edge parity 0), deep-hole subtypes up/down
     {
         "kind": "hexagon",
@@ -295,12 +296,12 @@ def _centered_prototile(kind: str) -> tuple[Module, ...]:
         verts = [(0, 0, 0, 0)]
         for k in (0, 2, 4, 6, 8):
             verts.append(_madd(verts[-1], _UNIT[k]))
-    doubled = [tuple(2 * x for x in v) for v in verts]
+    doubled: list[Module] = [(2 * v[0], 2 * v[1], 2 * v[2], 2 * v[3]) for v in verts]
     total = (0, 0, 0, 0)
     for v in doubled:
         total = _madd(total, v)
     n = len(doubled)
-    center = tuple(x // n for x in total)
+    center: Module = (total[0] // n, total[1] // n, total[2] // n, total[3] // n)
     if tuple(x * n for x in center) != total:
         raise AssertionError("prototile center is not integral at x2 scale")
     return tuple(_msub(v, center) for v in doubled)
@@ -317,7 +318,7 @@ _RADIUS_PER_DEPTH = 0.75
 _STAR_BOUND = 8.0
 
 
-def _reduced_base(spec: dict) -> Module:
+def _reduced_base(spec: dict[str, Any]) -> Module:
     """A coset point near the origin in physical space whose star image stays
     near the class window (the embedded base is a far-away literature-patch
     center). Solves the real 4x4 system (physical -> 0, star -> star(base))
@@ -368,7 +369,9 @@ def _reduced_base(spec: dict) -> Module:
     return current
 
 
-def _class_tiles(spec: dict, radius_units: float) -> list[tuple[Module, tuple[Module, ...]]]:
+def _class_tiles(
+    spec: dict[str, Any], radius_units: float
+) -> list[tuple[Module, tuple[Module, ...]]]:
     """All accepted centers of one class within the physical radius, with
     exact vertex tuples."""
     window = spec["window"]
