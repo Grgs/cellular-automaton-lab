@@ -137,6 +137,8 @@ describe("createSeedPreview", () => {
         });
         const link = preview.element.querySelector<HTMLAnchorElement>(".compare-thumb-link");
         expect(link?.getAttribute("href")).toBe("#share=v1.seed");
+        expect(link?.textContent).toContain("Edit in Lab");
+        expect(link?.getAttribute("aria-label")).toContain("Edit Square seed placement in the Lab");
         expect(link?.querySelector(".compare-thumb")).not.toBeNull();
     });
 

@@ -1109,6 +1109,9 @@
 }
 .compare-thumb-link {
     display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
     border-radius: 8px;
     color: inherit;
     text-decoration: none;
@@ -1116,6 +1119,22 @@
 .compare-thumb-link:hover .compare-thumb {
     border-color: var(--accent, #bf5a36);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #bf5a36) 28%, transparent);
+}
+.compare-thumb-link-action {
+    padding: 3px 5px;
+    border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+    border-radius: 6px;
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.05));
+    color: var(--ink, #1f2430);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+}
+.compare-thumb-link:hover .compare-thumb-link-action {
+    border-color: var(--accent, #bf5a36);
+    background: var(--btn-soft-hover, rgba(0, 0, 0, 0.1));
 }
 .compare-thumb {
     border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
