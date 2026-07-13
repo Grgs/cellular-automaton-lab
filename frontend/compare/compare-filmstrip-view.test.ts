@@ -582,4 +582,41 @@ describe("createFilmstripView", () => {
         expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
         expect(focusEvents).toEqual([]);
     });
+
+    it("keeps focus when a live fork overlay is clicked (paints must not unfocus)", async () => {
+        const focusEvents: Array<string | null> = [];
+        const { view } = mountView({ onFocusChange: (geometry) => focusEvents.push(geometry) });
+        await view.load(twoBoardFilmstrip());
+        view.focus("square");
+        expect(focusEvents).toEqual(["square"]);
+
+        const pane = document.createElement("div");
+        pane.className = "compare-focus-pane";
+        const canvas = document.createElement("canvas");
+        pane.append(canvas);
+        expect(view.setBoardOverlay("square", pane)).toBe(true);
+
+        // Painting the forked board bubbles a click from inside the slot;
+        // the board must stay the focused hero.
+        canvas.click();
+        expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
+        expect(focusEvents).toEqual(["square"]);
+
+        // Clicking the hero cell outside the pane still returns to the wall.
+        boardFor(view, "square").click();
+        expect(focusEvents).toEqual(["square", null]);
+
+        // In the gallery the fork keeps rendering as a compact tile; clicking
+        // it (the click lands inside the pane) must focus the board again
+        // rather than being swallowed.
+        canvas.click();
+        expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
+        expect(focusEvents).toEqual(["square", null, "square"]);
+
+        // Once the overlay is cleared, hero slot clicks toggle focus again.
+        expect(view.setBoardOverlay("square", null)).toBe(true);
+        boardFor(view, "square").querySelector<HTMLElement>(".compare-filmstrip-slot")!.click();
+        expect(focusEvents).toEqual(["square", null, "square", null]);
+    });
 });

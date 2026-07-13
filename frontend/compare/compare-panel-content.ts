@@ -898,6 +898,32 @@ export function createComparePanelContent(
         filmstripView?.setBoardOverlay(geometry, null);
     }
 
+    /**
+     * A live fork runs on its own clock, so wall playback visibly skips that
+     * board. The first time the shared clock moves while a fork is active,
+     * say so — otherwise the forked board just looks stuck.
+     */
+    let forkClockNoteShown = false;
+    function noteDetachedForksOnClockMove(): void {
+        if (forkedBoards.size === 0) {
+            forkClockNoteShown = false;
+            return;
+        }
+        if (forkClockNoteShown) {
+            return;
+        }
+        forkClockNoteShown = true;
+        const names = [...forkedBoards.keys()]
+            .map(
+                (geometry) =>
+                    allTilings.find((tiling) => tiling.geometry === geometry)?.label ?? geometry,
+            )
+            .join(", ");
+        statusLine.textContent =
+            `${names} is live-forked and runs on its own clock, so wall playback skips it — ` +
+            "use the Run on its chip, or ▶ Run wall from here / Discard to rejoin.";
+    }
+
     function disposeAllForkedBoards(): void {
         for (const geometry of [...forkedBoards.keys()]) {
             disposeForkedBoard(geometry);
@@ -2286,7 +2312,10 @@ export function createComparePanelContent(
                     getLiveColor: () => liveColorForRule(selectedRuleName()),
                     loop: true,
                     onFocusChange: handleFocusChanged,
-                    onFrameChange: () => updateExplainer(),
+                    onFrameChange: () => {
+                        updateExplainer();
+                        noteDetachedForksOnClockMove();
+                    },
                     onPaintCell: handlePaintCell,
                     onRemoveBoard: removeBoardFromWall,
                     tilingOptions: wallTilingPickerOptions(allTilings),

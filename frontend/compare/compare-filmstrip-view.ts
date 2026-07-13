@@ -431,6 +431,17 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             if (target?.closest("button")) {
                 return;
             }
+            // A live fork owns the hero's slot: its pane handles every pointer
+            // interaction there (painting, palette, its own transport), so
+            // those clicks must not bubble into unfocusing. Clicking a forked
+            // board's tile elsewhere (gallery or strip) still focuses it.
+            if (
+                focusedGeometry === tiling.geometry &&
+                entryFor(tiling.geometry)?.overlaid &&
+                slot.contains(target)
+            ) {
+                return;
+            }
             if (editMode) {
                 if (target?.closest(".compare-filmstrip-expand")) {
                     toggleFocus();
