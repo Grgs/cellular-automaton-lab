@@ -2195,8 +2195,14 @@ export function createComparePanelContent(
         activeFilmstrip = null;
         activeFilmstripRunKey = null;
         currentFocusGeometry = null;
+        // The loaded config replaces the current wall wholesale: tear down any
+        // live forks with it and unbind the shared clock, or the transport
+        // keeps playing the old, now-hidden boards instead of offering to run
+        // the loaded comparison.
+        disposeAllForkedBoards();
+        filmstripView?.detachPlayer();
         setWallLoading(null);
-        updateExplainer();
+        updateSummary();
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
     }
 
