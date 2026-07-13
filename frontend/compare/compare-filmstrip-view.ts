@@ -431,6 +431,12 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             if (target?.closest("button")) {
                 return;
             }
+            // A live fork owns this slot: its pane handles every pointer
+            // interaction (painting, palette, its own transport), so clicks
+            // inside it must not bubble into focus toggling.
+            if (entryFor(tiling.geometry)?.overlaid && slot.contains(target)) {
+                return;
+            }
             if (editMode) {
                 if (target?.closest(".compare-filmstrip-expand")) {
                     toggleFocus();
