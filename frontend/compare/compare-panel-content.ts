@@ -36,7 +36,12 @@ import {
     SEED_SHAPE_OPTIONS,
     TRAVERSAL_OPTIONS,
 } from "./compare-options.js";
-import { buildClassificationGrid, buildPhasePortraitSvg, familyColor } from "./compare-charts.js";
+import {
+    buildClassificationGrid,
+    buildPhasePortraitSvg,
+    buildPortraitLegend,
+    familyColor,
+} from "./compare-charts.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { createSeedPad } from "./compare-seed-pad.js";
 import { createSeedPreview } from "./compare-seed-preview.js";
@@ -2332,17 +2337,21 @@ export function createComparePanelContent(
                 }),
             );
         }
+        const tilingLabels = new Map(allTilings.map((tiling) => [tiling.geometry, tiling.label]));
+        const legend = buildPortraitLegend(comparison);
         resultsArea.append(
             el("div", {
                 class: "compare-section-title",
                 textContent: "Phase portrait — live(t) / live(0)",
             }),
             buildPhasePortraitSvg(comparison),
+            ...(legend ? [legend] : []),
             el("div", { class: "compare-section-title", textContent: "End-state classification" }),
             el("div", { class: "compare-grid-scroll" }, [
                 buildClassificationGrid(comparison, {
                     onRowHover: highlightGeometry,
                     renderRowActions: (result) => renderRowActions(comparison, result),
+                    labelForGeometry: (geometry) => tilingLabels.get(geometry),
                 }),
             ]),
         );
