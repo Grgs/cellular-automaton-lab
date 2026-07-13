@@ -14,7 +14,7 @@
         "format:frontend:check": "prettier --check \"frontend/**/*.{ts,d.ts,html}\" \"frontend/**/*.css\" \"static/css/**/*.css\" \"templates/**/*.html\" \"vite.config.ts\" \"tools/internal/*.mjs\" \"*.{json,mjs}\"",
         "format:python:check": "node ./tools/internal/python_tools_entry.mjs repo python-style format-check",
         "lint:frontend": "npm run typecheck:frontend && npm run lint:frontend:eslint && npm run format:frontend:check",
-        "lint:frontend:eslint": "eslint \"frontend/**/*.ts\" \"vite.config.ts\"",
+        "lint:frontend:eslint": "oxlint --deny no-unused-vars \"frontend/**/*.ts\" vite.config.ts",
         "lint:python": "node ./tools/internal/python_tools_entry.mjs repo python-style check",
         "typecheck:frontend": "tsc -p tsconfig.json --noEmit",
         "typecheck:python": "node ./tools/internal/python_exec.mjs -m mypy --config-file pyproject.toml",
@@ -36,18 +36,15 @@
         "check:doc-links": "linkinator \"*.md\" \".github/**/*.md\" \"docs/**/*.md\""
     },
     "devDependencies": {
-        "@eslint/js": "^10.0.1",
         "@types/node": "^26.1.1",
         "@vitest/coverage-v8": "^4.1.10",
-        "eslint": "^10.7.0",
-        "eslint-config-prettier": "^10.1.8",
         "jsdom": "^29.1.1",
         "linkinator": "7.6.1",
         "match-sorter": "^8.3.0",
+        "oxlint": "^1.73.0",
         "polygon-clipping": "^0.15.7",
         "prettier": "^3.9.5",
-        "typescript": "^6.0.3",
-        "typescript-eslint": "^8.63.0",
+        "typescript": "^7.0.2",
         "vite": "^8.1.4",
         "vitest": "^4.1.2"
     }
