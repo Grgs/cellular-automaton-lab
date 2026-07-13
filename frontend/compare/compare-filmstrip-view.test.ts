@@ -607,9 +607,16 @@ describe("createFilmstripView", () => {
         boardFor(view, "square").click();
         expect(focusEvents).toEqual(["square", null]);
 
-        // Once the overlay is cleared, slot clicks toggle focus again.
+        // In the gallery the fork keeps rendering as a compact tile; clicking
+        // it (the click lands inside the pane) must focus the board again
+        // rather than being swallowed.
+        canvas.click();
+        expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
+        expect(focusEvents).toEqual(["square", null, "square"]);
+
+        // Once the overlay is cleared, hero slot clicks toggle focus again.
         expect(view.setBoardOverlay("square", null)).toBe(true);
         boardFor(view, "square").querySelector<HTMLElement>(".compare-filmstrip-slot")!.click();
-        expect(focusEvents).toEqual(["square", null, "square"]);
+        expect(focusEvents).toEqual(["square", null, "square", null]);
     });
 });
