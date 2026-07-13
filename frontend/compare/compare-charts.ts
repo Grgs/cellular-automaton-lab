@@ -18,9 +18,11 @@ export interface ClassificationStyle {
     color: string;
 }
 
+/* Chip colors sit under white text (.compare-chip), so each must keep
+   >= 4.5:1 contrast against #fff. */
 export function classificationStyle(classification: string): ClassificationStyle {
     if (classification === "extinct") {
-        return { label: "Extinct", color: "#9aa0a6" };
+        return { label: "Extinct", color: "#5f6b70" };
     }
     if (classification === "still-life") {
         return { label: "Still life", color: "#2f6f4f" };
@@ -32,7 +34,7 @@ export function classificationStyle(classification: string): ClassificationStyle
         };
     }
     if (classification === "unsettled") {
-        return { label: "Unsettled", color: "#bf5a36" };
+        return { label: "Unsettled", color: "#b34f2c" };
     }
     if (classification === "error") {
         return { label: "Error", color: "#b02a37" };
@@ -186,6 +188,28 @@ export interface ComparePanelCallbacks {
     onRowHover?: (geometry: string | null) => void;
     /** Optional per-row action cell (e.g. open/share links). Omitted when it returns null. */
     renderRowActions?: (result: TopologyComparisonResultPayload) => Node | null;
+    /** Resolve a tiling's catalog display label; rows fall back to the geometry key. */
+    labelForGeometry?: (geometry: string) => string | undefined;
+}
+
+/** One swatch per family present in the results, so the portrait lines are readable. */
+export function buildPortraitLegend(comparison: SeedComparisonResult): HTMLElement | null {
+    const families = [...new Set(comparison.results.map((result) => result.family))].sort();
+    if (families.length < 2) {
+        return null;
+    }
+    const legend = document.createElement("div");
+    legend.className = "compare-portrait-legend";
+    for (const family of families) {
+        const item = document.createElement("span");
+        item.className = "compare-portrait-legend__item";
+        const swatch = document.createElement("span");
+        swatch.className = "compare-portrait-legend__swatch";
+        swatch.style.setProperty("--swatch", familyColor(family));
+        item.append(swatch, document.createTextNode(family));
+        legend.append(item);
+    }
+    return legend;
 }
 
 /** Build the classification grid: rows = tilings, coloured by end-state class. */
@@ -193,8 +217,12 @@ export function buildClassificationGrid(
     comparison: SeedComparisonResult,
     callbacks: ComparePanelCallbacks = {},
 ): HTMLTableElement {
+    const displayName = (geometry: string): string =>
+        callbacks.labelForGeometry?.(geometry) ?? geometry;
     const rows = [...comparison.results].sort(
-        (a, b) => a.family.localeCompare(b.family) || a.geometry.localeCompare(b.geometry),
+        (a, b) =>
+            a.family.localeCompare(b.family) ||
+            displayName(a.geometry).localeCompare(displayName(b.geometry)),
     );
     const withActions = Boolean(callbacks.renderRowActions);
 
@@ -220,8 +248,11 @@ export function buildClassificationGrid(
         }
 
         const note = result.note ? ` · ${result.note}` : "";
+        const label = displayName(result.geometry);
+        const nameTitle =
+            label === result.geometry ? "" : ` title="${escapeHtml(result.geometry)}"`;
         row.innerHTML =
-            `<td class="compare-grid__name">${escapeHtml(result.geometry)}</td>` +
+            `<td class="compare-grid__name"${nameTitle}>${escapeHtml(label)}</td>` +
             `<td>${escapeHtml(result.family)}</td>` +
             `<td>${result.cell_count}</td>` +
             `<td>${result.initial_population} → ${result.final_population}</td>` +

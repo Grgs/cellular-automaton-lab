@@ -42,7 +42,8 @@
     --btn-disabled-bg: rgba(31, 36, 48, 0.08);
     --btn-disabled-text: #69707b;
     --btn-disabled-line: rgba(31, 36, 48, 0.12);
-    --btn-primary-bg: #bf5a36;
+    /* Keep >= 4.5:1 contrast between --btn-primary-text and both bg/hover. */
+    --btn-primary-bg: #b34f2c;
     --btn-primary-hover: #a44928;
     --btn-primary-text: #fff8f3;
     --btn-primary-line: rgba(138, 61, 32, 0.26);
@@ -113,9 +114,11 @@
     --btn-disabled-bg: rgba(231, 237, 248, 0.06);
     --btn-disabled-text: #b7c3d7;
     --btn-disabled-line: rgba(231, 237, 248, 0.1);
+    /* Dark ink on the bright accent (same idiom as the wall's coral CTAs);
+       near-white text on this orange lands well below 4.5:1. */
     --btn-primary-bg: #d67a4c;
     --btn-primary-hover: #e89468;
-    --btn-primary-text: #fff9f5;
+    --btn-primary-text: #16110c;
     --btn-primary-line: rgba(241, 162, 117, 0.28);
     --btn-soft-bg: rgba(231, 237, 248, 0.07);
     --btn-soft-hover: rgba(231, 237, 248, 0.14);

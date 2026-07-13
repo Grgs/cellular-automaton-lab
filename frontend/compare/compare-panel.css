@@ -990,6 +990,25 @@
 .compare-portrait__point.is-dimmed {
     opacity: 0.12;
 }
+.compare-portrait-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 6px 0 0;
+    font-size: 11px;
+    color: var(--muted, #6d756f);
+}
+.compare-portrait-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.compare-portrait-legend__swatch {
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--swatch, currentColor);
+}
 .compare-grid-scroll {
     max-width: 100%;
     overflow-x: auto;

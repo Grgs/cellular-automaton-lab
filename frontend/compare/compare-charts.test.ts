@@ -4,6 +4,7 @@ import {
     buildClassificationGrid,
     buildPhasePortraitModel,
     buildPhasePortraitSvg,
+    buildPortraitLegend,
     classificationStyle,
     familyColor,
     normalizedSeries,
@@ -110,5 +111,61 @@ describe("DOM builders", () => {
         const names = [...grid.querySelectorAll(".compare-grid__name")].map((n) => n.textContent);
         expect(names).toEqual(["spectre", "square"]);
         expect(grid.querySelectorAll(".compare-chip")).toHaveLength(2);
+    });
+
+    it("shows catalog labels when a resolver is provided, keeping the slug as a tooltip", () => {
+        const labels = new Map([
+            ["hat-monotile", "Hat"],
+            ["trihexagonal-3-6-3-6", "Kagome / Trihexagonal (3.6.3.6)"],
+        ]);
+        const grid = buildClassificationGrid(
+            comparison([
+                result({ geometry: "trihexagonal-3-6-3-6", family: "mixed" }),
+                result({ geometry: "hat-monotile", family: "aperiodic" }),
+                result({ geometry: "square", family: "regular" }),
+            ]),
+            { labelForGeometry: (geometry) => labels.get(geometry) },
+        );
+        const cells = [...grid.querySelectorAll<HTMLElement>(".compare-grid__name")];
+        expect(cells.map((cell) => cell.textContent)).toEqual([
+            "Hat",
+            "Kagome / Trihexagonal (3.6.3.6)",
+            "square",
+        ]);
+        // Slug stays reachable for share-link debugging; unresolved rows skip the tooltip.
+        expect(cells[0]?.title).toBe("hat-monotile");
+        expect(cells[2]?.title).toBe("");
+        // Row hover hooks still key off the geometry slug.
+        expect(grid.querySelector("[data-geometry='hat-monotile']")).not.toBeNull();
+    });
+
+    it("sorts within a family by display label, not slug", () => {
+        const labels = new Map([
+            ["z-first", "Aardvark"],
+            ["a-last", "Zebra"],
+        ]);
+        const grid = buildClassificationGrid(
+            comparison([
+                result({ geometry: "a-last", family: "regular" }),
+                result({ geometry: "z-first", family: "regular" }),
+            ]),
+            { labelForGeometry: (geometry) => labels.get(geometry) },
+        );
+        const names = [...grid.querySelectorAll(".compare-grid__name")].map((n) => n.textContent);
+        expect(names).toEqual(["Aardvark", "Zebra"]);
+    });
+
+    it("builds a legend only when several families are compared", () => {
+        expect(buildPortraitLegend(comparison([result({})]))).toBeNull();
+        const legend = buildPortraitLegend(
+            comparison([
+                result({ geometry: "square", family: "regular" }),
+                result({ geometry: "hat-monotile", family: "aperiodic" }),
+            ]),
+        );
+        const items = [...(legend?.querySelectorAll(".compare-portrait-legend__item") ?? [])];
+        expect(items.map((item) => item.textContent)).toEqual(["aperiodic", "regular"]);
+        const swatch = legend?.querySelector<HTMLElement>(".compare-portrait-legend__swatch");
+        expect(swatch?.style.getPropertyValue("--swatch")).toBe(familyColor("aperiodic"));
     });
 });
