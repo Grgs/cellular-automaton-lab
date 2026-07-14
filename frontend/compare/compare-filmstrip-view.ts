@@ -96,6 +96,12 @@ export interface FilmstripViewController {
     setHeroToolbelt(node: HTMLElement | null): void;
     /** Close an open board tiling picker; returns whether one was open. */
     closeTilingPicker(): boolean;
+    /**
+     * Stop and unbind the shared clock, returning the transport to idle
+     * (used when a loaded run config invalidates the current filmstrip —
+     * the hidden boards must not keep playing on the old clock).
+     */
+    detachPlayer(): void;
     dispose(): void;
 }
 
@@ -592,6 +598,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             placeHeroToolbelt();
         },
         closeTilingPicker,
+        detachPlayer,
         dispose(): void {
             closeTilingPicker();
             teardownRun();

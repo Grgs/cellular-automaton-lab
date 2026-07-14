@@ -1453,6 +1453,46 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("returns the transport to idle when a run config replaces an active wall", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "Filmstrip ready",
+            ),
+        );
+        const playButton = document.querySelector<HTMLButtonElement>(
+            '.compare-filmstrip-btn[aria-label="Play / pause"]',
+        );
+        expect(playButton?.textContent).toBe("▶ Play");
+
+        // Loading a run config hides the wall; the shared clock must unbind
+        // with it, or Play silently animates the hidden stale boards.
+        await handle.applyRunConfig({
+            seed: "101",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["square", "hex"],
+        });
+        expect(playButton?.getAttribute("aria-label")).toBe("Run comparison");
+        expect(playButton?.disabled).toBe(false);
+
+        // The idle action runs the loaded comparison instead of resuming the old wall.
+        playButton?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        handle.dispose();
+    });
+
     it("expands a row preview into begin/end thumbnails", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
