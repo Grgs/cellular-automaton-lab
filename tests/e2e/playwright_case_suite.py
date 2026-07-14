@@ -338,6 +338,25 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         )
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
 
+    def test_space_on_lab_route_button_navigates_without_starting_playback(self) -> None:
+        # Space is the native activation key for the header route button. The
+        # wall's global playback shortcut must not steal it and start the clock.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        play_pause_selector = '.compare-filmstrip-btn[title="Play / pause"]'
+        self._expect(play_pause_selector).to_contain_text("Play")
+        lab_route = case.page.locator("#open-lab-btn")
+        lab_route.focus()
+        lab_route.press("Space")
+
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+        self._expect(play_pause_selector).to_contain_text("Play")
+
     def test_wall_fork_persists_across_gallery_and_speaker_view(self) -> None:
         # Forking a board leaves the shared clock for its own live session; that
         # fork must survive leaving the board (it keeps running as a compact
@@ -541,6 +560,41 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.evaluate("() => { window.location.hash = '#focus=square'; }")
         self._expect(".compare-filmstrip--speaker").to_have_count(1)
         case.page.wait_for_function("() => window.location.hash.includes('focus=square')")
+
+    def test_loading_saved_run_clears_previous_focused_board_route(self) -> None:
+        # A saved run replaces the wall wholesale. Its previous speaker route
+        # must be cleared with the old boards, or the replacement wall silently
+        # focuses the same geometry as soon as its filmstrip attaches.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-saved")
+        case.page.fill('input[aria-label="Saved run name"]', "Focus replacement run")
+        case.page.get_by_role("button", name="Save run", exact=True).click()
+        self._expect(".compare-status").to_contain_text("Saved run")
+        case.page.get_by_role("button", name="Close configuration").click()
+
+        case.page.locator(".compare-filmstrip-board").first.click()
+        self._expect(".compare-filmstrip--speaker").to_have_count(1)
+        case.page.wait_for_function("() => window.location.hash.includes('focus=square')")
+
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-saved")
+        case.page.get_by_role("button", name="Load run", exact=True).click()
+
+        case.page.wait_for_function("() => !window.location.hash.includes('focus=')")
+        self._expect(".compare-filmstrip--speaker:visible").to_have_count(0)
+        case.page.get_by_role("button", name="Close configuration").click()
+        run_button = case.page.locator('.compare-filmstrip-btn[aria-label="Run comparison"]')
+        self._expect('.compare-filmstrip-btn[aria-label="Run comparison"]').to_be_enabled()
+        run_button.click()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        self._expect(".compare-filmstrip--speaker:visible").to_have_count(0)
+        case.page.wait_for_function("() => !window.location.hash.includes('focus=')")
 
     def test_copy_and_paste_pattern_roundtrip(self) -> None:
         case = self._case()
