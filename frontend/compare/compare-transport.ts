@@ -64,6 +64,12 @@ export interface FilmstripTransportController {
     reset(): void;
     /** Enable/disable the idle "Run comparison" action (needs `onRun`). */
     setIdleRunEnabled(enabled: boolean): void;
+    /**
+     * Disable the controls while the wall rebuilds. A press accepted mid-rebuild
+     * would be wiped when the new filmstrip attaches paused at the seed, so the
+     * controls go quiet instead of silently dropping the intent.
+     */
+    setBusy(busy: boolean): void;
 }
 
 function el(tag: string, className: string, text?: string): HTMLElement {
@@ -97,6 +103,7 @@ export function createFilmstripTransport(
     let unsubscribe: (() => void) | null = null;
     let tickHandle: number | null = null;
     let idleRunEnabled = false;
+    let busy = false;
 
     const transport = el("div", "compare-filmstrip-transport");
     transport.setAttribute("role", "group");
@@ -173,6 +180,14 @@ export function createFilmstripTransport(
         }
     }
 
+    function disableAllControls(): void {
+        for (const control of [playButton, stepBackButton, stepForwardButton, resetButton]) {
+            control.disabled = true;
+        }
+        scrubber.disabled = true;
+        speedSelect.disabled = true;
+    }
+
     function setIdle(): void {
         for (const control of [stepBackButton, stepForwardButton, resetButton]) {
             control.disabled = true;
@@ -195,6 +210,9 @@ export function createFilmstripTransport(
             playButton.setAttribute("aria-label", "Play / pause");
             playButton.disabled = true;
         }
+        if (busy) {
+            disableAllControls();
+        }
     }
 
     function onState(state: FilmstripPlayerState): void {
@@ -212,6 +230,12 @@ export function createFilmstripTransport(
         scrubber.value = String(state.index);
         counter.textContent =
             state.frameCount === 0 ? "—" : `gen ${state.index} / ${state.frameCount - 1}`;
+
+        if (busy) {
+            // A rebuild is in flight; the new filmstrip's attach must not
+            // re-enable the controls before setBusy(false) lifts the gate.
+            disableAllControls();
+        }
 
         if (state.playing && tickHandle === null) {
             startTick();
@@ -252,20 +276,36 @@ export function createFilmstripTransport(
             }
         },
         toggle(): void {
-            currentPlayer?.toggle();
+            if (!busy) {
+                currentPlayer?.toggle();
+            }
         },
         step(delta: number): void {
-            currentPlayer?.step(delta);
+            if (!busy) {
+                currentPlayer?.step(delta);
+            }
         },
         reset(): void {
-            currentPlayer?.reset();
+            if (!busy) {
+                currentPlayer?.reset();
+            }
         },
         setIdleRunEnabled(enabled: boolean): void {
             idleRunEnabled = enabled;
             // Only the idle state exposes the run action; a live player owns the
             // button otherwise.
-            if (!currentPlayer && onRun) {
+            if (!currentPlayer && onRun && !busy) {
                 playButton.disabled = !enabled;
+            }
+        },
+        setBusy(next: boolean): void {
+            busy = next;
+            if (busy) {
+                disableAllControls();
+            } else if (currentPlayer) {
+                onState(currentPlayer.state);
+            } else {
+                setIdle();
             }
         },
     };

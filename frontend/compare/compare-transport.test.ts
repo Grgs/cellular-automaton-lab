@@ -185,4 +185,29 @@ describe("createFilmstripTransport", () => {
         transport.toggle();
         expect(clock.active()).toBe(0); // paused
     });
+
+    it("quiets the controls while busy so a rebuild cannot eat a play press", () => {
+        const clock = manualScheduler();
+        const transport = createFilmstripTransport({ scheduler: clock.scheduler });
+        transport.attach(new FilmstripPlayer(3));
+        const play = control(transport, "Play / pause");
+
+        transport.setBusy(true);
+
+        expect(play.disabled).toBe(true);
+        expect(control(transport, "Step forward one generation").disabled).toBe(true);
+        play.click();
+        transport.toggle(); // keyboard idiom is gated too
+        expect(clock.active()).toBe(0); // nothing started playing
+
+        // The fresh filmstrip attaches mid-rebuild; the gate must hold until
+        // the rebuild lifts it, then the controls come back.
+        transport.attach(new FilmstripPlayer(5));
+        expect(play.disabled).toBe(true);
+
+        transport.setBusy(false);
+        expect(play.disabled).toBe(false);
+        play.click();
+        expect(clock.active()).toBe(1);
+    });
 });

@@ -660,7 +660,20 @@ export function createComparePanelContent(
         if (!filmstripView || !activeFilmstrip) {
             return;
         }
-        filmstripView.focus(readFocusFromHash(window.location.hash));
+        const requested = readFocusFromHash(window.location.hash);
+        if (
+            requested !== null &&
+            !activeFilmstrip.tilings.some((tiling) => tiling.geometry === requested)
+        ) {
+            // A stale or mistyped deep link. The view treats it as "no focus",
+            // but when the wall is already unfocused it never notifies, so the
+            // dead slot would sit in the URL claiming a focus that isn't there.
+            // Scrub it here so the hash keeps matching what is on screen.
+            mirrorFocusToHash(null);
+            filmstripView.focus(null);
+            return;
+        }
+        filmstripView.focus(requested);
     }
 
     // ------ Edit mode: paint the shared seed by clicking board cells (gen 0) ------
@@ -791,6 +804,11 @@ export function createComparePanelContent(
             seedInput.value = reconstructSeedBits(order, tiling.frames[0] ?? {});
             shapeSelect.value = "";
             syncShapeMode();
+            // Programmatic select writes fire no "change" event, so refetch the
+            // placement previews here: the cached shape-mode responses carry
+            // shape_cells but no traversal order, and redrawing bits against
+            // them renders every thumbnail empty.
+            refreshPreview();
             converted = true;
         }
 
@@ -866,6 +884,10 @@ export function createComparePanelContent(
         if (isShapeMode()) {
             shapeSelect.value = "";
             syncShapeMode();
+            // Same as the gen-0 paint conversion: a programmatic source switch
+            // must refetch previews or they render the bits against stale
+            // shape-mode responses that have no traversal order.
+            refreshPreview();
         }
         seedInput.value = reconstructSeedBits(order, cellsById);
         seedPad.syncFromSeed();
@@ -2151,6 +2173,9 @@ export function createComparePanelContent(
     function setRunning(next: boolean): void {
         running = next;
         runButton.textContent = next ? "Running…" : "Run analysis";
+        // Quiet the transport too: a play press accepted mid-rebuild would be
+        // wiped when the fresh filmstrip attaches paused at the seed.
+        filmstripTransport.setBusy(next);
         updateSummary();
     }
 

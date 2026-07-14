@@ -38,7 +38,22 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     });
 
     if (!response.ok) {
-        throw new Error(`Request failed: ${response.status}`);
+        // Surface the server's error detail (e.g. "preview limit is 10000") so
+        // callers can classify failures instead of seeing only a status code.
+        let detail = "";
+        try {
+            const body: unknown = await response.json();
+            if (body && typeof body === "object" && "error" in body) {
+                detail = String((body as { error: unknown }).error);
+            }
+        } catch {
+            // Non-JSON error body; the status code alone will have to do.
+        }
+        throw new Error(
+            detail
+                ? `Request failed: ${response.status} — ${detail}`
+                : `Request failed: ${response.status}`,
+        );
     }
 
     return response.json();
