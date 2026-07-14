@@ -2234,7 +2234,7 @@ export function createComparePanelContent(
         stageMain.classList.remove("is-speaker");
         activeFilmstrip = null;
         activeFilmstripRunKey = null;
-        currentFocusGeometry = null;
+        mirrorFocusToHash(null);
         // The loaded config replaces the current wall wholesale: tear down any
         // live forks with it and unbind the shared clock, or the transport
         // keeps playing the old, now-hidden boards instead of offering to run

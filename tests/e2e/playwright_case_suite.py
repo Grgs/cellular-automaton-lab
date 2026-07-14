@@ -561,6 +561,41 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-filmstrip--speaker").to_have_count(1)
         case.page.wait_for_function("() => window.location.hash.includes('focus=square')")
 
+    def test_loading_saved_run_clears_previous_focused_board_route(self) -> None:
+        # A saved run replaces the wall wholesale. Its previous speaker route
+        # must be cleared with the old boards, or the replacement wall silently
+        # focuses the same geometry as soon as its filmstrip attaches.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-saved")
+        case.page.fill('input[aria-label="Saved run name"]', "Focus replacement run")
+        case.page.get_by_role("button", name="Save run", exact=True).click()
+        self._expect(".compare-status").to_contain_text("Saved run")
+        case.page.get_by_role("button", name="Close configuration").click()
+
+        case.page.locator(".compare-filmstrip-board").first.click()
+        self._expect(".compare-filmstrip--speaker").to_have_count(1)
+        case.page.wait_for_function("() => window.location.hash.includes('focus=square')")
+
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-saved")
+        case.page.get_by_role("button", name="Load run", exact=True).click()
+
+        case.page.wait_for_function("() => !window.location.hash.includes('focus=')")
+        self._expect(".compare-filmstrip--speaker:visible").to_have_count(0)
+        case.page.get_by_role("button", name="Close configuration").click()
+        run_button = case.page.locator('.compare-filmstrip-btn[aria-label="Run comparison"]')
+        self._expect('.compare-filmstrip-btn[aria-label="Run comparison"]').to_be_enabled()
+        run_button.click()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        self._expect(".compare-filmstrip--speaker:visible").to_have_count(0)
+        case.page.wait_for_function("() => !window.location.hash.includes('focus=')")
+
     def test_copy_and_paste_pattern_roundtrip(self) -> None:
         case = self._case()
         self._paint_canvas_center()

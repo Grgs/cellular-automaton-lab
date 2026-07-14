@@ -1475,8 +1475,14 @@ describe("mountComparePanel", () => {
         );
         expect(playButton?.textContent).toBe("▶ Play");
 
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        expect(document.querySelector(".compare-filmstrip--speaker")).not.toBeNull();
+        expect(window.location.hash).toContain("focus=square");
+
         // Loading a run config hides the wall; the shared clock must unbind
-        // with it, or Play silently animates the hidden stale boards.
+        // with it, or Play silently animates the hidden stale boards. Its
+        // focused-board route must also go, or the replacement wall silently
+        // reopens the old speaker when its boards attach.
         await handle.applyRunConfig({
             seed: "101",
             rule: "conway",
@@ -1487,10 +1493,14 @@ describe("mountComparePanel", () => {
         });
         expect(playButton?.getAttribute("aria-label")).toBe("Run comparison");
         expect(playButton?.disabled).toBe(false);
+        expect(window.location.hash).not.toContain("focus=");
 
         // The idle action runs the loaded comparison instead of resuming the old wall.
         playButton?.click();
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        await vi.waitFor(() =>
+            expect(document.querySelector(".compare-filmstrip--speaker")).toBeNull(),
+        );
         handle.dispose();
     });
 
