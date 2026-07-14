@@ -338,6 +338,25 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         )
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
 
+    def test_space_on_lab_route_button_navigates_without_starting_playback(self) -> None:
+        # Space is the native activation key for the header route button. The
+        # wall's global playback shortcut must not steal it and start the clock.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        play_pause_selector = '.compare-filmstrip-btn[title="Play / pause"]'
+        self._expect(play_pause_selector).to_contain_text("Play")
+        lab_route = case.page.locator("#open-lab-btn")
+        lab_route.focus()
+        lab_route.press("Space")
+
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+        self._expect(play_pause_selector).to_contain_text("Play")
+
     def test_wall_fork_persists_across_gallery_and_speaker_view(self) -> None:
         # Forking a board leaves the shared clock for its own live session; that
         # fork must survive leaving the board (it keeps running as a compact

@@ -135,6 +135,21 @@ function prefersReducedMotion(): boolean {
     );
 }
 
+function isInteractiveShortcutTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) {
+        return false;
+    }
+    if (target.isContentEditable) {
+        return true;
+    }
+    return Boolean(
+        target.closest(
+            "button, a[href], input, select, textarea, summary, " +
+                '[tabindex]:not([tabindex="-1"])',
+        ),
+    );
+}
+
 export interface ComparePanelContentOptions {
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
@@ -2790,13 +2805,12 @@ export function createComparePanelContent(
         handlePlaybackKey(event: KeyboardEvent): boolean {
             // Only claim playback keys once a live filmstrip exists, so typing in
             // the config fields (and plain Space) behaves normally until then.
-            if (!activeFilmstrip) {
-                return false;
-            }
-            const target = event.target;
+            // Controls and custom keyboard widgets own their focused keystrokes;
+            // a component may also have claimed the key before it bubbles here.
             if (
-                target instanceof HTMLElement &&
-                (target.isContentEditable || /^(input|select|textarea)$/i.test(target.tagName))
+                !activeFilmstrip ||
+                event.defaultPrevented ||
+                isInteractiveShortcutTarget(event.target)
             ) {
                 return false;
             }
