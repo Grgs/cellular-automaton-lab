@@ -488,6 +488,60 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect('.compare-filmstrip-btn[title="Play / pause"]').to_contain_text("Pause")
         self._expect(".compare-focus-pane").to_have_count(0)
 
+    def test_wall_paint_conversion_keeps_seed_placement_previews_live(self) -> None:
+        # Painting the wall while a named shape is the seed source converts it
+        # to a bit-string programmatically; the seed-placement thumbnails in
+        # the config sheet must be refetched with the traversal order, or they
+        # render every subsequent bit seed as an empty board.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        self._expect(".compare-edit-toggle").to_be_enabled()
+        case.page.click(".compare-edit-toggle")
+        case.page.click('.compare-filmstrip-btn[title="Back to the seed"]')
+        board = case.page.locator(".compare-filmstrip-board").first
+        board.locator("[data-cell-id]").first.click()
+        case.page.wait_for_function(
+            """() => {
+                const field = [...document.querySelectorAll('input.compare-field[type="text"]')]
+                    .find((input) => !input.disabled && /^[01]+$/.test(input.value));
+                return Boolean(field);
+            }"""
+        )
+
+        # The converted seed still has live bits, so the placement previews in
+        # the config sheet must show them (accent-filled cells), not blanks.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
+        case.page.wait_for_function(
+            """() => {
+                const cells = document.querySelectorAll(".compare-seedpreview svg [fill]");
+                return [...cells].some((cell) =>
+                    (cell.getAttribute("fill") ?? "").includes("accent"));
+            }""",
+            timeout=60_000,
+        )
+
+    def test_wall_scrubs_an_invalid_focus_deep_link_from_the_hash(self) -> None:
+        # A stale or mistyped #focus= slug must not linger in the URL claiming
+        # a speaker view that isn't there; a valid slug still deep-links.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.evaluate("() => { window.location.hash = '#focus=not-a-board'; }")
+        case.page.wait_for_function("() => !window.location.hash.includes('focus=')")
+        self._expect(".compare-filmstrip--speaker").to_have_count(0)
+
+        case.page.evaluate("() => { window.location.hash = '#focus=square'; }")
+        self._expect(".compare-filmstrip--speaker").to_have_count(1)
+        case.page.wait_for_function("() => window.location.hash.includes('focus=square')")
+
     def test_copy_and_paste_pattern_roundtrip(self) -> None:
         case = self._case()
         self._paint_canvas_center()

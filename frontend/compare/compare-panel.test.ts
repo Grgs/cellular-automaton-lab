@@ -7,6 +7,7 @@ import type {
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
+    TopologyPreviewRequest,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 import type { GridView } from "../types/controller-view.js";
@@ -1839,6 +1840,69 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("keeps the seed-placement previews live after a paint converts shape to bits", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const basePreview = await backend.previewTopology({ geometry: "square", grid_size: 16 });
+        // Mirror the server: pattern requests answer with shape placements and
+        // no traversal order; traversal requests answer with the order.
+        const previewTopology = vi.fn(async (request: TopologyPreviewRequest) =>
+            request.pattern
+                ? { ...basePreview, shape_cells: { "c:1:1": 1 } }
+                : { ...basePreview, order: ["c:1:1"] },
+        );
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: {
+                ...backend,
+                requestFilmstrip: async () => twoBoardFilmstrip(),
+                previewTopology,
+            },
+            bootstrapData: bootstrapData(),
+        });
+        const shapeSelect = [
+            ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
+        ].find((select) => [...select.options].some((option) => option.value === "r-pentomino"));
+        if (!shapeSelect) {
+            throw new Error("shape select not found");
+        }
+        shapeSelect.value = "r-pentomino";
+        shapeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+
+        // Painting converts the shape to bits ("1" -> toggled to "0").
+        document.querySelector<HTMLButtonElement>(".compare-edit-toggle")?.click();
+        document
+            .querySelector('.compare-filmstrip-board [data-cell-id="c:1:1"]')
+            ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        const seedField = [
+            ...document.querySelectorAll<HTMLInputElement>('input.compare-field[type="text"]'),
+        ].find((input) => /^[01\s,]*$/.test(input.value) && !input.disabled);
+        expect(seedField?.value).toBe("0");
+
+        // Typing bits must render on the placement thumbnails. Before the
+        // conversion refetched them, they were still the shape-mode responses
+        // (no traversal order), which map every bit string to an empty board.
+        seedField!.value = "1";
+        seedField!.dispatchEvent(new Event("input", { bubbles: true }));
+        // Let the redraw debounce flush first: until it fires, the stale
+        // shape-placement thumbnails (also accent-filled) still sit in the DOM
+        // and would satisfy the assertion vacuously.
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        await vi.waitFor(() => {
+            const live = [
+                ...document.querySelectorAll<SVGElement>(".compare-seedpreview svg [fill]"),
+            ].filter((node) => (node.getAttribute("fill") ?? "").includes("accent"));
+            expect(live.length).toBeGreaterThan(0);
+        });
+        handle.dispose();
+    });
+
     it("opens and closes the configuration sheet from the dock gear", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -1998,6 +2062,42 @@ describe("mountComparePanel", () => {
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
         expect(page()?.hidden).toBe(false);
         handle.dispose();
+    });
+
+    it("scrubs a focus slot that names no board instead of leaving it in the URL", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip: async () => twoBoardFilmstrip() },
+            bootstrapData: bootstrapData(),
+        });
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+        const filmstrip = () => document.querySelector<HTMLElement>(".compare-filmstrip");
+
+        // A stale or mistyped deep link while the wall is unfocused: the view
+        // stays on the gallery, and the dead slot must not linger in the URL
+        // claiming a focus that isn't there.
+        window.location.hash = "#focus=not-a-board";
+        window.dispatchEvent(new Event("hashchange"));
+        await vi.waitFor(() => {
+            expect(window.location.hash).not.toContain("focus=");
+        });
+        expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
+
+        // A valid slot still deep-links into speaker view afterwards.
+        window.location.hash = "#focus=square";
+        window.dispatchEvent(new Event("hashchange"));
+        await vi.waitFor(() => {
+            expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        });
+        handle.dispose();
+        window.history.replaceState(null, "", window.location.pathname);
     });
 
     it("keeps the seed workspace in Configure during speaker view (no seed rail)", async () => {
