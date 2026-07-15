@@ -53,6 +53,7 @@ history-gated demo prominence; true code-split of the analytics charts.
 
 ## Next
 
+- Replace the comparison wall's coarse viewport/CPU board-capacity heuristic (currently six boards on capable/wide devices and four on narrow or low-core devices) with an evidence-based capacity signal. Evaluate measured render/simulation cost, tiling density, and backend-advertised limits; keep the hard safety ceiling and visible explanation, and never auto-remove existing boards when a resize or capability change lowers the recommended capacity.
 - Continue the code-quality roadmap by splitting the remaining drawer sections into section-owned builders if cell-metadata and editor controls grow again.
 - The direct canonical fixture layer now covers shallow and representative depths for `robinson-triangles`, `tuebingen-triangle`, `dodecagonal-square-triangle`, `shield`, and `pinwheel`, plus depth-`3` fixtures for `spectre`, `sphinx`, and `taylor-socolar`; keep `chair` and `hat-monotile` out of scope unless there is a concrete need for more exactness than their current metadata/local-reference coverage provides.
 - Decide whether the stronger verification-strength JSON report should be published as a CI artifact once consumers for it are clear.
