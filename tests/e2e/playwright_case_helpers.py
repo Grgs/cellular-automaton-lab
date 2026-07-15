@@ -48,6 +48,7 @@ class SharedUiFlowCase(Protocol):
     page: Any
     host: BrowserRuntimeHost
     api: JsonApiClient | None
+    console_messages: list[str]
 
     def goto_page(
         self,

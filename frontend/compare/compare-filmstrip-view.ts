@@ -85,6 +85,8 @@ export interface FilmstripViewController {
      * focusing; the expand glyph becomes the only zoom affordance.
      */
     setEditMode(enabled: boolean): void;
+    /** Keep wall management visible but disabled while an authoritative rebuild is in flight. */
+    setManagementBusy(busy: boolean): void;
     /** Re-evaluate the add affordance after capacity inputs such as viewport width change. */
     refreshAddControl(): void;
     /** Re-render one board's current frame (e.g. after an optimistic seed edit). */
@@ -179,6 +181,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let focusedGeometry: string | null = null;
     let heroToolbelt: HTMLElement | null = null;
     let editMode = false;
+    let managementBusy = false;
     let openTilingPicker: HTMLElement | null = null;
 
     function closeTilingPicker(): boolean {
@@ -375,6 +378,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                     type: "button",
                 });
                 choice.disabled =
+                    managementBusy ||
                     (option.value !== tiling?.geometry &&
                         boards.some((board) => board.tiling.geometry === option.value)) ||
                     options.isTilingAvailable?.(option.value) === false ||
@@ -431,7 +435,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             }),
             element("span", { textContent: "Add tiling" }),
         );
-        const hasCapacity = options.canAddBoard?.() !== false;
+        const hasCapacity = !managementBusy && options.canAddBoard?.() !== false;
         const hasAvailableTiling =
             hasCapacity &&
             options.tilingOptions.some(
@@ -440,11 +444,13 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                     options.isTilingAvailable?.(option.value) !== false,
             );
         addButton.disabled = !hasAvailableTiling;
-        addButton.title = hasAvailableTiling
-            ? "Add another tiling to the wall"
-            : hasCapacity
-              ? "All compatible tilings are already on the wall"
-              : (options.addBoardDisabledReason?.() ?? "The wall is at its tiling limit");
+        addButton.title = managementBusy
+            ? "Wait for the wall update to finish"
+            : hasAvailableTiling
+              ? "Add another tiling to the wall"
+              : hasCapacity
+                ? "All compatible tilings are already on the wall"
+                : (options.addBoardDisabledReason?.() ?? "The wall is at its tiling limit");
         addButton.addEventListener("click", (event) => {
             event.stopPropagation();
             openBoardTilingPicker(anchor);
@@ -457,6 +463,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         const slot = el("div", "compare-filmstrip-slot", "…");
         const label = el("button", "compare-filmstrip-label", boardName(tiling));
         label.setAttribute("type", "button");
+        (label as HTMLButtonElement).disabled = managementBusy;
         label.title = `Replace ${boardName(tiling)}`;
         label.setAttribute("aria-label", `Replace ${boardName(tiling)}`);
         const countLabel = el("div", "compare-filmstrip-count");
@@ -474,10 +481,13 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             // early-return on buttons), in edit mode included.
             const removeButton = el("button", "compare-filmstrip-remove", "×") as HTMLButtonElement;
             removeButton.setAttribute("type", "button");
-            removeButton.disabled = !removable;
-            removeButton.title = removable
-                ? "Remove from the wall"
-                : "Keep at least two tilings on the wall";
+            removeButton.dataset.removable = removable ? "true" : "false";
+            removeButton.disabled = managementBusy || !removable;
+            removeButton.title = managementBusy
+                ? "Wait for the wall update to finish"
+                : removable
+                  ? "Remove from the wall"
+                  : "Keep at least two tilings on the wall";
             removeButton.setAttribute("aria-label", `Remove ${boardName(tiling)} from the wall`);
             removeButton.addEventListener("click", () => {
                 options.onRemoveBoard?.(tiling.geometry);
@@ -633,6 +643,30 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             editMode = enabled;
             root.classList.toggle("is-editing", editMode);
             applyFocusLayout();
+        },
+        setManagementBusy(busy: boolean): void {
+            managementBusy = busy;
+            if (busy) {
+                closeTilingPicker();
+            }
+            for (const label of root.querySelectorAll<HTMLButtonElement>(
+                ".compare-filmstrip-label",
+            )) {
+                label.disabled = busy;
+            }
+            for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
+                ".compare-filmstrip-remove",
+            )) {
+                const removable = removeButton.dataset.removable === "true";
+                removeButton.disabled = busy || !removable;
+                removeButton.title = busy
+                    ? "Wait for the wall update to finish"
+                    : removable
+                      ? "Remove from the wall"
+                      : "Keep at least two tilings on the wall";
+            }
+            wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
+            createAddControl();
         },
         refreshAddControl(): void {
             wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();

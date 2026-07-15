@@ -2259,6 +2259,7 @@ export function createComparePanelContent(
         // Quiet the transport too: a play press accepted mid-rebuild would be
         // wiped when the fresh filmstrip attaches paused at the seed.
         filmstripTransport.setBusy(next);
+        filmstripView?.setManagementBusy(next);
         updateSummary();
     }
 
@@ -2460,6 +2461,7 @@ export function createComparePanelContent(
                             ),
                         ),
                 });
+                filmstripView.setManagementBusy(running);
                 filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripView.setEditMode(editMode);
                 filmstripArea.append(filmstripView.element);

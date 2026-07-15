@@ -143,6 +143,7 @@ function mountView(
         onAddBoard?: (geometry: string) => void;
         onFocusChange?: (geometry: string | null) => void;
         onRemoveBoard?: (geometry: string) => void;
+        onReplaceBoard?: (previousGeometry: string, nextGeometry: string) => void;
         previewTopology?: SimulationBackend["previewTopology"];
         tilingOptions?: readonly TopologyOption[];
     } = {},
@@ -162,6 +163,7 @@ function mountView(
         ...(options.onAddBoard ? { onAddBoard: options.onAddBoard } : {}),
         ...(options.onFocusChange ? { onFocusChange: options.onFocusChange } : {}),
         ...(options.onRemoveBoard ? { onRemoveBoard: options.onRemoveBoard } : {}),
+        ...(options.onReplaceBoard ? { onReplaceBoard: options.onReplaceBoard } : {}),
         ...(options.tilingOptions ? { tilingOptions: options.tilingOptions } : {}),
     });
     document.body.append(transport.element, view.element);
@@ -391,6 +393,61 @@ describe("createFilmstripView", () => {
         expect(
             view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.disabled,
         ).toBe(false);
+    });
+
+    it("keeps add, replace, and remove truthful while a wall rebuild is busy", async () => {
+        const added: string[] = [];
+        const removed: string[] = [];
+        const replaced: Array<[string, string]> = [];
+        const { view } = mountView({
+            onAddBoard: (geometry) => added.push(geometry),
+            onRemoveBoard: (geometry) => removed.push(geometry),
+            onReplaceBoard: (previousGeometry, nextGeometry) =>
+                replaced.push([previousGeometry, nextGeometry]),
+            tilingOptions: [
+                pickerOption("square", "Square"),
+                pickerOption("hex", "Hexagonal"),
+                pickerOption("tri", "Triangular"),
+                pickerOption("penrose", "Penrose"),
+            ],
+        });
+        await view.load(
+            filmstrip(
+                [
+                    tiling("square", [{ a: 1 }]),
+                    tiling("hex", [{ a: 1 }]),
+                    tiling("tri", [{ a: 1 }]),
+                ],
+                1,
+            ),
+        );
+
+        view.setManagementBusy(true);
+
+        const addButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+        const labels = view.element.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label");
+        const removeButtons = view.element.querySelectorAll<HTMLButtonElement>(
+            ".compare-filmstrip-remove",
+        );
+        expect(addButton?.disabled).toBe(true);
+        expect(addButton?.title).toBe("Wait for the wall update to finish");
+        expect([...labels].every((button) => button.disabled)).toBe(true);
+        expect([...removeButtons].every((button) => button.disabled)).toBe(true);
+        expect([...removeButtons].every((button) => button.title.includes("Wait"))).toBe(true);
+        addButton?.click();
+        labels[0]?.click();
+        removeButtons[0]?.click();
+        expect(added).toEqual([]);
+        expect(replaced).toEqual([]);
+        expect(removed).toEqual([]);
+
+        view.setManagementBusy(false);
+
+        expect(
+            view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.disabled,
+        ).toBe(false);
+        expect([...labels].every((button) => !button.disabled)).toBe(true);
+        expect([...removeButtons].every((button) => !button.disabled)).toBe(true);
     });
 
     it("advances every board in lockstep on each clock tick while playing", async () => {
