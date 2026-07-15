@@ -459,6 +459,9 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-status").to_contain_text("Done — 2 tilings")
 
         first_row = case.page.locator(".compare-grid tbody tr").first
+        analysis_geometry = first_row.get_attribute("data-geometry")
+        if analysis_geometry is None:
+            raise AssertionError("analysis row did not expose its geometry")
         first_row.hover()
         case.assertGreater(
             case.page.locator(".compare-portrait [data-geometry].is-dimmed").count(), 0
@@ -466,7 +469,9 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.mouse.move(0, 0)
 
         def open_phase_in_lab(phase: str) -> dict[str, object]:
-            row = case.page.locator(".compare-grid tbody tr").first
+            row_selector = f'.compare-grid tbody tr[data-geometry="{analysis_geometry}"]'
+            row = case.page.locator(row_selector)
+            self._expect(row_selector).to_have_count(1)
             row.locator(
                 ".compare-action-menu", has=case.page.get_by_text("Open", exact=True)
             ).locator("summary").click()
