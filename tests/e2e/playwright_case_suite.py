@@ -689,6 +689,30 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.get_by_role("button", name="Step forward one generation").click()
         expect(first_live).to_have_attribute("fill", "#d64e4e")
 
+    def test_wall_applies_bits_seed_from_the_setup_strip(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        seed_select = case.page.locator('select[aria-label="Comparison seed"]')
+        self._expect('select[aria-label="Comparison seed"]').to_have_value("r-pentomino")
+        seed_select.select_option("")
+        self._expect(".compare-setup-run").to_have_text("Apply changes")
+        case.page.click(".compare-setup-run")
+
+        self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
+        self._expect(".compare-status").not_to_contain_text("Error:")
+        self._expect('select[aria-label="Comparison seed"]').to_have_value("")
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
     def test_wall_edit_mode_rewinds_mid_timeline_paint_to_shared_seed(self) -> None:
         # Edit seed should keep the edited board on the shared wall clock. If
         # the wall is resting on a lively later frame, arming edit mode rewinds

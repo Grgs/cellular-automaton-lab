@@ -1253,6 +1253,14 @@ export function createComparePanelContent(
 
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
     shapeSelect.addEventListener("change", () => {
+        // Named-shape run configs legitimately carry an empty bit seed. When
+        // the user returns to Bits, restore an editable seed before the next
+        // request drops the pattern field; otherwise both seed sources are
+        // absent and server/standalone validation rejects the rebuild.
+        if (!isShapeMode() && normalizedSeedBits().length === 0) {
+            seedInput.value = DEFAULT_SEED;
+            seedPad.syncFromSeed();
+        }
         syncShapeMode();
         seedPreview.refresh();
         updateSummary();

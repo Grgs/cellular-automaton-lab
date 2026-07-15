@@ -943,6 +943,46 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("restores a valid bit seed when the setup strip leaves an empty named shape", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        await handle.applyRunConfig({
+            seed: "",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: ["square", "hex"],
+            pattern: "r-pentomino",
+        });
+
+        const seedSelect = document.querySelector<HTMLSelectElement>(
+            'select[aria-label="Comparison seed"]',
+        );
+        if (!seedSelect) {
+            throw new Error("missing comparison seed select");
+        }
+        seedSelect.value = "";
+        seedSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+        expect(
+            document.querySelector<HTMLInputElement>('input.compare-field[type="text"]')?.value,
+        ).toBe("01100 11000 01000");
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        expect(requestFilmstrip.mock.calls[0]?.[0]).toMatchObject({
+            seed: "01100 11000 01000",
+        });
+        expect(requestFilmstrip.mock.calls[0]?.[0]?.pattern).toBeUndefined();
+        handle.dispose();
+    });
+
     it("renders a compact add control without counting it as a board tile", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
