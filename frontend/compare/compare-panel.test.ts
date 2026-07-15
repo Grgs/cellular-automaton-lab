@@ -332,6 +332,20 @@ function memoryStorage(): Storage {
     };
 }
 
+function deferred<T>(): {
+    promise: Promise<T>;
+    resolve: (value: T) => void;
+    reject: (reason: unknown) => void;
+} {
+    let resolve!: (value: T) => void;
+    let reject!: (reason: unknown) => void;
+    const promise = new Promise<T>((nextResolve, nextReject) => {
+        resolve = nextResolve;
+        reject = nextReject;
+    });
+    return { promise, resolve, reject };
+}
+
 function clickRunAnalysis(): void {
     const button = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
         (candidate) => candidate.textContent === "Run analysis",
@@ -1745,6 +1759,280 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("prevents an obsolete filmstrip success and finally handler from replacing a newer run", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const oldRequest = deferred<SeedFilmstripResult>();
+        const currentRequest = deferred<SeedFilmstripResult>();
+        const requestFilmstrip = vi
+            .fn<SimulationBackend["requestFilmstrip"]>()
+            .mockImplementationOnce(() => oldRequest.promise)
+            .mockImplementationOnce(() => currentRequest.promise);
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await handle.applyRunConfig({
+            seed: "101",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["hex", "square"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+
+        oldRequest.resolve({ ...twoBoardFilmstrip(), seed: "obsolete" });
+        await Promise.resolve();
+        expect(document.querySelector(".compare-filmstrip-board")).toBeNull();
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+            "Building comparison",
+        );
+        const seedField = document.querySelector<HTMLInputElement>(
+            'input.compare-field[type="text"]',
+        );
+        expect(seedField?.disabled).toBe(true);
+        expect(seedField?.title).toBe("Wait for the wall update to finish");
+
+        const current = twoBoardFilmstrip();
+        currentRequest.resolve({
+            ...current,
+            seed: "101",
+            tilings: [current.tilings[1]!, current.tilings[0]!],
+        });
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "Filmstrip ready",
+            ),
+        );
+        expect(
+            [...document.querySelectorAll<HTMLElement>(".compare-filmstrip-label")].map(
+                (label) => label.textContent,
+            ),
+        ).toEqual(["hex", "square"]);
+        expect(seedField?.disabled).toBe(false);
+        handle.dispose();
+    });
+
+    it("ignores an obsolete filmstrip rejection while a replacement request remains busy", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const oldRequest = deferred<SeedFilmstripResult>();
+        const currentRequest = deferred<SeedFilmstripResult>();
+        const requestFilmstrip = vi
+            .fn<SimulationBackend["requestFilmstrip"]>()
+            .mockImplementationOnce(() => oldRequest.promise)
+            .mockImplementationOnce(() => currentRequest.promise);
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await handle.applyRunConfig({
+            seed: "101",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["square", "hex"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+
+        oldRequest.reject(new Error("obsolete failure"));
+        await Promise.resolve();
+        expect(document.querySelector<HTMLElement>(".compare-stale-notice")?.hidden).toBe(true);
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).not.toContain(
+            "obsolete failure",
+        );
+        expect(document.querySelector<HTMLButtonElement>(".compare-setup-run")?.disabled).toBe(
+            true,
+        );
+
+        currentRequest.resolve(twoBoardFilmstrip());
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "Filmstrip ready",
+            ),
+        );
+        handle.dispose();
+    });
+
+    it("keeps the previous wall playable, blocks management, and retries a failed update with the latest setup", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi
+            .fn<SimulationBackend["requestFilmstrip"]>()
+            .mockResolvedValueOnce(twoBoardFilmstrip())
+            .mockRejectedValueOnce(new Error("temporary outage"))
+            .mockImplementationOnce(async (request) => ({
+                ...twoBoardFilmstrip(),
+                seed: request.seed,
+            }));
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "Filmstrip ready",
+            ),
+        );
+        document
+            .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[aria-label="Play / pause"]')
+            ?.click();
+
+        const rule = document.querySelector<HTMLSelectElement>(
+            'select[aria-label="Comparison rule"]',
+        );
+        if (!rule) throw new Error("missing setup rule");
+        rule.value = "wireworld";
+        rule.dispatchEvent(new Event("change", { bubbles: true }));
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-stale-notice")?.hidden).toBe(
+                false,
+            ),
+        );
+
+        const notice = document.querySelector<HTMLElement>(".compare-stale-notice");
+        expect(notice?.getAttribute("role")).toBe("alert");
+        expect(notice?.textContent).toContain("still showing the previous result");
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(
+            document.querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[aria-label="Play / pause"]',
+            )?.disabled,
+        ).toBe(false);
+        for (const control of document.querySelectorAll<HTMLButtonElement>(
+            ".compare-filmstrip-add, .compare-filmstrip-label, .compare-filmstrip-remove",
+        )) {
+            expect(control.disabled).toBe(true);
+            expect(control.title).toBe("Retry the failed update before editing this wall");
+        }
+
+        const setupSeed = document.querySelector<HTMLSelectElement>(
+            'select[aria-label="Comparison seed"]',
+        );
+        if (!setupSeed) throw new Error("missing setup seed");
+        setupSeed.value = "glider";
+        setupSeed.dispatchEvent(new Event("change", { bubbles: true }));
+        document.querySelector<HTMLButtonElement>(".compare-stale-retry")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(3));
+        expect(requestFilmstrip.mock.calls.at(2)?.[0]).toMatchObject({
+            pattern: "glider",
+            rule: "wireworld",
+        });
+        await vi.waitFor(() => expect(notice?.hidden).toBe(true));
+        expect(document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.disabled).toBe(
+            false,
+        );
+        handle.dispose();
+    });
+
+    it("lets an unchanged hidden wall request finish but invalidates work on disposal", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const hiddenRequest = deferred<SeedFilmstripResult>();
+        const disposedRequest = deferred<SeedFilmstripResult>();
+        const requestFilmstrip = vi
+            .fn<SimulationBackend["requestFilmstrip"]>()
+            .mockImplementationOnce(() => hiddenRequest.promise)
+            .mockImplementationOnce(() => disposedRequest.promise);
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        handle.close();
+        hiddenRequest.resolve(twoBoardFilmstrip());
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "Filmstrip ready",
+            ),
+        );
+        handle.open();
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+
+        const rule = document.querySelector<HTMLSelectElement>(
+            'select[aria-label="Comparison rule"]',
+        );
+        if (!rule) throw new Error("missing setup rule");
+        rule.value = "wireworld";
+        rule.dispatchEvent(new Event("change", { bubbles: true }));
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        handle.dispose();
+        disposedRequest.resolve(twoBoardFilmstrip());
+        await Promise.resolve();
+        expect(document.querySelector(".compare-content")).toBeNull();
+    });
+
+    it("keeps obsolete analysis resolve and finally handlers from replacing a newer analysis", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const oldAnalysis = deferred<SeedComparisonResult>();
+        const currentAnalysis = deferred<SeedComparisonResult>();
+        const compareSeed = vi
+            .fn<SimulationBackend["compareSeed"]>()
+            .mockImplementationOnce(() => oldAnalysis.promise)
+            .mockImplementationOnce(() => currentAnalysis.promise);
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, compareSeed },
+            bootstrapData: bootstrapData(),
+        });
+        clickRunAnalysis();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
+        await handle.applyRunConfig({
+            seed: "101",
+            rule: "wireworld",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["square", "hex"],
+        });
+        clickRunAnalysis();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(2));
+
+        oldAnalysis.resolve(comparisonResult());
+        await Promise.resolve();
+        expect(document.querySelector(".compare-row-actions")).toBeNull();
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+            "Running 2 tilings",
+        );
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Comparison rule"]')
+                ?.disabled,
+        ).toBe(true);
+
+        currentAnalysis.resolve({ ...comparisonResult(), rule_name: "wireworld" });
+        await vi.waitFor(() =>
+            expect(document.querySelector(".compare-row-actions")).not.toBeNull(),
+        );
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+            "Done",
+        );
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Comparison rule"]')
+                ?.disabled,
+        ).toBe(false);
+        handle.dispose();
+    });
+
     it("expands a row preview into begin/end thumbnails", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -2669,6 +2957,11 @@ describe("mountComparePanel", () => {
         // (c:1:1 alive -> bit 0 -> "1"), become the shared seed, and the wall
         // re-runs from it -- which also disposes the fork.
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "Filmstrip ready",
+            ),
+        );
         const seedField = [
             ...document.querySelectorAll<HTMLInputElement>('input.compare-field[type="text"]'),
         ].find((input) => /^[01\s,]*$/.test(input.value) && !input.disabled);

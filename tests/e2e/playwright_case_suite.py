@@ -359,6 +359,152 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#grid").to_be_visible()
         self._expect(play_pause_selector).to_contain_text("Play")
 
+    def test_wall_real_keyboard_routing_and_layered_escape(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        play_pause = case.page.locator('.compare-filmstrip-btn[aria-label="Play / pause"]')
+        expect(play_pause).to_be_enabled()
+        expect(play_pause).to_contain_text("Play")
+
+        # Only the wall background owns global playback keys.
+        case.page.locator(".wall-page").focus()
+        case.page.keyboard.press("Space")
+        expect(play_pause).to_contain_text("Pause")
+        case.page.keyboard.press("Space")
+        expect(play_pause).to_contain_text("Play")
+
+        # Board Enter/Space owns focus, never the clock; Escape removes exactly
+        # that speaker layer.
+        first_board = case.page.locator(".compare-filmstrip-board").first
+        first_board.focus()
+        first_board.press("Enter")
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
+        expect(play_pause).to_contain_text("Play")
+        case.page.keyboard.press("Escape")
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(0)
+
+        # Search fields keep literal spaces. Escape closes the picker without
+        # leaving the wall or touching playback.
+        case.page.locator(".compare-filmstrip-label").first.press("Enter")
+        picker_search = case.page.locator(".compare-board-tiling-picker-search")
+        expect(picker_search).to_be_focused()
+        picker_search.press("Space")
+        expect(picker_search).to_have_value(" ")
+        expect(play_pause).to_contain_text("Play")
+        case.page.keyboard.press("Escape")
+        self._expect(".compare-board-tiling-picker").to_have_count(0)
+
+        # A focused setup field also retains Space. Layered Escape closes the
+        # sheet first and speaker view second.
+        first_board.focus()
+        first_board.press("Space")
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
+        seed_source = case.page.locator(".compare-form label", has_text="Seed source").locator(
+            "select"
+        )
+        seed_source.focus()
+        seed_source.press("Space")
+        expect(play_pause).to_contain_text("Play")
+        case.page.keyboard.press("Escape")
+        self._expect(".compare-config-sheet.is-open").to_have_count(0)
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
+        case.page.keyboard.press("Escape")
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(0)
+
+        # Native route-button activation remains native and pauses the hidden
+        # wall rather than being stolen by the global transport handler.
+        lab_route = case.page.locator("#open-lab-btn")
+        lab_route.focus()
+        lab_route.press("Space")
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+        case.page.locator("#wall-view-btn").press("Enter")
+        self._expect(".wall-page").to_be_visible()
+        expect(play_pause).to_contain_text("Play")
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_analysis_begin_end_round_trips_preserve_the_workspace(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        # Keep two inexpensive ordinary representatives and preserve their order.
+        for expected_count in (3, 2):
+            case.page.locator(".compare-filmstrip-remove").last.click()
+            self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
+        labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
+
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        analysis_steps = case.page.locator(
+            ".compare-form label", has_text="Analysis steps"
+        ).locator("input")
+        analysis_steps.fill("12")
+        case.page.click("#compare-config-tab-analysis")
+        case.page.click(".compare-run-secondary")
+        self._expect(".compare-grid tbody tr").to_have_count(2, timeout=60_000)
+        self._expect(".compare-status").to_contain_text("Done — 2 tilings")
+
+        first_row = case.page.locator(".compare-grid tbody tr").first
+        analysis_geometry = first_row.get_attribute("data-geometry")
+        if analysis_geometry is None:
+            raise AssertionError("analysis row did not expose its geometry")
+        first_row.hover()
+        case.assertGreater(
+            case.page.locator(".compare-portrait [data-geometry].is-dimmed").count(), 0
+        )
+        case.page.mouse.move(0, 0)
+
+        def open_phase_in_lab(phase: str) -> dict[str, object]:
+            row_selector = f'.compare-grid tbody tr[data-geometry="{analysis_geometry}"]'
+            row = case.page.locator(row_selector)
+            self._expect(row_selector).to_have_count(1)
+            row.locator(
+                ".compare-action-menu", has=case.page.get_by_text("Open", exact=True)
+            ).locator("summary").click()
+            row.get_by_role("button", name=phase, exact=True).click()
+            self._expect("#grid").to_be_visible()
+            self._expect(".wall-page").to_be_hidden()
+            payload = self._export_pattern_payload()
+            case.assertEqual(payload["rule"], "conway")
+            case.assertTrue(isinstance(payload["cells_by_id"], dict))
+            return payload
+
+        begin = open_phase_in_lab("Begin")
+        case.page.locator("#wall-view-btn").press("Enter")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-grid tbody tr").to_have_count(2)
+        self._expect("#compare-config-tab-analysis").to_have_attribute("aria-selected", "true")
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        end = open_phase_in_lab("End")
+        case.assertEqual(end["topology_spec"], begin["topology_spec"])
+        case.page.locator("#wall-view-btn").press("Enter")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-grid tbody tr").to_have_count(2)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+        self._expect('.compare-filmstrip-btn[aria-label="Play / pause"]').to_contain_text("Play")
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
     def test_wall_fork_persists_across_gallery_and_speaker_view(self) -> None:
         # Forking a board leaves the shared clock for its own live session; that
         # fork must survive leaving the board (it keeps running as a compact
@@ -395,6 +541,85 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         # Discard tears it down.
         case.page.click(".compare-focus-pane-discard")
         self._expect(".compare-focus-pane").to_have_count(0)
+
+    def test_wall_multiple_forks_capacity_replacement_and_route_lifecycle(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
+
+        # Save the current setup so loading it later is a true whole-wall
+        # replacement, not a direct implementation hook.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-saved")
+        case.page.fill('input[aria-label="Saved run name"]', "Fork lifecycle")
+        case.page.get_by_role("button", name="Save run", exact=True).click()
+        case.page.get_by_role("button", name="Close configuration").click()
+
+        def fork_and_run(index: int, expected_count: int) -> None:
+            case.page.locator(".compare-filmstrip-board").nth(index).click()
+            case.page.click(".compare-hero-fork")
+            self._expect(".compare-focus-pane").to_have_count(expected_count, timeout=60_000)
+            hero = case.page.locator(".compare-filmstrip-board.is-hero")
+            hero.get_by_role("button", name="Run", exact=True).click()
+            expect(hero.locator(".compare-focus-pane-badge")).to_contain_text("live · gen")
+            case.page.click(".compare-hero-back")
+
+        fork_and_run(0, 1)
+        fork_and_run(1, 2)
+        self._expect(".compare-focus-pane").to_have_count(2)
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(0)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        if case.api is None:
+            # Standalone owns two Pyodide fork runtimes. The third request is
+            # refused visibly; discarding one returns capacity immediately.
+            case.page.locator(".compare-filmstrip-board").nth(2).click()
+            case.page.click(".compare-hero-fork")
+            self._expect(".compare-status").to_contain_text(
+                "Only 2 live forks at a time here — discard one first."
+            )
+            self._expect(".compare-focus-pane").to_have_count(2)
+            case.page.click(".compare-hero-back")
+
+            case.page.locator(".compare-filmstrip-board").first.click()
+            case.page.click(".compare-focus-pane-discard")
+            self._expect(".compare-focus-pane").to_have_count(1)
+            case.page.click(".compare-hero-back")
+            fork_and_run(2, 2)
+
+        # Loading the saved run replaces the authoritative wall and tears down
+        # every fork before the replacement is rerun.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-saved")
+        case.page.get_by_role("button", name="Load run", exact=True).click()
+        self._expect(".compare-focus-pane").to_have_count(0)
+        self._expect(".compare-status").to_contain_text("Loaded run link")
+        case.page.get_by_role("button", name="Close configuration").click()
+        case.page.click(".compare-setup-run")
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        # Route deactivation disposes the remaining live pane once; returning
+        # restores the same authoritative board order without any fork badge.
+        case.page.locator(".compare-filmstrip-board").first.click()
+        case.page.click(".compare-hero-fork")
+        self._expect(".compare-focus-pane").to_have_count(1, timeout=60_000)
+        case.page.click("#open-lab-btn")
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        case.page.locator("#wall-view-btn").press("Enter")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-focus-pane").to_have_count(0)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
 
     def test_wall_fork_rejoins_the_wall_as_the_new_shared_seed(self) -> None:
         # A fork detaches from the shared clock; "Run wall from here" is the
@@ -654,15 +879,52 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.add_init_script(
             "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
         )
-        case.page.set_viewport_size({"width": 390, "height": 844})
         case.reload_page(wait_until="load")
-        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 844])
         self._mark_compare_demo_seen()
         case.page.click("#wall-view-btn")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
-        self._expect("#drawer-backdrop").to_be_hidden()
 
+        def add_tiling(label: str, expected_count: int) -> None:
+            labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
+            add_button = case.page.locator(".compare-filmstrip-add")
+            expect(add_button).to_be_visible()
+            expect(add_button).to_be_enabled(timeout=60_000)
+            add_button.click()
+            self._expect(".compare-board-tiling-picker-search").to_be_focused()
+            case.page.fill(".compare-board-tiling-picker-search", label)
+            choice = case.page.locator(".compare-board-tiling-choice:not(:disabled)").filter(
+                has=case.page.get_by_text(label, exact=True)
+            )
+            case.assertEqual(choice.count(), 1)
+            choice.click()
+            self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
+            labels_after = case.page.locator(".compare-filmstrip-label").all_text_contents()
+            case.assertEqual(labels_after[:-1], labels_before)
+            case.assertEqual(labels_after[-1], label)
+
+        # Begin at the capable desktop maximum with two structural outliers:
+        # an aperiodic patch and the dense periodic snub trihexagonal board.
+        add_tiling("Ammann-Beenker", 5)
+        dense_label = "Snub Trihexagonal (3.3.3.3.6)"
+        add_tiling(dense_label, 6)
+        desktop_labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        desktop_maximum = case.page.locator(".compare-filmstrip-add")
+        expect(desktop_maximum).to_be_visible()
+        expect(desktop_maximum).to_be_disabled()
+        expect(desktop_maximum).to_have_attribute(
+            "title", "The wall supports up to 6 tilings at once."
+        )
+
+        # Narrowing changes only future capacity. Existing boards and order are
+        # preserved, while the one-past action remains visible and explained.
+        case.page.set_viewport_size({"width": 390, "height": 844})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 844])
+        self._expect("#drawer-backdrop").to_be_hidden()
+        self._expect(".compare-filmstrip-board").to_have_count(6)
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(), desktop_labels
+        )
         mobile_add = case.page.locator(".compare-filmstrip-add")
         expect(mobile_add).to_be_visible()
         expect(mobile_add).to_be_disabled()
@@ -675,29 +937,37 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             case.page.evaluate("() => innerWidth"),
         )
 
-        # Make room and add the dense periodic outlier back at the end. The
-        # control remains on the wall and returns to its disabled max state.
-        labels_before_remove = case.page.locator(".compare-filmstrip-label").all_text_contents()
-        case.page.locator(".compare-filmstrip-remove").first.click()
-        self._expect(".compare-filmstrip-board").to_have_count(3, timeout=60_000)
-        labels_after_remove = case.page.locator(".compare-filmstrip-label").all_text_contents()
-        case.assertEqual(labels_after_remove, labels_before_remove[1:])
-
-        mobile_add = case.page.locator(".compare-filmstrip-add")
-        expect(mobile_add).to_be_enabled(timeout=60_000)
-        mobile_add.click()
-        self._expect(".compare-board-tiling-picker-search").to_be_focused()
-        dense_label = "Snub Trihexagonal (3.3.3.3.6)"
-        case.page.fill(".compare-board-tiling-picker-search", dense_label)
-        available_dense_choice = case.page.locator(".compare-board-tiling-choice:not(:disabled)")
-        case.assertEqual(available_dense_choice.count(), 1)
-        available_dense_choice.first.click()
-        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
-        labels_after_add = case.page.locator(".compare-filmstrip-label").all_text_contents()
-        case.assertEqual(labels_after_add[:-1], labels_after_remove)
-        case.assertEqual(labels_after_add[-1], dense_label)
+        # Remove from the beginning at three different board positions. The
+        # survivors stay ordered, then the mobile maximum accepts exactly one.
+        expected_labels = list(desktop_labels)
+        removed_labels: list[str] = []
+        for index in (0, 2, 1):
+            case.page.locator(".compare-filmstrip-remove").nth(index).click()
+            removed_labels.append(expected_labels.pop(index))
+            self._expect(".compare-filmstrip-board").to_have_count(
+                len(expected_labels), timeout=60_000
+            )
+            case.assertEqual(
+                case.page.locator(".compare-filmstrip-label").all_text_contents(), expected_labels
+            )
+        add_tiling(removed_labels[0], 4)
+        mobile_labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
         expect(case.page.locator(".compare-filmstrip-add")).to_be_visible()
         expect(case.page.locator(".compare-filmstrip-add")).to_be_disabled()
+
+        # Cross the responsive breakpoint without reordering, then restore wide
+        # capacity and append back to six.
+        case.page.set_viewport_size({"width": 800, "height": 900})
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(), mobile_labels
+        )
+        case.page.set_viewport_size({"width": 1280, "height": 900})
+        add_tiling(removed_labels[1], 5)
+        add_tiling(removed_labels[2], 6)
+        maximum_add = case.page.locator(".compare-filmstrip-add")
+        expect(maximum_add).to_be_visible()
+        expect(maximum_add).to_be_disabled()
+        expect(maximum_add).to_have_attribute("title", "The wall supports up to 6 tilings at once.")
         case.assertLessEqual(
             case.page.evaluate("() => document.documentElement.scrollWidth"),
             case.page.evaluate("() => innerWidth"),
@@ -1098,6 +1368,126 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         # Leaving via the Lab route tab writes the /lab route back.
         self.page.click("#open-lab-btn")
         self.page.wait_for_function("() => window.location.hash === '#/lab'")
+
+    def test_wall_failed_update_keeps_previous_result_and_retries_latest_setup(self) -> None:
+        self._mark_compare_demo_seen()
+        self.page.click("#wall-view-btn")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        labels = self.page.locator(".compare-filmstrip-label").all_text_contents()
+        self.page.locator('.compare-filmstrip-btn[aria-label="Play / pause"]').click()
+
+        requests: list[dict[str, Any]] = []
+
+        def intercept_filmstrip(route: Any) -> None:
+            payload = route.request.post_data_json
+            requests.append(cast(dict[str, Any], payload))
+            if len(requests) == 1:
+                # A truncated success payload exercises frontend recovery
+                # without Chromium's expected failed-resource console noise.
+                route.fulfill(status=200, content_type="application/json", body="{")
+                return
+            route.continue_()
+
+        self.page.route("**/compare/filmstrip", intercept_filmstrip)
+        self.page.select_option('select[aria-label="Comparison rule"]', "wireworld")
+        self.page.click(".compare-setup-run")
+        self._expect(".compare-stale-notice").to_be_visible(timeout=60_000)
+        self._expect(".compare-stale-notice").to_contain_text(
+            "The wall is still showing the previous result."
+        )
+        self._expect('.compare-filmstrip-btn[aria-label="Play / pause"]').to_contain_text("Pause")
+        self._expect(".compare-filmstrip-board").to_have_count(4)
+        for selector in (
+            ".compare-filmstrip-add",
+            ".compare-filmstrip-label",
+            ".compare-filmstrip-remove",
+        ):
+            controls = self.page.locator(selector)
+            for control in controls.all():
+                expect(control).to_be_disabled()
+                expect(control).to_have_attribute(
+                    "title", "Retry the failed update before editing this wall"
+                )
+
+        # Recovery intentionally reads the current controls, not the failed
+        # request snapshot.
+        self.page.select_option('select[aria-label="Comparison seed"]', "glider")
+        self.page.click(".compare-stale-retry")
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        self._expect(".compare-stale-notice").to_be_hidden()
+        self.assertEqual(len(requests), 2)
+        self.assertEqual(requests[1]["rule"], "wireworld")
+        self.assertEqual(requests[1]["pattern"], "glider")
+        self.assertEqual(self.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+        expect(self.page.locator(".compare-filmstrip-add")).to_be_enabled()
+        self.page.unroute("**/compare/filmstrip", intercept_filmstrip)
+
+        unexpected_console = [
+            message
+            for message in self.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        self.assertEqual(unexpected_console, [])
+
+    def test_wall_loaded_run_cannot_be_overwritten_by_a_held_old_response(self) -> None:
+        self._mark_compare_demo_seen()
+        self.page.click("#wall-view-btn")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        held_routes: list[Any] = []
+
+        def hold_first_filmstrip(route: Any) -> None:
+            if not held_routes:
+                held_routes.append(route)
+                return
+            route.continue_()
+
+        self.page.route("**/compare/filmstrip", hold_first_filmstrip)
+        self.page.select_option('select[aria-label="Comparison rule"]', "wireworld")
+        self.page.click(".compare-setup-run")
+        expect(self.page.locator(".compare-setup-run")).to_be_disabled()
+        for _ in range(100):
+            if held_routes:
+                break
+            self.page.wait_for_timeout(25)
+        self.assertEqual(len(held_routes), 1)
+
+        fragment = _encode_compare_run_fragment(
+            {
+                "seed": "101",
+                "rule": "conway",
+                "traversal": "bfs",
+                "frames": 12,
+                "grid_size": 8,
+                "geometries": ["hex", "square"],
+            }
+        )
+        self.page.evaluate(
+            "fragment => { window.location.hash = '#/compare&' + fragment; }", fragment
+        )
+        self._expect(".compare-status").to_contain_text("Loaded run link")
+        expect(self.page.locator(".compare-filmstrip-board").first).not_to_be_visible()
+        self._expect(".compare-stage-hero").to_be_visible()
+
+        with self.page.expect_response("**/compare/filmstrip", timeout=60_000) as response_info:
+            held_routes[0].continue_()
+        response_info.value.body()
+        self._expect(".compare-status").to_contain_text("Loaded run link")
+        expect(self.page.locator(".compare-filmstrip-board").first).not_to_be_visible()
+        self._expect(".compare-stale-notice").to_be_hidden()
+
+        self.page.click(".compare-setup-run")
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        self.assertEqual(
+            self.page.locator(".compare-filmstrip-label").all_text_contents(),
+            ["Hexagonal", "Square"],
+        )
+        self.page.unroute("**/compare/filmstrip", hold_first_filmstrip)
+        unexpected_console = [
+            message
+            for message in self.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        self.assertEqual(unexpected_console, [])
 
 
 class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
