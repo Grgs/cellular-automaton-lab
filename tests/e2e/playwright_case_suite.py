@@ -12,6 +12,7 @@ from typing import Any, ClassVar, cast
 from playwright.sync_api import ViewportSize, expect
 
 try:
+    from backend.rules import RuleRegistry
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase
     from tests.e2e.playwright_case_helpers import SharedUiFlowHelpers
     from tools.render_review.browser_support.palette_regression import (
@@ -26,6 +27,7 @@ try:
     )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from backend.rules import RuleRegistry
     from tests.e2e.browser_support.bootstrap import BrowserAppTestCase
     from tests.e2e.playwright_case_helpers import SharedUiFlowHelpers
     from tools.render_review.browser_support.palette_regression import (
@@ -451,17 +453,42 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_wall_names_boards_and_edits_the_selection_in_place(self) -> None:
         # Boards carry their friendly catalog label (not the raw geometry
-        # key), the dock's ⊞ jumps straight to the searchable tiling
-        # checklist, and a board's hover ✕ drops it from the run with one
-        # debounced re-run.
+        # key), replacing a named board preserves its wall position, the dock's
+        # ⊞ jumps straight to the searchable tiling checklist, and a board's
+        # persistent upper-right × drops it with one debounced re-run.
         case = self._case()
+        case.page.add_init_script(
+            "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
+        )
+        case.reload_page(wait_until="load")
         self._mark_compare_demo_seen()
         case.page.click("#wall-view-btn")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
 
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 900])
+        case.page.set_viewport_size({"width": 800, "height": 900})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [800, 900])
+
         self._expect(".compare-filmstrip-label >> nth=0").to_have_text("Square")
         self._expect(".compare-filmstrip-label >> nth=2").to_have_text("Penrose P3 Rhombs")
+
+        # A board-local replacement keeps the position the user acted on.
+        labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.page.locator(".compare-filmstrip-label").nth(2).click()
+        replacement = case.page.locator(
+            ".compare-board-tiling-choice:not(:disabled):not(.is-current)"
+        ).first
+        replacement_label = replacement.locator(
+            ".compare-board-tiling-choice-copy > span"
+        ).inner_text()
+        replacement.click()
+        self._expect(".compare-filmstrip-label >> nth=2").to_have_text(
+            replacement_label, timeout=60_000
+        )
+        labels_after = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.assertEqual(labels_after[:2], labels_before[:2])
+        case.assertEqual(labels_after[3:], labels_before[3:])
 
         # ⊞ lands ready to type: sheet open, Tilings section expanded, search
         # focused.
@@ -470,14 +497,385 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-tilings-search").to_be_focused()
         case.page.click(".compare-config-sheet-close")
 
-        # The hover ✕ removes the board and re-runs the wall without it.
-        case.page.locator(".compare-filmstrip-board").first.hover()
-        case.page.click(".compare-filmstrip-remove >> nth=0")
+        # The × is visible without hover and sits at the tile's upper-right.
+        first_board = case.page.locator(".compare-filmstrip-board").first
+        first_remove = case.page.locator(".compare-filmstrip-remove").first
+        expect(first_remove).to_be_visible()
+        board_box = first_board.bounding_box()
+        remove_box = first_remove.bounding_box()
+        if board_box is None or remove_box is None:
+            raise AssertionError("visible board management controls must have layout boxes")
+        case.assertLessEqual(remove_box["y"] - board_box["y"], 12)
+        case.assertLessEqual(
+            (board_box["x"] + board_box["width"]) - (remove_box["x"] + remove_box["width"]),
+            12,
+        )
+        first_remove.click()
         self._expect(".compare-status").to_contain_text("Removed Square")
         self._expect(".compare-filmstrip-board").to_have_count(3, timeout=60_000)
         self._expect(".compare-filmstrip-label >> nth=0").to_have_text(
             "Kagome / Trihexagonal (3.6.3.6)"
         )
+
+        # Compact once more to the two-board minimum. Survivor order is stable,
+        # and remove remains visible, keyboard-discoverable, disabled, and explained.
+        survivor_labels = case.page.locator(".compare-filmstrip-label").all_text_contents()[1:]
+        second_remove = case.page.locator(".compare-filmstrip-remove").first
+        expect(second_remove).to_be_enabled(timeout=60_000)
+        second_remove.press("Enter")
+        self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(), survivor_labels
+        )
+        minimum_remove_buttons = case.page.locator(".compare-filmstrip-remove")
+        case.assertEqual(minimum_remove_buttons.count(), 2)
+        for remove_button in minimum_remove_buttons.all():
+            expect(remove_button).to_be_visible()
+            expect(remove_button).to_be_disabled()
+            expect(remove_button).to_have_attribute(
+                "title", "Keep at least two tilings on the wall"
+            )
+
+        # Add through the wall-local visual picker up to the capable desktop
+        # ceiling. Each addition appends, and the first picker is opened from
+        # the keyboard to keep the in-wall workflow accessible.
+        additions = [
+            "Ammann-Beenker",
+            "Penrose P3 Rhombs",
+            "Kagome / Trihexagonal (3.6.3.6)",
+            "Snub Trihexagonal (3.3.3.3.6)",
+        ]
+        for index, add_label in enumerate(additions):
+            labels_before_add = case.page.locator(".compare-filmstrip-label").all_text_contents()
+            add_button = case.page.locator(".compare-filmstrip-add")
+            expect(add_button).to_be_visible()
+            expect(add_button).to_be_enabled(timeout=60_000)
+            if index == 0:
+                add_button.press("Enter")
+            else:
+                add_button.click()
+            self._expect(".compare-board-tiling-picker[aria-label='Add tiling']").to_be_visible()
+            self._expect(".compare-board-tiling-picker-search").to_be_focused()
+            case.page.fill(".compare-board-tiling-picker-search", add_label)
+            filtered_choices = case.page.locator(".compare-board-tiling-choice:not(:disabled)")
+            case.assertEqual(filtered_choices.count(), 1)
+            filtered_choices.first.click()
+            self._expect(".compare-filmstrip-board").to_have_count(
+                len(labels_before_add) + 1, timeout=60_000
+            )
+            labels_after_add = case.page.locator(".compare-filmstrip-label").all_text_contents()
+            case.assertEqual(labels_after_add[:-1], labels_before_add)
+            case.assertEqual(labels_after_add[-1], add_label)
+
+        # Maximum + 1 is represented as a persistent disabled action rather
+        # than a disappearing control or a seventh board.
+        maximum_add = case.page.locator(".compare-filmstrip-add")
+        expect(maximum_add).to_be_visible()
+        expect(maximum_add).to_be_disabled()
+        expect(maximum_add).to_have_attribute("title", "The wall supports up to 6 tilings at once.")
+        self._expect(".compare-filmstrip-board").to_have_count(6)
+
+        add_label = additions[-1]
+        dense_board = case.page.locator(".compare-filmstrip-board").filter(
+            has=case.page.locator(".compare-filmstrip-label", has_text=add_label)
+        )
+        expect(dense_board.locator(".compare-thumb")).to_be_visible(timeout=60_000)
+        expect(dense_board.locator(".compare-filmstrip-slot")).not_to_have_text("too large")
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_rapid_board_removal_holds_the_two_board_minimum(self) -> None:
+        # Board removals coalesce into one debounced rebuild, so the displayed
+        # strip still shows the pre-removal boards while more × clicks land. A
+        # burst of removals -- faster than the rebuild, the way an impatient
+        # user drags the wall down -- must still stop at the two-board minimum
+        # instead of racing past it and collapsing the running wall to the
+        # empty hero. Regression guard for the debounce-race that let the strip
+        # empty out.
+        case = self._case()
+        case.page.add_init_script(
+            "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
+        )
+        case.reload_page(wait_until="load")
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        # The strip exists before the initial rebuild settles; wait for the wall
+        # to go idle (remove controls enabled) so the burst is not swallowed by
+        # the in-flight-rebuild guard.
+        expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
+
+        # Use real pointer input at three displayed × controls before the
+        # debounced rebuild swaps the strip. The second accepted click reaches
+        # the floor and disables every remove control synchronously; the third
+        # pointer click therefore lands on a disabled button and must be ignored
+        # by the browser rather than relying on a synthetic event bypass.
+        remove_buttons = case.page.locator(".compare-filmstrip-remove")
+        remove_boxes = [remove_buttons.nth(index).bounding_box() for index in range(3)]
+        if any(box is None for box in remove_boxes):
+            raise AssertionError("rapid-removal controls must have layout boxes")
+        for index, box in enumerate(remove_boxes):
+            assert box is not None
+            case.page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+            if index == 1:
+                case.assertTrue(remove_buttons.nth(2).is_disabled())
+
+        # The wall settles at the floor -- two boards, never the collapsed hero
+        # -- and the survivors' remove controls stay visible, disabled, and
+        # explained rather than silently allowing the wall to empty.
+        self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
+        self._expect(".compare-status").to_contain_text("2 tilings")
+        self._expect(".compare-status").not_to_contain_text("Select at least two tilings")
+        self._expect(".compare-stage-hero").not_to_be_visible()
+        remove_buttons = case.page.locator(".compare-filmstrip-remove")
+        case.assertEqual(remove_buttons.count(), 2)
+        for remove_button in remove_buttons.all():
+            expect(remove_button).to_be_visible()
+            expect(remove_button).to_be_disabled()
+            expect(remove_button).to_have_attribute(
+                "title", "Keep at least two tilings on the wall"
+            )
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_mobile_capacity_keeps_actions_visible_and_blocks_max_plus_one(self) -> None:
+        case = self._case()
+        case.page.add_init_script(
+            "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
+        )
+        case.page.set_viewport_size({"width": 390, "height": 844})
+        case.reload_page(wait_until="load")
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 844])
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        self._expect("#drawer-backdrop").to_be_hidden()
+
+        mobile_add = case.page.locator(".compare-filmstrip-add")
+        expect(mobile_add).to_be_visible()
+        expect(mobile_add).to_be_disabled()
+        expect(mobile_add).to_have_attribute(
+            "title",
+            "This screen or device supports up to 4 tilings at once (maximum 6).",
+        )
+        case.assertLessEqual(
+            case.page.evaluate("() => document.documentElement.scrollWidth"),
+            case.page.evaluate("() => innerWidth"),
+        )
+
+        # Make room and add the dense periodic outlier back at the end. The
+        # control remains on the wall and returns to its disabled max state.
+        labels_before_remove = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.page.locator(".compare-filmstrip-remove").first.click()
+        self._expect(".compare-filmstrip-board").to_have_count(3, timeout=60_000)
+        labels_after_remove = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.assertEqual(labels_after_remove, labels_before_remove[1:])
+
+        mobile_add = case.page.locator(".compare-filmstrip-add")
+        expect(mobile_add).to_be_enabled(timeout=60_000)
+        mobile_add.click()
+        self._expect(".compare-board-tiling-picker-search").to_be_focused()
+        dense_label = "Snub Trihexagonal (3.3.3.3.6)"
+        case.page.fill(".compare-board-tiling-picker-search", dense_label)
+        available_dense_choice = case.page.locator(".compare-board-tiling-choice:not(:disabled)")
+        case.assertEqual(available_dense_choice.count(), 1)
+        available_dense_choice.first.click()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        labels_after_add = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.assertEqual(labels_after_add[:-1], labels_after_remove)
+        case.assertEqual(labels_after_add[-1], dense_label)
+        expect(case.page.locator(".compare-filmstrip-add")).to_be_visible()
+        expect(case.page.locator(".compare-filmstrip-add")).to_be_disabled()
+        case.assertLessEqual(
+            case.page.evaluate("() => document.documentElement.scrollWidth"),
+            case.page.evaluate("() => innerWidth"),
+        )
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_enforces_setup_boundaries_and_uses_the_selected_limits(self) -> None:
+        # The live wall and statistical analysis have different compute ceilings.
+        # Keep both jobs explicit, block one-past values before dispatch, and prove
+        # the accepted maxima reach the rendered wall / analysis result.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        # Use two ordinary survivors so the boundary journey remains fast in the
+        # standalone worker while still crossing board-management and rerun state.
+        for expected_count in (3, 2):
+            remove_buttons = case.page.locator(".compare-filmstrip-remove")
+            remove_buttons.nth(remove_buttons.count() - 1).click()
+            self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
+            if expected_count > 2:
+                expect(case.page.locator(".compare-filmstrip-remove").last).to_be_enabled(
+                    timeout=60_000
+                )
+        labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
+
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
+        wall_generations = case.page.locator(
+            ".compare-form label", has_text="Wall generations"
+        ).locator("input")
+        analysis_steps = case.page.locator(
+            ".compare-form label", has_text="Analysis steps"
+        ).locator("input")
+        grid_size = case.page.locator(".compare-form label", has_text="Grid size").locator("input")
+        wall_run = case.page.locator(".compare-setup-run")
+        analysis_run = case.page.locator(".compare-run-secondary")
+
+        expect(wall_generations).to_have_attribute("max", "240")
+        expect(analysis_steps).to_have_attribute("max", "500")
+        expect(grid_size).to_have_attribute("max", "64")
+
+        wall_generations.fill("241")
+        expect(wall_run).to_be_disabled()
+        expect(wall_run).to_have_attribute(
+            "title", "Wall generations must be an integer from 1 to 240."
+        )
+        expect(analysis_run).to_be_enabled()
+
+        wall_generations.fill("240")
+        analysis_steps.fill("501")
+        expect(wall_run).to_be_enabled()
+        case.page.click("#compare-config-tab-analysis")
+        expect(analysis_run).to_be_visible()
+        expect(analysis_run).to_be_disabled()
+        expect(analysis_run).to_have_attribute(
+            "title", "Analysis steps must be an integer from 1 to 500."
+        )
+
+        case.page.click("#compare-config-tab-setup")
+        analysis_steps.fill("500")
+        grid_size.fill("65")
+        expect(wall_run).to_be_disabled()
+        case.page.click("#compare-config-tab-analysis")
+        expect(analysis_run).to_be_disabled()
+        case.page.click("#compare-config-tab-setup")
+        expect(wall_run).to_have_attribute("title", "Grid size must be an integer from 2 to 64.")
+
+        # Minimum grid with maximum wall length: the counter proves all 240
+        # selected generations reached the rendered result.
+        grid_size.fill("2")
+        expect(wall_run).to_be_enabled()
+        expect(analysis_run).to_be_enabled()
+        case.page.get_by_role("button", name="Close configuration").click()
+        wall_run.click()
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 239")
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        # The separate 500-step maximum remains usable for analysis without
+        # changing the running wall or its participant order.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-analysis")
+        analysis_run.click()
+        self._expect(".compare-status").to_contain_text("Done — 2 tilings", timeout=60_000)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        # Maximum grid with the minimum one-frame wall: the square board's cell
+        # count proves the selected 64 x 64 request, rather than a silent clamp.
+        case.page.click("#compare-config-tab-setup")
+        wall_generations.fill("1")
+        grid_size.fill("64")
+        case.page.get_by_role("button", name="Close configuration").click()
+        wall_run.click()
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 0")
+        square_board = case.page.locator(".compare-filmstrip-board").filter(
+            has=case.page.locator(".compare-filmstrip-label", has_text="Square")
+        )
+        expect(square_board.locator("[data-cell-id]")).to_have_count(4096)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_applies_wireworld_and_hides_tiling_specific_rules(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        rule_select = case.page.locator("select[aria-label='Comparison rule']")
+        rule_values = rule_select.locator("option").evaluate_all(
+            "options => options.map(option => option.value)"
+        )
+        expected_wall_rules = {
+            rule["name"]
+            for rule in RuleRegistry().describe_rules()
+            if rule["supports_all_topologies"] and rule["compatible_tiling_families"] is None
+        }
+        case.assertEqual(set(rule_values), expected_wall_rules)
+        case.assertTrue("wireworld" in rule_values)
+        case.assertTrue("kagome-life" not in rule_values)
+        case.assertTrue(not any(value.startswith("archlife") for value in rule_values))
+
+        rule_select.select_option("wireworld")
+        self._expect(".compare-setup-run").to_have_text("Apply changes")
+        case.page.click(".compare-setup-run")
+        self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
+        self._expect(".compare-status").to_contain_text("Filmstrip ready")
+        self._expect("select[aria-label='Comparison rule']").to_have_value("wireworld")
+
+        # WireWorld's electron head deterministically becomes a tail. Checking
+        # the rule's state colours before and after one shared step proves the
+        # applied rule reached the filmstrip, beyond merely changing the select.
+        first_live = (
+            case.page.locator(".compare-filmstrip-board").first.locator("polygon.is-live").first
+        )
+        expect(first_live).to_have_attribute("fill", "#2f80ed")
+        case.page.get_by_role("button", name="Step forward one generation").click()
+        expect(first_live).to_have_attribute("fill", "#d64e4e")
+
+    def test_wall_applies_bits_seed_from_the_setup_strip(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        seed_select = case.page.locator('select[aria-label="Comparison seed"]')
+        self._expect('select[aria-label="Comparison seed"]').to_have_value("r-pentomino")
+        seed_select.select_option("")
+        self._expect(".compare-setup-run").to_have_text("Apply changes")
+        case.page.click(".compare-setup-run")
+
+        self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
+        self._expect(".compare-status").not_to_contain_text("Error:")
+        self._expect('select[aria-label="Comparison seed"]').to_have_value("")
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
 
     def test_wall_edit_mode_rewinds_mid_timeline_paint_to_shared_seed(self) -> None:
         # Edit seed should keep the edited board on the shared wall clock. If

@@ -46,6 +46,18 @@ class ApiTopologyPreviewTests(ApiTestCase):
         cells = response.get_json()["topology_preview"]["cells"]
         self.assertTrue(all(len(cell["vertices"]) >= 3 for cell in cells))
 
+    def test_comparison_preview_scales_dense_snub_trihexagonal_patch(self) -> None:
+        response = self.client.post(
+            "/api/topology/preview",
+            json={"geometry": "archimedean-3-3-3-3-6", "grid_size": 16},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        preview = response.get_json()["topology_preview"]
+        self.assertEqual(preview["topology_spec"]["width"], 5)
+        self.assertEqual(preview["topology_spec"]["height"], 5)
+        self.assertLessEqual(len(preview["cells"]), 4000)
+
     def test_preview_does_not_disturb_running_state(self) -> None:
         before = self.get_state()["generation"]
         self.client.post(

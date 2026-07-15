@@ -59,6 +59,11 @@ describe("compare-run-link", () => {
         expect(() => decodeCompareRunFragment(`#/compare&${badFragment}`)).toThrow(
             CompareRunLinkDecodeError,
         );
+
+        const tooManyFrames = encodeCompareRunFragment(runConfig({ frames: 241 }));
+        expect(() => decodeCompareRunFragment(`#/compare&${tooManyFrames}`)).toThrow(
+            /frames must be an integer from 1 to 240/,
+        );
     });
 
     it("rejects a run link tagged with an unsupported (newer) version", async () => {

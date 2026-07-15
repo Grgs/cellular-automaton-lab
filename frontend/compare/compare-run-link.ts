@@ -9,6 +9,13 @@
  * compare workspace route as its own hash segment.
  */
 
+import {
+    MAX_COMPARE_GRID_SIZE,
+    MAX_WALL_GENERATIONS,
+    MIN_COMPARE_GRID_SIZE,
+    MIN_COMPARE_STEPS,
+} from "./compare-limits.js";
+
 export const COMPARE_ROUTE_SLOT = "/compare";
 export const COMPARE_RUN_HASH_KEY = "run";
 export const COMPARE_RUN_VERSION_TAG = "v1";
@@ -136,8 +143,13 @@ function validateConfig(value: unknown): CompareRunConfig {
         seed: typeof value.seed === "string" ? value.seed : "",
         rule: validateNonEmptyString(value.rule, "rule"),
         traversal: validateNonEmptyString(value.traversal, "traversal"),
-        grid_size: validateInteger(value.grid_size, "grid_size", 2, 64),
-        frames: validateInteger(value.frames, "frames", 1, 500),
+        grid_size: validateInteger(
+            value.grid_size,
+            "grid_size",
+            MIN_COMPARE_GRID_SIZE,
+            MAX_COMPARE_GRID_SIZE,
+        ),
+        frames: validateInteger(value.frames, "frames", MIN_COMPARE_STEPS, MAX_WALL_GENERATIONS),
         geometries: validateGeometries(value.geometries),
     };
     if (value.pattern !== undefined) {

@@ -284,6 +284,7 @@ describe("mountWorkspaceRouter", () => {
         expect(wallTrigger.classList.contains("is-active")).toBe(true);
         expect(wallTrigger.getAttribute("aria-current")).toBe("page");
         expect(labTrigger.classList.contains("is-active")).toBe(false);
+        expect(document.documentElement.dataset.workspaceRoute).toBe("wall");
         expect(ensureLabReady).not.toHaveBeenCalled();
 
         // Entering the Lab boots the controller (once) and flips the shell.
@@ -296,6 +297,7 @@ describe("mountWorkspaceRouter", () => {
         expect(labTrigger.classList.contains("is-active")).toBe(true);
         expect(labTrigger.getAttribute("aria-current")).toBe("page");
         expect(wallTrigger.classList.contains("is-active")).toBe(false);
+        expect(document.documentElement.dataset.workspaceRoute).toBe("lab");
         expect(ensureLabReady).toHaveBeenCalledTimes(1);
 
         // Returning to the wall and back does not boot the controller again.
