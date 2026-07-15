@@ -151,7 +151,14 @@ function createStandalonePaneBackendFactory(
                     void backend.dispose();
                     return;
                 }
-                void environmentPromise?.then((resolvedBackend) => resolvedBackend.dispose());
+                // The environment can still be booting when a wall replacement
+                // or route change disposes its fork. `resolveBackend` rejects
+                // that obsolete boot deliberately; consume the disposal chain
+                // so the expected cancellation is not surfaced as an uncaught
+                // page error. Active pane callers still receive the rejection.
+                void environmentPromise
+                    ?.then((resolvedBackend) => resolvedBackend.dispose())
+                    .catch(() => undefined);
             },
             postControl,
             toggleCell: async (cell) => (await resolveBackend()).toggleCell(cell),

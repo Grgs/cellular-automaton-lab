@@ -25,6 +25,7 @@ import type { FilmstripTransportController } from "./compare-transport.js";
 import { createTilingPreviewThumbnail } from "../controls/tiling-preview.js";
 
 const DEFAULT_THUMB_SIZE = 180;
+const MANAGEMENT_BUSY_REASON = "Wait for the wall update to finish";
 
 export interface FilmstripViewOptions {
     backend: SimulationBackend;
@@ -88,6 +89,11 @@ export interface FilmstripViewController {
     setEditMode(enabled: boolean): void;
     /** Keep wall management visible but disabled while an authoritative rebuild is in flight. */
     setManagementBusy(busy: boolean): void;
+    /**
+     * Keep wall management visible but disabled after a failed authoritative
+     * update. Pass null once a successful retry makes the wall current again.
+     */
+    setManagementBlocked(reason: string | null): void;
     /** Re-evaluate the add affordance after capacity inputs such as viewport width change. */
     refreshAddControl(): void;
     /**
@@ -190,6 +196,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let heroToolbelt: HTMLElement | null = null;
     let editMode = false;
     let managementBusy = false;
+    let managementBlockedReason: string | null = null;
+
+    const managementDisabledReason = (): string | null =>
+        managementBusy ? MANAGEMENT_BUSY_REASON : managementBlockedReason;
     let openTilingPicker: HTMLElement | null = null;
 
     function closeTilingPicker(): boolean {
@@ -385,12 +395,16 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                     class: "compare-board-tiling-choice",
                     type: "button",
                 });
+                const disabledReason = managementDisabledReason();
                 choice.disabled =
-                    managementBusy ||
+                    disabledReason !== null ||
                     (option.value !== tiling?.geometry &&
                         boards.some((board) => board.tiling.geometry === option.value)) ||
                     options.isTilingAvailable?.(option.value) === false ||
                     (adding && options.canAddBoard?.() === false);
+                if (disabledReason) {
+                    choice.title = disabledReason;
+                }
                 choice.classList.toggle("is-current", option.value === tiling?.geometry);
                 choice.append(
                     element(
@@ -443,7 +457,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             }),
             element("span", { textContent: "Add tiling" }),
         );
-        const hasCapacity = !managementBusy && options.canAddBoard?.() !== false;
+        const disabledReason = managementDisabledReason();
+        const hasCapacity = disabledReason === null && options.canAddBoard?.() !== false;
         const hasAvailableTiling =
             hasCapacity &&
             options.tilingOptions.some(
@@ -452,8 +467,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                     options.isTilingAvailable?.(option.value) !== false,
             );
         addButton.disabled = !hasAvailableTiling;
-        addButton.title = managementBusy
-            ? "Wait for the wall update to finish"
+        addButton.title = disabledReason
+            ? disabledReason
             : hasAvailableTiling
               ? "Add another tiling to the wall"
               : hasCapacity
@@ -467,12 +482,34 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         wallActions.append(anchor);
     }
 
+    function refreshManagementControls(): void {
+        const disabledReason = managementDisabledReason();
+        for (const label of root.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label")) {
+            label.disabled = disabledReason !== null;
+            label.title = disabledReason ?? `Replace ${label.textContent ?? "tiling"}`;
+        }
+        for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
+            ".compare-filmstrip-remove",
+        )) {
+            const removable = removeButton.dataset.removable === "true";
+            removeButton.disabled = disabledReason !== null || !removable;
+            removeButton.title = disabledReason
+                ? disabledReason
+                : removable
+                  ? "Remove from the wall"
+                  : "Keep at least two tilings on the wall";
+        }
+        wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
+        createAddControl();
+    }
+
     function createBoardEntry(tiling: TopologyFilmstrip, removable: boolean): BoardEntry {
         const slot = el("div", "compare-filmstrip-slot", "…");
         const label = el("button", "compare-filmstrip-label", boardName(tiling));
         label.setAttribute("type", "button");
-        (label as HTMLButtonElement).disabled = managementBusy;
-        label.title = `Replace ${boardName(tiling)}`;
+        const managementReason = managementDisabledReason();
+        (label as HTMLButtonElement).disabled = managementReason !== null;
+        label.title = managementReason ?? `Replace ${boardName(tiling)}`;
         label.setAttribute("aria-label", `Replace ${boardName(tiling)}`);
         const countLabel = el("div", "compare-filmstrip-count");
         const cell = el("div", "compare-filmstrip-board");
@@ -490,9 +527,9 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const removeButton = el("button", "compare-filmstrip-remove", "×") as HTMLButtonElement;
             removeButton.setAttribute("type", "button");
             removeButton.dataset.removable = removable ? "true" : "false";
-            removeButton.disabled = managementBusy || !removable;
-            removeButton.title = managementBusy
-                ? "Wait for the wall update to finish"
+            removeButton.disabled = managementReason !== null || !removable;
+            removeButton.title = managementReason
+                ? managementReason
                 : removable
                   ? "Remove from the wall"
                   : "Keep at least two tilings on the wall";
@@ -658,24 +695,14 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             if (busy) {
                 closeTilingPicker();
             }
-            for (const label of root.querySelectorAll<HTMLButtonElement>(
-                ".compare-filmstrip-label",
-            )) {
-                label.disabled = busy;
+            refreshManagementControls();
+        },
+        setManagementBlocked(reason: string | null): void {
+            managementBlockedReason = reason;
+            if (reason) {
+                closeTilingPicker();
             }
-            for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
-                ".compare-filmstrip-remove",
-            )) {
-                const removable = removeButton.dataset.removable === "true";
-                removeButton.disabled = busy || !removable;
-                removeButton.title = busy
-                    ? "Wait for the wall update to finish"
-                    : removable
-                      ? "Remove from the wall"
-                      : "Keep at least two tilings on the wall";
-            }
-            wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
-            createAddControl();
+            refreshManagementControls();
         },
         refreshAddControl(): void {
             wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
@@ -686,13 +713,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 ".compare-filmstrip-remove",
             )) {
                 removeButton.dataset.removable = removable ? "true" : "false";
-                removeButton.disabled = managementBusy || !removable;
-                removeButton.title = managementBusy
-                    ? "Wait for the wall update to finish"
-                    : removable
-                      ? "Remove from the wall"
-                      : "Keep at least two tilings on the wall";
             }
+            refreshManagementControls();
         },
         refreshBoard(geometry: string): void {
             const entry = entryFor(geometry);

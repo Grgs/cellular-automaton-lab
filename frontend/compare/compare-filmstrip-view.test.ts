@@ -450,6 +450,50 @@ describe("createFilmstripView", () => {
         expect([...removeButtons].every((button) => !button.disabled)).toBe(true);
     });
 
+    it("composes a persistent management block with busy state and the board minimum", async () => {
+        const reason = "Retry the failed update before editing this wall";
+        const { view } = mountView({
+            onAddBoard: vi.fn(),
+            onRemoveBoard: vi.fn(),
+            onReplaceBoard: vi.fn(),
+            tilingOptions: [
+                pickerOption("square", "Square"),
+                pickerOption("hex", "Hexagonal"),
+                pickerOption("tri", "Triangular"),
+            ],
+        });
+        await view.load(filmstrip([tiling("square", [{ a: 1 }]), tiling("hex", [{ a: 1 }])], 1));
+
+        view.setManagementBlocked(reason);
+        const controls = () =>
+            [
+                view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add"),
+                ...view.element.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label"),
+                ...view.element.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-remove"),
+            ].filter((button): button is HTMLButtonElement => button !== null);
+        expect(controls().every((button) => button.disabled && button.title === reason)).toBe(true);
+
+        view.setManagementBusy(true);
+        expect(
+            controls().every((button) => button.title === "Wait for the wall update to finish"),
+        ).toBe(true);
+        view.setManagementBusy(false);
+        expect(controls().every((button) => button.disabled && button.title === reason)).toBe(true);
+
+        view.setManagementBlocked(null);
+        const addButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+        const labels = view.element.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label");
+        const removeButtons = view.element.querySelectorAll<HTMLButtonElement>(
+            ".compare-filmstrip-remove",
+        );
+        expect(addButton?.disabled).toBe(false);
+        expect([...labels].every((button) => !button.disabled)).toBe(true);
+        expect([...removeButtons].every((button) => button.disabled)).toBe(true);
+        expect([...removeButtons].every((button) => button.title.includes("at least two"))).toBe(
+            true,
+        );
+    });
+
     it("advances every board in lockstep on each clock tick while playing", async () => {
         const { view, clock } = mountView();
         await view.load(

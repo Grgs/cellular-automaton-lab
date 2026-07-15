@@ -93,10 +93,18 @@ const PATTERN_VERSION = 5;
 
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
+const WAIT_FOR_WALL_UPDATE = "Wait for the wall update to finish";
+const FAILED_UPDATE_MANAGEMENT_REASON = "Retry the failed update before editing this wall";
 
 interface RunFilmstripOptions {
     /** Suppress the full-wall loading veil for debounced edits that can refresh in place. */
     quietUpdate?: boolean;
+}
+
+interface OperationTicket {
+    id: number;
+    revision: number;
+    kind: "analysis" | "filmstrip";
 }
 
 /** Build a shareable board pattern for a result's begin or end state, if states were returned. */
@@ -310,6 +318,11 @@ export function createComparePanelContent(
     let rules: RuleDefinition[] = [];
     let rulesLoaded = false;
     let running = false;
+    let disposed = false;
+    let operationSequence = 0;
+    let lifecycleRevision = 0;
+    let activeOperation: OperationTicket | null = null;
+    let failedWallUpdate = false;
     let tilingSearchQuery = "";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
@@ -651,6 +664,21 @@ export function createComparePanelContent(
                 el("span", { class: "compare-wall-loading-card" }),
             ]),
         ],
+    );
+    const retryWallUpdateButton = el("button", {
+        class: "compare-mini compare-stale-retry",
+        type: "button",
+        textContent: "Retry update",
+    });
+    const staleResultNoticeMessage = el("span", { class: "compare-stale-notice-message" });
+    const staleResultNotice = el(
+        "div",
+        {
+            class: "compare-stale-notice",
+            role: "alert",
+            hidden: true,
+        },
+        [staleResultNoticeMessage, retryWallUpdateButton],
     );
     const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [
         stageHero,
@@ -1269,7 +1297,10 @@ export function createComparePanelContent(
         ...(focusLiveEnabled ? [heroForkButton] : []),
     ]);
 
-    const stageMain = el("div", { class: "compare-stage-main" }, [filmstripArea]);
+    const stageMain = el("div", { class: "compare-stage-main" }, [
+        staleResultNotice,
+        filmstripArea,
+    ]);
     const explainerTitle = el("summary", {
         class: "compare-explainer-title",
         textContent: "What you are seeing",
@@ -1637,11 +1668,13 @@ export function createComparePanelContent(
                     ? "Unsupported for the selected rule"
                     : capacityReached
                       ? wallCapacityMessage(currentWallCapacity())
-                      : "";
+                      : running
+                        ? WAIT_FOR_WALL_UPDATE
+                        : "";
                 const checkbox = el("input", {
                     type: "checkbox",
                     checked: compatible && selected.has(option.geometry),
-                    disabled: !compatible || capacityReached,
+                    disabled: running || !compatible || capacityReached,
                     title: disabledReason,
                 });
                 checkbox.addEventListener("change", () => {
@@ -1725,6 +1758,10 @@ export function createComparePanelContent(
                     }),
                 ],
             );
+            chip.disabled = running;
+            if (running) {
+                chip.title = WAIT_FOR_WALL_UPDATE;
+            }
             chip.addEventListener("click", () => {
                 selected.delete(option.geometry);
                 renderTilingChecklist();
@@ -1824,6 +1861,8 @@ export function createComparePanelContent(
             const isActive = preset === active;
             button.classList.toggle("is-active", isActive);
             button.setAttribute("aria-pressed", isActive ? "true" : "false");
+            button.disabled = running;
+            button.title = running ? WAIT_FOR_WALL_UPDATE : `Select ${button.textContent} tilings`;
         }
     }
 
@@ -1842,8 +1881,9 @@ export function createComparePanelContent(
         const current = wallProblem === null && isFilmstripCurrent();
         const stale = activeFilmstrip !== null && !current && selected.size >= MIN_WALL_TILINGS;
         runButton.disabled = !canAnalyze;
-        runButton.title =
-            analysisProblem ?? "Run the selected tilings as a longer statistical analysis";
+        runButton.title = running
+            ? WAIT_FOR_WALL_UPDATE
+            : (analysisProblem ?? "Run the selected tilings as a longer statistical analysis");
         setupRunButton.disabled = !canPlay || current;
         setupRunButton.classList.toggle("is-current", current && !running);
         setupRunButton.classList.toggle("is-stale", stale && !running);
@@ -1859,6 +1899,9 @@ export function createComparePanelContent(
                   ? "Apply changes"
                   : "Run comparison";
         const playTitle = (() => {
+            if (running) {
+                return WAIT_FOR_WALL_UPDATE;
+            }
             if (wallProblem) {
                 return wallProblem;
             }
@@ -1886,6 +1929,7 @@ export function createComparePanelContent(
         heroOpenLabButton.disabled = running || currentFocusGeometry === null;
         // Painting needs boards on the stage; the toggle waits for a run.
         editModeButton.disabled = running || !activeFilmstrip;
+        editModeButton.title = running ? WAIT_FOR_WALL_UPDATE : "Edit the seed by painting boards";
         updateSetupSummary();
         updateExplainer();
     }
@@ -2369,6 +2413,49 @@ export function createComparePanelContent(
         renderTilingChecklist();
     }
 
+    type ConfigurationControl = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
+    const configurationControlState = new Map<
+        ConfigurationControl,
+        { disabled: boolean; title: string }
+    >();
+
+    function configurationMutationControls(): ConfigurationControl[] {
+        const controls = new Set<ConfigurationControl>([
+            setupSeedValue,
+            setupRuleValue,
+            setupRunButton,
+            editModeButton,
+            runButton,
+        ]);
+        for (const container of [setupConfigPanel, tilingsConfigPanel, savedConfigPanel]) {
+            container
+                .querySelectorAll<ConfigurationControl>("button, input, select")
+                .forEach((control) => controls.add(control));
+        }
+        return [...controls];
+    }
+
+    function setConfigurationControlsBusy(busy: boolean): void {
+        if (busy) {
+            for (const control of configurationMutationControls()) {
+                if (!configurationControlState.has(control)) {
+                    configurationControlState.set(control, {
+                        disabled: control.disabled,
+                        title: control.title,
+                    });
+                }
+                control.disabled = true;
+                control.title = WAIT_FOR_WALL_UPDATE;
+            }
+            return;
+        }
+        for (const [control, state] of configurationControlState) {
+            control.disabled = state.disabled;
+            control.title = state.title;
+        }
+        configurationControlState.clear();
+    }
+
     function setRunning(next: boolean): void {
         running = next;
         runButton.textContent = next ? "Running…" : "Run analysis";
@@ -2376,7 +2463,66 @@ export function createComparePanelContent(
         // wiped when the fresh filmstrip attaches paused at the seed.
         filmstripTransport.setBusy(next);
         filmstripView?.setManagementBusy(next);
+        retryWallUpdateButton.disabled = next;
+        retryWallUpdateButton.title = next
+            ? WAIT_FOR_WALL_UPDATE
+            : "Retry the update using the latest setup";
+        setConfigurationControlsBusy(next);
         updateSummary();
+        // Summary rendering recreates selection chips and can run after a resize;
+        // catch those controls without overwriting the state captured above.
+        if (next) {
+            setConfigurationControlsBusy(true);
+        } else {
+            renderTilingChecklist();
+            refreshSavedControls(savedRunSelect.value, savedTilingSetSelect.value);
+            syncShapeMode();
+        }
+    }
+
+    function ownsOperation(ticket: OperationTicket): boolean {
+        return (
+            !disposed && ticket.revision === lifecycleRevision && activeOperation?.id === ticket.id
+        );
+    }
+
+    function beginOperation(kind: OperationTicket["kind"]): OperationTicket {
+        const ticket = { id: ++operationSequence, revision: lifecycleRevision, kind };
+        activeOperation = ticket;
+        setRunning(true);
+        return ticket;
+    }
+
+    function finishOperation(ticket: OperationTicket): void {
+        if (!ownsOperation(ticket)) {
+            return;
+        }
+        activeOperation = null;
+        setWallLoading(null);
+        setRunning(false);
+    }
+
+    function invalidateOperations(): void {
+        lifecycleRevision += 1;
+        activeOperation = null;
+        if (running) {
+            setWallLoading(null);
+            setRunning(false);
+        }
+    }
+
+    function clearFailedWallUpdate(): void {
+        failedWallUpdate = false;
+        staleResultNotice.hidden = true;
+        staleResultNoticeMessage.textContent = "";
+        filmstripView?.setManagementBlocked(null);
+    }
+
+    function reportFailedWallUpdate(message: string): void {
+        failedWallUpdate = true;
+        staleResultNoticeMessage.textContent = `Update failed: ${message}. The wall is still showing the previous result.`;
+        staleResultNotice.hidden = false;
+        filmstripView?.setManagementBlocked(FAILED_UPDATE_MANAGEMENT_REASON);
     }
 
     function selectHasValue(select: HTMLSelectElement, value: string): boolean {
@@ -2392,7 +2538,14 @@ export function createComparePanelContent(
     }
 
     async function applyRunConfig(config: CompareRunConfig): Promise<void> {
+        // A loaded run replaces the entire wall. Older backend work may still
+        // settle, but it no longer owns any visible or busy state.
+        invalidateOperations();
+        clearFailedWallUpdate();
         await ensureRules();
+        if (disposed) {
+            return;
+        }
 
         seedInput.value = config.seed;
         seedPad.syncFromSeed();
@@ -2475,7 +2628,7 @@ export function createComparePanelContent(
     }
 
     async function runComparison(): Promise<void> {
-        if (running || selected.size === 0) {
+        if (disposed || running || selected.size === 0) {
             return;
         }
         const configProblem = analysisConfigProblem();
@@ -2484,10 +2637,6 @@ export function createComparePanelContent(
             updateSummary();
             return;
         }
-        setRunning(true);
-        statusLine.textContent = `Running ${selected.size} tilings…`;
-        resultsArea.replaceChildren();
-
         const request: CompareRequest = {
             seed: seedInput.value,
             rule: selectedRuleName(),
@@ -2503,18 +2652,27 @@ export function createComparePanelContent(
             include_states: true,
             ...(isShapeMode() ? { pattern: shapeSelect.value } : {}),
         };
+        const ticket = beginOperation("analysis");
+        statusLine.textContent = `Running ${selected.size} tilings…`;
+        resultsArea.replaceChildren();
 
         try {
             const comparison = await options.backend.compareSeed(request);
+            if (!ownsOperation(ticket)) {
+                return;
+            }
             renderResults(comparison);
             const sourceDesc = isShapeMode()
                 ? `shape "${shapeSelect.value}"`
                 : `${comparison.seed_bits} bits`;
             statusLine.textContent = `Done — ${comparison.results.length} tilings, ${sourceDesc}.`;
         } catch (error) {
+            if (!ownsOperation(ticket)) {
+                return;
+            }
             statusLine.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
         } finally {
-            setRunning(false);
+            finishOperation(ticket);
         }
     }
 
@@ -2522,7 +2680,7 @@ export function createComparePanelContent(
         playback?: FilmstripLoadOptions,
         runOptions: RunFilmstripOptions = {},
     ): Promise<void> {
-        if (running) {
+        if (disposed || running) {
             return;
         }
         const configProblem = wallConfigProblem();
@@ -2546,7 +2704,7 @@ export function createComparePanelContent(
         const hadFilmstrip = activeFilmstrip !== null;
         const loadingMessage = hadFilmstrip ? "Updating comparison..." : "Building comparison...";
         const showLoadingOverlay = !runOptions.quietUpdate || !hadFilmstrip;
-        setRunning(true);
+        const ticket = beginOperation("filmstrip");
         statusLine.textContent = `${loadingMessage} ${selected.size} tilings…`;
         if (showLoadingOverlay) {
             setWallLoading(loadingMessage);
@@ -2567,6 +2725,9 @@ export function createComparePanelContent(
 
         try {
             const filmstrip = await options.backend.requestFilmstrip(request);
+            if (!ownsOperation(ticket)) {
+                return;
+            }
             activeFilmstrip = filmstrip;
             activeFilmstripRunKey = requestKey;
             if (!filmstripView) {
@@ -2597,6 +2758,9 @@ export function createComparePanelContent(
                         ),
                 });
                 filmstripView.setManagementBusy(running);
+                filmstripView.setManagementBlocked(
+                    failedWallUpdate ? FAILED_UPDATE_MANAGEMENT_REASON : null,
+                );
                 filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripView.setEditMode(editMode);
                 filmstripArea.append(filmstripView.element);
@@ -2606,20 +2770,28 @@ export function createComparePanelContent(
                 ...(playback ?? {}),
                 ...(hadFilmstrip ? { preserveBoards: true } : {}),
             });
+            if (!ownsOperation(ticket)) {
+                return;
+            }
             // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
             applyFocusFromHash();
+            clearFailedWallUpdate();
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
         } catch (error) {
+            if (!ownsOperation(ticket)) {
+                return;
+            }
             const message = error instanceof Error ? error.message : String(error);
             statusLine.textContent = `Error: ${message}`;
             if (hadFilmstrip) {
                 showStageBoards();
+                reportFailedWallUpdate(message);
             } else {
+                clearFailedWallUpdate();
                 showStageHero();
             }
         } finally {
-            setWallLoading(null);
-            setRunning(false);
+            finishOperation(ticket);
         }
     }
 
@@ -2968,6 +3140,7 @@ export function createComparePanelContent(
     }
 
     runButton.addEventListener("click", () => void runComparison());
+    retryWallUpdateButton.addEventListener("click", () => void runFilmstrip());
     setupRunButton.addEventListener("click", () => {
         if (isFilmstripCurrent()) {
             statusLine.textContent = "The comparison is already up to date.";
@@ -3056,6 +3229,8 @@ export function createComparePanelContent(
             return false;
         },
         dispose(): void {
+            disposed = true;
+            invalidateOperations();
             if (paintRerunTimer !== null) {
                 window.clearTimeout(paintRerunTimer);
                 paintRerunTimer = null;

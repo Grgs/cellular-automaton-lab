@@ -221,6 +221,30 @@
     min-width: 0;
     min-height: 0;
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.compare-stale-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 12px;
+    border: 1px solid color-mix(in srgb, var(--danger, #dc2626) 44%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--danger, #dc2626) 10%, var(--panel, #ffffff));
+    color: var(--ink, #1f2430);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.compare-stale-notice[hidden] {
+    display: none;
+}
+.compare-stale-notice-message {
+    min-width: 0;
+}
+.compare-stale-retry {
+    flex: 0 0 auto;
 }
 /* Speaker view keeps the hero board bound to the stage's height (nowrap), so
    it fills rather than overflowing. Seed editing is edit mode's job in either
