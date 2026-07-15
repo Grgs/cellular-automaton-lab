@@ -72,6 +72,14 @@ import {
     wallCapacityMessage,
     wallTilingCapacity,
 } from "./compare-capacity.js";
+import {
+    MAX_ANALYSIS_STEPS,
+    MAX_COMPARE_GRID_SIZE,
+    MAX_COMPARE_SEED_LENGTH,
+    MAX_WALL_GENERATIONS,
+    MIN_COMPARE_GRID_SIZE,
+    MIN_COMPARE_STEPS,
+} from "./compare-limits.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
 // patches are not offered a thumbnail (the backend would reject them anyway).
@@ -314,6 +322,7 @@ export function createComparePanelContent(
         class: "compare-field",
         type: "text",
         value: DEFAULT_SEED,
+        maxlength: String(MAX_COMPARE_SEED_LENGTH),
         spellcheck: "false",
     });
     const traversalSelect = el(
@@ -323,19 +332,26 @@ export function createComparePanelContent(
             el("option", { value: option.value, textContent: option.label }),
         ),
     );
-    const stepsInput = el("input", {
+    const wallGenerationsInput = el("input", {
         class: "compare-field",
         type: "number",
         value: "50",
-        min: "1",
-        max: "500",
+        min: String(MIN_COMPARE_STEPS),
+        max: String(MAX_WALL_GENERATIONS),
+    });
+    const analysisStepsInput = el("input", {
+        class: "compare-field",
+        type: "number",
+        value: "50",
+        min: String(MIN_COMPARE_STEPS),
+        max: String(MAX_ANALYSIS_STEPS),
     });
     const gridInput = el("input", {
         class: "compare-field",
         type: "number",
         value: "16",
-        min: "2",
-        max: "64",
+        min: String(MIN_COMPARE_GRID_SIZE),
+        max: String(MAX_COMPARE_GRID_SIZE),
     });
     const shapeSelect = el(
         "select",
@@ -364,7 +380,8 @@ export function createComparePanelContent(
         backend: options.backend,
         getSeed: () => seedInput.value,
         getTraversal: () => traversalSelect.value,
-        getGridSize: () => clampNumber(gridInput.value, 2, 64, 16),
+        getGridSize: () =>
+            clampNumber(gridInput.value, MIN_COMPARE_GRID_SIZE, MAX_COMPARE_GRID_SIZE, 16),
         getPattern: () => shapeSelect.value,
         getPreviewHref: ({ cellsById, preview }) =>
             patternShareUrl({
@@ -405,8 +422,10 @@ export function createComparePanelContent(
         refreshPreview();
         updateSummary();
     });
-    stepsInput.addEventListener("input", updateSummary);
-    stepsInput.addEventListener("change", updateSummary);
+    wallGenerationsInput.addEventListener("input", updateSummary);
+    wallGenerationsInput.addEventListener("change", updateSummary);
+    analysisStepsInput.addEventListener("input", updateSummary);
+    analysisStepsInput.addEventListener("change", updateSummary);
     gridInput.addEventListener("input", updateSummary);
     gridInput.addEventListener("change", () => {
         refreshPreview();
@@ -1286,7 +1305,8 @@ export function createComparePanelContent(
             labeledField("Rule", ruleSelect),
             labeledField("Seed source", shapeSelect),
             labeledField("Traversal", traversalSelect),
-            labeledField("Steps", stepsInput),
+            labeledField("Wall generations", wallGenerationsInput),
+            labeledField("Analysis steps", analysisStepsInput),
             labeledField("Grid size", gridInput),
         ]),
         seedWorkspace,
@@ -1800,11 +1820,15 @@ export function createComparePanelContent(
         renderSelectedTilings();
         updateFamilyCountLabels();
         updatePresetButtons();
-        const disabled = running || selected.size === 0;
-        const canPlay = !running && selected.size >= 2;
-        const current = isFilmstripCurrent();
+        const wallProblem = wallConfigProblem();
+        const analysisProblem = analysisConfigProblem();
+        const canAnalyze = !running && selected.size > 0 && analysisProblem === null;
+        const canPlay = !running && selected.size >= 2 && wallProblem === null;
+        const current = wallProblem === null && isFilmstripCurrent();
         const stale = activeFilmstrip !== null && !current && selected.size >= 2;
-        runButton.disabled = disabled;
+        runButton.disabled = !canAnalyze;
+        runButton.title =
+            analysisProblem ?? "Run the selected tilings as a longer statistical analysis";
         setupRunButton.disabled = !canPlay || current;
         setupRunButton.classList.toggle("is-current", current && !running);
         setupRunButton.classList.toggle("is-stale", stale && !running);
@@ -1812,12 +1836,17 @@ export function createComparePanelContent(
             ? activeFilmstrip
                 ? "Applying..."
                 : "Running..."
-            : current
-              ? "Up to date"
-              : stale
-                ? "Apply changes"
-                : "Run comparison";
+            : wallProblem
+              ? "Check setup"
+              : current
+                ? "Up to date"
+                : stale
+                  ? "Apply changes"
+                  : "Run comparison";
         const playTitle = (() => {
+            if (wallProblem) {
+                return wallProblem;
+            }
             if (selected.size < 2) {
                 return "Select at least two tilings to run a comparison";
             }
@@ -1832,7 +1861,7 @@ export function createComparePanelContent(
         setupRunButton.title = playTitle;
         // The dock's idle play button shares the same gate as the Configure one.
         filmstripTransport.setIdleRunEnabled(canPlay);
-        copyRunButton.disabled = disabled;
+        copyRunButton.disabled = running || selected.size === 0 || wallProblem !== null;
         // Already-forked hero: Discard (in the pane's own chip) is the way to
         // undo it, so the toolbelt's fork button hides rather than offering a
         // confusing second fork.
@@ -2052,13 +2081,77 @@ export function createComparePanelContent(
         return buildShareUrl(pattern, window.location.href);
     }
 
+    function integerRangeProblem(
+        field: HTMLInputElement,
+        label: string,
+        minimum: number,
+        maximum: number,
+    ): string | null {
+        const value = Number(field.value);
+        if (!Number.isInteger(value) || value < minimum || value > maximum) {
+            return `${label} must be an integer from ${minimum} to ${maximum}.`;
+        }
+        return null;
+    }
+
+    function sharedConfigProblem(): string | null {
+        if (!isShapeMode()) {
+            if (seedInput.value.trim().length === 0) {
+                return "Enter a bit seed or choose a named seed shape.";
+            }
+            if (seedInput.value.length > MAX_COMPARE_SEED_LENGTH) {
+                return `Bit seeds can contain at most ${MAX_COMPARE_SEED_LENGTH} characters.`;
+            }
+        }
+        return integerRangeProblem(
+            gridInput,
+            "Grid size",
+            MIN_COMPARE_GRID_SIZE,
+            MAX_COMPARE_GRID_SIZE,
+        );
+    }
+
+    function wallConfigProblem(): string | null {
+        return (
+            sharedConfigProblem() ??
+            integerRangeProblem(
+                wallGenerationsInput,
+                "Wall generations",
+                MIN_COMPARE_STEPS,
+                MAX_WALL_GENERATIONS,
+            )
+        );
+    }
+
+    function analysisConfigProblem(): string | null {
+        return (
+            sharedConfigProblem() ??
+            integerRangeProblem(
+                analysisStepsInput,
+                "Analysis steps",
+                MIN_COMPARE_STEPS,
+                MAX_ANALYSIS_STEPS,
+            )
+        );
+    }
+
     function currentRunConfig(): CompareRunConfig {
         const config: CompareRunConfig = {
             seed: seedInput.value,
             rule: selectedRuleName(),
             traversal: traversalSelect.value,
-            frames: clampNumber(stepsInput.value, 1, 500, 50),
-            grid_size: clampNumber(gridInput.value, 2, 64, 16),
+            frames: clampNumber(
+                wallGenerationsInput.value,
+                MIN_COMPARE_STEPS,
+                MAX_WALL_GENERATIONS,
+                50,
+            ),
+            grid_size: clampNumber(
+                gridInput.value,
+                MIN_COMPARE_GRID_SIZE,
+                MAX_COMPARE_GRID_SIZE,
+                16,
+            ),
             geometries: [...selected],
         };
         if (isShapeMode()) {
@@ -2296,7 +2389,7 @@ export function createComparePanelContent(
         if (selectHasValue(traversalSelect, config.traversal)) {
             traversalSelect.value = config.traversal;
         }
-        stepsInput.value = String(config.frames);
+        wallGenerationsInput.value = String(config.frames);
         gridInput.value = String(config.grid_size);
         shapeSelect.value =
             config.pattern && selectHasValue(shapeSelect, config.pattern) ? config.pattern : "";
@@ -2322,6 +2415,7 @@ export function createComparePanelContent(
         filmstripView?.detachPlayer();
         setWallLoading(null);
         updateSummary();
+        const configProblem = wallConfigProblem();
         const notices = [
             ...(!requestedRuleAvailable
                 ? [
@@ -2329,6 +2423,7 @@ export function createComparePanelContent(
                   ]
                 : []),
             ...(omitted > 0 ? [wallCapacityMessage(currentWallCapacity())] : []),
+            ...(configProblem ? [configProblem] : []),
         ];
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.${notices.length > 0 ? ` ${notices.join(" ")}` : ""}`;
     }
@@ -2368,6 +2463,12 @@ export function createComparePanelContent(
         if (running || selected.size === 0) {
             return;
         }
+        const configProblem = analysisConfigProblem();
+        if (configProblem) {
+            statusLine.textContent = configProblem;
+            updateSummary();
+            return;
+        }
         setRunning(true);
         statusLine.textContent = `Running ${selected.size} tilings…`;
         resultsArea.replaceChildren();
@@ -2376,8 +2477,13 @@ export function createComparePanelContent(
             seed: seedInput.value,
             rule: selectedRuleName(),
             traversal: traversalSelect.value,
-            steps: clampNumber(stepsInput.value, 1, 500, 50),
-            grid_size: clampNumber(gridInput.value, 2, 64, 16),
+            steps: clampNumber(analysisStepsInput.value, MIN_COMPARE_STEPS, MAX_ANALYSIS_STEPS, 50),
+            grid_size: clampNumber(
+                gridInput.value,
+                MIN_COMPARE_GRID_SIZE,
+                MAX_COMPARE_GRID_SIZE,
+                16,
+            ),
             geometries: [...selected],
             include_states: true,
             ...(isShapeMode() ? { pattern: shapeSelect.value } : {}),
@@ -2402,6 +2508,12 @@ export function createComparePanelContent(
         runOptions: RunFilmstripOptions = {},
     ): Promise<void> {
         if (running) {
+            return;
+        }
+        const configProblem = wallConfigProblem();
+        if (configProblem) {
+            statusLine.textContent = configProblem;
+            updateSummary();
             return;
         }
         // The authoritative result owns each board slot, so any live forks are torn down first.
@@ -2431,7 +2543,7 @@ export function createComparePanelContent(
             seed: runConfig.seed,
             rule: runConfig.rule,
             traversal: runConfig.traversal,
-            // The backend further clamps frames to its filmstrip ceiling.
+            // The setup field is validated against the backend's filmstrip ceiling.
             frames: runConfig.frames,
             grid_size: runConfig.grid_size,
             geometries: runConfig.geometries,
@@ -2945,7 +3057,7 @@ export function createComparePanelContent(
 }
 
 function clampNumber(raw: string, low: number, high: number, fallback: number): number {
-    const parsed = Number.parseInt(raw, 10);
+    const parsed = Number(raw);
     if (!Number.isFinite(parsed)) {
         return fallback;
     }

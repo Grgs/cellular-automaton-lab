@@ -1176,6 +1176,79 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("keeps wall-generation and analysis-step limits truthful", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        const field = (label: string): HTMLInputElement => {
+            const labelNode = [
+                ...document.querySelectorAll<HTMLLabelElement>(".compare-form label"),
+            ].find((candidate) => candidate.querySelector("span")?.textContent === label);
+            const input = labelNode?.querySelector<HTMLInputElement>("input");
+            if (!input) throw new Error(`missing ${label} field`);
+            return input;
+        };
+        const wallGenerations = field("Wall generations");
+        const analysisSteps = field("Analysis steps");
+        const gridSize = field("Grid size");
+        const bitSeed = document.querySelector<HTMLInputElement>(
+            ".compare-seedbits input.compare-field",
+        );
+        const wallRun = document.querySelector<HTMLButtonElement>(".compare-setup-run");
+        const analysisRun = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
+            (button) => button.textContent === "Run analysis",
+        );
+        if (!bitSeed || !wallRun || !analysisRun) throw new Error("missing compare controls");
+
+        expect(wallGenerations.max).toBe("240");
+        expect(analysisSteps.max).toBe("500");
+        expect(gridSize.max).toBe("64");
+        expect(bitSeed.maxLength).toBe(4096);
+
+        wallGenerations.value = "241";
+        wallGenerations.dispatchEvent(new Event("input", { bubbles: true }));
+        expect(wallRun.disabled).toBe(true);
+        expect(wallRun.title).toContain("1 to 240");
+        expect(analysisRun.disabled).toBe(false);
+
+        wallGenerations.value = "240";
+        wallGenerations.dispatchEvent(new Event("input", { bubbles: true }));
+        analysisSteps.value = "501";
+        analysisSteps.dispatchEvent(new Event("input", { bubbles: true }));
+        expect(wallRun.disabled).toBe(false);
+        expect(analysisRun.disabled).toBe(true);
+        expect(analysisRun.title).toContain("1 to 500");
+
+        analysisSteps.value = "500";
+        analysisSteps.dispatchEvent(new Event("input", { bubbles: true }));
+        gridSize.value = "65";
+        gridSize.dispatchEvent(new Event("input", { bubbles: true }));
+        expect(wallRun.disabled).toBe(true);
+        expect(analysisRun.disabled).toBe(true);
+        expect(wallRun.title).toContain("2 to 64");
+
+        gridSize.value = "64";
+        gridSize.dispatchEvent(new Event("input", { bubbles: true }));
+        wallRun.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "Filmstrip ready",
+            ),
+        );
+        expect(requestFilmstrip.mock.calls[0]?.[0]).toMatchObject({ frames: 240, grid_size: 64 });
+
+        analysisRun.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
+        expect(compareSeed.mock.calls[0]?.[0]).toMatchObject({ steps: 500, grid_size: 64 });
+        handle.dispose();
+    });
+
     it("renders grouped row actions and opens a share URL from the open menu", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
@@ -1582,6 +1655,7 @@ describe("mountComparePanel", () => {
             "glider",
             "row-major",
             "12",
+            "50",
             "8",
             "101",
         ]);

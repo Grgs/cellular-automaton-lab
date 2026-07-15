@@ -541,7 +541,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         # ceiling. Each addition appends, and the first picker is opened from
         # the keyboard to keep the in-wall workflow accessible.
         additions = [
-            "Cairo Pentagonal",
+            "Ammann-Beenker",
             "Penrose P3 Rhombs",
             "Kagome / Trihexagonal (3.6.3.6)",
             "Snub Trihexagonal (3.3.3.3.6)",
@@ -643,6 +643,111 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             case.page.evaluate("() => document.documentElement.scrollWidth"),
             case.page.evaluate("() => innerWidth"),
         )
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_enforces_setup_boundaries_and_uses_the_selected_limits(self) -> None:
+        # The live wall and statistical analysis have different compute ceilings.
+        # Keep both jobs explicit, block one-past values before dispatch, and prove
+        # the accepted maxima reach the rendered wall / analysis result.
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        # Use two ordinary survivors so the boundary journey remains fast in the
+        # standalone worker while still crossing board-management and rerun state.
+        for expected_count in (3, 2):
+            remove_buttons = case.page.locator(".compare-filmstrip-remove")
+            remove_buttons.nth(remove_buttons.count() - 1).click()
+            self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
+            if expected_count > 2:
+                expect(case.page.locator(".compare-filmstrip-remove").last).to_be_enabled(
+                    timeout=60_000
+                )
+        labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
+
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
+        wall_generations = case.page.locator(
+            ".compare-form label", has_text="Wall generations"
+        ).locator("input")
+        analysis_steps = case.page.locator(
+            ".compare-form label", has_text="Analysis steps"
+        ).locator("input")
+        grid_size = case.page.locator(".compare-form label", has_text="Grid size").locator("input")
+        wall_run = case.page.locator(".compare-setup-run")
+        analysis_run = case.page.locator(".compare-run-secondary")
+
+        expect(wall_generations).to_have_attribute("max", "240")
+        expect(analysis_steps).to_have_attribute("max", "500")
+        expect(grid_size).to_have_attribute("max", "64")
+
+        wall_generations.fill("241")
+        expect(wall_run).to_be_disabled()
+        expect(wall_run).to_have_attribute(
+            "title", "Wall generations must be an integer from 1 to 240."
+        )
+        expect(analysis_run).to_be_enabled()
+
+        wall_generations.fill("240")
+        analysis_steps.fill("501")
+        expect(wall_run).to_be_enabled()
+        case.page.click("#compare-config-tab-analysis")
+        expect(analysis_run).to_be_visible()
+        expect(analysis_run).to_be_disabled()
+        expect(analysis_run).to_have_attribute(
+            "title", "Analysis steps must be an integer from 1 to 500."
+        )
+
+        case.page.click("#compare-config-tab-setup")
+        analysis_steps.fill("500")
+        grid_size.fill("65")
+        expect(wall_run).to_be_disabled()
+        case.page.click("#compare-config-tab-analysis")
+        expect(analysis_run).to_be_disabled()
+        case.page.click("#compare-config-tab-setup")
+        expect(wall_run).to_have_attribute("title", "Grid size must be an integer from 2 to 64.")
+
+        # Minimum grid with maximum wall length: the counter proves all 240
+        # selected generations reached the rendered result.
+        grid_size.fill("2")
+        expect(wall_run).to_be_enabled()
+        expect(analysis_run).to_be_enabled()
+        case.page.get_by_role("button", name="Close configuration").click()
+        wall_run.click()
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 239")
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        # The separate 500-step maximum remains usable for analysis without
+        # changing the running wall or its participant order.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        case.page.click("#compare-config-tab-analysis")
+        analysis_run.click()
+        self._expect(".compare-status").to_contain_text("Done — 2 tilings", timeout=60_000)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+
+        # Maximum grid with the minimum one-frame wall: the square board's cell
+        # count proves the selected 64 x 64 request, rather than a silent clamp.
+        case.page.click("#compare-config-tab-setup")
+        wall_generations.fill("1")
+        grid_size.fill("64")
+        case.page.get_by_role("button", name="Close configuration").click()
+        wall_run.click()
+        self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
+        self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 0")
+        square_board = case.page.locator(".compare-filmstrip-board").filter(
+            has=case.page.locator(".compare-filmstrip-label", has_text="Square")
+        )
+        expect(square_board.locator("[data-cell-id]")).to_have_count(4096)
+        case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
 
         unexpected_console = [
             message

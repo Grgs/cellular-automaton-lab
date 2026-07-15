@@ -54,6 +54,14 @@ const ROUTER_STYLES = `
     font-size: 14px;
 }
 .wall-loading-veil[hidden] { display: none; }
+
+/* The Lab backdrop lives outside #lab-root so its fixed sheet can cover the
+   viewport. Suspend it by route as well as by drawer state: late Lab renders
+   must not make it interactive over the comparison wall. */
+:root[data-workspace-route="wall"] #drawer-backdrop {
+    display: none !important;
+    pointer-events: none !important;
+}
 `;
 
 export interface MountWorkspaceRouterOptions {
@@ -96,6 +104,7 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
     ensureRouterStyles();
     const wallHost = options.wallHost ?? document.body;
     const labRoot = options.labRoot ?? null;
+    const previousWorkspaceRoute = document.documentElement.getAttribute("data-workspace-route");
 
     const loadingVeil = document.createElement("div");
     loadingVeil.className = "wall-loading-veil";
@@ -174,6 +183,7 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
     }
 
     function showRoute(route: ShellRoute): void {
+        document.documentElement.dataset.workspaceRoute = route;
         const routeContext = document.getElementById("shell-route-context");
         const sharedBoardOpen = route === "lab" && window.location.hash.includes("share=");
         if (routeContext) {
@@ -353,6 +363,14 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
             panel?.dispose();
             panel = null;
             loadingVeil.remove();
+            if (previousWorkspaceRoute === null) {
+                document.documentElement.removeAttribute("data-workspace-route");
+            } else {
+                document.documentElement.setAttribute(
+                    "data-workspace-route",
+                    previousWorkspaceRoute,
+                );
+            }
         },
     };
 }
