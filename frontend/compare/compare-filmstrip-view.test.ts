@@ -11,6 +11,7 @@ import type {
     SeedFilmstripResult,
     SimulationSnapshot,
     TopologyFilmstrip,
+    TopologyOption,
     TopologyPreview,
     TopologySpec,
 } from "../types/domain.js";
@@ -136,9 +137,12 @@ interface Harness {
 function mountView(
     options: {
         loop?: boolean;
+        isTilingAvailable?: (geometry: string) => boolean;
+        onAddBoard?: (geometry: string) => void;
         onFocusChange?: (geometry: string | null) => void;
         onRemoveBoard?: (geometry: string) => void;
         previewTopology?: SimulationBackend["previewTopology"];
+        tilingOptions?: readonly TopologyOption[];
     } = {},
 ): Harness {
     const backend = stubBackend(options.previewTopology ?? (async () => squarePreview()));
@@ -148,8 +152,11 @@ function mountView(
         backend,
         transport,
         ...(options.loop === undefined ? {} : { loop: options.loop }),
+        ...(options.isTilingAvailable ? { isTilingAvailable: options.isTilingAvailable } : {}),
+        ...(options.onAddBoard ? { onAddBoard: options.onAddBoard } : {}),
         ...(options.onFocusChange ? { onFocusChange: options.onFocusChange } : {}),
         ...(options.onRemoveBoard ? { onRemoveBoard: options.onRemoveBoard } : {}),
+        ...(options.tilingOptions ? { tilingOptions: options.tilingOptions } : {}),
     });
     document.body.append(transport.element, view.element);
     return { view, transport, clock };
@@ -160,6 +167,20 @@ function twoBoardFilmstrip(): SeedFilmstripResult {
         [tiling("square", [{ a: 1 }, { b: 1 }]), tiling("hex", [{ a: 1 }, { c: 1 }])],
         2,
     );
+}
+
+function pickerOption(value: string, label: string): TopologyOption {
+    return {
+        value,
+        label,
+        group: "Test tilings",
+        order: 0,
+        family: "regular",
+        previewKey: value,
+        renderKind: "square",
+        sizingMode: "grid",
+        searchAliases: [],
+    };
 }
 
 function boardFor(view: FilmstripViewController, geometry: string): HTMLElement {
@@ -283,7 +304,7 @@ describe("createFilmstripView", () => {
             .querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
             ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         expect(removed).toEqual(["square"]);
-        // The ✕ is a button, so the board click handler ignored it (no zoom).
+        // The × is a button, so the board click handler ignored it (no zoom).
         expect(view.element.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
 
         // At the backend's two-board minimum the affordance stays discoverable
@@ -297,13 +318,44 @@ describe("createFilmstripView", () => {
         expect(minimumButtons[0]?.title).toBe("Keep at least two tilings on the wall");
     });
 
-    it("keeps add-tiling out of the board grid", async () => {
-        const { view } = mountView();
+    it("opens a searchable in-wall picker and adds an available tiling", async () => {
+        const added: string[] = [];
+        const { view } = mountView({
+            onAddBoard: (geometry) => added.push(geometry),
+            tilingOptions: [
+                pickerOption("square", "Square"),
+                pickerOption("hex", "Hexagonal"),
+                pickerOption("tri", "Triangular"),
+            ],
+        });
 
         await view.load(twoBoardFilmstrip());
 
-        const addTile = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
-        expect(addTile).toBeNull();
+        const addButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+        expect(addButton?.disabled).toBe(false);
+        expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        addButton?.click();
+
+        const search = view.element.querySelector<HTMLInputElement>(
+            ".compare-board-tiling-picker-search",
+        );
+        expect(document.activeElement).toBe(search);
+        expect(
+            [...view.element.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice")]
+                .filter((choice) => choice.disabled)
+                .map((choice) => choice.textContent),
+        ).toEqual(["SquareTest tilings", "HexagonalTest tilings"]);
+
+        search!.value = "tri";
+        search?.dispatchEvent(new Event("input", { bubbles: true }));
+        const choices = view.element.querySelectorAll<HTMLButtonElement>(
+            ".compare-board-tiling-choice",
+        );
+        expect(choices).toHaveLength(1);
+        expect(choices[0]?.textContent).toContain("Triangular");
+        choices[0]?.click();
+        expect(added).toEqual(["tri"]);
+        expect(view.element.querySelector(".compare-board-tiling-picker")).toBeNull();
 
         const { view: plainView } = mountView();
         await plainView.load(twoBoardFilmstrip());

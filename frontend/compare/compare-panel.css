@@ -1253,6 +1253,52 @@
     flex: 1 1 auto;
     min-height: 0;
 }
+.compare-filmstrip-wall-actions {
+    position: relative;
+    z-index: 7;
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+.compare-filmstrip-add-anchor {
+    position: relative;
+}
+.compare-filmstrip-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 34px;
+    padding: 6px 12px;
+    border: 1px solid rgba(237, 245, 247, 0.32);
+    border-radius: 9px;
+    background: rgba(16, 20, 24, 0.82);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
+    color: var(--compare-text, #f2ede0);
+    font: 600 12px var(--sans, sans-serif);
+    cursor: pointer;
+}
+.compare-filmstrip-add:hover,
+.compare-filmstrip-add:focus-visible {
+    border-color: var(--focus, #7aa7ff);
+    background: rgba(16, 20, 24, 0.96);
+}
+.compare-filmstrip-add:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+.compare-filmstrip-add:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+.compare-filmstrip-add-glyph {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+}
+.compare-filmstrip--speaker .compare-filmstrip-wall-actions {
+    display: none;
+}
 .compare-filmstrip-board {
     position: relative;
     display: flex;
@@ -1491,6 +1537,15 @@
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.32);
     color: var(--compare-text, #f2ede0);
     pointer-events: auto;
+}
+.compare-board-tiling-picker.is-add-picker {
+    top: calc(100% + 8px);
+    right: 0;
+    bottom: auto;
+    left: auto;
+    width: min(620px, calc(100vw - 48px));
+    max-height: min(420px, calc(100vh - 190px));
+    box-sizing: border-box;
 }
 .compare-board-tiling-picker-header {
     display: flex;

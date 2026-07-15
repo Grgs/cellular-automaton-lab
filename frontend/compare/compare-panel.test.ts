@@ -826,7 +826,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("renders four board tiles cleanly without an add-tiling tile", async () => {
+    it("renders a compact add control without counting it as a board tile", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const requestFilmstrip = vi.fn(async () => fourBoardFilmstrip());
@@ -841,7 +841,7 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(4);
         });
-        expect(document.querySelector(".compare-filmstrip-add")).toBeNull();
+        expect(document.querySelector(".compare-filmstrip-add")).not.toBeNull();
         expect(document.querySelectorAll(".compare-filmstrip-label")).toHaveLength(4);
         expect(document.querySelectorAll(".compare-filmstrip-count")).toHaveLength(4);
         handle.dispose();
@@ -2173,7 +2173,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("removes a board from the wall via its ✕ chrome and re-runs without it", async () => {
+    it("removes a board from the wall via its × chrome and re-runs without it", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
@@ -2235,6 +2235,35 @@ describe("mountComparePanel", () => {
             "periodic-face",
             "spectre",
         ]);
+        handle.dispose();
+    });
+
+    it("adds a tiling directly from the wall's searchable picker", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.click();
+        expect(document.activeElement?.className).toContain("compare-board-tiling-picker-search");
+        const penroseChoice = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice"),
+        ].find((choice) => choice.textContent?.includes("Penrose"));
+        expect(penroseChoice?.disabled).toBe(false);
+        penroseChoice?.click();
+
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(requestFilmstrip.mock.calls.at(1)?.[0]?.geometries.at(-1)).toBe("penrose");
         handle.dispose();
     });
 

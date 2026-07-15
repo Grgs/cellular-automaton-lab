@@ -844,9 +844,9 @@ export function createComparePanelContent(
         scheduleWallRerun();
     }
 
-    // Selection editing from the wall itself: a board's ✕ chrome drops that
-    // tiling from the run (the filmstrip view only offers it while more than
-    // two boards remain), with removals coalescing into one debounced re-run.
+    // Selection editing from the wall itself: a board's × chrome drops that
+    // tiling from the run (the filmstrip view disables it at the two-board
+    // minimum), with removals coalescing into one debounced re-run.
     function removeBoardFromWall(geometry: string): void {
         if (running || !selected.has(geometry)) {
             return;
@@ -877,6 +877,21 @@ export function createComparePanelContent(
             selected.add(index === replacedIndex ? nextGeometry : geometry);
         });
         statusLine.textContent = `Replaced a board with ${next.label} — updating the wall…`;
+        renderTilingChecklist();
+        refreshPreview();
+        void runFilmstrip();
+    }
+
+    function addBoardToWall(geometry: string): void {
+        if (running || selected.has(geometry)) {
+            return;
+        }
+        const tiling = allTilings.find((option) => option.geometry === geometry);
+        if (!tiling || !tilingCompatibleWithSelectedRule(tiling)) {
+            return;
+        }
+        selected.add(geometry);
+        statusLine.textContent = `Added ${tiling.label} — updating the wall…`;
         renderTilingChecklist();
         refreshPreview();
         void runFilmstrip();
@@ -2373,6 +2388,7 @@ export function createComparePanelContent(
                     onRemoveBoard: removeBoardFromWall,
                     tilingOptions: wallTilingPickerOptions(allTilings),
                     onReplaceBoard: replaceBoardOnWall,
+                    onAddBoard: addBoardToWall,
                     isTilingAvailable: (geometry) =>
                         Boolean(
                             allTilings.find(

@@ -48,6 +48,8 @@ export interface FilmstripViewOptions {
     tilingOptions?: readonly TopologyOption[];
     /** Replace a board's tiling from its caption picker. */
     onReplaceBoard?: (previousGeometry: string, nextGeometry: string) => void;
+    /** Add a new tiling from the wall's searchable picker. */
+    onAddBoard?: (geometry: string) => void;
     /** Whether a catalog tiling supports the currently selected rule. */
     isTilingAvailable?: (geometry: string) => boolean;
     /** Called after the shared generation index changes. */
@@ -158,10 +160,11 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     root.setAttribute("role", "region");
     root.setAttribute("aria-label", "Synchronized side-by-side filmstrip");
 
+    const wallActions = el("div", "compare-filmstrip-wall-actions");
     const boardsArea = el("div", "compare-filmstrip-boards");
     boardsArea.setAttribute("role", "list");
     boardsArea.setAttribute("aria-label", "Compared tiling boards");
-    root.append(boardsArea);
+    root.append(wallActions, boardsArea);
 
     let player = new FilmstripPlayer(0, { loop: options.loop ?? false });
     let unsubscribe: (() => void) | null = null;
@@ -318,6 +321,126 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         lastRenderedIndex = -1;
     }
 
+    function openBoardTilingPicker(anchor: HTMLElement, tiling?: TopologyFilmstrip): void {
+        const pickerKey = tiling?.geometry ?? "add";
+        if (openTilingPicker?.dataset.geometry === pickerKey) {
+            closeTilingPicker();
+            return;
+        }
+        closeTilingPicker();
+        const adding = tiling === undefined;
+        const pickerLabel = adding ? "Add tiling" : `Replace ${boardName(tiling)}`;
+        const picker = element("div", {
+            class: ["compare-board-tiling-picker", adding ? "is-add-picker" : ""]
+                .filter(Boolean)
+                .join(" "),
+            role: "dialog",
+            "aria-label": pickerLabel,
+        });
+        picker.dataset.geometry = pickerKey;
+        const close = element("button", {
+            class: "compare-board-tiling-picker-close",
+            type: "button",
+            textContent: "×",
+            "aria-label": "Close tiling picker",
+        });
+        const header = element("div", { class: "compare-board-tiling-picker-header" }, [
+            element("strong", { textContent: adding ? "Add tiling" : "Replace tiling" }),
+            close,
+        ]);
+        const search = element("input", {
+            class: "compare-board-tiling-picker-search",
+            type: "search",
+            placeholder: "Search tilings",
+            "aria-label": "Search tilings",
+        });
+        const list = element("div", { class: "compare-board-tiling-picker-list" });
+        const renderChoices = (): void => {
+            const query = search.value.trim().toLowerCase();
+            list.replaceChildren();
+            for (const option of options.tilingOptions ?? []) {
+                if (
+                    query &&
+                    !`${option.label} ${option.value} ${option.group}`.toLowerCase().includes(query)
+                )
+                    continue;
+                const choice = element("button", {
+                    class: "compare-board-tiling-choice",
+                    type: "button",
+                });
+                choice.disabled =
+                    (option.value !== tiling?.geometry &&
+                        boards.some((board) => board.tiling.geometry === option.value)) ||
+                    options.isTilingAvailable?.(option.value) === false;
+                choice.classList.toggle("is-current", option.value === tiling?.geometry);
+                choice.append(
+                    element(
+                        "span",
+                        { class: "compare-board-tiling-choice-thumb", "aria-hidden": "true" },
+                        [createTilingPreviewThumbnail(option)],
+                    ),
+                    element("span", { class: "compare-board-tiling-choice-copy" }, [
+                        element("span", { textContent: option.label }),
+                        element("small", { textContent: option.group }),
+                    ]),
+                );
+                choice.addEventListener("click", () => {
+                    if (tiling) {
+                        if (option.value !== tiling.geometry) {
+                            options.onReplaceBoard?.(tiling.geometry, option.value);
+                        }
+                    } else {
+                        options.onAddBoard?.(option.value);
+                    }
+                    closeTilingPicker();
+                });
+                list.append(choice);
+            }
+        };
+        close.addEventListener("click", closeTilingPicker);
+        search.addEventListener("input", renderChoices);
+        picker.append(header, search, list);
+        anchor.append(picker);
+        openTilingPicker = picker;
+        renderChoices();
+        search.focus();
+    }
+
+    function createAddControl(): void {
+        if (!options.tilingOptions || !options.onAddBoard) {
+            return;
+        }
+        const anchor = el("div", "compare-filmstrip-add-anchor");
+        const addButton = element("button", {
+            class: "compare-filmstrip-add",
+            type: "button",
+            "aria-label": "Add tiling",
+        });
+        addButton.append(
+            element("span", {
+                class: "compare-filmstrip-add-glyph",
+                textContent: "+",
+                "aria-hidden": "true",
+            }),
+            element("span", { textContent: "Add tiling" }),
+        );
+        const hasAvailableTiling = options.tilingOptions.some(
+            (option) =>
+                !boards.some((board) => board.tiling.geometry === option.value) &&
+                options.isTilingAvailable?.(option.value) !== false,
+        );
+        addButton.disabled = !hasAvailableTiling;
+        addButton.title = hasAvailableTiling
+            ? "Add another tiling to the wall"
+            : "All compatible tilings are already on the wall";
+        addButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            openBoardTilingPicker(anchor);
+        });
+        anchor.append(addButton);
+        wallActions.append(anchor);
+    }
+
     function createBoardEntry(tiling: TopologyFilmstrip, removable: boolean): BoardEntry {
         const slot = el("div", "compare-filmstrip-slot", "…");
         const label = el("button", "compare-filmstrip-label", boardName(tiling));
@@ -353,80 +476,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         label.addEventListener("click", (event) => {
             event.stopPropagation();
             if (!options.tilingOptions || !options.onReplaceBoard) return;
-            if (openTilingPicker?.dataset.geometry === tiling.geometry) {
-                closeTilingPicker();
-                return;
-            }
-            closeTilingPicker();
-            const picker = element("div", {
-                class: "compare-board-tiling-picker",
-                role: "dialog",
-                "aria-label": `Replace ${boardName(tiling)}`,
-            });
-            picker.dataset.geometry = tiling.geometry;
-            const close = element("button", {
-                class: "compare-board-tiling-picker-close",
-                type: "button",
-                textContent: "×",
-                "aria-label": "Close tiling picker",
-            });
-            const header = element("div", { class: "compare-board-tiling-picker-header" }, [
-                element("strong", { textContent: "Replace tiling" }),
-                close,
-            ]);
-            const search = element("input", {
-                class: "compare-board-tiling-picker-search",
-                type: "search",
-                placeholder: "Search tilings",
-                "aria-label": "Search tilings",
-            });
-            const list = element("div", { class: "compare-board-tiling-picker-list" });
-            const renderChoices = (): void => {
-                const query = search.value.trim().toLowerCase();
-                list.replaceChildren();
-                for (const option of options.tilingOptions ?? []) {
-                    if (
-                        query &&
-                        !`${option.label} ${option.value} ${option.group}`
-                            .toLowerCase()
-                            .includes(query)
-                    )
-                        continue;
-                    const choice = element("button", {
-                        class: "compare-board-tiling-choice",
-                        type: "button",
-                    });
-                    choice.disabled =
-                        (option.value !== tiling.geometry &&
-                            boards.some((board) => board.tiling.geometry === option.value)) ||
-                        options.isTilingAvailable?.(option.value) === false;
-                    choice.classList.toggle("is-current", option.value === tiling.geometry);
-                    choice.append(
-                        element(
-                            "span",
-                            { class: "compare-board-tiling-choice-thumb", "aria-hidden": "true" },
-                            [createTilingPreviewThumbnail(option)],
-                        ),
-                        element("span", { class: "compare-board-tiling-choice-copy" }, [
-                            element("span", { textContent: option.label }),
-                            element("small", { textContent: option.group }),
-                        ]),
-                    );
-                    choice.addEventListener("click", () => {
-                        if (option.value !== tiling.geometry)
-                            options.onReplaceBoard?.(tiling.geometry, option.value);
-                        closeTilingPicker();
-                    });
-                    list.append(choice);
-                }
-            };
-            close.addEventListener("click", closeTilingPicker);
-            search.addEventListener("input", renderChoices);
-            picker.append(header, search, list);
-            cell.append(picker);
-            openTilingPicker = picker;
-            renderChoices();
-            search.focus();
+            openBoardTilingPicker(cell, tiling);
         });
         const toggleFocus = () => {
             focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
@@ -520,6 +570,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         filmstrip: SeedFilmstripResult,
         loadOptions?: FilmstripLoadOptions,
     ): Promise<void> {
+        closeTilingPicker();
         const reuseBoards = Boolean(loadOptions?.preserveBoards) && canReuseBoards(filmstrip);
         if (reuseBoards) {
             detachPlayer();
@@ -532,6 +583,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const removable = Boolean(options.onRemoveBoard) && filmstrip.tilings.length > 2;
             boards = filmstrip.tilings.map((tiling) => createBoardEntry(tiling, removable));
         }
+        wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
+        createAddControl();
         player = new FilmstripPlayer(filmstrip.frame_count, {
             loop: options.loop ?? false,
             ...(loadOptions?.loopStart === undefined ? {} : { loopStart: loadOptions.loopStart }),

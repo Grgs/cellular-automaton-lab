@@ -508,6 +508,26 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             "Kagome / Trihexagonal (3.6.3.6)"
         )
 
+        # Add is available directly on the wall. It opens the searchable visual
+        # picker, and choosing a result appends it and immediately re-runs.
+        labels_before_add = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.page.click(".compare-filmstrip-add")
+        self._expect(".compare-board-tiling-picker[aria-label='Add tiling']").to_be_visible()
+        self._expect(".compare-board-tiling-picker-search").to_be_focused()
+        enabled_choices = case.page.locator(".compare-board-tiling-choice:not(:disabled)")
+        case.assertGreater(enabled_choices.count(), 0)
+        add_label = enabled_choices.first.locator(
+            ".compare-board-tiling-choice-copy > span"
+        ).inner_text()
+        case.page.fill(".compare-board-tiling-picker-search", add_label)
+        filtered_choices = case.page.locator(".compare-board-tiling-choice:not(:disabled)")
+        case.assertGreater(filtered_choices.count(), 0)
+        filtered_choices.first.click()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        labels_after_add = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.assertEqual(labels_after_add[:-1], labels_before_add)
+        case.assertEqual(labels_after_add[-1], add_label)
+
     def test_wall_edit_mode_rewinds_mid_timeline_paint_to_shared_seed(self) -> None:
         # Edit seed should keep the edited board on the shared wall clock. If
         # the wall is resting on a lively later frame, arming edit mode rewinds
