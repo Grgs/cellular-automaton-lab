@@ -867,8 +867,15 @@ export function createComparePanelContent(
         if (!next || selected.has(nextGeometry) || !tilingCompatibleWithSelectedRule(next)) {
             return;
         }
-        selected.delete(previousGeometry);
-        selected.add(nextGeometry);
+        // A Set carries the wall's display order. Deleting and re-adding here
+        // would append the replacement, even though the user edited a specific
+        // tile. Rebuild the Set with the new geometry in that tile's slot.
+        const orderedSelection = [...selected];
+        const replacedIndex = orderedSelection.indexOf(previousGeometry);
+        selected.clear();
+        orderedSelection.forEach((geometry, index) => {
+            selected.add(index === replacedIndex ? nextGeometry : geometry);
+        });
         statusLine.textContent = `Replaced a board with ${next.label} — updating the wall…`;
         renderTilingChecklist();
         refreshPreview();

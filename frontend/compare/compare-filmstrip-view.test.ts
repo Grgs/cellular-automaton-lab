@@ -259,7 +259,7 @@ describe("createFilmstripView", () => {
         ).toBe("Penrose P3 Rhombs: focus this board");
     });
 
-    it("offers a remove affordance per board only above the two-board minimum", async () => {
+    it("keeps remove discoverable and disables it at the two-board minimum", async () => {
         const removed: string[] = [];
         const { view } = mountView({ onRemoveBoard: (geometry) => removed.push(geometry) });
 
@@ -273,7 +273,11 @@ describe("createFilmstripView", () => {
                 1,
             ),
         );
-        expect(view.element.querySelectorAll(".compare-filmstrip-remove")).toHaveLength(3);
+        const removeButtons = view.element.querySelectorAll<HTMLButtonElement>(
+            ".compare-filmstrip-remove",
+        );
+        expect(removeButtons).toHaveLength(3);
+        expect([...removeButtons].every((button) => !button.disabled)).toBe(true);
 
         view.element
             .querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
@@ -282,9 +286,15 @@ describe("createFilmstripView", () => {
         // The ✕ is a button, so the board click handler ignored it (no zoom).
         expect(view.element.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
 
-        // At the backend's two-board minimum the affordance disappears.
+        // At the backend's two-board minimum the affordance stays discoverable
+        // and explains why it cannot remove another board.
         await view.load(twoBoardFilmstrip());
-        expect(view.element.querySelectorAll(".compare-filmstrip-remove")).toHaveLength(0);
+        const minimumButtons = view.element.querySelectorAll<HTMLButtonElement>(
+            ".compare-filmstrip-remove",
+        );
+        expect(minimumButtons).toHaveLength(2);
+        expect([...minimumButtons].every((button) => button.disabled)).toBe(true);
+        expect(minimumButtons[0]?.title).toBe("Keep at least two tilings on the wall");
     });
 
     it("keeps add-tiling out of the board grid", async () => {

@@ -1309,34 +1309,54 @@
     font-size: 13px;
     opacity: 0.85;
 }
-/* The chrome's ✕ drops this board from the run. The chrome itself ignores the
-   pointer, so the button opts back in -- but only while the chrome is visible,
-   so an invisible ✕ never eats a board click. */
+/* The × is a persistent, conventional tile action. It sits in the upper-right
+   corner in the gallery and returns to the caption row for the focused hero,
+   where the hero toolbelt already owns that corner. */
 .compare-filmstrip-remove {
-    border: none;
-    background: none;
-    color: inherit;
-    font-size: 12px;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid rgba(237, 245, 247, 0.22);
+    background: rgba(16, 20, 24, 0.72);
+    color: #f2ede0;
+    font-size: 17px;
     line-height: 1;
-    padding: 2px 4px;
-    border-radius: 4px;
+    padding: 0;
+    border-radius: 7px;
     cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.12s ease;
-}
-.compare-filmstrip-remove:hover {
-    opacity: 1;
-    background: rgba(255, 255, 255, 0.16);
-}
-.compare-filmstrip-board:hover .compare-filmstrip-remove,
-.compare-filmstrip-board:focus-visible .compare-filmstrip-remove,
-.compare-filmstrip-board.is-hero .compare-filmstrip-remove {
-    opacity: 0.7;
+    opacity: 0.78;
     pointer-events: auto;
+    transition:
+        opacity 0.12s ease,
+        background 0.12s ease;
 }
-.compare-filmstrip-board .compare-filmstrip-remove:hover {
+.compare-filmstrip-remove:hover:not(:disabled),
+.compare-filmstrip-remove:focus-visible {
     opacity: 1;
+    background: rgba(16, 20, 24, 0.95);
+}
+.compare-filmstrip-remove:focus-visible {
+    outline: 2px solid var(--focus, #7aa7ff);
+    outline-offset: 2px;
+}
+.compare-filmstrip-remove:disabled {
+    cursor: not-allowed;
+    opacity: 0.32;
+}
+.compare-filmstrip-board.is-hero .compare-filmstrip-remove {
+    position: static;
+    width: 22px;
+    height: 22px;
+    margin-left: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 15px;
 }
 /* Edit mode: the pointer paints cells, so the cursor says so, hovered cells
    light up, and the chrome becomes interactive so its ⤢ glyph can stay the one
@@ -1786,13 +1806,10 @@
     .compare-explainer {
         display: none;
     }
-    /* Touch devices cannot reveal the hover-only remove control. Keep it
-       visible with a comfortable target while three or more boards are shown. */
+    /* Keep the persistent remove action comfortable on touch screens. */
     .compare-filmstrip-remove {
-        min-width: 24px;
-        min-height: 24px;
-        opacity: 0.78;
-        pointer-events: auto;
+        width: 28px;
+        height: 28px;
     }
     .compare-stage {
         padding: 8px;

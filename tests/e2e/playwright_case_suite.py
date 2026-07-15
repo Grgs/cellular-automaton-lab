@@ -451,9 +451,9 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_wall_names_boards_and_edits_the_selection_in_place(self) -> None:
         # Boards carry their friendly catalog label (not the raw geometry
-        # key), the dock's ⊞ jumps straight to the searchable tiling
-        # checklist, and a board's hover ✕ drops it from the run with one
-        # debounced re-run.
+        # key), replacing a named board preserves its wall position, the dock's
+        # ⊞ jumps straight to the searchable tiling checklist, and a board's
+        # persistent upper-right × drops it with one debounced re-run.
         case = self._case()
         self._mark_compare_demo_seen()
         case.page.click("#wall-view-btn")
@@ -463,6 +463,23 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-filmstrip-label >> nth=0").to_have_text("Square")
         self._expect(".compare-filmstrip-label >> nth=2").to_have_text("Penrose P3 Rhombs")
 
+        # A board-local replacement keeps the position the user acted on.
+        labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.page.locator(".compare-filmstrip-label").nth(2).click()
+        replacement = case.page.locator(
+            ".compare-board-tiling-choice:not(:disabled):not(.is-current)"
+        ).first
+        replacement_label = replacement.locator(
+            ".compare-board-tiling-choice-copy > span"
+        ).inner_text()
+        replacement.click()
+        self._expect(".compare-filmstrip-label >> nth=2").to_have_text(
+            replacement_label, timeout=60_000
+        )
+        labels_after = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.assertEqual(labels_after[:2], labels_before[:2])
+        case.assertEqual(labels_after[3:], labels_before[3:])
+
         # ⊞ lands ready to type: sheet open, Tilings section expanded, search
         # focused.
         case.page.click(".compare-tilings-open")
@@ -470,9 +487,21 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-tilings-search").to_be_focused()
         case.page.click(".compare-config-sheet-close")
 
-        # The hover ✕ removes the board and re-runs the wall without it.
-        case.page.locator(".compare-filmstrip-board").first.hover()
-        case.page.click(".compare-filmstrip-remove >> nth=0")
+        # The × is visible without hover and sits at the tile's upper-right.
+        first_board = case.page.locator(".compare-filmstrip-board").first
+        first_remove = case.page.locator(".compare-filmstrip-remove").first
+        expect(first_remove).to_be_visible()
+        board_box = first_board.bounding_box()
+        remove_box = first_remove.bounding_box()
+        case.assertIsNotNone(board_box)
+        case.assertIsNotNone(remove_box)
+        assert board_box is not None and remove_box is not None
+        case.assertLessEqual(remove_box["y"] - board_box["y"], 12)
+        case.assertLessEqual(
+            (board_box["x"] + board_box["width"]) - (remove_box["x"] + remove_box["width"]),
+            12,
+        )
+        first_remove.click()
         self._expect(".compare-status").to_contain_text("Removed Square")
         self._expect(".compare-filmstrip-board").to_have_count(3, timeout=60_000)
         self._expect(".compare-filmstrip-label >> nth=0").to_have_text(

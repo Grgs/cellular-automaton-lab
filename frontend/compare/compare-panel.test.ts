@@ -2204,6 +2204,40 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("keeps a replacement in the selected board's wall position", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+
+        document.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label")[1]?.click();
+        const penroseChoice = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice"),
+        ].find((choice) => choice.textContent?.includes("Penrose"));
+        expect(penroseChoice?.disabled).toBe(false);
+        penroseChoice?.click();
+
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(requestFilmstrip.mock.calls.at(1)?.[0]?.geometries).toEqual([
+            "square",
+            "penrose",
+            "kagome",
+            "periodic-face",
+            "spectre",
+        ]);
+        handle.dispose();
+    });
+
     it("opens the tiling checklist with search focused from the dock's ⊞ button", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();

@@ -40,9 +40,8 @@ export interface FilmstripViewOptions {
     /** Called when a board cell is clicked while edit mode is on. */
     onPaintCell?: (geometry: string, cellId: string) => void;
     /**
-     * Called when a board's ✕ chrome is clicked. The affordance only renders
-     * when this is provided and more than two boards are on the wall (the
-     * backend needs at least two to compare).
+     * Called when a board's × chrome is clicked. The affordance is disabled at
+     * the two-board minimum because the backend needs at least two to compare.
      */
     onRemoveBoard?: (geometry: string) => void;
     /** Tiling catalog used by the per-board replacement picker. */
@@ -335,12 +334,15 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         expandGlyph.setAttribute("aria-hidden", "true");
         const chrome = el("div", "compare-filmstrip-board-chrome");
         chrome.append(label, countLabel, expandGlyph);
-        if (removable) {
+        if (options.onRemoveBoard) {
             // A real <button> so the cell's click handler ignores it (its
             // early-return on buttons), in edit mode included.
-            const removeButton = el("button", "compare-filmstrip-remove", "✕");
+            const removeButton = el("button", "compare-filmstrip-remove", "×") as HTMLButtonElement;
             removeButton.setAttribute("type", "button");
-            removeButton.title = "Remove from the wall";
+            removeButton.disabled = !removable;
+            removeButton.title = removable
+                ? "Remove from the wall"
+                : "Keep at least two tilings on the wall";
             removeButton.setAttribute("aria-label", `Remove ${boardName(tiling)} from the wall`);
             removeButton.addEventListener("click", () => {
                 options.onRemoveBoard?.(tiling.geometry);
@@ -525,8 +527,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         } else {
             teardownRun();
             boardsArea.replaceChildren();
-            // Removing a board only makes sense while the backend can still
-            // compare what remains (two boards minimum).
+            // Keep the remove control visible at the two-board minimum, but
+            // disable it so the action and its current limit remain legible.
             const removable = Boolean(options.onRemoveBoard) && filmstrip.tilings.length > 2;
             boards = filmstrip.tilings.map((tiling) => createBoardEntry(tiling, removable));
         }
