@@ -52,6 +52,10 @@ export interface FilmstripViewOptions {
     onAddBoard?: (geometry: string) => void;
     /** Whether a catalog tiling supports the currently selected rule. */
     isTilingAvailable?: (geometry: string) => boolean;
+    /** Whether the wall currently has capacity for another board. */
+    canAddBoard?: () => boolean;
+    /** Explanation shown when adding is disabled by the wall capacity policy. */
+    addBoardDisabledReason?: () => string;
     /** Called after the shared generation index changes. */
     onFrameChange?: (frameIndex: number) => void;
 }
@@ -81,6 +85,8 @@ export interface FilmstripViewController {
      * focusing; the expand glyph becomes the only zoom affordance.
      */
     setEditMode(enabled: boolean): void;
+    /** Re-evaluate the add affordance after capacity inputs such as viewport width change. */
+    refreshAddControl(): void;
     /** Re-render one board's current frame (e.g. after an optimistic seed edit). */
     refreshBoard(geometry: string): void;
     /** The shared clock's current generation index. */
@@ -371,7 +377,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 choice.disabled =
                     (option.value !== tiling?.geometry &&
                         boards.some((board) => board.tiling.geometry === option.value)) ||
-                    options.isTilingAvailable?.(option.value) === false;
+                    options.isTilingAvailable?.(option.value) === false ||
+                    (adding && options.canAddBoard?.() === false);
                 choice.classList.toggle("is-current", option.value === tiling?.geometry);
                 choice.append(
                     element(
@@ -424,15 +431,20 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             }),
             element("span", { textContent: "Add tiling" }),
         );
-        const hasAvailableTiling = options.tilingOptions.some(
-            (option) =>
-                !boards.some((board) => board.tiling.geometry === option.value) &&
-                options.isTilingAvailable?.(option.value) !== false,
-        );
+        const hasCapacity = options.canAddBoard?.() !== false;
+        const hasAvailableTiling =
+            hasCapacity &&
+            options.tilingOptions.some(
+                (option) =>
+                    !boards.some((board) => board.tiling.geometry === option.value) &&
+                    options.isTilingAvailable?.(option.value) !== false,
+            );
         addButton.disabled = !hasAvailableTiling;
         addButton.title = hasAvailableTiling
             ? "Add another tiling to the wall"
-            : "All compatible tilings are already on the wall";
+            : hasCapacity
+              ? "All compatible tilings are already on the wall"
+              : (options.addBoardDisabledReason?.() ?? "The wall is at its tiling limit");
         addButton.addEventListener("click", (event) => {
             event.stopPropagation();
             openBoardTilingPicker(anchor);
@@ -621,6 +633,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             editMode = enabled;
             root.classList.toggle("is-editing", editMode);
             applyFocusLayout();
+        },
+        refreshAddControl(): void {
+            wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
+            createAddControl();
         },
         refreshBoard(geometry: string): void {
             const entry = entryFor(geometry);

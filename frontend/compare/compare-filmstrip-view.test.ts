@@ -137,6 +137,8 @@ interface Harness {
 function mountView(
     options: {
         loop?: boolean;
+        canAddBoard?: () => boolean;
+        addBoardDisabledReason?: () => string;
         isTilingAvailable?: (geometry: string) => boolean;
         onAddBoard?: (geometry: string) => void;
         onFocusChange?: (geometry: string | null) => void;
@@ -152,6 +154,10 @@ function mountView(
         backend,
         transport,
         ...(options.loop === undefined ? {} : { loop: options.loop }),
+        ...(options.canAddBoard ? { canAddBoard: options.canAddBoard } : {}),
+        ...(options.addBoardDisabledReason
+            ? { addBoardDisabledReason: options.addBoardDisabledReason }
+            : {}),
         ...(options.isTilingAvailable ? { isTilingAvailable: options.isTilingAvailable } : {}),
         ...(options.onAddBoard ? { onAddBoard: options.onAddBoard } : {}),
         ...(options.onFocusChange ? { onFocusChange: options.onFocusChange } : {}),
@@ -360,6 +366,31 @@ describe("createFilmstripView", () => {
         const { view: plainView } = mountView();
         await plainView.load(twoBoardFilmstrip());
         expect(plainView.element.querySelector(".compare-filmstrip-add")).toBeNull();
+    });
+
+    it("disables in-wall adding with a visible capacity explanation", async () => {
+        let hasCapacity = false;
+        const { view } = mountView({
+            onAddBoard: vi.fn(),
+            canAddBoard: () => hasCapacity,
+            addBoardDisabledReason: () => "This screen supports up to 4 tilings at once.",
+            tilingOptions: [
+                pickerOption("square", "Square"),
+                pickerOption("hex", "Hexagonal"),
+                pickerOption("tri", "Triangular"),
+            ],
+        });
+        await view.load(twoBoardFilmstrip());
+
+        const addButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+        expect(addButton?.disabled).toBe(true);
+        expect(addButton?.title).toContain("up to 4 tilings");
+
+        hasCapacity = true;
+        view.refreshAddControl();
+        expect(
+            view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.disabled,
+        ).toBe(false);
     });
 
     it("advances every board in lockstep on each clock tick while playing", async () => {

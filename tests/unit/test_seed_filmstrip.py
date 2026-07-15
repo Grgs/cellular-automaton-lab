@@ -5,24 +5,30 @@ from pathlib import Path
 try:
     from backend.simulation.seeding import run_seed_filmstrip
     from backend.simulation.seeding.comparison import (
+        MAX_COMPARISON_CELLS_PER_TILING,
         MAX_FILMSTRIP_FRAMES,
         MAX_FILMSTRIP_TILINGS,
+        board_size_for,
     )
     from backend.simulation.seeding.request import (
         parse_filmstrip_request,
         run_filmstrip_request,
     )
+    from backend.simulation.topology_preview import build_topology_preview
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.simulation.seeding import run_seed_filmstrip
     from backend.simulation.seeding.comparison import (
+        MAX_COMPARISON_CELLS_PER_TILING,
         MAX_FILMSTRIP_FRAMES,
         MAX_FILMSTRIP_TILINGS,
+        board_size_for,
     )
     from backend.simulation.seeding.request import (
         parse_filmstrip_request,
         run_filmstrip_request,
     )
+    from backend.simulation.topology_preview import build_topology_preview
 
 
 class SeedFilmstripEngineTests(unittest.TestCase):
@@ -102,6 +108,26 @@ class SeedFilmstripEngineTests(unittest.TestCase):
         too_many = tuple(["square"] * (MAX_FILMSTRIP_TILINGS + 1))
         with self.assertRaises(ValueError):
             run_seed_filmstrip(seed="1", geometries=too_many)
+
+    def test_dense_periodic_tiling_is_sized_to_the_comparison_cell_budget(self) -> None:
+        geometry = "archimedean-3-3-3-3-6"
+        width, height, patch_depth = board_size_for(geometry, 16)
+
+        self.assertEqual((width, height, patch_depth), (5, 5, None))
+        preview = build_topology_preview({"geometry": geometry, "grid_size": 16})
+        self.assertLessEqual(len(preview["cells"]), MAX_COMPARISON_CELLS_PER_TILING)
+
+        filmstrip = run_seed_filmstrip(
+            seed="111",
+            rule_name="wireworld",
+            geometries=(geometry,),
+            frame_count=4,
+            grid_size=16,
+        )
+        tiling = filmstrip.tilings[0]
+        self.assertIsNone(tiling.note)
+        self.assertTrue(tiling.frames)
+        self.assertLessEqual(tiling.cell_count, MAX_COMPARISON_CELLS_PER_TILING)
 
     def test_empty_geometries_is_rejected(self) -> None:
         with self.assertRaises(ValueError):

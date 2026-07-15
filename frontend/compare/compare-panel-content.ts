@@ -67,6 +67,11 @@ import {
 // while letting Vite's CSS minifier strip the comments and whitespace.
 import COMPARE_PANEL_STYLES from "./compare-panel.css?inline";
 import { ruleSupportsTilingFamily } from "../rule-compatibility.js";
+import {
+    WALL_HARD_TILING_LIMIT,
+    wallCapacityMessage,
+    wallTilingCapacity,
+} from "./compare-capacity.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
 // patches are not offered a thumbnail (the backend would reject them anyway).
@@ -290,7 +295,8 @@ export function createComparePanelContent(
 ): ComparePanelContentHandle {
     ensureComparePanelStyles();
     const allTilings = tilingOptions(options.bootstrapData);
-    const selected = defaultSelection(allTilings);
+    const currentWallCapacity = (): number => wallTilingCapacity();
+    const selected = new Set([...defaultSelection(allTilings)].slice(0, currentWallCapacity()));
 
     let rules: RuleDefinition[] = [];
     let rulesLoaded = false;
@@ -888,6 +894,11 @@ export function createComparePanelContent(
         }
         const tiling = allTilings.find((option) => option.geometry === geometry);
         if (!tiling || !tilingCompatibleWithSelectedRule(tiling)) {
+            return;
+        }
+        if (selected.size >= currentWallCapacity()) {
+            statusLine.textContent = wallCapacityMessage(currentWallCapacity());
+            filmstripView?.refreshAddControl();
             return;
         }
         selected.add(geometry);
@@ -1577,11 +1588,18 @@ export function createComparePanelContent(
             );
             for (const option of optionsForFamily) {
                 const compatible = tilingCompatibleWithSelectedRule(option);
+                const capacityReached =
+                    selected.size >= currentWallCapacity() && !selected.has(option.geometry);
+                const disabledReason = !compatible
+                    ? "Unsupported for the selected rule"
+                    : capacityReached
+                      ? wallCapacityMessage(currentWallCapacity())
+                      : "";
                 const checkbox = el("input", {
                     type: "checkbox",
                     checked: compatible && selected.has(option.geometry),
-                    disabled: !compatible,
-                    title: compatible ? "" : "Unsupported for the selected rule",
+                    disabled: !compatible || capacityReached,
+                    title: disabledReason,
                 });
                 checkbox.addEventListener("change", () => {
                     if (!tilingCompatibleWithSelectedRule(option)) {
@@ -1591,6 +1609,12 @@ export function createComparePanelContent(
                         return;
                     }
                     if (checkbox.checked) {
+                        if (selected.size >= currentWallCapacity()) {
+                            checkbox.checked = false;
+                            statusLine.textContent = wallCapacityMessage(currentWallCapacity());
+                            updateSummary();
+                            return;
+                        }
                         selected.add(option.geometry);
                     } else {
                         selected.delete(option.geometry);
@@ -1609,7 +1633,7 @@ export function createComparePanelContent(
                             ]
                                 .filter(Boolean)
                                 .join(" "),
-                            title: compatible ? "" : "Unsupported for the selected rule",
+                            title: disabledReason,
                         },
                         [checkbox, el("span", { textContent: option.label })],
                     ),
@@ -1682,9 +1706,12 @@ export function createComparePanelContent(
     }
 
     function applyTilingPreset(preset: TilingPreset): void {
-        replaceSelection(selectionForPreset(preset));
+        const omitted = replaceSelection(selectionForPreset(preset));
         renderTilingChecklist();
         refreshPreview();
+        if (omitted > 0) {
+            statusLine.textContent = `${wallCapacityMessage(currentWallCapacity())} ${omitted} tiling${omitted === 1 ? " was" : "s were"} not added.`;
+        }
     }
 
     function selectionForPreset(preset: TilingPreset): Set<string> {
@@ -1718,9 +1745,16 @@ export function createComparePanelContent(
         return new Set();
     }
 
-    function replaceSelection(nextSelection: Set<string>): void {
+    function replaceSelection(nextSelection: Set<string>): number {
         selected.clear();
-        nextSelection.forEach((geometry) => selected.add(geometry));
+        const limit = currentWallCapacity();
+        for (const geometry of nextSelection) {
+            if (selected.size >= limit) {
+                break;
+            }
+            selected.add(geometry);
+        }
+        return Math.max(0, nextSelection.size - selected.size);
     }
 
     function sameSelection(left: Set<string>, right: Set<string>): boolean {
@@ -1767,11 +1801,13 @@ export function createComparePanelContent(
         setupRunButton.classList.toggle("is-current", current && !running);
         setupRunButton.classList.toggle("is-stale", stale && !running);
         setupRunButton.textContent = running
-            ? "Running..."
+            ? activeFilmstrip
+                ? "Applying..."
+                : "Running..."
             : current
               ? "Up to date"
               : stale
-                ? "Run changes"
+                ? "Apply changes"
                 : "Run comparison";
         const playTitle = (() => {
             if (selected.size < 2) {
@@ -1994,7 +2030,9 @@ export function createComparePanelContent(
             }
         }
         if (selectAllIfEmpty && selected.size === 0 && compatibleTilings.length > 0) {
-            compatibleTilings.forEach((option) => selected.add(option.geometry));
+            compatibleTilings
+                .slice(0, currentWallCapacity())
+                .forEach((option) => selected.add(option.geometry));
             changed = true;
         }
         if (changed) {
@@ -2144,7 +2182,7 @@ export function createComparePanelContent(
             return;
         }
         const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
-        replaceSelection(
+        const omitted = replaceSelection(
             new Set(saved.geometries.filter((geometry) => knownGeometries.has(geometry))),
         );
         pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
@@ -2153,7 +2191,10 @@ export function createComparePanelContent(
         editingSavedTilingSetId = saved.id;
         savedTilingSetNameInput.value = saved.name;
         refreshSavedControls(savedRunSelect.value, saved.id);
-        statusLine.textContent = `Loaded tiling set "${saved.name}".`;
+        statusLine.textContent =
+            omitted > 0
+                ? `Loaded tiling set "${saved.name}" with ${selected.size} tilings. ${wallCapacityMessage(currentWallCapacity())}`
+                : `Loaded tiling set "${saved.name}".`;
     }
 
     function deleteSelectedTilingSet(): void {
@@ -2175,7 +2216,12 @@ export function createComparePanelContent(
         }
         try {
             const response = await options.backend.getRules();
-            rules = response.rules;
+            // A wall compares multiple topology families by definition. Keep
+            // tiling-specific rules in the Lab, where their compatible tiling
+            // can be selected explicitly, and expose only universal rules here.
+            rules = response.rules.filter(
+                (rule) => rule.supports_all_topologies && rule.compatible_tiling_families === null,
+            );
         } catch {
             rules = [];
         }
@@ -2233,6 +2279,8 @@ export function createComparePanelContent(
 
         seedInput.value = config.seed;
         seedPad.syncFromSeed();
+        const requestedRuleAvailable =
+            rules.length === 0 || selectHasValue(ruleSelect, config.rule);
         if (selectHasValue(ruleSelect, config.rule)) {
             ruleSelect.value = config.rule;
         }
@@ -2246,7 +2294,7 @@ export function createComparePanelContent(
         syncShapeMode();
 
         const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
-        replaceSelection(
+        const omitted = replaceSelection(
             new Set(config.geometries.filter((geometry) => knownGeometries.has(geometry))),
         );
         renderTilingChecklist();
@@ -2265,7 +2313,15 @@ export function createComparePanelContent(
         filmstripView?.detachPlayer();
         setWallLoading(null);
         updateSummary();
-        statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.`;
+        const notices = [
+            ...(!requestedRuleAvailable
+                ? [
+                      `Rule "${config.rule}" is tiling-specific or unavailable on the wall; using ${selectedRule()?.display_name ?? selectedRuleName()}.`,
+                  ]
+                : []),
+            ...(omitted > 0 ? [wallCapacityMessage(currentWallCapacity())] : []),
+        ];
+        statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.${notices.length > 0 ? ` ${notices.join(" ")}` : ""}`;
     }
 
     async function runFeaturedDemo(config: CompareRunConfig): Promise<void> {
@@ -2347,6 +2403,10 @@ export function createComparePanelContent(
             setWallLoading(null);
             return;
         }
+        if (selected.size > WALL_HARD_TILING_LIMIT) {
+            statusLine.textContent = wallCapacityMessage(WALL_HARD_TILING_LIMIT);
+            return;
+        }
         const hadFilmstrip = activeFilmstrip !== null;
         const loadingMessage = hadFilmstrip ? "Updating comparison..." : "Building comparison...";
         const showLoadingOverlay = !runOptions.quietUpdate || !hadFilmstrip;
@@ -2389,6 +2449,8 @@ export function createComparePanelContent(
                     tilingOptions: wallTilingPickerOptions(allTilings),
                     onReplaceBoard: replaceBoardOnWall,
                     onAddBoard: addBoardToWall,
+                    canAddBoard: () => selected.size < currentWallCapacity(),
+                    addBoardDisabledReason: () => wallCapacityMessage(currentWallCapacity()),
                     isTilingAvailable: (geometry) =>
                         Boolean(
                             allTilings.find(
@@ -2787,6 +2849,11 @@ export function createComparePanelContent(
     configSheetCloseButton.addEventListener("click", () => closeConfigIfOpen());
     document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);
+    const onWallCapacityChange = (): void => {
+        renderTilingChecklist();
+        filmstripView?.refreshAddControl();
+    };
+    window.addEventListener("resize", onWallCapacityChange);
 
     return {
         element: root,
@@ -2858,6 +2925,7 @@ export function createComparePanelContent(
             }
             document.removeEventListener("pointerdown", onDocumentPointerDown);
             window.removeEventListener("hashchange", onHashChangeFocus);
+            window.removeEventListener("resize", onWallCapacityChange);
             disposeAllForkedBoards();
             seedPad.dispose();
             seedPreview.dispose();

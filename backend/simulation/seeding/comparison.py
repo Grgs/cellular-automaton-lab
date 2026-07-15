@@ -13,6 +13,10 @@ from typing import Any
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.simulation.engine import SimulationEngine
+from backend.simulation.periodic_face_tilings import (
+    get_periodic_face_tiling_descriptor,
+    is_periodic_face_tiling,
+)
 from backend.simulation.rule_context_frames import TopologyFrame, topology_frame_for
 from backend.simulation.seeding.metrics import (
     classify,
@@ -49,6 +53,13 @@ DEFAULT_FILMSTRIP_FRAMES = 60
 MAX_FILMSTRIP_FRAMES = 240
 DEFAULT_FILMSTRIP_GRID_SIZE = 12
 MAX_FILMSTRIP_TILINGS = 6
+
+# Comparison boards carry full topology geometry and (for filmstrips) one sparse
+# state map per generation. Dense descriptor-backed tilings can place far more
+# than one cell in each requested grid unit, so cap their comparison dimensions
+# by an estimated per-board cell budget. This also keeps comparison previews
+# below topology_preview's 10,000-cell response ceiling.
+MAX_COMPARISON_CELLS_PER_TILING = 4000
 
 # A comparison is flagged degenerate when more than this fraction of viable
 # tilings go extinct in fewer than EARLY_EXTINCTION_STEPS generations.
@@ -170,7 +181,12 @@ def board_size_for(geometry: str, grid_size: int) -> tuple[int, int, int | None]
         patch_depth = default_patch_depth_for_tiling_family(variant.tiling_family)
     else:
         patch_depth = None
-    dimension = max(grid_size, minimum_grid_dimension_for_geometry(geometry))
+    minimum_dimension = minimum_grid_dimension_for_geometry(geometry)
+    dimension = max(grid_size, minimum_dimension)
+    if is_periodic_face_tiling(geometry):
+        cells_per_unit = get_periodic_face_tiling_descriptor(geometry).cell_count_per_unit
+        density_dimension = int((MAX_COMPARISON_CELLS_PER_TILING / cells_per_unit) ** 0.5)
+        dimension = max(minimum_dimension, min(dimension, density_dimension))
     return dimension, dimension, patch_depth
 
 

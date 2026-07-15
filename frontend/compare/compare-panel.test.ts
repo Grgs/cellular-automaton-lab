@@ -136,6 +136,17 @@ function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<ty
                     compatible_tiling_families: null,
                 },
                 {
+                    name: "wireworld",
+                    display_name: "WireWorld",
+                    description: "",
+                    default_paint_state: 1,
+                    supports_randomize: true,
+                    states: [],
+                    rule_protocol: "universal-v1",
+                    supports_all_topologies: true,
+                    compatible_tiling_families: null,
+                },
+                {
                     name: "kagome-life",
                     display_name: "Kagome Life",
                     description: "",
@@ -638,6 +649,79 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("caps new wall selections on narrow screens and explains the limit", async () => {
+        const originalWidth = window.innerWidth;
+        Object.defineProperty(window, "innerWidth", { configurable: true, value: 480 });
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+
+        try {
+            clickPreset("All");
+            expect(checkedTilingLabels()).toHaveLength(4);
+            expect(disabledTilingLabels()).toEqual(["Spectre", "Penrose"]);
+            expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+                "supports up to 4 tilings",
+            );
+            expect(
+                document.querySelector<HTMLInputElement>(".compare-tiling input:disabled")?.title,
+            ).toContain("supports up to 4 tilings");
+        } finally {
+            handle.dispose();
+            Object.defineProperty(window, "innerWidth", {
+                configurable: true,
+                value: originalWidth,
+            });
+        }
+    });
+
+    it("prevents a seventh tiling before sending a filmstrip request", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const sourceData = bootstrapData();
+        const square = sourceData.topology_catalog[0]!;
+        const triangle = {
+            ...square,
+            tiling_family: "Triangle",
+            label: "Triangle",
+            picker_order: 99,
+            geometry_keys: { edge: "triangle" },
+        };
+        const data: AppBootstrapData = {
+            ...sourceData,
+            topology_catalog: [...sourceData.topology_catalog, triangle],
+        };
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: data,
+        });
+
+        clickPreset("All");
+        expect(checkedTilingLabels()).toHaveLength(6);
+        expect(disabledTilingLabels()).toEqual(["Triangle"]);
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+            "supports up to 6 tilings",
+        );
+
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        expect(requestFilmstrip.mock.calls[0]?.[0]?.geometries).toHaveLength(6);
+        await vi.waitFor(() => {
+            expect(
+                document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.disabled,
+            ).toBe(true);
+        });
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.click();
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
+        handle.dispose();
+    });
+
     it("clears the active preset when the selection becomes custom", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -759,7 +843,7 @@ describe("mountComparePanel", () => {
 
         seedSelect.value = "glider";
         seedSelect.dispatchEvent(new Event("change"));
-        ruleSelect.value = "kagome-life";
+        ruleSelect.value = "wireworld";
         ruleSelect.dispatchEvent(new Event("change"));
 
         const analysisRun = [...document.querySelectorAll<HTMLButtonElement>(".compare-run")].find(
@@ -769,8 +853,8 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         expect(compareSeed.mock.calls.at(0)?.[0]).toMatchObject({
             pattern: "glider",
-            rule: "kagome-life",
-            geometries: ["kagome"],
+            rule: "wireworld",
+            geometries: ["square", "hex", "kagome", "periodic-face", "spectre"],
         });
         handle.dispose();
     });
@@ -817,12 +901,45 @@ describe("mountComparePanel", () => {
         seedField!.value = "10101";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
 
-        expect(setupRun?.textContent).toBe("Run changes");
+        expect(setupRun?.textContent).toBe("Apply changes");
         expect(setupRun?.classList.contains("is-stale")).toBe(true);
         expect(setupRun?.disabled).toBe(false);
         setupRun?.click();
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         await vi.waitFor(() => expect(setupRun?.textContent).toBe("Up to date"));
+        handle.dispose();
+    });
+
+    it("applies a WireWorld rule change to the next filmstrip request", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (request: FilmstripRequest) => ({
+            ...twoBoardFilmstrip(),
+            rule_name: request.rule ?? "conway",
+        }));
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        const applyButton = document.querySelector<HTMLButtonElement>(".compare-setup-run");
+        applyButton?.click();
+        await vi.waitFor(() => expect(applyButton?.textContent).toBe("Up to date"));
+
+        const ruleSelect = document.querySelector<HTMLSelectElement>(
+            'select[aria-label="Comparison rule"]',
+        );
+        if (!ruleSelect) {
+            throw new Error("missing comparison rule select");
+        }
+        ruleSelect.value = "wireworld";
+        ruleSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+        expect(applyButton?.textContent).toBe("Apply changes");
+        applyButton?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(requestFilmstrip.mock.calls[1]?.[0]?.rule).toBe("wireworld");
+        await vi.waitFor(() => expect(applyButton?.textContent).toBe("Up to date"));
         handle.dispose();
     });
 
@@ -864,6 +981,7 @@ describe("mountComparePanel", () => {
         });
         const run = document.querySelector<HTMLButtonElement>(".compare-setup-run");
         run?.click();
+        expect(run?.textContent).toBe("Running...");
 
         await vi.waitFor(() => {
             expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(
@@ -885,8 +1003,9 @@ describe("mountComparePanel", () => {
         );
         seedField!.value = "1110";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
-        expect(run?.textContent).toBe("Run changes");
+        expect(run?.textContent).toBe("Apply changes");
         run?.click();
+        expect(run?.textContent).toBe("Applying...");
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-wall-loading")?.textContent).toContain(
                 "Updating comparison...",
@@ -939,9 +1058,9 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("limits compare tilings to the selected rule's compatible families", async () => {
+    it("keeps tiling-specific rules out of the comparison wall", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
-        const { backend, compareSeed } = fakeBackend();
+        const { backend } = fakeBackend();
         const handle = mountComparePanel({
             openOnMount: true,
             backend,
@@ -949,35 +1068,15 @@ describe("mountComparePanel", () => {
         });
         await vi.waitFor(() => {
             expect(
-                [...document.querySelectorAll<HTMLSelectElement>("select.compare-field")].some(
-                    (select) =>
-                        [...select.options].some((option) => option.value === "kagome-life"),
-                ),
-            ).toBe(true);
+                document.querySelectorAll(".compare-setup-select option").length,
+            ).toBeGreaterThan(0);
         });
-        const ruleSelect = [
-            ...document.querySelectorAll<HTMLSelectElement>("select.compare-field"),
-        ].find((select) => [...select.options].some((option) => option.value === "kagome-life"));
-        if (!ruleSelect) {
-            throw new Error("missing rule select");
-        }
-        ruleSelect.value = "kagome-life";
-        ruleSelect.dispatchEvent(new Event("change", { bubbles: true }));
-
-        expect(checkedTilingLabels()).toEqual(["Kagome"]);
-        expect(disabledTilingLabels()).toEqual([
-            "Square",
-            "Hex",
-            "Periodic Face",
-            "Spectre",
-            "Penrose",
-        ]);
-        expect(summaryText()).toBe("1 / 1 selected · Mixed 1");
-
-        clickRunAnalysis();
-        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
-        expect(compareSeed.mock.calls.at(0)?.[0]?.rule).toBe("kagome-life");
-        expect(compareSeed.mock.calls.at(0)?.[0]?.geometries).toEqual(["kagome"]);
+        const ruleValues = [...document.querySelectorAll<HTMLOptionElement>("select option")].map(
+            (option) => option.value,
+        );
+        expect(ruleValues).toContain("wireworld");
+        expect(ruleValues).not.toContain("kagome-life");
+        expect(disabledTilingLabels()).toEqual([]);
         handle.dispose();
     });
 
@@ -1425,7 +1524,7 @@ describe("mountComparePanel", () => {
 
         await handle.applyRunConfig({
             seed: "101",
-            rule: "kagome-life",
+            rule: "wireworld",
             traversal: "row-major",
             frames: 12,
             grid_size: 8,
@@ -1439,7 +1538,7 @@ describe("mountComparePanel", () => {
             ),
         ];
         expect(fields.map((field) => field.value)).toEqual([
-            "kagome-life",
+            "wireworld",
             "glider",
             "row-major",
             "12",
@@ -1450,6 +1549,34 @@ describe("mountComparePanel", () => {
         expect(compareSeed).not.toHaveBeenCalled();
         expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
             "Loaded run link — 1 tilings ready.",
+        );
+        handle.dispose();
+    });
+
+    it("explains when a run link requests a tiling-specific rule", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+
+        await handle.applyRunConfig({
+            seed: "101",
+            rule: "kagome-life",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 8,
+            geometries: ["kagome"],
+        });
+
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Comparison rule"]')
+                ?.value,
+        ).toBe("conway");
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+            'Rule "kagome-life" is tiling-specific or unavailable on the wall; using Conway.',
         );
         handle.dispose();
     });

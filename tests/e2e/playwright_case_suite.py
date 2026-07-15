@@ -514,19 +514,52 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click(".compare-filmstrip-add")
         self._expect(".compare-board-tiling-picker[aria-label='Add tiling']").to_be_visible()
         self._expect(".compare-board-tiling-picker-search").to_be_focused()
-        enabled_choices = case.page.locator(".compare-board-tiling-choice:not(:disabled)")
-        case.assertGreater(enabled_choices.count(), 0)
-        add_label = enabled_choices.first.locator(
-            ".compare-board-tiling-choice-copy > span"
-        ).inner_text()
+        add_label = "Snub Trihexagonal (3.3.3.3.6)"
         case.page.fill(".compare-board-tiling-picker-search", add_label)
         filtered_choices = case.page.locator(".compare-board-tiling-choice:not(:disabled)")
-        case.assertGreater(filtered_choices.count(), 0)
+        case.assertEqual(filtered_choices.count(), 1)
         filtered_choices.first.click()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
         labels_after_add = case.page.locator(".compare-filmstrip-label").all_text_contents()
         case.assertEqual(labels_after_add[:-1], labels_before_add)
         case.assertEqual(labels_after_add[-1], add_label)
+        dense_board = case.page.locator(".compare-filmstrip-board").filter(
+            has=case.page.locator(".compare-filmstrip-label", has_text=add_label)
+        )
+        expect(dense_board.locator(".compare-thumb")).to_be_visible(timeout=60_000)
+        expect(dense_board.locator(".compare-filmstrip-slot")).not_to_have_text("too large")
+
+    def test_wall_applies_wireworld_and_hides_tiling_specific_rules(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        rule_select = case.page.locator("select[aria-label='Comparison rule']")
+        rule_values = rule_select.locator("option").evaluate_all(
+            "options => options.map(option => option.value)"
+        )
+        case.assertTrue("wireworld" in rule_values)
+        case.assertTrue("kagome-life" not in rule_values)
+        case.assertTrue(not any(value.startswith("archlife") for value in rule_values))
+
+        rule_select.select_option("wireworld")
+        self._expect(".compare-setup-run").to_have_text("Apply changes")
+        case.page.click(".compare-setup-run")
+        self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
+        self._expect(".compare-status").to_contain_text("Filmstrip ready")
+        self._expect("select[aria-label='Comparison rule']").to_have_value("wireworld")
+
+        # WireWorld's electron head deterministically becomes a tail. Checking
+        # the rule's state colours before and after one shared step proves the
+        # applied rule reached the filmstrip, beyond merely changing the select.
+        first_live = (
+            case.page.locator(".compare-filmstrip-board").first.locator("polygon.is-live").first
+        )
+        expect(first_live).to_have_attribute("fill", "#2f80ed")
+        case.page.get_by_role("button", name="Step forward one generation").click()
+        expect(first_live).to_have_attribute("fill", "#d64e4e")
 
     def test_wall_edit_mode_rewinds_mid_timeline_paint_to_shared_seed(self) -> None:
         # Edit seed should keep the edited board on the shared wall clock. If
