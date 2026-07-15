@@ -503,9 +503,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         expect(first_remove).to_be_visible()
         board_box = first_board.bounding_box()
         remove_box = first_remove.bounding_box()
-        case.assertIsNotNone(board_box)
-        case.assertIsNotNone(remove_box)
-        assert board_box is not None and remove_box is not None
+        if board_box is None or remove_box is None:
+            raise AssertionError("visible board management controls must have layout boxes")
         case.assertLessEqual(remove_box["y"] - board_box["y"], 12)
         case.assertLessEqual(
             (board_box["x"] + board_box["width"]) - (remove_box["x"] + remove_box["width"]),
@@ -582,6 +581,66 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         )
         expect(dense_board.locator(".compare-thumb")).to_be_visible(timeout=60_000)
         expect(dense_board.locator(".compare-filmstrip-slot")).not_to_have_text("too large")
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_rapid_board_removal_holds_the_two_board_minimum(self) -> None:
+        # Board removals coalesce into one debounced rebuild, so the displayed
+        # strip still shows the pre-removal boards while more × clicks land. A
+        # burst of removals -- faster than the rebuild, the way an impatient
+        # user drags the wall down -- must still stop at the two-board minimum
+        # instead of racing past it and collapsing the running wall to the
+        # empty hero. Regression guard for the debounce-race that let the strip
+        # empty out.
+        case = self._case()
+        case.page.add_init_script(
+            "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
+        )
+        case.reload_page(wait_until="load")
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        # The strip exists before the initial rebuild settles; wait for the wall
+        # to go idle (remove controls enabled) so the burst is not swallowed by
+        # the in-flight-rebuild guard.
+        expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
+
+        # Use real pointer input at three displayed × controls before the
+        # debounced rebuild swaps the strip. The second accepted click reaches
+        # the floor and disables every remove control synchronously; the third
+        # pointer click therefore lands on a disabled button and must be ignored
+        # by the browser rather than relying on a synthetic event bypass.
+        remove_buttons = case.page.locator(".compare-filmstrip-remove")
+        remove_boxes = [remove_buttons.nth(index).bounding_box() for index in range(3)]
+        if any(box is None for box in remove_boxes):
+            raise AssertionError("rapid-removal controls must have layout boxes")
+        for index, box in enumerate(remove_boxes):
+            assert box is not None
+            case.page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+            if index == 1:
+                case.assertTrue(remove_buttons.nth(2).is_disabled())
+
+        # The wall settles at the floor -- two boards, never the collapsed hero
+        # -- and the survivors' remove controls stay visible, disabled, and
+        # explained rather than silently allowing the wall to empty.
+        self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
+        self._expect(".compare-status").to_contain_text("2 tilings")
+        self._expect(".compare-status").not_to_contain_text("Select at least two tilings")
+        self._expect(".compare-stage-hero").not_to_be_visible()
+        remove_buttons = case.page.locator(".compare-filmstrip-remove")
+        case.assertEqual(remove_buttons.count(), 2)
+        for remove_button in remove_buttons.all():
+            expect(remove_button).to_be_visible()
+            expect(remove_button).to_be_disabled()
+            expect(remove_button).to_have_attribute(
+                "title", "Keep at least two tilings on the wall"
+            )
 
         unexpected_console = [
             message

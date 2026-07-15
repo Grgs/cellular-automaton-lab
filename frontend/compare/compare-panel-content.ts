@@ -68,6 +68,7 @@ import {
 import COMPARE_PANEL_STYLES from "./compare-panel.css?inline";
 import { ruleSupportsTilingFamily } from "../rule-compatibility.js";
 import {
+    MIN_WALL_TILINGS,
     WALL_HARD_TILING_LIMIT,
     wallCapacityMessage,
     wallTilingCapacity,
@@ -876,7 +877,21 @@ export function createComparePanelContent(
         if (running || !selected.has(geometry)) {
             return;
         }
+        // Removals coalesce into one debounced rebuild, so the displayed strip
+        // still shows the pre-removal boards while more clicks arrive. The
+        // filmstrip's own remove-button disable is keyed off that stale strip,
+        // so guard the two-board minimum here against the pending selection --
+        // otherwise a burst of clicks drops below it and the coalesced rerun
+        // collapses the wall to the empty hero.
+        if (selected.size <= MIN_WALL_TILINGS) {
+            statusLine.textContent = "Keep at least two tilings on the wall.";
+            filmstripView?.setBoardsRemovable(false);
+            return;
+        }
         selected.delete(geometry);
+        // Reflect the new floor on the still-displayed boards immediately, so a
+        // fast follow-up click sees a disabled control instead of overshooting.
+        filmstripView?.setBoardsRemovable(selected.size > MIN_WALL_TILINGS);
         const tiling = activeFilmstrip?.tilings.find((entry) => entry.geometry === geometry);
         statusLine.textContent = `Removed ${tiling?.label || geometry} — updating the wall…`;
         renderTilingChecklist();
@@ -1823,9 +1838,9 @@ export function createComparePanelContent(
         const wallProblem = wallConfigProblem();
         const analysisProblem = analysisConfigProblem();
         const canAnalyze = !running && selected.size > 0 && analysisProblem === null;
-        const canPlay = !running && selected.size >= 2 && wallProblem === null;
+        const canPlay = !running && selected.size >= MIN_WALL_TILINGS && wallProblem === null;
         const current = wallProblem === null && isFilmstripCurrent();
-        const stale = activeFilmstrip !== null && !current && selected.size >= 2;
+        const stale = activeFilmstrip !== null && !current && selected.size >= MIN_WALL_TILINGS;
         runButton.disabled = !canAnalyze;
         runButton.title =
             analysisProblem ?? "Run the selected tilings as a longer statistical analysis";
@@ -1847,7 +1862,7 @@ export function createComparePanelContent(
             if (wallProblem) {
                 return wallProblem;
             }
-            if (selected.size < 2) {
+            if (selected.size < MIN_WALL_TILINGS) {
                 return "Select at least two tilings to run a comparison";
             }
             if (current) {
@@ -2518,7 +2533,7 @@ export function createComparePanelContent(
         }
         // The authoritative result owns each board slot, so any live forks are torn down first.
         disposeAllForkedBoards();
-        if (selected.size < 2) {
+        if (selected.size < MIN_WALL_TILINGS) {
             statusLine.textContent = "Select at least two tilings to run a comparison.";
             showStageHero();
             setWallLoading(null);

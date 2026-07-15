@@ -18,6 +18,7 @@ import type {
     TopologyPreview,
     TopologySpec,
 } from "../types/domain.js";
+import { MIN_WALL_TILINGS } from "./compare-capacity.js";
 import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { FilmstripPlayer, type FilmstripPlayerState } from "./filmstrip-player.js";
 import type { FilmstripTransportController } from "./compare-transport.js";
@@ -89,6 +90,13 @@ export interface FilmstripViewController {
     setManagementBusy(busy: boolean): void;
     /** Re-evaluate the add affordance after capacity inputs such as viewport width change. */
     refreshAddControl(): void;
+    /**
+     * Immediately enable/disable every board's remove control to match the
+     * pending selection, before the debounced authoritative rebuild swaps the
+     * displayed strip. Prevents a burst of removals from dropping below the
+     * two-board minimum while the strip still shows the pre-removal boards.
+     */
+    setBoardsRemovable(removable: boolean): void;
     /** Re-render one board's current frame (e.g. after an optimistic seed edit). */
     refreshBoard(geometry: string): void;
     /** The shared clock's current generation index. */
@@ -602,7 +610,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             boardsArea.replaceChildren();
             // Keep the remove control visible at the two-board minimum, but
             // disable it so the action and its current limit remain legible.
-            const removable = Boolean(options.onRemoveBoard) && filmstrip.tilings.length > 2;
+            const removable =
+                Boolean(options.onRemoveBoard) && filmstrip.tilings.length > MIN_WALL_TILINGS;
             boards = filmstrip.tilings.map((tiling) => createBoardEntry(tiling, removable));
         }
         wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
@@ -671,6 +680,19 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         refreshAddControl(): void {
             wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
             createAddControl();
+        },
+        setBoardsRemovable(removable: boolean): void {
+            for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
+                ".compare-filmstrip-remove",
+            )) {
+                removeButton.dataset.removable = removable ? "true" : "false";
+                removeButton.disabled = managementBusy || !removable;
+                removeButton.title = managementBusy
+                    ? "Wait for the wall update to finish"
+                    : removable
+                      ? "Remove from the wall"
+                      : "Keep at least two tilings on the wall";
+            }
         },
         refreshBoard(geometry: string): void {
             const entry = entryFor(geometry);

@@ -9,6 +9,13 @@
  */
 export const WALL_HARD_TILING_LIMIT = 6;
 
+/**
+ * Fewest tilings a live wall can hold. A comparison needs at least two boards to
+ * mean anything, so the wall refuses to drop below this floor -- both the play
+ * gate and the per-board remove control enforce it.
+ */
+export const MIN_WALL_TILINGS = 2;
+
 export interface WallCapacityEnvironment {
     viewportWidth?: number;
     hardwareConcurrency?: number;
