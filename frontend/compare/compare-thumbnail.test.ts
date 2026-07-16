@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { buildBoardThumbnailSvg, computeBounds, fitDimensions } from "./compare-thumbnail.js";
+import {
+    buildBoardThumbnailSvg,
+    computeBounds,
+    fitDimensions,
+    updateBoardThumbnailSvg,
+} from "./compare-thumbnail.js";
 import type { TopologyPreview, TopologySpec } from "../types/domain.js";
 
 function topologySpec(): TopologySpec {
@@ -67,6 +72,17 @@ describe("compare-thumbnail geometry", () => {
 });
 
 describe("buildBoardThumbnailSvg", () => {
+    it("updates live cells without replacing polygon nodes", () => {
+        const svg = buildBoardThumbnailSvg(preview(), { a: 1 });
+        const polygon = svg.querySelector<SVGPolygonElement>('[data-cell-id="a"]');
+
+        updateBoardThumbnailSvg(svg, {}, { label: "generation 1" });
+
+        expect(svg.querySelector('[data-cell-id="a"]')).toBe(polygon);
+        expect(polygon?.classList.contains("is-live")).toBe(false);
+        expect(svg.getAttribute("aria-label")).toBe("generation 1");
+    });
+
     it("renders one polygon per cell and marks live cells", () => {
         const svg = buildBoardThumbnailSvg(preview(), { a: 1 });
         const polygons = svg.querySelectorAll("polygon");

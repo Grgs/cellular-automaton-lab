@@ -21,7 +21,6 @@ from backend.simulation.rule_context_frames import TopologyFrame, topology_frame
 from backend.simulation.seeding.metrics import (
     classify,
     first_extinction_step,
-    hamming,
     population,
 )
 from backend.simulation.seeding.shapes import NAMED_PATTERNS, place_pattern
@@ -40,6 +39,7 @@ from backend.simulation.topology_catalog import (
     minimum_grid_dimension_for_geometry,
     topology_spec_payload,
 )
+from backend.simulation.topology_types import LatticeTopology
 
 # Default sweep parameters. Kept modest so a full 46-tiling sweep finishes fast.
 DEFAULT_RULE = "conway"
@@ -65,6 +65,27 @@ MAX_COMPARISON_CELLS_PER_TILING = 4000
 # tilings go extinct in fewer than EARLY_EXTINCTION_STEPS generations.
 _EARLY_EXTINCTION_STEPS = 10
 _DEGENERATE_FRACTION = 0.5
+
+
+def _transition_metrics(previous: list[int], current: list[int]) -> tuple[int, int]:
+    live = changed = 0
+    for previous_state, current_state in zip(previous, current, strict=True):
+        live += current_state != 0
+        changed += previous_state != current_state
+    return live, changed
+
+
+def _sparse_states_and_population(
+    topology: LatticeTopology, states: list[int]
+) -> tuple[dict[str, int], int]:
+    sparse: dict[str, int] = {}
+    live = 0
+    for index, state in enumerate(states):
+        if state == 0:
+            continue
+        live += 1
+        sparse[topology.cells[index].id] = int(state)
+    return sparse, live
 
 
 @dataclass
@@ -291,8 +312,9 @@ def _run_single(
         nxt = engine.step_board(current, rule)
         steps_run = step
         final_board = nxt
-        populations.append(population(nxt.cell_states))
-        change_rates.append(hamming(current.cell_states, nxt.cell_states) / divisor)
+        next_population, changed = _transition_metrics(current.cell_states, nxt.cell_states)
+        populations.append(next_population)
+        change_rates.append(changed / divisor)
         key = tuple(nxt.cell_states)
         if key in seen:
             period = step - seen[key]
@@ -491,7 +513,8 @@ def _run_single_filmstrip(
     board = seeded.board
 
     engine = SimulationEngine()
-    frames: list[dict[str, int]] = [board.states_by_id(omit_zero=True)]
+    initial_sparse, _ = _sparse_states_and_population(board.topology, board.cell_states)
+    frames: list[dict[str, int]] = [initial_sparse]
     seen: dict[tuple[int, ...], int] = {tuple(board.cell_states): 0}
     period: int | None = None
     extinction_step: int | None = None
@@ -501,8 +524,11 @@ def _run_single_filmstrip(
     # extinction simply repeats; those frames are cheap (sparse, often empty).
     for step in range(1, frame_count):
         nxt = engine.step_board(current, rule)
-        frames.append(nxt.states_by_id(omit_zero=True))
-        if extinction_step is None and population(nxt.cell_states) == 0:
+        sparse_states, next_population = _sparse_states_and_population(
+            nxt.topology, nxt.cell_states
+        )
+        frames.append(sparse_states)
+        if extinction_step is None and next_population == 0:
             extinction_step = step
         if period is None:
             key = tuple(nxt.cell_states)
