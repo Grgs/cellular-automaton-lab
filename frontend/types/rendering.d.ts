@@ -115,6 +115,18 @@ export interface PolygonGeometryCell {
     maxY: number;
 }
 
+export interface PolygonSpatialIndex {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+    columnCount: number;
+    rowCount: number;
+    bucketWidth: number;
+    bucketHeight: number;
+    buckets: PolygonGeometryCell[][];
+}
+
 export type MixedGeometryCell = PolygonGeometryCell | null;
 
 export interface PeriodicFaceTilingDescriptor {
@@ -150,6 +162,7 @@ export interface PolygonGeometryCache {
     cells: PolygonGeometryCell[];
     cellsById: Map<string, PolygonGeometryCell>;
     strokePath: Path2D | null;
+    spatialIndex?: PolygonSpatialIndex | null;
 }
 
 export type GeometryCache = HexGeometryCache | TriangleGeometryCache | PolygonGeometryCache;

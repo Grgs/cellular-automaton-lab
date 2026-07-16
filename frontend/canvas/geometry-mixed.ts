@@ -1,5 +1,9 @@
 import { appendPolygonPath } from "./draw.js";
 import { asPolygonGeometryCache } from "../geometry/cache-guards.js";
+import {
+    buildPolygonSpatialIndex,
+    polygonSpatialIndexCandidates,
+} from "../geometry/polygon-spatial-index.js";
 import type { Point2D, PolygonGeometryCell, RenderableTopologyCell } from "../types/rendering.js";
 import type { PaintableCell } from "../types/editor.js";
 import type { TopologyPayload } from "../types/domain.js";
@@ -52,6 +56,7 @@ export function buildMixedTopologyGeometryCache(
         cells,
         cellsById: new Map(cells.map((cell) => [cell.cell.id, cell])),
         strokePath,
+        spatialIndex: buildPolygonSpatialIndex(cells),
     };
 }
 
@@ -60,7 +65,9 @@ export function resolveMixedCellFromOffset(
     offsetY: number,
     geometryCache: PolygonGeometryCache | null,
 ): PaintableCell | null {
-    const cachedCells = geometryCache?.cells ?? [];
+    const cachedCells = geometryCache?.spatialIndex
+        ? polygonSpatialIndexCandidates(geometryCache.spatialIndex, offsetX, offsetY)
+        : (geometryCache?.cells ?? []);
     for (const cachedCell of cachedCells) {
         if (
             offsetX < cachedCell.minX ||
