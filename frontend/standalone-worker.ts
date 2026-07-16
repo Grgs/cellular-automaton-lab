@@ -1,24 +1,17 @@
 /// <reference lib="webworker" />
 
 import type {
-    PersistedSimulationSnapshotV5,
-    RuleDefinition,
-    RulesResponse,
-    SeedComparisonResult,
-    SeedFilmstripResult,
-    SimulationSnapshot,
-    TopologyPayload,
-    TopologyPreview,
-    TopologySpec,
-} from "./types/domain.js";
-import type {
     StandaloneInitMessage,
     StandaloneRequestMessage,
     StandaloneWorkerIncomingMessage,
     StandaloneWorkerOutgoingMessage,
 } from "./standalone/protocol.js";
 import type { PlainObject } from "./runtime-validation.js";
-import { isPlainObject } from "./runtime-validation.js";
+import {
+    decodeInitResponse,
+    decodeRequestResponse,
+    decodeTickResponse,
+} from "./standalone/runtime-decoders.js";
 
 declare function importScripts(...urls: string[]): void;
 declare let loadPyodide: ((options: { indexURL: string }) => Promise<PyodideRuntime>) | undefined;
@@ -149,349 +142,6 @@ function syncSnapshotState(snapshot: { running?: boolean; speed?: number } | und
     currentSpeed = Number(snapshot?.speed) || currentSpeed;
 }
 
-function parseRuntimeJson(raw: string, context: string): PlainObject {
-    const payload: unknown = JSON.parse(raw);
-    if (!isPlainObject(payload)) {
-        throw new Error(`${context} returned an invalid payload.`);
-    }
-    return payload;
-}
-
-function requireTopologySpec(value: unknown, context: string): TopologySpec {
-    if (
-        !isPlainObject(value) ||
-        typeof value.tiling_family !== "string" ||
-        typeof value.adjacency_mode !== "string" ||
-        typeof value.sizing_mode !== "string" ||
-        typeof value.width !== "number" ||
-        typeof value.height !== "number" ||
-        typeof value.patch_depth !== "number"
-    ) {
-        throw new Error(`${context} returned an invalid topology spec.`);
-    }
-    return {
-        tiling_family: value.tiling_family,
-        adjacency_mode: value.adjacency_mode,
-        sizing_mode: value.sizing_mode,
-        width: value.width,
-        height: value.height,
-        patch_depth: value.patch_depth,
-    };
-}
-
-function isCompatibleTilingFamilies(value: unknown): value is string[] | null {
-    return (
-        value === null || (Array.isArray(value) && value.every((item) => typeof item === "string"))
-    );
-}
-
-function requireRuleDefinition(value: unknown, context: string): RuleDefinition {
-    if (
-        !isPlainObject(value) ||
-        typeof value.name !== "string" ||
-        typeof value.display_name !== "string" ||
-        typeof value.description !== "string" ||
-        typeof value.default_paint_state !== "number" ||
-        typeof value.supports_randomize !== "boolean" ||
-        !Array.isArray(value.states) ||
-        typeof value.rule_protocol !== "string" ||
-        typeof value.supports_all_topologies !== "boolean" ||
-        !isCompatibleTilingFamilies(value.compatible_tiling_families)
-    ) {
-        throw new Error(`${context} returned an invalid rule definition.`);
-    }
-    const states = value.states.map((state) => {
-        if (
-            !isPlainObject(state) ||
-            typeof state.value !== "number" ||
-            typeof state.label !== "string" ||
-            typeof state.color !== "string" ||
-            typeof state.paintable !== "boolean"
-        ) {
-            throw new Error(`${context} returned an invalid rule state definition.`);
-        }
-        return {
-            value: state.value,
-            label: state.label,
-            color: state.color,
-            paintable: state.paintable,
-        };
-    });
-    return {
-        name: value.name,
-        display_name: value.display_name,
-        description: value.description,
-        default_paint_state: value.default_paint_state,
-        supports_randomize: value.supports_randomize,
-        states,
-        rule_protocol: value.rule_protocol,
-        supports_all_topologies: value.supports_all_topologies,
-        compatible_tiling_families: value.compatible_tiling_families,
-        ...(typeof value.label === "string" ? { label: value.label } : {}),
-    };
-}
-
-function requireTopologyPayload(value: unknown, context: string): TopologyPayload {
-    if (
-        !isPlainObject(value) ||
-        typeof value.topology_revision !== "string" ||
-        !Array.isArray(value.cells)
-    ) {
-        throw new Error(`${context} returned an invalid topology payload.`);
-    }
-    return {
-        topology_revision: value.topology_revision,
-        topology_spec: requireTopologySpec(value.topology_spec, context),
-        cells: value.cells as TopologyPayload["cells"],
-    };
-}
-
-function optionalSnapshot(value: unknown, context: string): SimulationSnapshot | undefined {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (!isPlainObject(value)) {
-        throw new Error(`${context} returned an invalid simulation snapshot.`);
-    }
-    if (
-        typeof value.speed !== "number" ||
-        typeof value.running !== "boolean" ||
-        typeof value.generation !== "number" ||
-        typeof value.topology_revision !== "string" ||
-        !Array.isArray(value.cell_states)
-    ) {
-        throw new Error(`${context} returned an invalid simulation snapshot.`);
-    }
-    return {
-        topology_spec: requireTopologySpec(value.topology_spec, context),
-        speed: value.speed,
-        running: value.running,
-        generation: value.generation,
-        rule: requireRuleDefinition(value.rule, context),
-        topology_revision: value.topology_revision,
-        topology: requireTopologyPayload(value.topology, context),
-        cell_states: value.cell_states as number[],
-    };
-}
-
-function optionalPersistedSnapshot(
-    value: unknown,
-    context: string,
-): PersistedSimulationSnapshotV5 | undefined {
-    if (value === undefined || value === null) {
-        return undefined;
-    }
-    if (!isPlainObject(value)) {
-        throw new Error(`${context} returned an invalid persisted snapshot.`);
-    }
-    if (
-        value.version !== 5 ||
-        typeof value.speed !== "number" ||
-        typeof value.running !== "boolean" ||
-        typeof value.generation !== "number" ||
-        typeof value.rule !== "string" ||
-        !isPlainObject(value.cells_by_id)
-    ) {
-        throw new Error(`${context} returned an invalid persisted snapshot.`);
-    }
-    return {
-        version: 5,
-        topology_spec: requireTopologySpec(value.topology_spec, context),
-        speed: value.speed,
-        running: value.running,
-        generation: value.generation,
-        rule: value.rule,
-        cells_by_id: value.cells_by_id as Record<string, number>,
-    };
-}
-
-function optionalRules(value: unknown, context: string): RulesResponse["rules"] | undefined {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (!Array.isArray(value)) {
-        throw new Error(`${context} returned invalid rules.`);
-    }
-    return value.map((entry) => requireRuleDefinition(entry, context));
-}
-
-function requireBoolean(value: unknown, context: string, fieldName: string): boolean {
-    if (typeof value !== "boolean") {
-        throw new Error(`${context} returned invalid ${fieldName}.`);
-    }
-    return value;
-}
-
-function optionalString(value: unknown): string | undefined {
-    return typeof value === "string" ? value : undefined;
-}
-
-function optionalTopologyPreview(value: unknown, context: string): TopologyPreview | undefined {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (!isPlainObject(value) || !Array.isArray(value.cells)) {
-        throw new Error(`${context} returned an invalid topology preview.`);
-    }
-    return {
-        topology_revision: String(value.topology_revision ?? ""),
-        topology_spec: requireTopologySpec(value.topology_spec, context),
-        cells: value.cells as TopologyPreview["cells"],
-        ...(Array.isArray(value.order) ? { order: value.order as string[] } : {}),
-        ...(isPlainObject(value.shape_cells)
-            ? { shape_cells: value.shape_cells as Record<string, number> }
-            : {}),
-    };
-}
-
-function optionalFilmstrip(value: unknown, context: string): SeedFilmstripResult | undefined {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (!isPlainObject(value) || !Array.isArray(value.tilings)) {
-        throw new Error(`${context} returned an invalid filmstrip payload.`);
-    }
-    return {
-        rule_name: String(value.rule_name ?? ""),
-        seed: String(value.seed ?? ""),
-        traversal: String(value.traversal ?? ""),
-        frame_count: Number(value.frame_count ?? 0),
-        grid_size: Number(value.grid_size ?? 0),
-        tilings: value.tilings as SeedFilmstripResult["tilings"],
-    };
-}
-
-function optionalComparison(value: unknown, context: string): SeedComparisonResult | undefined {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (!isPlainObject(value) || !Array.isArray(value.results)) {
-        throw new Error(`${context} returned an invalid comparison payload.`);
-    }
-    return {
-        rule_name: String(value.rule_name ?? ""),
-        seed: String(value.seed ?? ""),
-        seed_bits: Number(value.seed_bits ?? 0),
-        traversal: String(value.traversal ?? ""),
-        steps: Number(value.steps ?? 0),
-        grid_size: Number(value.grid_size ?? 0),
-        degenerate: Boolean(value.degenerate),
-        results: value.results as SeedComparisonResult["results"],
-    };
-}
-
-function parseInitResponse(raw: string): {
-    snapshot?: SimulationSnapshot;
-    persistedSnapshot: PersistedSimulationSnapshotV5 | null;
-} {
-    const payload = parseRuntimeJson(raw, "Standalone init");
-    const result: {
-        snapshot?: SimulationSnapshot;
-        persistedSnapshot: PersistedSimulationSnapshotV5 | null;
-    } = {
-        persistedSnapshot:
-            optionalPersistedSnapshot(payload.persisted_snapshot, "Standalone init") ?? null,
-    };
-    const snapshot = optionalSnapshot(payload.snapshot, "Standalone init");
-    if (snapshot !== undefined) {
-        result.snapshot = snapshot;
-    }
-    return result;
-}
-
-function parseRequestResponse(raw: string): {
-    ok: boolean;
-    error?: string;
-    snapshot?: SimulationSnapshot;
-    rules?: RulesResponse["rules"];
-    comparison?: SeedComparisonResult;
-    filmstrip?: SeedFilmstripResult;
-    topologyPreview?: TopologyPreview;
-    persistedSnapshot?: PersistedSimulationSnapshotV5;
-} {
-    const payload = parseRuntimeJson(raw, "Standalone request");
-    const result: {
-        ok: boolean;
-        error?: string;
-        snapshot?: SimulationSnapshot;
-        rules?: RulesResponse["rules"];
-        comparison?: SeedComparisonResult;
-        filmstrip?: SeedFilmstripResult;
-        topologyPreview?: TopologyPreview;
-        persistedSnapshot?: PersistedSimulationSnapshotV5;
-    } = {
-        ok: requireBoolean(payload.ok, "Standalone request", "ok"),
-    };
-    const error = optionalString(payload.error);
-    if (error !== undefined) {
-        result.error = error;
-    }
-    const snapshot = optionalSnapshot(payload.snapshot, "Standalone request");
-    if (snapshot !== undefined) {
-        result.snapshot = snapshot;
-    }
-    const rules = optionalRules(payload.rules, "Standalone request");
-    if (rules !== undefined) {
-        result.rules = rules;
-    }
-    const comparison = optionalComparison(payload.comparison, "Standalone request");
-    if (comparison !== undefined) {
-        result.comparison = comparison;
-    }
-    const filmstrip = optionalFilmstrip(payload.filmstrip, "Standalone request");
-    if (filmstrip !== undefined) {
-        result.filmstrip = filmstrip;
-    }
-    const topologyPreview = optionalTopologyPreview(payload.topology_preview, "Standalone request");
-    if (topologyPreview !== undefined) {
-        result.topologyPreview = topologyPreview;
-    }
-    const persistedSnapshot = optionalPersistedSnapshot(
-        payload.persisted_snapshot,
-        "Standalone request",
-    );
-    if (persistedSnapshot !== undefined) {
-        result.persistedSnapshot = persistedSnapshot;
-    }
-    return result;
-}
-
-function parseTickResponse(raw: string): {
-    ok: boolean;
-    stepped: boolean;
-    error?: string;
-    snapshot?: SimulationSnapshot;
-    persistedSnapshot?: PersistedSimulationSnapshotV5;
-} {
-    const payload = parseRuntimeJson(raw, "Standalone tick");
-    const result: {
-        ok: boolean;
-        stepped: boolean;
-        error?: string;
-        snapshot?: SimulationSnapshot;
-        persistedSnapshot?: PersistedSimulationSnapshotV5;
-    } = {
-        ok: requireBoolean(payload.ok, "Standalone tick", "ok"),
-        stepped: payload.stepped === true,
-    };
-    const error = optionalString(payload.error);
-    if (error !== undefined) {
-        result.error = error;
-    }
-    const snapshot = optionalSnapshot(payload.snapshot, "Standalone tick");
-    if (snapshot !== undefined) {
-        result.snapshot = snapshot;
-    }
-    const persistedSnapshot = optionalPersistedSnapshot(
-        payload.persisted_snapshot,
-        "Standalone tick",
-    );
-    if (persistedSnapshot !== undefined) {
-        result.persistedSnapshot = persistedSnapshot;
-    }
-    return result;
-}
-
 async function handleInit(initMessage: StandaloneInitMessage): Promise<void> {
     try {
         await ensurePyodide(initMessage);
@@ -502,7 +152,7 @@ async function handleInit(initMessage: StandaloneInitMessage): Promise<void> {
             "browser_runtime.initialize_runtime(persisted_snapshot_json)",
             { persisted_snapshot_json: persistedSnapshotJson },
         );
-        const payload = parseInitResponse(raw);
+        const payload = decodeInitResponse(raw);
         const snapshot = payload.snapshot;
         if (!snapshot) {
             throw new Error("Standalone init did not return a simulation snapshot.");
@@ -544,13 +194,21 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
                     request.payload === undefined ? null : JSON.stringify(request.payload),
             },
         );
-        const payload = parseRequestResponse(raw);
+        const payload = decodeRequestResponse(raw);
         if (!payload.ok) {
             postMessage({
                 type: "response",
                 requestId: request.requestId,
                 ok: false,
                 error: payload.error || "Standalone runtime command failed.",
+                ...(payload.code === undefined ? {} : { code: payload.code }),
+                ...(payload.limit === undefined ? {} : { limit: payload.limit }),
+                ...(payload.estimated_cells === undefined
+                    ? {}
+                    : { estimated_cells: payload.estimated_cells }),
+                ...(payload.actual_cells === undefined
+                    ? {}
+                    : { actual_cells: payload.actual_cells }),
             });
             return;
         }
@@ -590,7 +248,7 @@ async function executeTick(): Promise<void> {
     }
     try {
         const raw = await executePython("browser_runtime.tick_running()");
-        const payload = parseTickResponse(raw);
+        const payload = decodeTickResponse(raw);
         if (!payload.ok) {
             throw new Error(payload.error || "Standalone tick failed.");
         }
