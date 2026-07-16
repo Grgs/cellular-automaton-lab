@@ -1,6 +1,8 @@
 import type { TopologyPreview, TopologyPreviewCell } from "../types/domain.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
+const polygonIndexes = new WeakMap<SVGSVGElement, Map<string, SVGPolygonElement>>();
+const renderedStates = new WeakMap<SVGSVGElement, Record<string, number>>();
 
 export interface ThumbnailBounds {
     minX: number;
@@ -95,6 +97,7 @@ export function buildBoardThumbnailSvg(
         role: "img",
         "aria-label": options.label ?? "Board preview",
     });
+    const polygonIndex = new Map<string, SVGPolygonElement>();
 
     for (const cell of preview.cells) {
         if (cell.vertices.length < 3) {
@@ -113,7 +116,42 @@ export function buildBoardThumbnailSvg(
         if (state !== 0) {
             polygon.classList.add("is-live");
         }
+        polygonIndex.set(cell.id, polygon);
         svg.append(polygon);
     }
+    polygonIndexes.set(svg, polygonIndex);
+    renderedStates.set(svg, { ...cellsById });
     return svg;
+}
+
+export function updateBoardThumbnailSvg(
+    svg: SVGSVGElement,
+    cellsById: Record<string, number>,
+    options: Pick<ThumbnailOptions, "deadFill" | "liveColor" | "label"> = {},
+): void {
+    const polygonIndex = polygonIndexes.get(svg);
+    const previous = renderedStates.get(svg);
+    if (!polygonIndex || !previous) {
+        throw new Error("Board thumbnail was not created by buildBoardThumbnailSvg().");
+    }
+    const deadFill = options.deadFill ?? DEFAULTS.deadFill;
+    const liveColor = options.liveColor ?? DEFAULTS.liveColor;
+    const changedIds = new Set([...Object.keys(previous), ...Object.keys(cellsById)]);
+    for (const cellId of changedIds) {
+        const previousState = previous[cellId] ?? 0;
+        const nextState = cellsById[cellId] ?? 0;
+        if (previousState === nextState) {
+            continue;
+        }
+        const polygon = polygonIndex.get(cellId);
+        if (!polygon) {
+            continue;
+        }
+        polygon.setAttribute("fill", nextState === 0 ? deadFill : liveColor(nextState));
+        polygon.classList.toggle("is-live", nextState !== 0);
+    }
+    if (options.label !== undefined) {
+        svg.setAttribute("aria-label", options.label);
+    }
+    renderedStates.set(svg, { ...cellsById });
 }

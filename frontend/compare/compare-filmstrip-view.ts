@@ -19,7 +19,7 @@ import type {
     TopologySpec,
 } from "../types/domain.js";
 import { MIN_WALL_TILINGS } from "./compare-capacity.js";
-import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
+import { buildBoardThumbnailSvg, updateBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { FilmstripPlayer, type FilmstripPlayerState } from "./filmstrip-player.js";
 import type { FilmstripTransportController } from "./compare-transport.js";
 import { createTilingPreviewThumbnail } from "../controls/tiling-preview.js";
@@ -137,6 +137,7 @@ interface BoardEntry {
     preview?: TopologyPreview;
     error?: string;
     overlaid?: boolean;
+    svg?: SVGSVGElement;
 }
 
 function el(tag: string, className: string, text?: string): HTMLElement {
@@ -302,12 +303,23 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             return;
         }
         const cellsById = frame;
-        const svg = buildBoardThumbnailSvg(preview, cellsById, {
-            size: thumbSize,
-            liveColor: getLiveColor(),
-            label: `${boardName(entry.tiling)} generation ${index}`,
-        });
-        entry.slot.replaceChildren(svg);
+        const label = `${boardName(entry.tiling)} generation ${index}`;
+        if (!entry.svg) {
+            entry.svg = buildBoardThumbnailSvg(preview, cellsById, {
+                size: thumbSize,
+                liveColor: getLiveColor(),
+                label,
+            });
+            entry.slot.replaceChildren(entry.svg);
+        } else {
+            updateBoardThumbnailSvg(entry.svg, cellsById, {
+                liveColor: getLiveColor(),
+                label,
+            });
+            if (entry.svg.parentElement !== entry.slot) {
+                entry.slot.replaceChildren(entry.svg);
+            }
+        }
         const liveCells = Object.keys(cellsById).length;
         const extinct =
             entry.tiling.extinction_step !== null && index >= entry.tiling.extinction_step;
