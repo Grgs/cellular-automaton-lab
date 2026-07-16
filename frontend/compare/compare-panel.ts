@@ -25,7 +25,7 @@ interface MountComparePanelOptions {
     bootstrapData: AppBootstrapData;
     host?: HTMLElement;
     /** When provided, begin/end open into the current board instead of a new tab. */
-    onOpenPattern?: (pattern: PatternPayload) => void;
+    onOpenPattern?: (pattern: PatternPayload) => void | Promise<void>;
     /** Show the wall immediately after mounting (e.g. right after a lazy load). */
     openOnMount?: boolean;
     /** Fired when the wall becomes visible (used to mirror the route into the hash). */

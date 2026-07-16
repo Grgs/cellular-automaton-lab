@@ -145,7 +145,7 @@ export interface ComparePanelContentOptions {
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
     /** When provided, begin/end open into the current board instead of a new tab. */
-    onOpenPattern?: (pattern: PatternPayload) => void;
+    onOpenPattern?: (pattern: PatternPayload) => void | Promise<void>;
     /** The content asks its host to dismiss it (e.g. after loading in place). */
     onRequestClose?: () => void;
     /** Server-only seams for the live focus pane; absent/null baseSessionId = fork to the Lab. */
@@ -2369,6 +2369,7 @@ export function createComparePanelContent(
             renderTilingChecklist();
             refreshSavedControls(savedRunSelect.value, savedTilingSetSelect.value);
             syncShapeMode();
+            window.requestAnimationFrame(() => focusTilingSearchIfOpen());
         }
     }
 
@@ -2718,9 +2719,9 @@ export function createComparePanelContent(
         );
     }
 
-    function openPattern(pattern: PatternPayload): void {
+    async function openPattern(pattern: PatternPayload): Promise<void> {
         if (options.onOpenPattern) {
-            options.onOpenPattern(pattern);
+            await options.onOpenPattern(pattern);
             options.onRequestClose?.();
             return;
         }
@@ -2745,7 +2746,7 @@ export function createComparePanelContent(
             {
                 label: "Begin",
                 title: beginTitle,
-                onClick: () => openPattern(begin),
+                onClick: () => void openPattern(begin),
             },
         ];
         if (end) {
@@ -2755,7 +2756,7 @@ export function createComparePanelContent(
             openItems.push({
                 label: "End",
                 title: endTitle,
-                onClick: () => openPattern(end),
+                onClick: () => void openPattern(end),
             });
         }
         wrap.append(actionMenu("Open", "Open state", openItems));
@@ -3025,22 +3026,24 @@ export function createComparePanelContent(
 
     // The tilings shortcut lands ready to type: sheet open, Tilings disclosure
     // expanded, search focused.
+    function focusTilingSearchIfOpen(): void {
+        if (
+            configSheet.classList.contains("is-open") &&
+            !configTabPanels.get("tilings")?.hidden &&
+            !tilingSearchInput.disabled
+        ) {
+            tilingSearchInput.focus();
+            tilingSearchInput.select();
+        }
+    }
+
     function openTilingsSheet(): void {
         openConfigSheet("tilings");
-        const focusSearch = (): void => {
-            if (
-                configSheet.classList.contains("is-open") &&
-                !configTabPanels.get("tilings")?.hidden
-            ) {
-                tilingSearchInput.focus();
-                tilingSearchInput.select();
-            }
-        };
-        focusSearch();
+        focusTilingSearchIfOpen();
         // Reassert focus after the opening click and sheet layout settle. Some
         // browsers restore focus to the activating dock button at the end of
         // the click sequence, which leaves the visible search box inactive.
-        window.requestAnimationFrame(focusSearch);
+        window.requestAnimationFrame(focusTilingSearchIfOpen);
     }
 
     runButton.addEventListener("click", () => void runComparison());

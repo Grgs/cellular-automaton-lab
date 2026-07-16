@@ -138,15 +138,13 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
             const state = activeController.getState();
             return state.editorRuleName ?? state.activeRule?.name ?? null;
         },
-        onOpenPattern: (payload) => {
-            void (async () => {
-                try {
-                    const controller = await ensureController();
-                    await controller.loadPattern(payload);
-                } catch (error) {
-                    handleAppError(error);
-                }
-            })();
+        onOpenPattern: async (payload) => {
+            try {
+                const controller = await ensureController();
+                await controller.loadPattern(payload);
+            } catch (error) {
+                handleAppError(error);
+            }
         },
     });
     await workspaceRouter.initialRouteSettled();
