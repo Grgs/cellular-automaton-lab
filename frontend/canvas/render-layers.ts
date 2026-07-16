@@ -1,6 +1,6 @@
 import { getGeometryAdapter } from "../geometry/registry.js";
 import { asPolygonGeometryCache } from "../geometry/cache-guards.js";
-import type { TopologyCell, TopologyPayload } from "../types/domain.js";
+import type { TopologyCell, TopologyIndex, TopologyPayload } from "../types/domain.js";
 import type { GestureOutlineTone, PaintableCell, PreviewPaintCell } from "../types/editor.js";
 import type {
     CanvasColors,
@@ -13,6 +13,7 @@ import type { CanvasSurfaceMetrics } from "./surface.js";
 interface SharedRenderInputs {
     geometry: string;
     topology: TopologyPayload | null;
+    topologyIndex: TopologyIndex;
     metrics: CanvasSurfaceMetrics;
     geometryCache: GeometryCache | null;
     canvasColors: CanvasColors;
@@ -34,51 +35,39 @@ interface SharedRenderInputs {
 
 function resolvePreviewTopologyCell(
     cell: PaintableCell,
-    topology: TopologyPayload | null,
+    topologyIndex: TopologyIndex,
     geometryCache: GeometryCache | null,
 ): RenderableTopologyCell | null {
     const polygonCache = asPolygonGeometryCache(geometryCache);
-    return (
-        polygonCache?.cellsById.get(cell.id)?.cell ||
-        topology?.cells?.find((candidate) => candidate.id === cell.id) ||
-        null
-    );
+    return polygonCache?.cellsById.get(cell.id)?.cell || topologyIndex.byId.get(cell.id) || null;
 }
 
 function resolveTransientRenderCell(
     cell: PaintableCell,
     geometry: string,
-    topology: TopologyPayload | null,
+    topologyIndex: TopologyIndex,
     geometryCache: GeometryCache | null,
 ): TopologyCell | PaintableCell {
     const adapter = getGeometryAdapter(geometry);
     if (adapter.family !== "mixed") {
         return cell;
     }
-    return resolvePreviewTopologyCell(cell, topology, geometryCache) || cell;
+    return resolvePreviewTopologyCell(cell, topologyIndex, geometryCache) || cell;
 }
 
 function resolveTransientStateValue(
     cell: PaintableCell,
-    topology: TopologyPayload | null,
+    topologyIndex: TopologyIndex,
     cellStates: number[],
 ): number {
     if (typeof cell.state === "number") {
         return cell.state;
     }
-    if (!Array.isArray(topology?.cells)) {
+    const indexedCell = topologyIndex.byId.get(cell.id);
+    if (!indexedCell) {
         return 0;
     }
-
-    const topologyCellIndex =
-        typeof cell.id === "string" && cell.id.length > 0
-            ? topology.cells.findIndex((candidate) => candidate.id === cell.id)
-            : -1;
-
-    if (topologyCellIndex < 0) {
-        return 0;
-    }
-    return cellStates[topologyCellIndex] ?? 0;
+    return cellStates[indexedCell.index] ?? 0;
 }
 
 export function drawCommittedLayer({
@@ -132,6 +121,51 @@ export function drawCommittedLayer({
     }
 }
 
+export function drawCommittedCells({
+    targetContext,
+    cellStates,
+    cellIndexes,
+    cellSize,
+    ...shared
+}: SharedRenderInputs & {
+    targetContext: CanvasRenderingContext2D;
+    cellStates: number[];
+    cellIndexes: number[];
+    cellSize: number;
+}): void {
+    const adapter = getGeometryAdapter(shared.geometry);
+    targetContext.setTransform(shared.metrics.dpr ?? 1, 0, 0, shared.metrics.dpr ?? 1, 0, 0);
+    for (const index of cellIndexes) {
+        const cell = shared.topology?.cells?.[index];
+        if (!cell) {
+            continue;
+        }
+        adapter.drawCell({
+            context: targetContext,
+            cell,
+            stateValue: cellStates[index] ?? 0,
+            metrics: shared.metrics,
+            cache: shared.geometryCache,
+            colors: shared.canvasColors,
+            colorLookup: shared.colorLookup,
+            resolveRenderedCellColor: shared.resolveRenderedCellColor,
+            renderStyle: shared.renderStyle,
+            renderLayer: "committed",
+        });
+    }
+    if (typeof adapter.drawOverlay === "function") {
+        adapter.drawOverlay({
+            context: targetContext,
+            width: shared.metrics.width,
+            height: shared.metrics.height,
+            metrics: shared.metrics,
+            cache: shared.geometryCache,
+            renderStyle: shared.renderStyle,
+            cellSize,
+        });
+    }
+}
+
 export function drawPreviewLayer({
     context,
     previewCells,
@@ -149,7 +183,7 @@ export function drawPreviewLayer({
         if (adapter.family === "mixed") {
             const topologyCell = resolvePreviewTopologyCell(
                 cell,
-                shared.topology,
+                shared.topologyIndex,
                 shared.geometryCache,
             );
             if (!topologyCell) {
@@ -205,14 +239,14 @@ export function drawHoverLayer({
     const renderCell = resolveTransientRenderCell(
         hoveredCell,
         shared.geometry,
-        shared.topology,
+        shared.topologyIndex,
         shared.geometryCache,
     );
     const adapter = getGeometryAdapter(shared.geometry);
     adapter.drawCell({
         context,
         cell: renderCell,
-        stateValue: resolveTransientStateValue(hoveredCell, shared.topology, cellStates),
+        stateValue: resolveTransientStateValue(hoveredCell, shared.topologyIndex, cellStates),
         metrics: shared.metrics,
         cache: shared.geometryCache,
         colors: shared.canvasColors,
@@ -242,13 +276,13 @@ export function drawSelectionLayer({
         const renderCell = resolveTransientRenderCell(
             selectedCell,
             shared.geometry,
-            shared.topology,
+            shared.topologyIndex,
             shared.geometryCache,
         );
         adapter.drawCell({
             context,
             cell: renderCell,
-            stateValue: resolveTransientStateValue(selectedCell, shared.topology, cellStates),
+            stateValue: resolveTransientStateValue(selectedCell, shared.topologyIndex, cellStates),
             metrics: shared.metrics,
             cache: shared.geometryCache,
             colors: shared.canvasColors,
@@ -281,13 +315,13 @@ export function drawGestureOutlineLayer({
         const renderCell = resolveTransientRenderCell(
             cell,
             shared.geometry,
-            shared.topology,
+            shared.topologyIndex,
             shared.geometryCache,
         );
         adapter.drawCell({
             context,
             cell: renderCell,
-            stateValue: resolveTransientStateValue(cell, shared.topology, cellStates),
+            stateValue: resolveTransientStateValue(cell, shared.topologyIndex, cellStates),
             metrics: shared.metrics,
             cache: shared.geometryCache,
             colors: shared.canvasColors,

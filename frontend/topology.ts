@@ -6,6 +6,8 @@ import type {
     TopologyIndex,
     TopologyPayload,
 } from "./types/domain.js";
+import { findTopologyCellById } from "./topology-index.js";
+export { findTopologyCellById, indexTopology } from "./topology-index.js";
 
 // Penrose geometry strings are referenced directly by penrose-adapter.ts and
 // the helpers below. The rest of the aperiodic family universe is consumed at
@@ -93,27 +95,6 @@ export function parseRegularCellId(
         x: Number(match[1]),
         y: Number(match[2]),
     };
-}
-
-export function indexTopology(topology: TopologyPayload | null | undefined): TopologyIndex {
-    const byId = new Map<string, TopologyCell & { index: number }>();
-
-    if (!topology || !Array.isArray(topology.cells)) {
-        return { byId };
-    }
-
-    topology.cells.forEach((cell, index) => {
-        byId.set(cell.id, { ...cell, index });
-    });
-
-    return { byId };
-}
-
-export function findTopologyCellById(
-    topologyIndex: TopologyIndex | null | undefined,
-    cellId: string,
-): (TopologyCell & { index: number }) | null {
-    return topologyIndex?.byId?.get(cellId) ?? null;
 }
 
 export function topologyCellStatesById(

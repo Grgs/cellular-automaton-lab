@@ -31,6 +31,7 @@ import type {
     TopologyIndex,
     TopologySpec,
 } from "../types/domain.js";
+import { indexTopology } from "../topology-index.js";
 import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
 import type { AppState } from "../types/state.js";
 
@@ -137,11 +138,7 @@ export function fitCanvasElementToViewport(canvas: HTMLCanvasElement, viewport: 
 }
 
 export function indexPaneTopology(snapshot: SimulationSnapshot): TopologyIndex {
-    const byId = new Map<string, IndexedTopologyCell>();
-    snapshot.topology.cells.forEach((cell, index) => {
-        byId.set(cell.id, { ...cell, index });
-    });
-    return { byId };
+    return indexTopology(snapshot.topology);
 }
 
 export function findPaneCellById(

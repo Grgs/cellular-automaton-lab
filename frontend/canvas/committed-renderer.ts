@@ -1,9 +1,10 @@
 import { DEFAULT_GEOMETRY, gridMetrics, normalizeGeometry } from "../layout.js";
 import { resolveCellFromCanvasOffset as resolveGeometryCellFromOffset } from "../geometry-adapters.js";
 import { getGeometryAdapter } from "../geometry/registry.js";
+import { indexTopology } from "../topology-index.js";
 import { topologyHeight, topologyWidth } from "../topology.js";
 import { resolveGeometryCache } from "./cache.js";
-import { drawCommittedLayer } from "./render-layers.js";
+import { drawCommittedCells, drawCommittedLayer } from "./render-layers.js";
 import {
     buildStateColorLookup,
     DEFAULT_COLORS,
@@ -17,7 +18,12 @@ import {
     sampleRenderDiagnostics,
 } from "./render-diagnostics.js";
 import { createCanvasSurface, type CanvasSurfaceMetrics } from "./surface.js";
-import type { CellStateDefinition, TopologyCell, TopologyPayload } from "../types/domain.js";
+import type {
+    CellStateDefinition,
+    TopologyCell,
+    TopologyIndex,
+    TopologyPayload,
+} from "../types/domain.js";
 import type { PaintableCell } from "../types/editor.js";
 import type {
     CanvasColors,
@@ -37,6 +43,7 @@ export interface CanvasCommittedRenderSnapshot {
     context: CanvasRenderingContext2D;
     geometry: string;
     topology: TopologyPayload | null;
+    topologyIndex: TopologyIndex;
     metrics: CanvasSurfaceMetrics;
     geometryCache: GeometryCache | null;
     canvasColors: CanvasColors;
@@ -92,6 +99,7 @@ export function createCanvasCommittedRenderer({
 }: CreateCanvasCommittedRendererOptions): CanvasCommittedRenderer {
     const surface = createCanvasSurface(canvas);
     let topology: TopologyPayload | null = null;
+    let topologyIndex = indexTopology(null);
     let cellStates: number[] = [];
     let cellSize = 12;
     let geometry = DEFAULT_GEOMETRY;
@@ -106,6 +114,8 @@ export function createCanvasCommittedRenderer({
     let resolvedRenderDiagnostics: RenderDiagnosticsSnapshot | null = null;
     let renderDiagnosticsContext: RenderDiagnosticsContext | null = null;
     let renderDiagnosticsSampled = false;
+    let previousCommittedKey = "";
+    let previousCellStates: number[] = [];
     let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
         pixelWidth: canvas.width,
@@ -120,10 +130,13 @@ export function createCanvasCommittedRenderer({
         canvas.style.margin = "0";
     }
 
-    function drawCommittedGrid(): void {
+    function prepareCommittedStyle(): void {
         canvasColors = readCanvasColors(canvas, getComputedStyleFn);
         colorLookup = buildStateColorLookup(stateDefinitions, canvasColors);
         currentRenderStyle = resolveCanvasRenderStyle(cellSize, geometry, canvasColors);
+    }
+
+    function committedLayerInputs() {
         const resolveCellColor = (
             stateValue: number,
             nextColorLookup: Map<number, string>,
@@ -140,10 +153,11 @@ export function createCanvasCommittedRenderer({
                 ...options,
                 tileColorsEnabled,
             });
-        drawCommittedLayer({
+        return {
             targetContext: surface.committedContext,
             geometry,
             topology,
+            topologyIndex,
             metrics,
             geometryCache,
             canvasColors,
@@ -152,6 +166,12 @@ export function createCanvasCommittedRenderer({
             resolveRenderedCellColor: resolveCellColor,
             cellStates,
             cellSize,
+        };
+    }
+
+    function drawCommittedGrid(): void {
+        drawCommittedLayer({
+            ...committedLayerInputs(),
         });
     }
 
@@ -162,6 +182,7 @@ export function createCanvasCommittedRenderer({
         nextGeometry = geometry,
     ): void {
         topology = nextState.topology;
+        topologyIndex = indexTopology(topology);
         cellStates = nextState.cellStates;
         tileColorsEnabled = nextState.tileColorsEnabled !== false;
         cellSize = nextCellSize;
@@ -206,7 +227,46 @@ export function createCanvasCommittedRenderer({
             cellSize,
         };
 
-        drawCommittedGrid();
+        prepareCommittedStyle();
+        const committedKey = JSON.stringify({
+            revision: topology?.topology_revision ?? "",
+            geometry,
+            cellSize,
+            pixelWidth: metrics.pixelWidth,
+            pixelHeight: metrics.pixelHeight,
+            dpr: metrics.dpr,
+            canvasColors,
+            currentRenderStyle,
+            stateDefinitions,
+            tileColorsEnabled,
+        });
+        const changedCellIndexes: number[] = [];
+        if (
+            adapter.family === "regular" &&
+            committedKey === previousCommittedKey &&
+            previousCellStates.length === cellStates.length
+        ) {
+            for (let index = 0; index < cellStates.length; index += 1) {
+                if (cellStates[index] !== previousCellStates[index]) {
+                    changedCellIndexes.push(index);
+                }
+            }
+        }
+        const incrementalLimit = Math.floor(cellStates.length * 0.25);
+        if (
+            changedCellIndexes.length > 0 &&
+            changedCellIndexes.length <= incrementalLimit &&
+            committedKey === previousCommittedKey
+        ) {
+            drawCommittedCells({
+                ...committedLayerInputs(),
+                cellIndexes: changedCellIndexes,
+            });
+        } else if (changedCellIndexes.length > 0 || committedKey !== previousCommittedKey) {
+            drawCommittedGrid();
+        }
+        previousCommittedKey = committedKey;
+        previousCellStates = cellStates.slice();
     }
 
     function restoreCommittedSurface(): void {
@@ -218,6 +278,7 @@ export function createCanvasCommittedRenderer({
             context: surface.context,
             geometry,
             topology,
+            topologyIndex,
             metrics,
             geometryCache,
             canvasColors,
