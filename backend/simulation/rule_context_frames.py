@@ -11,14 +11,18 @@ from backend.simulation.rule_context_geometry import (
     normalize_angle,
     topology_adjacency_mode,
 )
+from backend.simulation.rule_frame_capabilities import (
+    DIRECTIONAL_FRAME_CAPABILITIES,
+    RuleFrameCapabilities,
+)
 from backend.simulation.topology_types import LatticeTopology
 
 _ANGLE_EPSILON = 1e-9
 # Sized to comfortably hold every shipped tiling's frame at once, so a
 # cross-topology comparison sweep (and repeated sweeps) never thrash the LRU and
 # rebuild frames it just evicted. The live app only ever touches a handful.
-_MAX_TOPOLOGY_FRAME_CACHE_SIZE = 64
-_TOPOLOGY_FRAME_CACHE: OrderedDict[str, TopologyFrame] = OrderedDict()
+_MAX_TOPOLOGY_FRAME_CACHE_SIZE = 128
+_TOPOLOGY_FRAME_CACHE: OrderedDict[tuple[str, RuleFrameCapabilities], TopologyFrame] = OrderedDict()
 
 
 @dataclass(frozen=True)
@@ -67,11 +71,65 @@ class TopologyFrame:
         return self.cells[self.index_for(cell_id)]
 
 
-def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
-    cached = _TOPOLOGY_FRAME_CACHE.get(topology.topology_revision)
+def _adjacency_frame_for(topology: LatticeTopology) -> TopologyFrame:
+    cells = tuple(
+        TopologyCellFrame(
+            id=cell.id,
+            kind=cell.kind,
+            center=(0.0, 0.0),
+            vertices=None,
+            degree=sum(index >= 0 for index in topology.neighbor_indexes_for(cell_index)),
+            shell_rank=0,
+            radial_distance=0.0,
+            radial_ratio=0.0,
+            polar_angle=0.0,
+            neighbors=tuple(
+                TopologyNeighborFrame(
+                    index=neighbor_index,
+                    radial="level",
+                    turn="aligned",
+                    radial_delta=0.0,
+                    angle_delta=0.0,
+                    clockwise_index=clockwise_index,
+                )
+                for clockwise_index, neighbor_index in enumerate(
+                    topology.neighbor_indexes_for(cell_index)
+                )
+                if neighbor_index >= 0
+            ),
+        )
+        for cell_index, cell in enumerate(topology.cells)
+    )
+    return TopologyFrame(
+        adjacency_mode=topology_adjacency_mode(topology),
+        topology_revision=topology.topology_revision,
+        center=(0.0, 0.0),
+        cell_count=len(cells),
+        bounds=(0.0, 0.0, 0.0, 0.0),
+        max_shell_rank=0,
+        max_radial_distance=0.0,
+        cells=cells,
+        _index_by_id={cell.id: index for index, cell in enumerate(cells)},
+    )
+
+
+def topology_frame_for(
+    topology: LatticeTopology,
+    capabilities: RuleFrameCapabilities = DIRECTIONAL_FRAME_CAPABILITIES,
+) -> TopologyFrame:
+    cache_key = (topology.topology_revision, capabilities)
+    cached = _TOPOLOGY_FRAME_CACHE.get(cache_key)
     if cached is not None:
-        _TOPOLOGY_FRAME_CACHE.move_to_end(topology.topology_revision)
+        _TOPOLOGY_FRAME_CACHE.move_to_end(cache_key)
         return cached
+
+    if not capabilities.spatial and not capabilities.directional:
+        frame = _adjacency_frame_for(topology)
+        _TOPOLOGY_FRAME_CACHE[cache_key] = frame
+        _TOPOLOGY_FRAME_CACHE.move_to_end(cache_key)
+        while len(_TOPOLOGY_FRAME_CACHE) > _MAX_TOPOLOGY_FRAME_CACHE_SIZE:
+            _TOPOLOGY_FRAME_CACHE.popitem(last=False)
+        return frame
 
     cell_records = []
     for cell in topology.cells:
@@ -205,8 +263,8 @@ def topology_frame_for(topology: LatticeTopology) -> TopologyFrame:
         cells=tuple(frame_cells),
         _index_by_id={frame_cell.id: index for index, frame_cell in enumerate(frame_cells)},
     )
-    _TOPOLOGY_FRAME_CACHE[topology.topology_revision] = frame
-    _TOPOLOGY_FRAME_CACHE.move_to_end(topology.topology_revision)
+    _TOPOLOGY_FRAME_CACHE[cache_key] = frame
+    _TOPOLOGY_FRAME_CACHE.move_to_end(cache_key)
     while len(_TOPOLOGY_FRAME_CACHE) > _MAX_TOPOLOGY_FRAME_CACHE_SIZE:
         _TOPOLOGY_FRAME_CACHE.popitem(last=False)
     return frame

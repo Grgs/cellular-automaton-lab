@@ -13,7 +13,7 @@ class SimulationEngine:
         board: SimulationBoard,
         rule: AutomatonRule,
     ) -> SimulationBoard:
-        frame = topology_frame_for(board.topology)
+        frame = topology_frame_for(board.topology, rule.frame_capabilities)
         if frame.cell_count == 0:
             return board.clone()
         next_states = rule.next_states(frame, board.cell_states)

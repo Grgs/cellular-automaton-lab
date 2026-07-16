@@ -1,9 +1,11 @@
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
 from backend.simulation.rule_context_frames import TopologyFrame
+from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
 
 
 class WireWorldRule(AutomatonRule):
+    frame_capabilities = ADJACENCY_FRAME_CAPABILITIES
     name = "wireworld"
     display_name = "Circuit: WireWorld"
     description = "Electron heads and tails travel through conductors to form digital circuits."

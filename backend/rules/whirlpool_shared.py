@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
+from backend.simulation.rule_context_frames import TopologyFrame
 
 
 class WhirlpoolRuleBase(AutomatonRule):
@@ -216,3 +217,215 @@ class WhirlpoolRuleBase(AutomatonRule):
         if self.eye_has_excited_support(ctx, counts):
             return self.EXCITED
         return self.EXCITED if self.should_excite_resting(ctx, counts) else self.RESTING
+
+    def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+        cell_count = frame.cell_count
+        excited_outward = [0] * cell_count
+        excited_inward = [0] * cell_count
+        excited_clockwise = [0] * cell_count
+        excited_counterclockwise = [0] * cell_count
+        excited_total = [0] * cell_count
+        trailing_inward = [0] * cell_count
+        trailing_clockwise = [0] * cell_count
+        refractory_outward = [0] * cell_count
+        refractory_counterclockwise = [0] * cell_count
+
+        for index, cell in enumerate(frame.cells):
+            outward = inward = clockwise = counterclockwise = total = 0
+            wake_inward = wake_clockwise = resistance_outward = resistance_counter = 0
+            for neighbor in cell.neighbors:
+                state = cell_states[neighbor.index]
+                if state == self.EXCITED:
+                    total += 1
+                    if neighbor.radial == "outward":
+                        outward += 1
+                    elif neighbor.radial == "inward":
+                        inward += 1
+                    if neighbor.turn == "clockwise":
+                        clockwise += 1
+                    elif neighbor.turn == "counterclockwise":
+                        counterclockwise += 1
+                elif state == self.TRAILING:
+                    wake_inward += neighbor.radial == "inward"
+                    wake_clockwise += neighbor.turn == "clockwise"
+                elif state == self.REFRACTORY:
+                    resistance_outward += neighbor.radial == "outward"
+                    resistance_counter += neighbor.turn == "counterclockwise"
+            excited_outward[index] = outward
+            excited_inward[index] = inward
+            excited_clockwise[index] = clockwise
+            excited_counterclockwise[index] = counterclockwise
+            excited_total[index] = total
+            trailing_inward[index] = wake_inward
+            trailing_clockwise[index] = wake_clockwise
+            refractory_outward[index] = resistance_outward
+            refractory_counterclockwise[index] = resistance_counter
+
+        incoming_source_pulse = [False] * frame.cell_count
+        for source_index, source_state in enumerate(cell_states):
+            if source_state != self.SOURCE:
+                continue
+            best: tuple[tuple[float, float, float, float, int], int] | None = None
+            for neighbor in frame.cells[source_index].neighbors:
+                target_index = neighbor.index
+                if cell_states[target_index] != self.RESTING:
+                    continue
+                tier_index = self.source_selection_tier(neighbor.radial, neighbor.turn)
+                if tier_index is None:
+                    continue
+                wake_score = (trailing_clockwise[target_index] + trailing_inward[target_index]) - (
+                    refractory_counterclockwise[target_index] + refractory_outward[target_index]
+                )
+                radial_score = max(0.0, -neighbor.radial_delta)
+                turn_score = (
+                    max(0.0, -neighbor.angle_delta) if neighbor.turn == "clockwise" else 0.0
+                )
+                candidate = (
+                    (
+                        float(tier_index),
+                        -float(wake_score),
+                        -radial_score,
+                        -turn_score,
+                        neighbor.clockwise_index,
+                    ),
+                    target_index,
+                )
+                if best is None or candidate[0] < best[0]:
+                    best = candidate
+            if best is not None:
+                incoming_source_pulse[best[1]] = True
+
+        next_states: list[int] = []
+        append_state = next_states.append
+        for index, cell in enumerate(frame.cells):
+            state = cell_states[index]
+            if state == self.SOURCE:
+                append_state(self.SOURCE)
+                continue
+            if state == self.EXCITED:
+                append_state(self.TRAILING)
+                continue
+            if state == self.TRAILING:
+                append_state(self.REFRACTORY)
+                continue
+            zone = self.zone_for_radius(cell.radial_ratio)
+            if state == self.REFRACTORY:
+                if (cell.shell_rank == 0 and excited_total[index] >= 1) or (
+                    zone == "outer"
+                    and (
+                        (
+                            excited_inward[index] >= 1
+                            and (excited_clockwise[index] >= 1 or excited_total[index] >= 2)
+                        )
+                        or self._outer_guided_relay_from_counts(
+                            excited_outward[index],
+                            excited_clockwise[index],
+                            excited_counterclockwise[index],
+                            trailing_inward[index],
+                            trailing_clockwise[index],
+                            refractory_outward[index],
+                            refractory_counterclockwise[index],
+                        )
+                    )
+                ):
+                    append_state(self.EXCITED)
+                else:
+                    append_state(self.RESTING)
+                continue
+            if state != self.RESTING:
+                append_state(self.RESTING)
+                continue
+            if incoming_source_pulse[index] or (cell.shell_rank == 0 and excited_total[index] >= 1):
+                append_state(self.EXCITED)
+                continue
+            append_state(
+                self.EXCITED
+                if self._should_excite_from_counts(
+                    zone,
+                    excited_outward[index],
+                    excited_inward[index],
+                    excited_clockwise[index],
+                    excited_counterclockwise[index],
+                    excited_total[index],
+                    trailing_inward[index],
+                    trailing_clockwise[index],
+                    refractory_outward[index],
+                    refractory_counterclockwise[index],
+                )
+                else self.RESTING
+            )
+        return next_states
+
+    def _outer_guided_relay_from_counts(
+        self,
+        outward: int,
+        clockwise: int,
+        counterclockwise: int,
+        wake_inward: int,
+        wake_clockwise: int,
+        resistance_outward: int,
+        resistance_counterclockwise: int,
+    ) -> bool:
+        support = wake_clockwise + wake_inward
+        resistance = resistance_counterclockwise + resistance_outward
+        guided_clockwise = clockwise + min(1, wake_clockwise)
+        guided_swirl = clockwise - counterclockwise + support - resistance
+        tangential = (
+            wake_clockwise >= 1 and resistance == 0 and counterclockwise == 0 and outward == 0
+        )
+        return (
+            (support >= 2 or tangential)
+            and resistance == 0
+            and guided_clockwise >= 1
+            and guided_swirl >= 1
+            and outward <= 1
+        )
+
+    def _should_excite_from_counts(
+        self,
+        zone: str,
+        outward: int,
+        inward: int,
+        clockwise: int,
+        counterclockwise: int,
+        total: int,
+        wake_inward: int,
+        wake_clockwise: int,
+        resistance_outward: int,
+        resistance_counterclockwise: int,
+    ) -> bool:
+        support = wake_clockwise + wake_inward
+        resistance = resistance_counterclockwise + resistance_outward
+        guided_inward = inward + min(1, wake_inward)
+        guided_clockwise = clockwise + min(1, wake_clockwise)
+        guided_swirl = clockwise - counterclockwise + support - resistance
+        strong_wake = support >= 2
+        if zone == "eye":
+            return total >= 1
+        if zone == "inner":
+            return inward >= 1 and (guided_clockwise >= 1 or total >= 2) and guided_swirl >= 0
+        if zone == "shear":
+            score = (
+                (2 * guided_inward)
+                + (3 * guided_clockwise)
+                + support
+                - (2 * counterclockwise)
+                - (3 * resistance)
+            )
+            return (
+                score >= 5
+                and guided_inward >= 1
+                and guided_clockwise >= 1
+                and (total >= 1 or strong_wake)
+            )
+        if zone == "outer":
+            tangential = (
+                wake_clockwise >= 1 and resistance == 0 and counterclockwise == 0 and outward == 0
+            )
+            return (
+                (guided_inward >= 2 or strong_wake or tangential)
+                and guided_swirl >= 1
+                and (guided_clockwise >= 1 or total >= 3 or strong_wake)
+                and outward <= 1
+            )
+        return guided_inward >= 2 and guided_clockwise >= 1 and guided_swirl >= 1
