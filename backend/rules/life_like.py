@@ -3,6 +3,7 @@ from __future__ import annotations
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
 from backend.simulation.rule_context_frames import TopologyFrame
+from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
 
 BINARY_STATES = (
     CellStateDefinition(0, "Dead", "#f8f1e5"),
@@ -23,6 +24,7 @@ def apply_binary_life_rule(
 
 
 class BinaryLifeRule(AutomatonRule):
+    frame_capabilities = ADJACENCY_FRAME_CAPABILITIES
     states = BINARY_STATES
     default_paint_state = 1
     randomize_weights = {0: 0.5, 1: 0.5}
@@ -53,6 +55,7 @@ class BinaryLifeRule(AutomatonRule):
 
 
 class KindLifeRule(AutomatonRule):
+    frame_capabilities = ADJACENCY_FRAME_CAPABILITIES
     states = BINARY_STATES
     default_paint_state = 1
     randomize_weights = {0: 0.5, 1: 0.5}

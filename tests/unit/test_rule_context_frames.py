@@ -4,14 +4,31 @@ from pathlib import Path
 
 try:
     from backend.simulation.rule_context import build_rule_contexts_for_board, topology_frame_for
+    from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
     from backend.simulation.topology import LatticeTopology, build_topology, empty_board
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.simulation.rule_context import build_rule_contexts_for_board, topology_frame_for
+    from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
     from backend.simulation.topology import LatticeTopology, build_topology, empty_board
 
 
 class RuleContextFrameTests(unittest.TestCase):
+    def test_adjacency_frame_skips_spatial_and_directional_enrichment(self) -> None:
+        topology = build_topology("square", 3, 3)
+
+        frame = topology_frame_for(topology, ADJACENCY_FRAME_CAPABILITIES)
+
+        self.assertEqual(frame.bounds, (0.0, 0.0, 0.0, 0.0))
+        self.assertTrue(all(cell.center == (0.0, 0.0) for cell in frame.cells))
+        self.assertTrue(
+            all(
+                neighbor.radial == "level" and neighbor.turn == "aligned"
+                for cell in frame.cells
+                for neighbor in cell.neighbors
+            )
+        )
+
     def test_topology_frame_cache_reuses_revision_key(self) -> None:
         topology = build_topology("square", 3, 3)
         duplicated_topology = LatticeTopology(

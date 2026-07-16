@@ -3,9 +3,11 @@ from __future__ import annotations
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
 from backend.simulation.rule_context_frames import TopologyFrame
+from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
 
 
 class PenroseGreenbergHastingsRule(AutomatonRule):
+    frame_capabilities = ADJACENCY_FRAME_CAPABILITIES
     RESTING = 0
     EXCITED = 1
     TRAILING = 2

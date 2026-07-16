@@ -1,6 +1,7 @@
 import sys
 import unittest
 from pathlib import Path
+from random import Random
 
 try:
     from backend.rules.archlife488 import ArchLife488Rule
@@ -9,7 +10,9 @@ try:
     from backend.rules.hexlife import HexLifeRule
     from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
     from backend.rules.trilife import TriLifeRule
+    from backend.rules.whirlpool import WhirlpoolRule
     from backend.rules.wireworld import WireWorldRule
+    from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.rule_context import RuleContext, build_rule_contexts_for_board
     from backend.simulation.rule_context_frames import TopologyFrame
@@ -26,7 +29,9 @@ except ModuleNotFoundError:
     from backend.rules.hexlife import HexLifeRule
     from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
     from backend.rules.trilife import TriLifeRule
+    from backend.rules.whirlpool import WhirlpoolRule
     from backend.rules.wireworld import WireWorldRule
+    from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.rule_context import RuleContext, build_rule_contexts_for_board
     from backend.simulation.rule_context_frames import TopologyFrame
@@ -50,6 +55,28 @@ def reference_step_board(board: SimulationBoard, rule: AutomatonRule) -> Simulat
 
 
 class SimulationEngineTests(unittest.TestCase):
+    def test_whirlpool_batch_matches_reference_across_topology_families(self) -> None:
+        cases = (
+            ("square", 9, 7, None),
+            ("hex", 8, 7, None),
+            (ARCHIMEDEAN_488_GEOMETRY, 4, 3, None),
+            (PENROSE_GEOMETRY, 0, 0, 2),
+        )
+        random = Random(20260716)
+
+        for geometry, width, height, patch_depth in cases:
+            with self.subTest(geometry=geometry):
+                board = empty_board(geometry, width, height, patch_depth)
+                board.cell_states = [
+                    random.randint(WhirlpoolRule.RESTING, WhirlpoolRule.SOURCE)
+                    for _ in board.cell_states
+                ]
+
+                optimized = SimulationEngine().step_board(board, WhirlpoolRule())
+                expected = reference_step_board(board, WhirlpoolRule())
+
+                self.assertEqual(optimized.cell_states, expected.cell_states)
+
     def test_engine_uses_rule_batch_implementation(self) -> None:
         class BatchRule(AutomatonRule):
             calls = 0

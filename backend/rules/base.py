@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from backend.payload_types import CellStatePayload
+from backend.simulation.rule_frame_capabilities import (
+    DIRECTIONAL_FRAME_CAPABILITIES,
+    RuleFrameCapabilities,
+)
 
 if TYPE_CHECKING:
     from backend.simulation.rule_context import RuleContext
@@ -54,6 +58,7 @@ class AutomatonRule(ABC):
     )
     default_paint_state: int = 1
     randomize_weights: dict[int, float] | None = None
+    frame_capabilities: RuleFrameCapabilities = DIRECTIONAL_FRAME_CAPABILITIES
 
     @property
     def supports_randomize(self) -> bool:
