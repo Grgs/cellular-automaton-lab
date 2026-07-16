@@ -13,6 +13,34 @@ except ModuleNotFoundError:
 
 
 class BrowserRuntimeTests(unittest.TestCase):
+    def test_oversized_topology_error_is_structured(self) -> None:
+        initialize_runtime()
+
+        response = json.loads(
+            handle_request(
+                "/api/control/reset",
+                json.dumps(
+                    {
+                        "topology_spec": {
+                            "tiling_family": "square",
+                            "adjacency_mode": "edge",
+                            "sizing_mode": "grid",
+                            "width": 201,
+                            "height": 100,
+                            "patch_depth": 0,
+                            "unsafe_size_override": True,
+                        },
+                        "rule": "conway",
+                    }
+                ),
+            )
+        )
+
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["code"], "topology_cell_budget_exceeded")
+        self.assertEqual(response["limit"], 20_000)
+        self.assertEqual(response["estimated_cells"], 20_100)
+
     def test_initialize_runtime_returns_default_snapshot(self) -> None:
         payload = json.loads(initialize_runtime())
 

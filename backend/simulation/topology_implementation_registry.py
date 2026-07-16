@@ -29,6 +29,7 @@ TopologyImplementationBuilder = Callable[
     [str, int, int, int | None],
     "TopologyBuildCells",
 ]
+TopologyCellCountEstimator = Callable[[str, int, int, int | None], int]
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,23 @@ class TopologyImplementationDefinition:
     builder_kind: BuilderKind
     render_kind: RenderKind
     builder_ref: TopologyImplementationBuilder
+    estimate_cell_count_ref: TopologyCellCountEstimator | None
+
+
+def _estimate_regular_cell_count(
+    geometry: str, width: int, height: int, patch_depth: int | None
+) -> int:
+    del geometry, patch_depth
+    return max(0, width) * max(0, height)
+
+
+def _estimate_periodic_face_cell_count(
+    geometry: str, width: int, height: int, patch_depth: int | None
+) -> int:
+    from backend.simulation.periodic_face_tilings import get_periodic_face_tiling_descriptor
+
+    del patch_depth
+    return get_periodic_face_tiling_descriptor(geometry).estimate_cell_count(width, height)
 
 
 def _build_square_geometry(
@@ -153,18 +171,21 @@ _IMPLEMENTATIONS = {
         builder_kind="regular_grid",
         render_kind="regular_grid",
         builder_ref=_build_square_geometry,
+        estimate_cell_count_ref=_estimate_regular_cell_count,
     ),
     HEX_GEOMETRY: TopologyImplementationDefinition(
         geometry_key=HEX_GEOMETRY,
         builder_kind="regular_grid",
         render_kind="regular_grid",
         builder_ref=_build_hex_geometry,
+        estimate_cell_count_ref=_estimate_regular_cell_count,
     ),
     TRIANGLE_GEOMETRY: TopologyImplementationDefinition(
         geometry_key=TRIANGLE_GEOMETRY,
         builder_kind="regular_grid",
         render_kind="regular_grid",
         builder_ref=_build_triangle_geometry,
+        estimate_cell_count_ref=_estimate_regular_cell_count,
     ),
     **{
         geometry: TopologyImplementationDefinition(
@@ -172,6 +193,7 @@ _IMPLEMENTATIONS = {
             builder_kind="periodic_face",
             render_kind="polygon_periodic",
             builder_ref=_build_periodic_face_geometry,
+            estimate_cell_count_ref=_estimate_periodic_face_cell_count,
         )
         for geometry in _PERIODIC_FACE_GEOMETRIES
     },
@@ -181,6 +203,7 @@ _IMPLEMENTATIONS = {
             builder_kind="substitution_patch",
             render_kind="polygon_aperiodic",
             builder_ref=_build_aperiodic_geometry,
+            estimate_cell_count_ref=None,
         )
         for geometry in _APERIODIC_GEOMETRIES
     },

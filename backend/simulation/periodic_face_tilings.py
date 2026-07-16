@@ -78,6 +78,7 @@ class PeriodicFaceTilingDescriptor:
     max_y: float
     cell_count_per_unit: int
     build_faces: Callable[[int, int], tuple[PeriodicFaceCell, ...]]
+    estimate_cell_count: Callable[[int, int], int]
     face_template_count: int
     face_kinds: tuple[str, ...]
     face_slots: tuple[str, ...]
@@ -533,6 +534,9 @@ def _pattern_descriptor_from_payload(
             width,
             height,
             lattice_skew_x,
+        ),
+        estimate_cell_count=lambda width, height: sum(
+            (width + face.repeat_x_extra) * (height + face.repeat_y_extra) for face in faces
         ),
         face_template_count=face_template_count,
         face_kinds=face_kinds,

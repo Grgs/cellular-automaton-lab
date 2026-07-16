@@ -23,7 +23,7 @@ from backend.simulation.engine import SimulationEngine
 from backend.simulation.rule_context import build_rule_contexts_for_board
 from backend.simulation.topology import (
     SimulationBoard,
-    empty_board,
+    build_topology,
 )
 from backend.simulation.topology_family_manifest import ARCHIMEDEAN_488_GEOMETRY
 
@@ -45,7 +45,8 @@ def build_board(
     geometry: str, width: int, height: int, max_state: int, seed: int
 ) -> SimulationBoard:
     random = Random(seed)
-    board = empty_board(geometry, width, height)
+    topology = build_topology(geometry, width, height)
+    board = SimulationBoard(topology=topology, cell_states=[0] * topology.cell_count)
     if max_state == 1:
         board.cell_states = [
             1 if random.random() >= 0.5 else 0 for _ in range(board.topology.cell_count)

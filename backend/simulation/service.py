@@ -26,6 +26,7 @@ from backend.simulation.service_transitions import (
     apply_config_transition,
     apply_reset_transition,
 )
+from backend.simulation.topology_builders import TopologyCellBudgetExceeded
 
 
 class SimulationOperationError(ValueError):
@@ -120,6 +121,8 @@ class SimulationService:
                     speed=speed,
                     randomize=randomize,
                 )
+            except TopologyCellBudgetExceeded:
+                raise
             except ValueError as exc:
                 raise SimulationOperationError(str(exc)) from exc
 
@@ -140,6 +143,8 @@ class SimulationService:
                     speed=speed,
                     rule_name=rule_name,
                 )
+            except TopologyCellBudgetExceeded:
+                raise
             except ValueError as exc:
                 raise SimulationOperationError(str(exc)) from exc
 

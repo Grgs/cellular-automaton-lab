@@ -18,6 +18,7 @@ try:
         TUEBINGEN_TRIANGLE_GEOMETRY,
     )
     from backend.simulation.topology import (
+        TopologyCellBudgetExceeded,
         build_topology,
         empty_board,
     )
@@ -50,6 +51,7 @@ except ModuleNotFoundError:
         TUEBINGEN_TRIANGLE_GEOMETRY,
     )
     from backend.simulation.topology import (
+        TopologyCellBudgetExceeded,
         build_topology,
         empty_board,
     )
@@ -68,6 +70,32 @@ except ModuleNotFoundError:
 
 
 class SimulationTopologyTests(unittest.TestCase):
+    def test_interactive_regular_topology_rejects_estimate_before_build(self) -> None:
+        with self.assertRaises(TopologyCellBudgetExceeded) as raised:
+            build_topology("square", 201, 100, max_cells=20_000)
+
+        self.assertEqual(raised.exception.estimated_cells, 20_100)
+        self.assertIsNone(raised.exception.actual_cells)
+
+    def test_periodic_estimator_matches_realized_cell_count(self) -> None:
+        topology = build_topology("archimedean-3-3-3-3-6", 4, 3)
+
+        bounded = build_topology(
+            "archimedean-3-3-3-3-6",
+            4,
+            3,
+            max_cells=topology.cell_count,
+        )
+
+        self.assertIs(bounded, topology)
+
+    def test_aperiodic_topology_checks_actual_count_after_generation(self) -> None:
+        with self.assertRaises(TopologyCellBudgetExceeded) as raised:
+            build_topology(PENROSE_GEOMETRY, 0, 0, patch_depth=2, max_cells=1)
+
+        self.assertIsNone(raised.exception.estimated_cells)
+        self.assertGreater(raised.exception.actual_cells or 0, 1)
+
     def test_neighbor_index_cache_matches_neighbor_id_ordering(self) -> None:
         cases = [
             ("square", 4, 3),

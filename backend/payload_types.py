@@ -196,6 +196,10 @@ class SimulationStatePayload(TypedDict):
 
 class ApiErrorPayload(TypedDict):
     error: str
+    code: NotRequired[str]
+    limit: NotRequired[int]
+    estimated_cells: NotRequired[int]
+    actual_cells: NotRequired[int]
 
 
 class PeriodicFaceTilingDescriptorPayload(TypedDict):

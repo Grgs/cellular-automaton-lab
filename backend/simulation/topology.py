@@ -6,6 +6,8 @@ from backend.simulation.topology_boards import (
     empty_board,
 )
 from backend.simulation.topology_builders import (
+    INTERACTIVE_TOPOLOGY_CELL_BUDGET,
+    TopologyCellBudgetExceeded,
     _build_topology_cached,
     _build_topology_uncached,
     build_topology,
@@ -25,6 +27,8 @@ __all__ = [
     "LatticeCell",
     "LatticeTopology",
     "SimulationBoard",
+    "INTERACTIVE_TOPOLOGY_CELL_BUDGET",
+    "TopologyCellBudgetExceeded",
     "_build_topology_cached",
     "_build_topology_uncached",
     "board_from_cells_by_id",

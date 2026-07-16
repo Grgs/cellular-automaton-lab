@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from backend.simulation.topology_builders import build_topology
+from backend.simulation.topology_builders import (
+    build_topology,
+    interactive_topology_cell_budget,
+)
 from backend.simulation.topology_types import SimulationBoard
 
 
@@ -12,7 +15,13 @@ def empty_board(
     height: int,
     patch_depth: int | None = None,
 ) -> SimulationBoard:
-    topology = build_topology(geometry, width, height, patch_depth)
+    topology = build_topology(
+        geometry,
+        width,
+        height,
+        patch_depth,
+        max_cells=interactive_topology_cell_budget(),
+    )
     return SimulationBoard(
         topology=topology,
         cell_states=[0] * topology.cell_count,
@@ -26,7 +35,13 @@ def board_from_states(
     cell_states: Iterable[int],
     patch_depth: int | None = None,
 ) -> SimulationBoard:
-    topology = build_topology(geometry, width, height, patch_depth)
+    topology = build_topology(
+        geometry,
+        width,
+        height,
+        patch_depth,
+        max_cells=interactive_topology_cell_budget(),
+    )
     normalized_states = list(cell_states)
     if len(normalized_states) < topology.cell_count:
         normalized_states.extend([0] * (topology.cell_count - len(normalized_states)))
