@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import argparse
 import json
+import os
 import statistics
 import sys
 import time
@@ -17,6 +19,7 @@ if str(ROOT) not in sys.path:
 
 from backend.payload_types import CellTargetPayload, SimulationStatePayload, TopologySpecPayload
 from backend.simulation.topology import _build_topology_cached, _build_topology_uncached
+from backend.simulation.topology_builders import INTERNAL_ALLOW_OVERSIZED_TOPOLOGIES_ENV
 from tests.e2e.support_server import AppServer
 from tests.typed_payloads import require_simulation_state_payload
 
@@ -36,9 +39,9 @@ class ResetRequestPayload(TypedDict):
 VIEWPORT: ViewportPayload = {"width": 1440, "height": 900}
 CASES = (
     ("square", "conway", {"width": 90, "height": 60}),
-    ("archimedean-3-3-3-3-6", "archlife-3-3-3-3-6", {"width": 36, "height": 24}),
     ("trihexagonal-3-6-3-6", "kagome-life", {"width": 48, "height": 32}),
 )
+STRESS_CASES = (("archimedean-3-3-3-3-6", "archlife-3-3-3-3-6", {"width": 36, "height": 24}),)
 
 BROWSER_TRANSPORT_SCRIPT = """
 async ({ resetPayload, toggleId }) => {
@@ -165,7 +168,21 @@ def default_reset_payload(
     }
 
 
-def main() -> int | None:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Profile topology build and interaction latency.")
+    parser.add_argument(
+        "--allow-oversize",
+        action="store_true",
+        help="include intentionally oversized stress cases and bypass the interactive cell budget",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int | None:
+    args = parse_args(argv)
+    if args.allow_oversize:
+        os.environ[INTERNAL_ALLOW_OVERSIZED_TOPOLOGIES_ENV] = "1"
+    cases = (*CASES, *STRESS_CASES) if args.allow_oversize else CASES
     server = AppServer()
     server.start()
     try:
@@ -190,7 +207,7 @@ def main() -> int | None:
                 "browser toggle".rjust(15),
             )
 
-            for geometry, rule, dimensions in CASES:
+            for geometry, rule, dimensions in cases:
                 reset_payload = default_reset_payload(geometry, rule, dimensions)
                 build_ms = benchmark_topology_build_ms(
                     geometry,

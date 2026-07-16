@@ -15,10 +15,16 @@ def _bench_parser() -> argparse.ArgumentParser:
 
 
 def _latency_parser() -> argparse.ArgumentParser:
-    return argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         prog=command_doc("perf", "latency").label,
         description=command_doc("perf", "latency").details,
     )
+    parser.add_argument(
+        "--allow-oversize",
+        action="store_true",
+        help="include intentionally oversized stress cases",
+    )
+    return parser
 
 
 def _run_bench(argv: list[str] | None = None) -> int:
@@ -28,7 +34,7 @@ def _run_bench(argv: list[str] | None = None) -> int:
 
 def _run_latency(argv: list[str] | None = None) -> int:
     _latency_parser().parse_args(argv)
-    return profile_tiling_latency.main() or 0
+    return profile_tiling_latency.main(argv) or 0
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:

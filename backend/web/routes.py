@@ -20,6 +20,7 @@ from backend.simulation.sessions import (
     SimulationSessionError,
     SimulationSessionRegistry,
 )
+from backend.simulation.topology_builders import TopologyCellBudgetExceeded
 from backend.simulation.topology_preview import build_topology_preview
 from backend.web.requests import (
     RequestValidationError,
@@ -64,6 +65,13 @@ def state_actions(session_id: str = DEFAULT_SESSION_ID) -> StateActionService:
 def json_error(message: str, status_code: int = 400) -> tuple[Response, int]:
     payload: ApiErrorPayload = {"error": message}
     return jsonify(payload), status_code
+
+
+@api_bp.app_errorhandler(TopologyCellBudgetExceeded)
+def handle_topology_cell_budget_error(
+    exc: TopologyCellBudgetExceeded,
+) -> tuple[Response, int]:
+    return jsonify(exc.to_payload()), 400
 
 
 # Invalid session ids, request-contract violations, and rejected simulation

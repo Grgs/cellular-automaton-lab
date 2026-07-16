@@ -22,6 +22,7 @@ from backend.simulation.persistence import SimulationStateStore
 from backend.simulation.seeding import run_compare_request, run_filmstrip_request
 from backend.simulation.service import SimulationOperationError, SimulationService
 from backend.simulation.state_restore import SimulationStateRestorer
+from backend.simulation.topology_builders import TopologyCellBudgetExceeded
 from backend.simulation.topology_preview import build_topology_preview
 
 
@@ -51,8 +52,10 @@ def _response_payload(
     return json.dumps(payload)
 
 
-def _error_payload(message: str) -> str:
-    return json.dumps({"ok": False, "error": message})
+def _error_payload(error: str | TopologyCellBudgetExceeded) -> str:
+    if isinstance(error, TopologyCellBudgetExceeded):
+        return json.dumps({"ok": False, **error.to_payload()})
+    return json.dumps({"ok": False, "error": error})
 
 
 @dataclass
@@ -146,7 +149,7 @@ class BrowserSimulationRuntime:
             else:
                 raise ValueError(f"Unknown command '{path}'.")
         except (ContractValidationError, SimulationOperationError, ValueError) as exc:
-            return _error_payload(str(exc))
+            return _error_payload(exc if isinstance(exc, TopologyCellBudgetExceeded) else str(exc))
 
         snapshot = self.service.get_state()
         return _response_payload(
