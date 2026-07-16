@@ -71,7 +71,7 @@ export interface MountWorkspaceRouterOptions {
     wallHost?: HTMLElement | null;
     /** The static shell root that contains the Lab (editor) world. */
     labRoot?: HTMLElement | null;
-    onOpenPattern?: (pattern: PatternPayload) => void;
+    onOpenPattern?: (pattern: PatternPayload) => void | Promise<void>;
     /** Header button that navigates to the wall. */
     wallTrigger?: HTMLButtonElement | null;
     /** Header button that navigates to the Lab. */

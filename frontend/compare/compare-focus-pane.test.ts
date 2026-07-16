@@ -401,4 +401,38 @@ describe("mountFocusPane", () => {
         expect(fake.dispose).toHaveBeenCalledTimes(1);
         expect(onDiscard).toHaveBeenCalledTimes(1);
     });
+
+    it("does not report a late seed cancellation after disposal", async () => {
+        const fake = fakeBackend();
+        let rejectReset: ((reason: Error) => void) | undefined;
+        fake.postControl.mockImplementationOnce(
+            () =>
+                new Promise<SimulationSnapshot>((_resolve, reject) => {
+                    rejectReset = reject;
+                }),
+        );
+        const onError = vi.fn();
+        const handle = mountFocusPane({
+            geometry: "square",
+            frameIndex: 9,
+            pattern,
+            backend: fake.backend,
+            bootstrapData: bootstrapData(),
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+            onDiscard: vi.fn(),
+            onError,
+        });
+        document.body.append(handle.element);
+        await vi.waitFor(() => expect(fake.postControl).toHaveBeenCalled());
+
+        handle.dispose();
+        rejectReset?.(new Error("Standalone pane runtime was disposed."));
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(onError).not.toHaveBeenCalled();
+    });
 });

@@ -22,12 +22,24 @@ import type {
     SeedFilmstripResult,
     TopologyComparisonResultPayload,
     TopologyFilmstrip,
-    TopologyOption,
     TopologyPreview,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
+import { element as el } from "./compare-dom.js";
+import {
+    buildComparisonStatePattern,
+    buildFilmstripFramePattern,
+    PATTERN_FORMAT,
+    PATTERN_VERSION,
+} from "./compare-patterns.js";
 import { buildCompareRunUrl, type CompareRunConfig } from "./compare-run-link.js";
+import {
+    comparisonTilingOptions,
+    type CompareTilingOption as TilingOption,
+    defaultComparisonSelection,
+    wallTilingPickerOptions,
+} from "./compare-tiling-options.js";
 import { hashWithFocus, hashWithoutFocus, readFocusFromHash } from "./compare-route.js";
 import {
     FEATURED_COMPARE_DEMO_LOOP_START,
@@ -86,11 +98,6 @@ import {
 // patches are not offered a thumbnail (the backend would reject them anyway).
 const MAX_PREVIEW_CELLS = 10000;
 
-// Mirrors the pattern schema in pattern-io.ts / parsers/pattern.ts; reused so a
-// begin/end state can be encoded as a shareable board link.
-const PATTERN_FORMAT = "cellular-automaton-lab-pattern";
-const PATTERN_VERSION = 5;
-
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
 const WAIT_FOR_WALL_UPDATE = "Wait for the wall update to finish";
@@ -105,44 +112,6 @@ interface OperationTicket {
     id: number;
     revision: number;
     kind: "analysis" | "filmstrip";
-}
-
-/** Build a shareable board pattern for a result's begin or end state, if states were returned. */
-function buildStatePattern(
-    comparison: SeedComparisonResult,
-    result: TopologyComparisonResultPayload,
-    phase: "begin" | "end",
-): PatternPayload | null {
-    const cells = phase === "begin" ? result.initial_cells_by_id : result.final_cells_by_id;
-    if (!result.topology_spec || cells === undefined) {
-        return null;
-    }
-    return {
-        format: PATTERN_FORMAT,
-        version: PATTERN_VERSION,
-        topology_spec: result.topology_spec,
-        rule: comparison.rule_name,
-        cells_by_id: cells,
-    };
-}
-
-/** Build a shareable board pattern for the live filmstrip's current generation. */
-function buildFilmstripFramePattern(
-    filmstrip: SeedFilmstripResult,
-    tiling: TopologyFilmstrip,
-    frameIndex: number,
-): PatternPayload | null {
-    const cells = tiling.frames[frameIndex];
-    if (!tiling.topology_spec || cells === undefined) {
-        return null;
-    }
-    return {
-        format: PATTERN_FORMAT,
-        version: PATTERN_VERSION,
-        topology_spec: tiling.topology_spec,
-        rule: filmstrip.rule_name,
-        cells_by_id: cells,
-    };
 }
 
 function openPatternInTab(pattern: PatternPayload): void {
@@ -176,7 +145,7 @@ export interface ComparePanelContentOptions {
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
     /** When provided, begin/end open into the current board instead of a new tab. */
-    onOpenPattern?: (pattern: PatternPayload) => void;
+    onOpenPattern?: (pattern: PatternPayload) => void | Promise<void>;
     /** The content asks its host to dismiss it (e.g. after loading in place). */
     onRequestClose?: () => void;
     /** Server-only seams for the live focus pane; absent/null baseSessionId = fork to the Lab. */
@@ -211,17 +180,6 @@ export interface ComparePanelContentHandle {
     dispose(): void;
 }
 
-interface TilingOption {
-    geometry: string;
-    tilingFamily: string;
-    label: string;
-    family: string;
-    group: string;
-    order: number;
-    renderKind: string;
-    sizingMode: string;
-}
-
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
 type ConfigTab = "setup" | "tilings" | "analysis" | "help" | "saved";
 
@@ -229,74 +187,6 @@ interface ActionMenuItem {
     label: string;
     title: string;
     onClick(): void;
-}
-
-type ElementAttrs = Record<string, string | number | boolean | null | undefined>;
-
-function el<K extends keyof HTMLElementTagNameMap>(
-    tag: K,
-    attrs: ElementAttrs = {},
-    children: Array<Node | string> = [],
-): HTMLElementTagNameMap[K] {
-    const node = document.createElement(tag);
-    for (const [key, value] of Object.entries(attrs)) {
-        if (value === undefined || value === null || value === false) {
-            continue;
-        }
-        if (key === "textContent" || key === "text") {
-            node.textContent = String(value);
-            continue;
-        }
-        node.setAttribute(key, value === true ? "" : String(value));
-    }
-    for (const child of children) {
-        node.append(typeof child === "string" ? document.createTextNode(child) : child);
-    }
-    return node;
-}
-
-function tilingOptions(bootstrapData: AppBootstrapData): TilingOption[] {
-    return bootstrapData.topology_catalog
-        .map((definition) => ({
-            geometry: definition.geometry_keys[definition.default_adjacency_mode] ?? "",
-            tilingFamily: definition.tiling_family,
-            label: definition.label,
-            family: definition.family,
-            group: definition.picker_group,
-            order: definition.picker_order,
-            renderKind: definition.render_kind,
-            sizingMode: definition.sizing_mode,
-        }))
-        .filter((option): option is TilingOption => option.geometry.length > 0);
-}
-
-function wallTilingPickerOptions(options: readonly TilingOption[]): TopologyOption[] {
-    return options.map((option) => ({
-        value: option.geometry,
-        label: option.label,
-        group: option.group,
-        order: option.order,
-        family: option.family,
-        previewKey: option.geometry,
-        renderKind: option.renderKind,
-        sizingMode: option.sizingMode,
-        searchAliases: [],
-    }));
-}
-
-/** All regular grids plus one representative per other family: a fast default sweep. */
-function defaultSelection(options: TilingOption[]): Set<string> {
-    const selection = new Set<string>();
-    const seenFamilies = new Set<string>();
-    for (const option of options) {
-        if (option.family === "regular") {
-            selection.add(option.geometry);
-        } else if (!seenFamilies.has(option.family)) {
-            seenFamilies.add(option.family);
-            selection.add(option.geometry);
-        }
-    }
-    return selection;
 }
 
 export function ensureComparePanelStyles(): void {
@@ -311,9 +201,11 @@ export function createComparePanelContent(
     options: ComparePanelContentOptions,
 ): ComparePanelContentHandle {
     ensureComparePanelStyles();
-    const allTilings = tilingOptions(options.bootstrapData);
+    const allTilings = comparisonTilingOptions(options.bootstrapData);
     const currentWallCapacity = (): number => wallTilingCapacity();
-    const selected = new Set([...defaultSelection(allTilings)].slice(0, currentWallCapacity()));
+    const selected = new Set(
+        [...defaultComparisonSelection(allTilings)].slice(0, currentWallCapacity()),
+    );
 
     let rules: RuleDefinition[] = [];
     let rulesLoaded = false;
@@ -1796,7 +1688,7 @@ export function createComparePanelContent(
 
     function selectionForPreset(preset: TilingPreset): Set<string> {
         if (preset === "representative") {
-            return defaultSelection(allTilings);
+            return defaultComparisonSelection(allTilings);
         }
         if (preset === "regular") {
             return new Set(
@@ -2477,6 +2369,7 @@ export function createComparePanelContent(
             renderTilingChecklist();
             refreshSavedControls(savedRunSelect.value, savedTilingSetSelect.value);
             syncShapeMode();
+            window.requestAnimationFrame(() => focusTilingSearchIfOpen());
         }
     }
 
@@ -2826,9 +2719,9 @@ export function createComparePanelContent(
         );
     }
 
-    function openPattern(pattern: PatternPayload): void {
+    async function openPattern(pattern: PatternPayload): Promise<void> {
         if (options.onOpenPattern) {
-            options.onOpenPattern(pattern);
+            await options.onOpenPattern(pattern);
             options.onRequestClose?.();
             return;
         }
@@ -2839,11 +2732,11 @@ export function createComparePanelContent(
         comparison: SeedComparisonResult,
         result: TopologyComparisonResultPayload,
     ): Node | null {
-        const begin = buildStatePattern(comparison, result, "begin");
+        const begin = buildComparisonStatePattern(comparison, result, "begin");
         if (!begin) {
             return null;
         }
-        const end = buildStatePattern(comparison, result, "end");
+        const end = buildComparisonStatePattern(comparison, result, "end");
         const wrap = el("div", { class: "compare-row-actions" });
         const inPlace = options.onOpenPattern;
         const beginTitle = inPlace
@@ -2853,7 +2746,7 @@ export function createComparePanelContent(
             {
                 label: "Begin",
                 title: beginTitle,
-                onClick: () => openPattern(begin),
+                onClick: () => void openPattern(begin),
             },
         ];
         if (end) {
@@ -2863,7 +2756,7 @@ export function createComparePanelContent(
             openItems.push({
                 label: "End",
                 title: endTitle,
-                onClick: () => openPattern(end),
+                onClick: () => void openPattern(end),
             });
         }
         wrap.append(actionMenu("Open", "Open state", openItems));
@@ -3003,14 +2896,14 @@ export function createComparePanelContent(
                         preview,
                         result.initial_cells_by_id ?? {},
                         liveColor,
-                        buildStatePattern(comparison, result, "begin"),
+                        buildComparisonStatePattern(comparison, result, "begin"),
                     ),
                     thumbnailBlock(
                         "End",
                         preview,
                         result.final_cells_by_id ?? {},
                         liveColor,
-                        buildStatePattern(comparison, result, "end"),
+                        buildComparisonStatePattern(comparison, result, "end"),
                     ),
                 ]),
             );
@@ -3133,10 +3026,24 @@ export function createComparePanelContent(
 
     // The tilings shortcut lands ready to type: sheet open, Tilings disclosure
     // expanded, search focused.
+    function focusTilingSearchIfOpen(): void {
+        if (
+            configSheet.classList.contains("is-open") &&
+            !configTabPanels.get("tilings")?.hidden &&
+            !tilingSearchInput.disabled
+        ) {
+            tilingSearchInput.focus();
+            tilingSearchInput.select();
+        }
+    }
+
     function openTilingsSheet(): void {
         openConfigSheet("tilings");
-        tilingSearchInput.focus();
-        tilingSearchInput.select();
+        focusTilingSearchIfOpen();
+        // Reassert focus after the opening click and sheet layout settle. Some
+        // browsers restore focus to the activating dock button at the end of
+        // the click sequence, which leaves the visible search box inactive.
+        window.requestAnimationFrame(focusTilingSearchIfOpen);
     }
 
     runButton.addEventListener("click", () => void runComparison());

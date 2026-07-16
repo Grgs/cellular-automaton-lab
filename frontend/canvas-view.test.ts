@@ -453,6 +453,8 @@ describe("canvas-view", () => {
 
     it("delegates canvas centering to the grid viewport", async () => {
         const resize = vi.fn(() => ({ ...BASE_METRICS, cssWidth: 120, cssHeight: 60 }));
+        const drawCommittedLayer = vi.fn();
+        const drawCommittedCells = vi.fn();
 
         vi.doMock("./canvas/surface.js", () => ({
             createCanvasSurface: () => ({
@@ -464,7 +466,8 @@ describe("canvas-view", () => {
             }),
         }));
         vi.doMock("./canvas/render-layers.js", () => ({
-            drawCommittedLayer: vi.fn(),
+            drawCommittedLayer,
+            drawCommittedCells,
             drawHoverLayer: vi.fn(),
             drawSelectionLayer: vi.fn(),
             drawPreviewLayer: vi.fn(),
@@ -553,15 +556,16 @@ describe("canvas-view", () => {
 
         const view = createCanvasGridView({ canvas });
 
+        const pinwheelTopology = {
+            ...topologyPayload(),
+            topology_spec: {
+                ...topologyPayload().topology_spec,
+                tiling_family: "pinwheel",
+            },
+        };
         view.render(
             {
-                topology: {
-                    ...topologyPayload(),
-                    topology_spec: {
-                        ...topologyPayload().topology_spec,
-                        tiling_family: "pinwheel",
-                    },
-                },
+                topology: pinwheelTopology,
                 cellStates: [0],
                 previewCellStatesById: null,
             },
@@ -571,6 +575,20 @@ describe("canvas-view", () => {
         );
 
         expect(canvas.style.margin).toBe("0px");
+
+        view.render(
+            {
+                topology: pinwheelTopology,
+                cellStates: [1],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "pinwheel",
+        );
+
+        expect(drawCommittedLayer).toHaveBeenCalledTimes(2);
+        expect(drawCommittedCells).not.toHaveBeenCalled();
 
         view.render(
             {

@@ -1380,7 +1380,9 @@ describe("mountComparePanel", () => {
         const loaded = onOpenPattern.mock.calls.at(0)?.[0] as { cells_by_id?: unknown };
         expect(loaded?.cells_by_id).toBeDefined();
         // the wall closes after loading in place
-        expect(document.querySelector<HTMLElement>(".wall-page")?.hidden).toBe(true);
+        await vi.waitFor(() =>
+            expect(document.querySelector<HTMLElement>(".wall-page")?.hidden).toBe(true),
+        );
         handle.dispose();
     });
 

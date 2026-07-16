@@ -241,14 +241,17 @@ export function createCanvasCommittedRenderer({
             tileColorsEnabled,
         });
         const changedCellIndexes: number[] = [];
+        let stateVectorChanged = previousCellStates.length !== cellStates.length;
         if (
-            adapter.family === "regular" &&
             committedKey === previousCommittedKey &&
             previousCellStates.length === cellStates.length
         ) {
             for (let index = 0; index < cellStates.length; index += 1) {
                 if (cellStates[index] !== previousCellStates[index]) {
-                    changedCellIndexes.push(index);
+                    stateVectorChanged = true;
+                    if (adapter.family === "regular") {
+                        changedCellIndexes.push(index);
+                    }
                 }
             }
         }
@@ -262,7 +265,7 @@ export function createCanvasCommittedRenderer({
                 ...committedLayerInputs(),
                 cellIndexes: changedCellIndexes,
             });
-        } else if (changedCellIndexes.length > 0 || committedKey !== previousCommittedKey) {
+        } else if (stateVectorChanged || committedKey !== previousCommittedKey) {
             drawCommittedGrid();
         }
         previousCommittedKey = committedKey;
