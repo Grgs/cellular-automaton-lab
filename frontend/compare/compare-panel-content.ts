@@ -3027,8 +3027,20 @@ export function createComparePanelContent(
     // expanded, search focused.
     function openTilingsSheet(): void {
         openConfigSheet("tilings");
-        tilingSearchInput.focus();
-        tilingSearchInput.select();
+        const focusSearch = (): void => {
+            if (
+                configSheet.classList.contains("is-open") &&
+                !configTabPanels.get("tilings")?.hidden
+            ) {
+                tilingSearchInput.focus();
+                tilingSearchInput.select();
+            }
+        };
+        focusSearch();
+        // Reassert focus after the opening click and sheet layout settle. Some
+        // browsers restore focus to the activating dock button at the end of
+        // the click sequence, which leaves the visible search box inactive.
+        window.requestAnimationFrame(focusSearch);
     }
 
     runButton.addEventListener("click", () => void runComparison());
