@@ -7,9 +7,12 @@ try:
     from backend.rules.base import AutomatonRule
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.hexlife import HexLifeRule
+    from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
     from backend.rules.trilife import TriLifeRule
+    from backend.rules.wireworld import WireWorldRule
     from backend.simulation.engine import SimulationEngine
-    from backend.simulation.rule_context import build_rule_contexts_for_board
+    from backend.simulation.rule_context import RuleContext, build_rule_contexts_for_board
+    from backend.simulation.rule_context_frames import TopologyFrame
     from backend.simulation.topology import (
         SimulationBoard,
         empty_board,
@@ -21,9 +24,12 @@ except ModuleNotFoundError:
     from backend.rules.base import AutomatonRule
     from backend.rules.conway import ConwayLifeRule
     from backend.rules.hexlife import HexLifeRule
+    from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
     from backend.rules.trilife import TriLifeRule
+    from backend.rules.wireworld import WireWorldRule
     from backend.simulation.engine import SimulationEngine
-    from backend.simulation.rule_context import build_rule_contexts_for_board
+    from backend.simulation.rule_context import RuleContext, build_rule_contexts_for_board
+    from backend.simulation.rule_context_frames import TopologyFrame
     from backend.simulation.topology import (
         SimulationBoard,
         empty_board,
@@ -44,6 +50,25 @@ def reference_step_board(board: SimulationBoard, rule: AutomatonRule) -> Simulat
 
 
 class SimulationEngineTests(unittest.TestCase):
+    def test_engine_uses_rule_batch_implementation(self) -> None:
+        class BatchRule(AutomatonRule):
+            calls = 0
+
+            def next_state(self, ctx: RuleContext) -> int:
+                raise AssertionError(f"Unexpected per-cell dispatch for {ctx!r}")
+
+            def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+                self.calls += 1
+                return [7] * frame.cell_count
+
+        rule = BatchRule()
+        board = board_from_grid(BLINKER_GRID)
+
+        next_board = SimulationEngine().step_board(board, rule)
+
+        self.assertEqual(rule.calls, 1)
+        self.assertEqual(next_board.cell_states, [7] * board.topology.cell_count)
+
     def test_engine_steps_blinker_pattern(self) -> None:
         engine = SimulationEngine()
         rule = ConwayLifeRule()
@@ -171,6 +196,21 @@ class SimulationEngineTests(unittest.TestCase):
         expected = reference_step_board(board, ArchLife488Rule())
 
         self.assertEqual(optimized.cell_states, expected.cell_states)
+
+    def test_engine_step_board_matches_reference_logic_for_multistate_rules(self) -> None:
+        board = board_from_grid(
+            [
+                [0, 1, 2, 3],
+                [3, 0, 1, 2],
+                [2, 3, 0, 1],
+                [1, 2, 3, 0],
+            ]
+        )
+        for rule in (WireWorldRule(), PenroseGreenbergHastingsRule()):
+            with self.subTest(rule=rule.name):
+                optimized = SimulationEngine().step_board(board, rule)
+                expected = reference_step_board(board, rule)
+                self.assertEqual(optimized.cell_states, expected.cell_states)
 
 
 if __name__ == "__main__":

@@ -15,8 +15,10 @@ from backend.rules.base import AutomatonRule
 from backend.rules.conway import ConwayLifeRule
 from backend.rules.hexlife import HexLifeRule
 from backend.rules.hexwhirlpool import HexWhirlpoolRule
+from backend.rules.penrose_greenberg_hastings import PenroseGreenbergHastingsRule
 from backend.rules.trilife import TriLifeRule
 from backend.rules.whirlpool import WhirlpoolRule
+from backend.rules.wireworld import WireWorldRule
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.rule_context import build_rule_contexts_for_board
 from backend.simulation.topology import (
@@ -29,11 +31,9 @@ TRunnerResult = TypeVar("TRunnerResult")
 
 
 def reference_step_board(
-    engine: SimulationEngine,
     board: SimulationBoard,
     rule: AutomatonRule,
 ) -> SimulationBoard:
-    del engine
     topology = board.topology
     if topology.cell_count == 0:
         return board.clone()
@@ -68,30 +68,11 @@ def median_ms[TRunnerResult](
     return statistics.median(timings)
 
 
-def benchmark_case(name: str, rule: AutomatonRule, board: SimulationBoard) -> dict[str, float]:
+def benchmark_case(rule: AutomatonRule, board: SimulationBoard) -> dict[str, float]:
     optimized_engine = SimulationEngine()
-    reference_engine = SimulationEngine()
-    del name
 
     optimized_ms = median_ms(lambda: optimized_engine.step_board(board, rule))
-    reference_ms = median_ms(lambda: reference_step_board(reference_engine, board, rule))
-    speedup = reference_ms / optimized_ms if optimized_ms else float("inf")
-    return {
-        "optimized_ms": optimized_ms,
-        "reference_ms": reference_ms,
-        "speedup": speedup,
-    }
-
-
-def benchmark_board_case(
-    name: str, rule: AutomatonRule, board: SimulationBoard
-) -> dict[str, float]:
-    optimized_engine = SimulationEngine()
-    reference_engine = SimulationEngine()
-    del name
-
-    optimized_ms = median_ms(lambda: optimized_engine.step_board(board, rule))
-    reference_ms = median_ms(lambda: reference_step_board(reference_engine, board, rule))
+    reference_ms = median_ms(lambda: reference_step_board(board, rule))
     speedup = reference_ms / optimized_ms if optimized_ms else float("inf")
     return {
         "optimized_ms": optimized_ms,
@@ -107,6 +88,12 @@ def main() -> int | None:
         ("triangle-trilife", TriLifeRule(), build_board("triangle", 180, 120, 1, 303)),
         ("square-whirlpool", WhirlpoolRule(), build_board("square", 150, 100, 4, 404)),
         ("hex-hexwhirlpool", HexWhirlpoolRule(), build_board("hex", 150, 100, 4, 505)),
+        ("square-wireworld", WireWorldRule(), build_board("square", 180, 120, 3, 707)),
+        (
+            "hex-greenberg",
+            PenroseGreenbergHastingsRule(),
+            build_board("hex", 180, 120, 3, 808),
+        ),
         (
             "arch-archlife488",
             ArchLife488Rule(),
@@ -115,10 +102,10 @@ def main() -> int | None:
     ]
 
     print("Engine benchmark (median ms, lower is better)")
-    print("Baseline = helper-driven reference step that approximates the pre-optimization path")
+    print("Baseline = per-cell RuleContext dispatch through next_state()")
     print("")
     for name, rule, board in board_cases:
-        result = benchmark_case(name, rule, board)
+        result = benchmark_case(rule, board)
         print(
             f"{name:18s}  optimized={result['optimized_ms']:8.2f} ms  "
             f"reference={result['reference_ms']:8.2f} ms  speedup={result['speedup']:5.2f}x"

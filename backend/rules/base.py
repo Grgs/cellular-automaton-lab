@@ -8,6 +8,7 @@ from backend.payload_types import CellStatePayload
 
 if TYPE_CHECKING:
     from backend.simulation.rule_context import RuleContext
+    from backend.simulation.rule_context_frames import TopologyFrame
 
 
 @dataclass(frozen=True)
@@ -80,3 +81,12 @@ class AutomatonRule(ABC):
     @abstractmethod
     def next_state(self, ctx: RuleContext) -> int:
         """Return the next state for a cell using the universal rule context."""
+
+    def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+        """Return one generation, allowing rules to provide a batch implementation."""
+        from backend.simulation.rule_context import RuleContext
+
+        return [
+            self.next_state(RuleContext(frame, cell_states, index))
+            for index in range(frame.cell_count)
+        ]
