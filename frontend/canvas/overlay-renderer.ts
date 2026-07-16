@@ -14,6 +14,7 @@ export function drawTransientOverlaySnapshot(
     const shared = {
         geometry: renderState.geometry,
         topology: renderState.topology,
+        topologyIndex: renderState.topologyIndex,
         metrics: renderState.metrics,
         geometryCache: renderState.geometryCache,
         canvasColors: renderState.canvasColors,
