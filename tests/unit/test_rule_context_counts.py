@@ -61,6 +61,38 @@ class CountNeighborsTests(unittest.TestCase):
                     )
                     self.assertEqual(ctx.count_live_neighbors(turn=turn), expected_live)
 
+    def test_directional_counts_match_independent_neighbor_scan(self) -> None:
+        for ctx in self._seeded_contexts("square"):
+            frame = ctx.frame
+            neighbors = frame.cells[frame.index_for(ctx.cell_id)].neighbors
+            for states in ((), (1,), (1, 2)):
+                matching = [
+                    neighbor
+                    for neighbor in neighbors
+                    if not states or ctx.state_for(frame.cells[neighbor.index].id) in states
+                ]
+                expected = {
+                    "outward": sum(neighbor.radial == "outward" for neighbor in matching),
+                    "inward": sum(neighbor.radial == "inward" for neighbor in matching),
+                    "clockwise": sum(neighbor.turn == "clockwise" for neighbor in matching),
+                    "counterclockwise": sum(
+                        neighbor.turn == "counterclockwise" for neighbor in matching
+                    ),
+                    "total": len(matching),
+                }
+                with self.subTest(cell=ctx.cell_id, states=states):
+                    self.assertEqual(ctx.directional_counts(*states), expected)
+
+    def test_neighbor_state_queries_match_neighbor_state_payload(self) -> None:
+        for ctx in self._seeded_contexts("hex"):
+            neighbor_ids = ctx.neighbor_ids()
+            expected_ids = tuple(
+                cell_id for cell_id in neighbor_ids if ctx.state_for(cell_id) in (1, 2)
+            )
+            with self.subTest(cell=ctx.cell_id):
+                self.assertEqual(ctx.neighbor_ids_with(1, 2), expected_ids)
+                self.assertEqual(ctx.has_neighbor_state(1, 2), bool(expected_ids))
+
 
 if __name__ == "__main__":
     unittest.main()

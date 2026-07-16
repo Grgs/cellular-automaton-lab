@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
+from backend.simulation.rule_context_frames import TopologyFrame
 
 BINARY_STATES = (
     CellStateDefinition(0, "Dead", "#f8f1e5"),
@@ -37,6 +38,19 @@ class BinaryLifeRule(AutomatonRule):
             survives=self.survives,
         )
 
+    def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+        births = self.births
+        survives = self.survives
+        next_states: list[int] = []
+        append_state = next_states.append
+        for index, cell in enumerate(frame.cells):
+            live_neighbors = 0
+            for neighbor in cell.neighbors:
+                live_neighbors += cell_states[neighbor.index] != 0
+            thresholds = survives if cell_states[index] == 1 else births
+            append_state(1 if live_neighbors in thresholds else 0)
+        return next_states
+
 
 class KindLifeRule(AutomatonRule):
     states = BINARY_STATES
@@ -64,3 +78,20 @@ class KindLifeRule(AutomatonRule):
             births=births,
             survives=survives,
         )
+
+    def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+        thresholds_by_kind: dict[str, tuple[frozenset[int], frozenset[int]]] = {}
+        next_states: list[int] = []
+        append_state = next_states.append
+        for index, cell in enumerate(frame.cells):
+            thresholds = thresholds_by_kind.get(cell.kind)
+            if thresholds is None:
+                thresholds = self.kind_thresholds[self.resolve_kind(cell.kind)]
+                thresholds_by_kind[cell.kind] = thresholds
+            live_neighbors = 0
+            for neighbor in cell.neighbors:
+                live_neighbors += cell_states[neighbor.index] != 0
+            births, survives = thresholds
+            active_thresholds = survives if cell_states[index] == 1 else births
+            append_state(1 if live_neighbors in active_thresholds else 0)
+        return next_states

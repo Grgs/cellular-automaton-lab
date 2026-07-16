@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from backend.rules.base import AutomatonRule
-from backend.simulation.rule_context import RuleContext, topology_frame_for
+from backend.simulation.rule_context import topology_frame_for
 from backend.simulation.topology import SimulationBoard
 
 
@@ -16,8 +16,5 @@ class SimulationEngine:
         frame = topology_frame_for(board.topology)
         if frame.cell_count == 0:
             return board.clone()
-        next_states = [
-            rule.next_state(RuleContext(frame, board.cell_states, index))
-            for index in range(frame.cell_count)
-        ]
+        next_states = rule.next_states(frame, board.cell_states)
         return SimulationBoard(topology=board.topology, cell_states=next_states)

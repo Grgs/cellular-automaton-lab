@@ -131,7 +131,7 @@ class RuleContext:
         # Hot path: count over raw neighbor frames + cell states directly, without
         # materialising a NeighborSelection per neighbor (radial/turn live on the
         # neighbor frame). This is the dominant cost when stepping Life-like rules.
-        allowed = None if not states else set(states)
+        allowed = states or None
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         cell_states = self._cell_states
         count = 0
@@ -171,15 +171,17 @@ class RuleContext:
         turn: str | None = None,
         cell_id: str | None = None,
     ) -> bool:
-        return any(
-            True
-            for _ in self._iter_neighbor_selections(
-                states=states,
-                radial=radial,
-                turn=turn,
-                cell_id=cell_id,
-            )
-        )
+        allowed = states or None
+        resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
+        cell_states = self._cell_states
+        for neighbor in self._frame.cells[resolved_index].neighbors:
+            if radial is not None and neighbor.radial != radial:
+                continue
+            if turn is not None and neighbor.turn != turn:
+                continue
+            if allowed is None or cell_states[neighbor.index] in allowed:
+                return True
+        return False
 
     def neighbor_ids_with(
         self,
@@ -188,25 +190,41 @@ class RuleContext:
         turn: str | None = None,
         cell_id: str | None = None,
     ) -> tuple[str, ...]:
+        allowed = states or None
+        resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
+        frame_cells = self._frame.cells
+        cell_states = self._cell_states
         return tuple(
-            selection.id
-            for selection in self._iter_neighbor_selections(
-                states=states,
-                radial=radial,
-                turn=turn,
-                cell_id=cell_id,
-            )
+            frame_cells[neighbor.index].id
+            for neighbor in frame_cells[resolved_index].neighbors
+            if (radial is None or neighbor.radial == radial)
+            and (turn is None or neighbor.turn == turn)
+            and (allowed is None or cell_states[neighbor.index] in allowed)
         )
 
     def directional_counts(self, *states: int, cell_id: str | None = None) -> dict[str, int]:
+        allowed = states or None
+        resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
+        cell_states = self._cell_states
+        outward = inward = clockwise = counterclockwise = total = 0
+        for neighbor in self._frame.cells[resolved_index].neighbors:
+            if allowed is not None and cell_states[neighbor.index] not in allowed:
+                continue
+            total += 1
+            if neighbor.radial == "outward":
+                outward += 1
+            elif neighbor.radial == "inward":
+                inward += 1
+            if neighbor.turn == "clockwise":
+                clockwise += 1
+            elif neighbor.turn == "counterclockwise":
+                counterclockwise += 1
         return {
-            "outward": self.count_neighbors(*states, radial="outward", cell_id=cell_id),
-            "inward": self.count_neighbors(*states, radial="inward", cell_id=cell_id),
-            "clockwise": self.count_neighbors(*states, turn="clockwise", cell_id=cell_id),
-            "counterclockwise": self.count_neighbors(
-                *states, turn="counterclockwise", cell_id=cell_id
-            ),
-            "total": self.count_neighbors(*states, cell_id=cell_id),
+            "outward": outward,
+            "inward": inward,
+            "clockwise": clockwise,
+            "counterclockwise": counterclockwise,
+            "total": total,
         }
 
     def in_shell(self, *ranks: int) -> bool:
@@ -265,7 +283,7 @@ class RuleContext:
         turn: str | None = None,
         cell_id: str | None = None,
     ) -> Iterator[NeighborSelection]:
-        allowed = None if not states else set(states)
+        allowed = states or None
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         for neighbor in self._frame.cells[resolved_index].neighbors:
             frame_cell = self._frame.cells[neighbor.index]
