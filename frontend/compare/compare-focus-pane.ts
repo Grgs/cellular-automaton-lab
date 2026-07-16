@@ -179,6 +179,13 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         }
     }
 
+    let disposed = false;
+    const reportActiveError = (error: unknown): void => {
+        if (!disposed) {
+            onError(error);
+        }
+    };
+
     const pane = createEditablePane({
         canvas,
         viewport,
@@ -205,13 +212,13 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
             redoButton.disabled = !pane.canRedo();
             renderPalette();
         },
-        onError,
+        onError: reportActiveError,
     });
 
-    stepButton.addEventListener("click", () => void pane.step().catch(onError));
-    runButton.addEventListener("click", () => void pane.runToggle().catch(onError));
-    undoButton.addEventListener("click", () => void pane.undo().catch(onError));
-    redoButton.addEventListener("click", () => void pane.redo().catch(onError));
+    stepButton.addEventListener("click", () => void pane.step().catch(reportActiveError));
+    runButton.addEventListener("click", () => void pane.runToggle().catch(reportActiveError));
+    undoButton.addEventListener("click", () => void pane.undo().catch(reportActiveError));
+    redoButton.addEventListener("click", () => void pane.redo().catch(reportActiveError));
 
     // The pane only re-fits its canvas when a new snapshot arrives (a poll
     // tick or an action). Moving between the gallery and speaker view resizes
@@ -221,7 +228,6 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => pane.render());
     resizeObserver?.observe(viewport);
 
-    let disposed = false;
     function dispose(): void {
         if (disposed) {
             return;
@@ -229,7 +235,7 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         disposed = true;
         resizeObserver?.disconnect();
         pane.dispose();
-        void Promise.resolve(backend.dispose()).catch(onError);
+        void Promise.resolve(backend.dispose()).catch(reportActiveError);
     }
     discardButton.addEventListener("click", () => {
         dispose();
@@ -246,7 +252,7 @@ export function mountFocusPane(options: FocusPaneMountOptions): FocusPaneHandle 
         .then(() =>
             initialPaint ? pane.applyCellEdit(initialPaint.cellId, initialPaint.state) : undefined,
         )
-        .catch(onError);
+        .catch(reportActiveError);
 
     return {
         element: root,
