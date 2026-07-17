@@ -340,6 +340,45 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         )
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
 
+    def test_wall_playback_controls_preserve_the_shared_clock_contract(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        play_pause = case.page.locator('.compare-filmstrip-btn[aria-label="Play / pause"]')
+        reset = case.page.locator('.compare-filmstrip-btn[title="Back to the seed"]')
+        step_forward = case.page.locator(
+            '.compare-filmstrip-btn[title="Step forward one generation"]'
+        )
+        scrubber = case.page.locator('input[aria-label="Generation"]')
+        speed = case.page.locator('select[aria-label="Playback speed"]')
+        counter = case.page.locator(".compare-filmstrip-counter")
+        frame_max = scrubber.get_attribute("max")
+        if frame_max is None:
+            raise AssertionError("generation scrubber did not expose a maximum")
+        final_generation = str(frame_max)
+
+        reset.click()
+        expect(counter).to_have_text(f"gen 0 / {final_generation}")
+        step_forward.click()
+        expect(counter).to_have_text(f"gen 1 / {final_generation}")
+        scrubber.fill("3")
+        expect(counter).to_have_text(f"gen 3 / {final_generation}")
+        speed.select_option("2")
+        expect(speed).to_have_value("2")
+
+        play_pause.click()
+        expect(play_pause).to_contain_text("Pause")
+        case.page.wait_for_function(
+            "expected => document.querySelector('.compare-filmstrip-counter')?.textContent !== expected",
+            arg=f"gen 3 / {final_generation}",
+        )
+        play_pause.click()
+        expect(play_pause).to_contain_text("Play")
+        reset.click()
+        expect(counter).to_have_text(f"gen 0 / {final_generation}")
+
     def test_space_on_lab_route_button_navigates_without_starting_playback(self) -> None:
         # Space is the native activation key for the header route button. The
         # wall's global playback shortcut must not steal it and start the clock.

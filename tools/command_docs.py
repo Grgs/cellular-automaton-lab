@@ -360,6 +360,16 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("python -m tools perf latency",),
     ),
     CommandDoc(
+        ("perf", "baseline"),
+        "perf",
+        "Record refactor baselines for topology, mutation, comparison, filmstrip, and bundle size.",
+        "Emits a repeatable summary or JSON report for same-process before/after comparisons.",
+        (
+            "python -m tools perf baseline",
+            "python -m tools perf baseline --format json --output output/refactor-baseline.json",
+        ),
+    ),
+    CommandDoc(
         ("repo", "processes"),
         "repo",
         "Inspect or clean up repo-scoped helper processes.",

@@ -113,6 +113,7 @@ describe("canvas-view", () => {
 
     it("redraws transient layers for hover changes without redrawing the committed layer", async () => {
         const drawCommittedLayer = vi.fn();
+        const drawCommittedCells = vi.fn();
         const drawHoverLayer = vi.fn();
         const drawSelectionLayer = vi.fn();
         const drawPreviewLayer = vi.fn();
@@ -130,6 +131,7 @@ describe("canvas-view", () => {
         }));
         vi.doMock("./canvas/render-layers.js", () => ({
             drawCommittedLayer,
+            drawCommittedCells,
             drawHoverLayer,
             drawSelectionLayer,
             drawPreviewLayer,
@@ -211,11 +213,22 @@ describe("canvas-view", () => {
         const { createCanvasGridView } = await import("./canvas-view.js");
         const canvas = document.createElement("canvas");
         const view = createCanvasGridView({ canvas });
+        const stableTopology: TopologyPayload = {
+            ...topologyPayload(),
+            cells: Array.from({ length: 4 }, (_, index) => ({
+                id: `square:${index % 2}:${Math.floor(index / 2)}`,
+                kind: "cell",
+                neighbors: [],
+            })),
+            topology_spec: { ...topologyPayload().topology_spec, width: 2, height: 2 },
+            width: 2,
+            height: 2,
+        };
 
         view.render(
             {
-                topology: topologyPayload(),
-                cellStates: [0],
+                topology: stableTopology,
+                cellStates: [0, 0, 0, 0],
                 previewCellStatesById: null,
             },
             12,
@@ -224,7 +237,22 @@ describe("canvas-view", () => {
         );
 
         expect(drawCommittedLayer).toHaveBeenCalledTimes(1);
+        expect(drawCommittedCells).not.toHaveBeenCalled();
         expect(drawHoverLayer).not.toHaveBeenCalled();
+
+        view.render(
+            {
+                topology: stableTopology,
+                cellStates: [1, 0, 0, 0],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "square",
+        );
+
+        expect(drawCommittedLayer).toHaveBeenCalledTimes(1);
+        expect(drawCommittedCells).toHaveBeenCalledTimes(1);
 
         const restoreCallsAfterRender = restoreCommittedSurface.mock.calls.length;
         view.setHoveredCell({ id: "square:0:0", x: 0, y: 0 });

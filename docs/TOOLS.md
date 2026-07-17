@@ -403,6 +403,17 @@ Uses a real Playwright browser and server host for end-to-end timing investigati
 python -m tools perf latency
 ```
 
+### `python -m tools perf baseline`
+
+Record refactor baselines for topology, mutation, comparison, filmstrip, and bundle size.
+
+Emits a repeatable summary or JSON report for same-process before/after comparisons.
+
+```powershell
+python -m tools perf baseline
+python -m tools perf baseline --format json --output output/refactor-baseline.json
+```
+
 ## Repo
 
 Run repo-level maintenance commands.

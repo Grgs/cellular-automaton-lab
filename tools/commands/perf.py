@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from tools import bench_engine, profile_tiling_latency
+from tools import bench_engine, profile_refactor_baseline, profile_tiling_latency
 from tools.cli_support import add_passthrough_command
 from tools.command_docs import command_doc
 
@@ -27,6 +27,10 @@ def _latency_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _baseline_parser() -> argparse.ArgumentParser:
+    return profile_refactor_baseline.build_parser()
+
+
 def _run_bench(argv: list[str] | None = None) -> int:
     _bench_parser().parse_args(argv)
     return bench_engine.main() or 0
@@ -35,6 +39,10 @@ def _run_bench(argv: list[str] | None = None) -> int:
 def _run_latency(argv: list[str] | None = None) -> int:
     _latency_parser().parse_args(argv)
     return profile_tiling_latency.main(argv) or 0
+
+
+def _run_baseline(argv: list[str] | None = None) -> int:
+    return profile_refactor_baseline.main(argv)
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -51,4 +59,11 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("perf", "latency"),
         target_main=_run_latency,
         parser_factory=_latency_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="baseline",
+        doc=command_doc("perf", "baseline"),
+        target_main=_run_baseline,
+        parser_factory=_baseline_parser,
     )
