@@ -95,6 +95,7 @@ import {
 } from "./compare-limits.js";
 import { createCompareWorkspaceStore } from "./compare-workspace-store.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
+import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
 // patches are not offered a thumbnail (the backend would reject them anyway).
@@ -408,6 +409,16 @@ export function createComparePanelContent(
         },
         [dockGlyph("⚙"), dockLabel("Setup")],
     );
+    const inspectorButton = el(
+        "button",
+        {
+            class: "compare-dock-icon",
+            type: "button",
+            title: "Inspect the selected board",
+            "aria-label": "Inspect selected board",
+        },
+        [dockGlyph("ⓘ"), dockLabel("Inspector")],
+    );
     // One click from the wall to the searchable tiling checklist: opens the
     // config sheet with the Tilings disclosure expanded and search focused.
     const tilingsButton = el(
@@ -427,6 +438,15 @@ export function createComparePanelContent(
             type: "button",
             title: "Close configuration",
             "aria-label": "Close configuration",
+        },
+        ["✕"],
+    );
+    const inspectorCloseButton = el(
+        "button",
+        {
+            class: "compare-close compare-inspector-close",
+            type: "button",
+            "aria-label": "Close inspector",
         },
         ["✕"],
     );
@@ -636,6 +656,23 @@ export function createComparePanelContent(
             orderedBoards: config.geometries,
         }));
         return config;
+    }
+
+    function selectedBoardGeometry(): string | null {
+        return currentFocusGeometry ?? workspaceStore.getState().selectedBoard;
+    }
+
+    function selectedBoardElement(): HTMLElement | null {
+        const geometry = selectedBoardGeometry();
+        if (!geometry || !activeFilmstrip || !filmstripView) {
+            return null;
+        }
+        const index = activeFilmstrip.tilings.findIndex((tiling) => tiling.geometry === geometry);
+        return index < 0
+            ? null
+            : (filmstripView.element.querySelectorAll<HTMLElement>(".compare-filmstrip-board")[
+                  index
+              ] ?? null);
     }
 
     const workspaceScheduler = createLatestConfigScheduler<ScheduledCompareRun>({
@@ -1158,7 +1195,7 @@ export function createComparePanelContent(
     }
 
     async function forkFocusedBoardLive(): Promise<void> {
-        const geometry = currentFocusGeometry;
+        const geometry = selectedBoardGeometry();
         if (!filmstripView || !geometry) {
             return;
         }
@@ -1166,7 +1203,7 @@ export function createComparePanelContent(
     }
 
     function openFocusedBoardInLab(): void {
-        const geometry = currentFocusGeometry;
+        const geometry = selectedBoardGeometry();
         if (!filmstripView || !activeFilmstrip || !geometry) {
             return;
         }
@@ -1237,10 +1274,8 @@ export function createComparePanelContent(
         seedPreviewBlock,
     ]);
 
-    // The hero's toolbelt overlays the focused board: return to the wall, open
-    // the current frame in the Lab, and -- when the host supports it -- edit the
-    // focused frame live in place. It is handed to the filmstrip view, which
-    // parks it on whichever board is the hero.
+    // The inspector toolbelt acts on the selected board: return from focus,
+    // open the current frame in the Lab, or edit it live when the host supports it.
     const heroBackButton = el(
         "button",
         {
@@ -1270,10 +1305,32 @@ export function createComparePanelContent(
         },
         ["Edit live"],
     );
+    const inspectorReplaceButton = el(
+        "button",
+        {
+            class: "compare-hero-tool compare-inspector-replace",
+            type: "button",
+            title: "Replace the selected board",
+        },
+        ["Replace"],
+    );
+    const inspectorRemoveButton = el(
+        "button",
+        {
+            class: "compare-hero-tool compare-inspector-remove",
+            type: "button",
+            title: "Remove the selected board",
+        },
+        ["Remove"],
+    );
+    copyRunButton.classList.add("compare-hero-tool");
     const heroToolbelt = el("div", { class: "compare-hero-toolbelt" }, [
         heroBackButton,
         heroOpenLabButton,
         ...(focusLiveEnabled ? [heroForkButton] : []),
+        inspectorReplaceButton,
+        inspectorRemoveButton,
+        copyRunButton,
     ]);
 
     const stageMain = el("div", { class: "compare-stage-main" }, [
@@ -1287,12 +1344,11 @@ export function createComparePanelContent(
     const explainerBody = el("div", { class: "compare-explainer-body" });
     const explainerPanel = el(
         "details",
-        { class: "compare-explainer", "aria-label": "How the comparison works" },
+        { class: "compare-explainer", "aria-label": "How the comparison works", open: true },
         [explainerTitle, explainerBody],
     );
     const stageFrame = el("div", { class: "compare-stage-frame" }, [
-        setupStrip,
-        el("div", { class: "compare-stage-body" }, [stageMain, explainerPanel]),
+        el("div", { class: "compare-stage-body" }, [stageMain]),
     ]);
 
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
@@ -1311,8 +1367,8 @@ export function createComparePanelContent(
         scheduleWallRerun();
     });
 
-    // Configuration and data live in a tabbed bottom sheet the dock's gear
-    // slides up, closed by default, so the stage owns the whole first screen.
+    // Setup tabs coordinate the persistent desktop sidebars and the exclusive
+    // narrow-screen drawers without recreating their interactive content.
     const configTabButtons = new Map<ConfigTab, HTMLButtonElement>();
     const configTabPanels = new Map<ConfigTab, HTMLElement>();
     const configTabs = el(
@@ -1359,40 +1415,67 @@ export function createComparePanelContent(
         el("div", { class: "compare-help" }, comparisonHelpContent()),
     ]);
     const savedConfigPanel = configPanel("saved", [savedCompareControls()]);
-    const configSheet = el("div", { class: "compare-config-sheet", inert: true }, [
-        el("div", { class: "compare-config-sheet-header" }, [
-            el("div", { class: "compare-config-sheet-title", textContent: "Configure comparison" }),
-            configSheetCloseButton,
-        ]),
-        configTabs,
-        el("div", { class: "compare-config-sheet-body" }, [
-            setupConfigPanel,
-            tilingsConfigPanel,
-            analysisConfigPanel,
-            helpConfigPanel,
-            savedConfigPanel,
-        ]),
-    ]);
+    const configSheet = el(
+        "aside",
+        {
+            class: "compare-config-sheet compare-setup-sidebar",
+            inert: true,
+            "aria-label": "Comparison setup",
+        },
+        [
+            el("div", { class: "compare-config-sheet-header" }, [
+                el("div", { class: "compare-config-sheet-title", textContent: "Setup" }),
+                configSheetCloseButton,
+            ]),
+            configTabs,
+            el("div", { class: "compare-config-sheet-body" }, [
+                setupStrip,
+                setupConfigPanel,
+                tilingsConfigPanel,
+                helpConfigPanel,
+                savedConfigPanel,
+            ]),
+        ],
+    );
+    const inspector = el(
+        "aside",
+        {
+            class: "compare-inspector",
+            inert: true,
+            "aria-label": "Selected board inspector",
+        },
+        [
+            el("div", { class: "compare-inspector-header" }, [
+                el("strong", { textContent: "Inspector" }),
+                inspectorCloseButton,
+            ]),
+            el("div", { class: "compare-inspector-body" }, [
+                heroToolbelt,
+                explainerPanel,
+                analysisConfigPanel,
+            ]),
+        ],
+    );
     activateConfigTab("setup");
 
-    const root = el("div", { class: "compare-content" }, [
-        // The stage plus its docked transport fill the viewport; the config sheet
-        // overlays from the bottom on demand. The synchronized side-by-side is the
-        // point of the page, so it leads and the video-style transport docks
-        // directly beneath it.
-        el("div", { class: "wall-screen" }, [
-            el("div", { class: "compare-stage" }, [stageFrame]),
-            el("div", { class: "compare-dock" }, [
-                filmstripTransport.element,
-                editModeButton,
-                tilingsButton,
-                configButton,
-                copyRunButton,
-                statusLine,
-            ]),
-        ]),
-        configSheet,
+    const boardWall = el("main", { class: "compare-stage compare-board-wall" }, [stageFrame]);
+    const dock = el("div", { class: "compare-dock" }, [
+        filmstripTransport.element,
+        editModeButton,
+        tilingsButton,
+        configButton,
+        inspectorButton,
+        statusLine,
     ]);
+    const workspaceLayout = createCompareWorkspaceLayout({
+        setup: configSheet,
+        boardWall,
+        inspector,
+        dock,
+        setupToggle: configButton,
+        inspectorToggle: inspectorButton,
+    });
+    const root = el("div", { class: "compare-content" }, [workspaceLayout.element]);
 
     renderTilingChecklist();
     refreshSavedControls();
@@ -1495,6 +1578,7 @@ export function createComparePanelContent(
             configTabButtons.get(tab)?.focus();
         }
         if (tab === "analysis") {
+            workspaceLayout.openInspector();
             if (isFilmstripCurrent()) {
                 scheduleAnalysis();
             } else {
@@ -1926,10 +2010,18 @@ export function createComparePanelContent(
         // Already-forked hero: Discard (in the pane's own chip) is the way to
         // undo it, so the toolbelt's fork button hides rather than offering a
         // confusing second fork.
-        heroForkButton.hidden =
-            currentFocusGeometry !== null && forkedBoards.has(currentFocusGeometry);
+        const inspectedGeometry = selectedBoardGeometry();
+        heroForkButton.hidden = inspectedGeometry !== null && forkedBoards.has(inspectedGeometry);
         heroForkButton.disabled = running;
-        heroOpenLabButton.disabled = running || currentFocusGeometry === null;
+        heroOpenLabButton.disabled = running || inspectedGeometry === null;
+        heroBackButton.disabled = currentFocusGeometry === null;
+        inspectorButton.disabled = activeFilmstrip === null;
+        const inspectedBoard = selectedBoardElement();
+        inspectorReplaceButton.disabled = running || inspectedBoard === null;
+        inspectorRemoveButton.disabled =
+            running ||
+            inspectedBoard?.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
+                ?.disabled !== false;
         // Painting needs boards on the stage; the toggle waits for a run.
         editModeButton.disabled = running || !activeFilmstrip;
         editModeButton.title = running ? WAIT_FOR_WALL_UPDATE : "Edit the seed by painting boards";
@@ -2013,9 +2105,10 @@ export function createComparePanelContent(
     }
 
     function updateExplainer(): void {
-        if (currentFocusGeometry && activeFilmstrip) {
+        const inspectedGeometry = selectedBoardGeometry();
+        if (inspectedGeometry && activeFilmstrip) {
             const tiling = activeFilmstrip.tilings.find(
-                (candidate) => candidate.geometry === currentFocusGeometry,
+                (candidate) => candidate.geometry === inspectedGeometry,
             );
             if (tiling) {
                 const frameIndex = filmstripView?.currentFrameIndex() ?? 0;
@@ -2578,7 +2671,7 @@ export function createComparePanelContent(
     async function runDefaultFilmstrip(config: CompareRunConfig): Promise<void> {
         await ensureRules();
         await applyRunConfig(defaultFilmstripConfig(config));
-        await runFilmstrip({ initialFrame: FEATURED_COMPARE_DEMO_STILL_FRAME });
+        await runFilmstrip();
     }
 
     function highlightGeometry(geometry: string | null): void {
@@ -2719,6 +2812,11 @@ export function createComparePanelContent(
             workspaceStore.update((state) => ({
                 ...state,
                 orderedBoards: filmstrip.tilings.map((tiling) => tiling.geometry),
+                selectedBoard: filmstrip.tilings.some(
+                    (tiling) => tiling.geometry === state.selectedBoard,
+                )
+                    ? state.selectedBoard
+                    : (filmstrip.tilings[0]?.geometry ?? null),
                 results: { ...state.results, filmstrip },
                 playback: { frameIndex: 0, playing: false },
             }));
@@ -2760,7 +2858,6 @@ export function createComparePanelContent(
                 filmstripView.setManagementBlocked(
                     failedWallUpdate ? FAILED_UPDATE_MANAGEMENT_REASON : null,
                 );
-                filmstripView.setHeroToolbelt(heroToolbelt);
                 filmstripView.setEditMode(editMode);
                 filmstripArea.append(filmstripView.element);
             }
@@ -3122,23 +3219,14 @@ export function createComparePanelContent(
         applyFocusFromHash();
     }
 
-    // The gear slides the configuration sheet up over the stage; the sheet's own
-    // close button or Escape slides it back down. `inert` keeps the closed sheet
-    // out of the tab order and off assistive tech.
+    // The dock toggles the setup region. On narrow screens Escape closes the
+    // active drawer; `inert` keeps every closed region out of the tab order.
     function openConfigSheet(tab: ConfigTab = "setup"): void {
         activateConfigTab(tab);
-        if (!configSheet.classList.contains("is-open")) {
-            configSheet.removeAttribute("inert");
-            configSheet.classList.add("is-open");
-        }
+        workspaceLayout.openSetup();
     }
     function closeConfigIfOpen(): boolean {
-        if (!configSheet.classList.contains("is-open")) {
-            return false;
-        }
-        configSheet.classList.remove("is-open");
-        configSheet.setAttribute("inert", "");
-        return true;
+        return window.innerWidth < 960 && workspaceLayout.closeDrawer();
     }
 
     // The tilings shortcut lands ready to type: sheet open, Tilings disclosure
@@ -3176,11 +3264,31 @@ export function createComparePanelContent(
     heroOpenLabButton.addEventListener("click", openFocusedBoardInLab);
     heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
+    inspectorReplaceButton.addEventListener("click", () => {
+        selectedBoardElement()
+            ?.querySelector<HTMLButtonElement>(".compare-filmstrip-label")
+            ?.click();
+    });
+    inspectorRemoveButton.addEventListener("click", () => {
+        selectedBoardElement()
+            ?.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
+            ?.click();
+    });
     copyRunButton.addEventListener("click", copyRunLink);
-    configButton.addEventListener("click", () => openConfigSheet("setup"));
+    configButton.addEventListener("click", () => {
+        if (!workspaceLayout.closeSetup()) {
+            openConfigSheet("setup");
+        }
+    });
+    inspectorButton.addEventListener("click", () => {
+        if (!workspaceLayout.closeInspector()) {
+            workspaceLayout.openInspector();
+        }
+    });
     setupTilingsItem.addEventListener("click", openTilingsSheet);
     tilingsButton.addEventListener("click", openTilingsSheet);
-    configSheetCloseButton.addEventListener("click", () => closeConfigIfOpen());
+    configSheetCloseButton.addEventListener("click", workspaceLayout.closeSetup);
+    inspectorCloseButton.addEventListener("click", workspaceLayout.closeInspector);
     document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);
     const onWallCapacityChange = (): void => {
@@ -3256,6 +3364,7 @@ export function createComparePanelContent(
             disposed = true;
             invalidateOperations();
             workspaceScheduler.dispose();
+            workspaceLayout.dispose();
             document.removeEventListener("pointerdown", onDocumentPointerDown);
             window.removeEventListener("hashchange", onHashChangeFocus);
             window.removeEventListener("resize", onWallCapacityChange);

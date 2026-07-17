@@ -486,7 +486,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         analysis_steps = case.page.locator(
             ".compare-form label", has_text="Analysis steps"
         ).locator("input")
@@ -713,6 +712,54 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-focus-pane-brush").to_have_text("Brush 3")
         case.page.click(".compare-focus-pane-brush")
         self._expect(".compare-focus-pane-brush").to_have_text("Brush 1")
+
+    def test_wall_narrow_workspace_uses_exclusive_accessible_drawers(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.set_viewport_size({"width": 820, "height": 900})
+        setup = case.page.locator(".compare-setup-sidebar")
+        inspector = case.page.locator(".compare-inspector")
+        setup_toggle = case.page.get_by_role("button", name="Configure the run")
+        inspector_toggle = case.page.get_by_role("button", name="Inspect selected board")
+        expect(setup).to_have_attribute("inert", "")
+        expect(inspector).to_have_attribute("inert", "")
+        expect(setup).not_to_be_visible()
+        expect(inspector).not_to_be_visible()
+        expect(setup_toggle).to_have_attribute("aria-expanded", "false")
+        expect(inspector_toggle).to_be_enabled()
+
+        setup_toggle.press("Enter")
+        expect(setup).not_to_have_attribute("inert", "")
+        expect(setup).to_be_visible()
+        expect(setup_toggle).to_have_attribute("aria-expanded", "true")
+        self._expect(".compare-setup-run").to_be_visible()
+
+        inspector_toggle.press("Enter")
+        expect(setup).to_have_attribute("inert", "")
+        expect(inspector).not_to_have_attribute("inert", "")
+        expect(setup).not_to_be_visible()
+        expect(inspector).to_be_visible()
+        expect(inspector_toggle).to_have_attribute("aria-expanded", "true")
+        self._expect(".compare-explainer-body").to_contain_text("Generation0")
+        self._expect(".compare-hero-open-lab").to_be_enabled()
+        self._expect(".compare-hero-fork").to_be_enabled()
+        self._expect(".compare-inspector-replace").to_be_enabled()
+        self._expect(".compare-inspector-remove").to_be_enabled()
+        self._expect('.compare-dock-icon[aria-label="Copy run link"]').to_be_visible()
+
+        case.page.get_by_role("button", name="Close inspector").press("Enter")
+        expect(inspector).to_have_attribute("inert", "")
+        expect(inspector_toggle).to_be_focused()
+        self._expect(".compare-edit-toggle").to_be_visible()
+        self._expect('.compare-filmstrip-btn[aria-label="Play / pause"]').to_be_visible()
+        case.assertLessEqual(
+            case.page.evaluate("() => document.documentElement.scrollWidth"),
+            case.page.evaluate("() => innerWidth"),
+        )
 
     def test_wall_names_boards_and_edits_the_selection_in_place(self) -> None:
         # Boards carry their friendly catalog label (not the raw geometry
