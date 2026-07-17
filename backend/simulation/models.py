@@ -17,6 +17,7 @@ from backend.defaults import (
     MIN_SPEED,
 )
 from backend.payload_types import (
+    CellMutationDeltaPayload,
     CellStatePayload,
     RuleDefinitionPayload,
     SimulationStatePayload,
@@ -419,6 +420,26 @@ class RuleSnapshot:
             "rule_protocol": self.rule_protocol,
             "supports_all_topologies": self.supports_all_topologies,
             "compatible_tiling_families": self.compatible_tiling_families,
+        }
+
+
+@dataclass(frozen=True)
+class CellMutationDelta:
+    base_state_revision: int
+    state_revision: int
+    topology_revision: str
+    generation: int
+    cell_updates: tuple[tuple[str, int], ...]
+
+    def to_dict(self) -> CellMutationDeltaPayload:
+        return {
+            "base_state_revision": self.base_state_revision,
+            "state_revision": self.state_revision,
+            "topology_revision": self.topology_revision,
+            "generation": self.generation,
+            "cell_updates": [
+                {"id": cell_id, "state": state} for cell_id, state in self.cell_updates
+            ],
         }
 
 

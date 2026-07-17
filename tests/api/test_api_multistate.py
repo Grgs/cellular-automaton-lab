@@ -59,13 +59,13 @@ class ApiMultistateTests(ApiTestCase):
         self.assertEqual(toggle_off.status_code, 200)
         self.assertEqual(invalid_state.status_code, 400)
 
-        payload = batch.get_json()
+        payload = self.get_state()
         self.assert_wireworld_rule(payload)
         self.assertEqual(self.regular_cell_state(payload, 2, 3), 3)
         self.assertEqual(self.regular_cell_state(payload, 4, 1), 1)
         self.assertEqual(self.regular_cell_state(payload, 5, 2), 2)
-        self.assertEqual(self.regular_cell_state(toggle_on.get_json(), 1, 1), 3)
-        self.assertEqual(self.regular_cell_state(toggle_off.get_json(), 1, 1), 0)
+        self.assertEqual(toggle_on.get_json()["cell_updates"], [{"id": "c:1:1", "state": 3}])
+        self.assertEqual(toggle_off.get_json()["cell_updates"], [{"id": "c:1:1", "state": 0}])
 
     def test_whirlpool_rule_metadata_multistate_values_and_toggle_behavior(self) -> None:
         self.client.post("/api/config", json={"rule": "whirlpool"})
@@ -95,8 +95,8 @@ class ApiMultistateTests(ApiTestCase):
         self.assertEqual(self.regular_cell_state(payload, 4, 1), 1)
         self.assertEqual(self.regular_cell_state(payload, 5, 2), 2)
         self.assertEqual(self.regular_cell_state(payload, 0, 4), 3)
-        self.assertEqual(self.regular_cell_state(toggle_on.get_json(), 1, 1), 1)
-        self.assertEqual(self.regular_cell_state(toggle_off.get_json(), 1, 1), 0)
+        self.assertEqual(toggle_on.get_json()["cell_updates"], [{"id": "c:1:1", "state": 1}])
+        self.assertEqual(toggle_off.get_json()["cell_updates"], [{"id": "c:1:1", "state": 0}])
 
     def test_whirlpool_source_cells_persist_and_emit_one_neighbor(self) -> None:
         self.reset_simulation(width=9, height=9, rule="whirlpool", randomize=False)

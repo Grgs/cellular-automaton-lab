@@ -1,5 +1,8 @@
+import time
 import unittest
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 
 from backend.simulation.persistence_coordinator import PersistenceCoordinator, TimerLike
 
@@ -95,6 +98,26 @@ class PersistenceCoordinatorTests(unittest.TestCase):
         self.coordinator.shutdown()
 
         self.assertEqual(self.persist_calls, ["persist"])
+
+    def test_concurrent_flushes_serialize_persist_function(self) -> None:
+        counter_lock = Lock()
+        active = 0
+        maximum_active = 0
+
+        def persist() -> None:
+            nonlocal active, maximum_active
+            with counter_lock:
+                active += 1
+                maximum_active = max(maximum_active, active)
+            time.sleep(0.02)
+            with counter_lock:
+                active -= 1
+
+        coordinator = PersistenceCoordinator(persist, debounce_ms=0)
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            list(executor.map(lambda _: coordinator.flush_immediately(), range(8)))
+
+        self.assertEqual(maximum_active, 1)
 
 
 if __name__ == "__main__":

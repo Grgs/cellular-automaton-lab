@@ -103,12 +103,12 @@ The `path` values intentionally match the existing HTTP command surface:
   - success shape: `snapshot` and optional `persistedSnapshot`
   - failure shape: `error`
 - `response`
-  - success shape: `ok: true` plus `snapshot`, `rules`, and/or `persistedSnapshot`
+  - success shape: `ok: true` plus `snapshot`, `rules`, `cellDelta`, and/or `persistedSnapshot`
   - failure shape: `ok: false` and `error`
 - `persist`
   - emitted from background ticks so the main thread can keep browser-local persistence fresh even while the UI is only polling state snapshots
 
-The worker command paths intentionally stay aligned with the existing `/api/...` HTTP surface so the frontend controller does not branch on host after environment creation.
+The worker command paths intentionally stay aligned with the existing `/api/...` HTTP surface so the frontend controller does not branch on host after environment creation. Cell commands carry the same revisioned delta fields as HTTP. The main-thread snapshot cache validates those fields, forces a full worker `/api/state` request on mismatch, and serializes the reconciled full snapshot for browser-local persistence.
 
 ## Browser Test Architecture
 

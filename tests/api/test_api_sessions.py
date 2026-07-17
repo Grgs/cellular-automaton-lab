@@ -6,11 +6,17 @@ from backend.payload_types import SimulationStatePayload
 
 try:
     from tests.api.support import ApiTestCase
-    from tests.typed_payloads import require_simulation_state_payload
+    from tests.typed_payloads import (
+        require_cell_mutation_delta_payload,
+        require_simulation_state_payload,
+    )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tests.api.support import ApiTestCase
-    from tests.typed_payloads import require_simulation_state_payload
+    from tests.typed_payloads import (
+        require_cell_mutation_delta_payload,
+        require_simulation_state_payload,
+    )
 
 
 class ApiSessionTests(ApiTestCase):
@@ -89,16 +95,20 @@ class ApiSessionTests(ApiTestCase):
         self.assertEqual(started["state_revision"], 1)
         self.assertEqual(repeated["state_revision"], 1)
 
-        changed = require_simulation_state_payload(
+        changed = require_cell_mutation_delta_payload(
             self.client.post(path("/cells/set"), json={"id": "c:1:1", "state": 1}).get_json(),
-            context="changed cell state",
+            context="changed cell delta",
         )
-        unchanged = require_simulation_state_payload(
+        unchanged = require_cell_mutation_delta_payload(
             self.client.post(path("/cells/set"), json={"id": "c:1:1", "state": 1}).get_json(),
-            context="unchanged cell state",
+            context="unchanged cell delta",
         )
+        self.assertEqual(changed["base_state_revision"], 1)
         self.assertEqual(changed["state_revision"], 2)
+        self.assertEqual(changed["cell_updates"], [{"id": "c:1:1", "state": 1}])
+        self.assertEqual(unchanged["base_state_revision"], 2)
         self.assertEqual(unchanged["state_revision"], 2)
+        self.assertEqual(unchanged["cell_updates"], [])
 
     def test_invalid_session_id_returns_400(self) -> None:
         response = self.client.get("/api/sessions/bad.id/state")

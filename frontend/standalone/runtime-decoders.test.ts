@@ -99,6 +99,40 @@ describe("standalone runtime decoders", () => {
         });
     });
 
+    it("decodes strict revisioned cell deltas", () => {
+        expect(
+            decodeRequestResponse(
+                JSON.stringify({
+                    ok: true,
+                    base_state_revision: 2,
+                    state_revision: 3,
+                    topology_revision: "square:2x2",
+                    generation: 1,
+                    cell_updates: [{ id: "c:0:0", state: 1 }],
+                }),
+            ).cellDelta,
+        ).toEqual({
+            base_state_revision: 2,
+            state_revision: 3,
+            topology_revision: "square:2x2",
+            generation: 1,
+            cell_updates: [{ id: "c:0:0", state: 1 }],
+        });
+
+        expect(() =>
+            decodeRequestResponse(
+                JSON.stringify({
+                    ok: true,
+                    base_state_revision: 2,
+                    state_revision: 3,
+                    topology_revision: "square:2x2",
+                    generation: 1,
+                    cell_updates: [{ id: "c:0:0", state: 1.5 }],
+                }),
+            ),
+        ).toThrow("cell delta update.state");
+    });
+
     it("rejects values the previous decoder silently coerced", () => {
         expect(() =>
             decodeRequestResponse(

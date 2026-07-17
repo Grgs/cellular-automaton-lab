@@ -125,11 +125,35 @@ class SimulationServiceTests(unittest.TestCase):
         cell_id = self.cell_id(1, 1)
 
         with ThreadPoolExecutor(max_workers=8) as executor:
-            list(executor.map(lambda _: self.service.set_cell_state_by_id(cell_id, 1), range(32)))
+            deltas = list(
+                executor.map(lambda _: self.service.set_cell_state_by_id(cell_id, 1), range(32))
+            )
 
         state = self.service.get_state()
         self.assertEqual(state.board.state_for(cell_id), 1)
         self.assertEqual(state.state_revision, 1)
+        self.assertEqual(sum(bool(delta.cell_updates) for delta in deltas), 1)
+        self.assertTrue(all(delta.state_revision == 1 for delta in deltas))
+
+    def test_cell_mutation_delta_reports_actual_final_changes(self) -> None:
+        cell_id = self.cell_id(1, 1)
+
+        changed = self.service.set_cells_by_id([(cell_id, 1), (cell_id, 1)])
+        unchanged = self.service.set_cells_by_id([(cell_id, 0), (cell_id, 1)])
+
+        self.assertEqual(
+            changed.to_dict(),
+            {
+                "base_state_revision": 0,
+                "state_revision": 1,
+                "topology_revision": self.service.get_state().topology.topology_revision,
+                "generation": 0,
+                "cell_updates": [{"id": cell_id, "state": 1}],
+            },
+        )
+        self.assertEqual(unchanged.base_state_revision, 1)
+        self.assertEqual(unchanged.state_revision, 1)
+        self.assertEqual(unchanged.cell_updates, ())
 
     def test_update_config_resizes_grid_and_preserves_existing_cells(self) -> None:
         self.service.toggle_cell_by_id(self.cell_id(1, 1))

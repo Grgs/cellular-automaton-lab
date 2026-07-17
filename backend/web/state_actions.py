@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
 
 from backend.contract_validation import (
@@ -19,6 +18,7 @@ from backend.payload_types import (
 )
 from backend.rules import RuleRegistry
 from backend.simulation.coordinator import SimulationCoordinator
+from backend.simulation.models import CellMutationDelta
 
 
 @dataclass(frozen=True)
@@ -42,34 +42,21 @@ class StateActionService:
             rule_name=parse_rule_name(payload, self.rules),
         )
 
-    def _dispatch_single_cell_target(
-        self,
-        target: CellTargetPayload,
-        *,
-        by_id: Callable[[str], None],
-    ) -> None:
-        by_id(str(target["id"]))
-
-    def _dispatch_cell_updates(self, parsed_cells: list[CellUpdatePayload]) -> None:
+    def _dispatch_cell_updates(self, parsed_cells: list[CellUpdatePayload]) -> CellMutationDelta:
         id_cells = [(cell["id"], cell["state"]) for cell in parsed_cells]
-        if id_cells:
-            self.coordinator.set_cells_by_id(id_cells)
+        return self.coordinator.set_cells_by_id(id_cells)
 
-    def apply_toggle_cell_payload(self, payload: RawJsonObject) -> None:
-        self._dispatch_single_cell_target(
-            parse_cell_target(payload),
-            by_id=self.coordinator.toggle_cell_by_id,
-        )
+    def apply_toggle_cell_payload(self, payload: RawJsonObject) -> CellMutationDelta:
+        target: CellTargetPayload = parse_cell_target(payload)
+        return self.coordinator.toggle_cell_by_id(str(target["id"]))
 
-    def apply_set_cell_payload(self, payload: RawJsonObject) -> None:
+    def apply_set_cell_payload(self, payload: RawJsonObject) -> CellMutationDelta:
         state = parse_state_value(payload, self.coordinator.get_rule())
-        self._dispatch_single_cell_target(
-            parse_cell_target(payload),
-            by_id=lambda cell_id: self.coordinator.set_cell_state_by_id(
-                cell_id=cell_id,
-                state=state,
-            ),
+        target: CellTargetPayload = parse_cell_target(payload)
+        return self.coordinator.set_cell_state_by_id(
+            cell_id=str(target["id"]),
+            state=state,
         )
 
-    def apply_set_cells_payload(self, payload: RawJsonObject) -> None:
-        self._dispatch_cell_updates(parse_cell_updates(payload, self.coordinator.get_rule()))
+    def apply_set_cells_payload(self, payload: RawJsonObject) -> CellMutationDelta:
+        return self._dispatch_cell_updates(parse_cell_updates(payload, self.coordinator.get_rule()))

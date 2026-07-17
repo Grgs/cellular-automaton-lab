@@ -10,6 +10,35 @@ except ModuleNotFoundError:
 
 
 class ApiCellTests(ApiTestCase):
+    def test_single_cell_deltas_reduce_square_and_trihexagonal_payloads_by_99_percent(self) -> None:
+        fixtures = (
+            ("square", "c:1:1"),
+            ("trihexagonal-3-6-3-6", "tu:1:1"),
+        )
+        for tiling_family, cell_id in fixtures:
+            with self.subTest(tiling_family=tiling_family):
+                reset = self.client.post(
+                    "/api/control/reset",
+                    json={
+                        "topology_spec": {
+                            "tiling_family": tiling_family,
+                            "adjacency_mode": "edge",
+                            "width": 48,
+                            "height": 32,
+                            "patch_depth": 0,
+                        },
+                        "speed": 5,
+                        "randomize": False,
+                    },
+                )
+                self.assertEqual(reset.status_code, 200)
+                full_snapshot_bytes = len(self.client.get("/api/state").data)
+
+                delta = self.client.post("/api/cells/set", json={"id": cell_id, "state": 1})
+
+                self.assertEqual(delta.status_code, 200)
+                self.assertLessEqual(len(delta.data), full_snapshot_bytes * 0.01)
+
     def test_invalid_payloads_return_400(self) -> None:
         bad_width = self.client.post("/api/config", json={"width": "abc"})
         missing_id = self.client.post("/api/cells/toggle", json={})
@@ -55,13 +84,15 @@ class ApiCellTests(ApiTestCase):
 
         self.assertEqual(config.status_code, 200)
         self.assertEqual(toggled.status_code, 200)
-        payload = toggled.get_json()
+        delta = toggled.get_json()
+        self.assertEqual(delta["cell_updates"], [{"id": "c:11:7", "state": 1}])
+        payload = self.get_state()
         self.assertEqual(payload["topology_spec"]["height"], 8)
         self.assertEqual(payload["topology_spec"]["width"], 12)
         self.assertIn("topology", payload)
         self.assertEqual(self.regular_cell_state(payload, 11, 7), 1)
 
-    def test_state_only_cell_mutations_include_topology_when_revision_is_unchanged(self) -> None:
+    def test_state_only_cell_mutations_return_revisioned_deltas_without_topology(self) -> None:
         initial = self.get_state()
         initial_revision = initial["topology_revision"]
 
@@ -83,10 +114,13 @@ class ApiCellTests(ApiTestCase):
 
         for response in (single, batch, toggle):
             payload = response.get_json()
-            self.assertIn("topology", payload)
+            self.assertNotIn("topology", payload)
             self.assertEqual(payload["topology_revision"], initial_revision)
-            self.assertIn("cell_states", payload)
-            self.assertEqual(payload["topology_revision"], payload["topology"]["topology_revision"])
+            self.assertNotIn("cell_states", payload)
+            self.assertIn("base_state_revision", payload)
+            self.assertIn("state_revision", payload)
+            self.assertIn("generation", payload)
+            self.assertIn("cell_updates", payload)
 
     def test_set_cell_and_set_many(self) -> None:
         single = self.client.post("/api/cells/set", json={"id": "c:2:3", "state": 1})
@@ -102,7 +136,11 @@ class ApiCellTests(ApiTestCase):
 
         self.assertEqual(single.status_code, 200)
         self.assertEqual(batch.status_code, 200)
-        payload = batch.get_json()
+        self.assertEqual(
+            batch.get_json()["cell_updates"],
+            [{"id": "c:4:1", "state": 1}, {"id": "c:5:2", "state": 1}],
+        )
+        payload = self.get_state()
         self.assertEqual(self.regular_cell_state(payload, 2, 3), 1)
         self.assertEqual(self.regular_cell_state(payload, 4, 1), 1)
         self.assertEqual(self.regular_cell_state(payload, 5, 2), 1)
@@ -123,7 +161,9 @@ class ApiCellTests(ApiTestCase):
         self.assertEqual(single.status_code, 200)
         self.assertEqual(batch.status_code, 200)
 
-        payload = batch.get_json()
+        self.assertEqual(single.get_json()["cell_updates"], [])
+        self.assertEqual(batch.get_json()["cell_updates"], [{"id": "c:1:1", "state": 1}])
+        payload = self.get_state()
         self.assertEqual(self.regular_cell_state(payload, 1, 1), 1)
         self.assertEqual(sum(self.cells_by_id(payload).values()), 1)
 
@@ -162,7 +202,7 @@ class ApiCellTests(ApiTestCase):
         self.assertEqual(toggled.status_code, 200)
         self.assertEqual(batch.status_code, 200)
 
-        payload = batch.get_json()
+        payload = self.get_state()
         self.assertNotIn("grid", payload)
         self.assertEqual(payload["cell_states"][index_by_id["s:1:1"]], 1)
         self.assertEqual(payload["cell_states"][index_by_id["o:2:2"]], 1)
@@ -204,7 +244,7 @@ class ApiCellTests(ApiTestCase):
         self.assertEqual(toggled.status_code, 200)
         self.assertEqual(batch.status_code, 200)
 
-        payload = batch.get_json()
+        payload = self.get_state()
         self.assertNotIn("grid", payload)
         self.assertEqual(payload["cell_states"][index_by_id["tu:1:1"]], 1)
         self.assertEqual(payload["cell_states"][index_by_id["h:1:1"]], 1)

@@ -221,19 +221,19 @@ def update_config(session_id: str = DEFAULT_SESSION_ID) -> Response:
 @api_bp.post("/cells/toggle")
 @session_api_bp.post("/cells/toggle")
 def toggle_cell(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    state_actions(session_id).apply_toggle_cell_payload(get_payload(request))
-    return state_response(session_id)
+    delta = state_actions(session_id).apply_toggle_cell_payload(get_payload(request))
+    return jsonify(delta.to_dict())
 
 
 @api_bp.post("/cells/set")
 @session_api_bp.post("/cells/set")
 def set_cell(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    state_actions(session_id).apply_set_cell_payload(get_payload(request))
-    return state_response(session_id)
+    delta = state_actions(session_id).apply_set_cell_payload(get_payload(request))
+    return jsonify(delta.to_dict())
 
 
 @api_bp.post("/cells/set-many")
 @session_api_bp.post("/cells/set-many")
 def set_cells(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    state_actions(session_id).apply_set_cells_payload(get_payload(request))
-    return state_response(session_id)
+    delta = state_actions(session_id).apply_set_cells_payload(get_payload(request))
+    return jsonify(delta.to_dict())

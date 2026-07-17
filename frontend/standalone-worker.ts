@@ -227,6 +227,7 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             ...(payload.topologyPreview === undefined
                 ? {}
                 : { topologyPreview: payload.topologyPreview }),
+            ...(payload.cellDelta === undefined ? {} : { cellDelta: payload.cellDelta }),
             ...(payload.persistedSnapshot === undefined
                 ? {}
                 : { persistedSnapshot: payload.persistedSnapshot }),

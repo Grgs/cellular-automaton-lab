@@ -6,7 +6,7 @@ import threading
 from backend.payload_types import TopologySpecInput, TopologySpecPatch
 from backend.rules import RuleRegistry
 from backend.simulation.engine import SimulationEngine
-from backend.simulation.models import SimulationSnapshot, SimulationStateData
+from backend.simulation.models import CellMutationDelta, SimulationSnapshot, SimulationStateData
 from backend.simulation.service_boards import (
     build_initial_state,
     clone_service_board,
@@ -160,15 +160,28 @@ class SimulationService:
             except ValueError as exc:
                 raise SimulationOperationError(str(exc)) from exc
 
-    def toggle_cell_by_id(self, cell_id: str) -> dict[str, int]:
+    def _cell_mutation_delta(
+        self, base_state_revision: int, updates: dict[str, int]
+    ) -> CellMutationDelta:
+        return CellMutationDelta(
+            base_state_revision=base_state_revision,
+            state_revision=self._state.state_revision,
+            topology_revision=self._state.topology.topology_revision,
+            generation=self._state.generation,
+            cell_updates=tuple(updates.items()),
+        )
+
+    def toggle_cell_by_id(self, cell_id: str) -> CellMutationDelta:
         with self._lock:
+            base_state_revision = self._state.state_revision
             updates = toggle_cells_by_id(self._state, [cell_id])
             if updates:
                 self._state.state_revision += 1
-            return updates
+            return self._cell_mutation_delta(base_state_revision, updates)
 
-    def set_cell_state_by_id(self, cell_id: str, state: int) -> dict[str, int]:
+    def set_cell_state_by_id(self, cell_id: str, state: int) -> CellMutationDelta:
         with self._lock:
+            base_state_revision = self._state.state_revision
             try:
                 validate_state_values(self._state.rule, [state])
             except ValueError as exc:
@@ -176,10 +189,11 @@ class SimulationService:
             updates = set_cells_by_id(self._state, [(cell_id, state)])
             if updates:
                 self._state.state_revision += 1
-            return updates
+            return self._cell_mutation_delta(base_state_revision, updates)
 
-    def set_cells_by_id(self, cells: list[tuple[str, int]]) -> dict[str, int]:
+    def set_cells_by_id(self, cells: list[tuple[str, int]]) -> CellMutationDelta:
         with self._lock:
+            base_state_revision = self._state.state_revision
             try:
                 validate_state_values(self._state.rule, [state for _, state in cells])
             except ValueError as exc:
@@ -187,4 +201,4 @@ class SimulationService:
             updates = set_cells_by_id(self._state, cells)
             if updates:
                 self._state.state_revision += 1
-            return updates
+            return self._cell_mutation_delta(base_state_revision, updates)

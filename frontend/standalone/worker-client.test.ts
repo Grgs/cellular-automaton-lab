@@ -317,6 +317,85 @@ describe("standalone worker client", () => {
         });
     });
 
+    it("applies cell deltas and persists the reconciled snapshot", async () => {
+        const { module, persistence, worker } = await loadWorkerClientModule();
+        const environmentPromise = module.createStandaloneEnvironment(bootstrapData);
+        await flushAsyncStartup();
+        const initMessage = lastInitMessage(worker());
+        worker().dispatchMessage({
+            type: "ready",
+            requestId: initMessage.requestId,
+            snapshot,
+            persistedSnapshot: null,
+        });
+        const environment = await environmentPromise;
+
+        const mutationPromise = environment.backend.setCell({ id: "c:0:0" }, 1);
+        const requestMessage = lastRequestMessage(worker());
+        worker().dispatchMessage({
+            type: "response",
+            requestId: requestMessage.requestId,
+            ok: true,
+            cellDelta: {
+                base_state_revision: 0,
+                state_revision: 1,
+                topology_revision: "rev-1",
+                generation: 0,
+                cell_updates: [{ id: "c:0:0", state: 1 }],
+            },
+        });
+
+        await expect(mutationPromise).resolves.toMatchObject({
+            state_revision: 1,
+            cell_states: [1],
+        });
+        expect(persistence.save).toHaveBeenLastCalledWith(
+            expect.objectContaining({ cells_by_id: { "c:0:0": 1 } }),
+        );
+    });
+
+    it("forces a full-state resync when a cell delta is stale", async () => {
+        const { module, worker } = await loadWorkerClientModule();
+        const environmentPromise = module.createStandaloneEnvironment(bootstrapData);
+        await flushAsyncStartup();
+        const initMessage = lastInitMessage(worker());
+        worker().dispatchMessage({
+            type: "ready",
+            requestId: initMessage.requestId,
+            snapshot,
+            persistedSnapshot: null,
+        });
+        const environment = await environmentPromise;
+
+        const mutationPromise = environment.backend.setCell({ id: "c:0:0" }, 1);
+        const mutationMessage = lastRequestMessage(worker());
+        worker().dispatchMessage({
+            type: "response",
+            requestId: mutationMessage.requestId,
+            ok: true,
+            cellDelta: {
+                base_state_revision: 9,
+                state_revision: 10,
+                topology_revision: "rev-1",
+                generation: 0,
+                cell_updates: [{ id: "c:0:0", state: 1 }],
+            },
+        });
+        await vi.waitFor(() => expect(lastRequestMessage(worker()).path).toBe("/api/state"));
+        const stateMessage = lastRequestMessage(worker());
+        worker().dispatchMessage({
+            type: "response",
+            requestId: stateMessage.requestId,
+            ok: true,
+            snapshot: { ...snapshot, state_revision: 2, cell_states: [1] },
+        });
+
+        await expect(mutationPromise).resolves.toMatchObject({
+            state_revision: 2,
+            cell_states: [1],
+        });
+    });
+
     it("disposes pending requests and terminates the worker", async () => {
         const { module, worker } = await loadWorkerClientModule();
 

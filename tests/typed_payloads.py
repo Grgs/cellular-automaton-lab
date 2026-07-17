@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from backend.payload_types import (
     ApiErrorPayload,
+    CellMutationDeltaPayload,
     CellStatePayload,
     RawJsonObject,
     RuleDefinitionPayload,
@@ -232,6 +233,40 @@ def require_simulation_state_payload(value: object, *, context: str) -> Simulati
             payload.get("topology"),
             context=f"{context}.topology",
         ),
+    }
+
+
+def require_cell_mutation_delta_payload(value: object, *, context: str) -> CellMutationDeltaPayload:
+    payload = _require_json_object(value, context=context)
+    updates = _require_json_list(payload.get("cell_updates"), context=f"{context}.cell_updates")
+    return {
+        "base_state_revision": _require_int(
+            payload.get("base_state_revision"), context=f"{context}.base_state_revision"
+        ),
+        "state_revision": _require_int(
+            payload.get("state_revision"), context=f"{context}.state_revision"
+        ),
+        "topology_revision": _require_str(
+            payload.get("topology_revision"), context=f"{context}.topology_revision"
+        ),
+        "generation": _require_int(payload.get("generation"), context=f"{context}.generation"),
+        "cell_updates": [
+            {
+                "id": _require_str(
+                    _require_json_object(update, context=f"{context}.cell_updates[{index}]").get(
+                        "id"
+                    ),
+                    context=f"{context}.cell_updates[{index}].id",
+                ),
+                "state": _require_int(
+                    _require_json_object(update, context=f"{context}.cell_updates[{index}]").get(
+                        "state"
+                    ),
+                    context=f"{context}.cell_updates[{index}].state",
+                ),
+            }
+            for index, update in enumerate(updates)
+        ],
     }
 
 

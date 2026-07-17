@@ -17,11 +17,19 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.payload_types import CellTargetPayload, SimulationStatePayload, TopologySpecPayload
+from backend.payload_types import (
+    CellMutationDeltaPayload,
+    CellTargetPayload,
+    SimulationStatePayload,
+    TopologySpecPayload,
+)
 from backend.simulation.topology import _build_topology_cached, _build_topology_uncached
 from backend.simulation.topology_builders import INTERNAL_ALLOW_OVERSIZED_TOPOLOGIES_ENV
 from tests.e2e.support_server import AppServer
-from tests.typed_payloads import require_simulation_state_payload
+from tests.typed_payloads import (
+    require_cell_mutation_delta_payload,
+    require_simulation_state_payload,
+)
 
 
 class ViewportPayload(TypedDict):
@@ -114,7 +122,7 @@ def post_reset(
 def post_toggle(
     base_url: str,
     cell_id: str,
-) -> tuple[SimulationStatePayload, int, float]:
+) -> tuple[CellMutationDeltaPayload, int, float]:
     raw_payload, payload_bytes, elapsed_ms = _request_json_bytes(
         base_url,
         "/api/cells/toggle",
@@ -122,7 +130,7 @@ def post_toggle(
         payload={"id": cell_id},
     )
     return (
-        require_simulation_state_payload(raw_payload, context="latency profile toggle response"),
+        require_cell_mutation_delta_payload(raw_payload, context="latency profile toggle response"),
         payload_bytes,
         elapsed_ms,
     )
