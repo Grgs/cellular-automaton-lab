@@ -355,7 +355,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         speed = case.page.locator('select[aria-label="Playback speed"]')
         counter = case.page.locator(".compare-filmstrip-counter")
         frame_max = scrubber.get_attribute("max")
-        case.assertIsNotNone(frame_max)
+        if frame_max is None:
+            raise AssertionError("filmstrip generation scrubber is missing its maximum")
         final_generation = str(frame_max)
 
         reset.click()
@@ -589,7 +590,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # Save the current setup so loading it later is a true whole-wall
         # replacement, not a direct implementation hook.
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         case.page.click("#compare-config-tab-saved")
         case.page.fill('input[aria-label="Saved run name"]', "Fork lifecycle")
         case.page.get_by_role("button", name="Save run", exact=True).click()
@@ -635,7 +635,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-focus-pane").to_have_count(0)
         self._expect(".compare-status").to_contain_text("Loaded run link")
         case.page.get_by_role("button", name="Close configuration").click()
-        case.page.click(".compare-setup-run")
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
 
@@ -1191,8 +1190,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.assertTrue(not any(value.startswith("archlife") for value in rule_values))
 
         rule_select.select_option("wireworld")
-        self._expect(".compare-setup-run").to_have_text("Apply changes")
-        case.page.click(".compare-setup-run")
         self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
         self._expect(".compare-status").to_contain_text("Filmstrip ready")
         self._expect("select[aria-label='Comparison rule']").to_have_value("wireworld")
@@ -1217,9 +1214,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         seed_select = case.page.locator('select[aria-label="Comparison seed"]')
         self._expect('select[aria-label="Comparison seed"]').to_have_value("r-pentomino")
         seed_select.select_option("")
-        self._expect(".compare-setup-run").to_have_text("Apply changes")
-        case.page.click(".compare-setup-run")
-
         self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
         self._expect(".compare-status").not_to_contain_text("Error:")
         self._expect('select[aria-label="Comparison seed"]').to_have_value("")
@@ -1322,7 +1316,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
 
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         case.page.click("#compare-config-tab-saved")
         case.page.fill('input[aria-label="Saved run name"]', "Focus replacement run")
         case.page.get_by_role("button", name="Save run", exact=True).click()
@@ -1620,7 +1613,8 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
     def test_compare_run_link_restores_workspace_in_standalone(self) -> None:
         # C1 parity: a #/compare&run= deep link opens the full-page workspace in
-        # the Pyodide build and restores the saved setup without auto-running.
+        # the Pyodide build and restores the saved setup. An invalid one-board
+        # comparison is rejected inline without starting backend work.
         fragment = _encode_compare_run_fragment(
             {
                 "seed": "101",
@@ -1635,8 +1629,7 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-seedbits input.compare-field").to_have_value("101")
-        self._expect(".compare-status").to_contain_text("Loaded run link")
-        # Reconstruct-and-wait: the link must not have started a comparison.
+        self._expect(".compare-status").to_contain_text("Select at least two tilings")
         self._expect(".compare-grid").to_have_count(0)
 
     def test_saved_compare_run_persists_across_reload_in_standalone(self) -> None:
