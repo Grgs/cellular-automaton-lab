@@ -98,4 +98,10 @@ describe("buildBoardThumbnailSvg", () => {
         const live = svg.querySelector("polygon.is-live");
         expect(live?.getAttribute("fill")).toBe("#abcdef");
     });
+
+    it("updates the fill when the palette changes without a state change", () => {
+        const svg = buildBoardThumbnailSvg(preview(), { a: 1 }, { liveColor: () => "#111111" });
+        updateBoardThumbnailSvg(svg, { a: 1 }, { liveColor: () => "#222222" });
+        expect(svg.querySelector("polygon.is-live")?.getAttribute("fill")).toBe("#222222");
+    });
 });
