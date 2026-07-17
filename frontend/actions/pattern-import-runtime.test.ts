@@ -63,6 +63,7 @@ function makeSnapshot(
         speed: 5,
         running: false,
         generation: 0,
+        state_revision: 0,
         rule: makeRule(overrides.rule?.name ?? "conway"),
         topology_revision: "rev-1",
         topology: {

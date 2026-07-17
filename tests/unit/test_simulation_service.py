@@ -1,5 +1,6 @@
 import sys
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import ClassVar
 from unittest.mock import patch
@@ -53,6 +54,82 @@ class SimulationServiceTests(unittest.TestCase):
             state.config.patch_depth, APP_DEFAULTS["simulation"]["topology_spec"]["patch_depth"]
         )
         self.assertEqual(state.rule.name, APP_DEFAULTS["simulation"]["rule"])
+        self.assertEqual(state.state_revision, 0)
+
+    def test_state_revision_advances_once_for_effective_mutations(self) -> None:
+        cell_id = self.cell_id(1, 1)
+
+        self.service.get_state()
+        self.service.pause()
+        self.assertEqual(self.service.get_state().state_revision, 0)
+
+        self.service.start()
+        self.service.start()
+        self.service.resume()
+        self.assertEqual(self.service.get_state().state_revision, 1)
+
+        self.service.pause()
+        self.service.pause()
+        self.assertEqual(self.service.get_state().state_revision, 2)
+
+        self.service.step()
+        self.assertEqual(self.service.get_state().state_revision, 3)
+
+        self.service.reset(randomize=False)
+        self.assertEqual(self.service.get_state().state_revision, 4)
+
+        self.service.update_config(speed=self.service.get_state().config.speed, rule_name="conway")
+        self.assertEqual(self.service.get_state().state_revision, 4)
+        self.service.update_config(speed=6)
+        self.assertEqual(self.service.get_state().state_revision, 5)
+
+        self.service.set_cell_state_by_id(cell_id, 0)
+        self.service.set_cell_state_by_id("missing", 1)
+        self.assertEqual(self.service.get_state().state_revision, 5)
+        self.service.set_cell_state_by_id(cell_id, 1)
+        self.assertEqual(self.service.get_state().state_revision, 6)
+        self.service.set_cells_by_id([(cell_id, 0), (cell_id, 1)])
+        self.assertEqual(self.service.get_state().state_revision, 6)
+        self.service.toggle_cell_by_id(cell_id)
+        self.assertEqual(self.service.get_state().state_revision, 7)
+
+    def test_failed_mutations_preserve_state_and_revision(self) -> None:
+        self.service.start()
+        before = self.service.get_state()
+
+        with patch("backend.simulation.service.transfer_board", side_effect=ValueError("failed")):
+            with self.assertRaisesRegex(SimulationOperationError, "failed"):
+                self.service.update_config(topology_spec={"width": 12, "height": 9})
+
+        after = self.service.get_state()
+        self.assertTrue(after.running)
+        self.assertEqual(after.config, before.config)
+        self.assertEqual(after.state_revision, before.state_revision)
+
+        with self.assertRaises(SimulationOperationError):
+            self.service.reset(rule_name="wireworld", randomize=True)
+        self.assertEqual(self.service.get_state().state_revision, before.state_revision)
+
+    def test_running_tick_advances_revision_with_generation(self) -> None:
+        self.service.start()
+        self.assertTrue(self.service.step_if_running())
+        stepped = self.service.get_state()
+        self.assertEqual(stepped.generation, 1)
+        self.assertEqual(stepped.state_revision, 2)
+
+        self.service.pause()
+        self.assertFalse(self.service.step_if_running())
+        self.assertEqual(self.service.get_state().state_revision, 3)
+
+    def test_concurrent_identical_writes_increment_revision_once(self) -> None:
+        cell_id = self.cell_id(1, 1)
+
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            list(executor.map(lambda _: self.service.set_cell_state_by_id(cell_id, 1), range(32)))
+
+        state = self.service.get_state()
+        self.assertEqual(state.board.state_for(cell_id), 1)
+        self.assertEqual(state.state_revision, 1)
 
     def test_update_config_resizes_grid_and_preserves_existing_cells(self) -> None:
         self.service.toggle_cell_by_id(self.cell_id(1, 1))

@@ -107,6 +107,7 @@ const snapshot: SimulationSnapshot = {
     speed: 5,
     running: false,
     generation: 0,
+    state_revision: 0,
     rule: {
         name: "conway",
         display_name: "Conway",

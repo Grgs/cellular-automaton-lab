@@ -47,7 +47,9 @@ class BrowserRuntimeTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["snapshot"]["rule"]["name"], "conway")
         self.assertFalse(payload["snapshot"]["running"])
+        self.assertEqual(payload["snapshot"]["state_revision"], 0)
         self.assertEqual(payload["persisted_snapshot"]["version"], 5)
+        self.assertNotIn("state_revision", payload["persisted_snapshot"])
 
     def test_handle_request_supports_cell_mutations_and_runtime_ticks(self) -> None:
         initialize_runtime()
@@ -57,15 +59,26 @@ class BrowserRuntimeTests(unittest.TestCase):
         )
         self.assertTrue(set_response["ok"])
         self.assertEqual(set_response["snapshot"]["cell_states"][0], 1)
+        self.assertEqual(set_response["snapshot"]["state_revision"], 1)
+
+        no_op_response = json.loads(
+            handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1}))
+        )
+        self.assertEqual(no_op_response["snapshot"]["state_revision"], 1)
 
         start_response = json.loads(handle_request("/api/control/start"))
         self.assertTrue(start_response["ok"])
         self.assertTrue(start_response["snapshot"]["running"])
+        self.assertEqual(start_response["snapshot"]["state_revision"], 2)
+
+        repeated_start = json.loads(handle_request("/api/control/start"))
+        self.assertEqual(repeated_start["snapshot"]["state_revision"], 2)
 
         tick_response = json.loads(tick_running())
         self.assertTrue(tick_response["ok"])
         self.assertTrue(tick_response["stepped"])
         self.assertGreaterEqual(tick_response["snapshot"]["generation"], 1)
+        self.assertEqual(tick_response["snapshot"]["state_revision"], 3)
 
     def test_handle_request_runs_compare_filmstrip(self) -> None:
         initialize_runtime()
@@ -108,6 +121,7 @@ class BrowserRuntimeTests(unittest.TestCase):
 
         self.assertTrue(restored["ok"])
         self.assertEqual(restored["snapshot"]["cell_states"][0], 1)
+        self.assertEqual(restored["snapshot"]["state_revision"], 0)
 
     def test_handle_request_reports_validation_errors(self) -> None:
         initialize_runtime()

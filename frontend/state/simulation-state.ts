@@ -68,6 +68,7 @@ export function createAppState(): AppState {
         pollTimer: null,
         isRunning: false,
         generation: 0,
+        stateRevision: null,
         speed: DEFAULT_SPEED,
         measuredSpeed: null,
         measuredSpeedSample: null,

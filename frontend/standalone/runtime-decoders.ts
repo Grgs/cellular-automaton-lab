@@ -253,6 +253,11 @@ function optionalSnapshot(value: unknown, context: string): SimulationSnapshot |
         speed: number(payload.speed, context, "simulation snapshot.speed"),
         running: boolean(payload.running, context, "simulation snapshot.running"),
         generation: number(payload.generation, context, "simulation snapshot.generation"),
+        state_revision: number(
+            payload.state_revision,
+            context,
+            "simulation snapshot.state_revision",
+        ),
         rule: ruleDefinition(payload.rule, context),
         topology_revision: string(
             payload.topology_revision,

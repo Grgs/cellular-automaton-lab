@@ -216,6 +216,9 @@ def require_simulation_state_payload(value: object, *, context: str) -> Simulati
         "speed": _require_float(payload.get("speed"), context=f"{context}.speed"),
         "running": _require_bool(payload.get("running"), context=f"{context}.running"),
         "generation": _require_int(payload.get("generation"), context=f"{context}.generation"),
+        "state_revision": _require_int(
+            payload.get("state_revision"), context=f"{context}.state_revision"
+        ),
         "rule": require_rule_definition_payload(payload.get("rule"), context=f"{context}.rule"),
         "topology_revision": _require_str(
             payload.get("topology_revision"),

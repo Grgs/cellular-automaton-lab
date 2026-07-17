@@ -188,6 +188,7 @@ class SimulationStatePayload(TypedDict):
     speed: float
     running: bool
     generation: int
+    state_revision: int
     rule: RuleDefinitionPayload
     topology_revision: str
     cell_states: list[int]
