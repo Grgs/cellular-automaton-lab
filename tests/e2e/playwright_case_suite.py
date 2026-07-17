@@ -355,7 +355,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         speed = case.page.locator('select[aria-label="Playback speed"]')
         counter = case.page.locator(".compare-filmstrip-counter")
         frame_max = scrubber.get_attribute("max")
-        case.assertIsNotNone(frame_max)
+        if frame_max is None:
+            raise AssertionError("generation scrubber did not expose a maximum")
         final_generation = str(frame_max)
 
         reset.click()
