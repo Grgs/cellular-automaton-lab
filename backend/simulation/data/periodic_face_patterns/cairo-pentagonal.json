@@ -1,5 +1,6 @@
 {
   "geometry": "cairo-pentagonal",
+  "neighbor_mode": "edge-match",
   "unit_width": 142,
   "unit_height": 71,
   "base_edge": 30,

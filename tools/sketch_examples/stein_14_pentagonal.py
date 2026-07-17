@@ -34,6 +34,7 @@ BASE_EDGE = 50.0
 CELL_WIDTH = 278.39987995
 CELL_HEIGHT = 224.63131168
 LATTICE_SKEW_X = -153.02078259
+NEIGHBOR_MODE = "segment-overlap"
 
 
 def _tile(slot: str, verts: list[tuple[float, float]]) -> dict[str, Any]:

@@ -286,6 +286,7 @@ class SketchTilingLatticeSkewTests(unittest.TestCase):
         input_data = load_sketch(self.STEIN14_SKETCH)
         descriptor = emit_descriptor_json(input_data)
         self.assertEqual(descriptor["geometry"], "stein-14-pentagonal")
+        self.assertEqual(descriptor["neighbor_mode"], "segment-overlap")
         self.assertAlmostEqual(descriptor["lattice_skew_x"], -153.02078259, places=6)
         self.assertNotIn("row_offset_x", descriptor)
         self.assertNotIn("label", descriptor)
@@ -298,6 +299,7 @@ class SketchTilingLatticeSkewTests(unittest.TestCase):
 
         input_data = load_sketch(EXAMPLE_PATH)
         descriptor = emit_descriptor_json(input_data)
+        self.assertEqual(descriptor["neighbor_mode"], "edge-match")
         self.assertNotIn("lattice_skew_x", descriptor)
 
     def test_setting_both_offset_modes_raises(self) -> None:

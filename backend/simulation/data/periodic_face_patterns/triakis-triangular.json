@@ -1,5 +1,6 @@
 {
   "geometry": "triakis-triangular",
+  "neighbor_mode": "edge-match",
   "base_edge": 139.333599,
   "unit_width": 582,
   "unit_height": 336,

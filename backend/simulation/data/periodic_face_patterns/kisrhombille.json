@@ -1,5 +1,6 @@
 {
   "geometry": "kisrhombille",
+  "neighbor_mode": "edge-match",
   "base_edge": 142,
   "unit_width": 426,
   "unit_height": 246,
