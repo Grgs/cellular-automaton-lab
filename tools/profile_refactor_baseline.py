@@ -6,6 +6,7 @@ import statistics
 import time
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any, cast
 
 from backend.simulation.seeding import compare_seed, run_seed_filmstrip
 from tests.e2e.support_server import AppServer
@@ -136,14 +137,14 @@ def collect_baseline(*, repeats: int, bundle_dir: Path) -> dict[str, object]:
 
 def render_summary(payload: dict[str, object]) -> str:
     lines = ["Post-hotspot refactor baseline", ""]
-    for case in payload["topology_and_mutation"]:
+    for case in cast(list[dict[str, Any]], payload["topology_and_mutation"]):
         typed_case = dict(case)
         lines.append(
             "{geometry:28s} cells={cell_count:5d} build={cold_build_median_ms:7.1f}ms "
             "toggle={single_toggle_ms:7.1f}ms/{single_toggle_bytes:7d}B".format(**typed_case)
         )
-    comparison = dict(payload["comparison"])
-    filmstrip = dict(payload["filmstrip"])
+    comparison = cast(dict[str, Any], payload["comparison"])
+    filmstrip = cast(dict[str, Any], payload["filmstrip"])
     lines.extend(
         (
             "",
@@ -153,7 +154,7 @@ def render_summary(payload: dict[str, object]) -> str:
             f"payload={filmstrip['payload_bytes']}B",
         )
     )
-    bundle = dict(payload["bundle"])
+    bundle = cast(dict[str, Any], payload["bundle"])
     if bundle.get("available"):
         lines.append(f"bundle     raw={bundle['raw_bytes']}B gzip={bundle['gzip_bytes']}B")
     else:
