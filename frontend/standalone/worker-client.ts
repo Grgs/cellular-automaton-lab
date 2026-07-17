@@ -30,6 +30,22 @@ interface PendingRequest {
     reject: (error: Error) => void;
 }
 
+export class StandaloneRequestError extends Error {
+    readonly code: string | undefined;
+    readonly limit: number | undefined;
+    readonly estimatedCells: number | undefined;
+    readonly actualCells: number | undefined;
+
+    constructor(response: StandaloneErrorResponse) {
+        super(response.error);
+        this.name = "StandaloneRequestError";
+        this.code = response.code;
+        this.limit = response.limit;
+        this.estimatedCells = response.estimated_cells;
+        this.actualCells = response.actual_cells;
+    }
+}
+
 function createRequestId(): string {
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
@@ -167,7 +183,7 @@ export async function createStandaloneEnvironment(
             throw new Error("Standalone runtime returned an unexpected response.");
         }
         if (!response.ok) {
-            throw new Error(response.error);
+            throw new StandaloneRequestError(response);
         }
         if (response.persistedSnapshot && persistence) {
             await persistence.save(response.persistedSnapshot);

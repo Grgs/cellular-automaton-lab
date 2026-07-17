@@ -85,6 +85,10 @@ export interface StandaloneErrorResponse {
     requestId: string;
     ok: false;
     error: string;
+    code?: string;
+    limit?: number;
+    estimated_cells?: number;
+    actual_cells?: number;
 }
 
 export interface StandaloneInitErrorResponse {

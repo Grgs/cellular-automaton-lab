@@ -303,9 +303,17 @@ describe("standalone worker client", () => {
             requestId: requestMessage.requestId,
             ok: false,
             error: "state failed",
+            code: "topology_cell_budget_exceeded",
+            limit: 20_000,
+            actual_cells: 20_001,
         });
 
-        await expect(statePromise).rejects.toThrow("state failed");
+        await expect(statePromise).rejects.toMatchObject({
+            message: "state failed",
+            code: "topology_cell_budget_exceeded",
+            limit: 20_000,
+            actualCells: 20_001,
+        });
     });
 
     it("disposes pending requests and terminates the worker", async () => {
