@@ -24,15 +24,17 @@ class SimulationCoordinatorMutationDispatcher:
         action: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
-    ) -> None:
-        action(*args, **kwargs)
+    ) -> R:
+        result = action(*args, **kwargs)
         self._flush_immediately()
+        return result
 
     def run_deferred(
         self,
         action: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
-    ) -> None:
-        action(*args, **kwargs)
+    ) -> R:
+        result = action(*args, **kwargs)
         self._schedule_deferred_persist()
+        return result

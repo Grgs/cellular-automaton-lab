@@ -58,13 +58,16 @@ class BrowserRuntimeTests(unittest.TestCase):
             handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1}))
         )
         self.assertTrue(set_response["ok"])
-        self.assertEqual(set_response["snapshot"]["cell_states"][0], 1)
-        self.assertEqual(set_response["snapshot"]["state_revision"], 1)
+        self.assertEqual(set_response["base_state_revision"], 0)
+        self.assertEqual(set_response["state_revision"], 1)
+        self.assertEqual(set_response["cell_updates"], [{"id": "c:0:0", "state": 1}])
+        self.assertNotIn("snapshot", set_response)
 
         no_op_response = json.loads(
             handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1}))
         )
-        self.assertEqual(no_op_response["snapshot"]["state_revision"], 1)
+        self.assertEqual(no_op_response["state_revision"], 1)
+        self.assertEqual(no_op_response["cell_updates"], [])
 
         start_response = json.loads(handle_request("/api/control/start"))
         self.assertTrue(start_response["ok"])
@@ -116,8 +119,10 @@ class BrowserRuntimeTests(unittest.TestCase):
         response = json.loads(
             handle_request("/api/cells/set", json.dumps({"id": "c:0:0", "state": 1}))
         )
+        self.assertTrue(response["ok"])
+        state_response = json.loads(handle_request("/api/state"))
 
-        restored = json.loads(initialize_runtime(json.dumps(response["persisted_snapshot"])))
+        restored = json.loads(initialize_runtime(json.dumps(state_response["persisted_snapshot"])))
 
         self.assertTrue(restored["ok"])
         self.assertEqual(restored["snapshot"]["cell_states"][0], 1)

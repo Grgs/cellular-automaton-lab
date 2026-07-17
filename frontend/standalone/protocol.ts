@@ -1,4 +1,5 @@
 import type {
+    CellMutationDelta,
     CompareRequest,
     FilmstripRequest,
     PersistedSimulationSnapshotV5,
@@ -77,6 +78,7 @@ export interface StandaloneSuccessResponse {
     comparison?: SeedComparisonResult;
     filmstrip?: SeedFilmstripResult;
     topologyPreview?: TopologyPreview;
+    cellDelta?: CellMutationDelta;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 }
 

@@ -1,4 +1,5 @@
 import type {
+    CellMutationDelta,
     PersistedSimulationSnapshotV5,
     RuleDefinition,
     RulesResponse,
@@ -32,6 +33,7 @@ export interface DecodedRequestResponse extends RuntimeErrorDetails {
     comparison?: SeedComparisonResult;
     filmstrip?: SeedFilmstripResult;
     topologyPreview?: TopologyPreview;
+    cellDelta?: CellMutationDelta;
     persistedSnapshot?: PersistedSimulationSnapshotV5;
 }
 
@@ -56,6 +58,11 @@ function string(value: unknown, context: string, detail: string): string {
 
 function number(value: unknown, context: string, detail: string): number {
     return typeof value === "number" && Number.isFinite(value) ? value : invalid(context, detail);
+}
+
+function integer(value: unknown, context: string, detail: string): number {
+    const result = number(value, context, detail);
+    return Number.isInteger(result) ? result : invalid(context, detail);
 }
 
 function boolean(value: unknown, context: string, detail: string): boolean {
@@ -467,6 +474,39 @@ function optionalComparison(value: unknown, context: string): SeedComparisonResu
     };
 }
 
+export function decodeCellMutationDelta(value: unknown, context = "Runtime"): CellMutationDelta {
+    const payload = object(value, context, "cell delta");
+    return {
+        base_state_revision: integer(
+            payload.base_state_revision,
+            context,
+            "cell delta.base_state_revision",
+        ),
+        state_revision: integer(payload.state_revision, context, "cell delta.state_revision"),
+        topology_revision: string(
+            payload.topology_revision,
+            context,
+            "cell delta.topology_revision",
+        ),
+        generation: integer(payload.generation, context, "cell delta.generation"),
+        cell_updates: array(payload.cell_updates, context, "cell delta.cell_updates").map(
+            (entry) => {
+                const update = object(entry, context, "cell delta update");
+                return {
+                    id: string(update.id, context, "cell delta update.id"),
+                    state: integer(update.state, context, "cell delta update.state"),
+                };
+            },
+        ),
+    };
+}
+
+function optionalCellDelta(payload: PlainObject, context: string): CellMutationDelta | undefined {
+    return payload.base_state_revision === undefined
+        ? undefined
+        : decodeCellMutationDelta(payload, context);
+}
+
 function errorDetails(payload: PlainObject, context: string): RuntimeErrorDetails {
     return {
         ...(payload.error === undefined ? {} : { error: string(payload.error, context, "error") }),
@@ -505,6 +545,7 @@ export function decodeRequestResponse(raw: string): DecodedRequestResponse {
     const comparison = optionalComparison(payload.comparison, context);
     const filmstrip = optionalFilmstrip(payload.filmstrip, context);
     const topologyPreview = optionalTopologyPreview(payload.topology_preview, context);
+    const cellDelta = optionalCellDelta(payload, context);
     const persistedSnapshot = optionalPersistedSnapshot(payload.persisted_snapshot, context);
     return {
         ok: boolean(payload.ok, context, "ok"),
@@ -514,6 +555,7 @@ export function decodeRequestResponse(raw: string): DecodedRequestResponse {
         ...(comparison === undefined ? {} : { comparison }),
         ...(filmstrip === undefined ? {} : { filmstrip }),
         ...(topologyPreview === undefined ? {} : { topologyPreview }),
+        ...(cellDelta === undefined ? {} : { cellDelta }),
         ...(persistedSnapshot === undefined ? {} : { persistedSnapshot }),
     };
 }

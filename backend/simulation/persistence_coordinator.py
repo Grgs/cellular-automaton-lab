@@ -26,9 +26,14 @@ class PersistenceCoordinator:
         self._debounce_seconds = max(0.0, debounce_ms / 1000.0)
         self._timer_factory = timer_factory or self._default_timer_factory
         self._lock = threading.Lock()
+        self._persist_lock = threading.Lock()
         self._timer: TimerLike | None = None
         self._dirty = False
         self._token = 0
+
+    def _persist(self) -> None:
+        with self._persist_lock:
+            self._persist_fn()
 
     def _default_timer_factory(
         self,
@@ -66,7 +71,7 @@ class PersistenceCoordinator:
             self._timer = None
             self._dirty = False
 
-        self._persist_fn()
+        self._persist()
 
     def flush_immediately(self) -> None:
         with self._lock:
@@ -77,7 +82,7 @@ class PersistenceCoordinator:
 
         if timer is not None:
             timer.cancel()
-        self._persist_fn()
+        self._persist()
 
     def shutdown(self) -> None:
         self.flush_immediately()

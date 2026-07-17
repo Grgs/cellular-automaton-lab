@@ -1,6 +1,7 @@
 import type { AppBootstrapData, RulesResponse, SimulationSnapshot } from "../types/domain.js";
 import type { ConfigSyncBody, ResetControlBody, SimulationBackend } from "../types/controller.js";
 import { createSimulationStatePersistence } from "./persistence.js";
+import { persistedSnapshotFrom, SimulationSnapshotCache } from "../simulation-snapshot-cache.js";
 import type {
     StandaloneCommandPath,
     StandaloneErrorResponse,
@@ -165,6 +166,8 @@ export async function createStandaloneEnvironment(
     if (initResponse.persistedSnapshot && persistence) {
         await persistence.save(initResponse.persistedSnapshot);
     }
+    const snapshots = new SimulationSnapshotCache();
+    snapshots.install(requireSnapshot(initResponse.snapshot), null);
 
     async function request(
         path: StandaloneCommandPath,
@@ -185,10 +188,21 @@ export async function createStandaloneEnvironment(
         if (!response.ok) {
             throw new StandaloneRequestError(response);
         }
-        if (response.persistedSnapshot && persistence) {
-            await persistence.save(response.persistedSnapshot);
-        }
         return response;
+    }
+
+    async function persistAcceptedSnapshot(snapshot: SimulationSnapshot): Promise<void> {
+        if (persistence) {
+            await persistence.save(persistedSnapshotFrom(snapshot));
+        }
+    }
+
+    async function fetchFullState(): Promise<SimulationSnapshot> {
+        const requestBase = snapshots.current();
+        const response = await request("/api/state");
+        const snapshot = snapshots.install(requireSnapshot(response.snapshot), requestBase);
+        await persistAcceptedSnapshot(snapshot);
+        return snapshot;
     }
 
     type ControlRequestPayload = ResetControlBody | ConfigSyncBody;
@@ -212,14 +226,27 @@ export async function createStandaloneEnvironment(
         path: StandaloneCommandPath,
         body?: ControlRequestPayload,
     ): Promise<SimulationSnapshot> {
+        const requestBase = snapshots.current();
         const response = await request(path, body);
-        return requireSnapshot(response.snapshot);
+        const snapshot = snapshots.install(requireSnapshot(response.snapshot), requestBase);
+        await persistAcceptedSnapshot(snapshot);
+        return snapshot;
+    }
+
+    async function reconcileCellResponse(
+        response: StandaloneSuccessResponse,
+    ): Promise<SimulationSnapshot> {
+        if (!response.cellDelta) {
+            throw new Error("Standalone runtime did not return a cell-mutation delta.");
+        }
+        const snapshot = await snapshots.reconcileDelta(response.cellDelta, fetchFullState);
+        await persistAcceptedSnapshot(snapshot);
+        return snapshot;
     }
 
     const backend: SimulationBackend = {
         async getState() {
-            const response = await request("/api/state");
-            return requireSnapshot(response.snapshot);
+            return fetchFullState();
         },
         async getRules(): Promise<RulesResponse> {
             const response = await request("/api/rules");
@@ -229,15 +256,15 @@ export async function createStandaloneEnvironment(
         postControl,
         async toggleCell(cell) {
             const response = await request("/api/cells/toggle", { id: cell.id });
-            return requireSnapshot(response.snapshot);
+            return reconcileCellResponse(response);
         },
         async setCell(cell, state) {
             const response = await request("/api/cells/set", { id: cell.id, state });
-            return requireSnapshot(response.snapshot);
+            return reconcileCellResponse(response);
         },
         async setCells(cells) {
             const response = await request("/api/cells/set-many", { cells });
-            return requireSnapshot(response.snapshot);
+            return reconcileCellResponse(response);
         },
         async compareSeed(compareRequest) {
             const response = await request("/api/compare", compareRequest);

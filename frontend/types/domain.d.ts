@@ -380,6 +380,14 @@ export interface ApiSimulationSnapshot {
 
 export type SimulationSnapshot = ApiSimulationSnapshot;
 
+export interface CellMutationDelta {
+    base_state_revision: number;
+    state_revision: number;
+    topology_revision: string;
+    generation: number;
+    cell_updates: CellStateUpdate[];
+}
+
 export interface PersistedSimulationSnapshotV5 {
     version: 5;
     topology_spec: TopologySpec;

@@ -1,4 +1,5 @@
 import type {
+    CellMutationDelta,
     CellIdentifier,
     CompareRequest,
     FilmstripRequest,
@@ -15,6 +16,8 @@ import type {
     ResetControlBody,
     SimulationBackend,
 } from "./types/controller.js";
+import { SimulationSnapshotCache } from "./simulation-snapshot-cache.js";
+import { decodeCellMutationDelta } from "./standalone/runtime-decoders.js";
 
 interface CellMutation extends CellIdentifier {
     state: number;
@@ -82,33 +85,33 @@ function normalizeCellPayload(cell: CellIdentifier): CellIdentifier {
 export function toggleCellRequest(
     cell: CellIdentifier,
     sessionId?: string,
-): Promise<SimulationSnapshot> {
-    return request<SimulationSnapshot>(sessionPath("/api/cells/toggle", sessionId), {
+): Promise<CellMutationDelta> {
+    return request<unknown>(sessionPath("/api/cells/toggle", sessionId), {
         method: "POST",
         body: JSON.stringify(normalizeCellPayload(cell)),
-    });
+    }).then((payload) => decodeCellMutationDelta(payload, "Cell toggle response"));
 }
 
 export function setCellRequest(
     cell: CellIdentifier,
     state: number,
     sessionId?: string,
-): Promise<SimulationSnapshot> {
+): Promise<CellMutationDelta> {
     const payload = normalizeCellPayload(cell);
-    return request<SimulationSnapshot>(sessionPath("/api/cells/set", sessionId), {
+    return request<unknown>(sessionPath("/api/cells/set", sessionId), {
         method: "POST",
         body: JSON.stringify({ ...payload, state }),
-    });
+    }).then((response) => decodeCellMutationDelta(response, "Cell set response"));
 }
 
 export function setCellsRequest(
     cells: CellMutation[],
     sessionId?: string,
-): Promise<SimulationSnapshot> {
-    return request<SimulationSnapshot>(sessionPath("/api/cells/set-many", sessionId), {
+): Promise<CellMutationDelta> {
+    return request<unknown>(sessionPath("/api/cells/set-many", sessionId), {
         method: "POST",
         body: JSON.stringify({ cells }),
-    });
+    }).then((payload) => decodeCellMutationDelta(payload, "Cell batch response"));
 }
 
 export function postControl(path: EmptyControlCommandPath): Promise<SimulationSnapshot>;
@@ -178,19 +181,38 @@ export async function previewTopologyRequest(
 export function createHttpSimulationBackend({
     sessionId,
 }: HttpSimulationBackendOptions = {}): SimulationBackend {
-    const postControlForSession = ((
+    const snapshots = new SimulationSnapshotCache();
+
+    async function getStateForSession(): Promise<SimulationSnapshot> {
+        const requestBase = snapshots.current();
+        const nextSnapshot = await fetchState(sessionId);
+        return snapshots.install(nextSnapshot, requestBase);
+    }
+
+    const postControlForSession = (async (
         path: EmptyControlCommandPath | "/api/control/reset" | "/api/config",
         body?: ConfigSyncBody | ResetControlBody,
-    ) => postControl(path, body, sessionId)) as SimulationBackend["postControl"];
+    ) => {
+        const requestBase = snapshots.current();
+        const nextSnapshot = await postControl(path, body, sessionId);
+        return snapshots.install(nextSnapshot, requestBase);
+    }) as SimulationBackend["postControl"];
+
+    async function reconcileCellMutation(
+        mutation: Promise<CellMutationDelta>,
+    ): Promise<SimulationSnapshot> {
+        const delta = await mutation;
+        return snapshots.reconcileDelta(delta, () => fetchState(sessionId));
+    }
 
     return {
-        getState: () => fetchState(sessionId),
+        getState: getStateForSession,
         getRules: () => fetchRules(sessionId),
         dispose() {},
         postControl: postControlForSession,
-        toggleCell: (cell) => toggleCellRequest(cell, sessionId),
-        setCell: (cell, state) => setCellRequest(cell, state, sessionId),
-        setCells: (cells) => setCellsRequest(cells, sessionId),
+        toggleCell: (cell) => reconcileCellMutation(toggleCellRequest(cell, sessionId)),
+        setCell: (cell, state) => reconcileCellMutation(setCellRequest(cell, state, sessionId)),
+        setCells: (cells) => reconcileCellMutation(setCellsRequest(cells, sessionId)),
         compareSeed: (body) => compareSeedRequest(body, sessionId),
         requestFilmstrip: (body) => requestFilmstripRequest(body, sessionId),
         previewTopology: (body) => previewTopologyRequest(body, sessionId),

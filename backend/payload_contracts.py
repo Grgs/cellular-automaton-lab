@@ -113,6 +113,7 @@ PAYLOAD_FIELD_CONTRACTS: tuple[PayloadFieldContract, ...] = (
     PayloadFieldContract("RuleDefinitionPayload", "ApiRuleDefinition"),
     PayloadFieldContract("RulesResponsePayload", "RulesResponse"),
     PayloadFieldContract("SimulationStatePayload", "ApiSimulationSnapshot"),
+    PayloadFieldContract("CellMutationDeltaPayload", "CellMutationDelta"),
     PayloadFieldContract("PersistedSimulationSnapshotV5", "PersistedSimulationSnapshotV5"),
     PayloadFieldContract("PatternPayload", "PatternPayload"),
     PayloadFieldContract(
@@ -199,6 +200,12 @@ FRONTEND_PROPERTY_TYPE_CONTRACTS: tuple[FrontendPropertyTypeContract, ...] = (
         interface_name="ApiSimulationSnapshot",
         property_name="rule",
         property_type="RuleDefinition",
+        frontend_path=DOMAIN_FRONTEND_PATH,
+    ),
+    FrontendPropertyTypeContract(
+        interface_name="CellMutationDelta",
+        property_name="cell_updates",
+        property_type="CellStateUpdate[]",
         frontend_path=DOMAIN_FRONTEND_PATH,
     ),
     FrontendPropertyTypeContract(

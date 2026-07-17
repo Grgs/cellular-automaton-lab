@@ -136,16 +136,21 @@ class BrowserSimulationRuntime:
                     rule_name=parse_rule_name(request_payload, self.rule_registry),
                 )
             elif path == "/api/cells/toggle":
-                self.service.toggle_cell_by_id(parse_cell_id(request_payload))
+                delta = self.service.toggle_cell_by_id(parse_cell_id(request_payload))
+                return json.dumps({"ok": True, **delta.to_dict()})
             elif path == "/api/cells/set":
                 current_rule = self.service.state.rule
-                self.service.set_cell_state_by_id(
+                delta = self.service.set_cell_state_by_id(
                     parse_cell_id(request_payload),
                     parse_state_value(request_payload, current_rule),
                 )
+                return json.dumps({"ok": True, **delta.to_dict()})
             elif path == "/api/cells/set-many":
                 cells = parse_cell_updates(request_payload, self.service.state.rule)
-                self.service.set_cells_by_id([(cell["id"], cell["state"]) for cell in cells])
+                delta = self.service.set_cells_by_id(
+                    [(cell["id"], cell["state"]) for cell in cells]
+                )
+                return json.dumps({"ok": True, **delta.to_dict()})
             else:
                 raise ValueError(f"Unknown command '{path}'.")
         except (ContractValidationError, SimulationOperationError, ValueError) as exc:

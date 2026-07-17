@@ -41,7 +41,7 @@ Important rules:
 - `frontend/` is the only authored frontend source tree.
 - `static/dist/` is generated build output.
 - Backend snapshots are authoritative for topology, rule, speed, running state, generation, cell states, and the monotonic `state_revision` within a live session.
-- Frontend edits and control changes are explicit mutations that return the next canonical snapshot.
+- Frontend edits and control changes are explicit mutations. Controls return the next canonical snapshot; cell writes return a revisioned delta that the frontend applies to its cached snapshot or rejects in favor of a full-state resynchronization.
 - `state_revision` advances exactly once for each effective observable mutation. It is intentionally ephemeral: persistence omits it and a new or restored runtime begins at revision zero.
 
 Maintenance workflows and repo-owned guardrails live in [MAINTENANCE.md](./MAINTENANCE.md).
@@ -93,6 +93,20 @@ Main session API endpoints:
 - `POST /api/sessions/<session_id>/cells/toggle`
 - `POST /api/sessions/<session_id>/cells/set`
 - `POST /api/sessions/<session_id>/cells/set-many`
+
+The three cell-mutation endpoints intentionally return a breaking delta contract instead of a full topology snapshot:
+
+```json
+{
+  "base_state_revision": 12,
+  "state_revision": 13,
+  "topology_revision": "65617fa767e9",
+  "generation": 4,
+  "cell_updates": [{ "id": "c:2:3", "state": 1 }]
+}
+```
+
+Only cells whose final state changed are included. A no-op write has an empty `cell_updates` array and keeps the same revision. Clients apply a delta only when its base revision, topology revision, and generation match the installed snapshot; every mismatch is resolved by fetching `/state`. Older in-flight refreshes cannot replace a newer installed snapshot.
 
 `POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. Requests may set `include_states: true` to include each tiling's topology spec plus sparse begin/end `cells_by_id` maps; the compare-mode UI uses those optional fields to create shareable board links and inline thumbnails. `POST /api/topology/preview` ([backend/simulation/topology_preview.py](../backend/simulation/topology_preview.py)) is a second stateless helper that builds one tiling and returns its cells with per-cell geometry, which the thumbnail renderer draws. Both endpoints are exposed as matching `/api/...` worker commands in the standalone runtime, sharing their request parsers, so compare-mode works identically in server and standalone hosts.
 
@@ -336,8 +350,8 @@ The main runtime loop is:
 2. The frontend builds controller, view, config-sync, session, and interaction layers.
 3. The frontend fetches the current backend snapshot.
 4. User actions send explicit control or cell-mutation requests.
-5. The backend applies the mutation and returns the next canonical snapshot.
-6. The frontend reconciles that snapshot into state and re-renders controls and canvas.
+5. The backend applies the mutation and returns either the next canonical control snapshot or a revisioned cell delta.
+6. The frontend validates and applies the response, fetching a full snapshot on any delta mismatch, then re-renders controls and canvas.
 
 This keeps topology transitions, rule evaluation, and persistence centralized in the backend while preserving a responsive editor and control panel in the browser.
 

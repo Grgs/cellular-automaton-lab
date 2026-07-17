@@ -294,5 +294,13 @@ class CellUpdatePayload(CellTargetPayload):
 type CellUpdatesPayload = list[CellUpdatePayload]
 
 
+class CellMutationDeltaPayload(TypedDict):
+    base_state_revision: int
+    state_revision: int
+    topology_revision: str
+    generation: int
+    cell_updates: CellUpdatesPayload
+
+
 class CellUpdatesRequestPayload(TypedDict):
     cells: CellUpdatesPayload

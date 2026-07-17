@@ -15,7 +15,7 @@ from backend.simulation.coordinator_mutations import SimulationCoordinatorMutati
 from backend.simulation.coordinator_persistence import SimulationCoordinatorPersistence
 from backend.simulation.coordinator_restore import SimulationCoordinatorRestore
 from backend.simulation.engine import SimulationEngine
-from backend.simulation.models import SimulationSnapshot
+from backend.simulation.models import CellMutationDelta, SimulationSnapshot
 from backend.simulation.persistence import SimulationStateStore
 from backend.simulation.persistence_coordinator import TimerFactory
 from backend.simulation.runtime import SimulationRuntime
@@ -79,16 +79,16 @@ class SimulationCoordinator:
         action: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
-    ) -> None:
-        self.mutation_dispatcher.run_immediate(action, *args, **kwargs)
+    ) -> R:
+        return self.mutation_dispatcher.run_immediate(action, *args, **kwargs)
 
     def _run_deferred_mutation(
         self,
         action: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
-    ) -> None:
-        self.mutation_dispatcher.run_deferred(action, *args, **kwargs)
+    ) -> R:
+        return self.mutation_dispatcher.run_deferred(action, *args, **kwargs)
 
     def _save_state_to_store(self) -> None:
         self.persistence_runtime.save_to_store()
@@ -165,11 +165,11 @@ class SimulationCoordinator:
             rule_name=rule_name,
         )
 
-    def toggle_cell_by_id(self, cell_id: str) -> None:
-        self._run_deferred_mutation(self.service.toggle_cell_by_id, cell_id)
+    def toggle_cell_by_id(self, cell_id: str) -> CellMutationDelta:
+        return self._run_deferred_mutation(self.service.toggle_cell_by_id, cell_id)
 
-    def set_cell_state_by_id(self, cell_id: str, state: int) -> None:
-        self._run_deferred_mutation(self.service.set_cell_state_by_id, cell_id, state)
+    def set_cell_state_by_id(self, cell_id: str, state: int) -> CellMutationDelta:
+        return self._run_deferred_mutation(self.service.set_cell_state_by_id, cell_id, state)
 
-    def set_cells_by_id(self, cells: list[tuple[str, int]]) -> None:
-        self._run_deferred_mutation(self.service.set_cells_by_id, cells)
+    def set_cells_by_id(self, cells: list[tuple[str, int]]) -> CellMutationDelta:
+        return self._run_deferred_mutation(self.service.set_cells_by_id, cells)
