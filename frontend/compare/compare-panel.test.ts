@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type {
     AppBootstrapData,
+    CompareRequest,
     FilmstripRequest,
     SeedComparisonResult,
     SeedFilmstripResult,
@@ -117,9 +118,9 @@ function comparisonResult(): SeedComparisonResult {
     };
 }
 
-function fakeBackend(): { backend: SimulationBackend; compareSeed: ReturnType<typeof vi.fn> } {
+function fakeBackend() {
     const snapshot = {} as SimulationSnapshot;
-    const compareSeed = vi.fn(async () => comparisonResult());
+    const compareSeed = vi.fn(async (_request: CompareRequest) => comparisonResult());
     const backend: SimulationBackend = {
         getState: async () => snapshot,
         getRules: async () => ({
@@ -877,7 +878,7 @@ describe("mountComparePanel", () => {
     it("runs the filmstrip from the setup strip primary action", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
-        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => twoBoardFilmstrip());
         const handle = mountComparePanel({
             openOnMount: true,
             backend: { ...backend, requestFilmstrip },
@@ -891,6 +892,85 @@ describe("mountComparePanel", () => {
         const setupRun = document.querySelector<HTMLButtonElement>(".compare-setup-run");
         await vi.waitFor(() => expect(setupRun?.textContent).toBe("Up to date"));
         expect(setupRun?.disabled).toBe(true);
+        handle.dispose();
+    });
+
+    it("auto-runs only the latest configuration after 400 ms", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        const seedField = document.querySelector<HTMLInputElement>(
+            'input.compare-field[type="text"]',
+        );
+        if (!seedField) throw new Error("missing seed field");
+
+        for (const seed of ["1", "10", "10101"]) {
+            seedField.value = seed;
+            seedField.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        expect(requestFilmstrip).not.toHaveBeenCalled();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1), {
+            timeout: 1_000,
+        });
+        expect(requestFilmstrip.mock.calls[0]?.[0]?.seed).toBe("10101");
+        handle.dispose();
+    });
+
+    it("shows invalid auto-run configuration inline without issuing a request", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        const wallGenerations = document.querySelector<HTMLInputElement>(
+            ".compare-form input[type=number]",
+        );
+        if (!wallGenerations) throw new Error("missing wall generations field");
+        wallGenerations.value = "0";
+        wallGenerations.dispatchEvent(new Event("input", { bubbles: true }));
+
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        expect(requestFilmstrip).not.toHaveBeenCalled();
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+            "Wall generations must be an integer",
+        );
+        handle.dispose();
+    });
+
+    it("runs analysis only while its tab is visible and reuses the normalized cache", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, compareSeed, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+
+        const tab = (label: string) =>
+            [...document.querySelectorAll<HTMLButtonElement>(".compare-config-tab")].find(
+                (button) => button.textContent === label,
+            );
+        tab("Analysis")?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1), { timeout: 1_000 });
+        tab("Setup")?.click();
+        tab("Analysis")?.click();
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+
+        expect(compareSeed).toHaveBeenCalledTimes(1);
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
+            "cached",
+        );
         handle.dispose();
     });
 
@@ -916,7 +996,7 @@ describe("mountComparePanel", () => {
         seedField!.value = "10101";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
 
-        expect(setupRun?.textContent).toBe("Apply changes");
+        expect(setupRun?.textContent).toBe("Run now");
         expect(setupRun?.classList.contains("is-stale")).toBe(true);
         expect(setupRun?.disabled).toBe(false);
         setupRun?.click();
@@ -950,7 +1030,7 @@ describe("mountComparePanel", () => {
         ruleSelect.value = "wireworld";
         ruleSelect.dispatchEvent(new Event("change", { bubbles: true }));
 
-        expect(applyButton?.textContent).toBe("Apply changes");
+        expect(applyButton?.textContent).toBe("Run now");
         applyButton?.click();
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         expect(requestFilmstrip.mock.calls[1]?.[0]?.rule).toBe("wireworld");
@@ -1058,7 +1138,7 @@ describe("mountComparePanel", () => {
         );
         seedField!.value = "1110";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
-        expect(run?.textContent).toBe("Apply changes");
+        expect(run?.textContent).toBe("Run now");
         run?.click();
         expect(run?.textContent).toBe("Applying...");
         await vi.waitFor(() => {
@@ -1465,7 +1545,7 @@ describe("mountComparePanel", () => {
 
         const playSideBySide = [
             ...document.querySelectorAll<HTMLButtonElement>(".compare-run"),
-        ].find((button) => button.textContent === "Run comparison");
+        ].find((button) => button.textContent === "Run now");
         expect(playSideBySide?.disabled).toBe(true);
         expect(playSideBySide?.title).toBe("Select at least two tilings to run a comparison");
         // The dock's idle play button shares the same gate.
@@ -1592,6 +1672,7 @@ describe("mountComparePanel", () => {
     it("persists saved runs and tiling sets across remounts", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
         const first = mountComparePanel({
             openOnMount: true,
             backend,
@@ -1620,7 +1701,7 @@ describe("mountComparePanel", () => {
         document.body.innerHTML = "";
         const second = mountComparePanel({
             openOnMount: true,
-            backend,
+            backend: { ...backend, requestFilmstrip },
             bootstrapData: bootstrapData(),
         });
         clickPreset("None");
@@ -1639,6 +1720,9 @@ describe("mountComparePanel", () => {
             expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
                 "Loaded run link — 2 tilings ready.",
             );
+        });
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1), {
+            timeout: 1_000,
         });
         second.dispose();
     });
@@ -1788,10 +1872,10 @@ describe("mountComparePanel", () => {
             geometries: ["hex", "square"],
         });
         document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
-        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
 
         oldRequest.resolve({ ...twoBoardFilmstrip(), seed: "obsolete" });
-        await Promise.resolve();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         expect(document.querySelector(".compare-filmstrip-board")).toBeNull();
         expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
             "Building comparison",
@@ -1799,8 +1883,7 @@ describe("mountComparePanel", () => {
         const seedField = document.querySelector<HTMLInputElement>(
             'input.compare-field[type="text"]',
         );
-        expect(seedField?.disabled).toBe(true);
-        expect(seedField?.title).toBe("Wait for the wall update to finish");
+        expect(seedField?.disabled).toBe(false);
 
         const current = twoBoardFilmstrip();
         currentRequest.resolve({
@@ -1847,10 +1930,10 @@ describe("mountComparePanel", () => {
             geometries: ["square", "hex"],
         });
         document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
-        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
 
         oldRequest.reject(new Error("obsolete failure"));
-        await Promise.resolve();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         expect(document.querySelector<HTMLElement>(".compare-stale-notice")?.hidden).toBe(true);
         expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).not.toContain(
             "obsolete failure",
@@ -2009,18 +2092,18 @@ describe("mountComparePanel", () => {
             geometries: ["square", "hex"],
         });
         clickRunAnalysis();
-        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(2));
+        expect(compareSeed).toHaveBeenCalledTimes(1);
 
         oldAnalysis.resolve(comparisonResult());
-        await Promise.resolve();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(2));
         expect(document.querySelector(".compare-row-actions")).toBeNull();
         expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toContain(
-            "Running 2 tilings",
+            "Updating analysis for 2 tilings",
         );
         expect(
             document.querySelector<HTMLSelectElement>('select[aria-label="Comparison rule"]')
                 ?.disabled,
-        ).toBe(true);
+        ).toBe(false);
 
         currentAnalysis.resolve({ ...comparisonResult(), rule_name: "wireworld" });
         await vi.waitFor(() =>

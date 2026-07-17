@@ -93,6 +93,8 @@ import {
     MIN_COMPARE_GRID_SIZE,
     MIN_COMPARE_STEPS,
 } from "./compare-limits.js";
+import { createCompareWorkspaceStore } from "./compare-workspace-store.js";
+import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
 // patches are not offered a thumbnail (the backend would reject them anyway).
@@ -107,6 +109,21 @@ interface RunFilmstripOptions {
     /** Suppress the full-wall loading veil for debounced edits that can refresh in place. */
     quietUpdate?: boolean;
 }
+
+interface ScheduledFilmstripRun {
+    kind: "filmstrip";
+    config: CompareRunConfig;
+    playback?: FilmstripLoadOptions;
+    runOptions: RunFilmstripOptions;
+}
+
+interface ScheduledAnalysisRun {
+    kind: "analysis";
+    request: CompareRequest;
+    key: string;
+}
+
+type ScheduledCompareRun = ScheduledFilmstripRun | ScheduledAnalysisRun;
 
 interface OperationTicket {
     id: number;
@@ -216,7 +233,9 @@ export function createComparePanelContent(
     let activeOperation: OperationTicket | null = null;
     let failedWallUpdate = false;
     let tilingSearchQuery = "";
+    let activeConfigTab: ConfigTab = "setup";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
+    const analysisCache = new Map<string, SeedComparisonResult>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
     let savedRuns: SavedCompareRun[] = [];
     let savedTilingSets: SavedTilingSet[] = [];
@@ -309,6 +328,7 @@ export function createComparePanelContent(
             seedInput.value = formatted;
             redrawPreview();
             updateSummary();
+            scheduleWallRerun();
         },
     });
     // The live preview applies to both seed sources: a bit string placed by
@@ -323,19 +343,41 @@ export function createComparePanelContent(
         seedPad.syncFromSeed();
         redrawPreview();
         updateSummary();
+        scheduleWallRerun();
     });
     traversalSelect.addEventListener("change", () => {
         refreshPreview();
         updateSummary();
+        scheduleWallRerun();
     });
-    wallGenerationsInput.addEventListener("input", updateSummary);
-    wallGenerationsInput.addEventListener("change", updateSummary);
-    analysisStepsInput.addEventListener("input", updateSummary);
-    analysisStepsInput.addEventListener("change", updateSummary);
-    gridInput.addEventListener("input", updateSummary);
+    wallGenerationsInput.addEventListener("input", () => {
+        updateSummary();
+        scheduleWallRerun();
+    });
+    wallGenerationsInput.addEventListener("change", () => {
+        updateSummary();
+        scheduleWallRerun();
+    });
+    analysisStepsInput.addEventListener("input", () => {
+        updateSummary();
+        if (activeConfigTab === "analysis") {
+            scheduleAnalysis();
+        }
+    });
+    analysisStepsInput.addEventListener("change", () => {
+        updateSummary();
+        if (activeConfigTab === "analysis") {
+            scheduleAnalysis();
+        }
+    });
+    gridInput.addEventListener("input", () => {
+        updateSummary();
+        scheduleWallRerun();
+    });
     gridInput.addEventListener("change", () => {
         refreshPreview();
         updateSummary();
+        scheduleWallRerun();
     });
 
     // "Run comparison" builds (or rebuilds) the live wall from the setup strip
@@ -585,11 +627,52 @@ export function createComparePanelContent(
     let activeFilmstrip: SeedFilmstripResult | null = null;
     let activeFilmstripRunKey: string | null = null;
     let currentFocusGeometry: string | null = null;
+    const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
+
+    function syncWorkspaceConfiguration(config = currentRunConfig()): CompareRunConfig {
+        workspaceStore.update((state) => ({
+            ...state,
+            configuration: config,
+            orderedBoards: config.geometries,
+        }));
+        return config;
+    }
+
+    const workspaceScheduler = createLatestConfigScheduler<ScheduledCompareRun>({
+        delayMs: 400,
+        validate: (scheduled) =>
+            scheduled.kind === "filmstrip" ? wallConfigProblem() : analysisConfigProblem(),
+        execute: (scheduled, signal) =>
+            scheduled.kind === "filmstrip"
+                ? performFilmstrip(scheduled, signal)
+                : performAnalysis(scheduled, signal),
+        onInvalid: (message) => {
+            statusLine.textContent = message;
+            updateSummary();
+        },
+        onStateChange: ({ status, config, error }) => {
+            workspaceStore.update((state) => ({
+                ...state,
+                operation: {
+                    kind: status === "idle" ? null : (config?.kind ?? null),
+                    status,
+                    error: error instanceof Error ? error.message : error ? String(error) : null,
+                },
+            }));
+            updateSummary();
+        },
+    });
     // Live forks are per-board (keyed by geometry) and outlive a focus change:
     // a forked board keeps running as a live tile in the gallery, and speaker
     // view of it is just this same pane shown at hero size (see the
     // `:not(.is-hero)` compact styling in compare-panel.css).
     const forkedBoards = new Map<string, FocusPaneHandle>();
+    function syncWorkspaceForks(): void {
+        workspaceStore.update((state) => ({
+            ...state,
+            forkedBoards: [...forkedBoards.keys()],
+        }));
+    }
     // Live in-place forking needs an independent server session; standalone
     // (no baseSessionId) forks into the Lab instead. A host may also cap
     // concurrent forks (undefined means unlimited) -- see the check in
@@ -645,9 +728,7 @@ export function createComparePanelContent(
     // approximation), and debounces the authoritative re-run that recomputes
     // the evolution frames. Mid-timeline edits have no seed representation --
     // they will fork the board live in a later phase; for now they hint.
-    const PAINT_RERUN_DELAY_MS = 800;
     let editMode = false;
-    let paintRerunTimer: number | null = null;
 
     function normalizedSeedBits(): string {
         return seedInput.value.replace(/[^01]/g, "");
@@ -694,21 +775,23 @@ export function createComparePanelContent(
         }
     }
 
-    // Debounce the authoritative wall re-run so a burst of small changes (a
-    // paint stroke, removing a couple of boards) coalesces into one refresh.
+    function scheduledFilmstripRun(
+        playback?: FilmstripLoadOptions,
+        runOptions: RunFilmstripOptions = {},
+    ): ScheduledFilmstripRun {
+        return {
+            kind: "filmstrip",
+            config: syncWorkspaceConfiguration(),
+            runOptions,
+            ...(playback === undefined ? {} : { playback }),
+        };
+    }
+
+    // A single 400ms latest-config-wins queue covers painting and every setup
+    // mutation. HTTP work is aborted; Pyodide may finish but cannot install a
+    // stale result because the scheduler's signal is checked before rendering.
     function scheduleWallRerun(): void {
-        if (paintRerunTimer !== null) {
-            window.clearTimeout(paintRerunTimer);
-        }
-        paintRerunTimer = window.setTimeout(() => {
-            paintRerunTimer = null;
-            if (running) {
-                // A run is already in flight; try again once it settles.
-                scheduleWallRerun();
-                return;
-            }
-            void runFilmstrip(undefined, { quietUpdate: true });
-        }, PAINT_RERUN_DELAY_MS);
+        workspaceScheduler.schedule(scheduledFilmstripRun(undefined, { quietUpdate: true }));
     }
 
     function setEditMode(next: boolean): void {
@@ -734,7 +817,7 @@ export function createComparePanelContent(
     }
 
     function handlePaintCell(geometry: string, cellId: string): void {
-        if (!activeFilmstrip || !filmstripView || running) {
+        if (!activeFilmstrip || !filmstripView) {
             return;
         }
         const tiling = activeFilmstrip.tilings.find((entry) => entry.geometry === geometry);
@@ -794,7 +877,7 @@ export function createComparePanelContent(
     // tiling from the run (the filmstrip view disables it at the two-board
     // minimum), with removals coalescing into one debounced re-run.
     function removeBoardFromWall(geometry: string): void {
-        if (running || !selected.has(geometry)) {
+        if (!selected.has(geometry)) {
             return;
         }
         // Removals coalesce into one debounced rebuild, so the displayed strip
@@ -820,7 +903,7 @@ export function createComparePanelContent(
     }
 
     function replaceBoardOnWall(previousGeometry: string, nextGeometry: string): void {
-        if (running || previousGeometry === nextGeometry || !selected.has(previousGeometry)) {
+        if (previousGeometry === nextGeometry || !selected.has(previousGeometry)) {
             return;
         }
         const next = allTilings.find((tiling) => tiling.geometry === nextGeometry);
@@ -843,7 +926,7 @@ export function createComparePanelContent(
     }
 
     function addBoardToWall(geometry: string): void {
-        if (running || selected.has(geometry)) {
+        if (selected.has(geometry)) {
             return;
         }
         const tiling = allTilings.find((option) => option.geometry === geometry);
@@ -873,7 +956,7 @@ export function createComparePanelContent(
      * seed is binary); generation numbering restarts by design.
      */
     function adoptForkStateAsSeed(geometry: string, cellsById: Record<string, number>): void {
-        if (!activeFilmstrip || running) {
+        if (!activeFilmstrip) {
             return;
         }
         const order = activeFilmstrip.tilings.find(
@@ -904,6 +987,7 @@ export function createComparePanelContent(
         // board keeps it running as a live tile in the gallery instead of
         // tearing it down.
         mirrorFocusToHash(geometry);
+        workspaceStore.update((state) => ({ ...state, selectedBoard: geometry }));
         // Seed editing is edit mode's job in either layout (paint gen 0 for
         // the shared seed, any later gen to fork the board live), so speaker
         // view only changes the stage layout -- the seed pad stays in the
@@ -918,6 +1002,7 @@ export function createComparePanelContent(
             return;
         }
         forkedBoards.delete(geometry);
+        syncWorkspaceForks();
         pane.dispose();
         filmstripView?.setBoardOverlay(geometry, null);
     }
@@ -1048,6 +1133,7 @@ export function createComparePanelContent(
                 onDiscard: () => {
                     if (forkedBoards.get(geometry) === nextPane) {
                         forkedBoards.delete(geometry);
+                        syncWorkspaceForks();
                     }
                     filmstripView?.setBoardOverlay(geometry, null);
                     updateSummary();
@@ -1061,6 +1147,7 @@ export function createComparePanelContent(
                 return;
             }
             forkedBoards.set(geometry, nextPane);
+            syncWorkspaceForks();
             updateSummary();
         } catch (error) {
             if (backend) {
@@ -1221,6 +1308,7 @@ export function createComparePanelContent(
         syncShapeMode();
         seedPreview.refresh();
         updateSummary();
+        scheduleWallRerun();
     });
 
     // Configuration and data live in a tabbed bottom sheet the dock's gear
@@ -1395,6 +1483,7 @@ export function createComparePanelContent(
     }
 
     function activateConfigTab(tab: ConfigTab, options: { focus?: boolean } = {}): void {
+        activeConfigTab = tab;
         for (const [candidate, button] of configTabButtons) {
             const active = candidate === tab;
             button.classList.toggle("is-active", active);
@@ -1404,6 +1493,13 @@ export function createComparePanelContent(
         }
         if (options.focus) {
             configTabButtons.get(tab)?.focus();
+        }
+        if (tab === "analysis") {
+            if (isFilmstripCurrent()) {
+                scheduleAnalysis();
+            } else {
+                scheduleWallRerun();
+            }
         }
     }
 
@@ -1560,13 +1656,11 @@ export function createComparePanelContent(
                     ? "Unsupported for the selected rule"
                     : capacityReached
                       ? wallCapacityMessage(currentWallCapacity())
-                      : running
-                        ? WAIT_FOR_WALL_UPDATE
-                        : "";
+                      : "";
                 const checkbox = el("input", {
                     type: "checkbox",
                     checked: compatible && selected.has(option.geometry),
-                    disabled: running || !compatible || capacityReached,
+                    disabled: !compatible || capacityReached,
                     title: disabledReason,
                 });
                 checkbox.addEventListener("change", () => {
@@ -1589,6 +1683,7 @@ export function createComparePanelContent(
                     }
                     updateSummary();
                     refreshPreview();
+                    scheduleWallRerun();
                 });
                 group.append(
                     el(
@@ -1650,14 +1745,11 @@ export function createComparePanelContent(
                     }),
                 ],
             );
-            chip.disabled = running;
-            if (running) {
-                chip.title = WAIT_FOR_WALL_UPDATE;
-            }
             chip.addEventListener("click", () => {
                 selected.delete(option.geometry);
                 renderTilingChecklist();
                 refreshPreview();
+                scheduleWallRerun();
             });
             selectedTilingsList.append(chip);
         }
@@ -1681,6 +1773,7 @@ export function createComparePanelContent(
         const omitted = replaceSelection(selectionForPreset(preset));
         renderTilingChecklist();
         refreshPreview();
+        scheduleWallRerun();
         if (omitted > 0) {
             statusLine.textContent = `${wallCapacityMessage(currentWallCapacity())} ${omitted} tiling${omitted === 1 ? " was" : "s were"} not added.`;
         }
@@ -1753,8 +1846,8 @@ export function createComparePanelContent(
             const isActive = preset === active;
             button.classList.toggle("is-active", isActive);
             button.setAttribute("aria-pressed", isActive ? "true" : "false");
-            button.disabled = running;
-            button.title = running ? WAIT_FOR_WALL_UPDATE : `Select ${button.textContent} tilings`;
+            button.disabled = false;
+            button.title = `Select ${button.textContent} tilings`;
         }
     }
 
@@ -1772,24 +1865,42 @@ export function createComparePanelContent(
         const canPlay = !running && selected.size >= MIN_WALL_TILINGS && wallProblem === null;
         const current = wallProblem === null && isFilmstripCurrent();
         const stale = activeFilmstrip !== null && !current && selected.size >= MIN_WALL_TILINGS;
+        const operation = workspaceStore.getState().operation;
+        const failedFilmstrip = operation.status === "failed" && operation.kind === "filmstrip";
+        const failedAnalysis = operation.status === "failed" && operation.kind === "analysis";
+        const pendingFilmstrip =
+            operation.status === "updating" && operation.kind === "filmstrip" && !running;
+        const pendingAnalysis =
+            operation.status === "updating" && operation.kind === "analysis" && !running;
         runButton.disabled = !canAnalyze;
+        runButton.textContent = failedAnalysis
+            ? "Retry analysis"
+            : pendingAnalysis
+              ? "Run now"
+              : running
+                ? "Running…"
+                : "Run analysis";
         runButton.title = running
             ? WAIT_FOR_WALL_UPDATE
             : (analysisProblem ?? "Run the selected tilings as a longer statistical analysis");
         setupRunButton.disabled = !canPlay || current;
         setupRunButton.classList.toggle("is-current", current && !running);
         setupRunButton.classList.toggle("is-stale", stale && !running);
-        setupRunButton.textContent = running
-            ? activeFilmstrip
-                ? "Applying..."
-                : "Running..."
-            : wallProblem
-              ? "Check setup"
-              : current
-                ? "Up to date"
-                : stale
-                  ? "Apply changes"
-                  : "Run comparison";
+        setupRunButton.textContent = failedFilmstrip
+            ? "Retry"
+            : pendingFilmstrip
+              ? "Run now"
+              : running
+                ? activeFilmstrip
+                    ? "Applying..."
+                    : "Running..."
+                : wallProblem
+                  ? "Check setup"
+                  : current
+                    ? "Up to date"
+                    : stale
+                      ? "Apply changes"
+                      : "Run comparison";
         const playTitle = (() => {
             if (running) {
                 return WAIT_FOR_WALL_UPDATE;
@@ -2130,6 +2241,10 @@ export function createComparePanelContent(
     function refreshSavedControls(preferredRunId = "", preferredTilingSetId = ""): void {
         savedRuns = listSavedCompareRuns();
         savedTilingSets = listSavedTilingSets();
+        workspaceStore.update((state) => ({
+            ...state,
+            saved: { runs: savedRuns, tilingSets: savedTilingSets },
+        }));
         populateSavedSelect(savedRunSelect, savedRuns, "No saved runs", preferredRunId);
         populateSavedSelect(
             savedTilingSetSelect,
@@ -2247,6 +2362,7 @@ export function createComparePanelContent(
             omitted > 0
                 ? `Loaded tiling set "${saved.name}" with ${selected.size} tilings. ${wallCapacityMessage(currentWallCapacity())}`
                 : `Loaded tiling set "${saved.name}".`;
+        scheduleWallRerun();
     }
 
     function deleteSelectedTilingSet(): void {
@@ -2300,52 +2416,10 @@ export function createComparePanelContent(
             renderTilingChecklist();
             refreshPreview();
             updateSummary();
+            scheduleWallRerun();
         });
         pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
         renderTilingChecklist();
-    }
-
-    type ConfigurationControl = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
-    const configurationControlState = new Map<
-        ConfigurationControl,
-        { disabled: boolean; title: string }
-    >();
-
-    function configurationMutationControls(): ConfigurationControl[] {
-        const controls = new Set<ConfigurationControl>([
-            setupSeedValue,
-            setupRuleValue,
-            setupRunButton,
-            editModeButton,
-            runButton,
-        ]);
-        for (const container of [setupConfigPanel, tilingsConfigPanel, savedConfigPanel]) {
-            container
-                .querySelectorAll<ConfigurationControl>("button, input, select")
-                .forEach((control) => controls.add(control));
-        }
-        return [...controls];
-    }
-
-    function setConfigurationControlsBusy(busy: boolean): void {
-        if (busy) {
-            for (const control of configurationMutationControls()) {
-                if (!configurationControlState.has(control)) {
-                    configurationControlState.set(control, {
-                        disabled: control.disabled,
-                        title: control.title,
-                    });
-                }
-                control.disabled = true;
-                control.title = WAIT_FOR_WALL_UPDATE;
-            }
-            return;
-        }
-        for (const [control, state] of configurationControlState) {
-            control.disabled = state.disabled;
-            control.title = state.title;
-        }
-        configurationControlState.clear();
     }
 
     function setRunning(next: boolean): void {
@@ -2359,13 +2433,8 @@ export function createComparePanelContent(
         retryWallUpdateButton.title = next
             ? WAIT_FOR_WALL_UPDATE
             : "Retry the update using the latest setup";
-        setConfigurationControlsBusy(next);
         updateSummary();
-        // Summary rendering recreates selection chips and can run after a resize;
-        // catch those controls without overwriting the state captured above.
-        if (next) {
-            setConfigurationControlsBusy(true);
-        } else {
+        if (!next) {
             renderTilingChecklist();
             refreshSavedControls(savedRunSelect.value, savedTilingSetSelect.value);
             syncShapeMode();
@@ -2487,6 +2556,7 @@ export function createComparePanelContent(
             ...(configProblem ? [configProblem] : []),
         ];
         statusLine.textContent = `Loaded run link — ${selected.size} tilings ready.${notices.length > 0 ? ` ${notices.join(" ")}` : ""}`;
+        scheduleWallRerun();
     }
 
     async function runFeaturedDemo(config: CompareRunConfig): Promise<void> {
@@ -2520,16 +2590,7 @@ export function createComparePanelContent(
         });
     }
 
-    async function runComparison(): Promise<void> {
-        if (disposed || running || selected.size === 0) {
-            return;
-        }
-        const configProblem = analysisConfigProblem();
-        if (configProblem) {
-            statusLine.textContent = configProblem;
-            updateSummary();
-            return;
-        }
+    function scheduledAnalysisRun(): ScheduledAnalysisRun {
         const request: CompareRequest = {
             seed: seedInput.value,
             rule: selectedRuleName(),
@@ -2545,52 +2606,85 @@ export function createComparePanelContent(
             include_states: true,
             ...(isShapeMode() ? { pattern: shapeSelect.value } : {}),
         };
+        return { kind: "analysis", request, key: JSON.stringify(request) };
+    }
+
+    function scheduleAnalysis(): void {
+        if (selected.size === 0) {
+            statusLine.textContent = "Select at least one tiling to run analysis.";
+            return;
+        }
+        workspaceScheduler.schedule(scheduledAnalysisRun());
+    }
+
+    function runComparison(): Promise<void> {
+        if (disposed || selected.size === 0) {
+            return Promise.resolve();
+        }
+        return workspaceScheduler.runNow(scheduledAnalysisRun());
+    }
+
+    async function performAnalysis(
+        scheduled: ScheduledAnalysisRun,
+        signal: AbortSignal,
+    ): Promise<void> {
+        const cached = analysisCache.get(scheduled.key);
+        if (cached) {
+            renderResults(cached);
+            workspaceStore.update((state) => ({
+                ...state,
+                results: { ...state.results, analysis: cached, analysisKey: scheduled.key },
+            }));
+            statusLine.textContent = `Analysis ready — ${cached.results.length} tilings (cached).`;
+            return;
+        }
+        const { request } = scheduled;
         const ticket = beginOperation("analysis");
-        statusLine.textContent = `Running ${selected.size} tilings…`;
-        resultsArea.replaceChildren();
+        statusLine.textContent = `Updating analysis for ${request.geometries?.length ?? selected.size} tilings…`;
 
         try {
-            const comparison = await options.backend.compareSeed(request);
-            if (!ownsOperation(ticket)) {
+            const comparison = await options.backend.compareSeed(request, { signal });
+            if (signal.aborted || !ownsOperation(ticket)) {
                 return;
             }
+            analysisCache.set(scheduled.key, comparison);
             renderResults(comparison);
-            const sourceDesc = isShapeMode()
-                ? `shape "${shapeSelect.value}"`
+            workspaceStore.update((state) => ({
+                ...state,
+                results: { ...state.results, analysis: comparison, analysisKey: scheduled.key },
+            }));
+            const sourceDesc = request.pattern
+                ? `shape "${request.pattern}"`
                 : `${comparison.seed_bits} bits`;
             statusLine.textContent = `Done — ${comparison.results.length} tilings, ${sourceDesc}.`;
         } catch (error) {
-            if (!ownsOperation(ticket)) {
+            if (signal.aborted || !ownsOperation(ticket)) {
                 return;
             }
             statusLine.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+            throw error;
         } finally {
             finishOperation(ticket);
         }
     }
 
-    async function runFilmstrip(
-        playback?: FilmstripLoadOptions,
-        runOptions: RunFilmstripOptions = {},
+    async function performFilmstrip(
+        scheduled: ScheduledFilmstripRun,
+        signal: AbortSignal,
     ): Promise<void> {
-        if (disposed || running) {
+        if (disposed) {
             return;
         }
-        const configProblem = wallConfigProblem();
-        if (configProblem) {
-            statusLine.textContent = configProblem;
-            updateSummary();
-            return;
-        }
+        const { config: runConfig, playback, runOptions } = scheduled;
         // The authoritative result owns each board slot, so any live forks are torn down first.
         disposeAllForkedBoards();
-        if (selected.size < MIN_WALL_TILINGS) {
+        if (runConfig.geometries.length < MIN_WALL_TILINGS) {
             statusLine.textContent = "Select at least two tilings to run a comparison.";
             showStageHero();
             setWallLoading(null);
             return;
         }
-        if (selected.size > WALL_HARD_TILING_LIMIT) {
+        if (runConfig.geometries.length > WALL_HARD_TILING_LIMIT) {
             statusLine.textContent = wallCapacityMessage(WALL_HARD_TILING_LIMIT);
             return;
         }
@@ -2598,12 +2692,11 @@ export function createComparePanelContent(
         const loadingMessage = hadFilmstrip ? "Updating comparison..." : "Building comparison...";
         const showLoadingOverlay = !runOptions.quietUpdate || !hadFilmstrip;
         const ticket = beginOperation("filmstrip");
-        statusLine.textContent = `${loadingMessage} ${selected.size} tilings…`;
+        statusLine.textContent = `${loadingMessage} ${runConfig.geometries.length} tilings…`;
         if (showLoadingOverlay) {
             setWallLoading(loadingMessage);
         }
 
-        const runConfig = currentRunConfig();
         const requestKey = runConfigKey(runConfig);
         const request: FilmstripRequest = {
             seed: runConfig.seed,
@@ -2617,12 +2710,18 @@ export function createComparePanelContent(
         };
 
         try {
-            const filmstrip = await options.backend.requestFilmstrip(request);
-            if (!ownsOperation(ticket)) {
+            const filmstrip = await options.backend.requestFilmstrip(request, { signal });
+            if (signal.aborted || !ownsOperation(ticket)) {
                 return;
             }
             activeFilmstrip = filmstrip;
             activeFilmstripRunKey = requestKey;
+            workspaceStore.update((state) => ({
+                ...state,
+                orderedBoards: filmstrip.tilings.map((tiling) => tiling.geometry),
+                results: { ...state.results, filmstrip },
+                playback: { frameIndex: 0, playing: false },
+            }));
             if (!filmstripView) {
                 filmstripView = createFilmstripView({
                     backend: options.backend,
@@ -2631,6 +2730,13 @@ export function createComparePanelContent(
                     loop: true,
                     onFocusChange: handleFocusChanged,
                     onFrameChange: () => {
+                        workspaceStore.update((state) => ({
+                            ...state,
+                            playback: {
+                                ...state.playback,
+                                frameIndex: filmstripView?.currentFrameIndex() ?? 0,
+                            },
+                        }));
                         updateExplainer();
                         noteDetachedForksOnClockMove();
                     },
@@ -2663,15 +2769,18 @@ export function createComparePanelContent(
                 ...(playback ?? {}),
                 ...(hadFilmstrip ? { preserveBoards: true } : {}),
             });
-            if (!ownsOperation(ticket)) {
+            if (signal.aborted || !ownsOperation(ticket)) {
                 return;
             }
             // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
             applyFocusFromHash();
             clearFailedWallUpdate();
             statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
+            if (activeConfigTab === "analysis") {
+                scheduleAnalysis();
+            }
         } catch (error) {
-            if (!ownsOperation(ticket)) {
+            if (signal.aborted || !ownsOperation(ticket)) {
                 return;
             }
             const message = error instanceof Error ? error.message : String(error);
@@ -2683,9 +2792,17 @@ export function createComparePanelContent(
                 clearFailedWallUpdate();
                 showStageHero();
             }
+            throw error;
         } finally {
             finishOperation(ticket);
         }
+    }
+
+    function runFilmstrip(
+        playback?: FilmstripLoadOptions,
+        runOptions: RunFilmstripOptions = {},
+    ): Promise<void> {
+        return workspaceScheduler.runNow(scheduledFilmstripRun(playback, runOptions));
     }
 
     function renderResults(comparison: Parameters<typeof buildPhasePortraitSvg>[0]): void {
@@ -3047,7 +3164,7 @@ export function createComparePanelContent(
     }
 
     runButton.addEventListener("click", () => void runComparison());
-    retryWallUpdateButton.addEventListener("click", () => void runFilmstrip());
+    retryWallUpdateButton.addEventListener("click", () => void workspaceScheduler.retry());
     setupRunButton.addEventListener("click", () => {
         if (isFilmstripCurrent()) {
             statusLine.textContent = "The comparison is already up to date.";
@@ -3138,10 +3255,7 @@ export function createComparePanelContent(
         dispose(): void {
             disposed = true;
             invalidateOperations();
-            if (paintRerunTimer !== null) {
-                window.clearTimeout(paintRerunTimer);
-                paintRerunTimer = null;
-            }
+            workspaceScheduler.dispose();
             document.removeEventListener("pointerdown", onDocumentPointerDown);
             window.removeEventListener("hashchange", onHashChangeFocus);
             window.removeEventListener("resize", onWallCapacityChange);

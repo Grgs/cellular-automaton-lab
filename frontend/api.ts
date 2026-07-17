@@ -139,12 +139,14 @@ export function postControl(
 export async function compareSeedRequest(
     body: CompareRequest,
     sessionId?: string,
+    signal?: AbortSignal,
 ): Promise<SeedComparisonResult> {
     const response = await request<{ comparison: SeedComparisonResult }>(
         sessionPath("/api/compare", sessionId),
         {
             method: "POST",
             body: JSON.stringify(body),
+            ...(signal === undefined ? {} : { signal }),
         },
     );
     return response.comparison;
@@ -153,12 +155,14 @@ export async function compareSeedRequest(
 export async function requestFilmstripRequest(
     body: FilmstripRequest,
     sessionId?: string,
+    signal?: AbortSignal,
 ): Promise<SeedFilmstripResult> {
     const response = await request<{ filmstrip: SeedFilmstripResult }>(
         sessionPath("/api/compare/filmstrip", sessionId),
         {
             method: "POST",
             body: JSON.stringify(body),
+            ...(signal === undefined ? {} : { signal }),
         },
     );
     return response.filmstrip;
@@ -213,8 +217,9 @@ export function createHttpSimulationBackend({
         toggleCell: (cell) => reconcileCellMutation(toggleCellRequest(cell, sessionId)),
         setCell: (cell, state) => reconcileCellMutation(setCellRequest(cell, state, sessionId)),
         setCells: (cells) => reconcileCellMutation(setCellsRequest(cells, sessionId)),
-        compareSeed: (body) => compareSeedRequest(body, sessionId),
-        requestFilmstrip: (body) => requestFilmstripRequest(body, sessionId),
+        compareSeed: (body, options) => compareSeedRequest(body, sessionId, options?.signal),
+        requestFilmstrip: (body, options) =>
+            requestFilmstripRequest(body, sessionId, options?.signal),
         previewTopology: (body) => previewTopologyRequest(body, sessionId),
     };
 }
