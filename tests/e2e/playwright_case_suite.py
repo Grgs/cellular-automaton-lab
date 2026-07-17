@@ -1613,7 +1613,8 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
     def test_compare_run_link_restores_workspace_in_standalone(self) -> None:
         # C1 parity: a #/compare&run= deep link opens the full-page workspace in
-        # the Pyodide build and restores the saved setup without auto-running.
+        # the Pyodide build and restores the saved setup. An invalid one-board
+        # comparison is rejected inline without starting backend work.
         fragment = _encode_compare_run_fragment(
             {
                 "seed": "101",
@@ -1628,8 +1629,7 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-seedbits input.compare-field").to_have_value("101")
-        self._expect(".compare-status").to_contain_text("Loaded run link")
-        # Reconstruct-and-wait: the link must not have started a comparison.
+        self._expect(".compare-status").to_contain_text("Select at least two tilings")
         self._expect(".compare-grid").to_have_count(0)
 
     def test_saved_compare_run_persists_across_reload_in_standalone(self) -> None:
