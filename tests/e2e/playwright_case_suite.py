@@ -441,13 +441,13 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         first_board.focus()
         first_board.press("Space")
         self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
+        case.page.set_viewport_size({"width": 820, "height": 900})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [820, 900])
         case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
-        seed_source = case.page.locator(".compare-form label", has_text="Seed source").locator(
-            "select"
-        )
-        seed_source.focus()
-        seed_source.press("Space")
+        grid_size = case.page.locator(".compare-form label", has_text="Grid size").locator("input")
+        grid_size.focus()
+        grid_size.press("Space")
         expect(play_pause).to_contain_text("Play")
         case.page.keyboard.press("Escape")
         self._expect(".compare-config-sheet.is-open").to_have_count(0)
@@ -1087,7 +1087,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
                 )
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
         wall_generations = case.page.locator(
             ".compare-form label", has_text="Wall generations"
@@ -1134,8 +1133,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         grid_size.fill("2")
         expect(wall_run).to_be_enabled()
         expect(analysis_run).to_be_enabled()
-        case.page.get_by_role("button", name="Close configuration").click()
         wall_run.click()
+        case.page.get_by_role("button", name="Close configuration").click()
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 239")
         case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
@@ -1153,8 +1152,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#compare-config-tab-setup")
         wall_generations.fill("1")
         grid_size.fill("64")
-        case.page.get_by_role("button", name="Close configuration").click()
         wall_run.click()
+        case.page.get_by_role("button", name="Close configuration").click()
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 0")
         square_board = case.page.locator(".compare-filmstrip-board").filter(
@@ -1286,7 +1285,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # The converted seed still has live bits, so the placement previews in
         # the config sheet must show them (accent-filled cells), not blanks.
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
         case.page.wait_for_function(
             """() => {
