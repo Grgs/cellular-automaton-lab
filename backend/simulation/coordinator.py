@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
-from typing import ParamSpec
+from typing import ParamSpec, TypeVar
 
 from backend.payload_types import (
     PersistedSimulationSnapshotV5,
@@ -24,6 +24,7 @@ from backend.simulation.state_restore import SimulationStateRestorer
 from backend.simulation.topology import LatticeTopology
 
 P = ParamSpec("P")
+R = TypeVar("R")
 
 
 class SimulationCoordinator:
@@ -75,7 +76,7 @@ class SimulationCoordinator:
 
     def _run_immediate_mutation(
         self,
-        action: Callable[P, None],
+        action: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> None:
@@ -83,7 +84,7 @@ class SimulationCoordinator:
 
     def _run_deferred_mutation(
         self,
-        action: Callable[P, None],
+        action: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> None:
