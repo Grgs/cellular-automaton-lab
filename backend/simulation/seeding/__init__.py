@@ -36,6 +36,7 @@ from backend.simulation.seeding.shapes import (
     PATTERN_NAMES,
     place_pattern,
 )
+from backend.simulation.seeding.trajectory import TrajectoryFrame, iter_trajectory
 from backend.simulation.seeding.traversal import (
     DEFAULT_TRAVERSAL,
     TRAVERSALS,
@@ -57,12 +58,14 @@ __all__ = [
     "TRAVERSALS",
     "TopologyComparisonResult",
     "TopologyFilmstrip",
+    "TrajectoryFrame",
     "Traversal",
     "bfs_ring_order",
     "classify",
     "compare_seed",
     "first_extinction_step",
     "hamming",
+    "iter_trajectory",
     "normalize_bits",
     "paint_bits",
     "parse_compare_request",

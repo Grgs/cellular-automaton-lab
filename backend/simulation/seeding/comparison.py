@@ -12,7 +12,6 @@ from typing import Any
 
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
-from backend.simulation.engine import SimulationEngine
 from backend.simulation.periodic_face_tilings import (
     get_periodic_face_tiling_descriptor,
     is_periodic_face_tiling,
@@ -20,10 +19,9 @@ from backend.simulation.periodic_face_tilings import (
 from backend.simulation.rule_context_frames import TopologyFrame, topology_frame_for
 from backend.simulation.seeding.metrics import (
     classify,
-    first_extinction_step,
-    population,
 )
 from backend.simulation.seeding.shapes import NAMED_PATTERNS, place_pattern
+from backend.simulation.seeding.trajectory import iter_trajectory
 from backend.simulation.seeding.traversal import (
     DEFAULT_TRAVERSAL,
     TRAVERSALS,
@@ -39,7 +37,6 @@ from backend.simulation.topology_catalog import (
     minimum_grid_dimension_for_geometry,
     topology_spec_payload,
 )
-from backend.simulation.topology_types import LatticeTopology
 
 # Default sweep parameters. Kept modest so a full 46-tiling sweep finishes fast.
 DEFAULT_RULE = "conway"
@@ -65,27 +62,6 @@ MAX_COMPARISON_CELLS_PER_TILING = 4000
 # tilings go extinct in fewer than EARLY_EXTINCTION_STEPS generations.
 _EARLY_EXTINCTION_STEPS = 10
 _DEGENERATE_FRACTION = 0.5
-
-
-def _transition_metrics(previous: list[int], current: list[int]) -> tuple[int, int]:
-    live = changed = 0
-    for previous_state, current_state in zip(previous, current, strict=True):
-        live += current_state != 0
-        changed += previous_state != current_state
-    return live, changed
-
-
-def _sparse_states_and_population(
-    topology: LatticeTopology, states: list[int]
-) -> tuple[dict[str, int], int]:
-    sparse: dict[str, int] = {}
-    live = 0
-    for index, state in enumerate(states):
-        if state == 0:
-            continue
-        live += 1
-        sparse[topology.cells[index].id] = int(state)
-    return sparse, live
 
 
 @dataclass
@@ -298,29 +274,28 @@ def _run_single(
     seed_size = seeded.seed_size
     width, height, patch_depth = seeded.width, seeded.height, seeded.patch_depth
 
-    engine = SimulationEngine()
-    populations = [population(board.cell_states)]
+    populations: list[int] = []
     change_rates: list[float] = []
-    seen: dict[tuple[int, ...], int] = {tuple(board.cell_states): 0}
     period: int | None = None
     steps_run = 0
-    current = board
-    final_board = board
+    final_sparse_states: dict[str, int] | None = None
+    extinction_step: int | None = None
     divisor = max(1, frame.cell_count)
 
-    for step in range(1, steps + 1):
-        nxt = engine.step_board(current, rule)
-        steps_run = step
-        final_board = nxt
-        next_population, changed = _transition_metrics(current.cell_states, nxt.cell_states)
-        populations.append(next_population)
-        change_rates.append(changed / divisor)
-        key = tuple(nxt.cell_states)
-        if key in seen:
-            period = step - seen[key]
-            break
-        seen[key] = step
-        current = nxt
+    for trajectory_frame in iter_trajectory(
+        board,
+        rule,
+        max_steps=steps,
+        include_sparse=include_states,
+        stop_on_cycle=True,
+    ):
+        populations.append(trajectory_frame.population)
+        if trajectory_frame.generation > 0:
+            change_rates.append(trajectory_frame.changed_cells / divisor)
+        steps_run = trajectory_frame.generation
+        final_sparse_states = trajectory_frame.sparse_states
+        period = trajectory_frame.period
+        extinction_step = trajectory_frame.extinction_step
 
     result = TopologyComparisonResult(
         geometry=geometry,
@@ -334,7 +309,7 @@ def _run_single(
         classification=classify(populations, period),
         period=period,
         steps_run=steps_run,
-        extinction_step=first_extinction_step(populations),
+        extinction_step=extinction_step,
         note=note,
     )
     if include_states:
@@ -342,7 +317,7 @@ def _run_single(
             topology_spec_payload(geometry, width=width, height=height, patch_depth=patch_depth)
         )
         result.initial_cells_by_id = dict(cells_by_id)
-        result.final_cells_by_id = final_board.states_by_id(omit_zero=True)
+        result.final_cells_by_id = dict(final_sparse_states or {})
     return result
 
 
@@ -512,31 +487,29 @@ def _run_single_filmstrip(
     )
     board = seeded.board
 
-    engine = SimulationEngine()
-    initial_sparse, _ = _sparse_states_and_population(board.topology, board.cell_states)
-    frames: list[dict[str, int]] = [initial_sparse]
-    seen: dict[tuple[int, ...], int] = {tuple(board.cell_states): 0}
+    frames: list[dict[str, int]] = []
     period: int | None = None
     extinction_step: int | None = None
-    current = board
     # Every tiling captures the same number of frames so the client can advance
     # them on one shared clock. A board that reaches a fixed point, cycle, or
     # extinction simply repeats; those frames are cheap (sparse, often empty).
-    for step in range(1, frame_count):
-        nxt = engine.step_board(current, rule)
-        sparse_states, next_population = _sparse_states_and_population(
-            nxt.topology, nxt.cell_states
-        )
+    for trajectory_frame in iter_trajectory(
+        board,
+        rule,
+        max_steps=frame_count - 1,
+        include_sparse=True,
+    ):
+        sparse_states = trajectory_frame.sparse_states
+        if sparse_states is None:  # pragma: no cover - guaranteed by include_sparse
+            raise RuntimeError("Trajectory did not collect requested sparse states.")
         frames.append(sparse_states)
-        if extinction_step is None and next_population == 0:
-            extinction_step = step
-        if period is None:
-            key = tuple(nxt.cell_states)
-            if key in seen:
-                period = step - seen[key]
-            else:
-                seen[key] = step
-        current = nxt
+        period = trajectory_frame.period
+        if (
+            extinction_step is None
+            and trajectory_frame.generation > 0
+            and trajectory_frame.population == 0
+        ):
+            extinction_step = trajectory_frame.generation
 
     return TopologyFilmstrip(
         geometry=geometry,
