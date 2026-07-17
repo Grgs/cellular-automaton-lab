@@ -1,14 +1,7 @@
 /**
- * A reusable single editable board pane: one canvas backed by one independent
- * simulation session, with pointer painting, run/step controls, and snapshot
- * polling. It is the shared machinery behind the Split View panes and the
- * wall's live focus pane, so both drive their boards through the same code.
- *
- * The pane owns rendering, gestures, and polling; the consumer owns the tool
- * state (via getters), the DOM chrome around the canvas, and the backend's
- * lifecycle. `seedFromPattern` reconstructs a board from a `PatternPayload`
- * (topology spec + rule + sparse cells) using only existing session endpoints —
- * no backend changes.
+ * Composition root for a reusable editable board pane. Session state,
+ * rendering, pointer gestures, and edit history live in focused modules; this
+ * file keeps the stable public API shared by Split View and Compare focus.
  */
 
 import {
@@ -16,10 +9,9 @@ import {
     DEFAULT_EDITOR_TOOL,
     EDITOR_TOOL_BRUSH,
     EDITOR_TOOL_FILL,
-    EDITOR_TOOL_LINE,
-    EDITOR_TOOL_RECTANGLE,
     type EditorTool,
 } from "../editor-tools.js";
+import { indexTopology } from "../topology-index.js";
 import type { SimulationBackend } from "../types/controller-api.js";
 import type { GridView, ViewportDimensions } from "../types/controller-view.js";
 import type {
@@ -29,32 +21,23 @@ import type {
     PatternPayload,
     SimulationSnapshot,
     TopologyIndex,
-    TopologySpec,
 } from "../types/domain.js";
-import { indexTopology } from "../topology-index.js";
 import type { PaintableCell, PreviewPaintCell } from "../types/editor.js";
 import type { AppState } from "../types/state.js";
+import { createPaneEditHistory } from "./pane-edit-history.js";
+import { createPaneGestureController } from "./pane-gestures.js";
+import {
+    createPaneRenderer,
+    fitCanvasElementToViewport,
+    geometryForSpec,
+    type PaneCellSizeOptions,
+    type PaneViewportDimensionsOptions,
+} from "./pane-renderer.js";
+import { createPaneSession } from "./pane-session.js";
 
-const POLL_INTERVAL_MS = 250;
-
-export interface PaneViewportDimensionsOptions {
-    viewportWidth: number;
-    viewportHeight: number;
-    geometry: string;
-    cellSize: number;
-    fallbackDimensions: ViewportDimensions;
-    maxCellCount?: number;
-}
-
-export interface PaneCellSizeOptions {
-    viewportWidth: number;
-    viewportHeight: number;
-    width: number;
-    height: number;
-    topology: SimulationSnapshot["topology"];
-    geometry: string;
-    fallbackCellSize: number;
-}
+export { fitCanvasElementToViewport, geometryForSpec } from "./pane-renderer.js";
+export type { PaneCellSizeOptions, PaneViewportDimensionsOptions } from "./pane-renderer.js";
+export type { PaneEditGesture } from "./pane-gestures.js";
 
 export type PaneEditorCellsBuilder = (
     state: AppState,
@@ -64,15 +47,6 @@ export type PaneEditorCellsBuilder = (
     paintState: number,
     brushSize: number,
 ) => PreviewPaintCell[];
-
-export interface PaneEditGesture {
-    tool: EditorTool;
-    pointerId: number | null;
-    startCell: PaintableCell;
-    currentCell: PaintableCell;
-    previewCells: Map<string, PreviewPaintCell>;
-    moved: boolean;
-}
 
 export function element<K extends keyof HTMLElementTagNameMap>(
     tag: K,
@@ -96,45 +70,6 @@ function validSessionIdPart(value: string): string {
 /** A stable, session-id-safe suffix so a base session can spawn named children. */
 export function paneSessionId(baseSessionId: string, paneId: string): string {
     return `${validSessionIdPart(baseSessionId)}-${validSessionIdPart(paneId)}`;
-}
-
-export function geometryForSpec(
-    definitions: readonly BootstrappedTopologyDefinition[],
-    spec: TopologySpec,
-): string {
-    const definition = definitions.find(
-        (candidate) => candidate.tiling_family === spec.tiling_family,
-    );
-    return definition?.geometry_keys[spec.adjacency_mode] ?? spec.tiling_family;
-}
-
-function cssPixelValue(value: string): number {
-    const parsed = Number.parseFloat(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-}
-
-export function fitCanvasElementToViewport(canvas: HTMLCanvasElement, viewport: HTMLElement): void {
-    const canvasWidth = Number.parseFloat(canvas.style.width) || canvas.width;
-    const canvasHeight = Number.parseFloat(canvas.style.height) || canvas.height;
-    if (canvasWidth <= 0 || canvasHeight <= 0) {
-        return;
-    }
-    const viewportStyle = window.getComputedStyle(viewport);
-    const availableWidth = Math.max(
-        1,
-        viewport.clientWidth -
-            cssPixelValue(viewportStyle.paddingLeft) -
-            cssPixelValue(viewportStyle.paddingRight),
-    );
-    const availableHeight = Math.max(
-        1,
-        viewport.clientHeight -
-            cssPixelValue(viewportStyle.paddingTop) -
-            cssPixelValue(viewportStyle.paddingBottom),
-    );
-    const scale = Math.min(1, availableWidth / canvasWidth, availableHeight / canvasHeight);
-    canvas.style.width = `${canvasWidth * scale}px`;
-    canvas.style.height = `${canvasHeight * scale}px`;
 }
 
 export function indexPaneTopology(snapshot: SimulationSnapshot): TopologyIndex {
@@ -225,15 +160,6 @@ export function paneEditorState(
     };
 }
 
-/**
- * The app-runtime-owned seams the wall needs to spin up a live focus pane: an
- * independent backend session, a canvas grid view, and the editor geometry
- * helpers. `baseSessionId` is null when no host session exists at all, which
- * the wall reads as "fork into the Lab instead". Both hosts that do provide
- * one differ in cost: a server fork is just another lightweight backend
- * session, but a standalone fork boots its own persist-free Pyodide runtime
- * from scratch, so `forkCapacity` caps how many can run at once there.
- */
 export interface FocusPaneServices {
     baseSessionId: string | null;
     backendFactory: (sessionId: string) => SimulationBackend;
@@ -258,7 +184,6 @@ export interface EditablePaneOptions {
     setPaintState?: (state: number) => void;
     resolveCellSize?: (options: PaneCellSizeOptions) => number;
     buildEditorToolCells?: PaneEditorCellsBuilder;
-    /** Fired after every applied snapshot so the consumer can update its chrome. */
     onSnapshot?: (snapshot: SimulationSnapshot) => void;
     onError?: (error: unknown) => void;
 }
@@ -268,20 +193,8 @@ export interface EditablePaneHandle {
     applySnapshot(snapshot: SimulationSnapshot): void;
     refresh(): Promise<void>;
     render(): void;
-    /** Reconstruct the board from a pattern (topology spec + rule + sparse cells). */
     seedFromPattern(pattern: PatternPayload, speed: number): Promise<void>;
-    /**
-     * Apply one cell edit directly (no pointer, no preview gesture) — for
-     * carrying a paint stroke over into a board that was just programmatically
-     * seeded, e.g. an auto-fork triggered by that same stroke.
-     */
     applyCellEdit(cellId: string, state: number): Promise<void>;
-    /**
-     * Undo/redo committed paints as per-cell diffs: undo restores exactly the
-     * cells a paint overwrote (their pre-paint values), even if the sim has
-     * stepped since — cell-level history, not a board-wide rewind. A reseed
-     * clears both stacks.
-     */
     undo(): Promise<void>;
     redo(): Promise<void>;
     canUndo(): boolean;
@@ -310,89 +223,30 @@ export function createEditablePane(options: EditablePaneOptions): EditablePaneHa
         options.buildEditorToolCells ??
         ((_state, _tool, startCell, _endCell, paintState) => [{ ...startCell, state: paintState }]);
     const fallbackCellSize = bootstrapData.app_defaults.ui.cell_size;
-    const controller = new AbortController();
-    const { signal } = controller;
-
-    let snapshot: SimulationSnapshot | null = null;
-    let pollTimer: number | null = null;
-    let activeGesture: PaneEditGesture | null = null;
-    let suppressFollowupClick = false;
-    let disposed = false;
-
-    function clearPoll(): void {
-        if (pollTimer !== null) {
-            window.clearInterval(pollTimer);
-            pollTimer = null;
-        }
-    }
-
-    function syncPoll(): void {
-        if (disposed || !snapshot?.running) {
-            clearPoll();
-            return;
-        }
-        if (pollTimer !== null) {
-            return;
-        }
-        pollTimer = window.setInterval(() => {
-            void refresh();
-        }, POLL_INTERVAL_MS);
-    }
-
-    function render(): void {
-        if (!snapshot) {
-            return;
-        }
-        const geometry = geometryForSpec(definitions, snapshot.topology_spec);
-        const viewportWidth = viewport.clientWidth;
-        const viewportHeight = viewport.clientHeight;
-        const cellSize =
-            viewportWidth > 0 && viewportHeight > 0
-                ? (resolveCellSize?.({
-                      viewportWidth,
-                      viewportHeight,
-                      width: snapshot.topology.width ?? snapshot.topology_spec.width,
-                      height: snapshot.topology.height ?? snapshot.topology_spec.height,
-                      topology: snapshot.topology,
-                      geometry,
-                      fallbackCellSize,
-                  }) ?? fallbackCellSize)
-                : fallbackCellSize;
-        gridView.render?.(
-            {
-                topology: snapshot.topology,
-                cellStates: snapshot.cell_states,
-                previewCellStatesById: null,
-                tileColorsEnabled: true,
-            },
-            cellSize,
-            snapshot.rule.states,
-            geometry,
-        );
-        fitCanvasElementToViewport(canvas, viewport);
-    }
-
-    function applySnapshot(next: SimulationSnapshot): void {
-        snapshot = next;
-        render();
-        onSnapshot?.(next);
-        syncPoll();
-    }
-
-    async function refresh(): Promise<void> {
-        try {
-            applySnapshot(await backend.getState());
-        } catch (error) {
-            onError(error);
-            clearPoll();
-        }
-    }
+    const renderer = createPaneRenderer({
+        canvas,
+        viewport,
+        gridView,
+        definitions,
+        fallbackCellSize,
+        resolveCellSize,
+    });
+    const session = createPaneSession({
+        backend,
+        onError,
+        onSnapshot: (snapshot) => {
+            renderer.render(snapshot);
+            onSnapshot?.(snapshot);
+        },
+    });
+    const history = createPaneEditHistory(session);
 
     function buildToolCells(
         tool: EditorTool,
         startCell: PaintableCell,
         endCell: PaintableCell | null,
     ): PreviewPaintCell[] {
+        const snapshot = session.getSnapshot();
         if (!snapshot) {
             return [];
         }
@@ -426,10 +280,13 @@ export function createEditablePane(options: EditablePaneOptions): EditablePaneHa
 
     function previewCells(cells: PreviewPaintCell[]): void {
         gridView.setPreviewCells(cells);
-        gridView.setGestureOutline(
-            cells,
-            resolvePanePaintState(snapshot!, getPaintState()) === 0 ? "erase" : "paint",
-        );
+        const snapshot = session.getSnapshot();
+        if (snapshot) {
+            gridView.setGestureOutline(
+                cells,
+                resolvePanePaintState(snapshot, getPaintState()) === 0 ? "erase" : "paint",
+            );
+        }
     }
 
     function clearPreview(): void {
@@ -437,266 +294,31 @@ export function createEditablePane(options: EditablePaneOptions): EditablePaneHa
         gridView.clearGestureOutline();
     }
 
-    // Edit history: one entry per committed paint (a stroke, a programmatic
-    // edit), as per-cell diffs so undo can restore exactly what the paint
-    // overwrote. Undoing after the sim has stepped still restores those
-    // cells' pre-paint values — cell-level, not a board-wide rewind.
-    interface PaneCellDiff {
-        id: string;
-        prevState: number;
-        nextState: number;
-    }
-    const undoStack: PaneCellDiff[][] = [];
-    const redoStack: PaneCellDiff[][] = [];
-
-    /** Write cell states, pausing around the write when the sim is running. */
-    async function pushCellStates(updates: { id: string; state: number }[]): Promise<void> {
-        const wasRunning = Boolean(snapshot?.running);
-        if (wasRunning) {
-            applySnapshot(await backend.postControl("/api/control/pause"));
-        }
-        applySnapshot(await backend.setCells(updates));
-        if (wasRunning) {
-            applySnapshot(await backend.postControl("/api/control/resume"));
-        }
-    }
-
-    async function commitCells(cells: PreviewPaintCell[]): Promise<void> {
-        const current = snapshot ?? (await backend.getState());
-        const topologyIndex = indexPaneTopology(current);
-        const diffs = cells.flatMap((cell) => {
-            const resolved = findPaneCellById(topologyIndex, cell.id);
-            if (!resolved) {
-                return [];
-            }
-            const nextState = Number(cell.state);
-            const prevState = Number(current.cell_states[resolved.index] ?? 0);
-            if (prevState === nextState) {
-                return [];
-            }
-            return [{ id: resolved.id, prevState, nextState }];
-        });
-        if (diffs.length === 0) {
-            return;
-        }
-        // Record before writing: the write's own snapshot notification is
-        // where chrome refreshes its undo/redo enabled states, so the stacks
-        // must already reflect this commit when it fires.
-        undoStack.push(diffs);
-        redoStack.length = 0;
-        try {
-            await pushCellStates(diffs.map(({ id, nextState }) => ({ id, state: nextState })));
-        } catch (error) {
-            undoStack.pop();
-            throw error;
-        }
-    }
-
-    function suppressNextClick(): void {
-        suppressFollowupClick = true;
-        window.setTimeout(() => {
-            suppressFollowupClick = false;
-        }, 0);
-    }
-
-    canvas.addEventListener(
-        "pointerdown",
-        (event) => {
-            const cell = gridView.getCellFromPointerEvent?.(event) ?? null;
-            if (!cell) {
-                return;
-            }
-            event.preventDefault();
-            event.stopPropagation();
-            const paintableCell = cell as PaintableCell;
-            const selectedTool = getTool();
-            if (selectedTool === EDITOR_TOOL_FILL) {
-                const cells = buildToolCells(EDITOR_TOOL_FILL, paintableCell, paintableCell);
-                previewCells(cells);
-                suppressNextClick();
-                void commitCells(cells)
-                    .then(() => clearPreview())
-                    .catch(onError);
-                return;
-            }
-            const tool =
-                selectedTool === EDITOR_TOOL_LINE || selectedTool === EDITOR_TOOL_RECTANGLE
-                    ? selectedTool
-                    : EDITOR_TOOL_BRUSH;
-            const cells = buildToolCells(tool, paintableCell, paintableCell);
-            activeGesture = {
-                tool,
-                pointerId: event.pointerId ?? null,
-                startCell: paintableCell,
-                currentCell: paintableCell,
-                previewCells: new Map(cells.map((previewCell) => [previewCell.id, previewCell])),
-                moved: false,
-            };
-            previewCells(cells);
-            canvas.setPointerCapture?.(event.pointerId);
-        },
-        { signal },
-    );
-    canvas.addEventListener(
-        "pointermove",
-        (event) => {
-            if (!activeGesture) {
-                return;
-            }
-            const cell = gridView.getCellFromPointerEvent?.(event) ?? null;
-            if (!cell) {
-                return;
-            }
-            event.preventDefault();
-            const paintableCell = cell as PaintableCell;
-            if (activeGesture.currentCell.id === paintableCell.id) {
-                return;
-            }
-            activeGesture.moved = true;
-            const cells =
-                activeGesture.tool === EDITOR_TOOL_BRUSH
-                    ? buildToolCells(EDITOR_TOOL_LINE, activeGesture.currentCell, paintableCell)
-                    : buildToolCells(activeGesture.tool, activeGesture.startCell, paintableCell);
-            if (activeGesture.tool === EDITOR_TOOL_BRUSH) {
-                cells.forEach((previewCell) =>
-                    activeGesture?.previewCells.set(previewCell.id, previewCell),
-                );
-            } else {
-                activeGesture.previewCells = new Map(
-                    cells.map((previewCell) => [previewCell.id, previewCell]),
-                );
-            }
-            activeGesture.currentCell = paintableCell;
-            previewCells(Array.from(activeGesture.previewCells.values()));
-        },
-        { signal },
-    );
-    canvas.addEventListener(
-        "pointerup",
-        (event) => {
-            if (!activeGesture) {
-                return;
-            }
-            event.preventDefault();
-            canvas.releasePointerCapture?.(event.pointerId);
-            const cells = Array.from(activeGesture.previewCells.values());
-            activeGesture = null;
-            suppressNextClick();
-            void commitCells(cells)
-                .then(() => clearPreview())
-                .catch(onError);
-        },
-        { signal },
-    );
-    canvas.addEventListener(
-        "click",
-        (event) => {
-            if (suppressFollowupClick || activeGesture) {
-                return;
-            }
-            const cell = gridView.getCellFromPointerEvent?.(event) ?? null;
-            if (!cell) {
-                return;
-            }
-            event.preventDefault();
-            event.stopPropagation();
-            const paintableCell = cell as PaintableCell;
-            const tool = getTool() === EDITOR_TOOL_FILL ? EDITOR_TOOL_FILL : EDITOR_TOOL_BRUSH;
-            const cells = buildToolCells(tool, paintableCell, paintableCell);
-            previewCells(cells);
-            void commitCells(cells)
-                .then(() => clearPreview())
-                .catch(onError);
-        },
-        { signal },
-    );
-    canvas.addEventListener(
-        "pointercancel",
-        () => {
-            if (!activeGesture) {
-                return;
-            }
-            activeGesture = null;
-            clearPreview();
-        },
-        { signal },
-    );
+    const gestures = createPaneGestureController({
+        canvas,
+        gridView,
+        getTool,
+        buildToolCells,
+        previewCells,
+        clearPreview,
+        commitCells: history.commit,
+        onError,
+    });
+    session.registerCleanup(gestures.dispose);
 
     return {
-        getSnapshot: () => snapshot,
-        applySnapshot,
-        refresh,
-        render,
-        async seedFromPattern(pattern: PatternPayload, speed: number): Promise<void> {
-            const reset = await backend.postControl("/api/control/reset", {
-                topology_spec: pattern.topology_spec,
-                speed,
-                rule: pattern.rule,
-                randomize: false,
-            });
-            const updates = Object.entries(pattern.cells_by_id).map(([id, state]) => ({
-                id,
-                state: Number(state),
-            }));
-            // A reseed is a fresh board; edits made before it are not
-            // meaningful history against the new state.
-            undoStack.length = 0;
-            redoStack.length = 0;
-            applySnapshot(updates.length > 0 ? await backend.setCells(updates) : reset);
-        },
-        applyCellEdit(cellId: string, state: number): Promise<void> {
-            return commitCells([{ id: cellId, state }]);
-        },
-        canUndo: () => undoStack.length > 0,
-        canRedo: () => redoStack.length > 0,
-        async undo(): Promise<void> {
-            const diffs = undoStack.pop();
-            if (!diffs) {
-                return;
-            }
-            // Move between stacks before the write: the write's snapshot is
-            // where chrome refreshes its undo/redo enabled states, so the
-            // stacks must already reflect this operation when it fires.
-            redoStack.push(diffs);
-            try {
-                await pushCellStates(diffs.map(({ id, prevState }) => ({ id, state: prevState })));
-            } catch (error) {
-                redoStack.pop();
-                undoStack.push(diffs);
-                throw error;
-            }
-        },
-        async redo(): Promise<void> {
-            const diffs = redoStack.pop();
-            if (!diffs) {
-                return;
-            }
-            undoStack.push(diffs);
-            try {
-                await pushCellStates(diffs.map(({ id, nextState }) => ({ id, state: nextState })));
-            } catch (error) {
-                undoStack.pop();
-                redoStack.push(diffs);
-                throw error;
-            }
-        },
-        async step(): Promise<void> {
-            applySnapshot(await backend.postControl("/api/control/step"));
-        },
-        async runToggle(): Promise<void> {
-            const current = snapshot ?? (await backend.getState());
-            if (current.running) {
-                applySnapshot(await backend.postControl("/api/control/pause"));
-                return;
-            }
-            const path = current.generation > 0 ? "/api/control/resume" : "/api/control/start";
-            applySnapshot(await backend.postControl(path));
-        },
-        dispose(): void {
-            disposed = true;
-            clearPoll();
-            controller.abort();
-            clearPreview();
-        },
+        getSnapshot: session.getSnapshot,
+        applySnapshot: session.applySnapshot,
+        refresh: session.refresh,
+        render: () => renderer.render(session.getSnapshot()),
+        seedFromPattern: (pattern, speed) => session.seedFromPattern(pattern, speed, history.clear),
+        applyCellEdit: (cellId, state) => history.commit([{ id: cellId, state }]),
+        canUndo: history.canUndo,
+        canRedo: history.canRedo,
+        undo: history.undo,
+        redo: history.redo,
+        step: session.step,
+        runToggle: session.runToggle,
+        dispose: session.dispose,
     };
 }
