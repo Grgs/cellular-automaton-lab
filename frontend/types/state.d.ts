@@ -26,6 +26,7 @@ export interface AppState {
     pollTimer: BrowserTimerId | null;
     isRunning: boolean;
     generation: number;
+    stateRevision: number | null;
     speed: number;
     measuredSpeed: number | null;
     measuredSpeedSample: {

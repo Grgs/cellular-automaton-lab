@@ -27,6 +27,7 @@ def build_initial_state(rule_registry: RuleRegistry) -> SimulationStateData:
         generation=0,
         rule=default_rule,
         board=empty_service_board(DEFAULT_GEOMETRY, default_config.width, default_config.height),
+        state_revision=0,
     )
 
 

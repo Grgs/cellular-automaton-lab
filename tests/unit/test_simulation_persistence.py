@@ -164,6 +164,7 @@ class SimulationPersistenceTests(unittest.TestCase):
         self.assertEqual(payload["cells_by_id"], {"c:1:1": 1})
         self.assertNotIn("grid", payload)
         self.assertNotIn("cell_states", payload)
+        self.assertNotIn("state_revision", payload)
 
     def test_deferred_cell_edits_flush_after_timer_fires(self) -> None:
         manager = self.create_manager()
@@ -308,6 +309,7 @@ class SimulationPersistenceTests(unittest.TestCase):
         self.assertFalse(restored.running)
         self.assertEqual(restored.generation, 4)
         self.assertEqual(restored.rule.name, "whirlpool")
+        self.assertEqual(restored.state_revision, 0)
         restored_grid = regular_grid_from_board(restored.board)
         assert restored_grid is not None
         self.assertEqual(restored_grid[1][1:4], [1, 2, 3])

@@ -75,16 +75,21 @@ class SimulationService:
                 generation=int(next_state.generation),
                 rule=next_state.rule,
                 board=clone_service_board(next_state.board),
+                state_revision=0,
             )
 
     def start(self) -> SimulationSnapshot:
         with self._lock:
-            self._state.running = True
+            if not self._state.running:
+                self._state.running = True
+                self._state.state_revision += 1
             return snapshot_state(self._state)
 
     def pause(self) -> None:
         with self._lock:
-            self._state.running = False
+            if self._state.running:
+                self._state.running = False
+                self._state.state_revision += 1
 
     def resume(self) -> SimulationSnapshot:
         return self.start()
@@ -93,12 +98,14 @@ class SimulationService:
         with self._lock:
             self._state.running = False
             step_board(self.engine, self._state)
+            self._state.state_revision += 1
 
     def step_if_running(self) -> bool:
         with self._lock:
             if not self._state.running:
                 return False
             step_board(self.engine, self._state)
+            self._state.state_revision += 1
             return True
 
     def reset(
@@ -121,6 +128,7 @@ class SimulationService:
                     speed=speed,
                     randomize=randomize,
                 )
+                self._state.state_revision += 1
             except TopologyCellBudgetExceeded:
                 raise
             except ValueError as exc:
@@ -133,6 +141,8 @@ class SimulationService:
         rule_name: str | None = None,
     ) -> None:
         with self._lock:
+            previous_config = self._state.config
+            previous_rule = self._state.rule
             try:
                 apply_config_transition(
                     self._state,
@@ -143,27 +153,38 @@ class SimulationService:
                     speed=speed,
                     rule_name=rule_name,
                 )
+                if self._state.config != previous_config or self._state.rule is not previous_rule:
+                    self._state.state_revision += 1
             except TopologyCellBudgetExceeded:
                 raise
             except ValueError as exc:
                 raise SimulationOperationError(str(exc)) from exc
 
-    def toggle_cell_by_id(self, cell_id: str) -> None:
+    def toggle_cell_by_id(self, cell_id: str) -> dict[str, int]:
         with self._lock:
-            toggle_cells_by_id(self._state, [cell_id])
+            updates = toggle_cells_by_id(self._state, [cell_id])
+            if updates:
+                self._state.state_revision += 1
+            return updates
 
-    def set_cell_state_by_id(self, cell_id: str, state: int) -> None:
+    def set_cell_state_by_id(self, cell_id: str, state: int) -> dict[str, int]:
         with self._lock:
             try:
                 validate_state_values(self._state.rule, [state])
             except ValueError as exc:
                 raise SimulationOperationError(str(exc)) from exc
-            set_cells_by_id(self._state, [(cell_id, state)])
+            updates = set_cells_by_id(self._state, [(cell_id, state)])
+            if updates:
+                self._state.state_revision += 1
+            return updates
 
-    def set_cells_by_id(self, cells: list[tuple[str, int]]) -> None:
+    def set_cells_by_id(self, cells: list[tuple[str, int]]) -> dict[str, int]:
         with self._lock:
             try:
                 validate_state_values(self._state.rule, [state for _, state in cells])
             except ValueError as exc:
                 raise SimulationOperationError(str(exc)) from exc
-            set_cells_by_id(self._state, cells)
+            updates = set_cells_by_id(self._state, cells)
+            if updates:
+                self._state.state_revision += 1
+            return updates

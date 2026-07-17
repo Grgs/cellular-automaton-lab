@@ -47,6 +47,7 @@ class SimulationStateRestorer:
             generation=plan.generation,
             rule=plan.rule,
             board=next_board,
+            state_revision=0,
         )
 
     def _normalize_board(

@@ -37,9 +37,6 @@ def apply_reset_transition(
         randomize=randomize,
     )
 
-    state.running = False
-    state.generation = 0
-    state.rule = plan.rule
     next_board = (
         create_random_board(
             plan.config.geometry,
@@ -57,6 +54,9 @@ def apply_reset_transition(
             plan.config.patch_depth,
         )
     )
+    state.running = False
+    state.generation = 0
+    state.rule = plan.rule
     state.board = next_board
     state.config = plan.config.updated(
         width=next_board.topology.width,
@@ -82,9 +82,9 @@ def apply_config_transition(
         rule_name=rule_name,
     )
 
+    next_board = state.board
     if plan.board_mode == "transfer":
-        state.running = False
-        state.board = transfer_board(
+        next_board = transfer_board(
             state.board,
             plan.config.geometry,
             plan.config.width,
@@ -92,9 +92,14 @@ def apply_config_transition(
             plan.config.patch_depth,
         )
     if plan.coerce_rule_states:
-        state.board = coerce_board_to_rule(state.board, plan.rule)
+        next_board = coerce_board_to_rule(next_board, plan.rule)
+
+    if plan.board_mode == "transfer":
+        state.running = False
+    state.board = next_board
+    if plan.coerce_rule_states:
         state.rule = plan.rule
     state.config = plan.config.updated(
-        width=state.board.topology.width,
-        height=state.board.topology.height,
+        width=next_board.topology.width,
+        height=next_board.topology.height,
     )

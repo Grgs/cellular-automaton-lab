@@ -14,13 +14,28 @@ def validate_state_values(rule: AutomatonRule, states: list[int]) -> None:
         validate_state_value(rule, state)
 
 
-def set_cells_by_id(state: SimulationStateData, cells: list[tuple[str, int]]) -> None:
+def set_cells_by_id(state: SimulationStateData, cells: list[tuple[str, int]]) -> dict[str, int]:
+    previous_states = {
+        cell_id: state.board.state_for(cell_id)
+        for cell_id, _ in cells
+        if state.topology.has_cell(cell_id)
+    }
     for cell_id, next_state in cells:
         if state.topology.has_cell(cell_id):
             state.board.set_state_for(cell_id, int(next_state))
+    return {
+        cell_id: state.board.state_for(cell_id)
+        for cell_id, previous_state in previous_states.items()
+        if state.board.state_for(cell_id) != previous_state
+    }
 
 
-def toggle_cells_by_id(state: SimulationStateData, cell_ids: list[str]) -> None:
+def toggle_cells_by_id(state: SimulationStateData, cell_ids: list[str]) -> dict[str, int]:
+    previous_states = {
+        cell_id: state.board.state_for(cell_id)
+        for cell_id in cell_ids
+        if state.topology.has_cell(cell_id)
+    }
     for cell_id in cell_ids:
         if not state.topology.has_cell(cell_id):
             continue
@@ -29,3 +44,8 @@ def toggle_cells_by_id(state: SimulationStateData, cell_ids: list[str]) -> None:
             cell_id,
             0 if current_state else state.rule.default_paint_state,
         )
+    return {
+        cell_id: state.board.state_for(cell_id)
+        for cell_id, previous_state in previous_states.items()
+        if state.board.state_for(cell_id) != previous_state
+    }

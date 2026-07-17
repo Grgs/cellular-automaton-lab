@@ -371,6 +371,7 @@ export interface ApiSimulationSnapshot {
     speed: number;
     running: boolean;
     generation: number;
+    state_revision: number;
     rule: RuleDefinition;
     topology_revision: string;
     topology: TopologyPayload;

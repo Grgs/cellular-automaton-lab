@@ -429,6 +429,7 @@ class SimulationSnapshot:
     running: bool
     generation: int
     rule: RuleSnapshot
+    state_revision: int = 0
 
     @property
     def topology(self) -> LatticeTopology:
@@ -448,6 +449,7 @@ class SimulationSnapshot:
             "speed": self.config.speed,
             "running": self.running,
             "generation": self.generation,
+            "state_revision": self.state_revision,
             "rule": self.rule.to_dict(),
             "topology_revision": self.topology.topology_revision,
             "cell_states": self.cell_states,
@@ -462,6 +464,7 @@ class SimulationStateData:
     generation: int
     rule: AutomatonRule
     board: SimulationBoard
+    state_revision: int = 0
 
     @property
     def topology(self) -> LatticeTopology:

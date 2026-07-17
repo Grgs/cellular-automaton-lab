@@ -73,6 +73,7 @@ export function applySimulationSnapshot(
     state.previewCellStatesById = null;
     state.isRunning = simulationState.running;
     state.generation = simulationState.generation;
+    state.stateRevision = simulationState.state_revision;
     state.speed = simulationState.speed;
     const topologySpec = describeTopologySpec(
         simulationState.topology_spec || DEFAULT_TOPOLOGY_SPEC,

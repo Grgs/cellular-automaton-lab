@@ -49,6 +49,8 @@ class ApiSessionTests(ApiTestCase):
         self.assertEqual(self.regular_cell_state(first_state, 2, 2), 0)
         self.assertEqual(self.regular_cell_state(second_state, 1, 1), 0)
         self.assertEqual(self.regular_cell_state(second_state, 2, 2), 1)
+        self.assertEqual(first_state["state_revision"], 1)
+        self.assertEqual(second_state["state_revision"], 1)
 
     def test_session_state_persists_independently(self) -> None:
         first = "s-persist-first"
@@ -66,6 +68,37 @@ class ApiSessionTests(ApiTestCase):
         self.assertEqual(self.regular_cell_state(first_state, 2, 2), 0)
         self.assertEqual(self.regular_cell_state(second_state, 1, 1), 0)
         self.assertEqual(self.regular_cell_state(second_state, 2, 2), 1)
+        self.assertEqual(first_state["state_revision"], 0)
+        self.assertEqual(second_state["state_revision"], 0)
+
+    def test_session_revision_tracks_effective_http_mutations_only(self) -> None:
+        session_id = "s-revision"
+
+        def path(suffix: str) -> str:
+            return self.session_path(session_id, suffix)
+
+        initial = self.session_state(session_id)
+        self.assertEqual(initial["state_revision"], 0)
+
+        started = require_simulation_state_payload(
+            self.client.post(path("/control/start")).get_json(), context="started state"
+        )
+        repeated = require_simulation_state_payload(
+            self.client.post(path("/control/start")).get_json(), context="repeated start state"
+        )
+        self.assertEqual(started["state_revision"], 1)
+        self.assertEqual(repeated["state_revision"], 1)
+
+        changed = require_simulation_state_payload(
+            self.client.post(path("/cells/set"), json={"id": "c:1:1", "state": 1}).get_json(),
+            context="changed cell state",
+        )
+        unchanged = require_simulation_state_payload(
+            self.client.post(path("/cells/set"), json={"id": "c:1:1", "state": 1}).get_json(),
+            context="unchanged cell state",
+        )
+        self.assertEqual(changed["state_revision"], 2)
+        self.assertEqual(unchanged["state_revision"], 2)
 
     def test_invalid_session_id_returns_400(self) -> None:
         response = self.client.get("/api/sessions/bad.id/state")

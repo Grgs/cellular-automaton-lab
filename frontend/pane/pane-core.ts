@@ -193,6 +193,7 @@ export function paneEditorState(
         pollTimer: null,
         isRunning: snapshot.running,
         generation: snapshot.generation,
+        stateRevision: snapshot.state_revision,
         speed: snapshot.speed,
         measuredSpeed: null,
         measuredSpeedSample: null,

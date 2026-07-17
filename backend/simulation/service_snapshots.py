@@ -11,4 +11,5 @@ def snapshot_state(state: SimulationStateData) -> SimulationSnapshot:
         running=state.running,
         generation=state.generation,
         rule=RuleSnapshot.from_rule(state.rule),
+        state_revision=state.state_revision,
     )

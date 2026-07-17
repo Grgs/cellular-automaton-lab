@@ -40,8 +40,9 @@ Important rules:
 
 - `frontend/` is the only authored frontend source tree.
 - `static/dist/` is generated build output.
-- Backend snapshots are authoritative for topology, rule, speed, running state, generation, and cell states within a session.
+- Backend snapshots are authoritative for topology, rule, speed, running state, generation, cell states, and the monotonic `state_revision` within a live session.
 - Frontend edits and control changes are explicit mutations that return the next canonical snapshot.
+- `state_revision` advances exactly once for each effective observable mutation. It is intentionally ephemeral: persistence omits it and a new or restored runtime begins at revision zero.
 
 Maintenance workflows and repo-owned guardrails live in [MAINTENANCE.md](./MAINTENANCE.md).
 

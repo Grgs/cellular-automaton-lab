@@ -62,6 +62,7 @@ function createSimulationSnapshot(): SimulationSnapshot {
         speed: 0,
         running: false,
         generation: 0,
+        state_revision: 0,
         rule,
         topology_revision: "test",
         topology: {
