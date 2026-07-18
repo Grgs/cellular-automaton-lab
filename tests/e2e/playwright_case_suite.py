@@ -407,7 +407,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
         self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
         expect(generation).to_have_text(re.compile(r"0 of \d+"))
-        case.assertIn("focus=", case.page.url)
+        case.assertTrue("focus=" in case.page.url)
 
         unexpected_console = [
             message
