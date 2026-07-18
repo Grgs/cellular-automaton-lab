@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
     createFilmstripTransport,
@@ -117,6 +117,29 @@ describe("createFilmstripTransport", () => {
 
         control(transport, "Play / pause").click(); // pause
         expect(clock.active()).toBe(0);
+    });
+
+    it("reports play-state transitions once, including a detach while playing", () => {
+        const clock = manualScheduler();
+        const onPlayStateChange = vi.fn();
+        const transport = createFilmstripTransport({
+            scheduler: clock.scheduler,
+            onPlayStateChange,
+        });
+        transport.attach(new FilmstripPlayer(3));
+        expect(onPlayStateChange).not.toHaveBeenCalled();
+
+        control(transport, "Play / pause").click();
+        expect(onPlayStateChange).toHaveBeenCalledExactlyOnceWith(true);
+
+        // Frames advance without re-reporting the unchanged play state.
+        clock.tick();
+        clock.tick();
+        expect(onPlayStateChange).toHaveBeenCalledTimes(1);
+
+        transport.detach();
+        expect(onPlayStateChange).toHaveBeenLastCalledWith(false);
+        expect(onPlayStateChange).toHaveBeenCalledTimes(2);
     });
 
     it("keeps the play control disabled for a single-frame player", () => {

@@ -21,6 +21,8 @@ export interface CompareWorkspaceState {
     readonly selectedBoard: string | null;
     readonly results: {
         readonly filmstrip: SeedFilmstripResult | null;
+        /** Run-config key the filmstrip was produced from (staleness checks). */
+        readonly filmstripKey: string | null;
         readonly analysis: SeedComparisonResult | null;
         readonly analysisKey: string | null;
     };
@@ -79,7 +81,7 @@ export function createCompareWorkspaceStore(
         orderedBoards: configuration.geometries,
         focusedBoard: null,
         selectedBoard: null,
-        results: { filmstrip: null, analysis: null, analysisKey: null },
+        results: { filmstrip: null, filmstripKey: null, analysis: null, analysisKey: null },
         playback: { frameIndex: 0, playing: false },
         saved: { runs: [], tilingSets: [] },
         operation: { kind: null, status: "idle", error: null },
