@@ -93,7 +93,7 @@ import {
     MIN_COMPARE_GRID_SIZE,
     MIN_COMPARE_STEPS,
 } from "./compare-limits.js";
-import { createCompareWorkspaceStore } from "./compare-workspace-store.js";
+import { createCompareWorkspaceStore, inspectedBoard } from "./compare-workspace-store.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 
@@ -227,19 +227,15 @@ export function createComparePanelContent(
 
     let rules: RuleDefinition[] = [];
     let rulesLoaded = false;
-    let running = false;
     let disposed = false;
     let operationSequence = 0;
     let lifecycleRevision = 0;
     let activeOperation: OperationTicket | null = null;
-    let failedWallUpdate = false;
     let tilingSearchQuery = "";
     let activeConfigTab: ConfigTab = "setup";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
     const analysisCache = new Map<string, SeedComparisonResult>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
-    let savedRuns: SavedCompareRun[] = [];
-    let savedTilingSets: SavedTilingSet[] = [];
     let editingSavedRunId = "";
     let editingSavedTilingSetId = "";
 
@@ -641,12 +637,17 @@ export function createComparePanelContent(
     // The dock's play button doubles as "Run comparison" before any run is
     // attached, so the transport owns the primary action rather than a separate
     // button sitting beside it.
-    const filmstripTransport = createFilmstripTransport({ onRun: () => void runFilmstrip() });
+    const filmstripTransport = createFilmstripTransport({
+        onRun: () => void runFilmstrip(),
+        onPlayStateChange: (playing) => {
+            workspaceStore.update((state) => ({
+                ...state,
+                playback: { ...state.playback, playing },
+            }));
+        },
+    });
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
-    let activeFilmstrip: SeedFilmstripResult | null = null;
-    let activeFilmstripRunKey: string | null = null;
-    let currentFocusGeometry: string | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
 
     function syncWorkspaceConfiguration(config = currentRunConfig()): CompareRunConfig {
@@ -659,15 +660,16 @@ export function createComparePanelContent(
     }
 
     function selectedBoardGeometry(): string | null {
-        return currentFocusGeometry ?? workspaceStore.getState().selectedBoard;
+        return inspectedBoard(workspaceStore.getState());
     }
 
     function selectedBoardElement(): HTMLElement | null {
         const geometry = selectedBoardGeometry();
-        if (!geometry || !activeFilmstrip || !filmstripView) {
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (!geometry || !filmstrip || !filmstripView) {
             return null;
         }
-        const index = activeFilmstrip.tilings.findIndex((tiling) => tiling.geometry === geometry);
+        const index = filmstrip.tilings.findIndex((tiling) => tiling.geometry === geometry);
         return index < 0
             ? null
             : (filmstripView.element.querySelectorAll<HTMLElement>(".compare-filmstrip-board")[
@@ -691,10 +693,9 @@ export function createComparePanelContent(
             workspaceStore.update((state) => ({
                 ...state,
                 operation: {
+                    ...state.operation,
                     kind: status === "idle" ? null : (config?.kind ?? null),
-                    // The store's operation contract has no debounce phase;
-                    // surface a pending configuration as the same busy state.
-                    status: status === "pending" ? "updating" : status,
+                    status,
                     error: error instanceof Error ? error.message : error ? String(error) : null,
                 },
             }));
@@ -721,7 +722,7 @@ export function createComparePanelContent(
     // The focused board is mirrored into the hash (`&focus=<geometry>`) so speaker
     // view is shareable and the browser back button returns to the gallery.
     function mirrorFocusToHash(geometry: string | null): void {
-        currentFocusGeometry = geometry;
+        workspaceStore.update((state) => ({ ...state, focusedBoard: geometry }));
         const current = window.location.hash;
         const next =
             geometry === null ? hashWithoutFocus(current) : hashWithFocus(current, geometry);
@@ -740,13 +741,14 @@ export function createComparePanelContent(
     }
 
     function applyFocusFromHash(): void {
-        if (!filmstripView || !activeFilmstrip) {
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (!filmstripView || !filmstrip) {
             return;
         }
         const requested = readFocusFromHash(window.location.hash);
         if (
             requested !== null &&
-            !activeFilmstrip.tilings.some((tiling) => tiling.geometry === requested)
+            !filmstrip.tilings.some((tiling) => tiling.geometry === requested)
         ) {
             // A stale or mistyped deep link. The view treats it as "no focus",
             // but when the wall is already unfocused it never notifies, so the
@@ -795,13 +797,15 @@ export function createComparePanelContent(
 
     /** Re-project the seed onto every board's generation 0 and re-render them. */
     function projectSeedOntoFrameZero(bits: string): void {
-        if (!activeFilmstrip || !filmstripView) {
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (!filmstrip || !filmstripView) {
             return;
         }
-        for (const tiling of activeFilmstrip.tilings) {
+        const changedTilings: TopologyFilmstrip[] = [];
+        const tilings = filmstrip.tilings.map((tiling) => {
             const order = tiling.seed_order;
             if (!order || order.length === 0 || tiling.frames.length === 0) {
-                continue;
+                return tiling;
             }
             const frame: Record<string, number> = {};
             for (let index = 0; index < bits.length && index < order.length; index += 1) {
@@ -809,8 +813,26 @@ export function createComparePanelContent(
                     frame[order[index]!] = 1;
                 }
             }
-            tiling.frames[0] = frame;
-            filmstripView.refreshBoard(tiling.geometry);
+            const frames = [...tiling.frames];
+            frames[0] = frame;
+            const changed = { ...tiling, frames };
+            changedTilings.push(changed);
+            return changed;
+        });
+        const nextFilmstrip = { ...filmstrip, tilings };
+        const installed = workspaceStore.update((state) =>
+            state.results.filmstrip === filmstrip
+                ? {
+                      ...state,
+                      results: { ...state.results, filmstrip: nextFilmstrip },
+                  }
+                : state,
+        );
+        if (installed.results.filmstrip !== nextFilmstrip) {
+            return;
+        }
+        for (const tiling of changedTilings) {
+            filmstripView.updateBoardData(tiling);
         }
     }
 
@@ -856,10 +878,11 @@ export function createComparePanelContent(
     }
 
     function handlePaintCell(geometry: string, cellId: string): void {
-        if (!activeFilmstrip || !filmstripView) {
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (!filmstrip || !filmstripView) {
             return;
         }
-        const tiling = activeFilmstrip.tilings.find((entry) => entry.geometry === geometry);
+        const tiling = filmstrip.tilings.find((entry) => entry.geometry === geometry);
         if (!tiling) {
             statusLine.textContent = "This board cannot edit the seed.";
             return;
@@ -934,7 +957,9 @@ export function createComparePanelContent(
         // Reflect the new floor on the still-displayed boards immediately, so a
         // fast follow-up click sees a disabled control instead of overshooting.
         filmstripView?.setBoardsRemovable(selected.size > MIN_WALL_TILINGS);
-        const tiling = activeFilmstrip?.tilings.find((entry) => entry.geometry === geometry);
+        const tiling = workspaceStore
+            .getState()
+            .results.filmstrip?.tilings.find((entry) => entry.geometry === geometry);
         statusLine.textContent = `Removed ${tiling?.label || geometry} — updating the wall…`;
         renderTilingChecklist();
         refreshPreview();
@@ -995,12 +1020,11 @@ export function createComparePanelContent(
      * seed is binary); generation numbering restarts by design.
      */
     function adoptForkStateAsSeed(geometry: string, cellsById: Record<string, number>): void {
-        if (!activeFilmstrip) {
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (!filmstrip) {
             return;
         }
-        const order = activeFilmstrip.tilings.find(
-            (entry) => entry.geometry === geometry,
-        )?.seed_order;
+        const order = filmstrip.tilings.find((entry) => entry.geometry === geometry)?.seed_order;
         if (!order || order.length === 0) {
             statusLine.textContent = "This board cannot rebuild the shared seed.";
             return;
@@ -1026,7 +1050,9 @@ export function createComparePanelContent(
         // board keeps it running as a live tile in the gallery instead of
         // tearing it down.
         mirrorFocusToHash(geometry);
-        workspaceStore.update((state) => ({ ...state, selectedBoard: geometry }));
+        if (geometry !== null) {
+            workspaceStore.update((state) => ({ ...state, selectedBoard: geometry }));
+        }
         // Seed editing is edit mode's job in either layout (paint gen 0 for
         // the shared seed, any later gen to fork the board live), so speaker
         // view only changes the stage layout -- the seed pad stays in the
@@ -1099,7 +1125,8 @@ export function createComparePanelContent(
         frameIndex: number,
         initialPaint?: { cellId: string; state: number },
     ): Promise<void> {
-        if (!filmstripView || !activeFilmstrip) {
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (!filmstripView || !filmstrip) {
             return;
         }
         const existing = forkedBoards.get(geometry);
@@ -1109,11 +1136,11 @@ export function createComparePanelContent(
             }
             return;
         }
-        const tiling = activeFilmstrip.tilings.find((candidate) => candidate.geometry === geometry);
+        const tiling = filmstrip.tilings.find((candidate) => candidate.geometry === geometry);
         if (!tiling) {
             return;
         }
-        const pattern = buildFilmstripFramePattern(activeFilmstrip, tiling, frameIndex);
+        const pattern = buildFilmstripFramePattern(filmstrip, tiling, frameIndex);
         if (!pattern) {
             statusLine.textContent = "This generation cannot be forked.";
             return;
@@ -1146,10 +1173,13 @@ export function createComparePanelContent(
             );
             const { mountFocusPane } = await import("./compare-focus-pane.js");
 
+            // Re-read the wall: an update may have replaced it while the pane
+            // modules loaded, and a fork must not attach to a vanished board.
+            const latestWall = workspaceStore.getState().results.filmstrip;
             if (
                 !filmstripView ||
                 forkedBoards.has(geometry) ||
-                !activeFilmstrip.tilings.some((candidate) => candidate.geometry === geometry)
+                !latestWall?.tilings.some((candidate) => candidate.geometry === geometry)
             ) {
                 disposeDetachedBackend(backend);
                 backend = null;
@@ -1206,15 +1236,16 @@ export function createComparePanelContent(
 
     function openFocusedBoardInLab(): void {
         const geometry = selectedBoardGeometry();
-        if (!filmstripView || !activeFilmstrip || !geometry) {
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (!filmstripView || !filmstrip || !geometry) {
             return;
         }
-        const tiling = activeFilmstrip.tilings.find((candidate) => candidate.geometry === geometry);
+        const tiling = filmstrip.tilings.find((candidate) => candidate.geometry === geometry);
         if (!tiling) {
             return;
         }
         const pattern = buildFilmstripFramePattern(
-            activeFilmstrip,
+            filmstrip,
             tiling,
             filmstripView.currentFrameIndex(),
         );
@@ -1947,17 +1978,21 @@ export function createComparePanelContent(
         updatePresetButtons();
         const wallProblem = wallConfigProblem();
         const analysisProblem = analysisConfigProblem();
+        const { results, operation } = workspaceStore.getState();
+        const running = operation.executing;
         const canAnalyze = !running && selected.size > 0 && analysisProblem === null;
         const canPlay = !running && selected.size >= MIN_WALL_TILINGS && wallProblem === null;
         const current = wallProblem === null && isFilmstripCurrent();
-        const stale = activeFilmstrip !== null && !current && selected.size >= MIN_WALL_TILINGS;
-        const operation = workspaceStore.getState().operation;
+        const wallFilmstrip = results.filmstrip;
+        const stale = wallFilmstrip !== null && !current && selected.size >= MIN_WALL_TILINGS;
         const failedFilmstrip = operation.status === "failed" && operation.kind === "filmstrip";
         const failedAnalysis = operation.status === "failed" && operation.kind === "analysis";
-        const pendingFilmstrip =
-            operation.status === "updating" && operation.kind === "filmstrip" && !running;
-        const pendingAnalysis =
-            operation.status === "updating" && operation.kind === "analysis" && !running;
+        // Queued but not yet executing: debouncing, or launched without an
+        // open request bracket (cache hits never open one).
+        const queued =
+            operation.status === "pending" || (operation.status === "updating" && !running);
+        const pendingFilmstrip = queued && operation.kind === "filmstrip";
+        const pendingAnalysis = queued && operation.kind === "analysis";
         runButton.disabled = !canAnalyze;
         runButton.textContent = failedAnalysis
             ? "Retry analysis"
@@ -1977,7 +2012,7 @@ export function createComparePanelContent(
             : pendingFilmstrip
               ? "Run now"
               : running
-                ? activeFilmstrip
+                ? wallFilmstrip
                     ? "Applying..."
                     : "Running..."
                 : wallProblem
@@ -2016,8 +2051,8 @@ export function createComparePanelContent(
         heroForkButton.hidden = inspectedGeometry !== null && forkedBoards.has(inspectedGeometry);
         heroForkButton.disabled = running;
         heroOpenLabButton.disabled = running || inspectedGeometry === null;
-        heroBackButton.disabled = currentFocusGeometry === null;
-        inspectorButton.disabled = activeFilmstrip === null;
+        heroBackButton.disabled = workspaceStore.getState().focusedBoard === null;
+        inspectorButton.disabled = wallFilmstrip === null;
         const inspectedBoard = selectedBoardElement();
         inspectorReplaceButton.disabled = running || inspectedBoard === null;
         inspectorRemoveButton.disabled =
@@ -2025,7 +2060,7 @@ export function createComparePanelContent(
             inspectedBoard?.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
                 ?.disabled !== false;
         // Painting needs boards on the stage; the toggle waits for a run.
-        editModeButton.disabled = running || !activeFilmstrip;
+        editModeButton.disabled = running || !wallFilmstrip;
         editModeButton.title = running ? WAIT_FOR_WALL_UPDATE : "Edit the seed by painting boards";
         updateSetupSummary();
         updateExplainer();
@@ -2108,8 +2143,9 @@ export function createComparePanelContent(
 
     function updateExplainer(): void {
         const inspectedGeometry = selectedBoardGeometry();
-        if (inspectedGeometry && activeFilmstrip) {
-            const tiling = activeFilmstrip.tilings.find(
+        const filmstrip = workspaceStore.getState().results.filmstrip;
+        if (inspectedGeometry && filmstrip) {
+            const tiling = filmstrip.tilings.find(
                 (candidate) => candidate.geometry === inspectedGeometry,
             );
             if (tiling) {
@@ -2125,7 +2161,7 @@ export function createComparePanelContent(
                     explainerItem("Board", tiling.label || tiling.geometry),
                     explainerItem(
                         "Generation",
-                        `${frameIndex} of ${Math.max(activeFilmstrip.frame_count - 1, 0)}`,
+                        `${frameIndex} of ${Math.max(filmstrip.frame_count - 1, 0)}`,
                     ),
                     explainerItem("Live count", `${liveCells} live cells`),
                     explainerItem("Current tiling", `${family} · ${tiling.geometry}`),
@@ -2323,9 +2359,8 @@ export function createComparePanelContent(
 
     function isFilmstripCurrent(): boolean {
         return (
-            activeFilmstrip !== null &&
-            activeFilmstripRunKey !== null &&
-            activeFilmstripRunKey === runConfigKey(currentRunConfig())
+            workspaceStore.getState().results.filmstrip !== null &&
+            workspaceStore.getState().results.filmstripKey === runConfigKey(currentRunConfig())
         );
     }
 
@@ -2334,30 +2369,30 @@ export function createComparePanelContent(
     }
 
     function refreshSavedControls(preferredRunId = "", preferredTilingSetId = ""): void {
-        savedRuns = listSavedCompareRuns();
-        savedTilingSets = listSavedTilingSets();
+        const runs = listSavedCompareRuns();
+        const tilingSets = listSavedTilingSets();
         workspaceStore.update((state) => ({
             ...state,
-            saved: { runs: savedRuns, tilingSets: savedTilingSets },
+            saved: { runs, tilingSets },
         }));
-        populateSavedSelect(savedRunSelect, savedRuns, "No saved runs", preferredRunId);
+        populateSavedSelect(savedRunSelect, runs, "No saved runs", preferredRunId);
         populateSavedSelect(
             savedTilingSetSelect,
-            savedTilingSets,
+            tilingSets,
             "No saved tiling sets",
             preferredTilingSetId,
         );
-        const hasRuns = savedRuns.length > 0;
-        const hasTilingSets = savedTilingSets.length > 0;
+        const hasRuns = runs.length > 0;
+        const hasTilingSets = tilingSets.length > 0;
         loadRunButton.disabled = !hasRuns;
         deleteRunButton.disabled = !hasRuns;
         loadTilingSetButton.disabled = !hasTilingSets;
         deleteTilingSetButton.disabled = !hasTilingSets;
         savedRunHint.textContent = hasRuns
-            ? `${savedRuns.length} saved run${savedRuns.length === 1 ? "" : "s"} available.`
+            ? `${runs.length} saved run${runs.length === 1 ? "" : "s"} available.`
             : "No saved runs yet. Name the current setup and choose Save run.";
         savedTilingSetHint.textContent = hasTilingSets
-            ? `${savedTilingSets.length} saved tiling set${savedTilingSets.length === 1 ? "" : "s"} available.`
+            ? `${tilingSets.length} saved tiling set${tilingSets.length === 1 ? "" : "s"} available.`
             : "No saved tiling sets yet. Select tilings, name the set, and choose Save set.";
     }
 
@@ -2399,7 +2434,9 @@ export function createComparePanelContent(
     }
 
     async function loadSelectedRun(): Promise<void> {
-        const saved = savedRuns.find((run) => run.id === savedRunSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.runs.find((run) => run.id === savedRunSelect.value);
         if (!saved) {
             return;
         }
@@ -2410,7 +2447,9 @@ export function createComparePanelContent(
     }
 
     function deleteSelectedRun(): void {
-        const saved = savedRuns.find((run) => run.id === savedRunSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.runs.find((run) => run.id === savedRunSelect.value);
         if (!saved) {
             return;
         }
@@ -2439,7 +2478,9 @@ export function createComparePanelContent(
     }
 
     function loadSelectedTilingSet(): void {
-        const saved = savedTilingSets.find((set) => set.id === savedTilingSetSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.tilingSets.find((set) => set.id === savedTilingSetSelect.value);
         if (!saved) {
             return;
         }
@@ -2461,7 +2502,9 @@ export function createComparePanelContent(
     }
 
     function deleteSelectedTilingSet(): void {
-        const saved = savedTilingSets.find((set) => set.id === savedTilingSetSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.tilingSets.find((set) => set.id === savedTilingSetSelect.value);
         if (!saved) {
             return;
         }
@@ -2518,7 +2561,10 @@ export function createComparePanelContent(
     }
 
     function setRunning(next: boolean): void {
-        running = next;
+        workspaceStore.update((state) => ({
+            ...state,
+            operation: { ...state.operation, executing: next },
+        }));
         runButton.textContent = next ? "Running…" : "Run analysis";
         // Quiet the transport too: a play press accepted mid-rebuild would be
         // wiped when the fresh filmstrip attaches paused at the seed.
@@ -2562,21 +2608,27 @@ export function createComparePanelContent(
     function invalidateOperations(): void {
         lifecycleRevision += 1;
         activeOperation = null;
-        if (running) {
+        if (workspaceStore.getState().operation.executing) {
             setWallLoading(null);
             setRunning(false);
         }
     }
 
     function clearFailedWallUpdate(): void {
-        failedWallUpdate = false;
+        workspaceStore.update((state) => ({
+            ...state,
+            operation: { ...state.operation, wallUpdateFailed: false },
+        }));
         staleResultNotice.hidden = true;
         staleResultNoticeMessage.textContent = "";
         filmstripView?.setManagementBlocked(null);
     }
 
     function reportFailedWallUpdate(message: string): void {
-        failedWallUpdate = true;
+        workspaceStore.update((state) => ({
+            ...state,
+            operation: { ...state.operation, wallUpdateFailed: true },
+        }));
         staleResultNoticeMessage.textContent = `Update failed: ${message}. The wall is still showing the previous result.`;
         staleResultNotice.hidden = false;
         filmstripView?.setManagementBlocked(FAILED_UPDATE_MANAGEMENT_REASON);
@@ -2629,8 +2681,10 @@ export function createComparePanelContent(
         resultsArea.replaceChildren();
         showStageHero();
         stageMain.classList.remove("is-speaker");
-        activeFilmstrip = null;
-        activeFilmstripRunKey = null;
+        workspaceStore.update((state) => ({
+            ...state,
+            results: { ...state.results, filmstrip: null, filmstripKey: null },
+        }));
         mirrorFocusToHash(null);
         // The loaded config replaces the current wall wholesale: tear down any
         // live forks with it and unbind the shared clock, or the transport
@@ -2783,7 +2837,7 @@ export function createComparePanelContent(
             statusLine.textContent = wallCapacityMessage(WALL_HARD_TILING_LIMIT);
             return;
         }
-        const hadFilmstrip = activeFilmstrip !== null;
+        const hadFilmstrip = workspaceStore.getState().results.filmstrip !== null;
         const loadingMessage = hadFilmstrip ? "Updating comparison..." : "Building comparison...";
         const showLoadingOverlay = !runOptions.quietUpdate || !hadFilmstrip;
         const ticket = beginOperation("filmstrip");
@@ -2809,8 +2863,6 @@ export function createComparePanelContent(
             if (signal.aborted || !ownsOperation(ticket)) {
                 return;
             }
-            activeFilmstrip = filmstrip;
-            activeFilmstripRunKey = requestKey;
             workspaceStore.update((state) => ({
                 ...state,
                 orderedBoards: filmstrip.tilings.map((tiling) => tiling.geometry),
@@ -2819,7 +2871,7 @@ export function createComparePanelContent(
                 )
                     ? state.selectedBoard
                     : (filmstrip.tilings[0]?.geometry ?? null),
-                results: { ...state.results, filmstrip },
+                results: { ...state.results, filmstrip, filmstripKey: requestKey },
                 playback: { frameIndex: 0, playing: false },
             }));
             if (!filmstripView) {
@@ -2856,9 +2908,10 @@ export function createComparePanelContent(
                             ),
                         ),
                 });
-                filmstripView.setManagementBusy(running);
+                const operation = workspaceStore.getState().operation;
+                filmstripView.setManagementBusy(operation.executing);
                 filmstripView.setManagementBlocked(
-                    failedWallUpdate ? FAILED_UPDATE_MANAGEMENT_REASON : null,
+                    operation.wallUpdateFailed ? FAILED_UPDATE_MANAGEMENT_REASON : null,
                 );
                 filmstripView.setEditMode(editMode);
                 filmstripArea.append(filmstripView.element);
@@ -3330,7 +3383,7 @@ export function createComparePanelContent(
         },
         closeConfigIfOpen,
         exitFocusIfAny(): boolean {
-            if (currentFocusGeometry !== null && filmstripView) {
+            if (workspaceStore.getState().focusedBoard !== null && filmstripView) {
                 filmstripView.focus(null);
                 return true;
             }
@@ -3342,7 +3395,7 @@ export function createComparePanelContent(
             // Controls and custom keyboard widgets own their focused keystrokes;
             // a component may also have claimed the key before it bubbles here.
             if (
-                !activeFilmstrip ||
+                !workspaceStore.getState().results.filmstrip ||
                 event.defaultPrevented ||
                 isInteractiveShortcutTarget(event.target)
             ) {

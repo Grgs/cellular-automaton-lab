@@ -44,6 +44,11 @@ export interface FilmstripTransportOptions {
      * to play/pause.
      */
     onRun?: () => void;
+    /**
+     * Fired when playback starts or stops (including a detach while playing).
+     * Called only on transitions, never once per frame.
+     */
+    onPlayStateChange?: (playing: boolean) => void;
 }
 
 export interface FilmstripTransportController {
@@ -104,6 +109,15 @@ export function createFilmstripTransport(
     let tickHandle: number | null = null;
     let idleRunEnabled = false;
     let busy = false;
+    let lastReportedPlaying = false;
+
+    function reportPlaying(playing: boolean): void {
+        if (playing === lastReportedPlaying) {
+            return;
+        }
+        lastReportedPlaying = playing;
+        options.onPlayStateChange?.(playing);
+    }
 
     const transport = el("div", "compare-filmstrip-transport");
     transport.setAttribute("role", "group");
@@ -242,6 +256,7 @@ export function createFilmstripTransport(
         } else if (!state.playing && tickHandle !== null) {
             stopTick();
         }
+        reportPlaying(state.playing);
     }
 
     setIdle();
@@ -261,6 +276,7 @@ export function createFilmstripTransport(
             unsubscribe = null;
             currentPlayer = null;
             setIdle();
+            reportPlaying(false);
         },
         pause(): void {
             currentPlayer?.pause();

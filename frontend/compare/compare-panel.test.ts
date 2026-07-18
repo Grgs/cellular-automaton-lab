@@ -2204,12 +2204,14 @@ describe("mountComparePanel", () => {
     }): Promise<{
         handle: ComparePanelHandle;
         filmstripRequest: ReturnType<typeof vi.fn>;
+        sourceFilmstrip: SeedFilmstripResult;
         seedField: HTMLInputElement;
         editToggle: HTMLButtonElement;
     }> {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
-        const filmstripRequest = vi.fn(async () => twoBoardFilmstrip());
+        const sourceFilmstrip = twoBoardFilmstrip();
+        const filmstripRequest = vi.fn(async () => sourceFilmstrip);
         const handle = mountComparePanel({
             openOnMount: true,
             backend: { ...backend, requestFilmstrip: filmstripRequest },
@@ -2237,7 +2239,7 @@ describe("mountComparePanel", () => {
         if (!editToggle) {
             throw new Error("edit toggle not found");
         }
-        return { handle, filmstripRequest, seedField, editToggle };
+        return { handle, filmstripRequest, sourceFilmstrip, seedField, editToggle };
     }
 
     function paintCell(cellId: string): void {
@@ -2249,8 +2251,11 @@ describe("mountComparePanel", () => {
     }
 
     it("edit mode paints the shared seed at gen 0 and re-runs the wall", async () => {
-        const { handle, filmstripRequest, seedField, editToggle } =
+        const { handle, filmstripRequest, sourceFilmstrip, seedField, editToggle } =
             await mountWithLoadedFilmstrip();
+        const originalFrameZero = sourceFilmstrip.tilings.map((tiling) => ({
+            ...(tiling.frames[0] ?? {}),
+        }));
 
         // The toggle waits for a loaded run, then arms edit mode.
         expect(editToggle.disabled).toBe(false);
@@ -2277,6 +2282,9 @@ describe("mountComparePanel", () => {
                 expect(polygon.classList.contains("is-live")).toBe(false);
             }
         });
+        expect(sourceFilmstrip.tilings.map((tiling) => tiling.frames[0])).toEqual(
+            originalFrameZero,
+        );
         await vi.waitFor(
             () => {
                 expect(filmstripRequest).toHaveBeenCalledTimes(2);
@@ -2726,6 +2734,9 @@ describe("mountComparePanel", () => {
         expect(back).toBeTruthy();
         back?.click();
         expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        expect(
+            document.querySelector<HTMLButtonElement>(".compare-inspector-replace")?.disabled,
+        ).toBe(false);
         handle.dispose();
     });
 
@@ -2791,6 +2802,83 @@ describe("mountComparePanel", () => {
         // The wall is the page: a further Escape does not leave it.
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
         expect(page()?.hidden).toBe(false);
+        handle.dispose();
+    });
+
+    it("returns to the gallery when a re-run drops the focused board", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const board = (geometry: string) => ({
+            geometry,
+            tiling_family: geometry,
+            family: "regular",
+            cell_count: 100,
+            topology: {} as never,
+            topology_spec: {
+                tiling_family: geometry,
+                adjacency_mode: "edge",
+                sizing_mode: "grid",
+                width: 16,
+                height: 16,
+                patch_depth: 0,
+            },
+            frames: [{ "c:1:1": 1 }, { "c:2:1": 1 }],
+            extinction_step: null,
+            period: null,
+            note: null,
+        });
+        let wallGeometries = ["square", "hex"];
+        const requestFilmstrip = vi.fn(async () => ({
+            rule_name: "conway",
+            seed: "111",
+            traversal: "bfs",
+            frame_count: 2,
+            grid_size: 16,
+            tilings: wallGeometries.map(board),
+        }));
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+
+        // Focus square: speaker view, back button armed.
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        expect(document.querySelector(".compare-filmstrip--speaker")).not.toBeNull();
+        const backButton = document.querySelector<HTMLButtonElement>(".compare-hero-back");
+        expect(backButton?.disabled).toBe(false);
+
+        // The next authoritative wall no longer contains the focused board.
+        wallGeometries = ["hex", "kagome"];
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: wallGeometries,
+        });
+        const playButton = document.querySelector<HTMLButtonElement>(
+            '.compare-filmstrip-btn[aria-label="Run comparison"]',
+        );
+        expect(playButton).not.toBeNull();
+        playButton?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        await vi.waitFor(() =>
+            expect(document.querySelector(".compare-filmstrip--speaker")).toBeNull(),
+        );
+
+        // Gallery restored: no focus slot in the URL, back button disarmed.
+        expect(window.location.hash).not.toContain("focus=");
+        expect(document.querySelector<HTMLButtonElement>(".compare-hero-back")?.disabled).toBe(
+            true,
+        );
         handle.dispose();
     });
 
@@ -2921,6 +3009,50 @@ describe("mountComparePanel", () => {
             timeout: 3000,
         });
         expect(requestFilmstrip.mock.calls.at(1)?.[0]?.geometries).not.toContain("square");
+        handle.dispose();
+    });
+
+    it("holds the two-board floor against a rapid removal burst", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        // Pin the selection to exactly the three displayed boards so the
+        // two-board floor is genuinely one removal away.
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document
+            .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[aria-label="Run comparison"]')
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+
+        // Two removals inside one debounce window. The second must be judged
+        // against the pending two-board selection, not the still-displayed
+        // three-board strip, or the wall would collapse below its floor.
+        const removeButtons = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-remove"),
+        ];
+        removeButtons[0]?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        removeButtons[1]?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2), {
+            timeout: 3000,
+        });
+        const rerunGeometries = requestFilmstrip.mock.calls.at(1)?.[0]?.geometries ?? [];
+        expect(rerunGeometries).toHaveLength(2);
+        expect(requestFilmstrip).toHaveBeenCalledTimes(2);
         handle.dispose();
     });
 
