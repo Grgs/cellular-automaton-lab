@@ -200,6 +200,17 @@ python -m tools fixtures frontend --all --check
 python -m tools fixtures frontend --fixture shield-depth-3
 ```
 
+### `python -m tools fixtures decoder-contract`
+
+Regenerate or check the standalone decoder contract fixture.
+
+Records verbatim standalone runtime responses (init, state, rules, cell deltas, control, tick, compare, filmstrip, topology preview, errors) with `state_epoch` pinned, into `frontend/test-fixtures/decoder-contract/worker-responses.json`. The frontend contract test decodes every entry, so backend payload changes must regenerate this fixture. Supports `--check`.
+
+```powershell
+python -m tools fixtures decoder-contract
+python -m tools fixtures decoder-contract --check
+```
+
 ## Bootstrap
 
 Export bootstrapped backend metadata for standalone mode.

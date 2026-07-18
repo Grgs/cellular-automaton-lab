@@ -204,6 +204,16 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("fixtures", "decoder-contract"),
+        "fixtures",
+        "Regenerate or check the standalone decoder contract fixture.",
+        "Records verbatim standalone runtime responses (init, state, rules, cell deltas, control, tick, compare, filmstrip, topology preview, errors) with `state_epoch` pinned, into `frontend/test-fixtures/decoder-contract/worker-responses.json`. The frontend contract test decodes every entry, so backend payload changes must regenerate this fixture. Supports `--check`.",
+        (
+            "python -m tools fixtures decoder-contract",
+            "python -m tools fixtures decoder-contract --check",
+        ),
+    ),
+    CommandDoc(
         ("bootstrap", "export"),
         "bootstrap",
         "Export the backend bootstrap payload to JSON.",

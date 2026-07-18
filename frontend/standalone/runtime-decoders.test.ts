@@ -137,6 +137,15 @@ describe("standalone runtime decoders", () => {
         ).toThrow("cell delta update.state");
     });
 
+    it("rejects a fractional simulation snapshot epoch", () => {
+        const payload = snapshot();
+        payload.state_epoch = 1.5;
+
+        expect(() =>
+            decodeRequestResponse(JSON.stringify({ ok: true, snapshot: payload })),
+        ).toThrow("simulation snapshot.state_epoch");
+    });
+
     it("rejects values the previous decoder silently coerced", () => {
         expect(() =>
             decodeRequestResponse(

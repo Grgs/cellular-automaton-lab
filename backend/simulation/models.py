@@ -432,11 +432,11 @@ _last_state_epoch = 0
 def next_state_epoch() -> int:
     """Wall-clock microseconds, strictly increasing within this process.
 
-    Wall clock keeps epochs ordered across process restarts, so clients can
-    rank snapshots from different runtime lifetimes; the floor of previous
-    epoch + 1 keeps same-process constructions strictly ordered even when they
-    land in the same microsecond. Microseconds stay far below 2**53, so the
-    value survives a JavaScript number round-trip exactly.
+    The floor of previous epoch + 1 orders state lifetimes hosted by this
+    process even when they are constructed in the same microsecond. Wall-clock
+    time makes values useful in diagnostics but is not a persistent ordering
+    guarantee across process restarts. Microseconds stay far below 2**53, so
+    the value survives a JavaScript number round-trip exactly.
     """
     global _last_state_epoch
     with _state_epoch_lock:
