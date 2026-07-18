@@ -1525,19 +1525,14 @@ export function createComparePanelContent(
     // and the current frame index. Subscribing to exactly that slice means a
     // frame tick refreshes the explainer without touching the summary, and no
     // mutation site has to remember to call updateExplainer.
+    const selectExplainerState = (state: ReturnType<typeof workspaceStore.getState>) =>
+        [inspectedBoard(state), state.results.filmstrip, state.playback.frameIndex] as const;
     storeRenderSubscriptions.push(
-        subscribeSelector(
-            workspaceStore,
-            (state) =>
-                [
-                    inspectedBoard(state),
-                    state.results.filmstrip,
-                    state.playback.frameIndex,
-                ] as const,
-            () => updateExplainer(),
+        subscribeSelector(workspaceStore, selectExplainerState, (explainerState) =>
+            updateExplainer(explainerState),
         ),
     );
-    updateExplainer();
+    updateExplainer(selectExplainerState(workspaceStore.getState()));
 
     // The summary's store-derived inputs: the operation lifecycle, the wall
     // result and its key, focus/selection, and fork membership. Folding
@@ -2193,15 +2188,14 @@ export function createComparePanelContent(
         setupTilingsValue.title = summaryText();
     }
 
-    function updateExplainer(): void {
-        const inspectedGeometry = selectedBoardGeometry();
-        const filmstrip = workspaceStore.getState().results.filmstrip;
+    function updateExplainer([inspectedGeometry, filmstrip, frameIndex]: ReturnType<
+        typeof selectExplainerState
+    >): void {
         if (inspectedGeometry && filmstrip) {
             const tiling = filmstrip.tilings.find(
                 (candidate) => candidate.geometry === inspectedGeometry,
             );
             if (tiling) {
-                const frameIndex = filmstripView?.currentFrameIndex() ?? 0;
                 const frame = tiling.frames[frameIndex] ?? {};
                 const liveCells = Object.values(frame).filter((state) => state !== 0).length;
                 const catalog = allTilings.find(

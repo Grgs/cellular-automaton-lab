@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -378,6 +379,42 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         expect(play_pause).to_contain_text("Play")
         reset.click()
         expect(counter).to_have_text(f"gen 0 / {final_generation}")
+
+    def test_wall_rerun_resets_the_focused_explainer_generation(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.locator(".compare-filmstrip-board").first.click()
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
+        generation = case.page.locator(
+            ".compare-explainer-item",
+            has=case.page.locator(".compare-explainer-key", has_text="Generation"),
+        ).locator(".compare-explainer-copy")
+        step_forward = case.page.locator(
+            '.compare-filmstrip-btn[title="Step forward one generation"]'
+        )
+        for _ in range(3):
+            step_forward.click()
+        expect(generation).to_have_text(re.compile(r"3 of \d+"))
+
+        # Changing the seed rebuilds the wall in place while preserving focus.
+        # The replacement filmstrip starts at generation zero, and the
+        # explainer must render that store snapshot rather than the old player.
+        seed_select = case.page.locator('select[aria-label="Comparison seed"]')
+        seed_select.select_option("")
+        self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
+        self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
+        expect(generation).to_have_text(re.compile(r"0 of \d+"))
+        case.assertIn("focus=", case.page.url)
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
 
     def test_space_on_lab_route_button_navigates_without_starting_playback(self) -> None:
         # Space is the native activation key for the header route button. The

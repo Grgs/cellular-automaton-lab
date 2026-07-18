@@ -2739,6 +2739,8 @@ describe("mountComparePanel", () => {
         const setupRun = () =>
             document.querySelector<HTMLButtonElement>(".compare-setup-run")?.textContent;
         const summaryBefore = setupRun();
+        const selectedChipBefore = document.querySelector(".compare-selected-chip");
+        expect(selectedChipBefore).not.toBeNull();
 
         // Advance one generation via the transport's step control. This drives
         // onFrameChange, whose only render path is the explainer subscription.
@@ -2750,6 +2752,7 @@ describe("mountComparePanel", () => {
 
         expect(generationCopy()).toBe("1 of 1");
         expect(setupRun()).toBe(summaryBefore);
+        expect(document.querySelector(".compare-selected-chip")).toBe(selectedChipBefore);
         handle.dispose();
     });
 

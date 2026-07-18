@@ -24,6 +24,7 @@ describe("shallowEqual", () => {
         expect(shallowEqual(["a"], ["a", "b"])).toBe(false);
         expect(shallowEqual({ x: 1, y: 2 }, { x: 1, y: 2 })).toBe(true);
         expect(shallowEqual({ x: 1 }, { x: 2 })).toBe(false);
+        expect(shallowEqual({ x: undefined }, { y: undefined })).toBe(false);
         // One level only: nested different references are not equal.
         expect(shallowEqual({ x: { a: 1 } }, { x: { a: 1 } })).toBe(false);
     });
