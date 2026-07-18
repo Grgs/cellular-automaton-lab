@@ -44,6 +44,13 @@ repos:
           - ruff==0.15.11
         pass_filenames: false
         stages: [pre-commit, manual]
+      - id: python-typecheck
+        name: python typecheck
+        entry: npm run typecheck:python
+        language: system
+        files: ^(?:app\.py|pyproject\.toml|(?:backend|tests|tools)/.*\.py)$
+        pass_filenames: false
+        stages: [pre-commit, pre-push, manual]
       - id: frontend-lint
         name: frontend lint
         entry: npm run lint:frontend

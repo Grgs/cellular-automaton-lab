@@ -22,13 +22,16 @@ The Playwright browser suites are still Python `unittest` modules internally. Ru
 
 ## Local Git Guards
 
-The repo also includes local git guards built on `pre-commit`. They are meant to catch privacy leaks and obvious secret exposure before code is pushed.
+The repo also includes local git guards built on `pre-commit`. They catch privacy
+leaks, obvious secret exposure, formatting problems, and static type errors before
+code is pushed.
 
 The guard stack uses:
 
 - `pre-commit` as the hook runner
 - `detect-secrets` for secret scanning
 - a repo-local privacy scanner for local filesystem paths, consumer email addresses, and consumer cloud-share links
+- a path-gated full-project mypy check for Python and mypy-configuration changes
 
 Enable the repository-managed hooks with:
 
@@ -54,6 +57,12 @@ the same guard directly with `npm run check:bundle-size:fresh`. Raw budgets for
 actively changing frontend categories retain approximately `max(1%, 1 KiB)` of
 headroom; gzip ceilings remain tighter and should only move with an intentional,
 measured bundle change.
+
+Python type checking runs at both pre-commit and pre-push when the affected paths
+include `app.py`, `pyproject.toml`, or Python files under `backend/`, `tests/`, or
+`tools/`. The hook checks the complete configured mypy project so cross-file
+contracts remain accurate, while frontend-only changes skip it. Mypy reuses its
+incremental cache on subsequent runs.
 
 The privacy guard blocks patterns such as:
 

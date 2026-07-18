@@ -27,6 +27,19 @@ class RepoGuardConfigTests(unittest.TestCase):
         self.assertIn("pass_filenames: false", hook)
         self.assertIn("stages: [pre-push, manual]", hook)
 
+    def test_python_typecheck_runs_for_python_changes_before_commit_and_push(self) -> None:
+        config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+        _, hook = config.split("      - id: python-typecheck", maxsplit=1)
+        hook = hook.split("\n      - id:", maxsplit=1)[0]
+
+        self.assertIn("entry: npm run typecheck:python", hook)
+        self.assertIn(
+            r"files: ^(?:app\.py|pyproject\.toml|(?:backend|tests|tools)/.*\.py)$",
+            hook,
+        )
+        self.assertIn("pass_filenames: false", hook)
+        self.assertIn("stages: [pre-commit, pre-push, manual]", hook)
+
     def test_repository_managed_pre_push_dispatcher_is_tracked(self) -> None:
         dispatcher = (ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8")
 
