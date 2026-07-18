@@ -120,8 +120,7 @@ Suggested commands:
 npm run typecheck:frontend
 npm run test:frontend
 npm run build:frontend
-npm run build:frontend:standalone
-python -m tools build bundle-size
+npm run check:bundle-size:fresh
 npm run test:e2e:playwright:server
 ```
 
@@ -156,9 +155,8 @@ Run or update:
 Suggested commands:
 
 ```powershell
-npm run build:frontend:standalone
+npm run check:bundle-size:fresh
 npm run smoke:standalone
-python -m tools build bundle-size
 npm run test:e2e:playwright:standalone
 ```
 

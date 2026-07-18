@@ -73,7 +73,7 @@ Before cutting a public release:
 npm run typecheck:frontend
 npm run build:frontend
 npm run test:frontend
-npm run build:frontend:standalone
+npm run check:bundle-size:fresh
 npm run smoke:standalone
 npm run check:doc-links
 npm run audit:supply-chain

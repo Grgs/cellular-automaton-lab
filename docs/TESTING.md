@@ -30,11 +30,16 @@ The guard stack uses:
 - `detect-secrets` for secret scanning
 - a repo-local privacy scanner for local filesystem paths, consumer email addresses, and consumer cloud-share links
 
-Install the hooks with:
+Enable the repository-managed hooks with:
 
 ```powershell
-python -m pre_commit install --hook-type pre-commit --hook-type pre-push
+git config core.hooksPath .githooks
 ```
+
+The tracked hook launchers use `python -m pre_commit` (or an available
+`pre-commit` executable), so install the development requirements before
+enabling them. Do not run `pre-commit install` while `core.hooksPath` points at
+`.githooks`; pre-commit correctly refuses to overwrite a custom hook directory.
 
 Run them manually with:
 
@@ -42,6 +47,13 @@ Run them manually with:
 python -m pre_commit run --all-files
 python -m pre_commit run --hook-stage pre-push --all-files
 ```
+
+The pre-push stage rebuilds the standalone frontend and enforces its bundle-size
+budget, so a stale `output/standalone/` directory cannot hide a regression. Run
+the same guard directly with `npm run check:bundle-size:fresh`. Raw budgets for
+actively changing frontend categories retain approximately `max(1%, 1 KiB)` of
+headroom; gzip ceilings remain tighter and should only move with an intentional,
+measured bundle change.
 
 The privacy guard blocks patterns such as:
 
@@ -580,7 +592,7 @@ For broad refactors or release confidence, run the full local sweep:
 npm run typecheck:frontend
 npm run build:frontend
 npm run test:frontend
-npm run build:frontend:standalone
+npm run check:bundle-size:fresh
 npm run smoke:standalone
 npm run check:doc-links
 npm run audit:supply-chain

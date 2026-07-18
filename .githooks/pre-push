@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+PRE_COMMIT_HOOK_TYPE=pre-push exec "$HOOK_DIR/pre-commit" "$@"
