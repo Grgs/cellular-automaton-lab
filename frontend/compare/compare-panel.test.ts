@@ -2794,6 +2794,83 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("returns to the gallery when a re-run drops the focused board", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const board = (geometry: string) => ({
+            geometry,
+            tiling_family: geometry,
+            family: "regular",
+            cell_count: 100,
+            topology: {} as never,
+            topology_spec: {
+                tiling_family: geometry,
+                adjacency_mode: "edge",
+                sizing_mode: "grid",
+                width: 16,
+                height: 16,
+                patch_depth: 0,
+            },
+            frames: [{ "c:1:1": 1 }, { "c:2:1": 1 }],
+            extinction_step: null,
+            period: null,
+            note: null,
+        });
+        let wallGeometries = ["square", "hex"];
+        const requestFilmstrip = vi.fn(async () => ({
+            rule_name: "conway",
+            seed: "111",
+            traversal: "bfs",
+            frame_count: 2,
+            grid_size: 16,
+            tilings: wallGeometries.map(board),
+        }));
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+
+        // Focus square: speaker view, back button armed.
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        expect(document.querySelector(".compare-filmstrip--speaker")).not.toBeNull();
+        const backButton = document.querySelector<HTMLButtonElement>(".compare-hero-back");
+        expect(backButton?.disabled).toBe(false);
+
+        // The next authoritative wall no longer contains the focused board.
+        wallGeometries = ["hex", "kagome"];
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: wallGeometries,
+        });
+        const playButton = document.querySelector<HTMLButtonElement>(
+            '.compare-filmstrip-btn[aria-label="Run comparison"]',
+        );
+        expect(playButton).not.toBeNull();
+        playButton?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        await vi.waitFor(() =>
+            expect(document.querySelector(".compare-filmstrip--speaker")).toBeNull(),
+        );
+
+        // Gallery restored: no focus slot in the URL, back button disarmed.
+        expect(window.location.hash).not.toContain("focus=");
+        expect(document.querySelector<HTMLButtonElement>(".compare-hero-back")?.disabled).toBe(
+            true,
+        );
+        handle.dispose();
+    });
+
     it("scrubs a focus slot that names no board instead of leaving it in the URL", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();

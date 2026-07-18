@@ -8,6 +8,16 @@ export type CompareOperationStatus = "idle" | "updating" | "failed";
 export interface CompareWorkspaceState {
     readonly configuration: CompareRunConfig;
     readonly orderedBoards: readonly string[];
+    /**
+     * Speaker-view focus. Null in the gallery. Distinct from `selectedBoard`:
+     * a board can be selected for inspection without being focused.
+     */
+    readonly focusedBoard: string | null;
+    /**
+     * The board under inspection. Follows focus changes, and a filmstrip
+     * install defaults it to the first board when the previous one left the
+     * wall. Read it through `inspectedBoard`, which lets an active focus win.
+     */
     readonly selectedBoard: string | null;
     readonly results: {
         readonly filmstrip: SeedFilmstripResult | null;
@@ -28,6 +38,11 @@ export interface CompareWorkspaceState {
         readonly error: string | null;
     };
     readonly forkedBoards: readonly string[];
+}
+
+/** The board the inspector should describe: an active focus wins. */
+export function inspectedBoard(state: CompareWorkspaceState): string | null {
+    return state.focusedBoard ?? state.selectedBoard;
 }
 
 export interface CompareWorkspaceStore {
@@ -62,6 +77,7 @@ export function createCompareWorkspaceStore(
     let state = freezeState({
         configuration,
         orderedBoards: configuration.geometries,
+        focusedBoard: null,
         selectedBoard: null,
         results: { filmstrip: null, analysis: null, analysisKey: null },
         playback: { frameIndex: 0, playing: false },

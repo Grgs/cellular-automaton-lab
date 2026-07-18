@@ -93,7 +93,7 @@ import {
     MIN_COMPARE_GRID_SIZE,
     MIN_COMPARE_STEPS,
 } from "./compare-limits.js";
-import { createCompareWorkspaceStore } from "./compare-workspace-store.js";
+import { createCompareWorkspaceStore, inspectedBoard } from "./compare-workspace-store.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 
@@ -646,7 +646,6 @@ export function createComparePanelContent(
     let filmstripView: FilmstripViewController | null = null;
     let activeFilmstrip: SeedFilmstripResult | null = null;
     let activeFilmstripRunKey: string | null = null;
-    let currentFocusGeometry: string | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
 
     function syncWorkspaceConfiguration(config = currentRunConfig()): CompareRunConfig {
@@ -659,7 +658,7 @@ export function createComparePanelContent(
     }
 
     function selectedBoardGeometry(): string | null {
-        return currentFocusGeometry ?? workspaceStore.getState().selectedBoard;
+        return inspectedBoard(workspaceStore.getState());
     }
 
     function selectedBoardElement(): HTMLElement | null {
@@ -721,7 +720,7 @@ export function createComparePanelContent(
     // The focused board is mirrored into the hash (`&focus=<geometry>`) so speaker
     // view is shareable and the browser back button returns to the gallery.
     function mirrorFocusToHash(geometry: string | null): void {
-        currentFocusGeometry = geometry;
+        workspaceStore.update((state) => ({ ...state, focusedBoard: geometry }));
         const current = window.location.hash;
         const next =
             geometry === null ? hashWithoutFocus(current) : hashWithFocus(current, geometry);
@@ -2016,7 +2015,7 @@ export function createComparePanelContent(
         heroForkButton.hidden = inspectedGeometry !== null && forkedBoards.has(inspectedGeometry);
         heroForkButton.disabled = running;
         heroOpenLabButton.disabled = running || inspectedGeometry === null;
-        heroBackButton.disabled = currentFocusGeometry === null;
+        heroBackButton.disabled = workspaceStore.getState().focusedBoard === null;
         inspectorButton.disabled = activeFilmstrip === null;
         const inspectedBoard = selectedBoardElement();
         inspectorReplaceButton.disabled = running || inspectedBoard === null;
@@ -3330,7 +3329,7 @@ export function createComparePanelContent(
         },
         closeConfigIfOpen,
         exitFocusIfAny(): boolean {
-            if (currentFocusGeometry !== null && filmstripView) {
+            if (workspaceStore.getState().focusedBoard !== null && filmstripView) {
                 filmstripView.focus(null);
                 return true;
             }
