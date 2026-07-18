@@ -108,6 +108,7 @@ const snapshot: SimulationSnapshot = {
     running: false,
     generation: 0,
     state_revision: 0,
+    state_epoch: 1,
     rule: {
         name: "conway",
         display_name: "Conway",
@@ -339,6 +340,7 @@ describe("standalone worker client", () => {
             cellDelta: {
                 base_state_revision: 0,
                 state_revision: 1,
+                state_epoch: 1,
                 topology_revision: "rev-1",
                 generation: 0,
                 cell_updates: [{ id: "c:0:0", state: 1 }],
@@ -347,6 +349,7 @@ describe("standalone worker client", () => {
 
         await expect(mutationPromise).resolves.toMatchObject({
             state_revision: 1,
+            state_epoch: 1,
             cell_states: [1],
         });
         expect(persistence.save).toHaveBeenLastCalledWith(
@@ -376,6 +379,7 @@ describe("standalone worker client", () => {
             cellDelta: {
                 base_state_revision: 9,
                 state_revision: 10,
+                state_epoch: 1,
                 topology_revision: "rev-1",
                 generation: 0,
                 cell_updates: [{ id: "c:0:0", state: 1 }],
@@ -392,6 +396,7 @@ describe("standalone worker client", () => {
 
         await expect(mutationPromise).resolves.toMatchObject({
             state_revision: 2,
+            state_epoch: 1,
             cell_states: [1],
         });
     });

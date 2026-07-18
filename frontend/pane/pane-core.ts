@@ -129,6 +129,7 @@ export function paneEditorState(
         isRunning: snapshot.running,
         generation: snapshot.generation,
         stateRevision: snapshot.state_revision,
+        stateEpoch: snapshot.state_epoch,
         speed: snapshot.speed,
         measuredSpeed: null,
         measuredSpeedSample: null,

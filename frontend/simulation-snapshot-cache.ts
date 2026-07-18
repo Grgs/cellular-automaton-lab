@@ -10,6 +10,7 @@ export function applyCellMutationDelta(
     delta: CellMutationDelta,
 ): SimulationSnapshot | null {
     if (
+        delta.state_epoch !== snapshot.state_epoch ||
         delta.base_state_revision !== snapshot.state_revision ||
         delta.topology_revision !== snapshot.topology_revision ||
         delta.generation !== snapshot.generation
@@ -51,12 +52,19 @@ export class SimulationSnapshotCache {
         nextSnapshot: SimulationSnapshot,
         requestBase: SimulationSnapshot | null,
     ): SimulationSnapshot {
-        if (
-            this.snapshot !== requestBase &&
-            this.snapshot !== null &&
-            nextSnapshot.state_revision < this.snapshot.state_revision
-        ) {
-            return this.snapshot;
+        // When another response landed while this request was in flight, keep
+        // the cached snapshot unless the arriving one is genuinely newer.
+        // Epochs order runtime lifetimes (restore/replace resets revisions but
+        // always mints a larger epoch), revisions order within a lifetime.
+        if (this.snapshot !== requestBase && this.snapshot !== null) {
+            const cached = this.snapshot;
+            const stale =
+                nextSnapshot.state_epoch < cached.state_epoch ||
+                (nextSnapshot.state_epoch === cached.state_epoch &&
+                    nextSnapshot.state_revision < cached.state_revision);
+            if (stale) {
+                return cached;
+            }
         }
         this.snapshot = nextSnapshot;
         return nextSnapshot;

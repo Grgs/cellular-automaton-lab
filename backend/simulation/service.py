@@ -166,6 +166,7 @@ class SimulationService:
         return CellMutationDelta(
             base_state_revision=base_state_revision,
             state_revision=self._state.state_revision,
+            state_epoch=self._state.state_epoch,
             topology_revision=self._state.topology.topology_revision,
             generation=self._state.generation,
             cell_updates=tuple(updates.items()),

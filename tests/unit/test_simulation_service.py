@@ -135,6 +135,23 @@ class SimulationServiceTests(unittest.TestCase):
         self.assertEqual(sum(bool(delta.cell_updates) for delta in deltas), 1)
         self.assertTrue(all(delta.state_revision == 1 for delta in deltas))
 
+    def test_state_epoch_survives_mutations_and_advances_on_replace(self) -> None:
+        cell_id = self.cell_id(1, 1)
+        initial = self.service.get_state()
+        self.assertGreater(initial.state_epoch, 0)
+
+        delta = self.service.set_cell_state_by_id(cell_id, 1)
+        self.service.step()
+        self.service.reset(randomize=False)
+        after_mutations = self.service.get_state()
+        self.assertEqual(after_mutations.state_epoch, initial.state_epoch)
+        self.assertEqual(delta.state_epoch, initial.state_epoch)
+
+        self.service.replace_state(self.service.state)
+        replaced = self.service.get_state()
+        self.assertGreater(replaced.state_epoch, initial.state_epoch)
+        self.assertEqual(replaced.state_revision, 0)
+
     def test_cell_mutation_delta_reports_actual_final_changes(self) -> None:
         cell_id = self.cell_id(1, 1)
 
@@ -146,6 +163,7 @@ class SimulationServiceTests(unittest.TestCase):
             {
                 "base_state_revision": 0,
                 "state_revision": 1,
+                "state_epoch": self.service.get_state().state_epoch,
                 "topology_revision": self.service.get_state().topology.topology_revision,
                 "generation": 0,
                 "cell_updates": [{"id": cell_id, "state": 1}],

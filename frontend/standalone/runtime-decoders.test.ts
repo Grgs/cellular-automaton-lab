@@ -41,6 +41,7 @@ function snapshot() {
         running: false,
         generation: 0,
         state_revision: 0,
+        state_epoch: 1,
         rule: rule(),
         topology_revision: "square:2x2",
         topology: {
@@ -106,6 +107,7 @@ describe("standalone runtime decoders", () => {
                     ok: true,
                     base_state_revision: 2,
                     state_revision: 3,
+                    state_epoch: 1,
                     topology_revision: "square:2x2",
                     generation: 1,
                     cell_updates: [{ id: "c:0:0", state: 1 }],
@@ -114,6 +116,7 @@ describe("standalone runtime decoders", () => {
         ).toEqual({
             base_state_revision: 2,
             state_revision: 3,
+            state_epoch: 1,
             topology_revision: "square:2x2",
             generation: 1,
             cell_updates: [{ id: "c:0:0", state: 1 }],
@@ -125,6 +128,7 @@ describe("standalone runtime decoders", () => {
                     ok: true,
                     base_state_revision: 2,
                     state_revision: 3,
+                    state_epoch: 1,
                     topology_revision: "square:2x2",
                     generation: 1,
                     cell_updates: [{ id: "c:0:0", state: 1.5 }],

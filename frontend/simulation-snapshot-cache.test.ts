@@ -22,6 +22,7 @@ function snapshot(revision = 0, generation = 0): SimulationSnapshot {
         running: false,
         generation,
         state_revision: revision,
+        state_epoch: 1,
         rule: {
             name: "conway",
             display_name: "Conway",
@@ -53,6 +54,7 @@ function delta(overrides: Partial<CellMutationDelta> = {}): CellMutationDelta {
     return {
         base_state_revision: 0,
         state_revision: 1,
+        state_epoch: 1,
         topology_revision: "square:2x1",
         generation: 0,
         cell_updates: [{ id: "c:1:0", state: 1 }],
@@ -104,6 +106,34 @@ describe("cell mutation deltas", () => {
 
         await expect(reconciliation).resolves.toBe(newer);
         expect(cache.current()).toBe(newer);
+    });
+
+    it("rejects deltas minted by a different runtime epoch", () => {
+        const current = snapshot();
+
+        expect(applyCellMutationDelta(current, delta({ state_epoch: 2 }))).toBeNull();
+    });
+
+    it("keeps a restored snapshot when a stale higher-revision response races in", () => {
+        const cache = new SimulationSnapshotCache();
+        cache.install(snapshot(5), null);
+        const preRestoreBase = cache.current();
+
+        const restored = { ...snapshot(0), state_epoch: 2, cell_states: [1, 0] };
+        cache.install(restored, cache.current());
+
+        const staleResponse = snapshot(5);
+        expect(cache.install(staleResponse, preRestoreBase)).toBe(restored);
+        expect(cache.current()).toBe(restored);
+    });
+
+    it("installs a newer-epoch snapshot over a raced older epoch despite a lower revision", () => {
+        const cache = new SimulationSnapshotCache();
+        cache.install(snapshot(5), null);
+
+        const restored = { ...snapshot(0), state_epoch: 2 };
+        expect(cache.install(restored, null)).toBe(restored);
+        expect(cache.current()).toBe(restored);
     });
 
     it("allows an authoritative lower revision after a runtime restore when no request races", () => {

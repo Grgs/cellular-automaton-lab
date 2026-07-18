@@ -69,6 +69,7 @@ export function createAppState(): AppState {
         isRunning: false,
         generation: 0,
         stateRevision: null,
+        stateEpoch: null,
         speed: DEFAULT_SPEED,
         measuredSpeed: null,
         measuredSpeedSample: null,

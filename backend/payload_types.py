@@ -189,6 +189,7 @@ class SimulationStatePayload(TypedDict):
     running: bool
     generation: int
     state_revision: int
+    state_epoch: int
     rule: RuleDefinitionPayload
     topology_revision: str
     cell_states: list[int]
@@ -297,6 +298,7 @@ type CellUpdatesPayload = list[CellUpdatePayload]
 class CellMutationDeltaPayload(TypedDict):
     base_state_revision: int
     state_revision: int
+    state_epoch: int
     topology_revision: str
     generation: int
     cell_updates: CellUpdatesPayload
