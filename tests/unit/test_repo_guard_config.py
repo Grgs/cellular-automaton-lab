@@ -4,8 +4,6 @@ import json
 import unittest
 from pathlib import Path
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -21,13 +19,13 @@ class RepoGuardConfigTests(unittest.TestCase):
         self.assertIn("npm run check:bundle-size:fresh", scripts["check:ci-local"])
 
     def test_pre_push_runs_the_fresh_bundle_guard(self) -> None:
-        config = yaml.safe_load((ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8"))
-        hooks = {hook["id"]: hook for repository in config["repos"] for hook in repository["hooks"]}
+        config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+        _, hook = config.split("      - id: standalone-bundle-budget", maxsplit=1)
+        hook = hook.split("\n      - id:", maxsplit=1)[0]
 
-        hook = hooks["standalone-bundle-budget"]
-        self.assertEqual(hook["entry"], "npm run check:bundle-size:fresh")
-        self.assertFalse(hook["pass_filenames"])
-        self.assertIn("pre-push", hook["stages"])
+        self.assertIn("entry: npm run check:bundle-size:fresh", hook)
+        self.assertIn("pass_filenames: false", hook)
+        self.assertIn("stages: [pre-push, manual]", hook)
 
     def test_repository_managed_pre_push_dispatcher_is_tracked(self) -> None:
         dispatcher = (ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8")
