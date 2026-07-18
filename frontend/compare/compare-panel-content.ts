@@ -236,8 +236,6 @@ export function createComparePanelContent(
     const previewCache = new Map<string, Promise<TopologyPreview>>();
     const analysisCache = new Map<string, SeedComparisonResult>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
-    let savedRuns: SavedCompareRun[] = [];
-    let savedTilingSets: SavedTilingSet[] = [];
     let editingSavedRunId = "";
     let editingSavedTilingSetId = "";
 
@@ -2350,30 +2348,30 @@ export function createComparePanelContent(
     }
 
     function refreshSavedControls(preferredRunId = "", preferredTilingSetId = ""): void {
-        savedRuns = listSavedCompareRuns();
-        savedTilingSets = listSavedTilingSets();
+        const runs = listSavedCompareRuns();
+        const tilingSets = listSavedTilingSets();
         workspaceStore.update((state) => ({
             ...state,
-            saved: { runs: savedRuns, tilingSets: savedTilingSets },
+            saved: { runs, tilingSets },
         }));
-        populateSavedSelect(savedRunSelect, savedRuns, "No saved runs", preferredRunId);
+        populateSavedSelect(savedRunSelect, runs, "No saved runs", preferredRunId);
         populateSavedSelect(
             savedTilingSetSelect,
-            savedTilingSets,
+            tilingSets,
             "No saved tiling sets",
             preferredTilingSetId,
         );
-        const hasRuns = savedRuns.length > 0;
-        const hasTilingSets = savedTilingSets.length > 0;
+        const hasRuns = runs.length > 0;
+        const hasTilingSets = tilingSets.length > 0;
         loadRunButton.disabled = !hasRuns;
         deleteRunButton.disabled = !hasRuns;
         loadTilingSetButton.disabled = !hasTilingSets;
         deleteTilingSetButton.disabled = !hasTilingSets;
         savedRunHint.textContent = hasRuns
-            ? `${savedRuns.length} saved run${savedRuns.length === 1 ? "" : "s"} available.`
+            ? `${runs.length} saved run${runs.length === 1 ? "" : "s"} available.`
             : "No saved runs yet. Name the current setup and choose Save run.";
         savedTilingSetHint.textContent = hasTilingSets
-            ? `${savedTilingSets.length} saved tiling set${savedTilingSets.length === 1 ? "" : "s"} available.`
+            ? `${tilingSets.length} saved tiling set${tilingSets.length === 1 ? "" : "s"} available.`
             : "No saved tiling sets yet. Select tilings, name the set, and choose Save set.";
     }
 
@@ -2415,7 +2413,9 @@ export function createComparePanelContent(
     }
 
     async function loadSelectedRun(): Promise<void> {
-        const saved = savedRuns.find((run) => run.id === savedRunSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.runs.find((run) => run.id === savedRunSelect.value);
         if (!saved) {
             return;
         }
@@ -2426,7 +2426,9 @@ export function createComparePanelContent(
     }
 
     function deleteSelectedRun(): void {
-        const saved = savedRuns.find((run) => run.id === savedRunSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.runs.find((run) => run.id === savedRunSelect.value);
         if (!saved) {
             return;
         }
@@ -2455,7 +2457,9 @@ export function createComparePanelContent(
     }
 
     function loadSelectedTilingSet(): void {
-        const saved = savedTilingSets.find((set) => set.id === savedTilingSetSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.tilingSets.find((set) => set.id === savedTilingSetSelect.value);
         if (!saved) {
             return;
         }
@@ -2477,7 +2481,9 @@ export function createComparePanelContent(
     }
 
     function deleteSelectedTilingSet(): void {
-        const saved = savedTilingSets.find((set) => set.id === savedTilingSetSelect.value);
+        const saved = workspaceStore
+            .getState()
+            .saved.tilingSets.find((set) => set.id === savedTilingSetSelect.value);
         if (!saved) {
             return;
         }

@@ -3001,6 +3001,50 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("holds the two-board floor against a rapid removal burst", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        // Pin the selection to exactly the three displayed boards so the
+        // two-board floor is genuinely one removal away.
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document
+            .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[aria-label="Run comparison"]')
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+
+        // Two removals inside one debounce window. The second must be judged
+        // against the pending two-board selection, not the still-displayed
+        // three-board strip, or the wall would collapse below its floor.
+        const removeButtons = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-remove"),
+        ];
+        removeButtons[0]?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        removeButtons[1]?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2), {
+            timeout: 3000,
+        });
+        const rerunGeometries = requestFilmstrip.mock.calls.at(1)?.[0]?.geometries ?? [];
+        expect(rerunGeometries).toHaveLength(2);
+        expect(requestFilmstrip).toHaveBeenCalledTimes(2);
+        handle.dispose();
+    });
+
     it("keeps a replacement in the selected board's wall position", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
