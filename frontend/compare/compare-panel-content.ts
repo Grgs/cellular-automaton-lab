@@ -705,7 +705,8 @@ export function createComparePanelContent(
                     error: error instanceof Error ? error.message : error ? String(error) : null,
                 },
             }));
-            updateSummary();
+            // The operation slice drives the summary subscription; no manual
+            // updateSummary is needed for the button/status refresh.
         },
     });
     // Live forks are per-board (keyed by geometry) and outlive a focus change:
@@ -1064,7 +1065,8 @@ export function createComparePanelContent(
         // view only changes the stage layout -- the seed pad stays in the
         // config sheet for bit-level control.
         stageMain.classList.toggle("is-speaker", geometry !== null);
-        updateSummary();
+        // Focus/selection changes publish to the store, which refreshes the
+        // summary through its subscription.
     }
 
     function disposeForkedBoard(geometry: string): void {
@@ -1208,10 +1210,11 @@ export function createComparePanelContent(
                 onDiscard: () => {
                     if (forkedBoards.get(geometry) === nextPane) {
                         forkedBoards.delete(geometry);
+                        // The store's forkedBoards change refreshes the summary
+                        // through its subscription.
                         syncWorkspaceForks();
                     }
                     filmstripView?.setBoardOverlay(geometry, null);
-                    updateSummary();
                 },
                 onError: reportFocusPaneError,
             });
@@ -1223,7 +1226,6 @@ export function createComparePanelContent(
             }
             forkedBoards.set(geometry, nextPane);
             syncWorkspaceForks();
-            updateSummary();
         } catch (error) {
             if (backend) {
                 disposeDetachedBackend(backend);
@@ -1536,6 +1538,33 @@ export function createComparePanelContent(
         ),
     );
     updateExplainer();
+
+    // The summary's store-derived inputs: the operation lifecycle, the wall
+    // result and its key, focus/selection, and fork membership. Folding
+    // forkedBoards to a joined string keeps every selector element a primitive
+    // or stable reference (the frozen array is a fresh object each update), so
+    // the slice only changes on a genuine change. It deliberately omits
+    // playback, so the clock ticking never re-runs the summary. The summary
+    // also depends on local UI state (the selection Set, config fields), which
+    // still triggers updateSummary imperatively from those event handlers.
+    storeRenderSubscriptions.push(
+        subscribeSelector(
+            workspaceStore,
+            (state) =>
+                [
+                    state.operation.status,
+                    state.operation.executing,
+                    state.operation.kind,
+                    state.operation.wallUpdateFailed,
+                    state.results.filmstrip,
+                    state.results.filmstripKey,
+                    state.focusedBoard,
+                    state.selectedBoard,
+                    state.forkedBoards.join(","),
+                ] as const,
+            () => updateSummary(),
+        ),
+    );
 
     function labeledField(label: string, field: HTMLElement): HTMLLabelElement {
         return el("label", { class: "compare-label" }, [el("span", { textContent: label }), field]);
@@ -2597,7 +2626,8 @@ export function createComparePanelContent(
         retryWallUpdateButton.title = next
             ? WAIT_FOR_WALL_UPDATE
             : "Retry the update using the latest setup";
-        updateSummary();
+        // The executing flag published above refreshes the summary through its
+        // subscription; the browser paints only the settled DOM either way.
         if (!next) {
             renderTilingChecklist();
             refreshSavedControls(savedRunSelect.value, savedTilingSetSelect.value);
