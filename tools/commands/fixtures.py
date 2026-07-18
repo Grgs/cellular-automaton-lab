@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import argparse
 
-from tools import regenerate_frontend_topology_fixtures, regenerate_reference_fixtures
+from tools import (
+    regenerate_decoder_contract_fixtures,
+    regenerate_frontend_topology_fixtures,
+    regenerate_reference_fixtures,
+)
 from tools.cli_support import add_passthrough_command
 from tools.command_docs import command_doc
 
@@ -21,4 +25,11 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("fixtures", "frontend"),
         target_main=regenerate_frontend_topology_fixtures.main,
         parser_factory=regenerate_frontend_topology_fixtures.build_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="decoder-contract",
+        doc=command_doc("fixtures", "decoder-contract"),
+        target_main=regenerate_decoder_contract_fixtures.main,
+        parser_factory=regenerate_decoder_contract_fixtures.build_parser,
     )

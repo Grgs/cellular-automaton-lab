@@ -17,6 +17,7 @@ CheckName = Literal[
     "frontend-fixtures",
     "frontend-fixture-size",
     "reference-fixtures",
+    "decoder-contract",
 ]
 ALL_CHECKS: tuple[CheckName, ...] = (
     "tools-docs",
@@ -25,6 +26,7 @@ ALL_CHECKS: tuple[CheckName, ...] = (
     "frontend-fixtures",
     "frontend-fixture-size",
     "reference-fixtures",
+    "decoder-contract",
 )
 
 
@@ -154,6 +156,22 @@ def _check_reference_fixtures() -> GeneratedCheckResult:
     )
 
 
+def _check_decoder_contract_fixture() -> GeneratedCheckResult:
+    from tools.regenerate_decoder_contract_fixtures import fixture_drift_detail
+
+    drift = fixture_drift_detail()
+    return GeneratedCheckResult(
+        "decoder-contract",
+        drift is None,
+        "decoder contract fixture is up to date"
+        if drift is None
+        else (
+            f"decoder contract fixture drift: {drift}; run "
+            "`python -m tools fixtures decoder-contract`"
+        ),
+    )
+
+
 def run_selected_checks(selected: tuple[CheckName, ...]) -> tuple[GeneratedCheckResult, ...]:
     checks = {
         "tools-docs": _check_tools_docs,
@@ -162,6 +180,7 @@ def run_selected_checks(selected: tuple[CheckName, ...]) -> tuple[GeneratedCheck
         "frontend-fixtures": _check_frontend_fixtures,
         "frontend-fixture-size": _check_frontend_fixture_size,
         "reference-fixtures": _check_reference_fixtures,
+        "decoder-contract": _check_decoder_contract_fixture,
     }
     return tuple(checks[name]() for name in selected)
 
