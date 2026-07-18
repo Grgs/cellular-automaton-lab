@@ -103,8 +103,8 @@ export interface FilmstripViewController {
      * two-board minimum while the strip still shows the pre-removal boards.
      */
     setBoardsRemovable(removable: boolean): void;
-    /** Re-render one board's current frame (e.g. after an optimistic seed edit). */
-    refreshBoard(geometry: string): void;
+    /** Replace one board's immutable result data and re-render its current frame. */
+    updateBoardData(tiling: TopologyFilmstrip): void;
     /** The shared clock's current generation index. */
     currentFrameIndex(): number;
     /**
@@ -728,9 +728,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             }
             refreshManagementControls();
         },
-        refreshBoard(geometry: string): void {
-            const entry = entryFor(geometry);
+        updateBoardData(tiling: TopologyFilmstrip): void {
+            const entry = entryFor(tiling.geometry);
             if (entry) {
+                entry.tiling = tiling;
                 renderBoard(entry, player.index);
             }
         },

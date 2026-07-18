@@ -801,10 +801,11 @@ export function createComparePanelContent(
         if (!filmstrip || !filmstripView) {
             return;
         }
-        for (const tiling of filmstrip.tilings) {
+        const changedTilings: TopologyFilmstrip[] = [];
+        const tilings = filmstrip.tilings.map((tiling) => {
             const order = tiling.seed_order;
             if (!order || order.length === 0 || tiling.frames.length === 0) {
-                continue;
+                return tiling;
             }
             const frame: Record<string, number> = {};
             for (let index = 0; index < bits.length && index < order.length; index += 1) {
@@ -812,8 +813,26 @@ export function createComparePanelContent(
                     frame[order[index]!] = 1;
                 }
             }
-            tiling.frames[0] = frame;
-            filmstripView.refreshBoard(tiling.geometry);
+            const frames = [...tiling.frames];
+            frames[0] = frame;
+            const changed = { ...tiling, frames };
+            changedTilings.push(changed);
+            return changed;
+        });
+        const nextFilmstrip = { ...filmstrip, tilings };
+        const installed = workspaceStore.update((state) =>
+            state.results.filmstrip === filmstrip
+                ? {
+                      ...state,
+                      results: { ...state.results, filmstrip: nextFilmstrip },
+                  }
+                : state,
+        );
+        if (installed.results.filmstrip !== nextFilmstrip) {
+            return;
+        }
+        for (const tiling of changedTilings) {
+            filmstripView.updateBoardData(tiling);
         }
     }
 
@@ -1031,7 +1050,9 @@ export function createComparePanelContent(
         // board keeps it running as a live tile in the gallery instead of
         // tearing it down.
         mirrorFocusToHash(geometry);
-        workspaceStore.update((state) => ({ ...state, selectedBoard: geometry }));
+        if (geometry !== null) {
+            workspaceStore.update((state) => ({ ...state, selectedBoard: geometry }));
+        }
         // Seed editing is edit mode's job in either layout (paint gen 0 for
         // the shared seed, any later gen to fork the board live), so speaker
         // view only changes the stage layout -- the seed pad stays in the

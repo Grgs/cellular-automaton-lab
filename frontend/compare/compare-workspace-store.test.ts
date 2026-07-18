@@ -29,6 +29,42 @@ describe("compare workspace store", () => {
         expect(store.getState().selectedBoard).toBe("hex");
         expect(store.getState().forkedBoards).toEqual(["hex"]);
         expect(listener).toHaveBeenCalledOnce();
+
+        const current = store.getState();
+        expect(store.update((state) => state)).toBe(current);
+        expect(listener).toHaveBeenCalledOnce();
+    });
+
+    it("copies nested saved configuration and tiling arrays", () => {
+        const store = createCompareWorkspaceStore({
+            seed: "1",
+            rule: "conway",
+            traversal: "bfs",
+            grid_size: 16,
+            frames: 50,
+            geometries: ["square"],
+        });
+        const runGeometries = ["square"];
+        const setGeometries = ["hex"];
+        store.update((state) => ({
+            ...state,
+            saved: {
+                runs: [
+                    {
+                        id: "run-1",
+                        name: "Run",
+                        config: { ...state.configuration, geometries: runGeometries },
+                        updatedAt: 1,
+                    },
+                ],
+                tilingSets: [{ id: "set-1", name: "Set", geometries: setGeometries, updatedAt: 1 }],
+            },
+        }));
+
+        runGeometries.push("tri");
+        setGeometries.push("kagome");
+        expect(store.getState().saved.runs[0]?.config.geometries).toEqual(["square"]);
+        expect(store.getState().saved.tilingSets[0]?.geometries).toEqual(["hex"]);
     });
 
     it("derives the inspected board from focus with a selection fallback", () => {

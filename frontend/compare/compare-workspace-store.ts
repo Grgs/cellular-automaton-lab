@@ -66,6 +66,17 @@ function copyConfig(config: CompareRunConfig): CompareRunConfig {
     return Object.freeze({ ...config, geometries: Object.freeze([...config.geometries]) });
 }
 
+function copySavedRun(run: SavedCompareRun): SavedCompareRun {
+    return Object.freeze({ ...run, config: copyConfig(run.config) });
+}
+
+function copySavedTilingSet(tilingSet: SavedTilingSet): SavedTilingSet {
+    return Object.freeze({
+        ...tilingSet,
+        geometries: Object.freeze([...tilingSet.geometries]),
+    });
+}
+
 function freezeState(state: CompareWorkspaceState): CompareWorkspaceState {
     return Object.freeze({
         ...state,
@@ -74,8 +85,8 @@ function freezeState(state: CompareWorkspaceState): CompareWorkspaceState {
         results: Object.freeze({ ...state.results }),
         playback: Object.freeze({ ...state.playback }),
         saved: Object.freeze({
-            runs: Object.freeze([...state.saved.runs]),
-            tilingSets: Object.freeze([...state.saved.tilingSets]),
+            runs: Object.freeze(state.saved.runs.map(copySavedRun)),
+            tilingSets: Object.freeze(state.saved.tilingSets.map(copySavedTilingSet)),
         }),
         operation: Object.freeze({ ...state.operation }),
         forkedBoards: Object.freeze([...state.forkedBoards]),
@@ -107,10 +118,11 @@ export function createCompareWorkspaceStore(
     return {
         getState: () => state,
         update(updater): CompareWorkspaceState {
-            const next = freezeState(updater(state));
-            if (next === state) {
+            const candidate = updater(state);
+            if (candidate === state) {
                 return state;
             }
+            const next = freezeState(candidate);
             state = next;
             listeners.forEach((listener) => listener(state));
             return state;

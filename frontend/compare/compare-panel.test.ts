@@ -2204,12 +2204,14 @@ describe("mountComparePanel", () => {
     }): Promise<{
         handle: ComparePanelHandle;
         filmstripRequest: ReturnType<typeof vi.fn>;
+        sourceFilmstrip: SeedFilmstripResult;
         seedField: HTMLInputElement;
         editToggle: HTMLButtonElement;
     }> {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
-        const filmstripRequest = vi.fn(async () => twoBoardFilmstrip());
+        const sourceFilmstrip = twoBoardFilmstrip();
+        const filmstripRequest = vi.fn(async () => sourceFilmstrip);
         const handle = mountComparePanel({
             openOnMount: true,
             backend: { ...backend, requestFilmstrip: filmstripRequest },
@@ -2237,7 +2239,7 @@ describe("mountComparePanel", () => {
         if (!editToggle) {
             throw new Error("edit toggle not found");
         }
-        return { handle, filmstripRequest, seedField, editToggle };
+        return { handle, filmstripRequest, sourceFilmstrip, seedField, editToggle };
     }
 
     function paintCell(cellId: string): void {
@@ -2249,8 +2251,11 @@ describe("mountComparePanel", () => {
     }
 
     it("edit mode paints the shared seed at gen 0 and re-runs the wall", async () => {
-        const { handle, filmstripRequest, seedField, editToggle } =
+        const { handle, filmstripRequest, sourceFilmstrip, seedField, editToggle } =
             await mountWithLoadedFilmstrip();
+        const originalFrameZero = sourceFilmstrip.tilings.map((tiling) => ({
+            ...(tiling.frames[0] ?? {}),
+        }));
 
         // The toggle waits for a loaded run, then arms edit mode.
         expect(editToggle.disabled).toBe(false);
@@ -2277,6 +2282,9 @@ describe("mountComparePanel", () => {
                 expect(polygon.classList.contains("is-live")).toBe(false);
             }
         });
+        expect(sourceFilmstrip.tilings.map((tiling) => tiling.frames[0])).toEqual(
+            originalFrameZero,
+        );
         await vi.waitFor(
             () => {
                 expect(filmstripRequest).toHaveBeenCalledTimes(2);
@@ -2726,6 +2734,9 @@ describe("mountComparePanel", () => {
         expect(back).toBeTruthy();
         back?.click();
         expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        expect(
+            document.querySelector<HTMLButtonElement>(".compare-inspector-replace")?.disabled,
+        ).toBe(false);
         handle.dispose();
     });
 
