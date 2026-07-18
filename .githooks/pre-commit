@@ -2,7 +2,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
-ARGS=(hook-impl --config="$ROOT_DIR/.pre-commit-config.yaml" --hook-type=pre-commit)
+ARGS=(
+    hook-impl
+    --config="$ROOT_DIR/.pre-commit-config.yaml"
+    --hook-type="${PRE_COMMIT_HOOK_TYPE:-pre-commit}"
+)
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ARGS+=(--hook-dir "$HERE" -- "$@")
 

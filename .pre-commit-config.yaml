@@ -56,3 +56,9 @@ repos:
         language: system
         pass_filenames: false
         stages: [pre-push, manual]
+      - id: standalone-bundle-budget
+        name: standalone bundle budget (fresh build)
+        entry: npm run check:bundle-size:fresh
+        language: system
+        pass_filenames: false
+        stages: [pre-push, manual]
