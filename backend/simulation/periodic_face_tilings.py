@@ -5,7 +5,7 @@ import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import NotRequired, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 from backend.payload_types import PeriodicFaceTilingDescriptorPayload, RawJsonObject
 from backend.simulation.periodic_face_pattern_data import load_periodic_face_pattern_payloads
@@ -40,6 +40,8 @@ def _ordered_periodic_geometries(
 PERIODIC_FACE_TILING_GEOMETRIES = _ordered_periodic_geometries(_PERIODIC_FACE_PATTERN_KEYS)
 
 _ANGLE_START = -3 * math.pi / 4
+
+NeighborMode = Literal["edge-match", "segment-overlap"]
 
 
 @dataclass(frozen=True)
@@ -77,7 +79,9 @@ class PeriodicFaceTilingDescriptor:
     max_x: float
     max_y: float
     cell_count_per_unit: int
+    neighbor_mode: NeighborMode
     build_faces: Callable[[int, int], tuple[PeriodicFaceCell, ...]]
+    realize_faces: Callable[[int, int], list[PeriodicFaceCell]]
     estimate_cell_count: Callable[[int, int], int]
     face_template_count: int
     face_kinds: tuple[str, ...]
@@ -128,6 +132,7 @@ class _JsonFace(TypedDict):
 
 class _JsonPatternDescriptor(TypedDict):
     geometry: str
+    neighbor_mode: NeighborMode
     unit_width: float
     unit_height: float
     base_edge: float
@@ -165,6 +170,14 @@ def _require_float(value: object, *, context: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ValueError(f"{context} is invalid.")
     return float(value)
+
+
+def _require_neighbor_mode(value: object, *, context: str) -> NeighborMode:
+    if value == "edge-match":
+        return "edge-match"
+    if value == "segment-overlap":
+        return "segment-overlap"
+    raise ValueError(f"{context} must be 'edge-match' or 'segment-overlap'.")
 
 
 def _require_point_payload(value: object, *, context: str) -> _JsonPoint:
@@ -216,6 +229,9 @@ def _require_pattern_descriptor_payload(
         raise ValueError(f"Periodic face tiling descriptor '{geometry_key}'.faces is invalid.")
     normalized_payload: _JsonPatternDescriptor = {
         "geometry": _require_string(payload.get("geometry"), context=f"{geometry_key}.geometry"),
+        "neighbor_mode": _require_neighbor_mode(
+            payload.get("neighbor_mode"), context=f"{geometry_key}.neighbor_mode"
+        ),
         "unit_width": _require_float(
             payload.get("unit_width"), context=f"{geometry_key}.unit_width"
         ),
@@ -270,16 +286,22 @@ def _load_pattern_payload() -> dict[str, _JsonPatternDescriptor]:
     return normalized_payload
 
 
-def _edge_key(
-    left: tuple[float, float], right: tuple[float, float]
-) -> tuple[tuple[float, float], tuple[float, float]]:
-    normalized_left = (round(left[0], 6), round(left[1], 6))
-    normalized_right = (round(right[0], 6), round(right[1], 6))
+_COORDINATE_MICRO_UNITS = 1_000_000
+_CanonicalVertex = tuple[int, int]
+_CanonicalEdge = tuple[_CanonicalVertex, _CanonicalVertex]
+
+
+def _canonical_vertex(vertex: tuple[float, float]) -> _CanonicalVertex:
+    """Preserve the six-decimal matching rule as an exact integer key."""
+
     return (
-        (normalized_left, normalized_right)
-        if normalized_left <= normalized_right
-        else (normalized_right, normalized_left)
+        int(round(round(vertex[0], 6) * _COORDINATE_MICRO_UNITS)),
+        int(round(round(vertex[1], 6) * _COORDINATE_MICRO_UNITS)),
     )
+
+
+def _edge_key(left: _CanonicalVertex, right: _CanonicalVertex) -> _CanonicalEdge:
+    return (left, right) if left <= right else (right, left)
 
 
 def _sort_neighbor_ids(
@@ -301,14 +323,16 @@ def _sort_neighbor_ids(
 
 
 _T_JUNCTION_DISTANCE_TOLERANCE = 1e-3
+_T_JUNCTION_MICRO_DISTANCE_TOLERANCE = int(_T_JUNCTION_DISTANCE_TOLERANCE * _COORDINATE_MICRO_UNITS)
 
 
 def _point_on_segment(
-    point: tuple[float, float],
-    seg_start: tuple[float, float],
-    seg_end: tuple[float, float],
+    point: tuple[float, float] | _CanonicalVertex,
+    seg_start: tuple[float, float] | _CanonicalVertex,
+    seg_end: tuple[float, float] | _CanonicalVertex,
     *,
-    tolerance: float = _T_JUNCTION_DISTANCE_TOLERANCE,
+    distance_tolerance: float = _T_JUNCTION_DISTANCE_TOLERANCE,
+    endpoint_tolerance: float = _T_JUNCTION_DISTANCE_TOLERANCE,
 ) -> bool:
     """True iff ``point`` lies strictly inside the closed segment seg_start->
     seg_end (excluding the endpoints themselves), within ``tolerance`` in the
@@ -319,25 +343,38 @@ def _point_on_segment(
     bx, by = seg_end
     dx, dy = bx - ax, by - ay
     length_sq = dx * dx + dy * dy
-    if length_sq < tolerance * tolerance:
+    if length_sq < distance_tolerance * distance_tolerance:
         return False
     # Parametric position of point on the seg_start->seg_end line: t in [0, 1].
     t = ((px - ax) * dx + (py - ay) * dy) / length_sq
-    if t <= tolerance or t >= 1.0 - tolerance:
+    if t <= endpoint_tolerance or t >= 1.0 - endpoint_tolerance:
         return False  # endpoint or off-segment, no T-junction
     # Perpendicular distance from point to line (a, b).
     proj_x = ax + t * dx
     proj_y = ay + t * dy
     perp_sq = (px - proj_x) ** 2 + (py - proj_y) ** 2
-    return perp_sq <= tolerance * tolerance
+    return perp_sq <= distance_tolerance * distance_tolerance
 
 
-def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, ...]:
+def _attach_neighbors(
+    cells: list[PeriodicFaceCell], *, neighbor_mode: NeighborMode
+) -> tuple[PeriodicFaceCell, ...]:
     cells_by_id = {cell.id: cell for cell in cells}
-    edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = {}
+    edge_map: dict[_CanonicalEdge, list[str]] = {}
+    vertex_key_cache: dict[tuple[float, float], _CanonicalVertex] = {}
+    canonical_vertices_by_cell: dict[str, tuple[_CanonicalVertex, ...]] = {}
+
+    def canonical_key(vertex: tuple[float, float]) -> _CanonicalVertex:
+        key = vertex_key_cache.get(vertex)
+        if key is None:
+            key = _canonical_vertex(vertex)
+            vertex_key_cache[vertex] = key
+        return key
 
     for cell in cells:
-        vertices = cell.vertices
+        vertices = tuple(canonical_key(vertex) for vertex in cell.vertices)
+        if neighbor_mode == "segment-overlap":
+            canonical_vertices_by_cell[cell.id] = vertices
         for index, left in enumerate(vertices):
             right = vertices[(index + 1) % len(vertices)]
             edge_map.setdefault(_edge_key(left, right), []).append(cell.id)
@@ -367,17 +404,20 @@ def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, 
     # For each single-owner edge, look up candidate vertices via a coarse
     # grid hash (cell side = max edge length we'd plausibly contain). This
     # avoids the O(V*E) all-pairs check that dominated previously.
-    single_owner_edges = [
-        (edge_key_tuple, edge_cells)
-        for edge_key_tuple, edge_cells in edge_map.items()
-        if len(set(edge_cells)) == 1
-    ]
+    single_owner_edges = (
+        [
+            (edge_key_tuple, edge_cells)
+            for edge_key_tuple, edge_cells in edge_map.items()
+            if len(set(edge_cells)) == 1
+        ]
+        if neighbor_mode == "segment-overlap"
+        else []
+    )
     if single_owner_edges:
-        vertex_index: dict[tuple[float, float], set[str]] = {}
+        vertex_index: dict[_CanonicalVertex, set[str]] = {}
         for cell in cells:
-            for vertex in cell.vertices:
-                key = (round(vertex[0], 6), round(vertex[1], 6))
-                vertex_index.setdefault(key, set()).add(cell.id)
+            for vertex_key in canonical_vertices_by_cell[cell.id]:
+                vertex_index.setdefault(vertex_key, set()).add(cell.id)
 
         # Spatial hash: bin vertices by a coarse grid so each edge looks up
         # only the vertices that might lie inside its bounding box. Bin size
@@ -388,8 +428,8 @@ def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, 
             length = math.hypot(b[0] - a[0], b[1] - a[1])
             if length > max_edge_length:
                 max_edge_length = length
-        bin_size = max(max_edge_length, 1.0)
-        vertex_bins: dict[tuple[int, int], list[tuple[float, float]]] = {}
+        bin_size = max(math.ceil(max_edge_length), _COORDINATE_MICRO_UNITS)
+        vertex_bins: dict[tuple[int, int], list[_CanonicalVertex]] = {}
         for vertex_key in vertex_index:
             bx = int(vertex_key[0] // bin_size)
             by = int(vertex_key[1] // bin_size)
@@ -411,7 +451,12 @@ def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, 
                         vertex_owners = vertex_index[vertex_key]
                         if vertex_owners.issubset(edge_owner_set):
                             continue
-                        if not _point_on_segment(vertex_key, edge_a, edge_b):
+                        if not _point_on_segment(
+                            vertex_key,
+                            edge_a,
+                            edge_b,
+                            distance_tolerance=_T_JUNCTION_MICRO_DISTANCE_TOLERANCE,
+                        ):
                             continue
                         for edge_owner in edge_owner_set:
                             for vertex_owner in vertex_owners:
@@ -433,7 +478,7 @@ def _attach_neighbors(cells: list[PeriodicFaceCell]) -> tuple[PeriodicFaceCell, 
     )
 
 
-def _pattern_cells(
+def _realize_pattern_cells(
     unit_width: float,
     unit_height: float,
     faces: tuple[FaceTemplate, ...],
@@ -442,7 +487,7 @@ def _pattern_cells(
     width: int,
     height: int,
     lattice_skew_x: float | None = None,
-) -> tuple[PeriodicFaceCell, ...]:
+) -> list[PeriodicFaceCell]:
     cells: list[PeriodicFaceCell] = []
     for face in faces:
         for logical_y in range(height + face.repeat_y_extra):
@@ -474,7 +519,7 @@ def _pattern_cells(
                     )
                 )
 
-    return _attach_neighbors(cells)
+    return cells
 
 
 def _pattern_descriptor_from_payload(
@@ -493,6 +538,7 @@ def _pattern_descriptor_from_payload(
         for face in payload["faces"]
     )
     geometry = payload["geometry"]
+    neighbor_mode = payload["neighbor_mode"]
     manifest_entry = TOPOLOGY_FAMILY_MANIFEST.get(geometry)
     if manifest_entry is None:
         raise ValueError(f"Periodic face tiling geometry '{geometry}' is missing catalog metadata.")
@@ -512,6 +558,18 @@ def _pattern_descriptor_from_payload(
     face_kinds = tuple(sorted({face.kind for face in faces}))
     face_slots = tuple(sorted(face.slot for face in faces))
 
+    def realize_faces(width: int, height: int) -> list[PeriodicFaceCell]:
+        return _realize_pattern_cells(
+            unit_width,
+            unit_height,
+            faces,
+            row_offset_x,
+            id_pattern,
+            width,
+            height,
+            lattice_skew_x,
+        )
+
     return PeriodicFaceTilingDescriptor(
         geometry=geometry,
         label=manifest_entry.label,
@@ -525,16 +583,11 @@ def _pattern_descriptor_from_payload(
         max_x=max_x,
         max_y=max_y,
         cell_count_per_unit=cell_count_per_unit,
-        build_faces=lambda width, height: _pattern_cells(
-            unit_width,
-            unit_height,
-            faces,
-            row_offset_x,
-            id_pattern,
-            width,
-            height,
-            lattice_skew_x,
+        neighbor_mode=neighbor_mode,
+        build_faces=lambda width, height: _attach_neighbors(
+            realize_faces(width, height), neighbor_mode=neighbor_mode
         ),
+        realize_faces=realize_faces,
         estimate_cell_count=lambda width, height: sum(
             (width + face.repeat_x_extra) * (height + face.repeat_y_extra) for face in faces
         ),

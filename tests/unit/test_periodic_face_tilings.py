@@ -10,6 +10,74 @@ from backend.simulation.periodic_face_tilings import PERIODIC_FACE_TILING_GEOMET
 from backend.simulation.topology_family_manifest import TOPOLOGY_FAMILY_MANIFEST
 
 
+def _reference_attach_neighbors(
+    cells: list[periodic_face_tilings.PeriodicFaceCell],
+) -> tuple[periodic_face_tilings.PeriodicFaceCell, ...]:
+    """Pre-optimization six-decimal edge and T-junction reference."""
+
+    def edge_key(
+        left: tuple[float, float], right: tuple[float, float]
+    ) -> tuple[tuple[float, float], tuple[float, float]]:
+        normalized_left = (round(left[0], 6), round(left[1], 6))
+        normalized_right = (round(right[0], 6), round(right[1], 6))
+        return (
+            (normalized_left, normalized_right)
+            if normalized_left <= normalized_right
+            else (normalized_right, normalized_left)
+        )
+
+    cells_by_id = {cell.id: cell for cell in cells}
+    edge_map: dict[tuple[tuple[float, float], tuple[float, float]], list[str]] = {}
+    for cell in cells:
+        for index, left in enumerate(cell.vertices):
+            right = cell.vertices[(index + 1) % len(cell.vertices)]
+            edge_map.setdefault(edge_key(left, right), []).append(cell.id)
+
+    neighbor_sets = {cell.id: set[str]() for cell in cells}
+    for edge_cells in edge_map.values():
+        unique_edge_cells = tuple(dict.fromkeys(edge_cells))
+        for cell_id in unique_edge_cells:
+            neighbor_sets[cell_id].update(
+                other_id for other_id in unique_edge_cells if other_id != cell_id
+            )
+
+    vertex_index: dict[tuple[float, float], set[str]] = {}
+    for cell in cells:
+        for vertex in cell.vertices:
+            key = (round(vertex[0], 6), round(vertex[1], 6))
+            vertex_index.setdefault(key, set()).add(cell.id)
+    for (edge_a, edge_b), edge_cells in edge_map.items():
+        edge_owners = set(edge_cells)
+        if len(edge_owners) != 1:
+            continue
+        for vertex_key, vertex_owners in vertex_index.items():
+            if vertex_key == edge_a or vertex_key == edge_b:
+                continue
+            if vertex_owners.issubset(edge_owners):
+                continue
+            if not periodic_face_tilings._point_on_segment(vertex_key, edge_a, edge_b):
+                continue
+            for edge_owner in edge_owners:
+                for vertex_owner in vertex_owners:
+                    if vertex_owner != edge_owner:
+                        neighbor_sets[edge_owner].add(vertex_owner)
+                        neighbor_sets[vertex_owner].add(edge_owner)
+
+    return tuple(
+        periodic_face_tilings.PeriodicFaceCell(
+            id=cell.id,
+            kind=cell.kind,
+            slot=cell.slot,
+            neighbors=periodic_face_tilings._sort_neighbor_ids(
+                cell, neighbor_sets[cell.id], cells_by_id
+            ),
+            center=cell.center,
+            vertices=cell.vertices,
+        )
+        for cell in cells
+    )
+
+
 class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
     """Verify that registered geometries and descriptor files stay in sync."""
 
@@ -41,6 +109,19 @@ class PeriodicFaceTilingRegistrySyncTests(unittest.TestCase):
                 self.assertEqual(
                     descriptors[geometry].label, TOPOLOGY_FAMILY_MANIFEST[geometry].label
                 )
+
+    def test_every_descriptor_matches_the_reference_at_minimum_and_sample_sizes(self) -> None:
+        descriptors = periodic_face_tilings._loaded_pattern_descriptors()
+        for geometry, descriptor in descriptors.items():
+            sizes = (
+                (descriptor.min_dimension, descriptor.min_dimension),
+                (max(3, descriptor.min_dimension), max(2, descriptor.min_dimension)),
+            )
+            for width, height in sizes:
+                with self.subTest(geometry=geometry, width=width, height=height):
+                    realized = descriptor.realize_faces(width, height)
+                    reference = _reference_attach_neighbors(realized)
+                    self.assertEqual(descriptor.build_faces(width, height), reference)
 
     def test_uniform_2_13_uses_a_balanced_primitive_lattice(self) -> None:
         descriptor = periodic_face_tilings.get_periodic_face_tiling_descriptor(
@@ -122,6 +203,7 @@ class PeriodicFaceTilingPayloadTests(unittest.TestCase):
     def test_loaded_pattern_descriptors_rejects_invalid_face_entries(self) -> None:
         malformed_descriptor = {
             "geometry": "archimedean-4-8-8",
+            "neighbor_mode": "edge-match",
             "unit_width": 1.0,
             "unit_height": 1.0,
             "base_edge": 1.0,
@@ -138,6 +220,49 @@ class PeriodicFaceTilingPayloadTests(unittest.TestCase):
             return_value={"archimedean-4-8-8": malformed_descriptor},
         ):
             with self.assertRaisesRegex(ValueError, "invalid"):
+                periodic_face_tilings._loaded_pattern_descriptors()
+
+    def test_loaded_pattern_descriptors_require_an_explicit_neighbor_mode(self) -> None:
+        descriptor = {
+            "geometry": "archimedean-4-8-8",
+            "unit_width": 1.0,
+            "unit_height": 1.0,
+            "base_edge": 1.0,
+            "min_dimension": 1,
+            "min_x": 0.0,
+            "min_y": 0.0,
+            "max_x": 1.0,
+            "max_y": 1.0,
+            "cell_count_per_unit": 1,
+            "faces": [],
+        }
+        with mock.patch(
+            "backend.simulation.periodic_face_tilings.load_periodic_face_pattern_payloads",
+            return_value={"archimedean-4-8-8": descriptor},
+        ):
+            with self.assertRaisesRegex(ValueError, "neighbor_mode"):
+                periodic_face_tilings._loaded_pattern_descriptors()
+
+    def test_loaded_pattern_descriptors_reject_an_unknown_neighbor_mode(self) -> None:
+        descriptor = {
+            "geometry": "archimedean-4-8-8",
+            "neighbor_mode": "guess",
+            "unit_width": 1.0,
+            "unit_height": 1.0,
+            "base_edge": 1.0,
+            "min_dimension": 1,
+            "min_x": 0.0,
+            "min_y": 0.0,
+            "max_x": 1.0,
+            "max_y": 1.0,
+            "cell_count_per_unit": 1,
+            "faces": [],
+        }
+        with mock.patch(
+            "backend.simulation.periodic_face_tilings.load_periodic_face_pattern_payloads",
+            return_value={"archimedean-4-8-8": descriptor},
+        ):
+            with self.assertRaisesRegex(ValueError, "neighbor_mode"):
                 periodic_face_tilings._loaded_pattern_descriptors()
 
 
@@ -211,7 +336,7 @@ class TJunctionNeighborDetectionTests(unittest.TestCase):
 
     def test_t_junction_pair_becomes_neighbors(self) -> None:
         cells = self._build_two_cell_t_junction_topology()
-        attached = periodic_face_tilings._attach_neighbors(cells)
+        attached = periodic_face_tilings._attach_neighbors(cells, neighbor_mode="segment-overlap")
         neighbor_map = {cell.id: set(cell.neighbors) for cell in attached}
         self.assertEqual(neighbor_map["a"], {"b"})
         self.assertEqual(neighbor_map["b"], {"a"})
@@ -236,7 +361,7 @@ class TJunctionNeighborDetectionTests(unittest.TestCase):
                 vertices=((1.0, 0.0), (2.0, 0.0), (2.0, 1.0), (1.0, 1.0)),
             ),
         ]
-        attached = periodic_face_tilings._attach_neighbors(cells)
+        attached = periodic_face_tilings._attach_neighbors(cells, neighbor_mode="segment-overlap")
         neighbor_map = {cell.id: set(cell.neighbors) for cell in attached}
         self.assertEqual(neighbor_map["a"], {"b"})
         self.assertEqual(neighbor_map["b"], {"a"})
@@ -262,7 +387,7 @@ class TJunctionNeighborDetectionTests(unittest.TestCase):
                 vertices=((1.0, 1.0), (2.0, 1.0), (2.0, 2.0), (1.0, 2.0)),
             ),
         ]
-        attached = periodic_face_tilings._attach_neighbors(cells)
+        attached = periodic_face_tilings._attach_neighbors(cells, neighbor_mode="segment-overlap")
         neighbor_map = {cell.id: set(cell.neighbors) for cell in attached}
         self.assertEqual(neighbor_map["a"], set())
         self.assertEqual(neighbor_map["b"], set())

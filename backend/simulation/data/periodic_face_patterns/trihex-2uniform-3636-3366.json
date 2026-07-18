@@ -1,5 +1,6 @@
 {
   "geometry": "trihex-2uniform-3636-3366",
+  "neighbor_mode": "edge-match",
   "base_edge": 50,
   "unit_width": 86.6025,
   "unit_height": 100,

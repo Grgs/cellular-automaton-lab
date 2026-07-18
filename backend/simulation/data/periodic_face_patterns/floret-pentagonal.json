@@ -1,5 +1,6 @@
 {
   "geometry": "floret-pentagonal",
+  "neighbor_mode": "edge-match",
   "base_edge": 42.015551,
   "unit_width": 364,
   "unit_height": 630,

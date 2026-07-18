@@ -89,8 +89,10 @@ if str(ROOT_DIR) not in sys.path:
 
 from backend.simulation.periodic_face_tilings import (  # noqa: E402
     FaceTemplate,
+    NeighborMode,
     PeriodicFaceCell,
-    _pattern_cells,
+    _attach_neighbors,
+    _realize_pattern_cells,
 )
 from backend.simulation.reference_verification.periodic import (  # noqa: E402
     _periodic_face_interior_vertex_configuration_frequencies,
@@ -117,6 +119,7 @@ class SketchInput:
     base_edge: float | None = None
     geometry: str = "sketch-tiling"
     label: str = "Sketch Tiling"
+    neighbor_mode: NeighborMode = "edge-match"
 
 
 @dataclass(frozen=True)
@@ -224,6 +227,14 @@ def load_sketch(path: Path) -> SketchInput:
     row_offset_x = float(getattr(module, "ROW_OFFSET_X", 0.0))
     lattice_skew_x_raw = getattr(module, "LATTICE_SKEW_X", None)
     lattice_skew_x = None if lattice_skew_x_raw is None else float(lattice_skew_x_raw)
+    neighbor_mode_value = str(getattr(module, "NEIGHBOR_MODE", "edge-match"))
+    if neighbor_mode_value not in ("edge-match", "segment-overlap"):
+        raise RuntimeError(
+            f"Sketch {path} NEIGHBOR_MODE must be 'edge-match' or 'segment-overlap'."
+        )
+    neighbor_mode: NeighborMode = (
+        "segment-overlap" if neighbor_mode_value == "segment-overlap" else "edge-match"
+    )
     if lattice_skew_x is not None and row_offset_x != 0.0:
         raise RuntimeError(
             f"Sketch {path} sets both ROW_OFFSET_X and LATTICE_SKEW_X. They describe "
@@ -239,6 +250,7 @@ def load_sketch(path: Path) -> SketchInput:
         base_edge=getattr(module, "BASE_EDGE", None),
         geometry=str(getattr(module, "GEOMETRY", "sketch-tiling")),
         label=str(getattr(module, "LABEL", "Sketch Tiling")),
+        neighbor_mode=neighbor_mode,
     )
 
 
@@ -431,15 +443,18 @@ def _vertex_configurations(
 def sketch(input_data: SketchInput, *, patch_size: int = 3) -> SketchReport:
     """Build a patch and run all the analysis passes; return a structured report."""
     templates = _to_face_templates(input_data)
-    cells = _pattern_cells(
-        unit_width=input_data.cell_width,
-        unit_height=input_data.cell_height,
-        faces=templates,
-        row_offset_x=input_data.row_offset_x,
-        id_pattern="{prefix}:{slot}:{x}:{y}",
-        width=patch_size,
-        height=patch_size,
-        lattice_skew_x=input_data.lattice_skew_x,
+    cells = _attach_neighbors(
+        _realize_pattern_cells(
+            unit_width=input_data.cell_width,
+            unit_height=input_data.cell_height,
+            faces=templates,
+            row_offset_x=input_data.row_offset_x,
+            id_pattern="{prefix}:{slot}:{x}:{y}",
+            width=patch_size,
+            height=patch_size,
+            lattice_skew_x=input_data.lattice_skew_x,
+        ),
+        neighbor_mode=input_data.neighbor_mode,
     )
 
     kind_counts = dict(Counter(c.kind for c in cells))
@@ -674,6 +689,7 @@ def emit_descriptor_json(input_data: SketchInput) -> dict[str, Any]:
 
     descriptor: dict[str, Any] = {
         "geometry": input_data.geometry,
+        "neighbor_mode": input_data.neighbor_mode,
         "base_edge": input_data.base_edge or input_data.cell_width / 2,
         "unit_width": input_data.cell_width,
         "unit_height": input_data.cell_height,

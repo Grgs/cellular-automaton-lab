@@ -1,5 +1,6 @@
 {
   "geometry": "uniform-3-4-36-3262-63",
+  "neighbor_mode": "edge-match",
   "base_edge": 1.0,
   "unit_width": 6.9282,
   "unit_height": 6.0,

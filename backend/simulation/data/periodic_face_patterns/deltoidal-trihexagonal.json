@@ -1,5 +1,6 @@
 {
   "geometry": "deltoidal-trihexagonal",
+  "neighbor_mode": "edge-match",
   "base_edge": 56.001488,
   "unit_width": 142,
   "unit_height": 246,

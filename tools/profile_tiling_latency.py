@@ -23,8 +23,10 @@ from backend.payload_types import (
     SimulationStatePayload,
     TopologySpecPayload,
 )
+from backend.simulation import periodic_face_tilings
 from backend.simulation.topology import _build_topology_cached, _build_topology_uncached
 from backend.simulation.topology_builders import INTERNAL_ALLOW_OVERSIZED_TOPOLOGIES_ENV
+from backend.simulation.topology_types import LatticeCell, LatticeTopology, topology_revision
 from tests.e2e.support_server import AppServer
 from tests.typed_payloads import (
     require_cell_mutation_delta_payload,
@@ -42,6 +44,15 @@ class ResetRequestPayload(TypedDict):
     speed: int
     rule: str
     randomize: bool
+
+
+class PeriodicBuildStageMedians(TypedDict):
+    descriptor_loading_ms: float
+    cell_realization_ms: float
+    adjacency_ms: float
+    normalization_ms: float
+    serialization_ms: float
+    cell_count: int
 
 
 VIEWPORT: ViewportPayload = {"width": 1440, "height": 900}
@@ -158,6 +169,75 @@ def benchmark_topology_build_ms(
     return statistics.median(times)
 
 
+def benchmark_periodic_build_stages(
+    geometry: str,
+    width: int,
+    height: int,
+    *,
+    repeats: int = 7,
+) -> PeriodicBuildStageMedians:
+    timings: dict[str, list[float]] = {
+        "descriptor_loading_ms": [],
+        "cell_realization_ms": [],
+        "adjacency_ms": [],
+        "normalization_ms": [],
+        "serialization_ms": [],
+    }
+    cell_count = 0
+    for _ in range(repeats):
+        periodic_face_tilings._descriptor_registry.cache_clear()
+        periodic_face_tilings._loaded_pattern_descriptors.cache_clear()
+        started_at = time.perf_counter()
+        descriptor = periodic_face_tilings.get_periodic_face_tiling_descriptor(geometry)
+        timings["descriptor_loading_ms"].append((time.perf_counter() - started_at) * 1000)
+
+        started_at = time.perf_counter()
+        realized = descriptor.realize_faces(width, height)
+        timings["cell_realization_ms"].append((time.perf_counter() - started_at) * 1000)
+
+        started_at = time.perf_counter()
+        attached = periodic_face_tilings._attach_neighbors(
+            realized, neighbor_mode=descriptor.neighbor_mode
+        )
+        timings["adjacency_ms"].append((time.perf_counter() - started_at) * 1000)
+
+        started_at = time.perf_counter()
+        normalized = tuple(
+            LatticeCell(
+                id=cell.id,
+                kind=cell.kind,
+                neighbors=cell.neighbors,
+                slot=cell.slot,
+                center=cell.center,
+                vertices=cell.vertices,
+            )
+            for cell in attached
+        )
+        topology = LatticeTopology(
+            geometry=geometry,
+            width=width,
+            height=height,
+            cells=normalized,
+            topology_revision=topology_revision(geometry, width, height, 0),
+            patch_depth=0,
+        )
+        timings["normalization_ms"].append((time.perf_counter() - started_at) * 1000)
+
+        started_at = time.perf_counter()
+        topology.to_dict()
+        timings["serialization_ms"].append((time.perf_counter() - started_at) * 1000)
+        cell_count = len(normalized)
+
+    return {
+        "descriptor_loading_ms": statistics.median(timings["descriptor_loading_ms"]),
+        "cell_realization_ms": statistics.median(timings["cell_realization_ms"]),
+        "adjacency_ms": statistics.median(timings["adjacency_ms"]),
+        "normalization_ms": statistics.median(timings["normalization_ms"]),
+        "serialization_ms": statistics.median(timings["serialization_ms"]),
+        "cell_count": cell_count,
+    }
+
+
 def default_reset_payload(
     geometry: str, rule: str, dimensions: dict[str, int]
 ) -> ResetRequestPayload:
@@ -256,6 +336,21 @@ def main(argv: list[str] | None = None) -> int | None:
                     f"{browser_transport['resetMs']:10.1f}ms".rjust(14),
                     f"{browser_transport['toggleMs']:11.1f}ms".rjust(15),
                 )
+                if periodic_face_tilings.is_periodic_face_tiling(geometry):
+                    stages = benchmark_periodic_build_stages(
+                        geometry,
+                        int(dimensions["width"]),
+                        int(dimensions["height"]),
+                    )
+                    print(
+                        " " * 4,
+                        "stages",
+                        f"load={stages['descriptor_loading_ms']:.1f}ms",
+                        f"realize={stages['cell_realization_ms']:.1f}ms",
+                        f"adjacency={stages['adjacency_ms']:.1f}ms",
+                        f"normalize={stages['normalization_ms']:.1f}ms",
+                        f"serialize={stages['serialization_ms']:.1f}ms",
+                    )
 
             browser.close()
     finally:

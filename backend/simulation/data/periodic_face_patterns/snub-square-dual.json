@@ -1,5 +1,6 @@
 {
   "geometry": "snub-square-dual",
+  "neighbor_mode": "edge-match",
   "base_edge": 38.795122,
   "unit_width": 142,
   "unit_height": 142,

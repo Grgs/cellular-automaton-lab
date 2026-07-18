@@ -1,5 +1,6 @@
 {
   "geometry": "archimedean-3-3-3-3-6",
+  "neighbor_mode": "edge-match",
   "base_edge": 52,
   "unit_width": 364,
   "unit_height": 630,

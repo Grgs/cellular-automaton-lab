@@ -1,5 +1,6 @@
 {
   "geometry": "pentagon-crosses",
+  "neighbor_mode": "edge-match",
   "base_edge": 35,
   "unit_width": 133.682476,
   "unit_height": 133.682476,

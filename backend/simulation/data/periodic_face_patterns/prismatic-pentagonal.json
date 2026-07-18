@@ -1,5 +1,6 @@
 {
   "geometry": "prismatic-pentagonal",
+  "neighbor_mode": "edge-match",
   "base_edge": 38.806665,
   "unit_width": 104,
   "unit_height": 194,
