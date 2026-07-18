@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createHttpSimulationBackend, request } from "./api.js";
-import type { SimulationSnapshot } from "./types/domain.js";
+import type { CompareRequest, FilmstripRequest, SimulationSnapshot } from "./types/domain.js";
 
 function stubFetch(response: Response): void {
     vi.stubGlobal(
@@ -154,5 +154,28 @@ describe("HTTP simulation backend cell deltas", () => {
         await expect(backend.setCell({ id: "c:0:0" }, 1)).rejects.toThrow(
             "cell delta.state_revision",
         );
+    });
+});
+
+describe("HTTP simulation backend comparison cancellation", () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    it("passes AbortSignal through comparison and filmstrip fetches", async () => {
+        const fetchMock = vi
+            .fn<typeof fetch>()
+            .mockResolvedValueOnce(jsonResponse({ comparison: {} }))
+            .mockResolvedValueOnce(jsonResponse({ filmstrip: {} }));
+        vi.stubGlobal("fetch", fetchMock);
+        const backend = createHttpSimulationBackend();
+        const compareController = new AbortController();
+        const filmstripController = new AbortController();
+
+        await backend.compareSeed({} as CompareRequest, { signal: compareController.signal });
+        await backend.requestFilmstrip({} as FilmstripRequest, {
+            signal: filmstripController.signal,
+        });
+
+        expect(fetchMock.mock.calls[0]?.[1]?.signal).toBe(compareController.signal);
+        expect(fetchMock.mock.calls[1]?.[1]?.signal).toBe(filmstripController.signal);
     });
 });

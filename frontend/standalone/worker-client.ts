@@ -266,14 +266,14 @@ export async function createStandaloneEnvironment(
             const response = await request("/api/cells/set-many", { cells });
             return reconcileCellResponse(response);
         },
-        async compareSeed(compareRequest) {
+        async compareSeed(compareRequest, _options) {
             const response = await request("/api/compare", compareRequest);
             if (!response.comparison) {
                 throw new Error("Standalone runtime did not return a comparison result.");
             }
             return response.comparison;
         },
-        async requestFilmstrip(filmstripRequest) {
+        async requestFilmstrip(filmstripRequest, _options) {
             const response = await request("/api/compare/filmstrip", filmstripRequest);
             if (!response.filmstrip) {
                 throw new Error("Standalone runtime did not return a filmstrip result.");

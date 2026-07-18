@@ -66,6 +66,10 @@ export interface FetchStateFunction {
     (): Promise<SimulationSnapshot>;
 }
 
+export interface BackendRequestOptions {
+    signal?: AbortSignal;
+}
+
 export interface SimulationBackend {
     getState(): Promise<SimulationSnapshot>;
     getRules(): Promise<RulesResponse>;
@@ -76,8 +80,14 @@ export interface SimulationBackend {
     toggleCell(cell: CellTargetRequest): Promise<SimulationSnapshot>;
     setCell(cell: CellTargetRequest, state: number): Promise<SimulationSnapshot>;
     setCells(cells: CellUpdateRequest[]): Promise<SimulationSnapshot>;
-    compareSeed(request: CompareRequest): Promise<SeedComparisonResult>;
-    requestFilmstrip(request: FilmstripRequest): Promise<SeedFilmstripResult>;
+    compareSeed(
+        request: CompareRequest,
+        options?: BackendRequestOptions,
+    ): Promise<SeedComparisonResult>;
+    requestFilmstrip(
+        request: FilmstripRequest,
+        options?: BackendRequestOptions,
+    ): Promise<SeedFilmstripResult>;
     previewTopology(request: TopologyPreviewRequest): Promise<TopologyPreview>;
 }
 
