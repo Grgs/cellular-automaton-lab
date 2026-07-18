@@ -94,6 +94,7 @@ import {
     MIN_COMPARE_STEPS,
 } from "./compare-limits.js";
 import { createCompareWorkspaceStore, inspectedBoard } from "./compare-workspace-store.js";
+import { subscribeSelector } from "./compare-workspace-subscriptions.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 
@@ -649,6 +650,11 @@ export function createComparePanelContent(
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
+    // Store-derived renders driven by selector subscriptions. Handles are torn
+    // down in dispose(). Views that also depend on local UI state (the tiling
+    // selection Set, config fields) stay imperatively invoked; only the
+    // purely store-derived renders live here.
+    const storeRenderSubscriptions: Array<() => void> = [];
 
     function syncWorkspaceConfiguration(config = currentRunConfig()): CompareRunConfig {
         workspaceStore.update((state) => ({
@@ -1513,6 +1519,24 @@ export function createComparePanelContent(
     renderTilingChecklist();
     refreshSavedControls();
 
+    // The explainer is purely store-derived: inspected board, the wall result,
+    // and the current frame index. Subscribing to exactly that slice means a
+    // frame tick refreshes the explainer without touching the summary, and no
+    // mutation site has to remember to call updateExplainer.
+    storeRenderSubscriptions.push(
+        subscribeSelector(
+            workspaceStore,
+            (state) =>
+                [
+                    inspectedBoard(state),
+                    state.results.filmstrip,
+                    state.playback.frameIndex,
+                ] as const,
+            () => updateExplainer(),
+        ),
+    );
+    updateExplainer();
+
     function labeledField(label: string, field: HTMLElement): HTMLLabelElement {
         return el("label", { class: "compare-label" }, [el("span", { textContent: label }), field]);
     }
@@ -2063,7 +2087,6 @@ export function createComparePanelContent(
         editModeButton.disabled = running || !wallFilmstrip;
         editModeButton.title = running ? WAIT_FOR_WALL_UPDATE : "Edit the seed by painting boards";
         updateSetupSummary();
-        updateExplainer();
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -2882,6 +2905,9 @@ export function createComparePanelContent(
                     loop: true,
                     onFocusChange: handleFocusChanged,
                     onFrameChange: () => {
+                        // Publishing the frame index re-renders the explainer
+                        // through its subscription; the summary selector omits
+                        // the frame index, so it stays put as the clock ticks.
                         workspaceStore.update((state) => ({
                             ...state,
                             playback: {
@@ -2889,7 +2915,6 @@ export function createComparePanelContent(
                                 frameIndex: filmstripView?.currentFrameIndex() ?? 0,
                             },
                         }));
-                        updateExplainer();
                         noteDetachedForksOnClockMove();
                     },
                     onPaintCell: handlePaintCell,
@@ -3417,6 +3442,7 @@ export function createComparePanelContent(
         },
         dispose(): void {
             disposed = true;
+            storeRenderSubscriptions.forEach((unsubscribe) => unsubscribe());
             invalidateOperations();
             workspaceScheduler.dispose();
             workspaceLayout.dispose();
