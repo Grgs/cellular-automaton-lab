@@ -94,6 +94,7 @@ import {
     MIN_COMPARE_STEPS,
 } from "./compare-limits.js";
 import { createCompareWorkspaceStore, inspectedBoard } from "./compare-workspace-store.js";
+import { subscribeSelector } from "./compare-workspace-subscriptions.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 
@@ -649,6 +650,11 @@ export function createComparePanelContent(
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
+    // Store-derived renders driven by selector subscriptions. Handles are torn
+    // down in dispose(). Views that also depend on local UI state (the tiling
+    // selection Set, config fields) stay imperatively invoked; only the
+    // purely store-derived renders live here.
+    const storeRenderSubscriptions: Array<() => void> = [];
 
     function syncWorkspaceConfiguration(config = currentRunConfig()): CompareRunConfig {
         workspaceStore.update((state) => ({
@@ -699,7 +705,8 @@ export function createComparePanelContent(
                     error: error instanceof Error ? error.message : error ? String(error) : null,
                 },
             }));
-            updateSummary();
+            // The operation slice drives the summary subscription; no manual
+            // updateSummary is needed for the button/status refresh.
         },
     });
     // Live forks are per-board (keyed by geometry) and outlive a focus change:
@@ -1058,7 +1065,8 @@ export function createComparePanelContent(
         // view only changes the stage layout -- the seed pad stays in the
         // config sheet for bit-level control.
         stageMain.classList.toggle("is-speaker", geometry !== null);
-        updateSummary();
+        // Focus/selection changes publish to the store, which refreshes the
+        // summary through its subscription.
     }
 
     function disposeForkedBoard(geometry: string): void {
@@ -1202,10 +1210,11 @@ export function createComparePanelContent(
                 onDiscard: () => {
                     if (forkedBoards.get(geometry) === nextPane) {
                         forkedBoards.delete(geometry);
+                        // The store's forkedBoards change refreshes the summary
+                        // through its subscription.
                         syncWorkspaceForks();
                     }
                     filmstripView?.setBoardOverlay(geometry, null);
-                    updateSummary();
                 },
                 onError: reportFocusPaneError,
             });
@@ -1217,7 +1226,6 @@ export function createComparePanelContent(
             }
             forkedBoards.set(geometry, nextPane);
             syncWorkspaceForks();
-            updateSummary();
         } catch (error) {
             if (backend) {
                 disposeDetachedBackend(backend);
@@ -1512,6 +1520,46 @@ export function createComparePanelContent(
 
     renderTilingChecklist();
     refreshSavedControls();
+
+    // The explainer is purely store-derived: inspected board, the wall result,
+    // and the current frame index. Subscribing to exactly that slice means a
+    // frame tick refreshes the explainer without touching the summary, and no
+    // mutation site has to remember to call updateExplainer.
+    const selectExplainerState = (state: ReturnType<typeof workspaceStore.getState>) =>
+        [inspectedBoard(state), state.results.filmstrip, state.playback.frameIndex] as const;
+    storeRenderSubscriptions.push(
+        subscribeSelector(workspaceStore, selectExplainerState, (explainerState) =>
+            updateExplainer(explainerState),
+        ),
+    );
+    updateExplainer(selectExplainerState(workspaceStore.getState()));
+
+    // The summary's store-derived inputs: the operation lifecycle, the wall
+    // result and its key, focus/selection, and fork membership. Folding
+    // forkedBoards to a joined string keeps every selector element a primitive
+    // or stable reference (the frozen array is a fresh object each update), so
+    // the slice only changes on a genuine change. It deliberately omits
+    // playback, so the clock ticking never re-runs the summary. The summary
+    // also depends on local UI state (the selection Set, config fields), which
+    // still triggers updateSummary imperatively from those event handlers.
+    storeRenderSubscriptions.push(
+        subscribeSelector(
+            workspaceStore,
+            (state) =>
+                [
+                    state.operation.status,
+                    state.operation.executing,
+                    state.operation.kind,
+                    state.operation.wallUpdateFailed,
+                    state.results.filmstrip,
+                    state.results.filmstripKey,
+                    state.focusedBoard,
+                    state.selectedBoard,
+                    state.forkedBoards.join(","),
+                ] as const,
+            () => updateSummary(),
+        ),
+    );
 
     function labeledField(label: string, field: HTMLElement): HTMLLabelElement {
         return el("label", { class: "compare-label" }, [el("span", { textContent: label }), field]);
@@ -2063,7 +2111,6 @@ export function createComparePanelContent(
         editModeButton.disabled = running || !wallFilmstrip;
         editModeButton.title = running ? WAIT_FOR_WALL_UPDATE : "Edit the seed by painting boards";
         updateSetupSummary();
-        updateExplainer();
     }
 
     function familySelectionCounts(family: string): { selectedCount: number; totalCount: number } {
@@ -2141,15 +2188,14 @@ export function createComparePanelContent(
         setupTilingsValue.title = summaryText();
     }
 
-    function updateExplainer(): void {
-        const inspectedGeometry = selectedBoardGeometry();
-        const filmstrip = workspaceStore.getState().results.filmstrip;
+    function updateExplainer([inspectedGeometry, filmstrip, frameIndex]: ReturnType<
+        typeof selectExplainerState
+    >): void {
         if (inspectedGeometry && filmstrip) {
             const tiling = filmstrip.tilings.find(
                 (candidate) => candidate.geometry === inspectedGeometry,
             );
             if (tiling) {
-                const frameIndex = filmstripView?.currentFrameIndex() ?? 0;
                 const frame = tiling.frames[frameIndex] ?? {};
                 const liveCells = Object.values(frame).filter((state) => state !== 0).length;
                 const catalog = allTilings.find(
@@ -2574,7 +2620,8 @@ export function createComparePanelContent(
         retryWallUpdateButton.title = next
             ? WAIT_FOR_WALL_UPDATE
             : "Retry the update using the latest setup";
-        updateSummary();
+        // The executing flag published above refreshes the summary through its
+        // subscription; the browser paints only the settled DOM either way.
         if (!next) {
             renderTilingChecklist();
             refreshSavedControls(savedRunSelect.value, savedTilingSetSelect.value);
@@ -2882,6 +2929,9 @@ export function createComparePanelContent(
                     loop: true,
                     onFocusChange: handleFocusChanged,
                     onFrameChange: () => {
+                        // Publishing the frame index re-renders the explainer
+                        // through its subscription; the summary selector omits
+                        // the frame index, so it stays put as the clock ticks.
                         workspaceStore.update((state) => ({
                             ...state,
                             playback: {
@@ -2889,7 +2939,6 @@ export function createComparePanelContent(
                                 frameIndex: filmstripView?.currentFrameIndex() ?? 0,
                             },
                         }));
-                        updateExplainer();
                         noteDetachedForksOnClockMove();
                     },
                     onPaintCell: handlePaintCell,
@@ -3417,6 +3466,7 @@ export function createComparePanelContent(
         },
         dispose(): void {
             disposed = true;
+            storeRenderSubscriptions.forEach((unsubscribe) => unsubscribe());
             invalidateOperations();
             workspaceScheduler.dispose();
             workspaceLayout.dispose();

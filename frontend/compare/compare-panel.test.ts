@@ -2707,6 +2707,55 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("re-renders the explainer on a frame tick without disturbing the summary", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip: async () => twoBoardFilmstrip() },
+            bootstrapData: bootstrapData(),
+        });
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+
+        // Focus a board so the explainer shows the per-generation view.
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        const generationCopy = (): string | undefined => {
+            const items = [...document.querySelectorAll(".compare-explainer-item")];
+            const row = items.find(
+                (item) =>
+                    item.querySelector(".compare-explainer-key")?.textContent === "Generation",
+            );
+            return row?.querySelector(".compare-explainer-copy")?.textContent ?? undefined;
+        };
+        expect(generationCopy()).toBe("0 of 1");
+
+        // The summary's run button reflects the settled wall; capture it so we
+        // can confirm a frame tick leaves the summary untouched.
+        const setupRun = () =>
+            document.querySelector<HTMLButtonElement>(".compare-setup-run")?.textContent;
+        const summaryBefore = setupRun();
+        const selectedChipBefore = document.querySelector(".compare-selected-chip");
+        expect(selectedChipBefore).not.toBeNull();
+
+        // Advance one generation via the transport's step control. This drives
+        // onFrameChange, whose only render path is the explainer subscription.
+        document
+            .querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[aria-label="Step forward one generation"]',
+            )
+            ?.click();
+
+        expect(generationCopy()).toBe("1 of 1");
+        expect(setupRun()).toBe(summaryBefore);
+        expect(document.querySelector(".compare-selected-chip")).toBe(selectedChipBefore);
+        handle.dispose();
+    });
+
     it("returns to the gallery from the hero's back button", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
