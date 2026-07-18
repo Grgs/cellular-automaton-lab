@@ -692,7 +692,9 @@ export function createComparePanelContent(
                 ...state,
                 operation: {
                     kind: status === "idle" ? null : (config?.kind ?? null),
-                    status,
+                    // The store's operation contract has no debounce phase;
+                    // surface a pending configuration as the same busy state.
+                    status: status === "pending" ? "updating" : status,
                     error: error instanceof Error ? error.message : error ? String(error) : null,
                 },
             }));

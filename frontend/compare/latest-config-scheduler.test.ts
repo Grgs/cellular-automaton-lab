@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
+import {
+    createLatestConfigScheduler,
+    type LatestSchedulerState,
+} from "./latest-config-scheduler.js";
 
 function deferred<T>() {
     let resolve!: (value: T) => void;
@@ -92,6 +95,49 @@ describe("latest config scheduler", () => {
         await vi.advanceTimersByTimeAsync(500);
 
         expect(execute).not.toHaveBeenCalled();
+    });
+
+    it("stays pending through the debounce and updates only when execution starts", async () => {
+        vi.useFakeTimers();
+        const states: Array<[string, string | null]> = [];
+        const scheduler = createLatestConfigScheduler<string>({
+            execute: async () => {},
+            onStateChange: (state: LatestSchedulerState<string>) => {
+                states.push([state.status, state.config]);
+            },
+        });
+
+        scheduler.schedule("first");
+        scheduler.schedule("latest");
+        expect(states).toEqual([
+            ["pending", "first"],
+            ["pending", "latest"],
+        ]);
+
+        await vi.advanceTimersByTimeAsync(400);
+        await scheduler.whenIdle();
+        expect(states).toEqual([
+            ["pending", "first"],
+            ["pending", "latest"],
+            ["updating", "latest"],
+            ["idle", null],
+        ]);
+    });
+
+    it("reports pending, updating, then failed for an immediate failing run", async () => {
+        const states: string[] = [];
+        const scheduler = createLatestConfigScheduler<string>({
+            execute: async () => {
+                throw new Error("offline");
+            },
+            onStateChange: (state: LatestSchedulerState<string>) => {
+                states.push(state.status);
+            },
+        });
+
+        await scheduler.runNow("config");
+
+        expect(states).toEqual(["pending", "updating", "failed"]);
     });
 
     it("retries the most recent failed configuration", async () => {

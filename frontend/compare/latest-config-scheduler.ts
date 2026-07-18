@@ -1,4 +1,4 @@
-export type LatestSchedulerStatus = "idle" | "updating" | "failed";
+export type LatestSchedulerStatus = "idle" | "pending" | "updating" | "failed";
 
 export interface LatestSchedulerState<TConfig> {
     readonly status: LatestSchedulerStatus;
@@ -26,6 +26,10 @@ export interface LatestConfigScheduler<TConfig> {
  * Debounces configuration changes while enforcing one active request and one
  * replaceable pending configuration. Aborting is advisory: runtimes that
  * cannot interrupt work may finish, but their stale completion is discarded.
+ *
+ * Status lifecycle: an accepted configuration emits `pending` (debouncing or
+ * waiting on the active run), `updating` fires only when its execute call
+ * actually starts, and the run settles to `idle` or `failed`.
  */
 export function createLatestConfigScheduler<TConfig>(
     options: LatestConfigSchedulerOptions<TConfig>,
@@ -124,7 +128,7 @@ export function createLatestConfigScheduler<TConfig>(
         pending = config;
         pendingReady = ready;
         clearTimer();
-        emit("updating", config);
+        emit("pending", config);
         if (ready) {
             active?.controller.abort();
             launchPending();
