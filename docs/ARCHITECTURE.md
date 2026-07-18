@@ -43,7 +43,7 @@ Important rules:
 - Backend snapshots are authoritative for topology, rule, speed, running state, generation, cell states, and the monotonic `state_revision` within a live session.
 - Frontend edits and control changes are explicit mutations. Controls return the next canonical snapshot; cell writes return a revisioned delta that the frontend applies to its cached snapshot or rejects in favor of a full-state resynchronization.
 - `state_revision` advances exactly once for each effective observable mutation. It is intentionally ephemeral: persistence omits it and a new or restored runtime begins at revision zero.
-- `state_epoch` identifies the runtime lifetime that minted a revision. Every freshly constructed state (initial build, restore, replace) takes a new strictly larger epoch — wall-clock microseconds with a same-process monotonic floor — so clients can order snapshots across the revision resets that restores cause. Like the revision, it is never persisted.
+- `state_epoch` identifies the runtime lifetime that minted a revision. Every freshly constructed state (initial build, restore, replace) takes a strictly larger epoch within its hosting process — wall-clock microseconds with a same-process monotonic floor — so clients can order snapshots across revision resets while that runtime is live. The epoch is not a persistent cross-process clock and, like the revision, is never persisted.
 
 Maintenance workflows and repo-owned guardrails live in [MAINTENANCE.md](./MAINTENANCE.md).
 

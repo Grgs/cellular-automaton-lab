@@ -17,6 +17,7 @@ class GeneratedCheckToolTests(unittest.TestCase):
                 "frontend-fixtures",
                 "frontend-fixture-size",
                 "reference-fixtures",
+                "decoder-contract",
             ),
         )
 

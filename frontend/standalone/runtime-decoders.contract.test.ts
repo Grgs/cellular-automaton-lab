@@ -49,6 +49,20 @@ const EXPECTED_ENTRIES = [
     "error-unknown-command",
 ];
 
+const TOP_LEVEL_RENAMES: Readonly<Record<string, string>> = {
+    persisted_snapshot: "persistedSnapshot",
+    topology_preview: "topologyPreview",
+};
+
+const CELL_DELTA_KEYS = new Set([
+    "base_state_revision",
+    "state_revision",
+    "state_epoch",
+    "topology_revision",
+    "generation",
+    "cell_updates",
+]);
+
 function requireEntry(name: string): FixtureEntry {
     const entry = fixtureDocument.responses[name];
     if (!entry) {
@@ -71,6 +85,34 @@ function decodeEntry(entry: FixtureEntry): unknown {
     }
 }
 
+function expectedDecodedEntry(entry: FixtureEntry): Record<string, unknown> {
+    if (entry.decoder === "delta") {
+        return entry.response;
+    }
+
+    const expected: Record<string, unknown> = {};
+    const cellDelta: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(entry.response)) {
+        // Init success is represented by the decoder returning its data;
+        // unlike command responses, its public contract has no `ok` field.
+        if (entry.decoder === "init" && key === "ok") {
+            continue;
+        }
+        if (entry.decoder === "request" && CELL_DELTA_KEYS.has(key)) {
+            cellDelta[key] = value;
+            continue;
+        }
+        expected[TOP_LEVEL_RENAMES[key] ?? key] = value;
+    }
+    if (Object.keys(cellDelta).length > 0) {
+        expected.cellDelta = cellDelta;
+    }
+    if (entry.decoder === "init" && expected.persistedSnapshot === undefined) {
+        expected.persistedSnapshot = null;
+    }
+    return expected;
+}
+
 describe("runtime decoder contract fixtures", () => {
     it("covers the expected runtime responses", () => {
         expect(Object.keys(fixtureDocument.responses).sort()).toEqual([...EXPECTED_ENTRIES].sort());
@@ -78,39 +120,11 @@ describe("runtime decoder contract fixtures", () => {
 
     it.each(entries)("decodes the %s response without loss", (name, entry) => {
         const decoded = decodeEntry(entry) as Record<string, unknown>;
-        const response = entry.response;
 
-        if (entry.decoder === "delta") {
-            expect(decoded).toEqual(response);
-            return;
-        }
-        // Shared payload sections must survive decoding byte-for-byte; a field
-        // added on the backend but not copied by a decoder fails here.
-        if (response.snapshot !== undefined) {
-            expect(decoded.snapshot).toEqual(response.snapshot);
-        }
-        if (response.persisted_snapshot !== undefined) {
-            expect(decoded.persistedSnapshot).toEqual(response.persisted_snapshot);
-        }
-        if (entry.decoder !== "init") {
-            expect(decoded.ok).toBe(response.ok);
-        }
-        if (response.rules !== undefined) {
-            expect(decoded.rules).toEqual(response.rules);
-        }
-        if (response.comparison !== undefined) {
-            expect(decoded.comparison).toEqual(response.comparison);
-        }
-        if (response.filmstrip !== undefined) {
-            expect(decoded.filmstrip).toEqual(response.filmstrip);
-        }
-        if (response.topology_preview !== undefined) {
-            expect(decoded.topologyPreview).toEqual(response.topology_preview);
-        }
-        if (response.base_state_revision !== undefined) {
-            const { ok: _ok, ...deltaPayload } = response;
-            expect(decoded.cellDelta).toEqual(deltaPayload);
-        }
+        // Compare the complete envelope after the explicit public adapters
+        // above. Any new backend field must therefore survive decoding or be
+        // added as an intentional adapter here.
+        expect(decoded).toEqual(expectedDecodedEntry(entry));
     });
 
     it("preserves structured error details", () => {
