@@ -25,6 +25,7 @@ function snapshot(revision = 0): SimulationSnapshot {
         running: false,
         generation: 0,
         state_revision: revision,
+        state_epoch: 1,
         rule: {
             name: "conway",
             display_name: "Conway",
@@ -95,6 +96,7 @@ describe("HTTP simulation backend cell deltas", () => {
                 jsonResponse({
                     base_state_revision: 0,
                     state_revision: 1,
+                    state_epoch: 1,
                     topology_revision: "rev-1",
                     generation: 0,
                     cell_updates: [{ id: "c:0:0", state: 1 }],
@@ -106,6 +108,7 @@ describe("HTTP simulation backend cell deltas", () => {
 
         await expect(backend.setCell({ id: "c:0:0" }, 1)).resolves.toMatchObject({
             state_revision: 1,
+            state_epoch: 1,
             cell_states: [1],
         });
         expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -120,6 +123,7 @@ describe("HTTP simulation backend cell deltas", () => {
                 jsonResponse({
                     base_state_revision: 9,
                     state_revision: 10,
+                    state_epoch: 1,
                     topology_revision: "rev-1",
                     generation: 0,
                     cell_updates: [{ id: "c:0:0", state: 1 }],
@@ -142,6 +146,7 @@ describe("HTTP simulation backend cell deltas", () => {
                 jsonResponse({
                     base_state_revision: 0,
                     state_revision: "1",
+                    state_epoch: 1,
                     topology_revision: "rev-1",
                     generation: 0,
                     cell_updates: [{ id: "c:0:0", state: 1 }],

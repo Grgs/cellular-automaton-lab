@@ -27,6 +27,7 @@ export interface AppState {
     isRunning: boolean;
     generation: number;
     stateRevision: number | null;
+    stateEpoch: number | null;
     speed: number;
     measuredSpeed: number | null;
     measuredSpeedSample: {

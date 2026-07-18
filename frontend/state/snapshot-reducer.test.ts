@@ -23,6 +23,7 @@ describe("snapshot reducer revisions", () => {
             running: false,
             generation: 3,
             state_revision: 17,
+            state_epoch: 1,
             rule: {
                 name: "conway",
                 display_name: "Conway",

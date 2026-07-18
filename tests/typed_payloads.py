@@ -220,6 +220,7 @@ def require_simulation_state_payload(value: object, *, context: str) -> Simulati
         "state_revision": _require_int(
             payload.get("state_revision"), context=f"{context}.state_revision"
         ),
+        "state_epoch": _require_int(payload.get("state_epoch"), context=f"{context}.state_epoch"),
         "rule": require_rule_definition_payload(payload.get("rule"), context=f"{context}.rule"),
         "topology_revision": _require_str(
             payload.get("topology_revision"),
@@ -246,6 +247,7 @@ def require_cell_mutation_delta_payload(value: object, *, context: str) -> CellM
         "state_revision": _require_int(
             payload.get("state_revision"), context=f"{context}.state_revision"
         ),
+        "state_epoch": _require_int(payload.get("state_epoch"), context=f"{context}.state_epoch"),
         "topology_revision": _require_str(
             payload.get("topology_revision"), context=f"{context}.topology_revision"
         ),

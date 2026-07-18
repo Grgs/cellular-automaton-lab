@@ -372,6 +372,7 @@ export interface ApiSimulationSnapshot {
     running: boolean;
     generation: number;
     state_revision: number;
+    state_epoch: number;
     rule: RuleDefinition;
     topology_revision: string;
     topology: TopologyPayload;
@@ -383,6 +384,7 @@ export type SimulationSnapshot = ApiSimulationSnapshot;
 export interface CellMutationDelta {
     base_state_revision: number;
     state_revision: number;
+    state_epoch: number;
     topology_revision: string;
     generation: number;
     cell_updates: CellStateUpdate[];

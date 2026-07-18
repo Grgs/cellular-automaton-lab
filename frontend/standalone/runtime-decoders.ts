@@ -265,6 +265,7 @@ function optionalSnapshot(value: unknown, context: string): SimulationSnapshot |
             context,
             "simulation snapshot.state_revision",
         ),
+        state_epoch: number(payload.state_epoch, context, "simulation snapshot.state_epoch"),
         rule: ruleDefinition(payload.rule, context),
         topology_revision: string(
             payload.topology_revision,
@@ -483,6 +484,7 @@ export function decodeCellMutationDelta(value: unknown, context = "Runtime"): Ce
             "cell delta.base_state_revision",
         ),
         state_revision: integer(payload.state_revision, context, "cell delta.state_revision"),
+        state_epoch: integer(payload.state_epoch, context, "cell delta.state_epoch"),
         topology_revision: string(
             payload.topology_revision,
             context,

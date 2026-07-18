@@ -78,6 +78,7 @@ function snapshot(overrides: Partial<SimulationSnapshot> = {}): SimulationSnapsh
         running: false,
         generation: 0,
         state_revision: 0,
+        state_epoch: 1,
         rule: {
             name: "conway",
             display_name: "Conway",

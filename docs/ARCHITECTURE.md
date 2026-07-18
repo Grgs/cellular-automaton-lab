@@ -43,6 +43,7 @@ Important rules:
 - Backend snapshots are authoritative for topology, rule, speed, running state, generation, cell states, and the monotonic `state_revision` within a live session.
 - Frontend edits and control changes are explicit mutations. Controls return the next canonical snapshot; cell writes return a revisioned delta that the frontend applies to its cached snapshot or rejects in favor of a full-state resynchronization.
 - `state_revision` advances exactly once for each effective observable mutation. It is intentionally ephemeral: persistence omits it and a new or restored runtime begins at revision zero.
+- `state_epoch` identifies the runtime lifetime that minted a revision. Every freshly constructed state (initial build, restore, replace) takes a new strictly larger epoch — wall-clock microseconds with a same-process monotonic floor — so clients can order snapshots across the revision resets that restores cause. Like the revision, it is never persisted.
 
 Maintenance workflows and repo-owned guardrails live in [MAINTENANCE.md](./MAINTENANCE.md).
 
@@ -100,13 +101,14 @@ The three cell-mutation endpoints intentionally return a breaking delta contract
 {
   "base_state_revision": 12,
   "state_revision": 13,
+  "state_epoch": 1784227571512345,
   "topology_revision": "65617fa767e9",
   "generation": 4,
   "cell_updates": [{ "id": "c:2:3", "state": 1 }]
 }
 ```
 
-Only cells whose final state changed are included. A no-op write has an empty `cell_updates` array and keeps the same revision. Clients apply a delta only when its base revision, topology revision, and generation match the installed snapshot; every mismatch is resolved by fetching `/state`. Older in-flight refreshes cannot replace a newer installed snapshot.
+Only cells whose final state changed are included. A no-op write has an empty `cell_updates` array and keeps the same revision. Clients apply a delta only when its epoch, base revision, topology revision, and generation match the installed snapshot; every mismatch is resolved by fetching `/state`. Older in-flight refreshes cannot replace a newer installed snapshot: snapshots are ranked by epoch first, then revision, so a restore that resets the revision still outranks stale responses minted before it.
 
 `POST /api/compare` is the one stateless analysis endpoint: it runs a seed-comparison sweep ([backend/simulation/seeding](../backend/simulation/seeding)) and returns the result without touching the canonical simulation snapshot. Requests may set `include_states: true` to include each tiling's topology spec plus sparse begin/end `cells_by_id` maps; the compare-mode UI uses those optional fields to create shareable board links and inline thumbnails. `POST /api/topology/preview` ([backend/simulation/topology_preview.py](../backend/simulation/topology_preview.py)) is a second stateless helper that builds one tiling and returns its cells with per-cell geometry, which the thumbnail renderer draws. Both endpoints are exposed as matching `/api/...` worker commands in the standalone runtime, sharing their request parsers, so compare-mode works identically in server and standalone hosts.
 

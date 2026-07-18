@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import threading
+import time
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from backend.defaults import (
@@ -423,10 +425,31 @@ class RuleSnapshot:
         }
 
 
+_state_epoch_lock = threading.Lock()
+_last_state_epoch = 0
+
+
+def next_state_epoch() -> int:
+    """Wall-clock microseconds, strictly increasing within this process.
+
+    Wall clock keeps epochs ordered across process restarts, so clients can
+    rank snapshots from different runtime lifetimes; the floor of previous
+    epoch + 1 keeps same-process constructions strictly ordered even when they
+    land in the same microsecond. Microseconds stay far below 2**53, so the
+    value survives a JavaScript number round-trip exactly.
+    """
+    global _last_state_epoch
+    with _state_epoch_lock:
+        epoch = max(time.time_ns() // 1_000, _last_state_epoch + 1)
+        _last_state_epoch = epoch
+        return epoch
+
+
 @dataclass(frozen=True)
 class CellMutationDelta:
     base_state_revision: int
     state_revision: int
+    state_epoch: int
     topology_revision: str
     generation: int
     cell_updates: tuple[tuple[str, int], ...]
@@ -435,6 +458,7 @@ class CellMutationDelta:
         return {
             "base_state_revision": self.base_state_revision,
             "state_revision": self.state_revision,
+            "state_epoch": self.state_epoch,
             "topology_revision": self.topology_revision,
             "generation": self.generation,
             "cell_updates": [
@@ -451,6 +475,7 @@ class SimulationSnapshot:
     generation: int
     rule: RuleSnapshot
     state_revision: int = 0
+    state_epoch: int = 0
 
     @property
     def topology(self) -> LatticeTopology:
@@ -471,6 +496,7 @@ class SimulationSnapshot:
             "running": self.running,
             "generation": self.generation,
             "state_revision": self.state_revision,
+            "state_epoch": self.state_epoch,
             "rule": self.rule.to_dict(),
             "topology_revision": self.topology.topology_revision,
             "cell_states": self.cell_states,
@@ -486,6 +512,9 @@ class SimulationStateData:
     rule: AutomatonRule
     board: SimulationBoard
     state_revision: int = 0
+    # Every freshly constructed state (initial build, restore, replace) gets a
+    # new epoch; in-place mutations keep it while state_revision advances.
+    state_epoch: int = field(default_factory=next_state_epoch)
 
     @property
     def topology(self) -> LatticeTopology:
