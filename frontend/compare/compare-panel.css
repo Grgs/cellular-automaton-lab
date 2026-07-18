@@ -2167,6 +2167,11 @@
     flex-direction: column;
     gap: 12px;
 }
+.compare-inspector-body > .compare-hero-toolbelt,
+.compare-inspector-body > .compare-explainer,
+.compare-inspector-body > .compare-config-panel {
+    flex: 0 0 auto;
+}
 .compare-inspector .compare-hero-toolbelt {
     position: static;
     inset: auto;

@@ -477,6 +477,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
     def test_wall_analysis_begin_end_round_trips_preserve_the_workspace(self) -> None:
         case = self._case()
         self._mark_compare_demo_seen()
+        case.page.set_viewport_size({"width": 1280, "height": 826})
         case.page.click("#wall-view-btn")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
@@ -495,6 +496,19 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click(".compare-run-secondary")
         self._expect(".compare-grid tbody tr").to_have_count(2, timeout=60_000)
         self._expect(".compare-status").to_contain_text("Done — 2 tilings")
+
+        overflowing_sections = case.page.locator(
+            ".compare-inspector-body > :not([hidden])"
+        ).evaluate_all(
+            """(sections) => sections
+                .filter((section) => section.scrollHeight > section.clientHeight + 1)
+                .map((section) => section.className)"""
+        )
+        case.assertEqual(
+            overflowing_sections,
+            [],
+            "inspector sections must retain their content height and scroll as one flow",
+        )
 
         first_row = case.page.locator(".compare-grid tbody tr").first
         analysis_geometry = first_row.get_attribute("data-geometry")
