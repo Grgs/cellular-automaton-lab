@@ -477,6 +477,7 @@ describe("mountComparePanel", () => {
         window.history.replaceState(null, "", "/");
         window.localStorage?.clear();
         vi.restoreAllMocks();
+        Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
     });
 
     it("mounts hidden, opens via the handle, and renders no trigger of its own", async () => {
@@ -829,12 +830,12 @@ describe("mountComparePanel", () => {
         expect(analysis!.contains(run ?? null)).toBe(true);
         expect(analysis!.querySelector(".compare-results")).not.toBeNull();
 
-        // Saved runs/sets are demoted below the live output, not above it.
+        // Each capability is owned by the workspace region that renders it.
         const saved = document.querySelector(".compare-saved");
         expect(saved).not.toBeNull();
-        expect(
-            filmstrip!.compareDocumentPosition(saved!) & Node.DOCUMENT_POSITION_FOLLOWING,
-        ).toBeTruthy();
+        expect(filmstrip?.closest(".compare-board-wall")).not.toBeNull();
+        expect(analysis?.closest(".compare-inspector")).not.toBeNull();
+        expect(saved?.closest(".compare-setup-sidebar")).not.toBeNull();
         handle.dispose();
     });
 
@@ -1154,7 +1155,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("uses config tabs and keeps Run comparison out of the sheet", async () => {
+    it("uses setup tabs while analysis renders in the inspector", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
         const handle = mountComparePanel({
@@ -1168,21 +1169,22 @@ describe("mountComparePanel", () => {
             ).toContain("Conway");
         });
 
-        document
-            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
-            ?.click();
-
         const sheet = document.querySelector<HTMLElement>(".compare-config-sheet");
         expect(sheet?.classList.contains("is-open")).toBe(true);
         expect(document.querySelector<HTMLElement>("#compare-config-panel-setup")?.hidden).toBe(
             false,
         );
-        expect(sheet?.textContent).not.toContain("Run comparison");
+        expect(sheet?.textContent).toContain("Run comparison");
 
         document.querySelector<HTMLButtonElement>("#compare-config-tab-analysis")?.click();
         expect(document.querySelector<HTMLElement>("#compare-config-panel-analysis")?.hidden).toBe(
             false,
         );
+        expect(
+            document
+                .querySelector<HTMLElement>("#compare-config-panel-analysis")
+                ?.closest(".compare-inspector"),
+        ).not.toBeNull();
         document.querySelector<HTMLButtonElement>("#compare-config-tab-help")?.click();
         const helpPanel = document.querySelector<HTMLElement>("#compare-config-panel-help");
         expect(helpPanel?.hidden).toBe(false);
@@ -1246,6 +1248,9 @@ describe("mountComparePanel", () => {
         expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
         expect(summaryText()).toBe("2 / 6 selected · Regular 2");
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(document.querySelector(".compare-explainer-body")?.textContent).toContain(
+            "Generation0",
+        );
         handle.dispose();
     });
 
@@ -2537,7 +2542,13 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
         const sheet = () => document.querySelector<HTMLElement>(".compare-config-sheet");
-        // Closed by default: inert and not open.
+        // Desktop setup starts visible, then the gear and close button collapse it.
+        expect(sheet()?.classList.contains("is-open")).toBe(true);
+        expect(sheet()?.hasAttribute("inert")).toBe(false);
+
+        document
+            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
+            ?.click();
         expect(sheet()?.classList.contains("is-open")).toBe(false);
         expect(sheet()?.hasAttribute("inert")).toBe(true);
 
@@ -2553,7 +2564,100 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("uses exclusive keyboard-accessible setup and inspector drawers below 960 px", async () => {
+        Object.defineProperty(window, "innerWidth", { configurable: true, value: 800 });
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip: async () => twoBoardFilmstrip() },
+            bootstrapData: bootstrapData(),
+        });
+        const setup = document.querySelector<HTMLElement>(".compare-setup-sidebar");
+        const inspector = document.querySelector<HTMLElement>(".compare-inspector");
+        const setupToggle = document.querySelector<HTMLButtonElement>(
+            '.compare-dock-icon[aria-label="Configure the run"]',
+        );
+        const inspectorToggle = document.querySelector<HTMLButtonElement>(
+            '.compare-dock-icon[aria-label="Inspect selected board"]',
+        );
+        expect(setup?.classList.contains("is-open")).toBe(false);
+        expect(inspector?.classList.contains("is-open")).toBe(false);
+
+        setupToggle?.focus();
+        setupToggle?.click();
+        expect(setup?.classList.contains("is-open")).toBe(true);
+        expect(setupToggle?.getAttribute("aria-expanded")).toBe("true");
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(inspectorToggle?.disabled).toBe(false));
+
+        inspectorToggle?.focus();
+        inspectorToggle?.click();
+        expect(setup?.classList.contains("is-open")).toBe(false);
+        expect(inspector?.classList.contains("is-open")).toBe(true);
+        document.querySelector<HTMLButtonElement>(".compare-inspector-close")?.click();
+        expect(document.activeElement).toBe(inspectorToggle);
+        handle.dispose();
+    });
+
+    it("preserves inspector selection across compatible reruns and falls back to the first board", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const first = twoBoardFilmstrip();
+        const second = { ...first, tilings: [first.tilings[1]!, first.tilings[0]!] };
+        const third = {
+            ...first,
+            tilings: [
+                first.tilings[1]!,
+                { ...first.tilings[0]!, geometry: "kagome", tiling_family: "kagome" },
+            ],
+        };
+        const requestFilmstrip = vi
+            .fn<SimulationBackend["requestFilmstrip"]>()
+            .mockResolvedValueOnce(first)
+            .mockResolvedValueOnce(second)
+            .mockResolvedValueOnce(third);
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        const rerun = async (seed: string, expectedCalls: number) => {
+            const seedField = document.querySelector<HTMLInputElement>(
+                'input.compare-field[type="text"]',
+            );
+            if (!seedField) throw new Error("missing seed field");
+            seedField.value = seed;
+            seedField.dispatchEvent(new Event("input", { bubbles: true }));
+            document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+            await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(expectedCalls));
+            await vi.waitFor(() =>
+                expect(
+                    document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
+                ).toContain("Generation0"),
+            );
+        };
+
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await vi.waitFor(() =>
+            expect(
+                document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
+            ).toContain("Boardsquare"),
+        );
+        await rerun("101", 2);
+        expect(
+            document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
+        ).toContain("Boardsquare");
+        await rerun("111", 3);
+        expect(
+            document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
+        ).toContain("Boardhex");
+        handle.dispose();
+    });
+
     it("Escape closes the config sheet before it exits speaker view", async () => {
+        Object.defineProperty(window, "innerWidth", { configurable: true, value: 800 });
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const filmstripBackend: SimulationBackend = {

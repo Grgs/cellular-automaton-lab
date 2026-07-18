@@ -356,7 +356,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         counter = case.page.locator(".compare-filmstrip-counter")
         frame_max = scrubber.get_attribute("max")
         if frame_max is None:
-            raise AssertionError("generation scrubber did not expose a maximum")
+            raise AssertionError("filmstrip generation scrubber is missing its maximum")
         final_generation = str(frame_max)
 
         reset.click()
@@ -442,13 +442,13 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         first_board.focus()
         first_board.press("Space")
         self._expect(".compare-filmstrip-board.is-hero").to_have_count(1)
+        case.page.set_viewport_size({"width": 820, "height": 900})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [820, 900])
         case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
-        seed_source = case.page.locator(".compare-form label", has_text="Seed source").locator(
-            "select"
-        )
-        seed_source.focus()
-        seed_source.press("Space")
+        grid_size = case.page.locator(".compare-form label", has_text="Grid size").locator("input")
+        grid_size.focus()
+        grid_size.press("Space")
         expect(play_pause).to_contain_text("Play")
         case.page.keyboard.press("Escape")
         self._expect(".compare-config-sheet.is-open").to_have_count(0)
@@ -487,7 +487,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         analysis_steps = case.page.locator(
             ".compare-form label", has_text="Analysis steps"
         ).locator("input")
@@ -591,7 +590,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # Save the current setup so loading it later is a true whole-wall
         # replacement, not a direct implementation hook.
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         case.page.click("#compare-config-tab-saved")
         case.page.fill('input[aria-label="Saved run name"]', "Fork lifecycle")
         case.page.get_by_role("button", name="Save run", exact=True).click()
@@ -637,7 +635,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-focus-pane").to_have_count(0)
         self._expect(".compare-status").to_contain_text("Loaded run link")
         case.page.get_by_role("button", name="Close configuration").click()
-        case.page.click(".compare-setup-run")
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
 
@@ -714,6 +711,54 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-focus-pane-brush").to_have_text("Brush 3")
         case.page.click(".compare-focus-pane-brush")
         self._expect(".compare-focus-pane-brush").to_have_text("Brush 1")
+
+    def test_wall_narrow_workspace_uses_exclusive_accessible_drawers(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        case.page.set_viewport_size({"width": 820, "height": 900})
+        setup = case.page.locator(".compare-setup-sidebar")
+        inspector = case.page.locator(".compare-inspector")
+        setup_toggle = case.page.get_by_role("button", name="Configure the run")
+        inspector_toggle = case.page.get_by_role("button", name="Inspect selected board")
+        expect(setup).to_have_attribute("inert", "")
+        expect(inspector).to_have_attribute("inert", "")
+        expect(setup).not_to_be_visible()
+        expect(inspector).not_to_be_visible()
+        expect(setup_toggle).to_have_attribute("aria-expanded", "false")
+        expect(inspector_toggle).to_be_enabled()
+
+        setup_toggle.press("Enter")
+        expect(setup).not_to_have_attribute("inert", "")
+        expect(setup).to_be_visible()
+        expect(setup_toggle).to_have_attribute("aria-expanded", "true")
+        self._expect(".compare-setup-run").to_be_visible()
+
+        inspector_toggle.press("Enter")
+        expect(setup).to_have_attribute("inert", "")
+        expect(inspector).not_to_have_attribute("inert", "")
+        expect(setup).not_to_be_visible()
+        expect(inspector).to_be_visible()
+        expect(inspector_toggle).to_have_attribute("aria-expanded", "true")
+        self._expect(".compare-explainer-body").to_contain_text("Generation0")
+        self._expect(".compare-hero-open-lab").to_be_enabled()
+        self._expect(".compare-hero-fork").to_be_enabled()
+        self._expect(".compare-inspector-replace").to_be_enabled()
+        self._expect(".compare-inspector-remove").to_be_enabled()
+        self._expect('.compare-dock-icon[aria-label="Copy run link"]').to_be_visible()
+
+        case.page.get_by_role("button", name="Close inspector").press("Enter")
+        expect(inspector).to_have_attribute("inert", "")
+        expect(inspector_toggle).to_be_focused()
+        self._expect(".compare-edit-toggle").to_be_visible()
+        self._expect('.compare-filmstrip-btn[aria-label="Play / pause"]').to_be_visible()
+        case.assertLessEqual(
+            case.page.evaluate("() => document.documentElement.scrollWidth"),
+            case.page.evaluate("() => innerWidth"),
+        )
 
     def test_wall_names_boards_and_edits_the_selection_in_place(self) -> None:
         # Boards carry their friendly catalog label (not the raw geometry
@@ -1041,7 +1086,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
                 )
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
         wall_generations = case.page.locator(
             ".compare-form label", has_text="Wall generations"
@@ -1088,8 +1132,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         grid_size.fill("2")
         expect(wall_run).to_be_enabled()
         expect(analysis_run).to_be_enabled()
-        case.page.get_by_role("button", name="Close configuration").click()
         wall_run.click()
+        case.page.get_by_role("button", name="Close configuration").click()
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 239")
         case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
@@ -1107,8 +1151,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#compare-config-tab-setup")
         wall_generations.fill("1")
         grid_size.fill("64")
-        case.page.get_by_role("button", name="Close configuration").click()
         wall_run.click()
+        case.page.get_by_role("button", name="Close configuration").click()
         self._expect(".compare-status").to_contain_text("Filmstrip ready", timeout=60_000)
         self._expect(".compare-filmstrip-counter").to_contain_text("gen 0 / 0")
         square_board = case.page.locator(".compare-filmstrip-board").filter(
@@ -1235,7 +1279,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # The converted seed still has live bits, so the placement previews in
         # the config sheet must show them (accent-filled cells), not blanks.
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
         case.page.wait_for_function(
             """() => {
@@ -1273,7 +1316,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
 
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         case.page.click("#compare-config-tab-saved")
         case.page.fill('input[aria-label="Saved run name"]', "Focus replacement run")
         case.page.get_by_role("button", name="Save run", exact=True).click()
@@ -1599,10 +1641,12 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self._expect(".wall-page").to_be_visible()
 
         run_name = "Standalone smoke run"
-        # Configuration lives in a bottom sheet the dock gear opens; saved-run
-        # controls live under the Saved tab.
-        self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
-        self.page.click("#compare-config-tab-saved")
+        # Configuration is open by default on desktop, but the same journey
+        # also remains valid if a restored workspace has collapsed it.
+        saved_tab = self.page.locator("#compare-config-tab-saved")
+        if not saved_tab.is_visible():
+            self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        saved_tab.click()
         self.page.fill('input[aria-label="Saved run name"]', run_name)
         self.page.get_by_role("button", name="Save run", exact=True).click()
         self._expect(".compare-status").to_contain_text("Saved run")
@@ -1626,8 +1670,10 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
 
         # The wall is the landing view, so the reload lands straight back on it.
         self._expect(".wall-page").to_be_visible()
-        self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
-        self.page.click("#compare-config-tab-saved")
+        saved_tab = self.page.locator("#compare-config-tab-saved")
+        if not saved_tab.is_visible():
+            self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        saved_tab.click()
         self._expect('select[aria-label="Saved compare runs"]').to_contain_text(run_name)
 
 

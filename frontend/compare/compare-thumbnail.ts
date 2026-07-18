@@ -140,14 +140,15 @@ export function updateBoardThumbnailSvg(
     for (const cellId of changedIds) {
         const previousState = previous[cellId] ?? 0;
         const nextState = cellsById[cellId] ?? 0;
-        if (previousState === nextState) {
-            continue;
-        }
         const polygon = polygonIndex.get(cellId);
         if (!polygon) {
             continue;
         }
-        polygon.setAttribute("fill", nextState === 0 ? deadFill : liveColor(nextState));
+        const nextFill = nextState === 0 ? deadFill : liveColor(nextState);
+        if (previousState === nextState && polygon.getAttribute("fill") === nextFill) {
+            continue;
+        }
+        polygon.setAttribute("fill", nextFill);
         polygon.classList.toggle("is-live", nextState !== 0);
     }
     if (options.label !== undefined) {
