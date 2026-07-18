@@ -227,12 +227,10 @@ export function createComparePanelContent(
 
     let rules: RuleDefinition[] = [];
     let rulesLoaded = false;
-    let running = false;
     let disposed = false;
     let operationSequence = 0;
     let lifecycleRevision = 0;
     let activeOperation: OperationTicket | null = null;
-    let failedWallUpdate = false;
     let tilingSearchQuery = "";
     let activeConfigTab: ConfigTab = "setup";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
@@ -697,10 +695,9 @@ export function createComparePanelContent(
             workspaceStore.update((state) => ({
                 ...state,
                 operation: {
+                    ...state.operation,
                     kind: status === "idle" ? null : (config?.kind ?? null),
-                    // The store's operation contract has no debounce phase;
-                    // surface a pending configuration as the same busy state.
-                    status: status === "pending" ? "updating" : status,
+                    status,
                     error: error instanceof Error ? error.message : error ? String(error) : null,
                 },
             }));
@@ -1962,18 +1959,21 @@ export function createComparePanelContent(
         updatePresetButtons();
         const wallProblem = wallConfigProblem();
         const analysisProblem = analysisConfigProblem();
+        const { results, operation } = workspaceStore.getState();
+        const running = operation.executing;
         const canAnalyze = !running && selected.size > 0 && analysisProblem === null;
         const canPlay = !running && selected.size >= MIN_WALL_TILINGS && wallProblem === null;
         const current = wallProblem === null && isFilmstripCurrent();
-        const { results, operation } = workspaceStore.getState();
         const wallFilmstrip = results.filmstrip;
         const stale = wallFilmstrip !== null && !current && selected.size >= MIN_WALL_TILINGS;
         const failedFilmstrip = operation.status === "failed" && operation.kind === "filmstrip";
         const failedAnalysis = operation.status === "failed" && operation.kind === "analysis";
-        const pendingFilmstrip =
-            operation.status === "updating" && operation.kind === "filmstrip" && !running;
-        const pendingAnalysis =
-            operation.status === "updating" && operation.kind === "analysis" && !running;
+        // Queued but not yet executing: debouncing, or launched without an
+        // open request bracket (cache hits never open one).
+        const queued =
+            operation.status === "pending" || (operation.status === "updating" && !running);
+        const pendingFilmstrip = queued && operation.kind === "filmstrip";
+        const pendingAnalysis = queued && operation.kind === "analysis";
         runButton.disabled = !canAnalyze;
         runButton.textContent = failedAnalysis
             ? "Retry analysis"
@@ -2534,7 +2534,10 @@ export function createComparePanelContent(
     }
 
     function setRunning(next: boolean): void {
-        running = next;
+        workspaceStore.update((state) => ({
+            ...state,
+            operation: { ...state.operation, executing: next },
+        }));
         runButton.textContent = next ? "Running…" : "Run analysis";
         // Quiet the transport too: a play press accepted mid-rebuild would be
         // wiped when the fresh filmstrip attaches paused at the seed.
@@ -2578,21 +2581,27 @@ export function createComparePanelContent(
     function invalidateOperations(): void {
         lifecycleRevision += 1;
         activeOperation = null;
-        if (running) {
+        if (workspaceStore.getState().operation.executing) {
             setWallLoading(null);
             setRunning(false);
         }
     }
 
     function clearFailedWallUpdate(): void {
-        failedWallUpdate = false;
+        workspaceStore.update((state) => ({
+            ...state,
+            operation: { ...state.operation, wallUpdateFailed: false },
+        }));
         staleResultNotice.hidden = true;
         staleResultNoticeMessage.textContent = "";
         filmstripView?.setManagementBlocked(null);
     }
 
     function reportFailedWallUpdate(message: string): void {
-        failedWallUpdate = true;
+        workspaceStore.update((state) => ({
+            ...state,
+            operation: { ...state.operation, wallUpdateFailed: true },
+        }));
         staleResultNoticeMessage.textContent = `Update failed: ${message}. The wall is still showing the previous result.`;
         staleResultNotice.hidden = false;
         filmstripView?.setManagementBlocked(FAILED_UPDATE_MANAGEMENT_REASON);
@@ -2872,9 +2881,10 @@ export function createComparePanelContent(
                             ),
                         ),
                 });
-                filmstripView.setManagementBusy(running);
+                const operation = workspaceStore.getState().operation;
+                filmstripView.setManagementBusy(operation.executing);
                 filmstripView.setManagementBlocked(
-                    failedWallUpdate ? FAILED_UPDATE_MANAGEMENT_REASON : null,
+                    operation.wallUpdateFailed ? FAILED_UPDATE_MANAGEMENT_REASON : null,
                 );
                 filmstripView.setEditMode(editMode);
                 filmstripArea.append(filmstripView.element);

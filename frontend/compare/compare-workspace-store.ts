@@ -3,7 +3,8 @@ import type { CompareRunConfig } from "./compare-run-link.js";
 import type { SavedCompareRun, SavedTilingSet } from "./compare-storage.js";
 
 export type CompareOperationKind = "analysis" | "filmstrip";
-export type CompareOperationStatus = "idle" | "updating" | "failed";
+/** Mirrors the scheduler lifecycle: pending = accepted but not yet executing. */
+export type CompareOperationStatus = "idle" | "pending" | "updating" | "failed";
 
 export interface CompareWorkspaceState {
     readonly configuration: CompareRunConfig;
@@ -38,6 +39,14 @@ export interface CompareWorkspaceState {
         readonly kind: CompareOperationKind | null;
         readonly status: CompareOperationStatus;
         readonly error: string | null;
+        /**
+         * True while a backend request bracket is open. Narrower than
+         * `status === "updating"`: a cache hit or an aborted launch updates
+         * without ever opening the bracket.
+         */
+        readonly executing: boolean;
+        /** The last wall rebuild failed and stale boards are still showing. */
+        readonly wallUpdateFailed: boolean;
     };
     readonly forkedBoards: readonly string[];
 }
@@ -84,7 +93,13 @@ export function createCompareWorkspaceStore(
         results: { filmstrip: null, filmstripKey: null, analysis: null, analysisKey: null },
         playback: { frameIndex: 0, playing: false },
         saved: { runs: [], tilingSets: [] },
-        operation: { kind: null, status: "idle", error: null },
+        operation: {
+            kind: null,
+            status: "idle",
+            error: null,
+            executing: false,
+            wallUpdateFailed: false,
+        },
         forkedBoards: [],
     });
     const listeners = new Set<(state: CompareWorkspaceState) => void>();
