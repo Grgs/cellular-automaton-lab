@@ -388,6 +388,32 @@
     min-height: 0;
     display: flex;
 }
+/* Floating run label: names the seed · rule · tiling count without taking a row
+   from the boards or intercepting their pointer events. */
+.compare-stage-caption {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    max-width: calc(100% - 24px);
+    padding: 3px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--compare-line);
+    background: color-mix(in srgb, var(--compare-panel, #ffffff) 88%, transparent);
+    color: var(--compare-muted-ink, var(--ink, #1f2430));
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.compare-stage-caption[hidden] {
+    display: none;
+}
 .compare-wall-loading {
     position: absolute;
     inset: 0;

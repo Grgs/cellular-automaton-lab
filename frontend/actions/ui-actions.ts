@@ -182,10 +182,10 @@ export function createUiActions({
         exitEditMode: applyExitEditMode,
         toggleDrawer: () => {
             const { drawerToggleLabel } = buildDrawerToggleState(state);
-            if (drawerToggleLabel === "Hide Inspector") {
+            if (drawerToggleLabel === "Hide Controls") {
                 return applyDrawerState(false);
             }
-            if (drawerToggleLabel === "Show Inspector" || drawerToggleLabel === "Show Overlays") {
+            if (drawerToggleLabel === "Show Controls" || drawerToggleLabel === "Show Overlays") {
                 return applyDrawerState(true);
             }
             if (drawerToggleLabel === "Show HUD") {
