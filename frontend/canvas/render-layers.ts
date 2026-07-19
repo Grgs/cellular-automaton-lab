@@ -6,6 +6,7 @@ import type {
     CanvasColors,
     CanvasRenderStyle,
     GeometryCache,
+    PolygonIntersectionBounds,
     RenderableTopologyCell,
 } from "../types/rendering.js";
 import type { CanvasSurfaceMetrics } from "./surface.js";
@@ -125,16 +126,27 @@ export function drawCommittedCells({
     targetContext,
     cellStates,
     cellIndexes,
+    dirtyBounds = null,
     cellSize,
     ...shared
 }: SharedRenderInputs & {
     targetContext: CanvasRenderingContext2D;
     cellStates: number[];
     cellIndexes: number[];
+    dirtyBounds?: PolygonIntersectionBounds | null;
     cellSize: number;
 }): void {
     const adapter = getGeometryAdapter(shared.geometry);
     targetContext.setTransform(shared.metrics.dpr ?? 1, 0, 0, shared.metrics.dpr ?? 1, 0, 0);
+    if (dirtyBounds) {
+        targetContext.fillStyle = shared.renderStyle.lineColor;
+        targetContext.fillRect(
+            dirtyBounds.minX,
+            dirtyBounds.minY,
+            dirtyBounds.maxX - dirtyBounds.minX,
+            dirtyBounds.maxY - dirtyBounds.minY,
+        );
+    }
     for (const index of cellIndexes) {
         const cell = shared.topology?.cells?.[index];
         if (!cell) {

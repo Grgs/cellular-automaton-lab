@@ -253,6 +253,16 @@ describe("canvas-view", () => {
 
         expect(drawCommittedLayer).toHaveBeenCalledTimes(1);
         expect(drawCommittedCells).toHaveBeenCalledTimes(1);
+        expect(view.getRenderOperationCounters()).toEqual({
+            fullRenderCount: 1,
+            incrementalRenderCount: 1,
+            committedCellDrawCount: 5,
+            lastRenderMode: "incremental",
+            lastDrawnCellCount: 1,
+            lastChangedCellCount: 1,
+            lastDirtyAreaRatio: null,
+        });
+        expect(canvas.dataset.renderMode).toBe("incremental");
 
         const restoreCallsAfterRender = restoreCommittedSurface.mock.calls.length;
         view.setHoveredCell({ id: "square:0:0", x: 0, y: 0 });
@@ -260,6 +270,7 @@ describe("canvas-view", () => {
         expect(drawCommittedLayer).toHaveBeenCalledTimes(1);
         expect(restoreCommittedSurface).toHaveBeenCalledTimes(restoreCallsAfterRender + 1);
         expect(drawHoverLayer).toHaveBeenCalledTimes(1);
+        expect(view.getRenderOperationCounters().incrementalRenderCount).toBe(1);
 
         view.setHoveredCell({ id: "square:0:0", x: 0, y: 0 });
 

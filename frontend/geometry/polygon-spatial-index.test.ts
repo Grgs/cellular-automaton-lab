@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     buildPolygonSpatialIndex,
     polygonSpatialIndexCandidates,
+    polygonSpatialIndexIntersectionCandidates,
 } from "./polygon-spatial-index.js";
 import { installFrontendGlobals } from "../test-helpers/bootstrap.js";
 import type { PolygonGeometryCache, PolygonGeometryCell } from "../types/rendering.js";
@@ -82,5 +83,42 @@ describe("polygon spatial index", () => {
         );
 
         expect(buildPolygonSpatialIndex(cells)).toBeNull();
+    });
+
+    it("returns deduplicated rectangle intersections in source order", () => {
+        const cells = Array.from({ length: 100 }, (_, index) =>
+            squareCell(index % 10, Math.floor(index / 10), `cell:${index}`),
+        );
+        const index = buildPolygonSpatialIndex(cells);
+
+        const candidates = polygonSpatialIndexIntersectionCandidates(index!, {
+            minX: 4.25,
+            maxX: 5.75,
+            minY: 4.25,
+            maxY: 5.75,
+        });
+
+        expect(candidates.map((candidate) => candidate.cell.id)).toEqual([
+            "cell:44",
+            "cell:45",
+            "cell:54",
+            "cell:55",
+        ]);
+    });
+
+    it("returns no rectangle candidates outside the indexed extent", () => {
+        const cells = Array.from({ length: 100 }, (_, index) =>
+            squareCell(index % 10, Math.floor(index / 10)),
+        );
+        const index = buildPolygonSpatialIndex(cells);
+
+        expect(
+            polygonSpatialIndexIntersectionCandidates(index!, {
+                minX: 20,
+                maxX: 21,
+                minY: 20,
+                maxY: 21,
+            }),
+        ).toEqual([]);
     });
 });

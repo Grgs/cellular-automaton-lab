@@ -125,6 +125,14 @@ export interface PolygonSpatialIndex {
     bucketWidth: number;
     bucketHeight: number;
     buckets: PolygonGeometryCell[][];
+    sourceIndexes: Map<PolygonGeometryCell, number>;
+}
+
+export interface PolygonIntersectionBounds {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
 }
 
 export type MixedGeometryCell = PolygonGeometryCell | null;
@@ -309,6 +317,16 @@ export interface CanvasRenderPayload {
     cellStates: number[];
     previewCellStatesById: Record<string, number> | null;
     tileColorsEnabled?: boolean;
+}
+
+export interface CanvasRenderOperationCounters {
+    fullRenderCount: number;
+    incrementalRenderCount: number;
+    committedCellDrawCount: number;
+    lastRenderMode: "full" | "incremental" | "none";
+    lastDrawnCellCount: number;
+    lastChangedCellCount: number;
+    lastDirtyAreaRatio: number | null;
 }
 
 export interface CanvasGridView {
