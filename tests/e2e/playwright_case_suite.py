@@ -429,7 +429,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
     def test_overlay_drawer_toggle_hides_and_restores_inspector(self) -> None:
         case = self._case()
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
-        self._expect("#drawer-toggle-btn").to_have_text("Hide Inspector")
+        self._expect("#drawer-toggle-btn").to_have_text("Hide Controls")
 
         case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "false")

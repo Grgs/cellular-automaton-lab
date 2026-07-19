@@ -147,14 +147,14 @@ export function buildDrawerToggleState(state: AppState): DrawerToggleState {
 
     if (hudVisible && drawerVisible) {
         return {
-            drawerToggleLabel: "Hide Inspector",
-            drawerToggleTitle: "Hide the overlay inspector.",
+            drawerToggleLabel: "Hide Controls",
+            drawerToggleTitle: "Hide the controls drawer.",
         };
     }
     if (hudVisible && !drawerVisible) {
         return {
-            drawerToggleLabel: "Show Inspector",
-            drawerToggleTitle: "Show the overlay inspector.",
+            drawerToggleLabel: "Show Controls",
+            drawerToggleTitle: "Show the controls drawer.",
         };
     }
     if (!hudVisible && drawerVisible) {
@@ -166,7 +166,7 @@ export function buildDrawerToggleState(state: AppState): DrawerToggleState {
     if (savedInspectorOpen) {
         return {
             drawerToggleLabel: "Show Overlays",
-            drawerToggleTitle: "Restore the canvas HUD and overlay inspector.",
+            drawerToggleTitle: "Restore the canvas HUD and controls drawer.",
         };
     }
     return {

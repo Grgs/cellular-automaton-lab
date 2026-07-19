@@ -11,13 +11,17 @@
  * controller keeps applying snapshots even after the user returns to the wall,
  * so this guard is what keeps the two URL vocabularies apart.
  *
+ * An empty board has nothing worth sharing, so it never grows a `share=` slot:
+ * a fresh `#/lab` landing stays `#/lab` instead of gaining a ~300-char blob,
+ * and erasing a loaded board back to empty drops the slot again.
+ *
  * Updates use `history.replaceState` so the user's history stack is not
  * polluted with a new entry per generation.
  */
 
 import { buildPatternPayload } from "./pattern-io.js";
 import { PatternValidationError } from "./parsers/pattern.js";
-import { buildHashFragmentForReplaceState } from "./share-link.js";
+import { buildHashFragmentForReplaceState, clearShareFragment } from "./share-link.js";
 import { resolveShellRoute } from "./compare/compare-route.js";
 import type { AppState } from "./types/state.js";
 
@@ -49,7 +53,13 @@ export function syncShareLinkUrlFromState(
         }
         throw error;
     }
-    const nextHash = buildHashFragmentForReplaceState(payload, locationApi.hash);
+    const isEmptyBoard = Object.keys(payload.cells_by_id).length === 0;
+    // Never let dropping the slot collapse a bare `#share=…` link to the wall:
+    // an empty board keeps the canonical lab hash. replaceState fires no
+    // hashchange, so this rewrite never re-routes or reloads.
+    const nextHash = isEmptyBoard
+        ? clearShareFragment(locationApi.hash) || "#/lab"
+        : buildHashFragmentForReplaceState(payload, locationApi.hash);
     if (nextHash === locationApi.hash) {
         return;
     }
