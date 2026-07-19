@@ -1312,11 +1312,16 @@ export function createComparePanelContent(
     /**
      * The bottom status reflects whether the shared clock is running, so it does
      * not sit on "Press play" while the demo autoplays. It anchors on "Filmstrip
-     * ready" while paused; the transport owns the generation counter, so the
-     * status no longer restates a (differently framed) generation count.
+     * ready" while paused and names the board count, but the transport owns the
+     * generation counter, so the status no longer restates a (differently
+     * framed) generation count.
      */
     function filmstripReadyStatus(playing: boolean): string {
-        return playing ? "Playing all boards in lockstep." : "Filmstrip ready — press play.";
+        const count = workspaceStore.getState().results.filmstrip?.tilings.length ?? 0;
+        const boards = `${count} tiling${count === 1 ? "" : "s"}`;
+        return playing
+            ? `Playing ${boards} in lockstep.`
+            : `Filmstrip ready — ${boards}. Press play.`;
     }
 
     function setWallLoading(message: string | null): void {
