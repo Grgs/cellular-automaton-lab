@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
-from backend.simulation.rule_context_frames import TopologyFrame
+from backend.simulation.rule_context_frames import RuleFrame
 
 
 class WhirlpoolRuleBase(AutomatonRule):
@@ -218,7 +218,7 @@ class WhirlpoolRuleBase(AutomatonRule):
             return self.EXCITED
         return self.EXCITED if self.should_excite_resting(ctx, counts) else self.RESTING
 
-    def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+    def next_states(self, frame: RuleFrame, cell_states: list[int]) -> list[int]:
         cell_count = frame.cell_count
         excited_outward = [0] * cell_count
         excited_inward = [0] * cell_count

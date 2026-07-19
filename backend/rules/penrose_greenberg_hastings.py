@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from backend.rules.base import AutomatonRule, CellStateDefinition
 from backend.simulation.rule_context import RuleContext
-from backend.simulation.rule_context_frames import TopologyFrame
+from backend.simulation.rule_context_frames import RuleFrame
 from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
 
 
@@ -41,10 +41,10 @@ class PenroseGreenbergHastingsRule(AutomatonRule):
             return self.RESTING
         return self.EXCITED if ctx.has_neighbor_state(self.EXCITED) else self.RESTING
 
-    def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+    def next_states(self, frame: RuleFrame, cell_states: list[int]) -> list[int]:
         next_states: list[int] = []
         append_state = next_states.append
-        for index, cell in enumerate(frame.cells):
+        for index in range(frame.cell_count):
             current_state = cell_states[index]
             if current_state == self.EXCITED:
                 append_state(self.TRAILING)
@@ -52,7 +52,10 @@ class PenroseGreenbergHastingsRule(AutomatonRule):
                 append_state(self.REFRACTORY)
             elif current_state != self.RESTING:
                 append_state(self.RESTING)
-            elif any(cell_states[neighbor.index] == self.EXCITED for neighbor in cell.neighbors):
+            elif any(
+                cell_states[neighbor_index] == self.EXCITED
+                for neighbor_index in frame.neighbor_indexes_for(index)
+            ):
                 append_state(self.EXCITED)
             else:
                 append_state(self.RESTING)

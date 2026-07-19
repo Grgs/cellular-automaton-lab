@@ -12,7 +12,7 @@ from backend.simulation.rule_frame_capabilities import (
 
 if TYPE_CHECKING:
     from backend.simulation.rule_context import RuleContext
-    from backend.simulation.rule_context_frames import TopologyFrame
+    from backend.simulation.rule_context_frames import RuleFrame
 
 
 @dataclass(frozen=True)
@@ -87,7 +87,7 @@ class AutomatonRule(ABC):
     def next_state(self, ctx: RuleContext) -> int:
         """Return the next state for a cell using the universal rule context."""
 
-    def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+    def next_states(self, frame: RuleFrame, cell_states: list[int]) -> list[int]:
         """Return one generation, allowing rules to provide a batch implementation."""
         from backend.simulation.rule_context import RuleContext
 

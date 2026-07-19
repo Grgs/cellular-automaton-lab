@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from backend.simulation.rule_context_frames import (
+    AdjacencyTopologyFrame,
+    RuleFrame,
     TopologyCellFrame,
     TopologyFrame,
     TopologyNeighborFrame,
@@ -13,7 +15,9 @@ from backend.simulation.rule_context_queries import (
 )
 
 __all__ = [
+    "AdjacencyTopologyFrame",
     "NeighborSelection",
+    "RuleFrame",
     "RuleContext",
     "TopologyCellFrame",
     "TopologyFrame",

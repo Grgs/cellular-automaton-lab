@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from dataclasses import dataclass
 
-from backend.simulation.rule_context_frames import TopologyFrame, topology_frame_for
+from backend.simulation.rule_context_frames import RuleFrame, topology_frame_for
 from backend.simulation.topology_types import SimulationBoard
 
 
@@ -24,13 +24,13 @@ class NeighborSelection:
 class RuleContext:
     __slots__ = ("_frame", "_cell_states", "_index")
 
-    def __init__(self, frame: TopologyFrame, cell_states: list[int], index: int) -> None:
+    def __init__(self, frame: RuleFrame, cell_states: list[int], index: int) -> None:
         self._frame = frame
         self._cell_states = cell_states
         self._index = index
 
     @property
-    def frame(self) -> TopologyFrame:
+    def frame(self) -> RuleFrame:
         return self._frame
 
     @property
@@ -39,39 +39,39 @@ class RuleContext:
 
     @property
     def cell_id(self) -> str:
-        return self._frame.cells[self._index].id
+        return self._frame.cell_id_for(self._index)
 
     @property
     def kind(self) -> str:
-        return self._frame.cells[self._index].kind
+        return self._frame.cell_kind_for(self._index)
 
     @property
     def degree(self) -> int:
-        return self._frame.cells[self._index].degree
+        return self._frame.degree_for(self._index)
 
     @property
     def shell_rank(self) -> int:
-        return self._frame.cells[self._index].shell_rank
+        return self._frame.shell_rank_for(self._index)
 
     @property
     def radial_distance(self) -> float:
-        return self._frame.cells[self._index].radial_distance
+        return self._frame.radial_distance_for(self._index)
 
     @property
     def radial_ratio(self) -> float:
-        return self._frame.cells[self._index].radial_ratio
+        return self._frame.radial_ratio_for(self._index)
 
     @property
     def polar_angle(self) -> float:
-        return self._frame.cells[self._index].polar_angle
+        return self._frame.polar_angle_for(self._index)
 
     @property
     def center(self) -> tuple[float, float]:
-        return self._frame.cells[self._index].center
+        return self._frame.center_for(self._index)
 
     @property
     def vertices(self) -> tuple[tuple[float, float], ...] | None:
-        return self._frame.cells[self._index].vertices
+        return self._frame.vertices_for(self._index)
 
     @property
     def board_center(self) -> tuple[float, float]:
@@ -99,26 +99,26 @@ class RuleContext:
         return int(self._cell_states[self._frame.index_for(cell_id)])
 
     def kind_for(self, cell_id: str) -> str:
-        return self._frame.cell_for(cell_id).kind
+        return self._frame.cell_kind_for(self._frame.index_for(cell_id))
 
     def shell_rank_for(self, cell_id: str) -> int:
-        return self._frame.cell_for(cell_id).shell_rank
+        return self._frame.shell_rank_for(self._frame.index_for(cell_id))
 
     def radial_ratio_for(self, cell_id: str) -> float:
-        return self._frame.cell_for(cell_id).radial_ratio
+        return self._frame.radial_ratio_for(self._frame.index_for(cell_id))
 
     def neighbor_ids(self, *, cell_id: str | None = None) -> tuple[str, ...]:
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         return tuple(
-            self._frame.cells[neighbor.index].id
-            for neighbor in self._frame.cells[resolved_index].neighbors
+            self._frame.cell_id_for(neighbor_index)
+            for neighbor_index in self._frame.neighbor_indexes_for(resolved_index)
         )
 
     def neighbor_states(self, *, cell_id: str | None = None) -> tuple[int, ...]:
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         return tuple(
-            int(self._cell_states[neighbor.index])
-            for neighbor in self._frame.cells[resolved_index].neighbors
+            int(self._cell_states[neighbor_index])
+            for neighbor_index in self._frame.neighbor_indexes_for(resolved_index)
         )
 
     def count_neighbors(
@@ -134,8 +134,13 @@ class RuleContext:
         allowed = states or None
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         cell_states = self._cell_states
+        if radial is None and turn is None:
+            return sum(
+                allowed is None or int(cell_states[neighbor_index]) in allowed
+                for neighbor_index in self._frame.neighbor_indexes_for(resolved_index)
+            )
         count = 0
-        for neighbor in self._frame.cells[resolved_index].neighbors:
+        for neighbor in self._frame.neighbor_frames_for(resolved_index):
             if radial is not None and neighbor.radial != radial:
                 continue
             if turn is not None and neighbor.turn != turn:
@@ -154,8 +159,13 @@ class RuleContext:
         # Single pass counting non-zero neighbours (no two count_neighbors calls).
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         cell_states = self._cell_states
+        if radial is None and turn is None:
+            return sum(
+                cell_states[neighbor_index] != 0
+                for neighbor_index in self._frame.neighbor_indexes_for(resolved_index)
+            )
         count = 0
-        for neighbor in self._frame.cells[resolved_index].neighbors:
+        for neighbor in self._frame.neighbor_frames_for(resolved_index):
             if radial is not None and neighbor.radial != radial:
                 continue
             if turn is not None and neighbor.turn != turn:
@@ -174,7 +184,12 @@ class RuleContext:
         allowed = states or None
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         cell_states = self._cell_states
-        for neighbor in self._frame.cells[resolved_index].neighbors:
+        if radial is None and turn is None:
+            return any(
+                allowed is None or cell_states[neighbor_index] in allowed
+                for neighbor_index in self._frame.neighbor_indexes_for(resolved_index)
+            )
+        for neighbor in self._frame.neighbor_frames_for(resolved_index):
             if radial is not None and neighbor.radial != radial:
                 continue
             if turn is not None and neighbor.turn != turn:
@@ -192,11 +207,16 @@ class RuleContext:
     ) -> tuple[str, ...]:
         allowed = states or None
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
-        frame_cells = self._frame.cells
         cell_states = self._cell_states
+        if radial is None and turn is None:
+            return tuple(
+                self._frame.cell_id_for(neighbor_index)
+                for neighbor_index in self._frame.neighbor_indexes_for(resolved_index)
+                if allowed is None or cell_states[neighbor_index] in allowed
+            )
         return tuple(
-            frame_cells[neighbor.index].id
-            for neighbor in frame_cells[resolved_index].neighbors
+            self._frame.cell_id_for(neighbor.index)
+            for neighbor in self._frame.neighbor_frames_for(resolved_index)
             if (radial is None or neighbor.radial == radial)
             and (turn is None or neighbor.turn == turn)
             and (allowed is None or cell_states[neighbor.index] in allowed)
@@ -207,7 +227,7 @@ class RuleContext:
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
         cell_states = self._cell_states
         outward = inward = clockwise = counterclockwise = total = 0
-        for neighbor in self._frame.cells[resolved_index].neighbors:
+        for neighbor in self._frame.neighbor_frames_for(resolved_index):
             if allowed is not None and cell_states[neighbor.index] not in allowed:
                 continue
             total += 1
@@ -285,8 +305,7 @@ class RuleContext:
     ) -> Iterator[NeighborSelection]:
         allowed = states or None
         resolved_index = self._index if cell_id is None else self._frame.index_for(cell_id)
-        for neighbor in self._frame.cells[resolved_index].neighbors:
-            frame_cell = self._frame.cells[neighbor.index]
+        for neighbor in self._frame.neighbor_frames_for(resolved_index):
             state = int(self._cell_states[neighbor.index])
             if allowed is not None and state not in allowed:
                 continue
@@ -295,16 +314,16 @@ class RuleContext:
             if turn is not None and neighbor.turn != turn:
                 continue
             yield NeighborSelection(
-                id=frame_cell.id,
+                id=self._frame.cell_id_for(neighbor.index),
                 state=state,
-                kind=frame_cell.kind,
+                kind=self._frame.cell_kind_for(neighbor.index),
                 radial=neighbor.radial,
                 turn=neighbor.turn,
                 radial_delta=neighbor.radial_delta,
                 angle_delta=neighbor.angle_delta,
                 clockwise_index=neighbor.clockwise_index,
-                shell_rank=frame_cell.shell_rank,
-                radial_ratio=frame_cell.radial_ratio,
+                shell_rank=self._frame.shell_rank_for(neighbor.index),
+                radial_ratio=self._frame.radial_ratio_for(neighbor.index),
             )
 
 

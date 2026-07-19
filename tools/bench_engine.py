@@ -21,6 +21,7 @@ from backend.rules.whirlpool import WhirlpoolRule
 from backend.rules.wireworld import WireWorldRule
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.rule_context import build_rule_contexts_for_board
+from backend.simulation.rule_context_frames import _adjacency_frame_for
 from backend.simulation.topology import (
     SimulationBoard,
     build_topology,
@@ -82,7 +83,19 @@ def benchmark_case(rule: AutomatonRule, board: SimulationBoard) -> dict[str, flo
     }
 
 
+def benchmark_adjacency_frame_case(board: SimulationBoard) -> dict[str, float]:
+    """Measure cold frame construction and cached generation stepping together."""
+    engine = SimulationEngine()
+    rule = ConwayLifeRule()
+    return {
+        "cell_count": float(board.topology.cell_count),
+        "frame_build_ms": median_ms(lambda: _adjacency_frame_for(board.topology)),
+        "step_ms": median_ms(lambda: engine.step_board(board, rule)),
+    }
+
+
 def main() -> int | None:
+    adjacency_board = build_board("square", 150, 100, 1, 200)
     board_cases = [
         ("square-conway", ConwayLifeRule(), build_board("square", 180, 120, 1, 101)),
         ("hex-hexlife", HexLifeRule(), build_board("hex", 180, 120, 1, 202)),
@@ -101,6 +114,15 @@ def main() -> int | None:
             build_board(ARCHIMEDEAN_488_GEOMETRY, 90, 60, 1, 606),
         ),
     ]
+
+    adjacency_result = benchmark_adjacency_frame_case(adjacency_board)
+    print("Adjacency frame benchmark (same process, median ms)")
+    print(
+        f"cells={int(adjacency_result['cell_count'])}  "
+        f"cold_build={adjacency_result['frame_build_ms']:.2f} ms  "
+        f"conway_step={adjacency_result['step_ms']:.2f} ms"
+    )
+    print("")
 
     print("Engine benchmark (median ms, lower is better)")
     print("Baseline = per-cell RuleContext dispatch through next_state()")
