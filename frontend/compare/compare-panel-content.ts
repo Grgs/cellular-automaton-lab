@@ -631,7 +631,14 @@ export function createComparePanelContent(
         },
         [staleResultNoticeMessage, retryWallUpdateButton],
     );
+    // Names the run that is playing (seed · rule · N tilings) so the wall isn't
+    // an unlabelled animation; hidden on the empty-state hero.
+    const stageCaption = el("div", {
+        class: "compare-stage-caption",
+        hidden: true,
+    });
     const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [
+        stageCaption,
         stageHero,
         wallLoadingOverlay,
     ]);
@@ -1274,6 +1281,7 @@ export function createComparePanelContent(
 
     function showStageHero(): void {
         stageHero.hidden = false;
+        stageCaption.hidden = true;
         if (filmstripView) {
             filmstripView.element.hidden = true;
         }
@@ -1281,9 +1289,47 @@ export function createComparePanelContent(
 
     function showStageBoards(): void {
         stageHero.hidden = true;
+        stageCaption.hidden = stageCaption.textContent === "";
         if (filmstripView) {
             filmstripView.element.hidden = false;
         }
+    }
+
+    function optionLabel(select: HTMLSelectElement, value: string): string {
+        return [...select.options].find((option) => option.value === value)?.textContent ?? "";
+    }
+
+    /** Drop a "Category: " prefix so the caption reads "R-pentomino", not "Shape: R-pentomino". */
+    function conciseLabel(label: string): string {
+        const separator = label.indexOf(": ");
+        return separator >= 0 ? label.slice(separator + 2) : label;
+    }
+
+    function updateStageCaption(runConfig: CompareRunConfig): void {
+        const seedLabel = runConfig.pattern
+            ? conciseLabel(optionLabel(shapeSelect, runConfig.pattern)) || runConfig.pattern
+            : "Custom seed";
+        const ruleLabel = conciseLabel(optionLabel(ruleSelect, runConfig.rule)) || runConfig.rule;
+        const count = runConfig.geometries.length;
+        stageCaption.textContent = `${seedLabel} · ${ruleLabel} · ${count} tiling${
+            count === 1 ? "" : "s"
+        }`;
+        stageCaption.hidden = stageHero.hidden === false;
+    }
+
+    /**
+     * The bottom status reflects whether the shared clock is running, so it does
+     * not sit on "Press play" while the demo autoplays. It anchors on "Filmstrip
+     * ready" while paused and names the board count, but the transport owns the
+     * generation counter, so the status no longer restates a (differently
+     * framed) generation count.
+     */
+    function filmstripReadyStatus(playing: boolean): string {
+        const count = workspaceStore.getState().results.filmstrip?.tilings.length ?? 0;
+        const boards = `${count} tiling${count === 1 ? "" : "s"}`;
+        return playing
+            ? `Playing ${boards} in lockstep.`
+            : `Filmstrip ready — ${boards}. Press play.`;
     }
 
     function setWallLoading(message: string | null): void {
@@ -1391,9 +1437,12 @@ export function createComparePanelContent(
         textContent: "What you are seeing",
     });
     const explainerBody = el("div", { class: "compare-explainer-body" });
+    // The accessible name tracks the visible summary (set in updateExplainer),
+    // so a screen reader hears "Focused board" in speaker view rather than a
+    // fixed, now-wrong "How the comparison works".
     const explainerPanel = el(
         "details",
-        { class: "compare-explainer", "aria-label": "How the comparison works", open: true },
+        { class: "compare-explainer", "aria-label": explainerTitle.textContent ?? "", open: true },
         [explainerTitle, explainerBody],
     );
     const stageFrame = el("div", { class: "compare-stage-frame" }, [
@@ -1566,6 +1615,25 @@ export function createComparePanelContent(
                     state.forkedBoards.join(","),
                 ] as const,
             () => updateSummary(),
+        ),
+    );
+
+    // Keep the bottom status honest about the clock: when playback toggles
+    // (autoplay, or the user), refresh it -- but only while it is already the
+    // filmstrip-ready line, so transient messages (errors, "Updating…", "Saved
+    // run") are never clobbered.
+    storeRenderSubscriptions.push(
+        subscribeSelector(
+            workspaceStore,
+            (state) => state.playback.playing,
+            (playing) => {
+                const showingReadyLine =
+                    statusLine.textContent === filmstripReadyStatus(true) ||
+                    statusLine.textContent === filmstripReadyStatus(false);
+                if (showingReadyLine) {
+                    statusLine.textContent = filmstripReadyStatus(playing);
+                }
+            },
         ),
     );
 
@@ -2211,6 +2279,7 @@ export function createComparePanelContent(
                 );
                 const family = catalog?.family ? catalog.family.replace(/-/g, " ") : "tiling";
                 explainerTitle.textContent = "Focused board";
+                explainerPanel.setAttribute("aria-label", "Focused board");
                 explainerBody.replaceChildren(
                     explainerItem("Board", tiling.label || tiling.geometry),
                     explainerItem(
@@ -2236,6 +2305,7 @@ export function createComparePanelContent(
             }
         }
         explainerTitle.textContent = "What you are seeing";
+        explainerPanel.setAttribute("aria-label", "What you are seeing");
         explainerBody.replaceChildren(
             explainerItem(
                 "Same seed",
@@ -2989,7 +3059,10 @@ export function createComparePanelContent(
             // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
             applyFocusFromHash();
             clearFailedWallUpdate();
-            statusLine.textContent = `Filmstrip ready — ${filmstrip.tilings.length} tilings × ${filmstrip.frame_count} generations. Press play.`;
+            updateStageCaption(runConfig);
+            statusLine.textContent = filmstripReadyStatus(
+                workspaceStore.getState().playback.playing,
+            );
             if (activeConfigTab === "analysis") {
                 scheduleAnalysis();
             }

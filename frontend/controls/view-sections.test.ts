@@ -136,8 +136,8 @@ describe("controls/view-sections control shell", () => {
             quickStartHintText: "Or start by painting one tile.",
             drawerVisible: true,
             backdropVisible: false,
-            drawerToggleLabel: "Hide Inspector",
-            drawerToggleTitle: "Hide the overlay inspector.",
+            drawerToggleLabel: "Hide Controls",
+            drawerToggleTitle: "Hide the controls drawer.",
             runToggle: {
                 label: "Run",
                 controlAction: "start",

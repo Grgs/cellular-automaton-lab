@@ -3081,6 +3081,42 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("captions the run and keeps the status in step with playback", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip: async () => twoBoardFilmstrip() },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
+            .find((button) => button.textContent === "Run comparison")
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-filmstrip-board")).not.toBeNull();
+        });
+
+        // The caption names the run (seed · rule · N tilings) so the wall is not
+        // an unlabelled animation.
+        const caption = document.querySelector<HTMLElement>(".compare-stage-caption");
+        expect(caption?.hidden).toBe(false);
+        expect(caption?.textContent).toMatch(/·.*tiling/);
+
+        // The status anchors on "Filmstrip ready" while paused and no longer
+        // restates a generation count (the transport owns that).
+        const status = () =>
+            document.querySelector<HTMLElement>(".compare-status")?.textContent ?? "";
+        expect(status()).toContain("Filmstrip ready");
+        expect(status()).not.toContain("generations");
+
+        // Starting playback flips the status off the "press play" hint.
+        document
+            .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[aria-label="Play / pause"]')
+            ?.click();
+        await vi.waitFor(() => expect(status()).toContain("Playing"));
+        handle.dispose();
+    });
+
     it("removes a board from the wall via its × chrome and re-runs without it", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
