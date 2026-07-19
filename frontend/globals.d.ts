@@ -40,6 +40,7 @@ export interface ReviewApi {
     getDiagnostics(): AppDiagnosticsSnapshot | null;
     applyTopology(topology: TopologyPayload): Promise<void>;
     applyCellStates(reviewCellStates: Record<string, number> | CellStateUpdate[]): Promise<void>;
+    forceFullRender(): Promise<void>;
     resetState(): Promise<void>;
     sampleRenderedCellPixel(cellId: string): [number, number, number, number] | null;
 }

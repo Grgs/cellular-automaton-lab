@@ -235,6 +235,176 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             }""",
         )
 
+    def test_polygon_incremental_redraw_matches_full_render(self) -> None:
+        case = self._case()
+
+        def render_counts() -> tuple[int, int]:
+            raw_counts = case.page.evaluate(
+                """() => {
+                    const canvas = document.getElementById("grid");
+                    return [
+                        Number(canvas?.getAttribute("data-render-full-count") || "0"),
+                        Number(canvas?.getAttribute("data-render-incremental-count") || "0"),
+                    ];
+                }"""
+            )
+            if not isinstance(raw_counts, list) or len(raw_counts) != 2:
+                raise AssertionError(f"invalid canvas render counters: {raw_counts!r}")
+            return (int(raw_counts[0]), int(raw_counts[1]))
+
+        def canvas_signature() -> str:
+            signature = case.page.evaluate(
+                """() => {
+                    const canvas = document.getElementById("grid");
+                    if (!(canvas instanceof HTMLCanvasElement)) {
+                        throw new Error("grid canvas is missing");
+                    }
+                    return canvas.toDataURL("image/png");
+                }"""
+            )
+            if not isinstance(signature, str):
+                raise AssertionError("canvas signature was invalid")
+            return signature
+
+        for tiling_family in ("deltoidal-hexagonal", "shield"):
+            with case.subTest(tiling_family=tiling_family):
+                self._select_tiling_family_and_wait_for_reset(tiling_family)
+                self._wait_for_patch_render_complete()
+                target = case.page.evaluate(
+                    """() => {
+                        const diagnostics = window.__reviewApi?.getDiagnostics();
+                        const sample = diagnostics?.transformReport?.sampleCells.centerNearest;
+                        const width = diagnostics?.transformReport?.renderMetrics.cssWidth;
+                        const height = diagnostics?.transformReport?.renderMetrics.cssHeight;
+                        return sample && width && height
+                            ? { id: sample.cellId, ...sample.renderedCenter, width, height }
+                            : null;
+                    }"""
+                )
+                if not isinstance(target, dict):
+                    raise AssertionError(f"missing polygon render target for {tiling_family}")
+
+                # The topology switch may finish through a fitted preview before its
+                # stable render key is installed. A no-op review snapshot settles that
+                # key without changing any cells, so the next update isolates the delta.
+                self._apply_review_cell_states({})
+                case.page.wait_for_timeout(75)
+
+                canvas = case.page.locator("#grid")
+                bounding_box = canvas.bounding_box()
+                if bounding_box is None:
+                    raise AssertionError("grid canvas bounding box was unavailable")
+                position = {
+                    "x": float(target["x"]) * bounding_box["width"] / float(target["width"]),
+                    "y": float(target["y"]) * bounding_box["height"] / float(target["height"]),
+                }
+                full_count, incremental_count = render_counts()
+                self._apply_review_cell_states({str(target["id"]): 1})
+                case.page.wait_for_function(
+                    """([previousFullCount, previousIncrementalCount]) => {
+                        const canvas = document.getElementById("grid");
+                        const fullCount = Number(canvas?.getAttribute(
+                            "data-render-full-count"
+                        ) || "0");
+                        const incrementalCount = Number(canvas?.getAttribute(
+                            "data-render-incremental-count"
+                        ) || "0");
+                        return fullCount + incrementalCount >
+                            previousFullCount + previousIncrementalCount;
+                    }""",
+                    arg=[full_count, incremental_count],
+                )
+                case.assertEqual(
+                    render_counts()[1],
+                    incremental_count + 1,
+                    case.page.locator("#grid").evaluate(
+                        "canvas => JSON.stringify({ ...canvas.dataset })"
+                    ),
+                )
+                self._expect("#grid").to_have_attribute("data-render-mode", "incremental")
+                case.page.wait_for_timeout(350)
+                incremental_signature = canvas_signature()
+
+                full_count, _ = render_counts()
+                case.page.evaluate(
+                    """async () => {
+                        if (typeof window.__reviewApi?.forceFullRender !== "function") {
+                            throw new Error("review full-render hook is unavailable");
+                        }
+                        await window.__reviewApi.forceFullRender();
+                    }"""
+                )
+                case.page.wait_for_function(
+                    """(previousCount) =>
+                        Number(document.getElementById("grid")?.getAttribute(
+                            "data-render-full-count"
+                        ) || "0") > previousCount""",
+                    arg=full_count,
+                )
+                self._expect("#grid").to_have_attribute("data-render-mode", "full")
+                case.assertEqual(canvas_signature(), incremental_signature)
+
+                if tiling_family == "deltoidal-hexagonal":
+                    cell_size = case.page.locator("#cell-size-input")
+                    self._expect("#cell-size-input").to_be_visible()
+                    original_size = int(cell_size.input_value())
+                    maximum_size = int(cell_size.get_attribute("max") or original_size)
+                    next_size = (
+                        original_size + 1 if original_size < maximum_size else original_size - 1
+                    )
+                    full_count, _ = render_counts()
+                    cell_size.fill(str(next_size))
+                    case.page.wait_for_function(
+                        """(previousCount) =>
+                            Number(document.getElementById("grid")?.getAttribute(
+                                "data-render-full-count"
+                            ) || "0") > previousCount""",
+                        arg=full_count,
+                    )
+                    full_count, _ = render_counts()
+                    cell_size.fill(str(original_size))
+                    case.page.wait_for_function(
+                        """(previousCount) =>
+                            Number(document.getElementById("grid")?.getAttribute(
+                                "data-render-full-count"
+                            ) || "0") > previousCount""",
+                        arg=full_count,
+                    )
+
+                committed_counts = render_counts()
+                case.page.mouse.move(
+                    bounding_box["x"] + position["x"],
+                    bounding_box["y"] + position["y"],
+                )
+                canvas.click(button="right", position=position)
+                self._expect("#selection-inspector-title").to_contain_text("1 Cell Selected")
+                case.assertEqual(render_counts(), committed_counts)
+                canvas.click(button="right", position=position)
+
+                self._apply_review_cell_states({str(target["id"]): 0})
+                arm_button = case.page.locator("#canvas-toolbar-arm-btn")
+                if arm_button.is_visible() and arm_button.get_attribute("aria-pressed") != "true":
+                    arm_button.click()
+                canvas.click(position=position)
+                self._expect("#canvas-toolbar-undo-btn").to_be_enabled()
+
+                if tiling_family == "deltoidal-hexagonal":
+                    viewport = case.page.viewport_size
+                    if viewport is None:
+                        raise AssertionError("browser viewport size was unavailable")
+                    full_count, _ = render_counts()
+                    case.page.set_viewport_size(
+                        {"width": viewport["width"] - 120, "height": viewport["height"] - 80}
+                    )
+                    case.page.wait_for_function(
+                        """(previousCount) =>
+                            Number(document.getElementById("grid")?.getAttribute(
+                                "data-render-full-count"
+                            ) || "0") > previousCount""",
+                        arg=full_count,
+                    )
+                    case.page.set_viewport_size(viewport)
+
     def test_run_toggle_advances_generation_and_pauses(self) -> None:
         case = self._case()
         self._paint_canvas_center()

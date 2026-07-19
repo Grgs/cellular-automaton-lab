@@ -81,6 +81,7 @@ export interface GridView {
     getCellFromPointerEvent?(event: Event): CellIdentifier | null;
     getRenderDiagnostics?(): RenderDiagnosticsSnapshot | null;
     getRenderedCellCenter?(cellId: string): Point2D | null;
+    invalidateCommittedSurface?(): void;
     setPreviewCells(cells: PreviewPaintCells): void;
     clearPreview(): void;
     setHoveredCell(cell: PaintableCell | null): void;

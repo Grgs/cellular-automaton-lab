@@ -18,6 +18,10 @@ import {
     sampleRenderDiagnostics,
 } from "./render-diagnostics.js";
 import { createCanvasSurface, type CanvasSurfaceMetrics } from "./surface.js";
+import {
+    INCREMENTAL_CANDIDATE_RATIO_LIMIT,
+    resolvePolygonDirtyRegionPlan,
+} from "./polygon-dirty-region.js";
 import type {
     CellStateDefinition,
     TopologyCell,
@@ -28,6 +32,7 @@ import type { PaintableCell } from "../types/editor.js";
 import type {
     CanvasColors,
     CanvasRenderPayload,
+    CanvasRenderOperationCounters,
     CanvasRenderStyle,
     GeometryCache,
     RenderDiagnosticsSnapshot,
@@ -77,6 +82,8 @@ export interface CanvasCommittedRenderer {
     getMetrics(): CanvasSurfaceMetrics;
     getRenderDiagnostics(): RenderDiagnosticsSnapshot | null;
     getRenderedCellCenter(cellId: string): { x: number; y: number } | null;
+    getRenderOperationCounters(): CanvasRenderOperationCounters;
+    invalidateCommittedSurface(): void;
 }
 
 interface RenderDiagnosticsContext {
@@ -116,6 +123,15 @@ export function createCanvasCommittedRenderer({
     let renderDiagnosticsSampled = false;
     let previousCommittedKey = "";
     let previousCellStates: number[] = [];
+    const renderOperationCounters: CanvasRenderOperationCounters = {
+        fullRenderCount: 0,
+        incrementalRenderCount: 0,
+        committedCellDrawCount: 0,
+        lastRenderMode: "none",
+        lastDrawnCellCount: 0,
+        lastChangedCellCount: 0,
+        lastDirtyAreaRatio: null,
+    };
     let metrics: CanvasSurfaceMetrics = {
         ...gridMetrics(0, 0, cellSize, geometry),
         pixelWidth: canvas.width,
@@ -173,6 +189,39 @@ export function createCanvasCommittedRenderer({
         drawCommittedLayer({
             ...committedLayerInputs(),
         });
+    }
+
+    function recordRenderOperation(
+        mode: CanvasRenderOperationCounters["lastRenderMode"],
+        drawnCellCount: number,
+        changedCellCount: number,
+        dirtyAreaRatio: number | null = null,
+    ): void {
+        if (mode === "full") {
+            renderOperationCounters.fullRenderCount += 1;
+        } else if (mode === "incremental") {
+            renderOperationCounters.incrementalRenderCount += 1;
+        }
+        renderOperationCounters.committedCellDrawCount += drawnCellCount;
+        renderOperationCounters.lastRenderMode = mode;
+        renderOperationCounters.lastDrawnCellCount = drawnCellCount;
+        renderOperationCounters.lastChangedCellCount = changedCellCount;
+        renderOperationCounters.lastDirtyAreaRatio = dirtyAreaRatio;
+        canvas.dataset.renderMode = mode;
+        canvas.dataset.renderFullCount = String(renderOperationCounters.fullRenderCount);
+        canvas.dataset.renderIncrementalCount = String(
+            renderOperationCounters.incrementalRenderCount,
+        );
+        canvas.dataset.renderCommittedCellCount = String(
+            renderOperationCounters.committedCellDrawCount,
+        );
+        canvas.dataset.renderLastCellCount = String(drawnCellCount);
+        canvas.dataset.renderLastChangedCellCount = String(changedCellCount);
+        if (dirtyAreaRatio === null) {
+            delete canvas.dataset.renderDirtyAreaRatio;
+        } else {
+            canvas.dataset.renderDirtyAreaRatio = String(dirtyAreaRatio);
+        }
     }
 
     function render(
@@ -249,24 +298,50 @@ export function createCanvasCommittedRenderer({
             for (let index = 0; index < cellStates.length; index += 1) {
                 if (cellStates[index] !== previousCellStates[index]) {
                     stateVectorChanged = true;
-                    if (adapter.family === "regular") {
-                        changedCellIndexes.push(index);
-                    }
+                    changedCellIndexes.push(index);
                 }
             }
         }
-        const incrementalLimit = Math.floor(cellStates.length * 0.25);
-        if (
+        const incrementalLimit = Math.floor(cellStates.length * INCREMENTAL_CANDIDATE_RATIO_LIMIT);
+        const polygonDirtyPlan =
+            adapter.family === "mixed"
+                ? resolvePolygonDirtyRegionPlan({
+                      topology,
+                      topologyIndex,
+                      geometryCache,
+                      changedCellIndexes,
+                      canvasWidth: metrics.cssWidth,
+                      canvasHeight: metrics.cssHeight,
+                  })
+                : null;
+        const incrementalCellIndexes =
+            adapter.family === "regular" &&
             changedCellIndexes.length > 0 &&
-            changedCellIndexes.length <= incrementalLimit &&
-            committedKey === previousCommittedKey
-        ) {
+            changedCellIndexes.length <= incrementalLimit
+                ? changedCellIndexes
+                : (polygonDirtyPlan?.cellIndexes ?? null);
+        if (incrementalCellIndexes && committedKey === previousCommittedKey) {
+            const incrementalContext = polygonDirtyPlan
+                ? surface.prepareIncrementalSurface(metrics)
+                : surface.committedContext;
             drawCommittedCells({
                 ...committedLayerInputs(),
-                cellIndexes: changedCellIndexes,
+                targetContext: incrementalContext,
+                cellIndexes: incrementalCellIndexes,
+                dirtyBounds: polygonDirtyPlan?.bounds ?? null,
             });
+            if (polygonDirtyPlan) {
+                surface.commitIncrementalSurface(polygonDirtyPlan.bounds, metrics);
+            }
+            recordRenderOperation(
+                "incremental",
+                incrementalCellIndexes.length,
+                changedCellIndexes.length,
+                polygonDirtyPlan?.dirtyAreaRatio ?? null,
+            );
         } else if (stateVectorChanged || committedKey !== previousCommittedKey) {
             drawCommittedGrid();
+            recordRenderOperation("full", topology?.cells.length ?? 0, changedCellIndexes.length);
         }
         previousCommittedKey = committedKey;
         previousCellStates = cellStates.slice();
@@ -346,6 +421,14 @@ export function createCanvasCommittedRenderer({
         return resolveRenderedCellCenter(geometryCache, cellId);
     }
 
+    function getRenderOperationCounters(): CanvasRenderOperationCounters {
+        return { ...renderOperationCounters };
+    }
+
+    function invalidateCommittedSurface(): void {
+        previousCommittedKey = "";
+    }
+
     return {
         render,
         restoreCommittedSurface,
@@ -354,5 +437,7 @@ export function createCanvasCommittedRenderer({
         getMetrics,
         getRenderDiagnostics,
         getRenderedCellCenter,
+        getRenderOperationCounters,
+        invalidateCommittedSurface,
     };
 }

@@ -391,6 +391,43 @@ describe("review-api", () => {
         dispose();
     });
 
+    it("invalidates the committed surface before forcing a full review render", async () => {
+        const { installReviewApi } = await import("./review-api.js");
+        const topology = buildTopology();
+        const applySimulationState = vi.fn();
+        const invalidateCommittedSurface = vi.fn();
+        const controller: Pick<AppController, "applySimulationState" | "getState"> = {
+            applySimulationState,
+            getState: () => buildState(topology, [1, 0]),
+        };
+        const gridView: GridView = {
+            setPreviewCells: vi.fn(),
+            clearPreview: vi.fn(),
+            setHoveredCell: vi.fn(),
+            setSelectedCells: vi.fn(),
+            getSelectedCells: vi.fn(() => []),
+            setGestureOutline: vi.fn(),
+            flashGestureOutline: vi.fn(),
+            clearGestureOutline: vi.fn(),
+            invalidateCommittedSurface,
+        };
+        const dispose = installReviewApi({
+            controller,
+            gridView,
+            elements: buildElements(document.createElement("canvas")),
+        });
+
+        await window.__reviewApi?.forceFullRender();
+
+        expect(invalidateCommittedSurface).toHaveBeenCalledOnce();
+        expect(applySimulationState).toHaveBeenCalledWith(
+            expect.objectContaining({ topology, cell_states: [1, 0] }),
+            { source: "review-cell-states" },
+        );
+
+        dispose();
+    });
+
     it("rejects unknown cell ids and non-finite review state values", async () => {
         const { installReviewApi } = await import("./review-api.js");
         const topology = buildTopology();

@@ -32,7 +32,14 @@ interface CreateCanvasGridViewOptions {
 
 type RuntimeCanvasGridView = CanvasGridView & {
     supportsTopology: true;
-} & Pick<CanvasCommittedRenderer, "getMetrics" | "getRenderDiagnostics" | "getRenderedCellCenter">;
+} & Pick<
+        CanvasCommittedRenderer,
+        | "getMetrics"
+        | "getRenderDiagnostics"
+        | "getRenderedCellCenter"
+        | "getRenderOperationCounters"
+        | "invalidateCommittedSurface"
+    >;
 
 export {
     buildStateColorLookup,
@@ -185,5 +192,7 @@ export function createCanvasGridView({
         getMetrics: committedRenderer.getMetrics,
         getRenderDiagnostics: committedRenderer.getRenderDiagnostics,
         getRenderedCellCenter: committedRenderer.getRenderedCellCenter,
+        getRenderOperationCounters: committedRenderer.getRenderOperationCounters,
+        invalidateCommittedSurface: committedRenderer.invalidateCommittedSurface,
     };
 }

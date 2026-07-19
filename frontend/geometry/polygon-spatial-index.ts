@@ -1,4 +1,8 @@
-import type { PolygonGeometryCell, PolygonSpatialIndex } from "../types/rendering.js";
+import type {
+    PolygonGeometryCell,
+    PolygonIntersectionBounds,
+    PolygonSpatialIndex,
+} from "../types/rendering.js";
 
 const MIN_INDEXED_CELLS = 32;
 const TARGET_CELLS_PER_BUCKET = 8;
@@ -87,6 +91,7 @@ export function buildPolygonSpatialIndex(
         bucketWidth,
         bucketHeight,
         buckets,
+        sourceIndexes: new Map(cells.map((cell, sourceIndex) => [cell, sourceIndex])),
     };
 }
 
@@ -101,4 +106,70 @@ export function polygonSpatialIndexCandidates(
     const column = clampBucketIndex(x, index.minX, index.bucketWidth, index.columnCount);
     const row = clampBucketIndex(y, index.minY, index.bucketHeight, index.rowCount);
     return index.buckets[row * index.columnCount + column] ?? [];
+}
+
+export function polygonSpatialIndexIntersectionCandidates(
+    index: PolygonSpatialIndex,
+    bounds: PolygonIntersectionBounds,
+): readonly PolygonGeometryCell[] {
+    if (
+        !Number.isFinite(bounds.minX) ||
+        !Number.isFinite(bounds.maxX) ||
+        !Number.isFinite(bounds.minY) ||
+        !Number.isFinite(bounds.maxY) ||
+        bounds.minX > bounds.maxX ||
+        bounds.minY > bounds.maxY ||
+        bounds.maxX < index.minX ||
+        bounds.minX > index.maxX ||
+        bounds.maxY < index.minY ||
+        bounds.minY > index.maxY
+    ) {
+        return [];
+    }
+
+    const minColumn = clampBucketIndex(
+        Math.max(bounds.minX, index.minX),
+        index.minX,
+        index.bucketWidth,
+        index.columnCount,
+    );
+    const maxColumn = clampBucketIndex(
+        Math.min(bounds.maxX, index.maxX),
+        index.minX,
+        index.bucketWidth,
+        index.columnCount,
+    );
+    const minRow = clampBucketIndex(
+        Math.max(bounds.minY, index.minY),
+        index.minY,
+        index.bucketHeight,
+        index.rowCount,
+    );
+    const maxRow = clampBucketIndex(
+        Math.min(bounds.maxY, index.maxY),
+        index.minY,
+        index.bucketHeight,
+        index.rowCount,
+    );
+    const candidates = new Set<PolygonGeometryCell>();
+    for (let row = minRow; row <= maxRow; row += 1) {
+        for (let column = minColumn; column <= maxColumn; column += 1) {
+            for (const cell of index.buckets[row * index.columnCount + column] ?? []) {
+                if (
+                    cell.maxX >= bounds.minX &&
+                    cell.minX <= bounds.maxX &&
+                    cell.maxY >= bounds.minY &&
+                    cell.minY <= bounds.maxY
+                ) {
+                    candidates.add(cell);
+                }
+            }
+        }
+    }
+
+    return [...candidates].sort(
+        (left, right) =>
+            (index.sourceIndexes.get(left) ?? Number.MAX_SAFE_INTEGER) -
+            (index.sourceIndexes.get(right) ?? Number.MAX_SAFE_INTEGER),
+    );
 }

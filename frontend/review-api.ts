@@ -248,6 +248,18 @@ export function installReviewApi({
                 { source: "review-cell-states" },
             );
         },
+        forceFullRender: async () => {
+            if (typeof gridView.invalidateCommittedSurface !== "function") {
+                throw new Error("Review full-render invalidation hook is unavailable.");
+            }
+            const state = controller.getState();
+            const topology = currentTopologyOrThrow(state);
+            gridView.invalidateCommittedSurface();
+            controller.applySimulationState(
+                buildSimulationSnapshotFromState(state, topology, state.cellStates),
+                { source: "review-cell-states" },
+            );
+        },
         resetState: async () => {
             if (reviewBaselineSnapshot === null) {
                 return;
