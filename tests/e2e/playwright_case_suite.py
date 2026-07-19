@@ -572,6 +572,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         # Changing the seed rebuilds the wall in place while preserving focus.
         # The replacement filmstrip starts at generation zero, and the
         # explainer must render that store snapshot rather than the old player.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         seed_select = case.page.locator('select[aria-label="Comparison seed"]')
         seed_select.select_option("")
         self._expect(".compare-setup-run").to_have_text("Up to date", timeout=60_000)
@@ -695,6 +696,9 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
+        # Reach the analysis controls through the on-demand setup sheet.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
         analysis_steps = case.page.locator(
             ".compare-form label", has_text="Analysis steps"
         ).locator("input")
@@ -811,6 +815,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # Save the current setup so loading it later is a true whole-wall
         # replacement, not a direct implementation hook.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         case.page.click("#compare-config-tab-saved")
         case.page.fill('input[aria-label="Saved run name"]', "Fork lifecycle")
         case.page.get_by_role("button", name="Save run", exact=True).click()
@@ -964,6 +969,26 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         expect(setup).not_to_be_visible()
         expect(inspector).to_be_visible()
         expect(inspector_toggle).to_have_attribute("aria-expanded", "true")
+        # Opening the inspector without a chosen board shows the general
+        # explainer, and the board-specific actions stay disabled.
+        self._expect(".compare-explainer-body").to_contain_text("Same seed")
+        self._expect(".compare-hero-open-lab").to_be_disabled()
+        self._expect(".compare-inspector-replace").to_be_disabled()
+        self._expect(".compare-inspector-remove").to_be_disabled()
+
+        case.page.get_by_role("button", name="Close inspector").press("Enter")
+        expect(inspector).to_have_attribute("inert", "")
+        expect(inspector_toggle).to_be_focused()
+
+        # A narrow inspector is a full overlay, so focusing a board does not pop
+        # it over the board; the ⓘ button opens it on the focused board, with
+        # its stats, toolbelt, and enabled actions.
+        case.page.locator(".compare-filmstrip-board").first.click()
+        expect(inspector).to_have_attribute("inert", "")
+        inspector_toggle.click()
+        expect(inspector).not_to_have_attribute("inert", "")
+        expect(inspector).to_be_visible()
+        expect(inspector_toggle).to_have_attribute("aria-expanded", "true")
         self._expect(".compare-explainer-body").to_contain_text("Generation0")
         self._expect(".compare-hero-open-lab").to_be_enabled()
         self._expect(".compare-hero-fork").to_be_enabled()
@@ -973,7 +998,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         case.page.get_by_role("button", name="Close inspector").press("Enter")
         expect(inspector).to_have_attribute("inert", "")
-        expect(inspector_toggle).to_be_focused()
         self._expect(".compare-edit-toggle").to_be_visible()
         self._expect('.compare-filmstrip-btn[aria-label="Play / pause"]').to_be_visible()
         case.assertLessEqual(
@@ -1307,6 +1331,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
                 )
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
+        # The setup form opens on demand from the dock gear.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
         wall_generations = case.page.locator(
             ".compare-form label", has_text="Wall generations"
@@ -1396,6 +1422,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
 
+        # The setup strip's rule picker lives in the on-demand config sheet.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         rule_select = case.page.locator("select[aria-label='Comparison rule']")
         rule_values = rule_select.locator("option").evaluate_all(
             "options => options.map(option => option.value)"
@@ -1432,6 +1460,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
 
+        # The setup strip's seed picker lives in the on-demand config sheet.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         seed_select = case.page.locator('select[aria-label="Comparison seed"]')
         self._expect('select[aria-label="Comparison seed"]').to_have_value("r-pentomino")
         seed_select.select_option("")
@@ -1500,6 +1530,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # The converted seed still has live bits, so the placement previews in
         # the config sheet must show them (accent-filled cells), not blanks.
+        # The config sheet opens on demand from the dock gear.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
         case.page.wait_for_function(
             """() => {
@@ -1537,6 +1569,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
 
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         case.page.click("#compare-config-tab-saved")
         case.page.fill('input[aria-label="Saved run name"]', "Focus replacement run")
         case.page.get_by_role("button", name="Save run", exact=True).click()
@@ -1686,6 +1719,7 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
             route.continue_()
 
         self.page.route("**/compare/filmstrip", intercept_filmstrip)
+        self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self.page.select_option('select[aria-label="Comparison rule"]', "wireworld")
         self.page.click(".compare-setup-run")
         self._expect(".compare-stale-notice").to_be_visible(timeout=60_000)
@@ -1739,6 +1773,7 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
             route.continue_()
 
         self.page.route("**/compare/filmstrip", hold_first_filmstrip)
+        self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self.page.select_option('select[aria-label="Comparison rule"]', "wireworld")
         self.page.click(".compare-setup-run")
         expect(self.page.locator(".compare-setup-run")).to_be_disabled()
@@ -1862,8 +1897,8 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self._expect(".wall-page").to_be_visible()
 
         run_name = "Standalone smoke run"
-        # Configuration is open by default on desktop, but the same journey
-        # also remains valid if a restored workspace has collapsed it.
+        # The config sheet opens on demand, so reach the Saved tab through the
+        # dock gear whenever the sheet is collapsed.
         saved_tab = self.page.locator("#compare-config-tab-saved")
         if not saved_tab.is_visible():
             self.page.click('.compare-dock-icon[aria-label="Configure the run"]')
