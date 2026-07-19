@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict, deque
 from dataclasses import dataclass, field
 from math import atan2
+from typing import Protocol, overload
 
 from backend.simulation.rule_context_geometry import (
     board_bounds,
@@ -22,7 +23,6 @@ _ANGLE_EPSILON = 1e-9
 # cross-topology comparison sweep (and repeated sweeps) never thrash the LRU and
 # rebuild frames it just evicted. The live app only ever touches a handful.
 _MAX_TOPOLOGY_FRAME_CACHE_SIZE = 128
-_TOPOLOGY_FRAME_CACHE: OrderedDict[tuple[str, RuleFrameCapabilities], TopologyFrame] = OrderedDict()
 
 
 @dataclass(frozen=True)
@@ -49,6 +49,60 @@ class TopologyCellFrame:
     neighbors: tuple[TopologyNeighborFrame, ...]
 
 
+class RuleFrame(Protocol):
+    @property
+    def adjacency_mode(self) -> str: ...
+
+    @property
+    def topology_revision(self) -> str: ...
+
+    @property
+    def center(self) -> tuple[float, float]: ...
+
+    @property
+    def cell_count(self) -> int: ...
+
+    @property
+    def bounds(self) -> tuple[float, float, float, float]: ...
+
+    @property
+    def max_shell_rank(self) -> int: ...
+
+    @property
+    def max_radial_distance(self) -> float: ...
+
+    @property
+    def cells(self) -> tuple[TopologyCellFrame, ...]: ...
+
+    def has_cell(self, cell_id: str) -> bool: ...
+
+    def index_for(self, cell_id: str) -> int: ...
+
+    def cell_for(self, cell_id: str) -> TopologyCellFrame: ...
+
+    def cell_id_for(self, index: int) -> str: ...
+
+    def cell_kind_for(self, index: int) -> str: ...
+
+    def degree_for(self, index: int) -> int: ...
+
+    def shell_rank_for(self, index: int) -> int: ...
+
+    def radial_distance_for(self, index: int) -> float: ...
+
+    def radial_ratio_for(self, index: int) -> float: ...
+
+    def polar_angle_for(self, index: int) -> float: ...
+
+    def center_for(self, index: int) -> tuple[float, float]: ...
+
+    def vertices_for(self, index: int) -> tuple[tuple[float, float], ...] | None: ...
+
+    def neighbor_indexes_for(self, index: int) -> tuple[int, ...]: ...
+
+    def neighbor_frames_for(self, index: int) -> tuple[TopologyNeighborFrame, ...]: ...
+
+
 @dataclass(frozen=True)
 class TopologyFrame:
     adjacency_mode: str
@@ -70,53 +124,200 @@ class TopologyFrame:
     def cell_for(self, cell_id: str) -> TopologyCellFrame:
         return self.cells[self.index_for(cell_id)]
 
+    def cell_id_for(self, index: int) -> str:
+        return self.cells[index].id
 
-def _adjacency_frame_for(topology: LatticeTopology) -> TopologyFrame:
-    cells = tuple(
-        TopologyCellFrame(
-            id=cell.id,
-            kind=cell.kind,
-            center=(0.0, 0.0),
-            vertices=None,
-            degree=sum(index >= 0 for index in topology.neighbor_indexes_for(cell_index)),
-            shell_rank=0,
-            radial_distance=0.0,
-            radial_ratio=0.0,
-            polar_angle=0.0,
-            neighbors=tuple(
-                TopologyNeighborFrame(
-                    index=neighbor_index,
-                    radial="level",
-                    turn="aligned",
-                    radial_delta=0.0,
-                    angle_delta=0.0,
-                    clockwise_index=clockwise_index,
-                )
-                for clockwise_index, neighbor_index in enumerate(
-                    topology.neighbor_indexes_for(cell_index)
-                )
-                if neighbor_index >= 0
-            ),
-        )
-        for cell_index, cell in enumerate(topology.cells)
+    def cell_kind_for(self, index: int) -> str:
+        return self.cells[index].kind
+
+    def degree_for(self, index: int) -> int:
+        return self.cells[index].degree
+
+    def shell_rank_for(self, index: int) -> int:
+        return self.cells[index].shell_rank
+
+    def radial_distance_for(self, index: int) -> float:
+        return self.cells[index].radial_distance
+
+    def radial_ratio_for(self, index: int) -> float:
+        return self.cells[index].radial_ratio
+
+    def polar_angle_for(self, index: int) -> float:
+        return self.cells[index].polar_angle
+
+    def center_for(self, index: int) -> tuple[float, float]:
+        return self.cells[index].center
+
+    def vertices_for(self, index: int) -> tuple[tuple[float, float], ...] | None:
+        return self.cells[index].vertices
+
+    def neighbor_indexes_for(self, index: int) -> tuple[int, ...]:
+        return tuple(neighbor.index for neighbor in self.cells[index].neighbors)
+
+    def neighbor_frames_for(self, index: int) -> tuple[TopologyNeighborFrame, ...]:
+        return self.cells[index].neighbors
+
+
+class AdjacencyTopologyFrame:
+    """Compact frame for rules that need only cell identity and adjacency.
+
+    The legacy ``cells`` view is retained lazily for custom rules that explicitly
+    opt into adjacency-only capabilities but still inspect the historical frame
+    surface. Built-in batch rules use the raw accessors and never pay that cost.
+    """
+
+    __slots__ = (
+        "_cell_ids",
+        "_cell_kinds",
+        "_index_by_id",
+        "_legacy_cells",
+        "_neighbor_indexes",
+        "adjacency_mode",
+        "bounds",
+        "cell_count",
+        "center",
+        "max_radial_distance",
+        "max_shell_rank",
+        "topology_revision",
     )
-    return TopologyFrame(
+
+    def __init__(
+        self,
+        *,
+        adjacency_mode: str,
+        topology_revision: str,
+        cell_ids: tuple[str, ...],
+        cell_kinds: tuple[str, ...],
+        neighbor_indexes: tuple[tuple[int, ...], ...],
+    ) -> None:
+        self.adjacency_mode = adjacency_mode
+        self.topology_revision = topology_revision
+        self.center = (0.0, 0.0)
+        self.cell_count = len(cell_ids)
+        self.bounds = (0.0, 0.0, 0.0, 0.0)
+        self.max_shell_rank = 0
+        self.max_radial_distance = 0.0
+        self._cell_ids = cell_ids
+        self._cell_kinds = cell_kinds
+        self._neighbor_indexes = neighbor_indexes
+        self._index_by_id = {cell_id: index for index, cell_id in enumerate(cell_ids)}
+        self._legacy_cells: tuple[TopologyCellFrame, ...] | None = None
+
+    @property
+    def cells(self) -> tuple[TopologyCellFrame, ...]:
+        cells = self._legacy_cells
+        if cells is None:
+            cells = tuple(
+                TopologyCellFrame(
+                    id=cell_id,
+                    kind=self._cell_kinds[index],
+                    center=(0.0, 0.0),
+                    vertices=None,
+                    degree=len(self._neighbor_indexes[index]),
+                    shell_rank=0,
+                    radial_distance=0.0,
+                    radial_ratio=0.0,
+                    polar_angle=0.0,
+                    neighbors=self.neighbor_frames_for(index),
+                )
+                for index, cell_id in enumerate(self._cell_ids)
+            )
+            self._legacy_cells = cells
+        return cells
+
+    @property
+    def legacy_cells_materialized(self) -> bool:
+        return self._legacy_cells is not None
+
+    def has_cell(self, cell_id: str) -> bool:
+        return cell_id in self._index_by_id
+
+    def index_for(self, cell_id: str) -> int:
+        return self._index_by_id[cell_id]
+
+    def cell_for(self, cell_id: str) -> TopologyCellFrame:
+        return self.cells[self.index_for(cell_id)]
+
+    def cell_id_for(self, index: int) -> str:
+        return self._cell_ids[index]
+
+    def cell_kind_for(self, index: int) -> str:
+        return self._cell_kinds[index]
+
+    def degree_for(self, index: int) -> int:
+        return len(self._neighbor_indexes[index])
+
+    def shell_rank_for(self, index: int) -> int:
+        return 0
+
+    def radial_distance_for(self, index: int) -> float:
+        return 0.0
+
+    def radial_ratio_for(self, index: int) -> float:
+        return 0.0
+
+    def polar_angle_for(self, index: int) -> float:
+        return 0.0
+
+    def center_for(self, index: int) -> tuple[float, float]:
+        return (0.0, 0.0)
+
+    def vertices_for(self, index: int) -> tuple[tuple[float, float], ...] | None:
+        return None
+
+    def neighbor_indexes_for(self, index: int) -> tuple[int, ...]:
+        return self._neighbor_indexes[index]
+
+    def neighbor_frames_for(self, index: int) -> tuple[TopologyNeighborFrame, ...]:
+        return tuple(
+            TopologyNeighborFrame(
+                index=neighbor_index,
+                radial="level",
+                turn="aligned",
+                radial_delta=0.0,
+                angle_delta=0.0,
+                clockwise_index=clockwise_index,
+            )
+            for clockwise_index, neighbor_index in enumerate(self._neighbor_indexes[index])
+        )
+
+
+_TOPOLOGY_FRAME_CACHE: OrderedDict[tuple[str, RuleFrameCapabilities], RuleFrame] = OrderedDict()
+
+
+def _adjacency_frame_for(topology: LatticeTopology) -> AdjacencyTopologyFrame:
+    return AdjacencyTopologyFrame(
         adjacency_mode=topology_adjacency_mode(topology),
         topology_revision=topology.topology_revision,
-        center=(0.0, 0.0),
-        cell_count=len(cells),
-        bounds=(0.0, 0.0, 0.0, 0.0),
-        max_shell_rank=0,
-        max_radial_distance=0.0,
-        cells=cells,
-        _index_by_id={cell.id: index for index, cell in enumerate(cells)},
+        cell_ids=tuple(cell.id for cell in topology.cells),
+        cell_kinds=tuple(cell.kind for cell in topology.cells),
+        neighbor_indexes=tuple(
+            tuple(
+                neighbor_index
+                for neighbor_index in topology.neighbor_indexes_for(cell_index)
+                if neighbor_index >= 0
+            )
+            for cell_index in range(topology.cell_count)
+        ),
     )
+
+
+@overload
+def topology_frame_for(topology: LatticeTopology) -> TopologyFrame: ...
+
+
+@overload
+def topology_frame_for(
+    topology: LatticeTopology,
+    capabilities: RuleFrameCapabilities,
+) -> RuleFrame: ...
 
 
 def topology_frame_for(
     topology: LatticeTopology,
-    capabilities: RuleFrameCapabilities = DIRECTIONAL_FRAME_CAPABILITIES,
-) -> TopologyFrame:
+    capabilities: RuleFrameCapabilities | None = None,
+) -> RuleFrame:
+    capabilities = capabilities or DIRECTIONAL_FRAME_CAPABILITIES
     cache_key = (topology.topology_revision, capabilities)
     cached = _TOPOLOGY_FRAME_CACHE.get(cache_key)
     if cached is not None:
@@ -124,12 +325,12 @@ def topology_frame_for(
         return cached
 
     if not capabilities.spatial and not capabilities.directional:
-        frame = _adjacency_frame_for(topology)
-        _TOPOLOGY_FRAME_CACHE[cache_key] = frame
+        adjacency_frame = _adjacency_frame_for(topology)
+        _TOPOLOGY_FRAME_CACHE[cache_key] = adjacency_frame
         _TOPOLOGY_FRAME_CACHE.move_to_end(cache_key)
         while len(_TOPOLOGY_FRAME_CACHE) > _MAX_TOPOLOGY_FRAME_CACHE_SIZE:
             _TOPOLOGY_FRAME_CACHE.popitem(last=False)
-        return frame
+        return adjacency_frame
 
     cell_records = []
     for cell in topology.cells:
@@ -252,7 +453,7 @@ def topology_frame_for(
             )
         )
 
-    frame = TopologyFrame(
+    topology_frame = TopologyFrame(
         adjacency_mode=topology_adjacency_mode(topology),
         topology_revision=topology.topology_revision,
         center=board_center,
@@ -263,8 +464,8 @@ def topology_frame_for(
         cells=tuple(frame_cells),
         _index_by_id={frame_cell.id: index for index, frame_cell in enumerate(frame_cells)},
     )
-    _TOPOLOGY_FRAME_CACHE[cache_key] = frame
+    _TOPOLOGY_FRAME_CACHE[cache_key] = topology_frame
     _TOPOLOGY_FRAME_CACHE.move_to_end(cache_key)
     while len(_TOPOLOGY_FRAME_CACHE) > _MAX_TOPOLOGY_FRAME_CACHE_SIZE:
         _TOPOLOGY_FRAME_CACHE.popitem(last=False)
-    return frame
+    return topology_frame

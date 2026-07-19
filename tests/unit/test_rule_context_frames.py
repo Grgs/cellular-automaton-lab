@@ -3,12 +3,16 @@ import unittest
 from pathlib import Path
 
 try:
+    from backend.rules.conway import ConwayLifeRule
     from backend.simulation.rule_context import build_rule_contexts_for_board, topology_frame_for
+    from backend.simulation.rule_context_frames import AdjacencyTopologyFrame
     from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
     from backend.simulation.topology import LatticeTopology, build_topology, empty_board
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from backend.rules.conway import ConwayLifeRule
     from backend.simulation.rule_context import build_rule_contexts_for_board, topology_frame_for
+    from backend.simulation.rule_context_frames import AdjacencyTopologyFrame
     from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
     from backend.simulation.topology import LatticeTopology, build_topology, empty_board
 
@@ -19,8 +23,16 @@ class RuleContextFrameTests(unittest.TestCase):
 
         frame = topology_frame_for(topology, ADJACENCY_FRAME_CAPABILITIES)
 
+        self.assertIsInstance(frame, AdjacencyTopologyFrame)
+        assert isinstance(frame, AdjacencyTopologyFrame)
         self.assertEqual(frame.bounds, (0.0, 0.0, 0.0, 0.0))
+        self.assertFalse(frame.legacy_cells_materialized)
+        self.assertEqual(
+            frame.neighbor_indexes_for(frame.index_for("c:1:1")),
+            tuple(index for index in topology.neighbor_indexes_for(4) if index >= 0),
+        )
         self.assertTrue(all(cell.center == (0.0, 0.0) for cell in frame.cells))
+        self.assertTrue(frame.legacy_cells_materialized)
         self.assertTrue(
             all(
                 neighbor.radial == "level" and neighbor.turn == "aligned"
@@ -28,6 +40,16 @@ class RuleContextFrameTests(unittest.TestCase):
                 for neighbor in cell.neighbors
             )
         )
+
+    def test_adjacency_batch_rule_does_not_materialize_legacy_cells(self) -> None:
+        topology = build_topology("square", 4, 4)
+        frame = topology_frame_for(topology, ADJACENCY_FRAME_CAPABILITIES)
+        assert isinstance(frame, AdjacencyTopologyFrame)
+
+        result = ConwayLifeRule().next_states(frame, [0] * frame.cell_count)
+
+        self.assertEqual(result, [0] * frame.cell_count)
+        self.assertFalse(frame.legacy_cells_materialized)
 
     def test_topology_frame_cache_reuses_revision_key(self) -> None:
         topology = build_topology("square", 3, 3)

@@ -15,7 +15,8 @@ try:
     from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.rule_context import RuleContext, build_rule_contexts_for_board
-    from backend.simulation.rule_context_frames import TopologyFrame
+    from backend.simulation.rule_context_frames import AdjacencyTopologyFrame, RuleFrame
+    from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
     from backend.simulation.topology import (
         SimulationBoard,
         empty_board,
@@ -34,7 +35,8 @@ except ModuleNotFoundError:
     from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
     from backend.simulation.engine import SimulationEngine
     from backend.simulation.rule_context import RuleContext, build_rule_contexts_for_board
-    from backend.simulation.rule_context_frames import TopologyFrame
+    from backend.simulation.rule_context_frames import AdjacencyTopologyFrame, RuleFrame
+    from backend.simulation.rule_frame_capabilities import ADJACENCY_FRAME_CAPABILITIES
     from backend.simulation.topology import (
         SimulationBoard,
         empty_board,
@@ -55,6 +57,48 @@ def reference_step_board(board: SimulationBoard, rule: AutomatonRule) -> Simulat
 
 
 class SimulationEngineTests(unittest.TestCase):
+    def test_compact_adjacency_batches_match_randomized_reference_across_families(self) -> None:
+        cases = (
+            ("square", 9, 7, None, ConwayLifeRule, 1),
+            ("hex", 8, 7, None, HexLifeRule, 1),
+            (ARCHIMEDEAN_488_GEOMETRY, 4, 3, None, ArchLife488Rule, 1),
+            (PENROSE_GEOMETRY, 0, 0, 2, PenroseGreenbergHastingsRule, 3),
+        )
+        random = Random(20260719)
+
+        for geometry, width, height, patch_depth, rule_type, max_state in cases:
+            for sample in range(4):
+                with self.subTest(geometry=geometry, sample=sample):
+                    board = empty_board(geometry, width, height, patch_depth)
+                    board.cell_states = [
+                        random.randint(0, max_state) for _ in range(board.topology.cell_count)
+                    ]
+
+                    optimized = SimulationEngine().step_board(board, rule_type())
+                    expected = reference_step_board(board, rule_type())
+
+                    self.assertEqual(optimized.cell_states, expected.cell_states)
+
+    def test_custom_adjacency_rule_keeps_legacy_frame_surface(self) -> None:
+        class LegacyAdjacencyRule(AutomatonRule):
+            frame_capabilities = ADJACENCY_FRAME_CAPABILITIES
+
+            def __init__(self) -> None:
+                self.saw_compact_frame = False
+
+            def next_state(self, ctx: RuleContext) -> int:
+                self.saw_compact_frame |= isinstance(ctx.frame, AdjacencyTopologyFrame)
+                cell = ctx.frame.cells[ctx.frame.index_for(ctx.cell_id)]
+                return int(any(ctx.frame.cells[neighbor.index].id for neighbor in cell.neighbors))
+
+        board = board_from_grid([[0, 1], [1, 0]])
+        rule = LegacyAdjacencyRule()
+
+        stepped = SimulationEngine().step_board(board, rule)
+
+        self.assertTrue(rule.saw_compact_frame)
+        self.assertEqual(stepped.cell_states, [1] * board.topology.cell_count)
+
     def test_whirlpool_batch_matches_reference_across_topology_families(self) -> None:
         cases = (
             ("square", 9, 7, None),
@@ -84,7 +128,7 @@ class SimulationEngineTests(unittest.TestCase):
             def next_state(self, ctx: RuleContext) -> int:
                 raise AssertionError(f"Unexpected per-cell dispatch for {ctx!r}")
 
-            def next_states(self, frame: TopologyFrame, cell_states: list[int]) -> list[int]:
+            def next_states(self, frame: RuleFrame, cell_states: list[int]) -> list[int]:
                 self.calls += 1
                 return [7] * frame.cell_count
 
