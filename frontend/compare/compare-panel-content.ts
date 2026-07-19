@@ -1059,6 +1059,14 @@ export function createComparePanelContent(
         mirrorFocusToHash(geometry);
         if (geometry !== null) {
             workspaceStore.update((state) => ({ ...state, selectedBoard: geometry }));
+            // On a wide layout the inspector is a side column, so focusing a
+            // board opens it beside the hero (its stats and the toolbelt). On a
+            // narrow layout the inspector is a full overlay with a backdrop that
+            // would bury the very board just focused, so leave it to the ⓘ
+            // button there.
+            if (window.innerWidth >= 960) {
+                workspaceLayout.openInspector();
+            }
         }
         // Seed editing is edit mode's job in either layout (paint gen 0 for
         // the shared seed, any later gen to fork the board live), so speaker
@@ -2913,11 +2921,16 @@ export function createComparePanelContent(
             workspaceStore.update((state) => ({
                 ...state,
                 orderedBoards: filmstrip.tilings.map((tiling) => tiling.geometry),
+                // Keep a still-present selection so the inspector holds the
+                // board the user last looked at across a rerun, but do not
+                // preselect one: an untouched wall has no "focused board", so
+                // the inspector stays on its general explainer until a board
+                // is chosen.
                 selectedBoard: filmstrip.tilings.some(
                     (tiling) => tiling.geometry === state.selectedBoard,
                 )
                     ? state.selectedBoard
-                    : (filmstrip.tilings[0]?.geometry ?? null),
+                    : null,
                 results: { ...state.results, filmstrip, filmstripKey: requestKey },
                 playback: { frameIndex: 0, playing: false },
             }));

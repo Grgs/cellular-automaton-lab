@@ -87,14 +87,20 @@ export function createCompareWorkspaceLayout(
             window.removeEventListener("resize", handleBreakpointChange);
         },
     };
+    let wasNarrow = isNarrow();
     function handleBreakpointChange(): void {
-        if (isNarrow()) {
+        // Both drawers start closed and open on demand -- a dock button or a
+        // board focus -- so the wall lands full-bleed at every width; widening
+        // never auto-opens them. Crossing from the wide layout (side columns)
+        // to the narrow layout (modal overlays) closes any open drawer: one
+        // left open would bury the wall and its dock behind the backdrop. A
+        // resize that stays narrow leaves an intentionally-open drawer alone.
+        const nowNarrow = isNarrow();
+        if (nowNarrow && !wasNarrow) {
             setup.classList.remove("is-open");
             inspector.classList.remove("is-open");
-        } else {
-            setup.classList.add("is-open");
-            inspector.classList.add("is-open");
         }
+        wasNarrow = nowNarrow;
         sync();
     }
     backdrop.addEventListener("click", layout.closeDrawer);
