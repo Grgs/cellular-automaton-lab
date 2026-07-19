@@ -1157,6 +1157,7 @@ describe("mountComparePanel", () => {
     });
 
     it("uses setup tabs while analysis renders in the inspector", async () => {
+        Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
         const handle = mountComparePanel({
@@ -1170,6 +1171,10 @@ describe("mountComparePanel", () => {
             ).toContain("Conway");
         });
 
+        // The config sheet now opens on demand rather than on mount.
+        document
+            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
+            ?.click();
         const sheet = document.querySelector<HTMLElement>(".compare-config-sheet");
         expect(sheet?.classList.contains("is-open")).toBe(true);
         expect(document.querySelector<HTMLElement>("#compare-config-panel-setup")?.hidden).toBe(
@@ -1249,8 +1254,10 @@ describe("mountComparePanel", () => {
         expect(checkedTilingLabels()).toEqual(["Square", "Hex"]);
         expect(summaryText()).toBe("2 / 6 selected · Regular 2");
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        // An untouched wall preselects no board, so the inspector shows the
+        // general explainer rather than a phantom "focused board".
         expect(document.querySelector(".compare-explainer-body")?.textContent).toContain(
-            "Generation0",
+            "Same seed",
         );
         handle.dispose();
     });
@@ -2551,25 +2558,65 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
         const sheet = () => document.querySelector<HTMLElement>(".compare-config-sheet");
-        // Desktop setup starts visible, then the gear and close button collapse it.
-        expect(sheet()?.classList.contains("is-open")).toBe(true);
-        expect(sheet()?.hasAttribute("inert")).toBe(false);
-
-        document
-            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
-            ?.click();
+        const gear = () =>
+            document.querySelector<HTMLButtonElement>(
+                '.compare-dock-icon[aria-label="Configure the run"]',
+            );
+        // The setup sheet starts collapsed; the gear opens it, the gear or the
+        // close button collapses it again.
         expect(sheet()?.classList.contains("is-open")).toBe(false);
         expect(sheet()?.hasAttribute("inert")).toBe(true);
 
-        document
-            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
-            ?.click();
+        gear()?.click();
         expect(sheet()?.classList.contains("is-open")).toBe(true);
         expect(sheet()?.hasAttribute("inert")).toBe(false);
 
+        gear()?.click();
+        expect(sheet()?.classList.contains("is-open")).toBe(false);
+        expect(sheet()?.hasAttribute("inert")).toBe(true);
+
+        gear()?.click();
+        expect(sheet()?.classList.contains("is-open")).toBe(true);
         document.querySelector<HTMLButtonElement>(".compare-config-sheet-close")?.click();
         expect(sheet()?.classList.contains("is-open")).toBe(false);
         expect(sheet()?.hasAttribute("inert")).toBe(true);
+        handle.dispose();
+    });
+
+    it("lands with both drawers closed on desktop so the wall fills the stage", async () => {
+        Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, requestFilmstrip: async () => twoBoardFilmstrip() },
+            bootstrapData: bootstrapData(),
+        });
+        const setup = document.querySelector<HTMLElement>(".compare-setup-sidebar");
+        const inspector = document.querySelector<HTMLElement>(".compare-inspector");
+        expect(setup?.classList.contains("is-open")).toBe(false);
+        expect(inspector?.classList.contains("is-open")).toBe(false);
+
+        // On a wide layout the two drawers can coexist -- exclusivity is a
+        // narrow-only concession -- so opening both leaves both open.
+        document
+            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
+            ?.click();
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() =>
+            expect(
+                document.querySelector<HTMLButtonElement>(
+                    '.compare-dock-icon[aria-label="Inspect selected board"]',
+                )?.disabled,
+            ).toBe(false),
+        );
+        document
+            .querySelector<HTMLButtonElement>(
+                '.compare-dock-icon[aria-label="Inspect selected board"]',
+            )
+            ?.click();
+        expect(setup?.classList.contains("is-open")).toBe(true);
+        expect(inspector?.classList.contains("is-open")).toBe(true);
         handle.dispose();
     });
 
@@ -2609,7 +2656,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("preserves inspector selection across compatible reruns and falls back to the first board", async () => {
+    it("does not preselect a board, keeps a chosen one across reruns, and clears it when it leaves", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const first = twoBoardFilmstrip();
@@ -2631,6 +2678,8 @@ describe("mountComparePanel", () => {
             backend: { ...backend, requestFilmstrip },
             bootstrapData: bootstrapData(),
         });
+        const explainerText = () =>
+            document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent ?? "";
         const rerun = async (seed: string, expectedCalls: number) => {
             const seedField = document.querySelector<HTMLInputElement>(
                 'input.compare-field[type="text"]',
@@ -2640,28 +2689,30 @@ describe("mountComparePanel", () => {
             seedField.dispatchEvent(new Event("input", { bubbles: true }));
             document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
             await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(expectedCalls));
-            await vi.waitFor(() =>
-                expect(
-                    document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
-                ).toContain("Generation0"),
-            );
         };
 
+        // First run: nothing is preselected, so the inspector stays on the
+        // general explainer rather than a phantom "focused board".
         document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
-        await vi.waitFor(() =>
-            expect(
-                document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
-            ).toContain("Boardsquare"),
-        );
+        await vi.waitFor(() => expect(explainerText()).toContain("Same seed"));
+        expect(explainerText()).not.toContain("Boardsquare");
+
+        // Choosing a board fills the inspector; leaving speaker view keeps that
+        // selection so the inspector still describes the last board looked at.
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        await vi.waitFor(() => expect(explainerText()).toContain("Boardsquare"));
+        document.querySelector<HTMLButtonElement>(".compare-hero-back")?.click();
+        expect(explainerText()).toContain("Boardsquare");
+
+        // The selection survives a compatible rerun...
         await rerun("101", 2);
-        expect(
-            document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
-        ).toContain("Boardsquare");
+        await vi.waitFor(() => expect(explainerText()).toContain("Boardsquare"));
+
+        // ...and clears back to the general explainer once that board leaves.
         await rerun("111", 3);
-        expect(
-            document.querySelector<HTMLElement>(".compare-explainer-body")?.textContent,
-        ).toContain("Boardhex");
+        await vi.waitFor(() => expect(explainerText()).toContain("Same seed"));
+        expect(explainerText()).not.toContain("Boardsquare");
         handle.dispose();
     });
 
