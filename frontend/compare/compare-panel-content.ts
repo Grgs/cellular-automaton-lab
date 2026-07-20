@@ -200,7 +200,7 @@ export interface ComparePanelContentHandle {
 }
 
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
-type ConfigTab = "setup" | "tilings" | "analysis" | "help" | "saved";
+type ConfigTab = "setup" | "tilings" | "help" | "saved";
 
 interface ActionMenuItem {
     label: string;
@@ -239,6 +239,9 @@ export function createComparePanelContent(
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
     let editingSavedRunId = "";
     let editingSavedTilingSetId = "";
+    // True while the stage-wide analysis overlay is open; gates the analysis
+    // scheduling that used to be tied to the (now removed) analysis config tab.
+    let analysisOverlayOpen = false;
 
     const ruleSelect = el("select", { class: "compare-field" });
     const seedInput = el("input", {
@@ -358,13 +361,13 @@ export function createComparePanelContent(
     });
     analysisStepsInput.addEventListener("input", () => {
         updateSummary();
-        if (activeConfigTab === "analysis") {
+        if (analysisOverlayOpen) {
             scheduleAnalysis();
         }
     });
     analysisStepsInput.addEventListener("change", () => {
         updateSummary();
-        if (activeConfigTab === "analysis") {
+        if (analysisOverlayOpen) {
             scheduleAnalysis();
         }
     });
@@ -415,6 +418,18 @@ export function createComparePanelContent(
             "aria-label": "Inspect selected board",
         },
         [dockGlyph("ⓘ"), dockLabel("Inspector")],
+    );
+    // Analysis is its own stage-wide surface (a dimmed overlay), not a cramped
+    // inspector tail, so it gets a dock button beside the other surfaces.
+    const analysisButton = el(
+        "button",
+        {
+            class: "compare-dock-icon compare-analysis-open",
+            type: "button",
+            title: "Run a statistical analysis across the selected tilings",
+            "aria-label": "Analyze the tilings",
+        },
+        [dockGlyph("📊"), dockLabel("Analysis")],
     );
     // One click from the wall to the searchable tiling checklist: opens the
     // config sheet with the Tilings disclosure expanded and search focused.
@@ -1475,7 +1490,6 @@ export function createComparePanelContent(
         [
             configTabButton("setup", "Setup"),
             configTabButton("tilings", "Tilings"),
-            configTabButton("analysis", "Analysis"),
             configTabButton("help", "Help"),
             configTabButton("saved", "Saved"),
         ],
@@ -1498,17 +1512,66 @@ export function createComparePanelContent(
             tilingList,
         ]),
     ]);
-    const analysisConfigPanel = configPanel("analysis", [
-        el("div", { class: "compare-analysis" }, [
-            el("p", {
-                class: "compare-intro",
-                textContent:
-                    "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
-            }),
-            runButton,
-            resultsArea,
-        ]),
-    ]);
+    // Analysis lives on its own stage-wide overlay (dimmed wall behind), so the
+    // phase portrait and the wide result table get real room instead of the
+    // 280px inspector tail with a nested horizontal scroll. The Run button sits
+    // with the results it produces.
+    const analysisCloseButton = el(
+        "button",
+        {
+            class: "compare-close compare-analysis-close",
+            type: "button",
+            title: "Close analysis",
+            "aria-label": "Close analysis",
+        },
+        ["✕"],
+    );
+    // A decorative click-to-dismiss layer; Escape and the ✕ button are the
+    // accessible closers, so keep it out of the a11y tree (and off the tab order).
+    const analysisBackdrop = el("button", {
+        class: "compare-analysis-backdrop",
+        type: "button",
+        tabindex: "-1",
+        "aria-hidden": "true",
+    });
+    const analysisOverlay = el(
+        "div",
+        {
+            class: "compare-analysis-overlay",
+            hidden: true,
+            inert: true,
+        },
+        [
+            analysisBackdrop,
+            el(
+                "div",
+                {
+                    class: "compare-analysis-panel",
+                    role: "dialog",
+                    "aria-modal": "true",
+                    "aria-label": "Statistical analysis",
+                },
+                [
+                    el("div", { class: "compare-analysis-header" }, [
+                        el("strong", {
+                            class: "compare-analysis-title",
+                            textContent: "Statistical analysis",
+                        }),
+                        analysisCloseButton,
+                    ]),
+                    el("div", { class: "compare-analysis compare-analysis-body" }, [
+                        el("p", {
+                            class: "compare-intro",
+                            textContent:
+                                "Run the same seed to a fixed horizon and chart how each topology diverges — a phase portrait plus a per-tiling result table.",
+                        }),
+                        runButton,
+                        resultsArea,
+                    ]),
+                ],
+            ),
+        ],
+    );
     const helpConfigPanel = configPanel("help", [
         el("div", { class: "compare-help" }, comparisonHelpContent()),
     ]);
@@ -1547,11 +1610,7 @@ export function createComparePanelContent(
                 el("strong", { textContent: "Inspector" }),
                 inspectorCloseButton,
             ]),
-            el("div", { class: "compare-inspector-body" }, [
-                heroToolbelt,
-                explainerPanel,
-                analysisConfigPanel,
-            ]),
+            el("div", { class: "compare-inspector-body" }, [heroToolbelt, explainerPanel]),
         ],
     );
     activateConfigTab("setup");
@@ -1562,6 +1621,7 @@ export function createComparePanelContent(
         editModeButton,
         tilingsButton,
         configButton,
+        analysisButton,
         inspectorButton,
         statusLine,
     ]);
@@ -1573,7 +1633,10 @@ export function createComparePanelContent(
         setupToggle: configButton,
         inspectorToggle: inspectorButton,
     });
-    const root = el("div", { class: "compare-content" }, [workspaceLayout.element]);
+    const root = el("div", { class: "compare-content" }, [
+        workspaceLayout.element,
+        analysisOverlay,
+    ]);
 
     renderTilingChecklist();
     refreshSavedControls();
@@ -1734,18 +1797,10 @@ export function createComparePanelContent(
         if (options.focus) {
             configTabButtons.get(tab)?.focus();
         }
-        if (tab === "analysis") {
-            workspaceLayout.openInspector();
-            if (isFilmstripCurrent()) {
-                scheduleAnalysis();
-            } else {
-                scheduleWallRerun();
-            }
-        }
     }
 
     function handleConfigTabKeydown(event: KeyboardEvent): void {
-        const tabs: ConfigTab[] = ["setup", "tilings", "analysis", "help", "saved"];
+        const tabs: ConfigTab[] = ["setup", "tilings", "help", "saved"];
         const activeIndex = tabs.findIndex(
             (tab) => configTabButtons.get(tab) === document.activeElement,
         );
@@ -3063,7 +3118,7 @@ export function createComparePanelContent(
             statusLine.textContent = filmstripReadyStatus(
                 workspaceStore.getState().playback.playing,
             );
-            if (activeConfigTab === "analysis") {
+            if (analysisOverlayOpen) {
                 scheduleAnalysis();
             }
         } catch (error) {
@@ -3419,6 +3474,35 @@ export function createComparePanelContent(
         return window.innerWidth < 960 && workspaceLayout.closeDrawer();
     }
 
+    function openAnalysisOverlay(): void {
+        if (analysisOverlayOpen) {
+            return;
+        }
+        analysisOverlayOpen = true;
+        analysisOverlay.hidden = false;
+        analysisOverlay.removeAttribute("inert");
+        analysisButton.setAttribute("aria-expanded", "true");
+        // Opening runs the analysis on the current wall (or rebuilds first),
+        // matching the old analysis tab's behaviour.
+        if (isFilmstripCurrent()) {
+            scheduleAnalysis();
+        } else {
+            scheduleWallRerun();
+        }
+        analysisCloseButton.focus();
+    }
+    function closeAnalysisOverlayIfOpen(): boolean {
+        if (!analysisOverlayOpen) {
+            return false;
+        }
+        analysisOverlayOpen = false;
+        analysisOverlay.setAttribute("inert", "");
+        analysisOverlay.hidden = true;
+        analysisButton.setAttribute("aria-expanded", "false");
+        analysisButton.focus();
+        return true;
+    }
+
     // The tilings shortcut lands ready to type: sheet open, Tilings disclosure
     // expanded, search focused.
     function focusTilingSearchIfOpen(): void {
@@ -3475,6 +3559,13 @@ export function createComparePanelContent(
             workspaceLayout.openInspector();
         }
     });
+    analysisButton.addEventListener("click", () => {
+        if (!closeAnalysisOverlayIfOpen()) {
+            openAnalysisOverlay();
+        }
+    });
+    analysisCloseButton.addEventListener("click", closeAnalysisOverlayIfOpen);
+    analysisBackdrop.addEventListener("click", closeAnalysisOverlayIfOpen);
     setupTilingsItem.addEventListener("click", openTilingsSheet);
     tilingsButton.addEventListener("click", openTilingsSheet);
     configSheetCloseButton.addEventListener("click", workspaceLayout.closeSetup);
@@ -3497,6 +3588,7 @@ export function createComparePanelContent(
         deactivate(): void {
             filmstripTransport.pause();
             disposeAllForkedBoards();
+            closeAnalysisOverlayIfOpen();
             root.querySelector(".compare-action-menu[open]")?.removeAttribute("open");
         },
         applyRunConfig,
@@ -3512,6 +3604,10 @@ export function createComparePanelContent(
             const openMenu = root.querySelector(".compare-action-menu[open]");
             if (openMenu) {
                 openMenu.removeAttribute("open");
+                return true;
+            }
+            // Peel the analysis overlay before the config sheet / speaker view.
+            if (closeAnalysisOverlayIfOpen()) {
                 return true;
             }
             return false;

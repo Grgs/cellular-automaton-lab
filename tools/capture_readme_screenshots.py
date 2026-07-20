@@ -100,27 +100,35 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
             }
         }"""
     )
-    page.locator("#compare-config-tab-analysis").click(timeout=TIMEOUT_MS)
-    analysis_panel = page.locator("#compare-config-panel-analysis")
-    analysis_panel.wait_for(state="visible", timeout=TIMEOUT_MS)
-    analysis_panel.get_by_role("button", name="Run analysis", exact=True).click(timeout=TIMEOUT_MS)
+    page.locator('.compare-dock-icon[aria-label="Analyze the tilings"]').click(timeout=TIMEOUT_MS)
+    analysis_overlay = page.locator(".compare-analysis-overlay")
+    analysis_overlay.wait_for(state="visible", timeout=TIMEOUT_MS)
+    analysis_overlay.get_by_role("button", name="Run analysis", exact=True).click(
+        timeout=TIMEOUT_MS
+    )
     page.locator(".compare-grid tbody tr").nth(0).wait_for(state="visible", timeout=TIMEOUT_MS)
+    # Flatten the modal overlay into a static full-width panel of just the
+    # portrait and table for the README hero.
     page.add_style_tag(
         content="""
-            .compare-config-sheet {
+            .compare-analysis-overlay {
                 position: static !important;
-                transform: none !important;
-                max-height: none !important;
-                height: auto !important;
+                padding: 0 !important;
             }
-            .compare-config-sheet-body,
-            .compare-config-panel-analysis {
+            .compare-analysis-backdrop {
+                display: none !important;
+            }
+            .compare-analysis-panel {
+                width: 100% !important;
+                max-height: none !important;
+                box-shadow: none !important;
+            }
+            .compare-analysis-body {
                 overflow: visible !important;
                 max-height: none !important;
             }
             .wall-screen,
-            .compare-config-sheet-header,
-            .compare-config-tabs,
+            .compare-analysis-header,
             .compare-intro,
             .compare-run-secondary {
                 display: none !important;
