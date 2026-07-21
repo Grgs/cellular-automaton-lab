@@ -3114,7 +3114,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("removes a board from the wall via its × chrome and re-runs without it", async () => {
+    it("removes a board from the wall locally without a rebuild", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
@@ -3129,19 +3129,19 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
         });
-        const firstRequest = requestFilmstrip.mock.calls.at(0)?.[0];
-        expect(firstRequest?.geometries).toContain("square");
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
 
+        // Every survivor's frames are already here, so removal drops the board
+        // in place -- instantly, with no second request to the backend.
         document
             .querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
             ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
         expect(document.querySelector(".compare-status")?.textContent).toContain("Removed");
-        // Removals coalesce into one debounced re-run that drops the geometry.
-        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2), {
-            timeout: 3000,
-        });
-        expect(requestFilmstrip.mock.calls.at(1)?.[0]?.geometries).not.toContain("square");
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        // Give any (unwanted) debounced rerun its window, then confirm none fired.
+        await new Promise((resolve) => window.setTimeout(resolve, 900));
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
         handle.dispose();
     });
 
@@ -3171,21 +3171,23 @@ describe("mountComparePanel", () => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
         });
 
-        // Two removals inside one debounce window. The second must be judged
-        // against the pending two-board selection, not the still-displayed
-        // three-board strip, or the wall would collapse below its floor.
+        // Fire the whole burst in one task. Local removal drops the first board
+        // instantly; the follow-up clicks are judged against the pending
+        // two-board selection and refused, so the wall settles at exactly two
+        // boards rather than collapsing below its floor -- and never rebuilds.
         const removeButtons = [
             ...document.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-remove"),
         ];
-        removeButtons[0]?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        removeButtons[1]?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        removeButtons.forEach((button) =>
+            button.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+        );
 
-        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2), {
-            timeout: 3000,
-        });
-        const rerunGeometries = requestFilmstrip.mock.calls.at(1)?.[0]?.geometries ?? [];
-        expect(rerunGeometries).toHaveLength(2);
-        expect(requestFilmstrip).toHaveBeenCalledTimes(2);
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(document.querySelector(".compare-status")?.textContent).toContain(
+            "Keep at least two tilings",
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 900));
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
         handle.dispose();
     });
 

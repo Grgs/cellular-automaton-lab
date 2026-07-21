@@ -962,28 +962,52 @@ export function createComparePanelContent(
         if (!selected.has(geometry)) {
             return;
         }
-        // Removals coalesce into one debounced rebuild, so the displayed strip
-        // still shows the pre-removal boards while more clicks arrive. The
-        // filmstrip's own remove-button disable is keyed off that stale strip,
-        // so guard the two-board minimum here against the pending selection --
-        // otherwise a burst of clicks drops below it and the coalesced rerun
-        // collapses the wall to the empty hero.
+        // The two-board floor is enforced against the pending selection, not the
+        // displayed strip. Removal is local and instant now, so a rapid burst of
+        // clicks simply stops at the floor -- there is no debounced rebuild to
+        // outrun (the earlier race that collapsed the wall to the empty hero).
         if (selected.size <= MIN_WALL_TILINGS) {
             statusLine.textContent = "Keep at least two tilings on the wall.";
             filmstripView?.setBoardsRemovable(false);
             return;
         }
-        selected.delete(geometry);
-        // Reflect the new floor on the still-displayed boards immediately, so a
-        // fast follow-up click sees a disabled control instead of overshooting.
-        filmstripView?.setBoardsRemovable(selected.size > MIN_WALL_TILINGS);
         const tiling = workspaceStore
             .getState()
             .results.filmstrip?.tilings.find((entry) => entry.geometry === geometry);
-        statusLine.textContent = `Removed ${tiling?.label || geometry} — updating the wall…`;
+        selected.delete(geometry);
+        disposeForkedBoard(geometry);
+        // Drop the board from the client-side result and re-key the run to the
+        // reduced selection, so the wall stays "up to date" without a server
+        // rebuild -- every survivor's frames are already here.
+        workspaceStore.update((state) => {
+            const filmstrip = state.results.filmstrip;
+            return {
+                ...state,
+                orderedBoards: state.orderedBoards.filter((entry) => entry !== geometry),
+                selectedBoard: state.selectedBoard === geometry ? null : state.selectedBoard,
+                focusedBoard: state.focusedBoard === geometry ? null : state.focusedBoard,
+                results: {
+                    ...state.results,
+                    filmstrip:
+                        filmstrip === null
+                            ? null
+                            : {
+                                  ...filmstrip,
+                                  tilings: filmstrip.tilings.filter(
+                                      (entry) => entry.geometry !== geometry,
+                                  ),
+                              },
+                    filmstripKey: runConfigKey(currentRunConfig()),
+                },
+            };
+        });
+        filmstripView?.removeBoard(geometry);
+        filmstripView?.setBoardsRemovable(selected.size > MIN_WALL_TILINGS);
+        filmstripView?.refreshAddControl();
+        statusLine.textContent = `Removed ${tiling?.label || geometry}.`;
         renderTilingChecklist();
         refreshPreview();
-        scheduleWallRerun();
+        updateSummary();
     }
 
     function replaceBoardOnWall(previousGeometry: string, nextGeometry: string): void {

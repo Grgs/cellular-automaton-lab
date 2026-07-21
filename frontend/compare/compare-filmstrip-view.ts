@@ -105,6 +105,13 @@ export interface FilmstripViewController {
     setBoardsRemovable(removable: boolean): void;
     /** Replace one board's immutable result data and re-render its current frame. */
     updateBoardData(tiling: TopologyFilmstrip): void;
+    /**
+     * Drop one board's slot in place, keeping every survivor's rendering and the
+     * shared clock exactly where they are (no reload, no server round-trip).
+     * Returns false if the board is not on the wall. If the removed board was the
+     * hero, the view returns to the gallery first.
+     */
+    removeBoard(geometry: string): boolean;
     /** The shared clock's current generation index. */
     currentFrameIndex(): number;
     /**
@@ -734,6 +741,30 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 entry.tiling = tiling;
                 renderBoard(entry, player.index);
             }
+        },
+        removeBoard(geometry: string): boolean {
+            const index = boards.findIndex((entry) => entry.tiling.geometry === geometry);
+            if (index < 0) {
+                return false;
+            }
+            // Dropping the hero returns to the gallery before its slot vanishes.
+            if (focusedGeometry === geometry) {
+                focus(null);
+            }
+            const [removed] = boards.splice(index, 1);
+            removed?.cell.remove();
+            // Survivors keep their frames and the clock keeps ticking; just
+            // refresh the floor/capacity affordances for the new count and
+            // re-lay-out the (possibly speaker) stage.
+            const removable = Boolean(options.onRemoveBoard) && boards.length > MIN_WALL_TILINGS;
+            for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
+                ".compare-filmstrip-remove",
+            )) {
+                removeButton.dataset.removable = removable ? "true" : "false";
+            }
+            refreshManagementControls();
+            applyFocusLayout();
+            return true;
         },
         currentFrameIndex: () => player.index,
         setBoardOverlay(geometry: string, node: HTMLElement | null): boolean {

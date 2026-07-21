@@ -1146,13 +1146,11 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.assertEqual(unexpected_console, [])
 
     def test_wall_rapid_board_removal_holds_the_two_board_minimum(self) -> None:
-        # Board removals coalesce into one debounced rebuild, so the displayed
-        # strip still shows the pre-removal boards while more × clicks land. A
-        # burst of removals -- faster than the rebuild, the way an impatient
-        # user drags the wall down -- must still stop at the two-board minimum
-        # instead of racing past it and collapsing the running wall to the
-        # empty hero. Regression guard for the debounce-race that let the strip
-        # empty out.
+        # Removal is local and instant now (the board drops in place with no
+        # rebuild), so a burst can no longer outrun a debounced rebuild -- but
+        # the two-board floor must still hold. Fire every × in a single JS task,
+        # the way an impatient user drags the wall down, and confirm the wall
+        # settles at exactly two boards instead of collapsing to the empty hero.
         case = self._case()
         case.page.add_init_script(
             "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
@@ -1162,32 +1160,25 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#wall-view-btn")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
-        # The strip exists before the initial rebuild settles; wait for the wall
-        # to go idle (remove controls enabled) so the burst is not swallowed by
-        # the in-flight-rebuild guard.
+        # Wait for the wall to go idle (remove controls enabled) so the burst is
+        # not swallowed by the initial in-flight-rebuild guard.
         expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
 
-        # Use real pointer input at three displayed × controls before the
-        # debounced rebuild swaps the strip. The second accepted click reaches
-        # the floor and disables every remove control synchronously; the third
-        # pointer click therefore lands on a disabled button and must be ignored
-        # by the browser rather than relying on a synthetic event bypass.
-        remove_buttons = case.page.locator(".compare-filmstrip-remove")
-        remove_boxes = [remove_buttons.nth(index).bounding_box() for index in range(3)]
-        if any(box is None for box in remove_boxes):
-            raise AssertionError("rapid-removal controls must have layout boxes")
-        for index, box in enumerate(remove_boxes):
-            assert box is not None
-            case.page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
-            if index == 1:
-                case.assertTrue(remove_buttons.nth(2).is_disabled())
+        # Dispatch a click on every × captured at once, in one task. The first
+        # two are accepted; the rest are judged against the pending two-board
+        # selection and refused, so the wall cannot drop below its floor.
+        case.page.evaluate(
+            """() => {
+                document.querySelectorAll('.compare-filmstrip-remove').forEach((button) => {
+                    button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                });
+            }"""
+        )
 
         # The wall settles at the floor -- two boards, never the collapsed hero
         # -- and the survivors' remove controls stay visible, disabled, and
         # explained rather than silently allowing the wall to empty.
         self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
-        self._expect(".compare-status").to_contain_text("2 tilings")
-        self._expect(".compare-status").not_to_contain_text("Select at least two tilings")
         self._expect(".compare-stage-hero").not_to_be_visible()
         remove_buttons = case.page.locator(".compare-filmstrip-remove")
         case.assertEqual(remove_buttons.count(), 2)

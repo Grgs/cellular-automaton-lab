@@ -326,6 +326,39 @@ describe("createFilmstripView", () => {
         expect(minimumButtons[0]?.title).toBe("Keep at least two tilings on the wall");
     });
 
+    it("removeBoard drops a slot in place, keeps the clock, and unfocuses the hero", async () => {
+        const { view } = mountView({ onRemoveBoard: vi.fn() });
+        await view.load(
+            filmstrip(
+                [
+                    tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }]),
+                    tiling("hex", [{ a: 1 }, { b: 1 }, { c: 1 }]),
+                    tiling("tri", [{ a: 1 }, { b: 1 }, { c: 1 }]),
+                ],
+                3,
+            ),
+            { initialFrame: 1 },
+        );
+        view.focus("hex");
+        expect(view.currentFrameIndex()).toBe(1);
+
+        // Removing a non-hero board drops just its slot; the clock and the hero
+        // are untouched.
+        expect(view.removeBoard("square")).toBe(true);
+        expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(view.element.querySelector('[aria-label="Remove square from the wall"]')).toBeNull();
+        expect(view.currentFrameIndex()).toBe(1);
+        expect(view.element.querySelector(".compare-filmstrip-board.is-hero")).not.toBeNull();
+
+        // Removing the hero returns to the gallery.
+        expect(view.removeBoard("hex")).toBe(true);
+        expect(view.element.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
+        expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(1);
+
+        // A geometry no longer on the wall is a no-op.
+        expect(view.removeBoard("square")).toBe(false);
+    });
+
     it("opens a searchable in-wall picker and adds an available tiling", async () => {
         const added: string[] = [];
         const { view } = mountView({
