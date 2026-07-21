@@ -42,11 +42,11 @@
         "jsdom": "^29.1.1",
         "linkinator": "7.6.1",
         "match-sorter": "^8.3.0",
-        "oxlint": "^1.73.0",
+        "oxlint": "^1.74.0",
         "polygon-clipping": "^0.15.7",
         "prettier": "^3.9.5",
         "typescript": "^7.0.2",
-        "vite": "^8.1.4",
+        "vite": "^8.1.5",
         "vitest": "^4.1.2"
     }
 }
