@@ -1759,20 +1759,22 @@ describe("mountComparePanel", () => {
             pattern: "glider",
         });
 
+        // Rule and seed source now live in the always-visible quick strip; the
+        // form holds the remaining knobs plus the seed bits.
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Comparison rule"]')
+                ?.value,
+        ).toBe("wireworld");
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Comparison seed"]')
+                ?.value,
+        ).toBe("glider");
         const fields = [
             ...document.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
                 ".compare-form .compare-field, .compare-seedbits .compare-field",
             ),
         ];
-        expect(fields.map((field) => field.value)).toEqual([
-            "wireworld",
-            "glider",
-            "row-major",
-            "12",
-            "50",
-            "8",
-            "101",
-        ]);
+        expect(fields.map((field) => field.value)).toEqual(["row-major", "12", "50", "8", "101"]);
         expect(checkedTilingLabels()).toEqual(["Kagome"]);
         expect(compareSeed).not.toHaveBeenCalled();
         expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(
