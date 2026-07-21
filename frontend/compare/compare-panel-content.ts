@@ -240,7 +240,14 @@ export function createComparePanelContent(
     let editingSavedRunId = "";
     let editingSavedTilingSetId = "";
 
-    const ruleSelect = el("select", { class: "compare-field" });
+    // Rule and seed live in the always-visible quick strip (one authoritative
+    // control each), so they carry the strip styling and the accessible names
+    // the strip advertises rather than being duplicated in the Setup tab.
+    const ruleSelect = el("select", {
+        class: "compare-field compare-setup-value compare-setup-select",
+        "aria-label": "Comparison rule",
+        title: "Choose the comparison rule",
+    });
     const seedInput = el("input", {
         class: "compare-field",
         type: "text",
@@ -278,7 +285,11 @@ export function createComparePanelContent(
     });
     const shapeSelect = el(
         "select",
-        { class: "compare-field" },
+        {
+            class: "compare-field compare-setup-value compare-setup-select",
+            "aria-label": "Comparison seed",
+            title: "Choose the shared seed",
+        },
         SEED_SHAPE_OPTIONS.map((option) =>
             el("option", { value: option.value, textContent: option.label }),
         ),
@@ -524,15 +535,6 @@ export function createComparePanelContent(
         role: "status",
         "aria-live": "polite",
     });
-    const setupSeedValue = shapeSelect.cloneNode(true) as HTMLSelectElement;
-    setupSeedValue.className = "compare-setup-value compare-setup-select";
-    setupSeedValue.setAttribute("aria-label", "Comparison seed");
-    setupSeedValue.title = "Choose the shared seed";
-    const setupRuleValue = el("select", {
-        class: "compare-setup-value compare-setup-select",
-        "aria-label": "Comparison rule",
-        title: "Choose the comparison rule",
-    });
     const setupTilingsValue = el("strong", {
         class: "compare-setup-value",
         textContent: "Loading",
@@ -567,23 +569,12 @@ export function createComparePanelContent(
         "section",
         { class: "compare-setup-strip", "aria-label": "Comparison setup" },
         [
-            setupItem("Seed", setupSeedValue),
-            setupItem("Rule", setupRuleValue),
+            setupItem("Seed", shapeSelect),
+            setupItem("Rule", ruleSelect),
             setupTilingsItem,
             setupRunButton,
         ],
     );
-    setupSeedValue.addEventListener("change", () => {
-        shapeSelect.value = setupSeedValue.value;
-        shapeSelect.dispatchEvent(new Event("change"));
-    });
-    setupRuleValue.addEventListener("change", () => {
-        if (!selectHasValue(ruleSelect, setupRuleValue.value)) {
-            return;
-        }
-        ruleSelect.value = setupRuleValue.value;
-        ruleSelect.dispatchEvent(new Event("change"));
-    });
     const stageHero = el("div", { class: "compare-stage-hero" }, [
         el("div", { class: "compare-stage-hero-glyph", "aria-hidden": "true", textContent: "▦" }),
         el("div", {
@@ -1480,10 +1471,10 @@ export function createComparePanelContent(
             configTabButton("saved", "Saved"),
         ],
     );
+    // Rule and seed source now live only in the always-visible quick strip; the
+    // Setup tab keeps the deeper knobs and the seed pad.
     const setupConfigPanel = configPanel("setup", [
         el("div", { class: "compare-form" }, [
-            labeledField("Rule", ruleSelect),
-            labeledField("Seed source", shapeSelect),
             labeledField("Traversal", traversalSelect),
             labeledField("Wall generations", wallGenerationsInput),
             labeledField("Analysis steps", analysisStepsInput),
@@ -2256,11 +2247,7 @@ export function createComparePanelContent(
         const ruleLabel = selectedRule()?.display_name ?? selectedRuleName();
         const tilingLabel = `${selected.size} selected`;
         setupTilingsValue.textContent = tilingLabel;
-        setupSeedValue.value = shapeSelect.value;
-        if (selectHasValue(setupRuleValue, ruleSelect.value)) {
-            setupRuleValue.value = ruleSelect.value;
-        }
-        setupRuleValue.title = ruleLabel;
+        ruleSelect.title = ruleLabel;
         setupTilingsValue.title = summaryText();
     }
 
@@ -2657,11 +2644,6 @@ export function createComparePanelContent(
         }
         rulesLoaded = true;
         ruleSelect.replaceChildren(
-            ...rules.map((rule) =>
-                el("option", { value: rule.name, textContent: rule.display_name ?? rule.name }),
-            ),
-        );
-        setupRuleValue.replaceChildren(
             ...rules.map((rule) =>
                 el("option", { value: rule.name, textContent: rule.display_name ?? rule.name }),
             ),
