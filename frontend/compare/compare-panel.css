@@ -576,6 +576,16 @@
     background: var(--help-bg, rgba(0, 0, 0, 0.03));
     cursor: not-allowed;
 }
+/* The rule/seed selects carry .compare-field (shared field behaviour) but sit
+   inline in the quick strip, so strip context wins back the borderless look. */
+.compare-setup-item .compare-setup-select {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--compare-text);
+}
 .compare-seed-workspace {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);

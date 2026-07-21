@@ -4,7 +4,8 @@ import type { AppActionSet } from "../types/actions.js";
 import type { DomElements } from "../types/dom.js";
 
 export function bindChromeControls(elements: DomElements, actions: AppActionSet): void {
-    bindButtonControl(elements.themeToggleBtn, actions.toggleTheme);
+    // The theme toggle lives in the shared shell header (reachable from the wall
+    // too) and is wired by the shell, not the Lab control panel.
     bindButtonControl(elements.drawerToggleBtn, actions.toggleDrawer);
 
     if (elements.drawerBackdrop && actions.closeDrawer) {
