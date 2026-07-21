@@ -24,7 +24,17 @@
                         document.documentElement.dataset.theme = storedTheme;
                         return;
                     }
-                    document.documentElement.dataset.theme = defaultTheme;
+                    // No explicit choice yet: follow the OS colour scheme, and
+                    // only fall back to the configured default when the browser
+                    // reports no preference.
+                    var media = window.matchMedia;
+                    var osTheme =
+                        media && media("(prefers-color-scheme: dark)").matches
+                            ? "dark"
+                            : media && media("(prefers-color-scheme: light)").matches
+                              ? "light"
+                              : defaultTheme;
+                    document.documentElement.dataset.theme = osTheme;
                 } catch (error) {
                     void error;
                 }

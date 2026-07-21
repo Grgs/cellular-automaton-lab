@@ -1,9 +1,4 @@
-import {
-    renderThemeToggle,
-    renderPaintPalette,
-    renderRangeControl,
-    renderToggleButtons,
-} from "./view-primitives.js";
+import { renderPaintPalette, renderRangeControl, renderToggleButtons } from "./view-primitives.js";
 import {
     populateAdjacencyModes,
     populatePresetSeeds,
@@ -359,7 +354,6 @@ export function renderEditorAndPatternSections(
     }
 
     renderPaintPalette(elements, viewModel.paletteStates, viewModel.selectedPaintState);
-    renderThemeToggle(elements, viewModel.theme);
 
     // Canvas toolbar
     if (elements.canvasToolbar) {
