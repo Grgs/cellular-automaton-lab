@@ -12,6 +12,7 @@ import type {
 } from "./pane/pane-core.js";
 import { getGeometryAdapter } from "./geometry/registry.js";
 import { installReviewApi } from "./review-api.js";
+import { wireShellThemeToggle } from "./shell/shell-theme.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
 
 interface FitRenderCellSizeAdapter {
@@ -34,6 +35,7 @@ function handleAppError(error: unknown): void {
 
 let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
+let disposeThemeToggle: (() => void) | null = null;
 let workspaceRouter: WorkspaceRouterHandle | null = null;
 
 export function disposeApp(): void {
@@ -41,6 +43,8 @@ export function disposeApp(): void {
     workspaceRouter = null;
     disposeReviewApi?.();
     disposeReviewApi = null;
+    disposeThemeToggle?.();
+    disposeThemeToggle = null;
     activeController?.dispose();
     activeController = null;
     window.__appReady = false;
@@ -60,6 +64,7 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
         throw new Error("Missing grid canvas element.");
     }
     disposeApp();
+    disposeThemeToggle = wireShellThemeToggle(elements);
     const backend = options.backend ?? createHttpSimulationBackend();
     const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
     const paneBaseSessionId = options.paneBaseSessionId ?? window.APP_SESSION_ID ?? null;

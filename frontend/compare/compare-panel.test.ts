@@ -819,15 +819,12 @@ describe("mountComparePanel", () => {
         expect(play?.classList.contains("compare-run-secondary")).toBe(false);
         expect(run?.classList.contains("compare-run-secondary")).toBe(true);
 
-        // The live filmstrip appears above the analysis section in document order,
-        // and the Run button + results live inside that (scroll-down) section.
-        const filmstrip = document.querySelector(".compare-filmstrip-area");
+        // The Run analysis button and the results live together inside the
+        // analysis body, on the stage-wide overlay rather than the inspector.
         const analysis = document.querySelector(".compare-analysis");
+        const filmstrip = document.querySelector(".compare-filmstrip-area");
         expect(filmstrip).not.toBeNull();
         expect(analysis).not.toBeNull();
-        expect(
-            filmstrip!.compareDocumentPosition(analysis!) & Node.DOCUMENT_POSITION_FOLLOWING,
-        ).toBeTruthy();
         expect(analysis!.contains(run ?? null)).toBe(true);
         expect(analysis!.querySelector(".compare-results")).not.toBeNull();
 
@@ -835,7 +832,7 @@ describe("mountComparePanel", () => {
         const saved = document.querySelector(".compare-saved");
         expect(saved).not.toBeNull();
         expect(filmstrip?.closest(".compare-board-wall")).not.toBeNull();
-        expect(analysis?.closest(".compare-inspector")).not.toBeNull();
+        expect(analysis?.closest(".compare-analysis-overlay")).not.toBeNull();
         expect(saved?.closest(".compare-setup-sidebar")).not.toBeNull();
         handle.dispose();
     });
@@ -947,7 +944,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("runs analysis only while its tab is visible and reuses the normalized cache", async () => {
+    it("runs analysis when the overlay opens and reuses the normalized cache", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
         const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
@@ -959,14 +956,12 @@ describe("mountComparePanel", () => {
         document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
 
-        const tab = (label: string) =>
-            [...document.querySelectorAll<HTMLButtonElement>(".compare-config-tab")].find(
-                (button) => button.textContent === label,
-            );
-        tab("Analysis")?.click();
+        const analysisToggle = () =>
+            document.querySelector<HTMLButtonElement>(".compare-analysis-open");
+        analysisToggle()?.click(); // open the overlay -> runs analysis
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1), { timeout: 1_000 });
-        tab("Setup")?.click();
-        tab("Analysis")?.click();
+        analysisToggle()?.click(); // close
+        analysisToggle()?.click(); // reopen -> served from cache, no new request
         await new Promise((resolve) => window.setTimeout(resolve, 500));
 
         expect(compareSeed).toHaveBeenCalledTimes(1);
@@ -1156,7 +1151,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("uses setup tabs while analysis renders in the inspector", async () => {
+    it("uses setup tabs and opens analysis as a stage overlay", async () => {
         Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
@@ -1182,20 +1177,20 @@ describe("mountComparePanel", () => {
         );
         expect(sheet?.textContent).toContain("Run comparison");
 
-        document.querySelector<HTMLButtonElement>("#compare-config-tab-analysis")?.click();
-        expect(document.querySelector<HTMLElement>("#compare-config-panel-analysis")?.hidden).toBe(
-            false,
-        );
-        expect(
-            document
-                .querySelector<HTMLElement>("#compare-config-panel-analysis")
-                ?.closest(".compare-inspector"),
-        ).not.toBeNull();
+        // The sheet's remaining tabs still work; analysis is no longer among them.
         document.querySelector<HTMLButtonElement>("#compare-config-tab-help")?.click();
         const helpPanel = document.querySelector<HTMLElement>("#compare-config-panel-help");
         expect(helpPanel?.hidden).toBe(false);
         expect(helpPanel?.textContent).toContain("Same seed");
         expect(helpPanel?.textContent).toContain("Different tilings");
+        expect(document.querySelector("#compare-config-tab-analysis")).toBeNull();
+
+        // Analysis opens on its own stage-wide overlay, not in the inspector.
+        const overlay = document.querySelector<HTMLElement>(".compare-analysis-overlay");
+        expect(overlay?.hidden).toBe(true);
+        document.querySelector<HTMLButtonElement>(".compare-analysis-open")?.click();
+        expect(overlay?.hidden).toBe(false);
+        expect(overlay?.querySelector(".compare-analysis")).not.toBeNull();
         document.querySelector<HTMLButtonElement>(".compare-run-secondary")?.click();
         await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1));
         handle.dispose();
@@ -1759,20 +1754,22 @@ describe("mountComparePanel", () => {
             pattern: "glider",
         });
 
+        // Rule and seed source now live in the always-visible quick strip; the
+        // form holds the remaining knobs plus the seed bits.
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Comparison rule"]')
+                ?.value,
+        ).toBe("wireworld");
+        expect(
+            document.querySelector<HTMLSelectElement>('select[aria-label="Comparison seed"]')
+                ?.value,
+        ).toBe("glider");
         const fields = [
             ...document.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
                 ".compare-form .compare-field, .compare-seedbits .compare-field",
             ),
         ];
-        expect(fields.map((field) => field.value)).toEqual([
-            "wireworld",
-            "glider",
-            "row-major",
-            "12",
-            "50",
-            "8",
-            "101",
-        ]);
+        expect(fields.map((field) => field.value)).toEqual(["row-major", "12", "50", "8", "101"]);
         expect(checkedTilingLabels()).toEqual(["Kagome"]);
         expect(compareSeed).not.toHaveBeenCalled();
         expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(

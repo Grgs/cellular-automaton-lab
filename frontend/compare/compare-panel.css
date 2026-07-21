@@ -65,6 +65,7 @@
 /* Desktop keeps the wall inside the shared shell. Compact layouts opt into a
    contained vertical scroll below so boards and controls never get clipped. */
 .compare-content {
+    position: relative;
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
@@ -574,6 +575,16 @@
     color: var(--muted, #6d756f);
     background: var(--help-bg, rgba(0, 0, 0, 0.03));
     cursor: not-allowed;
+}
+/* The rule/seed selects carry .compare-field (shared field behaviour) but sit
+   inline in the quick strip, so strip context wins back the borderless look. */
+.compare-setup-item .compare-setup-select {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--compare-text);
 }
 .compare-seed-workspace {
     display: grid;
@@ -2221,7 +2232,63 @@
     max-height: none;
     overflow: visible;
 }
-.compare-inspector .compare-analysis {
+/* Analysis is a stage-wide overlay (a dimmed modal over the wall) so the phase
+   portrait and the wide result table read at full size instead of the 280px
+   inspector tail. */
+.compare-analysis-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+.compare-analysis-overlay[hidden] {
+    display: none;
+}
+.compare-analysis-backdrop {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+.compare-analysis-panel {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(1000px, 100%);
+    max-height: 100%;
+    background: var(--compare-panel);
+    border: 1px solid var(--compare-line);
+    border-radius: 14px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+.compare-analysis-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--compare-line);
+}
+.compare-analysis-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+.compare-analysis-body {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px;
+}
+.compare-analysis-body .compare-results {
+    /* Give the table room; the wide overlay means no nested horizontal scroll. */
     min-width: 0;
 }
 .compare-workspace .compare-dock {

@@ -2068,9 +2068,19 @@ button.theme-toggle .theme-icon-moon {
     margin: 8px 0;
 }
 
-.display-theme-toggle {
-    align-items: center;
-    margin-top: 8px;
+/* The theme toggle sits in the shared header; a touch smaller than the Lab
+   drawer's floating pill so it fits the slim header row. */
+.shell-theme-toggle.theme-toggle {
+    flex: 0 0 auto;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    box-shadow: none;
+    background-color: var(--btn-soft-bg, rgba(0, 0, 0, 0.05));
+    border-color: var(--btn-soft-line, rgba(0, 0, 0, 0.12));
+}
+.shell-theme-toggle.theme-toggle .theme-toggle-icon {
+    font-size: 1rem;
 }
 
 .rule-description,

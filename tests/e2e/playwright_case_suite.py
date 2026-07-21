@@ -696,29 +696,27 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
-        # Reach the analysis controls through the on-demand setup sheet.
+        # Analysis steps live in the setup sheet; set them, then open the
+        # stage-wide analysis overlay from the dock.
         case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         self._expect(".compare-config-sheet.is-open").to_be_visible()
         analysis_steps = case.page.locator(
             ".compare-form label", has_text="Analysis steps"
         ).locator("input")
         analysis_steps.fill("12")
-        case.page.click("#compare-config-tab-analysis")
+        case.page.click('.compare-dock-icon[aria-label="Analyze the tilings"]')
+        self._expect(".compare-analysis-overlay").to_be_visible()
         case.page.click(".compare-run-secondary")
         self._expect(".compare-grid tbody tr").to_have_count(2, timeout=60_000)
         self._expect(".compare-status").to_contain_text("Done — 2 tilings")
 
-        overflowing_sections = case.page.locator(
-            ".compare-inspector-body > :not([hidden])"
-        ).evaluate_all(
-            """(sections) => sections
-                .filter((section) => section.scrollHeight > section.clientHeight + 1)
-                .map((section) => section.className)"""
+        # The wide overlay lets the multi-column result table read without a
+        # nested horizontal scroll.
+        table_overflow = case.page.locator(".compare-grid-scroll").evaluate(
+            "el => el.scrollWidth - el.clientWidth"
         )
-        case.assertEqual(
-            overflowing_sections,
-            [],
-            "inspector sections must retain their content height and scroll as one flow",
+        case.assertLessEqual(
+            table_overflow, 1, "analysis table should fit the overlay without horizontal scroll"
         )
 
         first_row = case.page.locator(".compare-grid tbody tr").first
@@ -732,6 +730,11 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.mouse.move(0, 0)
 
         def open_phase_in_lab(phase: str) -> dict[str, object]:
+            # The overlay closes when the wall is left; reopen it (cached results
+            # come straight back) before acting on a row.
+            if not case.page.locator(".compare-analysis-overlay").is_visible():
+                case.page.click('.compare-dock-icon[aria-label="Analyze the tilings"]')
+                self._expect(".compare-grid tbody tr").to_have_count(2, timeout=60_000)
             row_selector = f'.compare-grid tbody tr[data-geometry="{analysis_geometry}"]'
             row = case.page.locator(row_selector)
             self._expect(row_selector).to_have_count(1)
@@ -750,7 +753,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.locator("#wall-view-btn").press("Enter")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-grid tbody tr").to_have_count(2)
-        self._expect("#compare-config-tab-analysis").to_have_attribute("aria-selected", "true")
         case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
 
         end = open_phase_in_lab("End")
@@ -1358,20 +1360,17 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         wall_generations.fill("240")
         analysis_steps.fill("501")
         expect(wall_run).to_be_enabled()
-        case.page.click("#compare-config-tab-analysis")
-        expect(analysis_run).to_be_visible()
+        # The analysis Run button lives on the overlay; out-of-range steps
+        # disable it with an explaining title (readable while it is still off-screen).
         expect(analysis_run).to_be_disabled()
         expect(analysis_run).to_have_attribute(
             "title", "Analysis steps must be an integer from 1 to 500."
         )
 
-        case.page.click("#compare-config-tab-setup")
         analysis_steps.fill("500")
         grid_size.fill("65")
         expect(wall_run).to_be_disabled()
-        case.page.click("#compare-config-tab-analysis")
         expect(analysis_run).to_be_disabled()
-        case.page.click("#compare-config-tab-setup")
         expect(wall_run).to_have_attribute("title", "Grid size must be an integer from 2 to 64.")
 
         # Minimum grid with maximum wall length: the counter proves all 240
@@ -1387,15 +1386,16 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # The separate 500-step maximum remains usable for analysis without
         # changing the running wall or its participant order.
-        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
-        case.page.click("#compare-config-tab-analysis")
+        case.page.click('.compare-dock-icon[aria-label="Analyze the tilings"]')
+        self._expect(".compare-analysis-overlay").to_be_visible()
         analysis_run.click()
         self._expect(".compare-status").to_contain_text("Done — 2 tilings", timeout=60_000)
         case.assertEqual(case.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
+        case.page.click(".compare-analysis-close")
 
         # Maximum grid with the minimum one-frame wall: the square board's cell
         # count proves the selected 64 x 64 request, rather than a silent clamp.
-        case.page.click("#compare-config-tab-setup")
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
         wall_generations.fill("1")
         grid_size.fill("64")
         wall_run.click()
