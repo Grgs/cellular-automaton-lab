@@ -502,7 +502,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#reset-btn")
         self._wait_for_exported_pattern_payload(expected_rule="conway", expected_cells_by_id={})
         case.page.click("#canvas-toolbar-arm-btn")
-        case.page.click('[data-editor-tool="brush"]')
         case.page.click('[data-brush-size="1"]')
         case.page.click('[data-state-value="1"]')
         self._ensure_drawer_open()
