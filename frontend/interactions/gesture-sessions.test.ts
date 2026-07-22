@@ -53,11 +53,13 @@ function createRouter({
     const getSelectedCells = vi.fn(() => selectedCells);
     const setSelectedCells = vi.fn();
     const setHoveredCell = vi.fn();
+    const clearGestureOutline = vi.fn();
+    const dismissEditingUi = vi.fn(() => Promise.resolve(false));
     const router = createPointerGestureRouter({
         surfaceElement: document.createElement("canvas"),
         editPolicy: {
             runningBrushEditingEnabled: () => false,
-            dismissEditingUi: () => Promise.resolve(false),
+            dismissEditingUi,
             prepareDirectGridInteraction: vi.fn(),
             runningAdvancedToolBlocked: () => false,
             blockRunningAdvancedTool: vi.fn(),
@@ -72,7 +74,7 @@ function createRouter({
         setHoveredCell,
         setSelectedCells,
         getSelectedCells,
-        clearGestureOutline: vi.fn(),
+        clearGestureOutline,
         openInspectorDrawer: vi.fn(),
         renderControlPanel: vi.fn(),
         paintCell: vi.fn().mockResolvedValue(undefined),
@@ -87,10 +89,24 @@ function createRouter({
         getSelectedCells,
         setSelectedCells,
         setHoveredCell,
+        clearGestureOutline,
+        dismissEditingUi,
     };
 }
 
 describe("interactions/gesture-sessions", () => {
+    it("reports the pointer active before pointerdown cleanup can render", () => {
+        const { router, setHoveredCell, clearGestureOutline } = createRouter();
+        const activeDuringCleanup: boolean[] = [];
+        setHoveredCell.mockImplementation(() => activeDuringCleanup.push(router.isActive()));
+        clearGestureOutline.mockImplementation(() => activeDuringCleanup.push(router.isActive()));
+
+        router.beginPointerDown(pointerEvent(), { id: "cell:a", state: 0 });
+
+        expect(activeDuringCleanup).toEqual([true, true]);
+        expect(router.isActive()).toBe(true);
+    });
+
     it("starts unarmed left gestures with the selected paint state", () => {
         const { router, paintDrag } = createRouter({ isEditArmed: false });
         const firstCell: PaintableCell = { id: "cell:a", state: 0 };
@@ -104,17 +120,22 @@ describe("interactions/gesture-sessions", () => {
     });
 
     it("routes armed pointer sessions through the editor session controller", () => {
-        const { router, editorSession } = createRouter({ isEditArmed: true, currentTool: "line" });
+        const { router, editorSession, dismissEditingUi } = createRouter({
+            isEditArmed: true,
+            currentTool: "line",
+        });
         const firstCell: PaintableCell = { id: "cell:a" };
         const secondCell: PaintableCell = { id: "cell:b" };
 
         router.beginPointerDown(pointerEvent(), firstCell);
+        expect(dismissEditingUi).not.toHaveBeenCalled();
         router.handlePointerMove(pointerEvent({ buttons: 1 }), secondCell);
         router.handlePointerUp(pointerEvent());
 
         expect(editorSession.beginPointerSession).toHaveBeenCalledWith(firstCell, 1);
         expect(editorSession.handlePointerMove).toHaveBeenCalledWith(secondCell);
         expect(editorSession.handlePointerUp).toHaveBeenCalledTimes(1);
+        expect(dismissEditingUi).toHaveBeenCalledTimes(1);
     });
 
     it("keeps left-button sessions bound to their original pointer id", () => {

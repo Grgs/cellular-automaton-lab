@@ -98,6 +98,7 @@ export function wireAppController({
         },
         renderControlPanel: appView.renderControlsPanel,
     });
+    appView.setPointerGestureActiveResolver(() => Boolean(interactions.isPointerGestureActive?.()));
 
     const viewportController = createViewportController(
         createViewportControllerDependencies({

@@ -26,6 +26,8 @@ export function createPointerGestureRouter({
     let pendingDirectGestureTargetState: number | null = null;
     let pendingDirectGestureCellId: string | null = null;
     let suppressNextContextMenu = false;
+    let deferredEditingUiDismissal: "prepare-direct" | "dismiss" | null = null;
+    let pointerDownInProgress = false;
 
     function rememberDirectGesture(
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
@@ -53,11 +55,28 @@ export function createPointerGestureRouter({
     }
 
     function isAnyPointerActive(): boolean {
-        return Boolean(activeSession) || editorSession.isPointerActive() || paintDrag.isActive();
+        return (
+            pointerDownInProgress ||
+            Boolean(activeSession) ||
+            editorSession.isPointerActive() ||
+            paintDrag.isActive()
+        );
     }
 
     function clearActiveSession(): void {
         activeSession = null;
+    }
+
+    function settleDeferredEditingUi(): void {
+        const dismissal = deferredEditingUiDismissal;
+        deferredEditingUiDismissal = null;
+        if (dismissal === "prepare-direct") {
+            editPolicy.prepareDirectGridInteraction();
+            return;
+        }
+        if (dismissal === "dismiss") {
+            void editPolicy.dismissEditingUi();
+        }
     }
 
     function scheduleContextMenuReset(): void {
@@ -96,7 +115,9 @@ export function createPointerGestureRouter({
         event: PointerEvent,
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
     ): void {
-        editPolicy.prepareDirectGridInteraction(event);
+        event.preventDefault();
+        event.stopPropagation();
+        deferredEditingUiDismissal = "prepare-direct";
         const targetState = resolveDirectGestureTargetState(cell);
         rememberDirectGesture(cell, targetState);
         paintDrag.begin(cell, event.pointerId, targetState);
@@ -113,8 +134,8 @@ export function createPointerGestureRouter({
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
     ): void {
         clearPendingDirectGesture();
-        void editPolicy.dismissEditingUi();
         event.preventDefault();
+        deferredEditingUiDismissal = "dismiss";
         paintDrag.begin(cell, event.pointerId);
         activeSession = createPaintDragGestureSession({
             pointerId: event.pointerId ?? null,
@@ -128,8 +149,8 @@ export function createPointerGestureRouter({
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
     ): void {
         clearPendingDirectGesture();
-        void editPolicy.dismissEditingUi();
         event.preventDefault();
+        deferredEditingUiDismissal = "dismiss";
         void editorSession.beginPointerSession(cell, event.pointerId);
         activeSession = createEditorPointerSession({
             pointerId: event.pointerId ?? null,
@@ -141,35 +162,41 @@ export function createPointerGestureRouter({
         event: PointerEvent,
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
     ): void {
-        setHoveredCell(null);
-        clearGestureOutline();
-        switch (resolvePointerDownIntent(event, editPolicy).kind) {
-            case "right-selection":
-                beginRightSelectionSession(event, cell);
-                return;
-            case "ignore":
-                return;
-            case "direct-paint":
-                beginDirectPaintSession(event, cell);
-                return;
-            case "running-brush":
-                beginRunningBrushSession(event, cell);
-                return;
-            case "blocked-advanced-tool":
-                clearPendingDirectGesture();
-                editPolicy.blockRunningAdvancedTool(event);
-                consumeNextClick = true;
-                return;
-            case "blocked-editing":
-                clearPendingDirectGesture();
-                return;
-            case "fill-click":
-                clearPendingDirectGesture();
-                void editPolicy.dismissEditingUi();
-                return;
-            case "editor-pointer":
-                beginEditorPointerSession(event, cell);
-                return;
+        pointerDownInProgress = true;
+        try {
+            setHoveredCell(null);
+            clearGestureOutline();
+            deferredEditingUiDismissal = null;
+            switch (resolvePointerDownIntent(event, editPolicy).kind) {
+                case "right-selection":
+                    beginRightSelectionSession(event, cell);
+                    return;
+                case "ignore":
+                    return;
+                case "direct-paint":
+                    beginDirectPaintSession(event, cell);
+                    return;
+                case "running-brush":
+                    beginRunningBrushSession(event, cell);
+                    return;
+                case "blocked-advanced-tool":
+                    clearPendingDirectGesture();
+                    editPolicy.blockRunningAdvancedTool(event);
+                    consumeNextClick = true;
+                    return;
+                case "blocked-editing":
+                    clearPendingDirectGesture();
+                    return;
+                case "fill-click":
+                    clearPendingDirectGesture();
+                    void editPolicy.dismissEditingUi();
+                    return;
+                case "editor-pointer":
+                    beginEditorPointerSession(event, cell);
+                    return;
+            }
+        } finally {
+            pointerDownInProgress = false;
         }
     }
 
@@ -194,6 +221,7 @@ export function createPointerGestureRouter({
         if (activeSession) {
             if (activeSession.handleUp(event)) {
                 clearActiveSession();
+                settleDeferredEditingUi();
             }
             return;
         }
@@ -207,6 +235,7 @@ export function createPointerGestureRouter({
 
     function handlePointerCancel(event: PointerEvent): void {
         consumeNextClick = false;
+        deferredEditingUiDismissal = null;
         clearPendingDirectGesture();
         setHoveredCell(null);
         clearGestureOutline();
@@ -264,6 +293,7 @@ export function createPointerGestureRouter({
         event: MouseEvent,
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
     ): void {
+        settleDeferredEditingUi();
         if (editorSession.isClickSuppressed()) {
             clearPendingDirectGesture();
             event.preventDefault();

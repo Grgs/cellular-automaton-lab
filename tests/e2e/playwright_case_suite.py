@@ -437,6 +437,142 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
+    def test_canvas_refits_after_lab_chrome_changes_without_accidental_drag(self) -> None:
+        case = self._case()
+
+        def canvas_metrics() -> dict[str, Any]:
+            return cast(
+                dict[str, Any],
+                case.page.evaluate(
+                    """() => {
+                        const viewport = document.getElementById("grid-viewport");
+                        const canvas = document.getElementById("grid");
+                        if (!viewport || !(canvas instanceof HTMLCanvasElement)) {
+                            throw new Error("Lab canvas is unavailable");
+                        }
+                        const canvasRect = canvas.getBoundingClientRect();
+                        return {
+                            innerWidth: window.innerWidth,
+                            innerHeight: window.innerHeight,
+                            board: document.getElementById("grid-size-text")?.textContent,
+                            viewportWidth: viewport.clientWidth,
+                            viewportHeight: viewport.clientHeight,
+                            scrollWidth: viewport.scrollWidth,
+                            scrollHeight: viewport.scrollHeight,
+                            canvasLeft: canvasRect.left,
+                            canvasTop: canvasRect.top,
+                            canvasWidth: canvasRect.width,
+                            canvasHeight: canvasRect.height,
+                            renderCellSize: Number(canvas.dataset.renderCellSize || "0"),
+                        };
+                    }"""
+                ),
+            )
+
+        def wait_for_fitted_canvas() -> dict[str, Any]:
+            case.page.wait_for_function(
+                """() => {
+                    const viewport = document.getElementById("grid-viewport");
+                    return Boolean(
+                        viewport &&
+                        viewport.scrollWidth <= viewport.clientWidth + 1 &&
+                        viewport.scrollHeight <= viewport.clientHeight + 1
+                    );
+                }"""
+            )
+            metrics = canvas_metrics()
+            case.assertLessEqual(metrics["scrollWidth"], metrics["viewportWidth"] + 1)
+            case.assertLessEqual(metrics["scrollHeight"], metrics["viewportHeight"] + 1)
+            return metrics
+
+        initial_board = canvas_metrics()["board"]
+        open_cell_sizes: list[float] = []
+        for _ in range(2):
+            self._expect("#control-drawer").to_have_attribute("data-open", "true")
+            open_cell_sizes.append(float(wait_for_fitted_canvas()["renderCellSize"]))
+            case.page.click("#drawer-toggle-btn")
+            self._expect("#control-drawer").to_have_attribute("data-open", "false")
+            wait_for_fitted_canvas()
+            case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
+        open_cell_sizes.append(float(wait_for_fitted_canvas()["renderCellSize"]))
+        case.assertLessEqual(max(open_cell_sizes) - min(open_cell_sizes), 0.05)
+        case.assertEqual(canvas_metrics()["board"], initial_board)
+
+        case.page.click("#reset-btn")
+        self._wait_for_exported_pattern_payload(expected_rule="conway", expected_cells_by_id={})
+        arm_button = case.page.locator("#canvas-toolbar-arm-btn")
+        if arm_button.get_attribute("aria-pressed") != "true":
+            arm_button.click()
+        self._expect("#canvas-toolbar-controls").to_be_visible()
+        brush_button = case.page.locator('[data-editor-tool="brush"]')
+        if brush_button.get_attribute("aria-pressed") != "true":
+            brush_button.click()
+        brush_size_button = case.page.locator('[data-brush-size="1"]')
+        if brush_size_button.get_attribute("aria-pressed") != "true":
+            brush_size_button.click()
+        state_button = case.page.locator('[data-state-value="1"]')
+        if state_button.get_attribute("aria-pressed") != "true":
+            state_button.click()
+        self._ensure_drawer_open()
+        before_pointer = wait_for_fitted_canvas()
+        canvas_box = case.page.locator("#grid").bounding_box()
+        if canvas_box is None:
+            raise AssertionError("grid canvas bounding box was unavailable")
+        pointer_x = canvas_box["x"] + (canvas_box["width"] / 2)
+        pointer_y = canvas_box["y"] + (canvas_box["height"] / 2)
+
+        case.page.mouse.move(pointer_x, pointer_y)
+        case.page.mouse.down()
+        case.page.wait_for_timeout(100)
+        during_pointer = canvas_metrics()
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
+        # CSS canvas dimensions can round by a few device pixels when a redraw
+        # settles. Keep any edge movement well below one cell, then verify the
+        # gesture still commits exactly one cell below. The original regression
+        # moved the board by many cells and produced a drag path.
+        edge_tolerance = max(0.5, float(before_pointer["renderCellSize"]) * 0.3)
+        size_tolerance = edge_tolerance * 2
+        case.assertLessEqual(
+            abs(during_pointer["canvasLeft"] - before_pointer["canvasLeft"]),
+            edge_tolerance,
+        )
+        case.assertLessEqual(
+            abs(during_pointer["canvasTop"] - before_pointer["canvasTop"]),
+            edge_tolerance,
+        )
+        case.assertLessEqual(
+            abs(during_pointer["canvasWidth"] - before_pointer["canvasWidth"]),
+            size_tolerance,
+        )
+        case.assertLessEqual(
+            abs(during_pointer["canvasHeight"] - before_pointer["canvasHeight"]),
+            size_tolerance,
+        )
+        case.page.mouse.up()
+        self._expect("#canvas-toolbar-undo-btn").to_be_enabled()
+        painted_payload = self._export_pattern_payload()
+        painted_cells = painted_payload.get("cells_by_id")
+        if not isinstance(painted_cells, dict):
+            raise AssertionError(f"painted cells payload was invalid: {painted_cells!r}")
+        case.assertEqual(len(painted_cells), 1)
+
+        case.page.set_viewport_size({"width": 820, "height": 900})
+        case.page.wait_for_function("() => window.innerWidth === 820 && window.innerHeight === 900")
+        self._ensure_drawer_open()
+        narrow_open = wait_for_fitted_canvas()
+        case.assertEqual(narrow_open["innerWidth"], 820)
+        case.assertEqual(narrow_open["innerHeight"], 900)
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        narrow_closed = wait_for_fitted_canvas()
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
+        narrow_reopened = wait_for_fitted_canvas()
+        case.assertLessEqual(
+            abs(narrow_closed["renderCellSize"] - narrow_reopened["renderCellSize"]), 0.05
+        )
+
     def test_canvas_editor_click_updates_exported_pattern(self) -> None:
         case = self._case()
         self._paint_canvas_center()
