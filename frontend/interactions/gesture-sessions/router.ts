@@ -27,6 +27,7 @@ export function createPointerGestureRouter({
     let pendingDirectGestureCellId: string | null = null;
     let suppressNextContextMenu = false;
     let deferredEditingUiDismissal: "prepare-direct" | "dismiss" | null = null;
+    let pointerDownInProgress = false;
 
     function rememberDirectGesture(
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
@@ -54,7 +55,12 @@ export function createPointerGestureRouter({
     }
 
     function isAnyPointerActive(): boolean {
-        return Boolean(activeSession) || editorSession.isPointerActive() || paintDrag.isActive();
+        return (
+            pointerDownInProgress ||
+            Boolean(activeSession) ||
+            editorSession.isPointerActive() ||
+            paintDrag.isActive()
+        );
     }
 
     function clearActiveSession(): void {
@@ -156,36 +162,41 @@ export function createPointerGestureRouter({
         event: PointerEvent,
         cell: Parameters<typeof resolveDirectGestureTargetState>[0],
     ): void {
-        setHoveredCell(null);
-        clearGestureOutline();
-        deferredEditingUiDismissal = null;
-        switch (resolvePointerDownIntent(event, editPolicy).kind) {
-            case "right-selection":
-                beginRightSelectionSession(event, cell);
-                return;
-            case "ignore":
-                return;
-            case "direct-paint":
-                beginDirectPaintSession(event, cell);
-                return;
-            case "running-brush":
-                beginRunningBrushSession(event, cell);
-                return;
-            case "blocked-advanced-tool":
-                clearPendingDirectGesture();
-                editPolicy.blockRunningAdvancedTool(event);
-                consumeNextClick = true;
-                return;
-            case "blocked-editing":
-                clearPendingDirectGesture();
-                return;
-            case "fill-click":
-                clearPendingDirectGesture();
-                void editPolicy.dismissEditingUi();
-                return;
-            case "editor-pointer":
-                beginEditorPointerSession(event, cell);
-                return;
+        pointerDownInProgress = true;
+        try {
+            setHoveredCell(null);
+            clearGestureOutline();
+            deferredEditingUiDismissal = null;
+            switch (resolvePointerDownIntent(event, editPolicy).kind) {
+                case "right-selection":
+                    beginRightSelectionSession(event, cell);
+                    return;
+                case "ignore":
+                    return;
+                case "direct-paint":
+                    beginDirectPaintSession(event, cell);
+                    return;
+                case "running-brush":
+                    beginRunningBrushSession(event, cell);
+                    return;
+                case "blocked-advanced-tool":
+                    clearPendingDirectGesture();
+                    editPolicy.blockRunningAdvancedTool(event);
+                    consumeNextClick = true;
+                    return;
+                case "blocked-editing":
+                    clearPendingDirectGesture();
+                    return;
+                case "fill-click":
+                    clearPendingDirectGesture();
+                    void editPolicy.dismissEditingUi();
+                    return;
+                case "editor-pointer":
+                    beginEditorPointerSession(event, cell);
+                    return;
+            }
+        } finally {
+            pointerDownInProgress = false;
         }
     }
 

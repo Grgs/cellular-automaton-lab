@@ -53,6 +53,7 @@ function createRouter({
     const getSelectedCells = vi.fn(() => selectedCells);
     const setSelectedCells = vi.fn();
     const setHoveredCell = vi.fn();
+    const clearGestureOutline = vi.fn();
     const dismissEditingUi = vi.fn(() => Promise.resolve(false));
     const router = createPointerGestureRouter({
         surfaceElement: document.createElement("canvas"),
@@ -73,7 +74,7 @@ function createRouter({
         setHoveredCell,
         setSelectedCells,
         getSelectedCells,
-        clearGestureOutline: vi.fn(),
+        clearGestureOutline,
         openInspectorDrawer: vi.fn(),
         renderControlPanel: vi.fn(),
         paintCell: vi.fn().mockResolvedValue(undefined),
@@ -88,11 +89,24 @@ function createRouter({
         getSelectedCells,
         setSelectedCells,
         setHoveredCell,
+        clearGestureOutline,
         dismissEditingUi,
     };
 }
 
 describe("interactions/gesture-sessions", () => {
+    it("reports the pointer active before pointerdown cleanup can render", () => {
+        const { router, setHoveredCell, clearGestureOutline } = createRouter();
+        const activeDuringCleanup: boolean[] = [];
+        setHoveredCell.mockImplementation(() => activeDuringCleanup.push(router.isActive()));
+        clearGestureOutline.mockImplementation(() => activeDuringCleanup.push(router.isActive()));
+
+        router.beginPointerDown(pointerEvent(), { id: "cell:a", state: 0 });
+
+        expect(activeDuringCleanup).toEqual([true, true]);
+        expect(router.isActive()).toBe(true);
+    });
+
     it("starts unarmed left gestures with the selected paint state", () => {
         const { router, paintDrag } = createRouter({ isEditArmed: false });
         const firstCell: PaintableCell = { id: "cell:a", state: 0 };
