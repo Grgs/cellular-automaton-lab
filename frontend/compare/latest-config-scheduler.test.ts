@@ -67,6 +67,66 @@ describe("latest config scheduler", () => {
         expect(applied).toEqual(["latest"]);
     });
 
+    it("cancels matching debounced work before it launches", async () => {
+        vi.useFakeTimers();
+        const execute = vi.fn(async (_config: { kind: string }) => {});
+        const scheduler = createLatestConfigScheduler({ execute });
+
+        scheduler.schedule({ kind: "analysis" });
+        expect(scheduler.cancel((config) => config.kind === "analysis")).toBe(true);
+        await vi.advanceTimersByTimeAsync(500);
+
+        expect(execute).not.toHaveBeenCalled();
+        await expect(scheduler.whenIdle()).resolves.toBeUndefined();
+    });
+
+    it("cancels queued analysis without aborting active filmstrip work", async () => {
+        vi.useFakeTimers();
+        const filmstrip = deferred<void>();
+        const signals: AbortSignal[] = [];
+        const execute = vi.fn(async (config: { kind: string }, signal: AbortSignal) => {
+            signals.push(signal);
+            if (config.kind === "filmstrip") {
+                await filmstrip.promise;
+            }
+        });
+        const scheduler = createLatestConfigScheduler({ execute });
+        void scheduler.runNow({ kind: "filmstrip" });
+        await vi.waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+
+        scheduler.schedule({ kind: "analysis" });
+        expect(scheduler.cancel((config) => config.kind === "analysis")).toBe(true);
+        expect(signals[0]?.aborted).toBe(false);
+
+        filmstrip.resolve();
+        await scheduler.whenIdle();
+        expect(execute).toHaveBeenCalledTimes(1);
+    });
+
+    it("aborts matching active work and ignores its eventual completion", async () => {
+        const analysis = deferred<void>();
+        const signals: AbortSignal[] = [];
+        const applied: string[] = [];
+        const scheduler = createLatestConfigScheduler<{ kind: string }>({
+            execute: async (config, signal) => {
+                signals.push(signal);
+                await analysis.promise;
+                if (!signal.aborted) {
+                    applied.push(config.kind);
+                }
+            },
+        });
+        void scheduler.runNow({ kind: "analysis" });
+        await vi.waitFor(() => expect(signals).toHaveLength(1));
+
+        expect(scheduler.cancel((config) => config.kind === "analysis")).toBe(true);
+        expect(signals[0]?.aborted).toBe(true);
+        analysis.resolve();
+        await scheduler.whenIdle();
+
+        expect(applied).toEqual([]);
+    });
+
     it("reports invalid configuration without issuing a request", async () => {
         const execute = vi.fn(async () => {});
         const onInvalid = vi.fn();
