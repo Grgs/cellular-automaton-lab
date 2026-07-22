@@ -1011,7 +1011,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         # Boards carry their friendly catalog label (not the raw geometry
         # key), replacing a named board preserves its wall position, the dock's
         # ⊞ jumps straight to the searchable tiling checklist, and a board's
-        # persistent upper-right × drops it with one debounced re-run.
+        # persistent upper-right × drops it instantly without rebuilding.
         case = self._case()
         case.page.add_init_script(
             "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
@@ -1145,14 +1145,11 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         ]
         case.assertEqual(unexpected_console, [])
 
-    def test_wall_rapid_board_removal_holds_the_two_board_minimum(self) -> None:
-        # Board removals coalesce into one debounced rebuild, so the displayed
-        # strip still shows the pre-removal boards while more × clicks land. A
-        # burst of removals -- faster than the rebuild, the way an impatient
-        # user drags the wall down -- must still stop at the two-board minimum
-        # instead of racing past it and collapsing the running wall to the
-        # empty hero. Regression guard for the debounce-race that let the strip
-        # empty out.
+    def test_wall_local_removal_reconciles_pending_setup_and_keyboard_state(self) -> None:
+        # A setup edit queued inside the scheduler must be rebased onto the
+        # survivor set, never restore a board removed during the debounce. The
+        # same local transaction closes stale pickers and restores keyboard
+        # focus to a useful surviving control.
         case = self._case()
         case.page.add_init_script(
             "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
@@ -1162,32 +1159,108 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#wall-view-btn")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
-        # The strip exists before the initial rebuild settles; wait for the wall
-        # to go idle (remove controls enabled) so the burst is not swallowed by
-        # the in-flight-rebuild guard.
+        expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
+        labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
+
+        # Reach the setup field through the visible sheet, then dispatch the
+        # input and keyboard-focused removal in one task to pin the debounce
+        # ordering deterministically.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
+        wall_generations = case.page.locator(
+            ".compare-form label", has_text="Wall generations"
+        ).locator("input")
+        expect(wall_generations).to_be_visible()
+        removal_state = case.page.evaluate(
+            """() => {
+                const generations = [...document.querySelectorAll('.compare-form label')]
+                    .find((label) => label.textContent?.includes('Wall generations'))
+                    ?.querySelector('input');
+                const remove = document.querySelector('.compare-filmstrip-remove');
+                if (!(generations instanceof HTMLInputElement) || !(remove instanceof HTMLButtonElement)) {
+                    throw new Error('missing pending-removal controls');
+                }
+                generations.value = String(Number(generations.value) + 1);
+                generations.dispatchEvent(new Event('input', { bubbles: true }));
+                remove.focus();
+                remove.click();
+                return {
+                    count: document.querySelectorAll('.compare-filmstrip-board').length,
+                    activeLabel: document.activeElement?.getAttribute('aria-label'),
+                };
+            }"""
+        )
+        case.assertEqual(removal_state["count"], 3)
+        case.assertEqual(removal_state["activeLabel"], f"Remove {labels_before[1]} from the wall")
+        case.page.click(".compare-config-sheet-close")
+
+        # The queued run settles with the setup change and the same three
+        # survivors. A stale four-board completion would fail both count/order
+        # and leave the setup action stale rather than Up to date.
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Up to date", timeout=60_000)
+        self._expect(".compare-filmstrip-board").to_have_count(3)
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(), labels_before[1:]
+        )
+        self._expect(".compare-stage-caption").to_contain_text("3 tilings")
+
+        # Removing while the Add search owns focus closes and clears the picker,
+        # focuses the stable Add button, and the next Enter reopens immediately.
+        add_button = case.page.locator(".compare-filmstrip-add")
+        add_button.press("Enter")
+        self._expect(".compare-board-tiling-picker-search").to_be_focused()
+        case.page.evaluate("() => document.querySelector('.compare-filmstrip-remove')?.click()")
+        self._expect(".compare-filmstrip-board").to_have_count(2)
+        case.assertEqual(case.page.locator(".compare-board-tiling-picker").count(), 0)
+        expect(add_button).to_be_focused()
+        add_button.press("Enter")
+        self._expect(".compare-board-tiling-picker").to_be_visible()
+        self._expect(".compare-board-tiling-picker-search").to_be_focused()
+        case.page.click(".compare-board-tiling-picker-close")
+
+        case.page.click('.compare-filmstrip-btn[aria-label="Play / pause"]')
+        self._expect(".compare-status").to_contain_text("Playing 2 tilings")
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_rapid_board_removal_holds_the_two_board_minimum(self) -> None:
+        # Removal is local and instant now (the board drops in place with no
+        # rebuild), so a burst can no longer outrun a debounced rebuild -- but
+        # the two-board floor must still hold. Fire every × in a single JS task,
+        # the way an impatient user drags the wall down, and confirm the wall
+        # settles at exactly two boards instead of collapsing to the empty hero.
+        case = self._case()
+        case.page.add_init_script(
+            "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
+        )
+        case.reload_page(wait_until="load")
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        # Wait for the wall to go idle (remove controls enabled) so the burst is
+        # not swallowed by the initial in-flight-rebuild guard.
         expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
 
-        # Use real pointer input at three displayed × controls before the
-        # debounced rebuild swaps the strip. The second accepted click reaches
-        # the floor and disables every remove control synchronously; the third
-        # pointer click therefore lands on a disabled button and must be ignored
-        # by the browser rather than relying on a synthetic event bypass.
-        remove_buttons = case.page.locator(".compare-filmstrip-remove")
-        remove_boxes = [remove_buttons.nth(index).bounding_box() for index in range(3)]
-        if any(box is None for box in remove_boxes):
-            raise AssertionError("rapid-removal controls must have layout boxes")
-        for index, box in enumerate(remove_boxes):
-            assert box is not None
-            case.page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
-            if index == 1:
-                case.assertTrue(remove_buttons.nth(2).is_disabled())
+        # Dispatch a click on every × captured at once, in one task. The first
+        # two are accepted; the rest are judged against the pending two-board
+        # selection and refused, so the wall cannot drop below its floor.
+        case.page.evaluate(
+            """() => {
+                document.querySelectorAll('.compare-filmstrip-remove').forEach((button) => {
+                    button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                });
+            }"""
+        )
 
         # The wall settles at the floor -- two boards, never the collapsed hero
         # -- and the survivors' remove controls stay visible, disabled, and
         # explained rather than silently allowing the wall to empty.
         self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
-        self._expect(".compare-status").to_contain_text("2 tilings")
-        self._expect(".compare-status").not_to_contain_text("Select at least two tilings")
         self._expect(".compare-stage-hero").not_to_be_visible()
         remove_buttons = case.page.locator(".compare-filmstrip-remove")
         case.assertEqual(remove_buttons.count(), 2)

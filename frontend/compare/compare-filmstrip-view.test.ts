@@ -326,6 +326,116 @@ describe("createFilmstripView", () => {
         expect(minimumButtons[0]?.title).toBe("Keep at least two tilings on the wall");
     });
 
+    it("removeBoard drops a slot in place, keeps the clock, and unfocuses the hero", async () => {
+        const { view } = mountView({ onRemoveBoard: vi.fn() });
+        await view.load(
+            filmstrip(
+                [
+                    tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }]),
+                    tiling("hex", [{ a: 1 }, { b: 1 }, { c: 1 }]),
+                    tiling("tri", [{ a: 1 }, { b: 1 }, { c: 1 }]),
+                ],
+                3,
+            ),
+            { initialFrame: 1 },
+        );
+        view.focus("hex");
+        expect(view.currentFrameIndex()).toBe(1);
+        const survivor = view.element.querySelectorAll<HTMLElement>(".compare-filmstrip-board")[1];
+
+        // Removing a non-hero board drops just its slot; the clock and the hero
+        // are untouched, including the survivor's DOM identity.
+        expect(view.removeBoard("square")).toBe(true);
+        expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(view.element.querySelector(".compare-filmstrip-board")).toBe(survivor);
+        expect(view.element.querySelector('[aria-label="Remove square from the wall"]')).toBeNull();
+        expect(view.currentFrameIndex()).toBe(1);
+        expect(view.element.querySelector(".compare-filmstrip-board.is-hero")).not.toBeNull();
+
+        // Removing the hero returns to the gallery.
+        expect(view.removeBoard("hex")).toBe(true);
+        expect(view.element.querySelector(".compare-filmstrip-board.is-hero")).toBeNull();
+        expect(view.element.querySelectorAll(".compare-filmstrip-board")).toHaveLength(1);
+
+        // A geometry no longer on the wall is a no-op.
+        expect(view.removeBoard("square")).toBe(false);
+    });
+
+    it("restores keyboard focus after board-chrome and hero-toolbelt removal", async () => {
+        const { view } = mountView({ onRemoveBoard: vi.fn() });
+        await view.load(
+            filmstrip(
+                [
+                    tiling("square", [{ a: 1 }]),
+                    tiling("hex", [{ a: 1 }]),
+                    tiling("tri", [{ a: 1 }]),
+                    tiling("penrose", [{ a: 1 }]),
+                ],
+                1,
+            ),
+        );
+
+        view.element
+            .querySelector<HTMLButtonElement>('[aria-label="Remove square from the wall"]')
+            ?.focus();
+        expect(view.removeBoard("square")).toBe(true);
+        expect(document.activeElement).toBe(
+            view.element.querySelector('[aria-label="Remove hex from the wall"]'),
+        );
+
+        view.focus("hex");
+        const toolbelt = document.createElement("div");
+        const removeFromHero = document.createElement("button");
+        toolbelt.append(removeFromHero);
+        view.setHeroToolbelt(toolbelt);
+        removeFromHero.focus();
+        expect(view.removeBoard("hex")).toBe(true);
+
+        const successor = view.element.querySelector<HTMLElement>(".compare-filmstrip-board");
+        expect(document.activeElement).toBe(successor);
+        expect(successor?.getAttribute("aria-label")).toContain("tri");
+    });
+
+    it("closes an open Add picker during removal and reopens it on the first activation", async () => {
+        const { view } = mountView({
+            onAddBoard: vi.fn(),
+            onRemoveBoard: vi.fn(),
+            tilingOptions: [
+                pickerOption("square", "Square"),
+                pickerOption("hex", "Hexagonal"),
+                pickerOption("tri", "Triangular"),
+                pickerOption("penrose", "Penrose"),
+            ],
+        });
+        await view.load(
+            filmstrip(
+                [
+                    tiling("square", [{ a: 1 }]),
+                    tiling("hex", [{ a: 1 }]),
+                    tiling("tri", [{ a: 1 }]),
+                ],
+                1,
+            ),
+        );
+
+        const addButton = view.element.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+        addButton?.click();
+        expect(
+            document.activeElement?.classList.contains("compare-board-tiling-picker-search"),
+        ).toBe(true);
+
+        expect(view.removeBoard("square")).toBe(true);
+        expect(view.element.querySelector(".compare-board-tiling-picker")).toBeNull();
+        expect(view.element.querySelector(".compare-filmstrip-add")).toBe(addButton);
+        expect(document.activeElement).toBe(addButton);
+
+        addButton?.click();
+        expect(view.element.querySelector(".compare-board-tiling-picker")).not.toBeNull();
+        expect(
+            document.activeElement?.classList.contains("compare-board-tiling-picker-search"),
+        ).toBe(true);
+    });
+
     it("opens a searchable in-wall picker and adds an available tiling", async () => {
         const added: string[] = [];
         const { view } = mountView({
